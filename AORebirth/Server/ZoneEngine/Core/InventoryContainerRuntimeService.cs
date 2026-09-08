@@ -56,7 +56,7 @@ namespace ZoneEngine.Core
 
         public BankSlot[] ResolveBankSlots(ICharacter character)
         {
-            return character.BaseInventory.Pages[(int)IdentityType.Bank].ToInventoryArray();
+            return character.BaseInventory.Pages[(int)IdentityType.BankByRef].ToInventoryArray();
         }
 
         public IEnumerable<IInventoryPage> CharacterStateInventoryPages(ICharacter character)
@@ -307,7 +307,7 @@ namespace ZoneEngine.Core
             IInventoryPage receivingPage;
             if ((toPlacement == 0x6f) && (target.Type == IdentityType.IncomingTradeWindow))
             {
-                receivingPage = itemReceiver.BaseInventory.Pages[(int)IdentityType.Bank];
+                receivingPage = itemReceiver.BaseInventory.Pages[(int)IdentityType.BankByRef];
             }
             else
             {
@@ -503,7 +503,7 @@ namespace ZoneEngine.Core
             IInventoryPage inventoryPage;
             IInventoryPage bankPage;
             if (!character.BaseInventory.Pages.TryGetValue((int)IdentityType.Inventory, out inventoryPage)
-                || !character.BaseInventory.Pages.TryGetValue((int)IdentityType.Bank, out bankPage))
+                || !character.BaseInventory.Pages.TryGetValue((int)IdentityType.BankByRef, out bankPage))
             {
                 LogUtil.Debug(
                     DebugInfoDetail.Error,

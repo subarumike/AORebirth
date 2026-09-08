@@ -59,7 +59,12 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             SpawnService spawn = playfield.GetRequiredService<SpawnService>();
-            NpcCharacter npc = spawn.Spawn(hash, context.Player.Position, context.Player.Rotation, level);
+            NpcCharacter npc = spawn.Spawn(
+                hash,
+                context.Player.Position,
+                context.Player.Rotation,
+                level,
+                SpawnSource.Command);
 
             GmCommandFeedback.Send(
                 context.Session,

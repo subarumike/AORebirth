@@ -14,23 +14,27 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         private readonly Dictionary<int, Cell> _cells = [];
         private readonly float _cellWorldSize;
+        private readonly float _worldSizeX;
+        private readonly float _worldSizeZ;
         private readonly int _numZonesX;
         private readonly int _numZonesZ;
         private readonly bool _outdoor;
 
         internal CellGrid(PlayfieldMetaData? metaData, int visibilityNeighborLevel)
         {
-            if (metaData != null && metaData.TryGetOutdoorGrid(out int zonesX, out int zonesZ, out float cellSize))
+            if (metaData != null
+                && metaData.TryGetOutdoorGrid(out int zonesX, out int zonesZ, out float cellSize)
+                && metaData.TryGetOutdoorWorldSize(out float worldSizeX, out float worldSizeZ))
             {
                 _outdoor = true;
                 _numZonesX = Math.Max(1, zonesX);
                 _numZonesZ = Math.Max(1, zonesZ);
                 _cellWorldSize = cellSize;
+                _worldSizeX = worldSizeX;
+                _worldSizeZ = worldSizeZ;
                 int cellCount = _numZonesX * _numZonesZ;
                 for (int i = 0; i < cellCount; i++)
-                {
                     _cells[i] = new Cell(i, this, visibilityNeighborLevel);
-                }
             }
             else
             {
@@ -38,6 +42,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 _numZonesX = 1;
                 _numZonesZ = 1;
                 _cellWorldSize = PlayfieldMetaData.CellSize;
+                _worldSizeX = 0f;
+                _worldSizeZ = 0f;
                 _cells[0] = new Cell(0, this, visibilityNeighborLevel);
             }
         }
@@ -48,25 +54,47 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         internal int NumZonesZ => _numZonesZ;
 
-        internal bool TryResolveCell(Vector3 position, out Cell cell)
+        internal float WorldSizeX => _worldSizeX;
+
+        internal float WorldSizeZ => _worldSizeZ;
+
+        /// <summary>
+        /// Outdoor XZ must lie in <c>[0, worldSize)</c>. Indoor layouts always accept.
+        /// </summary>
+        internal bool ContainsWorldPosition(float x, float z)
         {
             if (!_outdoor)
-            {
-                cell = _cells[0];
                 return true;
-            }
 
-            if (!TryGetCellId(position, out int cellId))
-            {
-                cell = null!;
-                return false;
-            }
+            return x >= 0f
+                && z >= 0f
+                && x < _worldSizeX
+                && z < _worldSizeZ;
+        }
 
-            cell = _cells[cellId];
+        /// <summary>
+        /// Resolves the cell for <paramref name="position"/>. Outdoor indices are floored then
+        /// clamped into the grid so a registered dynel always has a cell.
+        /// </summary>
+        internal Cell ResolveCell(Vector3 position)
+        {
+            if (!_outdoor)
+                return _cells[0];
+
+            TryGetCellId(position, out int cellId, clampToGrid: true);
+            return _cells[cellId];
+        }
+
+        internal bool TryResolveCell(Vector3 position, out Cell cell)
+        {
+            cell = ResolveCell(position);
             return true;
         }
 
-        internal bool TryGetCellId(Vector3 position, out int cellId)
+        internal bool TryGetCellId(Vector3 position, out int cellId) =>
+            TryGetCellId(position, out cellId, clampToGrid: true);
+
+        internal bool TryGetCellId(Vector3 position, out int cellId, bool clampToGrid)
         {
             if (!_outdoor)
             {
@@ -82,7 +110,12 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
             int ix = (int)Math.Floor(position.xf / _cellWorldSize);
             int iz = (int)Math.Floor(position.zf / _cellWorldSize);
-            if (ix < 0 || iz < 0 || ix >= _numZonesX || iz >= _numZonesZ)
+            if (clampToGrid)
+            {
+                ix = Math.Clamp(ix, 0, _numZonesX - 1);
+                iz = Math.Clamp(iz, 0, _numZonesZ - 1);
+            }
+            else if (ix < 0 || iz < 0 || ix >= _numZonesX || iz >= _numZonesZ)
             {
                 cellId = NonLocalCellId;
                 return false;
@@ -105,6 +138,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             iz = cellId / _numZonesX;
         }
 
+        /// <summary>
+        /// Legacy outdoor index: <c>_cellCountWidth * heightIndex + widthIndex</c>.
+        /// </summary>
         internal int GetCellId(int ix, int iz) => (iz * _numZonesX) + ix;
 
         internal bool TryGetCell(int cellId, out Cell cell) => _cells.TryGetValue(cellId, out cell!);
@@ -113,9 +149,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             results.Clear();
             if (!_outdoor || radius < 0 || _numZonesX <= 0 || _numZonesZ <= 0 || cellId < 0)
-            {
                 return;
-            }
 
             GetCellCoords(cellId, out int cx, out int cz);
             int minX = Math.Max(0, cx - radius);
@@ -126,18 +160,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             for (int iz = minZ; iz <= maxZ; iz++)
             {
                 for (int ix = minX; ix <= maxX; ix++)
-                {
                     results.Add(GetCellId(ix, iz));
-                }
             }
         }
 
         internal int ChebyshevDistance(int cellA, int cellB)
         {
             if (!_outdoor)
-            {
                 return int.MaxValue;
-            }
 
             GetCellCoords(cellA, out int ax, out int az);
             GetCellCoords(cellB, out int bx, out int bz);
@@ -149,23 +179,17 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             foreach (KeyValuePair<int, Cell> pair in _cells)
             {
                 if (pair.Value.OccupantCount > 0)
-                {
                     yield return pair.Key;
-                }
             }
         }
 
         internal IEnumerable<Dynel> OccupantsInCell(int cellId)
         {
             if (!_cells.TryGetValue(cellId, out Cell? cell))
-            {
                 yield break;
-            }
 
             foreach (Dynel dynel in cell.Occupants)
-            {
                 yield return dynel;
-            }
         }
     }
 }

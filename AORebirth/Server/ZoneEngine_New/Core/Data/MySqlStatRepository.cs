@@ -18,6 +18,11 @@ namespace ZoneEngine_New.Core.Data
             "SELECT StatId, StatValue FROM stats "
             + "WHERE Type = @Type AND Instance = @Instance";
 
+        private const string UpsertSql =
+            "INSERT INTO stats (Type, Instance, StatId, StatValue) "
+            + "VALUES (@Type, @Instance, @StatId, @StatValue) "
+            + "ON DUPLICATE KEY UPDATE StatValue = @StatValue";
+
         private readonly IZoneLogger _logger;
         private readonly string _connectionString;
 
@@ -68,6 +73,43 @@ namespace ZoneEngine_New.Core.Data
             }
 
             return stats;
+        }
+
+        public void UpsertForCharacter(int characterId, IReadOnlyList<StatRecord> stats)
+        {
+            ArgumentNullException.ThrowIfNull(stats);
+            if (characterId <= 0 || stats.Count == 0)
+                return;
+
+            try
+            {
+                using MySqlConnection connection = new MySqlConnection(_connectionString);
+                connection.Open();
+                using MySqlTransaction transaction = connection.BeginTransaction();
+
+                for (int i = 0; i < stats.Count; i++)
+                {
+                    StatRecord stat = stats[i];
+                    using MySqlCommand command = new MySqlCommand(UpsertSql, connection, transaction);
+                    command.Parameters.AddWithValue("@Type", CharacterStatOwnerType);
+                    command.Parameters.AddWithValue("@Instance", characterId);
+                    command.Parameters.AddWithValue("@StatId", stat.StatId);
+                    command.Parameters.AddWithValue("@StatValue", stat.StatValue);
+                    command.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "StatRepository.UpsertForCharacter failed for {0}",
+                        characterId));
+                throw;
+            }
         }
     }
 }

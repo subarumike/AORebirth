@@ -480,7 +480,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     {
                         Identity = new Identity { Type = IdentityType.Playfield2, Instance = 0x11E6 },
                         Unknown = 0,
-                        Unknown1 = 4,
+                        Version = 4,
                         CharacterCoordinates = new Vector3 { X = 940.0f, Y = 20.0f, Z = 732.0f },
                         Unknown2 = 0x61,
                         PlayfieldId1 = new Identity { Type = IdentityType.Playfield1, Instance = 0x11E6 },
@@ -760,10 +760,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                           Identity = thief,
                                           Unknown = 0,
                                           Specials = new SpecialAttack[0],
-                                          MeleeInit = 32,
-                                          RangedInit = 32,
-                                          PhysicalInit = 32,
-                                          NanoInit = 32,
+                                          CloseCombatInitiative = 32,
+                                          DistanceWeaponInitiative = 32,
+                                          PhysicalProwessInitiative = 32,
+                                          NanoProwessInitiative = 32,
                                           AggDef = 0
                                       };
             CollectionAssert.AreEqual(
@@ -818,10 +818,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                                              Unknown4 = "SIW1"
                                                          }
                                                      },
-                                          MeleeInit = 49,
-                                          RangedInit = 49,
-                                          PhysicalInit = 49,
-                                          NanoInit = 49,
+                                          CloseCombatInitiative = 49,
+                                          DistanceWeaponInitiative = 49,
+                                          PhysicalProwessInitiative = 49,
+                                          NanoProwessInitiative = 49,
                                           AggDef = 0
                                       };
             CollectionAssert.AreEqual(

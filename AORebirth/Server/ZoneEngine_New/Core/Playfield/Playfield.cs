@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Playfield
 {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
 
@@ -12,17 +13,21 @@ namespace ZoneEngine_New.Core.Playfield
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Characters;
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
     /// Playfield instance: GameData metadata, child DI (DynelRegistry, SpawnService), heartbeat.
     /// </summary>
-    public sealed class Playfield : IDisposable
+    public class Playfield : IPlayfield, IDisposable
     {
         private readonly IZoneLogger _logger;
         private readonly IMessageRouter _router;
@@ -30,13 +35,24 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly PlayerHydrator _playerHydrator;
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
-        private readonly ServiceProvider _serviceProvider;
+        private readonly HashItemMinter _hashItems;
+        private readonly IInventoryRepository _inventoryRepository;
+        private readonly IItemInstanceIdAllocator _instanceIds;
+        private readonly InventoryMoveService _inventoryMoves;
+        private readonly InventoryFlushService _inventoryFlush;
+        private readonly TradeService _trades;
+        private readonly CharacterSnapshotService _characterSnapshot;
+        private readonly PlayfieldMetrics _metrics;
+        private ServiceProvider _serviceProvider;
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
         private PlayfieldHeartbeat? _heartBeat;
         private readonly Lock _tickSync = new();
-        private int _nextLootInventoryHandle = 0x70;
+        private int _nextContainerInventoryHandle = 1;
+        // TEMP: WIFU Identity.Instance until real weapon-instance identity allocation exists.
+        private int _nextWeaponInstanceId = 1;
         private bool _disposed;
+        private bool _built;
 
         public Playfield(
             Identity playfieldIdentity,
@@ -45,7 +61,15 @@ namespace ZoneEngine_New.Core.Playfield
             PlayfieldManager playfieldManager,
             PlayerHydrator playerHydrator,
             IGameData gameData,
-            IItemBuilder items)
+            IItemBuilder items,
+            HashItemMinter hashItems,
+            IInventoryRepository inventoryRepository,
+            IItemInstanceIdAllocator instanceIds,
+            InventoryMoveService inventoryMoves,
+            InventoryFlushService inventoryFlush,
+            TradeService trades,
+            CharacterSnapshotService characterSnapshot,
+            IPlayfieldMetricsRegistry metricsRegistry)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
                 playfieldIdentity.Instance,
@@ -56,6 +80,14 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(playerHydrator);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(hashItems);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ArgumentNullException.ThrowIfNull(instanceIds);
+            ArgumentNullException.ThrowIfNull(inventoryMoves);
+            ArgumentNullException.ThrowIfNull(inventoryFlush);
+            ArgumentNullException.ThrowIfNull(trades);
+            ArgumentNullException.ThrowIfNull(characterSnapshot);
+            ArgumentNullException.ThrowIfNull(metricsRegistry);
 
             Identity = playfieldIdentity;
             _logger = playfieldLogger;
@@ -64,7 +96,16 @@ namespace ZoneEngine_New.Core.Playfield
             _playerHydrator = playerHydrator;
             _gameData = gameData;
             _items = items;
+            _hashItems = hashItems;
+            _inventoryRepository = inventoryRepository;
+            _instanceIds = instanceIds;
+            _inventoryMoves = inventoryMoves;
+            _inventoryFlush = inventoryFlush;
+            _trades = trades;
+            _characterSnapshot = characterSnapshot;
+            _metrics = metricsRegistry.GetOrCreate(playfieldIdentity.Instance);
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
+            Geometry = _gameData.GetPlayfieldGeometry(playfieldIdentity.Instance);
 
             _serviceProvider = BuildServices().BuildServiceProvider();
             _dynelRegistry = _serviceProvider.GetRequiredService<DynelRegistry>();
@@ -74,9 +115,42 @@ namespace ZoneEngine_New.Core.Playfield
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Playfield created metadata={0}",
-                    MetaData == null ? "null(indoor)" : "loaded"));
+                    "Playfield created metadata={0} walls={1} dynels={2} doors={3} tilemap={4} surface={5}",
+                    MetaData == null ? "null(indoor)" : "loaded",
+                    Geometry.Walls != null,
+                    Geometry.Dynels != null,
+                    Geometry.Doors != null,
+                    Geometry.Tilemap != null,
+                    Geometry.Surface != null));
         }
+
+        /// <summary>
+        /// Default Build loads static dynels (indoor / non-ACG). Outdoor world construction lives on <see cref="ACGPlayfield"/>.
+        /// </summary>
+        public virtual void Build()
+        {
+            if (_built)
+                return;
+
+            _built = true;
+            Stopwatch sw = Stopwatch.StartNew();
+            int staticDynels = SpawnStaticDynels();
+            sw.Stop();
+            _metrics.RecordBuild(sw.Elapsed.TotalMilliseconds);
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield Build complete id={0} elapsedMs={1} statics=0 wallTriggers=0 portalTriggers=0 doors={2} staticDynels={3}",
+                    Identity.Instance,
+                    sw.ElapsedMilliseconds,
+                    Geometry.Doors?.Doors?.Count ?? 0,
+                    staticDynels));
+        }
+
+        protected PlayfieldMetrics Metrics => _metrics;
+
+        protected int SpawnStaticDynels()
+            => GetRequiredService<SpawnService>().LoadStaticDynels();
 
         /// <summary>Starts the tick thread after the playfield is registered with <see cref="PlayfieldManager"/>.</summary>
         public void StartHeartbeat()
@@ -89,8 +163,28 @@ namespace ZoneEngine_New.Core.Playfield
 
         public Identity Identity { get; }
 
+        protected IZoneLogger Logger => _logger;
+
         /// <summary>Null for playfields with no extracted GameData; those resolve to an indoor layout.</summary>
         public PlayfieldMetaData? MetaData { get; }
+
+        /// <summary>Parsed Walls.dat / Dynels.dat / Doors.dat / Collision.dat; members null when files are missing.</summary>
+        public PlayfieldGeometryData Geometry { get; }
+
+        /// <summary>Zoning needs the destination playfield's geometry, not just this one's.</summary>
+        protected IGameData GameData => _gameData;
+
+        /// <summary>Optional world simulation assigned by <see cref="ACGPlayfield.Build"/>.</summary>
+        public WorldSimulationAccess WorldAccess =>
+            _serviceProvider.GetRequiredService<WorldSimulationAccess>();
+
+        protected void MarkBuilt() => _built = true;
+
+        protected void RegisterWorldServices(WorldSimulation.PlayfieldWorldSimulation world)
+        {
+            ArgumentNullException.ThrowIfNull(world);
+            WorldAccess.Instance = world;
+        }
 
         /// <summary>
         /// Builds a PlayfieldAnarchyF login packet for this playfield.
@@ -135,17 +229,57 @@ namespace ZoneEngine_New.Core.Playfield
             where T : class
             => _serviceProvider.GetRequiredService<T>();
 
-        /// <summary>Client inventory handle for an opened loot bag (0x70..0xFF).</summary>
-        public int AllocateLootInventoryHandle()
+        /// <summary>Client inventory handle for an opened container (bags, corpses, chests). Range 1..ushort.MaxValue.</summary>
+        public int AllocateContainerInventoryHandle()
         {
-            int handle = _nextLootInventoryHandle++;
-            if (_nextLootInventoryHandle > 0xff)
-                _nextLootInventoryHandle = 0x70;
+            int handle = _nextContainerInventoryHandle;
+            if (_nextContainerInventoryHandle == ushort.MaxValue)
+                _nextContainerInventoryHandle = 1;
+            else
+                _nextContainerInventoryHandle++;
+
             return handle;
+        }
+
+        /// <summary>
+        /// TEMP: Playfield-scoped unique id for WeaponItemFullUpdate Identity.Instance.
+        /// Increments on every WIFU build; not tied to inventory item.InstanceId.
+        /// </summary>
+        public int AllocateWeaponInstanceId()
+        {
+            int id = _nextWeaponInstanceId;
+            if (_nextWeaponInstanceId == int.MaxValue)
+                _nextWeaponInstanceId = 1;
+            else
+                _nextWeaponInstanceId++;
+
+            return id;
         }
 
         /// <summary>Called from async I/O tasks. Handlers run on the playfield tick thread.</summary>
         public bool TryEnqueue(PlayfieldInboundItem item) => _inbound.TryEnqueue(item);
+
+        /// <summary>
+        /// Registers a transferred player on this playfield under the tick lock (safe from another PF tick).
+        /// </summary>
+        public void ArriveTransferredPlayer(Player player, AORebirth.Core.Vector.Vector3 position)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(position);
+
+            lock (_tickSync)
+            {
+                ObjectDisposedException.ThrowIf(_disposed, this);
+                GetRequiredService<SpawnService>().ArriveFromTransfer(player, position);
+            }
+        }
+
+        /// <summary>Soft-leave for playfield transfer. Must run on this playfield's tick thread.</summary>
+        public void LeaveTransferredPlayer(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            GetRequiredService<SpawnService>().LeaveForTransfer(player);
+        }
 
         public void Dispose()
         {
@@ -160,33 +294,68 @@ namespace ZoneEngine_New.Core.Playfield
 
             lock (_tickSync)
             {
-                foreach (Player player in _dynelRegistry.PlayerEntities())
+                SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
+                Player[] remaining = [.. _dynelRegistry.PlayerEntities()];
+                foreach (Player player in remaining)
                 {
-                    _playfieldManager.UnregisterPlayer(player);
+                    try
+                    {
+                        spawn.LogoutPlayer(player);
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger.Error(
+                            exception,
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "Shutdown logout failed for character {0}",
+                                player.Identity.Instance));
+                    }
                 }
 
                 _dynelRegistry.Clear();
             }
 
+            OnDispose();
             _serviceProvider.Dispose();
+        }
+
+        protected virtual void OnDispose()
+        {
         }
 
         public void Tick(double deltaTime)
         {
+            long tickStart = Stopwatch.GetTimestamp();
             lock (_tickSync)
             {
                 if (_disposed)
-                {
                     return;
-                }
 
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
                 _inbound.Drain(_router, spawn);
-                spawn.DespawnExpiredLinkDeadPlayers();
-                spawn.DespawnExpiredCorpses();
+                spawn.Tick();
+                _inventoryMoves.Tick(this, deltaTime);
+                _trades.Tick(this, deltaTime);
+
+                WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
+                if (world != null)
+                {
+                    long worldStart = Stopwatch.GetTimestamp();
+                    world.TickSoftTriggers(this, deltaTime);
+                    _metrics.WorldSimTick.Record(ElapsedMilliseconds(worldStart));
+                }
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
             }
+
+            _metrics.TickExecution.Record(ElapsedMilliseconds(tickStart));
+        }
+
+        private static double ElapsedMilliseconds(long startTimestamp)
+        {
+            long elapsed = Stopwatch.GetTimestamp() - startTimestamp;
+            return elapsed * 1000.0 / Stopwatch.Frequency;
         }
 
         private IServiceCollection BuildServices()
@@ -199,12 +368,33 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);
             services.AddSingleton(_items);
+            services.AddSingleton(_hashItems);
+            services.AddSingleton(_inventoryRepository);
+            services.AddSingleton(_instanceIds);
+            services.AddSingleton(_inventoryMoves);
+            services.AddSingleton(_inventoryFlush);
+            services.AddSingleton(_trades);
+            services.AddSingleton(_characterSnapshot);
+            services.AddSingleton(new WorldSimulationAccess());
             services.Add(new ServiceDescriptor(typeof(Identity), Identity));
             if (MetaData != null)
             {
                 services.AddSingleton(MetaData);
             }
 
+            services.AddSingleton(Geometry);
+            if (Geometry.Walls != null)
+                services.AddSingleton(Geometry.Walls);
+            if (Geometry.Dynels != null)
+                services.AddSingleton(Geometry.Dynels);
+            if (Geometry.Doors != null)
+                services.AddSingleton(Geometry.Doors);
+            if (Geometry.Tilemap != null)
+                services.AddSingleton(Geometry.Tilemap);
+            if (Geometry.Surface != null)
+                services.AddSingleton(Geometry.Surface);
+
+            services.AddSingleton<IUploadedNanoRepository, MySqlUploadedNanoRepository>();
             services.AddSingleton<DynelRegistry>();
             services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));
             services.AddSingleton<SpawnService>();

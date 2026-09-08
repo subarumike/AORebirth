@@ -267,6 +267,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                     recipient.Session.Send(wifu);
             }
 
+            foreach (MessageBody companion in source.BuildSpawnCompanionMessages())
+                recipient.Session.Send(companion);
+
             return true;
         }
 

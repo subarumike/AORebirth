@@ -4,14 +4,16 @@ namespace ZoneEngine_New.Core.Entities
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using AORebirth.Enums;
-
+    using ZoneEngine_New.Core.Helpers;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
-    using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Playfield.Locality;
 
     /// <summary>
     /// Online player character. Session is attached at login via SpawnService.
@@ -31,6 +33,10 @@ namespace ZoneEngine_New.Core.Entities
 
         public override bool IsPlayer => true;
 
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+
         public IZoneSession? Session { get; set; }
 
         public PlayerConnectionPhase ConnectionPhase { get; set; } = PlayerConnectionPhase.Online;
@@ -46,9 +52,47 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Current look-at / selection target from the client.</summary>
         public Identity Target { get; set; } = Identity.None;
 
-        internal IZoneLogger Logger { get; }
+        internal IZoneLogger Logger { get; set; }
 
-        public override void Rebase() => RebaseWeapons();
+        public override void Rebase()
+        {
+            RebaseMaxHealth();
+            RebaseMaxNano();
+            RebaseEquipBonuses();
+            RebaseWeapons();
+        }
+
+        void RebaseMaxHealth()
+        {
+            if (!MaxHealthCalculator.TryCompute(Stats, out int maxHealth))
+                return;
+
+            Stats.Set(CharacterStat.MaxHealth, maxHealth, StatDetail.Base, dirty: true);
+        }
+
+        void RebaseMaxNano()
+        {
+            if (!MaxNanoCalculator.TryCompute(Stats, out int maxNano))
+                return;
+
+            Stats.Set(CharacterStat.MaxNanoEnergy, maxNano, StatDetail.Base, dirty: true);
+        }
+
+        void RebaseEquipBonuses()
+        {
+            if (!Inventory.IsHydrated)
+            {
+                Stats.ClearBonuses(dirty: true);
+                return;
+            }
+
+            Inventory.ApplyWearBonuses(Stats);
+        }
+
+        const CharacterStat WeaponMeshRightStat = (CharacterStat)1006;
+        const CharacterStat WeaponMeshLeftStat = (CharacterStat)1007;
+        const CharacterStat OverrideTextureWeaponRightStat = (CharacterStat)1009;
+        const CharacterStat OverrideTextureWeaponLeftStat = (CharacterStat)1010;
 
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
         {
@@ -61,13 +105,40 @@ namespace ZoneEngine_New.Core.Entities
             return messages;
         }
 
-        void TryAddEquippedHandWifu(List<WeaponItemFullUpdateMessage> messages, int equipmentSlot)
+        /// <summary>
+        /// Called after a Weapons / Armor / Implant / Social slot changes.
+        /// Hand weapons announce WIFU.
+        /// </summary>
+        public void OnEquipmentChanged(EquipSlot slot)
         {
-            Item? item = Inventory.Equipment.Content.GetValueOrDefault(equipmentSlot);
-            if (item == null)
+            if (slot.Page != IdentityType.WeaponPage)
                 return;
 
-            WeaponItemFullUpdateMessage? message = TryBuildWeaponItemFullUpdate(item, equipmentSlot);
+            if (slot.Placement is not ((int)WeaponSlots.Righthand or (int)WeaponSlots.LeftHand))
+                return;
+
+            WeaponItemFullUpdateMessage? wifu = TryBuildEquippedHandWifu(slot.Placement);
+            if (wifu == null)
+                return;
+
+            Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, wifu, includeSelf: true);
+        }
+
+        WeaponItemFullUpdateMessage? TryBuildEquippedHandWifu(int equipmentSlot)
+        {
+            if (!Inventory.IsHydrated)
+                return null;
+
+            Item? item = Inventory.Equipment.Content.GetValueOrDefault(equipmentSlot);
+            if (item == null)
+                return null;
+
+            return TryBuildWeaponItemFullUpdate(item, equipmentSlot);
+        }
+
+        void TryAddEquippedHandWifu(List<WeaponItemFullUpdateMessage> messages, int equipmentSlot)
+        {
+            WeaponItemFullUpdateMessage? message = TryBuildEquippedHandWifu(equipmentSlot);
             if (message != null)
                 messages.Add(message);
         }
@@ -102,6 +173,108 @@ namespace ZoneEngine_New.Core.Entities
 
             bool maCombined = (right?.IsMaCombinedWeapon() == true) || (left?.IsMaCombinedWeapon() == true);
             FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
+
+            if (!SyncHandWeaponMeshes())
+                return;
+
+            if (Session?.State != SessionState.InPlay)
+                return;
+
+            AppearanceUpdateMessage appearance = BuildAppearanceUpdateMessage();
+            Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, appearance, includeSelf: true);
+        }
+
+        bool SyncHandWeaponMeshes()
+        {
+            bool changed = SyncOneHandWeaponMesh(
+                (int)WeaponSlots.Righthand,
+                meshPosition: 1,
+                WeaponMeshRightStat,
+                OverrideTextureWeaponRightStat);
+            changed |= SyncOneHandWeaponMesh(
+                (int)WeaponSlots.LeftHand,
+                meshPosition: 2,
+                WeaponMeshLeftStat,
+                OverrideTextureWeaponLeftStat);
+            return changed;
+        }
+
+        bool SyncOneHandWeaponMesh(
+            int equipmentSlot,
+            byte meshPosition,
+            CharacterStat meshStat,
+            CharacterStat overrideTextureStat)
+        {
+            Item? item = Inventory.Equipment.Content.GetValueOrDefault(equipmentSlot);
+            int meshId = 0;
+            int overrideTexture = 0;
+
+            if (item != null)
+            {
+                meshId = NormalizeVisualValue(item.GetStat(meshStat));
+                if (meshId <= 0)
+                    meshId = NormalizeVisualValue(item.GetStat(CharacterStat.WeaponMesh));
+                overrideTexture = NormalizeVisualValue(item.GetStat(overrideTextureStat));
+            }
+
+            int existingIndex = -1;
+            for (int i = 0; i < Meshes.Count; i++)
+            {
+                if (Meshes[i].Position != meshPosition)
+                    continue;
+
+                existingIndex = i;
+                break;
+            }
+
+            if (meshId <= 0)
+            {
+                if (existingIndex < 0)
+                    return false;
+
+                Meshes.RemoveAt(existingIndex);
+                Stats.Set(meshStat, 0, StatDetail.Base, dirty: true);
+                return true;
+            }
+
+            if (existingIndex >= 0)
+            {
+                Mesh existing = Meshes[existingIndex];
+                if (existing.Id == (uint)meshId
+                    && existing.OverrideTextureId == overrideTexture
+                    && existing.Layer == (byte)MeshLayer.Equipment)
+                {
+                    return false;
+                }
+
+                Meshes[existingIndex] = new Mesh
+                {
+                    Position = meshPosition,
+                    Id = (uint)meshId,
+                    OverrideTextureId = overrideTexture,
+                    Layer = (byte)MeshLayer.Equipment
+                };
+            }
+            else
+            {
+                Meshes.Add(
+                    new Mesh
+                    {
+                        Position = meshPosition,
+                        Id = (uint)meshId,
+                        OverrideTextureId = overrideTexture,
+                        Layer = (byte)MeshLayer.Equipment
+                    });
+            }
+
+            Stats.Set(meshStat, meshId, StatDetail.Base, dirty: true);
+            return true;
+        }
+
+        static int NormalizeVisualValue(int value)
+        {
+            value = StatCollection.Normalize(value);
+            return value <= 0 ? 0 : value;
         }
 
         public void EnterLinkDead(TimeSpan timeout)
@@ -119,6 +292,337 @@ namespace ZoneEngine_New.Core.Entities
             LinkDeadUntilUtc = null;
             Session = session;
             session.BindPlayer(this);
+        }
+
+        static readonly CharacterStat[] FullCharacterStats1 =
+        [
+            CharacterStat.State,
+            CharacterStat.UnarmedTemplateInstance,
+            CharacterStat.InvadersKilled,
+            CharacterStat.KilledByInvaders,
+            CharacterStat.AccountFlags,
+            CharacterStat.VP,
+            CharacterStat.UnsavedXP,
+            CharacterStat.NanoFocusLevel,
+            CharacterStat.Specialization,
+            CharacterStat.ShadowBreedTemplate,
+            CharacterStat.ShadowBreed,
+            CharacterStat.LastPerkResetTime,
+            CharacterStat.SocialStatus,
+            CharacterStat.PlayerOptions,
+            // CharacterStat.TempSaveTeamID,
+            // CharacterStat.TempSavePlayfield,
+            // CharacterStat.TempSaveX,
+            // CharacterStat.TempSaveY,
+            CharacterStat.VisualFlags,
+            CharacterStat.PVPDuelKills,
+            CharacterStat.PVPDuelDeaths,
+            CharacterStat.PVPProfessionDuelKills,
+            CharacterStat.PVPProfessionDuelDeaths,
+            CharacterStat.PVPRankedSoloKills,
+            CharacterStat.PVPRankedSoloDeaths,
+            CharacterStat.PVPRankedTeamKills,
+            CharacterStat.PVPRankedTeamDeaths,
+            CharacterStat.PVPSoloScore,
+            CharacterStat.PVPTeamScore,
+            CharacterStat.PVPDuelScore,
+            //CharacterStat.UnreadMailCount,
+            //CharacterStat.LastMailCheckTime,
+            CharacterStat.SavedXP,
+            CharacterStat.Flags,
+            //CharacterStat.Features,
+            CharacterStat.ApartmentsAllowed,
+            CharacterStat.ApartmentsOwned,
+            CharacterStat.Scale,
+            CharacterStat.VisualProfession,
+            // CharacterStat.NanoAC,
+            CharacterStat.CurrentNano,
+            CharacterStat.MaxNanoEnergy,
+            CharacterStat.LastConcretePlayfieldInstance,
+            CharacterStat.MapOptions,
+            CharacterStat.MapsA,
+            CharacterStat.MapsB,
+            CharacterStat.MapsC,
+            CharacterStat.MapsD,
+            CharacterStat.MissionBits1,
+            CharacterStat.MissionBits2,
+            // CharacterStat.MissionBits3,
+            // CharacterStat.MissionBits4,
+            // CharacterStat.MissionBits5,
+            // CharacterStat.MissionBits6,
+            // CharacterStat.MissionBits7,
+            // CharacterStat.MissionBits8,
+            // CharacterStat.MissionBits9,
+            // CharacterStat.MissionBits10,
+            // CharacterStat.MissionBits11,
+            // CharacterStat.MissionBits12,
+            CharacterStat.SessionTime,
+            // CharacterStat.AutoAttackFlags,
+            CharacterStat.PersonalResearchLevel,
+            CharacterStat.GlobalResearchLevel,
+            CharacterStat.PersonalResearchGoal,
+            CharacterStat.GlobalResearchGoal,
+            CharacterStat.BattlestationSide,
+            CharacterStat.BattlestationRep,
+            CharacterStat.Members,
+        ];
+
+        static readonly CharacterStat[] FullCharacterStats2 =
+        [
+            // CharacterStat.VeteranPoints,
+            // CharacterStat.MonthsPaid,
+            CharacterStat.PaidPoints,
+            // CharacterStat.AutoAttackFlags,
+            CharacterStat.XPKillRange,
+            CharacterStat.InPlay,
+            CharacterStat.Health,
+            CharacterStat.MaxHealth,
+            CharacterStat.Psychic,
+            CharacterStat.Sense,
+            CharacterStat.Intelligence,
+            CharacterStat.Stamina,
+            CharacterStat.Agility,
+            CharacterStat.Strength,
+            CharacterStat.Attitude,
+            CharacterStat.AlignmentClanTokens,
+            CharacterStat.Cash,
+            CharacterStat.Profession,
+            CharacterStat.AggDef,
+            CharacterStat.Icon,
+            CharacterStat.Mesh,
+            CharacterStat.RunSpeed,
+            CharacterStat.DeadTimer,
+            CharacterStat.Team,
+            CharacterStat.Breed,
+            CharacterStat.Sex,
+            CharacterStat.LastSaveXP,
+            CharacterStat.NextXP,
+            CharacterStat.LastXP,
+            CharacterStat.Level,
+            CharacterStat.XP,
+            CharacterStat.IP,
+            CharacterStat.Mass,
+            CharacterStat.CurrentMass,
+            CharacterStat.ItemType,
+            CharacterStat.PreviousHealth,
+            CharacterStat.CurrentState,
+            CharacterStat.Age,
+            CharacterStat.Side,
+            CharacterStat.WaitState,
+            CharacterStat.VehicleWater,
+            CharacterStat.MultiMelee,
+            CharacterStat.MultiRanged,
+            CharacterStat.RangedEnergy,
+            CharacterStat.RadiationAC,
+            CharacterStat.SensoryImprovement,
+            CharacterStat.BowSpecialAttack,
+            CharacterStat.Burst,
+            CharacterStat.FullAuto,
+            CharacterStat.MapNavigation,
+            CharacterStat.VehicleAir,
+            CharacterStat.VehicleGround,
+            CharacterStat.BreakingEntry,
+            CharacterStat.Concealment,
+            CharacterStat.Chemistry,
+            CharacterStat.Psychology,
+            CharacterStat.ComputerLiteracy,
+            CharacterStat.NanoProgramming,
+            CharacterStat.Pharmaceuticals,
+            CharacterStat.WeaponSmithing,
+            CharacterStat.QuantumFT,
+            CharacterStat.AttackSpeed,
+            CharacterStat.EvadeClsC,
+            CharacterStat.DodgeRanged,
+            CharacterStat.DuckExp,
+            CharacterStat.BodyDevelopment,
+            CharacterStat.AimedShot,
+            CharacterStat.FlingShot,
+            CharacterStat.NanoCInit,
+            CharacterStat.FastAttack,
+            CharacterStat.SneakAttack,
+            CharacterStat.Parry,
+            CharacterStat.Dimach,
+            CharacterStat.Riposte,
+            CharacterStat.Brawl,
+            CharacterStat.Tutoring,
+            CharacterStat.Swimming,
+            CharacterStat.Adventuring,
+            CharacterStat.Perception,
+            CharacterStat.TrapDisarm,
+            CharacterStat.NanoPool,
+            CharacterStat.SpaceTime,
+            CharacterStat.MaterialCreation,
+            CharacterStat.PsychologicalModification,
+            CharacterStat.BiologicalMetamorphosis,
+            CharacterStat.MaterialMetamorphosis,
+            CharacterStat.ElectricalEngineering,
+            CharacterStat.MechanicalEngineering,
+            CharacterStat.Treatment,
+            CharacterStat.FirstAid,
+            CharacterStat.PhysicalInit,
+            CharacterStat.RangedInit,
+            CharacterStat.MeleeInit,
+            CharacterStat.AssaultRifle,
+            CharacterStat.Shotgun,
+            CharacterStat.MGSMG,
+            CharacterStat.Rifle,
+            CharacterStat.Pistol,
+            CharacterStat.Bow,
+            CharacterStat.HeavyWeapons,
+            CharacterStat.Grenade,
+            CharacterStat.SharpObject,
+            CharacterStat._2hBlunt,
+            CharacterStat.Piercing,
+            CharacterStat.Skill2hEdged,
+            CharacterStat.MeleeEnergy,
+            CharacterStat._1hEdged,
+            CharacterStat._1hBlunt,
+            CharacterStat.MartialArts,
+            // CharacterStat.MetaType,
+            CharacterStat.TitleLevel,
+            CharacterStat.GmLevel,
+            CharacterStat.FireAC,
+            CharacterStat.PoisonAC,
+            CharacterStat.ColdAC,
+            CharacterStat.ChemicalAC,
+            CharacterStat.EnergyAC,
+            CharacterStat.MeleeAC,
+            CharacterStat.ProjectileAC,
+            CharacterStat.RP,
+            // CharacterStat.SpecialCondition,
+            CharacterStat.SK,
+            CharacterStat.Expansion,
+            CharacterStat.ClanRedeemed,
+            CharacterStat.ClanConserver,
+            CharacterStat.ClanDevoted,
+            CharacterStat.OTUnredeemed,
+            CharacterStat.OTOperator,
+            CharacterStat.OTFollowers,
+            CharacterStat.GOS,
+            CharacterStat.ClanVanguards,
+            CharacterStat.OTTrans,
+            CharacterStat.ClanGaia,
+            CharacterStat.OTMed,
+            CharacterStat.ClanSentinels,
+            CharacterStat.OTArmedForces,
+            CharacterStat.SocialStatus,
+            CharacterStat.PlayerID,
+            CharacterStat.KilledByInvaders,
+            CharacterStat.InvadersKilled,
+            CharacterStat.AlienLevel,
+            CharacterStat.AlienNextXP,
+            CharacterStat.AlienXP,
+        ];
+
+        static readonly CharacterStat[] FullCharacterStats3 =
+        [
+            CharacterStat.InsurancePercentage,
+            CharacterStat.ProfessionLevel,
+            CharacterStat.PrevMovementMode,
+            CharacterStat.CurrentMovementMode,
+            CharacterStat.Fatness,
+            CharacterStat.Race,
+            CharacterStat.TeamSide,
+            CharacterStat.BeltSlots,
+        ];
+
+        static readonly CharacterStat[] FullCharacterStats4 =
+        [
+            CharacterStat.AbsorbProjectileAC,
+            CharacterStat.AbsorbMeleeAC,
+            CharacterStat.AbsorbEnergyAC,
+            CharacterStat.AbsorbChemicalAC,
+            CharacterStat.AbsorbRadiationAC,
+            CharacterStat.AbsorbColdAC,
+            CharacterStat.AbsorbNanoAC,
+            CharacterStat.AbsorbFireAC,
+            CharacterStat.AbsorbPoisonAC,
+            CharacterStat.TemporarySkillReduction,
+            CharacterStat.InsuranceTime,
+            CharacterStat.MaxNCU,
+            CharacterStat.CurrentNano,
+            CharacterStat.MapFlags,
+            CharacterStat.ChangeSideCount,
+        ];
+
+        public override InfoPacketMessage BuildInfoPacket()
+        {
+            // Player inspect is Character (0x40), same as ZoneEngine CharacterInfoPacket.
+            // N3 Unknown=0. Unknown=1 is the monster path and stuck the official client
+            // on "Please wait". Reference Unknowns=1 is CharacterInfoPacket.Unknown1.
+            // Do not copy Name into FirstName — official 0x40 uses the DB first/last
+            // strings (often empty). Unique name already arrives in SCFU.Name.
+            int level = Stats.GetOrOne(CharacterStat.Level);
+            int profession = ClampProfession(Stats.GetOrZero(CharacterStat.Profession));
+            int visualProfession = ClampProfession(Stats.GetOrZero(CharacterStat.VisualProfession));
+            int health = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
+            int maxHealth = Math.Max(1, Stats.GetOrZero(CharacterStat.MaxHealth));
+            if (health > maxHealth)
+                health = maxHealth;
+
+            string firstName = FirstName ?? string.Empty;
+            string lastName = LastName ?? string.Empty;
+
+            Logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "InfoPacket player={0} name={1} first='{2}' last='{3}' level={4} prof={5} hp={6}/{7}",
+                    Identity.Instance,
+                    Name ?? string.Empty,
+                    firstName,
+                    lastName,
+                    level,
+                    profession,
+                    health,
+                    maxHealth));
+
+            return new InfoPacketMessage
+            {
+                Identity = Identity,
+                Unknown = 0,
+                Type = InfoPacketType.Character,
+                Info = new CharacterInfoPacket
+                {
+                    Unknown1 = 0x01,
+                    Profession = (Profession)profession,
+                    Level = ClampToByte(level),
+                    TitleLevel = ClampToByte(Stats.GetOrOne(CharacterStat.TitleLevel)),
+                    VisualProfession = (Profession)visualProfession,
+                    SideXp = 0,
+                    Health = health,
+                    MaxHealth = maxHealth,
+                    BreedHostility = 0,
+                    OrganizationId = null,
+                    FirstName = firstName,
+                    LastName = lastName,
+                    LegacyTitle = string.Empty,
+                    Unknown2 = 0,
+                    OrganizationRank = null,
+                    TowerFields = null,
+                    CityPlayfieldId = 0,
+                    Towers = null,
+                    InvadersKilled = 0,
+                    KilledByInvaders = 0,
+                    AiLevel = Stats.GetOrZero(CharacterStat.AlienLevel),
+                    PvpDuelWins = 0,
+                    PvpDuelLoses = 0,
+                    PvpProfessionDuelLoses = 0,
+                    PvpSoloKills = 0,
+                    PvpTeamKills = 0,
+                    PvpSoloScore = 0,
+                    PvpTeamScore = 0,
+                    PvpDuelScore = 0
+                }
+            };
+        }
+
+        static int ClampProfession(int value)
+        {
+            if (value < 0)
+                return 0;
+            if (value > (int)Profession.Shade)
+                return (int)Profession.Shade;
+            return value;
         }
 
         /// <summary>
@@ -144,128 +648,10 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown6 = []
             };
 
-            var statGroup1 = new List<GameTuple<int, uint>>
-            {
-                new() { Value1 = (int)CharacterStat.State, Value2 = (uint)stats.Get(CharacterStat.State, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.UnarmedTemplateInstance, Value2 = (uint)stats.Get(CharacterStat.UnarmedTemplateInstance, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.InvadersKilled, Value2 = (uint)stats.Get(CharacterStat.InvadersKilled, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.KilledByInvaders, Value2 = (uint)stats.Get(CharacterStat.KilledByInvaders, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.AccountFlags, Value2 = (uint)stats.Get(CharacterStat.AccountFlags, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.VP, Value2 = (uint)stats.Get(CharacterStat.VP, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.UnsavedXP, Value2 = (uint)stats.Get(CharacterStat.UnsavedXP, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.NanoFocusLevel, Value2 = (uint)stats.Get(CharacterStat.NanoFocusLevel, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.Specialization, Value2 = (uint)stats.Get(CharacterStat.Specialization, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.ShadowBreedTemplate, Value2 = (uint)stats.Get(CharacterStat.ShadowBreedTemplate, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.ShadowBreed, Value2 = (uint)stats.Get(CharacterStat.ShadowBreed, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.LastPerkResetTime, Value2 = (uint)stats.Get(CharacterStat.LastPerkResetTime, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.SocialStatus, Value2 = (uint)stats.Get(CharacterStat.SocialStatus, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.PlayerOptions, Value2 = (uint)stats.Get(CharacterStat.PlayerOptions, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.TempSaveTeamID, Value2 = (uint)stats.Get(CharacterStat.TempSaveTeamID, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.TempSavePlayfield, Value2 = (uint)stats.Get(CharacterStat.TempSavePlayfield, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.TempSaveX, Value2 = (uint)stats.Get(CharacterStat.TempSaveX, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.TempSaveY, Value2 = (uint)stats.Get(CharacterStat.TempSaveY, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.VisualFlags, Value2 = (uint)stats.Get(CharacterStat.VisualFlags, StatDetail.Base) },
-                // PvP / commendation / mission-bit / research / battlestation stats not wired yet.
-                // new() { Value1 = (int)CharacterStat.SavedXP, Value2 = (uint)stats.Get(CharacterStat.SavedXP, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Flags, Value2 = (uint)stats.Get(CharacterStat.Flags, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.Features, Value2 = (uint)stats.Get(CharacterStat.Features, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.ApartmentsAllowed, Value2 = (uint)stats.Get(CharacterStat.ApartmentsAllowed, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.ApartmentsOwned, Value2 = (uint)stats.Get(CharacterStat.ApartmentsOwned, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Scale, Value2 = (uint)stats.Get(CharacterStat.Scale, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.VisualProfession, Value2 = (uint)stats.Get(CharacterStat.VisualProfession, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.NanoAC, Value2 = (uint)stats.Get(CharacterStat.NanoAC, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.CurrentNano, Value2 = (uint)stats.Get(CharacterStat.CurrentNano, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.MaxNanoEnergy, Value2 = (uint)stats.Get(CharacterStat.MaxNanoEnergy, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.LastConcretePlayfieldInstance, Value2 = (uint)stats.Get(CharacterStat.LastConcretePlayfieldInstance, StatDetail.Base) },
-                // Map / mission / auto-attack / research stats not wired yet.
-                // new() { Value1 = (int)CharacterStat.MapOptions, Value2 = (uint)stats.Get(CharacterStat.MapOptions, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.MapAreaPart1, Value2 = (uint)stats.Get(CharacterStat.MapAreaPart1, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.MapAreaPart2, Value2 = (uint)stats.Get(CharacterStat.MapAreaPart2, StatDetail.Base) },
-                // ActiveNanos-derived MapsC override not implemented yet.
-                // new() { Value1 = (int)CharacterStat.MapAreaPart3, Value2 = (uint)stats.Get(CharacterStat.MapAreaPart3, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.MapAreaPart4, Value2 = (uint)stats.Get(CharacterStat.MapAreaPart4, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.MissionBits1, Value2 = (uint)stats.Get(CharacterStat.MissionBits1, StatDetail.Base) },
-            };
-
-            var statGroup2 = new List<GameTuple<int, uint>>
-            {
-                // new() { Value1 = (int)CharacterStat.VeteranPoints, Value2 = (uint)stats.Get(CharacterStat.VeteranPoints, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.MonthsPaid, Value2 = (uint)stats.Get(CharacterStat.MonthsPaid, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.PaidPoints, Value2 = (uint)stats.Get(CharacterStat.PaidPoints, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.AutoAttackFlags, Value2 = (uint)stats.Get(CharacterStat.AutoAttackFlags, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.XPKillRange, Value2 = (uint)stats.Get(CharacterStat.XPKillRange, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.InPlay, Value2 = (uint)stats.Get(CharacterStat.InPlay, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Health, Value2 = (uint)stats.Get(CharacterStat.Health, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.MaxHealth, Value2 = (uint)stats.Get(CharacterStat.MaxHealth, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Psychic, Value2 = (uint)stats.Get(CharacterStat.Psychic, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Sense, Value2 = (uint)stats.Get(CharacterStat.Sense, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Intelligence, Value2 = (uint)stats.Get(CharacterStat.Intelligence, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Stamina, Value2 = (uint)stats.Get(CharacterStat.Stamina, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Agility, Value2 = (uint)stats.Get(CharacterStat.Agility, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Strength, Value2 = (uint)stats.Get(CharacterStat.Strength, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Attitude, Value2 = (uint)stats.Get(CharacterStat.Attitude, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.AlignmentClanTokens, Value2 = (uint)stats.Get(CharacterStat.AlignmentClanTokens, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Cash, Value2 = (uint)stats.Get(CharacterStat.Cash, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Profession, Value2 = (uint)stats.Get(CharacterStat.Profession, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.AggDef, Value2 = (uint)stats.Get(CharacterStat.AggDef, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.Icon, Value2 = (uint)stats.Get(CharacterStat.Icon, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Mesh, Value2 = (uint)stats.Get(CharacterStat.Mesh, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.RunSpeed, Value2 = (uint)stats.Get(CharacterStat.RunSpeed, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.DeadTimer, Value2 = (uint)stats.Get(CharacterStat.DeadTimer, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Team, Value2 = (uint)stats.Get(CharacterStat.Team, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Breed, Value2 = (uint)stats.Get(CharacterStat.Breed, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Sex, Value2 = (uint)stats.Get(CharacterStat.Sex, StatDetail.Base) },
-                // XP bar stats omitted from FullCharacter in legacy; login uses standalone StatMessage.
-                // new() { Value1 = (int)CharacterStat.LastSaveXP, Value2 = (uint)stats.Get(CharacterStat.LastSaveXP, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.NextXP, Value2 = (uint)stats.Get(CharacterStat.NextXP, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.LastXP, Value2 = (uint)stats.Get(CharacterStat.LastXP, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Level, Value2 = (uint)stats.Get(CharacterStat.Level, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.XP, Value2 = (uint)stats.Get(CharacterStat.XP, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.IP, Value2 = (uint)stats.Get(CharacterStat.IP, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Mass, Value2 = (uint)stats.Get(CharacterStat.Mass, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.ItemType, Value2 = (uint)stats.Get(CharacterStat.ItemType, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.PreviousHealth, Value2 = (uint)stats.Get(CharacterStat.PreviousHealth, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.CurrentState, Value2 = (uint)stats.Get(CharacterStat.CurrentState, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Age, Value2 = (uint)stats.Get(CharacterStat.Age, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Side, Value2 = (uint)stats.Get(CharacterStat.Side, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.WaitState, Value2 = (uint)stats.Get(CharacterStat.WaitState, StatDetail.Base) },
-                // Skill / AC / weapon / perk stats not wired yet.
-                // new() { Value1 = (int)CharacterStat.DriveWater, Value2 = (uint)stats.Get(CharacterStat.DriveWater, StatDetail.Base) },
-                // new() { Value1 = (int)CharacterStat.MeleeMultiple, Value2 = (uint)stats.Get(CharacterStat.MeleeMultiple, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.TitleLevel, Value2 = (uint)stats.Get(CharacterStat.TitleLevel, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.GmLevel, Value2 = (uint)stats.Get(CharacterStat.GmLevel, StatDetail.Base) },
-                new() { Value1 = (int)CharacterStat.Expansion, Value2 = (uint)stats.Get(CharacterStat.Expansion, StatDetail.Base) },
-                // Faction / alien / social / player-id stats not wired yet.
-                // new() { Value1 = (int)CharacterStat.ClanRedeemed, Value2 = (uint)stats.Get(CharacterStat.ClanRedeemed, StatDetail.Base) },
-            };
-
-            var statGroup3 = new List<GameTuple<byte, byte>>
-            {
-                // new() { Value1 = (byte)CharacterStat.InsurancePercentage, Value2 = (byte)stats.Get(CharacterStat.InsurancePercentage, StatDetail.Base) },
-                new() { Value1 = (byte)CharacterStat.ProfessionLevel, Value2 = (byte)stats.Get(CharacterStat.ProfessionLevel, StatDetail.Base) },
-                // new() { Value1 = (byte)CharacterStat.PrevMovementMode, Value2 = (byte)stats.Get(CharacterStat.PrevMovementMode, StatDetail.Base) },
-                new() { Value1 = (byte)CharacterStat.CurrentMovementMode, Value2 = (byte)stats.Get(CharacterStat.CurrentMovementMode, StatDetail.Base) },
-                new() { Value1 = (byte)CharacterStat.Fatness, Value2 = (byte)stats.Get(CharacterStat.Fatness, StatDetail.Base) },
-                new() { Value1 = (byte)CharacterStat.Race, Value2 = (byte)stats.Get(CharacterStat.Race, StatDetail.Base) },
-                // new() { Value1 = (byte)CharacterStat.TeamSide, Value2 = (byte)stats.Get(CharacterStat.TeamSide, StatDetail.Base) },
-                new() { Value1 = (byte)CharacterStat.BeltSlots, Value2 = (byte)stats.Get(CharacterStat.BeltSlots, StatDetail.Base) },
-            };
-
-            var statGroup4 = new List<GameTuple<byte, short>>
-            {
-                // Absorb / insurance / temp-skill stats not wired yet.
-                // new() { Value1 = (byte)CharacterStat.AbsorbProjectileAC, Value2 = (short)stats.Get(CharacterStat.AbsorbProjectileAC, StatDetail.Base) },
-                new() { Value1 = (byte)CharacterStat.CurrentNano, Value2 = (short)stats.Get(CharacterStat.CurrentNano, StatDetail.Base) },
-                // new() { Value1 = (byte)CharacterStat.MaxNanoEnergy, Value2 = (short)stats.Get(CharacterStat.MaxNanoEnergy, StatDetail.Base) },
-                // new() { Value1 = (byte)CharacterStat.MaxNCU, Value2 = (short)stats.Get(CharacterStat.MaxNCU, StatDetail.Base) },
-                new() { Value1 = (byte)CharacterStat.MapFlags, Value2 = (short)stats.Get(CharacterStat.MapFlags, StatDetail.Base) },
-                // new() { Value1 = (byte)CharacterStat.ChangeSideCount, Value2 = (short)stats.Get(CharacterStat.ChangeSideCount, StatDetail.Base) },
-            };
-
-            message.Stats1 = statGroup1.ToArray();
-            message.Stats2 = statGroup2.ToArray();
-            message.Stats3 = statGroup3.ToArray();
-            message.Stats4 = statGroup4.ToArray();
+            message.Stats1 = BuildFullCharacterIntStats(stats, FullCharacterStats1);
+            message.Stats2 = BuildFullCharacterIntStats(stats, FullCharacterStats2);
+            message.Stats3 = BuildFullCharacterByteStats(stats, FullCharacterStats3);
+            message.Stats4 = BuildFullCharacterShortStats(stats, FullCharacterStats4);
 
             message.Unknown9 = 0;
             message.Unknown10 = 0;
@@ -281,6 +667,54 @@ namespace ZoneEngine_New.Core.Entities
 
             LogFullCharacterInventory(message);
             return message;
+        }
+
+        static GameTuple<int, uint>[] BuildFullCharacterIntStats(StatCollection stats, CharacterStat[] ids)
+        {
+            var tuples = new GameTuple<int, uint>[ids.Length];
+            for (int i = 0; i < ids.Length; i++)
+            {
+                CharacterStat id = ids[i];
+                tuples[i] = new GameTuple<int, uint>
+                {
+                    Value1 = (int)id,
+                    Value2 = (uint)stats.GetOrZero(id)
+                };
+            }
+
+            return tuples;
+        }
+
+        static GameTuple<byte, byte>[] BuildFullCharacterByteStats(StatCollection stats, CharacterStat[] ids)
+        {
+            var tuples = new GameTuple<byte, byte>[ids.Length];
+            for (int i = 0; i < ids.Length; i++)
+            {
+                CharacterStat id = ids[i];
+                tuples[i] = new GameTuple<byte, byte>
+                {
+                    Value1 = (byte)id,
+                    Value2 = (byte)stats.GetOrZero(id)
+                };
+            }
+
+            return tuples;
+        }
+
+        static GameTuple<byte, short>[] BuildFullCharacterShortStats(StatCollection stats, CharacterStat[] ids)
+        {
+            var tuples = new GameTuple<byte, short>[ids.Length];
+            for (int i = 0; i < ids.Length; i++)
+            {
+                CharacterStat id = ids[i];
+                tuples[i] = new GameTuple<byte, short>
+                {
+                    Value1 = (byte)id,
+                    Value2 = (short)stats.GetOrZero(id)
+                };
+            }
+
+            return tuples;
         }
 
         void LogFullCharacterInventory(FullCharacterMessage message)
@@ -312,12 +746,5 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
-        protected override byte[] CreateMovementStatus(int movementMode) =>
-        [
-            0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            (byte)movementMode, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
-            0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        ];
     }
 }

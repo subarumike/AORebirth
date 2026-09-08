@@ -25,11 +25,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AODB" Version="1.0.6" />
+    <PackageReference Include="BepuPhysics" Version="2.5.0-beta.25" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
     <PackageReference Include="NLog" Version="6.1.4" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,16 +55,15 @@
       <Link>Config.xml</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\Libraries\Source\AORebirth.Database\Migrations\*.sql"
-             Exclude="..\..\Libraries\Source\AORebirth.Database\Migrations\*account*">
+    <Content Include="..\..\Libraries\Source\AORebirth.Database\Migrations\*.sql" Exclude="..\..\Libraries\Source\AORebirth.Database\Migrations\*account*">
       <Link>Migrations\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="..\..\Datafiles\items.dat">
-      <Link>items.dat</Link>
+    <Content Include="..\..\Libraries\Source\AORebirth.Database\SqlTables\*.sql">
+      <Link>SqlTables\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <!-- Full GameData tree (MobTemplates + Playfields metadata/spawns) for locality and hash spawns. -->
+    </Content>
+    <!-- Full GameData tree (items.dat, MobTemplates, Playfields metadata/spawns). -->
     <Content Include="..\..\GameData\**\*">
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -84,8 +86,26 @@
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemClass.cs">
       <Link>Enums\ItemClass.cs</Link>
     </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemSource.cs">
+      <Link>Enums\ItemSource.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ItemFlags.cs">
+      <Link>Enums\ItemFlags.cs</Link>
+    </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponSlots.cs">
       <Link>Enums\WeaponSlots.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponFlags.cs">
+      <Link>Enums\WeaponFlags.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\MeshLayer.cs">
+      <Link>Enums\MeshLayer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\CanFlags.cs">
+      <Link>Enums\CanFlags.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\FunctionType.cs">
+      <Link>Enums\FunctionType.cs</Link>
     </Compile>
   </ItemGroup>
 </Project>

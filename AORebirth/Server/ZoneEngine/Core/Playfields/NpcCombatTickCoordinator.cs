@@ -1193,10 +1193,10 @@ namespace AORebirth.Core.Playfields
                         Identity = attacker.Identity,
                         Unknown = 0,
                         Specials = new SpecialAttack[0],
-                        MeleeInit = 0,
-                        RangedInit = 0,
-                        PhysicalInit = 0,
-                        NanoInit = 0,
+                        CloseCombatInitiative = 0,
+                        DistanceWeaponInitiative = 0,
+                        PhysicalProwessInitiative = 0,
+                        NanoProwessInitiative = 0,
                         AggDef = 0
                     });
                 this.playfield.Announce(
@@ -1263,10 +1263,10 @@ namespace AORebirth.Core.Playfields
                 {
                     Identity = attacker.Identity,
                     Specials = CreatePlayerOwnedAttackPetSpecialAttacks(),
-                    MeleeInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                    RangedInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                    PhysicalInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                    NanoInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    CloseCombatInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    DistanceWeaponInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    PhysicalProwessInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                    NanoProwessInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
                     AggDef = 0
                 });
             this.playfield.Announce(

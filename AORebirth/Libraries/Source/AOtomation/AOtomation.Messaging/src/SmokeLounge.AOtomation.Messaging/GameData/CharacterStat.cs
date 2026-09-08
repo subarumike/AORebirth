@@ -1270,6 +1270,9 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         Type = 0x000003E9, 
 
-        Instance = 0x000003EA, 
+        Instance = 0x000003EA,
+
+        /// <summary>Sentinel for missing / unset stat and item attribute values.</summary>
+        Unset = 1234567890,
     }
 }

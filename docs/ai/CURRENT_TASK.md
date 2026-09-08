@@ -2,13 +2,13 @@
 
 ## Active
 
-Complete DAO Phase 1 infrastructure and the Phase 2 mission-persistence slice.
-Mission runtime must depend on `IMissionDao`, with SQL and provider APIs owned by
-`AORebirth.Database`, while preserving existing schema, transaction order,
-packets, and gameplay. Character aggregate persistence and every later DAO phase
-remain out of scope. The architecture guard, mission regressions,
-Windows/Linux compatibility, and 30-check disposable MySQL DAO validation pass.
-Governed exact-SHA acceptance remains before any live promotion.
+Reconcile Delmus's nine `origin/zoneengine` commits through `4a5e86e2` with the
+current master line. Keep Legacy ZoneEngine as the production/default route;
+ZoneEngine_New remains development-only. The merged source passes the Legacy and
+ZoneEngine_New builds, its 47-test focused suite, the 1,127-test AOtomation suite,
+and all 12 mandatory repository gates. The included additive item-instance
+database migrations remain unapplied pending explicit schema approval. Governed
+exact-SHA Windows acceptance remains before the merge is promoted to master.
 
 ## Prior active checkpoint
 

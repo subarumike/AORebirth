@@ -23,9 +23,46 @@ namespace AORebirth.Core.GameData
 
         public const string MobTemplatesFileName = "MobTemplates.json";
 
-        public const string LootTableFileName = "LootTable.json";
+        public const string ItemTemplatesFileName = "ItemTemplates.json";
+
+        public const string HashInstancesFileName = "HashInstances.json";
+
+        public const string VendingMachinesFileName = "VendingMachines.json";
 
         public const string MonsterDataFileName = "MonsterData.json";
+
+        public const string XpFileName = "Xp.json";
+
+        public const string ItemsFileName = "items.dat";
+
+        public const string WallsFileName = "Walls.dat";
+
+        public const string DynelsFileName = "Dynels.dat";
+
+        public const string DoorsFileName = "Doors.dat";
+
+        public const string CollisionFileName = "Collision.dat";
+
+        public const string SurfacesFileName = "Surfaces.dat";
+
+        public const string DestinationsFileName = "Destinations.dat";
+
+        /// <summary>
+        /// Outdoor SurfaceResource RDB instance id for a locality cell:
+        /// <c>(playfieldId &lt;&lt; 16) | (cellId &amp; 0xFFFF)</c>.
+        /// </summary>
+        public static int CollisionSurfaceResourceRecordId(int playfieldId, int cellId)
+        {
+            if (playfieldId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(playfieldId),
+                    playfieldId,
+                    "A positive playfield id is required.");
+            }
+
+            return (playfieldId << 16) | (cellId & 0xFFFF);
+        }
 
         public static string PlayfieldRelativeDirectory(int playfieldId)
         {
@@ -55,6 +92,36 @@ namespace AORebirth.Core.GameData
         public static string PlayfieldSpawnsRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), SpawnsFileName);
+        }
+
+        public static string PlayfieldWallsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), WallsFileName);
+        }
+
+        public static string PlayfieldDynelsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DynelsFileName);
+        }
+
+        public static string PlayfieldDoorsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DoorsFileName);
+        }
+
+        public static string PlayfieldCollisionRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), CollisionFileName);
+        }
+
+        public static string PlayfieldDestinationsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DestinationsFileName);
+        }
+
+        public static string PlayfieldSurfacesRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), SurfacesFileName);
         }
     }
 }

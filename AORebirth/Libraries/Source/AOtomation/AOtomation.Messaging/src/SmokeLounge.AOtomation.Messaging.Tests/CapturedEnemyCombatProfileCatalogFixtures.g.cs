@@ -20,15 +20,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     internal sealed class CapturedEnemySpecialAttackWeaponPacketFixture
     {
-        internal CapturedEnemySpecialAttackWeaponPacketFixture(string packetId, string bodyHex, int sourceType, int sourceIdentity, int unknown5)
+        internal CapturedEnemySpecialAttackWeaponPacketFixture(string packetId, string bodyHex, int sourceType, int sourceIdentity, int aggDef)
         {
-            this.PacketId = packetId; this.BodyHex = bodyHex; this.SourceType = sourceType; this.SourceIdentity = sourceIdentity; this.Unknown5 = unknown5;
+            this.PacketId = packetId; this.BodyHex = bodyHex; this.SourceType = sourceType; this.SourceIdentity = sourceIdentity; this.AggDef = aggDef;
         }
         internal string PacketId { get; private set; }
         internal string BodyHex { get; private set; }
         internal int SourceType { get; private set; }
         internal int SourceIdentity { get; private set; }
-        internal int Unknown5 { get; private set; }
+        internal int AggDef { get; private set; }
     }
 
     internal sealed class CapturedEnemyAttackPacketFixture

@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Inventory
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Data;
@@ -26,10 +28,68 @@ namespace ZoneEngine_New.Core.Inventory
             int lowId,
             int highId,
             int quality,
+            ItemSource source,
             int stackCount = 1,
             int instanceId = 0,
             Identity? identity = null,
             byte[]? statsBlob = null)
+        {
+            ItemTemplate definition = CreateTemplate(lowId, highId, quality);
+            ApplyStatsBlob(definition, statsBlob);
+
+            int clampedQuality = definition.Quality;
+
+            int resolvedStack = stackCount;
+            if (definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats) && stackFromStats > 0)
+                resolvedStack = stackFromStats;
+
+            Item item = new()
+            {
+                InstanceId = instanceId,
+                Identity = ResolveMintedIdentity(
+                    identity,
+                    definition.DynelType != 0 ? definition.DynelType : definition.ItemType,
+                    instanceId),
+                LowId = lowId,
+                HighId = highId,
+                Quality = clampedQuality,
+                StackCount = Math.Max(1, resolvedStack),
+                Source = source,
+                Definition = definition
+            };
+            item.ApplyContainerIdentityIfBag();
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Item created name={0} low={1} high={2} ql={3} itemType={4} dynelType={5} statItemType={6} identity={7}:{8}",
+                    item.Name,
+                    item.LowId,
+                    item.HighId,
+                    item.Quality,
+                    definition.ItemType,
+                    definition.DynelType,
+                    item.GetStat(CharacterStat.ItemType),
+                    item.Identity.Type,
+                    item.Identity.Instance));
+            return item;
+        }
+
+        static Identity ResolveMintedIdentity(Identity? identity, int itemType, int instanceId)
+        {
+            if (identity is Identity supplied && supplied.Type != IdentityType.None)
+                return supplied;
+
+            if (itemType == 0)
+                return identity ?? Identity.None;
+
+            return new Identity
+            {
+                Type = (IdentityType)itemType,
+                Instance = instanceId
+            };
+        }
+
+        public ItemTemplate CreateTemplate(int lowId, int highId, int quality)
         {
             ItemTemplate low = ResolveTemplate(lowId);
             ItemTemplate high = highId == lowId || !_catalog.TryGet(highId, out ItemTemplate? highTemplate)
@@ -37,23 +97,7 @@ namespace ZoneEngine_New.Core.Inventory
                 : highTemplate!;
 
             int clampedQuality = ClampQuality(quality, low.Quality, high.Quality);
-            ItemTemplate definition = BuildEffectiveDefinition(low, high, clampedQuality);
-            ApplyStatsBlob(definition, statsBlob);
-
-            int resolvedStack = stackCount;
-            if (definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats) && stackFromStats > 0)
-                resolvedStack = stackFromStats;
-
-            return new Item
-            {
-                InstanceId = instanceId,
-                Identity = identity ?? Identity.None,
-                LowId = lowId,
-                HighId = highId,
-                Quality = clampedQuality,
-                StackCount = Math.Max(1, resolvedStack),
-                Definition = definition
-            };
+            return BuildEffectiveDefinition(low, high, clampedQuality);
         }
 
         public bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item)
@@ -69,9 +113,12 @@ namespace ZoneEngine_New.Core.Inventory
                     row.LowId,
                     row.HighId,
                     row.Quality,
+                    row.Source,
                     row.StackCount,
                     row.InstanceId,
                     identity);
+                item.IsPersisted = true;
+                item.ApplyContainerIdentityIfBag();
                 return true;
             }
             catch (Exception exception)
@@ -137,6 +184,7 @@ namespace ZoneEngine_New.Core.Inventory
                 Quality = quality,
                 Flags = low.Flags,
                 ItemType = low.ItemType,
+                DynelType = low.DynelType,
                 MultipleCount = LerpInt(low.MultipleCount, high.MultipleCount, factor),
                 Stats = LerpIntMap(low.Stats, high.Stats, factor),
                 Attack = LerpIntMap(low.Attack, high.Attack, factor),
@@ -169,6 +217,7 @@ namespace ZoneEngine_New.Core.Inventory
                 Quality = quality,
                 Flags = source.Flags,
                 ItemType = source.ItemType,
+                DynelType = source.DynelType,
                 MultipleCount = source.MultipleCount,
                 Stats = new Dictionary<CharacterStat, int>(source.Stats),
                 Attack = new Dictionary<CharacterStat, int>(source.Attack),

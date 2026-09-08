@@ -108,7 +108,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(zoneClient, "(int)IdentityType.ArmorPage");
             StringAssert.Contains(zoneClient, "(int)IdentityType.ImplantPage");
             StringAssert.Contains(zoneClient, "(int)IdentityType.SocialPage");
-            StringAssert.Contains(zoneClient, "(int)IdentityType.Bank");
+            StringAssert.Contains(zoneClient, "(int)IdentityType.BankByRef");
             StringAssert.Contains(zoneClient, "|| !page.IsHydrated");
             StringAssert.Contains(character, "public bool TryClaimReconnectOwnership(out bool preserveLogoutSitPosture)");
             StringAssert.Contains(character, "public bool WaitForLogoutTimerDisposalToComplete(int timeoutMilliseconds)");

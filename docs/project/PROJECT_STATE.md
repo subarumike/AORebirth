@@ -9,6 +9,13 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Delmus's nine `origin/zoneengine` commits through `4a5e86e2` are reconciled
+  with the current master line as development-only ZoneEngine_New work. Legacy
+  ZoneEngine remains the production/default route. Both engine builds, the
+  47-test ZoneEngine_New suite, the 1,127-test AOtomation suite, and all 12
+  mandatory repository gates pass. The additive item-instance migrations are
+  tracked but unapplied; no database, Linux production, or live-client action
+  was performed as part of reconciliation.
 - DAO refactor Phase 1 infrastructure and the Phase 2 mission-persistence source
   slice are implemented without schema, packet, or gameplay changes. Mission
   runtime, roll-fee persistence, start-area selection, and mission account-key

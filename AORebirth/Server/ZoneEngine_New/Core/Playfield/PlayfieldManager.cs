@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Playfield
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Threading;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -10,11 +11,14 @@ namespace ZoneEngine_New.Core.Playfield
     using Utility.Config;
 
     using ZoneEngine_New.Core.Characters;
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Trade;
 
     public sealed class PlayfieldManager : IDisposable
     {
@@ -28,6 +32,14 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly PlayerHydrator _playerHydrator;
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
+        private readonly HashItemMinter _hashItems;
+        private readonly IInventoryRepository _inventoryRepository;
+        private readonly IItemInstanceIdAllocator _instanceIds;
+        private readonly InventoryMoveService _inventoryMoves;
+        private readonly InventoryFlushService _inventoryFlush;
+        private readonly TradeService _trades;
+        private readonly CharacterSnapshotService _characterSnapshot;
+        private readonly IPlayfieldMetricsRegistry _metricsRegistry;
         private bool _disposed;
 
         public PlayfieldManager(
@@ -35,19 +47,43 @@ namespace ZoneEngine_New.Core.Playfield
             IMessageRouter router,
             PlayerHydrator playerHydrator,
             IGameData gameData,
-            IItemBuilder items)
+            IItemBuilder items,
+            HashItemMinter hashItems,
+            IInventoryRepository inventoryRepository,
+            IItemInstanceIdAllocator instanceIds,
+            InventoryMoveService inventoryMoves,
+            InventoryFlushService inventoryFlush,
+            TradeService trades,
+            CharacterSnapshotService characterSnapshot,
+            IPlayfieldMetricsRegistry metricsRegistry)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
             ArgumentNullException.ThrowIfNull(playerHydrator);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(hashItems);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ArgumentNullException.ThrowIfNull(instanceIds);
+            ArgumentNullException.ThrowIfNull(inventoryMoves);
+            ArgumentNullException.ThrowIfNull(inventoryFlush);
+            ArgumentNullException.ThrowIfNull(trades);
+            ArgumentNullException.ThrowIfNull(characterSnapshot);
+            ArgumentNullException.ThrowIfNull(metricsRegistry);
 
             _logger = logger;
             _router = router;
             _playerHydrator = playerHydrator;
             _gameData = gameData;
             _items = items;
+            _hashItems = hashItems;
+            _inventoryRepository = inventoryRepository;
+            _instanceIds = instanceIds;
+            _inventoryMoves = inventoryMoves;
+            _inventoryFlush = inventoryFlush;
+            _trades = trades;
+            _characterSnapshot = characterSnapshot;
+            _metricsRegistry = metricsRegistry;
         }
 
         public static TimeSpan ResolveLinkDeadTimeout()
@@ -81,14 +117,47 @@ namespace ZoneEngine_New.Core.Playfield
                 Instance = playfieldId
             };
 
-            Playfield created = new Playfield(
-                identity,
-                playfieldLogger,
-                _router,
-                this,
-                _playerHydrator,
-                _gameData,
-                _items);
+            Playfield created;
+            if (_gameData.GetPlayfieldMetaData(playfieldId) != null)
+            {
+                created = new ACGPlayfield(
+                    identity,
+                    playfieldLogger,
+                    _router,
+                    this,
+                    _playerHydrator,
+                    _gameData,
+                    _items,
+                    _hashItems,
+                    _inventoryRepository,
+                    _instanceIds,
+                    _inventoryMoves,
+                    _inventoryFlush,
+                    _trades,
+                    _characterSnapshot,
+                    _metricsRegistry);
+            }
+            else
+            {
+                created = new Playfield(
+                    identity,
+                    playfieldLogger,
+                    _router,
+                    this,
+                    _playerHydrator,
+                    _gameData,
+                    _items,
+                    _hashItems,
+                    _inventoryRepository,
+                    _instanceIds,
+                    _inventoryMoves,
+                    _inventoryFlush,
+                    _trades,
+                    _characterSnapshot,
+                    _metricsRegistry);
+            }
+
+            created.Build();
 
             lock (_sync)
             {
@@ -126,6 +195,14 @@ namespace ZoneEngine_New.Core.Playfield
             lock (_sync)
             {
                 return _playersByCharacterId.TryGetValue(characterId, out player!);
+            }
+        }
+
+        public IReadOnlyList<Player> SnapshotPlayers()
+        {
+            lock (_sync)
+            {
+                return _playersByCharacterId.Values.ToList();
             }
         }
 
@@ -174,6 +251,8 @@ namespace ZoneEngine_New.Core.Playfield
 
             foreach (Playfield playfield in playfields)
                 playfield.Dispose();
+
+            _metricsRegistry.Clear();
         }
     }
 }

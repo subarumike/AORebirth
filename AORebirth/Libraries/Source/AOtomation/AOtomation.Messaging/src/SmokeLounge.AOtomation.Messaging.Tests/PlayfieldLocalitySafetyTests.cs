@@ -34,13 +34,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string locality = ReadRepositoryFile(
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocality.cs");
-            string tick = ExtractBlock(locality, "internal void Tick(double deltaTime)");
+            string tick = ExtractBlock(locality, "internal void Tick(");
 
             int safetyIndex = tick.IndexOf(
                 "if (!this.policy.EnableCellHeatScheduling)",
                 StringComparison.Ordinal);
             int allCharactersIndex = tick.IndexOf(
-                "this.tickCallbacks.GetAllCharacters()",
+                "this.dynelRegistry.Characters()",
                 StringComparison.Ordinal);
             int processIndex = tick.IndexOf(
                 "this.ProcessDynelTick(character, deltaTime);",

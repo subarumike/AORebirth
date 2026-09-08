@@ -7,12 +7,15 @@ namespace ZoneEngine_New.Core.GameData
     using System.Text.Json;
     using System.Threading;
 
+    using AODB.Common.RDBObjects;
+
     using AORebirth.Core.GameData;
 
     using Utility;
 
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
     /// Loads and caches the GameData tree from {BaseDirectory}\GameData.
@@ -41,11 +44,17 @@ namespace ZoneEngine_New.Core.GameData
         private readonly IZoneLogger _logger;
         private readonly Dictionary<string, MobTemplate> _mobTemplates =
             new(StringComparer.Ordinal);
-        private readonly Dictionary<string, LootItemPair[]> _lootTables =
-            new(StringComparer.Ordinal);
+        private HashItemCatalog _hashItems = new(
+            new Dictionary<string, string[]>(StringComparer.Ordinal),
+            new Dictionary<string, HashInstance>(StringComparer.Ordinal));
+        private readonly Dictionary<int, VendingMachineDefinition> _vendingMachines = new();
         private readonly Dictionary<int, int> _catMeshByMonsterData = new();
+        private readonly Dictionary<int, XpLevelEntry> _xpLevels = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
         private readonly Dictionary<int, PlayfieldSpawnsData> _playfieldSpawns = new();
+        private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
+        private readonly Lock _exitProxySync = new();
+        private Dictionary<int, int[]>? _exitProxyDoorsByPlayfield;
 
         public GameDataStore(IZoneLogger logger)
         {
@@ -59,8 +68,10 @@ namespace ZoneEngine_New.Core.GameData
 
             EnsureRootExists();
             LoadMobTemplates();
-            LoadLootTables();
+            LoadHashItems();
+            LoadVendingMachines();
             LoadMonsterData();
+            LoadXpLevels();
         }
 
         public string RootPath { get; }
@@ -69,9 +80,26 @@ namespace ZoneEngine_New.Core.GameData
 
         public int MobTemplateCount => _mobTemplates.Count;
 
-        public int LootTableCount => _lootTables.Count;
+        public int HashTemplateCount => _hashItems.CategoryCount;
+
+        public int HashInstanceCount => _hashItems.InstanceCount;
+
+        public int VendingMachineCount => _vendingMachines.Count;
 
         public int MonsterDataCount => _catMeshByMonsterData.Count;
+
+        public int XpLevelCount => _xpLevels.Count;
+
+        public bool TryGetXpLevel(int level, out XpLevelEntry entry)
+        {
+            if (level <= 0)
+            {
+                entry = null!;
+                return false;
+            }
+
+            return _xpLevels.TryGetValue(level, out entry!);
+        }
 
         public bool TryGetMobTemplate(string hash, out MobTemplate template)
         {
@@ -96,16 +124,27 @@ namespace ZoneEngine_New.Core.GameData
                     hash));
         }
 
-        public bool TryGetLootTable(string hash, out IReadOnlyList<LootItemPair> pairs)
+        public bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes)
+            => _hashItems.TryGetCategory(hash, out childHashes);
+
+        public bool TryGetHashInstance(string hash, out HashInstance instance)
+            => _hashItems.TryGetInstance(hash, out instance);
+
+        public bool TryResolveHashInstance(string hash, out HashInstance instance)
+            => _hashItems.TryResolveInstance(hash, out instance);
+
+        public void CollectHashLeafInstances(string hash, List<HashInstance> into)
+            => _hashItems.CollectLeafInstances(hash, into);
+
+        public bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition)
         {
-            if (string.IsNullOrEmpty(hash) || !_lootTables.TryGetValue(hash, out LootItemPair[]? entries))
+            if (templateId <= 0)
             {
-                pairs = Array.Empty<LootItemPair>();
+                definition = null!;
                 return false;
             }
 
-            pairs = entries;
-            return true;
+            return _vendingMachines.TryGetValue(templateId, out definition!);
         }
 
         public bool TryGetCatMesh(int monsterData, out int catMesh)
@@ -146,6 +185,81 @@ namespace ZoneEngine_New.Core.GameData
                 PlayfieldSpawnsData loaded = ReadPlayfieldSpawns(playfieldId);
                 _playfieldSpawns[playfieldId] = loaded;
                 return loaded;
+            }
+        }
+
+        public PlayfieldGeometryData GetPlayfieldGeometry(int playfieldId)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playfieldId);
+
+            lock (_playfieldSync)
+            {
+                if (_playfieldGeometry.TryGetValue(playfieldId, out PlayfieldGeometryData? cached))
+                    return cached;
+
+                PlayfieldGeometryData loaded = ReadPlayfieldGeometry(playfieldId);
+                _playfieldGeometry[playfieldId] = loaded;
+                return loaded;
+            }
+        }
+
+        public IReadOnlyList<int> GetExitProxyDoorInstances(int playfieldId)
+        {
+            if (playfieldId <= 0)
+                return [];
+
+            EnsureExitProxyIndex();
+            return _exitProxyDoorsByPlayfield!.TryGetValue(playfieldId, out int[]? doors)
+                ? doors
+                : [];
+        }
+
+        private void EnsureExitProxyIndex()
+        {
+            lock (_exitProxySync)
+            {
+                if (_exitProxyDoorsByPlayfield != null)
+                    return;
+
+                Dictionary<int, HashSet<int>> collected = new();
+                if (!Directory.Exists(PlayfieldsPath))
+                {
+                    _exitProxyDoorsByPlayfield = new Dictionary<int, int[]>();
+                    return;
+                }
+
+                foreach (string directory in Directory.EnumerateDirectories(PlayfieldsPath))
+                {
+                    string name = Path.GetFileName(directory);
+                    if (!int.TryParse(name, NumberStyles.Integer, CultureInfo.InvariantCulture, out int sourcePlayfieldId)
+                        || sourcePlayfieldId <= 0)
+                        continue;
+
+                    string dynelsPath = Path.Combine(
+                        RootPath,
+                        GameDataPaths.PlayfieldDynelsRelativePath(sourcePlayfieldId));
+                    PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(dynelsPath);
+                    ExitProxyDoorCatalog.CollectFromDynels(dynels, collected);
+                }
+
+                Dictionary<int, int[]> index = new(collected.Count);
+                int doorTotal = 0;
+                foreach (KeyValuePair<int, HashSet<int>> pair in collected)
+                {
+                    int[] doors = new int[pair.Value.Count];
+                    pair.Value.CopyTo(doors);
+                    Array.Sort(doors);
+                    index[pair.Key] = doors;
+                    doorTotal += doors.Length;
+                }
+
+                _exitProxyDoorsByPlayfield = index;
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData exit-proxy destinations playfields={0} doors={1}",
+                        index.Count,
+                        doorTotal));
             }
         }
 
@@ -237,23 +351,66 @@ namespace ZoneEngine_New.Core.GameData
             }
         }
 
-        private void LoadLootTables()
+        private void LoadHashItems()
         {
-            string path = Path.Combine(RootPath, GameDataPaths.LootTableFileName);
+            string templatesPath = Path.Combine(RootPath, GameDataPaths.ItemTemplatesFileName);
+            string instancesPath = Path.Combine(RootPath, GameDataPaths.HashInstancesFileName);
+
+            if (!File.Exists(templatesPath))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "ItemTemplates.json not found at {0}; hash categories empty",
+                        templatesPath));
+            }
+
+            if (!File.Exists(instancesPath))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "HashInstances.json not found at {0}; hash instances empty",
+                        instancesPath));
+            }
+
+            try
+            {
+                string? templatesJson = File.Exists(templatesPath) ? File.ReadAllText(templatesPath) : null;
+                string? instancesJson = File.Exists(instancesPath) ? File.ReadAllText(instancesPath) : null;
+                _hashItems = HashItemCatalog.Parse(templatesJson, instancesJson);
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData hash templates={0} hash instances={1}",
+                        _hashItems.CategoryCount,
+                        _hashItems.InstanceCount));
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    "Failed to load ItemTemplates.json / HashInstances.json; hash catalogs empty");
+            }
+        }
+
+        private void LoadVendingMachines()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.VendingMachinesFileName);
             if (!File.Exists(path))
             {
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "LootTable.json not found at {0}; catalog empty",
+                        "VendingMachines.json not found at {0}; shops will stock nothing",
                         path));
                 return;
             }
 
             try
             {
-                Dictionary<string, List<List<int>>>? loaded =
-                    JsonSerializer.Deserialize<Dictionary<string, List<List<int>>>>(
+                Dictionary<string, VendingMachineDefinition>? loaded =
+                    JsonSerializer.Deserialize<Dictionary<string, VendingMachineDefinition>>(
                         File.ReadAllText(path),
                         CatalogJsonOptions);
                 if (loaded == null)
@@ -261,64 +418,36 @@ namespace ZoneEngine_New.Core.GameData
                     _logger.Warn(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "LootTable.json was empty: {0}",
+                            "VendingMachines.json was empty: {0}",
                             path));
                     return;
                 }
 
                 int skipped = 0;
-                foreach (KeyValuePair<string, List<List<int>>> entry in loaded)
+                foreach (KeyValuePair<string, VendingMachineDefinition> pair in loaded)
                 {
-                    if (string.IsNullOrEmpty(entry.Key) || entry.Value == null)
+                    if (!int.TryParse(
+                            pair.Key,
+                            NumberStyles.Integer,
+                            CultureInfo.InvariantCulture,
+                            out int templateId)
+                        || templateId <= 0
+                        || pair.Value == null)
                     {
                         skipped++;
                         continue;
                     }
 
-                    List<LootItemPair> pairs = new();
-                    foreach (List<int> pair in entry.Value)
-                    {
-                        if (pair == null || pair.Count < 2 || pair[0] <= 0)
-                        {
-                            skipped++;
-                            continue;
-                        }
-
-                        pairs.Add(new LootItemPair(pair[0], pair[1]));
-                    }
-
-                    if (pairs.Count == 0)
-                    {
+                    if (!_vendingMachines.TryAdd(templateId, pair.Value))
                         skipped++;
-                        continue;
-                    }
-
-                    if (!_lootTables.TryAdd(entry.Key, pairs.ToArray()))
-                    {
-                        _logger.Warn(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "Duplicate loot table hash '{0}' skipped",
-                                entry.Key));
-                        skipped++;
-                    }
                 }
 
                 _logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "GameData loot tables={0} from {1}",
-                        _lootTables.Count,
-                        path));
-
-                if (skipped > 0)
-                {
-                    _logger.Warn(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "GameData skipped {0} loot entries (empty, invalid, or duplicate)",
-                            skipped));
-                }
+                        "GameData vending machines={0} skipped={1}",
+                        _vendingMachines.Count,
+                        skipped));
             }
             catch (Exception exception)
             {
@@ -326,7 +455,7 @@ namespace ZoneEngine_New.Core.GameData
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Failed to load LootTable.json from {0}; catalog empty",
+                        "Failed to load VendingMachines.json from {0}; shops will stock nothing",
                         path));
             }
         }
@@ -403,6 +532,100 @@ namespace ZoneEngine_New.Core.GameData
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Failed to load MonsterData.json from {0}; catalog empty",
+                        path));
+            }
+        }
+
+        private void LoadXpLevels()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.XpFileName);
+            if (!File.Exists(path))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Xp.json not found at {0}; catalog empty",
+                        path));
+                return;
+            }
+
+            try
+            {
+                Dictionary<string, XpLevelRow>? loaded =
+                    JsonSerializer.Deserialize<Dictionary<string, XpLevelRow>>(
+                        File.ReadAllText(path),
+                        CatalogJsonOptions);
+                if (loaded == null)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Xp.json was empty: {0}",
+                            path));
+                    return;
+                }
+
+                var parsed = new List<(int Level, XpLevelRow Row)>();
+                int skipped = 0;
+                foreach (KeyValuePair<string, XpLevelRow> pair in loaded)
+                {
+                    if (!int.TryParse(pair.Key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int level)
+                        || level <= 0
+                        || pair.Value == null)
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    parsed.Add((level, pair.Value));
+                }
+
+                parsed.Sort((left, right) => left.Level.CompareTo(right.Level));
+                int floorXp = 0;
+                foreach ((int level, XpLevelRow row) in parsed)
+                {
+                    if (!_xpLevels.TryAdd(
+                            level,
+                            new XpLevelEntry
+                            {
+                                Level = level,
+                                KillAward = row.KillAward,
+                                LevelDelta = row.LevelDelta,
+                                NextLevelXp = row.NextLevelXp,
+                                FloorXp = floorXp
+                            }))
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    if (row.NextLevelXp > 0)
+                        floorXp += row.NextLevelXp;
+                }
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData xp levels={0} from {1}",
+                        _xpLevels.Count,
+                        path));
+
+                if (skipped > 0)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "GameData skipped {0} xp level rows (invalid or duplicate)",
+                            skipped));
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load Xp.json from {0}; catalog empty",
                         path));
             }
         }
@@ -510,6 +733,255 @@ namespace ZoneEngine_New.Core.GameData
             return metaData;
         }
 
+        private PlayfieldGeometryData ReadPlayfieldGeometry(int playfieldId)
+        {
+            PlayfieldWalls? walls = TryDeserializeRdbObject<PlayfieldWalls>(
+                Path.Combine(RootPath, GameDataPaths.PlayfieldWallsRelativePath(playfieldId)));
+            PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(
+                Path.Combine(RootPath, GameDataPaths.PlayfieldDynelsRelativePath(playfieldId)));
+            PlayfieldDoors? doors = TryDeserializeRdbObject<PlayfieldDoors>(
+                Path.Combine(RootPath, GameDataPaths.PlayfieldDoorsRelativePath(playfieldId)));
+
+            Tilemap? tilemap = null;
+            SurfaceResource? surface = null;
+            string collisionPath = Path.Combine(
+                RootPath,
+                GameDataPaths.PlayfieldCollisionRelativePath(playfieldId));
+            if (File.Exists(collisionPath))
+            {
+                byte[] framed;
+                try
+                {
+                    framed = File.ReadAllBytes(collisionPath);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidDataException(
+                        "Playfield Collision.dat could not be read: "
+                        + collisionPath
+                        + " ("
+                        + exception.GetType().Name
+                        + ": "
+                        + exception.Message
+                        + ")",
+                        exception);
+                }
+
+                byte[] tilemapPayload;
+                byte[] surfacePayload;
+                try
+                {
+                    PlayfieldCollisionDat.Parse(framed, out tilemapPayload, out surfacePayload);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidDataException(
+                        "Playfield Collision.dat framing is invalid: "
+                        + collisionPath
+                        + " ("
+                        + exception.GetType().Name
+                        + ": "
+                        + exception.Message
+                        + ")",
+                        exception);
+                }
+
+                if (tilemapPayload.Length > 0)
+                    tilemap = DeserializeRdbObject<Tilemap>(tilemapPayload, collisionPath + "#tilemap");
+
+                if (surfacePayload.Length > 0)
+                {
+                    surface = DeserializeRdbObject<SurfaceResource>(
+                        surfacePayload,
+                        collisionPath + "#surface");
+                }
+            }
+
+            return new PlayfieldGeometryData
+            {
+                Walls = walls,
+                Dynels = dynels,
+                Doors = doors,
+                Tilemap = tilemap,
+                Surface = surface,
+                CellSurfaces = ReadCellSurfaces(playfieldId)
+            };
+        }
+
+        /// <summary>
+        /// Loads Surfaces.dat, the per-locality-cell SurfaceResource records. A cell whose payload
+        /// fails to deserialize is skipped so one bad record cannot cost the whole playfield its
+        /// static geometry.
+        /// </summary>
+        private IReadOnlyList<SurfaceResource> ReadCellSurfaces(int playfieldId)
+        {
+            string surfacesPath = Path.Combine(
+                RootPath,
+                GameDataPaths.PlayfieldSurfacesRelativePath(playfieldId));
+            if (!File.Exists(surfacesPath))
+                return [];
+
+            List<PlayfieldSurfaceEntry> entries;
+            try
+            {
+                entries = PlayfieldSurfacesDat.Parse(File.ReadAllBytes(surfacesPath));
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidDataException(
+                    "Playfield Surfaces.dat framing is invalid: "
+                    + surfacesPath
+                    + " ("
+                    + exception.GetType().Name
+                    + ": "
+                    + exception.Message
+                    + ")",
+                    exception);
+            }
+
+            List<SurfaceResource> surfaces = new(entries.Count);
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i].Payload == null || entries[i].Payload.Length == 0)
+                    continue;
+
+                try
+                {
+                    surfaces.Add(DeserializeRdbObject<SurfaceResource>(
+                        entries[i].Payload,
+                        surfacesPath + "#cell" + entries[i].CellId.ToString(CultureInfo.InvariantCulture)));
+                }
+                catch (Exception exception)
+                {
+                    LogUtil.Debug(
+                        DebugInfoDetail.Engine,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "GameData skipped unreadable surface playfield={0} cell={1}: {2}",
+                            playfieldId,
+                            entries[i].CellId,
+                            exception.Message));
+                }
+            }
+
+            return surfaces;
+        }
+
+        private static T? TryDeserializeRdbObject<T>(string path)
+            where T : RDBObject, new()
+        {
+            if (!File.Exists(path))
+                return null;
+
+            byte[] payload;
+            try
+            {
+                payload = File.ReadAllBytes(path);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidDataException(
+                    "Playfield geometry could not be read: "
+                    + path
+                    + " ("
+                    + exception.GetType().Name
+                    + ": "
+                    + exception.Message
+                    + ")",
+                    exception);
+            }
+
+            if (payload.Length == 0)
+                return null;
+
+            try
+            {
+                return DeserializeRdbObject<T>(payload, path);
+            }
+            catch (Exception exception)
+            {
+                // Optional geometry: prefer null over aborting playfield load.
+                // Callers that need hard failure use DeserializeRdbObject directly (Collision.dat).
+                System.Diagnostics.Debug.WriteLine(
+                    "GameData skipped unreadable geometry file "
+                    + path
+                    + ": "
+                    + exception.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// RDBDataExtractor writes GetRaw payloads that begin with type+id+version (12 bytes).
+        /// Prefer a parse that consumes the stream; partial "success" at wrong offsets is common.
+        /// </summary>
+        private static T DeserializeRdbObject<T>(byte[] payload, string sourcePath)
+            where T : RDBObject, new()
+        {
+            Exception? lastFailure = null;
+            T? best = null;
+            long bestRemaining = long.MaxValue;
+            int[] offsets = ResolveDeserializeOffsets(payload);
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                int offset = offsets[i];
+                if (offset < 0 || offset >= payload.Length)
+                    continue;
+
+                try
+                {
+                    T record = new();
+                    using MemoryStream stream = new(payload, offset, payload.Length - offset, writable: false);
+                    using BinaryReader reader = new(stream);
+                    record.Deserialize(reader);
+                    long remaining = stream.Length - stream.Position;
+                    if (remaining < bestRemaining)
+                    {
+                        best = record;
+                        bestRemaining = remaining;
+                        if (remaining == 0)
+                            return record;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    lastFailure = exception;
+                }
+            }
+
+            if (best != null)
+                return best;
+
+            throw new InvalidDataException(
+                "Playfield geometry could not be deserialized: "
+                + sourcePath
+                + " ("
+                + (lastFailure?.GetType().Name ?? "Error")
+                + ": "
+                + (lastFailure?.Message ?? "no viable offset")
+                + ")",
+                lastFailure);
+        }
+
+        private static int[] ResolveDeserializeOffsets(byte[] payload)
+        {
+            if (payload.Length < 8)
+                return new[] { 0 };
+
+            uint typeId = unchecked((uint)BitConverter.ToInt32(payload, 0));
+            // AODB ResourceTypeId values used for playfield geometry (e.g. PlayfieldWall = 0xF4255).
+            bool looksLikeRdbHeader =
+                typeId is >= 0x000F4200 and <= 0x000F42FF
+                or >= 0x000F6900 and <= 0x000F69FF
+                or 0x000FDE97;
+
+            if (!looksLikeRdbHeader)
+                return new[] { 0 };
+
+            // type(4)+id(4)+version(4) is the common GetRaw prefix for these records.
+            return new[] { 12, 8, 0 };
+        }
+
         #endregion
 
         private sealed class MonsterDataCatMeshPairing
@@ -517,6 +989,15 @@ namespace ZoneEngine_New.Core.GameData
             public int MonsterData { get; set; }
 
             public int CatMesh { get; set; }
+        }
+
+        private sealed class XpLevelRow
+        {
+            public int KillAward { get; set; }
+
+            public int LevelDelta { get; set; }
+
+            public int NextLevelXp { get; set; }
         }
     }
 }

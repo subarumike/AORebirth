@@ -114,6 +114,8 @@ namespace Utility.Config
                 {
                     Console.WriteLine("Error parsing configuration: {0}", ex.Message);
                     this._config = new Config();
+                    // Still honor AO_REBIRTH_MYSQL_CONNECTION when the config file is missing/invalid.
+                    ApplyMysqlConnectionOverride(this._config);
                 }
 #endif
 
@@ -174,7 +176,11 @@ namespace Utility.Config
             string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
             if (!string.IsNullOrWhiteSpace(configuredPath))
             {
-                return configuredPath;
+                configuredPath = configuredPath.Trim().Trim('"');
+                if (!string.IsNullOrWhiteSpace(configuredPath))
+                {
+                    return configuredPath;
+                }
             }
 
             string baseDirectoryConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config.xml");
@@ -193,7 +199,6 @@ namespace Utility.Config
                     new XmlSerializer(typeof(Config)).Deserialize(
                         new MemoryStream(File.ReadAllBytes(GetConfigPath())));
 
-            string mysqlConnection = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
 #if AOREBIRTH_LINUX
             string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
             if (string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal)
@@ -206,12 +211,17 @@ namespace Utility.Config
                     "Config.xml must contain only a placeholder MySQL connection for the Linux deployment profile.");
             }
 #endif
+            ApplyMysqlConnectionOverride(config);
+            return config;
+        }
+
+        private static void ApplyMysqlConnectionOverride(Config config)
+        {
+            string mysqlConnection = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
             if (!string.IsNullOrWhiteSpace(mysqlConnection))
             {
                 config.MysqlConnection = mysqlConnection;
             }
-
-            return config;
         }
 
         #endregion

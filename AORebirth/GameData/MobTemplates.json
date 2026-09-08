@@ -1,5 +1,36 @@
 [
 	{
+		"HasHeadMesh": true,
+		"Hash": "EQVE",
+		"Name": "Vendor Antonio Stacklund",
+		"TemplateId": 0,
+		"Stats": {
+		  "0": 10486272,
+		  "1": 1649,
+		  "4": 1,
+		  "27": 1649,
+		  "33": 0,
+		  "47": 1,
+		  "54": 40,
+		  "59": 2,
+		  "64": 40687,
+		  "89": 1,
+		  "156": 137,
+		  "359": 26088,
+		  "360": 103,
+		  "389": 3,
+		  "455": 137,
+		  "466": 0,
+		  "660": 0,
+		  "673": 31
+		},
+		"MinLevel": 40,
+		"MaxLevel": 40,
+		"Equipment": [[248368, 248368], [121567, 121567]],
+		"KnuBotId": 0,
+		"ItemTable": []
+	},
+	{
 		"HasHeadMesh": false,
 		"Hash": "AAAA",
 		"Name": "To Be Determined",
@@ -118,12 +149,8 @@
 		},
 		"MinLevel": 0,
 		"MaxLevel": 0,
-		"Equipment": [],
-		"Weapons": [
-			[
-				44008,
-				44007
-			]
+		"Equipment": [
+			[44008, 44007]
 		],
 		"KnuBotId": 1131,
 		"ItemTable": [
