@@ -48,6 +48,15 @@ services, DB, migrations, public configuration and client processes were untouch
   evidenced New template bridge. Missing bridges/templates remain blocked.
 - Linux source omission and SQL counts are replaced/supplemented with exact
   source/asset identity, casing and hash-set checks plus negative fixtures.
+- The first exact Linux run caught stale public-contract baselines inherited from
+  the integration base (including Delmus's OnStageEnter enum value). Baselines
+  must be generated from the actual Windows assemblies, never manually patched
+  to match Linux. Windows exact-SHA acceptance now runs the existing Stage
+  2/3/4/5/7 verification wrappers before approving a SHA for Linux. Reviewed
+  generated drift also includes Delmus enum/codec changes, existing ownership,
+  mission DAO/stat additions and the compiled PlayfieldLoader reference removal.
+  The Stage 7 exact SQL-set checker now uses a net48-compatible rooted path
+  calculation so the same checker can run in its Windows generator and Linux.
 - DotNetZip is replaced with BCL ZLibStream for the existing compressed item
   slices and matching extractor writer. Removing DotNetZip also removes its
   transitive vulnerable Drawing 4.7.0 dependency chain. Redundant CodePages
@@ -80,6 +89,11 @@ Serialization tests remain required. No packet layout or new authentication fiel
 was invented. `ZoneLoginMessage` contains CharacterId only in the shared model;
 the prior cookie TODO cannot safely be fixed by making up wire fields. This is
 not proof of stronger authentication than the existing contract.
+
+Delmus's existing `ItemType` to `ItemClass` managed-type rename preserves its
+eight numeric enum values, but external binaries compiled against the removed
+CLR type can still require rebuilding. Refreshing a Windows/Linux baseline is
+not proof of binary compatibility for untested external plugins.
 
 The actual New dispatcher has ZoneLogin plus eleven gameplay handlers:
 CharDCMove, CharacterAction, CharInPlay, LookAt, Attack, StopFight, GenericCmd,
