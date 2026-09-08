@@ -62,7 +62,6 @@
     <Compile Include="Persistence\Missions\IMissionDao.cs" />
     <Compile Include="Persistence\Missions\IGeneratedMissionDao.cs" />
     <Compile Include="Persistence\Missions\IMissionInventoryMutationTransaction.cs" />
-    <Compile Include="Persistence\Missions\IMissionInventoryMutationTransaction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
