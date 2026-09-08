@@ -63,6 +63,29 @@ or an opaque replacement store.
 - No live gameplay validation was performed. No client or capture was launched.
   Production databases, migrations, services and deployment were not touched.
 
+## Cross-platform inventory correction
+
+The first pushed gameplay checkpoint is
+`b3ebcffa6b2a557db080a32fa76165124bed800f`. Its exact-SHA Windows check caught a
+duplicate `IMissionInventoryMutationTransaction` compile item in the original
+Interfaces project. The ordinary Windows compiler tolerated the duplicate;
+the cross-platform source guard correctly rejected it. The correction removes
+only that duplicate, with a fresh full Windows Debug build PASS.
+
+The approved source inventory writer adds the two mission interface sources,
+three DAO fragments and seventeen extracted Legacy/shared helpers to the Linux
+compile inventories. No content inventory or inventory configuration changes.
+Windows-built assemblies remain the authority for the affected API baselines;
+the exact correction SHA must pass Windows acceptance before Linux acceptance.
+There is no additional gameplay or schema change in this correction.
+
+Stage 2 and 3 baseline writers add only fifteen approved mission types and the
+DAO's generated-mission interface plus sixteen methods. There are no removed
+contracts or enum-value changes. Stage 4, 5 and 7 baselines remain unchanged.
+Windows `verify-stage2/3/4/5/7-contracts.cmd` wrappers all PASS; their evidence is
+under `build-verify/gameplay-stage*-contracts-correction.log`. This is Windows
+compatibility evidence, not a substitute for target-native exact-SHA Linux proof.
+
 ## Remaining supported-runtime work
 
 These are concrete remaining connections, not a requirement to implement all AO

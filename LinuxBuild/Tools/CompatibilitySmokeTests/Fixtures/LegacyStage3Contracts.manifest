@@ -678,19 +678,36 @@ api|type.kind|class
 api|type.modifiers|sealed
 api|type.serializable-attribute|false
 api|type.base|System.Object
+api|type.interface|AORebirth.Interfaces.Persistence.Missions.IGeneratedMissionDao
 api|type.interface|AORebirth.Interfaces.Persistence.Missions.IMissionDao
 api|type.constructor|public instance .ctor()
 api|type.constructor|public instance .ctor(System.Func<System.Data.IDbConnection> connectionFactory)
 api|type.method|public instance virtual final !!0:T Execute<!!0:T>(System.Int32 characterId,System.Func<AORebirth.Interfaces.Persistence.Missions.IMissionDaoTransaction,!!0:T> operation) where !!0:T[modifiers=;constraints=]
 api|type.method|public instance virtual final !!0:T Execute<!!0:T>(System.Int32 characterId,System.String accountKey,System.Func<AORebirth.Interfaces.Persistence.Missions.IMissionDaoTransaction,!!0:T> operation) where !!0:T[modifiers=;constraints=]
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding ReadAccepted(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult Accept(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionAcceptance acceptance)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult AdvanceCleanup(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int64 expectedVersion,System.Int64 checkpointMask,System.Int64 nowUtcTicks)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult ClaimCorpseCredits(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int32 runtimeNpcInstance,System.Int32 currentCash,System.Int64 nowUtcTicks)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult CleanupArtifacts(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int64 nowUtcTicks)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult Complete(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionCompletion completion)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult End(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState state,System.Int64 nowUtcTicks)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult Observe(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObservation observation)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult PublishOffers(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOfferBatch batch)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult SavePosition(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int32 livePlayfield,System.Single x,System.Single y,System.Single z,System.Int64 nowUtcTicks)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult UpdateObjects(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> objects,System.Int64 nowUtcTicks)
 api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionAccountFlagData GetAccountFlag(System.String accountKey,System.String flagKey)
 api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionCharacterSnapshotData ReadCharacter(System.Int32 characterId)
 api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionRollFeeResult TryChargeRollFee(AORebirth.Interfaces.Persistence.Missions.MissionRollFeeRequest request)
 api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionStateData GetMission(AORebirth.Interfaces.Persistence.Missions.MissionKeyData key)
 api|type.method|public instance virtual final System.Boolean MarkStartAreaSelectionPending(System.Int32 characterId)
 api|type.method|public instance virtual final System.Boolean TryCompleteStartAreaSelection(System.Int32 characterId,System.String selectedState)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding> ReadAccepted(System.Int32 ownerId)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> ReadObjects(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer> ReadOffers(System.Int32 ownerId)
 api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionAccountFlagData> GetAccountFlags(System.String accountKey)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> ReadArtifacts(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance)
 api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionStateData> GetMissions(System.Int32 characterId)
+api|type.method|public instance virtual final System.Int32 ReserveIdentities(System.String sequence,System.Int32 count)
 api|type.method|public instance virtual final System.String GetStartAreaSelectionState(System.Int32 characterId)
 api|type.method|public instance virtual final System.String ResolveCharacterAccountKey(System.Int32 characterId)
 api|type.end|AORebirth.Database.Domain.Missions.MySqlMissionDao

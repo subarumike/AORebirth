@@ -1711,6 +1711,660 @@ type.method|public instance abstract virtual special-name System.Void set_x(Syst
 type.method|public instance abstract virtual special-name System.Void set_y(System.Double value)
 type.method|public instance abstract virtual special-name System.Void set_z(System.Double value)
 type.end|AORebirth.Interfaces.IVector3
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionAcceptance
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> Objects {get:public;set:public}
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> Artifacts {get:public;set:public}
+type.property|public instance System.Int32 BuildingInstance {get:public;set:public}
+type.property|public instance System.Int32 BuildingType {get:public;set:public}
+type.property|public instance System.Int32 KeyInstance {get:public;set:public}
+type.property|public instance System.Int32 LivePlayfield {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveInstance {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveInteraction {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveTemplateId {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveType {get:public;set:public}
+type.property|public instance System.Int32 OfferInstance {get:public;set:public}
+type.property|public instance System.Int32 OfferType {get:public;set:public}
+type.property|public instance System.Int32 OwnerId {get:public;set:public}
+type.property|public instance System.Int32 QuestInstance {get:public;set:public}
+type.property|public instance System.Int32 QuestType {get:public;set:public}
+type.property|public instance System.Int32 RequiredCount {get:public;set:public}
+type.property|public instance System.Int32 TeamInstance {get:public;set:public}
+type.property|public instance System.Int32 TeamType {get:public;set:public}
+type.property|public instance System.Int64 AcceptedAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 ExpiresAtUtcTicks {get:public;set:public}
+type.property|public instance System.String BundleId {get:public;set:public}
+type.property|public instance System.String BundleSha256 {get:public;set:public}
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> get_Objects()
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> get_Artifacts()
+type.method|public instance special-name System.Int32 get_BuildingInstance()
+type.method|public instance special-name System.Int32 get_BuildingType()
+type.method|public instance special-name System.Int32 get_KeyInstance()
+type.method|public instance special-name System.Int32 get_LivePlayfield()
+type.method|public instance special-name System.Int32 get_ObjectiveInstance()
+type.method|public instance special-name System.Int32 get_ObjectiveInteraction()
+type.method|public instance special-name System.Int32 get_ObjectiveTemplateId()
+type.method|public instance special-name System.Int32 get_ObjectiveType()
+type.method|public instance special-name System.Int32 get_OfferInstance()
+type.method|public instance special-name System.Int32 get_OfferType()
+type.method|public instance special-name System.Int32 get_OwnerId()
+type.method|public instance special-name System.Int32 get_QuestInstance()
+type.method|public instance special-name System.Int32 get_QuestType()
+type.method|public instance special-name System.Int32 get_RequiredCount()
+type.method|public instance special-name System.Int32 get_TeamInstance()
+type.method|public instance special-name System.Int32 get_TeamType()
+type.method|public instance special-name System.Int64 get_AcceptedAtUtcTicks()
+type.method|public instance special-name System.Int64 get_ExpiresAtUtcTicks()
+type.method|public instance special-name System.String get_BundleId()
+type.method|public instance special-name System.String get_BundleSha256()
+type.method|public instance special-name System.Void set_AcceptedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_Artifacts(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> value)
+type.method|public instance special-name System.Void set_BuildingInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_BuildingType(System.Int32 value)
+type.method|public instance special-name System.Void set_BundleId(System.String value)
+type.method|public instance special-name System.Void set_BundleSha256(System.String value)
+type.method|public instance special-name System.Void set_ExpiresAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_KeyInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_LivePlayfield(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveInteraction(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveTemplateId(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveType(System.Int32 value)
+type.method|public instance special-name System.Void set_Objects(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> value)
+type.method|public instance special-name System.Void set_OfferInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_OfferType(System.Int32 value)
+type.method|public instance special-name System.Void set_OwnerId(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestType(System.Int32 value)
+type.method|public instance special-name System.Void set_RequiredCount(System.Int32 value)
+type.method|public instance special-name System.Void set_TeamInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_TeamType(System.Int32 value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionAcceptance
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer Offer {get:public;set:public}
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState State {get:public;set:public}
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData MissionItem {get:public;set:public}
+type.property|public instance System.Int32 BuildingInstance {get:public;set:public}
+type.property|public instance System.Int32 BuildingType {get:public;set:public}
+type.property|public instance System.Int32 KeyInstance {get:public;set:public}
+type.property|public instance System.Int32 LivePlayfield {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveInstance {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveInteraction {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveTemplateId {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveType {get:public;set:public}
+type.property|public instance System.Int32 OfferInstance {get:public;set:public}
+type.property|public instance System.Int32 OfferType {get:public;set:public}
+type.property|public instance System.Int32 OwnerId {get:public;set:public}
+type.property|public instance System.Int32 Progress {get:public;set:public}
+type.property|public instance System.Int32 QuestInstance {get:public;set:public}
+type.property|public instance System.Int32 QuestType {get:public;set:public}
+type.property|public instance System.Int32 RequiredCount {get:public;set:public}
+type.property|public instance System.Int32 TeamInstance {get:public;set:public}
+type.property|public instance System.Int32 TeamType {get:public;set:public}
+type.property|public instance System.Int64 AcceptedAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 CleanupCheckpoints {get:public;set:public}
+type.property|public instance System.Int64 CompletedAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 CompletionFrozenAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 ExpiresAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 UpdatedAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 Version {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> TokenClaimLevel {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> TokenClaimSide {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> TokenCount {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> TokenDisposition {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> TokenProgressPercent {get:public;set:public}
+type.property|public instance System.String BundleId {get:public;set:public}
+type.property|public instance System.String BundleSha256 {get:public;set:public}
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer get_Offer()
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState get_State()
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData get_MissionItem()
+type.method|public instance special-name System.Int32 get_BuildingInstance()
+type.method|public instance special-name System.Int32 get_BuildingType()
+type.method|public instance special-name System.Int32 get_KeyInstance()
+type.method|public instance special-name System.Int32 get_LivePlayfield()
+type.method|public instance special-name System.Int32 get_ObjectiveInstance()
+type.method|public instance special-name System.Int32 get_ObjectiveInteraction()
+type.method|public instance special-name System.Int32 get_ObjectiveTemplateId()
+type.method|public instance special-name System.Int32 get_ObjectiveType()
+type.method|public instance special-name System.Int32 get_OfferInstance()
+type.method|public instance special-name System.Int32 get_OfferType()
+type.method|public instance special-name System.Int32 get_OwnerId()
+type.method|public instance special-name System.Int32 get_Progress()
+type.method|public instance special-name System.Int32 get_QuestInstance()
+type.method|public instance special-name System.Int32 get_QuestType()
+type.method|public instance special-name System.Int32 get_RequiredCount()
+type.method|public instance special-name System.Int32 get_TeamInstance()
+type.method|public instance special-name System.Int32 get_TeamType()
+type.method|public instance special-name System.Int64 get_AcceptedAtUtcTicks()
+type.method|public instance special-name System.Int64 get_CleanupCheckpoints()
+type.method|public instance special-name System.Int64 get_CompletedAtUtcTicks()
+type.method|public instance special-name System.Int64 get_CompletionFrozenAtUtcTicks()
+type.method|public instance special-name System.Int64 get_ExpiresAtUtcTicks()
+type.method|public instance special-name System.Int64 get_UpdatedAtUtcTicks()
+type.method|public instance special-name System.Int64 get_Version()
+type.method|public instance special-name System.Nullable<System.Int32> get_TokenClaimLevel()
+type.method|public instance special-name System.Nullable<System.Int32> get_TokenClaimSide()
+type.method|public instance special-name System.Nullable<System.Int32> get_TokenCount()
+type.method|public instance special-name System.Nullable<System.Int32> get_TokenDisposition()
+type.method|public instance special-name System.Nullable<System.Int32> get_TokenProgressPercent()
+type.method|public instance special-name System.String get_BundleId()
+type.method|public instance special-name System.String get_BundleSha256()
+type.method|public instance special-name System.Void set_AcceptedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_BuildingInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_BuildingType(System.Int32 value)
+type.method|public instance special-name System.Void set_BundleId(System.String value)
+type.method|public instance special-name System.Void set_BundleSha256(System.String value)
+type.method|public instance special-name System.Void set_CleanupCheckpoints(System.Int64 value)
+type.method|public instance special-name System.Void set_CompletedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_CompletionFrozenAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_ExpiresAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_KeyInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_LivePlayfield(System.Int32 value)
+type.method|public instance special-name System.Void set_MissionItem(AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData value)
+type.method|public instance special-name System.Void set_ObjectiveInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveInteraction(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveTemplateId(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveType(System.Int32 value)
+type.method|public instance special-name System.Void set_Offer(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer value)
+type.method|public instance special-name System.Void set_OfferInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_OfferType(System.Int32 value)
+type.method|public instance special-name System.Void set_OwnerId(System.Int32 value)
+type.method|public instance special-name System.Void set_Progress(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestType(System.Int32 value)
+type.method|public instance special-name System.Void set_RequiredCount(System.Int32 value)
+type.method|public instance special-name System.Void set_State(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState value)
+type.method|public instance special-name System.Void set_TeamInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_TeamType(System.Int32 value)
+type.method|public instance special-name System.Void set_TokenClaimLevel(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_TokenClaimSide(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_TokenCount(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_TokenDisposition(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_TokenProgressPercent(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_UpdatedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_Version(System.Int64 value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionCompletion
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData TokenItem {get:public;set:public}
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> Items {get:public;set:public}
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionStatValueData> ProgressionStats {get:public;set:public}
+type.property|public instance System.Int32 CharacterType {get:public;set:public}
+type.property|public instance System.Int32 CurrentCash {get:public;set:public}
+type.property|public instance System.Int32 CurrentExperience {get:public;set:public}
+type.property|public instance System.Int32 CurrentLevel {get:public;set:public}
+type.property|public instance System.Int32 FinalExperience {get:public;set:public}
+type.property|public instance System.Int32 OwnerId {get:public;set:public}
+type.property|public instance System.Int32 QuestInstance {get:public;set:public}
+type.property|public instance System.Int32 QuestType {get:public;set:public}
+type.property|public instance System.Int32 RequestedExperienceReward {get:public;set:public}
+type.property|public instance System.Int64 CompletedAtUtcTicks {get:public;set:public}
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData get_TokenItem()
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> get_Items()
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionStatValueData> get_ProgressionStats()
+type.method|public instance special-name System.Int32 get_CharacterType()
+type.method|public instance special-name System.Int32 get_CurrentCash()
+type.method|public instance special-name System.Int32 get_CurrentExperience()
+type.method|public instance special-name System.Int32 get_CurrentLevel()
+type.method|public instance special-name System.Int32 get_FinalExperience()
+type.method|public instance special-name System.Int32 get_OwnerId()
+type.method|public instance special-name System.Int32 get_QuestInstance()
+type.method|public instance special-name System.Int32 get_QuestType()
+type.method|public instance special-name System.Int32 get_RequestedExperienceReward()
+type.method|public instance special-name System.Int64 get_CompletedAtUtcTicks()
+type.method|public instance special-name System.Void set_CharacterType(System.Int32 value)
+type.method|public instance special-name System.Void set_CompletedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_CurrentCash(System.Int32 value)
+type.method|public instance special-name System.Void set_CurrentExperience(System.Int32 value)
+type.method|public instance special-name System.Void set_CurrentLevel(System.Int32 value)
+type.method|public instance special-name System.Void set_FinalExperience(System.Int32 value)
+type.method|public instance special-name System.Void set_Items(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> value)
+type.method|public instance special-name System.Void set_OwnerId(System.Int32 value)
+type.method|public instance special-name System.Void set_ProgressionStats(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionStatValueData> value)
+type.method|public instance special-name System.Void set_QuestInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestType(System.Int32 value)
+type.method|public instance special-name System.Void set_RequestedExperienceReward(System.Int32 value)
+type.method|public instance special-name System.Void set_TokenItem(AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionCompletion
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Boolean CorpseClaimed {get:public;set:public}
+type.property|public instance System.Boolean IsDead {get:public;set:public}
+type.property|public instance System.Boolean IsLocked {get:public;set:public}
+type.property|public instance System.Boolean IsOpen {get:public;set:public}
+type.property|public instance System.Boolean LootResolved {get:public;set:public}
+type.property|public instance System.Boolean ObjectiveConsumed {get:public;set:public}
+type.property|public instance System.Int32 CapturedInstance {get:public;set:public}
+type.property|public instance System.Int32 CapturedType {get:public;set:public}
+type.property|public instance System.Int32 CorpseCredits {get:public;set:public}
+type.property|public instance System.Int32 DeathActorId {get:public;set:public}
+type.property|public instance System.Int32 Kind {get:public;set:public}
+type.property|public instance System.Int32 OwnerId {get:public;set:public}
+type.property|public instance System.Int32 QuestInstance {get:public;set:public}
+type.property|public instance System.Int32 QuestType {get:public;set:public}
+type.property|public instance System.Int32 RuntimeInstance {get:public;set:public}
+type.property|public instance System.Int32 RuntimeType {get:public;set:public}
+type.property|public instance System.Int32 TemplateId {get:public;set:public}
+type.property|public instance System.Int64 CorpseExpiresAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 DiedAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 UpdatedAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 Version {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> CurrentHealth {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> Level {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> MaxHealth {get:public;set:public}
+type.property|public instance System.Single HeadingW {get:public;set:public}
+type.property|public instance System.Single HeadingX {get:public;set:public}
+type.property|public instance System.Single HeadingY {get:public;set:public}
+type.property|public instance System.Single HeadingZ {get:public;set:public}
+type.property|public instance System.Single X {get:public;set:public}
+type.property|public instance System.Single Y {get:public;set:public}
+type.property|public instance System.Single Z {get:public;set:public}
+type.method|public instance special-name System.Boolean get_CorpseClaimed()
+type.method|public instance special-name System.Boolean get_IsDead()
+type.method|public instance special-name System.Boolean get_IsLocked()
+type.method|public instance special-name System.Boolean get_IsOpen()
+type.method|public instance special-name System.Boolean get_LootResolved()
+type.method|public instance special-name System.Boolean get_ObjectiveConsumed()
+type.method|public instance special-name System.Int32 get_CapturedInstance()
+type.method|public instance special-name System.Int32 get_CapturedType()
+type.method|public instance special-name System.Int32 get_CorpseCredits()
+type.method|public instance special-name System.Int32 get_DeathActorId()
+type.method|public instance special-name System.Int32 get_Kind()
+type.method|public instance special-name System.Int32 get_OwnerId()
+type.method|public instance special-name System.Int32 get_QuestInstance()
+type.method|public instance special-name System.Int32 get_QuestType()
+type.method|public instance special-name System.Int32 get_RuntimeInstance()
+type.method|public instance special-name System.Int32 get_RuntimeType()
+type.method|public instance special-name System.Int32 get_TemplateId()
+type.method|public instance special-name System.Int64 get_CorpseExpiresAtUtcTicks()
+type.method|public instance special-name System.Int64 get_DiedAtUtcTicks()
+type.method|public instance special-name System.Int64 get_UpdatedAtUtcTicks()
+type.method|public instance special-name System.Int64 get_Version()
+type.method|public instance special-name System.Nullable<System.Int32> get_CurrentHealth()
+type.method|public instance special-name System.Nullable<System.Int32> get_Level()
+type.method|public instance special-name System.Nullable<System.Int32> get_MaxHealth()
+type.method|public instance special-name System.Single get_HeadingW()
+type.method|public instance special-name System.Single get_HeadingX()
+type.method|public instance special-name System.Single get_HeadingY()
+type.method|public instance special-name System.Single get_HeadingZ()
+type.method|public instance special-name System.Single get_X()
+type.method|public instance special-name System.Single get_Y()
+type.method|public instance special-name System.Single get_Z()
+type.method|public instance special-name System.Void set_CapturedInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_CapturedType(System.Int32 value)
+type.method|public instance special-name System.Void set_CorpseClaimed(System.Boolean value)
+type.method|public instance special-name System.Void set_CorpseCredits(System.Int32 value)
+type.method|public instance special-name System.Void set_CorpseExpiresAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_CurrentHealth(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_DeathActorId(System.Int32 value)
+type.method|public instance special-name System.Void set_DiedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_HeadingW(System.Single value)
+type.method|public instance special-name System.Void set_HeadingX(System.Single value)
+type.method|public instance special-name System.Void set_HeadingY(System.Single value)
+type.method|public instance special-name System.Void set_HeadingZ(System.Single value)
+type.method|public instance special-name System.Void set_IsDead(System.Boolean value)
+type.method|public instance special-name System.Void set_IsLocked(System.Boolean value)
+type.method|public instance special-name System.Void set_IsOpen(System.Boolean value)
+type.method|public instance special-name System.Void set_Kind(System.Int32 value)
+type.method|public instance special-name System.Void set_Level(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_LootResolved(System.Boolean value)
+type.method|public instance special-name System.Void set_MaxHealth(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_ObjectiveConsumed(System.Boolean value)
+type.method|public instance special-name System.Void set_OwnerId(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestType(System.Int32 value)
+type.method|public instance special-name System.Void set_RuntimeInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_RuntimeType(System.Int32 value)
+type.method|public instance special-name System.Void set_TemplateId(System.Int32 value)
+type.method|public instance special-name System.Void set_UpdatedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_Version(System.Int64 value)
+type.method|public instance special-name System.Void set_X(System.Single value)
+type.method|public instance special-name System.Void set_Y(System.Single value)
+type.method|public instance special-name System.Void set_Z(System.Single value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObservation
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.GeneratedMissionTokenClaim CompletionToken {get:public;set:public}
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData ConsumeItem {get:public;set:public}
+type.property|public instance System.Boolean AdvanceProgress {get:public;set:public}
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> Objects {get:public;set:public}
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> Grants {get:public;set:public}
+type.property|public instance System.Int32 ActualPlayfield {get:public;set:public}
+type.property|public instance System.Int32 Interaction {get:public;set:public}
+type.property|public instance System.Int32 LivePlayfield {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveInstance {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveTemplateId {get:public;set:public}
+type.property|public instance System.Int32 ObjectiveType {get:public;set:public}
+type.property|public instance System.Int32 OwnerId {get:public;set:public}
+type.property|public instance System.Int32 QuestInstance {get:public;set:public}
+type.property|public instance System.Int32 QuestType {get:public;set:public}
+type.property|public instance System.Int32 TerminalInstance {get:public;set:public}
+type.property|public instance System.Int32 TerminalType {get:public;set:public}
+type.property|public instance System.Int64 ObservedAtUtcTicks {get:public;set:public}
+type.property|public instance System.String ObservationIdentity {get:public;set:public}
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.GeneratedMissionTokenClaim get_CompletionToken()
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData get_ConsumeItem()
+type.method|public instance special-name System.Boolean get_AdvanceProgress()
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> get_Objects()
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> get_Grants()
+type.method|public instance special-name System.Int32 get_ActualPlayfield()
+type.method|public instance special-name System.Int32 get_Interaction()
+type.method|public instance special-name System.Int32 get_LivePlayfield()
+type.method|public instance special-name System.Int32 get_ObjectiveInstance()
+type.method|public instance special-name System.Int32 get_ObjectiveTemplateId()
+type.method|public instance special-name System.Int32 get_ObjectiveType()
+type.method|public instance special-name System.Int32 get_OwnerId()
+type.method|public instance special-name System.Int32 get_QuestInstance()
+type.method|public instance special-name System.Int32 get_QuestType()
+type.method|public instance special-name System.Int32 get_TerminalInstance()
+type.method|public instance special-name System.Int32 get_TerminalType()
+type.method|public instance special-name System.Int64 get_ObservedAtUtcTicks()
+type.method|public instance special-name System.String get_ObservationIdentity()
+type.method|public instance special-name System.Void set_ActualPlayfield(System.Int32 value)
+type.method|public instance special-name System.Void set_AdvanceProgress(System.Boolean value)
+type.method|public instance special-name System.Void set_CompletionToken(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionTokenClaim value)
+type.method|public instance special-name System.Void set_ConsumeItem(AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData value)
+type.method|public instance special-name System.Void set_Grants(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> value)
+type.method|public instance special-name System.Void set_Interaction(System.Int32 value)
+type.method|public instance special-name System.Void set_LivePlayfield(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveTemplateId(System.Int32 value)
+type.method|public instance special-name System.Void set_ObjectiveType(System.Int32 value)
+type.method|public instance special-name System.Void set_Objects(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> value)
+type.method|public instance special-name System.Void set_ObservationIdentity(System.String value)
+type.method|public instance special-name System.Void set_ObservedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_OwnerId(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_QuestType(System.Int32 value)
+type.method|public instance special-name System.Void set_TerminalInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_TerminalType(System.Int32 value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObservation
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState State {get:public;set:public}
+type.property|public instance System.Byte[] FrozenWireBody {get:public;set:public}
+type.property|public instance System.Int32 CashReward {get:public;set:public}
+type.property|public instance System.Int32 DestinationInstance {get:public;set:public}
+type.property|public instance System.Int32 DestinationPlayfield {get:public;set:public}
+type.property|public instance System.Int32 DestinationType {get:public;set:public}
+type.property|public instance System.Int32 EntranceHigh {get:public;set:public}
+type.property|public instance System.Int32 EntranceInstance {get:public;set:public}
+type.property|public instance System.Int32 EntranceLow {get:public;set:public}
+type.property|public instance System.Int32 EntranceType {get:public;set:public}
+type.property|public instance System.Int32 ExperienceReward {get:public;set:public}
+type.property|public instance System.Int32 IssuingTerminalInstance {get:public;set:public}
+type.property|public instance System.Int32 IssuingTerminalPlayfield {get:public;set:public}
+type.property|public instance System.Int32 IssuingTerminalType {get:public;set:public}
+type.property|public instance System.Int32 MissionType {get:public;set:public}
+type.property|public instance System.Int32 OfferIndex {get:public;set:public}
+type.property|public instance System.Int32 OfferInstance {get:public;set:public}
+type.property|public instance System.Int32 OfferType {get:public;set:public}
+type.property|public instance System.Int32 OwnerId {get:public;set:public}
+type.property|public instance System.Int32 Quality {get:public;set:public}
+type.property|public instance System.Int32 RewardCount {get:public;set:public}
+type.property|public instance System.Int32 RewardHighId {get:public;set:public}
+type.property|public instance System.Int32 RewardLowId {get:public;set:public}
+type.property|public instance System.Int32 RewardQuality {get:public;set:public}
+type.property|public instance System.Int64 ExpiresAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 OfferedAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 Version {get:public;set:public}
+type.property|public instance System.Single DestinationX {get:public;set:public}
+type.property|public instance System.Single DestinationY {get:public;set:public}
+type.property|public instance System.Single DestinationZ {get:public;set:public}
+type.property|public instance System.String BatchIdentity {get:public;set:public}
+type.property|public instance System.String Description {get:public;set:public}
+type.property|public instance System.String FrozenWireSha256 {get:public;set:public}
+type.property|public instance System.String Title {get:public;set:public}
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState get_State()
+type.method|public instance special-name System.Byte[] get_FrozenWireBody()
+type.method|public instance special-name System.Int32 get_CashReward()
+type.method|public instance special-name System.Int32 get_DestinationInstance()
+type.method|public instance special-name System.Int32 get_DestinationPlayfield()
+type.method|public instance special-name System.Int32 get_DestinationType()
+type.method|public instance special-name System.Int32 get_EntranceHigh()
+type.method|public instance special-name System.Int32 get_EntranceInstance()
+type.method|public instance special-name System.Int32 get_EntranceLow()
+type.method|public instance special-name System.Int32 get_EntranceType()
+type.method|public instance special-name System.Int32 get_ExperienceReward()
+type.method|public instance special-name System.Int32 get_IssuingTerminalInstance()
+type.method|public instance special-name System.Int32 get_IssuingTerminalPlayfield()
+type.method|public instance special-name System.Int32 get_IssuingTerminalType()
+type.method|public instance special-name System.Int32 get_MissionType()
+type.method|public instance special-name System.Int32 get_OfferIndex()
+type.method|public instance special-name System.Int32 get_OfferInstance()
+type.method|public instance special-name System.Int32 get_OfferType()
+type.method|public instance special-name System.Int32 get_OwnerId()
+type.method|public instance special-name System.Int32 get_Quality()
+type.method|public instance special-name System.Int32 get_RewardCount()
+type.method|public instance special-name System.Int32 get_RewardHighId()
+type.method|public instance special-name System.Int32 get_RewardLowId()
+type.method|public instance special-name System.Int32 get_RewardQuality()
+type.method|public instance special-name System.Int64 get_ExpiresAtUtcTicks()
+type.method|public instance special-name System.Int64 get_OfferedAtUtcTicks()
+type.method|public instance special-name System.Int64 get_Version()
+type.method|public instance special-name System.Single get_DestinationX()
+type.method|public instance special-name System.Single get_DestinationY()
+type.method|public instance special-name System.Single get_DestinationZ()
+type.method|public instance special-name System.String get_BatchIdentity()
+type.method|public instance special-name System.String get_Description()
+type.method|public instance special-name System.String get_FrozenWireSha256()
+type.method|public instance special-name System.String get_Title()
+type.method|public instance special-name System.Void set_BatchIdentity(System.String value)
+type.method|public instance special-name System.Void set_CashReward(System.Int32 value)
+type.method|public instance special-name System.Void set_Description(System.String value)
+type.method|public instance special-name System.Void set_DestinationInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_DestinationPlayfield(System.Int32 value)
+type.method|public instance special-name System.Void set_DestinationType(System.Int32 value)
+type.method|public instance special-name System.Void set_DestinationX(System.Single value)
+type.method|public instance special-name System.Void set_DestinationY(System.Single value)
+type.method|public instance special-name System.Void set_DestinationZ(System.Single value)
+type.method|public instance special-name System.Void set_EntranceHigh(System.Int32 value)
+type.method|public instance special-name System.Void set_EntranceInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_EntranceLow(System.Int32 value)
+type.method|public instance special-name System.Void set_EntranceType(System.Int32 value)
+type.method|public instance special-name System.Void set_ExperienceReward(System.Int32 value)
+type.method|public instance special-name System.Void set_ExpiresAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_FrozenWireBody(System.Byte[] value)
+type.method|public instance special-name System.Void set_FrozenWireSha256(System.String value)
+type.method|public instance special-name System.Void set_IssuingTerminalInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_IssuingTerminalPlayfield(System.Int32 value)
+type.method|public instance special-name System.Void set_IssuingTerminalType(System.Int32 value)
+type.method|public instance special-name System.Void set_MissionType(System.Int32 value)
+type.method|public instance special-name System.Void set_OfferIndex(System.Int32 value)
+type.method|public instance special-name System.Void set_OfferInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_OfferType(System.Int32 value)
+type.method|public instance special-name System.Void set_OfferedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_OwnerId(System.Int32 value)
+type.method|public instance special-name System.Void set_Quality(System.Int32 value)
+type.method|public instance special-name System.Void set_RewardCount(System.Int32 value)
+type.method|public instance special-name System.Void set_RewardHighId(System.Int32 value)
+type.method|public instance special-name System.Void set_RewardLowId(System.Int32 value)
+type.method|public instance special-name System.Void set_RewardQuality(System.Int32 value)
+type.method|public instance special-name System.Void set_State(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState value)
+type.method|public instance special-name System.Void set_Title(System.String value)
+type.method|public instance special-name System.Void set_Version(System.Int64 value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOfferBatch
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer> Offers {get:public;set:public}
+type.property|public instance System.Int32 CurrentCash {get:public;set:public}
+type.property|public instance System.Int32 Fee {get:public;set:public}
+type.property|public instance System.Int32 GoodBadSlider {get:public;set:public}
+type.property|public instance System.Int32 HeadOnStealthSlider {get:public;set:public}
+type.property|public instance System.Int32 LevelSlider {get:public;set:public}
+type.property|public instance System.Int32 MoneyExperienceSlider {get:public;set:public}
+type.property|public instance System.Int32 OpenHiddenSlider {get:public;set:public}
+type.property|public instance System.Int32 OrderChaosSlider {get:public;set:public}
+type.property|public instance System.Int32 OwnerId {get:public;set:public}
+type.property|public instance System.Int32 OwnerType {get:public;set:public}
+type.property|public instance System.Int32 PhysicalMysticalSlider {get:public;set:public}
+type.property|public instance System.Int32 ResponseNonce {get:public;set:public}
+type.property|public instance System.Int32 RollSeed {get:public;set:public}
+type.property|public instance System.Int32 TerminalInstance {get:public;set:public}
+type.property|public instance System.Int32 TerminalPlayfield {get:public;set:public}
+type.property|public instance System.Int32 TerminalType {get:public;set:public}
+type.property|public instance System.Int64 ExpiresAtUtcTicks {get:public;set:public}
+type.property|public instance System.Int64 OfferedAtUtcTicks {get:public;set:public}
+type.property|public instance System.String BatchIdentity {get:public;set:public}
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer> get_Offers()
+type.method|public instance special-name System.Int32 get_CurrentCash()
+type.method|public instance special-name System.Int32 get_Fee()
+type.method|public instance special-name System.Int32 get_GoodBadSlider()
+type.method|public instance special-name System.Int32 get_HeadOnStealthSlider()
+type.method|public instance special-name System.Int32 get_LevelSlider()
+type.method|public instance special-name System.Int32 get_MoneyExperienceSlider()
+type.method|public instance special-name System.Int32 get_OpenHiddenSlider()
+type.method|public instance special-name System.Int32 get_OrderChaosSlider()
+type.method|public instance special-name System.Int32 get_OwnerId()
+type.method|public instance special-name System.Int32 get_OwnerType()
+type.method|public instance special-name System.Int32 get_PhysicalMysticalSlider()
+type.method|public instance special-name System.Int32 get_ResponseNonce()
+type.method|public instance special-name System.Int32 get_RollSeed()
+type.method|public instance special-name System.Int32 get_TerminalInstance()
+type.method|public instance special-name System.Int32 get_TerminalPlayfield()
+type.method|public instance special-name System.Int32 get_TerminalType()
+type.method|public instance special-name System.Int64 get_ExpiresAtUtcTicks()
+type.method|public instance special-name System.Int64 get_OfferedAtUtcTicks()
+type.method|public instance special-name System.String get_BatchIdentity()
+type.method|public instance special-name System.Void set_BatchIdentity(System.String value)
+type.method|public instance special-name System.Void set_CurrentCash(System.Int32 value)
+type.method|public instance special-name System.Void set_ExpiresAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_Fee(System.Int32 value)
+type.method|public instance special-name System.Void set_GoodBadSlider(System.Int32 value)
+type.method|public instance special-name System.Void set_HeadOnStealthSlider(System.Int32 value)
+type.method|public instance special-name System.Void set_LevelSlider(System.Int32 value)
+type.method|public instance special-name System.Void set_MoneyExperienceSlider(System.Int32 value)
+type.method|public instance special-name System.Void set_OfferedAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_Offers(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer> value)
+type.method|public instance special-name System.Void set_OpenHiddenSlider(System.Int32 value)
+type.method|public instance special-name System.Void set_OrderChaosSlider(System.Int32 value)
+type.method|public instance special-name System.Void set_OwnerId(System.Int32 value)
+type.method|public instance special-name System.Void set_OwnerType(System.Int32 value)
+type.method|public instance special-name System.Void set_PhysicalMysticalSlider(System.Int32 value)
+type.method|public instance special-name System.Void set_ResponseNonce(System.Int32 value)
+type.method|public instance special-name System.Void set_RollSeed(System.Int32 value)
+type.method|public instance special-name System.Void set_TerminalInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_TerminalPlayfield(System.Int32 value)
+type.method|public instance special-name System.Void set_TerminalType(System.Int32 value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOfferBatch
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding Binding {get:public;set:public}
+type.property|public instance AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResultStatus Status {get:public;set:public}
+type.property|public instance System.Int32 Cash {get:public;set:public}
+type.property|public instance System.Int32 Experience {get:public;set:public}
+type.property|public instance System.String Reason {get:public;set:public}
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding get_Binding()
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResultStatus get_Status()
+type.method|public instance special-name System.Int32 get_Cash()
+type.method|public instance special-name System.Int32 get_Experience()
+type.method|public instance special-name System.String get_Reason()
+type.method|public instance special-name System.Void set_Binding(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding value)
+type.method|public instance special-name System.Void set_Cash(System.Int32 value)
+type.method|public instance special-name System.Void set_Experience(System.Int32 value)
+type.method|public instance special-name System.Void set_Reason(System.String value)
+type.method|public instance special-name System.Void set_Status(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResultStatus value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResultStatus
+type.kind|enum
+type.modifiers|sealed
+type.serializable-attribute|not-applicable
+type.enum-underlying|System.Int32
+type.enum-flags-attribute|false
+type.enum-value|AlreadyApplied|System.Int32:2
+type.enum-value|Applied|System.Int32:1
+type.enum-value|Rejected|System.Int32:3
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResultStatus
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState
+type.kind|enum
+type.modifiers|sealed
+type.serializable-attribute|not-applicable
+type.enum-underlying|System.Int32
+type.enum-flags-attribute|false
+type.enum-value|Abandoned|System.Int32:4
+type.enum-value|Active|System.Int32:2
+type.enum-value|Completed|System.Int32:3
+type.enum-value|Expired|System.Int32:5
+type.enum-value|Offered|System.Int32:1
+type.enum-value|Replaced|System.Int32:6
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState
+type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionTokenClaim
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Int32 CharacterLevel {get:public;set:public}
+type.property|public instance System.Int32 Count {get:public;set:public}
+type.property|public instance System.Int32 Disposition {get:public;set:public}
+type.property|public instance System.Int32 ProgressPercent {get:public;set:public}
+type.property|public instance System.Int32 Side {get:public;set:public}
+type.method|public instance special-name System.Int32 get_CharacterLevel()
+type.method|public instance special-name System.Int32 get_Count()
+type.method|public instance special-name System.Int32 get_Disposition()
+type.method|public instance special-name System.Int32 get_ProgressPercent()
+type.method|public instance special-name System.Int32 get_Side()
+type.method|public instance special-name System.Void set_CharacterLevel(System.Int32 value)
+type.method|public instance special-name System.Void set_Count(System.Int32 value)
+type.method|public instance special-name System.Void set_Disposition(System.Int32 value)
+type.method|public instance special-name System.Void set_ProgressPercent(System.Int32 value)
+type.method|public instance special-name System.Void set_Side(System.Int32 value)
+type.end|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionTokenClaim
+type.begin|AORebirth.Interfaces.Persistence.Missions.IGeneratedMissionDao
+type.kind|interface
+type.modifiers|abstract
+type.serializable-attribute|not-applicable
+type.base|
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding ReadAccepted(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult Accept(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionAcceptance acceptance)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult AdvanceCleanup(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int64 expectedVersion,System.Int64 checkpointMask,System.Int64 nowUtcTicks)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult ClaimCorpseCredits(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int32 runtimeNpcInstance,System.Int32 currentCash,System.Int64 nowUtcTicks)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult CleanupArtifacts(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int64 nowUtcTicks)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult Complete(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionCompletion completion)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult End(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,AORebirth.Interfaces.Persistence.Missions.GeneratedMissionState state,System.Int64 nowUtcTicks)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult Observe(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObservation observation)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult PublishOffers(AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOfferBatch batch)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult SavePosition(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Int32 livePlayfield,System.Single x,System.Single y,System.Single z,System.Int64 nowUtcTicks)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Missions.GeneratedMissionResult UpdateObjects(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> objects,System.Int64 nowUtcTicks)
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionBinding> ReadAccepted(System.Int32 ownerId)
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionObject> ReadObjects(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance)
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.GeneratedMissionOffer> ReadOffers(System.Int32 ownerId)
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> ReadArtifacts(System.Int32 ownerId,System.Int32 questType,System.Int32 questInstance)
+type.method|public instance abstract virtual System.Int32 ReserveIdentities(System.String sequence,System.Int32 count)
+type.end|AORebirth.Interfaces.Persistence.Missions.IGeneratedMissionDao
 type.begin|AORebirth.Interfaces.Persistence.Missions.IMissionDao
 type.kind|interface
 type.modifiers|abstract
@@ -1754,6 +2408,13 @@ type.method|public instance abstract virtual System.Void SaveObjective(AORebirth
 type.method|public instance abstract virtual special-name System.Int32 get_CharacterId()
 type.method|public instance abstract virtual special-name System.String get_AccountKey()
 type.end|AORebirth.Interfaces.Persistence.Missions.IMissionDaoTransaction
+type.begin|AORebirth.Interfaces.Persistence.Missions.IMissionInventoryMutationTransaction
+type.kind|interface
+type.modifiers|abstract
+type.serializable-attribute|not-applicable
+type.base|
+type.method|public instance abstract virtual System.Void ApplyInventoryMutation(System.Collections.Generic.IReadOnlyList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> grants,System.Collections.Generic.IReadOnlyList<AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData> consumed)
+type.end|AORebirth.Interfaces.Persistence.Missions.IMissionInventoryMutationTransaction
 type.begin|AORebirth.Interfaces.Persistence.Missions.MissionAccountFlagData
 type.kind|class
 type.modifiers|sealed
@@ -1829,6 +2490,13 @@ type.method|public instance special-name System.Collections.Generic.IList<AORebi
 type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionStateData> get_Missions()
 type.method|public instance special-name System.Int32 get_CharacterId()
 type.end|AORebirth.Interfaces.Persistence.Missions.MissionCharacterSnapshotData
+type.begin|AORebirth.Interfaces.Persistence.Missions.MissionCommitOutcomeUnknownException
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Exception
+type.constructor|public instance .ctor(System.Exception inner)
+type.end|AORebirth.Interfaces.Persistence.Missions.MissionCommitOutcomeUnknownException
 type.begin|AORebirth.Interfaces.Persistence.Missions.MissionFlagData
 type.kind|class
 type.modifiers|sealed
@@ -1858,6 +2526,43 @@ type.method|public instance special-name System.Void set_UpdatedAtUtcTicks(Syste
 type.method|public instance special-name System.Void set_Value(System.String value)
 type.method|public instance special-name System.Void set_Version(System.Int64 value)
 type.end|AORebirth.Interfaces.Persistence.Missions.MissionFlagData
+type.begin|AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Byte Source {get:public;set:public}
+type.property|public instance System.Int32 ContainerInstance {get:public;set:public}
+type.property|public instance System.Int32 ContainerPlacement {get:public;set:public}
+type.property|public instance System.Int32 ContainerType {get:public;set:public}
+type.property|public instance System.Int32 HighId {get:public;set:public}
+type.property|public instance System.Int32 InstanceId {get:public;set:public}
+type.property|public instance System.Int32 ItemType {get:public;set:public}
+type.property|public instance System.Int32 LowId {get:public;set:public}
+type.property|public instance System.Int32 Quality {get:public;set:public}
+type.property|public instance System.Int32 StackCount {get:public;set:public}
+type.method|public instance special-name System.Byte get_Source()
+type.method|public instance special-name System.Int32 get_ContainerInstance()
+type.method|public instance special-name System.Int32 get_ContainerPlacement()
+type.method|public instance special-name System.Int32 get_ContainerType()
+type.method|public instance special-name System.Int32 get_HighId()
+type.method|public instance special-name System.Int32 get_InstanceId()
+type.method|public instance special-name System.Int32 get_ItemType()
+type.method|public instance special-name System.Int32 get_LowId()
+type.method|public instance special-name System.Int32 get_Quality()
+type.method|public instance special-name System.Int32 get_StackCount()
+type.method|public instance special-name System.Void set_ContainerInstance(System.Int32 value)
+type.method|public instance special-name System.Void set_ContainerPlacement(System.Int32 value)
+type.method|public instance special-name System.Void set_ContainerType(System.Int32 value)
+type.method|public instance special-name System.Void set_HighId(System.Int32 value)
+type.method|public instance special-name System.Void set_InstanceId(System.Int32 value)
+type.method|public instance special-name System.Void set_ItemType(System.Int32 value)
+type.method|public instance special-name System.Void set_LowId(System.Int32 value)
+type.method|public instance special-name System.Void set_Quality(System.Int32 value)
+type.method|public instance special-name System.Void set_Source(System.Byte value)
+type.method|public instance special-name System.Void set_StackCount(System.Int32 value)
+type.end|AORebirth.Interfaces.Persistence.Missions.MissionItemInstanceData
 type.begin|AORebirth.Interfaces.Persistence.Missions.MissionKeyData
 type.kind|struct
 type.modifiers|sealed
