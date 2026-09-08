@@ -953,9 +953,10 @@ namespace ZoneEngine_New.Core.Trade
         }
 
         /// <summary>
-        /// Whether a client frame addresses the machine pane rather than the player's own. Compares
-        /// the whole identity: a Dynels.dat machine instance can collide numerically with a
-        /// character id, and matching on instance alone would let one pane answer for the other.
+        /// Whether a client frame addresses the machine pane rather than the player's own. The owning
+        /// NPC counts too, since that is the identity the player used to open the shop. Compares whole
+        /// identities: a Dynels.dat machine instance can collide numerically with a character id, and
+        /// matching on instance alone would let one pane answer for the other.
         /// </summary>
         static bool IsShopSide(TradeSession session, Identity target)
         {
@@ -963,7 +964,11 @@ namespace ZoneEngine_New.Core.Trade
             if (machine == null)
                 return false;
 
-            return target == machine.ShopIdentity || target == machine.Identity;
+            if (target == machine.Identity)
+                return true;
+
+            NpcCharacter? owner = machine.OwnerNpc;
+            return owner != null && target == owner.Identity;
         }
 
         #endregion
