@@ -903,8 +903,11 @@ namespace AORebirth.LinuxBuild.Contracts
                 .Select(e => RequireAttribute(e, "Include").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
             string[] packaged = content.Select(e => RequireAttribute(e, "Link").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
             Assert(declared.SequenceEqual(packaged, StringComparer.Ordinal), "Database SQL inventory identity set differs from the authoritative project.");
-            string[] actual = Directory.GetFiles(Path.Combine(publish, "SqlTables"), "*.sql", SearchOption.AllDirectories)
-                .Select(p => "SqlTables/" + Path.GetRelativePath(Path.Combine(publish, "SqlTables"), p).Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            string sqlRoot = Path.GetFullPath(Path.Combine(publish, "SqlTables"));
+            // GetFiles is rooted here, so removing this exact prefix retains nested
+            // identities/casing without the net10-only Path.GetRelativePath API.
+            string[] actual = Directory.GetFiles(sqlRoot, "*.sql", SearchOption.AllDirectories)
+                .Select(p => "SqlTables/" + p.Substring(sqlRoot.Length + 1).Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
             Assert(packaged.SequenceEqual(actual, StringComparer.Ordinal), "Published SQL identity set contains missing or unexpected assets.");
             Assert(
                 content.Count(

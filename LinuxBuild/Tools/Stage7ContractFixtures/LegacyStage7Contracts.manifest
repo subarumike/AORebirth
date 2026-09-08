@@ -221,6 +221,7 @@ api|type.method%7Cpublic instance special-name System.Void set_Level(System.Int3
 api|type.method%7Cpublic instance special-name System.Void set_MonsterScale(System.Int32 value)
 api|type.method%7Cpublic instance special-name System.Void set_Name(System.String value)
 api|type.method%7Cpublic instance special-name System.Void set_Profession(System.Int32 value)
+api|type.method%7Cpublic static System.Void InitializeMissionPersistence(AORebirth.Interfaces.Persistence.Missions.IMissionDao dao)
 api|type.end%7CLoginEngine.Packets.CharacterName
 api|type.begin%7CLoginEngine.Packets.CheckLogin
 api|type.kind%7Cclass
@@ -522,6 +523,7 @@ handler|LoginEngine.MessageHandlers.UserCredentialsHandler|SmokeLounge.AOtomatio
 handler|LoginEngine.MessageHandlers.UserLoginHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.UserLoginMessage|export=IHandleMessage
 reference|AORebirth.Core|1.0.0.0|
 reference|AORebirth.Database|1.0.0.0|
+reference|AORebirth.Interfaces|1.0.0.0|
 reference|Cell.Core|0.5.0.0|
 reference|NBug|1.2.0.0|a4292a325f69b123
 reference|NLog|2.1.0.0|5120e14c03d0593c

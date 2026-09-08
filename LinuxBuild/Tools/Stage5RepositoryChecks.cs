@@ -253,8 +253,13 @@ namespace AORebirth.LinuxBuild.Contracts
                 .Select(element => NormalizeInventoryInclude(RequireAttribute(element, "Include")))
                 .ToArray();
 
-            Assert(legacySources.Length == 76, "Legacy ChatEngine compile inventory must contain exactly 76 items.");
-            Assert(linuxSources.Length == 76, "Linux ChatEngine compile inventory must contain exactly 76 items.");
+            Assert(legacySources.Length > 0, "Authoritative ChatEngine project has no compile inventory.");
+            Assert(legacySources.Distinct(StringComparer.OrdinalIgnoreCase).Count() == legacySources.Length,
+                "Authoritative ChatEngine project has duplicate or case-colliding compile identities.");
+            Assert(linuxSources.Distinct(StringComparer.OrdinalIgnoreCase).Count() == linuxSources.Length,
+                "Linux ChatEngine inventory has duplicate or case-colliding compile identities.");
+            // The checked-in Windows project is the authority; retain exact identity,
+            // casing, and order parity as the source set grows instead of pinning a count.
             VerifySequence(legacySources, linuxSources, "ChatEngine compile inventory");
             foreach (string source in linuxSources)
             {

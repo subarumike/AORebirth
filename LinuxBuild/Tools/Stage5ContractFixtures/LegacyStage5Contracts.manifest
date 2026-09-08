@@ -821,7 +821,6 @@ reference|AORebirth.Stats|1.0.0.0|
 reference|Cell.Core|0.5.0.0|
 reference|NBug|1.2.0.0|a4292a325f69b123
 reference|NLog|2.1.0.0|5120e14c03d0593c
-reference|PlayfieldLoader|1.0.0.0|
 reference|SmokeLounge.AOtomation.Messaging|0.62.1.0|366f6caa557bb5ed
 reference|System|4.0.0.0|b77a5c561934e089
 reference|System.Core|4.0.0.0|b77a5c561934e089
@@ -1093,4 +1092,4 @@ parser.mode|source-mapped-only|handlers-not-invoked
 unsafe.excluded|AccountCharacterList.Create
 unsafe.excluded|Authenticate/AuthenticateBot handlers
 unsafe.excluded|ChatServer.Start/Parser.Parse/DAO/Connector.Open
-auth.password-fixture|Stage5-Password-μ|1268:NkoZPh18NQTNRAjipJYK42vjbue1RVAx3kzqt77T:0hjQnQVZjzLm0SgqerfqqqZXOO2Qo5TBP0u91iWD
+auth.password-fixture|Stage5-Password-μ|1241:fi4nJsmF00S0krxOkV1aR0qQFrBjoZPrQxJwrUJO:39pm0bUX+xtBEsQn3t02iWUAFaDYHUHQYn5jf3+T

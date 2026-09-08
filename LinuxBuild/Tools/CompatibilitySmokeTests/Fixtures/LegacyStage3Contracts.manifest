@@ -54,6 +54,16 @@ api|type.method|public instance System.Void SetOffline(System.Int32 id)
 api|type.method|public instance System.Void SetOnline(System.Int32 id)
 api|type.method|public instance System.Void SetPlayfield(System.Int32 charId,System.Int32 pfType,System.Int32 pfNum,System.Data.IDbConnection connection optional=true;default=null,System.Data.IDbTransaction transaction optional=true;default=null)
 api|type.end|AORebirth.Database.Dao.CharacterDao
+api|type.begin|AORebirth.Database.Dao.CharacterOnlineOwnershipGuard
+api|type.kind|class
+api|type.modifiers|abstract,sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.method|public static AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult TryClearLoginOwnership(System.Int32 characterId)
+api|type.method|public static AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult TryClearLoginOwnership(System.Int32 characterId,System.Action<System.Int32> setOffline)
+api|type.method|public static System.IDisposable AcquireZoneOwnership(System.Int32 characterId)
+api|type.method|public static System.IDisposable AcquireZoneOwnership(System.Int32 characterId,System.Action<System.Int32> setOnline)
+api|type.end|AORebirth.Database.Dao.CharacterOnlineOwnershipGuard
 api|type.begin|AORebirth.Database.Dao.CharacterPerksDao
 api|type.kind|class
 api|type.modifiers|
@@ -401,6 +411,7 @@ api|type.modifiers|abstract,sealed
 api|type.serializable-attribute|false
 api|type.base|System.Object
 api|type.method|public static AORebirth.Database.Dao.GmiVaultDao.VaultSnapshot Load(System.Int32 characterId)
+api|type.method|public static System.Boolean CanUseVaultSchema()
 api|type.method|public static System.Boolean Save(System.Int32 characterId,System.String characterName,System.Int64 credits,System.Collections.Generic.IList<AORebirth.Database.Dao.GmiVaultDao.VaultItemRow> items)
 api|type.end|AORebirth.Database.Dao.GmiVaultDao
 api|type.begin|AORebirth.Database.Dao.GmiVaultDao.VaultItemRow
@@ -506,6 +517,15 @@ api|type.method|public static System.Void SetExpansions(System.String user,Syste
 api|type.method|public static System.Void SetGM(System.String user,System.Int32 gmlevel)
 api|type.method|public static System.Void WriteLoginData(AORebirth.Database.Dao.DBLoginData login)
 api|type.end|AORebirth.Database.Dao.LoginDataDao
+api|type.begin|AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult
+api|type.kind|enum
+api|type.modifiers|sealed
+api|type.serializable-attribute|not-applicable
+api|type.enum-underlying|System.Int32
+api|type.enum-flags-attribute|false
+api|type.enum-value|Cleared|System.Int32:0
+api|type.enum-value|ZoneOwned|System.Int32:1
+api|type.end|AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult
 api|type.begin|AORebirth.Database.Dao.MobDroptableDao
 api|type.kind|class
 api|type.modifiers|
@@ -646,6 +666,34 @@ api|type.serializable-attribute|false
 api|type.base|AORebirth.Database.Dao.Dao<AORebirth.Database.Entities.DBVendorTemplate,AORebirth.Database.Dao.VendorTemplateDao>
 api|type.constructor|public instance .ctor()
 api|type.end|AORebirth.Database.Dao.VendorTemplateDao
+api|type.begin|AORebirth.Database.DatabaseDaoFactory
+api|type.kind|class
+api|type.modifiers|abstract,sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.method|public static AORebirth.Interfaces.Persistence.Missions.IMissionDao CreateMissionDao()
+api|type.end|AORebirth.Database.DatabaseDaoFactory
+api|type.begin|AORebirth.Database.Domain.Missions.MySqlMissionDao
+api|type.kind|class
+api|type.modifiers|sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|AORebirth.Interfaces.Persistence.Missions.IMissionDao
+api|type.constructor|public instance .ctor()
+api|type.constructor|public instance .ctor(System.Func<System.Data.IDbConnection> connectionFactory)
+api|type.method|public instance virtual final !!0:T Execute<!!0:T>(System.Int32 characterId,System.Func<AORebirth.Interfaces.Persistence.Missions.IMissionDaoTransaction,!!0:T> operation) where !!0:T[modifiers=;constraints=]
+api|type.method|public instance virtual final !!0:T Execute<!!0:T>(System.Int32 characterId,System.String accountKey,System.Func<AORebirth.Interfaces.Persistence.Missions.IMissionDaoTransaction,!!0:T> operation) where !!0:T[modifiers=;constraints=]
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionAccountFlagData GetAccountFlag(System.String accountKey,System.String flagKey)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionCharacterSnapshotData ReadCharacter(System.Int32 characterId)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionRollFeeResult TryChargeRollFee(AORebirth.Interfaces.Persistence.Missions.MissionRollFeeRequest request)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Missions.MissionStateData GetMission(AORebirth.Interfaces.Persistence.Missions.MissionKeyData key)
+api|type.method|public instance virtual final System.Boolean MarkStartAreaSelectionPending(System.Int32 characterId)
+api|type.method|public instance virtual final System.Boolean TryCompleteStartAreaSelection(System.Int32 characterId,System.String selectedState)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionAccountFlagData> GetAccountFlags(System.String accountKey)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Missions.MissionStateData> GetMissions(System.Int32 characterId)
+api|type.method|public instance virtual final System.String GetStartAreaSelectionState(System.Int32 characterId)
+api|type.method|public instance virtual final System.String ResolveCharacterAccountKey(System.Int32 characterId)
+api|type.end|AORebirth.Database.Domain.Missions.MySqlMissionDao
 api|type.begin|AORebirth.Database.Entities.DBCharacter
 api|type.kind|class
 api|type.modifiers|
@@ -1919,6 +1967,7 @@ api|type.property|public instance AORebirth.Stats.Stat ColdDamageModifier {get:p
 api|type.property|public instance AORebirth.Stats.Stat CollideCheckInterval {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat CollisionRadius {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat CommandRange {get:public;set:none}
+api|type.property|public instance AORebirth.Stats.Stat Commendations {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat Compulsion {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat ComputerLiteracy {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat Concealment {get:public;set:none}
@@ -1938,6 +1987,7 @@ api|type.property|public instance AORebirth.Stats.Stat CurrentNcu {get:public;se
 api|type.property|public instance AORebirth.Stats.Stat CurrentPlayfield {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat CurrentState {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat CurrentTime {get:public;set:none}
+api|type.property|public instance AORebirth.Stats.Stat DailyMissionResets {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat DamageBonus {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat DamageOverrideType {get:public;set:none}
 api|type.property|public instance AORebirth.Stats.Stat DamageToNano {get:public;set:none}
@@ -2648,6 +2698,7 @@ api|type.method|public instance special-name AORebirth.Stats.Stat get_ColdDamage
 api|type.method|public instance special-name AORebirth.Stats.Stat get_CollideCheckInterval()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_CollisionRadius()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_CommandRange()
+api|type.method|public instance special-name AORebirth.Stats.Stat get_Commendations()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_Compulsion()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_ComputerLiteracy()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_Concealment()
@@ -2667,6 +2718,7 @@ api|type.method|public instance special-name AORebirth.Stats.Stat get_CurrentNcu
 api|type.method|public instance special-name AORebirth.Stats.Stat get_CurrentPlayfield()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_CurrentState()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_CurrentTime()
+api|type.method|public instance special-name AORebirth.Stats.Stat get_DailyMissionResets()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_DamageBonus()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_DamageOverrideType()
 api|type.method|public instance special-name AORebirth.Stats.Stat get_DamageToNano()
@@ -3591,8 +3643,8 @@ runtime.array-row|AORebirth.Stats.SpecialStats.XPTable.TableShadowLandsSK|row=17
 runtime.array-row|AORebirth.Stats.SpecialStats.XPTable.TableShadowLandsSK|row=18|218,10249334,2129867
 runtime.array-row|AORebirth.Stats.SpecialStats.XPTable.TableShadowLandsSK|row=19|219,12379201,2555840
 runtime.array-row|AORebirth.Stats.SpecialStats.XPTable.TableShadowLandsSK|row=20|220,14935041,0
-runtime.stats.sha256|11f3f56ac78e23ba9887aba8bc99597a8283c16af0f68375ccec4bd3f8007897
-runtime.stats.summary|owner=SmokeLounge.AOtomation.Messaging.GameData.Identity|count=703
+runtime.stats.sha256|8f95a202e9c575f59be5c157914915066db8f0eb756b43fbb063f3c8ddf48de9
+runtime.stats.summary|owner=SmokeLounge.AOtomation.Messaging.GameData.Identity|count=705
 runtime.stats.item|index=0|id=0|type=AORebirth.Stats.Stat
 runtime.stats.item|index=1|id=1|type=AORebirth.Stats.SpecialStats.StatLife
 runtime.stats.item|index=2|id=2|type=AORebirth.Stats.Stat
@@ -4284,33 +4336,35 @@ runtime.stats.item|index=672|id=681|type=AORebirth.Stats.Stat
 runtime.stats.item|index=673|id=682|type=AORebirth.Stats.Stat
 runtime.stats.item|index=674|id=683|type=AORebirth.Stats.Stat
 runtime.stats.item|index=675|id=684|type=AORebirth.Stats.Stat
-runtime.stats.item|index=676|id=700|type=AORebirth.Stats.Stat
-runtime.stats.item|index=677|id=701|type=AORebirth.Stats.Stat
-runtime.stats.item|index=678|id=702|type=AORebirth.Stats.Stat
-runtime.stats.item|index=679|id=703|type=AORebirth.Stats.Stat
-runtime.stats.item|index=680|id=704|type=AORebirth.Stats.Stat
-runtime.stats.item|index=681|id=768|type=AORebirth.Stats.Stat
-runtime.stats.item|index=682|id=800|type=AORebirth.Stats.Stat
-runtime.stats.item|index=683|id=801|type=AORebirth.Stats.Stat
-runtime.stats.item|index=684|id=802|type=AORebirth.Stats.Stat
-runtime.stats.item|index=685|id=888|type=AORebirth.Stats.Stat
-runtime.stats.item|index=686|id=889|type=AORebirth.Stats.Stat
-runtime.stats.item|index=687|id=900|type=AORebirth.Stats.Stat
-runtime.stats.item|index=688|id=999|type=AORebirth.Stats.Stat
-runtime.stats.item|index=689|id=1001|type=AORebirth.Stats.Stat
-runtime.stats.item|index=690|id=1002|type=AORebirth.Stats.Stat
-runtime.stats.item|index=691|id=1003|type=AORebirth.Stats.Stat
-runtime.stats.item|index=692|id=1004|type=AORebirth.Stats.Stat
-runtime.stats.item|index=693|id=1005|type=AORebirth.Stats.Stat
-runtime.stats.item|index=694|id=1006|type=AORebirth.Stats.Stat
-runtime.stats.item|index=695|id=1007|type=AORebirth.Stats.Stat
-runtime.stats.item|index=696|id=1014|type=AORebirth.Stats.Stat
-runtime.stats.item|index=697|id=1013|type=AORebirth.Stats.Stat
-runtime.stats.item|index=698|id=1008|type=AORebirth.Stats.Stat
-runtime.stats.item|index=699|id=1012|type=AORebirth.Stats.Stat
-runtime.stats.item|index=700|id=1011|type=AORebirth.Stats.Stat
-runtime.stats.item|index=701|id=1010|type=AORebirth.Stats.Stat
-runtime.stats.item|index=702|id=1009|type=AORebirth.Stats.Stat
+runtime.stats.item|index=676|id=695|type=AORebirth.Stats.Stat
+runtime.stats.item|index=677|id=696|type=AORebirth.Stats.Stat
+runtime.stats.item|index=678|id=700|type=AORebirth.Stats.Stat
+runtime.stats.item|index=679|id=701|type=AORebirth.Stats.Stat
+runtime.stats.item|index=680|id=702|type=AORebirth.Stats.Stat
+runtime.stats.item|index=681|id=703|type=AORebirth.Stats.Stat
+runtime.stats.item|index=682|id=704|type=AORebirth.Stats.Stat
+runtime.stats.item|index=683|id=768|type=AORebirth.Stats.Stat
+runtime.stats.item|index=684|id=800|type=AORebirth.Stats.Stat
+runtime.stats.item|index=685|id=801|type=AORebirth.Stats.Stat
+runtime.stats.item|index=686|id=802|type=AORebirth.Stats.Stat
+runtime.stats.item|index=687|id=888|type=AORebirth.Stats.Stat
+runtime.stats.item|index=688|id=889|type=AORebirth.Stats.Stat
+runtime.stats.item|index=689|id=900|type=AORebirth.Stats.Stat
+runtime.stats.item|index=690|id=999|type=AORebirth.Stats.Stat
+runtime.stats.item|index=691|id=1001|type=AORebirth.Stats.Stat
+runtime.stats.item|index=692|id=1002|type=AORebirth.Stats.Stat
+runtime.stats.item|index=693|id=1003|type=AORebirth.Stats.Stat
+runtime.stats.item|index=694|id=1004|type=AORebirth.Stats.Stat
+runtime.stats.item|index=695|id=1005|type=AORebirth.Stats.Stat
+runtime.stats.item|index=696|id=1006|type=AORebirth.Stats.Stat
+runtime.stats.item|index=697|id=1007|type=AORebirth.Stats.Stat
+runtime.stats.item|index=698|id=1014|type=AORebirth.Stats.Stat
+runtime.stats.item|index=699|id=1013|type=AORebirth.Stats.Stat
+runtime.stats.item|index=700|id=1008|type=AORebirth.Stats.Stat
+runtime.stats.item|index=701|id=1012|type=AORebirth.Stats.Stat
+runtime.stats.item|index=702|id=1011|type=AORebirth.Stats.Stat
+runtime.stats.item|index=703|id=1010|type=AORebirth.Stats.Stat
+runtime.stats.item|index=704|id=1009|type=AORebirth.Stats.Stat
 runtime.stats.property|AbsorbChemicalAC|id=241|type=AORebirth.Stats.Stat
 runtime.stats.property|AbsorbColdAC|id=243|type=AORebirth.Stats.Stat
 runtime.stats.property|AbsorbEnergyAC|id=240|type=AORebirth.Stats.Stat
@@ -4448,6 +4502,7 @@ runtime.stats.property|ColdDamageModifier|id=311|type=AORebirth.Stats.Stat
 runtime.stats.property|CollideCheckInterval|id=437|type=AORebirth.Stats.Stat
 runtime.stats.property|CollisionRadius|id=357|type=AORebirth.Stats.Stat
 runtime.stats.property|CommandRange|id=456|type=AORebirth.Stats.Stat
+runtime.stats.property|Commendations|id=695|type=AORebirth.Stats.Stat
 runtime.stats.property|Compulsion|id=328|type=AORebirth.Stats.Stat
 runtime.stats.property|ComputerLiteracy|id=161|type=AORebirth.Stats.SpecialStats.StatSkill
 runtime.stats.property|Concealment|id=164|type=AORebirth.Stats.SpecialStats.StatSkill
@@ -4467,6 +4522,7 @@ runtime.stats.property|CurrentNcu|id=180|type=AORebirth.Stats.Stat
 runtime.stats.property|CurrentPlayfield|id=589|type=AORebirth.Stats.Stat
 runtime.stats.property|CurrentState|id=423|type=AORebirth.Stats.Stat
 runtime.stats.property|CurrentTime|id=578|type=AORebirth.Stats.Stat
+runtime.stats.property|DailyMissionResets|id=696|type=AORebirth.Stats.Stat
 runtime.stats.property|DamageBonus|id=284|type=AORebirth.Stats.Stat
 runtime.stats.property|DamageOverrideType|id=339|type=AORebirth.Stats.Stat
 runtime.stats.property|DamageToNano|id=659|type=AORebirth.Stats.Stat
@@ -5024,6 +5080,7 @@ legacy.reference|AORebirth.Database|Dapper|1.12.1.1|neutral|null
 legacy.reference|AORebirth.Database|Microsoft.CSharp|4.0.0.0|neutral|b03f5f7f11d50a3a
 legacy.reference|AORebirth.Database|MySqlConnector|2.0.0.0|neutral|d33d3e53aa5f8c92
 legacy.reference|AORebirth.Database|Npgsql|4.0.14.0|neutral|5d8b90d52f46fda7
+legacy.reference|AORebirth.Database|System|4.0.0.0|neutral|b77a5c561934e089
 legacy.reference|AORebirth.Database|System.Core|4.0.0.0|neutral|b77a5c561934e089
 legacy.reference|AORebirth.Database|System.Data|4.0.0.0|neutral|b77a5c561934e089
 legacy.reference|AORebirth.Database|System.Data.Linq|4.0.0.0|neutral|b77a5c561934e089

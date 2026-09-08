@@ -104,6 +104,12 @@ def main():
         "a healthy managed New backend must not be rejected by an obsolete special prestart")
     require("Built\\Debug\\ZoneEngine_New\\Content" in windows_acceptance,
         "Windows acceptance must validate the default NewEngine package")
+    require("for %%S in (2 3 4 5 7) do (" in windows_acceptance
+        and "call LinuxBuild\\verify-stage%%S-contracts.cmd" in windows_acceptance
+        and "if errorlevel 1 goto :contracts_failed" in windows_acceptance,
+        "Windows acceptance must refuse stale cross-platform contract baselines")
+    ordered(windows_acceptance, "echo BUILD=%BUILD_RESULT%",
+        "call LinuxBuild\\verify-stage%%S-contracts.cmd", "echo WINDOWS_CROSS_PLATFORM_CONTRACTS=PASS")
 
     require("Get-Process -Name" not in stop_ps,
             "shutdown must not fall back to killing processes by name")

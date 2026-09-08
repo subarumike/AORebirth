@@ -83,6 +83,14 @@ if "%RUN_BUILD%"=="1" (
 )
 echo BUILD=%BUILD_RESULT%
 
+rem Verify committed compatibility baselines against Windows-authoritative
+rem assemblies before accepting the SHA for Linux. Verification never regenerates.
+for %%S in (2 3 4 5 7) do (
+    call LinuxBuild\verify-stage%%S-contracts.cmd
+    if errorlevel 1 goto :contracts_failed
+)
+echo WINDOWS_CROSS_PLATFORM_CONTRACTS=PASS
+
 set "PLACEMENT_OUTPUT=AORebirth\Built\Debug\ZoneEngine_New\Content\Official\PlayfieldPlacements"
 set "PLACEMENT_MANIFEST=%PLACEMENT_OUTPUT%\official-placement-build-manifest.json"
 set "PLACEMENT_PROVENANCE=%PLACEMENT_OUTPUT%\PLACEMENT_PROVENANCE.env"
@@ -152,6 +160,7 @@ set "EVIDENCE=build-verify\windows-acceptance-%SHORT_SHA%.env"
 >> "%EVIDENCE%" echo TRACKED_SOURCE_CLEAN=PASS
 >> "%EVIDENCE%" echo GIT_DIFF_CHECK=PASS
 >> "%EVIDENCE%" echo GENERATED_COMBAT_INTEGRITY=PASS
+>> "%EVIDENCE%" echo WINDOWS_CROSS_PLATFORM_CONTRACTS=PASS
 >> "%EVIDENCE%" echo BUILD=%BUILD_RESULT%
 >> "%EVIDENCE%" echo PLACEMENT_CORPUS=PASS
 >> "%EVIDENCE%" echo PLACEMENT_BUILD_MANIFEST_SHA256=%PLACEMENT_BUILD_MANIFEST_SHA256%
@@ -173,6 +182,12 @@ echo TRACKED_SOURCE_CLEAN=FAIL
 echo WINDOWS_ACCEPTANCE=FAIL
 popd
 exit /b 11
+
+:contracts_failed
+echo WINDOWS_CROSS_PLATFORM_CONTRACTS=FAIL
+echo WINDOWS_ACCEPTANCE=FAIL
+popd
+exit /b 22
 
 :placement_failed
 echo PLACEMENT_CORPUS=FAIL

@@ -272,6 +272,14 @@ api|type.method|public instance special-name System.Void set_TypeName(System.Str
 api|type.method|public instance virtual final System.Void PackToMessage(MsgPack.Packer packer,MsgPack.PackingOptions options)
 api|type.method|public instance virtual final System.Void UnpackFromMessage(MsgPack.Unpacker unpacker)
 api|type.end|AORebirth.Communication.Messages.DynamicMessage
+api|type.begin|AORebirth.Communication.Messages.DynamicMessageCodec
+api|type.kind|class
+api|type.modifiers|abstract,sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.method|public static AORebirth.Communication.Messages.DynamicMessage Unpack(System.Byte[] buffer)
+api|type.method|public static System.Byte[] Pack(AORebirth.Communication.Messages.DynamicMessage message)
+api|type.end|AORebirth.Communication.Messages.DynamicMessageCodec
 api|type.begin|AORebirth.Communication.Messages.IMessageData
 api|type.kind|interface
 api|type.modifiers|abstract
