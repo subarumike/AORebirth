@@ -2,6 +2,17 @@
 setlocal
 set RUNTIME_ID=%~1
 if "%RUNTIME_ID%"=="" set RUNTIME_ID=linux-x64
+set ENGINE=%~3
+if "%ENGINE%"=="" set ENGINE=new
+if "%ENGINE%"=="new" (
+  set ZONE_PROJECT=..\AORebirth\Server\ZoneEngine_New\ZoneEngine_New.csproj
+  set ARTIFACT_NAME=zoneengine
+) else if "%ENGINE%"=="legacy" (
+  set ZONE_PROJECT=Projects\ZoneEngine.Linux.csproj
+  set ARTIFACT_NAME=zoneengine-legacy
+) else (
+  exit /b 2
+)
 set SELF_CONTAINED=%~2
 if "%SELF_CONTAINED%"=="" set SELF_CONTAINED=false
 
@@ -26,36 +37,42 @@ if "%SOURCE_SHA%"=="" goto :failed
 dotnet run --project Tools\SourceInventoryGuard\SourceInventoryGuard.csproj -- --repository-root .. --manifest source-inventory\inventory.json --check
 if errorlevel 1 goto :failed
 
-if exist "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%" rmdir /s /q "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%"
-mkdir "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%"
+if exist "artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%" rmdir /s /q "artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%"
+mkdir "artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%"
 if errorlevel 1 goto :failed
 
-dotnet restore Projects\ZoneEngine.Linux.csproj --runtime "%RUNTIME_ID%" --nologo
+dotnet restore "%ZONE_PROJECT%" --runtime "%RUNTIME_ID%" --nologo
 if errorlevel 1 goto :failed
 
-dotnet clean Projects\ZoneEngine.Linux.csproj --configuration Release --runtime "%RUNTIME_ID%" --nologo
+dotnet clean "%ZONE_PROJECT%" --configuration Release --runtime "%RUNTIME_ID%" --nologo
 if errorlevel 1 goto :failed
 
-dotnet publish Projects\ZoneEngine.Linux.csproj --configuration Release --runtime "%RUNTIME_ID%" --self-contained "%SELF_CONTAINED%" --output "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%" --no-restore --nologo
+dotnet publish "%ZONE_PROJECT%" --configuration Release --runtime "%RUNTIME_ID%" --self-contained "%SELF_CONTAINED%" --output "artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%" --no-restore --nologo
 if errorlevel 1 goto :failed
 
+if "%ENGINE%"=="new" (
+  dotnet run --project Tools\BackendIntegrationGuard\BackendIntegrationGuard.csproj --configuration Release -- --repository-root .. --publish "artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%" --source-sha "%SOURCE_SHA%" --build-platform windows-hosted-linux-publish --self-test
+  if errorlevel 1 goto :failed
+  goto :publish_validated
+)
 dotnet build Tools\Stage8OfflineSmokeTests\Stage8OfflineSmokeTests.csproj -c Release -v:minimal
 if errorlevel 1 goto :failed
 
 if "%SELF_CONTAINED%"=="true" (
-  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%" --source-sha "%SOURCE_SHA%" --build-platform windows-hosted-linux-publish --structure-only
+  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%" --source-sha "%SOURCE_SHA%" --build-platform windows-hosted-linux-publish --structure-only
 ) else (
-  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%" --source-sha "%SOURCE_SHA%" --build-platform windows-hosted-linux-publish
+  dotnet Tools\Stage8OfflineSmokeTests\bin\Release\net10.0\Stage8OfflineSmokeTests.dll --repository-root .. --zone-output "artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%" --source-sha "%SOURCE_SHA%" --build-platform windows-hosted-linux-publish
 )
 if errorlevel 1 goto :failed
 
+:publish_validated
 for /f "usebackq delims=" %%I in (`dotnet --version`) do set DOTNET_SDK_VERSION=%%I
 set TRACKED_SOURCE_CLEAN=PASS
 git -C .. diff --quiet --
 if errorlevel 1 set TRACKED_SOURCE_CLEAN=FAIL
 git -C .. diff --cached --quiet --
 if errorlevel 1 set TRACKED_SOURCE_CLEAN=FAIL
-set PUBLISH_DIR=artifacts\zoneengine\%RUNTIME_ID%\%PACKAGE_KIND%
+set PUBLISH_DIR=artifacts\%ARTIFACT_NAME%\%RUNTIME_ID%\%PACKAGE_KIND%
 set PLACEMENT_DIR=%PUBLISH_DIR%\Content\Official\PlayfieldPlacements
 set PLACEMENT_BUILD_MANIFEST=%PLACEMENT_DIR%\official-placement-build-manifest.json
 set PLACEMENT_PROVENANCE=%PLACEMENT_DIR%\PLACEMENT_PROVENANCE.env
@@ -98,6 +115,7 @@ if "%PLACEMENT_BUILD_MANIFEST_SHA256%"=="" goto :failed
 > "%PUBLISH_DIR%\SOURCE_SHA" echo %SOURCE_SHA%
 > "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo REPOSITORY=AORebirth
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo COMMIT_SHA=%SOURCE_SHA%
+>> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo ZONEENGINE_IMPLEMENTATION=%ENGINE%
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo BUILD_PLATFORM=windows-hosted-linux-publish
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo RUNTIME_IDENTIFIER=%RUNTIME_ID%
 >> "%PUBLISH_DIR%\BUILD_PROVENANCE.env" echo CONFIGURATION=Release

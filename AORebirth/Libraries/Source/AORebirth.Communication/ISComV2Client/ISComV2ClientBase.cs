@@ -311,7 +311,7 @@ namespace AORebirth.Communication.ISComV2Client
             this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             this._tcpSock.NoDelay = true;
             this._tcpSock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-#if AOREBIRTH_LINUX
+#if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
             try
             {
                 this._tcpSock.SetSocketOption(

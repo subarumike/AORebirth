@@ -97,7 +97,7 @@ namespace Utility.Config
         {
             get
             {
-#if AOREBIRTH_LINUX
+#if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
                 if (this._config == null)
                 {
                     this._config = LoadConfig();
@@ -199,7 +199,7 @@ namespace Utility.Config
                     new XmlSerializer(typeof(Config)).Deserialize(
                         new MemoryStream(File.ReadAllBytes(GetConfigPath())));
 
-#if AOREBIRTH_LINUX
+#if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
             string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
             if (string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal)
                 && !string.IsNullOrWhiteSpace(config.MysqlConnection)

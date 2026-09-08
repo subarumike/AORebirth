@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-09-01
+Updated: 2026-09-08
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -9,13 +9,16 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Delmus's nine `origin/zoneengine` commits through `4a5e86e2` are reconciled
-  with the current master line as development-only ZoneEngine_New work. Legacy
-  ZoneEngine remains the production/default route. Both engine builds, the
-  47-test ZoneEngine_New suite, the 1,127-test AOtomation suite, and all 12
-  mandatory repository gates pass. The additive item-instance migrations are
-  tracked but unapplied; no database, Linux production, or live-client action
-  was performed as part of reconciliation.
+- The full-integration candidate builds on Delmus reconciliation
+  `307e87670f9d26b50b1ed26e019684726600c52c`. Its normal Windows/Linux wrappers
+  select `ZoneEngine_New`; Legacy requires explicit rollback selection.
+  Schema startup authority is removed and an acknowledged operator migration
+  tool is provided. The offline world package is pinned and validated. This is
+  not a production-accepted release: missing external gameplay routes and
+  unbridged accepted NPC profiles still block master promotion.
+  Historical build-only acceptance does not establish NewEngine gameplay parity.
+  Production remains unchanged. See
+  `docs/evidence/ZONEENGINE_NEW_FULL_INTEGRATION_20260908.md`.
 - DAO refactor Phase 1 infrastructure and the Phase 2 mission-persistence source
   slice are implemented without schema, packet, or gameplay changes. Mission
   runtime, roll-fee persistence, start-area selection, and mission account-key

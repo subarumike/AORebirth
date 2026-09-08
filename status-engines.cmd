@@ -3,6 +3,7 @@ setlocal EnableExtensions DisableDelayedExpansion
 
 set "STATUS_PROBE=%~dp0Tools\engine_status_probe.js"
 set "STATUS_CONFIG=%~dp0AORebirth\Config\Config.xml"
+if defined AO_REBIRTH_CONFIG_PATH set "STATUS_CONFIG=%AO_REBIRTH_CONFIG_PATH%"
 set "STATUS_ENGINE_DIR=%~dp0AORebirth\Built\Debug"
 set "CSCRIPT_EXE=%SystemRoot%\System32\cscript.exe"
 

@@ -5,6 +5,8 @@ export LC_ALL=C
 readonly EXPECTED_OWNERSHIP_DIR="/var/lib/ao-rebirth/session-ownership"
 readonly EXPECTED_SERVICE_USER="aorebirth"
 readonly EXPECTED_SERVICE_GROUP="aorebirth"
+readonly ZONE_APPHOST="ZoneEngine_New"
+PREVIOUS_ZONE_APPHOST=""
 readonly EXPECTED_DATABASE="aorebirth_chatengine_stage6"
 readonly DATABASE_CONTAINER="aorebirth-chatengine-mysql-stage6"
 readonly READINESS_TIMEOUT_SECONDS=30
@@ -227,16 +229,16 @@ validate_units()
     [[ "$(ownership_value "${LOGIN_UNIT_SOURCE}")" != /tmp* ]] || fail "ownership directory must not be under /tmp"
     require_exact_line "${LOGIN_UNIT_SOURCE}" "Environment=AO_REBIRTH_BIND_MODE=Public" "LoginEngine Public bind contract failed"
     require_exact_line "${LOGIN_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/loginengine/current/LoginEngine --headless" "LoginEngine executable contract failed"
-    require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --recover-stale-online --recovery-lock-file /run/ao-rebirth-zoneengine/stale-online-recovery.lock" "ZoneEngine stale-online recovery contract failed"
-    require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-database" "ZoneEngine database validation contract failed"
-    require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown" "ZoneEngine production executable contract failed"
-    [[ "$(grep -Fxc -- "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle --shutdown-file /run/ao-rebirth-zoneengine/shutdown" "${ZONE_UNIT_SOURCE}" || true)" == "0" ]] || fail "ZoneEngine validation lifecycle cannot be production ExecStart"
-    local ownership_line recovery_line database_line start_line
+    [[ "$(grep -Ec -- '(^Exec.*--migrate|^Exec.*--recover-stale-online)' "${ZONE_UNIT_SOURCE}" || true)" == "0" ]] || fail "ZoneEngine startup mutation command is forbidden"
+    require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --validate-database" "ZoneEngine database validation contract failed"
+    require_exact_line "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown" "ZoneEngine production executable contract failed"
+    [[ "$(grep -Fxc -- "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --validate-lifecycle --shutdown-file /run/ao-rebirth-zoneengine/shutdown" "${ZONE_UNIT_SOURCE}" || true)" == "0" ]] || fail "ZoneEngine validation lifecycle cannot be production ExecStart"
+    local ownership_line startup_line database_line start_line
     ownership_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/usr/bin/install -d -m 0700 ${EXPECTED_OWNERSHIP_DIR}")"
-    recovery_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --recover-stale-online --recovery-lock-file /run/ao-rebirth-zoneengine/stale-online-recovery.lock")"
-    database_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-database")"
-    start_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown")"
-    (( ownership_line < recovery_line && database_line == recovery_line + 1 && database_line < start_line )) || fail "ZoneEngine ExecStartPre ordering contract failed"
+    startup_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --validate-startup")"
+    database_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --validate-database")"
+    start_line="$(line_number "${ZONE_UNIT_SOURCE}" "ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown")"
+    (( ownership_line < startup_line && database_line == startup_line + 1 && database_line < start_line )) || fail "ZoneEngine ExecStartPre ordering contract failed"
 }
 
 service_active()
@@ -633,7 +635,7 @@ validate_candidate_database_contract()
         AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1 \
         AO_REBIRTH_CONFIG_PATH="${zone_config_path}" \
         AO_REBIRTH_MYSQL_CONNECTION="${zone_connection}" \
-        "${ZONE_ARTIFACT_DIR}/ZoneEngine" --validate-startup >/dev/null; then
+        "${ZONE_ARTIFACT_DIR}/${ZONE_APPHOST}" --validate-startup >/dev/null; then
         fail "candidate ZoneEngine startup contract validation failed"
     fi
     if ! runuser -u "${EXPECTED_SERVICE_USER}" -g "${EXPECTED_SERVICE_GROUP}" -- env \
@@ -645,7 +647,7 @@ validate_candidate_database_contract()
         AO_REBIRTH_CHAT_LISTEN_IP=127.0.0.1 \
         AO_REBIRTH_CONFIG_PATH="${zone_config_path}" \
         AO_REBIRTH_MYSQL_CONNECTION="${zone_connection}" \
-        "${ZONE_ARTIFACT_DIR}/ZoneEngine" --validate-database >/dev/null; then
+        "${ZONE_ARTIFACT_DIR}/${ZONE_APPHOST}" --validate-database >/dev/null; then
         fail "candidate ZoneEngine database contract validation failed"
     fi
     echo "CANDIDATE_DATABASE_COMPATIBILITY=PASS"
@@ -794,7 +796,14 @@ require_rollback_material()
     [[ -n "${PREVIOUS_LOGIN_LINK_TARGET}" ]] || fail "could not capture prior LoginEngine current symlink target"
     [[ -n "${PREVIOUS_ZONE_LINK_TARGET}" ]] || fail "could not capture prior ZoneEngine current symlink target"
     require_regular_file "${PREVIOUS_LOGIN_RELEASE}/LoginEngine"
-    require_regular_file "${PREVIOUS_ZONE_RELEASE}/ZoneEngine"
+    if [[ -f "${PREVIOUS_ZONE_RELEASE}/ZoneEngine_New" && ! -e "${PREVIOUS_ZONE_RELEASE}/ZoneEngine" ]]; then
+        PREVIOUS_ZONE_APPHOST="ZoneEngine_New"
+    elif [[ -f "${PREVIOUS_ZONE_RELEASE}/ZoneEngine" && ! -e "${PREVIOUS_ZONE_RELEASE}/ZoneEngine_New" ]]; then
+        PREVIOUS_ZONE_APPHOST="ZoneEngine"
+    else
+        fail "prior ZoneEngine apphost is missing or ambiguous"
+    fi
+    require_regular_file "${PREVIOUS_ZONE_RELEASE}/${PREVIOUS_ZONE_APPHOST}"
     require_regular_file "${LOGIN_UNIT_TARGET}"
     require_regular_file "${ZONE_UNIT_TARGET}"
     require_regular_file "${LOGIN_ENV}"
@@ -802,7 +811,7 @@ require_rollback_material()
     require_regular_file "${LOGIN_CONFIG}"
     require_regular_file "${ZONE_CONFIG}"
     PREVIOUS_LOGIN_ARTIFACT_SHA256="$(sha256sum "${PREVIOUS_LOGIN_RELEASE}/LoginEngine" | awk '{print $1}')"
-    PREVIOUS_ZONE_ARTIFACT_SHA256="$(sha256sum "${PREVIOUS_ZONE_RELEASE}/ZoneEngine" | awk '{print $1}')"
+    PREVIOUS_ZONE_ARTIFACT_SHA256="$(sha256sum "${PREVIOUS_ZONE_RELEASE}/${PREVIOUS_ZONE_APPHOST}" | awk '{print $1}')"
     PREVIOUS_LOGIN_UNIT_SHA256="$(sha256sum "${LOGIN_UNIT_TARGET}" | awk '{print $1}')"
     PREVIOUS_ZONE_UNIT_SHA256="$(sha256sum "${ZONE_UNIT_TARGET}" | awk '{print $1}')"
     readonly PREVIOUS_LOGIN_RELEASE PREVIOUS_ZONE_RELEASE PREVIOUS_LOGIN_LINK_TARGET PREVIOUS_ZONE_LINK_TARGET
@@ -852,7 +861,7 @@ preflight()
 {
     validate_manifest_shape
     require_artifact "${LOGIN_ARTIFACT_DIR}" LoginEngine "${LOGIN_ARTIFACT_SHA}"
-    require_artifact "${ZONE_ARTIFACT_DIR}" ZoneEngine "${ZONE_ARTIFACT_SHA}"
+    require_artifact "${ZONE_ARTIFACT_DIR}" "${ZONE_APPHOST}" "${ZONE_ARTIFACT_SHA}"
     require_zone_placement_artifact "${ZONE_ARTIFACT_DIR}"
     validate_units
     verify_unit_static
@@ -912,7 +921,7 @@ current_release_matches()
     [[ "$(tr -d '\r\n\t ' < "${LOGIN_CURRENT}/SOURCE_SHA")" == "${SOURCE_SHA}" ]] || return 1
     [[ "$(tr -d '\r\n\t ' < "${ZONE_CURRENT}/SOURCE_SHA")" == "${SOURCE_SHA}" ]] || return 1
     [[ "$(sha256sum "${LOGIN_CURRENT}/LoginEngine" | awk '{print $1}')" == "${LOGIN_ARTIFACT_SHA}" ]] || return 1
-    [[ "$(sha256sum "${ZONE_CURRENT}/ZoneEngine" | awk '{print $1}')" == "${ZONE_ARTIFACT_SHA}" ]] || return 1
+    [[ "$(sha256sum "${ZONE_CURRENT}/${ZONE_APPHOST}" | awk '{print $1}')" == "${ZONE_ARTIFACT_SHA}" ]] || return 1
     placement_provenance_load \
         "${ZONE_CURRENT}" \
         "${SOURCE_SHA}" \
@@ -952,6 +961,7 @@ PREVIOUS_LOGINENGINE_LINK_TARGET=${PREVIOUS_LOGIN_LINK_TARGET}
 PREVIOUS_ZONEENGINE_LINK_TARGET=${PREVIOUS_ZONE_LINK_TARGET}
 PREVIOUS_LOGINENGINE_ARTIFACT_SHA256=${PREVIOUS_LOGIN_ARTIFACT_SHA256}
 PREVIOUS_ZONEENGINE_ARTIFACT_SHA256=${PREVIOUS_ZONE_ARTIFACT_SHA256}
+PREVIOUS_ZONEENGINE_APPHOST=${PREVIOUS_ZONE_APPHOST}
 PREVIOUS_LOGINENGINE_UNIT_SHA256=${PREVIOUS_LOGIN_UNIT_SHA256}
 PREVIOUS_ZONEENGINE_UNIT_SHA256=${PREVIOUS_ZONE_UNIT_SHA256}
 LOGINENGINE_WAS_ACTIVE=${login_was_active}
@@ -974,7 +984,7 @@ install_release()
         [[ -d "${target}" && ! -L "${target}" ]] || fail "existing release target is unsafe"
         [[ "$(sha256sum "${target}/${apphost}" | awk '{print $1}')" == "${expected_hash}" ]] || fail "existing immutable release differs"
         [[ "$(tr -d '\r\n\t ' < "${target}/SOURCE_SHA")" == "${SOURCE_SHA}" ]] || fail "existing immutable release source differs"
-        if [[ "${apphost}" == "ZoneEngine" ]]; then
+        if [[ "${apphost}" == "${ZONE_APPHOST}" ]]; then
             require_zone_placement_artifact "${target}"
         fi
         return
@@ -994,7 +1004,7 @@ install_release()
         [[ ! -f "${staging}/createdump" ]] || chmod 0750 "${staging}/createdump"
     fi
     [[ "$(sha256sum "${staging}/${apphost}" | awk '{print $1}')" == "${expected_hash}" ]] || fail "staged ${apphost} hash mismatch"
-    if [[ "${apphost}" == "ZoneEngine" ]]; then
+    if [[ "${apphost}" == "${ZONE_APPHOST}" ]]; then
         require_zone_placement_artifact "${staging}"
     fi
     mv -T -- "${staging}" "${target}"
@@ -1092,7 +1102,7 @@ verify_rollback_state()
     [[ "$(realpath -e -- "${LOGIN_CURRENT}")" == "${PREVIOUS_LOGIN_RELEASE}" ]] || return 1
     [[ "$(realpath -e -- "${ZONE_CURRENT}")" == "${PREVIOUS_ZONE_RELEASE}" ]] || return 1
     [[ "$(sha256sum "${LOGIN_CURRENT}/LoginEngine" | awk '{print $1}')" == "${PREVIOUS_LOGIN_ARTIFACT_SHA256}" ]] || return 1
-    [[ "$(sha256sum "${ZONE_CURRENT}/ZoneEngine" | awk '{print $1}')" == "${PREVIOUS_ZONE_ARTIFACT_SHA256}" ]] || return 1
+    [[ "$(sha256sum "${ZONE_CURRENT}/${PREVIOUS_ZONE_APPHOST}" | awk '{print $1}')" == "${PREVIOUS_ZONE_ARTIFACT_SHA256}" ]] || return 1
     [[ "$(sha256sum "${LOGIN_UNIT_TARGET}" | awk '{print $1}')" == "${PREVIOUS_LOGIN_UNIT_SHA256}" ]] || return 1
     [[ "$(sha256sum "${ZONE_UNIT_TARGET}" | awk '{print $1}')" == "${PREVIOUS_ZONE_UNIT_SHA256}" ]] || return 1
     verify_zone_dropin_rollback || return 1
@@ -1182,7 +1192,7 @@ main()
     verify_closed_engine_boundary
     inject_failure artifact_install
     install_release "${LOGIN_ARTIFACT_DIR}" LoginEngine "${LOGIN_ARTIFACT_SHA}" "${LOGIN_RELEASE_TARGET}" "${LOGIN_RELEASES}"
-    install_release "${ZONE_ARTIFACT_DIR}" ZoneEngine "${ZONE_ARTIFACT_SHA}" "${ZONE_RELEASE_TARGET}" "${ZONE_RELEASES}"
+    install_release "${ZONE_ARTIFACT_DIR}" "${ZONE_APPHOST}" "${ZONE_ARTIFACT_SHA}" "${ZONE_RELEASE_TARGET}" "${ZONE_RELEASES}"
     inject_failure unit_install
     install_units
     switch_link "${LOGIN_CURRENT}" "${LOGIN_RELEASE_TARGET}"

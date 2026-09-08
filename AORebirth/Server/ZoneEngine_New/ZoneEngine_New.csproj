@@ -27,15 +27,15 @@
   <ItemGroup>
     <PackageReference Include="AODB" Version="1.0.6" />
     <PackageReference Include="BepuPhysics" Version="2.5.0-beta.25" />
-    <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
     <PackageReference Include="NLog" Version="6.1.4" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj" />
+    <ProjectReference Include="../../Libraries/Source/AORebirth.World.Package/AORebirth.World.Package.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/Utility.ZoneNew.WinNet10.csproj" />
@@ -45,12 +45,27 @@
   <!-- Sources under this directory are globbed by the SDK. Only the shared assembly info,
        which lives outside the project cone, needs an explicit entry. -->
   <ItemGroup>
+    <!-- Shared evidence-only placement validation, not legacy runtime ownership. -->
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" Link="Shared/CharacterOnlineOwnershipGuard.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacement.cs" Link="OfficialPlacements/OfficialPlayfieldPlacement.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs" Link="OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/LinuxBuild/Compatibility/ZoneEngine/JavaScriptSerializer.Linux.cs" Link="Compatibility/JavaScriptSerializer.cs" />
     <Compile Include="..\..\SolutionAssemblyInfo.cs">
       <Link>Properties\SolutionAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
 
     <ItemGroup>
+    <Content Include="$(AORebirthRepositoryRoot)/docs/generated/playfields/official-placement-corpus-manifest.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/official-placement-index.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/official-placement-summary.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/official-acghash-inventory.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/playfield-package-manifest.json">
+      <Link>Content/Official/PlayfieldPlacements/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="$(AORebirthRepositoryRoot)/docs/generated/playfields/placements/pf_*.json">
+      <Link>Content/Official/PlayfieldPlacements/placements/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="..\..\Config\Config.xml">
       <Link>Config.xml</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

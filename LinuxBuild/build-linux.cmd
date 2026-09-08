@@ -9,6 +9,12 @@ if errorlevel 1 (
     exit /b 1
 )
 
+dotnet run --project Tools\BackendIntegrationGuard\BackendIntegrationGuard.csproj --configuration Release -- --repository-root .. --self-test
+if errorlevel 1 (
+    popd
+    exit /b 1
+)
+
 dotnet build AORebirth.Linux.slnx --configuration Release --nologo
 set "EXIT_CODE=%ERRORLEVEL%"
 if not "%EXIT_CODE%"=="0" (

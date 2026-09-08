@@ -291,7 +291,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 "LinuxBuild",
                 "deployment",
                 "systemd",
-                "ao-rebirth-zoneengine.service");
+                "ao-rebirth-zoneengine-legacy.service");
             string[] lines = File.ReadAllLines(unitPath);
             int recoveryIndex = Array.FindIndex(
                 lines,

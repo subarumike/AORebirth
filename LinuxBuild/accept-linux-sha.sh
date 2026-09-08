@@ -96,6 +96,16 @@ if [[ ! -d "${repo_dir}/.git" ]]; then
     git clone --no-checkout "${repo_url}" "${repo_dir}"
 fi
 
+# Validate input location before cleanup, so a mistakenly supplied archive inside
+# the checkout is rejected rather than deleted by the governed clean operation.
+[[ -n "${AO_REBIRTH_PLAYFIELD_PACKAGE_ARCHIVE:-}" ]] || fail "PLAYFIELD_PACKAGE_ARCHIVE_REQUIRED"
+[[ -f "${AO_REBIRTH_PLAYFIELD_PACKAGE_ARCHIVE}" && ! -L "${AO_REBIRTH_PLAYFIELD_PACKAGE_ARCHIVE}" ]] \
+    || fail "PLAYFIELD_PACKAGE_ARCHIVE_INVALID"
+playfield_package_archive="$(realpath -e -- "${AO_REBIRTH_PLAYFIELD_PACKAGE_ARCHIVE}")"
+case "${playfield_package_archive}" in
+    "${repo_dir}"|"${repo_dir}"/*) fail "PLAYFIELD_PACKAGE_ARCHIVE_MUST_BE_OUTSIDE_CHECKOUT" ;;
+esac
+
 git -C "${repo_dir}" fetch origin
 git -C "${repo_dir}" checkout --detach "${expected_sha}"
 git -C "${repo_dir}" reset --hard "${expected_sha}"
@@ -122,8 +132,20 @@ echo "TRACKED_SOURCE_CLEAN=PASS"
 # caller checkout that launched this wrapper.
 source "${repo_dir}/LinuxBuild/placement-provenance.sh"
 
+# Clean acceptance never relies on ignored files left in a checkout. The operator
+# supplies a local immutable archive outside that checkout; no download/fallback.
+bash "${repo_dir}/Tools/manage_playfield_package.sh" --self-test
+bash "${repo_dir}/Tools/manage_playfield_package.sh" import \
+    --root "${repo_dir}/AORebirth/GameData/Playfields" \
+    --manifest "${repo_dir}/docs/generated/playfields/playfield-package-manifest.json" \
+    --archive "${AO_REBIRTH_PLAYFIELD_PACKAGE_ARCHIVE}"
+
+"${repo_dir}/LinuxBuild/build-linux.sh"
+dotnet test "${repo_dir}/AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj" --configuration Release --nologo
+"${repo_dir}/LinuxBuild/publish-chatengine.sh" "${runtime_id}" "${self_contained}"
 "${repo_dir}/LinuxBuild/publish-loginengine.sh" "${runtime_id}" "${self_contained}"
 "${repo_dir}/LinuxBuild/publish-zoneengine.sh" "${runtime_id}" "${self_contained}"
+"${repo_dir}/LinuxBuild/publish-zoneengine.sh" "${runtime_id}" "${self_contained}" legacy
 bash "${repo_dir}/LinuxBuild/deployment/production-release/tests/test-upgrade-active-services.sh"
 bash "${repo_dir}/LinuxBuild/deployment/zone-stage9/test-artifact-provenance.sh"
 
@@ -140,6 +162,7 @@ if ! placement_require_build_provenance "${zone_publish_dir}/BUILD_PROVENANCE.en
     fail "PLACEMENT_BUILD_PROVENANCE_INVALID"
 fi
 dotnet_sdk_version="$(dotnet --version)"
+[[ -z "$(git -C "${repo_dir}" status --porcelain --untracked-files=no)" ]] || fail "TRACKED_SOURCE_CHANGED_DURING_ACCEPTANCE"
 build_timestamp_utc="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 build_host_type="$(uname -srm)"
 
@@ -161,6 +184,7 @@ BUILD_TIMESTAMP_UTC=${build_timestamp_utc}
 ACCEPTANCE_RESULT=PASS
 EOF
     if [[ "${include_placement}" == "true" ]]; then
+        printf '%s\n' 'ZONEENGINE_IMPLEMENTATION=new' >> "${publish_dir}/BUILD_PROVENANCE.env"
         placement_append_build_provenance "${publish_dir}/BUILD_PROVENANCE.env"
     fi
 
@@ -176,6 +200,7 @@ PUBLISH=PASS
 RUNTIME_IDENTIFIER=${runtime_id}
 SELF_CONTAINED=${self_contained}
 LINUX_ACCEPTANCE=PASS
+ZONEENGINE_DEFAULT=ZoneEngine_New
 EOF
     if [[ "${include_placement}" == "true" ]]; then
         cat >> "${publish_dir}/LINUX_ACCEPTANCE.env" <<EOF
@@ -211,4 +236,5 @@ echo "LINUX_PLACEMENT_RESOURCES=${PLACEMENT_RESOURCE_COUNT}"
 echo "LINUX_PLACEMENT_DISTRICTS=${PLACEMENT_DISTRICT_COUNT}"
 echo "LINUX_PLACEMENT_RECORDS=${PLACEMENT_RECORD_COUNT}"
 echo "LINUX_UNIQUE_ACGHASH_TAGS=${PLACEMENT_UNIQUE_ACGHASH_COUNT}"
+echo "LINUX_DEFAULT_ZONEENGINE=ZoneEngine_New"
 echo "LINUX_ACCEPTANCE=PASS"

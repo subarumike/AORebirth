@@ -46,7 +46,7 @@ zone_unit="$(realpath -e -- "${zone_unit}")"
 [[ "${login_unit}" == "${repository_root}/LinuxBuild/deployment/systemd/ao-rebirth-loginengine.service" ]] || fail "LoginEngine unit is not the repository-controlled unit"
 [[ "${zone_unit}" == "${repository_root}/LinuxBuild/deployment/systemd/ao-rebirth-zoneengine.service" ]] || fail "ZoneEngine unit is not the repository-controlled unit"
 
-for pair in "${login_artifact_dir}:LoginEngine" "${zone_artifact_dir}:ZoneEngine"; do
+for pair in "${login_artifact_dir}:LoginEngine" "${zone_artifact_dir}:ZoneEngine_New"; do
     artifact_dir="${pair%:*}"
     apphost="${pair##*:}"
     [[ -f "${artifact_dir}/${apphost}" && ! -L "${artifact_dir}/${apphost}" ]] || fail "missing ${apphost} artifact"
@@ -80,7 +80,7 @@ BUILD_TIMESTAMP_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 LOGINENGINE_ARTIFACT_DIR=${login_artifact_dir}
 LOGINENGINE_ARTIFACT_SHA256=$(sha256sum "${login_artifact_dir}/LoginEngine" | awk '{print $1}')
 ZONEENGINE_ARTIFACT_DIR=${zone_artifact_dir}
-ZONEENGINE_ARTIFACT_SHA256=$(sha256sum "${zone_artifact_dir}/ZoneEngine" | awk '{print $1}')
+ZONEENGINE_ARTIFACT_SHA256=$(sha256sum "${zone_artifact_dir}/ZoneEngine_New" | awk '{print $1}')
 PLACEMENT_CORPUS_VERSION=${PLACEMENT_CORPUS_VERSION}
 PLACEMENT_CORPUS_MANIFEST_SHA256=${PLACEMENT_CORPUS_MANIFEST_SHA256}
 PLACEMENT_CORPUS_SUMMARY_SHA256=${PLACEMENT_CORPUS_SUMMARY_SHA256}

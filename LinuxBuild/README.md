@@ -1,4 +1,21 @@
-# AORebirth parallel Linux build
+# AORebirth Linux backend
+
+`ZoneEngine_New` is the authoritative ZoneEngine on both Windows and Linux.
+The normal Linux build and publish commands below select the shared SDK project
+`AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj`. Legacy `ZoneEngine.Linux`
+is retained for explicit rollback and contract compatibility only.
+
+```sh
+./LinuxBuild/build-linux.sh
+./LinuxBuild/publish-zoneengine.sh linux-x64 true
+# Explicit rollback package, isolated from the default package:
+./LinuxBuild/publish-zoneengine.sh linux-x64 true legacy
+```
+
+See [the backend deployment and rollback plan](deployment/ZONEENGINE_NEW_BACKEND.md)
+for schema prerequisites, readiness, and the production approval boundary. The
+stage history below documents compatibility foundations; it does not choose the
+current default runtime.
 
 This directory adds a Linux-targeted build lane alongside the existing
 Windows/.NET Framework solution. The existing project files, lifecycle
@@ -28,7 +45,7 @@ metrics, and compression smoke checks. The current foundation compiles
 `Cell.Core`, `Utility`, `AORebirth.Enums`, `AORebirth.Core.Exceptions`,
 `AORebirth.Interfaces`, `AORebirth.ObjectManager`, `AORebirth.Database`, and
 `AORebirth.Stats`, and `AORebirth.Communication` from guarded legacy
-source/resource inventories. Database's 34 SQL assets are guarded from the
+source/resource inventories. Database SQL assets are guarded from the
 legacy Content inventory and copied exactly to build and publish outputs.
 Utility uses a Linux-only source for portable CPU/RAM metrics and references a
 separate `Ionic.Zlib` compatibility assembly, preserving the original external
@@ -90,7 +107,7 @@ LinuxBuild\verify-stage3-offline.cmd
 
 The offline gate exercises Dapper binary parameters/materialization, closed
 provider construction, SQL generation, and safe Stats behavior without opening
-a connection. It also verifies the exact 34 SQL assets by name, case, length,
+a connection. It also verifies the exact governed SQL identity set by name, case, length,
 and SHA-256 in source, build, and `linux-x64` publish output. MySQL remains the
 only operationally supported schema dialect; PostgreSQL and SQL Server are
 compile-covered only.

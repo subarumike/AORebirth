@@ -120,7 +120,7 @@ Build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, then builds `AORebirth.Core`, `LoginEngine`, `ZoneEngine`, `DatabasePreflight`, and `WebEngine`, using:
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, preserves unrelated processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, then builds `AORebirth.Core`, `LoginEngine`, legacy `ZoneEngine`, `DatabasePreflight`, and `WebEngine`, using:
 
 ```cmd
 MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
@@ -184,21 +184,36 @@ launched-PID ownership and rolls back only processes launched by that
 invocation. Managed shutdown trusts only PID metadata whose executable path and
 start time match and never falls back to killing processes by name.
 
-`ZoneEngine_New` remains an explicit development route. Build it with:
+On the full-integration candidate branch, normal build/acceptance also builds and
+tests `ZoneEngine_New`, the selected default backend. Build it alone with:
 
 ```cmd
-dotnet build AORebirth\Server\ZoneEngine_New\ZoneEngine_New.csproj --configuration Debug
+cmd /d /c NewZoneEngineBuild\build.cmd
 ```
 
 Then start ChatEngine, LoginEngine, and `ZoneEngine_New` in the governed order
 with:
 
 ```cmd
-cmd /d /c restart-engines.cmd -NewZoneEngine
+cmd /d /c restart-engines.cmd
 ```
 
-This option does not change the default legacy route and does not authorize a
-Linux or production migration.
+Use `restart-engines.cmd -LegacyZoneEngine` and
+`status-engines.cmd --legacy-zoneengine` only for deliberate legacy rollback.
+`-NewZoneEngine` remains a redundant compatibility alias, not a second runtime.
+New startup requires schema-current readiness before services are stopped or
+started. No engine startup can migrate the database. `--validate-startup` checks
+configuration and the packaged world without opening the database;
+`--validate-database` performs read-only schema readiness. Neither is a migration.
+The separate operator command and production boundary are documented in
+`docs/project/ZONEENGINE_NEW_TRANSITION_PLAN.md`.
+
+Clean checkouts must explicitly import the pinned offline Playfields archive
+using `docs/project/PLAYFIELD_PACKAGE_SUPPLY.md` before offline startup acceptance.
+This candidate is not yet accepted for master or deployment: the gameplay route
+audit identifies missing legacy features and unbridged accepted NPC profiles.
+Keep the fail-closed checks; do not start a partially packaged world or substitute
+fixture content. Existing production is unchanged.
 
 WebEngine remains excluded from normal startup. Its explicit optional workflow
 is:

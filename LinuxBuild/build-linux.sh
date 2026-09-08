@@ -9,6 +9,8 @@ dotnet run --project Tools/SourceInventoryGuard/SourceInventoryGuard.csproj -- \
   --manifest source-inventory/inventory.json \
   --check
 
+dotnet run --project Tools/BackendIntegrationGuard/BackendIntegrationGuard.csproj --configuration Release -- --repository-root .. --self-test
+
 dotnet build AORebirth.Linux.slnx --configuration Release --nologo
 dotnet run --project Tools/CompatibilitySmokeTests/CompatibilitySmokeTests.csproj \
   --configuration Release \

@@ -1,5 +1,7 @@
 from pathlib import Path
+import json
 import re
+import subprocess
 import sys
 
 
@@ -49,6 +51,7 @@ def main():
             "normal startup must not opt into WebEngine")
 
     ordered(restart_cmd, "preflight-database.cmd", "stop-engines.cmd", "start-engines.cmd")
+    ordered(restart_cmd, "-ValidateSchemaOnly", "stop-engines.cmd", "start-engines.cmd")
     require("running engines were not stopped" in restart_cmd,
             "restart preflight failure must preserve running engines")
 
@@ -73,10 +76,42 @@ def main():
     require("Get-Process -Name" not in start_ps,
             "startup must not trust or manipulate processes by name alone")
 
+    def select_backend(*arguments):
+        return subprocess.run(
+            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+             str(ROOT / "start-engines.ps1"), "-PrintEngineSelection", *arguments],
+            capture_output=True, text=True, check=False)
+
+    normal = select_backend()
+    require(normal.returncode == 0, "normal launcher selection failed")
+    require(json.loads(normal.stdout) == {
+        "Name": "ZoneEngine_New", "File": "ZoneEngine_New\\ZoneEngine_New.exe"},
+        "normal Windows launcher must select the exact ZoneEngine_New backend")
+    rollback = select_backend("-LegacyZoneEngine")
+    require(rollback.returncode == 0, "explicit rollback selection failed")
+    require(json.loads(rollback.stdout) == {"Name": "ZoneEngine", "File": "ZoneEngine.exe"},
+        "legacy backend must require explicit rollback selection")
+    require(select_backend("-LegacyZoneEngine", "-NewZoneEngine").returncode != 0,
+        "ambiguous backend selection must fail closed")
+    require("taskkill" not in build_cmd.lower(),
+        "normal backend build must not kill unrelated dotnet/runtime processes")
+    require("run_zoneengine_new_tests.cmd" in mandatory_gate,
+        "normal mandatory acceptance must exercise NewEngine tests and startup validation")
+    ordered(start_ps, "$newZoneExecutable --validate-startup", "$newZoneExecutable --validate-database", "if ($ValidateSchemaOnly)")
+    require(start_ps.count('$prestartExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $processName)') == 1,
+        "all backends must use the same ownership-safe and idempotent prestart")
+    require("pre-start check requires no process" not in start_ps,
+        "a healthy managed New backend must not be rejected by an obsolete special prestart")
+    require("Built\\Debug\\ZoneEngine_New\\Content" in windows_acceptance,
+        "Windows acceptance must validate the default NewEngine package")
+
     require("Get-Process -Name" not in stop_ps,
             "shutdown must not fall back to killing processes by name")
     require("metadataIsTrusted" in stop_ps and "StartedAt" in stop_ps and "--prestart" in stop_ps,
             "shutdown must validate managed PID path/start identity and released ports")
+    require(stop_ps.count("foreach ($engine in $engines)") == 2,
+            "shared zone port release checks must run after all selected engines stop")
+    ordered(stop_ps, "Stop-EngineProcess -Process $metadataProcess", "# Both zone implementations share one port", "--prestart ZoneEngine_New")
     require('$configPath = Join-Path $root "AORebirth\\Config\\Config.xml"' in stop_ps,
             "shutdown status probes must use the repository configuration")
     require("$statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name" in stop_ps,

@@ -257,6 +257,7 @@ main()
         return
     fi
 
+    [[ "${AO_REBIRTH_LEGACY_ROLLBACK:-}" == "YES" ]] || fail "This historical legacy-only workflow requires explicit AO_REBIRTH_LEGACY_ROLLBACK=YES; use production-release for ZoneEngine_New."
     require_root
     [[ "$#" -eq 3 ]] || fail "usage: upgrade-live-service.sh <publish-dir> <release-id> <expected-source-sha>"
     local publish_dir

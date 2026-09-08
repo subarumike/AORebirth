@@ -5,6 +5,7 @@ namespace ZoneEngine_New.Core.Network
         Connected,
         Loading,
         SpawnReady,
-        InPlay
+        InPlay,
+        Closed
     }
 }

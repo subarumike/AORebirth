@@ -898,7 +898,14 @@ namespace AORebirth.LinuxBuild.Contracts
             string inventoryPath = RequireFile(Path.Combine(root, "LinuxBuild", "source-inventory", "AORebirth.Database.ContentItems.props"), "Database SQL content inventory");
             XDocument inventory = LoadXml(inventoryPath);
             XElement[] content = inventory.Descendants().Where(element => element.Name.LocalName == "Content").ToArray();
-            Assert(content.Length == 36, "Database SQL content inventory must contain exactly 36 packaged assets.");
+            string databaseProject = Path.Combine(root, "AORebirth", "Libraries", "Source", "AORebirth.Database", "AORebirth.Database.csproj");
+            string[] declared = LoadXml(databaseProject).Descendants().Where(e => e.Name.LocalName == "Content")
+                .Select(e => RequireAttribute(e, "Include").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            string[] packaged = content.Select(e => RequireAttribute(e, "Link").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            Assert(declared.SequenceEqual(packaged, StringComparer.Ordinal), "Database SQL inventory identity set differs from the authoritative project.");
+            string[] actual = Directory.GetFiles(Path.Combine(publish, "SqlTables"), "*.sql", SearchOption.AllDirectories)
+                .Select(p => "SqlTables/" + Path.GetRelativePath(Path.Combine(publish, "SqlTables"), p).Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            Assert(packaged.SequenceEqual(actual, StringComparer.Ordinal), "Published SQL identity set contains missing or unexpected assets.");
             Assert(
                 content.Count(
                     item => string.Equals(

@@ -2,13 +2,20 @@
 
 ## Active
 
-Reconcile Delmus's nine `origin/zoneengine` commits through `4a5e86e2` with the
-current master line. Keep Legacy ZoneEngine as the production/default route;
-ZoneEngine_New remains development-only. The merged source passes the Legacy and
-ZoneEngine_New builds, its 47-test focused suite, the 1,127-test AOtomation suite,
-and all 12 mandatory repository gates. The included additive item-instance
-database migrations remain unapplied pending explicit schema approval. Governed
-exact-SHA Windows acceptance remains before the merge is promoted to master.
+Integrate `ZoneEngine_New` as the governed Windows/Linux default on
+`codex/zoneengine-new-full-integration`, based on integration commit
+`307e87670f9d26b50b1ed26e019684726600c52c`. Runtime startup is schema-read-only;
+the separate operator migration tool owns explicit, acknowledged schema changes.
+Legacy is an explicit rollback selection in this candidate branch.
+
+The clean-checkout playfield package is pinned and validated; see
+`docs/project/PLAYFIELD_PACKAGE_SUPPLY.md`. Master promotion remains blocked until
+external gameplay contract gaps are resolved and the complete Windows then
+same-SHA Linux acceptance gates pass. Missing content must not be replaced with
+empty fixtures or made optional to obtain acceptance. No production deployment,
+production schema mutation, public-network change, or live client use is authorized.
+See `docs/evidence/ZONEENGINE_NEW_FULL_INTEGRATION_20260908.md` and
+`docs/project/ZONEENGINE_NEW_TRANSITION_PLAN.md` for evidence and remaining gates.
 
 ## Prior active checkpoint
 
