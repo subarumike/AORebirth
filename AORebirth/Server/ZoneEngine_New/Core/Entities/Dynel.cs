@@ -108,6 +108,10 @@ namespace ZoneEngine_New.Core.Entities
                 GetType().Name + " does not implement BuildSpawnMessage.");
         }
 
+        /// <summary>Exact accepted wire for a spawn not representable by the shared typed codec.
+        /// Ordinary dynels return null and retain the existing typed path.</summary>
+        public virtual byte[]? BuildSpawnPacket(Identity receiver) => null;
+
         /// <summary>
         /// Additional packets sent right after <see cref="BuildSpawnMessage"/> when this dynel enters
         /// a client's visibility. Used for objects that are rendered as part of another dynel, such as

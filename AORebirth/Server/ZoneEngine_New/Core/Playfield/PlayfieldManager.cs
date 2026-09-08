@@ -19,6 +19,11 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.Teams;
+    using ZoneEngine_New.Core.Missions;
+    using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine.Core.Missions;
+    using AORebirth.Interfaces.Persistence.Missions;
 
     public sealed class PlayfieldManager : IDisposable
     {
@@ -27,6 +32,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly Lock _sync = new();
         private readonly Dictionary<int, Playfield> _playfields = new();
         private readonly Dictionary<int, Player> _playersByCharacterId = new();
+        private readonly HashSet<int> _failedMissionReleases = new();
         private readonly IZoneLogger _logger;
         private readonly IMessageRouter _router;
         private readonly PlayerHydrator _playerHydrator;
@@ -55,7 +61,11 @@ namespace ZoneEngine_New.Core.Playfield
             InventoryFlushService inventoryFlush,
             TradeService trades,
             CharacterSnapshotService characterSnapshot,
-            IPlayfieldMetricsRegistry metricsRegistry)
+            IPlayfieldMetricsRegistry metricsRegistry,
+            TeamService teams,
+            NanoService nanos,
+            GeneratedMissionAcgService missions,
+            AuthoredQuestService authoredQuests)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
@@ -84,6 +94,50 @@ namespace ZoneEngine_New.Core.Playfield
             _trades = trades;
             _characterSnapshot = characterSnapshot;
             _metricsRegistry = metricsRegistry;
+            Teams = teams ?? throw new ArgumentNullException(nameof(teams));
+            Nanos = nanos ?? throw new ArgumentNullException(nameof(nanos));
+            Missions = missions ?? throw new ArgumentNullException(nameof(missions));
+            AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
+        }
+
+        public TeamService Teams { get; }
+        public NanoService Nanos { get; }
+        public GeneratedMissionAcgService Missions { get; }
+        public AuthoredQuestService AuthoredQuests { get; }
+
+        /// <summary>Releases only the exact ended, empty mission lease; never an ordinary playfield.</summary>
+        public bool TryReleaseMission(GeneratedMissionBinding binding)
+        {
+            ArgumentNullException.ThrowIfNull(binding);
+            if (binding.State == GeneratedMissionState.Active || binding.OwnerId <= 0) return false;
+            MissionPlayfield? released;
+            lock (_sync)
+            {
+                if (_disposed) return false;
+                if (_failedMissionReleases.Contains(binding.LivePlayfield)) return false;
+                if (!_playfields.TryGetValue(binding.LivePlayfield, out var existing)) return true;
+                if (existing is not MissionPlayfield mission) return false;
+                var world = mission.World;
+                if (world.OwnerId != binding.OwnerId || world.QuestType != binding.QuestType
+                    || world.QuestInstance != binding.QuestInstance || world.BundleId != binding.BundleId
+                    || world.BundleSha256 != binding.BundleSha256 || world.LivePlayfield != binding.LivePlayfield
+                    || world.BuildingType != binding.BuildingType || world.BuildingInstance != binding.BuildingInstance)
+                    return false;
+                if (mission.GetRequiredService<DynelRegistry>().PlayerEntities().Any()
+                    || _playersByCharacterId.Values.Any(player => ReferenceEquals(player.Playfield, mission))) return false;
+                _playfields.Remove(binding.LivePlayfield);
+                released = mission;
+            }
+            // Callers are on the exterior owner's tick, never this world's heartbeat.
+            // Do not join/dispose a heartbeat while holding the manager lock.
+            try { released.Dispose(); }
+            catch (Exception exception)
+            {
+                lock (_sync) _failedMissionReleases.Add(binding.LivePlayfield);
+                _logger.Error(exception, "Mission world disposal failed; release checkpoint remains pending until restart.");
+                return false;
+            }
+            return true;
         }
 
         public static TimeSpan ResolveLinkDeadTimeout()
@@ -99,6 +153,12 @@ namespace ZoneEngine_New.Core.Playfield
         public Playfield GetOrCreate(int playfieldId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playfieldId);
+
+            // SQL-leased mission instances require their exact accepted binding;
+            // an unknown lease must never become an ordinary empty RDB playfield.
+            if (playfieldId >= MissionAcgIdentityRanges.MinimumLivePlayfield2
+                && playfieldId <= MissionAcgIdentityRanges.MaximumLivePlayfield2)
+                throw new InvalidOperationException("A generated mission playfield requires its owned accepted world binding.");
 
             lock (_sync)
             {
@@ -188,6 +248,53 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 return _playfields.TryGetValue(playfieldId, out playfield);
             }
+        }
+
+        public MissionPlayfield GetOrCreateMission(GeneratedMissionWorld world)
+        {
+            ArgumentNullException.ThrowIfNull(world);
+            if (world.LivePlayfield < MissionAcgIdentityRanges.MinimumLivePlayfield2
+                || world.LivePlayfield > MissionAcgIdentityRanges.MaximumLivePlayfield2)
+                throw new ArgumentOutOfRangeException(nameof(world), "Mission live identity is outside its governed SQL lease namespace.");
+            lock (_sync)
+            {
+                ObjectDisposedException.ThrowIf(_disposed, this);
+                if (_playfields.TryGetValue(world.LivePlayfield, out var existing))
+                    return RequireMissionWorld(existing, world);
+            }
+
+            MissionPlayfield created = new(world, _logger.CreateForPlayfield(world.LivePlayfield), _router,
+                this, _playerHydrator, _gameData, _items, _hashItems, _inventoryRepository, _instanceIds,
+                _inventoryMoves, _inventoryFlush, _trades, _characterSnapshot, _metricsRegistry);
+            try
+            {
+                created.Build();
+                lock (_sync)
+                {
+                    ObjectDisposedException.ThrowIf(_disposed, this);
+                    if (_playfields.TryGetValue(world.LivePlayfield, out var raced))
+                    {
+                        MissionPlayfield winner = RequireMissionWorld(raced, world);
+                        created.Dispose();
+                        return winner;
+                    }
+                    _playfields.Add(world.LivePlayfield, created);
+                }
+            }
+            catch
+            {
+                created.Dispose();
+                throw;
+            }
+            created.StartHeartbeat();
+            return created;
+        }
+
+        private static MissionPlayfield RequireMissionWorld(Playfield candidate, GeneratedMissionWorld world)
+        {
+            if (candidate is not MissionPlayfield mission || !mission.World.Matches(world))
+                throw new InvalidOperationException("Mission live identity is already owned by a different immutable world binding.");
+            return mission;
         }
 
         public bool FindPlayer(int characterId, out Player player)

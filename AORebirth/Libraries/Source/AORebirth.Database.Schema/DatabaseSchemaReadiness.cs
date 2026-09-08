@@ -111,7 +111,7 @@ public static class DatabaseSchemaReadiness
             if (!Equal(actual.DataType, required.DataType) || (required.Unsigned.HasValue && actual.ColumnType.Contains("unsigned", StringComparison.OrdinalIgnoreCase) != required.Unsigned.Value))
                 return Failure(SchemaState.SCHEMA_INCOMPATIBLE, "Incompatible column: " + required.Table + "." + required.Column + "; review the governed schema before migration.", pending);
         }
-        foreach (string table in new[] { "characters", "stats", "charactersuploadednanos", "item_instances", "item_instance_id_sequence", "schema_migrations" })
+        foreach (string table in new[] { "characters", "stats", "charactersuploadednanos", "charactersactivenanos", "missionrewardledger" }.Concat(SchemaContract.MigrationOwnedTables))
             if (snapshot.TableEngines.TryGetValue(table, out string? engine) && !Equal(engine, "InnoDB"))
                 return Failure(SchemaState.SCHEMA_INCOMPATIBLE, "Transactional table must use InnoDB: " + table + ".", pending);
 
@@ -119,7 +119,7 @@ public static class DatabaseSchemaReadiness
             return Failure(SchemaState.SCHEMA_MIGRATION_REQUIRED, "Run DatabaseMigrationTool plan, review the backup and shutdown prerequisites, then explicitly migrate. Missing columns: " + string.Join(", ", missing) + ". Pending migrations: " + string.Join(", ", pending) + ".", pending);
 
         bool Unique(string table, string fields) => snapshot.Indexes.Any(i => Equal(i.Table, table) && i.Unique && Equal(i.Columns, fields));
-        foreach (var required in new[] { ("item_instances", "InstanceId"), ("item_instances", "ContainerType,ContainerInstance,ContainerPlacement"), ("item_instance_id_sequence", "Id"), ("schema_migrations", "MigrationName"), ("stats", "Type,Instance,StatId") })
+        foreach (var required in SchemaContract.UniqueKeys)
             if (!Unique(required.Item1, required.Item2))
                 return Failure(SchemaState.SCHEMA_INCOMPATIBLE, "Required unique key is absent: " + required.Item1 + "(" + required.Item2 + ").");
         if (snapshot.NextInstanceId is null or <= 0 || snapshot.NextInstanceId <= snapshot.MaximumInstanceId || snapshot.NextInstanceId > int.MaxValue - 10000)

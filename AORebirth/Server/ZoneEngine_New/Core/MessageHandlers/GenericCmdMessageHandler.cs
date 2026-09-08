@@ -15,6 +15,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
@@ -22,13 +23,15 @@ namespace ZoneEngine_New.Core.MessageHandlers
     {
         private readonly IInventoryRepository _inventoryRepository;
         private readonly IItemBuilder _items;
+        private readonly GeneratedMissionAcgService _missions;
 
-        public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items)
+        public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items, GeneratedMissionAcgService missions)
         {
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
             _inventoryRepository = inventoryRepository;
             _items = items;
+            _missions = missions ?? throw new ArgumentNullException(nameof(missions));
         }
 
         public Type MessageBodyType => typeof(GenericCmdMessage);
@@ -57,7 +60,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (player == null || player.IsDead)
+            if (player == null || player.IsDead || player.IsPersistenceQuarantined
+                || !ReferenceEquals(player.Session, session) || message.Identity != player.Identity)
             {
                 player?.Logger.Warn(
                     string.Format(
@@ -106,6 +110,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
             {
                 case GenericCmdAction.Use:
                     HandleUse(message, session, player, playfield);
+                    break;
+
+                case GenericCmdAction.UseItemOnItem:
+                    if (message.Target is { Length: >= 2 }
+                        && _missions.TryUseItemOnTarget(player, message.Target[0], message.Target[1]))
+                        Acknowledge(session, message, message.Target[1]);
+                    else Deny(session, message, player, "no accepted item-on-target interaction");
                     break;
 
                 default:
@@ -221,7 +232,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             Acknowledge(session, message, target);
         }
 
-        static void HandleUseWorldDynel(
+        void HandleUseWorldDynel(
             GenericCmdMessage message,
             IZoneSession session,
             Player player,
@@ -231,6 +242,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (target.Instance == 0)
             {
                 Deny(session, message, player, "use target instance=0");
+                return;
+            }
+
+            if (_missions.TryHandleCorpseUse(player, target,
+                corpse => Acknowledge(session, message, corpse),
+                () => Deny(session, message, player, "generated mission corpse is not eligible")))
+                return;
+
+            if (_missions.ClaimsExteriorMarker(player))
+            {
+                if (_missions.TryEnterExterior(player, target)) Acknowledge(session, message, target);
+                else Deny(session, message, player, "generated mission entrance is not eligible");
                 return;
             }
 

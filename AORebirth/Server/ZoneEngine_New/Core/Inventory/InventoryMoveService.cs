@@ -25,14 +25,14 @@ namespace ZoneEngine_New.Core.Inventory
         private readonly object _gate = new();
         private readonly Dictionary<int, PendingEquip> _pending = new();
         private readonly IZoneLogger _logger;
-        private readonly InventoryFlushService _flush;
+        private readonly InventoryActionService _actions;
 
-        public InventoryMoveService(IZoneLogger logger, InventoryFlushService flush)
+        public InventoryMoveService(IZoneLogger logger, InventoryFlushService flush, InventoryActionService actions)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(flush);
             _logger = logger;
-            _flush = flush;
+            _actions = actions ?? throw new ArgumentNullException(nameof(actions));
         }
 
         public void CancelPending(int characterId)
@@ -56,6 +56,7 @@ namespace ZoneEngine_New.Core.Inventory
         public void Tick(Playfield playfield, double deltaTime)
         {
             ArgumentNullException.ThrowIfNull(playfield);
+            _actions.Tick(playfield);
             if (deltaTime <= 0)
                 return;
 
@@ -130,7 +131,6 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
             }
 
-            // TODO: Block multiple Uniques on ClientMoveItemToInventory
             bool sourceIsWear = sourcePage.Identity.Type.IsWearPage();
             if (!player.Inventory.TryResolveTargetSlot(
                     message.TargetPlacement,
@@ -326,6 +326,7 @@ namespace ZoneEngine_New.Core.Inventory
                 IdentityType.ArmorPage => player.Inventory.Armor,
                 IdentityType.ImplantPage => player.Inventory.Implant,
                 IdentityType.SocialPage => player.Inventory.Social,
+                IdentityType.BankByRef when player.Inventory.Bank.IsHydrated => player.Inventory.Bank,
                 IdentityType.OverflowWindow => player.Inventory.Overflow,
                 _ => null!
             };
@@ -630,43 +631,39 @@ namespace ZoneEngine_New.Core.Inventory
             LootableDynel? lootSource)
         {
             Item? existingDest = destPage.Content.GetValueOrDefault(destSlot);
-
-            if (!ReferenceEquals(sourcePage, destPage) || sourceSlot != destSlot)
+            if (ReferenceEquals(sourcePage, destPage) && sourceSlot == destSlot)
+                return true;
+            if (sourceSlot < sourcePage.Offset || sourceSlot >= sourcePage.Offset + sourcePage.Capacity
+                || destSlot < destPage.Offset || destSlot >= destPage.Offset + destPage.Capacity
+                || destPage.Identity.Type == IdentityType.OverflowWindow)
+                return false;
+            if (lootSource != null && Trade.TradeRules.IsUnique(item)
+                && Trade.TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId))
+                return false;
+            var changes = new List<InventoryRowChange>
             {
-                if (sourcePage.Remove(sourceSlot) == null)
-                    return false;
-
-                if (existingDest != null)
+                new(item, destPage.Identity, destSlot, item.StackCount)
+            };
+            if (existingDest != null)
+                changes.Add(new InventoryRowChange(existingDest, sourcePage.Identity, sourceSlot, existingDest.StackCount));
+            bool committed = _actions.TryCommit(player, changes,
+                () => !item.Locked && existingDest?.Locked != true
+                    && sourcePage.Content.TryGetValue(sourceSlot, out Item? current) && ReferenceEquals(current, item)
+                    && ReferenceEquals(destPage.Content.GetValueOrDefault(destSlot), existingDest),
+                () =>
                 {
-                    destPage.Remove(destSlot);
-                    if (!sourcePage.Add(sourceSlot, existingDest))
-                    {
-                        // Rollback best-effort
-                        sourcePage.Add(sourceSlot, item);
-                        destPage.Add(destSlot, existingDest);
-                        return false;
-                    }
-
-                    player.Inventory.MarkDirty(existingDest, sourcePage, sourceSlot);
-                }
-
-                if (!destPage.Add(destSlot, item))
-                {
-                    sourcePage.Add(sourceSlot, item);
+                    sourcePage.Content.Remove(sourceSlot);
                     if (existingDest != null)
                     {
-                        sourcePage.Remove(sourceSlot);
-                        destPage.Add(destSlot, existingDest);
+                        destPage.Content.Remove(destSlot);
+                        if (!sourcePage.Add(sourceSlot, existingDest))
+                            throw new InvalidOperationException("Reserved inventory swap source changed.");
                     }
-
-                    return false;
-                }
-            }
-
-            player.Inventory.MarkDirty(item, destPage, destSlot);
-            lootSource?.NotifyLootChanged();
-            _flush.NotifyDirty(player);
-            return true;
+                    if (!destPage.Add(destSlot, item))
+                        throw new InvalidOperationException("Reserved inventory move destination changed.");
+                });
+            if (committed) lootSource?.NotifyLootChanged();
+            return committed;
         }
 
         static void SetMoveLock(PendingEquip pending, bool locked)

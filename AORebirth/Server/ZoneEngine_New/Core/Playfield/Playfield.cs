@@ -148,6 +148,8 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         protected PlayfieldMetrics Metrics => _metrics;
+        protected bool IsBuilt => _built;
+        protected void MarkBuilt() => _built = true;
 
         protected int SpawnStaticDynels()
             => GetRequiredService<SpawnService>().LoadStaticDynels();
@@ -178,8 +180,6 @@ namespace ZoneEngine_New.Core.Playfield
         public WorldSimulationAccess WorldAccess =>
             _serviceProvider.GetRequiredService<WorldSimulationAccess>();
 
-        protected void MarkBuilt() => _built = true;
-
         protected void RegisterWorldServices(WorldSimulation.PlayfieldWorldSimulation world)
         {
             ArgumentNullException.ThrowIfNull(world);
@@ -190,7 +190,7 @@ namespace ZoneEngine_New.Core.Playfield
         /// Builds a PlayfieldAnarchyF login packet for this playfield.
         /// TEMP: PlayfieldX/Z hardcoded from Playfields.xml 4310; special playfield types not wired yet.
         /// </summary>
-        public PlayfieldAnarchyFMessage CreatePlayfieldAnarchyFMessage(Vector3 characterCoordinates)
+        public virtual PlayfieldAnarchyFMessage CreatePlayfieldAnarchyFMessage(Vector3 characterCoordinates)
         {
             // TEMP: Playfields.xml 4310 (Nascense Frontier) until GameData / Playfields.xml lookup is wired.
             int playfieldX = 32321;
@@ -258,6 +258,19 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>Called from async I/O tasks. Handlers run on the playfield tick thread.</summary>
         public bool TryEnqueue(PlayfieldInboundItem item) => _inbound.TryEnqueue(item);
+
+        // Team projections may originate on another playfield. Never enter the
+        // recipient tick lock synchronously while the caller owns another tick.
+        public void DispatchPlayerProjection(Player player, Action projection)
+        {
+            if (_tickSync.IsHeldByCurrentThread && ReferenceEquals(player.Playfield, this))
+            {
+                projection();
+                return;
+            }
+            if (!_disposed)
+                _inbound.TryEnqueue(new PlayerProjectionInboundItem { Player = player, Projection = projection });
+        }
 
         /// <summary>
         /// Registers a transferred player on this playfield under the tick lock (safe from another PF tick).
@@ -333,8 +346,10 @@ namespace ZoneEngine_New.Core.Playfield
                     return;
 
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
-                _inbound.Drain(_router, spawn);
+                _inbound.Drain(_router, spawn, this);
                 spawn.Tick();
+                foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
+                    if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Nanos.Tick(player);
                 _inventoryMoves.Tick(this, deltaTime);
                 _trades.Tick(this, deltaTime);
 
@@ -347,6 +362,8 @@ namespace ZoneEngine_New.Core.Playfield
                 }
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
+                foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
+                    if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Missions.PollLifecycle(player);
             }
 
             _metrics.TickExecution.Record(ElapsedMilliseconds(tickStart));
@@ -365,6 +382,10 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(this);
             services.AddSingleton(_logger);
             services.AddSingleton(_playfieldManager);
+            services.AddSingleton(_playfieldManager.Teams);
+            services.AddSingleton(_playfieldManager.Nanos);
+            services.AddSingleton(_playfieldManager.Missions);
+            services.AddSingleton(_playfieldManager.AuthoredQuests);
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);
             services.AddSingleton(_items);

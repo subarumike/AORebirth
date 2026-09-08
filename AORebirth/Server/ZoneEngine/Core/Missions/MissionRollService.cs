@@ -22,7 +22,7 @@ namespace ZoneEngine.Core.Missions
     /// offer shells. Mutable location, quality, identity and reward fields are applied before structured
     /// text is regenerated, while a materially unchanged captured combination keeps its exact text.
     /// </summary>
-    internal static class MissionRollService
+    internal static partial class MissionRollService
     {
         // Mission-terminal identity type as observed on the wire. The repo enum value
         // (IdentityType.MissionTerminal = 0x0000DCA1) does not match live captures, so compare raw.
@@ -48,11 +48,9 @@ namespace ZoneEngine.Core.Missions
 
         private static CapturedOfferReference[] capturedOfferReferences;
 
-        private static readonly object OfferIdentityLock = new object();
-
-        private static MissionOfferIdentityStore offerIdentityStore;
-
-        private static Func<int, bool> offerIdentityCollisionValidator;
+        // Legacy supplies its historical allocator from its own partial. New
+        // supplies a SQL allocator per call and does not compile that partial.
+        private static Func<int> defaultOfferIdentityAllocator;
 
         /// <summary>
         /// Builds a fresh 5-offer roll for the requesting player/terminal.
@@ -98,7 +96,8 @@ namespace ZoneEngine.Core.Missions
             MissionLocationSide characterSide,
             int clientClockNowSeconds,
             out int rollSeed,
-            out int responseNonce)
+            out int responseNonce,
+            Func<int> allocateOfferIdentity = null)
         {
             EnsureInitialized();
 
@@ -138,7 +137,8 @@ namespace ZoneEngine.Core.Missions
                 rng,
                 responseNonce,
                 clientClockNowSeconds,
-                NextQuestInstance);
+                allocateOfferIdentity ?? defaultOfferIdentityAllocator
+                    ?? throw new InvalidOperationException("A durable mission identity allocator is required."));
         }
 
         internal static QuestAlternativeMessage BuildRollResponseDeterministic(
@@ -872,42 +872,6 @@ namespace ZoneEngine.Core.Missions
         {
             int ql = missionQuality > 0 ? missionQuality : 1;
             return Math.Max(50, ql * ql * 50);
-        }
-
-        private static int NextQuestInstance()
-        {
-            lock (OfferIdentityLock)
-            {
-                if (offerIdentityStore == null)
-                {
-                    string missionStateDirectory = MissionStateDirectory.Resolve();
-                    offerIdentityStore =
-                        new MissionOfferIdentityStore(missionStateDirectory);
-                }
-
-                MissionOfferIdentityAllocationResult result =
-                    offerIdentityStore.TryAllocate(IsOfferIdentityInUse);
-                if (!result.Succeeded)
-                {
-                    throw new InvalidOperationException(
-                        "Mission offer identity allocation failed closed: "
-                        + result.Diagnostic);
-                }
-
-                return result.OfferId;
-            }
-        }
-
-        private static bool IsOfferIdentityInUse(int offerInstance)
-        {
-            Func<int, bool> validator = offerIdentityCollisionValidator;
-            return validator != null && validator(offerInstance);
-        }
-
-        internal static void SetOfferIdentityCollisionValidator(
-            Func<int, bool> validator)
-        {
-            offerIdentityCollisionValidator = validator;
         }
 
         internal static int ResolveClientClockNowSeconds(

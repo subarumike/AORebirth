@@ -36,7 +36,7 @@ namespace AORebirth.Database.Domain.Missions
     /// MySQL-backed authoritative mission repository. Every write operation is
     /// executed through a caller-scoped transaction and uses optimistic versions.
     /// </summary>
-    public sealed class MySqlMissionDao : IMissionDao
+    public sealed partial class MySqlMissionDao : IMissionDao
     {
         private const string StartAreaQuestId = "system.new_character_start_area";
         private const string StartAreaFlagKey = "selection";
@@ -44,11 +44,6 @@ namespace AORebirth.Database.Domain.Missions
         private const string RollFeeRewardType = "GeneratedMissionRollFee";
 
         private readonly Func<IDbConnection> connectionFactory;
-
-        public MySqlMissionDao()
-            : this(Connector.GetConnection)
-        {
-        }
 
         public MySqlMissionDao(Func<IDbConnection> connectionFactory)
         {
@@ -142,24 +137,33 @@ namespace AORebirth.Database.Domain.Missions
             }
 
             using (IDbConnection connection = this.connectionFactory())
-            using (IDbTransaction transaction = connection.BeginTransaction())
+            using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.RepeatableRead))
             {
+                T result;
                 try
                 {
-                    T result = operation(
+                    // Serialize authored state and item/stat rewards on the same durable owner
+                    // row as generated missions, including calls without an account scope.
+                    if (!connection.Query<int>(
+                        "SELECT Id FROM characters WHERE Id=@characterId FOR UPDATE",
+                        new { characterId }, transaction).Any())
+                        throw new InvalidOperationException("Mission owner does not exist.");
+                    result = operation(
                         new MySqlMissionDaoTransaction(
                             characterId,
                             accountKey,
                             connection,
                             transaction));
-                    transaction.Commit();
-                    return result;
                 }
                 catch
                 {
-                    transaction.Rollback();
+                    // Preserve the operation failure if the transport also fails during rollback.
+                    try { transaction.Rollback(); } catch { }
                     throw;
                 }
+                try { transaction.Commit(); }
+                catch (Exception exception) { throw new MissionCommitOutcomeUnknownException(exception); }
+                return result;
             }
         }
 
@@ -757,7 +761,7 @@ namespace AORebirth.Database.Domain.Missions
             public string EffectReference { get; set; }
         }
 
-        private sealed class MySqlMissionDaoTransaction : IMissionDaoTransaction
+        private sealed partial class MySqlMissionDaoTransaction : IMissionDaoTransaction
         {
             private readonly IDbConnection connection;
             private readonly IDbTransaction transaction;

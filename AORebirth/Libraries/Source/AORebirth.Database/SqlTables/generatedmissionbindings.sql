@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS generatedmissionbindings (
+ OwnerId INT NOT NULL, OfferType INT NOT NULL, OfferInstance INT NOT NULL,
+ QuestType INT NOT NULL, QuestInstance INT NOT NULL,
+ TeamType INT NOT NULL, TeamInstance INT NOT NULL, KeyInstance INT NOT NULL,
+ BundleId VARCHAR(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ BundleSha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+ BuildingType INT NOT NULL, BuildingInstance INT NOT NULL, LivePlayfield INT NOT NULL, ActivePlayfield INT NULL,
+ ObjectiveType INT NOT NULL, ObjectiveInstance INT NOT NULL, ObjectiveTemplateId INT NOT NULL, ObjectiveInteraction INT NOT NULL,
+ RequiredCount INT NOT NULL, Progress INT NOT NULL DEFAULT 0, State INT NOT NULL,
+ CleanupCheckpoints BIGINT NOT NULL DEFAULT 0,
+ TokenProgressPercent INT NULL, TokenClaimLevel INT NULL, TokenClaimSide INT NULL, TokenDisposition INT NULL, TokenCount INT NULL,
+ CompletionFrozenAtUtcTicks BIGINT NOT NULL DEFAULT 0,
+ AcceptedAtUtcTicks BIGINT NOT NULL, ExpiresAtUtcTicks BIGINT NOT NULL, CompletedAtUtcTicks BIGINT NOT NULL DEFAULT 0,
+ UpdatedAtUtcTicks BIGINT NOT NULL, Version BIGINT NOT NULL DEFAULT 1,
+ PRIMARY KEY (QuestType,QuestInstance),
+ UNIQUE KEY owner_offer (OwnerId,OfferType,OfferInstance),
+ UNIQUE KEY active_playfield (ActivePlayfield),
+ UNIQUE KEY key_instance (KeyInstance), KEY owner_state (OwnerId,State),
+ CONSTRAINT fk_generated_binding_offer FOREIGN KEY (OfferType,OfferInstance) REFERENCES generatedmissionoffers (OfferType,OfferInstance)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

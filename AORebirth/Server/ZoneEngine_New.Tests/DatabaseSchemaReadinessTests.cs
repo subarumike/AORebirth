@@ -28,7 +28,7 @@ public sealed class DatabaseSchemaReadinessTests
         var result = DatabaseSchemaReadiness.Evaluate(Current() with { AppliedMigrations = SchemaContract.MigrationNames.Take(2).ToArray() });
         Assert.AreEqual(SchemaState.SCHEMA_MIGRATION_REQUIRED, result.State);
         Assert.IsFalse(result.IsCurrent);
-        CollectionAssert.AreEqual(new[] { SchemaContract.MigrationNames[2] }, result.PendingMigrations.ToArray());
+        CollectionAssert.AreEqual(SchemaContract.MigrationNames.Skip(2).ToArray(), result.PendingMigrations.ToArray());
     }
 
     [TestMethod]
@@ -130,7 +130,7 @@ public sealed class DatabaseSchemaReadinessTests
     private static SchemaSnapshot Current()
     {
         var columns = SchemaContract.Columns.Select(c => new SchemaColumn(c.Table, c.Column, c.DataType, c.DataType + (c.Unsigned == true ? " unsigned" : string.Empty))).ToArray();
-        var indexes = new[] { new SchemaIndex("item_instances", "PRIMARY", true, "InstanceId"), new SchemaIndex("item_instances", "location", true, "ContainerType,ContainerInstance,ContainerPlacement"), new SchemaIndex("item_instance_id_sequence", "PRIMARY", true, "Id"), new SchemaIndex("schema_migrations", "PRIMARY", true, "MigrationName"), new SchemaIndex("stats", "main", true, "Type,Instance,StatId") };
+        var indexes = SchemaContract.UniqueKeys.Select((key, index) => new SchemaIndex(key.Table, "governed_" + index, true, key.Columns)).ToArray();
         var engines = SchemaContract.Columns.Select(c => c.Table).Distinct().ToDictionary(name => name, _ => "InnoDB", StringComparer.OrdinalIgnoreCase);
         return new(columns, indexes, SchemaContract.MigrationNames.ToArray(), 11, 10, engines);
     }

@@ -117,6 +117,9 @@ namespace ZoneEngine_New.Core.Inventory
                     row.StackCount,
                     row.InstanceId,
                     identity);
+                // Template MultipleCount controls minting defaults, never an already persisted stack.
+                if (row.StackCount <= 0) throw new InvalidOperationException("Persisted item has an invalid stack count.");
+                item.StackCount = row.StackCount;
                 item.IsPersisted = true;
                 item.ApplyContainerIdentityIfBag();
                 return true;

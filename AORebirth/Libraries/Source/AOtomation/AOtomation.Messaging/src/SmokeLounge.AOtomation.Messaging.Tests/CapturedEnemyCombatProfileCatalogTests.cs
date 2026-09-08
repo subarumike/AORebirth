@@ -4742,7 +4742,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Assert.AreEqual(archetypeId, resolved.CaptureProvenArchetypeId);
             }
 
-            string source = File.ReadAllText(
+            string source = LegacyGameplaySource.ReadAllText(
                 Path.Combine(
                     FindRepositoryRoot(),
                     "AORebirth",
