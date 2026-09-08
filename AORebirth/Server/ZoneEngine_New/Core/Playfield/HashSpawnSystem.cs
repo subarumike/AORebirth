@@ -50,9 +50,11 @@ namespace ZoneEngine_New.Core.Playfield
             int respawnChance,
             int minLevel,
             int maxLevel,
-            int cellId)
+            int cellId,
+            PlayfieldSpawnEntry source)
         {
             ArgumentNullException.ThrowIfNull(sites);
+            ArgumentNullException.ThrowIfNull(source);
             if (sites.Length == 0)
                 throw new ArgumentException("At least one spawn site is required.", nameof(sites));
 
@@ -63,11 +65,14 @@ namespace ZoneEngine_New.Core.Playfield
             MinLevel = minLevel;
             MaxLevel = maxLevel;
             CellId = cellId;
+            Source = source;
             State = HashSpawnState.Dead;
             NextSpawnTime = DateTime.UtcNow;
         }
 
         internal string HashText { get; }
+
+        internal PlayfieldSpawnEntry Source { get; }
 
         internal SpawnSite[] Sites { get; }
 
@@ -128,6 +133,12 @@ namespace ZoneEngine_New.Core.Playfield
 
         internal int PointCount => _allPoints.Count;
 
+        internal bool TryGetSpawnPoint(NpcCharacter npc, out HashSpawnPoint point)
+        {
+            ArgumentNullException.ThrowIfNull(npc);
+            return _pointBySpawned.TryGetValue(npc, out point!);
+        }
+
         /// <summary>Called once after playfield DI is ready.</summary>
         public void Initialize(PlayfieldLocality locality)
         {
@@ -163,6 +174,12 @@ namespace ZoneEngine_New.Core.Playfield
             foreach (PlayfieldSpawnEntry entry in entries)
             {
                 if (entry == null)
+                {
+                    skipped++;
+                    continue;
+                }
+
+                if (HasExcludedSeasonalEvent(entry))
                 {
                     skipped++;
                     continue;
@@ -237,7 +254,8 @@ namespace ZoneEngine_New.Core.Playfield
                     entry.RespawnChance,
                     entry.MinLevel,
                     entry.MaxLevel,
-                    cell.Id);
+                    cell.Id,
+                    entry);
 
                 if (!_pointsByCell.TryGetValue(cell.Id, out List<HashSpawnPoint>? list))
                 {
@@ -258,6 +276,25 @@ namespace ZoneEngine_New.Core.Playfield
                         skipped,
                         _playfield.Identity.Instance));
             }
+        }
+
+        private static bool HasExcludedSeasonalEvent(PlayfieldSpawnEntry entry)
+        {
+            PlayfieldHashSpawnExtensionEvent[]? events = entry.Extensions?.Events;
+            if (events == null)
+                return false;
+
+            for (int i = 0; i < events.Length; i++)
+            {
+                string? name = events[i]?.Name;
+                if (string.IsNullOrEmpty(name))
+                    continue;
+                if (name.StartsWith("christmas", StringComparison.OrdinalIgnoreCase)
+                    || name.StartsWith("halloween", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
         }
 
         private static SpawnSite[] BuildSites(PlayfieldSpawnEntry entry, Vector3 primaryPosition)
@@ -361,7 +398,8 @@ namespace ZoneEngine_New.Core.Playfield
                     point.HashText,
                     position,
                     heading,
-                    RollLevel(point));
+                    RollLevel(point),
+                    SpawnSource.HashSpawn);
                 point.Spawned = character;
                 point.State = HashSpawnState.Alive;
                 _pointBySpawned[character] = point;

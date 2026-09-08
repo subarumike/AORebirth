@@ -3,10 +3,12 @@ namespace ZoneEngine_New.Core.Entities
     using System;
     using System.Collections.Generic;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Playfield;
@@ -14,15 +16,19 @@ namespace ZoneEngine_New.Core.Entities
     /// <summary>
     /// Dynel with a loot container that players can open (corpses, chests).
     /// </summary>
-    public abstract class LootableDynel : Dynel
+    public abstract class LootableDynel : Dynel, IUsableDynel
     {
         public const float OpenRange = 5f;
+
+        static readonly TimeSpan EmptyDespawnDelay = TimeSpan.FromSeconds(1);
 
         const int CloseActionIdentity = 0x66;
 
         static readonly Random LootRandom = new();
 
         int _inventoryHandle;
+        bool _wasOpened;
+        DateTime? _emptyDespawnAtUtc;
 
         protected LootableDynel(Identity identity, IdentityType lootContainerType, int lootCapacity)
             : base(identity)
@@ -43,7 +49,19 @@ namespace ZoneEngine_New.Core.Entities
 
         public bool IsOpen => OpenerIdentity != Identity.None;
 
+        /// <summary>True after the first successful open (survives close toggle).</summary>
+        public bool WasOpened => _wasOpened;
+
         public int InventoryHandle => _inventoryHandle;
+
+        /// <summary>
+        /// Opened at least once, loot empty, and the 1s empty-despawn delay has elapsed.
+        /// </summary>
+        public bool ShouldDespawnEmpty
+            => _wasOpened
+                && Loot.Content.Count == 0
+                && _emptyDespawnAtUtc.HasValue
+                && DateTime.UtcNow >= _emptyDespawnAtUtc.Value;
 
         protected int LootLevel { get; set; } = 1;
 
@@ -51,12 +69,13 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Rolls <see cref="ItemTable"/> against the loot catalog into <see cref="Loot"/>.
-        /// Must run before the dynel is added to a cell (spawn packet).
+        /// Each rolled item gets a unique in-memory <see cref="Item.InstanceId"/> (no DB write).
+        /// Persistence happens on loot via MarkDirty / flush.
         /// </summary>
-        public void ResolveLoot(IGameData gameData, IItemBuilder items)
+        public void ResolveLoot(HashItemMinter minter, IItemInstanceIdAllocator ids)
         {
-            ArgumentNullException.ThrowIfNull(gameData);
-            ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(minter);
+            ArgumentNullException.ThrowIfNull(ids);
 
             if (ItemTable == null || ItemTable.Count == 0)
                 return;
@@ -75,12 +94,11 @@ namespace ZoneEngine_New.Core.Entities
                     if (!RollChance(entry.Chance))
                         continue;
 
-                    if (!gameData.TryGetLootTable(entry.Hash, out IReadOnlyList<LootItemPair> pairs) || pairs.Count == 0)
+                    int quality = RollQuality(LootLevel, entry.LevelMod);
+                    if (!minter.TryMint(entry.Hash, quality, ItemSource.Loot, out Item item))
                         continue;
 
-                    LootItemPair pair = pairs[LootRandom.Next(pairs.Count)];
-                    int quality = RollQuality(LootLevel, entry.LevelMod);
-                    Item item = items.Create(pair.LowId, pair.HighId, quality);
+                    AssignEphemeralInstanceId(item, ids);
                     if (!Loot.Add(nextSlot, item))
                         return;
 
@@ -89,7 +107,30 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
-        public bool TryOpen(Player player)
+        static void AssignEphemeralInstanceId(Item item, IItemInstanceIdAllocator ids)
+        {
+            if (item.InstanceId > 0)
+                throw new InvalidOperationException("Loot item already has an InstanceId.");
+
+            item.InstanceId = ids.Allocate();
+            item.IsPersisted = false;
+
+            int itemType = item.Identity.Type != IdentityType.None
+                ? (int)item.Identity.Type
+                : item.Definition.ItemType;
+            if (itemType != 0)
+            {
+                item.Identity = new Identity
+                {
+                    Type = (IdentityType)itemType,
+                    Instance = item.InstanceId
+                };
+            }
+
+            item.ApplyContainerIdentityIfBag();
+        }
+
+        public bool TryUse(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
 
@@ -107,12 +148,44 @@ namespace ZoneEngine_New.Core.Entities
                 return false;
             }
 
+            if (!CanOpenLoot(player))
+                return false;
+
             if (_inventoryHandle == 0 && Playfield != null)
-                _inventoryHandle = Playfield.AllocateLootInventoryHandle();
+                _inventoryHandle = Playfield.AllocateContainerInventoryHandle();
 
             OpenerIdentity = player.Identity;
+            _wasOpened = true;
+            OnOpened(player);
             player.Session.Send(Loot.BuildInventoryUpdateMessage(player.Identity, Identity, _inventoryHandle));
+            NotifyLootChanged();
             return true;
+        }
+
+        /// <summary>Called when a player newly opens this lootable (not on close toggle).</summary>
+        protected virtual void OnOpened(Player player)
+        {
+        }
+
+        protected virtual bool CanOpenLoot(Player player)
+            => true;
+
+        /// <summary>
+        /// Call after loot contents change (item taken/deleted). Schedules despawn 1s after empty
+        /// once the lootable has been opened.
+        /// </summary>
+        public void NotifyLootChanged()
+        {
+            if (!_wasOpened)
+                return;
+
+            if (Loot.Content.Count > 0)
+            {
+                _emptyDespawnAtUtc = null;
+                return;
+            }
+
+            _emptyDespawnAtUtc = DateTime.UtcNow.Add(EmptyDespawnDelay);
         }
 
         public void Close()
@@ -176,13 +249,6 @@ namespace ZoneEngine_New.Core.Entities
             int min = Math.Max(1, level * (100 - mod) / 100);
             int max = Math.Max(min, level * (100 + mod) / 100);
             return LootRandom.Next(min, max + 1);
-        }
-
-        protected static int NormalizeLevel(int level)
-        {
-            if (StatCollection.IsUnset(level) || level < 1)
-                return 1;
-            return level;
         }
     }
 }

@@ -215,6 +215,27 @@ function Start-HiddenEngineProcess {
     return $process
 }
 
+function Get-ProcessesByExecutablePath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedPath
+    )
+
+    $normalizedExpectedPath = [System.IO.Path]::GetFullPath($ExpectedPath)
+    @(
+        foreach ($candidate in @(Get-Process -ErrorAction SilentlyContinue)) {
+            try {
+                $candidatePath = [System.IO.Path]::GetFullPath($candidate.Path)
+                if ($candidatePath -ieq $normalizedExpectedPath) {
+                    $candidate
+                }
+            }
+            catch {
+            }
+        }
+    )
+}
+
 $zoneEngine = if ($NewZoneEngine) {
     @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe"; Ports = @(7501) }
 }
@@ -255,14 +276,14 @@ foreach ($engine in $engines) {
     }
 
     if ($processName -eq "ZoneEngine_New") {
-        $existingProcesses = @(Get-Process -Name $processName -ErrorAction SilentlyContinue)
+        $existingProcesses = @(Get-ProcessesByExecutablePath -ExpectedPath $exePath)
         $existingListeners = @(
             foreach ($port in $engine.Ports) {
                 Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
             }
         )
         if ($existingProcesses.Count -gt 0 -or $existingListeners.Count -gt 0) {
-            $failures.Add("ZoneEngine_New pre-start check requires no existing process and a free zone port.")
+            $failures.Add("ZoneEngine_New pre-start check requires no process from the expected repository executable and a free zone port.")
             break
         }
     }
@@ -350,7 +371,8 @@ if ($failures.Count -eq 0) {
             $finalStatus = Invoke-EngineStatusProbe -Arguments @("--engine-required", "LoginEngine")
         }
 
-        $newZoneProcesses = @(Get-Process -Name "ZoneEngine_New" -ErrorAction SilentlyContinue)
+        $newZoneExePath = Join-Path $engineDir "ZoneEngine_New\ZoneEngine_New.exe"
+        $newZoneProcesses = @(Get-ProcessesByExecutablePath -ExpectedPath $newZoneExePath)
         $newZoneListeners = @(Get-NetTCPConnection -State Listen -LocalPort 7501 -ErrorAction SilentlyContinue)
         if (($newZoneProcesses.Count -ne 1) -or
             ($newZoneListeners.Count -ne 1) -or
@@ -396,7 +418,8 @@ if ($failures.Count -gt 0) {
 
         try {
             if ($entry.Engine -eq "ZoneEngine_New") {
-                if (Get-Process -Name "ZoneEngine_New" -ErrorAction SilentlyContinue) {
+                $entry.Process.Refresh()
+                if (-not $entry.Process.HasExited) {
                     $failures.Add("ZoneEngine_New cleanup did not stop its managed process.")
                 }
                 if (Get-NetTCPConnection -State Listen -LocalPort 7501 -ErrorAction SilentlyContinue) {

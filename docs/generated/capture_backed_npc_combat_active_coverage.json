@@ -40583,7 +40583,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Missions/MissionInstanceMobCombat.cs",
-      "sha256": "a4fd562ee9b1befa8aee91d1182ebf147ff845e7454bd793f81325361a36797c"
+      "sha256": "c9fbe0098f87fff5674d52f3dc3eeb48825963a5d814cceeca0c1d2fd100d549"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40593,27 +40593,27 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
-      "sha256": "72cdbde59a3290e62c4197a01f95326a726a468eb78afa9a2172d0519b754277"
+      "sha256": "06b58ef3e037d0268d90002b3f4e6153955dcad34a6396e4f717092d472b8a4c"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs",
-      "sha256": "8d549450db343de31b06586bc5a00cab23d15e82a0b188f772aed8ed95657fa9"
+      "sha256": "96943796af7e0c4711ae158c005bfe904a0ea5f79a18c161800794df8249c792"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteIccPeacekeeperPatrolRuntime.cs",
-      "sha256": "2244edf3bb494e8cd9676eb62f426b0b1f1ab6ac26d5032216c3ee496809a089"
+      "sha256": "4387cc50654b0b3001620cd042aaa8c2e2f808915b1b49fad0b2dbd3b675df4b"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs",
-      "sha256": "df462053195dc6377111efbe278f10b64f37b33087f522f3ff8024f8d3145fa3"
+      "sha256": "0e360e8479120f0ec5dabbe37fefa93182b224d34c0160d2cfda22c2dd4ad45c"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteRoboticGuardDogRuntime.cs",
-      "sha256": "68bb99140fa7408d45bc4e12d02157a99d950824e1b5aefa4b6a7e329537ed6c"
+      "sha256": "9db7bd1d710c955c88fbf92449ef5e445ac68fb0ac495b6e62410214c187ad31"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40623,7 +40623,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
-      "sha256": "e68a87871f4bc4984b8e58f0e216f128cbd8e2439558309feba70bd8fe9ef125"
+      "sha256": "9ea7a2febaf90622b9b6dd3e19ee47bf9a8106171a23e1b5db069a95db3e93b9"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40643,7 +40643,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
-      "sha256": "15e7d171e030e2391f8c074d320b95191f0f7eccbf3fa7879d05354f4d3185fb"
+      "sha256": "cffba43b7a60e06755b22041745fa58845ae10d2ee8a5e67fbe7d52d8888cfd5"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40663,7 +40663,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorRuntimeService.cs",
-      "sha256": "2f4d40b55dc762d058e1b46398ae3f15338ff5fb5b4a654b5c3bd350e9cd7fc1"
+      "sha256": "07bd2aa4bf50dd77e0ddbcabcab4e79ced73dec396c2f6bac842ccf5d4416cd4"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40678,7 +40678,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
-      "sha256": "a4e59e40cda2d1fa74656381c07739ef9732d97d2553224dc9377b60212f71c0"
+      "sha256": "050d90787b4db92f868f4d4ac33c1926eaf5692a4e8bd977f8b82375f1d1203c"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40693,22 +40693,22 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs",
-      "sha256": "a19f2d8e38c1920fcb59fd2e5175be1f79dbe75af194a581037b980bbd2ed4ca"
+      "sha256": "2760fb1a041fdbc2d5b5cb6e1d92f43888804bcaf701eef303fe209e9b51389a"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
-      "sha256": "912026730dbceb454f03e48b8e2110e6c11e6ff604d31e96b07f3736ad444b0d"
+      "sha256": "e3397f35876f01052116fa3e44f3128da9753efa40995d4a8275924459ce6a1e"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
-      "sha256": "9cc2a5ebfaea7a875dbb39a283115ab05aaab3b9762e4113a7496f573c402a08"
+      "sha256": "a36563288ede4fe4e18752c8aa2005ae79d593b82169d206b20badec9d5f5748"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
-      "sha256": "7eb4200ac53282da4ff0db9947350ff9e439601c45e9de9de701565c426dbabe"
+      "sha256": "6f05be714c131064e7738f39daeeb3476c1282e8f9b159e5942341a5c9a430ee"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40718,7 +40718,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceSpawn.cs",
-      "sha256": "1d3c116f41740ffac12a3c5e005910b8b5303a78f41e00c83897f17a97037ec4"
+      "sha256": "fd9b23352c29d053829871c79e58448f978dd309a5722981fff9c230dc31d7b3"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40728,12 +40728,12 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerSpawnOrchestrator.cs",
-      "sha256": "d43490b7dff338d291e90b39dfb5ff2c8079b6f768e430a151a23f1bc7b02eac"
+      "sha256": "1213c59ec79f8191ba7b8c44c1f785fa5629d382edc68d5f3d49475253253222"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
-      "sha256": "60e1f902dc54d27736a2a10348e1ad85182ca23b6a16b638df21ebe88089829c"
+      "sha256": "08cc1415e9ad7af9272ad90a86d82ed52a6e165381efb5903ce3ad71d6b39ca5"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40743,17 +40743,17 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
-      "sha256": "bf1df3ae932fab2846dbb055eececacbeaaa70841bb46b4d007d92798f1a5e1d"
+      "sha256": "1778a5dff20e5d6dc67388fa8954739724afff9aee8aa3823df452c2085aae1a"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/RomeBlueCitySpawn.cs",
-      "sha256": "521ca7564a381c7c4f1abc2b78a6e7f66f925b6695cbab07a5bf489cc8249189"
+      "sha256": "08bf217728708c0d64e04a128b7b068c98e981e3bed24b355c08f4e5a92e6ffd"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs",
-      "sha256": "f6b04f5fed9378d4c73655ec7ba59496c2d8a69b7dcd909932ebed716f059d97"
+      "sha256": "c6c11ca9b3e5b0f6077899f7ac9cf50d402158d13ae472c8d91a147affeaab16"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40763,7 +40763,7 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeySilvertailTransform.cs",
-      "sha256": "4cfcebb0c1b85121b229f507fe0e2f356699ef2ddc43801fc15fdd4022839bfe"
+      "sha256": "a1cf1da66f8703595b2c84369b6a819f1aca37072f48c4944c2c8a299d860d6f"
     }
   ],
   "corpusSearch": {
@@ -225934,7 +225934,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          999
+          983
         ]
       },
       {
@@ -225946,7 +225946,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          179
+          178
         ]
       },
       {
@@ -225959,7 +225959,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          1764
+          1759
         ]
       },
       {
@@ -225983,7 +225983,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          756
+          754
         ]
       },
       {
@@ -226045,7 +226045,7 @@
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
         "prepareCallCount": 1,
         "prepareCallSourceLines": [
-          12294
+          12296
         ]
       },
       {

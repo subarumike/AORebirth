@@ -94,6 +94,27 @@ function Stop-EngineProcess {
     }
 }
 
+function Get-ProcessesByExecutablePath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedPath
+    )
+
+    $normalizedExpectedPath = [System.IO.Path]::GetFullPath($ExpectedPath)
+    @(
+        foreach ($candidate in @(Get-Process -ErrorAction SilentlyContinue)) {
+            try {
+                $candidatePath = [System.IO.Path]::GetFullPath($candidate.Path)
+                if ($candidatePath -ieq $normalizedExpectedPath) {
+                    $candidate
+                }
+            }
+            catch {
+            }
+        }
+    )
+}
+
 foreach ($engine in $engines) {
     $pidFile = Join-Path $logDir "$($engine.Name).pid.json"
     $defaultShutdownFile = Join-Path $logDir "$($engine.Name).shutdown"
@@ -166,7 +187,7 @@ foreach ($engine in $engines) {
 
     if ($engine.Name -eq "ZoneEngine_New") {
         # net10 skeleton host is not registered in engine_status_probe (shared zone port / path).
-        $stillRunning = Get-Process -Name "ZoneEngine_New" -ErrorAction SilentlyContinue
+        $stillRunning = @(Get-ProcessesByExecutablePath -ExpectedPath $expectedPath)
         if ($stillRunning) {
             Write-Warning "ZoneEngine_New is still running after stop (pid=$($stillRunning.Id -join ','))."
             $failed = $true

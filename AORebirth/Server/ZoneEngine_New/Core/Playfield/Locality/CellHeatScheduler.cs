@@ -311,23 +311,34 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 return;
 
             _grid.GetCellCoords(cellId, out int ix, out int iz);
+
+            string coldSuffix = string.Empty;
+            if (newHeat == CellHeat.Asleep
+                && _coldSinceUtcByCell.TryGetValue(cellId, out DateTime coldSince))
+            {
+                coldSuffix = string.Format(
+                    CultureInfo.InvariantCulture,
+                    " (cold for {0:F1}s)",
+                    (DateTime.UtcNow - coldSince).TotalSeconds);
+            }
+
             LogUtil.Debug(
                 DebugInfoDetail.Locality,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Playfield {0} cell {1} ({2},{3}) heat {4} -> {5}",
+                    "Playfield {0} cell {1} ({2},{3}) heat {4} -> {5}{6}",
                     _playfieldId,
                     cellId,
                     ix,
                     iz,
                     previousHeat,
-                    newHeat));
+                    newHeat,
+                    coldSuffix));
         }
 
         private static bool IsCombatHot(Dynel dynel)
         {
-            int health = dynel.Stats.Get(CharacterStat.Health);
-            if (StatCollection.IsUnset(health) || health <= 0)
+            if (dynel.Stats.GetOrZero(CharacterStat.Health) <= 0)
                 return false;
 
             int selectedTarget = dynel.Stats.Get(CharacterStat.SelectedTarget);

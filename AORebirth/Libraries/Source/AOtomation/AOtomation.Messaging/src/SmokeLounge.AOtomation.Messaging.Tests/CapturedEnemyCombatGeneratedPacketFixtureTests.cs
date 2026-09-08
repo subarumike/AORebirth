@@ -158,7 +158,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemySpecialAttackWeaponPacketFixture saw =
                     fixture.SpecialAttackWeaponPackets.First(
                         value => value.SourceIdentity == weapon.OwnerIdentity
-                                 && value.Unknown5
+                                 && value.AggDef
                                     == profile.SpecialAttackWeaponUnknown5);
                 CapturedEnemyAttackPacketFixture attack = fixture.AttackPackets.First(
                     value => value.SourceIdentity == saw.SourceIdentity);
@@ -238,10 +238,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         profile.SpecialAttackWeaponUnknown3,
                         profile.SpecialAttackWeaponUnknown4,
                         99);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown1, mutableState.MeleeInit);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown2, mutableState.RangedInit);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown3, mutableState.PhysicalInit);
-                Assert.AreEqual(profile.SpecialAttackWeaponUnknown4, mutableState.NanoInit);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown1, mutableState.CloseCombatInitiative);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown2, mutableState.DistanceWeaponInitiative);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown3, mutableState.PhysicalProwessInitiative);
+                Assert.AreEqual(profile.SpecialAttackWeaponUnknown4, mutableState.NanoProwessInitiative);
                 Assert.AreEqual(99, mutableState.AggDef);
                 Assert.AreEqual(0, mutableState.Specials.Length);
             }
@@ -326,7 +326,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedEnemySpecialAttackWeaponPacketFixture saw =
                     fixture.SpecialAttackWeaponPackets.FirstOrDefault(
                         value => value.SourceIdentity == resolved.EvidenceSourceIdentity
-                                 && value.Unknown5
+                                 && value.AggDef
                                     == resolved.SpecialAttackWeaponUnknown5);
                 Assert.IsNotNull(saw, selectedProfile.ProfileId + " resolved SAW evidence");
                 Identity source = IdentityOf(saw.SourceType, saw.SourceIdentity);

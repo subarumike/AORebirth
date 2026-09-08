@@ -2,6 +2,8 @@ namespace ZoneEngine_New.Core.Entities
 {
     using System;
 
+    using AORebirth.Enums;
+
     using ZoneEngine_New.Core.Inventory;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -30,6 +32,8 @@ namespace ZoneEngine_New.Core.Entities
 
         public const double DefaultRechargeSpeedSeconds = 1.0;
 
+        public const double DefaultMeleeAttackRange = 4.0;
+
         const double MinCycleSeconds = 1.0;
 
         double _timer;
@@ -50,20 +54,56 @@ namespace ZoneEngine_New.Core.Entities
 
         public Character? Wielder { get; set; }
 
+        public bool IsFullyCharged => State == WeaponState.Attacking && _timer >= AttackSpeed;
+
         public event Action? Attacked;
 
-        public void Tick(double deltaTime)
+        public double GetAttackRange()
+        {
+            if (Item == null)
+                return DefaultMeleeAttackRange;
+
+            double range = Math.Max(0, StatCollection.Normalize(Item.GetStat(CharacterStat.AttackRange)));
+            return range > 0.0 ? range : DefaultMeleeAttackRange;
+        }
+
+        public bool IsInRange()
+        {
+            //TODO: Make a
+            Character? wielder = Wielder;
+            Character? target = wielder?.TryResolveFightingTarget();
+            if (wielder == null || target == null)
+                return false;
+
+            return wielder.Distance3D(target) <= GetAttackRange();
+        }
+
+        /// <summary>
+        /// Advances the attack/recharge clock. Returns true when this tick consumed a swing.
+        /// </summary>
+        public bool Tick(double deltaTime)
         {
             if (deltaTime <= 0.0)
-                return;
+                return false;
+
+            if (Item != null
+                && (Item.GetWeaponFlags() & WeaponFlags.Ranged) != 0
+                && Wielder?.Motor.IsMoving == true)
+                return false;
 
             _timer += deltaTime;
 
             if (State == WeaponState.Attacking && _timer >= AttackSpeed)
             {
+                Character? wielder = Wielder;
+                Character? target = wielder?.TryResolveFightingTarget();
+                if (wielder == null || target == null || !IsInRange() || !wielder.HasLineOfSightTo(target))
+                    return false;
+
                 _timer = 0.0;
                 Attacked?.Invoke();
                 State = WeaponState.Recharging;
+                return true;
             }
 
             if (State == WeaponState.Recharging && _timer >= RechargeSpeed)
@@ -71,6 +111,8 @@ namespace ZoneEngine_New.Core.Entities
                 _timer = 0.0;
                 State = WeaponState.Attacking;
             }
+
+            return false;
         }
 
         public void ResetAttack()

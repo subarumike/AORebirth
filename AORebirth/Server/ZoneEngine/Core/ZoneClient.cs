@@ -535,7 +535,7 @@ namespace ZoneEngine.Core
                     (int)IdentityType.ArmorPage,
                     (int)IdentityType.ImplantPage,
                     (int)IdentityType.SocialPage,
-                    (int)IdentityType.Bank
+                    (int)IdentityType.BankByRef
                 };
 
             for (int i = 0; i < requiredPages.Length; i++)

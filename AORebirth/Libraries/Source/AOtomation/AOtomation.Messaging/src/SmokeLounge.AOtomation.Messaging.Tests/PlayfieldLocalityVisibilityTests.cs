@@ -26,7 +26,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldDynelCellRegistry.cs");
 
             StringAssert.Contains(registry, "private const int NonLocalCellId = -1;");
-            StringAssert.Contains(registry, "this.AssignCellUnlocked(character)");
+            StringAssert.Contains(
+                registry,
+                "this.AssignCellUnlocked(character.Identity, character.CalculatePredictedPosition())");
             StringAssert.Contains(registry, "this.RemoveFromCellUnlocked(key, oldCellId);");
             StringAssert.Contains(registry, "this.cellByIdentity[key] = newCellId;");
             StringAssert.Contains(registry, "if (newCellId >= 0)");

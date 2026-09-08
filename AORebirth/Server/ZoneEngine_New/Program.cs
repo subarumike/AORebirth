@@ -2,6 +2,7 @@ namespace ZoneEngine_New
 {
     using System;
     using System.IO;
+    using System.Text;
     using System.Threading;
 
     using Microsoft.Extensions.DependencyInjection;
@@ -14,13 +15,16 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Chat;
     using ZoneEngine_New.Core.Commands;
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.WorldSimulation;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.MessageHandlers;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Trade;
 
     using ConfigReadWrite = Utility.Config.ConfigReadWrite;
 
@@ -35,6 +39,9 @@ namespace ZoneEngine_New
 
         private static void Main(string[] args)
         {
+            // AODB playfield RDB parsers read strings with Windows-1252.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             Console.CancelKeyPress += ConsoleCancelKeyPress;
 
             OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
@@ -69,18 +76,21 @@ namespace ZoneEngine_New
                 rootServices = BuildRootServices();
                 IZoneLogger logger = rootServices.GetRequiredService<IZoneLogger>();
                 IGameData gameData = rootServices.GetRequiredService<IGameData>();
+                DestinationsCatalog.Instance.ConfigureRoot(gameData.RootPath);
                 LogLocalityStartup();
                 logger.Info(
                     string.Format(
                         System.Globalization.CultureInfo.InvariantCulture,
-                        "GameData ready root={0} mobs={1} loot={2} monsterData={3}",
+                        "GameData ready root={0} mobs={1} hashTemplates={2} hashInstances={3} monsterData={4}",
                         gameData.RootPath,
                         gameData.MobTemplateCount,
-                        gameData.LootTableCount,
+                        gameData.HashTemplateCount,
+                        gameData.HashInstanceCount,
                         gameData.MonsterDataCount));
                 chatEngineLink = rootServices.GetRequiredService<IChatEngineLink>();
                 chatEngineLink.Start();
                 playfieldManager = rootServices.GetRequiredService<PlayfieldManager>();
+                _ = rootServices.GetRequiredService<InventoryFlushService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
                 logger.Info("ZoneEngine_New root container started.");
@@ -109,14 +119,27 @@ namespace ZoneEngine_New
             services.AddSingleton<IZoneLogger, NLogZoneLogger>();
             services.AddSingleton<ICharacterRepository, MySqlCharacterRepository>();
             services.AddSingleton<IStatRepository, MySqlStatRepository>();
-            services.AddSingleton<IInventoryRepository, MySqlInventoryRepository>();
+            services.AddSingleton<MySqlInventoryRepository>();
+            services.AddSingleton<IInventoryRepository>(provider => provider.GetRequiredService<MySqlInventoryRepository>());
+            services.AddSingleton<MySqlUploadedNanoRepository>();
+            services.AddSingleton<IUploadedNanoRepository>(provider => provider.GetRequiredService<MySqlUploadedNanoRepository>());
+            services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();
+            services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();
             services.AddSingleton<IItemBuilder, ItemBuilder>();
             services.AddSingleton<IGameData, GameDataStore>();
+            services.AddSingleton<HashItemMinter>();
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
+            services.AddSingleton<CharacterSnapshotService>();
+            services.AddSingleton<IPlayfieldMetricsRegistry, PlayfieldMetricsRegistry>();
             services.AddSingleton<PlayfieldManager>();
+            // Explicit Lazy so TeleportCommand can break the PlayfieldManager <-> command handler cycle.
+            services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));
+            services.AddSingleton<InventoryFlushService>();
+            services.AddSingleton<InventoryMoveService>();
+            services.AddSingleton<TradeService>();
             services.AddSingleton<ZoneMessageCodec>();
 
             //Chat
@@ -127,6 +150,9 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, SpawnCommand>();
             services.AddSingleton<IGmCommand, TeleportCommand>();
             services.AddSingleton<IGmCommand, SetCommand>();
+            services.AddSingleton<IGmCommand, GiveItemCommand>();
+            services.AddSingleton<IGmCommand, NpcCommand>();
+            services.AddSingleton<IGmCommand, ServerStatsCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
 
@@ -138,6 +164,9 @@ namespace ZoneEngine_New
             AddMessageHandler<AttackMessageHandler>(services);
             AddMessageHandler<StopFightMessageHandler>(services);
             AddMessageHandler<GenericCmdMessageHandler>(services);
+            AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
+            AddMessageHandler<ClientContainerAddItemMessageHandler>(services);
+            AddMessageHandler<TradeMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();

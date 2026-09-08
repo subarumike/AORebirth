@@ -1939,7 +1939,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scfuMessageText.Contains("public SimpleCharFullUpdateFlags SuppressedFlags { get; set; }")
                 && scfuMessageText.Contains("public Vector3[] Waypoints { get; set; }")
                 && scfuSerializerText.Contains("SimpleCharFullUpdateFlags.HasWaypoints")
-                && scfuSerializerText.Contains("streamWriter.WriteInt32(scfu.Waypoints.Length);")
+                && scfuSerializerText.Contains("streamWriter.WriteInt32(waypoints.Length);")
                 && scfuSerializerText.Contains("flags |= scfu.AdditionalFlags;")
                 && scfuSerializerText.Contains("flags &= ~scfu.SuppressedFlags;"),
                 "SimpleCharFullUpdate must be able to emit captured waypoint data and capture-only flag deltas.");
@@ -5917,7 +5917,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string heartbeatTimer = ExtractMethodBlock(playfieldText, "private void HeartBeatTimer");
             string playfieldCharacterTick = ExtractMethodBlock(playfieldText, "private void ProcessCharacterTick");
             Assert.IsTrue(
-                heartbeatTimer.Contains("this.locality.Tick(deltaTime);")
+                heartbeatTimer.Contains(
+                    "this.locality.Tick(deltaTime, this.SendVisibilityMessage, this.SendVisibilityLeave);")
                 && playfieldText.Contains("ProcessCharacterTick = this.ProcessCharacterTick")
                 && playfieldText.Contains("ProcessNpcPatrolTick = this.runtimeSystems.ProcessNpcPatrolTick")
                 && playfieldText.Contains("ProcessFollow = this.runtimeSystems.ProcessCharacterFollow")
@@ -8301,10 +8302,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ExtractMethodBlock(playfieldText, "internal void StopFightingDeadTarget(Identity deadTarget)");
 
             Assert.IsTrue(
-                heartBeat.Contains("this.locality.Tick(deltaTime);"),
+                heartBeat.Contains(
+                    "this.locality.Tick(deltaTime, this.SendVisibilityMessage, this.SendVisibilityLeave);"),
                 "Playfield heartbeat must route current-playfield character loops through the locality boundary.");
             Assert.IsTrue(
-                localityText.Contains("this.tickCallbacks.GetAllCharacters")
+                localityText.Contains("this.dynelRegistry.Characters()")
                 && localityText.Contains("this.ProcessDynelTick(character, deltaTime);"),
                 "Locality must use the registry-backed full character callback for the safe tick path.");
             Assert.IsFalse(

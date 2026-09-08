@@ -58,15 +58,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            player.SetFightingTarget(target.Identity);
-            player.ResetAllWeaponAttacks();
-            player.Cell?.Announce(
-                new AttackMessage
-                {
-                    Identity = player.Identity,
-                    Target = target.Identity,
-                    Action = message.Action
-                });
+            player.StartFighting(target.Identity, message.Action);
         }
     }
 }

@@ -141,6 +141,7 @@
     <Compile Include="GameData\CharacterFlags.cs" />
     <Compile Include="GameData\CharacterInfoPacket.cs" />
     <Compile Include="GameData\CharacterStatus.cs" />
+    <Compile Include="GameData\CharMovementStatus.cs" />
     <Compile Include="GameData\ChatMessage.cs" />
     <Compile Include="GameData\ChatMessageType.cs" />
     <Compile Include="GameData\Fatness.cs" />

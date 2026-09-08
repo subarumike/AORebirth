@@ -336,10 +336,10 @@ namespace ZoneEngine.Core.Playfields
                     Identity = marcus.Identity,
                     Unknown = 0,
                     Specials = new SpecialAttack[0],
-                    MeleeInit = MarcusSpecialAttackWeaponUnknown1,
-                    RangedInit = MarcusSpecialAttackWeaponUnknown2,
-                    PhysicalInit = MarcusSpecialAttackWeaponUnknown3,
-                    NanoInit = MarcusSpecialAttackWeaponUnknown4,
+                    CloseCombatInitiative = MarcusSpecialAttackWeaponUnknown1,
+                    DistanceWeaponInitiative = MarcusSpecialAttackWeaponUnknown2,
+                    PhysicalProwessInitiative = MarcusSpecialAttackWeaponUnknown3,
+                    NanoProwessInitiative = MarcusSpecialAttackWeaponUnknown4,
                     AggDef = MarcusSpecialAttackWeaponUnknown5
                 });
         }

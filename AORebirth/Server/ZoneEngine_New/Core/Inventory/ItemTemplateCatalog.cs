@@ -5,7 +5,10 @@ namespace ZoneEngine_New.Core.Inventory
     using System.Globalization;
     using System.IO;
 
+    using AORebirth.Core.GameData;
+
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory.Dat;
     using ZoneEngine_New.Core.Logging;
 
@@ -13,12 +16,15 @@ namespace ZoneEngine_New.Core.Inventory
     {
         private readonly Dictionary<int, ItemTemplate> _templates;
         private readonly IZoneLogger _logger;
+        private readonly string _itemsDatPath;
 
-        public ItemTemplateCatalog(IItemNameRepository names, IZoneLogger logger)
+        public ItemTemplateCatalog(IItemNameRepository names, IGameData gameData, IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(names);
+            ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
+            _itemsDatPath = Path.Combine(gameData.RootPath, GameDataPaths.ItemsFileName);
             _templates = new Dictionary<int, ItemTemplate>(capacity: 130000);
 
             IReadOnlyDictionary<int, string> nameMap = names.GetAllNames();
@@ -58,16 +64,19 @@ namespace ZoneEngine_New.Core.Inventory
 
         private void TryLoadItemsDat(IReadOnlyDictionary<int, string> nameMap)
         {
-            string? path = ResolveItemsDatPath();
-            if (path == null)
+            if (!File.Exists(_itemsDatPath))
             {
-                _logger.Warn("items.dat not found; catalog will use name stubs only");
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData items.dat not found at {0}; catalog will use name stubs only",
+                        _itemsDatPath));
                 return;
             }
 
             try
             {
-                List<DatItemTemplate> loaded = ItemsDatReader.Read(path);
+                List<DatItemTemplate> loaded = ItemsDatReader.Read(_itemsDatPath);
                 int merged = 0;
                 foreach (DatItemTemplate dat in loaded)
                 {
@@ -81,7 +90,7 @@ namespace ZoneEngine_New.Core.Inventory
                         CultureInfo.InvariantCulture,
                         "Loaded {0} item templates from {1}",
                         merged,
-                        path));
+                        _itemsDatPath));
             }
             catch (Exception exception)
             {
@@ -89,30 +98,9 @@ namespace ZoneEngine_New.Core.Inventory
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Failed to load items.dat from {0}; continuing with name stubs",
-                        path));
+                        "Failed to load GameData items.dat from {0}; continuing with name stubs",
+                        _itemsDatPath));
             }
-        }
-
-        private static string? ResolveItemsDatPath()
-        {
-            string baseDir = AppContext.BaseDirectory;
-            string[] candidates =
-            [
-                Path.Combine(baseDir, "items.dat"),
-                Path.GetFullPath(Path.Combine(baseDir, "..", "items.dat")),
-                Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "Datafiles", "items.dat")),
-                Path.GetFullPath(
-                    Path.Combine(baseDir, "..", "..", "..", "..", "..", "AORebirth", "Datafiles", "items.dat"))
-            ];
-
-            foreach (string candidate in candidates)
-            {
-                if (File.Exists(candidate))
-                    return candidate;
-            }
-
-            return null;
         }
     }
 }

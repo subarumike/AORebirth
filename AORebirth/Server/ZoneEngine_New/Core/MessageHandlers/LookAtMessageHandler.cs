@@ -7,6 +7,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Playfield;
 
     public sealed class LookAtMessageHandler : IMessageHandler<LookAtMessage>
     {
@@ -31,7 +32,19 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
             player.Target = message.Target;
 
-            // TODO: Update Quests
+            // ReturnInfo=1 means InfoRequest will carry the inspect packet.
+            if (message.ReturnInfo == 1 || message.Target.Instance == 0)
+                return;
+
+            Playfield? playfield = player.Playfield;
+            if (playfield == null)
+                return;
+
+            if (!playfield.GetRequiredService<DynelRegistry>().TryGet(message.Target, out Dynel? dynel)
+                || dynel is not Character target)
+                return;
+
+            session.Send(target.BuildInfoPacket());
         }
     }
 }

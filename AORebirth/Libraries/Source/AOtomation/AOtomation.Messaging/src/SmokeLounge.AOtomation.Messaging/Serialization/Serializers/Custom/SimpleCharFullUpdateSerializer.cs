@@ -179,13 +179,16 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             message.VisualFlags = streamReader.ReadInt16();
             message.VisibleTitle = streamReader.ReadByte();
 
-            int unknownLength = streamReader.ReadInt32();
-            if (unknownLength < 0 || unknownLength > streamReader.Length - streamReader.Position)
+            int movementStatusLength = streamReader.ReadInt32();
+            if (movementStatusLength < 0 || movementStatusLength > streamReader.Length - streamReader.Position)
             {
-                throw new System.IO.InvalidDataException("Invalid SimpleCharFullUpdate Unknown1 length.");
+                throw new System.IO.InvalidDataException("Invalid SimpleCharFullUpdate MovementStatus length.");
             }
 
-            message.Unknown1 = streamReader.ReadBytes(unknownLength);
+            byte[] movementStatusBytes = streamReader.ReadBytes(movementStatusLength);
+            message.Unknown1 = movementStatusBytes;
+            if (movementStatusLength >= CharMovementStatus.Size)
+                message.MovementStatus = CharMovementStatus.FromBytes(movementStatusBytes);
             if (flags.HasFlag(SimpleCharFullUpdateFlags.HasHeadMesh))
             {
                 message.HeadMesh = streamReader.ReadUInt32();
@@ -265,7 +268,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             var activeNanos = scfu.ActiveNanos ?? new ActiveNano[0];
             var textures = scfu.Textures ?? new Texture[0];
             var meshes = scfu.Meshes ?? new Mesh[0];
-            var unknown1 = scfu.Unknown1 ?? new byte[0];
+            var movementStatusBytes = scfu.Unknown1 ?? scfu.MovementStatus.ToBytes();
             var waypoints = scfu.Waypoints ?? new Vector3[0];
             string name = scfu.Name ?? string.Empty;
 
@@ -427,8 +430,8 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             streamWriter.WriteInt16(scfu.VisualFlags);
             streamWriter.WriteByte(scfu.VisibleTitle);
 
-            streamWriter.WriteInt32(unknown1.Length);
-            streamWriter.WriteBytes(unknown1);
+            streamWriter.WriteInt32(movementStatusBytes.Length);
+            streamWriter.WriteBytes(movementStatusBytes);
 
             if (scfu.HeadMesh.HasValue)
             {

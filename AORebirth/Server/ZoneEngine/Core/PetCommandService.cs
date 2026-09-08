@@ -887,10 +887,10 @@ namespace ZoneEngine.Core
                                            Unknown4 = PetCombatRules.AttackPetRightWeaponName
                                        }
                                    },
-                        MeleeInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                        RangedInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                        PhysicalInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
-                        NanoInit = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        CloseCombatInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        DistanceWeaponInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        PhysicalProwessInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
+                        NanoProwessInitiative = PetCombatRules.AttackPetSpecialAttackWeaponValue,
                         AggDef = 0
                     });
             }

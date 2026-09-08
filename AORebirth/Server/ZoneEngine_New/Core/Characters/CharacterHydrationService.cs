@@ -11,22 +11,26 @@ namespace ZoneEngine_New.Core.Characters
         private readonly ICharacterRepository _characters;
         private readonly IStatRepository _stats;
         private readonly IInventoryRepository _inventory;
+        private readonly IUploadedNanoRepository _uploadedNanos;
         private readonly IZoneLogger _logger;
 
         public CharacterHydrationService(
             ICharacterRepository characters,
             IStatRepository stats,
             IInventoryRepository inventory,
+            IUploadedNanoRepository uploadedNanos,
             IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(characters);
             ArgumentNullException.ThrowIfNull(stats);
             ArgumentNullException.ThrowIfNull(inventory);
+            ArgumentNullException.ThrowIfNull(uploadedNanos);
             ArgumentNullException.ThrowIfNull(logger);
 
             _characters = characters;
             _stats = stats;
             _inventory = inventory;
+            _uploadedNanos = uploadedNanos;
             _logger = logger;
         }
 
@@ -43,7 +47,8 @@ namespace ZoneEngine_New.Core.Characters
             {
                 Character = character,
                 Stats = _stats.GetForCharacter(characterId),
-                Items = _inventory.GetCarriedItems(characterId)
+                Items = _inventory.GetCarriedItems(characterId),
+                UploadedNanoIds = _uploadedNanos.GetForCharacter(characterId)
             };
 
             if (!result.IsSpawnReady)
@@ -60,10 +65,11 @@ namespace ZoneEngine_New.Core.Characters
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Character hydrated id={0} stats={1} items={2}",
+                    "Character hydrated id={0} stats={1} items={2} nanos={3}",
                     characterId,
                     result.Stats.Count,
-                    result.Items.Count));
+                    result.Items.Count,
+                    result.UploadedNanoIds.Count));
 
             return result;
         }

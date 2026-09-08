@@ -23,11 +23,13 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Lifetime in centiseconds (1/100 s). 18000 = 3 minutes.</summary>
         private const int DefaultTimeExist = 18000;
         private const int DefaultDeadTimer = 60;
+        public const int LootReserveSeconds = 60;
 
         /// <summary>Live Biofreak-style Flags when source Flags is missing/zero.</summary>
         private const int DefaultCorpseFlags = 1579013;
 
         private readonly IGameData _gameData;
+        private bool _cashClaimed;
 
         public Corpse(Identity identity, Character dead, IGameData gameData)
             : base(identity, IdentityType.Corpse, LootCapacity)
@@ -43,11 +45,48 @@ namespace ZoneEngine_New.Core.Entities
             Position = dead.Position;
             Rotation = dead.Rotation;
             Playfield = dead.Playfield;
-            LootLevel = NormalizeLevel(dead.Stats.Get(CharacterStat.Level));
+            LootLevel = dead.Stats.GetOrOne(CharacterStat.Level);
             ItemTable = dead is NpcCharacter npc ? npc.MobTemplate?.ItemTable : null;
             TimeExist = DefaultTimeExist;
             ExpiresAtUtc = DateTime.UtcNow.AddMilliseconds(TimeExist * 10);
             CopySourceStats(dead);
+        }
+
+        public Identity LootWinner { get; set; } = Identity.None;
+
+        public DateTime ReservedUntilUtc { get; set; }
+
+        protected override bool CanOpenLoot(Player player)
+        {
+            if (LootWinner.Instance == 0 || DateTime.UtcNow >= ReservedUntilUtc)
+                return true;
+
+            return player.Identity.Instance == LootWinner.Instance;
+        }
+
+        /// <summary>
+        /// First opener receives any cash on the corpse; later openers get none.
+        /// </summary>
+        protected override void OnOpened(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            if (_cashClaimed)
+                return;
+
+            _cashClaimed = true;
+
+            if (!SourceStats.TryGetValue(CharacterStat.Cash, out int cash) || cash <= 0)
+                return;
+
+            SourceStats[CharacterStat.Cash] = 0;
+
+            int current = Math.Max(0, player.Stats.GetOrZero(CharacterStat.Cash, StatDetail.Base));
+
+            long sum = (long)current + cash;
+            int newCash = sum > int.MaxValue ? int.MaxValue : (int)sum;
+
+            player.Stats.Set(CharacterStat.Cash, newCash, StatDetail.Base, dirty: false); // Client somehow knows?
         }
 
         public Identity Owner { get; }

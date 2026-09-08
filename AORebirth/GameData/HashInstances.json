@@ -1,0 +1,17 @@
+{
+    "MOPA": {
+        "TemplateId": [42640, 42641],
+        "MinLevel": 1,
+        "MaxLevel": 400
+    },
+    "PSTL": {
+        "TemplateId": [254633, 254634, 254635, 254636, 254637, 254638, 254639],
+        "MinLevel": 1,
+        "MaxLevel": 300
+    },
+    "RIFL": {
+        "TemplateId": [257128],
+        "MinLevel": 300,
+        "MaxLevel": 300
+    }
+}

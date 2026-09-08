@@ -22,6 +22,12 @@ namespace AORebirth.Core.GameData
         /// <summary>Outdoor locality cell size in world units (legacy AO CELL_SIZE).</summary>
         public const float CellSize = 40f;
 
+        /// <summary>
+        /// Legacy ground-tile world size used for outdoor cell counts
+        /// (<c>(Width|Height) * 4 / CELL_SIZE</c>), independent of extracted <see cref="TileSize"/>.
+        /// </summary>
+        public const float GroundTileWorldSize = 4f;
+
         public int SchemaVersion { get; set; }
 
         public int RecordType { get; set; }
@@ -116,7 +122,10 @@ namespace AORebirth.Core.GameData
 
         /// <summary>
         /// Derives the outdoor cell grid from playfield dimensions and <see cref="CellSize"/>.
-        /// Returns false for embedded ground and when width, height, or tileSize are invalid;
+        /// Matches legacy locality:
+        /// <c>cellCountWidth = (Width * 4) / CELL_SIZE</c>,
+        /// <c>cellCountHeight = (Height * 4) / CELL_SIZE</c>.
+        /// Returns false for embedded ground and when width/height are invalid;
         /// those cases resolve to an indoor layout.
         /// </summary>
         public bool TryGetOutdoorGrid(out int numZonesX, out int numZonesZ, out float cellWorldSize)
@@ -126,19 +135,32 @@ namespace AORebirth.Core.GameData
             cellWorldSize = 0f;
 
             if (!string.Equals(this.TilemapFormat, ChunkedGroundFormat, StringComparison.Ordinal))
-            {
                 return false;
-            }
 
-            if (this.Width <= 0 || this.Height <= 0 || this.TileSize <= 0f || CellSize <= 0f)
-            {
+            if (this.Width <= 0 || this.Height <= 0 || CellSize <= 0f || GroundTileWorldSize <= 0f)
                 return false;
-            }
 
-            numZonesX = (int)((this.Width * this.TileSize) / CellSize);
-            numZonesZ = (int)((this.Height * this.TileSize) / CellSize);
+            // Legacy: _cellCountWidth from Width, _cellCountHeight from Height; index = width * heightIndex + widthIndex.
+            numZonesX = (int)((this.Width * GroundTileWorldSize) / CellSize);
+            numZonesZ = (int)((this.Height * GroundTileWorldSize) / CellSize);
             cellWorldSize = CellSize;
             return numZonesX > 0 && numZonesZ > 0;
+        }
+
+        /// <summary>
+        /// Outdoor playfield XZ extent in world units (<c>Width|Height * 4</c>).
+        /// False for non-outdoor layouts.
+        /// </summary>
+        public bool TryGetOutdoorWorldSize(out float worldSizeX, out float worldSizeZ)
+        {
+            worldSizeX = 0f;
+            worldSizeZ = 0f;
+            if (!TryGetOutdoorGrid(out _, out _, out _))
+                return false;
+
+            worldSizeX = this.Width * GroundTileWorldSize;
+            worldSizeZ = this.Height * GroundTileWorldSize;
+            return worldSizeX > 0f && worldSizeZ > 0f;
         }
     }
 }
