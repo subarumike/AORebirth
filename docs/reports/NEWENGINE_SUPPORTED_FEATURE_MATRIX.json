@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "policy": "FULL_GAMEPLAY_PARITY_REQUIRED_FOR_CUTOVER=NO",
+  "scope": "Declared implementation capability, not a connected operational acceptance receipt. Partial rows refer to supported routes and explicit rejection paths, not all catalog content.",
+  "testRoot": "AORebirth/Server/ZoneEngine_New.Tests/",
+  "features": [
+    {
+      "feature": "login/world entry",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Duplicate/closed sessions and hydration failures reject; credential-to-zone handoff is not proven by this fixture.",
+      "tests": [
+        "SessionOwnershipTests.cs",
+        "GeneratedMissionLoginPlanTests.cs"
+      ]
+    },
+    {
+      "feature": "character loading",
+      "status": "SUPPORTED",
+      "boundary": "Repository errors propagate; incomplete hydration cannot spawn.",
+      "tests": [
+        "SessionOwnershipTests.cs"
+      ]
+    },
+    {
+      "feature": "character saving",
+      "status": "SUPPORTED",
+      "boundary": "Character/base-stat snapshot transaction; unknown outcome quarantines.",
+      "tests": [
+        "TradePersistenceTests.cs"
+      ]
+    },
+    {
+      "feature": "reconnect",
+      "status": "SUPPORTED",
+      "boundary": "Exact actor/transport ownership; connected durable sequence remains unproven.",
+      "tests": [
+        "SessionOwnershipTests.cs",
+        "ExactSpawnVisibilityTests.cs"
+      ]
+    },
+    {
+      "feature": "disconnect cleanup",
+      "status": "SUPPORTED",
+      "boundary": "Stale sessions cannot clear the current ownership lease.",
+      "tests": [
+        "SessionOwnershipTests.cs"
+      ]
+    },
+    {
+      "feature": "inventory",
+      "status": "SUPPORTED",
+      "boundary": "Owned instance/slot operations; split/delete/move commit before acknowledgement.",
+      "tests": [
+        "InventoryActionTests.cs",
+        "PlayerInventoryOverflowTests.cs",
+        "ItemInstanceAssignmentTests.cs"
+      ]
+    },
+    {
+      "feature": "equipment/wear",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Supported owned-slot delayed equip; wider equipment effects remain unsupported.",
+      "tests": [
+        "InventoryActionTests.cs",
+        "MorphNanoTests.cs"
+      ]
+    },
+    {
+      "feature": "credits",
+      "status": "SUPPORTED",
+      "boundary": "Supported aggregate transactions; generic nontransactional item stat effects reject.",
+      "tests": [
+        "TradePersistenceTests.cs",
+        "InventoryActionTests.cs"
+      ]
+    },
+    {
+      "feature": "trades",
+      "status": "SUPPORTED",
+      "boundary": "Both participants commit together; definite failure preserves state; unknown outcome quarantines.",
+      "tests": [
+        "TradePersistenceTests.cs",
+        "TradeSessionTests.cs"
+      ]
+    },
+    {
+      "feature": "mission persistence",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Supported authored/generated owners only; rejected definitions cannot partly progress.",
+      "tests": [
+        "GeneratedMissionServiceTests.cs",
+        "AuthoredQuestTests.cs"
+      ]
+    },
+    {
+      "feature": "rewards",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Complete planned grants; capacity/unsupported action rejection before transaction.",
+      "tests": [
+        "AuthoredQuestTests.cs",
+        "GeneratedMissionServiceTests.cs",
+        "InventoryActionTests.cs"
+      ]
+    },
+    {
+      "feature": "item use",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Transactional dedicated routes; generic Set/Hit/flags/upload reject before any effect.",
+      "tests": [
+        "InventoryActionTests.cs"
+      ]
+    },
+    {
+      "feature": "vendors",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Exact connected catalogs; capacity/ownership checks precede purchase. Missing vendors stay unavailable.",
+      "tests": [
+        "AcceptedVendorRealCatalogTests.cs",
+        "AcceptedVendorDeathTests.cs",
+        "TradePersistenceTests.cs"
+      ]
+    },
+    {
+      "feature": "NPC interaction",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Connected actors only; unbound placements remain inactive.",
+      "tests": [
+        "AcceptedNpcActivationTests.cs",
+        "OfficialHashSpawnAuthorizationTests.cs"
+      ]
+    },
+    {
+      "feature": "combat",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Supported mission/captured capabilities only; missing consumers do not authorize generic activation.",
+      "tests": [
+        "CapturedNpcCombatResolverTests.cs",
+        "MissionNpcCombatPolicyTests.cs"
+      ]
+    },
+    {
+      "feature": "loot",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Owned supported corpse transfers; stale/unauthorized actions reject.",
+      "tests": [
+        "GeneratedMissionCorpseInteractionTests.cs",
+        "MissionCorpseInteractionLeaseTests.cs"
+      ]
+    },
+    {
+      "feature": "nanos",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Supported catalog graphs/specializations; rejected graphs spend no resources.",
+      "tests": [
+        "NanoServiceTests.cs",
+        "MongoNanoTests.cs",
+        "BucketheadNanoTests.cs"
+      ]
+    },
+    {
+      "feature": "pets",
+      "status": "UNSUPPORTED_FAIL_CLOSED",
+      "boundary": "No general pet owner; unsupported shell consumption/summon graphs reject. Buckethead is separate.",
+      "tests": [
+        "NanoServiceTests.cs",
+        "InventoryActionTests.cs",
+        "BucketheadNanoTests.cs"
+      ]
+    },
+    {
+      "feature": "dialogue",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Connected validated action routes only; 27 absent routes remain tracked.",
+      "tests": [
+        "DialogueTests.cs",
+        "AuthoredQuestTests.cs"
+      ]
+    },
+    {
+      "feature": "quests",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Supported authored definitions only; action/capacity failures reject before rewards.",
+      "tests": [
+        "AuthoredQuestTests.cs",
+        "AcceptedQuestPropTests.cs"
+      ]
+    },
+    {
+      "feature": "morphs",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Four recognized morphs preserve saved baseline; wider graphs/equipment effects are not enabled.",
+      "tests": [
+        "MorphNanoTests.cs",
+        "MorphVisualPacketTests.cs"
+      ]
+    },
+    {
+      "feature": "teams",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Implemented membership and supported warp contracts.",
+      "tests": [
+        "TeamServiceTests.cs",
+        "TeamWarpNanoTests.cs"
+      ]
+    },
+    {
+      "feature": "corpses",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Exact supported corpse lifecycle and leases.",
+      "tests": [
+        "GeneratedMissionCorpseWireTests.cs",
+        "MissionCorpseInteractionLeaseTests.cs"
+      ]
+    },
+    {
+      "feature": "zoning",
+      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
+      "boundary": "Supported destination/package routes; failed transfer retains source owner.",
+      "tests": [
+        "PlayfieldTransferTests.cs",
+        "GeneratedMissionLoginPlanTests.cs"
+      ]
+    },
+    {
+      "feature": "shutdown/restart restoration",
+      "status": "SUPPORTED",
+      "boundary": "Snapshot/active-effect restoration implemented; fresh connected acceptance remains required.",
+      "tests": [
+        "RuntimeStartupTests.cs",
+        "SessionOwnershipTests.cs",
+        "MorphNanoTests.cs"
+      ]
+    }
+  ]
+}

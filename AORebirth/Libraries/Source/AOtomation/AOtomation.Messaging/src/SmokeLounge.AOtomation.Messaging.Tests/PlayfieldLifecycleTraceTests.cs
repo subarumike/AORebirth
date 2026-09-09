@@ -1514,9 +1514,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string replayPath = provider.FindPatrolReplayPath();
 
             Assert.IsTrue(File.Exists(replayPath));
+            string repositoryRoot = Path.GetFullPath(FindRepositoryRoot())
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            string fullReplayPath = Path.GetFullPath(replayPath);
+            Assert.IsTrue(fullReplayPath.StartsWith(repositoryRoot, StringComparison.OrdinalIgnoreCase));
+            string relativeReplayPath = fullReplayPath.Substring(repositoryRoot.Length);
             Assert.IsTrue(
-                replayPath.IndexOf("tools-temp", StringComparison.OrdinalIgnoreCase) < 0,
+                relativeReplayPath.IndexOf("tools-temp", StringComparison.OrdinalIgnoreCase) < 0,
                 "Runtime replay data must load from committed content, not tools-temp captures.");
+            CollectionAssert.AreEqual(
+                File.ReadAllBytes(Path.Combine(repositoryRoot, CapturedAreteRobotContentProvider.PatrolReplaySourceRelativePath)),
+                File.ReadAllBytes(fullReplayPath),
+                "The selected runtime content must match the committed canonical bytes.");
 
             Assert.AreEqual(39, provider.GetPatrolReplaySegments(0x79866553).Length);
 
