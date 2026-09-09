@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Characters
         private readonly IStatRepository _stats;
         private readonly IInventoryRepository _inventory;
         private readonly IUploadedNanoRepository _uploadedNanos;
+        private readonly IActiveNanoRepository _activeNanos;
         private readonly IZoneLogger _logger;
 
         public CharacterHydrationService(
@@ -19,18 +20,21 @@ namespace ZoneEngine_New.Core.Characters
             IStatRepository stats,
             IInventoryRepository inventory,
             IUploadedNanoRepository uploadedNanos,
+            IActiveNanoRepository activeNanos,
             IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(characters);
             ArgumentNullException.ThrowIfNull(stats);
             ArgumentNullException.ThrowIfNull(inventory);
             ArgumentNullException.ThrowIfNull(uploadedNanos);
+            ArgumentNullException.ThrowIfNull(activeNanos);
             ArgumentNullException.ThrowIfNull(logger);
 
             _characters = characters;
             _stats = stats;
             _inventory = inventory;
             _uploadedNanos = uploadedNanos;
+            _activeNanos = activeNanos;
             _logger = logger;
         }
 
@@ -48,7 +52,8 @@ namespace ZoneEngine_New.Core.Characters
                 Character = character,
                 Stats = _stats.GetForCharacter(characterId),
                 Items = _inventory.GetCarriedItems(characterId),
-                UploadedNanoIds = _uploadedNanos.GetForCharacter(characterId)
+                UploadedNanoIds = _uploadedNanos.GetForCharacter(characterId),
+                ActiveNanos = _activeNanos.GetForCharacter(characterId)
             };
 
             if (!result.IsSpawnReady)

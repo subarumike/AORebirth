@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.Movement
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.WorldSimulation;
@@ -290,6 +291,7 @@ namespace ZoneEngine_New.Core.Movement
             float maxVel;
             if (HasPath)
             {
+                TickStallWatch.Stage("motor.path", _character.Identity.Instance);
                 desired = ComputePathDesiredVelocity(dt);
                 maxVel = GetActiveLimits().Forward;
             }

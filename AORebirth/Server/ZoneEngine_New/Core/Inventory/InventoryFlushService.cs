@@ -158,18 +158,19 @@ namespace ZoneEngine_New.Core.Inventory
             if (!player.Inventory.IsHydrated)
                 return;
 
-            if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
+            if (!IsDirty(player))
                 return;
 
             object gate = GateFor(player.Identity.Instance);
             lock (gate)
             {
-                if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
+                if (!IsDirty(player))
                     return;
 
                 PlayerInventory.InventoryDirtyFlush? inventory = player.Inventory.TakeDirty();
                 int[] nanos = player.DrainDirtyUploadedNanos();
-                if (inventory == null && nanos.Length == 0)
+                List<ActiveNanoRecord>? activeNanos = player.TakeDirtyActiveNanos();
+                if (inventory == null && nanos.Length == 0 && activeNanos == null)
                     return;
 
                 try
@@ -178,7 +179,8 @@ namespace ZoneEngine_New.Core.Inventory
                         inventory?.Inserts ?? [],
                         inventory?.Updates ?? [],
                         player.Identity.Instance,
-                        nanos);
+                        nanos,
+                        activeNanos);
                     inventory?.MarkNewlyPersisted();
                 }
                 catch (Exception exception)
@@ -186,6 +188,7 @@ namespace ZoneEngine_New.Core.Inventory
                     if (inventory != null)
                         player.Inventory.RestoreDirty(inventory);
                     player.RestoreDirtyUploadedNanos(nanos);
+                    player.RestoreDirtyActiveNanos(activeNanos);
                     _logger.Error(
                         exception,
                         string.Format(
@@ -196,6 +199,9 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
         }
+
+        static bool IsDirty(Player player)
+            => player.Inventory.HasDirtyEntries || player.HasDirtyUploadedNanos || player.HasDirtyActiveNanos;
 
         object GateFor(int characterId)
         {

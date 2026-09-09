@@ -14,8 +14,16 @@ namespace ZoneEngine_New.Core.Mobs
         public int LevelMod { get; set; }
     }
 
+    /// <summary>Level keypoint used to lerp scaling stats between adjacent bands.</summary>
+    public sealed class MobStatBand
+    {
+        public int Level { get; set; }
+
+        public Dictionary<int, int> Stats { get; set; } = new();
+    }
+
     /// <summary>
-    /// Full mob template as stored in GameData/MobTemplates.json.
+    /// Full NPC template as stored in GameData/NpcTemplate.json.
     /// </summary>
     public sealed class MobTemplate
     {
@@ -29,6 +37,11 @@ namespace ZoneEngine_New.Core.Mobs
 
         public Dictionary<int, int> Stats { get; set; } = new();
 
+        public List<MobStatBand> StatBands { get; set; } = new();
+
+        /// <summary>When false, players cannot fight this NPC and it gets no combat brain.</summary>
+        public bool Attackable { get; set; } = true;
+
         public int MinLevel { get; set; }
 
         public int MaxLevel { get; set; }
@@ -36,8 +49,10 @@ namespace ZoneEngine_New.Core.Mobs
         /// <summary>Per-slot AOID lists from the template Equipment jagged array.</summary>
         public List<List<int>> Equipment { get; set; } = new();
 
-        /// <summary>Combat weapons as [lowId, highId] pairs (index 0 = main, 1 = off).</summary>
         public List<List<int>> Weapons { get; set; } = new();
+
+        /// <summary>SCFU texture overrides keyed by place. Empty omits the texture block.</summary>
+        public Dictionary<int, int> Textures { get; set; } = new();
 
         public int KnuBotId { get; set; }
 

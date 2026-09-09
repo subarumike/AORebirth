@@ -36,6 +36,15 @@ namespace ZoneEngine_New.Core.Inventory
 
         public Identity Identity { get; set; }
 
+        /// <summary>
+        /// Item type for occupancy identities and the <c>item_instances.ItemType</c> column: the live
+        /// <see cref="Identity"/> type when set, otherwise the catalog value.
+        /// </summary>
+        public int ResolvedItemType
+            => Identity.Type != IdentityType.None
+                ? (int)Identity.Type
+                : Definition.ItemType;
+
         public int LowId { get; init; }
 
         public int HighId { get; init; }
@@ -193,6 +202,26 @@ namespace ZoneEngine_New.Core.Inventory
 
             page.IsOpen = true;
             return true;
+        }
+
+        /// <summary>
+        /// Stamps a freshly allocated id onto a newly minted item and derives the occupancy
+        /// <see cref="Identity"/> from it. The item stays unpersisted until a flush inserts its row.
+        /// </summary>
+        public void AssignInstanceId(int instanceId)
+        {
+            if (instanceId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(instanceId));
+            if (InstanceId > 0)
+                throw new InvalidOperationException("Item already has an InstanceId.");
+
+            int itemType = ResolvedItemType;
+            InstanceId = instanceId;
+            IsPersisted = false;
+            if (itemType != 0)
+                Identity = new Identity { Type = (IdentityType)itemType, Instance = instanceId };
+
+            ApplyContainerIdentityIfBag();
         }
 
         /// <summary>

@@ -86,11 +86,21 @@ namespace ZoneEngine_New.Core.Trade
             return Math.Max(0, (int)Math.Round(scaled));
         }
 
+        /// <summary>Computer Literacy above this does not change shop buy/sell prices.</summary>
+        public const int MaxPricingComputerLiteracy = 3000;
+
         /// <summary>Skill discount steps a shopper earns from Computer Literacy.</summary>
         public static int PricingSkillSteps(Player shopper)
         {
             ArgumentNullException.ThrowIfNull(shopper);
-            return Math.Max(0, shopper.Stats.GetOrZero(CharacterStat.ComputerLiteracy) / 40);
+            return PricingSkillSteps(shopper.Stats.GetOrZero(CharacterStat.ComputerLiteracy));
+        }
+
+        /// <summary>Skill discount steps from a raw Computer Literacy value, clamped to 0-3000.</summary>
+        public static int PricingSkillSteps(int computerLiteracy)
+        {
+            int capped = Math.Clamp(computerLiteracy, 0, MaxPricingComputerLiteracy);
+            return capped / 40;
         }
 
         /// <summary>What the shopper pays the machine for one stocked item.</summary>

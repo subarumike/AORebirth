@@ -12,20 +12,24 @@ namespace ZoneEngine_New.Core.Data
     {
         private readonly MySqlInventoryRepository _inventory;
         private readonly MySqlUploadedNanoRepository _nanos;
+        private readonly MySqlActiveNanoRepository _activeNanos;
         private readonly IZoneLogger _logger;
         private readonly string _connectionString;
 
         public MySqlCharacterCoalesceCommit(
             MySqlInventoryRepository inventory,
             MySqlUploadedNanoRepository nanos,
+            MySqlActiveNanoRepository activeNanos,
             IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(inventory);
             ArgumentNullException.ThrowIfNull(nanos);
+            ArgumentNullException.ThrowIfNull(activeNanos);
             ArgumentNullException.ThrowIfNull(logger);
 
             _inventory = inventory;
             _nanos = nanos;
+            _activeNanos = activeNanos;
             _logger = logger;
             _connectionString = MySqlConnectionSettings.GetRequiredConnectionString();
         }
@@ -34,13 +38,14 @@ namespace ZoneEngine_New.Core.Data
             IReadOnlyList<ItemInstanceRecord> inserts,
             IReadOnlyList<ItemLocationUpdate> updates,
             int characterId,
-            IReadOnlyList<int> uploadedNanoIds)
+            IReadOnlyList<int> uploadedNanoIds,
+            IReadOnlyList<ActiveNanoRecord>? activeNanos)
         {
             ArgumentNullException.ThrowIfNull(inserts);
             ArgumentNullException.ThrowIfNull(updates);
             ArgumentNullException.ThrowIfNull(uploadedNanoIds);
 
-            if (inserts.Count == 0 && updates.Count == 0 && uploadedNanoIds.Count == 0)
+            if (inserts.Count == 0 && updates.Count == 0 && uploadedNanoIds.Count == 0 && activeNanos == null)
                 return;
 
             try
@@ -51,6 +56,8 @@ namespace ZoneEngine_New.Core.Data
 
                 _inventory.WritePersist(inserts, updates, connection, transaction);
                 _nanos.WriteInsertMissing(characterId, uploadedNanoIds, connection, transaction);
+                if (activeNanos != null)
+                    _activeNanos.WriteReplaceAll(characterId, activeNanos, connection, transaction);
 
                 transaction.Commit();
             }
@@ -60,11 +67,12 @@ namespace ZoneEngine_New.Core.Data
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "CharacterCoalesceCommit failed character={0} inserts={1} updates={2} nanos={3}",
+                        "CharacterCoalesceCommit failed character={0} inserts={1} updates={2} nanos={3} ncu={4}",
                         characterId,
                         inserts.Count,
                         updates.Count,
-                        uploadedNanoIds.Count));
+                        uploadedNanoIds.Count,
+                        activeNanos?.Count ?? -1));
                 throw;
             }
         }

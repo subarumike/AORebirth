@@ -14,6 +14,9 @@ namespace ZoneEngine_New.Core.Characters
 
         public IReadOnlyList<int> UploadedNanoIds { get; init; } = [];
 
+        /// <summary>Stored NCU. Entries whose deadline already passed are dropped on apply.</summary>
+        public IReadOnlyList<ActiveNanoRecord> ActiveNanos { get; init; } = [];
+
         public bool IsSpawnReady => Character != null && Stats.Count > 0;
     }
 }

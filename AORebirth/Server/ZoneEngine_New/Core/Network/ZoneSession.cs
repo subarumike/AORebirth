@@ -91,6 +91,8 @@ namespace ZoneEngine_New.Core.Network
 
         public Player? Player { get; private set; }
 
+        public bool IsClosed => _closed;
+
         public void BindPlayer(Player player)
         {
             Player = player;

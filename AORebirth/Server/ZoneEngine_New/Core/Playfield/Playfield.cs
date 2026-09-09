@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Playfield
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
@@ -46,6 +47,7 @@ namespace ZoneEngine_New.Core.Playfield
         private ServiceProvider _serviceProvider;
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
+        private readonly List<Character> _rebaseQueue = [];
         private PlayfieldHeartbeat? _heartBeat;
         private readonly Lock _tickSync = new();
         private int _nextContainerInventoryHandle = 1;
@@ -327,29 +329,85 @@ namespace ZoneEngine_New.Core.Playfield
         public void Tick(double deltaTime)
         {
             long tickStart = Stopwatch.GetTimestamp();
-            lock (_tickSync)
+            TickStallWatch.BeginTick(Identity.Instance);
+            try
             {
-                if (_disposed)
-                    return;
-
-                SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
-                _inbound.Drain(_router, spawn);
-                spawn.Tick();
-                _inventoryMoves.Tick(this, deltaTime);
-                _trades.Tick(this, deltaTime);
-
-                WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
-                if (world != null)
+                TickStallWatch.Stage("tick.lock");
+                lock (_tickSync)
                 {
-                    long worldStart = Stopwatch.GetTimestamp();
-                    world.TickSoftTriggers(this, deltaTime);
-                    _metrics.WorldSimTick.Record(ElapsedMilliseconds(worldStart));
-                }
+                    if (_disposed)
+                        return;
 
-                _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
+                    SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
+                    TickStallWatch.Stage("inbound.drain");
+                    _inbound.Drain(_router, spawn);
+                    spawn.Tick();
+                    TickStallWatch.Stage("inventory.moves");
+                    _inventoryMoves.Tick(this, deltaTime);
+                    TickStallWatch.Stage("trades");
+                    _trades.Tick(this, deltaTime);
+
+                    WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
+                    if (world != null)
+                    {
+                        TickStallWatch.Stage("world.softtriggers");
+                        long worldStart = Stopwatch.GetTimestamp();
+                        world.TickSoftTriggers(this, deltaTime);
+                        _metrics.WorldSimTick.Record(ElapsedMilliseconds(worldStart));
+                    }
+
+                    _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
+
+                    TickStallWatch.Stage("stats.rebase");
+                    DrainRebases();
+                }
+            }
+            finally
+            {
+                TickStallWatch.EndTick();
             }
 
             _metrics.TickExecution.Record(ElapsedMilliseconds(tickStart));
+        }
+
+        /// <summary>
+        /// Requests one stat rebase for <paramref name="character"/> at the end of this tick.
+        /// Coalesced: a burst of buff changes recomputes bonuses once, not once per change.
+        /// Called from the tick thread only (handlers and character ticks).
+        /// </summary>
+        public void QueueRebase(Character character)
+        {
+            if (character == null || _rebaseQueue.Contains(character))
+                return;
+
+            _rebaseQueue.Add(character);
+        }
+
+        private void DrainRebases()
+        {
+            if (_rebaseQueue.Count == 0)
+                return;
+
+            for (int i = 0; i < _rebaseQueue.Count; i++)
+            {
+                Character character = _rebaseQueue[i];
+                try
+                {
+                    character.RebaseStats();
+                    character.FlushDirtyStats();
+                }
+                catch (Exception exception)
+                {
+                    _logger.Error(
+                        exception,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Stat rebase failed for character {0}",
+                            character.Identity.Instance));
+                }
+            }
+
+            _rebaseQueue.Clear();
         }
 
         private static double ElapsedMilliseconds(long startTimestamp)

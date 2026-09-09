@@ -21,7 +21,7 @@ namespace AORebirth.Core.GameData
 
         public const string SpawnsFileName = "Spawns.json";
 
-        public const string MobTemplatesFileName = "MobTemplates.json";
+        public const string NpcTemplateFileName = "NpcTemplate.json";
 
         public const string ItemTemplatesFileName = "ItemTemplates.json";
 

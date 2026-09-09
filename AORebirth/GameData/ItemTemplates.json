@@ -2,17 +2,14 @@
     "WEAP": {
         "PSTL": {
             "Description": "Pistols",
-            "Hash": "PSTL",
             "ParentHash": "WEPN"
         },
         "RIFL": {
             "Description": "Rifles",
-            "Hash": "RIFL",
             "ParentHash": "WEPN"
         },
         "SMGN": {
             "Description": "Sub Machine Guns",
-            "Hash": "MSTA",
             "ParentHash": "WEPN"
         }
     }

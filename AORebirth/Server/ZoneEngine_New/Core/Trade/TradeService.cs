@@ -32,7 +32,6 @@ namespace ZoneEngine_New.Core.Trade
         readonly IGameData _gameData;
         readonly IItemTemplateCatalog _catalog;
         readonly HashItemMinter _minter;
-        readonly IItemInstanceIdAllocator _ids;
         readonly InventoryFlushService _flush;
 
         public TradeService(
@@ -40,21 +39,18 @@ namespace ZoneEngine_New.Core.Trade
             IGameData gameData,
             IItemTemplateCatalog catalog,
             HashItemMinter minter,
-            IItemInstanceIdAllocator ids,
             InventoryFlushService flush)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(catalog);
             ArgumentNullException.ThrowIfNull(minter);
-            ArgumentNullException.ThrowIfNull(ids);
             ArgumentNullException.ThrowIfNull(flush);
 
             _logger = logger;
             _gameData = gameData;
             _catalog = catalog;
             _minter = minter;
-            _ids = ids;
             _flush = flush;
         }
 
@@ -634,16 +630,16 @@ namespace ZoneEngine_New.Core.Trade
             }
 
             // Mint first so unique duplication is checked against real items, and so a rejected
-            // purchase costs the player nothing. Ids are allocated here because a bag only gets its
-            // container identity once it has an instance id.
+            // purchase costs the player nothing beyond a burned instance id.
             var minted = new List<MintedPurchase>(purchases.Count);
             foreach (Purchase purchase in purchases)
             {
                 ShopStockSlot stock = purchase.Stock;
-                Item item = _minter.Create(stock.LowId, stock.HighId, stock.Quality, ItemSource.Vendor);
-                item.InstanceId = _ids.Allocate();
-                item.IsPersisted = false;
-                item.ApplyContainerIdentityIfBag();
+                Item item = _minter.CreateWithNewInstance(
+                    stock.LowId,
+                    stock.HighId,
+                    stock.Quality,
+                    ItemSource.Vendor);
                 if (TradeRules.IsUnique(item)
                     && (TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId)
                         || ContainsTemplate(minted, item)))

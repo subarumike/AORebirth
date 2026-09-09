@@ -14,9 +14,11 @@ namespace ZoneEngine_New.Core.Entities
 
     using Utility;
 
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Helpers;
+    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.GameData;
 
@@ -68,8 +70,6 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         //TODO: Put cooldowns here
-        //TODO: Put buffs here
-        //TODO: Nano casting should live here
 
         /// <summary>
         /// Subscribe for delayed actions. Honor <see cref="TimedActionInterrupt.LeavePlayfield"/>
@@ -80,6 +80,7 @@ namespace ZoneEngine_New.Core.Entities
         public void InterruptTimedActions(TimedActionInterrupt reason)
         {
             Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
+            CancelNanoCast();
             TimedActionsInterrupted?.Invoke(this, reason);
         }
 
@@ -126,6 +127,7 @@ namespace ZoneEngine_New.Core.Entities
             _deathNotified = true;
             InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             SetFightingTarget(Identity.None);
+            NanoRuntime.ClearBuffsOnDeath(this);
 
             Cell?.Announce(
                 new CharacterActionMessage
@@ -141,6 +143,32 @@ namespace ZoneEngine_New.Core.Entities
             _corpseSwapRemainingSeconds = CorpseSwapDelayMilliseconds / 1000.0;
 
             AwardKillRewards();
+        }
+
+        /// <summary>
+        /// Clears death and restores health/nano so the character can live again.
+        /// </summary>
+        public virtual void Revive()
+        {
+            _deathNotified = false;
+            _corpseSwapPending = false;
+            _corpseSwapRemainingSeconds = 0;
+            ClearNanoRecharge();
+
+            int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
+            Stats.Set(CharacterStat.Health, maxHealth > 0 ? maxHealth : 1, StatDetail.Base, dirty: true);
+
+            int maxNano = Stats.GetOrZero(CharacterStat.MaxNanoEnergy);
+            if (maxNano > 0)
+                Stats.Set(CharacterStat.CurrentNano, maxNano, StatDetail.Base, dirty: true);
+
+            Stats.Set(CharacterStat.DeadTimer, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.State, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.CurrentState, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.ActionCategory, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.SocialStatus, 0, StatDetail.Base, dirty: true);
+
+            FlushDirtyStats();
         }
 
         /// <summary>
@@ -677,6 +705,7 @@ namespace ZoneEngine_New.Core.Entities
                 TickWeapons(deltaTime);
             if (!IsDead)
                 TickPassiveRegen(deltaTime);
+            NanoRuntime.Tick(this, DateTime.UtcNow);
             base.Tick(deltaTime);
         }
 
@@ -840,11 +869,18 @@ namespace ZoneEngine_New.Core.Entities
 
             Stats.Set(CharacterStat.Health, newHealth, StatDetail.Base, dirty: true);
 
+            if (hpRemoved > 0)
+                OnDamaged(attacker, hpRemoved, hitType);
+
             if (newHealth > 0)
                 return false;
 
             OnDeath(attacker);
             return true;
+        }
+
+        protected virtual void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
+        {
         }
 
         internal Character? TryResolveFightingTarget()
@@ -905,7 +941,327 @@ namespace ZoneEngine_New.Core.Entities
         }
 
 
+        #region Nano casting and buffs
+
+        readonly List<Buff> _buffs = [];
+        DateTime _nanoRechargeUntilUtc = DateTime.MinValue;
+        int _nextNanoInstance;
+
+        /// <summary>Active NCU entries, oldest first.</summary>
+        public IReadOnlyList<Buff> Buffs => _buffs;
+
+        /// <summary>NCU consumed by friendly buffs; mirrored into CurrentNCU for the client.</summary>
+        public int UsedNcu { get; private set; }
+
+        /// <summary>0 means unlimited: NPCs carry no NCU stat.</summary>
+        public int MaxNcu => Stats.GetOrZero(CharacterStat.MaxNCU);
+
+        /// <summary>Cast bar in flight, or null when idle.</summary>
+        public PendingNanoCast? PendingCast { get; private set; }
+
+        public bool IsCastingNano => PendingCast != null;
+
+        public bool IsInNanoRecharge(DateTime nowUtc) => nowUtc < _nanoRechargeUntilUtc;
+
+        public void BeginNanoCast(PendingNanoCast cast)
+        {
+            ArgumentNullException.ThrowIfNull(cast);
+            PendingCast = cast;
+        }
+
+        /// <summary>
+        /// Drops a cast bar in flight. An interrupted cast never charges nano and never starts
+        /// a recharge lockout, so spam-cancelling a cast buys nothing.
+        /// </summary>
+        //TODO: Tell the client the bar died. CharacterActionType.InterruptNanoCasting looks right
+        // but has not been seen outbound in a capture, so nothing is sent yet.
+        public void CancelNanoCast() => PendingCast = null;
+
+        /// <summary>
+        /// Post-cast lockout before the next nano. Caster-wide rather than per-nano, a UTC
+        /// deadline rather than a countdown, and never persisted: a relog clears it.
+        /// It does not gate weapon attacks or specials.
+        /// </summary>
+        public void StartNanoRecharge(int centiseconds, DateTime nowUtc)
+        {
+            if (centiseconds <= 0)
+                return;
+
+            _nanoRechargeUntilUtc = nowUtc.AddMilliseconds(centiseconds * 10L);
+        }
+
+        public void ClearNanoRecharge() => _nanoRechargeUntilUtc = DateTime.MinValue;
+
+        /// <summary>
+        /// Runs the strain / stacking / NCU gate and lands <paramref name="spell"/> when it passes.
+        /// <paramref name="replaced"/> is the entry this buff pushed out, which the caller still
+        /// has to announce as removed.
+        /// </summary>
+        public BuffApplyDecision TryApplyBuff(
+            NanoSpell spell,
+            Identity source,
+            DateTime nowUtc,
+            out Buff? applied,
+            out Buff? replaced)
+        {
+            ArgumentNullException.ThrowIfNull(spell);
+
+            applied = null;
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, _buffs, MaxNcu, out replaced);
+            if (decision != BuffApplyDecision.Apply && decision != BuffApplyDecision.Replace)
+                return decision;
+
+            if (replaced != null)
+                _buffs.Remove(replaced);
+
+            applied = Buff.Create(spell, source, ++_nextNanoInstance, nowUtc);
+            _buffs.Add(applied);
+
+            OnBuffsChanged();
+            return decision;
+        }
+
+        /// <summary>
+        /// Puts a persisted buff back in NCU at login. Skips strain and NCU checks: the set was
+        /// already legal when it was stored, and an expired deadline is dropped by the caller.
+        /// </summary>
+        public Buff? TryRestoreBuff(NanoSpell spell, Identity source, int nanoInstance, DateTime expiresAtUtc)
+        {
+            ArgumentNullException.ThrowIfNull(spell);
+
+            if (!spell.IsBuff || TryGetBuff(spell.Id, out _))
+                return null;
+
+            Buff buff = Buff.Restore(spell, source, nanoInstance, expiresAtUtc);
+            _buffs.Add(buff);
+            if (nanoInstance > _nextNanoInstance)
+                _nextNanoInstance = nanoInstance;
+
+            OnBuffsChanged();
+            return buff;
+        }
+
+        public bool TryGetBuff(int nanoId, out Buff? buff)
+        {
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                if (_buffs[i].Id != nanoId)
+                    continue;
+
+                buff = _buffs[i];
+                return true;
+            }
+
+            buff = null;
+            return false;
+        }
+
+        public BuffRemovalOutcome TryRemoveBuff(int nanoId, BuffRemovalReason reason, out Buff? removed)
+        {
+            removed = null;
+            if (!TryGetBuff(nanoId, out Buff? buff) || buff == null)
+                return BuffRemovalOutcome.NotFound;
+
+            if (!buff.TryCancel(reason))
+                return BuffRemovalOutcome.NotCancellable;
+
+            _buffs.Remove(buff);
+            removed = buff;
+            OnBuffsChanged();
+            return BuffRemovalOutcome.Removed;
+        }
+
+        /// <summary>
+        /// Empties NCU. Used by death and playfield exit, which ignore
+        /// <see cref="ItemTemplate.CanCancel"/>.
+        /// </summary>
+        public List<Buff> RemoveAllBuffs(BuffRemovalReason reason)
+        {
+            if (_buffs.Count == 0)
+                return [];
+
+            var removed = new List<Buff>(_buffs);
+            _buffs.Clear();
+            OnBuffsChanged();
+            return removed;
+        }
+
+        /// <summary>Removes and returns every buff whose deadline has passed.</summary>
+        public List<Buff> DrainExpiredBuffs(DateTime nowUtc)
+        {
+            List<Buff>? expired = null;
+            for (int i = _buffs.Count - 1; i >= 0; i--)
+            {
+                if (!_buffs[i].IsExpired(nowUtc))
+                    continue;
+
+                expired ??= [];
+                expired.Add(_buffs[i]);
+                _buffs.RemoveAt(i);
+            }
+
+            if (expired == null)
+                return [];
+
+            OnBuffsChanged();
+            return expired;
+        }
+
+        void OnBuffsChanged()
+        {
+            SyncUsedNcu();
+            MarkRebaseDirty();
+            SnapshotActiveNanosForPersistence();
+        }
+
+        void SyncUsedNcu()
+        {
+            int used = 0;
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                if (!_buffs[i].IsHostile)
+                    used += _buffs[i].NcuCost;
+            }
+
+            if (used == UsedNcu)
+                return;
+
+            UsedNcu = used;
+            Stats.Set(CharacterStat.CurrentNCU, used, StatDetail.Base, dirty: true);
+        }
+
+        readonly object _activeNanoDirtyGate = new();
+        List<ActiveNanoRecord>? _dirtyActiveNanos;
+
+        public bool HasDirtyActiveNanos
+        {
+            get
+            {
+                lock (_activeNanoDirtyGate)
+                    return _dirtyActiveNanos != null;
+            }
+        }
+
+        /// <summary>
+        /// Snapshots NCU for the write-behind flush, which runs off the tick thread and so must
+        /// never walk the live buff list. Only players persist NCU.
+        /// </summary>
+        void SnapshotActiveNanosForPersistence()
+        {
+            if (this is not Player player)
+                return;
+
+            var snapshot = new List<ActiveNanoRecord>(_buffs.Count);
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                Buff buff = _buffs[i];
+                snapshot.Add(
+                    new ActiveNanoRecord
+                    {
+                        NanoId = buff.Id,
+                        Strain = buff.NanoStrain,
+                        NanoInstance = buff.NanoInstance,
+                        DurationCentiseconds = buff.DurationCentiseconds,
+                        ExpiresAtUtcTicks = buff.ExpiresAtUtc.Ticks
+                    });
+            }
+
+            lock (_activeNanoDirtyGate)
+                _dirtyActiveNanos = snapshot;
+
+            Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);
+        }
+
+        /// <summary>Takes ownership of the pending NCU snapshot; null when nothing changed.</summary>
+        public List<ActiveNanoRecord>? TakeDirtyActiveNanos()
+        {
+            lock (_activeNanoDirtyGate)
+            {
+                List<ActiveNanoRecord>? snapshot = _dirtyActiveNanos;
+                _dirtyActiveNanos = null;
+                return snapshot;
+            }
+        }
+
+        /// <summary>
+        /// Returns a failed snapshot for a later retry. A newer snapshot wins: it already
+        /// describes the current NCU set.
+        /// </summary>
+        public void RestoreDirtyActiveNanos(List<ActiveNanoRecord>? snapshot)
+        {
+            if (snapshot == null)
+                return;
+
+            lock (_activeNanoDirtyGate)
+                _dirtyActiveNanos ??= snapshot;
+        }
+
+        /// <summary>
+        /// NCU entries for a spawn packet, so a client that just gained visibility sees the same
+        /// buffs and remaining durations as one that watched them land.
+        /// </summary>
+        protected ActiveNano[] BuildActiveNanos()
+        {
+            if (_buffs.Count == 0)
+                return [];
+
+            DateTime nowUtc = DateTime.UtcNow;
+            var nanos = new ActiveNano[_buffs.Count];
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                Buff buff = _buffs[i];
+                int remaining = buff.RemainingCentiseconds(nowUtc);
+                nanos[i] = new ActiveNano
+                {
+                    NanoIdentity = new Identity
+                    {
+                        Type = IdentityType.NanoProgram,
+                        Instance = buff.Id
+                    },
+                    NanoInstance = buff.NanoInstance,
+                    Time1 = remaining,
+                    Time2 = remaining
+                };
+            }
+
+            return nanos;
+        }
+
+        /// <summary>
+        /// Adds active buff bonuses. Runs at the end of a rebase, after the equipment pass has
+        /// cleared bonuses, so buffs never need an inverse operation when they drop.
+        /// </summary>
+        protected void ApplyBuffBonuses()
+        {
+            for (int i = 0; i < _buffs.Count; i++)
+                StatModifierSpells.Apply(_buffs[i].ModifierSpells, Stats);
+        }
+
+        /// <summary>
+        /// Requests a stat rebase at the next safe point in the tick. Batched so a burst of buff
+        /// changes recomputes bonuses once. Playfield-less characters rebase inline.
+        /// </summary>
+        public void MarkRebaseDirty()
+        {
+            Playfield? playfield = Playfield;
+            if (playfield == null)
+            {
+                RebaseStats();
+                return;
+            }
+
+            playfield.QueueRebase(this);
+        }
+
+        #endregion
+
         public abstract void Rebase();
+
+        /// <summary>
+        /// Recomputes the bonus layer and anything derived from it, without touching weapons.
+        /// Buff changes take this path: re-arming would reset swing timers mid-fight.
+        /// </summary>
+        public abstract void RebaseStats();
 
         public abstract void RebaseWeapons();
 
@@ -1207,7 +1563,7 @@ namespace ZoneEngine_New.Core.Entities
                 RunSpeedBase = (short)runSpeedBase,
                 Flags2 = 0,
                 Unknown2 = 0,
-                ActiveNanos = [],
+                ActiveNanos = BuildActiveNanos(),
                 Textures = BuildTextures(isNpc),
                 Meshes = BuildMeshes(headMesh)
             };

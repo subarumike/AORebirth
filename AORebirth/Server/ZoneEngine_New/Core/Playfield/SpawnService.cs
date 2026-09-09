@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Playfield
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.Core.Textures;
+
     using AODB.Common.RDBObjects;
 
     using Microsoft.Extensions.DependencyInjection;
@@ -11,12 +13,14 @@ namespace ZoneEngine_New.Core.Playfield
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
@@ -38,7 +42,6 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
         private readonly HashItemMinter _hashItems;
-        private readonly IItemInstanceIdAllocator _ids;
         private readonly InventoryFlushService _flush;
         private readonly TradeService _trades;
         private readonly CharacterSnapshotService _snapshot;
@@ -52,7 +55,6 @@ namespace ZoneEngine_New.Core.Playfield
             IGameData gameData,
             IItemBuilder items,
             HashItemMinter hashItems,
-            IItemInstanceIdAllocator ids,
             InventoryFlushService flush,
             TradeService trades,
             CharacterSnapshotService snapshot)
@@ -65,7 +67,6 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
             ArgumentNullException.ThrowIfNull(hashItems);
-            ArgumentNullException.ThrowIfNull(ids);
             ArgumentNullException.ThrowIfNull(flush);
             ArgumentNullException.ThrowIfNull(trades);
             ArgumentNullException.ThrowIfNull(snapshot);
@@ -78,7 +79,6 @@ namespace ZoneEngine_New.Core.Playfield
             _gameData = gameData;
             _hashItems = hashItems;
             _items = items;
-            _ids = ids;
             _flush = flush;
             _trades = trades;
             _snapshot = snapshot;
@@ -102,19 +102,20 @@ namespace ZoneEngine_New.Core.Playfield
                 Playfield = _playfield,
                 Name = template.Name,
                 MobTemplate = template,
+                Attackable = template.Attackable,
                 Position = position,
                 Rotation = heading ?? new Quaternion(),
                 SpawnSource = spawnSource
             };
 
-            foreach (var entry in template.Stats)
+            foreach (var entry in MobStatResolver.Resolve(template, level))
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
-            if (level.HasValue)
-                npc.Stats.Set(CharacterStat.Level, level.Value);
-
+            ApplyTextures(npc, template);
             npc.Rebase();
             TryAttachShop(npc, template);
+            if (npc.Shop == null && npc.Attackable)
+                NpcBrain.Create(npc, position, NpcAiProfiles.Resolve(template.Hash));
 
             _registry.Register(npc);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(npc);
@@ -122,15 +123,31 @@ namespace ZoneEngine_New.Core.Playfield
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Spawned mob hash={0} name={1} id={2} at ({3},{4},{5})",
+                    "Spawned mob hash={0} name={1} id={2} level={3} at ({4},{5},{6})",
                     template.Hash,
                     template.Name,
                     identity.Instance,
+                    npc.Stats.GetOrZero(CharacterStat.Level),
                     position.xf,
                     position.yf,
                     position.zf));
 
             return npc;
+        }
+
+        static void ApplyTextures(NpcCharacter npc, MobTemplate template)
+        {
+            Dictionary<int, int>? textures = template.Textures;
+            if (textures == null)
+                return;
+
+            foreach (KeyValuePair<int, int> entry in textures)
+            {
+                if (entry.Value <= 0)
+                    continue;
+
+                npc.Textures.Add(new AOTextures(entry.Key, entry.Value));
+            }
         }
 
         /// <summary>
@@ -200,7 +217,7 @@ namespace ZoneEngine_New.Core.Playfield
                 corpse.ReservedUntilUtc = DateTime.UtcNow.AddSeconds(Corpse.LootReserveSeconds);
             }
 
-            corpse.ResolveLoot(_hashItems, _ids);
+            corpse.ResolveLoot(_hashItems);
 
             _registry.Register(corpse);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(corpse);
@@ -413,6 +430,9 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(command);
 
+            if (session.IsClosed)
+                return;
+
             if (session.State is SessionState.InPlay or SessionState.SpawnReady)
                 return;
 
@@ -458,9 +478,7 @@ namespace ZoneEngine_New.Core.Playfield
             DateTime now = DateTime.UtcNow;
             foreach (Player player in _registry.PlayerEntities())
             {
-                if (player.ConnectionPhase != PlayerConnectionPhase.LinkDead)
-                    continue;
-                if (player.LinkDeadUntilUtc == null || player.LinkDeadUntilUtc > now)
+                if (!player.HasLinkDeadExpired(now))
                     continue;
 
                 DespawnPlayer(player);
@@ -567,13 +585,25 @@ namespace ZoneEngine_New.Core.Playfield
         {
             int characterId = player.Identity.Instance;
 
-            player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
-            // Return offered items before the snapshot so a logout mid-trade cannot eat them.
-            _trades.Cancel(player, "logged out");
-            if (player.Inventory.IsHydrated)
-                _flush.HardFlush(player);
+            try
+            {
+                player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
+                // Return offered items before the snapshot so a logout mid-trade cannot eat them.
+                _trades.Cancel(player, "logged out");
+                if (player.Inventory.IsHydrated)
+                    _flush.HardFlush(player);
 
-            _snapshot.Commit(player);
+                _snapshot.Commit(player);
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "LinkDead persist failed character={0}; despawning anyway",
+                        characterId));
+            }
 
             IZoneSession? session = player.Session;
             if (session != null)

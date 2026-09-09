@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Movement;
+    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
@@ -53,6 +54,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
             switch (message.Action)
             {
+                case CharacterActionType.Die:
+                case CharacterActionType.DeathRespawn:
+                    player.RequestRespawn();
+                    break;
+
                 case CharacterActionType.StandUp:
                     // Sit posture arrives via CharDCMove (MoveType SwitchToSit), not CharacterAction.
                     ApplyStand(player);
@@ -66,6 +72,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case CharacterActionType.StopSneaking: //TODO: Wire in cooldown on sneak
                     player.Motor.ApplyAction(MovementAction.LeaveSneak);
                     AnnounceAction(player, CharacterActionType.StopSneaking);
+                    break;
+
+                case CharacterActionType.RemoveFriendlyNano:
+                    CancelNano(player, message);
                     break;
 
                 case CharacterActionType.InfoRequest:
@@ -112,6 +122,30 @@ namespace ZoneEngine_New.Core.MessageHandlers
                             player.Identity.Instance));
                     break;
             }
+        }
+
+        /// <summary>
+        /// NCU cancel from the client. The nano is read from the NanoProgram identity the client
+        /// sends; legacy also guessed the nano from instance ids and from "there is only one
+        /// active nano", which cancelled the wrong buff, so an unresolved request is refused.
+        /// </summary>
+        static void CancelNano(Player player, CharacterActionMessage message)
+        {
+            int nanoId = message.Target.Type == IdentityType.NanoProgram ? message.Target.Instance : 0;
+            if (nanoId <= 0)
+            {
+                player.Logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "RemoveFriendlyNano without a NanoProgram target: target={0} p1={1} p2={2} character={3}",
+                        message.Target,
+                        message.Parameter1,
+                        message.Parameter2,
+                        player.Identity.Instance));
+                return;
+            }
+
+            NanoRuntime.TryCancelBuff(player, nanoId);
         }
 
         static void ApplyStand(Player player)

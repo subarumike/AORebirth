@@ -14,9 +14,9 @@ namespace ZoneEngine_New.Tests
             """
             {
                 "WEAP": {
-                    "PSTL": { "Description": "Pistols", "Hash": "PSTL", "ParentHash": "WEPN" },
-                    "RIFL": { "Description": "Rifles", "Hash": "RIFL", "ParentHash": "WEPN" },
-                    "SMGN": { "Description": "Sub Machine Guns", "Hash": "MSTA", "ParentHash": "WEPN" }
+                    "PSTL": { "Description": "Pistols", "ParentHash": "WEPN" },
+                    "RIFL": { "Description": "Rifles", "ParentHash": "WEPN" },
+                    "SMGN": { "Description": "Sub Machine Guns", "ParentHash": "WEPN" }
                 }
             }
             """;
@@ -50,7 +50,7 @@ namespace ZoneEngine_New.Tests
             HashItemCatalog catalog = HashItemCatalog.Parse(TemplatesJson, InstancesJson, new FixedRandom(0));
 
             Assert.IsTrue(catalog.TryGetCategory("WEAP", out IReadOnlyList<string> children));
-            CollectionAssert.AreEqual(new[] { "PSTL", "RIFL", "MSTA" }, new List<string>(children));
+            CollectionAssert.AreEqual(new[] { "PSTL", "RIFL", "SMGN" }, new List<string>(children));
             Assert.IsTrue(catalog.TryResolveInstance("WEAP", out HashInstance instance));
             Assert.AreEqual("PSTL", instance.Hash);
         }
@@ -76,6 +76,9 @@ namespace ZoneEngine_New.Tests
             Assert.IsFalse(catalog.TryResolveInstance("AAAA", out _));
             Assert.IsFalse(catalog.TryResolveInstance("AAAB", out _));
             Assert.IsFalse(catalog.TryResolveInstance("MSTA", out _));
+
+            // A category child with no HashInstances entry is a dead leaf, not a resolvable item.
+            Assert.IsFalse(catalog.TryResolveInstance("SMGN", out _));
             Assert.IsFalse(catalog.TryResolveInstance(string.Empty, out _));
         }
 
