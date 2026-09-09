@@ -69,6 +69,29 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void PropertyKeyFormatResolvesOnlyRealInstanceLeavesAndSkipsScalarMetadata()
+        {
+            var catalog = HashItemCatalog.Parse("""
+                {"WEAP":{"Description":"Weapons","ParentHash":"ROOT","PSTL":{},"SMGN":{}}}
+                """, InstancesJson, new FixedRandom(0));
+            Assert.IsTrue(catalog.TryGetCategory("WEAP", out var children));
+            CollectionAssert.AreEqual(new[] { "PSTL", "SMGN" }, new List<string>(children));
+            Assert.IsTrue(catalog.TryResolveInstance("WEAP", out var instance));
+            Assert.AreEqual("PSTL", instance.Hash); Assert.IsFalse(catalog.TryResolveInstance("SMGN", out _));
+        }
+
+        [TestMethod]
+        public void ExplicitAliasIsPreservedAndMalformedHashDoesNotAcquireAPropertyFallback()
+        {
+            var catalog = HashItemCatalog.Parse("""
+                {"WEAP":{"SMGN":{"Hash":"MSTA"},"PSTL":{"Hash":17},"RIFL":{"Hash":""}}}
+                """, InstancesJson);
+            Assert.IsTrue(catalog.TryGetCategory("WEAP", out var children));
+            CollectionAssert.AreEqual(new[] { "MSTA" }, new List<string>(children));
+            Assert.IsFalse(catalog.TryResolveInstance("WEAP", out _));
+        }
+
+        [TestMethod]
         public void UnknownHashIncludingLegacyLootTableFails()
         {
             HashItemCatalog catalog = HashItemCatalog.Parse(TemplatesJson, InstancesJson);

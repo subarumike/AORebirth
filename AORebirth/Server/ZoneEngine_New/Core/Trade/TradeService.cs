@@ -799,9 +799,7 @@ namespace ZoneEngine_New.Core.Trade
             {
                 ShopStockSlot stock = purchase.Stock;
                 Item item = _minter.Create(stock.LowId, stock.HighId, stock.Quality, ItemSource.Vendor);
-                item.InstanceId = _ids.Allocate();
-                item.IsPersisted = false;
-                item.ApplyContainerIdentityIfBag();
+                item.AssignInstanceId(_ids.Allocate());
                 if (TradeRules.IsUnique(item)
                     && (TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId)
                         || ContainsTemplate(minted, item)))

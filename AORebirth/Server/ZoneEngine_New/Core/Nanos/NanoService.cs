@@ -237,9 +237,10 @@ namespace ZoneEngine_New.Core.Nanos
 
         public bool TryCast(Player caster, int nanoId, Identity targetIdentity)
         {
+            nanoId = BucketheadNanoSpecialization.NormalizeNanoId(nanoId);
             if (!TryState(caster, out State state) || !Online(caster) || state.Pending != null
                 || _milliseconds() < state.ReadyAt || !_catalog.TryGet(nanoId, out NanoDefinition nano)
-                || !caster.UploadedNanoIds.Contains(nanoId)) return false;
+                || !BucketheadNanoSpecialization.IsUploaded(caster, nanoId)) return false;
             var castContext = Specialty(nanoId) as INanoCastContextSpecialization;
             Player? target = castContext != null || targetIdentity == Identity.None || targetIdentity == caster.Identity ? caster
                 : _states.TryGetValue(targetIdentity.Instance, out State? targetState)
@@ -363,7 +364,7 @@ namespace ZoneEngine_New.Core.Nanos
         {
             Player caster = casterState.Player; Player target = pending.Target;
             if (!ReferenceEquals(caster.Session, pending.Session) || !ReferenceEquals(target.Session, pending.TargetSession)
-                || !ReferenceEquals(caster.Playfield, pending.Playfield) || !caster.UploadedNanoIds.Contains(pending.Nano.Id)
+                || !ReferenceEquals(caster.Playfield, pending.Playfield) || !BucketheadNanoSpecialization.IsUploaded(caster, pending.Nano.Id)
                 || !Validate(caster, target, pending.Nano, out var specialty, out int duration, out bool usesActive)
                 || !TryState(target, out State targetState)) return;
             var effects = new NanoEffectPlan();

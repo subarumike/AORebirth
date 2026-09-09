@@ -109,6 +109,7 @@
     <Compile Include="../ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs" Link="SharedGameplay/Dialogue/AreteFrameworkBootstrap.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedSubwayTailorDialogueContent.cs" Link="SharedGameplay/Dialogue/CapturedSubwayTailorDialogueContent.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedSubwayVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedSubwayVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedBucketheadTechnodealerContentProvider.cs" Link="SharedGameplay/Mobs/CapturedBucketheadTechnodealerContentProvider.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedThrakGardenVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedThrakGardenVendorContentProvider.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedAbanGardenVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedAbanGardenVendorContentProvider.cs" />
     <Compile Include="../ZoneEngine/Core/Arete/AreteConditionReferenceValidator.cs" Link="SharedGameplay/Dialogue/AreteConditionReferenceValidator.cs" />

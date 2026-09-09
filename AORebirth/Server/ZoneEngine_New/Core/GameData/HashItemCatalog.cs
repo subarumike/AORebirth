@@ -243,6 +243,10 @@ namespace ZoneEngine_New.Core.GameData
 
                 if (TryReadChildHash(property.Value, out string childHash))
                     children.Add(childHash);
+                else if (!property.Value.TryGetProperty("Hash", out _) && property.Name.Length != 0)
+                    // Delmus's property-key format coexists with the accepted explicit aliases.
+                    // Malformed/empty explicit Hash values are not silently rewritten.
+                    children.Add(property.Name);
 
                 IndexCategories(property.Value, property.Name, result);
             }

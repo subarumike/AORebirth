@@ -108,9 +108,11 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         public void Tick(double deltaTime)
         {
-            foreach (Dynel dynel in _tracked)
+            // Visibility delivery can remove an actor. Iterate a snapshot but do
+            // not reposition a removed actor or let it consume a replacement's visibility.
+            foreach (Dynel dynel in new List<Dynel>(_tracked))
             {
-                if (!dynel.Transform.PositionChangedSinceLastTick)
+                if (!_tracked.Contains(dynel) || !dynel.Transform.PositionChangedSinceLastTick)
                     continue;
 
                 Cell? previous = dynel.Cell;

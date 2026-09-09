@@ -256,7 +256,8 @@ public sealed class PlayfieldTransferTests
             _flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => Manager), Persist, new StubLogger());
             Set(_trades, "_gate", new object()); Set(_trades, "_byPlayer", new Dictionary<int, TradeSession>());
         }
-        internal Playfield World(int id)
+        internal Playfield World(int id, IItemTemplateCatalog? itemCatalog = null, IItemBuilder? itemBuilder = null,
+            Func<long>? milliseconds = null)
         {
             var world = Blank<Playfield>(); var registry = new DynelRegistry(); var logger = new StubLogger();
             var locality = new PlayfieldLocality(id, null); var spawn = Blank<SpawnService>();
@@ -265,12 +266,15 @@ public sealed class PlayfieldTransferTests
             Set(world, "_outgoingTransfers", new ConcurrentDictionary<PlayfieldTransfer, byte>());
             Set(world, "_incomingTransfers", new ConcurrentDictionary<PlayfieldTransfer, byte>());
             Set(world, "_dynelRegistry", registry); Set(world, "_logger", logger); Set(world, "_playfieldManager", Manager);
+            itemCatalog ??= new StubCatalog(); itemBuilder ??= new StubItemBuilder();
+            var accepted = new AcceptedNpcActivationService(world, registry, locality, itemBuilder, itemCatalog);
             var services = new ServiceCollection().AddSingleton(spawn).AddSingleton(registry).AddSingleton(locality)
                 .AddSingleton(Manager.Teams).AddSingleton(new WorldSimulationAccess())
                 .AddSingleton(new InventoryMoveService(logger, _flush, Blank<InventoryActionService>()))
                 .AddSingleton(_trades)
                 .AddSingleton(new AcceptedQuestPropService(world, registry, locality, new StubCatalog(), null!))
-                .AddSingleton(new AcceptedNpcActivationService(world, registry, locality, new StubItemBuilder(), new StubCatalog()))
+                .AddSingleton(accepted)
+                .AddSingleton(new BucketheadSummonService(world, registry, locality, accepted, itemBuilder, itemCatalog, milliseconds))
                 .BuildServiceProvider();
             Set(world, "_serviceProvider", services);
             Set(spawn, "_registry", registry); Set(spawn, "_logger", logger); Set(spawn, "_playfield", world);

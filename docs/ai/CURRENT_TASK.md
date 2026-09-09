@@ -2,12 +2,14 @@
 
 ## Active
 
-Close remaining accepted NPC activation, dialogue, nano-specialty and mission gaps
-on `codex/zoneengine-new-gameplay-reconciliation`, beginning at validated Windows/
-Linux checkpoint `05c8d4ef7429e1ed765a19bd63ace0e21a2b29e5`.
-Use the existing isolated integration worktree; preserve the primary master
-worktree and the prior integration branch. Starting origin/master and merge base:
-`6e90dda030774726aa2060acb9edb756ea1f635c`.
+Reconcile Delmus `d2d9844673a766c02aa768623db9f0ab5b6ea01c` with validated
+Windows/Linux checkpoint `e31142e850063726adfda0d33b5b68b0ed6b309f` on
+`codex/zoneengine-final-delmus-reconciliation` in the dedicated AORebirth worktree.
+Preserve primary master and the validated integration branch. Delmus is based
+on master `6e90dda030774726aa2060acb9edb756ea1f635c`, not on e31142e8.
+All 77 introduced file diffs were read before implementation. Per-file decisions
+and implemented/retained/rejected dispositions are recorded in
+`docs/evidence/DELMUS_D2D98446_FILE_RECONCILIATION.json`.
 
 Preserve the proven schema/startup/persistence/packaging boundaries. Inventory all
 accepted NPC mappings; connect only complete accepted data, preserving explicit
@@ -25,22 +27,24 @@ use is authorized. The existing integration and transition evidence remains at
 
 ### Current candidate and remaining acceptance work
 
-The current source adds 22 exact social/vendor NPCs, three standalone accepted
-world shops, two Arete quest props and 16 activated dialogue domains. Stan/Sarah,
-DOJA and vendor interactions retain the existing transactional services. Sparrow,
-attribute trickle, two team warps, owned-bank mission-key cleanup and repeated
-corpse UI have exact source-backed repairs. Source-level Windows validation passes
-420/420 New-engine tests, 1,129/1,129 AOtomation tests and all 12 mandatory stages.
-The final committed SHA still requires Windows acceptance, disposable validation
-and matching Linux execution; a prior PASS is not reused for changed source. The
-final ignored `build-verify/zoneengine-gap-closure-final-results.md` records that
-execution without creating a self-referential commit/report SHA.
+This reconciliation repairs exact-session reconnect visibility, fresh shop/loot/give
+item identity stamping, hash-less category compatibility without changing accepted
+aliases, vendor/combat cell heat and mutation-safe locality iteration. N06 Buckethead
+300439 now has its exact NPC/shop graph, 46 real-catalog stock rows, one postcommit
+publication, owner/session cleanup and 600-second source-playfield lifetime.
+The existing 22 static NPC adapters, 19 NPC shops, three standalone shops, 1,335
+stock rows, 16 dialogue domains and transaction/lifecycle guards are preserved.
+Candidate validation and exact-SHA receipts are separate from the historical e311
+checkpoint. See `docs/evidence/DELMUS_D2D98446_RUNTIME_RECONCILIATION.md`.
 
-Concrete master blockers remain: the complete accepted actor/consumer ledger,
-ordinary NPC runtime consumers (including the 322 Subway and 167 Temple bindings),
-27 specialized accepted dialogue routes and six definite nano review units, plus
+Concrete master blockers remain: ordinary NPC runtime consumers
+(including the 322 Subway and 167 Temple bindings),
+27 specialized accepted dialogue routes and five definite nano review units
+(N02/N05/N07/N08/N10), plus
 conditional persisted-morph handling for affected rows (N03).
 Unexpanded source consumers are assessment-pending, not mislabeled missing data.
+The broader forensic NPC census is not itself a master blocker; the required
+boundary is the accepted production mappings for supported playfields.
 The source/parity evidence and boundaries are in
 `docs/evidence/ZONEENGINE_NEW_GAP_CLOSURE_20260908.md` and its linked domain reports.
 

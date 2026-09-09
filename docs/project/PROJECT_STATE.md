@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-09-08
+Updated: 2026-09-09
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -9,6 +9,16 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Dedicated `codex/zoneengine-final-delmus-reconciliation` preserves e31142e8 and
+  explicitly reconciles all 77 files introduced by the parallel Delmus d2d98446
+  revision. Narrow rewrites repair reconnect, fresh-item identities, category
+  compatibility and locality scheduling. The exact Buckethead summon/vendor
+  adapter closes N06; five definite nano review units, the accepted Subway/Temple
+  ordinary consumers and 27 dialogue routes remain unresolved. No generic NPC AI,
+  stat-band fallback, parallel nano persistence authority or production change is
+  imported. Broader forensic census completion is not itself a master gate.
+  See `docs/evidence/DELMUS_D2D98446_RUNTIME_RECONCILIATION.md` for dispositions,
+  exact remaining contracts and candidate validation boundaries.
 - The approved gameplay reconciliation branch extends the accepted `05c8d4ef`
   checkpoint with 22 exact social/vendor NPC adapters, three standalone shops,
   two Arete quest props and 16 activated dialogue domains. Stan/Sarah hand-ins,
