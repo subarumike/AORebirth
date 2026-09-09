@@ -24,16 +24,19 @@ namespace ZoneEngine_New.Tests
     {
         readonly HashItemCatalog _hashItems;
         readonly Dictionary<int, VendingMachineDefinition> _machines;
+        readonly bool _allowMissingCatMesh;
 
         public StubGameData(
             HashItemCatalog hashItems,
-            Dictionary<int, VendingMachineDefinition>? machines = null)
+            Dictionary<int, VendingMachineDefinition>? machines = null,
+            bool allowMissingCatMesh = false)
         {
             _hashItems = hashItems;
             _machines = machines ?? new Dictionary<int, VendingMachineDefinition>();
+            _allowMissingCatMesh = allowMissingCatMesh;
         }
 
-        public string RootPath => string.Empty;
+        public string RootPath { get; init; } = string.Empty;
 
         public int MobTemplateCount => 0;
 
@@ -66,7 +69,12 @@ namespace ZoneEngine_New.Tests
 
         public MobTemplate RequireMobTemplate(string hash) => throw new NotSupportedException();
 
-        public bool TryGetCatMesh(int monsterData, out int catMesh) => throw new NotSupportedException();
+        public bool TryGetCatMesh(int monsterData, out int catMesh)
+        {
+            if (!_allowMissingCatMesh) throw new NotSupportedException();
+            catMesh = 0;
+            return false;
+        }
 
         public PlayfieldMetaData? GetPlayfieldMetaData(int playfieldId) => throw new NotSupportedException();
 

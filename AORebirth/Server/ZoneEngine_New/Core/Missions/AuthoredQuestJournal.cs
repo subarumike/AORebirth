@@ -20,6 +20,9 @@ internal static class AuthoredQuestJournal
             AuthoredQuestService.DeliverFactory => SafeQuestFullUpdateSender.CreateDeliverAntonioFactoryPreviewMessage(player.Identity),
             AuthoredQuestService.TalkSarah => SafeQuestFullUpdateSender.CreateTalkToSarahGreenePreviewMessage(player.Identity),
             AuthoredQuestService.BuyNano => SafeQuestFullUpdateSender.CreateBuyNanoProgramsPreviewMessage(player.Identity),
+            AuthoredQuestService.FindThief => SafeQuestFullUpdateSender.CreateFindTheThiefPreviewMessage(player.Identity),
+            AuthoredQuestService.DeliverArmor => SafeQuestFullUpdateSender.CreateDeliverDnaLockedArmorPreviewMessage(player.Identity),
+            AuthoredQuestService.TalkVernon => SafeQuestFullUpdateSender.CreateSpeakToVernonGodfrayPreviewMessage(player.Identity),
             _ => null
         };
         if (packet == null || player.Session == null) return false;

@@ -30,7 +30,7 @@ namespace ZoneEngine_New.Core.Nanos
             public bool FlightAllowed;
         }
         private readonly ConcurrentDictionary<int, State> _states = new();
-        public bool Handles(int nanoId) => nanoId is 281569 or 288546 or 270542;
+        public bool Handles(int nanoId) => nanoId is 82835 or 281569 or 288546 or 270542;
 
         public bool TryPrepare(Player caster, Player target, NanoDefinition nano, out NanoSpecializationPlan plan)
         {
@@ -44,7 +44,8 @@ namespace ZoneEngine_New.Core.Nanos
             // ambiguous hydration instead of inventing a zero base or clearing an equipped vehicle.
             if (target.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base) != 0
                 || !CanOverlay(target, description, old)) return false;
-            plan = plan with { Modifiers = description.Modifiers };
+            plan = plan with { Modifiers = description.Modifiers,
+                ScriptedChildren = nano.Id == 82835 ? [SparrowChildNanoSpecialization.NanoId] : [] };
             return true;
         }
 
@@ -69,7 +70,7 @@ namespace ZoneEngine_New.Core.Nanos
         private static bool TryDescribe(Player player, NanoDefinition nano, out Description description)
         {
             var modifiers = new Dictionary<CharacterStat, int>();
-            int shape = 0, restrictions = 0; bool flight = false;
+            int shape = 0, restrictions = 0, children = 0; bool flight = false;
             description = new(modifiers, 0, false, 0);
             if (!nano.Template.SpellList.TryGetValue(EventType.OnUse, out var spells) || spells.Count == 0) return false;
             try
@@ -79,6 +80,16 @@ namespace ZoneEngine_New.Core.Nanos
                     if (spell.Target is not ((int)ItemTarget.User or (int)ItemTarget.Self or (int)ItemTarget.Wearer)
                         || spell.TickCount is < 0 or > 1 || spell.TickInterval != 0
                         || !NanoRequirements.TryEvent(player, player, spell.Requirements, out bool met)) return false;
+                    if (nano.Id == 82835 && spell.FunctionType == (int)FunctionType.CanFly)
+                    {
+                        if (spell.Arguments.Count != 0 || spell.Requirements.Count != 2
+                            || spell.Requirements[0] is not { ChildOperator: (int)Operator.Unknown,
+                                Operator: (int)Operator.EqualTo, StatNumber: 531, Target: (int)ItemTarget.Self, Value: 0 }
+                            || spell.Requirements[1] is not { ChildOperator: (int)Operator.Unknown,
+                                Operator: (int)Operator.And, StatNumber: 0, Target: (int)ItemTarget.Self, Value: 0 }) return false;
+                        flight = true; // Capability stays; current playfield controls its projection after zoning.
+                        continue;
+                    }
                     if (!met) continue;
                     switch ((FunctionType)spell.FunctionType)
                     {
@@ -101,12 +112,17 @@ namespace ZoneEngine_New.Core.Nanos
                             if (spell.Arguments.Count != 1 || !ItemUseFunctions.TryReadInt(spell.Arguments, 0, out int flags)
                                 || flags != 2) return false;
                             restrictions |= flags; break;
+                        case FunctionType.CastNano:
+                            if (nano.Id != 82835 || spell.Requirements.Count != 0 || spell.Arguments.Count != 1
+                                || !ItemUseFunctions.TryReadInt(spell.Arguments, 0, out int child)
+                                || child != SparrowChildNanoSpecialization.NanoId || ++children != 1) return false;
+                            break; // NanoService owns this exact nested duration/wire transaction.
                         default: return false;
                     }
                 }
             }
             catch (OverflowException) { return false; }
-            if (shape == 0) return false; // No guessed breed/head-to-vehicle mapping.
+            if (shape == 0 || (nano.Id == 82835 && children != 1)) return false; // No guessed morph/child mapping.
             description = new(modifiers, shape, flight, restrictions); return true;
         }
 

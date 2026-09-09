@@ -22,6 +22,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine_New.Core.Dialogue;
     using ZoneEngine.Core.Missions;
     using AORebirth.Interfaces.Persistence.Missions;
 
@@ -65,7 +66,9 @@ namespace ZoneEngine_New.Core.Playfield
             TeamService teams,
             NanoService nanos,
             GeneratedMissionAcgService missions,
-            AuthoredQuestService authoredQuests)
+            AuthoredQuestService authoredQuests,
+            DialogueService dialogues,
+            IItemTemplateCatalog itemTemplates)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
@@ -98,12 +101,16 @@ namespace ZoneEngine_New.Core.Playfield
             Nanos = nanos ?? throw new ArgumentNullException(nameof(nanos));
             Missions = missions ?? throw new ArgumentNullException(nameof(missions));
             AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
+            Dialogues = dialogues ?? throw new ArgumentNullException(nameof(dialogues));
+            ItemTemplates = itemTemplates ?? throw new ArgumentNullException(nameof(itemTemplates));
         }
 
         public TeamService Teams { get; }
         public NanoService Nanos { get; }
         public GeneratedMissionAcgService Missions { get; }
         public AuthoredQuestService AuthoredQuests { get; }
+        public DialogueService Dialogues { get; }
+        public IItemTemplateCatalog ItemTemplates { get; }
 
         /// <summary>Releases only the exact ended, empty mission lease; never an ordinary playfield.</summary>
         public bool TryReleaseMission(GeneratedMissionBinding binding)

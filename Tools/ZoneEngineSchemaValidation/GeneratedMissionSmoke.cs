@@ -142,11 +142,19 @@ static class GeneratedMissionSmoke
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM generatedmissionbindings WHERE QuestInstance={questId + 1} AND ActivePlayfield={livePf + 1}") == 1, "mission-pf-released-before-cleanup-complete");
         var removedWorld = dao.AdvanceCleanup(Owner, QuestType, questId + 1, checkpoint.Binding.Version, 255, secondAccept.ExpiresAtUtcTicks + 1);
         Require(removedWorld.Status == GeneratedMissionResultStatus.Applied, "mission-cleanup-world-order");
-        FixtureSql.Execute(connection, $"UPDATE item_instances SET ContainerType=105 WHERE InstanceId={firstItem + 2}");
+        FixtureSql.Execute(connection, $"UPDATE item_instances SET ContainerType=105,ContainerInstance={Owner + 1} WHERE InstanceId={firstItem + 2}");
         string nonMain = FixtureSql.Fingerprint(connection);
         Require(dao.CleanupArtifacts(Owner, QuestType, questId + 1, secondAccept.ExpiresAtUtcTicks + 2).Status == GeneratedMissionResultStatus.Rejected
-            && nonMain == FixtureSql.Fingerprint(connection), "mission-cleanup-unverified-page-must-remain-pending");
-        FixtureSql.Execute(connection, $"UPDATE item_instances SET ContainerType=104 WHERE InstanceId={firstItem + 2}");
+            && nonMain == FixtureSql.Fingerprint(connection), "mission-cleanup-foreign-bank-must-remain-pending");
+        FixtureSql.Execute(connection, $"UPDATE item_instances SET ContainerType=51017,ContainerInstance={Owner} WHERE InstanceId={firstItem + 2}");
+        nonMain = FixtureSql.Fingerprint(connection);
+        Require(dao.CleanupArtifacts(Owner, QuestType, questId + 1, secondAccept.ExpiresAtUtcTicks + 2).Status == GeneratedMissionResultStatus.Rejected
+            && nonMain == FixtureSql.Fingerprint(connection), "mission-cleanup-unverified-container-must-remain-pending");
+        FixtureSql.Execute(connection, $"UPDATE item_instances SET ContainerType=105 WHERE InstanceId={firstItem + 2}");
+        FixtureSql.Execute(connection, $"ALTER TABLE generatedmissionbindings ADD CONSTRAINT fixture_mission_bank_cleanup CHECK (QuestInstance <> {questId + 1} OR CleanupCheckpoints < 256)");
+        ExpectRollback(connection, () => dao.CleanupArtifacts(Owner, QuestType, questId + 1, secondAccept.ExpiresAtUtcTicks + 2), 3819,
+            "mission-bank-cleanup-late-checkpoint-failure-changed-artifacts");
+        FixtureSql.Execute(connection, "ALTER TABLE generatedmissionbindings DROP CHECK fixture_mission_bank_cleanup");
         var cleanedItems = dao.CleanupArtifacts(Owner, QuestType, questId + 1, secondAccept.ExpiresAtUtcTicks + 2);
         Require(cleanedItems.Status == GeneratedMissionResultStatus.Applied && cleanedItems.Binding.CleanupCheckpoints == 511, "mission-cleanup-item-checkpoint-atomic");
         Require(dao.ReadArtifacts(Owner, QuestType, questId + 1).All(item => item.ContainerType == 0), "mission-cleanup-key-not-retired");
@@ -157,6 +165,7 @@ static class GeneratedMissionSmoke
             "mission-cleanup-deleted-earned-reward");
         Console.WriteLine("MISSION_EXPIRY_RESTART_IDEMPOTENCE=PASS MISSION_CLEANUP_MONOTONIC_CAS=PASS");
         Console.WriteLine("MISSION_CLEANUP_ARTIFACT_CHECKPOINT_ATOMIC=PASS MISSION_CLEANUP_FOREIGN_PAGE_PENDING=PASS MISSION_CLEANUP_REWARD_PRESERVED=PASS");
+        Console.WriteLine("MISSION_BANK_CLEANUP_ATOMIC=PASS MISSION_BANK_CLEANUP_LATE_FAILURE_ROLLBACK=PASS MISSION_BANK_CLEANUP_RESTART_IDEMPOTENCE=PASS");
         ValidatePickupReturn(fixture, connection, dao, offerId + 2);
         int corpseCash = (int)FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId=61");
         long claimTime = Now + TimeSpan.TicksPerSecond;

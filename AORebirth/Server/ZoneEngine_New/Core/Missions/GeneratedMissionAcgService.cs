@@ -169,7 +169,7 @@ public sealed partial class GeneratedMissionAcgService
                 && binding.Offer.EntranceType == (int)entrance.Type && binding.Offer.EntranceInstance == entrance.Instance
                 && binding.Offer.EntranceLow == low && binding.Offer.EntranceHigh == high
                 && binding.Offer.DestinationPlayfield == player.Playfield.Identity.Instance
-                && player.Inventory.Inventory.Content.Values.Any(item => item.InstanceId == binding.KeyInstance && item.LowId == 28577 && item.HighId == 28577)).ToArray();
+                && _missions.HasPhysicalKey(player, binding)).ToArray();
             if (matches.Length != 1) return false;
             var b = matches[0];
             if (!WithinExteriorMarker(player, b)) return false;

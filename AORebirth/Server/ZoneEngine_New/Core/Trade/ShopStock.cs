@@ -39,9 +39,27 @@ namespace ZoneEngine_New.Core.Trade
         int _openTrades;
         long _idleSinceMs = Environment.TickCount64;
 
-        public IReadOnlyList<ShopStockSlot> Slots => _slots;
+        public IReadOnlyList<ShopStockSlot> Slots => _slots.AsReadOnly();
 
         public bool IsGenerated { get; private set; }
+        internal bool IsAcceptedSnapshot { get; private set; }
+
+        /// <summary>An exact accepted vendor adapter installs its entire frozen stock once.</summary>
+        internal void SetAcceptedSnapshot(IReadOnlyList<ShopStockSlot> slots)
+        {
+            ArgumentNullException.ThrowIfNull(slots);
+            if (IsGenerated || _openTrades != 0 || slots.Count == 0)
+                throw new InvalidOperationException("An accepted shop snapshot must be nonempty and installed before opening.");
+            var copy = new List<ShopStockSlot>(slots.Count);
+            foreach (var slot in slots)
+            {
+                if (slot.LowId <= 0 || slot.HighId <= 0 || slot.Quality <= 0)
+                    throw new InvalidOperationException("An accepted shop snapshot contains an incomplete item identity.");
+                copy.Add(slot);
+            }
+            _slots.Clear(); _slots.AddRange(copy);
+            IsGenerated = true; IsAcceptedSnapshot = true;
+        }
 
         /// <summary>Shoppers currently holding this machine's trade window open.</summary>
         public int OpenTrades => _openTrades;
@@ -60,7 +78,7 @@ namespace ZoneEngine_New.Core.Trade
             ArgumentNullException.ThrowIfNull(minter);
             ArgumentNullException.ThrowIfNull(random);
 
-            if (IsGenerated && !IsIdleExpired())
+            if (IsAcceptedSnapshot || (IsGenerated && !IsIdleExpired()))
                 return;
 
             Generate(definition, minter, random);

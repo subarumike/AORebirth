@@ -20,6 +20,7 @@ using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Missions;
+using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Playfield.Locality;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
@@ -214,6 +215,26 @@ public sealed class AuthoredQuestTests
     }
 
     [TestMethod]
+    public void CommonMissionServiceDoesNotReactivateCompletedDojaAfterCooldown()
+    {
+        using var w = new World(7010); w.Activate(DojaChipInteractionRules.QuestTurnIn);
+        var key = new MissionKeyData(111, DojaChipInteractionRules.QuestTurnIn);
+        var completed = w.Dao.Missions[key]; completed.State = DaoState.Completed;
+        completed.CompletedAtUtcTicks = w.Now.AddDays(-2).Ticks;
+        long version = completed.Version, acceptedAt = completed.AcceptedAtUtcTicks, updatedAt = completed.UpdatedAtUtcTicks;
+        var service = new PersistentMissionService(new MissionDaoRepositoryAdapter(w.Dao), w.Catalog.Definitions, () => w.Now.Ticks);
+        var offered = service.OfferMission(111, key.QuestId);
+        var accepted = service.AcceptMission(111, key.QuestId);
+        Assert.AreEqual(MissionOperationStatus.AlreadyApplied, offered.Status);
+        Assert.AreEqual(MissionOperationStatus.AlreadyApplied, accepted.Status);
+        Assert.AreEqual(ZoneEngine.Core.Missions.MissionLifecycleState.Completed, accepted.Mission.State);
+        var after = w.Dao.GetMission(key);
+        Assert.AreEqual(version, after.Version); Assert.AreEqual(acceptedAt, after.AcceptedAtUtcTicks);
+        Assert.AreEqual(updatedAt, after.UpdatedAtUtcTicks); Assert.AreEqual(completed.CompletedAtUtcTicks, after.CompletedAtUtcTicks);
+        Assert.AreEqual(0, w.Dao.Rewards.Count); Assert.AreEqual(0, w.Session.Messages.Count);
+    }
+
+    [TestMethod]
     public void CompletedDojaCycleCannotPublishFalseFreshAcceptanceOrConsumeAnotherChip()
     {
         using var w = new World(7010); var chip = w.Add(284954); w.Player.Stats.Set(CharacterStat.Level, 2);
@@ -225,6 +246,69 @@ public sealed class AuthoredQuestTests
         Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(0, w.Dao.Rewards.Count);
         Assert.AreEqual(104, w.Dao.Items[10].ContainerType); Assert.AreSame(chip, w.Player.Inventory.Inventory.Content[64]);
         Assert.IsFalse(w.Player.IsPersistenceQuarantined);
+    }
+
+    [TestMethod]
+    public void StrongboxAndThiefFailureNeverAcknowledgeOrPublishPartialGrant()
+    {
+        using (var w = new World())
+        {
+            var lockpick = w.Add(95577); w.Activate(AuthoredQuestService.Strongbox); int ack = 0;
+            w.Dao.Failure = new InvalidOperationException("late Strongbox handoff failure");
+            Assert.IsFalse(w.Service.TryUseLockpickOnStrongbox(w.Player, Slot, lockpick, () => ack++));
+            Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count);
+            Assert.AreSame(lockpick, w.Player.Inventory.Inventory.Content[64]); Assert.AreEqual(1, w.Dao.Items.Count);
+            Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestService.DeliverFactory)));
+            w.Dao.Failure = null;
+            w.Dao.BeforeCommit = pending => Assert.AreEqual(0, ack);
+            Assert.IsTrue(w.Service.TryUseLockpickOnStrongbox(w.Player, Slot, lockpick, () => ack++), w.Logger.LastError);
+            Assert.AreEqual(1, ack); Assert.AreEqual(2, w.Dao.Items.Count);
+        }
+        using (var w = new World())
+        {
+            w.Activate(AuthoredQuestService.FindThief); int ack = 0;
+            w.Dao.Failure = new InvalidOperationException("late thief handoff failure");
+            Assert.IsFalse(w.Service.TryUseShopThiefRemains(w.Player, () => ack++));
+            Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(0, w.Dao.Items.Count);
+            Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.FindThief)).State);
+            Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestService.DeliverArmor)));
+            Assert.IsFalse(w.Player.IsPersistenceQuarantined);
+        }
+    }
+
+    [TestMethod]
+    public void CompletedFactoryAndArmorCannotRegenerateUnfinishableQuestItems()
+    {
+        using (var w = new World())
+        {
+            var lockpick = w.Add(95577); w.Activate(AuthoredQuestService.DeliverFactory);
+            w.Dao.Missions[new(111, AuthoredQuestService.DeliverFactory)].State = DaoState.Completed;
+            int ack = 0;
+            Assert.IsFalse(w.Service.TryUseLockpickOnStrongbox(w.Player, Slot, lockpick, () => ack++));
+            Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(1, w.Dao.Items.Count);
+            Assert.AreSame(lockpick, w.Player.Inventory.Inventory.Content[64]);
+        }
+        using (var w = new World())
+        {
+            w.Activate(AuthoredQuestService.DeliverArmor);
+            w.Dao.Missions[new(111, AuthoredQuestService.DeliverArmor)].State = DaoState.Completed;
+            int ack = 0;
+            Assert.IsFalse(w.Service.TryUseShopThiefRemains(w.Player, () => ack++));
+            Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(0, w.Dao.Items.Count);
+            Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestService.DeliverArmor)).State);
+        }
+    }
+
+    [TestMethod]
+    public void SarahRestoreUsesExistingExactJournalBuildersForOnlyActiveMissions()
+    {
+        using var w = new World(); w.Activate(AuthoredQuestService.DeliverArmor);
+        w.Service.Restore(w.Player);
+        var tip = w.Session.Messages.OfType<QuestFullUpdateMessage>().Single().Quests.Single();
+        Assert.AreEqual(unchecked((int)0x555BE9F6), tip.QuestId.Instance); Assert.AreEqual(158429, tip.MissionIconId);
+        Assert.AreEqual(unchecked((int)0x78E0FC69), tip.UnknownId1.Instance);
+        w.Session.Messages.Clear(); w.Dao.Missions[new(111, AuthoredQuestService.DeliverArmor)].State = DaoState.Completed;
+        w.Service.Restore(w.Player); Assert.AreEqual(0, w.Session.Messages.Count);
     }
 
     [TestMethod]
@@ -249,7 +333,7 @@ public sealed class AuthoredQuestTests
     static Identity Slot => new() { Type = IdentityType.Inventory, Instance = 64 };
     static AuthoredQuestCatalog LoadCatalog() => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content"));
 
-    sealed class World : IDisposable
+    internal sealed class World : IDisposable
     {
         internal readonly Player Player = TestWorld.CreatePlayer(111);
         internal readonly Session Session = new();
@@ -257,16 +341,22 @@ public sealed class AuthoredQuestTests
         internal readonly AuthoredQuestCatalog Catalog = LoadCatalog();
         internal readonly AuthoredQuestService Service;
         internal readonly ErrorLogger Logger = new();
+        internal readonly DynelRegistry Registry = new();
+        internal readonly AcceptedNpcActivationService Npcs;
         internal DateTime Now = new(2026, 9, 8, 12, 0, 0, DateTimeKind.Utc);
         readonly InventoryFlushService _flush;
+        internal InventoryFlushService Flush => _flush;
         readonly ServiceProvider _services;
         internal World(int playfield = 6553)
         {
             Player.Session = Session; Session.BindPlayer(Player);
             Player.Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Player.Playfield, new Identity { Type = IdentityType.Playfield, Instance = playfield });
-            _services = new ServiceCollection().AddSingleton(new PlayfieldLocality(playfield, null)).BuildServiceProvider();
+            var locality = new PlayfieldLocality(playfield, null);
+            Npcs = new(Player.Playfield, Registry, locality, new StubItemBuilder(), new TemplateCatalog());
+            _services = new ServiceCollection().AddSingleton(locality).AddSingleton(Registry).AddSingleton(Npcs).BuildServiceProvider();
             typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Player.Playfield, _services);
+            Registry.Register(Player);
             var manager = (PlayfieldManager)RuntimeHelpers.GetUninitializedObject(typeof(PlayfieldManager));
             typeof(PlayfieldManager).GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Lock());
             typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Dictionary<int, Player>());
@@ -287,10 +377,19 @@ public sealed class AuthoredQuestTests
                 LowId = template, HighId = template, Quality = 1, StackCount = 1, Source = (byte)item.Source });
             return item;
         }
+        internal NpcCharacter AddNpc(string contentIdentity, bool accepted = true, bool vendor = false, int instance = 222)
+        {
+            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = instance }, new StubItemBuilder())
+            { Playfield = Player.Playfield, Position = Player.Position, Name = "Fixture accepted actor" };
+            Registry.Register(npc);
+            if (accepted) Npcs.Bind(npc, new("fixture:" + instance, "accepted-test-contract", contentIdentity,
+                Player.Playfield!.Identity.Instance, true, vendor));
+            return npc;
+        }
         public void Dispose() { _flush.Dispose(); _services.Dispose(); }
     }
     sealed class Ids : IItemInstanceIdAllocator { int _next = 1000; public int Allocate() => _next++; }
-    sealed class ErrorLogger : ZoneEngine_New.Core.Logging.IZoneLogger
+    internal sealed class ErrorLogger : ZoneEngine_New.Core.Logging.IZoneLogger
     {
         internal string LastError = string.Empty;
         public void Debug(string message) { }
@@ -307,7 +406,7 @@ public sealed class AuthoredQuestTests
     }
     sealed class NoIndependentFlush : ICharacterCoalesceCommit
     { public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int owner, IReadOnlyList<int> nanos) => throw new InvalidOperationException("No independent item transaction expected."); }
-    sealed class Session : IZoneSession
+    internal sealed class Session : IZoneSession
     {
         internal readonly List<object> Messages = [];
         public SessionState State { get; set; } = SessionState.InPlay;

@@ -185,30 +185,80 @@ public sealed class GeneratedMissionService
         => WithPlayer(player, () => CommitAndPublish(player,
             () => _dao.End(player.Identity.Instance, (int)quest.Type, quest.Instance, state, _now()), _ => { }));
 
+    // Legacy mission possession scans the character's top-level Pages, including bank,
+    // but not the separately stored backpack interiors. SQL proves an unopened bank
+    // row's exact owner; it must not be confused with an unverified container parent.
+    internal bool HasPhysicalKey(Player player, GeneratedMissionBinding binding)
+        => WithPlayer(player, () =>
+        {
+            if (binding.OwnerId != player.Identity.Instance || binding.KeyInstance <= 0)
+                return Rejected("Mission key owner mismatch.");
+            _flush.HardFlush(player);
+            var key = _dao.ReadArtifacts(player.Identity.Instance, binding.QuestType, binding.QuestInstance)
+                .SingleOrDefault(row => row.InstanceId == binding.KeyInstance);
+            return key != null && key.LowId == 28577 && key.HighId == 28577
+                && TryResolveArtifactPage(player, key, out _, out _)
+                ? new() { Status = GeneratedMissionResultStatus.Applied }
+                : Rejected("The exact mission key is not in an owned top-level page.");
+        }).Status == GeneratedMissionResultStatus.Applied;
+
     internal GeneratedMissionResult CleanupArtifacts(Player player, Identity quest)
         => WithPlayer(player, () =>
         {
             _flush.HardFlush(player);
             var rows = _dao.ReadArtifacts(player.Identity.Instance, (int)quest.Type, quest.Instance).Where(row => row.ContainerType != 0).ToArray();
+            var removals = new List<(MissionItemInstanceData Row, Container Page, Item? Item)>();
             foreach (var row in rows)
             {
-                if (row.ContainerType != (int)IdentityType.Inventory || row.ContainerInstance != player.Identity.Instance
-                    || !player.Inventory.Inventory.Content.TryGetValue(row.ContainerPlacement, out var item)
-                    || item.InstanceId != row.InstanceId || item.LowId != row.LowId || item.HighId != row.HighId
-                    || item.Quality != row.Quality || item.StackCount != row.StackCount || item.Locked)
+                if (!TryResolveArtifactPage(player, row, out var page, out var item))
                     return Rejected("Mission cleanup needs exact owned inventory-page reconciliation; no artifact removed.");
+                removals.Add((row, page, item));
             }
             return CommitAndPublish(player, () => _dao.CleanupArtifacts(player.Identity.Instance, (int)quest.Type, quest.Instance, _now()), _ =>
             {
-                foreach (var row in rows)
+                foreach (var removal in removals)
                 {
-                    var item = player.Inventory.Inventory.Content[row.ContainerPlacement];
-                    if (item.InstanceId != row.InstanceId) throw new InvalidOperationException("Committed cleanup inventory identity changed.");
-                    player.Inventory.Inventory.Content.Remove(row.ContainerPlacement);
-                    player.Session?.Send(new DespawnMessage { Identity = item.Identity, Unknown = 1 });
+                    if (removal.Item != null)
+                    {
+                        if (!removal.Page.Content.TryGetValue(removal.Row.ContainerPlacement, out var current)
+                            || !ReferenceEquals(current, removal.Item))
+                            throw new InvalidOperationException("Committed cleanup inventory identity changed.");
+                        removal.Page.Content.Remove(removal.Row.ContainerPlacement);
+                    }
+                    // A never-opened bank has no in-memory item to remove. Its next hydration
+                    // reads the committed retirement; do not create a partial bank snapshot.
+                    player.Session?.Send(new DespawnMessage
+                    {
+                        Identity = new() { Type = (IdentityType)removal.Row.ItemType, Instance = removal.Row.InstanceId }, Unknown = 1
+                    });
                 }
             });
         });
+
+    static bool TryResolveArtifactPage(Player player, MissionItemInstanceData row, out Container page, out Item? item)
+    {
+        item = null;
+        page = (IdentityType)row.ContainerType switch
+        {
+            IdentityType.Inventory => player.Inventory.Inventory,
+            IdentityType.WeaponPage => player.Inventory.Equipment,
+            IdentityType.ArmorPage => player.Inventory.Armor,
+            IdentityType.ImplantPage => player.Inventory.Implant,
+            IdentityType.SocialPage => player.Inventory.Social,
+            IdentityType.BankByRef => player.Inventory.Bank,
+            _ => null!
+        };
+        if (page == null || row.ContainerInstance != player.Identity.Instance || page.Identity.Instance != player.Identity.Instance
+            || row.InstanceId <= 0 || row.ItemType <= 0 || row.LowId <= 0 || row.HighId <= 0 || row.Quality <= 0 || row.StackCount <= 0
+            || row.ContainerPlacement < page.Offset || row.ContainerPlacement >= page.Offset + page.Capacity)
+            return false;
+        if (!page.IsHydrated)
+            return page == player.Inventory.Bank && page.Content.Count == 0;
+        return page.Content.TryGetValue(row.ContainerPlacement, out item)
+            && item.IsPersisted && !item.Locked && item.InstanceId == row.InstanceId
+            && (int)item.Identity.Type == row.ItemType && item.LowId == row.LowId && item.HighId == row.HighId
+            && item.Quality == row.Quality && item.StackCount == row.StackCount && (int)item.Source == row.Source;
+    }
 
     GeneratedMissionResult WithPlayer(Player player, Func<GeneratedMissionResult> action)
     {

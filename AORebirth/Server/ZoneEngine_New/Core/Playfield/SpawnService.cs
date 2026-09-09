@@ -564,6 +564,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             _trades.Cancel(player, "left playfield");
+            _playfieldManager.Dialogues.Detached(player);
             _flush.HardFlush(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
@@ -608,6 +609,9 @@ namespace ZoneEngine_New.Core.Playfield
         {
             ArgumentNullException.ThrowIfNull(npc);
 
+            _playfieldManager.Dialogues.Detached(npc);
+            _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.AcceptedNpcActivationService>().Detached(npc);
+
             npc.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             Identity identity = npc.Identity;
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(npc);
@@ -628,6 +632,8 @@ namespace ZoneEngine_New.Core.Playfield
             if (oldSession == null || ReferenceEquals(oldSession, newSession))
                 return;
 
+            _playfieldManager.Dialogues.Detached(player);
+
             lock (oldSession)
             {
                 // Closing the old socket cannot race the accepted reconnect's ownership.
@@ -646,6 +652,7 @@ namespace ZoneEngine_New.Core.Playfield
         private void DespawnPlayer(Player player)
         {
             int characterId = player.Identity.Instance;
+            _playfieldManager.Dialogues.Detached(player);
             _playfieldManager.Teams.DetachPlayer(player);
             _playfieldManager.Nanos.DetachPlayer(player);
             player.NanoRuntime = null;

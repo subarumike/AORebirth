@@ -26,6 +26,15 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 switch (item)
                 {
+                    case TransferDepartureInboundItem departure:
+                        departure.Transfer.Depart();
+                        break;
+                    case TransferArrivalInboundItem arrival:
+                        arrival.Transfer.Arrive();
+                        break;
+                    case TransferReturnInboundItem returned:
+                        returned.Transfer.Return();
+                        break;
                     case PlayerProjectionInboundItem projection:
                         if (ReferenceEquals(projection.Player.Playfield, owner))
                             projection.Projection();

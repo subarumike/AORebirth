@@ -11,12 +11,14 @@ using ZoneEngine_New.Core.Inventory;
 public sealed partial class AuthoredQuestService
 {
     /// <summary>Called only after a real nearby Merchant's Strongbox target has been resolved by the playfield owner.</summary>
-    public bool TryUseLockpickOnStrongbox(Player player, Identity slot, Item lockpick)
+    public bool TryUseLockpickOnStrongbox(Player player, Identity slot, Item lockpick, Action? publishAcknowledgement = null)
     {
         if (player.Playfield?.Identity.Instance != 6553 || (lockpick.LowId != 95577 && lockpick.HighId != 95577)) return false;
         return Mutate(player, null, (tx, service) =>
         {
             RequireSource(player, slot, lockpick);
+            if (tx.GetMission(new(player.Identity.Instance, DeliverFactory))?.State == MissionLifecycleState.Completed)
+                throw new InvalidOperationException("The factory has already been delivered; terminal quest history cannot be restarted.");
             var grants = HasCarried(player, 248306) ? Array.Empty<Item>() : new[] { CreateItem(248306, 1) };
             var plan = Plan(player, grants);
             CompleteIfPresent(service, player.Identity.Instance, Strongbox, "mission_555BE9C5_strongbox");
@@ -26,6 +28,7 @@ public sealed partial class AuthoredQuestService
             return () =>
             {
                 plan.PublishAfterCommit(false);
+                publishAcknowledgement?.Invoke();
                 foreach (var grant in grants) SendOverflowGrant(player, grant);
                 player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1,
                     FormattedMessage = "~&!!!\":!!!)<sOYou successfully picked this lock and obtained the Antonio's Adaption Factory." });

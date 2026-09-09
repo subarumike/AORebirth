@@ -199,13 +199,14 @@ public sealed partial class AuthoredQuestService
         RequireSuccess(service.AcceptMission(owner, quest));
     }
 
-    static void CompleteIfPresent(PersistentMissionService service, int owner, string quest, string objective)
+    static void CompleteIfPresent(PersistentMissionService service, int owner, string quest, string objective,
+        string observationKey = "stan-goodman-force-complete", string eventType = "StanGoodmanQuestRuntime")
     {
         var state = service.GetMission(owner, quest);
         if (state == null || state.State == DomainState.Completed) return;
         if (state.State == DomainState.Offered) RequireSuccess(service.AcceptMission(owner, quest));
         RequireSuccess(service.ObserveObjective(new MissionObjectiveObservation { CharacterId = owner, QuestId = quest,
-            ObjectiveId = objective, ObservationKey = "stan-goodman-force-complete", Amount = 1, EventType = "StanGoodmanQuestRuntime", SourceIdentity = string.Empty, TargetIdentity = string.Empty }));
+            ObjectiveId = objective, ObservationKey = observationKey, Amount = 1, EventType = eventType, SourceIdentity = string.Empty, TargetIdentity = string.Empty }));
         RequireSuccess(service.CompleteMission(owner, quest));
     }
 

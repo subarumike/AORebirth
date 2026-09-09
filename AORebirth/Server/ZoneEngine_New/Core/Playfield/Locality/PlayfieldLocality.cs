@@ -103,6 +103,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             _visibility.Announce(source, message, includeSelf);
         }
 
+        internal Player[] SnapshotObservers(Dynel source, bool includeSelf = false)
+            => _visibility.SnapshotObservers(source, includeSelf);
+
         public void Tick(double deltaTime)
         {
             foreach (Dynel dynel in _tracked)

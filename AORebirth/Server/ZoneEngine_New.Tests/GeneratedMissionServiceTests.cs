@@ -151,6 +151,103 @@ public sealed class GeneratedMissionServiceTests
         Assert.AreEqual(0, w.Ids.Calls);
     }
 
+    [TestMethod]
+    public void ExactMissionKeyAndCleanupSupportEveryLegacyOwnedTopLevelPage()
+    {
+        foreach (IdentityType type in new[] { IdentityType.Inventory, IdentityType.WeaponPage, IdentityType.ArmorPage,
+                     IdentityType.ImplantPage, IdentityType.SocialPage, IdentityType.BankByRef })
+        {
+            using var w = new World();
+            var page = type switch
+            {
+                IdentityType.Inventory => w.Player.Inventory.Inventory,
+                IdentityType.WeaponPage => w.Player.Inventory.Equipment,
+                IdentityType.ArmorPage => w.Player.Inventory.Armor,
+                IdentityType.ImplantPage => w.Player.Inventory.Implant,
+                IdentityType.SocialPage => w.Player.Inventory.Social,
+                _ => w.Player.Inventory.Bank
+            };
+            page.IsHydrated = true;
+            var key = AddKey(w, page);
+            w.Dao.BeforeCleanup = () =>
+            {
+                Assert.IsTrue(Monitor.IsEntered(w.Player.PersistenceGate));
+                Assert.AreSame(key, page.Content[page.Offset], "No page removal before the mission commit.");
+            };
+            Assert.IsTrue(w.Service.HasPhysicalKey(w.Player, w.Dao.Binding), type.ToString());
+            Assert.AreEqual(GeneratedMissionResultStatus.Applied, w.Service.CleanupArtifacts(w.Player, Quest).Status, type.ToString());
+            Assert.IsFalse(page.Content.ContainsKey(page.Offset));
+            Assert.AreEqual(1, w.Dao.CleanupCalls);
+        }
+    }
+
+    [TestMethod]
+    public void UnopenedBankUsesExactDurableOwnerWithoutCreatingPartialHydration()
+    {
+        using var w = new World();
+        var bank = w.Player.Inventory.Bank;
+        var key = AddKey(w, bank);
+        bank.Content.Clear(); bank.IsHydrated = false;
+        w.Dao.BeforeCleanup = () => Assert.IsFalse(bank.IsHydrated);
+        Assert.IsTrue(w.Service.HasPhysicalKey(w.Player, w.Dao.Binding));
+        Assert.AreEqual(GeneratedMissionResultStatus.Applied, w.Service.CleanupArtifacts(w.Player, Quest).Status);
+        Assert.IsFalse(bank.IsHydrated); Assert.AreEqual(0, bank.Content.Count);
+        Assert.AreEqual(1, w.Dao.CleanupCalls);
+        Assert.IsFalse(w.Service.HasPhysicalKey(w.Player, w.Dao.Binding));
+    }
+
+    [TestMethod]
+    public void BankCleanupKnownRollbackAndUnknownCommitNeverRemoveLiveItems()
+    {
+        foreach (bool unknown in new[] { false, true })
+        {
+            using var w = new World();
+            var bank = w.Player.Inventory.Bank; bank.IsHydrated = true;
+            var key = AddKey(w, bank);
+            w.Dao.Failure = unknown ? new MissionCommitOutcomeUnknownException(new Exception("uncertain")) : new InvalidOperationException("rollback");
+            Assert.AreEqual(GeneratedMissionResultStatus.Rejected, w.Service.CleanupArtifacts(w.Player, Quest).Status);
+            Assert.AreSame(key, bank.Content[bank.Offset]);
+            Assert.AreEqual(unknown, w.Player.IsPersistenceQuarantined);
+            w.Dao.Failure = null;
+            Assert.AreEqual(unknown ? GeneratedMissionResultStatus.Rejected : GeneratedMissionResultStatus.Applied,
+                w.Service.CleanupArtifacts(w.Player, Quest).Status);
+            Assert.AreEqual(unknown ? 1 : 2, w.Dao.CleanupCalls, "Unknown commit must never retry.");
+        }
+    }
+
+    [TestMethod]
+    public void ForeignBankNestedContainerAndStaleLoadedArtifactRemainPending()
+    {
+        foreach (string invalid in new[] { "foreign", "container", "stale", "locked" })
+        {
+            using var w = new World();
+            var bank = w.Player.Inventory.Bank; bank.IsHydrated = true;
+            var key = AddKey(w, bank);
+            if (invalid == "foreign") w.Dao.Artifacts[0].ContainerInstance++;
+            if (invalid == "container") w.Dao.Artifacts[0].ContainerType = (int)IdentityType.Container;
+            if (invalid == "stale") w.Dao.Artifacts[0].StackCount++;
+            if (invalid == "locked") key.Locked = true;
+            Assert.IsFalse(w.Service.HasPhysicalKey(w.Player, w.Dao.Binding), invalid);
+            Assert.AreEqual(GeneratedMissionResultStatus.Rejected, w.Service.CleanupArtifacts(w.Player, Quest).Status, invalid);
+            Assert.AreSame(key, bank.Content[bank.Offset]); Assert.AreEqual(0, w.Dao.CleanupCalls);
+        }
+    }
+
+    static Item AddKey(World w, Container page)
+    {
+        var key = TestWorld.CreateItem(lowId: 28577, highId: 28577, instanceId: 200);
+        key.Identity = new() { Type = (IdentityType)0xC76D, Instance = key.InstanceId };
+        w.Dao.Binding.KeyInstance = key.InstanceId;
+        page.Content[page.Offset] = key;
+        w.Dao.Artifacts = [new MissionItemInstanceData
+        {
+            InstanceId = key.InstanceId, ItemType = (int)key.Identity.Type, LowId = key.LowId, HighId = key.HighId,
+            Quality = key.Quality, StackCount = key.StackCount, Source = (byte)key.Source,
+            ContainerType = (int)page.Identity.Type, ContainerInstance = w.Player.Identity.Instance, ContainerPlacement = page.Offset
+        }];
+        return key;
+    }
+
     sealed class World : IDisposable
     {
         public Player Player = TestWorld.CreatePlayer(77);
@@ -180,9 +277,11 @@ public sealed class GeneratedMissionServiceTests
     }
     sealed class Dao : IGeneratedMissionDao
     {
-        public int CompleteCalls, AcceptCalls;
+        public int CompleteCalls, AcceptCalls, CleanupCalls;
         public Exception? Failure;
         public Action<GeneratedMissionCompletion>? BeforeComplete;
+        public Action? BeforeCleanup;
+        public IList<MissionItemInstanceData> Artifacts = [];
         public GeneratedMissionBinding Binding = new()
         {
             OwnerId = 77, QuestType = 0xDAC3, QuestInstance = 12345, OfferType = 0xDAC3, OfferInstance = 400,
@@ -209,8 +308,14 @@ public sealed class GeneratedMissionServiceTests
         public IList<GeneratedMissionObject> ReadObjects(int owner, int type, int instance) => throw new NotSupportedException();
         public GeneratedMissionResult UpdateObjects(int owner, int type, int instance, IList<GeneratedMissionObject> objects, long now) => throw new NotSupportedException();
         public GeneratedMissionResult SavePosition(int owner, int type, int instance, int pf, float x, float y, float z, long now) => throw new NotSupportedException();
-        public IList<MissionItemInstanceData> ReadArtifacts(int owner, int type, int instance) => throw new NotSupportedException();
-        public GeneratedMissionResult CleanupArtifacts(int owner, int type, int instance, long now) => throw new NotSupportedException();
+        public IList<MissionItemInstanceData> ReadArtifacts(int owner, int type, int instance) => Artifacts;
+        public GeneratedMissionResult CleanupArtifacts(int owner, int type, int instance, long now)
+        {
+            CleanupCalls++; BeforeCleanup?.Invoke();
+            if (Failure != null) throw Failure;
+            Artifacts = []; Binding.CleanupCheckpoints |= 256;
+            return new() { Status = GeneratedMissionResultStatus.Applied, Binding = Binding };
+        }
         public GeneratedMissionResult ClaimCorpseCredits(int owner, int type, int instance, int npc, int cash, long now) => throw new NotSupportedException();
     }
 }

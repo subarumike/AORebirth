@@ -46,7 +46,7 @@ namespace ZoneEngine_New.Tests
                     SourceSha256 = Convert.ToHexString(SHA256.HashData(input)), Count = catalog.Count,
                     Definitions = definitions.OrderBy(n => n.Id).Select(n => new { n.Id, n.DurationCentiseconds,
                         n.NcuCost, n.Strain, n.NanoCost, n.RangeMeters, n.AttackCentiseconds, n.RechargeCentiseconds,
-                        n.Template.Stats, n.Template.Actions, n.Template.SpellList }) },
+                        n.Template.Stats, n.Template.Attack, n.Template.Defend, n.Template.Actions, n.Template.SpellList }) },
                     new JsonSerializerOptions { WriteIndented = true }));
         }
 
