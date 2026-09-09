@@ -105,6 +105,8 @@ namespace ZoneEngine_New.Core.Nanos
                                 CharacterStat sourceStat = stat == CharacterStat.Health ? CharacterStat.BodyDevelopment : CharacterStat.NanoPool;
                                 int sourceDelta = checked(plan.Modifiers.GetValueOrDefault(sourceStat)
                                     - (previousRemoved ? previousSameNanoModifiers?.GetValueOrDefault(sourceStat) ?? 0 : 0));
+                                sourceDelta = checked(sourceDelta + NanoDerivedStats.SkillDelta(subject.Stats, sourceStat,
+                                    plan.Modifiers, previousRemoved ? previousSameNanoModifiers : null));
                                 projectedMaximum = checked(projectedMaximum + (stat == CharacterStat.Health
                                     ? NanoDerivedStats.HealthDelta(subject, sourceDelta) : NanoDerivedStats.NanoDelta(subject, sourceDelta)));
                                 projectedBonus = checked(projectedBonus + plan.Modifiers.GetValueOrDefault(stat)

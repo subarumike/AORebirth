@@ -37,4 +37,11 @@ namespace ZoneEngine_New.Core.Playfield
         public required Player Player { get; init; }
         public required Action Projection { get; init; }
     }
+
+    internal sealed class TransferDepartureInboundItem(PlayfieldTransfer transfer) : PlayfieldInboundItem
+    { public PlayfieldTransfer Transfer { get; } = transfer; }
+    internal sealed class TransferArrivalInboundItem(PlayfieldTransfer transfer) : PlayfieldInboundItem
+    { public PlayfieldTransfer Transfer { get; } = transfer; }
+    internal sealed class TransferReturnInboundItem(PlayfieldTransfer transfer) : PlayfieldInboundItem
+    { public PlayfieldTransfer Transfer { get; } = transfer; }
 }

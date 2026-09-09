@@ -2,7 +2,9 @@ namespace ZoneEngine_New.Core.Missions;
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using AORebirth.Interfaces.Persistence.Missions;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using ZoneEngine_New.Core.Entities;
@@ -13,6 +15,21 @@ using ZoneEngine.Core.Missions;
 public sealed partial class GeneratedMissionAcgService
 {
     readonly ConcurrentDictionary<int, (NpcCharacter Npc, long Deadline)> _deadNpcVisuals = new();
+    readonly ConditionalWeakTable<Player, HashSet<GeneratedMissionCorpseDynel>> _corpseAcknowledgements = new();
+
+    void PollCorpseAcknowledgements(Player player)
+    {
+        lock (player.PersistenceGate)
+        {
+            if (!_corpseAcknowledgements.TryGetValue(player, out var corpses)) return;
+            foreach (var corpse in corpses.ToArray())
+            {
+                corpse.FlushPendingAcknowledgements();
+                if (!corpse.HasPendingAcknowledgements) corpses.Remove(corpse);
+            }
+            if (corpses.Count == 0) _corpseAcknowledgements.Remove(player);
+        }
+    }
     public void SpawnDeathCorpse(NpcCharacter npc)
     {
         if (npc.Playfield is not MissionPlayfield world) throw new InvalidOperationException("Generated corpse requires its exact owned mission world.");
@@ -63,7 +80,11 @@ public sealed partial class GeneratedMissionAcgService
             if (target.Type != IdentityType.Corpse) return false;
             deny(); return true;
         }
-        if (!corpse.Open(player, opener => ClaimCorpse(opener, corpse), acknowledge, deny)) deny();
+        lock (player.PersistenceGate)
+        {
+            if (!corpse.Open(player, opener => ClaimCorpse(opener, corpse), acknowledge, deny)) deny();
+            else _corpseAcknowledgements.GetValue(player, _ => new()).Add(corpse);
+        }
         return true;
     }
 

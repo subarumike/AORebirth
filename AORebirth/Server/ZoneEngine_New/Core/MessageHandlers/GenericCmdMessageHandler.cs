@@ -113,7 +113,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     break;
 
                 case GenericCmdAction.UseItemOnItem:
-                    if (message.Target is { Length: >= 2 }
+                    if (message.Target is { Length: >= 2 } && playfield.GetRequiredService<AcceptedQuestPropService>().ClaimsStrongbox(message.Target[1]))
+                    {
+                        if (!playfield.GetRequiredService<AcceptedQuestPropService>().TryUseStrongbox(session, message.Target[0], message.Target[1],
+                            () => Acknowledge(session, message, message.Target[1])))
+                            Deny(session, message, player, "accepted Strongbox item/target is not eligible");
+                    }
+                    else if (message.Target is { Length: >= 2 }
                         && _missions.TryUseItemOnTarget(player, message.Target[0], message.Target[1]))
                         Acknowledge(session, message, message.Target[1]);
                     else Deny(session, message, player, "no accepted item-on-target interaction");
@@ -246,9 +252,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             if (_missions.TryHandleCorpseUse(player, target,
-                corpse => Acknowledge(session, message, corpse),
+                corpse => Acknowledge(session, message, corpse, corpseUse: true),
                 () => Deny(session, message, player, "generated mission corpse is not eligible")))
                 return;
+
+            if (playfield.GetRequiredService<AcceptedQuestPropService>().ClaimsRemains(target))
+            {
+                if (!playfield.GetRequiredService<AcceptedQuestPropService>().TryUseRemains(session, target,
+                    () => Acknowledge(session, message, target)))
+                    Deny(session, message, player, "accepted thief-remains target is not eligible");
+                return;
+            }
 
             if (_missions.ClaimsExteriorMarker(player))
             {
@@ -404,7 +418,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 isContainer);
         }
 
-        static void Acknowledge(IZoneSession session, GenericCmdMessage message, Identity target)
+        static void Acknowledge(IZoneSession session, GenericCmdMessage message, Identity target, bool corpseUse = false)
         {
             session.Player?.Logger.Info(
                 string.Format(
@@ -412,7 +426,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     "GenericCmd ack temp1=1 action={0} target={1}",
                     message.Action,
                     target));
-            session.Send(Reply(message, target, temp1: 1));
+            session.Send(Reply(message, target, temp1: 1, corpseUse));
         }
 
         static void Deny(IZoneSession session, GenericCmdMessage message)
@@ -433,7 +447,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             Deny(session, message);
         }
 
-        static GenericCmdMessage Reply(GenericCmdMessage message, Identity targetOverride, int temp1)
+        internal static GenericCmdMessage Reply(GenericCmdMessage message, Identity targetOverride, int temp1, bool corpseUse = false)
         {
             Identity[] targets = message.Target != null
                 ? (Identity[])message.Target.Clone()
@@ -448,7 +462,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 Temp1 = temp1,
                 Count = message.Count,
                 Action = message.Action,
-                Temp4 = message.Temp4,
+                Temp4 = corpseUse ? 1 : message.Temp4,
                 User = message.User,
                 Target = targets,
                 Unknown = 0

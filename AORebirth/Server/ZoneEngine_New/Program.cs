@@ -200,12 +200,17 @@ namespace ZoneEngine_New
             services.AddSingleton<GeneratedMissionAcgService>();
             services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
             services.AddSingleton<AuthoredQuestService>();
+            services.AddSingleton(_ => ZoneEngine_New.Core.Dialogue.DialogueCatalog.Load(AppContext.BaseDirectory));
+            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueActionRouter>();
+            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueService>();
             services.AddSingleton<INanoCatalog>(provider => NanoCatalog.Load(
                 Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "nanos.dat")));
             services.AddSingleton<IActiveNanoRepository, MySqlActiveNanoRepository>();
             services.AddSingleton<INanoSpecialization, AmbientRestorationNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, OverviewMapNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, MorphNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, SparrowChildNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, TeamWarpNanoSpecialization>();
             services.AddSingleton<NanoService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
@@ -240,6 +245,11 @@ namespace ZoneEngine_New
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<ClientContainerAddItemMessageHandler>(services);
             AddMessageHandler<TradeMessageHandler>(services);
+            AddMessageHandler<KnuBotOpenChatWindowMessageHandler>(services);
+            AddMessageHandler<KnuBotAnswerMessageHandler>(services);
+            AddMessageHandler<KnuBotCloseChatWindowMessageHandler>(services);
+            AddMessageHandler<KnuBotTradeMessageHandler>(services);
+            AddMessageHandler<KnuBotFinishTradeMessageHandler>(services);
             AddMessageHandler<RaidCmdMessageHandler>(services);
             AddMessageHandler<TeamChatMessageHandler>(services);
             AddMessageHandler<QuestAlternativeMessageHandler>(services);

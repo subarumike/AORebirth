@@ -20,6 +20,75 @@ namespace ZoneEngine.Core.Arete.Quests
 
         private const int BuyNanoProgramsInstance = unchecked((int)0x555BE9F4);
 
+        private const int FindTheThiefInstance = unchecked((int)0x555BE9F5);
+
+        private const int DeliverDnaLockedArmorInstance = unchecked((int)0x555BE9F6);
+
+        private const int SpeakToVernonGodfrayInstance = unchecked((int)0x555BE9F7);
+
+        // Capture 20260721-sara QuestFullUpdate short/long after Talk to Sarah accept.
+        private const string FindTheThiefShortInfo = "Find the thief";
+
+        private const string FindTheThiefLongInfo =
+            "Find the thief<BR><BR>"
+            + "Sarah recently had one of her custom-built suits of armor stolen from her. The thief was last seen "
+            + "in the underground.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Locate the thief and recover the DNA-Locked Armor.</font>";
+
+        private const string DeliverDnaLockedArmorShortInfo = "Deliver DNA-Locked Armor to ...";
+
+        private const string DeliverDnaLockedArmorLongInfo =
+            "Deliver DNA-Locked Armor to Sarah Greene<BR><BR>"
+            + "You have found the stolen suit of armor. <BR><BR>"
+            + "<a href='itemref://295618/295618/1'><img src=\"rdb://88053\"></a><BR>"
+            + "<font color=\"#FFFFFF\">Return the DNA-Locked Armor to Sarah Greene.</font>";
+
+        private const string SpeakToVernonGodfrayShortInfo = "Speak to Vernon Godfray";
+
+        private const string SpeakToVernonGodfrayLongInfo =
+            "Speak to Vernon Godfray<BR><BR>"
+            + "<font color=\"#63ad63\">Identity Crisis:</font><BR>"
+            + "In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. "
+            + "Your mission is to create a fake ID Card to you can leave this place..<BR><BR>"
+            + "Sarah told you to speak to Vernon Godfray, a local hacker, who should be able to help with aquiring "
+            + "more parts needed for your ID card.<BR><BR>"
+            + "<font color=\"#FF0000\">Mission Objective:<BR>"
+            + "Talk to Vernon Godfray.</font>";
+
+        internal static QuestFullUpdateMessage CreateFindTheThiefPreviewMessage(Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                FindTheThiefInstance,
+                FindTheThiefShortInfo,
+                FindTheThiefLongInfo,
+                244818,
+                unchecked((int)0x78E0FC69));
+        }
+
+        internal static QuestFullUpdateMessage CreateDeliverDnaLockedArmorPreviewMessage(Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                DeliverDnaLockedArmorInstance,
+                DeliverDnaLockedArmorShortInfo,
+                DeliverDnaLockedArmorLongInfo,
+                158429,
+                unchecked((int)0x78E0FC69));
+        }
+
+        internal static QuestFullUpdateMessage CreateSpeakToVernonGodfrayPreviewMessage(Identity characterIdentity)
+        {
+            return CreateSarahChainTipPreviewMessage(
+                characterIdentity,
+                SpeakToVernonGodfrayInstance,
+                SpeakToVernonGodfrayShortInfo,
+                SpeakToVernonGodfrayLongInfo,
+                244818,
+                unchecked((int)0x78E0FC68));
+        }
+
         private const string TalkToStanShortInfo = "Talk to Stan Goodman";
 
         private const string TalkToStanLongInfo =

@@ -340,9 +340,9 @@ namespace AORebirth.Database.Domain.Missions
                 if ((binding.CleanupCheckpoints & 256) != 0)
                     return new GeneratedMissionResult { Status = GeneratedMissionResultStatus.AlreadyApplied, Binding = binding };
                 var items = ReadGeneratedArtifacts(connection, transaction, ownerId, questType, questInstance).Where(item => item.ContainerType != 0).ToArray();
-                if (items.Any(item => item.ContainerType != 104 || item.ContainerInstance != ownerId))
-                    return GeneratedResult(GeneratedMissionResultStatus.Rejected, "Mission artifact is outside verified main inventory; retain pending cleanup until owned page reconciliation.");
-                foreach (var item in items) RetireGeneratedItem(connection, transaction, item, ownerId);
+                if (items.Any(item => !IsOwnedTopLevelArtifact(item, ownerId)))
+                    return GeneratedResult(GeneratedMissionResultStatus.Rejected, "Mission artifact is outside verified owned top-level pages; retain pending cleanup until owned page reconciliation.");
+                foreach (var item in items) RetireGeneratedCleanupArtifact(connection, transaction, item, ownerId);
                 connection.Execute("UPDATE generatedmissionbindings SET CleanupCheckpoints=CleanupCheckpoints|256,Version=Version+1,UpdatedAtUtcTicks=@nowUtcTicks WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance", new { ownerId, questType, questInstance, nowUtcTicks }, transaction);
                 binding.CleanupCheckpoints |= 256; binding.Version++;
                 return new GeneratedMissionResult { Status = GeneratedMissionResultStatus.Applied, Binding = binding };
@@ -413,6 +413,16 @@ namespace AORebirth.Database.Domain.Missions
         private static void RetireGeneratedItem(IDbConnection connection, IDbTransaction transaction, MissionItemInstanceData item, int ownerId)
         {
             if (item.ContainerInstance != ownerId || item.ContainerType != 104) throw new ArgumentException("Objective consumption requires the exact owned main-inventory row.");
+            RetireGeneratedCleanupArtifact(connection, transaction, item, ownerId);
+        }
+        private static bool IsOwnedTopLevelArtifact(MissionItemInstanceData item, int ownerId)
+            // IdentityType Weapon/Armor/Implant/Inventory/Bank/Social: exactly the
+            // Legacy character Pages, not backpack interiors or another owner.
+            => item.ContainerInstance == ownerId && (item.ContainerType == 101 || item.ContainerType == 102
+                || item.ContainerType == 103 || item.ContainerType == 104 || item.ContainerType == 105 || item.ContainerType == 115);
+        private static void RetireGeneratedCleanupArtifact(IDbConnection connection, IDbTransaction transaction, MissionItemInstanceData item, int ownerId)
+        {
+            if (!IsOwnedTopLevelArtifact(item, ownerId)) throw new ArgumentException("Cleanup requires the exact owned top-level inventory row.");
             if (connection.Execute("UPDATE item_instances SET ContainerType=0,ContainerPlacement=InstanceId WHERE InstanceId=@InstanceId AND ContainerType=@ContainerType AND ContainerInstance=@ContainerInstance AND ContainerPlacement=@ContainerPlacement AND ItemType=@ItemType AND LowId=@LowId AND HighId=@HighId AND Quality=@Quality AND StackCount=@StackCount AND Source=@Source", item, transaction) != 1)
                 throw new InvalidOperationException("Bound artifact ownership/location/shape changed; complete objective transaction rolled back.");
         }

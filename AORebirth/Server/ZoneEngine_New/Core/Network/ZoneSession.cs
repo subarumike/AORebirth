@@ -67,6 +67,7 @@ namespace ZoneEngine_New.Core.Network
         private short _packetNumber;
         private bool _outboundCompressed;
         private volatile bool _closed;
+        private PlayfieldTransfer? _transfer;
         private int _state;
 
         public ZoneSession(
@@ -228,52 +229,51 @@ namespace ZoneEngine_New.Core.Network
         }
 
         public void TransferToPlayfield(Playfield destination, Vector3 landing)
+            => TransferToPlayfield(destination, landing, Player?.Rotation
+                ?? throw new InvalidOperationException("Session has no bound player."));
+
+        public void TransferToPlayfield(Playfield destination, Vector3 landing, AORebirth.Core.Vector.Quaternion heading)
+            => TransferToPlayfield(destination, landing, heading, null);
+
+        internal void TransferToPlayfield(Playfield destination, Vector3 landing,
+            AORebirth.Core.Vector.Quaternion heading, Func<bool>? stillAuthorized)
         {
             ArgumentNullException.ThrowIfNull(destination);
             ArgumentNullException.ThrowIfNull(landing);
-
-            Player? player = Player;
-            if (player == null)
-                throw new InvalidOperationException("Session has no bound player.");
-
-            Playfield? source = player.Playfield;
-            if (source == null)
-                throw new InvalidOperationException("Player is not on a playfield.");
-
-            if (ReferenceEquals(source, destination))
-                throw new InvalidOperationException("Destination playfield matches current playfield.");
-
-            int characterId = player.Identity.Instance;
-            int destId = destination.Identity.Instance;
-
-            source.LeaveTransferredPlayer(player);
-            destination.ArriveTransferredPlayer(player, landing);
-
-            Send(
-                BuildNormalTeleport(player, landing, destId),
-                destId,
-                characterId);
-            Send(
-                BuildZoneRedirection(),
-                destId,
-                characterId);
-
-            player.Session = null;
-            UnbindPlayer();
-
-            _logger.Info(
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Playfield transfer character={0} from={1} to={2} landing=({3},{4},{5})",
-                    characterId,
-                    source.Identity.Instance,
-                    destId,
-                    landing.xf,
-                    landing.yf,
-                    landing.zf));
+            ArgumentNullException.ThrowIfNull(heading);
+            lock (this)
+            {
+                Player player = Player ?? throw new InvalidOperationException("Session has no bound player.");
+                Playfield source = player.Playfield ?? throw new InvalidOperationException("Player is not on a playfield.");
+                if (_closed || State != SessionState.InPlay || !ReferenceEquals(player.Session, this)
+                    || _transfer != null || player.IsPersistenceQuarantined)
+                    throw new InvalidOperationException("Session is not the current playable transfer owner.");
+                if (ReferenceEquals(source, destination))
+                    throw new InvalidOperationException("Destination playfield matches current playfield.");
+                var transfer = new PlayfieldTransfer(this, player, source, destination, landing, heading, stillAuthorized);
+                _transfer = transfer;
+                if (!source.ScheduleTransfer(transfer))
+                {
+                    _transfer = null;
+                    throw new ObjectDisposedException(nameof(source));
+                }
+            }
         }
 
-        private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId)
+        internal byte[][] PrepareTransferPackets(Player player, Vector3 landing,
+            AORebirth.Core.Vector.Quaternion heading, int destinationId) =>
+        [
+            _codec.Serialize(BuildNormalTeleport(player, landing, destinationId, heading), destinationId, player.Identity.Instance),
+            _codec.Serialize(BuildZoneRedirection(), destinationId, player.Identity.Instance)
+        ];
+
+        internal void FinishTransfer(PlayfieldTransfer transfer)
+        {
+            if (ReferenceEquals(_transfer, transfer)) _transfer = null;
+        }
+
+        private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId,
+            AORebirth.Core.Vector.Quaternion heading)
         {
             const IdentityType livePlayfieldProxyType = (IdentityType)0x0000C79E;
 
@@ -294,10 +294,10 @@ namespace ZoneEngine_New.Core.Network
                 },
                 Heading = new MsgQuaternion
                 {
-                    X = player.Rotation.xf,
-                    Y = player.Rotation.yf,
-                    Z = player.Rotation.zf,
-                    W = player.Rotation.wf
+                    X = heading.xf,
+                    Y = heading.yf,
+                    Z = heading.zf,
+                    W = heading.wf
                 },
                 Unknown1 = 0x61,
                 Playfield = new Identity
@@ -365,6 +365,8 @@ namespace ZoneEngine_New.Core.Network
 
             _closed = true;
             State = SessionState.Closed;
+            Playfield? transferSource = _transfer?.Source;
+            _transfer?.RequestReturn();
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -398,8 +400,9 @@ namespace ZoneEngine_New.Core.Network
                 Player owned = Player;
                 if (ReferenceEquals(owned.Session, this))
                 {
-                    owned.Playfield?.GetRequiredService<ZoneEngine_New.Core.Teams.TeamService>()
-                        .OnTransportDisconnected(owned, this);
+                    // Close can race the final PF shutdown/snapshot. The manager-owned team
+                    // authority outlives its disposed child provider and fences exact owners.
+                    (owned.Playfield ?? transferSource)?.NotifyTransportDisconnected(owned, this);
                     owned.NanoRuntime?.Cancel(owned, this);
                     owned.EnterLinkDead(PlayfieldManager.ResolveLinkDeadTimeout());
                     _logger.Info(

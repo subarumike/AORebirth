@@ -23,7 +23,8 @@ namespace ZoneEngine_New.Core.Entities
         Command = 2,
         Player = 3,
         Corpse = 4,
-        StaticDynel = 5
+        StaticDynel = 5,
+        AcceptedPlacement = 6
     }
 
     /// <summary>

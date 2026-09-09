@@ -39,6 +39,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         internal void Untrack(Dynel dynel)
         {
             ulong key = dynel.Identity.Long();
+            // A stale object's cleanup must not withdraw its replacement's visibility.
+            // PlayfieldLocality still removes the old reference from its own cell/set.
+            if (!_byIdentity.TryGetValue(key, out Dynel? current) || !ReferenceEquals(current, dynel)) return;
             DespawnSourceFromObservers(dynel);
             RemoveSourceState(key);
             ForgetRecipient(key);
@@ -118,6 +121,18 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
                 recipient.Session.Send(message);
             }
+        }
+
+        /// <summary>Owner-tick snapshot of exactly the existing Announce recipient filter.</summary>
+        internal Player[] SnapshotObservers(Dynel source, bool includeSelf)
+        {
+            var result = new List<Player>();
+            if (includeSelf && source is Player self && self.Session != null) result.Add(self);
+            if (_visibleRecipientsBySource.TryGetValue(source.Identity.Long(), out HashSet<ulong>? keys))
+                foreach (ulong key in keys)
+                    if (_byIdentity.TryGetValue(key, out Dynel? dynel) && dynel is Player recipient
+                        && recipient.Session != null && !result.Contains(recipient)) result.Add(recipient);
+            return result.ToArray();
         }
 
         private void ReconcileRecipient(Player recipient)

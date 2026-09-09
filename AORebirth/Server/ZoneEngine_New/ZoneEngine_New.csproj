@@ -50,6 +50,7 @@
     <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" Link="Shared/CharacterOnlineOwnershipGuard.cs" />
     <Compile Include="../ZoneEngine/Core/TeamXpShareWindow.cs" Link="SharedGameplay/TeamXpShareWindow.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Stats/SpecialStats/XPTable.cs" Link="SharedGameplay/Progression/XPTable.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Stats/SkillTrickleTable.cs" Link="SharedGameplay/Nanos/SkillTrickleTable.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatData.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatData.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileData.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatProfileData.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatSequenceData.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatSequenceData.cs" />
@@ -105,6 +106,22 @@
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Inventory.cs" />
     <Compile Include="../ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs" Link="SharedGameplay/Missions/MissionDefinitionCatalog.cs" />
     <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestModels.cs" Link="SharedGameplay/Missions/QuestModels.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs" Link="SharedGameplay/Dialogue/AreteFrameworkBootstrap.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedSubwayTailorDialogueContent.cs" Link="SharedGameplay/Dialogue/CapturedSubwayTailorDialogueContent.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedSubwayVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedSubwayVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedThrakGardenVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedThrakGardenVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAbanGardenVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedAbanGardenVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteConditionReferenceValidator.cs" Link="SharedGameplay/Dialogue/AreteConditionReferenceValidator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteEnvironmentGate.cs" Link="SharedGameplay/Dialogue/AreteEnvironmentGate.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteNoOpActionRecorder.cs" Link="SharedGameplay/Dialogue/AreteNoOpActionRecorder.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteNoOpConditionEvaluator.cs" Link="SharedGameplay/Dialogue/AreteNoOpConditionEvaluator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueSessionService.cs" Link="SharedGameplay/Dialogue/DialogueSessionService.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueSessionModels.cs" Link="SharedGameplay/Dialogue/DialogueSessionModels.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueModels.cs" Link="SharedGameplay/Dialogue/DialogueModels.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueContentRegistry.cs" Link="SharedGameplay/Dialogue/DialogueContentRegistry.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueContentPackValidator.cs" Link="SharedGameplay/Dialogue/DialogueContentPackValidator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueContentPackLoader.cs" Link="SharedGameplay/Dialogue/DialogueContentPackLoader.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueActionReferenceValidator.cs" Link="SharedGameplay/Dialogue/DialogueActionReferenceValidator.cs" />
     <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestContentRegistry.cs" Link="SharedGameplay/Missions/QuestContentRegistry.cs" />
     <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestContentPackLoader.cs" Link="SharedGameplay/Missions/QuestContentPackLoader.cs" />
     <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestContentPackValidator.cs" Link="SharedGameplay/Missions/QuestContentPackValidator.cs" />
@@ -117,6 +134,9 @@
     <Compile Include="../ZoneEngine/Core/FlintKneecappingTipWire.Data.cs" Link="SharedGameplay/Missions/FlintKneecappingTipWire.Data.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteMarcoSpidaVendorContentProvider.cs" Link="SharedGameplay/Missions/CapturedAreteMarcoSpidaVendorContentProvider.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorStockDefinition.cs" Link="SharedGameplay/Missions/CapturedAreteAlexAreaVendorStockDefinition.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorDefinition.cs" Link="SharedGameplay/Mobs/CapturedAreteAlexAreaVendorDefinition.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedAreteAlexAreaVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteLoreleiVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedAreteLoreleiVendorContentProvider.cs" />
     <Compile Include="../ZoneEngine/Core/Doja/DojaChipInteractionRules.cs" Link="SharedGameplay/Missions/DojaChipInteractionRules.cs" />
     <Compile Include="../ZoneEngine/Core/Doja/DojaChipPacketSender.Data.cs" Link="SharedGameplay/Missions/DojaChipPacketSender.Data.cs" />
     <Compile Include="../ZoneEngine/Core/Missions/DailyMissionRewardRules.cs" Link="SharedGameplay/Missions/DailyMissionRewardRules.cs" />
@@ -148,6 +168,56 @@
     </Content>
     <Content Include="../../Datafiles/nanos.dat">
       <Link>GameData/nanos.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Arete/rex-larsson/**/*">
+      <Link>Content/Arete/rex-larsson/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Arete/marcus-stone/**/*">
+      <Link>Content/Arete/marcus-stone/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Subway/windcaller-karrec/**/*">
+      <Link>Content/Subway/windcaller-karrec/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Subway/tailor/**/*">
+      <Link>Content/Subway/tailor/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Thrak/garden-key/**/*">
+      <Link>Content/Thrak/garden-key/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Thrak/garden-vendors/**/*">
+      <Link>Content/Thrak/garden-vendors/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Aban/garden-vendors/**/*">
+      <Link>Content/Aban/garden-vendors/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Nascence/rosenblatt-hiathlin/**/*">
+      <Link>Content/Nascence/rosenblatt-hiathlin/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Nascence/life-dialogs/**/*">
+      <Link>Content/Nascence/life-dialogs/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Andromeda/zyvania-bagh/**/*">
+      <Link>Content/Andromeda/zyvania-bagh/%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

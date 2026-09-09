@@ -35,6 +35,7 @@ namespace ZoneEngine_New.Core.Nanos
             public Pending? Pending;
             public long ReadyAt;
             public int NextInstance;
+            public int InterruptGeneration;
             public Action<Character, TimedActionInterrupt>? Interrupt;
         }
 
@@ -101,7 +102,8 @@ namespace ZoneEngine_New.Core.Nanos
                     Dictionary<CharacterStat, int> modifiers;
                     if (specialty != null)
                     {
-                        if (!specialty.TryPrepare(player, player, nano, out var plan) || !plan.UsesActiveNano) return false;
+                        if (!specialty.TryPrepare(player, player, nano, out var plan) || !plan.UsesActiveNano
+                            || !TryScriptedChildren(player, player, nano, plan, out _)) return false;
                         modifiers = new(plan.Modifiers);
                     }
                     else
@@ -162,6 +164,8 @@ namespace ZoneEngine_New.Core.Nanos
         public void Cancel(Player player, IZoneSession? session = null)
         {
             if (!TryState(player, out State state)) return;
+            if (session != null && !ReferenceEquals(player.Session, session)) return;
+            Interlocked.Increment(ref state.InterruptGeneration);
             Pending? pending = Volatile.Read(ref state.Pending);
             if (pending != null && (session == null || ReferenceEquals(pending.Session, session)))
                 Interlocked.CompareExchange(ref state.Pending, null, pending);
@@ -213,12 +217,11 @@ namespace ZoneEngine_New.Core.Nanos
                 var projected = new StatCollection();
                 foreach (var entry in detachedStats.GetEntries())
                 { projected.Set(entry.Stat, entry.Base); projected.Set(entry.Stat, entry.Bonus, StatDetail.Bonus); }
+                var modifiers = state.Active.Values.SelectMany(a => a.Modifiers).ToArray();
+                var derived = NanoDerivedStats.Project(detachedStats, [], new Dictionary<CharacterStat, int>(), modifiers);
                 foreach (Active active in state.Active.Values)
                     foreach (var modifier in active.Modifiers) AddChecked(modifier.Key, modifier.Value);
-                int body = checked(state.Active.Values.Sum(a => a.Modifiers.GetValueOrDefault(CharacterStat.BodyDevelopment)));
-                int pool = checked(state.Active.Values.Sum(a => a.Modifiers.GetValueOrDefault(CharacterStat.NanoPool)));
-                AddChecked(CharacterStat.MaxHealth, checked(-NanoDerivedStats.HealthDelta(projected, checked(-body))));
-                AddChecked(CharacterStat.MaxNanoEnergy, checked(-NanoDerivedStats.NanoDelta(projected, checked(-pool))));
+                foreach (var modifier in derived) AddChecked(modifier.Key, modifier.Value);
                 foreach (var entry in projected.GetEntries()) detachedStats.Set(entry.Stat, entry.Bonus, StatDetail.Bonus);
                 void AddChecked(CharacterStat stat, int amount)
                 {
@@ -237,12 +240,14 @@ namespace ZoneEngine_New.Core.Nanos
             if (!TryState(caster, out State state) || !Online(caster) || state.Pending != null
                 || _milliseconds() < state.ReadyAt || !_catalog.TryGet(nanoId, out NanoDefinition nano)
                 || !caster.UploadedNanoIds.Contains(nanoId)) return false;
-            Player? target = targetIdentity == Identity.None || targetIdentity == caster.Identity ? caster
+            var castContext = Specialty(nanoId) as INanoCastContextSpecialization;
+            Player? target = castContext != null || targetIdentity == Identity.None || targetIdentity == caster.Identity ? caster
                 : _states.TryGetValue(targetIdentity.Instance, out State? targetState)
                     && targetState.Player.Identity == targetIdentity ? targetState.Player : null;
             if (target == null || !Validate(caster, target, nano, out _, out _, out _)
                 || !nano.TryCalculateAttackTime(caster.Stats.GetOrZero(CharacterStat.AggDef),
                     caster.Stats.GetOrZero(CharacterStat.NanoCInit), out int attack)) return false;
+            if (castContext != null && !castContext.TryPrepareCast(caster, nano, targetIdentity, () => true, out _)) return false;
             var pending = new Pending(nano, target, caster.Session!, target.Session!, caster.Playfield,
                 targetIdentity, checked(_milliseconds() + (long)attack * 10));
             if (Interlocked.CompareExchange(ref state.Pending, pending, null) != null) return false;
@@ -296,7 +301,8 @@ namespace ZoneEngine_New.Core.Nanos
                 || caster.Distance3D(target) > nano.RangeMeters || !caster.HasLineOfSightTo(target))) return false;
             if (specialty != null)
             {
-                if (!specialty.TryPrepare(caster, target, nano, out var plan)) return false;
+                if (!specialty.TryPrepare(caster, target, nano, out var plan)
+                    || !TryScriptedChildren(caster, target, nano, plan, out _)) return false;
                 duration = Math.Min(plan.DurationCentiseconds, MaximumDurationCentiseconds); usesActive = plan.UsesActiveNano;
                 if (duration < 0 || (usesActive && duration == 0)) return false;
             }
@@ -311,6 +317,30 @@ namespace ZoneEngine_New.Core.Nanos
                 long used = state.Active.Values.Where(a => a.Record.Strain != nano.Strain)
                     .Sum(a => (long)NcuCost(a.Record.NanoId));
                 if (used + nano.NcuCost > Math.Max(0, target.Stats.GetOrZero(CharacterStat.MaxNCU))) return false;
+            }
+            return true;
+        }
+
+        private bool TryScriptedChildren(Player caster, Player target, NanoDefinition parent, NanoSpecializationPlan plan,
+            out List<(NanoDefinition Nano, INanoSpecialization Specialty, NanoSpecializationPlan Plan)> children)
+        {
+            children = new();
+            if (plan.ScriptedChildren.Count == 0) return true;
+            // This is not a recursive arbitrary-script interpreter. Only Sparrow's exact child
+            // has a proven no-OnUse duration contract in the currently supported Legacy runtime.
+            if (parent.Id != 82835 || plan.ScriptedChildren.Count != 1
+                || plan.ScriptedChildren[0] != SparrowChildNanoSpecialization.NanoId
+                || !ReferenceEquals(caster, target)) return false;
+            foreach (int id in plan.ScriptedChildren)
+            {
+                if (!_catalog.TryGet(id, out NanoDefinition child) || child.Strain == parent.Strain
+                    || !child.TryCalculateAttackTime(0, 0, out _)
+                    || Specialty(id) is not SparrowChildNanoSpecialization specialty
+                    || !specialty.TryPrepare(caster, target, child, out var childPlan)
+                    || !childPlan.UsesActiveNano || childPlan.DurationCentiseconds <= 0
+                    || childPlan.DurationCentiseconds > MaximumDurationCentiseconds
+                    || childPlan.Modifiers.Count != 0 || childPlan.ScriptedChildren.Count != 0) return false;
+                children.Add((child, specialty, childPlan));
             }
             return true;
         }
@@ -337,6 +367,8 @@ namespace ZoneEngine_New.Core.Nanos
                 || !Validate(caster, target, pending.Nano, out var specialty, out int duration, out bool usesActive)
                 || !TryState(target, out State targetState)) return;
             var effects = new NanoEffectPlan();
+            Action? afterCommit = null;
+            var children = new List<(NanoDefinition Nano, INanoSpecialization Specialty, NanoSpecializationPlan Plan)>();
             Active? previous = usesActive ? targetState.Active.GetValueOrDefault(pending.Nano.Strain) : null;
             if (specialty == null)
             {
@@ -345,7 +377,18 @@ namespace ZoneEngine_New.Core.Nanos
             }
             else
             {
-                if (!specialty.TryPrepare(caster, target, pending.Nano, out var plan)) return;
+                if (!specialty.TryPrepare(caster, target, pending.Nano, out var plan)
+                    || !TryScriptedChildren(caster, target, pending.Nano, plan, out children)) return;
+                if (specialty is INanoCastContextSpecialization castContext)
+                {
+                    int generation = Volatile.Read(ref casterState.InterruptGeneration);
+                    bool StillCurrent() => Volatile.Read(ref casterState.InterruptGeneration) == generation
+                        && TryState(caster, out State current) && ReferenceEquals(current, casterState)
+                        && ReferenceEquals(caster.Session, pending.Session) && ReferenceEquals(pending.Session.Player, caster)
+                        && pending.Session.State == SessionState.InPlay && !caster.IsPersistenceQuarantined
+                        && ReferenceEquals(caster.Playfield, pending.Playfield);
+                    if (!castContext.TryPrepareCast(caster, pending.Nano, pending.WireTarget, StillCurrent, out afterCommit)) return;
+                }
                 foreach (var modifier in plan.Modifiers) effects.Modifiers.Add(modifier.Key, modifier.Value);
                 effects.BaseWrites[caster] = new() { [CharacterStat.CurrentNano] =
                     caster.Stats.GetOrZero(CharacterStat.CurrentNano, StatDetail.Base) - pending.Nano.NanoCost };
@@ -362,12 +405,47 @@ namespace ZoneEngine_New.Core.Nanos
                     effects.Modifiers, specialty, caster.Identity.Instance);
             }
             var replacements = new Dictionary<State, Active[]>();
+            var childCompletions = new List<(NanoDefinition Nano, Active? Active, Active? Previous)>();
             if (active != null)
             {
-                Active[] next = targetState.Active.Values.Where(a => a.Record.Strain != active.Record.Strain).Append(active).ToArray();
+                var nextByStrain = targetState.Active.Values.Where(a => a.Record.Strain != active.Record.Strain)
+                    .Append(active).ToDictionary(a => a.Record.Strain);
+                int nextInstance = Math.Max(targetState.NextInstance, active.Record.NanoInstance);
+                foreach (var child in children)
+                {
+                    Active? priorChild = nextByStrain.GetValueOrDefault(child.Nano.Strain);
+                    long used = nextByStrain.Values.Where(a => a.Record.Strain != child.Nano.Strain)
+                        .Sum(a => (long)NcuCost(a.Record.NanoId));
+                    // Unlike Legacy's client-only ghost duration, a rejected child produces no
+                    // duration packet or row. Parent effects still own their admitted NCU.
+                    if (used + child.Nano.NcuCost > Math.Max(0, target.Stats.GetOrZero(CharacterStat.MaxNCU)))
+                    { childCompletions.Add((child.Nano, null, null)); continue; }
+                    if (nextInstance == int.MaxValue && priorChild?.Record.NanoId != child.Nano.Id) return;
+                    int childInstance = priorChild?.Record.NanoId == child.Nano.Id
+                        ? priorChild.Record.NanoInstance : ++nextInstance;
+                    long childExpiry;
+                    try { childExpiry = _utcNow().AddMilliseconds((long)child.Plan.DurationCentiseconds * 10).Ticks; }
+                    catch (ArgumentOutOfRangeException) { return; }
+                    var childActive = new Active(new(child.Nano.Id, child.Nano.Strain, childInstance,
+                        child.Plan.DurationCentiseconds, childExpiry), new(), child.Specialty, caster.Identity.Instance);
+                    nextByStrain[child.Nano.Strain] = childActive;
+                    childCompletions.Add((child.Nano, childActive, priorChild));
+                }
+                Active[] next = nextByStrain.Values.ToArray();
+                var priorModifiers = new Dictionary<CharacterStat, int>(previous?.Modifiers ?? new());
+                try
+                {
+                    foreach (var child in childCompletions)
+                        if (child.Previous != null)
+                            foreach (var stat in child.Previous.Modifiers)
+                                priorModifiers[stat.Key] = checked(priorModifiers.GetValueOrDefault(stat.Key) + stat.Value);
+                }
+                catch (OverflowException) { return; }
+                if (!CanProject(target, effects.Modifiers, priorModifiers)) return;
                 if (!CanProjectDerived(targetState, next)) return;
                 replacements[targetState] = next;
             }
+            else if (children.Count != 0) return; // Only the proven active parent owns this nested path.
             State[] participants = new[] { casterState, targetState }.Distinct().OrderBy(s => s.Player.Identity.Instance).ToArray();
             if (!Commit(participants, effects.BaseWrites, replacements)) return;
             casterState.ReadyAt = checked(_milliseconds() + (long)pending.Nano.RechargeCentiseconds * 10);
@@ -384,13 +462,39 @@ namespace ZoneEngine_New.Core.Nanos
             {
                 targetState.NextInstance = Math.Max(targetState.NextInstance, active.Record.NanoInstance);
                 targetState.Active[active.Record.Strain] = active;
-                ApplyModifiers(target, active.Modifiers, 1); UpdateDerived(targetState); SyncNcu(targetState);
+                ApplyModifiers(target, active.Modifiers, 1);
+                foreach (var child in childCompletions)
+                {
+                    if (child.Active == null) continue;
+                    if (child.Previous != null)
+                    {
+                        ApplyModifiers(target, child.Previous.Modifiers, -1);
+                        if (child.Previous.Record.NanoId != child.Nano.Id)
+                        {
+                            child.Previous.Specialty?.Removed(target, child.Previous.Record.NanoId);
+                            SendRemoval(target, child.Previous.Record.NanoId);
+                        }
+                    }
+                    targetState.NextInstance = Math.Max(targetState.NextInstance, child.Active.Record.NanoInstance);
+                    targetState.Active[child.Active.Record.Strain] = child.Active;
+                }
+                UpdateDerived(targetState); SyncNcu(targetState);
             }
             ApplyWrites(effects.BaseWrites);
             caster.Session?.Send(new CharacterActionMessage { Identity = caster.Identity, Unknown = 0,
                 Action = CharacterActionType.FinishNanoCasting, Target = Identity.None, Parameter1 = 1, Parameter2 = pending.Nano.Id });
             foreach (State participant in participants) Flush(participant.Player);
+            foreach (var child in childCompletions)
+            {
+                // Accepted castnano.ApplyInstantNano has no second mana/attack/recharge charge.
+                Announce(caster, new CastNanoSpellMessage { Identity = caster.Identity, Unknown = 0,
+                    Caster = caster.Identity, Target = target.Identity, NanoId = child.Nano.Id, Unknown1 = 0 });
+                caster.Session?.Send(new CharacterActionMessage { Identity = caster.Identity, Unknown = 0,
+                    Action = CharacterActionType.FinishNanoCasting, Target = Identity.None, Parameter1 = 1, Parameter2 = child.Nano.Id });
+                if (child.Active != null) SendDuration(target, child.Active);
+            }
             specialty?.Applied(caster, target, pending.Nano, active?.Record);
+            afterCommit?.Invoke();
             if (active != null) SendDuration(target, active);
             foreach (State participant in participants) SendProjections(participant.Player);
         }
@@ -486,13 +590,10 @@ namespace ZoneEngine_New.Core.Nanos
         { foreach (IActiveNanoProjection projection in _projections) projection.SendProjection(player); }
         private static void UpdateDerived(State state)
         {
+            var modifiers = state.Active.Values.SelectMany(a => a.Modifiers).ToArray();
+            var next = NanoDerivedStats.Project(state.Player.Stats, modifiers, state.Derived, modifiers);
             ApplyModifiers(state.Player, state.Derived, -1); state.Derived.Clear();
-            int body = checked(state.Active.Values.Sum(a => a.Modifiers.GetValueOrDefault(CharacterStat.BodyDevelopment)));
-            int pool = checked(state.Active.Values.Sum(a => a.Modifiers.GetValueOrDefault(CharacterStat.NanoPool)));
-            int health = checked(-NanoDerivedStats.HealthDelta(state.Player, checked(-body)));
-            int nano = checked(-NanoDerivedStats.NanoDelta(state.Player, checked(-pool)));
-            if (health != 0) state.Derived[CharacterStat.MaxHealth] = health;
-            if (nano != 0) state.Derived[CharacterStat.MaxNanoEnergy] = nano;
+            foreach (var modifier in next) state.Derived.Add(modifier.Key, modifier.Value);
             ApplyModifiers(state.Player, state.Derived, 1);
         }
         private static bool CanProjectDerived(State state, Active[] next, bool currentApplied = true)
@@ -500,23 +601,11 @@ namespace ZoneEngine_New.Core.Nanos
             try
             {
                 Active[] prior = currentApplied ? state.Active.Values.ToArray() : [];
-                foreach (var pair in new[] { (CharacterStat.BodyDevelopment, CharacterStat.MaxHealth),
-                    (CharacterStat.NanoPool, CharacterStat.MaxNanoEnergy) })
-                {
-                    int oldSource = checked(prior.Sum(a => a.Modifiers.GetValueOrDefault(pair.Item1)));
-                    int newSource = checked(next.Sum(a => a.Modifiers.GetValueOrDefault(pair.Item1)));
-                    if (oldSource == int.MinValue || newSource == int.MinValue) return false;
-                    int changed = checked(newSource - oldSource);
-                    int derived = pair.Item1 == CharacterStat.BodyDevelopment
-                        ? checked(NanoDerivedStats.HealthDelta(state.Player, changed) - NanoDerivedStats.HealthDelta(state.Player, -oldSource))
-                        : checked(NanoDerivedStats.NanoDelta(state.Player, changed) - NanoDerivedStats.NanoDelta(state.Player, -oldSource));
-                    long oldLiteral = prior.Sum(a => (long)a.Modifiers.GetValueOrDefault(pair.Item2));
-                    long newLiteral = next.Sum(a => (long)a.Modifiers.GetValueOrDefault(pair.Item2));
-                    long delta = newLiteral - oldLiteral + derived - state.Derived.GetValueOrDefault(pair.Item2);
-                    if ((long)state.Player.Stats.GetOrZero(pair.Item2) + delta is < int.MinValue or > int.MaxValue
-                        || (long)state.Player.Stats.GetOrZero(pair.Item2, StatDetail.Bonus) + delta is < int.MinValue or > int.MaxValue) return false;
-                }
-                return true;
+                var previousDerived = currentApplied ? state.Derived : new Dictionary<CharacterStat, int>();
+                var nextModifiers = next.SelectMany(a => a.Modifiers).ToArray();
+                var priorModifiers = prior.SelectMany(a => a.Modifiers).ToArray();
+                var projected = NanoDerivedStats.Project(state.Player.Stats, priorModifiers, previousDerived, nextModifiers);
+                return CanProject(state.Player, nextModifiers.Concat(projected), priorModifiers.Concat(previousDerived));
             }
             catch (OverflowException) { return false; }
         }
@@ -529,7 +618,7 @@ namespace ZoneEngine_New.Core.Nanos
         private void SyncNcu(State state) => state.Player.Stats.Set(CharacterStat.CurrentNCU,
             checked(state.Active.Values.Sum(a => NcuCost(a.Record.NanoId))), StatDetail.Base, dirty: true);
         private static bool CanProject(Player player, IEnumerable<KeyValuePair<CharacterStat, int>> add,
-            Dictionary<CharacterStat, int>? subtract)
+            IEnumerable<KeyValuePair<CharacterStat, int>>? subtract)
         {
             var deltas = new Dictionary<CharacterStat, long>();
             foreach (var pair in add) deltas[pair.Key] = deltas.GetValueOrDefault(pair.Key) + pair.Value;

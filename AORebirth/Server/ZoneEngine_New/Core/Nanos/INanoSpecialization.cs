@@ -1,12 +1,14 @@
 namespace ZoneEngine_New.Core.Nanos
 {
     using ZoneEngine_New.Core.Entities;
+    using System;
     using System.Collections.Generic;
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     public sealed record NanoSpecializationPlan(bool UsesActiveNano, int DurationCentiseconds)
     {
         public IReadOnlyDictionary<CharacterStat, int> Modifiers { get; init; } = new Dictionary<CharacterStat, int>();
+        public IReadOnlyList<int> ScriptedChildren { get; init; } = System.Array.Empty<int>();
     }
 
     public interface INanoOwnerProjection
@@ -19,6 +21,17 @@ namespace ZoneEngine_New.Core.Nanos
     public interface INanoActiveSetValidator
     {
         bool IsValidActiveSet(Player player, IReadOnlyList<ActiveNanoRecord> active);
+    }
+
+    /// <summary>
+    /// Exact remote actions whose durable recipient is the caster, not a foreign playfield's
+    /// character aggregate. Preparation has no effects; its one-shot publication follows commit.
+    /// The supplied cancellation fence is transport-safe and must not read foreign owner stats.
+    /// </summary>
+    internal interface INanoCastContextSpecialization
+    {
+        bool TryPrepareCast(Player caster, NanoDefinition nano, Identity requestedTarget,
+            Func<bool> casterStillCurrent, out Action afterCommit);
     }
 
     /// <summary>

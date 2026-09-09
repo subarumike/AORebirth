@@ -47,6 +47,7 @@ public sealed partial class GeneratedMissionAcgService
     // Executed from the owning player/playfield dispatcher, not a separate timer thread.
     public void PollLifecycle(Player player, bool force = false)
     {
+        PollCorpseAcknowledgements(player);
         if (player.IsPersistenceQuarantined || player.Session?.State != SessionState.InPlay || player.Playfield == null) return;
         long now = DateTime.UtcNow.Ticks;
         if (!force && _nextLifecycle.TryGetValue(player.Identity.Instance, out long next) && next > now) return;

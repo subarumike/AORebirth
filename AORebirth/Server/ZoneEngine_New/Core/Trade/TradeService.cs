@@ -101,20 +101,24 @@ namespace ZoneEngine_New.Core.Trade
                 Cancel(player, "opening another trade");
 
             int templateId = machine.Template.Id;
-            if (!_gameData.TryGetVendingMachine(templateId, out VendingMachineDefinition definition))
+            if (machine.Stock.IsAcceptedSnapshot)
             {
-                Tell(player, "This shop has no stock list yet.");
-                _logger.Warn(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Vending machine {0} has no VendingMachines.json entry",
-                        templateId));
-                return false;
+                // Frozen stock belongs only to its exact live accepted vendor, never to
+                // a matching template, nearby actor, or stale replacement identity.
+                if (!IsCurrentAcceptedShop(player, machine))
+                    return false;
             }
-
-            // Random.Shared, not a field: playfields tick on their own threads and a shared
-            // Random instance torn across threads silently degrades to returning zeroes.
-            machine.Stock.EnsureFresh(definition, _minter, Random.Shared);
+            else
+            {
+                if (!_gameData.TryGetVendingMachine(templateId, out VendingMachineDefinition definition))
+                {
+                    Tell(player, "This shop has no stock list yet.");
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Vending machine {0} has no VendingMachines.json entry", templateId));
+                    return false;
+                }
+                machine.Stock.EnsureFresh(definition, _minter, Random.Shared);
+            }
 
             Identity bag = player.Playfield.GetRequiredService<DynelRegistry>().AllocateTempBagIdentity();
             var session = new TradeSession(bag, TradeKind.Shop, player, partner: null, machine);
@@ -223,6 +227,13 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
+            if (session.Machine?.Stock.IsAcceptedSnapshot == true
+                && (session.AcceptedShopTransport == null || !IsCurrentAcceptedShop(player, session.Machine, session.AcceptedShopTransport)))
+            {
+                Cancel(player, "accepted vendor ownership changed");
+                return;
+            }
+
             switch (message.Action)
             {
                 case TradeAction.AddItem:
@@ -244,6 +255,24 @@ namespace ZoneEngine_New.Core.Trade
                 default:
                     break;
             }
+        }
+
+        static bool IsCurrentAcceptedShop(Player player, VendingMachine machine,
+            ZoneEngine_New.Core.Network.IZoneSession? expectedTransport = null)
+        {
+            var transport = player.Session;
+            var field = player.Playfield;
+            var owner = machine.OwnerNpc;
+            return transport != null && transport.State == ZoneEngine_New.Core.Network.SessionState.InPlay
+                && ReferenceEquals(transport.Player, player) && (expectedTransport == null || ReferenceEquals(transport, expectedTransport))
+                && field != null && !field.IsDisposed && !player.IsDead && !player.IsPersistenceQuarantined && player.Inventory.IsHydrated
+                && (owner == null || (!owner.IsDead && ReferenceEquals(owner.Shop, machine) && ReferenceEquals(owner.Playfield, field)))
+                && ReferenceEquals(machine.Playfield, field)
+                && player.Distance3D(owner != null ? owner : machine) <= RangeCancelDistance
+                && field.GetRequiredService<DynelRegistry>().TryGet(player.Identity, out var currentPlayer)
+                && ReferenceEquals(currentPlayer, player)
+                && field.GetRequiredService<ZoneEngine_New.Core.Mobs.AcceptedNpcActivationService>()
+                    .TryGetShopBinding(machine, out _);
         }
 
         void HandleAddItem(Player player, TradeSession session, TradeMessage message)
@@ -693,6 +722,12 @@ namespace ZoneEngine_New.Core.Trade
             if (session.Committing)
                 return;
             VendingMachine machine = session.Machine!;
+            if (machine.Stock.IsAcceptedSnapshot && (!ReferenceEquals(player, session.Initiator)
+                || session.AcceptedShopTransport == null || !IsCurrentAcceptedShop(player, machine, session.AcceptedShopTransport)))
+            {
+                Cancel(player, "accepted vendor ownership changed");
+                return;
+            }
             NpcCharacter? owner = machine.OwnerNpc;
             if (machine.Playfield == null || (owner != null && (owner.IsDead || owner.Playfield == null)))
             {
@@ -1027,6 +1062,9 @@ namespace ZoneEngine_New.Core.Trade
             {
                 VendingMachine? machine = session.Machine;
                 if (machine == null || !ReferenceEquals(machine.Playfield, playfield))
+                    return true;
+                if (machine.Stock.IsAcceptedSnapshot && (session.AcceptedShopTransport == null
+                    || !IsCurrentAcceptedShop(initiator, machine, session.AcceptedShopTransport)))
                     return true;
 
                 NpcCharacter? owner = machine.OwnerNpc;

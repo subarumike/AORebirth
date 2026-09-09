@@ -546,6 +546,98 @@ namespace ZoneEngine_New.Tests
             return nano;
         }
 
+        [TestMethod]
+        public void Attribute_nano_trickle_uses_floor_of_total_not_floor_of_delta_and_survives_restore()
+        {
+            var nano = AbilityBuff(10, CharacterStat.Agility, 1);
+            var f = new Fixture(nano); var p = f.Player();
+            foreach (var stat in AbilityStats) p.Stats.Set(stat, 0);
+            p.Stats.Set(CharacterStat.Agility, 6); p.Stats.Set((CharacterStat)108, 50);
+            f.Cast(p, 10);
+            // Skill108 is 20% Strength +60% Agility +20% Sense. floor(4.2/4)-floor(3.6/4)=1.
+            Assert.AreEqual(51, p.Stats.GetOrZero((CharacterStat)108));
+            Assert.AreEqual(50, p.Stats.GetOrZero((CharacterStat)108, StatDetail.Base));
+            f.Service.DetachPlayer(p); Assert.AreEqual(50, p.Stats.GetOrZero((CharacterStat)108));
+            f.Session(p).Bodies.Clear(); Assert.IsTrue(f.Service.AttachPlayer(p));
+            Assert.AreEqual(51, p.Stats.GetOrZero((CharacterStat)108)); Assert.AreEqual(0, f.Session(p).Bodies.Count);
+            Assert.AreEqual(1, f.Store.Commits); Assert.IsTrue(f.Service.Remove(p, 10));
+            Assert.AreEqual(50, p.Stats.GetOrZero((CharacterStat)108));
+        }
+
+        [TestMethod]
+        public void Multiple_attribute_nanos_share_fractional_trickle_without_double_apply_or_reverse()
+        {
+            var first = AbilityBuff(10, CharacterStat.Stamina, 2);
+            var second = AbilityBuff(11, CharacterStat.Stamina, 2); second.Template.Stats[(CharacterStat)75] = 8;
+            var f = new Fixture(first, second); var p = f.Player(); p.Stats.Set(CharacterStat.Stamina, 2);
+            p.Stats.Set(CharacterStat.BodyDevelopment, 10);
+            f.Cast(p, 10); Assert.AreEqual(1, p.Stats.GetOrZero(CharacterStat.BodyDevelopment, StatDetail.Bonus));
+            f.Advance(300); f.Cast(p, 11);
+            Assert.AreEqual(6, p.Stats.GetOrZero(CharacterStat.Stamina));
+            Assert.AreEqual(1, p.Stats.GetOrZero(CharacterStat.BodyDevelopment, StatDetail.Bonus));
+            Assert.IsTrue(f.Service.Remove(p, 10));
+            Assert.AreEqual(1, p.Stats.GetOrZero(CharacterStat.BodyDevelopment, StatDetail.Bonus));
+            Assert.IsTrue(f.Service.Remove(p, 11)); Assert.IsFalse(f.Service.Remove(p, 11));
+            Assert.AreEqual(0, p.Stats.GetOrZero(CharacterStat.BodyDevelopment, StatDetail.Bonus));
+            Assert.AreEqual(500, p.Stats.GetOrZero(CharacterStat.MaxHealth));
+        }
+
+        [TestMethod]
+        public void Attribute_then_heal_uses_owned_body_trickle_and_expiry_preserves_equipment_baseline()
+        {
+            var nano = AbilityBuff(10, CharacterStat.Stamina, 1);
+            nano.Template.SpellList[EventType.OnUse].Add(Heal(100));
+            var f = new Fixture(nano); var p = f.Player();
+            p.Stats.Set(CharacterStat.Stamina, 2); p.Stats.AddBonus(CharacterStat.Stamina, 1);
+            p.Stats.Set(CharacterStat.BodyDevelopment, 10); p.Stats.Set(CharacterStat.Health, 500);
+            f.Cast(p, 10);
+            Assert.AreEqual(503, p.Stats.GetOrZero(CharacterStat.MaxHealth));
+            Assert.AreEqual(503, p.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(503, f.Store.Last.Single().BaseStats.Single(s => s.StatId == (int)CharacterStat.Health).StatValue);
+            p.Stats.ClearBonuses(); p.Stats.AddBonus(CharacterStat.Stamina, 2);
+            f.Service.ReapplyBonusesAfterRebase(p);
+            Assert.AreEqual(5, p.Stats.GetOrZero(CharacterStat.Stamina));
+            Assert.AreEqual(0, p.Stats.GetOrZero(CharacterStat.BodyDevelopment, StatDetail.Bonus));
+            // Only the nano delta is recomputed; this does not claim baseline equipment trickle ownership.
+            f.Advance(10000); f.Service.Tick(p); f.Service.Tick(p);
+            Assert.AreEqual(4, p.Stats.GetOrZero(CharacterStat.Stamina));
+            Assert.AreEqual(2, p.Stats.GetOrZero(CharacterStat.Stamina, StatDetail.Bonus));
+            Assert.AreEqual(10, p.Stats.GetOrZero(CharacterStat.BodyDevelopment));
+        }
+
+        [TestMethod]
+        public void Attribute_trickle_downstream_health_nano_and_prospective_xp_match_published_actor()
+        {
+            var nano = AbilityBuff(10, CharacterStat.Stamina, 4);
+            nano.Template.SpellList[EventType.OnUse].Add(new() { FunctionType = (int)FunctionType.Modify,
+                Target = (int)ItemTarget.Target, Arguments = [(int)CharacterStat.Psychic, 4] });
+            var f = new Fixture(nano); var p = f.Player();
+            foreach (var stat in AbilityStats) p.Stats.Set(stat, 3);
+            p.Stats.Set(CharacterStat.BodyDevelopment, 10); p.Stats.Set(CharacterStat.NanoPool, 10);
+            p.Stats.Set(CharacterStat.Level, 1); p.Stats.Set(CharacterStat.XP, 0); p.Stats.Set(CharacterStat.IP, 1500);
+            f.Cast(p, 10); p.NanoRuntime = f.Service; p.Rebase();
+            Assert.AreEqual(11, p.Stats.GetOrZero(CharacterStat.BodyDevelopment));
+            Assert.AreEqual(11, p.Stats.GetOrZero(CharacterStat.NanoPool));
+            int commits = f.Store.Commits; var before = p.Stats.GetEntries().ToArray();
+            var plan = DirectXpRewardPlan.Create(p, 1500);
+            Assert.IsTrue(before.SequenceEqual(p.Stats.GetEntries())); Assert.AreEqual(commits, f.Store.Commits);
+            Assert.AreEqual(MaxHealthCalculator.Compute(1, 1, 1, 2, 11), plan.Stats[CharacterStat.Health]);
+            Assert.AreEqual(MaxNanoCalculator.Compute(1, 1, 1, 2, 11), plan.Stats[CharacterStat.CurrentNano]);
+            plan.PublishAfterCommit(p);
+            Assert.AreEqual(plan.Stats[CharacterStat.Health], p.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(p.Stats.GetOrZero(CharacterStat.MaxHealth), p.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(p.Stats.GetOrZero(CharacterStat.MaxNanoEnergy), p.Stats.GetOrZero(CharacterStat.CurrentNano));
+        }
+
+        private static readonly CharacterStat[] AbilityStats = [CharacterStat.Strength, CharacterStat.Agility,
+            CharacterStat.Stamina, CharacterStat.Intelligence, CharacterStat.Sense, CharacterStat.Psychic];
+        private static NanoDefinition AbilityBuff(int id, CharacterStat stat, int amount)
+        {
+            var nano = Buff(id, modifier: amount);
+            nano.Template.SpellList[EventType.OnUse][0].Arguments[0] = (int)stat;
+            return nano;
+        }
+
         private static string Describe(MessageBody body) => body is CharacterActionMessage action ? action.Action.ToString() : body.GetType().Name;
         private static NanoDefinition Buff(int id, int modifier = 5, int ncu = 5, int duration = 1000, int strain = 7)
             => new(new ItemTemplate { Id = id, Stats = new() { [(CharacterStat)8] = duration, [(CharacterStat)54] = ncu,

@@ -9,14 +9,21 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- The approved gameplay reconciliation branch now has normalized generated
-  mission persistence and five-bundle runtime connections, transactional supported
-  inventory/authored rewards, team lifecycle and accepted nano paths. The coherent
-  final focused checkpoint passes 308 tests and startup validation. Remaining trusted
-  authored/NPC activation, nano specialties and occupied-state migration still
-  prevent a full-parity/master-switch claim. Fresh disposable and full exact-SHA
-  acceptance are tracked in `docs/evidence/ZONEENGINE_NEW_GAMEPLAY_CHECKPOINT_20260908.md`.
-  No production change or client launch occurred.
+- The approved gameplay reconciliation branch extends the accepted `05c8d4ef`
+  checkpoint with 22 exact social/vendor NPC adapters, three standalone shops,
+  two Arete quest props and 16 activated dialogue domains. Stan/Sarah hand-ins,
+  captured shops, Sparrow/trickle, team warps, owned-bank mission cleanup and
+  repeated corpse UI retain the existing transaction/ownership boundaries.
+  The broader accepted NPC/ordinary-runtime consumers, 27 specialized dialogue
+  routes, remaining supported nano graphs and general corpse presentation still
+  prevent a master-switch claim. The exhaustive NPC ledger is explicitly incomplete;
+  overlapping evidence views are not added together or called missing data.
+  Current source/parity and validation records are linked from
+  `docs/evidence/ZONEENGINE_NEW_GAP_CLOSURE_20260908.md`; the preceding 308-test
+  checkpoint remains historical evidence, not approval of this changed source.
+  Occupied Legacy sidecar conversion is a separate production-transition prerequisite,
+  not a requirement for theoretical retail completeness. Master, production and
+  the live client remain untouched by this reconciliation.
 - The full-integration candidate builds on Delmus reconciliation
   `307e87670f9d26b50b1ed26e019684726600c52c`. Its normal Windows/Linux wrappers
   select `ZoneEngine_New`; Legacy requires explicit rollback selection.
