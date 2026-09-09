@@ -9,6 +9,19 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- The follow-on `codex/zoneengine-final-runtime-consumers` candidate starts at
+  `44fa42fc`. Its deterministic source ledger reconstructs exactly 489 ordinary
+  bindings (322 Subway / 167 Temple), without falsely reporting them connected.
+  Exact Mongo 100198/100194 uses the existing nano transaction and explicit combat
+  NPC eligibility. Mike approved preserved saved appearance for legacy morph
+  records: recognized effects may restore over that baseline without guessing an
+  original look or bypassing new-cast requirements. Precommit Windows passes
+  479/479 NewEngine tests, 1129/1129 AOtomation tests, all 12 mandatory stages
+  and disposable migration/rollback/restart. Exact committed Windows/Linux
+  receipts are separate from these precommit results. Ordinary consumers,
+  27 dialogue routes and N02/N07/N08/N10 remain master blockers. Production and
+  primary master are unchanged. See
+  `docs/evidence/ZONEENGINE_NEW_RUNTIME_CONSUMER_CHECKPOINT.md`.
 - Dedicated `codex/zoneengine-final-delmus-reconciliation` preserves e31142e8 and
   explicitly reconciles all 77 files introduced by the parallel Delmus d2d98446
   revision. Narrow rewrites repair reconnect, fresh-item identities, category

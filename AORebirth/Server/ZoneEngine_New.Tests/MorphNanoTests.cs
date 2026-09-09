@@ -159,14 +159,174 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void Ambiguous_legacy_persisted_morph_base_is_preserved_not_cleared()
+        public void Approved_legacy_persisted_morph_base_allows_login_without_reset_or_double_application()
         {
             var f = new Fixture(270542, attach: false); f.Player.Stats.Set(CharacterStat.MonsterData, 270497);
             f.Store.Rows.Add(new(f.Nano.Id, f.Nano.Strain, 9, f.Nano.DurationCentiseconds,
                 f.Now.AddMilliseconds((long)f.Nano.DurationCentiseconds * 10).Ticks));
-            Assert.IsFalse(f.Service.AttachPlayer(f.Player)); Assert.AreEqual(0, f.Store.Commits);
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player)); Assert.AreEqual(0, f.Store.Commits);
             Assert.AreEqual(270497, f.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base));
+            Assert.AreEqual(270497, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(0, f.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Bonus));
+            Assert.AreEqual(250, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
+            Assert.AreEqual(0, f.Session.Bodies.Count); Assert.AreEqual(0, f.Session.Raw.Count);
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player));
+            Assert.AreEqual(250, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
             Assert.AreEqual(1, f.Store.Rows.Count);
+            Assert.IsTrue(f.Service.Remove(f.Player, f.Nano.Id));
+            Assert.AreEqual(270497, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(100, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
+        }
+
+        [TestMethod]
+        [DataRow(270542)] [DataRow(288546)] [DataRow(281569)] [DataRow(82835)]
+        public void Opaque_baseline_survives_restore_logout_reconnect_cancel_and_expiry(int id)
+        {
+            var f = new Fixture(id, attach: false); const int baseline = 270497;
+            f.Player.Stats.Set(CharacterStat.MonsterData, baseline);
+            f.Player.Stats.Set(CharacterStat.CATMesh, 111); f.Player.Stats.Set(CharacterStat.DisplayCATMesh, 222);
+            f.Store.Rows.Add(new(id, f.Nano.Strain, 9, f.Nano.DurationCentiseconds,
+                f.Now.AddMilliseconds((long)f.Nano.DurationCentiseconds * 10).Ticks));
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player));
+            int speed = f.Player.Stats.GetOrZero(CharacterStat.RunSpeed);
+            var persisted = f.Player.Stats.GetEntries().ToDictionary(e => e.Stat, e => e.Base);
+            Assert.AreEqual(baseline, persisted[CharacterStat.MonsterData]);
+            Assert.AreEqual(111, persisted[CharacterStat.CATMesh]); Assert.AreEqual(222, persisted[CharacterStat.DisplayCATMesh]);
+            f.Service.DetachPlayer(f.Player);
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            f.Session.Bodies.Clear(); f.Session.Raw.Clear();
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player)); Assert.AreEqual(speed, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
+            Assert.AreEqual(0, f.Session.Bodies.Count); Assert.AreEqual(0, f.Session.Raw.Count);
+            Assert.IsTrue(f.Service.Remove(f.Player, id));
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual((uint)baseline, f.Session.Bodies.OfType<StatMessage>()
+                .Single(m => m.Stats.Length == 1 && m.Stats[0].Value1 == CharacterStat.MonsterData).Stats[0].Value2);
+            Assert.AreEqual(111, f.Player.Stats.GetOrZero(CharacterStat.CATMesh));
+            Assert.AreEqual(222, f.Player.Stats.GetOrZero(CharacterStat.DisplayCATMesh));
+            f.Service.DetachPlayer(f.Player); Assert.IsTrue(f.Service.AttachPlayer(f.Player));
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.IsFalse(f.Service.GetActive(f.Player).Any(n => n.NanoId == id));
+            // Restore another supported saved row, without bypassing ToUse requirements.
+            f.Service.DetachPlayer(f.Player);
+            f.Store.Rows.Add(new(id, f.Nano.Strain, 10, f.Nano.DurationCentiseconds,
+                f.Now.AddMilliseconds((long)f.Nano.DurationCentiseconds * 10).Ticks));
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player));
+            f.Now = f.Now.AddMilliseconds((long)f.Nano.DurationCentiseconds * 10 + 1); f.Service.Tick(f.Player);
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(100, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
+            f.Service.DetachPlayer(f.Player); Assert.IsTrue(f.Service.AttachPlayer(f.Player));
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+        }
+
+        [TestMethod]
+        [DataRow(270542)] [DataRow(288546)] [DataRow(281569)] [DataRow(82835)]
+        public void Fresh_login_restores_saved_base_and_effect_without_process_local_history(int id)
+        {
+            var old = new Fixture(id, attach: false);
+            old.Player.Stats.Set(CharacterStat.MonsterData, 288538);
+            old.Player.Stats.Set(CharacterStat.CATMesh, 111); old.Player.Stats.Set(CharacterStat.DisplayCATMesh, 222);
+            old.Store.Rows.Add(new(id, old.Nano.Strain, 9, old.Nano.DurationCentiseconds,
+                old.Now.AddMilliseconds((long)old.Nano.DurationCentiseconds * 10).Ticks));
+            Assert.IsTrue(old.Service.AttachPlayer(old.Player));
+            var bases = old.Player.Stats.GetEntries().ToDictionary(e => e.Stat, e => e.Base);
+            var rows = old.Store.Rows.ToArray();
+            old.Service.DetachPlayer(old.Player);
+
+            // New player, session, nano service and projection owner: no restoration
+            // depends on the previous process retaining an original appearance.
+            var fresh = new Fixture(id, attach: false);
+            foreach (var entry in bases) fresh.Player.Stats.Set(entry.Key, entry.Value);
+            fresh.Store.Rows.AddRange(rows);
+            Assert.IsTrue(fresh.Service.AttachPlayer(fresh.Player));
+            Assert.AreEqual(288538, fresh.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base));
+            Assert.AreEqual(0, fresh.Store.Commits); Assert.AreEqual(0, fresh.Session.Bodies.Count);
+            Assert.AreEqual(0, fresh.Session.Raw.Count);
+            Assert.IsTrue(fresh.Service.Remove(fresh.Player, id));
+            Assert.AreEqual(288538, fresh.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(111, fresh.Player.Stats.GetOrZero(CharacterStat.CATMesh));
+            Assert.AreEqual(222, fresh.Player.Stats.GetOrZero(CharacterStat.DisplayCATMesh));
+            Assert.AreEqual(100, fresh.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
+        }
+
+        [TestMethod]
+        public void Allowed_new_sparrow_cast_returns_to_saved_appearance_on_cancel_and_expiry()
+        {
+            var f = new Fixture(82835); const int baseline = 270497;
+            f.Player.Stats.Set(CharacterStat.MonsterData, baseline);
+            f.Player.Stats.Set(CharacterStat.CATMesh, 111); f.Player.Stats.Set(CharacterStat.DisplayCATMesh, 222);
+            f.Cast();
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base));
+            Assert.IsTrue(f.Service.Remove(f.Player, f.Nano.Id));
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(111, f.Player.Stats.GetOrZero(CharacterStat.CATMesh));
+            Assert.AreEqual(222, f.Player.Stats.GetOrZero(CharacterStat.DisplayCATMesh));
+            f.Milliseconds += (long)f.Nano.RechargeCentiseconds * 10; f.Cast();
+            f.Now = f.Now.AddMilliseconds((long)f.Nano.DurationCentiseconds * 10 + 1); f.Service.Tick(f.Player);
+            Assert.AreEqual(baseline, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(111, f.Player.Stats.GetOrZero(CharacterStat.CATMesh));
+            Assert.AreEqual(222, f.Player.Stats.GetOrZero(CharacterStat.DisplayCATMesh));
+        }
+
+        [TestMethod]
+        [DataRow(270542)] [DataRow(288546)] [DataRow(281569)]
+        public void Login_compatibility_does_not_bypass_unmorphed_cast_requirement(int id)
+        {
+            var f = new Fixture(id); f.Player.Stats.Set(CharacterStat.MonsterData, 270497);
+            Assert.IsTrue(f.Nano.Template.Actions.Where(a => a.ActionType == (int)ActionType.ToUse)
+                .SelectMany(a => a.Requirements).Any(r => r.StatNumber == (int)CharacterStat.MonsterData
+                    && r.Operator == (int)Operator.EqualTo && r.Value == 0));
+            Assert.IsTrue(f.Morph.TryPrepare(f.Player, f.Player, f.Nano, out _));
+            Assert.IsFalse(f.Service.TryCast(f.Player, id, f.Player.Identity));
+            Assert.AreEqual(0, f.Store.Commits); Assert.AreEqual(0, f.Store.Rows.Count);
+            Assert.AreEqual(270497, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(1000, f.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
+        }
+
+        [TestMethod]
+        public void Legacy_duration_only_record_normalizes_identity_without_rewriting_saved_appearance()
+        {
+            var f = new Fixture(270542, attach: false);
+            f.Player.Stats.Set(CharacterStat.MonsterData, 288538);
+            f.Store.Rows.Add(new(f.Nano.Id, f.Nano.Strain, 0, 1000, 0));
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player));
+            Assert.AreEqual(1, f.Store.Commits); Assert.IsTrue(f.Store.Rows.Single().NanoInstance > 0);
+            Assert.AreEqual(f.Now.AddSeconds(10).Ticks, f.Store.Rows.Single().ExpiresAtUtcTicks);
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base));
+            Assert.AreEqual(270497, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            f.Now = f.Now.AddSeconds(11); f.Service.Tick(f.Player);
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+        }
+
+        [TestMethod]
+        public void Expired_legacy_record_cannot_resurrect_effect_or_reset_the_opaque_baseline()
+        {
+            var f = new Fixture(270542, attach: false); f.Player.Stats.Set(CharacterStat.MonsterData, 288538);
+            f.Store.Rows.Add(new(f.Nano.Id, f.Nano.Strain, 9, 1000, f.Now.AddSeconds(-1).Ticks));
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player)); Assert.AreEqual(0, f.Store.Rows.Count);
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(100, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
+            Assert.AreEqual(0, f.Session.Raw.Count);
+        }
+
+        [TestMethod]
+        public void Opaque_baseline_rebase_and_death_preserve_storage_and_do_not_duplicate_effects()
+        {
+            var f = new Fixture(270542, attach: false); f.Player.Stats.Set(CharacterStat.MonsterData, 288538);
+            f.Store.Rows.Add(new(f.Nano.Id, f.Nano.Strain, 9, f.Nano.DurationCentiseconds,
+                f.Now.AddMilliseconds((long)f.Nano.DurationCentiseconds * 10).Ticks));
+            Assert.IsTrue(f.Service.AttachPlayer(f.Player));
+            f.Player.Stats.ClearBonuses(); f.Service.ReapplyBonusesAfterRebase(f.Player);
+            Assert.AreEqual(270497, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base));
+            Assert.AreEqual(250, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
+            f.Player.OnDeath(); f.Player.OnDeath();
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base));
+            // Preserve the current active-effect policy: death cancels pending casts;
+            // it does not introduce an unproven blanket deletion of durable nanos.
+            Assert.AreEqual(1, f.Service.GetActive(f.Player).Count);
+            f.Now = f.Now.AddMilliseconds((long)f.Nano.DurationCentiseconds * 10 + 1); f.Service.Tick(f.Player);
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
+            Assert.AreEqual(100, f.Player.Stats.GetOrZero(CharacterStat.RunSpeed));
         }
 
         [TestMethod]
@@ -274,7 +434,8 @@ namespace ZoneEngine_New.Tests
         [TestMethod]
         public void Sparrow_cast_in_sl_retains_morph_and_reacquires_only_proven_flight_after_zone_refresh()
         {
-            var f = new Fixture(82835); f.Player.Stats.Set((CharacterStat)531, 1); f.Cast();
+            var f = new Fixture(82835); f.Player.Stats.Set(CharacterStat.MonsterData, 288538);
+            f.Player.Stats.Set((CharacterStat)531, 1); f.Cast();
             Assert.AreEqual(30365, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
             Assert.AreEqual(0, f.Player.Stats.GetOrZero(CharacterStat.IsVehicle));
             f.Player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
@@ -282,6 +443,9 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, f.Player.Stats.GetOrZero(CharacterStat.IsVehicle));
             Assert.AreEqual(1, f.Store.Commits);
             Assert.AreEqual(1, f.Session.Bodies.OfType<CastNanoSpellMessage>().Count(m => m.NanoId == 273292));
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base));
+            Assert.IsTrue(f.Service.Remove(f.Player, f.Nano.Id));
+            Assert.AreEqual(288538, f.Player.Stats.GetOrZero(CharacterStat.MonsterData));
         }
 
         [TestMethod]

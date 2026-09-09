@@ -104,6 +104,16 @@ Stop-after-success rule:
 
 ## Build And Engines
 
+### Accepted ordinary binding export (offline)
+
+For the bounded Subway/Temple NewEngine consumer ledger, run
+`cmd /d /c Tools\export_accepted_ordinary_bindings.cmd --write`, then
+`cmd /d /c Tools\export_accepted_ordinary_bindings.cmd --check`.
+This evaluates the existing compiled catalog and exact per-variant combat resolver
+through the shared cross-platform Legacy project on Windows. It does not invoke
+the engine entry point, start listeners, access a database, or activate NPCs.
+It is not the broader capture census or a substitute for consumer lifecycle tests.
+
 After code changes that affect server binaries:
 
 1. Stop engines if running processes are locking build outputs.

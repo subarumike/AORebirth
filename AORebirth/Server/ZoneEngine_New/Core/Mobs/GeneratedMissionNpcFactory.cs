@@ -60,6 +60,7 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
     Lazy<GeneratedMissionAcgService> missions) : NpcCharacter(identity, items)
 {
     internal MissionNpcCombatRuntime? Combat { get; set; }
+    public override bool AcceptsPlayerCombatNanos => Combat?.Contract.IsCombatReady == true;
     bool _deathCommitted;
     protected override bool UsesPassiveRegen => false;
     protected override int DeathAnimationKey => 501; // MissionInstanceMobCombat.DeathParameter2.
