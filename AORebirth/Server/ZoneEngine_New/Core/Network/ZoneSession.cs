@@ -253,6 +253,25 @@ namespace ZoneEngine_New.Core.Network
                     landing.zf));
         }
 
+        public void SendSamePlayfieldRespawnTeleport(Vector3 landing)
+        {
+            ArgumentNullException.ThrowIfNull(landing);
+
+            Player? player = Player;
+            if (player == null)
+                throw new InvalidOperationException("Session has no bound player.");
+
+            Playfield? playfield = player.Playfield;
+            if (playfield == null)
+                throw new InvalidOperationException("Player is not on a playfield.");
+
+            int playfieldId = playfield.Identity.Instance;
+            Send(
+                BuildNormalTeleport(player, landing, playfieldId),
+                playfieldId,
+                player.Identity.Instance);
+        }
+
         private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId)
         {
             const IdentityType livePlayfieldProxyType = (IdentityType)0x0000C79E;

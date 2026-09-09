@@ -12,13 +12,10 @@ namespace ZoneEngine_New.Core.Entities
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
-    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
 
-    using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
-    using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     /// <summary>
@@ -141,7 +138,6 @@ namespace ZoneEngine_New.Core.Entities
         void Respawn()
         {
             Revive();
-            AnnounceDeathCleared();
 
             Playfield? playfield = Playfield;
             if (playfield == null)
@@ -161,9 +157,11 @@ namespace ZoneEngine_New.Core.Entities
 
             if (playfield.Identity.Instance == TemporaryRespawnPlayfieldId)
             {
-                AnnounceSamePlayfieldRespawn(landing);
+                playfield.GetRequiredService<SpawnService>().CompleteSamePlayfieldDeathRespawn(this, landing);
                 return;
             }
+
+            AnnounceDeathCleared();
 
             Playfield destination = playfield.GetRequiredService<PlayfieldManager>().GetOrCreate(TemporaryRespawnPlayfieldId);
             if (Session != null)
@@ -176,7 +174,9 @@ namespace ZoneEngine_New.Core.Entities
             destination.ArriveTransferredPlayer(this, landing);
         }
 
-        void AnnounceDeathCleared()
+        void AnnounceDeathCleared() => SendDeathRespawnAction();
+
+        internal void SendDeathRespawnAction()
         {
             IZoneSession? session = Session;
             if (session == null)
@@ -194,41 +194,6 @@ namespace ZoneEngine_New.Core.Entities
                     Parameter2 = DeathRespawnActionParameter2,
                     Unknown2 = 0
                 });
-        }
-
-        void AnnounceSamePlayfieldRespawn(Vector3 landing)
-        {
-            Position = landing;
-
-            Playfield? playfield = Playfield;
-            if (playfield == null)
-                return;
-
-            playfield.GetRequiredService<PlayfieldLocality>().Announce(
-                this,
-                new CharDCMoveMessage
-                {
-                    Identity = Identity,
-                    Unknown = 0x00,
-                    MoveType = (byte)MovementAction.FullStop,
-                    Heading = new MsgQuaternion
-                    {
-                        X = Rotation.xf,
-                        Y = Rotation.yf,
-                        Z = Rotation.zf,
-                        W = Rotation.wf
-                    },
-                    Coordinates = new MsgVector3
-                    {
-                        X = Position.xf,
-                        Y = Position.yf,
-                        Z = Position.zf
-                    },
-                    Unknown1 = 0,
-                    AuxA = 0,
-                    AuxB = 0
-                },
-                includeSelf: true);
         }
 
         public override void Rebase()

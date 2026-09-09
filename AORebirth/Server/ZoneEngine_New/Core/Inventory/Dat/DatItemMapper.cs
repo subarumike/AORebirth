@@ -12,31 +12,8 @@ namespace ZoneEngine_New.Core.Inventory.Dat
     {
         public static ItemTemplate ToTemplate(DatItemTemplate dat, string name)
         {
-            var spellList = new Dictionary<EventType, List<ItemSpell>>();
-            if (dat.Events != null)
-            {
-                foreach (DatEvent ev in dat.Events)
-                {
-                    var spells = new List<ItemSpell>();
-                    if (ev.Functions != null)
-                    {
-                        foreach (DatFunction function in ev.Functions)
-                            spells.Add(ToSpell(function));
-                    }
-
-                    if (spellList.TryGetValue(ev.EventType, out List<ItemSpell>? existing))
-                        existing.AddRange(spells);
-                    else
-                        spellList[ev.EventType] = spells;
-                }
-            }
-
-            var actions = new List<ItemAction>();
-            if (dat.Actions != null)
-            {
-                foreach (DatAction action in dat.Actions)
-                    actions.Add(ToAction(action));
-            }
+            Dictionary<EventType, List<ItemSpell>> spellList = ToSpellList(dat.Events);
+            List<ItemAction> actions = ToActions(dat.Actions);
 
             return new ItemTemplate
             {
@@ -54,6 +31,70 @@ namespace ZoneEngine_New.Core.Inventory.Dat
                 Actions = actions,
                 Relations = dat.Relations != null ? new List<int>(dat.Relations) : new List<int>()
             };
+        }
+
+        /// <summary>
+        /// Rebuilds <paramref name="template"/> with event and action data from the companion
+        /// file. Everything the RDB export owns is carried across unchanged.
+        /// </summary>
+        public static ItemTemplate WithEvents(ItemTemplate template, ItemEventsDatTemplate events)
+        {
+            return new ItemTemplate
+            {
+                Id = template.Id,
+                Name = template.Name,
+                Quality = template.Quality,
+                Flags = template.Flags,
+                ItemType = template.ItemType,
+                DynelType = template.DynelType,
+                MultipleCount = template.MultipleCount,
+                Stats = template.Stats,
+                Attack = template.Attack,
+                Defend = template.Defend,
+                SpellList = ToSpellList(events.Events),
+                Actions = ToActions(events.Actions),
+                Relations = events.Relations != null
+                    ? new List<int>(events.Relations)
+                    : new List<int>(template.Relations),
+                IsBuff = template.IsBuff,
+                CanCancel = template.CanCancel
+            };
+        }
+
+        private static Dictionary<EventType, List<ItemSpell>> ToSpellList(List<DatEvent>? events)
+        {
+            var spellList = new Dictionary<EventType, List<ItemSpell>>();
+            if (events == null)
+                return spellList;
+
+            foreach (DatEvent ev in events)
+            {
+                var spells = new List<ItemSpell>();
+                if (ev.Functions != null)
+                {
+                    foreach (DatFunction function in ev.Functions)
+                        spells.Add(ToSpell(function));
+                }
+
+                if (spellList.TryGetValue(ev.EventType, out List<ItemSpell>? existing))
+                    existing.AddRange(spells);
+                else
+                    spellList[ev.EventType] = spells;
+            }
+
+            return spellList;
+        }
+
+        private static List<ItemAction> ToActions(List<DatAction>? actions)
+        {
+            var result = new List<ItemAction>();
+            if (actions == null)
+                return result;
+
+            foreach (DatAction action in actions)
+                result.Add(ToAction(action));
+
+            return result;
         }
 
         private static Dictionary<CharacterStat, int> ToCharacterStatMap(Dictionary<int, int>? source)

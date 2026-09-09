@@ -124,9 +124,25 @@ namespace ZoneEngine_New.Core.Entities
             Stats.Set(CharacterStat.Flags, updated, StatDetail.Base, dirty: true);
         }
 
-        /// <summary>NPC WIFUs not implemented yet.</summary>
+        /// <summary>
+        /// Announces equipped combat weapons after SCFU only when they need owner-linked WIFU.
+        /// Tag-backed NPC natural weapons stay SAW/AttackInfo-only (no fist/WIFU).
+        /// </summary>
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
-            => new();
+        {
+            var messages = new List<WeaponItemFullUpdateMessage>();
+            foreach (CharacterWeapon? armed in Weapons.Values)
+            {
+                if (armed?.Item == null || armed.WireSlot < 0)
+                    continue;
+
+                WeaponItemFullUpdateMessage? message = TryBuildWeaponItemFullUpdate(armed.Item, armed.WireSlot, armed);
+                if (message != null)
+                    messages.Add(message);
+            }
+
+            return messages;
+        }
 
         public override InfoPacketMessage BuildInfoPacket()
         {
@@ -199,64 +215,98 @@ namespace ZoneEngine_New.Core.Entities
         {
             ClearWeapons();
 
-            bool armedMain = false;
-            bool armedOff = false;
+            int quality = Stats.GetOrOne(CharacterStat.Level);
+            int armed = 0;
             bool maCombined = false;
 
-            List<List<int>>? equipment = MobTemplate?.Equipment;
-            if (equipment != null && equipment.Count > 0)
+            // Prefer template Weapons (LowId/HighId/Hash). Fall back to Equipment (no SAW hash).
+            if (!TryArmNpcWeapons(MobTemplate?.Weapons, quality, ref armed, ref maCombined))
+                TryArmNpcEquipment(MobTemplate?.Equipment, quality, ref armed, ref maCombined);
+
+            if (armed == 0)
             {
-                int quality = Stats.GetOrOne(CharacterStat.Level);
-
-                for (int i = 0; i < equipment.Count; i++)
-                {
-                    if (armedMain && armedOff)
-                        break;
-
-                    List<int> pair = equipment[i];
-                    if (pair == null || pair.Count < 1)
-                        continue;
-
-                    int lowId = pair[0];
-                    int highId = pair.Count >= 2 ? pair[1] : lowId;
-                    if (lowId <= 0)
-                        continue;
-
-                    Item item = _items.Create(lowId, highId, quality, ItemSource.Other);
-                    if (!item.IsWieldableCombatWeapon())
-                        continue;
-
-                    WeaponSlot slot = ResolveHandSlot(i, equipment.Count, armedMain, armedOff);
-                    if (slot == WeaponSlot.None)
-                        continue;
-
-                    ArmFromItem(slot, item);
-                    if (slot == WeaponSlot.MainHand)
-                        armedMain = true;
-                    else
-                        armedOff = true;
-
-                    if (item.IsMaCombinedWeapon())
-                        maCombined = true;
-                }
+                FinishWeaponRebase(_items, armedMain: false, armedOff: false, maCombined: false);
+                return;
             }
 
-            FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
+            if (maCombined)
+                ArmMartialArtsFist(_items, WeaponSlot.CombinedMA);
+
+            ResetAllWeaponAttacks();
         }
 
-        static WeaponSlot ResolveHandSlot(int equipmentSlot, int equipmentCount, bool armedMain, bool armedOff)
+        bool TryArmNpcWeapons(
+            List<MobWeaponEntry>? source,
+            int quality,
+            ref int armed,
+            ref bool maCombined)
         {
-            if (equipmentSlot == (int)WeaponSlots.Righthand)
-                return armedMain ? WeaponSlot.None : WeaponSlot.MainHand;
-            if (equipmentSlot == (int)WeaponSlots.LeftHand)
-                return armedOff ? WeaponSlot.None : WeaponSlot.OffHand;
-            if (equipmentCount > (int)WeaponSlots.LeftHand)
-                return WeaponSlot.None;
-            if (!armedMain)
-                return WeaponSlot.MainHand;
-            if (!armedOff)
-                return WeaponSlot.OffHand;
-            return WeaponSlot.None;
+            if (source == null || source.Count == 0)
+                return false;
+
+            bool armedAny = false;
+            for (int i = 0; i < source.Count && armed < MaxNpcCombatWeapons; i++)
+            {
+                MobWeaponEntry? entry = source[i];
+                if (entry == null)
+                    continue;
+
+                int lowId = entry.LowId;
+                int highId = entry.HighId > 0 ? entry.HighId : lowId;
+                if (lowId <= 0)
+                    continue;
+
+                Item item = _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other);
+                if (!item.IsWieldableCombatWeapon())
+                    continue;
+
+                WeaponSlot slot = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
+                ArmFromItem(slot, item, wireSlot: armed, sawHash: entry.Hash);
+                armed++;
+                armedAny = true;
+                if (item.IsMaCombinedWeapon())
+                    maCombined = true;
+            }
+
+            return armedAny;
         }
+
+        bool TryArmNpcEquipment(
+            List<List<int>>? source,
+            int quality,
+            ref int armed,
+            ref bool maCombined)
+        {
+            if (source == null || source.Count == 0)
+                return false;
+
+            bool armedAny = false;
+            for (int i = 0; i < source.Count && armed < MaxNpcCombatWeapons; i++)
+            {
+                List<int> pair = source[i];
+                if (pair == null || pair.Count < 1)
+                    continue;
+
+                int lowId = pair[0];
+                int highId = pair.Count >= 2 ? pair[1] : lowId;
+                if (lowId <= 0)
+                    continue;
+
+                Item item = _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other);
+                if (!item.IsWieldableCombatWeapon())
+                    continue;
+
+                WeaponSlot slot = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
+                ArmFromItem(slot, item, wireSlot: armed);
+                armed++;
+                armedAny = true;
+                if (item.IsMaCombinedWeapon())
+                    maCombined = true;
+            }
+
+            return armedAny;
+        }
+
+        const int MaxNpcCombatWeapons = 8;
     }
 }

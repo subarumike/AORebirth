@@ -22,6 +22,16 @@ namespace ZoneEngine_New.Core.Mobs
         public Dictionary<int, int> Stats { get; set; } = new();
     }
 
+    /// <summary>NPC template combat weapon: low/high AOID + 4-char SAW hash.</summary>
+    public sealed class MobWeaponEntry
+    {
+        public int LowId { get; set; }
+
+        public int HighId { get; set; }
+
+        public string Hash { get; set; } = string.Empty;
+    }
+
     /// <summary>
     /// Full NPC template as stored in GameData/NpcTemplate.json.
     /// </summary>
@@ -49,7 +59,8 @@ namespace ZoneEngine_New.Core.Mobs
         /// <summary>Per-slot AOID lists from the template Equipment jagged array.</summary>
         public List<List<int>> Equipment { get; set; } = new();
 
-        public List<List<int>> Weapons { get; set; } = new();
+        /// <summary>Combat weapons as LowId/HighId/Hash for SAW + AttackInfo.</summary>
+        public List<MobWeaponEntry> Weapons { get; set; } = new();
 
         /// <summary>SCFU texture overrides keyed by place. Empty omits the texture block.</summary>
         public Dictionary<int, int> Textures { get; set; } = new();

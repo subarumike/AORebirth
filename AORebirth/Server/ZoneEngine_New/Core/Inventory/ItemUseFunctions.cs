@@ -12,19 +12,25 @@ namespace ZoneEngine_New.Core.Inventory
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.WorldSimulation;
+
+    using Quaternion = AORebirth.Core.Vector.Quaternion;
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     /// <summary>OnUse FunctionType implementations that ZoneEngine_New can run today.</summary>
     internal static class ItemUseFunctions
     {
         public static bool TryExecute(
             int templateId,
-            Player player,
+            Character target,
+            Character? source,
             ItemSpell spell,
             IInventoryRepository inventoryRepository,
             IItemBuilder items)
         {
-            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
@@ -32,21 +38,25 @@ namespace ZoneEngine_New.Core.Inventory
             switch ((FunctionType)spell.FunctionType)
             {
                 case FunctionType.OpenBank:
-                    return OpenBank(player, inventoryRepository, items);
+                    return target is Player bankPlayer
+                        && OpenBank(bankPlayer, inventoryRepository, items);
                 case FunctionType.Hit:
-                    return Hit(player, spell);
+                    return Hit(target, source, spell);
                 case FunctionType.Set:
-                    return Set(player, spell);
+                    return Set(target, spell);
                 case FunctionType.SetFlag:
-                    return SetFlag(player, spell);
+                    return SetFlag(target, spell);
                 case FunctionType.ClearFlag:
-                    return ClearFlag(player, spell);
+                    return ClearFlag(target, spell);
                 case FunctionType.SystemText:
-                    return SystemText(player, spell);
+                case FunctionType.Text:
+                    return target is Player textPlayer && SystemText(textPlayer, spell);
                 case FunctionType.SaveChar:
                     return true;
                 case FunctionType.UploadNano:
-                    return UploadNano(player, spell);
+                    return target is Player uploadPlayer && UploadNano(uploadPlayer, spell);
+                case FunctionType.TeleportProxy2:
+                    return target is Player proxyPlayer && TeleportProxy2(proxyPlayer, spell);
                 default:
                     LogUtil.Debug(
                         DebugInfoDetail.Network,
@@ -55,7 +65,7 @@ namespace ZoneEngine_New.Core.Inventory
                             "Unhandled OnUse FunctionType={0} template={1} character={2}",
                             spell.FunctionType,
                             templateId,
-                            player.Identity.Instance));
+                            target.Identity.Instance));
                     return false;
             }
         }
@@ -71,19 +81,30 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
-        static bool Hit(Player player, ItemSpell spell)
+        static bool Hit(Character target, Character? source, ItemSpell spell)
         {
             if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int minHit))
                 return false;
 
+            // Hit args: Stat, Min, Max [, AC]. Collapsed Stat, Amount, ACType when Amount<0 and third>0.
             int maxHit = minHit;
+            int acStat = 0;
             if (TryGetInt(spell.Arguments, 2, out int third))
             {
                 maxHit = third;
-                if (spell.Arguments.Count == 3 && minHit < 0 && maxHit > 0)
+                if (spell.Arguments.Count == 3 && minHit < 0 && third > 0)
+                {
+                    acStat = third;
                     maxHit = minHit;
-                else if (spell.Arguments.Count >= 4 && minHit < 0 && maxHit > 0)
-                    maxHit = minHit;
+                }
+                else if (spell.Arguments.Count >= 4)
+                {
+                    if (TryGetInt(spell.Arguments, 3, out int fourth))
+                        acStat = fourth;
+
+                    if (minHit < 0 && maxHit > 0)
+                        maxHit = minHit;
+                }
             }
 
             if (minHit > maxHit)
@@ -99,57 +120,51 @@ namespace ZoneEngine_New.Core.Inventory
 
             var stat = (CharacterStat)statId;
             if (stat == CharacterStat.Health)
-                return ApplyHealthDelta(player, delta);
+                return ApplyHealthDelta(target, source, delta, acStat);
 
             if (stat == CharacterStat.CurrentNano || stat == CharacterStat.NanoPool)
-                return ApplyNanoDelta(player, delta);
+                return ApplyNanoDelta(target, delta);
 
-            player.Stats.Set(stat, player.Stats.GetOrZero(stat, StatDetail.Base) + delta, StatDetail.Base, dirty: true);
-            player.FlushDirtyStats();
+            target.Stats.Set(stat, target.Stats.GetOrZero(stat, StatDetail.Base) + delta, StatDetail.Base, dirty: true);
+            target.FlushDirtyStats();
             return true;
         }
 
-        static bool ApplyHealthDelta(Player player, int delta)
+        static bool ApplyHealthDelta(Character target, Character? source, int delta, int acStat)
         {
+            Character caster = source ?? target;
+
             if (delta < 0)
             {
-                player.ApplyDamage(player, -delta, HitType.Normal);
-                player.FlushDirtyStats();
+                int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
+                target.ApplyDamage(caster, -delta, HitType.Normal);
+                target.FlushDirtyStats();
+
+                int after = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
+                int actual = before - after;
+                if (actual > 0)
+                    target.AnnounceHealthDamage(caster, after, -actual, acStat);
+
                 return true;
             }
 
-            int maxHealth = Math.Max(1, player.Stats.GetOrZero(CharacterStat.MaxHealth));
-            int current = Math.Max(0, player.Stats.GetOrZero(CharacterStat.Health));
+            int maxHealth = Math.Max(1, target.Stats.GetOrZero(CharacterStat.MaxHealth));
+            int current = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
             int applied = Math.Min(delta, Math.Max(0, maxHealth - current));
             if (applied <= 0)
                 return true;
 
-            player.Stats.Set(CharacterStat.Health, current + applied, StatDetail.Base, dirty: true);
-            player.FlushDirtyStats();
-
-            if (player.Session != null)
-            {
-                player.Session.Send(
-                    new ChatTextMessage
-                    {
-                        Identity = player.Identity,
-                        Text = string.Format(
-                            CultureInfo.InvariantCulture,
-                            "You healed yourself for {0} points.",
-                            applied),
-                        Unknown1 = 0,
-                        Unknown2 = 0,
-                        Unknown3 = 0
-                    });
-            }
-
+            int healed = current + applied;
+            target.Stats.Set(CharacterStat.Health, healed, StatDetail.Base, dirty: true);
+            target.FlushDirtyStats();
+            target.AnnounceHealthDamage(caster, healed, applied, damageTypeStat: 0);
             return true;
         }
 
-        static bool ApplyNanoDelta(Player player, int delta)
+        static bool ApplyNanoDelta(Character target, int delta)
         {
-            int maxNano = Math.Max(0, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
-            int current = Math.Max(0, player.Stats.GetOrZero(CharacterStat.CurrentNano));
+            int maxNano = Math.Max(0, target.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
+            int current = Math.Max(0, target.Stats.GetOrZero(CharacterStat.CurrentNano));
             int next = delta >= 0
                 ? current + Math.Min(delta, Math.Max(0, maxNano - current))
                 : Math.Max(0, current + delta);
@@ -157,22 +172,22 @@ namespace ZoneEngine_New.Core.Inventory
             if (next == current)
                 return true;
 
-            player.Stats.Set(CharacterStat.CurrentNano, next, StatDetail.Base, dirty: true);
-            player.FlushDirtyStats();
+            target.Stats.Set(CharacterStat.CurrentNano, next, StatDetail.Base, dirty: true);
+            target.FlushDirtyStats();
             return true;
         }
 
-        static bool Set(Player player, ItemSpell spell)
+        static bool Set(Character target, ItemSpell spell)
         {
             if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int value))
                 return false;
 
-            player.Stats.Set((CharacterStat)statId, value, StatDetail.Base, dirty: true);
-            player.FlushDirtyStats();
+            target.Stats.Set((CharacterStat)statId, value, StatDetail.Base, dirty: true);
+            target.FlushDirtyStats();
             return true;
         }
 
-        static bool SetFlag(Player player, ItemSpell spell)
+        static bool SetFlag(Character target, ItemSpell spell)
         {
             if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int bitIndex))
                 return false;
@@ -181,13 +196,13 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             var stat = (CharacterStat)statId;
-            int current = player.Stats.GetOrZero(stat, StatDetail.Base);
-            player.Stats.Set(stat, current | (1 << bitIndex), StatDetail.Base, dirty: true);
-            player.FlushDirtyStats();
+            int current = target.Stats.GetOrZero(stat, StatDetail.Base);
+            target.Stats.Set(stat, current | (1 << bitIndex), StatDetail.Base, dirty: true);
+            target.FlushDirtyStats();
             return true;
         }
 
-        static bool ClearFlag(Player player, ItemSpell spell)
+        static bool ClearFlag(Character target, ItemSpell spell)
         {
             if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int bitIndex))
                 return false;
@@ -196,9 +211,9 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             var stat = (CharacterStat)statId;
-            int current = player.Stats.GetOrZero(stat, StatDetail.Base);
-            player.Stats.Set(stat, current & ~(1 << bitIndex), StatDetail.Base, dirty: true);
-            player.FlushDirtyStats();
+            int current = target.Stats.GetOrZero(stat, StatDetail.Base);
+            target.Stats.Set(stat, current & ~(1 << bitIndex), StatDetail.Base, dirty: true);
+            target.FlushDirtyStats();
             return true;
         }
 
@@ -219,13 +234,59 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
+        /// <summary>
+        /// One-way proxy teleport used by Grid enter terminals and similar OnUse machines.
+        /// Destination is packed as PlayfieldDoor (playfield + door index); the landing dynel may
+        /// be a Door or a Terminal with that packed instance.
+        /// </summary>
+        static bool TeleportProxy2(Player player, ItemSpell spell)
+        {
+            if (player.Session == null || player.Playfield == null)
+                return false;
+
+            if (!PortalDoorLandingResolver.TryParseProxyDestination(
+                    spell.Arguments,
+                    PortalDoorLandingResolver.Proxy2EntryDoorClearance,
+                    recordsReturn: false,
+                    out PortalDestination destination))
+                return false;
+
+            Playfield source = player.Playfield;
+            if (destination.PlayfieldId == source.Identity.Instance)
+                return false;
+
+            IGameData gameData = source.GetRequiredService<IGameData>();
+            if (!PortalDoorLandingResolver.TryResolveProxyLanding(
+                    gameData.GetPlayfieldGeometry(destination.PlayfieldId),
+                    destination.DoorInstance,
+                    destination.DoorClearance,
+                    out Vector3 landing,
+                    out Quaternion heading))
+                return false;
+
+            // TeleportProxy2 is one-way: clear any stale return door so exit proxies cannot pull
+            // the character back to an unrelated entry.
+            player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+            player.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+            player.Rotation = heading;
+
+            Playfield destPlayfield = source.GetRequiredService<PlayfieldManager>()
+                .GetOrCreate(destination.PlayfieldId);
+            player.Session.TransferToPlayfield(destPlayfield, landing);
+            return true;
+        }
+
         static bool UploadNano(Player player, ItemSpell spell)
         {
             if (!TryGetInt(spell.Arguments, 0, out int nanoId) || nanoId <= 0)
                 return false;
 
+            // A nano already in the list is not uploaded again, and the crystal is not spent.
             if (!player.TryAddUploadedNano(nanoId))
-                return true;
+            {
+                AlreadyUploaded(player);
+                return false;
+            }
 
             player.MarkUploadedNanoDirty(nanoId);
             player.Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);
@@ -246,6 +307,22 @@ namespace ZoneEngine_New.Core.Inventory
                     Unknown2 = 0
                 });
             return true;
+        }
+
+        static void AlreadyUploaded(Player player)
+        {
+            if (player.Session == null)
+                return;
+
+            player.Session.Send(
+                new ChatTextMessage
+                {
+                    Identity = player.Identity,
+                    Text = "You already know that nano program.",
+                    Unknown1 = 0,
+                    Unknown2 = 0,
+                    Unknown3 = 0
+                });
         }
 
         static bool TryGetInt(System.Collections.Generic.List<object> arguments, int index, out int result)

@@ -138,6 +138,38 @@ namespace ZoneEngine_New.Core.WorldSimulation
         }
 
         /// <summary>
+        /// Reads a TeleportProxy / TeleportProxy2 argument list of the form
+        /// <c>{PlayfieldDoor, destPlayfieldId, destDoorIndex, ...}</c>.
+        /// </summary>
+        public static bool TryParseProxyDestination(
+            IList? arguments,
+            float clearance,
+            bool recordsReturn,
+            out PortalDestination destination)
+        {
+            destination = default;
+            if (arguments == null
+                || arguments.Count < 3
+                || ToInt(arguments[0]) != (int)IdentityType.PlayfieldDoor)
+                return false;
+
+            int playfieldId = ToInt(arguments[1]);
+            int doorIndex = ToInt(arguments[2]);
+            if (!IsAddressable(playfieldId, doorIndex) || playfieldId <= 0)
+                return false;
+
+            destination = new PortalDestination
+            {
+                PlayfieldId = playfieldId,
+                Kind = PortalLandingKind.DoorDynel,
+                DoorInstance = ToDoorInstance(playfieldId, doorIndex),
+                DoorClearance = clearance,
+                RecordsReturn = recordsReturn
+            };
+            return true;
+        }
+
+        /// <summary>
         /// Finds the destination door in <paramref name="geometry"/> and reports where it puts the
         /// arriving character: <paramref name="clearance"/> units out along the door's heading. A
         /// dynel instance is only unique per identity type — playfield 3084 has a Terminal, a
@@ -149,24 +181,80 @@ namespace ZoneEngine_New.Core.WorldSimulation
             int doorInstance,
             float clearance,
             out Vector3 landing)
+            => TryResolveLandingForType(
+                geometry,
+                doorInstance,
+                (int)IdentityType.Door,
+                clearance,
+                out landing,
+                out _);
+
+        /// <summary>
+        /// Resolves a TeleportProxy2 OnUse landing. Grid enter terminals pack a PlayfieldDoor
+        /// destination instance that is often a <see cref="IdentityType.Terminal"/> on the
+        /// destination playfield (not a Door), so Terminal is tried after Door.
+        /// </summary>
+        public static bool TryResolveProxyLanding(
+            PlayfieldGeometryData? geometry,
+            int destinationInstance,
+            float clearance,
+            out Vector3 landing,
+            out Quaternion heading)
+        {
+            if (TryResolveLandingForType(
+                    geometry,
+                    destinationInstance,
+                    (int)IdentityType.Door,
+                    clearance,
+                    out landing,
+                    out heading))
+                return true;
+
+            return TryResolveLandingForType(
+                geometry,
+                destinationInstance,
+                (int)IdentityType.Terminal,
+                clearance,
+                out landing,
+                out heading);
+        }
+
+        /// <summary>
+        /// Places the character <paramref name="clearance"/> units in front of an anchor along its
+        /// heading (Z-forward). Used by door and terminal proxy landings.
+        /// </summary>
+        public static Vector3 LandingInFront(Vector3 position, Quaternion heading, float clearance)
+        {
+            var forward = (Vector3)heading.RotateVector3(Vector3.AxisZ);
+            return new Vector3(
+                position.x + (forward.x * clearance),
+                position.y,
+                position.z + (forward.z * clearance));
+        }
+
+        static bool TryResolveLandingForType(
+            PlayfieldGeometryData? geometry,
+            int destinationInstance,
+            int identityType,
+            float clearance,
+            out Vector3 landing,
+            out Quaternion heading)
         {
             landing = default!;
+            heading = default!;
             List<PlayfieldDynel>? dynels = geometry?.Dynels?.Dynels;
             if (dynels == null)
                 return false;
 
             for (int i = 0; i < dynels.Count; i++)
             {
-                PlayfieldDynel door = dynels[i];
-                if (door.IdentityInstance != doorInstance || door.IdentityType != (int)IdentityType.Door)
+                PlayfieldDynel dynel = dynels[i];
+                if (dynel.IdentityInstance != destinationInstance || dynel.IdentityType != identityType)
                     continue;
 
-                var heading = new Quaternion(door.Heading.X, door.Heading.Y, door.Heading.Z, door.Heading.W);
-                var forward = (Vector3)heading.RotateVector3(Vector3.AxisZ);
-                landing = new Vector3(
-                    door.Position.X + (forward.x * clearance),
-                    door.Position.Y,
-                    door.Position.Z + (forward.z * clearance));
+                heading = new Quaternion(dynel.Heading.X, dynel.Heading.Y, dynel.Heading.Z, dynel.Heading.W);
+                var position = new Vector3(dynel.Position.X, dynel.Position.Y, dynel.Position.Z);
+                landing = LandingInFront(position, heading, clearance);
                 return true;
             }
 
@@ -217,25 +305,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
                 for (int s = 0; s < sets!.Count; s++)
                 {
-                    if (!TryGetArgumentList(sets[s], out IList? values)
-                        || values!.Count < 3
-                        || ToInt(values[0]) != (int)IdentityType.PlayfieldDoor)
+                    if (!TryGetArgumentList(sets[s], out IList? values))
                         continue;
 
-                    int playfieldId = ToInt(values[1]);
-                    int doorIndex = ToInt(values[2]);
-                    if (!IsAddressable(playfieldId, doorIndex) || playfieldId <= 0)
-                        continue;
-
-                    destination = new PortalDestination
-                    {
-                        PlayfieldId = playfieldId,
-                        Kind = PortalLandingKind.DoorDynel,
-                        DoorInstance = ToDoorInstance(playfieldId, doorIndex),
-                        DoorClearance = clearance,
-                        RecordsReturn = recordsReturn
-                    };
-                    return true;
+                    if (TryParseProxyDestination(values, clearance, recordsReturn, out destination))
+                        return true;
                 }
             }
 

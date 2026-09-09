@@ -25,6 +25,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -272,6 +273,7 @@ namespace ZoneEngine_New.Core.Playfield
             };
 
             ItemTemplate template = _items.CreateTemplate(record.TemplateId, record.TemplateId, 1);
+            template = DynelEventSpells.WithOnUseFromDynel(template, record);
             StaticDynel dynel;
             if (MissionTerminal.IsMissionTerminalType(identity.Type))
                 dynel = new MissionTerminal(identity, template);
@@ -518,6 +520,62 @@ namespace ZoneEngine_New.Core.Playfield
                     "Player {0} left playfield {1} for transfer",
                     player.Identity.Instance,
                     _playfield.Identity.Instance));
+        }
+
+        /// <summary>
+        /// Death respawn when the hospital is on the current playfield. Mirrors live in-zone respawn:
+        /// N3Teleport, playfield ready block, self spawn packets, then DeathRespawn action.
+        /// </summary>
+        public void CompleteSamePlayfieldDeathRespawn(Player player, Vector3 landing)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(landing);
+
+            IZoneSession? session = player.Session;
+            if (session == null)
+                return;
+
+            int characterId = player.Identity.Instance;
+            int playfieldId = _playfield.Identity.Instance;
+
+            session.SendSamePlayfieldRespawnTeleport(landing);
+            player.Position = landing;
+
+            session.Send(
+                _playfield.CreatePlayfieldAnarchyFMessage(
+                    new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                    {
+                        X = landing.xf,
+                        Y = landing.yf,
+                        Z = landing.zf
+                    }),
+                playfieldId,
+                characterId);
+
+            SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
+            ScfuSendLog.Write(spawn);
+            session.Send(spawn);
+            foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
+                session.Send(wifu);
+            session.Send(player.BuildFullCharacterMessage());
+
+            session.Send(
+                new GameTimeMessage
+                {
+                    Identity = new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = characterId
+                    },
+                    Unknown1 = 30024.0f,
+                    Unknown3 = 185408,
+                    Unknown4 = 80183.3125f
+                },
+                playfieldId,
+                characterId);
+
+            _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+            player.SendDeathRespawnAction();
         }
 
         /// <summary>

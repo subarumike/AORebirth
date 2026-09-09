@@ -17,6 +17,7 @@ namespace ZoneEngine_New.Core.Inventory
         private readonly Dictionary<int, ItemTemplate> _templates;
         private readonly IZoneLogger _logger;
         private readonly string _itemsDatPath;
+        private readonly string _itemEventsDatPath;
 
         public ItemTemplateCatalog(IItemNameRepository names, IGameData gameData, IZoneLogger logger)
         {
@@ -25,6 +26,7 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
             _itemsDatPath = Path.Combine(gameData.RootPath, GameDataPaths.ItemsFileName);
+            _itemEventsDatPath = Path.Combine(gameData.RootPath, GameDataPaths.ItemEventsFileName);
             _templates = new Dictionary<int, ItemTemplate>(capacity: 130000);
 
             IReadOnlyDictionary<int, string> nameMap = names.GetAllNames();
@@ -42,6 +44,8 @@ namespace ZoneEngine_New.Core.Inventory
                     Quality = 1
                 };
             }
+
+            TryLoadItemEventsDat();
 
             _logger.Info(
                 string.Format(
@@ -100,6 +104,56 @@ namespace ZoneEngine_New.Core.Inventory
                         CultureInfo.InvariantCulture,
                         "Failed to load GameData items.dat from {0}; continuing with name stubs",
                         _itemsDatPath));
+            }
+        }
+
+        /// <summary>
+        /// Merges OnUse/OnWear events from the legacy companion overlay onto RDB templates.
+        /// RDB-exported items.dat already embeds events; IDs absent from this overlay keep those.
+        /// </summary>
+        private void TryLoadItemEventsDat()
+        {
+            if (!File.Exists(_itemEventsDatPath))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData {0} not found at {1}; templates rely on events embedded in items.dat",
+                        GameDataPaths.ItemEventsFileName,
+                        _itemEventsDatPath));
+                return;
+            }
+
+            try
+            {
+                Dictionary<int, ItemEventsDatTemplate> events = ItemEventsDatReader.Read(_itemEventsDatPath);
+                int merged = 0;
+                foreach (KeyValuePair<int, ItemEventsDatTemplate> pair in events)
+                {
+                    if (!_templates.TryGetValue(pair.Key, out ItemTemplate? template))
+                        continue;
+
+                    _templates[pair.Key] = DatItemMapper.WithEvents(template, pair.Value);
+                    merged++;
+                }
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Merged item events into {0} of {1} templates from {2}",
+                        merged,
+                        events.Count,
+                        _itemEventsDatPath));
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load {0} from {1}; templates rely on events embedded in items.dat",
+                        GameDataPaths.ItemEventsFileName,
+                        _itemEventsDatPath));
             }
         }
     }

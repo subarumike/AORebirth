@@ -5,13 +5,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
-    using ZoneEngine_New.Core.Entities;
-    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
 
     /// <summary>
-    /// Client asks to cast a nano. This only starts the cast bar; the buff lands when the bar
-    /// finishes, and every gate is re-checked at that point.
+    /// Server→client cast-bar visual. Client cast requests arrive as
+    /// <see cref="CharacterActionType.CastNano"/> (Parameter2 = nano id).
+    /// Starting a cast from this inbound packet double-applies with CharacterAction.
     /// </summary>
     public sealed class CastNanoSpellMessageHandler : IMessageHandler<CastNanoSpellMessage>
     {
@@ -26,15 +25,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
         {
             ArgumentNullException.ThrowIfNull(message);
             ArgumentNullException.ThrowIfNull(session);
-
-            if (session.State != SessionState.InPlay)
-                return;
-
-            Player? player = session.Player;
-            if (player?.Playfield == null)
-                return;
-
-            NanoRuntime.TryStartCast(player, message.NanoId, message.Target, DateTime.UtcNow);
         }
     }
 }

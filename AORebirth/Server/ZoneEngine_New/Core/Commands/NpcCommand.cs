@@ -262,7 +262,7 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             AppendIdLists(lines, "equipment", template.Equipment);
-            AppendIdLists(lines, "weapon", template.Weapons);
+            AppendWeaponEntries(lines, template.Weapons);
 
             Dictionary<int, int> textures = template.Textures;
             if (textures == null || textures.Count == 0)
@@ -369,6 +369,35 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             return lines;
+        }
+
+        void AppendWeaponEntries(List<string> lines, List<MobWeaponEntry> weapons)
+        {
+            if (weapons == null || weapons.Count == 0)
+            {
+                lines.Add("  weapon (empty)");
+                return;
+            }
+
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                MobWeaponEntry? entry = weapons[i];
+                if (entry == null || entry.LowId <= 0)
+                {
+                    lines.Add(
+                        string.Format(CultureInfo.InvariantCulture, "  weapon[{0}] (empty)", i));
+                    continue;
+                }
+
+                int highId = entry.HighId > 0 ? entry.HighId : entry.LowId;
+                lines.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "  weapon[{0}] {1} hash={2}",
+                        i,
+                        FormatItemPair(entry.LowId, highId),
+                        string.IsNullOrEmpty(entry.Hash) ? "(none)" : entry.Hash));
+            }
         }
 
         void AppendIdLists(List<string> lines, string label, List<List<int>> lists)

@@ -69,6 +69,11 @@
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- Legacy item events overlay (RDB items.dat now carries events; nanos are not in this file). -->
+    <Content Include="..\..\Datafiles\items.dat">
+      <Link>GameData\ItemEvents.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

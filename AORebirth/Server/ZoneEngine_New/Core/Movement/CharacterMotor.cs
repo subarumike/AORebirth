@@ -405,24 +405,28 @@ namespace ZoneEngine_New.Core.Movement
             {
                 case MovementAction.ForwardStart:
                     SetFlags(_flags | MovementFlags.Forward);
+                    InterruptCastOnLocomotion();
                     break;
                 case MovementAction.ForwardStop:
                     SetFlags(_flags & ~MovementFlags.Forward);
                     break;
                 case MovementAction.BackwardStart:
                     SetFlags(_flags | MovementFlags.Backward);
+                    InterruptCastOnLocomotion();
                     break;
                 case MovementAction.BackwardStop:
                     SetFlags(_flags & ~MovementFlags.Backward);
                     break;
                 case MovementAction.StrafeLeftStart:
                     SetFlags(_flags | MovementFlags.StrafeLeft);
+                    InterruptCastOnLocomotion();
                     break;
                 case MovementAction.StrafeLeftStop:
                     SetFlags(_flags & ~MovementFlags.StrafeLeft);
                     break;
                 case MovementAction.StrafeRightStart:
                     SetFlags(_flags | MovementFlags.StrafeRight);
+                    InterruptCastOnLocomotion();
                     break;
                 case MovementAction.StrafeRightStop:
                     SetFlags(_flags & ~MovementFlags.StrafeRight);
@@ -454,12 +458,14 @@ namespace ZoneEngine_New.Core.Movement
                     break;
                 case MovementAction.ElevateUpStart:
                     SetFlags((_flags | MovementFlags.ElevateUp) & ~MovementFlags.ElevateDown);
+                    InterruptCastOnLocomotion();
                     break;
                 case MovementAction.ElevateUpStop:
                     SetFlags(_flags & ~MovementFlags.ElevateUp);
                     break;
                 case MovementAction.ElevateDownStart:
                     SetFlags((_flags | MovementFlags.ElevateDown) & ~MovementFlags.ElevateUp);
+                    InterruptCastOnLocomotion();
                     break;
                 case MovementAction.ElevateDownStop:
                     SetFlags(_flags & ~MovementFlags.ElevateDown);
@@ -510,6 +516,9 @@ namespace ZoneEngine_New.Core.Movement
                     break;
             }
         }
+
+        void InterruptCastOnLocomotion()
+            => _character.InterruptTimedActions(TimedActionInterrupt.Movement);
 
         void SetFlags(MovementFlags flags)
         {

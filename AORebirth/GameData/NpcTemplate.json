@@ -196,8 +196,9 @@
 		],
 		"MinLevel": 1,
 		"MaxLevel": 250,
-		"Equipment": [
-			[44008, 44007]
+		"Equipment": [],
+		"Weapons": [
+			{ "LowId": 44008, "HighId": 44007, "Hash": "AAAA" }
 		],
 		"Attackable": true,
 		"KnuBotId": 1131,

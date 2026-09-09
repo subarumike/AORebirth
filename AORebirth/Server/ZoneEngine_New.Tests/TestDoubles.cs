@@ -88,14 +88,19 @@ namespace ZoneEngine_New.Tests
     {
         readonly Dictionary<int, ItemTemplate> _templates = new();
 
-        public StubCatalog Add(int id, int quality, int price = 0, int flags = 0)
+        public StubCatalog Add(int id, int quality, int price = 0, int flags = 0, int multipleCount = 0)
         {
+            var stats = new Dictionary<CharacterStat, int> { [CharacterStat.Value] = price };
+            if (multipleCount > 0)
+                stats[CharacterStat.MultipleCount] = multipleCount;
+
             _templates[id] = new ItemTemplate
             {
                 Id = id,
                 Quality = quality,
                 Flags = flags,
-                Stats = new Dictionary<CharacterStat, int> { [CharacterStat.Value] = price }
+                MultipleCount = multipleCount,
+                Stats = stats
             };
             return this;
         }
@@ -158,23 +163,35 @@ namespace ZoneEngine_New.Tests
             ItemFlags flags = 0,
             int instanceId = 1,
             bool persisted = true,
-            string name = "Item")
-            => new()
+            string name = "Item",
+            CanFlags can = 0,
+            int stackCount = 1,
+            IEnumerable<ItemSpell>? onUse = null)
+        {
+            var spellList = new Dictionary<EventType, List<ItemSpell>>();
+            if (onUse != null)
+                spellList[EventType.OnUse] = new List<ItemSpell>(onUse);
+
+            return new Item
             {
                 InstanceId = instanceId,
                 IsPersisted = persisted,
                 LowId = lowId,
                 HighId = highId,
                 Quality = quality,
+                StackCount = stackCount,
                 Source = ItemSource.Command,
                 Definition = new ItemTemplate
                 {
                     Id = lowId,
                     Name = name,
                     Quality = quality,
-                    Flags = (int)flags
+                    Flags = (int)flags,
+                    Stats = new Dictionary<CharacterStat, int> { [CharacterStat.Can] = unchecked((int)can) },
+                    SpellList = spellList
                 }
             };
+        }
 
         /// <summary>Fills main inventory so the next placement has to fall through to overflow.</summary>
         public static void FillInventory(Player player)
@@ -295,6 +312,41 @@ namespace ZoneEngine_New.Tests
             => throw new NotSupportedException();
     }
 
+    /// <summary>Every call throws: item use paths must not reach the database.</summary>
+    internal sealed class StubInventoryRepository : IInventoryRepository
+    {
+        public IReadOnlyList<ItemInstanceRecord> GetCarriedItems(int characterId)
+            => throw new NotSupportedException();
+
+        public IReadOnlyList<ItemInstanceRecord> GetBankItems(int characterId)
+            => throw new NotSupportedException();
+
+        public IReadOnlyList<ItemInstanceRecord> GetContainerItems(int containerInstanceId)
+            => throw new NotSupportedException();
+
+        public int LeaseInstanceIdBlock(int count) => throw new NotSupportedException();
+
+        public ItemInstanceRecord Insert(ItemInstanceRecord item) => throw new NotSupportedException();
+
+        public void UpdateLocation(int instanceId, int containerType, int containerInstance, int containerPlacement)
+            => throw new NotSupportedException();
+
+        public void UpdateLocations(IReadOnlyList<ItemLocationUpdate> locations)
+            => throw new NotSupportedException();
+
+        public void PersistNewAndUpdateLocations(
+            IReadOnlyList<ItemInstanceRecord> inserts,
+            IReadOnlyList<ItemLocationUpdate> updates)
+            => throw new NotSupportedException();
+    }
+
+    internal sealed class StubInstanceIdAllocator : IItemInstanceIdAllocator
+    {
+        int _next = 500000;
+
+        public int Allocate() => ++_next;
+    }
+
     internal sealed class RecordingZoneSession : IZoneSession
     {
         public SessionState State { get; set; } = SessionState.Connected;
@@ -310,6 +362,9 @@ namespace ZoneEngine_New.Tests
         public void UnbindPlayer() => Player = null;
 
         public void TransferToPlayfield(Playfield destination, Vector3 landing)
+            => throw new NotSupportedException();
+
+        public void SendSamePlayfieldRespawnTeleport(Vector3 landing)
             => throw new NotSupportedException();
 
         public void Send(byte[] packet)

@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Nanos
 
     using Utility;
 
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
@@ -69,6 +70,10 @@ namespace ZoneEngine_New.Core.Nanos
 
             if (nanoId <= 0)
                 return NanoCastRefusal.NotUploaded;
+
+            // Same click often delivers two start packets; the second must not refresh/remove.
+            if (caster.IsDuplicateRecentNanoLand(nanoId, target, nowUtc))
+                return NanoCastRefusal.None;
 
             if (!TryResolveSpell(caster, nanoId, out NanoSpell? spell) || spell == null)
             {
@@ -135,6 +140,24 @@ namespace ZoneEngine_New.Core.Nanos
             return outcome;
         }
 
+        /// <summary>
+        /// Drops a cast bar in flight and tells nearby clients. Successful cast completion
+        /// clears via <see cref="Character.CancelNanoCast"/> without this packet.
+        /// </summary>
+        public static bool InterruptCast(Character character)
+        {
+            ArgumentNullException.ThrowIfNull(character);
+
+            PendingNanoCast? cast = character.PendingCast;
+            if (cast == null)
+                return false;
+
+            int nanoId = cast.Spell.Id;
+            character.CancelNanoCast();
+            AnnounceCastInterrupted(character, nanoId);
+            return true;
+        }
+
         static void Complete(Character caster, PendingNanoCast cast, DateTime nowUtc)
         {
             NanoSpell spell = cast.Spell;
@@ -143,11 +166,17 @@ namespace ZoneEngine_New.Core.Nanos
             // Everything the up-front gate checked can have changed while the bar ran.
             NanoCastRefusal refusal = NanoCastRules.Evaluate(
                 BuildAttempt(caster, spell, recipient, cast.NanoCost, nowUtc));
+            // Cast bar already went out via CastNanoSpell; refusal must clear it.
             if (refusal != NanoCastRefusal.None)
             {
+                AnnounceCastInterrupted(caster, spell.Id);
                 Refuse(caster, NanoCastRules.Describe(refusal));
                 return;
             }
+
+            // Duplicate instant-cast packets can both reach Complete before the land window closes.
+            if (!caster.TryClaimNanoLand(spell.Id, cast.Target, nowUtc))
+                return;
 
             SpendNano(caster, cast.NanoCost);
             AnnounceCastFinished(caster, spell.Id);
@@ -162,7 +191,7 @@ namespace ZoneEngine_New.Core.Nanos
 
             if (!spell.IsBuff)
             {
-                //TODO: Instant nano effects (heals, damage, teleports) once nano functions land.
+                ExecuteOnUseEffects(caster, recipient!, spell, skipPassiveModifiers: false);
                 return;
             }
 
@@ -173,7 +202,9 @@ namespace ZoneEngine_New.Core.Nanos
                 out Buff? applied,
                 out Buff? replaced);
 
-            if (replaced != null)
+            // Player casts use SetNanoDuration for NCU display (legacy never Buff-adds on land).
+            // Buff remove is only for a different nano leaving the same strain.
+            if (replaced != null && replaced.Id != spell.Id)
                 AnnounceBuffRemoved(recipient, replaced);
 
             if (applied == null)
@@ -182,8 +213,8 @@ namespace ZoneEngine_New.Core.Nanos
                 return;
             }
 
-            AnnounceBuffAdded(recipient, applied);
             SendNanoDuration(caster, recipient, applied);
+            ExecuteOnUseEffects(caster, recipient, spell, skipPassiveModifiers: true);
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
@@ -303,23 +334,67 @@ namespace ZoneEngine_New.Core.Nanos
                     Unknown2 = 0
                 });
 
-        /// <summary>NCU icons are client-local, so buff add/remove goes to the owner only.</summary>
-        static void AnnounceBuffAdded(Character owner, Buff buff)
-            => SessionOf(owner)?.Send(
-                new BuffMessage
-                {
-                    Identity = owner.Identity,
-                    Action = 0,
-                    // Live add uses the owner instance as the identity type; remove uses NanoProgram.
-                    NanoProgram = new Identity
-                    {
-                        Type = (IdentityType)owner.Identity.Instance,
-                        Instance = buff.Id
-                    }
-                });
+        static void AnnounceCastInterrupted(Character caster, int nanoId)
+        {
+            var message = new CharacterActionMessage
+            {
+                Identity = caster.Identity,
+                Unknown = 0x00,
+                Action = CharacterActionType.InterruptNanoCasting,
+                Unknown1 = 0,
+                Target = Identity.None,
+                Parameter1 = 1,
+                Parameter2 = nanoId,
+                Unknown2 = 0
+            };
+
+            // Cast bar lives on the caster client; always deliver there first.
+            SessionOf(caster)?.Send(message);
+
+            Cell? cell = caster.Cell;
+            if (cell != null)
+                cell.Announce(message, exclude: caster);
+        }
+
+        static void ExecuteOnUseEffects(
+            Character caster,
+            Character recipient,
+            NanoSpell spell,
+            bool skipPassiveModifiers)
+        {
+            Playfield? playfield = recipient.Playfield ?? caster.Playfield;
+            if (playfield == null)
+                return;
+
+            IInventoryRepository inventory = playfield.GetRequiredService<IInventoryRepository>();
+            IItemBuilder items = playfield.GetRequiredService<IItemBuilder>();
+            spell.ExecuteOnUseSpells(recipient, inventory, items, skipPassiveModifiers, source: caster);
+            recipient.FlushDirtyStats();
+        }
+
+        static void ExecuteBuffEnd(Character owner, Buff buff)
+        {
+            buff.ReverseOnUseSetFlags(owner);
+
+            Playfield? playfield = owner.Playfield;
+            if (playfield != null)
+            {
+                IInventoryRepository inventory = playfield.GetRequiredService<IInventoryRepository>();
+                IItemBuilder items = playfield.GetRequiredService<IItemBuilder>();
+                buff.ExecuteTerminateSpells(owner, inventory, items);
+            }
+
+            if (owner is Player)
+                owner.FlushDirtyStats();
+            else
+                owner.MarkRebaseDirty();
+        }
 
         static void AnnounceBuffRemoved(Character owner, Buff buff)
-            => SessionOf(owner)?.Send(
+        {
+            ExecuteBuffEnd(owner, buff);
+
+            SessionOf(owner)?.Send(
                 new BuffMessage
                 {
                     Identity = owner.Identity,
@@ -330,6 +405,7 @@ namespace ZoneEngine_New.Core.Nanos
                         Instance = buff.Id
                     }
                 });
+        }
 
         /// <summary>Duration drives the NCU countdown; both caster and target need it.</summary>
         static void SendNanoDuration(Character caster, Character owner, Buff buff)
