@@ -1,0 +1,326 @@
+{
+  "originMasterSha": "6e90dda030774726aa2060acb9edb756ea1f635c",
+  "newEngineBaseSha": "4dac603b82dfe64206b155e7e6c0499a9f8ad7f8",
+  "integrationBranch": "codex/newengine-production-cutover-001",
+  "integrationWorktree": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\cutover001",
+  "method": "Fast-forward from origin/master; complete ten-commit history retained; no conflicts; no master changes discarded",
+  "developerBranch": "origin/New-ZoneEngine",
+  "developerSha": "53c858d9900266fb6740975dbb2b5011a5792e66",
+  "developerBranchTouched": false,
+  "importedCommits": [
+    {
+      "sha": "206418a9c558dd06002fc9982fd9fb948c22a81c",
+      "subject": "Repair Linux source inventories for Delmus integration"
+    },
+    {
+      "sha": "108798f6c29f1fbdc79fcfe8b14bd975dfdebdec",
+      "subject": "Update Linux SQL artifact acceptance for Delmus schema asset"
+    },
+    {
+      "sha": "307e87670f9d26b50b1ed26e019684726600c52c",
+      "subject": "Document Delmus cross-platform integration acceptance"
+    },
+    {
+      "sha": "d0377a6ad2f38674b36467150750c6f0023d12f2",
+      "subject": "Integrate schema-safe NewEngine candidate and cross-platform acceptance"
+    },
+    {
+      "sha": "6dab287bd52590d7b9c0e7054bef95160a1594ba",
+      "subject": "Refresh Windows-authoritative contracts and enforce pre-Linux parity"
+    },
+    {
+      "sha": "b3ebcffa6b2a557db080a32fa76165124bed800f",
+      "subject": "Integrate durable ZoneEngine_New gameplay and acceptance coverage"
+    },
+    {
+      "sha": "05c8d4ef7429e1ed765a19bd63ace0e21a2b29e5",
+      "subject": "Reconcile Windows-authoritative gameplay compatibility inventories"
+    },
+    {
+      "sha": "e31142e850063726adfda0d33b5b68b0ed6b309f",
+      "subject": "Restore accepted NPC interactions and supported gameplay contracts"
+    },
+    {
+      "sha": "44fa42fce316d98c1d5f6326d92caae909398289",
+      "subject": "Reconcile Delmus safety fixes and restore exact Buckethead summon"
+    },
+    {
+      "sha": "4dac603b82dfe64206b155e7e6c0499a9f8ad7f8",
+      "subject": "Preserve legacy morph appearance and wire exact Mongo runtime"
+    }
+  ],
+  "newerImportedCommits": [],
+  "newerComparisonBase": "d2d9844673a766c02aa768623db9f0ab5b6ea01c",
+  "newerChanges": [
+    {
+      "file": "AORebirth/GameData/NpcTemplate.json",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/GameData/items.dat",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/AttackInfoRulesTests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/HitHealthDamageTests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/ItemChargeTests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/NpcWeaponItemFullUpdateTests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/SpecialAttackWeaponTests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/TeleportProxy2Tests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/TestDoubles.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/UploadNanoTests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Commands/NpcCommand.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/IInventoryRepository.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/CharacterWeapon.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Helpers/AttackInfoRules.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Helpers/DamageCalculator.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Dat/DatItemMapper.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Dat/ItemEventsDatReader.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Item.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemBuilder.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemTemplate.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemTemplateCatalog.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemUseFunctions.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/PlayerInventory.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/StatModifierSpells.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CastNanoSpellMessageHandler.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobTemplates.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoRuntime.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Network/IZoneSession.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneSession.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "classification": "CONFLICTING",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Conflicts with reconciled owner; separate semantic reconciliation required."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DynelEventSpells.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PortalDoorLandingResolver.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "Tools/RDBDataExtractor/FunctionSets.cfg",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "Tools/RDBDataExtractor/ItemDatExporter.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "Tools/RDBDataExtractor/ItemRdbMapper.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "Tools/RDBDataExtractor/RDBDataExtractor.csproj",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    },
+    {
+      "file": "Tools/RDBDataExtractor/SelfTests.cs",
+      "classification": "UNKNOWN",
+      "disposition": "NOT_IMPORTED",
+      "reason": "Footprint inspected; no cutover necessity established. Detailed semantic review remains open."
+    }
+  ]
+}

@@ -82,6 +82,7 @@ try
     InventoryMutationSmoke.Validate(fixture, connection);
     ActiveNanoSmoke.Validate(fixture, connection);
     AuthoredMissionSmoke.Validate(fixture, connection);
+    CutoverDurableReloadSmoke.Validate(args[2], fixture, connection);
 
     // A missing real world package is a lifecycle failure, not a reason to lose the
     // independent schema and transactional-import proofs completed above.

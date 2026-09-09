@@ -9,6 +9,15 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- Mike's `codex/newengine-production-cutover-001` integrates the full reconciled
+  history through `4dac603b` without editing the developer branch or master.
+  NewEngine is the candidate default; Legacy remains explicitly selectable.
+  Cutover policy now permits incomplete gameplay while requiring operational and
+  durable-state integrity. Generic item effects without a transaction owner now
+  reject durable mutations before any effect. Cutover evidence, environmental
+  blockers, and follow-up dependency/DAO inventories live in
+  `docs/reports/NEWENGINE_CUTOVER_HANDOFF.md`. This is not production acceptance.
+
 - The follow-on `codex/zoneengine-final-runtime-consumers` candidate starts at
   `44fa42fc`. Its deterministic source ledger reconstructs exactly 489 ordinary
   bindings (322 Subway / 167 Temple), without falsely reporting them connected.

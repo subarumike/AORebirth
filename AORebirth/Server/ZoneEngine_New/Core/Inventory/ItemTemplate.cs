@@ -123,8 +123,12 @@ namespace ZoneEngine_New.Core.Inventory
             if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells) || spells.Count == 0)
                 return false;
 
+            // This generic executor has no aggregate persistence transaction. Durable
+            // effects belong to InventoryActionService or another explicit transactional
+            // owner. A later failure must never leave an earlier stat/upload effect dirty.
             foreach (ItemSpell spell in spells)
-                if (!ItemUseFunctions.CanExecute(player, spell)) return false;
+                if (((FunctionType)spell.FunctionType is not FunctionType.OpenBank and not FunctionType.SystemText)
+                    || !ItemUseFunctions.CanExecute(player, spell)) return false;
             foreach (ItemSpell spell in spells)
                 if (!ExecuteSpell(player, spell, inventoryRepository, items)) return false;
 

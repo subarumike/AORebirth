@@ -2,6 +2,40 @@
 
 ## First Checks
 
+### NewEngine cutover foundation
+
+The Mike-owned cutover branch accepts a reduced feature set; full gameplay parity
+is not the operational gate. Preserve all durable-state and schema checks.
+Do not merge master, change production, remove Legacy, or alter the developer
+branch during this milestone. Historical all-parity promotion requirements are
+superseded for this explicitly scoped foundation task.
+
+After the normal NewEngine Debug build, generate/check the source inventory:
+
+```cmd
+cmd /d /c Tools\generate_newengine_cutover_inventory.cmd --write
+cmd /d /c Tools\generate_newengine_cutover_inventory.cmd --check
+```
+
+The Roslyn tool reads the NewEngine project-reference graph and source; it does
+not load engine code, access a database, or modify gameplay. It requires the
+normal Debug reference assemblies. Dependency symbols are compiler-resolved;
+DAO method/table candidates retain explicit static-analysis limits.
+
+For disposable schema/transaction/restart validation use the existing wrapper
+with its required explicit engine path:
+
+```cmd
+cmd /d /c Tools\run_zoneengine_schema_validation.cmd --run-disposable --engine <absolute-built-ZoneEngine_New.dll>
+```
+
+This fixture accepts no application connection string and creates its own
+labelled loopback MySQL. It includes exact item/credit/location fresh-repository
+reloads across engine restarts and a Legacy-table staleness check. Its
+`LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED` result must never be relabelled full
+account-login/character-selection/reconnect acceptance. See the operational
+report for that remaining boundary.
+
 Run:
 
 ```cmd

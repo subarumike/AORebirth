@@ -321,6 +321,35 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        [DataRow(FunctionType.Set)]
+        [DataRow(FunctionType.Hit)]
+        [DataRow(FunctionType.SetFlag)]
+        [DataRow(FunctionType.ClearFlag)]
+        [DataRow(FunctionType.UploadNano)]
+        public void GenericDurableEffectsRejectBeforeAnyEffectOrRepositoryAccess(FunctionType function)
+        {
+            using var w = new World(); Item item = w.Add(11, 2);
+            w.Player.Stats.Set(CharacterStat.Cash, 100);
+            item.SpellList[EventType.OnUse] = new List<ItemSpell>
+            {
+                new() { FunctionType = (int)FunctionType.SystemText, Target = (int)ItemTarget.User,
+                    Arguments = new List<object> { "must not publish before rejecting the durable effect" } },
+                new() { FunctionType = (int)function, Target = (int)ItemTarget.User,
+                    Arguments = new List<object> { (int)CharacterStat.Cash, 1 } },
+                // Bank hydration would throw through this rejecting repository. Even
+                // recognized functions cannot make the earlier mutation safe to publish.
+                new() { FunctionType = (int)FunctionType.OpenBank, Target = (int)ItemTarget.User }
+            };
+            Assert.IsFalse(item.Definition.ExecuteOnUseSpells(w.Player, new RejectingInventory(), new StubItemBuilder()));
+            Assert.AreEqual(100, w.Player.Stats.GetOrZero(CharacterStat.Cash));
+            Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
+            Assert.AreEqual(11, item.InstanceId);
+            Assert.AreEqual(2, item.StackCount);
+            Assert.AreEqual(0, w.Persistence.Calls);
+            Assert.AreEqual(0, w.Session.Messages.Count);
+        }
+
+        [TestMethod]
         public void MissionGrantPlanIsPureCapacityCheckedAndPublishedOnce()
         {
             using var w = new World(); Item reward = TestWorld.CreateItem(instanceId: 88, persisted: false);
