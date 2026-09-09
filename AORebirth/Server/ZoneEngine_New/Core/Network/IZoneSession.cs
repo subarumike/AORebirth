@@ -22,6 +22,11 @@ namespace ZoneEngine_New.Core.Network
 
         void TransferToPlayfield(Playfield destination, Vector3 landing);
 
+        /// <summary>
+        /// In-zone death respawn: N3Teleport with ChangePlayfield set to the current playfield.
+        /// </summary>
+        void SendSamePlayfieldRespawnTeleport(Vector3 landing);
+
         void Send(byte[] packet);
 
         void Send(Message message);

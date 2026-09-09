@@ -56,6 +56,12 @@ namespace ZoneEngine_New.Core.Data
             + "ContainerInstance = @ContainerInstance, ContainerPlacement = @ContainerPlacement "
             + "WHERE InstanceId = @InstanceId";
 
+        private const string UpdateLocationAndCountSql =
+            "UPDATE item_instances SET ContainerType = @ContainerType, "
+            + "ContainerInstance = @ContainerInstance, ContainerPlacement = @ContainerPlacement, "
+            + "StackCount = @StackCount "
+            + "WHERE InstanceId = @InstanceId";
+
         private readonly IZoneLogger _logger;
         private readonly string _connectionString;
 
@@ -288,11 +294,12 @@ namespace ZoneEngine_New.Core.Data
 
             foreach (ItemLocationUpdate update in updates)
             {
-                using MySqlCommand commit = new MySqlCommand(UpdateLocationSql, connection, transaction);
+                using MySqlCommand commit = new MySqlCommand(UpdateLocationAndCountSql, connection, transaction);
                 commit.Parameters.AddWithValue("@InstanceId", update.InstanceId);
                 commit.Parameters.AddWithValue("@ContainerType", update.ContainerType);
                 commit.Parameters.AddWithValue("@ContainerInstance", update.ContainerInstance);
                 commit.Parameters.AddWithValue("@ContainerPlacement", update.ContainerPlacement);
+                commit.Parameters.AddWithValue("@StackCount", Math.Max(1, update.StackCount));
                 if (commit.ExecuteNonQuery() == 0)
                 {
                     throw new InvalidOperationException(

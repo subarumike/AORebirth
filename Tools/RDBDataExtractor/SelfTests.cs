@@ -17,6 +17,7 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestPlayfieldDatFileNames();
             TestItemsDatFileName();
             TestItemsDatDynelTypeRoundTrip();
+            TestHitFunctionArgOrdering();
             TestCollisionDatFraming();
             TestSurfacesDatFraming();
             Console.WriteLine("RDBDataExtractor self-test PASS");
@@ -237,6 +238,36 @@ namespace AORebirth.Tools.RDBDataExtractor
             {
                 throw new InvalidOperationException(
                     "items.dat file name was unexpected.");
+            }
+        }
+
+        private static void TestHitFunctionArgOrdering()
+        {
+            var keyed = new Dictionary<AODB.Common.Enums.FunctionOperator, object>
+            {
+                { AODB.Common.Enums.FunctionOperator.Duration, 1 },
+                { AODB.Common.Enums.FunctionOperator.Interval, 0u },
+                { AODB.Common.Enums.FunctionOperator.ApplyOn, 3u },
+                { AODB.Common.Enums.FunctionOperator.TargetList, 9u },
+                { AODB.Common.Enums.FunctionOperator.Stat, 27u },
+                { AODB.Common.Enums.FunctionOperator.Min, -12 },
+                { AODB.Common.Enums.FunctionOperator.Max, -22 },
+                { AODB.Common.Enums.FunctionOperator.DamageType, 90u },
+            };
+
+            ZoneEngine_New.Core.Inventory.Dat.DatFunction function =
+                ItemRdbMapper.ToFunction((int)AODB.Common.Enums.FunctionType.Hit, keyed);
+
+            if (function.Target != 3
+                || function.TickCount != 1
+                || function.Arguments.Values.Count != 4
+                || function.Arguments.Values[0].AsInt32() != 27
+                || function.Arguments.Values[1].AsInt32() != -12
+                || function.Arguments.Values[2].AsInt32() != -22
+                || function.Arguments.Values[3].AsInt32() != 90)
+            {
+                throw new InvalidOperationException(
+                    "Hit function positional args did not match Weak Smiting Missile layout.");
             }
         }
 

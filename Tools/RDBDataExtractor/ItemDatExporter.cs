@@ -15,15 +15,11 @@ namespace AORebirth.Tools.RDBDataExtractor
 
     /// <summary>
     /// Exports AODB <see cref="ItemObject"/> and <see cref="NanoObject"/> records
-    /// into one GameData/items.dat, including DynelType.
+    /// into one GameData/items.dat, including DynelType, events, and actions.
     /// </summary>
     internal sealed class ItemDatExporter
     {
         internal const int NanoRecordType = 1040005;
-
-        private const int QualityStat = 54;
-        private const int FlagsStat = 0;
-        private const int MultipleCountStat = 412;
 
         private readonly RdbController controller;
         private readonly string gameDataDirectory;
@@ -79,11 +75,21 @@ namespace AORebirth.Tools.RDBDataExtractor
             List<DatItemTemplate> templates = this.BuildTemplates();
             ItemsDatWriter.Write(path, templates);
 
+            int withEvents = 0;
+            for (int i = 0; i < templates.Count; i++)
+            {
+                DatItemTemplate template = templates[i];
+                if (template.Events.Count > 0 || template.Actions.Count > 0)
+                    withEvents++;
+            }
+
             Console.WriteLine(
                 "exported "
                 + GameDataPaths.ItemsFileName
                 + " templates="
-                + templates.Count);
+                + templates.Count
+                + " withEventsOrActions="
+                + withEvents);
             return new ExportFileCounts(1, 0);
         }
 
@@ -97,7 +103,14 @@ namespace AORebirth.Tools.RDBDataExtractor
                 if (item == null)
                     continue;
 
-                templates.Add(Map(itemId, item.DynelType, item.Stats));
+                templates.Add(
+                    ItemRdbMapper.Map(
+                        itemId,
+                        item.DynelType,
+                        item.Stats,
+                        item.SkillChecks,
+                        item.Modifiers,
+                        item.Requirements));
             }
 
             foreach (int nanoId in this.controller.RecordTypeToId[NanoRecordType].Keys.OrderBy(id => id))
@@ -108,39 +121,18 @@ namespace AORebirth.Tools.RDBDataExtractor
                 if (nano == null)
                     continue;
 
-                templates.Add(Map(nanoId, nano.DynelType, nano.Stats));
+                templates.Add(
+                    ItemRdbMapper.Map(
+                        nanoId,
+                        nano.DynelType,
+                        nano.Stats,
+                        nano.SkillChecks,
+                        nano.Modifiers,
+                        nano.Requirements));
             }
 
             templates.Sort((left, right) => left.ID.CompareTo(right.ID));
             return templates;
-        }
-
-        internal static DatItemTemplate Map(int id, int dynelType, Dictionary<StatId, uint> stats)
-        {
-            var template = new DatItemTemplate
-            {
-                ID = id,
-                DynelType = dynelType,
-                Quality = 1,
-            };
-
-            if (stats == null)
-                return template;
-
-            foreach (KeyValuePair<StatId, uint> pair in stats)
-            {
-                int key = (int)pair.Key;
-                int value = unchecked((int)pair.Value);
-                template.Stats[key] = value;
-                if (key == QualityStat && value > 0)
-                    template.Quality = value;
-                else if (key == FlagsStat)
-                    template.Flags = value;
-                else if (key == MultipleCountStat)
-                    template.MultipleCount = value;
-            }
-
-            return template;
         }
     }
 }

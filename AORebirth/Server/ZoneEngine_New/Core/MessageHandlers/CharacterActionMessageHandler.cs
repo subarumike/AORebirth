@@ -74,6 +74,15 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     AnnounceAction(player, CharacterActionType.StopSneaking);
                     break;
 
+                case CharacterActionType.CastNano:
+                    // Client cast request: Parameter2 = nano id, Target = recipient.
+                    NanoRuntime.TryStartCast(player, message.Parameter2, message.Target, DateTime.UtcNow);
+                    break;
+
+                case CharacterActionType.InterruptNanoCasting:
+                    NanoRuntime.InterruptCast(player);
+                    break;
+
                 case CharacterActionType.RemoveFriendlyNano:
                     CancelNano(player, message);
                     break;
@@ -125,19 +134,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
         }
 
         /// <summary>
-        /// NCU cancel from the client. The nano is read from the NanoProgram identity the client
-        /// sends; legacy also guessed the nano from instance ids and from "there is only one
-        /// active nano", which cancelled the wrong buff, so an unresolved request is refused.
+        /// NCU cancel from the client. Live cancel often arrives as Target=None with the nano id
+        /// in Parameter2; Target.Type=NanoProgram is accepted when present. No single-buff guess.
         /// </summary>
         static void CancelNano(Player player, CharacterActionMessage message)
         {
-            int nanoId = message.Target.Type == IdentityType.NanoProgram ? message.Target.Instance : 0;
+            int nanoId = ResolveCancelNanoId(message);
             if (nanoId <= 0)
             {
                 player.Logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "RemoveFriendlyNano without a NanoProgram target: target={0} p1={1} p2={2} character={3}",
+                        "RemoveFriendlyNano without a nano id: target={0} p1={1} p2={2} character={3}",
                         message.Target,
                         message.Parameter1,
                         message.Parameter2,
@@ -146,6 +154,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             NanoRuntime.TryCancelBuff(player, nanoId);
+        }
+
+        static int ResolveCancelNanoId(CharacterActionMessage message)
+        {
+            if (message.Target.Type == IdentityType.NanoProgram && message.Target.Instance > 0)
+                return message.Target.Instance;
+
+            return message.Parameter2 > 0 ? message.Parameter2 : 0;
         }
 
         static void ApplyStand(Player player)

@@ -131,8 +131,72 @@ namespace ZoneEngine_New.Core.Inventory
             if (!Can(CanFlags.Use))
                 return false;
 
-            Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
+            if (!Definition.ExecuteOnUseSpells(player, inventoryRepository, items))
+                return false;
+
+            ConsumeCharge(player, slotIdentity);
             return true;
+        }
+
+        /// <summary>
+        /// Spends one charge of a consumable after its OnUse functions ran. The item is destroyed
+        /// once the last charge is gone: the slot is cleared, the row is retired so a relog cannot
+        /// bring it back, and the client is told to drop the slot.
+        /// </summary>
+        internal void ConsumeCharge(Player player, Identity slotIdentity)
+        {
+            if (!Can(CanFlags.Consume) || InstanceId <= 0)
+                return;
+
+            PlayerInventory inventory = player.Inventory;
+            int placement = slotIdentity.Instance;
+            if (!inventory.TryResolvePageByPlacement(placement, out Container page, out bool isWearPage)
+                || isWearPage)
+                return;
+
+            if (!page.Content.TryGetValue(placement, out Item? occupant) || !ReferenceEquals(occupant, this))
+                return;
+
+            if (StackCount > 1)
+            {
+                StackCount--;
+                inventory.MarkDirty(this, page, placement);
+            }
+            else
+            {
+                // A locked item is mid-move; leave the charge alone rather than half-destroy it.
+                if (page.Remove(placement) == null)
+                    return;
+
+                StackCount = 0;
+                inventory.Discard(this, ConsumedGraveyard(player));
+                SendDeleteItem(player, page.Identity.Type, placement);
+            }
+
+            player.Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);
+        }
+
+        /// <summary>
+        /// Location a consumed item's row is parked at. No carried, bank, or backpack query selects
+        /// <see cref="IdentityType.None"/>, and placement is the instance id, so it cannot collide.
+        /// </summary>
+        static Identity ConsumedGraveyard(Player player)
+            => new() { Type = IdentityType.None, Instance = player.Identity.Instance };
+
+        static void SendDeleteItem(Player player, IdentityType pageType, int placement)
+        {
+            player.Session!.Send(
+                new CharacterActionMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.DeleteItem,
+                    Unknown1 = 0,
+                    Target = new Identity { Type = pageType, Instance = placement },
+                    Parameter1 = 0,
+                    Parameter2 = 0,
+                    Unknown2 = 0
+                });
         }
 
         bool TryUseBackpack(

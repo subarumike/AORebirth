@@ -35,6 +35,13 @@ namespace AORebirth.Core.GameData
 
         public const string ItemsFileName = "items.dat";
 
+        /// <summary>
+        /// Optional OnUse/OnWear overlay. Prefer events written into <see cref="ItemsFileName"/> by
+        /// RDBDataExtractor; this companion remains for legacy Datafiles extracts that already
+        /// encode positional function arguments.
+        /// </summary>
+        public const string ItemEventsFileName = "ItemEvents.dat";
+
         public const string WallsFileName = "Walls.dat";
 
         public const string DynelsFileName = "Dynels.dat";

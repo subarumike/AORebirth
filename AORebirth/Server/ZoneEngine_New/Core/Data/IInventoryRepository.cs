@@ -49,12 +49,18 @@ namespace ZoneEngine_New.Core.Data
 
     public readonly struct ItemLocationUpdate
     {
-        public ItemLocationUpdate(int instanceId, int containerType, int containerInstance, int containerPlacement)
+        public ItemLocationUpdate(
+            int instanceId,
+            int containerType,
+            int containerInstance,
+            int containerPlacement,
+            int stackCount = 1)
         {
             InstanceId = instanceId;
             ContainerType = containerType;
             ContainerInstance = containerInstance;
             ContainerPlacement = containerPlacement;
+            StackCount = stackCount;
         }
 
         public int InstanceId { get; }
@@ -64,5 +70,8 @@ namespace ZoneEngine_New.Core.Data
         public int ContainerInstance { get; }
 
         public int ContainerPlacement { get; }
+
+        /// <summary>Remaining charges. Written with the location so spent charges survive a relog.</summary>
+        public int StackCount { get; }
     }
 }

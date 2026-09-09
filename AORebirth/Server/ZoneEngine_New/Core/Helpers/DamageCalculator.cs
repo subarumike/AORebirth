@@ -63,15 +63,26 @@ namespace ZoneEngine_New.Core.Helpers
                 amsCap = NormalizeStat(weapon.GetStat(CharacterStat.AMSCap));
                 fullAutoClip = NormalizeStat(weapon.GetStat(CharacterStat.MaxEnergy));
                 attackDefendSource = weapon.Definition;
+
+                // Fist / incomplete templates often lack min/max. Fall back to natural damage so
+                // the swing still lands and AttackInfo can drive the client animation.
                 if (weaponMin <= 0 && weaponMax <= 0)
-                    return new DamageResult(false, 0, HitType.Normal);
+                {
+                    weaponMin = Math.Max(
+                        NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.MinDamage)),
+                        NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.MaxDamage)));
+                    weaponMax = Math.Max(weaponMin, 1);
+                    if (weaponCritBonus <= 0)
+                        weaponCritBonus = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.DamageBonus));
+                    attackDefendSource = null;
+                }
             }
             else
             {
                 weaponMin = Math.Max(
                     NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.MinDamage)),
                     NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.MaxDamage)));
-                weaponMax = weaponMin;
+                weaponMax = Math.Max(weaponMin, 1);
                 weaponCritBonus = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.DamageBonus));
                 rawDamageType = 0;
                 amsCap = 0;

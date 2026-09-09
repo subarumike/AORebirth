@@ -19,6 +19,12 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="FunctionSets.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <!--
     AORebirth.Core targets net48 and cannot be referenced from this net10.0 project,
     so the GameData contracts are compiled from their single source location instead.

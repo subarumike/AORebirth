@@ -577,6 +577,28 @@ namespace ZoneEngine_New.Core.Inventory
                 _dirty[item.InstanceId] = entry;
         }
 
+        /// <summary>
+        /// Retires an item that no longer exists anywhere. A persisted item is re-homed under
+        /// <paramref name="graveyard"/>; an item that was never written is dropped from the pending
+        /// set instead, so no row is ever created for it.
+        /// </summary>
+        public void Discard(Item item, Identity graveyard)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (item.InstanceId <= 0)
+                return;
+
+            if (item.IsPersisted)
+            {
+                MarkOrphaned(item, graveyard);
+                return;
+            }
+
+            lock (_dirtyGate)
+                _dirty.Remove(item.InstanceId);
+        }
+
         public bool HasDirtyEntries
         {
             get
@@ -659,7 +681,8 @@ namespace ZoneEngine_New.Core.Inventory
                             item.InstanceId,
                             entry.ContainerType,
                             entry.ContainerInstance,
-                            entry.ContainerPlacement));
+                            entry.ContainerPlacement,
+                            item.StackCount));
                 }
             }
 
