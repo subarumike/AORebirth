@@ -17,7 +17,8 @@ MIGRATION_REQUIRED=CONDITIONAL_ON_CURRENT_SCHEMA; actual production state was
 not inspected. The current contract checks required columns, unique indexes,
 migration records, sequence floor, and transactional table engines. It includes
 baseline-owned authored mission/active-nano tables; startup does not create them.
-MIGRATION_TOOL=existing explicit database migration tool and governed SQL assets.
+MIGRATION_TOOL=AORebirth.Database.Migrations.MigrationCommand and governed SQL assets
+(existing status/plan/validate/migrate administrative CLI).
 SCHEMA_VERSION_OR_CHECK=SchemaContract + explicit --validate-database.
 FAIL_CLOSED_SCHEMA_CHECK=implemented; fresh disposable execution blocked here.
 

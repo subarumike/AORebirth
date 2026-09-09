@@ -68,8 +68,9 @@ startup guards. Package-negative fixtures passed 4/4, source-omission fixtures 2
 This publication ran on Windows; it is not Linux-host acceptance.
 
 Initial AOtomation had 1128 pass / 1 fail from the inherited patrol path assertion.
-The repaired focused test passed. Full post-commit counts and the exact tested
-source SHA belong in the final validation receipt.
+The repaired focused test passed. Full post-commit acceptance then passed:
+1129/1129 AOtomation, 484/484 NewEngine tests and 12/12 mandatory stages at
+`d1c6d01e976a841dd1cdb85c6f31a62aa4ddf767`. See the final validation receipt.
 
 The real disposable command compiled the new fixture and failed before database
 creation with `SCHEMA_VALIDATION=FAIL docker-image-failed`. Docker's backend
