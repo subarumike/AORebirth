@@ -30,6 +30,9 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Source mob template when this NPC was spawned from GameData mob templates.</summary>
         public MobTemplate? MobTemplate { get; set; }
 
+        /// <summary>Granted only by an accepted runtime combat adapter, never by a template or name.</summary>
+        public virtual bool AcceptsPlayerCombatNanos => false;
+
         /// <summary>
         /// Shop backing this NPC when its equipment includes a vending machine item. The machine is
         /// not registered as a world dynel: it exists only as the pane behind this character.

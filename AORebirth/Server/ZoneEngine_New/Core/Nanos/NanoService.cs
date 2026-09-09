@@ -393,6 +393,20 @@ namespace ZoneEngine_New.Core.Nanos
                 foreach (var modifier in plan.Modifiers) effects.Modifiers.Add(modifier.Key, modifier.Value);
                 effects.BaseWrites[caster] = new() { [CharacterStat.CurrentNano] =
                     caster.Stats.GetOrZero(CharacterStat.CurrentNano, StatDetail.Base) - pending.Nano.NanoCost };
+                foreach (var hit in plan.InitialResourceDeltas)
+                {
+                    // Supported self resource hits join the existing cast transaction.
+                    // Do not allow arbitrary base-stat writes or negative damage here.
+                    if (hit.Key is not (CharacterStat.Health or CharacterStat.CurrentNano) || hit.Value < 0) return;
+                    var maximum = hit.Key == CharacterStat.Health ? CharacterStat.MaxHealth : CharacterStat.MaxNanoEnergy;
+                    int current = effects.BaseWrites[caster].GetValueOrDefault(hit.Key,
+                        caster.Stats.GetOrZero(hit.Key, StatDetail.Base));
+                    long room = Math.Max(0L, (long)caster.Stats.GetOrZero(maximum)
+                        - caster.Stats.GetOrZero(hit.Key, StatDetail.Bonus) - current);
+                    long next = current + Math.Min(room, hit.Value);
+                    if (next > int.MaxValue || next < int.MinValue) return;
+                    effects.BaseWrites[caster][hit.Key] = (int)next;
+                }
             }
             Active? active = null;
             if (usesActive)

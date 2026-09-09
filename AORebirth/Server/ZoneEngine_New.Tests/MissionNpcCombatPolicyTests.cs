@@ -9,6 +9,20 @@ using ZoneEngine_New.Core.Mobs;
 [TestClass]
 public sealed class MissionNpcCombatPolicyTests
 {
+    [TestMethod]
+    public void Player_combat_nano_capability_requires_the_actual_accepted_combat_owner()
+    {
+        var actor = new GeneratedMissionNpcCharacter(new() { Type = IdentityType.CanbeAffected, Instance = 1_000_001 },
+            new StubItemBuilder(), null!);
+        Assert.IsFalse(actor.AcceptsPlayerCombatNanos); // Find-person actors have no combat owner.
+        var contract = MissionNpcCombatPolicy.Create(actor.Identity.Instance, 10, false,
+            new StubItemBuilder(), new StubCatalog(), out var weapon);
+        actor.Combat = new MissionNpcCombatRuntime(contract, weapon);
+        Assert.IsTrue(actor.AcceptsPlayerCombatNanos);
+        actor.Combat = null;
+        Assert.IsFalse(actor.AcceptsPlayerCombatNanos);
+    }
+
     [DataTestMethod]
     [DataRow(1, 2, 4)]
     [DataRow(10, 10, 17)]

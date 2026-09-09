@@ -40,10 +40,11 @@ namespace ZoneEngine_New.Core.Nanos
                 || (_states.TryGetValue(target.Identity.Instance, out State? old)
                     && (!ReferenceEquals(old.Player, target) || old.NanoId != nano.Id))
                 || !TryDescribe(target, nano, out Description description)) return false;
-            // Old persisted morph bases have no original appearance field. Preserve/refuse that
-            // ambiguous hydration instead of inventing a zero base or clearing an equipped vehicle.
-            if (target.Stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base) != 0
-                || !CanOverlay(target, description, old)) return false;
+            // Approved legacy compatibility: saved appearance is an opaque baseline.
+            // It may already contain an old morph. Never guess its pre-morph value,
+            // reset it to zero, or persist this overlay over it. Removal returns to
+            // that exact saved baseline, not a purported recovered original look.
+            if (!CanOverlay(target, description, old)) return false;
             plan = plan with { Modifiers = description.Modifiers,
                 ScriptedChildren = nano.Id == 82835 ? [SparrowChildNanoSpecialization.NanoId] : [] };
             return true;

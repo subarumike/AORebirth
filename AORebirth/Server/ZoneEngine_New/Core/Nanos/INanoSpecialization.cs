@@ -9,6 +9,8 @@ namespace ZoneEngine_New.Core.Nanos
     {
         public IReadOnlyDictionary<CharacterStat, int> Modifiers { get; init; } = new Dictionary<CharacterStat, int>();
         public IReadOnlyList<int> ScriptedChildren { get; init; } = System.Array.Empty<int>();
+        // Cast-time only. Restoring an active row must never replay these hits.
+        public IReadOnlyDictionary<CharacterStat, int> InitialResourceDeltas { get; init; } = new Dictionary<CharacterStat, int>();
     }
 
     public interface INanoOwnerProjection
