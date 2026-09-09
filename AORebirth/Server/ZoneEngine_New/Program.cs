@@ -211,6 +211,7 @@ namespace ZoneEngine_New
             services.AddSingleton<INanoSpecialization, MorphNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, SparrowChildNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, TeamWarpNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, BucketheadNanoSpecialization>();
             services.AddSingleton<NanoService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();

@@ -415,6 +415,7 @@ namespace ZoneEngine_New.Core.Playfield
                     }
                 }
 
+                GetRequiredService<BucketheadSummonService>().Shutdown();
                 GetRequiredService<AcceptedNpcActivationService>().Shutdown();
                 _dynelRegistry.Clear();
             }
@@ -439,6 +440,7 @@ namespace ZoneEngine_New.Core.Playfield
                 _inbound.Drain(_router, spawn, this);
                 spawn.Tick();
                 GetRequiredService<AcceptedNpcActivationService>().Tick();
+                GetRequiredService<BucketheadSummonService>().Tick();
                 foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
                     if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Nanos.Tick(player);
                 _inventoryMoves.Tick(this, deltaTime);
@@ -514,6 +516,7 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));
             services.AddSingleton<SpawnService>();
             services.AddSingleton<AcceptedNpcActivationService>();
+            services.AddSingleton<BucketheadSummonService>();
             services.AddSingleton<ZoneEngine_New.Core.Missions.AcceptedQuestPropService>();
             services.AddSingleton<HashSpawnSystem>();
             return services;

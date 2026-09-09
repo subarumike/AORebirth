@@ -1,5 +1,12 @@
 # ZoneEngine_New nano gap closure
 
+Current reconciliation update (2026-09-09): N06 Buckethead is implemented on the
+dedicated d2d98446 reconciliation branch. Its exact graph, stock, lifecycle and
+transaction tests are described in [the new reconciliation report](DELMUS_D2D98446_RUNTIME_RECONCILIATION.md).
+The matrix below remains the e311 checkpoint history; its six definite gaps are
+now five in the candidate (N02/N05/N07/N08/N10). This does not close N03 or grant
+master readiness. Cross-platform acceptance belongs to the exact candidate SHA.
+
 Starting checkpoint: `05c8d4ef7429e1ed765a19bd63ace0e21a2b29e5`, branch `codex/zoneengine-new-gameplay-reconciliation`, isolated AORebirth integration worktree. Comparison target is currently supported compiled Legacy behavior, not theoretical retail completeness. The original inventory is [ZONEENGINE_NEW_NANOS_RECONCILIATION.md](ZONEENGINE_NEW_NANOS_RECONCILIATION.md); it remains checkpoint history.
 
 No production/database migration/client/capture operation is part of this slice. Existing session ownership, ordered persistence gates, unknown-commit quarantine and character/corpse authorities remain mandatory.

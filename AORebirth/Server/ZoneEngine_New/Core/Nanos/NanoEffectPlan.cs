@@ -36,6 +36,7 @@ namespace ZoneEngine_New.Core.Nanos
 
         internal static bool ActionRequirements(Player caster, Player target, NanoDefinition nano)
         {
+            if (nano.Id == 300439) return BucketheadNanoSpecialization.ActionRequirements(caster, target, nano);
             foreach (ItemAction action in nano.Template.Actions)
                 if (action.ActionType == (int)ActionType.ToUse && !NanoRequirements.Action(caster, target, action.Requirements))
                     return false;

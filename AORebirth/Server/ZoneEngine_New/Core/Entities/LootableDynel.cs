@@ -108,27 +108,7 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         static void AssignEphemeralInstanceId(Item item, IItemInstanceIdAllocator ids)
-        {
-            if (item.InstanceId > 0)
-                throw new InvalidOperationException("Loot item already has an InstanceId.");
-
-            item.InstanceId = ids.Allocate();
-            item.IsPersisted = false;
-
-            int itemType = item.Identity.Type != IdentityType.None
-                ? (int)item.Identity.Type
-                : item.Definition.ItemType;
-            if (itemType != 0)
-            {
-                item.Identity = new Identity
-                {
-                    Type = (IdentityType)itemType,
-                    Instance = item.InstanceId
-                };
-            }
-
-            item.ApplyContainerIdentityIfBag();
-        }
+            => item.AssignInstanceId(ids.Allocate());
 
         public bool TryUse(Player player)
         {

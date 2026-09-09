@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Network;
 
     /// <summary>
     /// Cell-neighbor interest management: enter via ISpawnable.BuildSpawnMessage, leave via Despawn.
@@ -21,6 +22,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly Dictionary<ulong, HashSet<ulong>> _visibleSourcesByRecipient = new();
         private readonly Dictionary<ulong, HashSet<ulong>> _visibleRecipientsBySource = new();
         private readonly HashSet<ulong> _initializedRecipients = new();
+        private readonly Dictionary<ulong, IZoneSession> _recipientSessions = new();
         private readonly List<int> _neighborBuffer = new();
         private readonly Dictionary<ulong, Dynel> _byIdentity = new();
 
@@ -53,6 +55,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             _visibleSourcesByRecipient.Clear();
             _visibleRecipientsBySource.Clear();
             _initializedRecipients.Clear();
+            _recipientSessions.Clear();
             _byIdentity.Clear();
         }
 
@@ -64,6 +67,19 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             ArgumentNullException.ThrowIfNull(player);
 
             ulong recipientKey = player.Identity.Long();
+            IZoneSession? session = player.Session;
+            if (session == null || session.State == SessionState.Closed
+                || !ReferenceEquals(session.Player, player)
+                || !_byIdentity.TryGetValue(recipientKey, out Dynel? current)
+                || !ReferenceEquals(current, player)) return;
+            // Delmus's reconnect repair, fenced to the exact transport. Repeating
+            // activation on the same session must keep successful spawn de-duplication.
+            if (!_recipientSessions.TryGetValue(recipientKey, out var previousSession)
+                || !ReferenceEquals(previousSession, session))
+            {
+                ForgetRecipient(recipientKey);
+                _recipientSessions[recipientKey] = session;
+            }
             _initializedRecipients.Add(recipientKey);
             if (!_visibleSourcesByRecipient.ContainsKey(recipientKey))
             {
@@ -371,6 +387,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         private void ForgetRecipient(ulong recipientKey)
         {
+            _recipientSessions.Remove(recipientKey);
             if (_visibleSourcesByRecipient.TryGetValue(recipientKey, out HashSet<ulong>? visibleSources))
             {
                 foreach (ulong sourceKey in visibleSources)

@@ -57,6 +57,50 @@ public sealed class ExactSpawnVisibilityTests
         locality.RegisterDynel(player);
         return (player, session, locality);
     }
+
+    [TestMethod]
+    public void ReconnectResendsExactSpawnOnceToTheReplacementTransport()
+    {
+        var (player, first, locality) = Create();
+        var source = new ExactDynel();
+        locality.RegisterDynel(source); locality.ActivatePlayerVisibility(player);
+        first.UnbindPlayer(); player.EnterLinkDead(TimeSpan.FromSeconds(60));
+        var second = new Session(); player.EnterOnline(second);
+        locality.ActivatePlayerVisibility(player);
+        locality.ActivatePlayerVisibility(player);
+        Assert.AreEqual(1, first.Packets.Count);
+        Assert.AreEqual(1, second.Packets.Count);
+        CollectionAssert.AreEqual(source.Bytes, second.Packets[0]);
+    }
+
+    [TestMethod]
+    public void StaleActorActivationCannotClearReplacementRecipientVisibility()
+    {
+        var (stale, first, locality) = Create();
+        locality.RegisterDynel(new ExactDynel()); locality.ActivatePlayerVisibility(stale);
+        var current = TestWorld.CreatePlayer(stale.Identity.Instance);
+        var second = new Session(); current.EnterOnline(second);
+        locality.RegisterDynel(current); locality.ActivatePlayerVisibility(current);
+        locality.ActivatePlayerVisibility(stale);
+        locality.UnregisterDynel(stale);
+        locality.ActivatePlayerVisibility(current);
+        Assert.AreEqual(1, first.Packets.Count);
+        Assert.AreEqual(1, second.Packets.Count);
+    }
+
+    [TestMethod]
+    public void ClosedOrUnboundTransportCannotConsumeARecipientSnapshot()
+    {
+        var (player, first, locality) = Create();
+        locality.RegisterDynel(new ExactDynel());
+        first.Close(); locality.ActivatePlayerVisibility(player);
+        Assert.AreEqual(0, first.Packets.Count);
+        var second = new Session(); player.Session = second;
+        locality.ActivatePlayerVisibility(player);
+        Assert.AreEqual(0, second.Packets.Count);
+        second.BindPlayer(player); locality.ActivatePlayerVisibility(player);
+        Assert.AreEqual(1, second.Packets.Count);
+    }
     sealed class ExactDynel() : Dynel(new() { Type = IdentityType.Corpse, Instance = 1000001 })
     {
         internal byte[] Bytes = [1, 2, 3, 4];
