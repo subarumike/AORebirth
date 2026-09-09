@@ -12,9 +12,39 @@ namespace ZoneEngine_New.Core.Inventory
 
     /// <summary>
     /// Shared item definition shape (catalog entry or builder-baked effective def).
+    /// Derived views (<see cref="Nanos.NanoSpell"/>) reinterpret the same stat map.
     /// </summary>
-    public sealed class ItemTemplate
+    public class ItemTemplate
     {
+        public ItemTemplate()
+        {
+        }
+
+        /// <summary>
+        /// Reinterpretation copy for derived views. Collections are shared, not cloned:
+        /// catalog templates are read-only after load.
+        /// </summary>
+        protected ItemTemplate(ItemTemplate other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+
+            Id = other.Id;
+            Name = other.Name;
+            Quality = other.Quality;
+            Flags = other.Flags;
+            ItemType = other.ItemType;
+            DynelType = other.DynelType;
+            MultipleCount = other.MultipleCount;
+            Stats = other.Stats;
+            Attack = other.Attack;
+            Defend = other.Defend;
+            SpellList = other.SpellList;
+            Actions = other.Actions;
+            Relations = other.Relations;
+            IsBuff = other.IsBuff;
+            CanCancel = other.CanCancel;
+        }
+
         public int Id { get; init; }
 
         public string Name { get; init; } = string.Empty;
@@ -40,6 +70,15 @@ namespace ZoneEngine_New.Core.Inventory
         public List<ItemAction> Actions { get; init; } = new();
 
         public List<int> Relations { get; init; } = new();
+
+        /// <summary>
+        /// True when this definition takes an NCU slot for a while instead of firing once.
+        /// <see cref="ItemFlags"/> already uses all 32 bits, so buff-ness lives here.
+        /// </summary>
+        public bool IsBuff { get; init; }
+
+        /// <summary>False when the owner may not dismiss the effect from NCU.</summary>
+        public bool CanCancel { get; init; } = true;
 
         /// <summary>
         /// Combat style from InitiativeType; handedness from MultiMelee/MultiRanged presence.

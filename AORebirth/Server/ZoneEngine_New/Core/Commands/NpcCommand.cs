@@ -237,12 +237,13 @@ namespace ZoneEngine_New.Core.Commands
             lines.Add(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Template: {0} hash={1} templateId={2} knuBot={3} hasHeadMesh={4} levels={5}-{6}",
+                    "Template: {0} hash={1} templateId={2} knuBot={3} hasHeadMesh={4} attackable={5} levels={6}-{7}",
                     template.Name,
                     template.Hash,
                     template.TemplateId,
                     template.KnuBotId,
                     template.HasHeadMesh,
+                    template.Attackable,
                     template.MinLevel,
                     template.MaxLevel));
 
@@ -262,6 +263,24 @@ namespace ZoneEngine_New.Core.Commands
 
             AppendIdLists(lines, "equipment", template.Equipment);
             AppendIdLists(lines, "weapon", template.Weapons);
+
+            Dictionary<int, int> textures = template.Textures;
+            if (textures == null || textures.Count == 0)
+            {
+                lines.Add("  textures (empty)");
+            }
+            else
+            {
+                foreach (KeyValuePair<int, int> texture in textures)
+                {
+                    lines.Add(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "  texture place={0} id={1}",
+                            texture.Key,
+                            texture.Value));
+                }
+            }
 
             List<MobItemTableEntry> itemTable = template.ItemTable;
             if (itemTable == null || itemTable.Count == 0)

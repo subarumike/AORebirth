@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
     using Utility;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Metrics;
 
     internal enum CellHeat
     {
@@ -22,8 +23,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
     /// Outdoor cell tick cadence by heat tier. Indoor and disabled-heat paths tick every dynel every heartbeat.
     /// Warm/Cold pass accumulated wall-clock delta since the cell's last successful tick.
     /// Cells default Asleep until Hot/Warm (player proximity or forced hot); Cold is only the
-    /// post-Hot/Warm cooldown before sleep. Heat candidates = occupied ∪ spawn-bearing ∪ cells
-    /// within Warm range of connected players (so empty neighbor heat transitions are tracked).
+    /// post-Hot/Warm cooldown before sleep, except vendor cells which cool to Cold and never sleep.
+    /// Heat candidates = occupied ∪ spawn-bearing ∪ cells within Warm range of connected players
+    /// (so empty neighbor heat transitions are tracked).
     /// </summary>
     internal sealed class CellHeatScheduler
     {
@@ -36,6 +38,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly HashSet<int> _spawnCellIds = new();
         private readonly List<int> _playerCells = new();
         private readonly HashSet<int> _forcedHotCells = new();
+        private readonly HashSet<int> _vendorCells = new();
         private readonly List<int> _heatCellBuffer = new();
         private readonly List<int> _neighborBuffer = new();
         private readonly List<Dynel> _tickDynelBuffer = new();
@@ -83,14 +86,21 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                     _tickDynelBuffer.Add(dynel);
 
                 for (int i = 0; i < _tickDynelBuffer.Count; i++)
-                    _tickDynelBuffer[i].Tick(heartbeatDeltaTime);
+                {
+                    Dynel dynel = _tickDynelBuffer[i];
+                    TickStallWatch.Stage("heat.dynel.indoor", dynel.Identity.Instance);
+                    dynel.Tick(heartbeatDeltaTime);
+                }
 
+                TickStallWatch.Stage("heat.indoorspawn");
                 _onIndoorSpawnTick?.Invoke();
                 return;
             }
 
             DateTime now = DateTime.UtcNow;
+            TickStallWatch.Stage("heat.context");
             CollectHeatContext(tracked);
+            TickStallWatch.Stage("heat.transitions");
             TrackHeatTransitions(now, heartbeatDeltaTime);
         }
 
@@ -98,6 +108,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             _playerCells.Clear();
             _forcedHotCells.Clear();
+            _vendorCells.Clear();
 
             HashSet<int> connectedPlayerInstances = new();
 
@@ -117,6 +128,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
                 if (IsCombatHot(dynel) || IsPetPinnedToConnectedPlayer(dynel, connectedPlayerInstances))
                     _forcedHotCells.Add(dynel.Cell.Id);
+
+                if (IsVendor(dynel))
+                    _vendorCells.Add(dynel.Cell.Id);
             }
         }
 
@@ -148,7 +162,10 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 if (heat == CellHeat.Asleep)
                 {
                     if (!isNewCell && previousHeat != CellHeat.Asleep)
+                    {
+                        TickStallWatch.Stage("heat.cellsleep", cellId);
                         _onCellSleep?.Invoke(cellId);
+                    }
 
                     // Keep last-tick current so wake does not dump the full sleep duration as delta.
                     _lastTickUtcByCell[cellId] = now;
@@ -167,6 +184,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 }
 
                 _lastTickUtcByCell[cellId] = now;
+                TickStallWatch.Stage("heat.cellspawn", cellId);
                 _onCellTick?.Invoke(cellId);
 
                 // Snapshot: Tick may despawn NPCs and spawn corpses into this cell.
@@ -175,7 +193,11 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                     _tickDynelBuffer.Add(dynel);
 
                 for (int i = 0; i < _tickDynelBuffer.Count; i++)
-                    _tickDynelBuffer[i].Tick(elapsed);
+                {
+                    Dynel dynel = _tickDynelBuffer[i];
+                    TickStallWatch.Stage("heat.dynel", dynel.Identity.Instance);
+                    dynel.Tick(elapsed);
+                }
             }
 
             List<int> staleCells = new();
@@ -256,6 +278,10 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
             if (minDistance <= _policy.WarmNeighborLevel)
                 return CellHeat.Warm;
+
+            // Vendors keep shop stock and the live dynel; Cold still ticks, Asleep despawns the cell.
+            if (_vendorCells.Contains(cellId))
+                return CellHeat.Cold;
 
             // No cooling timer → never woken (or fully slept) → Asleep. Cold only while cooling.
             if (!_coldSinceUtcByCell.TryGetValue(cellId, out DateTime coldSince))
@@ -341,6 +367,12 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             if (dynel.Stats.GetOrZero(CharacterStat.Health) <= 0)
                 return false;
 
+            if (dynel is Character character && character.FightingTarget.Instance != 0)
+                return true;
+
+            if (dynel is NpcCharacter npc && npc.IsAiBusy)
+                return true;
+
             int selectedTarget = dynel.Stats.Get(CharacterStat.SelectedTarget);
             return !StatCollection.IsUnset(selectedTarget) && selectedTarget != 0;
         }
@@ -351,6 +383,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             return !StatCollection.IsUnset(petMaster)
                    && petMaster != 0
                    && connectedPlayerInstances.Contains(petMaster);
+        }
+
+        private static bool IsVendor(Dynel dynel)
+        {
+            if (dynel is VendingMachine)
+                return true;
+
+            return dynel is NpcCharacter npc && npc.Shop != null && !npc.IsDead;
         }
     }
 }

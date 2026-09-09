@@ -12,8 +12,14 @@ namespace ZoneEngine_New.Core.Entities
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+
+    using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
+    using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     /// <summary>
     /// Online player character. Session is attached at login via SpawnService.
@@ -21,6 +27,21 @@ namespace ZoneEngine_New.Core.Entities
     public class Player : Character
     {
         readonly IItemBuilder _items;
+
+        // Temporary hardcoded hospital until real respawn tables exist.
+        public const int RespawnGracePeriodMilliseconds = 3000;
+        public const int TemporaryRespawnPlayfieldId = 800;
+        public const float TemporaryRespawnX = 665f;
+        public const float TemporaryRespawnY = 72.6f;
+        public const float TemporaryRespawnZ = 570f;
+
+        // Live DeathRespawn action parameters (CharacterAction 0xAB).
+        const int DeathRespawnActionParameter1 = 1000020;
+        const int DeathRespawnActionParameter2 = 295830;
+
+        bool _respawnPending;
+        double _respawnRemainingSeconds;
+        DateTime _diedAtUtc;
 
         public Player(Identity identity, IZoneLogger logger, IItemBuilder items)
             : base(identity)
@@ -54,12 +75,176 @@ namespace ZoneEngine_New.Core.Entities
 
         internal IZoneLogger Logger { get; set; }
 
+        public override void OnDeath(Character? killer = null)
+        {
+            if (IsDead)
+                return;
+
+            base.OnDeath(killer);
+            _respawnPending = true;
+            _respawnRemainingSeconds = RespawnGracePeriodMilliseconds / 1000.0;
+            _diedAtUtc = DateTime.UtcNow;
+        }
+
+        public override void Revive()
+        {
+            _respawnPending = false;
+            base.Revive();
+        }
+
+        /// <summary>
+        /// Official client requests respawn with <see cref="CharacterActionType.Die"/> after death.
+        /// Grace still applies; a request before 3s waits, a request after 3s runs immediately.
+        /// </summary>
+        internal void RequestRespawn()
+        {
+            if (!_respawnPending && !IsDead)
+                return;
+
+            if (!IsRespawnGraceElapsed())
+                return;
+
+            _respawnPending = false;
+            TryRespawn();
+        }
+
+        public override void Tick(double deltaTime)
+        {
+            base.Tick(deltaTime);
+            if (!_respawnPending)
+                return;
+
+            _respawnRemainingSeconds -= deltaTime;
+            if (!IsRespawnGraceElapsed())
+                return;
+
+            _respawnPending = false;
+            TryRespawn();
+        }
+
+        bool IsRespawnGraceElapsed()
+            => _respawnRemainingSeconds <= 0.0
+                || (DateTime.UtcNow - _diedAtUtc).TotalSeconds >= RespawnGracePeriodMilliseconds / 1000.0;
+
+        void TryRespawn()
+        {
+            try
+            {
+                Respawn();
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception, "Player respawn failed.");
+            }
+        }
+
+        void Respawn()
+        {
+            Revive();
+            AnnounceDeathCleared();
+
+            Playfield? playfield = Playfield;
+            if (playfield == null)
+                return;
+
+            Vector3 landing = new Vector3(TemporaryRespawnX, TemporaryRespawnY, TemporaryRespawnZ);
+
+            Logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Player respawn character={0} to ({1},{2},{3}) pf={4}",
+                    Identity.Instance,
+                    TemporaryRespawnX,
+                    TemporaryRespawnY,
+                    TemporaryRespawnZ,
+                    TemporaryRespawnPlayfieldId));
+
+            if (playfield.Identity.Instance == TemporaryRespawnPlayfieldId)
+            {
+                AnnounceSamePlayfieldRespawn(landing);
+                return;
+            }
+
+            Playfield destination = playfield.GetRequiredService<PlayfieldManager>().GetOrCreate(TemporaryRespawnPlayfieldId);
+            if (Session != null)
+            {
+                Session.TransferToPlayfield(destination, landing);
+                return;
+            }
+
+            playfield.LeaveTransferredPlayer(this);
+            destination.ArriveTransferredPlayer(this, landing);
+        }
+
+        void AnnounceDeathCleared()
+        {
+            IZoneSession? session = Session;
+            if (session == null)
+                return;
+
+            session.Send(
+                new CharacterActionMessage
+                {
+                    Identity = Identity,
+                    Unknown = 0x00,
+                    Action = CharacterActionType.DeathRespawn,
+                    Unknown1 = 0,
+                    Target = Identity.None,
+                    Parameter1 = DeathRespawnActionParameter1,
+                    Parameter2 = DeathRespawnActionParameter2,
+                    Unknown2 = 0
+                });
+        }
+
+        void AnnounceSamePlayfieldRespawn(Vector3 landing)
+        {
+            Position = landing;
+
+            Playfield? playfield = Playfield;
+            if (playfield == null)
+                return;
+
+            playfield.GetRequiredService<PlayfieldLocality>().Announce(
+                this,
+                new CharDCMoveMessage
+                {
+                    Identity = Identity,
+                    Unknown = 0x00,
+                    MoveType = (byte)MovementAction.FullStop,
+                    Heading = new MsgQuaternion
+                    {
+                        X = Rotation.xf,
+                        Y = Rotation.yf,
+                        Z = Rotation.zf,
+                        W = Rotation.wf
+                    },
+                    Coordinates = new MsgVector3
+                    {
+                        X = Position.xf,
+                        Y = Position.yf,
+                        Z = Position.zf
+                    },
+                    Unknown1 = 0,
+                    AuxA = 0,
+                    AuxB = 0
+                },
+                includeSelf: true);
+        }
+
         public override void Rebase()
         {
+            RebaseStats();
+            RebaseWeapons();
+        }
+
+        public override void RebaseStats()
+        {
+            // Bonuses first: max health and max nano read the full (base + bonus) ability values,
+            // so equipment and buffs have to be in place before those are recomputed.
+            RebaseEquipBonuses();
+            ApplyBuffBonuses();
             RebaseMaxHealth();
             RebaseMaxNano();
-            RebaseEquipBonuses();
-            RebaseWeapons();
         }
 
         void RebaseMaxHealth()
@@ -283,6 +468,11 @@ namespace ZoneEngine_New.Core.Entities
             LinkDeadUntilUtc = DateTime.UtcNow + timeout;
             Session = null;
         }
+
+        public bool HasLinkDeadExpired(DateTime now)
+            => ConnectionPhase == PlayerConnectionPhase.LinkDead
+                && LinkDeadUntilUtc is DateTime deadline
+                && now >= deadline;
 
         public void EnterOnline(IZoneSession session)
         {

@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.Characters
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Nanos;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -53,6 +54,30 @@ namespace ZoneEngine_New.Core.Characters
             player.UploadedNanoIds.Clear();
             foreach (int nanoId in hydration.UploadedNanoIds)
                 player.TryAddUploadedNano(nanoId);
+
+            RestoreActiveNanos(player, hydration);
+        }
+
+        /// <summary>
+        /// Puts stored NCU back. Buffs whose deadline passed while the character was offline are
+        /// simply not restored, and the next flush drops their rows.
+        /// </summary>
+        void RestoreActiveNanos(Player player, CharacterHydrationResult hydration)
+        {
+            DateTime nowUtc = DateTime.UtcNow;
+            foreach (ActiveNanoRecord record in hydration.ActiveNanos)
+            {
+                if (record.NanoId <= 0)
+                    continue;
+
+                var expiresAtUtc = new DateTime(record.ExpiresAtUtcTicks, DateTimeKind.Utc);
+                if (expiresAtUtc <= nowUtc)
+                    continue;
+
+                NanoSpell spell = NanoSpell.From(
+                    _items.CreateTemplate(record.NanoId, record.NanoId, quality: 1));
+                player.TryRestoreBuff(spell, player.Identity, record.NanoInstance, expiresAtUtc);
+            }
         }
 
         void ApplyXpThresholds(Player player)

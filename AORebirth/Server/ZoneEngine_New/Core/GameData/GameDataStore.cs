@@ -279,13 +279,13 @@ namespace ZoneEngine_New.Core.GameData
 
         private void LoadMobTemplates()
         {
-            string path = Path.Combine(RootPath, GameDataPaths.MobTemplatesFileName);
+            string path = Path.Combine(RootPath, GameDataPaths.NpcTemplateFileName);
             if (!File.Exists(path))
             {
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "MobTemplates.json not found at {0}; catalog empty",
+                        "NpcTemplate.json not found at {0}; catalog empty",
                         path));
                 return;
             }
@@ -299,7 +299,7 @@ namespace ZoneEngine_New.Core.GameData
                     _logger.Warn(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "MobTemplates.json was empty: {0}",
+                            "NpcTemplate.json was empty: {0}",
                             path));
                     return;
                 }
@@ -346,7 +346,7 @@ namespace ZoneEngine_New.Core.GameData
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Failed to load MobTemplates.json from {0}; catalog empty",
+                        "Failed to load NpcTemplate.json from {0}; catalog empty",
                         path));
             }
         }

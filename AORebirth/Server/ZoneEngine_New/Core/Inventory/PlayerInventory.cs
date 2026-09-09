@@ -636,10 +636,6 @@ namespace ZoneEngine_New.Core.Inventory
 
                 if (!item.IsPersisted)
                 {
-                    int itemType = item.Identity.Type != IdentityType.None
-                        ? (int)item.Identity.Type
-                        : item.Definition.ItemType;
-
                     inserts.Add(
                         new ItemInstanceRecord
                         {
@@ -647,7 +643,7 @@ namespace ZoneEngine_New.Core.Inventory
                             ContainerType = entry.ContainerType,
                             ContainerInstance = entry.ContainerInstance,
                             ContainerPlacement = entry.ContainerPlacement,
-                            ItemType = itemType,
+                            ItemType = item.ResolvedItemType,
                             LowId = item.LowId,
                             HighId = item.HighId,
                             Quality = item.Quality,
@@ -753,74 +749,7 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         static void ApplyWearSpells(List<ItemSpell> spells, StatCollection stats)
-        {
-            for (int i = 0; i < spells.Count; i++)
-            {
-                ItemSpell spell = spells[i];
-                FunctionType function = (FunctionType)spell.FunctionType;
-                if (function != FunctionType.Modify && function != FunctionType.ScalingModify)
-                    continue;
-                if (!MeetsSpellRequirements(spell, stats))
-                    continue;
-                if (!TryReadModify(spell, out CharacterStat stat, out int delta))
-                    continue;
-                if (stat == CharacterStat.Cash)
-                    continue;
-
-                stats.AddBonus(stat, delta, dirty: true);
-            }
-        }
-
-        static bool MeetsSpellRequirements(ItemSpell spell, StatCollection stats)
-        {
-            for (int i = 0; i < spell.Requirements.Count; i++)
-            {
-                ItemRequirement requirement = spell.Requirements[i];
-                int value = stats.Get((CharacterStat)requirement.StatNumber);
-                if (!ItemTemplate.EvaluateRequirement(value, requirement))
-                    return false;
-            }
-
-            return true;
-        }
-
-        static bool TryReadModify(ItemSpell spell, out CharacterStat stat, out int delta)
-        {
-            stat = default;
-            delta = 0;
-            if (spell.Arguments.Count < 2)
-                return false;
-            if (!TryGetInt(spell.Arguments[0], out int statId) || !TryGetInt(spell.Arguments[1], out delta))
-                return false;
-
-            stat = (CharacterStat)statId;
-            return true;
-        }
-
-        static bool TryGetInt(object? value, out int result)
-        {
-            switch (value)
-            {
-                case int i:
-                    result = i;
-                    return true;
-                case long l:
-                    result = (int)l;
-                    return true;
-                case uint u:
-                    result = (int)u;
-                    return true;
-                case short s:
-                    result = s;
-                    return true;
-                case byte b:
-                    result = b;
-                    return true;
-                default:
-                    result = 0;
-                    return false;
-            }
-        }
+            => StatModifierSpells.Apply(spells, stats);
 
         public IEnumerable<InventorySlot> BuildInventorySlots()
         {

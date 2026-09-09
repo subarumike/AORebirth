@@ -13,6 +13,8 @@ namespace ZoneEngine_New.Core.Network
 
         Player? Player { get; }
 
+        bool IsClosed { get; }
+
         void BindPlayer(Player player);
 
         /// <summary>Clears session→player without world teardown (used after LinkDead / steal / despawn).</summary>

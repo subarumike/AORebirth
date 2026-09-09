@@ -7,6 +7,7 @@ namespace ZoneEngine_New.Tests
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Data;
@@ -15,6 +16,11 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Playfield;
+
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     /// <summary>
     /// Serves a fixed <see cref="HashItemCatalog"/> and vending machine table. Everything a hash roll
@@ -183,8 +189,68 @@ namespace ZoneEngine_New.Tests
         }
     }
 
+    /// <summary>Builds nano definitions from the item attribute ids a real nano template uses.</summary>
+    internal static class TestNanos
+    {
+        public static NanoSpell Create(
+            int nanoId,
+            int durationCentiseconds = 6000,
+            int ncuCost = 10,
+            int strain = 0,
+            int stackingOrder = 0,
+            int nanoPointCost = 0,
+            int attackDelay = 0,
+            int attackDelayCap = 0,
+            int rechargeDelay = 0,
+            int rechargeDelayCap = 0,
+            CanFlags can = CanFlags.ApplyOnFriendly,
+            bool canCancel = true,
+            IEnumerable<ItemSpell>? modifiers = null)
+        {
+            var stats = new Dictionary<CharacterStat, int>
+            {
+                [CharacterStat.TimeExist] = durationCentiseconds,
+                [NanoSpell.NcuCostStat] = ncuCost,
+                [NanoSpell.NanoStrainStat] = strain,
+                [CharacterStat.StackingOrder] = stackingOrder,
+                [CharacterStat.NanoPoints] = nanoPointCost,
+                [CharacterStat.AttackDelay] = attackDelay,
+                [CharacterStat.AttackDelayCap] = attackDelayCap,
+                [CharacterStat.RechargeDelay] = rechargeDelay,
+                [CharacterStat.RechargeDelayCap] = rechargeDelayCap,
+                [CharacterStat.Can] = unchecked((int)can)
+            };
+
+            var spellList = new Dictionary<EventType, List<ItemSpell>>();
+            if (modifiers != null)
+                spellList[EventType.OnUse] = new List<ItemSpell>(modifiers);
+
+            return NanoSpell.From(
+                new ItemTemplate
+                {
+                    Id = nanoId,
+                    Name = "Nano " + nanoId,
+                    Quality = 1,
+                    Stats = stats,
+                    SpellList = spellList,
+                    CanCancel = canCancel
+                });
+        }
+
+        /// <summary>A Modify function, the same shape worn equipment uses for stat bonuses.</summary>
+        public static ItemSpell Modify(CharacterStat stat, int delta)
+            => new()
+            {
+                FunctionType = (int)FunctionType.Modify,
+                Arguments = new List<object> { (int)stat, delta },
+                Requirements = new List<ItemRequirement>()
+            };
+    }
+
     internal sealed class StubItemBuilder : IItemBuilder
     {
+        int _nextInstanceId = 90000;
+
         public Item Create(
             int lowId,
             int highId,
@@ -206,6 +272,18 @@ namespace ZoneEngine_New.Tests
                 Definition = CreateTemplate(lowId, highId, quality)
             };
 
+        public Item CreateWithNewInstance(
+            int lowId,
+            int highId,
+            int quality,
+            ItemSource source,
+            int stackCount = 1)
+        {
+            Item item = Create(lowId, highId, quality, source, stackCount);
+            item.AssignInstanceId(++_nextInstanceId);
+            return item;
+        }
+
         public ItemTemplate CreateTemplate(int lowId, int highId, int quality)
             => new()
             {
@@ -215,5 +293,47 @@ namespace ZoneEngine_New.Tests
 
         public bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item)
             => throw new NotSupportedException();
+    }
+
+    internal sealed class RecordingZoneSession : IZoneSession
+    {
+        public SessionState State { get; set; } = SessionState.Connected;
+
+        public Player? Player { get; private set; }
+
+        public bool IsClosed { get; private set; }
+
+        public List<MessageBody> Sent { get; } = new();
+
+        public void BindPlayer(Player player) => Player = player;
+
+        public void UnbindPlayer() => Player = null;
+
+        public void TransferToPlayfield(Playfield destination, Vector3 landing)
+            => throw new NotSupportedException();
+
+        public void Send(byte[] packet)
+        {
+        }
+
+        public void Send(Message message)
+        {
+            if (message?.Body != null)
+                Sent.Add(message.Body);
+        }
+
+        public void Send(MessageBody body)
+        {
+            if (body != null)
+                Sent.Add(body);
+        }
+
+        public void Send(MessageBody body, int sender, int receiver) => Send(body);
+
+        public void SendInitiateCompression()
+        {
+        }
+
+        public void Close() => IsClosed = true;
     }
 }

@@ -9,7 +9,9 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Trade;
 
@@ -30,11 +32,18 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Source mob template when this NPC was spawned from GameData mob templates.</summary>
         public MobTemplate? MobTemplate { get; set; }
 
+        /// <summary>False for vendors and other non-combat NPCs.</summary>
+        public bool Attackable { get; set; } = true;
+
         /// <summary>
         /// Shop backing this NPC when its equipment includes a vending machine item. The machine is
         /// not registered as a world dynel: it exists only as the pane behind this character.
         /// </summary>
         public VendingMachine? Shop { get; private set; }
+
+        public NpcBrain? Brain { get; private set; }
+
+        public bool IsAiBusy => Brain?.IsBusy == true;
 
         /// <summary>
         /// Binds a shop to this NPC and flags the character so the client draws the vendor cart.
@@ -46,6 +55,12 @@ namespace ZoneEngine_New.Core.Entities
             Shop = machine;
             machine.OwnerNpc = this;
             SetCharacterFlag(CharacterFlags.HasItemsForSale, true);
+        }
+
+        public void AttachBrain(NpcBrain brain)
+        {
+            ArgumentNullException.ThrowIfNull(brain);
+            Brain = brain;
         }
 
         /// <summary>Using a vendor NPC opens its shop; other NPCs have no use action yet.</summary>
@@ -75,6 +90,8 @@ namespace ZoneEngine_New.Core.Entities
         {
             if (IsDead)
                 return;
+
+            Brain?.OnOwnerDied();
 
             VendingMachine? shop = Shop;
             if (shop != null)
@@ -137,14 +154,46 @@ namespace ZoneEngine_New.Core.Entities
             };
         }
 
+        public override void Tick(double deltaTime)
+        {
+            if (!IsDead)
+                Brain?.Tick(deltaTime);
+
+            TickStallWatch.Stage("npc.base", Identity.Instance);
+            base.Tick(deltaTime);
+        }
+
+        protected override void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
+        {
+            if (attacker.IsPlayer)
+                Brain?.AddThreat(attacker.Identity, hpRemoved);
+        }
+
         /// <summary>
-        /// Fight ended without a kill. Clears kill credit.
-        /// Later: restore HP, leash home, clear FightingTarget.
+        /// Fight ended without a kill. Restores HP, clears fight state, and drops kill credit.
         /// </summary>
         public void OnReset()
-            => ClearKillRewards();
+        {
+            ClearKillRewards();
+            int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
+            if (maxHealth > 0)
+                Stats.Set(CharacterStat.Health, maxHealth, StatDetail.Base, dirty: true);
+            SetFightingTarget(Identity.None);
+            Motor.ClearPath();
+        }
 
-        public override void Rebase() => RebaseWeapons();
+        public override void Rebase()
+        {
+            RebaseStats();
+            RebaseWeapons();
+        }
+
+        public override void RebaseStats()
+        {
+            // NPCs carry no equipment bonuses, so buffs own the whole bonus layer.
+            Stats.ClearBonuses(dirty: true);
+            ApplyBuffBonuses();
+        }
 
         public override void RebaseWeapons()
         {

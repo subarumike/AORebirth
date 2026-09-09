@@ -14,13 +14,16 @@ namespace ZoneEngine_New.Core.Inventory
     public sealed class ItemBuilder : IItemBuilder
     {
         private readonly IItemTemplateCatalog _catalog;
+        private readonly IItemInstanceIdAllocator _ids;
         private readonly IZoneLogger _logger;
 
-        public ItemBuilder(IItemTemplateCatalog catalog, IZoneLogger logger)
+        public ItemBuilder(IItemTemplateCatalog catalog, IItemInstanceIdAllocator ids, IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(catalog);
+            ArgumentNullException.ThrowIfNull(ids);
             ArgumentNullException.ThrowIfNull(logger);
             _catalog = catalog;
+            _ids = ids;
             _logger = logger;
         }
 
@@ -71,6 +74,18 @@ namespace ZoneEngine_New.Core.Inventory
                     item.GetStat(CharacterStat.ItemType),
                     item.Identity.Type,
                     item.Identity.Instance));
+            return item;
+        }
+
+        public Item CreateWithNewInstance(
+            int lowId,
+            int highId,
+            int quality,
+            ItemSource source,
+            int stackCount = 1)
+        {
+            Item item = Create(lowId, highId, quality, source, stackCount);
+            item.AssignInstanceId(_ids.Allocate());
             return item;
         }
 

@@ -123,6 +123,8 @@ namespace ZoneEngine_New
             services.AddSingleton<IInventoryRepository>(provider => provider.GetRequiredService<MySqlInventoryRepository>());
             services.AddSingleton<MySqlUploadedNanoRepository>();
             services.AddSingleton<IUploadedNanoRepository>(provider => provider.GetRequiredService<MySqlUploadedNanoRepository>());
+            services.AddSingleton<MySqlActiveNanoRepository>();
+            services.AddSingleton<IActiveNanoRepository>(provider => provider.GetRequiredService<MySqlActiveNanoRepository>());
             services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();
             services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
@@ -162,6 +164,7 @@ namespace ZoneEngine_New
             AddMessageHandler<CharInPlayMessageHandler>(services);
             AddMessageHandler<LookAtMessageHandler>(services);
             AddMessageHandler<AttackMessageHandler>(services);
+            AddMessageHandler<CastNanoSpellMessageHandler>(services);
             AddMessageHandler<StopFightMessageHandler>(services);
             AddMessageHandler<GenericCmdMessageHandler>(services);
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);

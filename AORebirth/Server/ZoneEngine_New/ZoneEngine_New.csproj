@@ -27,6 +27,7 @@
   <ItemGroup>
     <PackageReference Include="AODB" Version="1.0.6" />
     <PackageReference Include="BepuPhysics" Version="2.5.0-beta.25" />
+    <PackageReference Include="GroveGames.BehaviourTree" Version="1.1.1" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />

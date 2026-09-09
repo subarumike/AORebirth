@@ -230,6 +230,10 @@ namespace ZoneEngine_New.Core.GameData
             return result;
         }
 
+        /// <summary>
+        /// A child's hash is its property name, the same key HashInstances.json is indexed by. Scalar
+        /// members (Description, ParentHash) are metadata and are skipped.
+        /// </summary>
         static void IndexCategories(JsonElement element, string? key, Dictionary<string, string[]> result)
         {
             if (element.ValueKind != JsonValueKind.Object)
@@ -238,28 +242,15 @@ namespace ZoneEngine_New.Core.GameData
             List<string> children = new();
             foreach (JsonProperty property in element.EnumerateObject())
             {
-                if (property.Value.ValueKind != JsonValueKind.Object)
+                if (property.Value.ValueKind != JsonValueKind.Object || property.Name.Length == 0)
                     continue;
 
-                if (TryReadChildHash(property.Value, out string childHash))
-                    children.Add(childHash);
-
+                children.Add(property.Name);
                 IndexCategories(property.Value, property.Name, result);
             }
 
             if (key != null && children.Count > 0)
                 result.TryAdd(key, children.ToArray());
-        }
-
-        static bool TryReadChildHash(JsonElement obj, out string hash)
-        {
-            hash = string.Empty;
-            if (!obj.TryGetProperty("Hash", out JsonElement hashProperty)
-                || hashProperty.ValueKind != JsonValueKind.String)
-                return false;
-
-            hash = hashProperty.GetString() ?? string.Empty;
-            return hash.Length > 0;
         }
 
         static Dictionary<string, HashInstance> ParseInstances(string? json)

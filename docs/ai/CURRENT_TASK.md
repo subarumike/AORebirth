@@ -2,6 +2,27 @@
 
 ## Active
 
+ZoneEngine_New nano casting and buffs is implemented in source and unvalidated in
+game. `Core/Nanos` owns the nano program view over `ItemTemplate` (`NanoSpell`),
+NCU entries (`Buff`), the strain/stacking/NCU gate (`BuffApplyRules`), the cast
+gate (`NanoCastRules`), the in-flight cast bar (`PendingNanoCast`), and the
+runtime that sequences cast start, completion, buff application, cancel, expiry
+and the packets for each (`NanoRuntime`). Cast time and the post-cast recharge
+lockout share one AggDef/NanoCInit reduction in `NanoDelayCalculator`; nano cost
+runs through `NanoCostCalculator`. `Character` holds the buff list, used NCU,
+cast state and the recharge deadline; buff bonuses are recomputed by a coalesced
+`RebaseStats` drain on the playfield tick. Inbound `CastNanoSpell` starts a cast
+and inbound `CharacterAction RemoveFriendlyNano` cancels one NCU entry, resolved
+strictly from the `NanoProgram` identity. NCU persists through
+`charactersactivenanos` with absolute expiry, hydrates on login, and flushes in
+the existing coalesced character transaction; the recharge lockout is never
+persisted. Validation so far: ZoneEngine_New Debug build PASS and the focused
+suite PASS at 116 tests. Remaining before this can be called done: live
+official-client acceptance of cast, NCU icon/duration, cancel, and recharge,
+plus a capture for the interrupted-cast notification, which is not sent yet.
+
+## Prior active checkpoint
+
 Reconcile Delmus's nine `origin/zoneengine` commits through `4a5e86e2` with the
 current master line. Keep Legacy ZoneEngine as the production/default route;
 ZoneEngine_New remains development-only. The merged source passes the Legacy and
@@ -10,7 +31,7 @@ and all 12 mandatory repository gates. The included additive item-instance
 database migrations remain unapplied pending explicit schema approval. Governed
 exact-SHA Windows acceptance remains before the merge is promoted to master.
 
-## Prior active checkpoint
+## Prior checkpoint
 
 Crash-reconnect zombie-session fix is production accepted. Windows-authoritative
 source commit `fe6617b3bcd1d3806eddd4dbbb91e9c6680ef499` deployed to Linux

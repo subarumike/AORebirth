@@ -40,7 +40,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 && playfield.GetRequiredService<DynelRegistry>().TryGet(message.Target, out Dynel? dynel)
                 && dynel is Character character
                 && !character.IsDead
-                && character.Identity.Instance != player.Identity.Instance)
+                && character.Identity.Instance != player.Identity.Instance
+                && IsAttackable(character))
             {
                 target = character;
             }
@@ -59,6 +60,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             player.StartFighting(target.Identity, message.Action);
+        }
+
+        static bool IsAttackable(Character character)
+        {
+            return character is not NpcCharacter npc || npc.Attackable;
         }
     }
 }

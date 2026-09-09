@@ -55,22 +55,19 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         /// <summary>
         /// After the joining player's self packets: snapshot neighborhood to the player, then announce the player out.
+        /// Clears any prior recipient mapping so a new session is not treated as already spawned.
         /// </summary>
         internal void ActivatePlayerVisibility(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
 
             ulong recipientKey = player.Identity.Long();
+            ForgetRecipient(recipientKey);
             _initializedRecipients.Add(recipientKey);
-            if (!_visibleSourcesByRecipient.ContainsKey(recipientKey))
-            {
-                _visibleSourcesByRecipient[recipientKey] = new HashSet<ulong>();
-            }
+            _visibleSourcesByRecipient[recipientKey] = new HashSet<ulong>();
 
             foreach (Dynel source in CollectCandidates(player))
-            {
                 TryEnterVisibility(player, source);
-            }
 
             ReconcileSource(player);
         }
