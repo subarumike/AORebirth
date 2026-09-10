@@ -160,7 +160,7 @@ namespace ZoneEngine_New.Core.Playfield
                 };
                 npc.AttachShop(machine);
 
-                _logger.Info(
+            _logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Attached shop to NPC id={0} name={1} shopTemplate={2} machine={3}",
@@ -439,7 +439,9 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(spawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
+            SendRetailWorldEntryReadyBlock(session, player);
             session.Send(player.BuildFullCharacterMessage());
+            SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
 
             _playfieldManager.Teams.AttachPlayer(player);
@@ -509,7 +511,9 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(reconnectSpawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
+            SendRetailWorldEntryReadyBlock(session, player);
             session.Send(player.BuildFullCharacterMessage());
+            SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
 
             _playfieldManager.Teams.AttachPlayer(player);
@@ -521,12 +525,72 @@ namespace ZoneEngine_New.Core.Playfield
 
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
 
-            _logger.Info(
+                _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "ZoneReconnect completed character={0} playfield={1}",
                     characterId,
                     _playfield.Identity.Instance));
+        }
+
+        private void SendRetailWorldEntryReadyBlock(IZoneSession session, Player player)
+        {
+            // Official capture 20260623-042326 sends the entering player's SCFU and
+            // weapon state before GameTime, then SocialStatus before FullCharacter.
+            if (session is IGameTimeSession clock)
+                clock.RecordGameTimeSynchronization(DateTime.UtcNow);
+
+            session.Send(
+                new GameTimeMessage
+                {
+                    Identity = player.Identity,
+                    Unknown1 = 30024.0f,
+                    Unknown3 = 185408,
+                    Unknown4 = 80183.3125f
+                },
+                _playfield.Identity.Instance,
+                player.Identity.Instance);
+
+            session.Send(
+                new StatMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 1,
+                    Stats =
+                    [
+                        new GameTuple<CharacterStat, uint>
+                        {
+                            Value1 = CharacterStat.SocialStatus,
+                            Value2 = (uint)player.Stats.GetOrZero(CharacterStat.SocialStatus)
+                        }
+                    ]
+                });
+        }
+
+        private void SendRetailWorldEntryCompletion(IZoneSession session, Player player)
+        {
+            // Both captured retail zone transitions finish the ready block with
+            // towers, cities and SpecialAttackWeapon before the client sends CharInPlay.
+            var playfieldIdentity = new Identity
+            {
+                Type = IdentityType.Playfield2,
+                Instance = _playfield.Identity.Instance
+            };
+
+            session.Send(
+                new PlayfieldAllTowersMessage
+                {
+                    Identity = playfieldIdentity,
+                    Unknown1 = []
+                });
+            session.Send(
+                new PlayfieldAllCitiesMessage
+                {
+                    Identity = playfieldIdentity,
+                    Unknown = 0,
+                    Payload = []
+                });
+            session.Send(player.BuildSpecialAttackWeaponMessage());
         }
 
         void DespawnExpiredLinkDeadPlayers()
