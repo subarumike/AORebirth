@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Tests;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
@@ -10,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using AORebirth.Database.Dao;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
@@ -55,6 +57,9 @@ public sealed class PlayfieldTransferTests
         Assert.IsInstanceOfType<N3TeleportMessage>(teleport.Body);
         Assert.AreEqual(501, teleport.Header.Sender); Assert.AreEqual(1, teleport.Header.Receiver);
         Assert.IsInstanceOfType<ZoneRedirectionMessage>(codec.Deserialize(packets[1])!.Body);
+        var redirect = (ZoneRedirectionMessage)codec.Deserialize(packets[1])!.Body;
+        Assert.IsTrue(f.ClaimRedirect(1, redirect).Accepted);
+        Assert.IsFalse(f.ClaimRedirect(1, redirect).Accepted);
         Assert.AreEqual(0x61, ((N3TeleportMessage)teleport.Body).Unknown1);
         f.Drain(a); f.Drain(b);
         Assert.AreEqual(0, f.Packets(s).Length); Assert.AreEqual(1, f.Persist.Count);
@@ -246,8 +251,12 @@ public sealed class PlayfieldTransferTests
         readonly TradeService _trades = Blank<TradeService>();
         readonly List<Playfield> _worlds = [];
         readonly List<ZoneSession> _sessions = [];
+        readonly string _handoffDirectory = Path.Combine(Path.GetTempPath(), "aorebirth-transfer-handoff-" + Guid.NewGuid().ToString("N"));
+        readonly Dictionary<int, ZoneHandoffTicket> _tickets = [];
+        readonly ZoneHandoffStore _handoffs;
         internal Fixture()
         {
+            _handoffs = new ZoneHandoffStore(_handoffDirectory);
             Set(Manager, "_sync", new Lock()); Set(Manager, "_playersByCharacterId", new Dictionary<int, Player>());
             Set(Manager, "<Teams>k__BackingField", new TeamService(dispatchOnOwner: (player, action) =>
                 player.Playfield?.DispatchPlayerProjection(player, action)));
@@ -286,7 +295,13 @@ public sealed class PlayfieldTransferTests
         {
             var player = TestWorld.CreatePlayer(id); player.Position = new Vector3(id, 0, 0); player.Playfield = world;
             player.Stats.Set(CharacterStat.Health, 100); player.Stats.Set(CharacterStat.MaxHealth, 100);
-            player.EnterOnline(Session()); Manager.RegisterPlayer(player);
+            ZoneSession session = Session();
+            string account = "fixture-" + id.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            ZoneHandoffTicket ticket = _handoffs.Issue(account, _handoffs.BeginLogin(account), id);
+            Assert.IsTrue(_handoffs.Claim(id, ticket.Cookie1, ticket.Cookie2, _ => account).Accepted);
+            session.BindZoneHandoff(id, ticket.Cookie1, ticket.Cookie2, _handoffs);
+            _tickets[id] = ticket;
+            player.EnterOnline(session); Manager.RegisterPlayer(player);
             world.GetRequiredService<DynelRegistry>().Register(player); world.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
             return player;
         }
@@ -306,7 +321,20 @@ public sealed class PlayfieldTransferTests
             while (queue.Reader.TryRead(out var packet)) result.Add(packet);
             return result.ToArray();
         }
-        public void Dispose() { foreach (var world in _worlds) world.Dispose(); foreach (var session in _sessions) session.Close(); _flush.Dispose(); }
+        internal ZoneHandoffClaim ClaimRedirect(int character, ZoneRedirectionMessage redirect)
+        {
+            ZoneHandoffTicket ticket = _tickets[character];
+            string account = "fixture-" + character.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            return _handoffs.Claim(character, ticket.Cookie1, ticket.Cookie2, _ => account,
+                redirect.ServerIpAddress.ToString(), redirect.ServerPort);
+        }
+        public void Dispose()
+        {
+            foreach (var world in _worlds) world.Dispose();
+            foreach (var session in _sessions) session.Close();
+            _flush.Dispose();
+            if (Directory.Exists(_handoffDirectory)) Directory.Delete(_handoffDirectory, true);
+        }
         static T Blank<T>() => (T)RuntimeHelpers.GetUninitializedObject(typeof(T));
         static object Get(object target, string name) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(target)!;
         static void Set(object target, string name, object value) => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(target, value);

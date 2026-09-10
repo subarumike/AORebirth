@@ -71,31 +71,69 @@ namespace AORebirth.Database.Dao
         }
         public ZoneHandoffClaim Claim(int character, uint cookie1, uint cookie2, Func<int, string> resolveCurrentAccount)
         {
+            return Claim(character, cookie1, cookie2, resolveCurrentAccount, null, 0);
+        }
+        public ZoneHandoffClaim Claim(int character, uint cookie1, uint cookie2, Func<int, string> resolveCurrentAccount,
+            string expectedRedirectAddress, ushort expectedRedirectPort)
+        {
             if (character <= 0 || (cookie1 == 0 && cookie2 == 0)) return new ZoneHandoffClaim(false, "missing_handoff");
             if (resolveCurrentAccount == null) throw new ArgumentNullException("resolveCurrentAccount");
             return Locked(() =>
             {
                 string path = CharacterPath(character);
                 if (!File.Exists(path)) return new ZoneHandoffClaim(false, "unknown_handoff");
-                Record record;
-                using (var reader = Read(path))
-                {
-                    if (reader.ReadInt32() != 1) throw new InvalidDataException("Invalid handoff version.");
-                    record = new Record { Character = reader.ReadInt32(), Account = reader.ReadString(), Generation = reader.ReadString(),
-                        Hash = reader.ReadBytes(32), Issued = reader.ReadInt64(), Expires = reader.ReadInt64(), Consumed = reader.ReadBoolean() };
-                    if (record.Hash.Length != 32 || reader.BaseStream.Position != reader.BaseStream.Length) throw new InvalidDataException("Invalid handoff record.");
-                }
+                Record record = Load(path);
                 if (record.Character != character || !Equal(record.Hash, Hash(cookie1, cookie2))) return new ZoneHandoffClaim(false, "unknown_handoff");
                 long now = utcNow().Ticks;
-                if (now < record.Issued || now >= record.Expires || record.Expires - record.Issued > TimeSpan.FromSeconds(120).Ticks)
-                    return new ZoneHandoffClaim(false, "expired_handoff");
-                if (record.Consumed) return new ZoneHandoffClaim(false, "already_claimed");
-                if (!Current(record.Account, record.Generation)) return new ZoneHandoffClaim(false, "stale_login");
                 if (!string.Equals(record.Account, resolveCurrentAccount(character), StringComparison.OrdinalIgnoreCase))
                     return new ZoneHandoffClaim(false, "account_mismatch");
-                record.Consumed = true;
+                if (!record.InitialConsumed)
+                {
+                    if (now < record.Issued || now >= record.Expires || record.Expires - record.Issued > TimeSpan.FromSeconds(120).Ticks)
+                        return new ZoneHandoffClaim(false, "expired_handoff");
+                    if (!Current(record.Account, record.Generation)) return new ZoneHandoffClaim(false, "stale_login");
+                    record.InitialConsumed = true;
+                    Save(record); // Durable claim before any hydration/ownership. Crash here requires a fresh login.
+                    return new ZoneHandoffClaim(true, "claimed_initial");
+                }
+                if (record.RedirectExpires == 0 || record.RedirectConsumed)
+                    return new ZoneHandoffClaim(false, "already_claimed");
+                if (!string.Equals(record.RedirectAddress, expectedRedirectAddress, StringComparison.OrdinalIgnoreCase)
+                    || record.RedirectPort != expectedRedirectPort)
+                    return new ZoneHandoffClaim(false, "redirect_target_mismatch");
+                if (now < record.RedirectIssued || now >= record.RedirectExpires
+                    || record.RedirectExpires - record.RedirectIssued > TimeSpan.FromSeconds(120).Ticks)
+                    return new ZoneHandoffClaim(false, "expired_redirect");
+                record.RedirectConsumed = true;
                 Save(record); // Durable claim before any hydration/ownership. Crash here requires a fresh login.
-                return new ZoneHandoffClaim(true, "claimed");
+                return new ZoneHandoffClaim(true, "claimed_redirect");
+            });
+        }
+        public ZoneHandoffClaim AuthorizeRedirect(int character, uint cookie1, uint cookie2,
+            string targetAddress, ushort targetPort)
+        {
+            if (character <= 0 || (cookie1 == 0 && cookie2 == 0)) return new ZoneHandoffClaim(false, "missing_handoff");
+            if (string.IsNullOrWhiteSpace(targetAddress) || targetAddress.Length > 64 || targetPort == 0)
+                return new ZoneHandoffClaim(false, "invalid_redirect_target");
+            return Locked(() =>
+            {
+                string path = CharacterPath(character);
+                if (!File.Exists(path)) return new ZoneHandoffClaim(false, "unknown_handoff");
+                Record record = Load(path);
+                if (record.Character != character || !Equal(record.Hash, Hash(cookie1, cookie2)))
+                    return new ZoneHandoffClaim(false, "unknown_handoff");
+                if (!record.InitialConsumed) return new ZoneHandoffClaim(false, "initial_not_claimed");
+                long now = utcNow().Ticks;
+                if (!record.RedirectConsumed && record.RedirectExpires != 0
+                    && now >= record.RedirectIssued && now < record.RedirectExpires)
+                    return new ZoneHandoffClaim(false, "redirect_already_authorized");
+                record.RedirectAddress = targetAddress;
+                record.RedirectPort = targetPort;
+                record.RedirectIssued = now;
+                record.RedirectExpires = checked(now + TimeSpan.FromSeconds(LifetimeSeconds).Ticks);
+                record.RedirectConsumed = false;
+                Save(record);
+                return new ZoneHandoffClaim(true, "redirect_authorized");
             });
         }
         private bool Current(string account, string generation)
@@ -104,10 +142,33 @@ namespace AORebirth.Database.Dao
             if (string.IsNullOrEmpty(generation) || !File.Exists(path)) return false;
             using (var reader = Read(path)) return reader.ReadString() == generation;
         }
+        private Record Load(string path)
+        {
+            using (var reader = Read(path))
+            {
+                int version = reader.ReadInt32();
+                if (version != 1 && version != 2) throw new InvalidDataException("Invalid handoff version.");
+                var record = new Record { Character = reader.ReadInt32(), Account = reader.ReadString(), Generation = reader.ReadString(),
+                    Hash = reader.ReadBytes(32), Issued = reader.ReadInt64(), Expires = reader.ReadInt64(), InitialConsumed = reader.ReadBoolean() };
+                if (version == 2)
+                {
+                    record.RedirectAddress = reader.ReadString();
+                    record.RedirectPort = reader.ReadUInt16();
+                    record.RedirectIssued = reader.ReadInt64();
+                    record.RedirectExpires = reader.ReadInt64();
+                    record.RedirectConsumed = reader.ReadBoolean();
+                }
+                if (record.Hash.Length != 32 || reader.BaseStream.Position != reader.BaseStream.Length)
+                    throw new InvalidDataException("Invalid handoff record.");
+                return record;
+            }
+        }
         private void Save(Record record) => Write(CharacterPath(record.Character), writer =>
         {
-            writer.Write(1); writer.Write(record.Character); writer.Write(record.Account); writer.Write(record.Generation);
-            writer.Write(record.Hash); writer.Write(record.Issued); writer.Write(record.Expires); writer.Write(record.Consumed);
+            writer.Write(2); writer.Write(record.Character); writer.Write(record.Account); writer.Write(record.Generation);
+            writer.Write(record.Hash); writer.Write(record.Issued); writer.Write(record.Expires); writer.Write(record.InitialConsumed);
+            writer.Write(record.RedirectAddress ?? string.Empty); writer.Write(record.RedirectPort);
+            writer.Write(record.RedirectIssued); writer.Write(record.RedirectExpires); writer.Write(record.RedirectConsumed);
         });
         private string CharacterPath(int id) => Path.Combine(directory, "character-" + id.ToString(System.Globalization.CultureInfo.InvariantCulture) + ".bin");
         private string AccountPath(string account)
@@ -180,7 +241,9 @@ namespace AORebirth.Database.Dao
         private sealed class Record
         {
             public int Character; public string Account; public string Generation; public byte[] Hash;
-            public long Issued; public long Expires; public bool Consumed;
+            public long Issued; public long Expires; public bool InitialConsumed;
+            public string RedirectAddress; public ushort RedirectPort;
+            public long RedirectIssued; public long RedirectExpires; public bool RedirectConsumed;
         }
     }
     public sealed class ZoneHandoffTicket

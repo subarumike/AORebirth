@@ -114,6 +114,9 @@ namespace LoginEngine.MessageHandlers
                                                  CharacterId = selectCharacterMessage.CharacterId,
                                                  Cookie1 = ticket.Cookie1,
                                                  Cookie2 = ticket.Cookie2,
+                                                 EventServerType = 1,
+                                                 // The retail client stores this field but has no proven runtime consumer.
+                                                 PlayerId = 0,
                                                  ServerIpAddress = zoneIpAdress,
                                                  ServerPort =
                                                      (ushort)

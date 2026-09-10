@@ -89,6 +89,59 @@ public sealed class ZoneHandoffStoreTests
         Assert.IsFalse(f.Store.Claim(1, t.Cookie1 ^ 1, t.Cookie2, f.Account).Accepted);
         Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account).Accepted);
     }
+    [TestMethod] public void ConsumedLoginRequiresExplicitServerRedirectAuthorization()
+    {
+        using var f = new Fixture(); var t = f.Issue();
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account).Accepted);
+        Assert.AreEqual("already_claimed", f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.1", 7501).Reason);
+    }
+    [TestMethod] public void RedirectAuthorizationIsEndpointBoundSingleUseAndDoesNotUseOriginalExpiry()
+    {
+        using var f = new Fixture(); var t = f.Issue();
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account).Accepted);
+        f.Now = f.Now.AddMinutes(10);
+        Assert.IsTrue(f.Store.AuthorizeRedirect(1, t.Cookie1, t.Cookie2, "127.0.0.1", 7501).Accepted);
+        Assert.AreEqual("redirect_target_mismatch", f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.2", 7501).Reason);
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.1", 7501).Accepted);
+        Assert.AreEqual("already_claimed", f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.1", 7501).Reason);
+    }
+    [TestMethod] public void RedirectMayBeRearmedOnlyAfterPriorAllowanceIsConsumedOrExpired()
+    {
+        using var f = new Fixture(); var t = f.Issue();
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account).Accepted);
+        Assert.IsTrue(f.Store.AuthorizeRedirect(1, t.Cookie1, t.Cookie2, "127.0.0.1", 7501).Accepted);
+        Assert.AreEqual("redirect_already_authorized", f.Store.AuthorizeRedirect(1, t.Cookie1, t.Cookie2, "127.0.0.1", 7501).Reason);
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.1", 7501).Accepted);
+        Assert.IsTrue(f.Store.AuthorizeRedirect(1, t.Cookie1, t.Cookie2, "127.0.0.1", 7501).Accepted);
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.1", 7501).Accepted);
+    }
+    [TestMethod] public void ConcurrentRedirectClaimsHaveExactlyOneWinnerAcrossStoreInstances()
+    {
+        using var f = new Fixture(); var t = f.Issue();
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account).Accepted);
+        Assert.IsTrue(f.Store.AuthorizeRedirect(1, t.Cookie1, t.Cookie2, "127.0.0.1", 7501).Accepted);
+        var accepted = new bool[16];
+        Parallel.For(0, accepted.Length, i => accepted[i] = new ZoneHandoffStore(f.DirectoryPath, () => f.Now)
+            .Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.1", 7501).Accepted);
+        Assert.AreEqual(1, accepted.Count(x => x));
+    }
+    [TestMethod] public void ExpiredRedirectAndUnclaimedLoginCannotBeAuthorized()
+    {
+        using var f = new Fixture(); var unclaimed = f.Issue();
+        Assert.AreEqual("initial_not_claimed", f.Store.AuthorizeRedirect(1, unclaimed.Cookie1, unclaimed.Cookie2, "127.0.0.1", 7501).Reason);
+        Assert.IsTrue(f.Store.Claim(1, unclaimed.Cookie1, unclaimed.Cookie2, f.Account).Accepted);
+        Assert.IsTrue(f.Store.AuthorizeRedirect(1, unclaimed.Cookie1, unclaimed.Cookie2, "127.0.0.1", 7501).Accepted);
+        f.Now = f.Now.AddSeconds(121);
+        Assert.AreEqual("expired_redirect", f.Store.Claim(1, unclaimed.Cookie1, unclaimed.Cookie2, f.Account, "127.0.0.1", 7501).Reason);
+    }
+    [TestMethod] public void FreshAccountAuthenticationDoesNotBreakAnAlreadyAdmittedSessionsRedirect()
+    {
+        using var f = new Fixture(); var t = f.Issue();
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account).Accepted);
+        f.Store.BeginLogin("accountA");
+        Assert.IsTrue(f.Store.AuthorizeRedirect(1, t.Cookie1, t.Cookie2, "127.0.0.1", 7501).Accepted);
+        Assert.IsTrue(f.Store.Claim(1, t.Cookie1, t.Cookie2, f.Account, "127.0.0.1", 7501).Accepted);
+    }
     [TestMethod] public void CorruptStorageFailsClosed()
     {
         using var f = new Fixture(); var t = f.Issue();

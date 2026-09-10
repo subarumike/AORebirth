@@ -96,6 +96,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
+            if (session is not ZoneSession zoneSession)
+            {
+                _logger.Warn("Zone admission rejected: reason=unsupported_session");
+                session.Close();
+                return;
+            }
+            zoneSession.BindZoneHandoff(message.CharacterId, message.Cookie1, message.Cookie2);
+
             int characterId = message.CharacterId;
             if (characterId <= 0)
             {
