@@ -1,84 +1,44 @@
 # NewEngine operational acceptance
 
-This is an evidence boundary, not a production acceptance certificate.
-FAIL below means required fresh disposable/connected proof was not obtained; it
-does not claim that every listed behavior is broken.
+The authenticated positive lifecycle is proven on disposable loopback MySQL.
+Production cutover remains **NO**: a direct zone connection received the character
+without LoginEngine authentication. This is an observed character-access integrity
+failure, not missing gameplay coverage.
 
-| Required acceptance | Result | Available evidence and missing proof |
+| Gate | Result | Evidence |
 | --- | --- | --- |
-| Account login, character selection, world entry | FAIL | Session ownership/hydration unit tests exist; the fixture has no authenticated protocol sequence |
-| Character loading | FAIL | Unit coverage; fresh real-MySQL reload fixture compiled but blocked |
-| Character saving | FAIL | Snapshot transaction and failure tests; disposable runtime proof blocked |
-| Reconnect | FAIL | Actor/transport lease tests; no connected durable reconnect sequence |
-| Inventory preservation | FAIL | Exact instance/owner/slot/QL/count/source fixture added; not executed |
-| Clean restart | FAIL | Process lifecycle fixture present; Docker prevents runtime execution |
-| Transactional integrity | FAIL | Deterministic failure tests pass; fresh multi-record MySQL rollback execution blocked |
-| Schema fail-closed | FAIL | Contract/startup unit and package guards; fresh schema mismatch runtime fixture blocked |
-| Post-write Legacy rollback | UNKNOWN | Source shows stale Legacy inventory tables; the added disposable check did not execute |
+| Authentication, list, selection, world entry | PASS | Real challenge/credentials, ZoneInfo, FullCharacter and both quest journals |
+| Character save, exact inventory, credits, position | PASS | Connected move 64 to 66, real acknowledgement, SQL and subsequent wire assertions |
+| Authenticated reconnect | PASS | Fresh clients repeat credentials and selection; no repair writes |
+| Clean restart and exact state | PASS | Exit zero, distinct ZoneEngine PID, identical binary, fresh authenticated entry |
+| Active nano and morph restoration | PASS | Exact durable identity/strain/duration/expiry, decreasing wire timer, captured morph payload |
+| Morph cancellation and baseline restoration | PASS | RemoveFriendlyNano, Buff removal, MonsterData=0, original meshes; another authenticated reconnect |
+| Authored and generated mission reload | PASS | Pre-start seeds, both real journals, exact generated binding/object snapshot and physical key |
+| Generic unsupported item effects | PASS | Five retained Set/Hit/SetFlag/ClearFlag/UploadNano regression tests |
+| Wrong password and invalid inventory source | PASS | Connected rejection; valid move acknowledgement establishes ordering; exact state remains |
+| Transactions, schema refusal, durable repository reload | PASS | Separate full disposable suite, injected failures and process cycles |
+| Unauthenticated zone admission | **FAIL** | Direct ZoneLogin receives FullCharacter without any LoginEngine connection |
+| Executable-only Legacy rollback after NewEngine writes | **UNSAFE** | Executed stale Legacy item-table assertions |
 
-No inference is made from historical baseline receipts to this branch's fresh
-runtime acceptance. The provided baseline had 479 tests and earlier migration/
-restart proof; those historical results are not relabelled current.
+Inventory move and morph cancellation are CONNECTED_MUTATION_PROVEN.
+Nano activation and authored/generated mission state are SEEDED_STATE_RELOAD;
+connected casting, mission rolling/acceptance/completion/rewards are not claimed.
+Credits remain exactly1234; this proves preservation, not a credit-changing action.
+No equipment action is claimed. Separate repository transactions are still
+REPOSITORY_ONLY_PROOF even when they execute real MySQL.
 
-## What the new fixture actually tests
+The generic SCFU tail and fixed-effect SpellList reader cannot fully describe
+the captured variable-criterion morph payload. The fixture compares the actual
+received payload with the existing capture-backed MorphVisualPackets adapter,
+checks SetNanoDuration and the durable nano record, and observes baseline
+restoration on cancellation. It does not invent a decoder or claim live-client
+visual acceptance.
 
-`Tools/ZoneEngineSchemaValidation/CutoverDurableReloadSmoke.cs` seeds only the
-disposable fixture, uses actual character/inventory/stat repositories, swaps
-two exact item identities, changes a stack, moves one item to wear storage and
-persists cash and position. Fresh hydration validates both items' identities,
-templates, quality, source metadata, owner, container and slot, plus cash and
-position. It repeats the reload after each of two real engine process cycles,
-compares whole database fingerprints and checks for phantom owned rows.
+See [connected report](NEWENGINE_CONNECTED_ACCEPTANCE.md) and
+[exact-source receipt](NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md).
+The historical Docker failure at d1c6d01 is superseded by actual disposable runs.
+No global Docker configuration or production state was changed.
 
-This does not send an equip request or prove equip legality. It does not log an
-account in, select a character, exercise session save/logout or reconnect over the
-protocol. Engine lifecycle connects a loopback socket only. Existing separate
-nano/morph, mission, trade and inventory fixtures remain useful but are not a
-substitute for the single connected lifecycle requested for cutover.
-
-## Required connected acceptance completion
-
-Use only a labelled disposable database and loopback endpoints. Build the client
-fixture from the repository's actual login and zone packet contracts; do not
-launch or control Mike's game client. Seed an account through the accepted
-account boundary, authenticate, select a character and enter the world. Record
-the authoritative pre-state. Perform supported move/swap/equip/unequip,
-stack/consumption, credit and transactional actions. Include supported active
-nano/morph and mission persistence; reject unsupported routes before mutation.
-Save/logout, reconnect and assert exact committed state. Request clean shutdown,
-restart the same NewEngine/database, reconnect and assert the same state again.
-
-Assert item instance/template/QL/count/source and all container/slot/owner
-coordinates, equipment, credits and relevant durable character/mission/nano
-fields. Check absence of duplicates, lost/stale copies and phantom rows. Inject
-definite pre-commit failures and ambiguous commit outcomes; require no partial
-publication and quarantine ambiguous outcomes. Unit success alone is insufficient.
-
-`ZoneLoginHandler` still contains an existing session-cookie validation TODO.
-The credential-to-zone ownership handoff must be established from actual
-contracts in this fixture; hydration by character ID must not be presented as
-authentication proof.
-
-## Available validation and failures
-
-The local branch passed the normal Windows build (Legacy and NewEngine), 484
-NewEngine tests and NewEngine offline startup readiness. Linux self-contained
-cross-publication passed default-engine, source, SQL, package, backend and offline
-startup guards. Package-negative fixtures passed 4/4, source-omission fixtures 2/2.
-This publication ran on Windows; it is not Linux-host acceptance.
-
-Initial AOtomation had 1128 pass / 1 fail from the inherited patrol path assertion.
-The repaired focused test passed. Full post-commit acceptance then passed:
-1129/1129 AOtomation, 484/484 NewEngine tests and 12/12 mandatory stages at
-`d1c6d01e976a841dd1cdb85c6f31a62aa4ddf767`. See the final validation receipt.
-
-The real disposable command compiled the new fixture and failed before database
-creation with `SCHEMA_VALIDATION=FAIL docker-image-failed`. Docker's backend
-cannot initialize `.../Docker/run/dockerInference` on this host. This is
-ENVIRONMENTAL, not a schema or gameplay failure. No production settings were used.
-
-Logs are generated, ignored artifacts in `build-verify/cutover-*.log`.
-The source/feature inventories have deterministic --write/--check validation.
-Feature statuses describe scoped implementation, not a universal fail-closed
-proof for all catalog routes. Global unsupported-action acceptance is therefore
-not claimed; the new five-case generic durable-effect boundary is proven locally.
+NEWENGINE_OPERATIONAL_CUTOVER_READY=NO
+CHARACTER_AND_INVENTORY_INTEGRITY_PROVEN=YES (tested authenticated lifecycle)
+AUTHENTICATED_CONNECTED_ACCEPTANCE_PROVEN=YES (positive sequence; admission isolation FAIL)

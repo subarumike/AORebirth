@@ -10,14 +10,14 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 /// </summary>
 static class CutoverDurableReloadSmoke
 {
-    const int CharacterId = 9701;
+    const int CharacterId = 9801;
     public static void Validate(string engine, DisposableSchemaDatabase fixture, MySqlConnection connection)
     {
         string? previous = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
         try
         {
             Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", fixture.ConnectionString);
-            FixtureSql.Execute(connection, "INSERT INTO characters (Id,Name,FirstName,LastName,Playfield,X,Y,Z,HeadingW,HeadingX,HeadingY,HeadingZ,Online) VALUES (9701,'CutoverFixture','','',4582,100,20,100,1,0,0,0,0)");
+            FixtureSql.Execute(connection, $"INSERT INTO characters (Id,Name,FirstName,LastName,Playfield,X,Y,Z,HeadingW,HeadingX,HeadingY,HeadingZ,Online) VALUES ({CharacterId},'CutoverFixture','','',4582,100,20,100,1,0,0,0,0)");
             var log = new SilentLogger();
             var inventory = new MySqlInventoryRepository(log);
             int identity = inventory.LeaseInstanceIdBlock(2);
@@ -53,8 +53,8 @@ static class CutoverDurableReloadSmoke
             VerifyFreshReload(fixture, connection, identity);
             Require(durable == FixtureSql.Fingerprint(connection), "second-restart-exact-database-fingerprint");
             Require(legacyBefore == FixtureSql.TableFingerprint(connection, "items") + FixtureSql.TableFingerprint(connection, "instanceditems"), "legacy-tables-remain-stale-after-new-write");
-            Require(FixtureSql.Scalar(connection, "SELECT COUNT(*) FROM items WHERE ContainerType=9701") == 0
-                && FixtureSql.Scalar(connection, "SELECT COUNT(*) FROM instanceditems WHERE ContainerType=9701") == 0, "new-owned-items-not-readable-from-legacy-tables");
+            Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM items WHERE ContainerType={CharacterId}") == 0
+                && FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM instanceditems WHERE ContainerType={CharacterId}") == 0, "new-owned-items-not-readable-from-legacy-tables");
             Console.WriteLine("CUTOVER_DAO_FRESH_RELOAD=PASS CUTOVER_EXACT_ITEM_STATE=PASS CUTOVER_PERSISTED_STATE_PROCESS_RESTART=PASS POST_NEWENGINE_WRITE_LEGACY_ROLLBACK_SAFE=NO LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED");
         }
         finally { Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", previous); }
@@ -78,7 +78,7 @@ static class CutoverDurableReloadSmoke
             && first.LowId == 20 && first.HighId == 21 && first.Quality == 17 && first.StackCount == 7 && (int)first.Source == 1, "exact-first-item-state");
         Require(second.ContainerType == (int)IdentityType.WeaponPage && second.ContainerInstance == CharacterId && second.ContainerPlacement == 6
             && second.LowId == 22 && second.HighId == 23 && second.Quality == 18 && second.StackCount == 1 && second.Source == 0, "exact-equipped-item-state");
-        Require(FixtureSql.Scalar(connection, "SELECT COUNT(*) FROM item_instances WHERE ContainerInstance=9701") == 2, "no-phantom-owned-rows");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={CharacterId}") == 2, "no-phantom-owned-rows");
     }
     static void Require(bool condition, string name) { if (!condition) throw new FixtureFailure("cutover-" + name); }
 }

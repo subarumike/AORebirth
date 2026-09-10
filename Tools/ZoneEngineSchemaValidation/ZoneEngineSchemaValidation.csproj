@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../LinuxBuild/Tools/Stage7MySqlSecurityIntegrationTests/DeterministicLoginKeyEncoder.cs" Link="Shared/DeterministicLoginKeyEncoder.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Core/Encryption/BigInteger.cs" Link="Shared/BigInteger.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Core/Encryption/PasswordHash.cs" Link="Shared/PasswordHash.cs" />
     <ProjectReference Include="../DatabaseMigrationTool/DatabaseMigrationTool.csproj" />
     <ProjectReference Include="../../AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj" />
   </ItemGroup>

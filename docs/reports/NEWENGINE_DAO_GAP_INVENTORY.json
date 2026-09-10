@@ -1783,7 +1783,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-      "sourceSha256": "4703139eeed65444ed0ebfea2454e41a900b2bb5071a439f23703c559f48af16",
+      "sourceSha256": "9838500c9e4ea6e3e5d1156ab38a6fa8e9f4cde3f3f71743de90ff290a5a71f1",
       "class": "GeneratedMissionAcgService",
       "method": "ResolveLogin",
       "signature": "(int characterId, int storedPlayfield)",
@@ -1806,7 +1806,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-      "sourceSha256": "4703139eeed65444ed0ebfea2454e41a900b2bb5071a439f23703c559f48af16",
+      "sourceSha256": "9838500c9e4ea6e3e5d1156ab38a6fa8e9f4cde3f3f71743de90ff290a5a71f1",
       "class": "GeneratedMissionAcgService",
       "method": "Accept",
       "signature": "(Player player, Identity originalOffer)",
@@ -1820,6 +1820,7 @@
         "IItemInstanceIdAllocator"
       ],
       "calls": [
+        "CanonicalBundleHash",
         "CreateRepairComponent",
         "DecodeFrozenOffer",
         "GeneratedMissionArtifactProjection.Send",
@@ -1853,7 +1854,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-      "sourceSha256": "4703139eeed65444ed0ebfea2454e41a900b2bb5071a439f23703c559f48af16",
+      "sourceSha256": "9838500c9e4ea6e3e5d1156ab38a6fa8e9f4cde3f3f71743de90ff290a5a71f1",
       "class": "GeneratedMissionAcgService",
       "method": "TryEnter",
       "signature": "(Player player, Identity entrance, int low, int high)",
@@ -1881,7 +1882,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-      "sourceSha256": "4703139eeed65444ed0ebfea2454e41a900b2bb5071a439f23703c559f48af16",
+      "sourceSha256": "9838500c9e4ea6e3e5d1156ab38a6fa8e9f4cde3f3f71743de90ff290a5a71f1",
       "class": "GeneratedMissionAcgService",
       "method": "PrepareWorld",
       "signature": "(GeneratedMissionBinding binding)",
@@ -1903,7 +1904,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-      "sourceSha256": "4703139eeed65444ed0ebfea2454e41a900b2bb5071a439f23703c559f48af16",
+      "sourceSha256": "9838500c9e4ea6e3e5d1156ab38a6fa8e9f4cde3f3f71743de90ff290a5a71f1",
       "class": "GeneratedMissionAcgService",
       "method": "TryUse",
       "signature": "(Player player, GeneratedMissionObject stale)",
@@ -1931,7 +1932,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-      "sourceSha256": "4703139eeed65444ed0ebfea2454e41a900b2bb5071a439f23703c559f48af16",
+      "sourceSha256": "9838500c9e4ea6e3e5d1156ab38a6fa8e9f4cde3f3f71743de90ff290a5a71f1",
       "class": "GeneratedMissionAcgService",
       "method": "ReservePlayfield",
       "signature": "()",
