@@ -684,7 +684,9 @@ api|type.serializable-attribute|false
 api|type.base|System.Object
 api|type.constructor|public instance .ctor(System.String directory,System.Func<System.DateTime> utcNow optional=true;default=null)
 api|type.property|public static System.Int32 LifetimeSeconds {get:public;set:none}
+api|type.method|public instance AORebirth.Database.Dao.ZoneHandoffClaim AuthorizeRedirect(System.Int32 character,System.UInt32 cookie1,System.UInt32 cookie2,System.String targetAddress,System.UInt16 targetPort)
 api|type.method|public instance AORebirth.Database.Dao.ZoneHandoffClaim Claim(System.Int32 character,System.UInt32 cookie1,System.UInt32 cookie2,System.Func<System.Int32,System.String> resolveCurrentAccount)
+api|type.method|public instance AORebirth.Database.Dao.ZoneHandoffClaim Claim(System.Int32 character,System.UInt32 cookie1,System.UInt32 cookie2,System.Func<System.Int32,System.String> resolveCurrentAccount,System.String expectedRedirectAddress,System.UInt16 expectedRedirectPort)
 api|type.method|public instance AORebirth.Database.Dao.ZoneHandoffTicket Issue(System.String account,System.String generation,System.Int32 selectedCharacter)
 api|type.method|public instance System.String BeginLogin(System.String authenticatedAccount)
 api|type.method|public static AORebirth.Database.Dao.ZoneHandoffStore Configured()
