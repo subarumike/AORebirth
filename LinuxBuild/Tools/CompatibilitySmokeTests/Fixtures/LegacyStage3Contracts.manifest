@@ -666,6 +666,41 @@ api|type.serializable-attribute|false
 api|type.base|AORebirth.Database.Dao.Dao<AORebirth.Database.Entities.DBVendorTemplate,AORebirth.Database.Dao.VendorTemplateDao>
 api|type.constructor|public instance .ctor()
 api|type.end|AORebirth.Database.Dao.VendorTemplateDao
+api|type.begin|AORebirth.Database.Dao.ZoneHandoffClaim
+api|type.kind|class
+api|type.modifiers|sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.constructor|public instance .ctor(System.Boolean accepted,System.String reason)
+api|type.property|public instance System.Boolean Accepted {get:public;set:private}
+api|type.property|public instance System.String Reason {get:public;set:private}
+api|type.method|public instance special-name System.Boolean get_Accepted()
+api|type.method|public instance special-name System.String get_Reason()
+api|type.end|AORebirth.Database.Dao.ZoneHandoffClaim
+api|type.begin|AORebirth.Database.Dao.ZoneHandoffStore
+api|type.kind|class
+api|type.modifiers|sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.constructor|public instance .ctor(System.String directory,System.Func<System.DateTime> utcNow optional=true;default=null)
+api|type.property|public static System.Int32 LifetimeSeconds {get:public;set:none}
+api|type.method|public instance AORebirth.Database.Dao.ZoneHandoffClaim Claim(System.Int32 character,System.UInt32 cookie1,System.UInt32 cookie2,System.Func<System.Int32,System.String> resolveCurrentAccount)
+api|type.method|public instance AORebirth.Database.Dao.ZoneHandoffTicket Issue(System.String account,System.String generation,System.Int32 selectedCharacter)
+api|type.method|public instance System.String BeginLogin(System.String authenticatedAccount)
+api|type.method|public static AORebirth.Database.Dao.ZoneHandoffStore Configured()
+api|type.method|public static special-name System.Int32 get_LifetimeSeconds()
+api|type.end|AORebirth.Database.Dao.ZoneHandoffStore
+api|type.begin|AORebirth.Database.Dao.ZoneHandoffTicket
+api|type.kind|class
+api|type.modifiers|sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.constructor|public instance .ctor(System.UInt32 first,System.UInt32 second)
+api|type.property|public instance System.UInt32 Cookie1 {get:public;set:private}
+api|type.property|public instance System.UInt32 Cookie2 {get:public;set:private}
+api|type.method|public instance special-name System.UInt32 get_Cookie1()
+api|type.method|public instance special-name System.UInt32 get_Cookie2()
+api|type.end|AORebirth.Database.Dao.ZoneHandoffTicket
 api|type.begin|AORebirth.Database.DatabaseDaoFactory
 api|type.kind|class
 api|type.modifiers|abstract,sealed
