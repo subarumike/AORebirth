@@ -71,7 +71,17 @@ namespace LoginEngine
             "account_game_mappings",
             "account_identities",
             "account_password_reset_tokens",
-            "account_provisioning_jobs"
+            "account_provisioning_jobs",
+            "generatedmissionartifacts",
+            "generatedmissionbatches",
+            "generatedmissionbindings",
+            "generatedmissionobjects",
+            "generatedmissionobservations",
+            "generatedmissionoffers",
+            "generatedmissionsequences",
+            "item_instance_id_sequence",
+            "item_instances",
+            "schema_migrations"
         };
 
         private static volatile bool exited;

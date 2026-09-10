@@ -747,10 +747,43 @@ namespace AORebirth.LinuxBuild.Contracts
             string ownershipGuardPath = RequireFile(
                 Path.Combine(root, "AORebirth", "Libraries", "Source", "AORebirth.Database", "Dao", "CharacterOnlineOwnershipGuard.cs"),
                 "session ownership guard source");
+            string linuxProgramPath = RequireFile(
+                Path.Combine(root, "LinuxBuild", "Compatibility", "LoginEngine", "LinuxProgram.cs"),
+                "LoginEngine Linux program source");
             string unit = File.ReadAllText(unitPath);
             string zoneUnit = File.ReadAllText(zoneUnitPath);
             string environment = File.ReadAllText(environmentPath);
             string ownershipGuard = File.ReadAllText(ownershipGuardPath);
+            string linuxProgram = File.ReadAllText(linuxProgramPath);
+            int allowlistStart = linuxProgram.IndexOf(
+                "private static readonly string[] AllowedExtensionTables",
+                StringComparison.Ordinal);
+            int allowlistEnd = allowlistStart < 0
+                ? -1
+                : linuxProgram.IndexOf("};", allowlistStart, StringComparison.Ordinal);
+            Assert(allowlistStart >= 0 && allowlistEnd > allowlistStart,
+                "LoginEngine Linux database extension allowlist is missing.");
+            string extensionAllowlist = linuxProgram.Substring(
+                allowlistStart,
+                allowlistEnd - allowlistStart);
+            foreach (string tableName in new[]
+            {
+                "generatedmissionartifacts",
+                "generatedmissionbatches",
+                "generatedmissionbindings",
+                "generatedmissionobjects",
+                "generatedmissionobservations",
+                "generatedmissionoffers",
+                "generatedmissionsequences",
+                "item_instance_id_sequence",
+                "item_instances",
+                "schema_migrations"
+            })
+            {
+                Assert(
+                    extensionAllowlist.IndexOf("\"" + tableName + "\"", StringComparison.Ordinal) >= 0,
+                    "LoginEngine Linux database extension allowlist omits current NewEngine table " + tableName + ".");
+            }
             VerifyExactActiveLine(
                 unit,
                 "Environment=AO_REBIRTH_EXPECTED_DATABASE=aorebirth_chatengine_stage6",
