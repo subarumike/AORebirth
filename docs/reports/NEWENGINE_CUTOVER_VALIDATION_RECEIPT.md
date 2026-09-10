@@ -1,14 +1,152 @@
 # NewEngine cutover validation receipt
 
-## Connected acceptance candidate
+## Final connected acceptance receipt
 
-The new connected fixture executes the full authenticated positive lifecycle,
-including distinct-process restart and morph cancellation; disposable schema and
-durable reload also execute. NewEngine tests: PASS 485/485. Direct unauthenticated
-zone admission is reproduced, so overall operational readiness remains NO.
-The exact committed-source rerun and binary/log hashes will replace this candidate
-paragraph after the source commit. The older receipt below remains historical;
-its Docker failure and missing instrumentation no longer describe current state.
+SOURCE_SHA=eddd90e73fdf912f766c5218acd4c07ec2972980
+STARTING_SHA=de764881cfae677bd0b2975499e8ad6cb5944c4a
+BRANCH=codex/newengine-production-cutover-001
+ORIGIN_MASTER_SHA=6e90dda030774726aa2060acb9edb756ea1f635c
+DEVELOPER_REF_SHA=53c858d9900266fb6740975dbb2b5011a5792e66
+
+Worktree: `C:\Users\Mike\Documents\AORebirth\tools-temp\cutover001`.
+The source commit was pushed and all final execution below used that clean
+committed source. The following receipt commit changes documentation only;
+it must not be substituted for the actual tested source SHA above.
+
+**Decision: operational cutover NO.** Positive authenticated connected lifecycle
+passes. Direct unauthenticated zone admission also succeeds, which fails the
+negative admission gate. No failed admission result is overridden by unit tests
+or positive login evidence. Production, master and developer branch are untouched.
+
+| Evidence category | Final result |
+| --- | --- |
+| STATIC/BUILD EVIDENCE | Windows Legacy + NewEngine build PASS; exact-SHA acceptance PASS; NewEngine 485/485, AOtomation 1129/1129; mandatory stages 12/12; source/default/SQL/backend guards PASS; inventory check PASS, 93 links / 99 method rows |
+| REPOSITORY PERSISTENCE EVIDENCE | Fresh disposable migrations, negative schema/startup, injected transaction failures, exact inventory/stat/nano/mission persistence and CutoverDurableReloadSmoke PASS |
+| PROCESS LIFECYCLE EVIDENCE | Real LoginEngine and NewEngine start; normal logout; clean zone shutdown and exit; distinct process restart; same Debug binary; owned process/container/network cleanup PASS |
+| AUTHENTICATED WIRE EVIDENCE | Credentials/list/selection/world entry, acknowledged inventory move, fresh authenticated reconnect, fresh authenticated reconnect after restart, exact state and connected morph cancellation PASS; unauthenticated zone admission FAIL |
+
+### Exact connected execution
+
+```text
+DATABASE_FIXTURE_ID=aorebirth-zone-schema-9d25823d58a04451b110fb1678b06994
+ACCEPTANCE_TIMESTAMP=2026-09-10T01:27:45.6844450Z
+SOURCE_WORKTREE_TRACKED_CLEAN=YES
+ZONEENGINE_NEW_BINARY_SHA256=88d1d8686cce71d6c5a51416da8cf1e575e5f86cfcb84ede83127f706b6a50e2
+LOGINENGINE_BINARY_SHA256=1be83a560282af4adb40c363e34d92c26379dcdc4a8e82f2b0867575a0378bb8
+ENGINE_PID_BEFORE=16372
+ENGINE_PID_AFTER=29964
+ENGINE_RESTART_PROVEN=YES
+CONNECTED_POSITIVE_LIFECYCLE=PASS
+CONNECTED_WRONG_PASSWORD_FAIL_CLOSED=PASS
+CONNECTED_INVALID_INVENTORY_SOURCE_FAIL_CLOSED=PASS
+UNAUTHENTICATED_ZONE_CHARACTER_ACCESS=REPRODUCED
+ZONE_HANDOFF_FAIL_CLOSED=FAIL
+CONNECTED_MORPH_CANCEL=PASS
+BASELINE_RESTORATION=PASS
+MORPH_CANCEL_AUTHENTICATED_RECONNECT=PASS
+DISPOSABLE_CLEANUP=PASS
+```
+
+The connected wrapper's shell invocation returned nonzero, as required by the
+reproduced admission failure. No exception or setup failure occurred in the final
+positive lifecycle. The fixture identifies its negative failure explicitly.
+
+The exact Windows command was:
+`cmd /d /c Tools\accept_windows_source.cmd --expected-sha eddd90e73fdf912f766c5218acd4c07ec2972980 --mandatory-gate`.
+Its receipt is `build-verify/windows-acceptance-eddd90e7.env`.
+Placement manifest SHA256:
+`a5a0b2efc51508500f4542e8403389b95946408344ed31eab06739cbf3465108`.
+
+Connected binaries were the accepted Windows build's
+`AORebirth/Built/Debug/ZoneEngine_New/ZoneEngine_New.dll` and
+`AORebirth/Built/Debug/LoginEngine.exe`. The independent full schema wrapper used
+the same committed source's Release ZoneEngine_New.dll. Run commands are recorded
+in WORKFLOW.md; both wrappers require explicit binary paths and own their DB.
+
+Linux command: `cmd /d /c LinuxBuild\publish-zoneengine.cmd linux-x64 true`.
+Self-contained publication, offline startup validation, default-engine parity,
+source inventory, SQL parity and backend guards PASS. Package negatives 4/4 and
+source-omission negatives 2/2 PASS. This is Linux-target publication on Windows;
+fresh Linux-host service/runtime acceptance was NOT RUN. No deployment occurred.
+
+### Persistence and rollback interpretation
+
+Connected inventory movement and morph cancellation are proven mutations.
+Nano activation and authored/generated mission progress are pre-start seeds,
+verified over authenticated wire and read-only durable state after reconnect and
+restart. Credits are preserved at 1234; no connected credit reward is claimed.
+The exact state table and packet limitations are in NEWENGINE_CONNECTED_ACCEPTANCE.md.
+
+The separate full disposable suite returned exit zero and reported:
+
+```text
+SCHEMA_NEGATIVE_TEST=PASS
+SCHEMA_CURRENT_TEST=PASS
+EXPLICIT_MIGRATION_TEST=PASS
+COPY_FAILURE_ROLLBACK=PASS
+CUTOVER_DAO_FRESH_RELOAD=PASS
+CUTOVER_EXACT_ITEM_STATE=PASS
+CUTOVER_PERSISTED_STATE_PROCESS_RESTART=PASS
+POST_NEWENGINE_WRITE_LEGACY_ROLLBACK_SAFE=NO
+RUNTIME_RESTART=PASS
+PRODUCTION_CONTACT=NO
+DISPOSABLE_CLEANUP=PASS
+```
+
+Legacy inventory tables remain stale after NewEngine writes. Executable-only
+rollback is unsafe; a return to Legacy requires validated database restoration
+or a separately validated reconciliation. This does not claim a production backup
+has been restored. Snapshot restoration would discard later writes.
+
+### Retained evidence hashes
+
+Logs are ignored local artifacts in this worktree, not committed credentials.
+
+| Artifact | SHA256 |
+| --- | --- |
+| build-verify/connected-final.log | 8b987f0223ecaf3ea13096ad9307c524622c15362c36d985fa74842d13a2496e |
+| build-verify/connected-schema-final.log | 4aa43e1049b98d3d74d82b57f909e74028fc5fdf5a87fc9c9bb8bd38fb9c5637 |
+| build-verify/connected-windows-acceptance.log | cac37fc9609aea509690aa6f1db6fefa2838d4eb7dd845c3202f8a224d6e6347 |
+| build-verify/connected-linux-publish.log | 264c5fce99f88943dc4ee6c33796e5c915241ecf919f84f53862c1dbfdccdf76 |
+
+### Files changed in this task
+
+Six added, fifteen modified relative to starting de764881. Generated builds,
+logs, package outputs and process logs stay ignored. The two inventory JSONs
+are regenerated tracked artifacts; dependency/method counts are unchanged.
+
+Added:
+
+- Tools/ZoneEngineSchemaValidation/ConnectedAcceptanceSmoke.cs
+- Tools/ZoneEngineSchemaValidation/ConnectedEngineProcess.cs
+- Tools/ZoneEngineSchemaValidation/ConnectedMissionSeed.cs
+- Tools/ZoneEngineSchemaValidation/ConnectedWireClient.cs
+- Tools/run_newengine_connected_acceptance.cmd
+- docs/reports/NEWENGINE_CONNECTED_ACCEPTANCE.md
+
+Modified:
+
+- AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs
+- AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs
+- AORebirth/Server/ZoneEngine_New/Properties/IntegrationTestVisibility.cs
+- Tools/ZoneEngineSchemaValidation/CutoverDurableReloadSmoke.cs
+- Tools/ZoneEngineSchemaValidation/Program.cs
+- Tools/ZoneEngineSchemaValidation/ZoneEngineSchemaValidation.csproj
+- docs/ai/CURRENT_TASK.md
+- docs/ai/WORKFLOW.md
+- docs/project/PROJECT_STATE.md
+- docs/reports/NEWENGINE_CUTOVER_HANDOFF.md
+- docs/reports/NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md
+- docs/reports/NEWENGINE_DAO_GAP_INVENTORY.json
+- docs/reports/NEWENGINE_DATABASE_CUTOVER_AND_ROLLBACK_PLAN.md
+- docs/reports/NEWENGINE_LEGACY_DEPENDENCY_INVENTORY.json
+- docs/reports/NEWENGINE_OPERATIONAL_ACCEPTANCE.md
+
+Runtime changes are limited to canonical accepted-bundle hashes and test assembly
+visibility. No Legacy removal, DAO consolidation, schema edit, master merge,
+developer change, production database operation or production service operation.
+The prior receipt below is historical; its Docker and instrumentation failures
+no longer describe current execution.
 
 ## Historical foundation source and result
 

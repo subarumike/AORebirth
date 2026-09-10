@@ -5,7 +5,7 @@
 Mike-owned branch codex/newengine-production-cutover-001, starting at
 de764881cfae677bd0b2975499e8ad6cb5944c4a.
 Worktree: C:\Users\Mike\Documents\AORebirth\tools-temp\cutover001.
-Master remains6e90dda030774726aa2060acb9edb756ea1f635c and the developer ref
+Master remains 6e90dda030774726aa2060acb9edb756ea1f635c and the developer ref
 53c858d9900266fb6740975dbb2b5011a5792e66. No master merge, developer edits,
 production access, schema changes, Legacy deletion or DAO consolidation.
 
@@ -21,7 +21,7 @@ MySQL/network, loopback endpoints and random credentials. Pinned image:
 mysql@sha256:c592c15aaf4a1961e15d82eb31ea5987dda862d1c4b1e93424438c0e91dc1f8d.
 Only that database is migrated with the existing explicit migration tool.
 
-Before startup, setup creates account/character9901, base stats, two items,
+Before startup, setup creates account/character 9901, base stats, two items,
 an uploaded active supported morph, the existing DeliverArmor quest and a
 generated mission. Generated setup reuses the real deterministic generator,
 captured ACG bundle, materializer, difficulty policy, reserved identities and DAO.
@@ -38,7 +38,7 @@ It never starts or controls the AO client.
 2. UserLogin -> ServerSalt -> UserCredentials -> CharacterList -> SelectCharacter
    -> ZoneInfo -> ZoneLogin -> FullCharacter -> CharInPlay -> both quest journals.
 3. Assert character, exact inventory, credits, position, nano/morph and missions.
-4. Send invalid inventory source9999, then supported slot64-to-66 move. Await its
+4. Send invalid inventory source 9999, then supported slot 64-to-66 move. Await its
    real acknowledgement and assert exact durable results.
 5. Logout, discard clients, authenticate/select/connect again and compare.
 6. Separately test direct zone admission. Its unexpected FullCharacter is FAIL,
@@ -71,8 +71,8 @@ reward, equip legality or live-client visual claim is made.
 
 ## Repairs and concrete remaining blocker
 
-The independent durable reload fixture reused character9701 owned by
-AuthoredMissionSmoke. It now owns9801, removing a test-data collision.
+The independent durable reload fixture reused character 9701 owned by
+AuthoredMissionSmoke. It now owns 9801, removing a test-data collision.
 
 Captured bundle hashes are uppercase; the DAO requires canonical lowercase.
 NewEngine canonicalizes the acceptance-plan hash without changing its digest.
