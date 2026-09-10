@@ -195,6 +195,7 @@ namespace ZoneEngine_New.Core.Entities
             if (maxHealth > 0)
                 Stats.Set(CharacterStat.Health, maxHealth, StatDetail.Base, dirty: true);
             SetFightingTarget(Identity.None);
+            // Path settle is announced by NpcBrain.StopPathing before OnReset.
             Motor.ClearPath();
         }
 

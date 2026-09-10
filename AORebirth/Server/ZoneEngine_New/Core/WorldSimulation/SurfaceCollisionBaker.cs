@@ -46,7 +46,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
         {
             int vertexCount = vertices.Count;
             int triangleCount = triangles.Count;
-            pool.Take<Triangle>(triangleCount, out Buffer<Triangle> tris);
+            // Bepu mesh rays are one-sided; bake each triangle twice so LOS/sweeps hit either face.
+            int bakedCount = triangleCount * 2;
+            pool.Take<Triangle>(bakedCount, out Buffer<Triangle> tris);
             try
             {
                 for (int t = 0; t < triangleCount; t++)
@@ -59,13 +61,15 @@ namespace ZoneEngine_New.Core.WorldSimulation
                         || aIdx >= vertexCount || bIdx >= vertexCount || cIdx >= vertexCount)
                     {
                         tris[t] = default;
+                        tris[triangleCount + t] = default;
                         continue;
                     }
 
-                    tris[t] = new Triangle(
-                        ReadVec(vertices[aIdx]!),
-                        ReadVec(vertices[bIdx]!),
-                        ReadVec(vertices[cIdx]!));
+                    Vector3 a = ReadVec(vertices[aIdx]!);
+                    Vector3 b = ReadVec(vertices[bIdx]!);
+                    Vector3 c = ReadVec(vertices[cIdx]!);
+                    tris[t] = new Triangle(a, b, c);
+                    tris[triangleCount + t] = new Triangle(a, c, b);
                 }
 
                 var mesh = new Mesh(tris, Vector3.One, pool);

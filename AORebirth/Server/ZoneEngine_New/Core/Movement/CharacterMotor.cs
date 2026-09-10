@@ -15,6 +15,7 @@ namespace ZoneEngine_New.Core.Movement
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
+    using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     /// <summary>
     /// Server locomotion: Lost Eden velocity model + optional path following; Bepu sweep resolve.
@@ -97,11 +98,13 @@ namespace ZoneEngine_New.Core.Movement
         public bool HasPath => _pathIndex >= 0 && _pathIndex < _path.Count;
 
         /// <summary>
-        /// True while the character is trying to translate (keys or path), not leftover slide.
+        /// True while translating (keys/path) or still carrying planar speed.
+        /// Ranged weapon ticks use this so a held run key and residual slide both pause fire.
         /// </summary>
         public bool IsMoving =>
             (_flags & TranslationFlags) != 0
-            || HasPath;
+            || HasPath
+            || Vector3.Abs(_velocity) > MovementConfig.SpeedStopEpsilon;
 
         public event Action? PathCompleted;
 
@@ -148,9 +151,49 @@ namespace ZoneEngine_New.Core.Movement
             if (waypoints == null || waypoints.Count == 0)
                 return;
 
+            // Copy components: callers often pass live Position references that move every tick.
             for (int i = 0; i < waypoints.Count; i++)
-                _path.Add(waypoints[i]);
+            {
+                Vector3 point = waypoints[i];
+                _path.Add(new Vector3(point.x, point.y, point.z));
+            }
+
             _pathIndex = 0;
+        }
+
+        /// <summary>
+        /// Updates the final path point without clearing velocity. False when there is no active path.
+        /// </summary>
+        public bool TryRetargetFinalWaypoint(Vector3 destination, float minDeltaMeters)
+        {
+            if (!HasPath || _path.Count == 0)
+                return false;
+
+            Vector3 current = _path[_path.Count - 1];
+            if (Vector3.Abs(destination - current) < minDeltaMeters)
+                return true;
+
+            _path[_path.Count - 1] = new Vector3(destination.x, destination.y, destination.z);
+            return true;
+        }
+
+        /// <summary>
+        /// Remaining path points for SCFU. Empty when idle so HasWaypoints stays clear.
+        /// </summary>
+        public MsgVector3[] CopyRemainingWaypoints()
+        {
+            if (!HasPath)
+                return [];
+
+            int remaining = _path.Count - _pathIndex;
+            var waypoints = new MsgVector3[remaining];
+            for (int i = 0; i < remaining; i++)
+            {
+                Vector3 point = _path[_pathIndex + i];
+                waypoints[i] = new MsgVector3((float)point.x, (float)point.y, (float)point.z);
+            }
+
+            return waypoints;
         }
 
         public void ClearPath()
@@ -328,9 +371,13 @@ namespace ZoneEngine_New.Core.Movement
 
             Vector3 planar = _velocity;
             Vector3 start = _character.Position;
+            // Grounded steps must sweep horizontally. Including GroundStickVelocity (-Y) aims the
+            // capsule into the floor, the sweep reports an immediate hit, and planar travel is
+            // cancelled — FollowTarget still animates on the client while the server stays put.
+            double endY = grounded ? start.y : start.y + (_verticalVelocity * dt);
             Vector3 end = new(
                 start.x + (planar.x * dt),
-                start.y + (_verticalVelocity * dt),
+                endY,
                 start.z + (planar.z * dt));
 
             WorldSimulation.PlayfieldWorldSimulation? world = _character.Playfield?.WorldAccess.Instance;
@@ -358,7 +405,14 @@ namespace ZoneEngine_New.Core.Movement
                 _character.Position = end;
             }
 
-            if (!_jumpArmed
+            if (grounded && TryResolveGroundSupport(out float groundedSnapY))
+            {
+                _character.Position = new Vector3(
+                    _character.Position.x,
+                    groundedSnapY,
+                    _character.Position.z);
+            }
+            else if (!_jumpArmed
                 && _verticalVelocity <= 0f
                 && TryResolveGroundSupport(out float landY))
             {
