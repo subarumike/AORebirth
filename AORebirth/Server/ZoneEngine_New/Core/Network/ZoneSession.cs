@@ -12,6 +12,8 @@ namespace ZoneEngine_New.Core.Network
     using System.Threading.Channels;
     using System.Threading.Tasks;
 
+    using AORebirth.Database.Dao;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -68,6 +70,10 @@ namespace ZoneEngine_New.Core.Network
         private bool _outboundCompressed;
         private volatile bool _closed;
         private PlayfieldTransfer? _transfer;
+        private ZoneHandoffStore? _handoffAuthority;
+        private int _handoffCharacter;
+        private uint _handoffCookie1;
+        private uint _handoffCookie2;
         private int _state;
 
         public ZoneSession(
@@ -106,6 +112,20 @@ namespace ZoneEngine_New.Core.Network
         }
 
         public Player? Player { get; private set; }
+
+        internal void BindZoneHandoff(int character, uint cookie1, uint cookie2, ZoneHandoffStore? authority = null)
+        {
+            if (character <= 0 || (cookie1 == 0 && cookie2 == 0))
+                throw new InvalidOperationException("A valid claimed handoff is required.");
+            lock (this)
+            {
+                if (_closed) throw new InvalidOperationException("A closed session cannot accept a handoff.");
+                _handoffCharacter = character;
+                _handoffCookie1 = cookie1;
+                _handoffCookie2 = cookie2;
+                _handoffAuthority = authority ?? ZoneHandoffStore.Configured();
+            }
+        }
 
         public void BindPlayer(Player player)
         {
@@ -261,11 +281,17 @@ namespace ZoneEngine_New.Core.Network
         }
 
         internal byte[][] PrepareTransferPackets(Player player, Vector3 landing,
-            AORebirth.Core.Vector.Quaternion heading, int destinationId) =>
-        [
-            _codec.Serialize(BuildNormalTeleport(player, landing, destinationId, heading), destinationId, player.Identity.Instance),
-            _codec.Serialize(BuildZoneRedirection(), destinationId, player.Identity.Instance)
-        ];
+            AORebirth.Core.Vector.Quaternion heading, int destinationId)
+        {
+            ZoneRedirectEndpoint target = ZoneRedirectEndpoint.Configured();
+            AuthorizeZoneRedirect(player.Identity.Instance, target);
+            return
+            [
+                _codec.Serialize(BuildNormalTeleport(player, landing, destinationId, heading), destinationId, player.Identity.Instance),
+                _codec.Serialize(new ZoneRedirectionMessage { ServerIpAddress = target.Address, ServerPort = target.Port },
+                    destinationId, player.Identity.Instance)
+            ];
+        }
 
         internal void FinishTransfer(PlayfieldTransfer transfer)
         {
@@ -319,33 +345,14 @@ namespace ZoneEngine_New.Core.Network
             };
         }
 
-        private static ZoneRedirectionMessage BuildZoneRedirection()
+        private void AuthorizeZoneRedirect(int character, ZoneRedirectEndpoint target)
         {
-            Config? config = ConfigReadWrite.Instance.CurrentConfig;
-            string host = config == null || string.IsNullOrWhiteSpace(config.ZoneIP)
-                ? "127.0.0.1"
-                : config.ZoneIP;
-            int port = config == null || config.ZonePort <= 0 ? 7501 : config.ZonePort;
-
-            return new ZoneRedirectionMessage
-            {
-                ServerIpAddress = ResolveZoneRedirectAddress(host),
-                ServerPort = (ushort)port
-            };
-        }
-
-        private static IPAddress ResolveZoneRedirectAddress(string host)
-        {
-            if (IPAddress.TryParse(host, out IPAddress? parsed))
-                return parsed;
-
-            foreach (IPAddress ip in Dns.GetHostEntry(host).AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    return ip;
-            }
-
-            return IPAddress.Loopback;
+            if (_handoffAuthority == null || _handoffCharacter != character)
+                throw new InvalidOperationException("Session has no claimed redirect authority.");
+            ZoneHandoffClaim authorization = _handoffAuthority.AuthorizeRedirect(
+                character, _handoffCookie1, _handoffCookie2, target.Address.ToString(), target.Port);
+            if (!authorization.Accepted)
+                throw new InvalidOperationException("Zone redirect authorization failed: " + authorization.Reason);
         }
 
         public void Close()
@@ -365,6 +372,10 @@ namespace ZoneEngine_New.Core.Network
 
             _closed = true;
             State = SessionState.Closed;
+            _handoffAuthority = null;
+            _handoffCharacter = 0;
+            _handoffCookie1 = 0;
+            _handoffCookie2 = 0;
             Playfield? transferSource = _transfer?.Source;
             _transfer?.RequestReturn();
             _logger.Info(

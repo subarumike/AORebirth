@@ -197,6 +197,8 @@ static partial class ConnectedAcceptanceSmoke
         var zone = login.Wait<ZoneInfoMessage>();
         Require(zone.CharacterId == owner && zone.ServerIpAddress.Equals(System.Net.IPAddress.Loopback)
             && zone.ServerPort == fixture.ZonePort, "authenticated-character-selection-endpoint");
+        Require(zone.EventServerType == 1 && zone.PlayerId == 0
+            && login.Packets.Any(packet => packet.Length == 46), "retail-zoneinfo-26-byte-body");
         Console.WriteLine("AUTHENTICATED_LOGIN=PASS CHARACTER_LIST=PASS CHARACTER_SELECTION=PASS");
         Require(zone.Cookie1 != 0 || zone.Cookie2 != 0, "issued-handoff");
         login.Dispose();
