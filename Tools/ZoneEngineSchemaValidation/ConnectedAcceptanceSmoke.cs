@@ -15,7 +15,7 @@ using AORebirth.Database.Domain.Missions;
 using AORebirth.Interfaces.Persistence.Missions;
 
 /// <summary>Administrative setup ends before startup. Every subsequent mutation is sent over TCP.</summary>
-static class ConnectedAcceptanceSmoke
+static partial class ConnectedAcceptanceSmoke
 {
     const int Owner = 9901;
     const string Account = "cutoverconnected";
@@ -87,6 +87,7 @@ static class ConnectedAcceptanceSmoke
                     AcceptedAtUtcTicks = now, CreatedAtUtcTicks = now, UpdatedAtUtcTicks = now }); return true; });
             generated = ConnectedMissionSeed.Create(fixture, Owner);
             missionSnapshot = MissionSnapshot();
+            SeedHandoffCases(connection, fixture, password);
             Console.WriteLine("DATABASE_FIXTURE_ID=" + fixture.FixtureId + " ACCEPTANCE_TIMESTAMP=" + DateTime.UtcNow.ToString("O"));
             Console.WriteLine("CONNECTED_FIXTURE_SEEDED=PASS ACCOUNT_ID=9901 CHARACTER_ID=9901");
             using var login = new ConnectedEngineProcess(loginBinary, true, fixture);
@@ -102,6 +103,7 @@ static class ConnectedAcceptanceSmoke
                 Console.WriteLine("CONNECTED_WRONG_PASSWORD_FAIL_CLOSED=PASS");
             }
             int before;
+            ZoneLoginMessage outstanding;
             using (var zone = new ConnectedEngineProcess(zoneBinary, false, fixture))
             {
                 before = zone.Id;
@@ -128,26 +130,28 @@ static class ConnectedAcceptanceSmoke
                     Console.WriteLine("AUTH_RECONNECT=PASS STATE_AFTER_RECONNECT=PASS");
                     Logout(client, connection);
                 }
-                // Adversarial loopback-only test: no LoginEngine connection or authentication.
-                // This must never be mistaken for the positive authenticated lifecycle above.
-                using (var unauthenticated = new ConnectedWireClient(fixture.ZonePort))
-                {
-                    unauthenticated.Send(new ZoneLoginMessage { CharacterId = Owner });
-                    HandoffRejected = unauthenticated.AdmissionRejected(Owner);
-                    if (!HandoffRejected)
-                    {
-                        unauthenticated.Send(new CharInPlayMessage { Identity = Character }, Owner);
-                        Console.WriteLine("UNAUTHENTICATED_ZONE_CHARACTER_ACCESS=REPRODUCED ZONE_HANDOFF_FAIL_CLOSED=FAIL NEWENGINE_OPERATIONAL_CUTOVER_READY=NO");
-                        Logout(unauthenticated, connection);
-                    }
-                    else Console.WriteLine("ZONE_HANDOFF_FAIL_CLOSED=PASS");
-                }
+                ValidateHandoffCases(fixture, password, connection, identity);
+                outstanding = Authorize(fixture, password, "cutoverother", 9903);
                 zone.Stop();
                 Console.WriteLine("ENGINE_PID_BEFORE=" + before + " CLEAN_DISCONNECT=PASS");
             }
             using (var zone = new ConnectedEngineProcess(zoneBinary, false, fixture))
             {
                 Require(zone.Id != before, "restart-process-identity");
+                RejectUnchanged(fixture, connection, consumedHandoff, "replay-after-process-restart");
+                RejectUnchanged(fixture, connection, expiredHandoff, "expired-after-process-restart");
+                using (var pending = new ConnectedWireClient(fixture.ZonePort))
+                {
+                    pending.Send(outstanding);
+                    pending.Wait<FullCharacterMessage>(m => m.Identity.Instance == 9903);
+                    var otherCharacter = new Identity { Type = IdentityType.CanbeAffected, Instance = 9903 };
+                    pending.Send(new CharInPlayMessage { Identity = otherCharacter }, 9903);
+                    pending.Wait<CharInPlayMessage>(m => m.Identity == otherCharacter);
+                    pending.Send(new CharacterActionMessage { Identity = otherCharacter, Action = CharacterActionType.Logout }, 9903);
+                    pending.Wait<StartLogoutMessage>();
+                    Until(() => FixtureSql.Scalar(connection, "SELECT Online FROM characters WHERE Id=9903") == 0, "outstanding-restart-logout");
+                    Console.WriteLine("UNCONSUMED_HANDOFF_AFTER_PROCESS_RESTART=PASS");
+                }
                 using (var client = Enter(fixture, password))
                 {
                     VerifyConnected(client, identity, 66, "RESTART");
@@ -178,33 +182,48 @@ static class ConnectedAcceptanceSmoke
         finally { Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", previous); }
     }
     static ConnectedWireClient Enter(DisposableSchemaDatabase fixture, string password)
+        => EnterWithHandoff(fixture, Authorize(fixture, password));
+
+    static ZoneLoginMessage Authorize(DisposableSchemaDatabase fixture, string password, string account = Account, int owner = Owner)
     {
         using var login = new ConnectedWireClient(fixture.LoginPort, paddedLoginFrames: true);
-        login.Send(new UserLoginMessage { UserName = Account, ClientVersion = "18.8.53_EP1" });
+        login.Send(new UserLoginMessage { UserName = account, ClientVersion = "18.8.53_EP1" });
         var challenge = login.Wait<ServerSaltMessage>();
-        login.Send(new UserCredentialsMessage { UserName = Account,
-            Credentials = DeterministicLoginKeyEncoder.Create(Account, password, challenge.ServerSalt) });
+        login.Send(new UserCredentialsMessage { UserName = account,
+            Credentials = DeterministicLoginKeyEncoder.Create(account, password, challenge.ServerSalt) });
         var characters = login.Wait<CharacterListMessage>();
-        Require(characters.Characters.Length == 1 && characters.Characters[0].Id == Owner, "authenticated-character-list");
-        login.Send(new SelectCharacterMessage { CharacterId = Owner });
+        Require(characters.Characters.Any(c => c.Id == owner), "authenticated-character-list");
+        login.Send(new SelectCharacterMessage { CharacterId = owner });
         var zone = login.Wait<ZoneInfoMessage>();
-        Require(zone.CharacterId == Owner && zone.ServerIpAddress.Equals(System.Net.IPAddress.Loopback)
+        Require(zone.CharacterId == owner && zone.ServerIpAddress.Equals(System.Net.IPAddress.Loopback)
             && zone.ServerPort == fixture.ZonePort, "authenticated-character-selection-endpoint");
         Console.WriteLine("AUTHENTICATED_LOGIN=PASS CHARACTER_LIST=PASS CHARACTER_SELECTION=PASS");
-        // The current repository maps no credential fields in ZoneLoginMessage.
-        // Record the actual unused ZoneInfo cookies; do not invent packet members.
-        Console.WriteLine("ZONE_HANDOFF_COOKIE_VALIDATION=NOT_IMPLEMENTED");
+        Require(zone.Cookie1 != 0 || zone.Cookie2 != 0, "issued-handoff");
+        login.Dispose();
+        // Wait for the legitimate LoginEngine disconnect cleanup before measuring
+        // a rejected zone attempt; otherwise its Online write races the snapshot.
+        using (var connection = fixture.Open())
+            Until(() => FixtureSql.Scalar(connection, $"SELECT Online FROM characters WHERE Id={owner}") == 0, "login-disconnect-cleanup");
+        return new ZoneLoginMessage { CharacterId = owner, Cookie1 = zone.Cookie1, Cookie2 = zone.Cookie2 };
+    }
+    static ConnectedWireClient EnterWithHandoff(DisposableSchemaDatabase fixture, ZoneLoginMessage handoff)
+    {
         var client = new ConnectedWireClient(fixture.ZonePort);
         try
         {
-            client.Send(new ZoneLoginMessage { CharacterId = zone.CharacterId });
+            client.Send(handoff);
             client.Wait<FullCharacterMessage>(m => m.Identity.Instance == Owner);
-            client.Send(new CharInPlayMessage { Identity = Character }, Owner);
-            client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == generated.QuestInstance));
-            client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == unchecked((int)0x555BE9F6)));
+            Console.WriteLine("ZONE_HANDOFF_VALIDATION=PASS");
+            EnterWorld(client);
             return client;
         }
         catch { client.Dispose(); throw; }
+    }
+    static void EnterWorld(ConnectedWireClient client)
+    {
+        client.Send(new CharInPlayMessage { Identity = Character }, Owner);
+        client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == generated.QuestInstance));
+        client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == unchecked((int)0x555BE9F6)));
     }
     static void VerifyConnected(ConnectedWireClient client, int identity, int slot, string phase)
     {

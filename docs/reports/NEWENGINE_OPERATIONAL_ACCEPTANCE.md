@@ -1,9 +1,9 @@
 # NewEngine operational acceptance
 
 The authenticated positive lifecycle is proven on disposable loopback MySQL.
-Production cutover remains **NO**: a direct zone connection received the character
-without LoginEngine authentication. This is an observed character-access integrity
-failure, not missing gameplay coverage.
+The historical direct-zone character-access failure is repaired. Development
+connected security and lifecycle checks pass; the final committed-source gate
+receipt remains pending. This is an isolated candidate, not a production deployment.
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
@@ -17,7 +17,8 @@ failure, not missing gameplay coverage.
 | Generic unsupported item effects | PASS | Five retained Set/Hit/SetFlag/ClearFlag/UploadNano regression tests |
 | Wrong password and invalid inventory source | PASS | Connected rejection; valid move acknowledgement establishes ordering; exact state remains |
 | Transactions, schema refusal, durable repository reload | PASS | Separate full disposable suite, injected failures and process cycles |
-| Unauthenticated zone admission | **FAIL** | Direct ZoneLogin receives FullCharacter without any LoginEngine connection |
+| Unauthenticated zone admission | PASS (development) | Missing/forged/expired/stale/wrong-owner tickets close before hydration; complete disposable database unchanged |
+| Replay and concurrency | PASS (development) | Consumed tickets rejected while in play, after disconnect and restart; eight real sockets admit exactly one owner |
 | Executable-only Legacy rollback after NewEngine writes | **UNSAFE** | Executed stale Legacy item-table assertions |
 
 Inventory move and morph cancellation are CONNECTED_MUTATION_PROVEN.
@@ -39,6 +40,6 @@ See [connected report](NEWENGINE_CONNECTED_ACCEPTANCE.md) and
 The historical Docker failure at d1c6d01 is superseded by actual disposable runs.
 No global Docker configuration or production state was changed.
 
-NEWENGINE_OPERATIONAL_CUTOVER_READY=NO
+NEWENGINE_OPERATIONAL_CUTOVER_READY=NO (pending final exact-source gates)
 CHARACTER_AND_INVENTORY_INTEGRITY_PROVEN=YES (tested authenticated lifecycle)
-AUTHENTICATED_CONNECTED_ACCEPTANCE_PROVEN=YES (positive sequence; admission isolation FAIL)
+AUTHENTICATED_CONNECTED_ACCEPTANCE_PROVEN=YES (development positive and negative sequence)

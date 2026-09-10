@@ -26,12 +26,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly PlayfieldManager _playfieldManager;
         private readonly IZoneLogger _logger;
         private readonly GeneratedMissionAcgService _missions;
+        private readonly IZoneAdmissionGate _admission;
 
         public ZoneLoginHandler(
             ICharacterHydrationService hydration,
             PlayfieldManager playfieldManager,
             IZoneLogger logger,
-            GeneratedMissionAcgService missions)
+            GeneratedMissionAcgService missions,
+            IZoneAdmissionGate admission)
         {
             ArgumentNullException.ThrowIfNull(hydration);
             ArgumentNullException.ThrowIfNull(playfieldManager);
@@ -41,6 +43,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _playfieldManager = playfieldManager;
             _logger = logger;
             _missions = missions ?? throw new ArgumentNullException(nameof(missions));
+            _admission = admission ?? throw new ArgumentNullException(nameof(admission));
         }
 
         public void HandleAsync(MessageBody body, IZoneSession session)
@@ -78,9 +81,20 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         private async Task HandleAsyncCoreInner(ZoneLoginMessage message, IZoneSession session)
         {
-            // EXPLOIT
-            // TODO: Validate ZoneLoginMessage session cookies against the login handoff
-            // before loading the character (reject mismatched/missing cookies).
+            AORebirth.Database.Dao.ZoneHandoffClaim claim;
+            try { claim = _admission.Claim(message); }
+            catch
+            {
+                _logger.Warn("Zone admission rejected: reason=authority_unavailable");
+                session.Close();
+                return;
+            }
+            if (!claim.Accepted)
+            {
+                _logger.Warn("Zone admission rejected: reason=" + claim.Reason);
+                session.Close();
+                return;
+            }
 
             int characterId = message.CharacterId;
             if (characterId <= 0)

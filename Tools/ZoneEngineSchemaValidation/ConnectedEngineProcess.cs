@@ -33,6 +33,7 @@ sealed class ConnectedEngineProcess : IDisposable
         start.Environment["AO_REBIRTH_BIND_MODE"] = "Loopback";
         start.Environment["AO_REBIRTH_EXPECTED_DATABASE"] = DisposableSchemaDatabase.DatabaseName;
         start.Environment["AO_REBIRTH_REQUIRED_SQL_TYPE"] = "MySql";
+        start.Environment["AO_REBIRTH_SESSION_OWNERSHIP_DIR"] = Path.Combine(fixture.DirectoryPath, "sessions");
         process = new Process { StartInfo = start };
         process.OutputDataReceived += (_, e) => { if (e.Data != null) lock (output) output.AppendLine(e.Data); };
         process.ErrorDataReceived += (_, e) => { if (e.Data != null) lock (output) output.AppendLine(e.Data); };

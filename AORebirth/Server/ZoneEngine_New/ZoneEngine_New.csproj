@@ -48,6 +48,7 @@
   <ItemGroup>
     <!-- Shared evidence-only placement validation, not legacy runtime ownership. -->
     <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" Link="Shared/CharacterOnlineOwnershipGuard.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/ZoneHandoffStore.cs" Link="Shared/ZoneHandoffStore.cs" />
     <Compile Include="../ZoneEngine/Core/TeamXpShareWindow.cs" Link="SharedGameplay/TeamXpShareWindow.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Stats/SpecialStats/XPTable.cs" Link="SharedGameplay/Progression/XPTable.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Stats/SkillTrickleTable.cs" Link="SharedGameplay/Nanos/SkillTrickleTable.cs" />

@@ -2,20 +2,21 @@
 
 ## Active
 
-Close authenticated NewEngine connected operational acceptance on Mike-owned
+Close secure LoginEngine to NewEngine admission on Mike-owned
 `codex/newengine-production-cutover-001`, based on origin/master
 `6e90dda030774726aa2060acb9edb756ea1f635c` and the complete reconciled history
 through `4dac603b82dfe64206b155e7e6c0499a9f8ad7f8`.
 
-Starting source: `de764881cfae677bd0b2975499e8ad6cb5944c4a`.
-Disposable schema execution and the authenticated positive connected lifecycle
-now pass, including exact inventory, nanos/morphs, both mission journals and
-connected morph cancellation. The isolated fixture identity collision and
-generated mission acceptance hash casing are repaired. Exact-source Windows,
-database and Linux publication validation are complete at `eddd90e73fdf912f766c5218acd4c07ec2972980`.
-The concrete remaining cutover
-blocker is direct unauthenticated zone admission; see the connected report.
-Preserve the generic unsupported item-effect restrictions.
+Starting source: `b87faf8b6de31d22f79d8f469990c27592bab6f9`.
+The recovered retail cookie mapping now drives an expiring, account/character/
+login-generation-bound, atomically consumed cross-process handoff. Development
+connected acceptance passes missing/forged/expired/stale/cross-account/replayed
+tickets, eight-way concurrent admission with one winner, unchanged database
+contents for every rejected attempt, and the full prior positive lifecycle.
+Finish exact committed-source Windows, disposable database and Linux publication
+validation, then publish the receipt and operational decision. Retain the
+generic unsupported item-effect restrictions. See
+`docs/reports/NEWENGINE_ZONE_HANDOFF_SECURITY.md` for remaining retail evidence.
 
 NewEngine may become default before full gameplay parity. Character, inventory,
 transaction, persistence, reconnect and restart integrity remain required.
