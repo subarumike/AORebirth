@@ -14,9 +14,12 @@ The validation receipt identifies the exact committed source, binary hashes,
 fixture ID, UTC time and PIDs. Dirty-tree development runs are explicitly labelled
 and are not exact-source acceptance.
 
-Final positive, negative, concurrent and restart acceptance passes on clean
-source `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`. The receipt records the
-accepted binaries and all remaining original-retail evidence limits.
+Final positive, negative, concurrent and restart acceptance passes with the code
+at `75c8a784ad99be48cf51f9d1652e73d2791c3f5c`; final exact-source mandatory
+acceptance passes at `75a78a88535bffc321fe82c5ab824852c4636b47`, whose only
+additional change is the regenerated DAO inventory. LoginEngine now emits the
+captured 46-byte ZoneInfo frame with EventServerType 1 and a conservative
+PlayerID 0. The receipt records the evidence boundary.
 
 ## Fixture and protocol
 
@@ -59,6 +62,12 @@ It never starts or controls the AO client.
    MonsterData, logout and authenticate again to verify cancellation persisted.
 9. Stop engines and remove the owned container/network. Admission failure
    produces nonzero overall exit even when the positive lifecycle passes.
+
+The connected fixture proves initial LoginEngine-to-zone admission. The actual
+playfield-transfer test separately proves that NewEngine arms the redirect before
+emitting the transfer and type-0x3c endpoint, and that exactly one matching
+destination admission succeeds. An official client has not yet run this path
+against AORebirth.
 
 ## Expected state
 

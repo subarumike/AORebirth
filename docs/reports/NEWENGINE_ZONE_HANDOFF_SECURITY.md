@@ -5,7 +5,7 @@
 The direct unauthenticated character-admission flaw is repaired on
 `codex/newengine-production-cutover-001`, starting at
 `b87faf8b6de31d22f79d8f469990c27592bab6f9`. Final exact-source acceptance passes
-at `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`: 498 NewEngine tests, 1129
+at `75a78a88535bffc321fe82c5ab824852c4636b47`: 505 NewEngine tests, 1129
 AOtomation tests, 12 mandatory gates, Windows acceptance, disposable database,
 connected security/lifecycle and Linux publication. Binary hashes and proof
 boundaries are recorded in `NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`.
@@ -32,17 +32,29 @@ are big-endian. No extra client account field or guessed LoginKey is needed.
 | Selected character | 0x00 | 0x14; also header sender at 0x08 |
 | Cookie 1 | 0x0a | 0x18 |
 | Cookie 2 | 0x0e | 0x1c |
+| EventServerType | 0x12 | not returned in ZoneLogin |
+| PlayerID | 0x16 | not returned in ZoneLogin |
 
-ZoneInfo is System family 1/type `0x17`; ZoneLogin is family 1/type `0x1b`,
-32 bytes including its header, destination 2. The new serializer contract adds
-both uint32 cookies; a synthetic exact 32-byte fixture verifies round-trip bytes.
-It is labelled static-layout evidence, never a packet captured from retail.
+ZoneInfo is System family 1/type `0x17`, 46 bytes including its header. ZoneLogin
+is family 1/type `0x1b`, 32 bytes including its header, destination 2. The
+serializer models the complete ZoneInfo body and both returned uint32 cookies;
+exact fixtures verify both envelopes and round-trip bytes.
 
-The complete available recovery report explicitly records no complete retail
-login-to-zone capture. Existing AOSharp captures begin after this boundary.
-The clean-room client trace corroborates its own behavior only. Neither is
-silently promoted to original-client runtime proof. No additional capture is
-needed to invent or discover the returned-cookie mapping: that mapping is proven.
+The completed official-retail capture is
+`tools-temp/live-pcaps/retail-handshake/20260910-041844-14c0d788/network.pcapng`,
+SHA256 `8F38383A7727DE8142B3182FD2717E84882B4D0FAE95934330B65CD93EB79171`.
+Frame 788 is a type-0x17 ZoneInfo with a 26-byte body: selected character
+`0x0D904118`, endpoint `37.18.193.20:7501`, EventServerType 1 and PlayerID
+`0x59E3C875`. All four observed admissions begin with the 32-byte type-0x1b
+ZoneLogin and reuse the same character/cookie tuple.
+
+Three captured redirects change the endpoint to `37.18.193.56:7514`,
+`37.18.193.20:7506` and `37.18.193.20:7509`. In each case the client closes the
+old stream, opens the advertised stream and sends type-0x1b with the same
+cookies; it does not return to LoginEngine. Recovered static client evidence at
+commit `67aa6f36b030a99c73736acbc33bb3ec301bce10` independently establishes the
+26-byte layout, the type-0x3c IP/port body, cookie reuse, and that unexpected
+connection loss exits to the launcher instead of automatically resending.
 
 ## Server authority and lifecycle
 
@@ -78,12 +90,20 @@ history authorizes a new socket. The gate runs before FindPlayer, hydration,
 mission restoration and reconnect ownership. Storage/lookup failure rejects.
 An interrupted admission after consumption needs fresh authentication.
 
-Each new zone TCP admission needs a fresh unconsumed ticket. Fresh successful
-authentication invalidates the account's older outstanding tickets and prevents
-an older authenticated login socket from issuing new ones. Already admitted
-sessions retain their existing ownership lifecycle. Login TCP closure does not
-immediately revoke a ticket, avoiding an invented disconnect-order requirement;
-its short expiry and generation still apply. Existing login Online cleanup is
+Initial admission needs a fresh unconsumed ticket. After that ticket is consumed,
+the admitted `ZoneSession` may authorize one redirect to the exact configured
+destination endpoint immediately before it serializes and sends the playfield
+transfer and type-0x3c redirect. The allowance is durable, expiring, endpoint
+bound and consumed atomically. Wrong endpoints, unarmed reconnects, concurrent
+reuse and replay reject. A successful destination admission may later arm the
+next sequential redirect. A failed authorization prevents the transfer from
+being sent.
+
+Fresh successful authentication invalidates the account's older outstanding
+initial tickets and prevents an older authenticated login socket from issuing new
+ones. It does not invalidate the redirect authority of the currently admitted
+session. Login TCP closure does not immediately revoke an initial ticket; its
+short expiry and generation still apply. Existing login Online cleanup is
 retained, with the unsafe unconditional SetOffline before issuance removed.
 
 Clean ZoneEngine restart preserves consumed/expired rejection and permits a
@@ -97,7 +117,11 @@ If the shared directory is unavailable, admission fails closed.
 Unit tests cover missing/unknown, selected character/account, wrong current
 database account, exact expiry, future issuance, consumed persistence, outstanding
 ticket reload, newer login generation, stale issuer, lookup/storage failure and
-16 concurrent claims. The wire test verifies the recovered 32-byte envelope.
+16 concurrent claims. Redirect tests cover no-arm rejection, target binding,
+sequential rearm, expiry, concurrency and admitted-session generation behavior.
+Wire tests verify the exact 32-byte ZoneLogin and 46-byte ZoneInfo envelopes.
+The playfield-transfer fixture proves that the real send path arms authority and
+that exactly one matching claim succeeds.
 
 The disposable connected fixture runs actual LoginEngine and NewEngine processes
 against an owned MySQL database. It rejects missing/random/unknown/altered,
@@ -118,28 +142,26 @@ transaction and schema results are recorded separately in the validation receipt
 
 ## What is still needed, and how to get it
 
-1. **Retail initial-entry runtime evidence.** One completed passive PCAP/PCAPNG
-   beginning before character selection and ending after world entry, with the
-   exact client build/hashes, endpoints and both stream IDs. Compare ZoneInfo
-   body +0x0a/+0x0e to first ZoneLogin frame +0x18/+0x1c. Mike controls the client;
-   Codex can analyze the completed trace. No client patch or authentication
-   bypass is required. If transport hides bytes, the recovery report names
-   ProcessMessage and Send_i observation points for an authorized debugger trace.
-2. **Remaining ZoneInfo fields.** Retail reads a 26-byte body, including
-   EventServerType at +0x12 and PlayerID at +0x16. The existing AORebirth emitter
-   models only the first 18 bytes. This task does not invent values for the
-   trailing fields. A full type-0x17 frame plus downstream source/decompiler
-   consumers must establish the values and semantics before claiming complete
-   18.8.62 wire compatibility. The synthetic connected client cannot prove this.
-3. **Redirect and connection-loss reconnect.** The recovered type-0x3c path
-   reuses cookies; generic TCP-loss retry behavior remains unresolved. The new
-   boundary intentionally rejects reuse on a fresh socket. Observe those
-   specific transitions and define a separately authorized ownership-transfer
-   protocol if required. Tested reconnect here is fresh LoginEngine authentication;
-   in-process NewEngine playfield transfer is not a fresh zone admission.
+1. **Official client against AORebirth.** Run login, selection, initial world
+   entry and at least two zone changes against an isolated deployment of the
+   candidate. Capture the run passively and compare the emitted ZoneInfo,
+   type-0x3c endpoint and each type-0x1b admission. This is the remaining
+   end-to-end runtime gate; the official-server behavior itself is already known.
+2. **PlayerID semantics.** The retail frame contains a nonzero value distinct
+   from the selected character, but recovered client code only stores/exports it
+   and no consumer establishes its meaning. AORebirth sends zero in the correct
+   field. Do not substitute a character, account or session identifier without a
+   direct consumer bridge. EventServerType is emitted as the captured value 1.
+3. **Connection loss.** Static client evidence says unexpected loss returns to
+   the launcher and does not automatically resend cookies. The server therefore
+   accepts only an explicitly armed transfer. No generic cookie-based reconnect
+   is required or permitted by this evidence.
 4. **Deployment review.** Confirm both deployed services use the same protected
    authority directory and identity, then prepare exact-SHA cutover and database
-   restore rollback. This task performs no live deployment. NewEngine writes
-   still make executable-only Legacy rollback unsafe; a matching database restore
-   remains required. Gameplay gaps, Legacy extraction and DAO consolidation are
-   separately scoped follow-ups, not hidden prerequisites for these security tests.
+   restore rollback. NewEngine writes still make executable-only Legacy rollback
+   unsafe; a matching database restore remains required. After official-client
+   staging passes, merge the Mike-owned cutover branch by exact SHA and deploy in
+   a maintenance window. Remove Legacy only after the NewEngine release has
+   completed burn-in and rollback has been rehearsed. DAO consolidation remains
+   incomplete: the deterministic inventory has 99 persistence method rows and
+   the architecture guard has seven reviewed Legacy baseline SQL exceptions.

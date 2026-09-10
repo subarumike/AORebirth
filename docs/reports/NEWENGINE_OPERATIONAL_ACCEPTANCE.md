@@ -3,10 +3,10 @@
 The authenticated positive lifecycle is proven on disposable loopback MySQL.
 The historical direct-zone character-access failure is repaired. Exact-source
 connected security, lifecycle, Windows, mandatory integration and Linux publication
-gates pass at `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`. This is operational
-candidate acceptance, not production deployment or full original-retail wire
-compatibility. Remaining ZoneInfo fields and redirect/reconnect evidence are
-explicitly listed in `NEWENGINE_ZONE_HANDOFF_SECURITY.md`.
+gates pass. Final exact-source acceptance is
+`75a78a88535bffc321fe82c5ab824852c4636b47`. This is operational candidate
+acceptance, not production deployment or official-client runtime acceptance.
+The remaining evidence is listed in `NEWENGINE_ZONE_HANDOFF_SECURITY.md`.
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
@@ -22,6 +22,8 @@ explicitly listed in `NEWENGINE_ZONE_HANDOFF_SECURITY.md`.
 | Transactions, schema refusal, durable repository reload | PASS | Separate full disposable suite, injected failures and process cycles |
 | Unauthenticated zone admission | PASS | Missing/forged/expired/stale/wrong-owner tickets close before hydration; complete disposable database unchanged |
 | Replay and concurrency | PASS | Consumed tickets rejected while in play, after disconnect and restart; eight real sockets admit exactly one owner |
+| Retail ZoneInfo wire shape | PASS | Captured 26-byte body and exact 46-byte serialized fixture; EventServerType 1; PlayerID semantics remain unresolved |
+| Server-authorized retail redirect | PASS | Transfer arms one endpoint-bound, expiring claim; one matching destination admission succeeds; replay and wrong target reject |
 | Executable-only Legacy rollback after NewEngine writes | **UNSAFE** | Executed stale Legacy item-table assertions |
 
 Inventory move and morph cancellation are CONNECTED_MUTATION_PROVEN.
