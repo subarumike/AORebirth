@@ -17,10 +17,13 @@ namespace ZoneEngine_New.Core.Ai
     public sealed class NpcBrain
     {
         readonly NpcBehaviourTree _tree;
-        readonly List<Vector3> _pathScratch = new(1);
+        readonly List<Vector3> _pathScratch = new(2);
         Identity _currentTarget = Identity.None;
         bool _leashing;
         bool _treeResetPending;
+        bool _followAnnounced;
+        Vector3 _lastAnnouncedEnd = new(0, 0, 0);
+        DateTime _lastRepathUtc;
 
         NpcBrain(NpcCharacter npc, Vector3 home, NpcAiProfile profile)
         {
@@ -86,6 +89,7 @@ namespace ZoneEngine_New.Core.Ai
         {
             _tree.Disable();
             _leashing = false;
+            StopPathing();
             ClearHate();
         }
 
@@ -159,9 +163,49 @@ namespace ZoneEngine_New.Core.Ai
 
         public void PathTo(Vector3 destination)
         {
-            _pathScratch.Clear();
-            _pathScratch.Add(destination);
-            Npc.Motor.SetPath(_pathScratch);
+            DateTime now = DateTime.UtcNow;
+            if (Npc.Motor.HasPath || _followAnnounced)
+            {
+                double elapsed = (now - _lastRepathUtc).TotalSeconds;
+                if (elapsed < NpcFollowTarget.RepathIntervalSeconds)
+                    return;
+
+                float delta = (float)Vector3.Abs(destination - _lastAnnouncedEnd);
+                if (delta < NpcFollowTarget.MinAnnounceDeltaMeters)
+                    return;
+            }
+
+            // Retarget in place while chasing so SetPath does not ClearPath every repath.
+            if (!Npc.Motor.TryRetargetFinalWaypoint(destination, 0.25f))
+            {
+                _pathScratch.Clear();
+                _pathScratch.Add(new Vector3(destination.x, destination.y, destination.z));
+                Npc.Motor.SetPath(_pathScratch);
+            }
+            else
+            {
+                _pathScratch.Clear();
+                _pathScratch.Add(new Vector3(destination.x, destination.y, destination.z));
+            }
+
+            NpcFollowTarget.AnnounceCoordinatePath(Npc, Npc.Position, _pathScratch);
+            _followAnnounced = true;
+            _lastAnnouncedEnd = new Vector3(destination.x, destination.y, destination.z);
+            _lastRepathUtc = now;
+        }
+
+        /// <summary>Clears motor path and settles observers with a FollowTarget stop.</summary>
+        public void StopPathing()
+        {
+            bool had = Npc.Motor.HasPath || _followAnnounced;
+            Npc.Motor.ClearPath();
+            if (!had)
+                return;
+
+            NpcFollowTarget.AnnounceStop(Npc, Npc.Position);
+            _followAnnounced = false;
+            _lastAnnouncedEnd = new Vector3(0, 0, 0);
+            _lastRepathUtc = default;
         }
 
         public void StopFighting() => NpcAiCombat.AnnounceStopFight(Npc);
@@ -171,6 +215,7 @@ namespace ZoneEngine_New.Core.Ai
             TickStallWatch.Stage("brain.reset", Npc.Identity.Instance);
             _leashing = false;
             ClearHate();
+            StopPathing();
             Npc.OnReset();
 
             // Resetting the tree from inside Evaluate rewinds the running Sequence child index, so

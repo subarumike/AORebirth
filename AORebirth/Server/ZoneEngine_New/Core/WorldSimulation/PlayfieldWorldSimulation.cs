@@ -44,7 +44,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
         readonly IZoneLogger _logger;
         readonly Dictionary<int, PlayerTriggerState> _playerTriggerState = new();
         readonly Dictionary<int, double> _zoneGraceUntil = new();
-        readonly Dictionary<long, LosCacheEntry> _losCache = new();
+        readonly Dictionary<int, LosCacheEntry> _losCache = new();
         readonly HashSet<int> _exitProxyDoors = new();
         readonly int _playfieldId;
         int _nextTriggerId = 1;
@@ -147,13 +147,14 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public bool HasLineOfSight(AoVector3 from, AoVector3 to)
         {
             long nowMs = Environment.TickCount64;
-            // Quantize to ~0.25u so nearby spam hits the same entry.
-            long key =
-                (((long)(int)(from.x * 4f) & 0xFFFFL) << 48)
-                | (((long)(int)(from.y * 4f) & 0xFFFFL) << 32)
-                | (((long)(int)(from.z * 4f) & 0xFFFFL) << 16)
-                | (((long)(int)(to.x * 4f) & 0xFFL) << 8)
-                | (((long)(int)(to.z * 4f) & 0xFFL));
+            // Quantize to ~0.25u. Include all axes — the prior 8-bit to.xz key collided often.
+            int key = HashCode.Combine(
+                (int)(from.x * 4f),
+                (int)(from.y * 4f),
+                (int)(from.z * 4f),
+                (int)(to.x * 4f),
+                (int)(to.y * 4f),
+                (int)(to.z * 4f));
 
             if (_losCache.TryGetValue(key, out LosCacheEntry entry) && nowMs < entry.ExpireMs)
                 return entry.Clear;
@@ -164,7 +165,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             _losCache[key] = new LosCacheEntry
             {
                 Clear = clear,
-                ExpireMs = nowMs + 250
+                ExpireMs = nowMs + 100
             };
 
             if (_losCache.Count > 4096)

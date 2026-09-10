@@ -198,7 +198,7 @@
 		"MaxLevel": 250,
 		"Equipment": [],
 		"Weapons": [
-			{ "LowId": 44008, "HighId": 44007, "Hash": "AAAA" }
+			{ "LowId": 156599, "HighId": 156599, "Hash": "AAAA" }
 		],
 		"Attackable": true,
 		"KnuBotId": 1131,

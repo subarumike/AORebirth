@@ -88,7 +88,7 @@ namespace ZoneEngine_New.Core.Ai
 
             if (_brain.IsInAttackRange(target))
             {
-                _brain.Npc.Motor.ClearPath();
+                _brain.StopPathing();
                 return _nodeState = NodeState.Success;
             }
 
@@ -172,7 +172,7 @@ namespace ZoneEngine_New.Core.Ai
         public override NodeState Evaluate(float deltaTime)
         {
             TickStallWatch.Stage("node.idle", _brain.Npc.Identity.Instance);
-            _brain.Npc.Motor.ClearPath();
+            _brain.StopPathing();
             return _nodeState = NodeState.Success;
         }
     }

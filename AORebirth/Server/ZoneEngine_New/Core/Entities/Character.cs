@@ -843,10 +843,22 @@ namespace ZoneEngine_New.Core.Entities
 
         void TickWeapons(double deltaTime)
         {
+            // Parked full bars (waiting on LOS/range) must still Tick so they can fire,
+            // but must not monopolize the exclusive charge slot.
+            foreach (CharacterWeapon weapon in Weapons.Values)
+            {
+                if (weapon == null || !weapon.IsFullyCharged)
+                    continue;
+                if (weapon.Tick(deltaTime))
+                    return;
+            }
+
             CharacterWeapon? charging = null;
             foreach (CharacterWeapon weapon in Weapons.Values)
             {
-                if (weapon != null && weapon.State == WeaponState.Attacking)
+                if (weapon != null
+                    && weapon.State == WeaponState.Attacking
+                    && !weapon.IsFullyCharged)
                 {
                     charging = weapon;
                     break;
@@ -861,8 +873,8 @@ namespace ZoneEngine_New.Core.Entities
 
             foreach (CharacterWeapon weapon in Weapons.Values)
             {
-                if (weapon != null && weapon.Tick(deltaTime))
-                    break;
+                if (weapon != null && weapon.State == WeaponState.Recharging)
+                    weapon.Tick(deltaTime);
             }
         }
 
@@ -870,6 +882,9 @@ namespace ZoneEngine_New.Core.Entities
         {
             Character? target = TryResolveFightingTarget();
             if (target == null)
+                return;
+
+            if (!HasLineOfSightTo(target))
                 return;
 
             Item? weapon = characterWeapon.Item;
@@ -1726,6 +1741,7 @@ namespace ZoneEngine_New.Core.Entities
                 Flags2 = 0,
                 Unknown2 = 0,
                 ActiveNanos = BuildActiveNanos(),
+                Waypoints = Motor.CopyRemainingWaypoints(),
                 Textures = BuildTextures(isNpc),
                 Meshes = BuildMeshes(headMesh)
             };
@@ -1833,8 +1849,6 @@ namespace ZoneEngine_New.Core.Entities
             {
                 scfu.HeadMesh = (uint)headMesh;
             }
-
-            // ActiveNanos / Waypoints not wired on Character yet.
 
             return scfu;
         }
