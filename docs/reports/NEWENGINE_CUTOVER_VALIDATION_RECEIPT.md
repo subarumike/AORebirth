@@ -33,6 +33,9 @@ CUTOVER_INVENTORIES=PASS LEGACY_DEPENDENCY_EDGES=93 PERSISTENCE_METHOD_ROWS=99
 DAO_ARCHITECTURE_GUARD=PASS NEW_VIOLATIONS=0 LEGACY_BASELINE_EXCEPTIONS=7
 RETAIL_CLIENT_RUNTIME_ACCEPTANCE=NOT_RUN
 PRODUCTION_DEPLOYMENT=NOT_RUN
+DEVELOPER_REF_CURRENT=ced79688bc9ad1011119b77e033e37530bd56941
+DEVELOPER_NEW_COMMIT_IMPORTED=NO
+DEVELOPER_SINGLE_COMMIT_MERGE_SIMULATION=CONFLICT
 ```
 
 One mandatory-gate attempt hit the existing nondeterministic Buckethead world and
@@ -48,6 +51,9 @@ sent rather than inventing identity semantics. Master merge and Legacy deletion
 should follow staging acceptance and a rollback rehearsal. Full DAO conversion
 is not complete: the current inventory has 99 persistence method rows and the
 architecture guard retains seven reviewed Legacy baseline SQL exceptions.
+The current developer-branch tip was inspected read-only after the final fetch.
+Its new NPC/pathing commit conflicts with the cutover runtime and is quarantined
+from this candidate; it is not a login/redirect dependency.
 
 ## Final secure handoff acceptance
 

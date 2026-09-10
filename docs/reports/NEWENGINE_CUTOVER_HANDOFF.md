@@ -32,12 +32,17 @@ against AORebirth, fresh Linux-host execution and live deployment remain unclaim
   preserving all ten intervening commits, with no conflict resolutions.
 - [Reconciliation JSON](NEWENGINE_CUTOVER_RECONCILIATION.json) records every imported
   commit and the newer developer change footprints.
-- Developer ref inspected read-only: `origin/New-ZoneEngine` at
-  `53c858d9900266fb6740975dbb2b5011a5792e66`; prior reconciled developer input
-  `d2d9844673a766c02aa768623db9f0ab5b6ea01c`.
-  Newer file changes are CONFLICTING where merge-tree reports a conflict and
-  otherwise UNKNOWN. UNKNOWN does not mean safe or required. No newer developer
-  commits were imported; no developer branch/worktree was changed.
+- Developer ref inspected read-only: `origin/New-ZoneEngine` advanced from
+  `53c858d9900266fb6740975dbb2b5011a5792e66` to
+  `ced79688bc9ad1011119b77e033e37530bd56941`; prior reconciled developer input
+  remains `d2d9844673a766c02aa768623db9f0ab5b6ea01c`. The new commit owns NPC
+  following, combat/LOS and collision work. A whole-branch merge conflicts across
+  multiple cutover runtime files. A read-only single-commit merge simulation also
+  conflicts in MobTemplates, Character, NpcCharacter and the removed legacy
+  NpcAiActions/NpcBrain paths. It is therefore not safe to import into this
+  cutover candidate without a separately reviewed reconciliation. Login/redirect
+  staging does not depend on it. No developer commit was imported and no
+  developer branch/worktree was changed.
 - Primary checkout pre-existing untracked work was preserved:
   `Tools/NPC_Inspect/`, `docs/reference/enemy-templates/`,
   `quest example from PRK.txt`, and the three earlier branch/cutover reports in
