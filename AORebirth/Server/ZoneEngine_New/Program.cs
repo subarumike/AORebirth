@@ -235,6 +235,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, ServerStatsCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
+            services.AddSingleton<IZoneAdmissionGate, ZoneAdmissionGate>();
 
             //Networking
             AddMessageHandler<CharDCMoveMessageHandler>(services);

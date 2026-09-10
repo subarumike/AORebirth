@@ -3,17 +3,17 @@
 ## Decision
 
 NewEngine is the default on this Mike-owned branch. Keep Legacy present.
-The foundation can be reviewed and tested now; production cutover is **not yet
-accepted**. Full gameplay parity is not a release gate. Missing NPC bindings,
+The secure handoff candidate passes development connected acceptance; final
+committed-source validation is pending. Full gameplay parity is not a release gate. Missing NPC bindings,
 dialogue, pets and other catalog coverage are follow-up gameplay work.
 
 Disposable MySQL and the full authenticated positive lifecycle now execute:
 inventory movement, reconnect, distinct-process restart, nanos/morphs and both
 mission journals, plus connected morph cancellation and another reconnect.
-The remaining cutover blocker is reproduced unauthenticated zone admission:
-a direct ZoneLogin receives the character without authenticating to LoginEngine.
-See `NEWENGINE_CONNECTED_ACCEPTANCE.md` for evidence and the scoped closure needed.
-Runtime data preservation passed; session admission isolation did not.
+The previously reproduced unauthenticated zone admission is repaired with the
+recovered retail cookie fields and a shared, expiring, single-use authority.
+See `NEWENGINE_ZONE_HANDOFF_SECURITY.md` and `NEWENGINE_CONNECTED_ACCEPTANCE.md`.
+Development execution passes both runtime preservation and admission isolation.
 
 ## Provenance and ownership
 
@@ -58,8 +58,9 @@ check incorrectly rejected a legitimate isolated worktree under `tools-temp`.
 The disposable schema tool now contains `CutoverDurableReloadSmoke`: exact
 instance/template/QL/source/owner/slot/stack/credits/location checks through actual
 repositories, across two clean engine process cycles, plus a check that Legacy
-inventory tables stay stale after NewEngine writes. It is compiled but has not
-executed here. It explicitly emits LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED.
+inventory tables stay stale after NewEngine writes. It has executed successfully
+in the separate disposable suite. It explicitly emits
+LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED; the separate connected fixture supplies wire proof.
 
 No DAO implementation was moved. No Legacy source was deleted. No NPC, item,
 quest, vendor or other game content was added to runtime C#; fixture identities
@@ -105,7 +106,7 @@ every method or every content route.
 
 The Docker and instrumentation failures below describe the earlier d1c6d01
 foundation attempt. Both are superseded by the current disposable/connected
-execution. The current admission-integrity blocker is described above.
+execution. The former admission-integrity failure is retained in the historical receipt.
 
 - Docker fixture: ENVIRONMENTAL. `SCHEMA_VALIDATION=FAIL docker-image-failed`.
   Docker Desktop backend fails initializing its local Inference socket; no
@@ -125,12 +126,7 @@ execution. The current admission-integrity blocker is described above.
 
 ## Next bounded acceptance work
 
-Provide a working disposable MySQL/Docker environment; run the existing explicit
-schema wrapper on this exact branch. Then complete the authenticated protocol
-fixture from repository packet contracts, including character selection and
-supported durable actions before logout/reconnect and after clean restart.
-Validate active nanos/morphs and authored/generated mission state with exact
-persisted expectations as part of that connected sequence. Do not infer wire
-behavior from DAO success. Only after these integrity gates pass is a separate
-production cutover proposal ready. Legacy extraction and DAO consolidation remain
-separate work with the inventories below.
+Complete exact-source gates and record the decision in the validation receipt.
+Remaining retail packet evidence and service-account/shared-authority requirements
+are listed in the handoff security report. Production cutover, Legacy extraction
+and DAO consolidation remain separate milestones; the inventories preserve their scope.

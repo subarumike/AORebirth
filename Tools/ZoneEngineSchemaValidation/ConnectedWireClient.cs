@@ -23,12 +23,13 @@ sealed class ConnectedWireClient : IDisposable
         client.Connect(IPAddress.Loopback, port);
         input = network = client.GetStream();
     }
-    public void Send(MessageBody body, int characterId = 0)
+    public void Send(MessageBody body, int characterId = 0, int? headerSender = null, int? headerReceiver = null)
     {
         using var stream = new MemoryStream();
         serializer.Serialize(stream, new Message { Header = new Header {
             MessageId = 0xdfdf, PacketType = body.PacketType, Unknown = 1,
-            Sender = characterId, Receiver = 0 }, Body = body });
+            Sender = headerSender ?? (body is SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.ZoneLoginMessage zone ? zone.CharacterId : characterId),
+            Receiver = headerReceiver ?? (body is SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.ZoneLoginMessage ? 2 : 0) }, Body = body });
         byte[] bytes = stream.ToArray();
         if (bytes.Length < 16) throw new FixtureFailure("connected-message-not-serialized");
         // ZoneSession.TryPopPacket consumes four-byte-aligned plaintext frames.

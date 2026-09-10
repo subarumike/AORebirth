@@ -1,6 +1,14 @@
 # NewEngine cutover validation receipt
 
-## Final connected acceptance receipt
+## Secure handoff candidate
+
+Starting at `b87faf8b6de31d22f79d8f469990c27592bab6f9`, the recovered-cookie
+authority and connected negative/concurrent/restart tests pass in development.
+Final exact-source execution is pending. The receipt below is preserved as
+history of the admission failure; it is not the current implementation result.
+See `NEWENGINE_ZONE_HANDOFF_SECURITY.md`.
+
+## Historical connected acceptance receipt
 
 SOURCE_SHA=eddd90e73fdf912f766c5218acd4c07ec2972980
 STARTING_SHA=de764881cfae677bd0b2975499e8ad6cb5944c4a

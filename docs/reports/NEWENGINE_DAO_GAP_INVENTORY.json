@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceFilesScanned": 216,
+  "sourceFilesScanned": 217,
   "persistenceMethodRows": 99,
   "entries": [
     {
@@ -1580,11 +1580,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
-      "sourceSha256": "158257bbe7f3bd7017c3df22ea5f971f2d4c14d9a122e62613eb626ae2fcfebc",
+      "sourceSha256": "47a90d6bb33b28a95f3f5defbf83533b2ebe6433c7479ff6764772afb80b3120",
       "class": "ZoneLoginHandler",
       "method": "LoadHydrationAsync",
       "signature": "(IZoneSession session, int characterId)",
-      "line": 190,
+      "line": 204,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "REPOSITORY_CONSUMER",
@@ -2776,7 +2776,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "0193003053d748312f584aa2efbcf623d3d47e3875f494e98289881288185bb8",
+      "sourceSha256": "7a3265885220c5cb50542a032986d749a8599d05f438468aa9b74d9533a71feb",
       "class": "Program",
       "method": "RedirectConsoleLog",
       "signature": "(string[] args, string first, string second, bool error)",
@@ -2799,7 +2799,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "0193003053d748312f584aa2efbcf623d3d47e3875f494e98289881288185bb8",
+      "sourceSha256": "7a3265885220c5cb50542a032986d749a8599d05f438468aa9b74d9533a71feb",
       "class": "Program",
       "method": "BuildRootServices",
       "signature": "()",
@@ -2885,6 +2885,7 @@
         "services.AddSingleton\u003CIStatRepository, MySqlStatRepository\u003E",
         "services.AddSingleton\u003CITradePersistence, MySqlTradePersistence\u003E",
         "services.AddSingleton\u003CIUploadedNanoRepository\u003E",
+        "services.AddSingleton\u003CIZoneAdmissionGate, ZoneAdmissionGate\u003E",
         "services.AddSingleton\u003CIZoneLogger, NLogZoneLogger\u003E",
         "services.AddSingleton\u003CInventoryActionService\u003E",
         "services.AddSingleton\u003CInventoryFlushService\u003E",
@@ -2910,11 +2911,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "0193003053d748312f584aa2efbcf623d3d47e3875f494e98289881288185bb8",
+      "sourceSha256": "7a3265885220c5cb50542a032986d749a8599d05f438468aa9b74d9533a71feb",
       "class": "Program",
       "method": "StartShutdownFileWatcher",
       "signature": "(string[] args)",
-      "line": 392,
+      "line": 393,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "FILE_OR_SERIALIZATION",

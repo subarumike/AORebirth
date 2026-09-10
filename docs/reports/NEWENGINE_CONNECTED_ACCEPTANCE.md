@@ -2,7 +2,8 @@
 
 ## Scope
 
-Mike-owned branch codex/newengine-production-cutover-001, starting at
+Mike-owned branch codex/newengine-production-cutover-001. Security closure starts
+at b87faf8b6de31d22f79d8f469990c27592bab6f9; prior positive milestone started at
 de764881cfae677bd0b2975499e8ad6cb5944c4a.
 Worktree: C:\Users\Mike\Documents\AORebirth\tools-temp\cutover001.
 Master remains 6e90dda030774726aa2060acb9edb756ea1f635c and the developer ref
@@ -41,10 +42,15 @@ It never starts or controls the AO client.
 4. Send invalid inventory source 9999, then supported slot 64-to-66 move. Await its
    real acknowledgement and assert exact durable results.
 5. Logout, discard clients, authenticate/select/connect again and compare.
-6. Separately test direct zone admission. Its unexpected FullCharacter is FAIL,
-   never positive authentication evidence.
-7. Stop ZoneEngine cleanly, start the same binary with a different PID, repeat
-   authentication/selection/entry and compare exact state.
+6. Reject no/random/unknown/altered/expired/stale/cross-character/cross-account
+   tickets and invalid header identities. Hash every table before/after each
+   rejection. Race eight TCP clients with one real LoginEngine ticket: exactly
+   one FullCharacter, seven disconnects. Verify the winner's exact world state;
+   reject replay while in play and after logout without database changes.
+7. Stop ZoneEngine cleanly, start the same binary with a different PID. Reject
+   consumed and expired tickets again. Admit an unconsumed LoginEngine ticket
+   issued before restart; then repeat fresh authentication/selection/entry and
+   compare exact state for the main character.
 8. Cancel morph over RemoveFriendlyNano, observe Buff removal and base
    MonsterData, logout and authenticate again to verify cancellation persisted.
 9. Stop engines and remove the owned container/network. Admission failure
@@ -69,7 +75,7 @@ Nano activation and mission state are administrative seeds. Inventory movement
 and morph cancellation are connected mutations. No mission gameplay, credit
 reward, equip legality or live-client visual claim is made.
 
-## Repairs and concrete remaining blocker
+## Repairs and security closure
 
 The independent durable reload fixture reused character 9701 owned by
 AuthoredMissionSmoke. It now owns 9801, removing a test-data collision.
@@ -79,19 +85,21 @@ NewEngine canonicalizes the acceptance-plan hash without changing its digest.
 All captured bundle hashes have regression coverage, and the connected fixture
 restores a real accepted bundle. No schema or transaction boundary changed.
 
-ZoneLoginHandler.HandleAsyncCoreInner loads/reconnects by CharacterId without
-authenticated handoff validation. SelectCharacterHandler validates the login
-account but supplies no consumed proof. The mapped ZoneLoginMessage contains
-only CharacterId. Direct zone entry after normal logout reproduces unauthorized
-character access.
+The historical direct-zone admission failure is closed by ZoneHandoffStore and
+ZoneAdmissionGate. LoginEngine issues both recovered cookies only after verified
+credentials and owned character selection. NewEngine validates the 32-byte
+envelope and consumes the account/character/login-generation-bound authorization
+before lookup, hydration or reconnect ownership. See the dedicated security
+report for protocol provenance, expiry, restart and deployment boundaries.
 
-Safe closure needs a verifiable, expiring, single-use login-to-zone binding to
-the authenticated account, selected character and session, grounded in the
-established client wire contract. Verify actual handoff fields/transport first;
-do not invent cookie fields, trust CharacterId/Online alone, or treat a prior
-successful login as authorization of a different socket. Repeat missing,
-forged, replayed and cross-character admission tests plus the positive lifecycle.
-No unsafe handoff shim was introduced to make the gate green.
+Extra fixture identities 9902 (same account), 9903 (another account), and 9904
+(expired ticket) are created before either engine starts. Only the expired
+negative ticket is administratively preseeded with an injected past clock; all
+positive and concurrency tickets come through the real LoginEngine protocol.
+The harness awaits normal LoginEngine disconnect cleanup before measuring each
+negative zone attempt, avoiding a race with its legitimate Online flag cleanup.
+No repair or authorization writes occur after engine startup outside real TCP
+handlers. Original-retail end-to-end capture remains a separate evidence gap.
 
 ## Inspected files
 

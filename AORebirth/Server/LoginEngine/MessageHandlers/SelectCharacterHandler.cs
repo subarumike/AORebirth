@@ -92,16 +92,6 @@ namespace LoginEngine.MessageHandlers
                 return;
             }
 
-            if (CharacterDao.Instance.IsOnline(selectCharacterMessage.CharacterId) == 1)
-            {
-                Console.WriteLine(
-                    "Client '" + authenticatedAccount
-                    + "' is reclaiming stale online state for character " + selectCharacterMessage.CharacterId + ".");
-                CharacterDao.Instance.SetOffline(selectCharacterMessage.CharacterId);
-            }
-
-            client.MarkCharacterOnlineForHandoff(selectCharacterMessage.CharacterId);
-
             try
             {
                 IPAddress zoneIpAdress;
@@ -117,14 +107,19 @@ namespace LoginEngine.MessageHandlers
                     throw new InvalidOperationException("ZoneIP did not resolve to an IPv4 address.");
                 }
 
+                var ticket = AORebirth.Database.Dao.ZoneHandoffStore.Configured().Issue(
+                    authenticatedAccount, client.ZoneHandoffGeneration, selectCharacterMessage.CharacterId);
                 var zoneRedirectionMessage = new ZoneInfoMessage
                                              {
                                                  CharacterId = selectCharacterMessage.CharacterId,
+                                                 Cookie1 = ticket.Cookie1,
+                                                 Cookie2 = ticket.Cookie2,
                                                  ServerIpAddress = zoneIpAdress,
                                                  ServerPort =
                                                      (ushort)
                                                      ConfigReadWrite.Instance.CurrentConfig.ZonePort
                                              };
+                client.MarkCharacterOnlineForHandoff(selectCharacterMessage.CharacterId);
                 client.StartZoneHandoff();
                 client.Send(0x0000615B, zoneRedirectionMessage);
             }

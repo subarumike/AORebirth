@@ -16,8 +16,9 @@ completion matrices and dated evidence retain detailed provenance.
   durable-state integrity. Generic item effects without a transaction owner now
   reject durable mutations before any effect. Disposable MySQL and authenticated
   connected inventory/nano/morph/mission reload across a distinct-process restart
-  now pass. Production cutover is blocked by reproduced unauthenticated direct
-  zone admission, not missing gameplay coverage. Cutover evidence and dependency/DAO inventories live in
+  now pass. The reproduced unauthenticated direct-zone admission is repaired in
+  the current handoff-security candidate; connected negative and concurrent tests
+  pass, with final committed-source validation pending. Cutover evidence and dependency/DAO inventories live in
   `docs/reports/NEWENGINE_CUTOVER_HANDOFF.md`. This is not production acceptance.
 
 - The follow-on `codex/zoneengine-final-runtime-consumers` candidate starts at
