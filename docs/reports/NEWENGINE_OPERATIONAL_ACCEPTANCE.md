@@ -23,7 +23,7 @@ failure, not missing gameplay coverage.
 Inventory move and morph cancellation are CONNECTED_MUTATION_PROVEN.
 Nano activation and authored/generated mission state are SEEDED_STATE_RELOAD;
 connected casting, mission rolling/acceptance/completion/rewards are not claimed.
-Credits remain exactly1234; this proves preservation, not a credit-changing action.
+Credits remain exactly 1234; this proves preservation, not a credit-changing action.
 No equipment action is claimed. Separate repository transactions are still
 REPOSITORY_ONLY_PROOF even when they execute real MySQL.
 

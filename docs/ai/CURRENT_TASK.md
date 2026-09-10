@@ -11,8 +11,9 @@ Starting source: `de764881cfae677bd0b2975499e8ad6cb5944c4a`.
 Disposable schema execution and the authenticated positive connected lifecycle
 now pass, including exact inventory, nanos/morphs, both mission journals and
 connected morph cancellation. The isolated fixture identity collision and
-generated mission acceptance hash casing are repaired. Final exact-source
-acceptance and receipt are being completed. The concrete remaining cutover
+generated mission acceptance hash casing are repaired. Exact-source Windows,
+database and Linux publication validation are complete at `eddd90e73fdf912f766c5218acd4c07ec2972980`.
+The concrete remaining cutover
 blocker is direct unauthenticated zone admission; see the connected report.
 Preserve the generic unsupported item-effect restrictions.
 
