@@ -215,11 +215,28 @@ static partial class ConnectedAcceptanceSmoke
         {
             client.Send(handoff);
             client.Wait<FullCharacterMessage>(m => m.Identity.Instance == Owner);
+            client.Wait<SpecialAttackWeaponMessage>(m => m.Identity.Instance == Owner);
+            VerifyRetailWorldEntryReadyBlock(client);
             Console.WriteLine("ZONE_HANDOFF_VALIDATION=PASS");
             EnterWorld(client);
             return client;
         }
         catch { client.Dispose(); throw; }
+    }
+    static void VerifyRetailWorldEntryReadyBlock(ConnectedWireClient client)
+    {
+        var received = client.Received.ToList();
+        int spawn = received.FindIndex(m => m is SimpleCharFullUpdateMessage s && s.Identity == Character);
+        int gameTime = received.FindIndex(m => m is GameTimeMessage g && g.Identity == Character);
+        int social = received.FindIndex(m => m is StatMessage s && s.Identity == Character && s.Unknown == 1
+            && s.Stats.Any(stat => stat.Value1 == CharacterStat.SocialStatus && stat.Value2 == 4));
+        int full = received.FindIndex(m => m is FullCharacterMessage f && f.Identity == Character);
+        int towers = received.FindIndex(m => m is PlayfieldAllTowersMessage);
+        int cities = received.FindIndex(m => m is PlayfieldAllCitiesMessage);
+        int specials = received.FindIndex(m => m is SpecialAttackWeaponMessage s && s.Identity == Character);
+        Require(spawn >= 0 && spawn < gameTime && gameTime < social && social < full
+            && full < towers && towers < cities && cities < specials, "retail-world-entry-ready-order");
+        Console.WriteLine("RETAIL_WORLD_ENTRY_READY_BLOCK=PASS");
     }
     static void EnterWorld(ConnectedWireClient client)
     {

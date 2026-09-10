@@ -145,7 +145,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     Z = hydration.Character.Z
                 },
                 characterId);
-            SendGameTime(session, playfield, characterId);
             EnqueueSpawn(session, playfield, hydration);
         }
 
@@ -187,8 +186,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     Z = position.zf
                 },
                 characterId);
-            SendGameTime(session, playfield, characterId);
-
             if (!playfield.TryEnqueue(
                 new PendingReconnectInboundItem
                 {
@@ -259,26 +256,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
         {
             session.Send(
                 playfield.CreatePlayfieldAnarchyFMessage(characterCoordinates),
-                playfield.Identity.Instance,
-                characterId);
-        }
-
-        private static void SendGameTime(IZoneSession session, Playfield playfield, int characterId)
-        {
-            if (session is IGameTimeSession clock)
-                clock.RecordGameTimeSynchronization(DateTime.UtcNow);
-            session.Send(
-                new GameTimeMessage
-                {
-                    Identity = new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = characterId
-                    },
-                    Unknown1 = 30024.0f,
-                    Unknown3 = 185408,
-                    Unknown4 = 80183.3125f
-                },
                 playfield.Identity.Instance,
                 characterId);
         }
