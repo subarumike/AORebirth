@@ -14,8 +14,10 @@ completion matrices and dated evidence retain detailed provenance.
   NewEngine is the candidate default; Legacy remains explicitly selectable.
   Cutover policy now permits incomplete gameplay while requiring operational and
   durable-state integrity. Generic item effects without a transaction owner now
-  reject durable mutations before any effect. Cutover evidence, environmental
-  blockers, and follow-up dependency/DAO inventories live in
+  reject durable mutations before any effect. Disposable MySQL and authenticated
+  connected inventory/nano/morph/mission reload across a distinct-process restart
+  now pass. Production cutover is blocked by reproduced unauthenticated direct
+  zone admission, not missing gameplay coverage. Cutover evidence and dependency/DAO inventories live in
   `docs/reports/NEWENGINE_CUTOVER_HANDOFF.md`. This is not production acceptance.
 
 - The follow-on `codex/zoneengine-final-runtime-consumers` candidate starts at

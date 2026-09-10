@@ -7,11 +7,13 @@ The foundation can be reviewed and tested now; production cutover is **not yet
 accepted**. Full gameplay parity is not a release gate. Missing NPC bindings,
 dialogue, pets and other catalog coverage are follow-up gameplay work.
 
-Two operational gaps remain: the disposable MySQL runner cannot start Docker on
-this machine, and the fixture does not exercise authenticated account login,
-character selection and connected player mutations/reconnect across restart.
-Repository reload tests and an empty process lifecycle do not prove that sequence.
-No corruption was observed; the required proof is unavailable.
+Disposable MySQL and the full authenticated positive lifecycle now execute:
+inventory movement, reconnect, distinct-process restart, nanos/morphs and both
+mission journals, plus connected morph cancellation and another reconnect.
+The remaining cutover blocker is reproduced unauthenticated zone admission:
+a direct ZoneLogin receives the character without authenticating to LoginEngine.
+See `NEWENGINE_CONNECTED_ACCEPTANCE.md` for evidence and the scoped closure needed.
+Runtime data preservation passed; session admission isolation did not.
 
 ## Provenance and ownership
 
@@ -99,7 +101,11 @@ documents and newer developer Git changes. The JSON source hashes make the
 inventory inputs reproducible. Static enumeration is not a semantic proof of
 every method or every content route.
 
-## Failure classification and execution corrections
+## Historical foundation failures and execution corrections
+
+The Docker and instrumentation failures below describe the earlier d1c6d01
+foundation attempt. Both are superseded by the current disposable/connected
+execution. The current admission-integrity blocker is described above.
 
 - Docker fixture: ENVIRONMENTAL. `SCHEMA_VALIDATION=FAIL docker-image-failed`.
   Docker Desktop backend fails initializing its local Inference socket; no

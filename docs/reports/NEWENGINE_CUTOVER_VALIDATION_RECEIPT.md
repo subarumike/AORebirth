@@ -1,6 +1,16 @@
 # NewEngine cutover validation receipt
 
-## Exact source and result
+## Connected acceptance candidate
+
+The new connected fixture executes the full authenticated positive lifecycle,
+including distinct-process restart and morph cancellation; disposable schema and
+durable reload also execute. NewEngine tests: PASS 485/485. Direct unauthenticated
+zone admission is reproduced, so overall operational readiness remains NO.
+The exact committed-source rerun and binary/log hashes will replace this candidate
+paragraph after the source commit. The older receipt below remains historical;
+its Docker failure and missing instrumentation no longer describe current state.
+
+## Historical foundation source and result
 
 Date: 2026-09-09. Accepted source/tool/test commit:
 `d1c6d01e976a841dd1cdb85c6f31a62aa4ddf767`.

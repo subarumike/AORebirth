@@ -11,9 +11,10 @@ using MySqlConnector;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Logging;
 
-if (args.Length != 3 || args[0] != "--run-disposable" || args[1] != "--engine" || !File.Exists(args[2]))
+bool connected = args.Length == 5 && args[0] == "--run-connected" && args[3] == "--login-engine" && File.Exists(args[4]);
+if ((!connected && (args.Length != 3 || args[0] != "--run-disposable")) || args[1] != "--engine" || !File.Exists(args[2]))
 {
-    Console.Error.WriteLine("USAGE: ZoneEngineSchemaValidation --run-disposable --engine <absolute ZoneEngine_New.dll>. Creates its own loopback-only, labeled disposable MySQL. Never reads production connection settings.");
+    Console.Error.WriteLine("USAGE: ZoneEngineSchemaValidation --run-disposable --engine <absolute ZoneEngine_New.dll> OR --run-connected --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll>. Creates its own loopback-only, labeled disposable MySQL. Never reads production connection settings.");
     return 64;
 }
 try
@@ -23,6 +24,13 @@ try
     using var connection = fixture.Open();
     FixtureSql.CreateBaseline(connection);
     AuthoredMissionSmoke.CreateBaseline(connection);
+    if (connected)
+    {
+        Require(MigrationSmoke.Run(fixture, MigrateArgs(), Console.Out) == 0, "connected-explicit-migration");
+        EngineSmoke.Validate(args[2], fixture, SchemaState.SCHEMA_CURRENT);
+        ConnectedAcceptanceSmoke.Validate(args[2], args[4], fixture, connection);
+        return ConnectedAcceptanceSmoke.HandoffRejected ? 0 : 2;
+    }
     FixtureSql.Execute(connection, "INSERT INTO instanceditems (Id,ContainerType,ContainerInstance,ContainerPlacement,Itemtype,LowId,HighId,Quality,MultipleCount) VALUES (42,1001,104,1,0,10,10,1,2); INSERT INTO items (ContainerType,ContainerInstance,ContainerPlacement,LowId,HighId,Quality,MultipleCount) VALUES (1001,104,2,11,11,1,1)");
     string before = FixtureSql.Fingerprint(connection);
     Require(DatabaseSchemaReadiness.Check(fixture.ConnectionString).State == SchemaState.SCHEMA_MIGRATION_REQUIRED, "negative-readiness");
@@ -98,6 +106,7 @@ try
 catch (Exception exception)
 {
     Console.Error.WriteLine("SCHEMA_VALIDATION=FAIL " + (exception is FixtureFailure ? exception.Message : exception.GetType().Name));
+    if (connected) Console.Error.WriteLine(exception.StackTrace); // Frames only; never connection/credential-bearing exception messages.
     if (exception is MySqlException sqlException)
         Console.Error.WriteLine("DISPOSABLE_SQL_ERROR_NUMBER=" + sqlException.Number);
     return 1;
@@ -402,6 +411,8 @@ sealed class DisposableSchemaDatabase : IDisposable
     public string DirectoryPath { get; } = Path.Combine(Path.GetTempPath(), "aorebirth-zone-schema-" + Guid.NewGuid().ToString("N"));
     public string ConnectionString { get; private set; } = string.Empty;
     public int ZonePort { get; private set; }
+    public int LoginPort { get; private set; }
+    public string FixtureId => name;
     public string ConfigPath => Path.Combine(DirectoryPath, "Config.xml");
     public void Start()
     {
@@ -433,6 +444,7 @@ sealed class DisposableSchemaDatabase : IDisposable
         if (!ready) throw new FixtureFailure("disposable-mysql-timeout");
         // Config is an isolated copy of nonsecret runtime defaults; endpoints are loopback-only.
         ZonePort = AvailablePort();
+        LoginPort = AvailablePort();
         int communicationPort = AvailablePort();
         File.WriteAllText(ConfigPath, "<?xml version=\"1.0\"?><Config><SQLType>MySql</SQLType><MysqlConnection>REPLACE_WITH_DISPOSABLE_RUNTIME_SECRET</MysqlConnection><ListenIP>127.0.0.1</ListenIP><ChatIP>127.0.0.1</ChatIP><ISCommLocalIP>127.0.0.1</ISCommLocalIP><ZoneIP>127.0.0.1</ZoneIP><ZonePort>" + ZonePort.ToString(CultureInfo.InvariantCulture) + "</ZonePort><LoginPort>17500</LoginPort><CommPort>" + communicationPort.ToString(CultureInfo.InvariantCulture) + "</CommPort><ChatPort>17512</ChatPort><DefaultPlayfield>4582</DefaultPlayfield></Config>");
     }

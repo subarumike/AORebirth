@@ -41,30 +41,36 @@ The added exact-state fixture checks that NewEngine writes to item_instances do
 not synchronize the historical items/instanceditems representation. Existing
 fixtures exercise identity migration, sequence bounds, source metadata,
 character/trade/inventory/nano/mission transaction failure and schema mismatch.
-The full account-to-reconnect lifecycle remains separate unfinished coverage.
+The full account-to-reconnect lifecycle is separately exercised by the connected
+fixture, including a distinct-process restart and exact state comparisons.
 
-Current attempt: ENVIRONMENTAL failure before database creation (Docker image/
-daemon unavailable). No fresh migration, rollback or restart PASS is claimed.
+Current disposable execution: PASS for migration, transactional failure rollback,
+durable repository reload and process restart. The earlier Docker failure is
+historical. Connected positive lifecycle also passes, but direct unauthenticated
+zone admission fails its negative gate; production cutover remains blocked.
 
 ## Rollback decision
 
 | Flag | Current result |
 | --- | --- |
 | PRE_NEWENGINE_ROLLBACK_SAFE | UNKNOWN; exact previous release+restored snapshot requires rehearsal |
-| POST_NEWENGINE_WRITE_ROLLBACK_SAFE | UNKNOWN from execution; source indicates a binary-only switch is unsafe |
+| POST_NEWENGINE_WRITE_ROLLBACK_SAFE | NO for executable-only return; stale Legacy item tables proven in disposable execution |
 | ROLLBACK_REQUIRES_DATABASE_RESTORE | YES for the proposed return-to-Legacy recovery path |
 | ROLLBACK_REQUIRES_FORWARD_FIX | NO if accepting snapshot restoration; otherwise a validated forward fix/reconciliation is required to retain new writes |
 
 Legacy and NewEngine use different durable inventory representations. NewEngine
 does not update Legacy item tables in the inspected transaction paths. Do not
 infer rollback safety from a successful build or from leaving Legacy binaries
-available. The new fixture will emit POST_NEWENGINE_WRITE_LEGACY_ROLLBACK_SAFE=NO
-only if its stale-table assertions actually pass; it has not run here.
+available. The fixture emitted POST_NEWENGINE_WRITE_LEGACY_ROLLBACK_SAFE=NO
+after its exact-state and stale-table assertions passed. This proves divergence,
+not successful restoration of a production backup. The recovery plan requires a
+validated snapshot restoration or a forward fix/reconciliation preserving writes.
 
 ## Concrete later production procedure
 
-1. Accept the exact candidate only after connected durable lifecycle and
-   disposable schema/transaction tests pass. Record the exact prior release and
+1. Accept the exact candidate only after connected durable lifecycle,
+   authenticated zone admission isolation and disposable schema/transaction tests
+   pass. Record the exact prior release and
    both packages' hashes.
 2. Schedule downtime, stop all writers and capture a restorable consistent
    database snapshot plus configuration. Prove restoration on a disposable

@@ -12,6 +12,17 @@ namespace ZoneEngine_New.Tests
     [TestClass]
     public sealed class GeneratedMissionRollProjectionTests
     {
+        [TestMethod]
+        public void CapturedBundleHashesUseDaoCanonicalHexWithoutChangingDigest()
+        {
+            foreach (var bundle in MissionAcgCapturedLayoutCatalog.CreateBundles())
+            {
+                string hash = GeneratedMissionAcgService.CanonicalBundleHash(bundle);
+                Assert.AreEqual(64, hash.Length);
+                Assert.IsTrue(hash.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f'));
+                CollectionAssert.AreEqual(Convert.FromHexString(bundle.GeneratorPayloadSha256), Convert.FromHexString(hash));
+            }
+        }
         private static readonly Identity Owner = new() { Type = IdentityType.CanbeAffected, Instance = 990101 };
         private static QuestAlternativeMessage Request() => new()
         {

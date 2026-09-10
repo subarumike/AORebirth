@@ -83,7 +83,7 @@ public sealed partial class GeneratedMissionAcgService
                 {
                     OwnerId = player.Identity.Instance, OfferType = offer.OfferType, OfferInstance = offer.OfferInstance,
                     QuestType = 0xDAC3, QuestInstance = quest, KeyInstance = key, BundleId = bundle.LayoutId,
-                    BundleSha256 = bundle.GeneratorPayloadSha256, BuildingType = bundle.BuildingIdentity.Type, BuildingInstance = bundle.BuildingIdentity.Instance,
+                    BundleSha256 = CanonicalBundleHash(bundle), BuildingType = bundle.BuildingIdentity.Type, BuildingInstance = bundle.BuildingIdentity.Instance,
                     LivePlayfield = livePf, State = GeneratedMissionState.Active, AcceptedAtUtcTicks = now,
                     ExpiresAtUtcTicks = now + TimeSpan.TicksPerHour * 48, UpdatedAtUtcTicks = now, Version = 1, Offer = offer, RequiredCount = 1
                 };
@@ -294,6 +294,7 @@ public sealed partial class GeneratedMissionAcgService
         }
         throw new InvalidOperationException("No governed mission playfield lease remains.");
     }
+    internal static string CanonicalBundleHash(MissionAcgLayoutBundle bundle) => bundle.GeneratorPayloadSha256.ToLowerInvariant();
     static int Seed(GeneratedMissionOffer offer)
     {
         unchecked

@@ -34,7 +34,26 @@ labelled loopback MySQL. It includes exact item/credit/location fresh-repository
 reloads across engine restarts and a Legacy-table staleness check. Its
 `LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED` result must never be relabelled full
 account-login/character-selection/reconnect acceptance. See the operational
-report for that remaining boundary.
+report for that evidence boundary.
+
+For real LoginEngine authentication, character selection, NewEngine TCP entry,
+inventory mutation, reconnect, distinct-process restart, nano/morph/quest reload,
+morph cancellation and negative admission tests:
+
+```cmd
+cmd /d /c Tools\run_newengine_connected_acceptance.cmd --engine <absolute-built-ZoneEngine_New.dll> --login-engine <absolute-built-LoginEngine.exe-or-dll>
+```
+
+Use the normal Windows build's `AORebirth\Built\Debug\ZoneEngine_New\ZoneEngine_New.dll`
+and `AORebirth\Built\Debug\LoginEngine.exe` for an exact-source acceptance run.
+This synthetic client uses AOtomation codecs and the existing login-key encoder;
+it does not start the AO client. Setup writes finish before engine startup.
+After startup only network actions mutate state; SQL/DAO access is read-only.
+The fixture creates and removes its own labelled loopback MySQL/network and
+processes, records source/binary provenance, and returns nonzero if zone admission
+accepts an unauthenticated character. Positive lifecycle PASS does not override
+that negative gate. Retain the console log under `build-verify` and link the
+actual SHA in `NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`.
 
 Run:
 

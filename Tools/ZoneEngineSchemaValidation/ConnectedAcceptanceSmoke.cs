@@ -1,0 +1,286 @@
+using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Xml.Linq;
+using MySqlConnector;
+using AORebirth.Core.Encryption;
+using AORebirth.LinuxBuild.Stage7MySqlSecurityIntegrationTests;
+using SmokeLounge.AOtomation.Messaging.GameData;
+using SmokeLounge.AOtomation.Messaging.Messages;
+using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using ZoneEngine_New.Core.Data;
+using ZoneEngine_New.Core.Nanos;
+using ZoneEngine_New.Core.Missions;
+using AORebirth.Database.Domain.Missions;
+using AORebirth.Interfaces.Persistence.Missions;
+
+/// <summary>Administrative setup ends before startup. Every subsequent mutation is sent over TCP.</summary>
+static class ConnectedAcceptanceSmoke
+{
+    const int Owner = 9901;
+    const string Account = "cutoverconnected";
+    static readonly Identity Character = new() { Type = IdentityType.CanbeAffected, Instance = Owner };
+    static GeneratedMissionBinding generated = null!;
+    static ActiveNanoRecord seededNano = null!;
+    static string missionSnapshot = "";
+    static DisposableSchemaDatabase ownedFixture = null!;
+    static bool morphActive = true;
+    static int previousDuration = int.MaxValue;
+    public static bool HandoffRejected { get; private set; }
+    public static string RepositoryRoot()
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory != null; directory = directory.Parent)
+            if (File.Exists(Path.Combine(directory.FullName, "AI_START_HERE.md"))) return directory.FullName;
+        throw new FixtureFailure("connected-repository-root-not-found");
+    }
+    public static void Validate(string zoneBinary, string loginBinary, DisposableSchemaDatabase fixture, MySqlConnection connection)
+    {
+        string password = Convert.ToHexString(RandomNumberGenerator.GetBytes(20));
+        string? previous = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION");
+        try
+        {
+            ownedFixture = fixture;
+            Console.WriteLine("SOURCE_SHA=" + Git("rev-parse", "HEAD"));
+            Console.WriteLine("SOURCE_WORKTREE_TRACKED_CLEAN=" + (Git("status", "--porcelain", "--untracked-files=no").Length == 0 ? "YES" : "NO"));
+            Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", fixture.ConnectionString);
+            var xml = XDocument.Load(fixture.ConfigPath);
+            xml.Root!.SetElementValue("LoginPort", fixture.LoginPort);
+            xml.Save(fixture.ConfigPath);
+            FixtureSql.Execute(connection, File.ReadAllText(Path.Combine(RepositoryRoot(),
+                "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/login.sql")));
+            using (var command = new MySqlCommand("INSERT INTO login (Id,CreationDate,Email,FirstName,LastName,Username,Password,AllowedCharacters,Flags,AccountFlags,Expansions,GM) VALUES (9901,'2026-09-09','fixture@invalid','','',@account,@hash,6,0,0,2047,0)", connection))
+            {
+                command.Parameters.AddWithValue("@account", Account);
+                command.Parameters.AddWithValue("@hash", PasswordHash.CreateHash(password));
+                command.ExecuteNonQuery();
+            }
+            FixtureSql.Execute(connection, $"INSERT INTO characters (Id,Username,Name,FirstName,LastName,Playfield,X,Y,Z,HeadingW,HeadingX,HeadingY,HeadingZ,Online) VALUES ({Owner},'{Account}','ConnectedFixture','','',4582,100,0,100,1,0,0,0,0)");
+            // Real schema stat IDs from CharacterList and CharacterStat, fixture values only.
+            var stats = new Dictionary<CharacterStat, int> {
+                [CharacterStat.Level] = 1, [CharacterStat.Breed] = 1, [CharacterStat.Sex] = 2,
+                [CharacterStat.Profession] = 1, [CharacterStat.Cash] = 1234,
+                [CharacterStat.Health] = 1000,
+                [CharacterStat.CurrentNano] = 1000, [CharacterStat.MaxNanoEnergy] = 1000,
+                [CharacterStat.MonsterData] = 0, [CharacterStat.CATMesh] = 111, [CharacterStat.DisplayCATMesh] = 222,
+                [(CharacterStat)12] = 5907,
+                [CharacterStat.MaxNCU] = 100, [CharacterStat.RunSpeed] = 100 };
+            foreach (var stat in stats)
+                FixtureSql.Execute(connection, $"INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (50000,{Owner},{(int)stat.Key},{stat.Value})");
+            var inventory = new MySqlInventoryRepository(new SilentLogger());
+            int identity = inventory.LeaseInstanceIdBlock(2);
+            inventory.Insert(new ItemInstanceRecord { InstanceId = identity, ContainerType = 104, ContainerInstance = Owner,
+                ContainerPlacement = 64, LowId = 43384, HighId = 43384, Quality = 1, StackCount = 3, Source = (AORebirth.Enums.ItemSource)1 });
+            inventory.Insert(new ItemInstanceRecord { InstanceId = identity + 1, ContainerType = 104, ContainerInstance = Owner,
+                ContainerPlacement = 65, LowId = 42423, HighId = 42423, Quality = 4, StackCount = 1, Source = (AORebirth.Enums.ItemSource)1 });
+            var catalog = NanoCatalog.Load(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(zoneBinary))!, "GameData", "nanos.dat"));
+            Require(catalog.TryGet(270542, out var morph), "seed-supported-morph-catalog");
+            long expiry = DateTime.UtcNow.AddMilliseconds((long)morph.DurationCentiseconds * 10).Ticks;
+            var active = new ActiveNanoRecord(morph.Id, morph.Strain, 99, morph.DurationCentiseconds, expiry);
+            seededNano = active;
+            new MySqlActiveNanoRepository().Commit([new NanoCharacterWrite(Owner, [active], [])]);
+            FixtureSql.Execute(connection, $"INSERT INTO charactersuploadednanos (CharacterId,NanoId) VALUES ({Owner},{morph.Id})");
+            IMissionDao missions = new MySqlMissionDao(() => fixture.Open());
+            long now = DateTime.UtcNow.Ticks;
+            missions.Execute(Owner, Account, tx => { tx.SaveMission(new MissionKeyData(Owner, AuthoredQuestService.DeliverArmor),
+                new MissionStateData { CharacterId = Owner, QuestId = AuthoredQuestService.DeliverArmor,
+                    State = MissionLifecycleState.Active, CurrentStepId = "active", OfferedAtUtcTicks = now,
+                    AcceptedAtUtcTicks = now, CreatedAtUtcTicks = now, UpdatedAtUtcTicks = now }); return true; });
+            generated = ConnectedMissionSeed.Create(fixture, Owner);
+            missionSnapshot = MissionSnapshot();
+            Console.WriteLine("DATABASE_FIXTURE_ID=" + fixture.FixtureId + " ACCEPTANCE_TIMESTAMP=" + DateTime.UtcNow.ToString("O"));
+            Console.WriteLine("CONNECTED_FIXTURE_SEEDED=PASS ACCOUNT_ID=9901 CHARACTER_ID=9901");
+            using var login = new ConnectedEngineProcess(loginBinary, true, fixture);
+            Console.WriteLine("LOGINENGINE_STARTED=YES LOGINENGINE_BINARY_SHA256=" + login.BinarySha256);
+            using (var rejected = new ConnectedWireClient(fixture.LoginPort, paddedLoginFrames: true))
+            {
+                rejected.Send(new UserLoginMessage { UserName = Account, ClientVersion = "18.8.53_EP1" });
+                var challenge = rejected.Wait<ServerSaltMessage>();
+                rejected.Send(new UserCredentialsMessage { UserName = Account,
+                    Credentials = DeterministicLoginKeyEncoder.Create(Account, password + "incorrect", challenge.ServerSalt) });
+                Require(rejected.Wait<LoginErrorMessage>().Error == LoginError.InvalidUserNamePassword, "wrong-password-rejected");
+                Require(FixtureSql.Scalar(connection, $"SELECT Online FROM characters WHERE Id={Owner}") == 0, "wrong-password-no-session");
+                Console.WriteLine("CONNECTED_WRONG_PASSWORD_FAIL_CLOSED=PASS");
+            }
+            int before;
+            using (var zone = new ConnectedEngineProcess(zoneBinary, false, fixture))
+            {
+                before = zone.Id;
+                Console.WriteLine("ZONEENGINE_NEW_STARTED=YES ZONEENGINE_NEW_BINARY_SHA256=" + zone.BinarySha256);
+                using (var client = Enter(fixture, password))
+                {
+                    VerifyConnected(client, identity, 64, "INITIAL");
+                    VerifyDatabase(connection, identity, 64);
+                    client.Send(new ClientMoveItemToInventoryMessage { Identity = Character,
+                        SourceContainer = new Identity { Type = IdentityType.Inventory, Instance = 9999 }, TargetPlacement = 65 }, Owner);
+                    client.Send(new ClientMoveItemToInventoryMessage { Identity = Character,
+                        SourceContainer = new Identity { Type = IdentityType.Inventory, Instance = 64 }, TargetPlacement = 66 }, Owner);
+                    client.Wait<ContainerAddItemMessage>(m => m.Identity == Character && m.TargetPlacement == 66);
+                    Until(() => FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity} AND ContainerPlacement=66") == 1, "connected-inventory-move");
+                    VerifyDatabase(connection, identity, 66);
+                    Console.WriteLine("CONNECTED_INVALID_INVENTORY_SOURCE_FAIL_CLOSED=PASS");
+                    Console.WriteLine("CONNECTED_DURABLE_MUTATION=PASS OPERATION=inventory-move SOURCE=64 TARGET=66");
+                    Logout(client, connection);
+                }
+                using (var client = Enter(fixture, password))
+                {
+                    VerifyConnected(client, identity, 66, "RECONNECT");
+                    VerifyDatabase(connection, identity, 66);
+                    Console.WriteLine("AUTH_RECONNECT=PASS STATE_AFTER_RECONNECT=PASS");
+                    Logout(client, connection);
+                }
+                // Adversarial loopback-only test: no LoginEngine connection or authentication.
+                // This must never be mistaken for the positive authenticated lifecycle above.
+                using (var unauthenticated = new ConnectedWireClient(fixture.ZonePort))
+                {
+                    unauthenticated.Send(new ZoneLoginMessage { CharacterId = Owner });
+                    HandoffRejected = unauthenticated.AdmissionRejected(Owner);
+                    if (!HandoffRejected)
+                    {
+                        unauthenticated.Send(new CharInPlayMessage { Identity = Character }, Owner);
+                        Console.WriteLine("UNAUTHENTICATED_ZONE_CHARACTER_ACCESS=REPRODUCED ZONE_HANDOFF_FAIL_CLOSED=FAIL NEWENGINE_OPERATIONAL_CUTOVER_READY=NO");
+                        Logout(unauthenticated, connection);
+                    }
+                    else Console.WriteLine("ZONE_HANDOFF_FAIL_CLOSED=PASS");
+                }
+                zone.Stop();
+                Console.WriteLine("ENGINE_PID_BEFORE=" + before + " CLEAN_DISCONNECT=PASS");
+            }
+            using (var zone = new ConnectedEngineProcess(zoneBinary, false, fixture))
+            {
+                Require(zone.Id != before, "restart-process-identity");
+                using (var client = Enter(fixture, password))
+                {
+                    VerifyConnected(client, identity, 66, "RESTART");
+                    VerifyDatabase(connection, identity, 66);
+                    Console.WriteLine("AUTHENTICATED_RECONNECT_AFTER_RESTART=PASS STATE_AFTER_RESTART=PASS");
+                    client.Send(new CharacterActionMessage { Identity = Character, Action = CharacterActionType.RemoveFriendlyNano,
+                        Target = new Identity { Type = IdentityType.NanoProgram, Instance = 270542 } }, Owner);
+                    client.Wait<BuffMessage>(m => m.Identity == Character && m.NanoProgram.Instance == 270542 && m.Action == 0);
+                    client.Wait<StatMessage>(m => m.Identity == Character && m.Stats.Any(s => s.Value1 == CharacterStat.MonsterData && s.Value2 == 0));
+                    morphActive = false;
+                    VerifyDatabase(connection, identity, 66);
+                    Console.WriteLine("CONNECTED_MORPH_CANCEL=PASS BASELINE_RESTORATION=PASS");
+                    Logout(client, connection);
+                }
+                using (var client = Enter(fixture, password))
+                {
+                    VerifyConnected(client, identity, 66, "AFTER_CANCEL");
+                    VerifyDatabase(connection, identity, 66);
+                    Logout(client, connection);
+                    Console.WriteLine("MORPH_CANCEL_AUTHENTICATED_RECONNECT=PASS");
+                }
+                zone.Stop();
+                Console.WriteLine("ENGINE_PID_AFTER=" + zone.Id + " ENGINE_RESTART_PROVEN=YES");
+            }
+            login.Stop();
+            Console.WriteLine("LOGIN_WIRE_ACCEPTANCE=PASS CONNECTED_POSITIVE_LIFECYCLE=PASS");
+        }
+        finally { Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", previous); }
+    }
+    static ConnectedWireClient Enter(DisposableSchemaDatabase fixture, string password)
+    {
+        using var login = new ConnectedWireClient(fixture.LoginPort, paddedLoginFrames: true);
+        login.Send(new UserLoginMessage { UserName = Account, ClientVersion = "18.8.53_EP1" });
+        var challenge = login.Wait<ServerSaltMessage>();
+        login.Send(new UserCredentialsMessage { UserName = Account,
+            Credentials = DeterministicLoginKeyEncoder.Create(Account, password, challenge.ServerSalt) });
+        var characters = login.Wait<CharacterListMessage>();
+        Require(characters.Characters.Length == 1 && characters.Characters[0].Id == Owner, "authenticated-character-list");
+        login.Send(new SelectCharacterMessage { CharacterId = Owner });
+        var zone = login.Wait<ZoneInfoMessage>();
+        Require(zone.CharacterId == Owner && zone.ServerIpAddress.Equals(System.Net.IPAddress.Loopback)
+            && zone.ServerPort == fixture.ZonePort, "authenticated-character-selection-endpoint");
+        Console.WriteLine("AUTHENTICATED_LOGIN=PASS CHARACTER_LIST=PASS CHARACTER_SELECTION=PASS");
+        // The current repository maps no credential fields in ZoneLoginMessage.
+        // Record the actual unused ZoneInfo cookies; do not invent packet members.
+        Console.WriteLine("ZONE_HANDOFF_COOKIE_VALIDATION=NOT_IMPLEMENTED");
+        var client = new ConnectedWireClient(fixture.ZonePort);
+        try
+        {
+            client.Send(new ZoneLoginMessage { CharacterId = zone.CharacterId });
+            client.Wait<FullCharacterMessage>(m => m.Identity.Instance == Owner);
+            client.Send(new CharInPlayMessage { Identity = Character }, Owner);
+            client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == generated.QuestInstance));
+            client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == unchecked((int)0x555BE9F6)));
+            return client;
+        }
+        catch { client.Dispose(); throw; }
+    }
+    static void VerifyConnected(ConnectedWireClient client, int identity, int slot, string phase)
+    {
+        var full = client.Received.OfType<FullCharacterMessage>().Single(m => m.Identity.Instance == Owner);
+        var spawn = client.Received.OfType<SimpleCharFullUpdateMessage>().First(m => m.Identity.Instance == Owner);
+        Require(spawn.Coordinates.X == 100 && spawn.Coordinates.Y == 0 && spawn.Coordinates.Z == 100,
+            $"wire-position-{phase}-actual-{spawn.Coordinates.X}-{spawn.Coordinates.Y}-{spawn.Coordinates.Z}");
+        Require(MorphVisualPackets.TryBuild(270542, false, Character, 4582, false, out byte[] expectedMorph)
+            && client.Packets.Any(p => p.AsSpan(16).SequenceEqual(expectedMorph.AsSpan(16))) == morphActive, "wire-captured-morph-projection-" + phase);
+        var durations = client.Received.OfType<CharacterActionMessage>().Where(m => m.Identity == Character && m.Action == CharacterActionType.SetNanoDuration && m.Target.Instance == 270542).ToArray();
+        Require(durations.Length == (morphActive ? 1 : 0), "wire-active-nano-count-" + phase);
+        if (morphActive)
+        {
+            int duration = durations[0].Parameter2;
+            Require(duration > 0 && duration <= seededNano.DurationCentiseconds && duration <= previousDuration,
+                "wire-active-nano-expiry-not-reset-" + phase);
+            previousDuration = duration;
+            Console.WriteLine("WIRE_ACTIVE_NANO_REMAINING_CENTISECONDS=" + duration + " PERSISTED_INSTANCE=99 PERSISTED_EXPIRY=" + seededNano.ExpiresAtUtcTicks);
+        }
+        Require(full.UploadedNanoIds.Contains(270542), "wire-uploaded-morph-" + phase);
+        Require(full.InventorySlots.Length == 3, "wire-item-count-" + phase);
+        var key = full.InventorySlots.Single(i => i.Identity.Instance == generated.KeyInstance);
+        Require(key.Placement == 67 && key.Identity.Type == (IdentityType)0xC76D && key.ItemLowId == 28577 && key.ItemHighId == 28577 && key.Quality == 1 && key.Count == 1, "wire-mission-key-" + phase);
+        var first = full.InventorySlots.Single(i => i.Identity.Instance == identity);
+        var second = full.InventorySlots.Single(i => i.Identity.Instance == identity + 1);
+        Require(first.Placement == slot && first.ItemLowId == 43384 && first.ItemHighId == 43384 && first.Quality == 1 && first.Count == 3, "wire-first-item-" + phase);
+        Require(second.Placement == 65 && second.ItemLowId == 42423 && second.ItemHighId == 42423 && second.Quality == 4 && second.Count == 1, "wire-second-item-" + phase);
+        Require((int)first.Identity.Type == 0xC73D && (int)second.Identity.Type == 0xC73D
+            && full.InventorySlots.All(i => i.Flags == 161 && i.Unknown == 0), "wire-item-types-flags-metadata-" + phase);
+        Require(full.Stats1.Concat(full.Stats2).Any(s => s.Value1 == (int)CharacterStat.Cash && s.Value2 == 1234), "wire-cash-" + phase);
+        Console.WriteLine("CONNECTED_STATE_" + phase + "=PASS CHARACTER_IDENTITY=PASS INVENTORY_IDENTITY=PASS CREDITS=PASS POSITION=PASS");
+        Console.WriteLine("ACTIVE_NANOS_RELOAD=PASS MORPH_RELOAD=PASS AUTHORED_MISSION_RELOAD=PASS GENERATED_MISSION_RELOAD=PASS PROOF=SEEDED_STATE_CONNECTED_RELOAD");
+        Console.WriteLine("WIRE_INVENTORY_" + phase + "=" + System.Text.Json.JsonSerializer.Serialize(full.InventorySlots));
+    }
+    static void VerifyDatabase(MySqlConnection connection, int identity, int slot)
+    {
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={Owner}") == 3, "persisted-no-phantom-rows");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={generated.KeyInstance} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement=67 AND ItemType={0xC76D} AND LowId=28577 AND HighId=28577 AND Quality=1 AND StackCount=1 AND Source=0") == 1, "persisted-mission-key-exact");
+        var nanos = new MySqlActiveNanoRepository().Load(Owner);
+        Require(morphActive ? nanos.Count == 1 && nanos[0] == seededNano : nanos.Count == 0, "persisted-active-nano-exact-expiry");
+        Require(MissionSnapshot() == missionSnapshot, "persisted-generated-binding-objects-exact");
+        var authored = ((IMissionDao)new MySqlMissionDao(() => ownedFixture.Open())).GetMission(new MissionKeyData(Owner, AuthoredQuestService.DeliverArmor));
+        Require(authored != null && authored.State == MissionLifecycleState.Active && authored.CurrentStepId == "active", "persisted-authored-mission");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement={slot} AND ItemType=0 AND LowId=43384 AND HighId=43384 AND Quality=1 AND StackCount=3 AND Source=1") == 1, "persisted-first-item-exact");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity + 1} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement=65 AND ItemType=0 AND LowId=42423 AND HighId=42423 AND Quality=4 AND StackCount=1 AND Source=1") == 1, "persisted-second-item-exact");
+        Require(FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId={(int)CharacterStat.Cash}") == 1234, "persisted-cash-exact");
+        Require(FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId={(int)CharacterStat.MonsterData}") == 0, "persisted-morph-baseline");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM stats WHERE Type=50000 AND Instance={Owner} AND ((StatId={(int)CharacterStat.CATMesh} AND StatValue=111) OR (StatId={(int)CharacterStat.DisplayCATMesh} AND StatValue=222))") == 2, "persisted-morph-mesh-baselines");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM characters WHERE Id={Owner} AND Username='{Account}' AND Name='ConnectedFixture' AND Playfield=4582 AND X=100 AND Y=0 AND Z=100 AND HeadingW=1 AND HeadingX=0 AND HeadingY=0 AND HeadingZ=0") == 1, "persisted-character-exact");
+    }
+    static void Logout(ConnectedWireClient client, MySqlConnection connection)
+    {
+        client.Send(new CharacterActionMessage { Identity = Character, Action = CharacterActionType.Logout }, Owner);
+        client.Wait<StartLogoutMessage>();
+        Until(() => FixtureSql.Scalar(connection, $"SELECT Online FROM characters WHERE Id={Owner}") == 0, "logout-persistence");
+    }
+    static void Until(Func<bool> test, string code)
+    {
+        var elapsed = Stopwatch.StartNew();
+        while (elapsed.Elapsed < TimeSpan.FromSeconds(15)) { if (test()) return; Thread.Sleep(50); }
+        throw new FixtureFailure("connected-" + code + "-timeout");
+    }
+    static void Require(bool condition, string code) { if (!condition) throw new FixtureFailure("connected-" + code); }
+    static string MissionSnapshot()
+    {
+        var dao = new MySqlMissionDao(() => ownedFixture.Open());
+        return System.Text.Json.JsonSerializer.Serialize(new { Binding = dao.ReadAccepted(Owner, generated.QuestType, generated.QuestInstance),
+            Objects = dao.ReadObjects(Owner, generated.QuestType, generated.QuestInstance).OrderBy(o => o.RuntimeType).ThenBy(o => o.RuntimeInstance) });
+    }
+    static string Git(params string[] arguments)
+    {
+        var start = new ProcessStartInfo("git") { WorkingDirectory = RepositoryRoot(), UseShellExecute = false,
+            CreateNoWindow = true, RedirectStandardOutput = true };
+        foreach (var argument in arguments) start.ArgumentList.Add(argument);
+        using var process = Process.Start(start) ?? throw new FixtureFailure("connected-source-provenance-start");
+        string value = process.StandardOutput.ReadToEnd().Trim(); process.WaitForExit();
+        Require(process.ExitCode == 0, "source-provenance"); return value;
+    }
+}
