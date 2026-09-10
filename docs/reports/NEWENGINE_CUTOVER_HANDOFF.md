@@ -3,8 +3,8 @@
 ## Decision
 
 NewEngine is the default on this Mike-owned branch. Keep Legacy present.
-The secure handoff candidate passes development connected acceptance; final
-committed-source validation is pending. Full gameplay parity is not a release gate. Missing NPC bindings,
+The secure handoff candidate passes final committed-source operational acceptance
+at `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`. Full gameplay parity is not a release gate. Missing NPC bindings,
 dialogue, pets and other catalog coverage are follow-up gameplay work.
 
 Disposable MySQL and the full authenticated positive lifecycle now execute:
@@ -13,7 +13,9 @@ mission journals, plus connected morph cancellation and another reconnect.
 The previously reproduced unauthenticated zone admission is repaired with the
 recovered retail cookie fields and a shared, expiring, single-use authority.
 See `NEWENGINE_ZONE_HANDOFF_SECURITY.md` and `NEWENGINE_CONNECTED_ACCEPTANCE.md`.
-Development execution passes both runtime preservation and admission isolation.
+Final execution passes both runtime preservation and admission isolation.
+This is candidate acceptance only; original-retail ZoneInfo/redirect compatibility,
+fresh Linux-host execution and live deployment remain unclaimed.
 
 ## Provenance and ownership
 
@@ -126,7 +128,7 @@ execution. The former admission-integrity failure is retained in the historical 
 
 ## Next bounded acceptance work
 
-Complete exact-source gates and record the decision in the validation receipt.
+Exact-source gates and the decision are recorded in the validation receipt.
 Remaining retail packet evidence and service-account/shared-authority requirements
 are listed in the handoff security report. Production cutover, Legacy extraction
 and DAO consolidation remain separate milestones; the inventories preserve their scope.

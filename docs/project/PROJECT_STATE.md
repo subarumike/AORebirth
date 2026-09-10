@@ -16,9 +16,12 @@ completion matrices and dated evidence retain detailed provenance.
   durable-state integrity. Generic item effects without a transaction owner now
   reject durable mutations before any effect. Disposable MySQL and authenticated
   connected inventory/nano/morph/mission reload across a distinct-process restart
-  now pass. The reproduced unauthenticated direct-zone admission is repaired in
-  the current handoff-security candidate; connected negative and concurrent tests
-  pass, with final committed-source validation pending. Cutover evidence and dependency/DAO inventories live in
+  now pass. The reproduced unauthenticated direct-zone admission is repaired.
+  Source `65f7e3c9` passes connected negative/concurrent/restart checks, all 498
+  NewEngine tests, 1129 messaging tests, 12 mandatory gates, Windows acceptance
+  and Linux publication. The candidate meets scoped operational integrity gates;
+  original-retail ZoneInfo/redirect compatibility and deployed Linux execution
+  remain unclaimed. Cutover evidence and dependency/DAO inventories live in
   `docs/reports/NEWENGINE_CUTOVER_HANDOFF.md`. This is not production acceptance.
 
 - The follow-on `codex/zoneengine-final-runtime-consumers` candidate starts at

@@ -1,12 +1,247 @@
 # NewEngine cutover validation receipt
 
-## Secure handoff candidate
+## Final secure handoff acceptance
 
-Starting at `b87faf8b6de31d22f79d8f469990c27592bab6f9`, the recovered-cookie
-authority and connected negative/concurrent/restart tests pass in development.
-Final exact-source execution is pending. The receipt below is preserved as
-history of the admission failure; it is not the current implementation result.
-See `NEWENGINE_ZONE_HANDOFF_SECURITY.md`.
+**Operational candidate: YES under the scoped connected-integrity gates.**
+The historical unauthenticated admission failure is closed. This accepts the
+automated synthetic-client candidate; it does not claim a live deployment,
+complete original-retail wire compatibility or fresh Linux-host execution.
+The exact remaining ZoneInfo/redirect evidence and deployment work are in
+[the handoff security report](NEWENGINE_ZONE_HANDOFF_SECURITY.md#what-is-still-needed-and-how-to-get-it).
+Full gameplay parity is not required for this scoped decision.
+
+```text
+STARTING_SHA=b87faf8b6de31d22f79d8f469990c27592bab6f9
+SOURCE_SHA=65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d
+IMPLEMENTATION_COMMIT=c6c7a76736f0f779c447c2dd0d48e2699cea0993
+CONTRACT_COMMIT=65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d
+BRANCH=codex/newengine-production-cutover-001
+WORKTREE=C:\Users\Mike\Documents\AORebirth\tools-temp\cutover001
+ORIGIN_MASTER_SHA=6e90dda030774726aa2060acb9edb756ea1f635c
+DEVELOPER_REF_SHA=53c858d9900266fb6740975dbb2b5011a5792e66
+DEVELOPER_BRANCH_TOUCHED=NO
+MASTER_MODIFIED_DIRECTLY=NO
+PRODUCTION_DATABASE_MODIFIED=NO
+PRODUCTION_SERVICE_MODIFIED=NO
+NEWENGINE_DEFAULT=YES
+LEGACY_PRESENT=YES
+LEGACY_REMOVED=NO
+FULL_DAO_CONVERSION_PERFORMED=NO
+
+HANDOFF_MECHANISM=two recovered opaque uint32 cookies; CSPRNG 64-bit value; stored SHA256 digest
+HANDOFF_AUTHORITY=shared private ZoneHandoffStore files; cross-process atomic claim
+HANDOFF_ACCOUNT_BOUND=YES
+HANDOFF_CHARACTER_BOUND=YES
+HANDOFF_EXPIRATION_ENFORCED=YES
+HANDOFF_SINGLE_USE_OR_OWNERSHIP_ENFORCED=YES
+HANDOFF_ATOMIC_CLAIM=YES
+NO_HANDOFF_REJECTION=PASS
+UNKNOWN_HANDOFF_REJECTION=PASS
+EXPIRED_HANDOFF_REJECTION=PASS
+CONSUMED_HANDOFF_REJECTION=PASS
+REPLAY_REJECTION=PASS
+WRONG_ACCOUNT_REJECTION=PASS
+WRONG_CHARACTER_REJECTION=PASS
+CONCURRENT_REPLAY_REJECTION=PASS
+STALE_HANDOFF_REJECTION=PASS
+DIRECT_ZONE_SOCKET_CONNECTED=YES
+DIRECT_ZONE_SESSION_ADMITTED=NO
+DIRECT_ZONE_WORLD_ENTRY=NO
+DIRECT_ZONE_DURABLE_MUTATION=NO
+
+AUTHENTICATED_LOGIN=PASS
+CHARACTER_LIST=PASS
+CHARACTER_SELECTION=PASS
+ZONE_HANDOFF_VALIDATION=PASS
+ZONE_SESSION=PASS
+WORLD_ENTRY=PASS
+CONNECTED_DURABLE_MUTATION=PASS
+CHARACTER_SAVE=PASS
+INVENTORY_IDENTITY=PASS
+CREDITS_PERSISTENCE=PASS
+AUTHENTICATED_RECONNECT=PASS
+STATE_AFTER_RECONNECT=PASS
+CLEAN_ENGINE_RESTART=PASS
+AUTHENTICATED_RECONNECT_AFTER_RESTART=PASS
+STATE_AFTER_RESTART=PASS
+ACTIVE_NANOS_RELOAD=PASS
+MORPH_RELOAD=PASS
+AUTHORED_MISSION_RELOAD=PASS
+GENERATED_MISSION_RELOAD=PASS
+UNSUPPORTED_ACTION_FAIL_CLOSED=PASS
+TRANSACTIONAL_INTEGRITY=PASS
+SCHEMA_VALIDATION=PASS
+DURABLE_RELOAD_SMOKE=PASS
+POST_NEWENGINE_WRITE_EXECUTABLE_ONLY_ROLLBACK_SAFE=NO
+ROLLBACK_DATABASE_RESTORE_REQUIRED=YES
+
+NEWENGINE_TESTS=PASS 498/498
+AOTOMATION=PASS 1129/1129
+INTEGRATION_GATES=PASS 12/12
+WINDOWS_ACCEPTANCE=PASS
+LINUX_SOURCE_OR_PUBLISH_ACCEPTANCE=PASS linux-x64 self-contained publication on Windows
+FRESH_LINUX_HOST_RUNTIME_ACCEPTANCE=NOT_RUN
+RETAIL_CLIENT_RUNTIME_ACCEPTANCE=NOT_RUN
+SOURCE_WORKTREE_TRACKED_CLEAN=YES
+ZONEENGINE_NEW_BINARY_SHA256=296788080dfac666689e0218066a77b229ebd2877a46d9f2d63e06f424d8f1e9
+LOGINENGINE_BINARY_SHA256=6f451201fbb61ece5a5ef7a83c685e52478f34caf7ee5dcdef80f6f6756c358a
+DATABASE_FIXTURE_ID=aorebirth-zone-schema-0574fa378d4741a9972445822161f818
+ACCEPTANCE_TIMESTAMP=2026-09-10T03:52:24.9515398Z
+ENGINE_PID_BEFORE=29680
+ENGINE_PID_AFTER=25200
+ZONE_HANDOFF_CONCURRENCY=PASS ATTEMPTS=8 ADMITTED=1 REJECTED=7
+UNCONSUMED_HANDOFF_AFTER_PROCESS_RESTART=PASS
+DISPOSABLE_CONTAINER_RESIDUE=NONE
+DISPOSABLE_NETWORK_RESIDUE=NONE
+DISPOSABLE_CLEANUP=PASS
+SOURCE_COMMITS_PUSHED=YES
+```
+
+The direct-zone fields describe attempts without a valid unconsumed ticket.
+Socket acceptance alone is not session/world admission. Every rejected wire
+case compares complete disposable-table fingerprints before/after. The concurrent
+winner is separately checked against exact character, inventory, credits, nano,
+morph and mission expectations. Thirteen new tests cover the authority and
+recovered wire layout; the prior 485 NewEngine tests remain in the 498 total.
+
+Both source commits were pushed before final validation. This receipt is a
+documentation-only follow-up; its commit must not replace SOURCE_SHA when
+identifying the tested runtime. The final task reply identifies the ending
+documentation commit. Final execution of each wrapper returned zero.
+
+### Decision table
+
+| Gate | Result |
+| --- | --- |
+| Authenticated LoginEngine path works | YES |
+| Character selection works | YES |
+| Zone handoff validated server-side | YES |
+| No-handoff admission rejected | YES |
+| Forged/unknown handoff rejected | YES |
+| Expired handoff rejected | YES |
+| Replayed handoff rejected | YES |
+| Wrong-account use rejected | YES |
+| Wrong-character use rejected | YES |
+| Concurrent replay permits at most one owner | YES; 1 of 8 |
+| Direct zone connection cannot establish player session | YES without valid ticket |
+| Direct zone connection cannot mutate durable state | YES without valid ticket |
+| Normal authenticated world entry still works | YES; synthetic connected client |
+| Reconnect still works | YES; fresh authentication |
+| Clean restart lifecycle still works | YES |
+| Character/inventory persistence remains exact | YES |
+| Unsupported gameplay mutations still fail closed | YES |
+| Transactional integrity remains proven | YES |
+| Full gameplay parity required | NO |
+| Legacy removed | NO |
+| Full DAO conversion performed | NO |
+| Production modified | NO |
+| Developer branch touched | NO |
+
+### Exact commands and evidence
+
+Commands ran in the worktree above, through the documented wrappers:
+
+```cmd
+cmd /d /c Tools\accept_windows_source.cmd --expected-sha 65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d --mandatory-gate
+cmd /d /c Tools\run_zoneengine_schema_validation.cmd --run-disposable --engine C:\Users\Mike\Documents\AORebirth\tools-temp\cutover001\AORebirth\Built\Release\ZoneEngine_New\ZoneEngine_New.dll
+cmd /d /c LinuxBuild\publish-zoneengine.cmd linux-x64 true
+cmd /d /c Tools\run_newengine_connected_acceptance.cmd --engine C:\Users\Mike\Documents\AORebirth\tools-temp\cutover001\AORebirth\Built\Debug\ZoneEngine_New\ZoneEngine_New.dll --login-engine C:\Users\Mike\Documents\AORebirth\tools-temp\cutover001\AORebirth\Built\Debug\LoginEngine.exe
+cmd /d /c Tools\generate_newengine_cutover_inventory.cmd --check
+```
+
+Windows acceptance includes the normal Legacy/NewEngine build, cross-platform
+contracts, messaging and NewEngine tests, all mandatory stages and a clean-tree
+check. Placement manifest SHA256:
+`4874db0a15cfe1e576e6fb12408dfdd8e4614e07c6f4152707e5bdacfc119c57`.
+Linux publication passes default/source/SQL/backend guards, offline startup,
+4/4 package negatives and 2/2 source-omission negatives. The inventory remains
+93 Legacy links and 99 persistence method rows, now scanning 217 NewEngine files.
+
+| Ignored local artifact | SHA256 |
+| --- | --- |
+| build-verify/handoff-connected-final.log | 64d4c16fe83a08671cc64e6a5e23c20cbb2b0d431641c1eb62025eedec7be6fa |
+| build-verify/handoff-schema.log | c6cd44515f9d8b64215e557d5e8e371fbe1eacc6e4fa9592e124d88faa575777 |
+| build-verify/handoff-windows.log | ac0dce69fba2a467d7395c0fe212f60a62053fee1b4990781f06cc4d805630e9 |
+| build-verify/handoff-linux.log | 8fbb10b411db42548876cce23617153869b03d58474972643a920e88f30ffb55 |
+| build-verify/windows-acceptance-65f7e3c9.env | 21eb1dbdbb47a76499ad5300d18a9b4cc1a7cc809afe1a0520937286f459ca5f |
+
+### Corrections and evidence limits
+
+An early development negative test observed LoginEngine's normal asynchronous
+Online cleanup during its fingerprint interval. The fixture now awaits that
+cleanup before taking the baseline; no database writes or weaker assertions
+were added. The first exact-source attempt also exposed the expected additive
+Stage 3 public API drift. The existing LegacyStage3ContractTool regenerated the
+manifest; review showed only the three new handoff types (35 added lines).
+The following exact-source run passed both Windows and Linux contract verification.
+No failing run was relabelled PASS.
+
+Connected inventory movement and morph cancellation are proven mutations.
+Active nano and mission state are seeded before startup, then proven to reload
+over authenticated wire. Credits preservation is exact, not a credit-changing
+action. Generic TCP-loss reconnect, type-0x3c cookie reuse and the original
+retail 26-byte ZoneInfo tail remain explicitly outside this acceptance.
+
+### Files inspected and changed
+
+Inspected: LoginEngine authentication/selection/client lifecycle and CheckLogin;
+AOtomation ZoneInfo/ZoneLogin contracts and serializer; NewEngine dispatcher,
+session, login handler and composition; existing account DAO resolver and online
+ownership guard; Linux service ownership-directory settings; connected/disposable
+fixtures, build/contract inventory outputs, governing documents and the recovered
+retail handshake report. Linked evidence is identified in the security report.
+
+Six files added, twenty modified relative to the starting SHA. Added:
+
+- AORebirth/Libraries/Source/AORebirth.Database/Dao/ZoneHandoffStore.cs
+- AORebirth/Server/ZoneEngine_New/Core/Network/ZoneAdmissionGate.cs
+- AORebirth/Server/ZoneEngine_New.Tests/ZoneHandoffStoreTests.cs
+- AORebirth/Server/ZoneEngine_New.Tests/ZoneHandoffWireTests.cs
+- Tools/ZoneEngineSchemaValidation/ConnectedHandoffAcceptance.cs
+- docs/reports/NEWENGINE_ZONE_HANDOFF_SECURITY.md
+
+Modified:
+
+- AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj
+- AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/SystemMessages/ZoneLoginMessage.cs
+- AORebirth/Server/LoginEngine/CoreClient/Client.cs
+- AORebirth/Server/LoginEngine/MessageHandlers/SelectCharacterHandler.cs
+- AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs
+- AORebirth/Server/ZoneEngine_New/Core/Network/ZoneMessageDispatcher.cs
+- AORebirth/Server/ZoneEngine_New/Program.cs
+- AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj
+- LinuxBuild/Tools/CompatibilitySmokeTests/Fixtures/LegacyStage3Contracts.manifest
+- LinuxBuild/source-inventory/AORebirth.Database.CompileItems.props
+- Tools/ZoneEngineSchemaValidation/ConnectedAcceptanceSmoke.cs
+- Tools/ZoneEngineSchemaValidation/ConnectedEngineProcess.cs
+- Tools/ZoneEngineSchemaValidation/ConnectedWireClient.cs
+- docs/ai/CURRENT_TASK.md
+- docs/project/PROJECT_STATE.md
+- docs/reports/NEWENGINE_CONNECTED_ACCEPTANCE.md
+- docs/reports/NEWENGINE_CUTOVER_HANDOFF.md
+- docs/reports/NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md
+- docs/reports/NEWENGINE_DAO_GAP_INVENTORY.json
+- docs/reports/NEWENGINE_OPERATIONAL_ACCEPTANCE.md
+
+Generated tracked artifacts: Database source inventory, additive Stage 3 public
+contract manifest and DAO inventory JSON. Builds, packages and validation logs
+remain ignored; fixture-owned processes, directory, database container and network
+were removed. Primary master checkout retains its original untracked work.
+
+```text
+NEWENGINE_OPERATIONAL_CUTOVER_READY=YES (scoped candidate acceptance)
+ZONE_HANDOFF_FAIL_CLOSED=PASS
+UNAUTHENTICATED_ZONE_ADMISSION_POSSIBLE=NO
+CHARACTER_AND_INVENTORY_INTEGRITY_PROVEN=YES
+AUTHENTICATED_CONNECTED_ACCEPTANCE_PROVEN=YES
+FULL_GAMEPLAY_PARITY_REQUIRED_FOR_CUTOVER=NO
+LEGACY_REMOVAL_PERFORMED=NO
+FULL_DAO_CONVERSION_PERFORMED=NO
+DEVELOPER_BRANCH_TOUCHED=NO
+PRODUCTION_DATABASE_MODIFIED=NO
+```
+
+The receipt below is preserved history of the former admission failure.
 
 ## Historical connected acceptance receipt
 

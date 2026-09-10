@@ -1,9 +1,12 @@
 # NewEngine operational acceptance
 
 The authenticated positive lifecycle is proven on disposable loopback MySQL.
-The historical direct-zone character-access failure is repaired. Development
-connected security and lifecycle checks pass; the final committed-source gate
-receipt remains pending. This is an isolated candidate, not a production deployment.
+The historical direct-zone character-access failure is repaired. Exact-source
+connected security, lifecycle, Windows, mandatory integration and Linux publication
+gates pass at `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`. This is operational
+candidate acceptance, not production deployment or full original-retail wire
+compatibility. Remaining ZoneInfo fields and redirect/reconnect evidence are
+explicitly listed in `NEWENGINE_ZONE_HANDOFF_SECURITY.md`.
 
 | Gate | Result | Evidence |
 | --- | --- | --- |
@@ -17,8 +20,8 @@ receipt remains pending. This is an isolated candidate, not a production deploym
 | Generic unsupported item effects | PASS | Five retained Set/Hit/SetFlag/ClearFlag/UploadNano regression tests |
 | Wrong password and invalid inventory source | PASS | Connected rejection; valid move acknowledgement establishes ordering; exact state remains |
 | Transactions, schema refusal, durable repository reload | PASS | Separate full disposable suite, injected failures and process cycles |
-| Unauthenticated zone admission | PASS (development) | Missing/forged/expired/stale/wrong-owner tickets close before hydration; complete disposable database unchanged |
-| Replay and concurrency | PASS (development) | Consumed tickets rejected while in play, after disconnect and restart; eight real sockets admit exactly one owner |
+| Unauthenticated zone admission | PASS | Missing/forged/expired/stale/wrong-owner tickets close before hydration; complete disposable database unchanged |
+| Replay and concurrency | PASS | Consumed tickets rejected while in play, after disconnect and restart; eight real sockets admit exactly one owner |
 | Executable-only Legacy rollback after NewEngine writes | **UNSAFE** | Executed stale Legacy item-table assertions |
 
 Inventory move and morph cancellation are CONNECTED_MUTATION_PROVEN.
@@ -40,6 +43,6 @@ See [connected report](NEWENGINE_CONNECTED_ACCEPTANCE.md) and
 The historical Docker failure at d1c6d01 is superseded by actual disposable runs.
 No global Docker configuration or production state was changed.
 
-NEWENGINE_OPERATIONAL_CUTOVER_READY=NO (pending final exact-source gates)
+NEWENGINE_OPERATIONAL_CUTOVER_READY=YES (scoped candidate acceptance)
 CHARACTER_AND_INVENTORY_INTEGRITY_PROVEN=YES (tested authenticated lifecycle)
-AUTHENTICATED_CONNECTED_ACCEPTANCE_PROVEN=YES (development positive and negative sequence)
+AUTHENTICATED_CONNECTED_ACCEPTANCE_PROVEN=YES (exact-source positive and negative sequence)

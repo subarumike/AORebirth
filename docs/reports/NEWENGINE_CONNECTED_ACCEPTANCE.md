@@ -14,6 +14,10 @@ The validation receipt identifies the exact committed source, binary hashes,
 fixture ID, UTC time and PIDs. Dirty-tree development runs are explicitly labelled
 and are not exact-source acceptance.
 
+Final positive, negative, concurrent and restart acceptance passes on clean
+source `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`. The receipt records the
+accepted binaries and all remaining original-retail evidence limits.
+
 ## Fixture and protocol
 
 Tools/run_newengine_connected_acceptance.cmd takes explicit LoginEngine and
