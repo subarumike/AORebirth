@@ -112,6 +112,11 @@ namespace LoginAuthenticationValidation
                 false,
                 encryption.IsValidLogin("not-a-login-key", ServerSalt, account, storedHash),
                 failures);
+            Expect(
+                "leading-zero shared secret",
+                true,
+                ValidateWithClientPublicKey(account, password, storedHash, account, "1"),
+                failures);
 
             if (failures.Count > 0)
             {
@@ -123,7 +128,7 @@ namespace LoginAuthenticationValidation
                 return 1;
             }
 
-            Console.WriteLine("PASS LoginAuthenticationValidation 14/14");
+            Console.WriteLine("PASS LoginAuthenticationValidation 15/15");
             return 0;
         }
 
@@ -154,6 +159,21 @@ namespace LoginAuthenticationValidation
                 storedHash);
         }
 
+        private static bool ValidateWithClientPublicKey(
+            string accountName,
+            string suppliedPassword,
+            string storedHash,
+            string credentialAccountName,
+            string clientPublicKey)
+        {
+            string loginKey = CreateLoginKey(
+                credentialAccountName,
+                suppliedPassword,
+                ServerSalt,
+                clientPublicKey);
+            return CheckLogin.IsLoginCorrect(loginKey, ServerSalt, accountName, storedHash);
+        }
+
         private static void Expect(string name, bool expected, bool actual, IList<string> failures)
         {
             if (actual != expected)
@@ -164,15 +184,24 @@ namespace LoginAuthenticationValidation
 
         private static string CreateLoginKey(string username, string password, string serverSalt)
         {
-            string teaKey = ComputeTeaKey();
-            string plaintext = CreatePlaintext(username, password, serverSalt);
-            string encryptedBlock = EncryptTea(plaintext, teaKey);
-            return ClientPublicKey + "-" + encryptedBlock;
+            return CreateLoginKey(username, password, serverSalt, ClientPublicKey);
         }
 
-        private static string ComputeTeaKey()
+        private static string CreateLoginKey(
+            string username,
+            string password,
+            string serverSalt,
+            string clientPublicKey)
         {
-            var clientPublicKey = new BigInteger(ClientPublicKey, 16);
+            string teaKey = ComputeTeaKey(clientPublicKey);
+            string plaintext = CreatePlaintext(username, password, serverSalt);
+            string encryptedBlock = EncryptTea(plaintext, teaKey);
+            return clientPublicKey + "-" + encryptedBlock;
+        }
+
+        private static string ComputeTeaKey(string clientPublicKeyText)
+        {
+            var clientPublicKey = new BigInteger(clientPublicKeyText, 16);
             var serverPrivateKey = new BigInteger(ServerPrivateKey, 16);
             var prime = new BigInteger(Prime, 16);
             string teaKey = clientPublicKey.modPow(serverPrivateKey, prime).ToString(16).ToLowerInvariant();

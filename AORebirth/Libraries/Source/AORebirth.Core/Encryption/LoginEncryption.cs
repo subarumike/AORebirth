@@ -100,7 +100,7 @@ namespace AO.Core.Encryption
             if (TeaKey.Length < 32)
             {
                 // If TeaKey is not at least 128bits, pad to the left with 0x00
-                TeaKey.PadLeft(32, '0');
+                TeaKey = TeaKey.PadLeft(32, '0');
             }
             else
             {
