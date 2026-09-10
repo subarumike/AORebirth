@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceFilesScanned": 217,
+  "sourceFilesScanned": 218,
   "persistenceMethodRows": 99,
   "entries": [
     {
@@ -1580,11 +1580,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
-      "sourceSha256": "47a90d6bb33b28a95f3f5defbf83533b2ebe6433c7479ff6764772afb80b3120",
+      "sourceSha256": "80bf2e80c2774f08fd1daf5c5250adc2cbe9274b63cbe86e1e0280480da3fa13",
       "class": "ZoneLoginHandler",
       "method": "LoadHydrationAsync",
       "signature": "(IZoneSession session, int characterId)",
-      "line": 204,
+      "line": 212,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "REPOSITORY_CONSUMER",
