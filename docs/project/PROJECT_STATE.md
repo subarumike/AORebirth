@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-09-09
+Updated: 2026-09-10
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -17,12 +17,17 @@ completion matrices and dated evidence retain detailed provenance.
   reject durable mutations before any effect. Disposable MySQL and authenticated
   connected inventory/nano/morph/mission reload across a distinct-process restart
   now pass. The reproduced unauthenticated direct-zone admission is repaired.
-  Source `65f7e3c9` passes connected negative/concurrent/restart checks, all 498
-  NewEngine tests, 1129 messaging tests, 12 mandatory gates, Windows acceptance
-  and Linux publication. The candidate meets scoped operational integrity gates;
-  original-retail ZoneInfo/redirect compatibility and deployed Linux execution
-  remain unclaimed. Cutover evidence and dependency/DAO inventories live in
-  `docs/reports/NEWENGINE_CUTOVER_HANDOFF.md`. This is not production acceptance.
+  Source `75a78a88` passes all 505 NewEngine tests, 1129 messaging tests, all 12
+  mandatory gates, Windows acceptance and Linux publication. Connected
+  authentication, admission, negative/concurrent/restart checks and durable-state
+  reload also pass. Official retail capture and static client evidence now prove
+  the 26-byte ZoneInfo body, first-zone and redirect cookie reuse, and redirect
+  connection order. The server emits the complete wire shape and arms a durable,
+  endpoint-bound, expiring, one-use redirect claim immediately before transfer.
+  PlayerID semantics, official-client execution against AORebirth and deployed
+  Linux execution remain unclaimed. Cutover evidence and dependency/DAO
+  inventories live in `docs/reports/NEWENGINE_CUTOVER_HANDOFF.md`. This is not
+  production acceptance.
 
 - The follow-on `codex/zoneengine-final-runtime-consumers` candidate starts at
   `44fa42fc`. Its deterministic source ledger reconstructs exactly 489 ordinary

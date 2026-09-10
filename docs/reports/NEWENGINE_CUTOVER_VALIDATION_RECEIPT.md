@@ -1,5 +1,54 @@
 # NewEngine cutover validation receipt
 
+## Retail ZoneInfo and redirect acceptance (supersedes the limits below)
+
+The official retail capture and recovered client evidence close the previously
+missing ZoneInfo layout and normal redirect sequence. Final exact-source Windows
+acceptance passes at `75a78a88535bffc321fe82c5ab824852c4636b47`. The connected
+LoginEngine/NewEngine fixture passes against the identical runtime code at
+`75c8a784ad99be48cf51f9d1652e73d2791c3f5c`; `75a78a88` adds only regenerated
+DAO inventory metadata.
+
+```text
+RETAIL_CAPTURE=C:\Users\Mike\Documents\AORebirth\tools-temp\live-pcaps\retail-handshake\20260910-041844-14c0d788
+RETAIL_PCAP_SHA256=8F38383A7727DE8142B3182FD2717E84882B4D0FAE95934330B65CD93EB79171
+CLIENT_STATIC_EVIDENCE_COMMIT=67aa6f36b030a99c73736acbc33bb3ec301bce10
+ZONEINFO_FRAME_SIZE=46
+ZONEINFO_BODY_SIZE=26
+ZONEINFO_EVENT_SERVER_TYPE=1
+ZONEINFO_PLAYER_ID=0 conservative unresolved semantic
+INITIAL_ZONELOGIN_COOKIE_REUSE=PROVEN
+REDIRECT_TYPE_0X3C_ENDPOINT=PROVEN
+REDIRECT_ZONELOGIN_COOKIE_REUSE=PROVEN
+REDIRECT_AUTHORITY=endpoint-bound expiring one-use server authorization
+UNEXPECTED_LOSS_AUTOMATIC_RECONNECT=NOT_SUPPORTED_BY_STATIC_CLIENT_EVIDENCE
+NEWENGINE_TESTS=PASS 505/505
+AOTOMATION=PASS 1129/1129
+INTEGRATION_GATES=PASS 12/12
+WINDOWS_ACCEPTANCE=PASS
+CONNECTED_LOGIN_ACCEPTANCE=PASS
+CONNECTED_REDIRECT_WIRE_ACCEPTANCE=NOT_RUN
+PLAYFIELD_TRANSFER_REDIRECT_ACCEPTANCE=PASS
+CUTOVER_INVENTORIES=PASS LEGACY_DEPENDENCY_EDGES=93 PERSISTENCE_METHOD_ROWS=99
+DAO_ARCHITECTURE_GUARD=PASS NEW_VIOLATIONS=0 LEGACY_BASELINE_EXCEPTIONS=7
+RETAIL_CLIENT_RUNTIME_ACCEPTANCE=NOT_RUN
+PRODUCTION_DEPLOYMENT=NOT_RUN
+```
+
+One mandatory-gate attempt hit the existing nondeterministic Buckethead world and
+stock admission test. The isolated test passed immediately and the complete
+mandatory gate then passed 505/505 without source changes. Earlier Stage 3 and
+Stage 7 contract failures were real manifest drift from the new public API and
+46-byte ZoneInfo shape; both manifests were updated and subsequently passed.
+
+The remaining gates are an official-client run against the AORebirth candidate,
+deployed Linux service identity/shared-directory inspection, and database
+backup/restore readiness. PlayerID's runtime meaning is still unknown; zero is
+sent rather than inventing identity semantics. Master merge and Legacy deletion
+should follow staging acceptance and a rollback rehearsal. Full DAO conversion
+is not complete: the current inventory has 99 persistence method rows and the
+architecture guard retains seven reviewed Legacy baseline SQL exceptions.
+
 ## Final secure handoff acceptance
 
 **Operational candidate: YES under the scoped connected-integrity gates.**

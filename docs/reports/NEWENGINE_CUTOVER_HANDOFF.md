@@ -3,8 +3,9 @@
 ## Decision
 
 NewEngine is the default on this Mike-owned branch. Keep Legacy present.
-The secure handoff candidate passes final committed-source operational acceptance
-at `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`. Full gameplay parity is not a release gate. Missing NPC bindings,
+The secure handoff and retail redirect candidate passes final committed-source
+operational acceptance at `75a78a88535bffc321fe82c5ab824852c4636b47`.
+Full gameplay parity is not a release gate. Missing NPC bindings,
 dialogue, pets and other catalog coverage are follow-up gameplay work.
 
 Disposable MySQL and the full authenticated positive lifecycle now execute:
@@ -12,10 +13,13 @@ inventory movement, reconnect, distinct-process restart, nanos/morphs and both
 mission journals, plus connected morph cancellation and another reconnect.
 The previously reproduced unauthenticated zone admission is repaired with the
 recovered retail cookie fields and a shared, expiring, single-use authority.
+Official retail capture plus static client evidence prove the complete ZoneInfo
+layout and sequential redirect cookie reuse. NewEngine now arms an endpoint-bound,
+expiring, one-use redirect claim immediately before it sends the transfer.
 See `NEWENGINE_ZONE_HANDOFF_SECURITY.md` and `NEWENGINE_CONNECTED_ACCEPTANCE.md`.
 Final execution passes both runtime preservation and admission isolation.
-This is candidate acceptance only; original-retail ZoneInfo/redirect compatibility,
-fresh Linux-host execution and live deployment remain unclaimed.
+This is candidate acceptance only; PlayerID semantics, official-client execution
+against AORebirth, fresh Linux-host execution and live deployment remain unclaimed.
 
 ## Provenance and ownership
 
