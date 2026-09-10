@@ -4,8 +4,11 @@
 
 The direct unauthenticated character-admission flaw is repaired on
 `codex/newengine-production-cutover-001`, starting at
-`b87faf8b6de31d22f79d8f469990c27592bab6f9`. Development connected acceptance
-passes. Final exact-source results belong in `NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`.
+`b87faf8b6de31d22f79d8f469990c27592bab6f9`. Final exact-source acceptance passes
+at `65f7e3c9e2d13b37a58f27bd1dfd72b1917ea80d`: 498 NewEngine tests, 1129
+AOtomation tests, 12 mandatory gates, Windows acceptance, disposable database,
+connected security/lifecycle and Linux publication. Binary hashes and proof
+boundaries are recorded in `NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`.
 Master, the other developer's branch and production are unchanged. Legacy remains
 present; this task does not perform the full DAO conversion.
 
