@@ -2,13 +2,14 @@
 
 ## Active
 
-Active: integrate the existing DAO stack and wire supported account and character
-directory/online-state consumers on `codex/dao-stack-cutover-integration-001`.
-The foundation checkpoint is `a8daaa5e`; consumer wiring and connected acceptance
-pass. Exact-source Windows acceptance and Linux publication are pending. Preserve full gameplay hydration, current saving, secure
-admission and session ownership. This task permits local commits only; no push,
-merge back, deployment or production changes. See
-`docs/reports/DAO_STACK_CUTOVER_INTEGRATION.md`.
+No implementation work remains in the authorized DAO integration milestone.
+`codex/dao-stack-cutover-integration-001` is locally accepted at source
+`c47f463d375664d2d7594451b0b8204d9eac6f27`: exact Windows/all mandatory gates,
+DAO suites, connected/schema/restart and Linux publication pass. Linux-host and
+official-client acceptance for this integration remain NOT RUN. Full hydration
+and existing saving are preserved; character/stat/inventory save conversion is
+outside this milestone. No push, merge back, deployment or production changes
+were performed. Final receipt: `docs/reports/DAO_STACK_CUTOVER_INTEGRATION.md`.
 
 Secure LoginEngine to NewEngine admission and
 retail-compatible server-authorized zone redirect are complete on

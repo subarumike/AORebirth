@@ -1,7 +1,9 @@
 # DAO stack cutover integration
 
-Status: integration and supported runtime wiring pass pre-commit acceptance.
-Exact-source Windows acceptance and Linux publication are pending.
+Status: COMPLETE for this isolated integration milestone. The existing DAO stack
+and supported consumers are integrated, with final exact-source Windows,
+connected/schema/restart acceptance and Linux publication PASS. This is not full
+DAO conversion or production/Linux-host acceptance.
 
 ## Scope and provenance
 
@@ -14,9 +16,77 @@ Exact-source Windows acceptance and Linux publication are pending.
   detached at the same starting SHA.
 - Integration checkpoint: `a8daaa5e74eb3a260d42150da16d84d167d1d16e`.
 - Consumer implementation commit: `b8e8d227bddc4af210e70a8ae14a92973e43e0b3`.
-- Tested SOURCE_SHA and final receipt SHA: pending final source acceptance.
+- Tested SOURCE_SHA: `c47f463d375664d2d7594451b0b8204d9eac6f27`.
+- Final receipt: a documentation-only commit after that source; its exact SHA is
+  recorded in `build-verify/dao-stack/final-receipt.json` and the final task response.
+- Master at task start: `6e90dda030774726aa2060acb9edb756ea1f635c`.
+  Independently advanced during this run to
+  `7be49b22b4c0116af9c48dc88a44f86ba802f7c7` (last observed at receipt time;
+  `Correlate captured SCFUs to official ACG hashes`). This task did not update
+  master, and the new master work was not merged into this candidate.
+- Preserved active cutover branch: `827c7fb50a9d860b6f671c73baebc2447c282dff`.
 - The task explicitly requires local-only commits. No push, merge back, deployment,
   production database modification or collision-fix import is authorized.
+
+## Final accepted result
+
+Runtime, source inventory, contract, fixture and generated-manifest changes are
+included in SOURCE_SHA above. No tracked changes were present for final Windows
+acceptance, Linux publication, or final connected/schema fixture execution.
+
+| Check | Result | Evidence under `build-verify/dao-stack/` |
+| --- | --- | --- |
+| Exact-source Windows acceptance | PASS; build and cross-platform contracts PASS | `windows-source-c47f463d.log` |
+| Mandatory stages | 12/12 PASS | Same Windows receipt |
+| NewEngine tests | 534/534 PASS; zero skipped | Same Windows receipt |
+| Complete AOtomation suite | 1,129 PASS | Same Windows receipt |
+| Account DAO and adapter tests | 303 PASS; cleanup PASS | `account-logoff-ownership-validation.log` |
+| Character DAO, recovery and ownership | 551 PASS twice; cleanup PASS | `character-source-final-1.log`, `character-source-final-2.log` |
+| Mission full-reference / isolated sources | 261 / 275 PASS; cleanup PASS | `mission-readiness-repair-full.log`, `mission-readiness-repair-isolated.log` |
+| Final exact-source connected lifecycle | PASS: 11 phases, complete character row, 40 stats, 4 items | `connected-source-c47f463d.log` |
+| Final schema, rollback and restart | PASS: 40 stats, 2 items, two fresh-process restarts | `schema-source-c47f463d.log` |
+| Linux self-contained publication | PASS; package/source/SQL parity and offline guards PASS | `linux-publication-c47f463d.log`, `linux-publication-c47f463d-source-sha.txt` |
+| Linux-host execution / official AO client against this integration | NOT RUN | No deployment or client control performed |
+
+The DAO-specific runs precede the final commit; their production code did not
+change afterward. The full-reference mission run precedes the isolated compile
+list correction, which only affects isolated mode. These focused results are
+not relabeled as exact-SHA Windows runs. The final Windows, connected and schema
+receipts explicitly identify SOURCE_SHA. Mission cleanup was verified through
+empty filtered Docker container, network and volume listings in the task tool
+outputs; its result logs contain test counts, not cleanup markers.
+
+The connected fixture checks fresh authentication, rejected credentials and
+handoffs, one-use admission, equipment serialization, the expected inventory
+slot move, clean logout/stop, reconnect and restart/morph lifecycle. Complete
+state is compared at all 11 phases; location, quantities, equipment, credits and
+other unrelated fields are preserved. Its final offline snapshot SHA-256 is
+`1f81df15076271f06efea2bd66d8bbf50cd8b5d9ce34d0a10dc639a9ab2f52de`.
+The separate schema/restart snapshot remains
+`16284780877fc1875f1ff25ab08e013abe3a1fa3b2390dc6b366a770abe16c89`
+across both restarts. Disposable resources are cleaned; production contact is NO.
+
+The final Linux package is
+`LinuxBuild/artifacts/zoneengine/linux-x64/self-contained/`. It was produced on
+Windows from the same clean SOURCE_SHA. Its offline acceptance marker is not a
+claim that the package was executed on a Linux host.
+
+## Files inspected and changed
+
+Inspection covered the account/character interfaces and implementations,
+`DatabaseDaoFactory`, legacy `LoginDataDao`/`CharacterDao` adapters and ownership
+guard; authored/generated/inventory mission partials; LoginEngine account and
+character selection/list consumers; Chat registration, directory and disconnect
+consumers; NewEngine admission, full hydration and persistence; stale recovery;
+the DAO, connected, schema and ownership fixtures; project source inventories,
+governed contract manifests and the approved acceptance workflows.
+
+The complete changed-file list from starting cutover to final SOURCE_SHA is
+`build-verify/dao-stack/source-files-changed.txt`, generated with
+`git diff --name-only 827c7fb50a9d860b6f671c73baebc2447c282dff c47f463d375664d2d7594451b0b8204d9eac6f27`.
+Caller mappings and exact operation boundaries follow below. The final receipt
+commit changes only this report, `docs/ai/CURRENT_TASK.md`, and
+`docs/project/PROJECT_STATE.md`.
 
 ## Imported stack
 
@@ -247,6 +317,9 @@ buying/selling, player trade implementation, website/Broker ownership, collision
 commit `5d663b7a`, deployment and arbitrary transport-loss recovery are outside
 this delivery. Linux-host runtime acceptance must remain NOT RUN unless executed
 through its established workflow; Windows publication alone cannot supply it.
+The independently advanced master tip also requires separate reconciliation
+before any later promotion; this candidate remains based on the reviewed
+cutover SHA and the explicitly imported DAO stack.
 
 The existing `LoginDataDao.SetGM` helper is outside `IAccountDao` and remains
 unchanged. Its SQL updates `login.GM` without a username predicate, despite
@@ -351,6 +424,18 @@ Every linked source was checked: the existing `AOREBIRTH_WIN_NET10` symbol only
 removes the ownership helper's two unused parameterless Legacy overloads; no
 mission provider/start-area assertion is omitted. Owned container, network and
 volume cleanup passes. Captured final TCP startup completes within the new bound.
+
+Retained fixture failure receipts under `build-verify/dao-stack/`:
+
+- `connected-exact-source-startup-failure.log`
+- `connected-exact-source-startup-retry-failure.log`
+- `mission-source-full-startup-failure.log`
+- `mission-source-full-startup-retry-failure.log`
+- `mission-isolated-missing-ownership-source.log`
+- `mission-isolated-legacy-host-dependency.log`
+
+`mission-readiness-repair-full-mysql.log` records the successful server startup
+timing. These failures are historical evidence, not the final acceptance verdict.
 
 This milestone does not migrate character/stat/inventory saves, vendor or trade
 systems, Account Broker/unified identity, or every remaining Legacy consumer.

@@ -14,8 +14,11 @@ completion matrices and dated evidence retain detailed provenance.
   character directory and online-state consumers are wired, including guarded
   stale recovery and Chat disconnect ownership. Fresh connected lifecycle tests
   preserve the complete character row, 40 stat rows and four seeded item rows.
-  This is local candidate evidence; exact-source Windows/Linux publication
-  receipts are recorded separately in
+  Source `c47f463d375664d2d7594451b0b8204d9eac6f27` passes exact Windows
+  acceptance (all 12 mandatory stages, 534 NewEngine and 1,129 messaging tests),
+  final connected/schema/restart validation and Linux publication. Account,
+  character and full/isolated mission DAO suites pass. Linux-host and official
+  client acceptance for this integration are NOT RUN. Receipts are recorded in
   `docs/reports/DAO_STACK_CUTOVER_INTEGRATION.md`. No merge back, push, deployment,
   schema change or new character/stat/inventory saving system is included.
 
