@@ -19,7 +19,7 @@ namespace AORebirth.Tools.MissionDaoValidation
 
     using MySqlConnector;
 
-    internal static class Program
+    internal static partial class Program
     {
         private const string AcknowledgementEnvironment = "AO_REBIRTH_ALLOW_DISPOSABLE_MISSION_DAO_VALIDATION";
         private const string ContainerName = "aorebirth-mission-dao-validation";
@@ -71,6 +71,14 @@ namespace AORebirth.Tools.MissionDaoValidation
                 ValidateRewards(dao);
                 ValidateRollFeeConcurrency(dao, disposable.RootConnectionString);
                 ValidateStartArea(dao);
+                ValidateHardening(dao, disposable.ApplicationConnectionString);
+                ValidateCutoverReconciliation(disposable.ApplicationConnectionString);
+
+#if MISSION_DAO_ISOLATED_TESTS
+                Console.WriteLine("MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES");
+#else
+                Console.WriteLine("MISSION_DAO_TEST_MODE=FULL_PROJECT_REFERENCES");
+#endif
 
                 Console.WriteLine("MISSION_DAO_MYSQL_INTEGRATION=PASS");
                 Console.WriteLine("ROLLBACK_AND_CONCURRENCY_TESTS=PASS");
@@ -374,7 +382,15 @@ namespace AORebirth.Tools.MissionDaoValidation
                          "missionobjectiveobservations.sql",
                          "missionflags.sql",
                          "missionaccountflags.sql",
-                         "missionrewardledger.sql"
+                         "missionrewardledger.sql",
+                         "item_instances.sql",
+                         "generatedmissionsequences.sql",
+                         "generatedmissionbatches.sql",
+                         "generatedmissionoffers.sql",
+                         "generatedmissionbindings.sql",
+                         "generatedmissionobjects.sql",
+                         "generatedmissionobservations.sql",
+                         "generatedmissionartifacts.sql"
                      })
             {
                 using (var command = new MySqlCommand(File.ReadAllText(Path.Combine(directory, name)), connection))
@@ -386,7 +402,14 @@ namespace AORebirth.Tools.MissionDaoValidation
 
         private static void SeedCharacters(MySqlConnection connection)
         {
-            for (int id = 101; id <= 103; id++)
+            using (var command = new MySqlCommand(
+                       "INSERT INTO generatedmissionsequences (SequenceName,NextIdentity,MaximumIdentity) VALUES ('offer',100000,100099)",
+                       connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            foreach (int id in new[] { 101, 102, 103, 10001 })
             {
                 using (var command = new MySqlCommand(
                            "INSERT INTO characters "

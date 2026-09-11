@@ -5,8 +5,24 @@ namespace AORebirth.Database.Domain.Missions
     public sealed partial class MySqlMissionDao
     {
         public MySqlMissionDao()
-            : this(Connector.GetConnection)
+            : this(OpenConfiguredMySqlConnection)
         {
+        }
+
+        private static System.Data.IDbConnection OpenConfiguredMySqlConnection()
+        {
+            System.Data.IDbConnection connection = Connector.GetConnection();
+            if (connection is MySqlConnector.MySqlConnection)
+            {
+                return connection;
+            }
+
+            if (connection != null)
+            {
+                connection.Dispose();
+            }
+
+            throw new System.NotSupportedException("Mission persistence requires the configured MySQL provider.");
         }
     }
 }

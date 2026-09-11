@@ -108,7 +108,7 @@ namespace AORebirth.Database.Domain.Missions
         public IList<GeneratedMissionOffer> ReadOffers(int ownerId)
         {
             if (ownerId <= 0) throw new ArgumentOutOfRangeException("ownerId");
-            using (var connection = connectionFactory())
+            using (var connection = OpenConnection())
             {
                 var offers = connection.Query<GeneratedMissionOffer>(OfferReadSql + " WHERE o.OwnerId=@ownerId ORDER BY o.OfferedAtUtcTicks,o.OfferIndex", new { ownerId }).ToList();
                 foreach (var offer in offers) ValidateFrozenOffer(offer);
@@ -119,7 +119,7 @@ namespace AORebirth.Database.Domain.Missions
         public IList<GeneratedMissionBinding> ReadAccepted(int ownerId)
         {
             if (ownerId <= 0) throw new ArgumentOutOfRangeException("ownerId");
-            using (var connection = connectionFactory())
+            using (var connection = OpenConnection())
             {
                 var bindings = connection.Query<GeneratedMissionBinding>("SELECT " + BindingColumns + " FROM generatedmissionbindings WHERE OwnerId=@ownerId ORDER BY QuestType,QuestInstance", new { ownerId }).ToList();
                 foreach (var binding in bindings) HydrateOffer(connection, null, binding);
@@ -130,7 +130,7 @@ namespace AORebirth.Database.Domain.Missions
         public GeneratedMissionBinding ReadAccepted(int ownerId, int questType, int questInstance)
         {
             if (ownerId <= 0 || questType <= 0 || questInstance <= 0) return null;
-            using (var connection = connectionFactory()) return ReadGeneratedBinding(connection, null, ownerId, questType, questInstance);
+            using (var connection = OpenConnection()) return ReadGeneratedBinding(connection, null, ownerId, questType, questInstance);
         }
 
         public GeneratedMissionResult Observe(GeneratedMissionObservation observation)
@@ -274,12 +274,21 @@ namespace AORebirth.Database.Domain.Missions
 
         private T GeneratedTransaction<T>(int ownerId, Func<IDbConnection, IDbTransaction, T> operation)
         {
-            using (var connection = connectionFactory())
+            using (var connection = OpenConnection())
             using (var transaction = connection.BeginTransaction())
             {
-                if (ownerId > 0 && !connection.Query<int>("SELECT Id FROM characters WHERE Id=@ownerId FOR UPDATE", new { ownerId }, transaction).Any())
-                    throw new InvalidOperationException("Mission owner does not exist.");
-                T result = operation(connection, transaction);
+                T result;
+                try
+                {
+                    if (ownerId > 0 && !connection.Query<int>("SELECT Id FROM characters WHERE Id=@ownerId FOR UPDATE", new { ownerId }, transaction).Any())
+                        throw new InvalidOperationException("Mission owner does not exist.");
+                    result = operation(connection, transaction);
+                }
+                catch (Exception operationFailure)
+                {
+                    RollbackAfterFailure(transaction, operationFailure);
+                    throw;
+                }
                 try { transaction.Commit(); }
                 catch (Exception exception) { throw new MissionCommitOutcomeUnknownException(exception); }
                 return result;
@@ -327,7 +336,7 @@ namespace AORebirth.Database.Domain.Missions
         public IList<MissionItemInstanceData> ReadArtifacts(int ownerId, int questType, int questInstance)
         {
             if (ownerId <= 0) throw new ArgumentOutOfRangeException("ownerId");
-            using (var connection = connectionFactory())
+            using (var connection = OpenConnection())
                 return ReadGeneratedArtifacts(connection, null, ownerId, questType, questInstance);
         }
 
@@ -354,7 +363,7 @@ namespace AORebirth.Database.Domain.Missions
         public IList<GeneratedMissionObject> ReadObjects(int ownerId, int questType, int questInstance)
         {
             if (ownerId <= 0) throw new ArgumentOutOfRangeException("ownerId");
-            using (var connection = connectionFactory())
+            using (var connection = OpenConnection())
                 return connection.Query<GeneratedMissionObject>("SELECT " + ObjectColumns + " FROM generatedmissionobjects WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance ORDER BY RuntimeType,RuntimeInstance", new { ownerId, questType, questInstance }).ToList();
         }
 
