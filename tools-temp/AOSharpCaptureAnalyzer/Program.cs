@@ -224,6 +224,7 @@ namespace AOSharpCaptureAnalyzer
             int rows = 0;
             int failures = packetSet.SourceFailures;
             int incomplete = 0;
+            var acgObservations = new List<ScfuAcgObservation>();
             using (var output = new StreamWriter(pendingOutputPath, false, new UTF8Encoding(false)))
             using (var errors = new StreamWriter(pendingErrorPath, false, new UTF8Encoding(false)))
             {
@@ -244,6 +245,12 @@ namespace AOSharpCaptureAnalyzer
                     else if (!message.DecodeFullyConsumed)
                     {
                         incomplete++;
+                    }
+
+                    if (decoded)
+                    {
+                        acgObservations.Add(
+                            ScfuAcgObservation.From(capturedPacket.Metadata, message));
                     }
 
                     output.WriteLine(
@@ -275,6 +282,33 @@ namespace AOSharpCaptureAnalyzer
             {
                 PromoteFile(pendingOutputPath, outputPath);
                 PromoteFile(pendingErrorPath, errorPath);
+
+                try
+                {
+                    ScfuAcgCorrelationSummary acgSummary =
+                        ScfuAcgCorrelation.Export(captureFolder, acgObservations);
+                    Console.WriteLine(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "{0}: ACG correlation rows={1} exactRecord={2} exactHash={3} ambiguous={4} unmatchedNpc={5} nonNpc={6} uniqueHashes={7} output={8}",
+                            Path.GetFileName(captureFolder),
+                            acgSummary.RowCount,
+                            acgSummary.ExactRecordCount,
+                            acgSummary.ExactHashCount,
+                            acgSummary.AmbiguousCount,
+                            acgSummary.UnmatchedNpcCount,
+                            acgSummary.NonNpcCount,
+                            acgSummary.UniqueHashCount,
+                            acgSummary.OutputPath));
+                }
+                catch (Exception exception)
+                {
+                    Console.Error.WriteLine(
+                        Path.GetFileName(captureFolder)
+                        + ": ACG correlation failed: "
+                        + exception.Message);
+                    result++;
+                }
             }
             else
             {
@@ -1568,7 +1602,8 @@ namespace AOSharpCaptureAnalyzer
                         boundedExpectations),
                     "Trailing packet after finalized legacy capture excluded");
                 RawInventoryLootProjection.RunSelfTest();
-                Console.WriteLine("SCFU decoder and loot projection self-test PASS");
+                ScfuAcgCorrelation.RunSelfTest();
+                Console.WriteLine("SCFU decoder, ACG correlation, and loot projection self-test PASS");
                 return 0;
             }
             catch (Exception exception)
