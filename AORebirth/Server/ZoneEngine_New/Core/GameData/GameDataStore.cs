@@ -931,6 +931,11 @@ namespace ZoneEngine_New.Core.GameData
                 try
                 {
                     T record = new();
+                    // Surfaces.dat / Collision.dat strip the RDB type+id+version header.
+                    // AODB SurfaceResource.Deserialize requires RecordVersion 5 on the instance.
+                    if (record is SurfaceResource surface)
+                        surface.RecordVersion = 5;
+
                     using MemoryStream stream = new(payload, offset, payload.Length - offset, writable: false);
                     using BinaryReader reader = new(stream);
                     record.Deserialize(reader);
