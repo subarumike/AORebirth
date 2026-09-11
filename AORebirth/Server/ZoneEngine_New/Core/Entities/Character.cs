@@ -1213,6 +1213,7 @@ namespace ZoneEngine_New.Core.Entities
                     ? (isNpc ? (short)3 : (short)0)
                     : (short)expansions,
                 Level = (short)Stats.GetOrZero(CharacterStat.Level),
+                MonsterScale = (short)monsterScale,
                 VisualFlags = wireVisualFlags,
                 VisibleTitle = 0,
                 RunSpeedBase = (short)runSpeedBase,

@@ -48,6 +48,7 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(6, scfu.HealthDamage);
             Assert.AreEqual(40683u, scfu.HeadMesh);
             Assert.AreEqual(31, scfu.VisualFlags);
+            Assert.AreEqual(100, scfu.MonsterScale);
             Assert.AreEqual(171, scfu.Expansions);
             Assert.IsInstanceOfType<SimplePcInfo>(scfu.CharacterInfo);
             var pc = (SimplePcInfo)scfu.CharacterInfo;
@@ -55,6 +56,7 @@ namespace ZoneEngine_New.Tests
                 new[] { pc.StrengthBase, pc.AgilityBase, pc.StaminaBase, pc.IntelligenceBase, pc.SenseBase, pc.PsychicBase });
             Assert.AreEqual(25u, RequiredFullStat(full, CharacterStat.Health));
             Assert.AreEqual(31u, RequiredFullStat(full, CharacterStat.MaxHealth));
+            Assert.AreEqual(100u, RequiredFullStat(full, CharacterStat.Scale));
             Assert.IsFalse(full.Stats1.Concat(full.Stats2).Any(stat => stat.Value2 == (uint)(int)CharacterStat.Unset));
         }
 
@@ -99,7 +101,7 @@ namespace ZoneEngine_New.Tests
         {
             CharacterStat[] missing =
             [
-                CharacterStat.HeadMesh, CharacterStat.VisualFlags, CharacterStat.Race, CharacterStat.Breed,
+                CharacterStat.HeadMesh, CharacterStat.VisualFlags, CharacterStat.Scale, CharacterStat.Race, CharacterStat.Breed,
                 CharacterStat.Sex, CharacterStat.Strength, CharacterStat.Agility, CharacterStat.Stamina,
                 CharacterStat.Intelligence, CharacterStat.Sense, CharacterStat.Psychic,
             ];
@@ -119,6 +121,7 @@ namespace ZoneEngine_New.Tests
                 [CharacterStat.Flags] = 0x00081241, [CharacterStat.Breed] = 1, [CharacterStat.Sex] = 2,
                 [CharacterStat.Profession] = 1, [CharacterStat.Fatness] = 0, [CharacterStat.Race] = 1,
                 [CharacterStat.HeadMesh] = 40683, [CharacterStat.VisualFlags] = 31,
+                [CharacterStat.Scale] = 100,
                 [CharacterStat.Level] = 1, [CharacterStat.TitleLevel] = 1, [CharacterStat.Side] = 0,
                 [CharacterStat.Expansion] = 171,
                 [CharacterStat.Strength] = 6, [CharacterStat.Agility] = 6, [CharacterStat.Stamina] = 6,
