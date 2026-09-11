@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceFilesScanned": 221,
-  "persistenceMethodRows": 100,
+  "sourceFilesScanned": 222,
+  "persistenceMethodRows": 87,
   "entries": [
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationService.cs",
@@ -144,27 +144,23 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlActiveNanoRepository.cs",
-      "sourceSha256": "5aa58041263becd027f281c49b6168fa81820826977b24ff7962a87f198f3a67",
+      "sourceSha256": "4f7453103d041d1785209b040ce53886c6901e7437b6c91a1ce2dbc3ad469a17",
       "class": "MySqlActiveNanoRepository",
       "method": "Load",
       "signature": "(int characterId)",
-      "line": 15,
-      "tables": [
-        "charactersactivenanos"
+      "line": 14,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
       "calls": [
-        "ArgumentOutOfRangeException.ThrowIfNegativeOrZero",
-        "command.ExecuteReader",
-        "command.Parameters.AddWithValue",
-        "connection.Open",
-        "reader.GetInt32",
-        "reader.GetInt64",
-        "reader.Read",
-        "rows.Add"
+        "Run",
+        "_persistence.LoadActiveNanos",
+        "_persistence.LoadActiveNanos(characterId)\n            .Select",
+        "_persistence.LoadActiveNanos(characterId)\n            .Select(v =\u003E new ActiveNanoRecord(v.NanoId, v.Strain, v.NanoInstance, v.DurationCentiseconds, v.ExpiresAtUtcTicks)).ToArray"
       ],
       "migrationTarget": "character nano DAO with aggregate nano/stat transaction",
       "cutoverCritical": "YES",
@@ -172,41 +168,27 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlActiveNanoRepository.cs",
-      "sourceSha256": "5aa58041263becd027f281c49b6168fa81820826977b24ff7962a87f198f3a67",
+      "sourceSha256": "4f7453103d041d1785209b040ce53886c6901e7437b6c91a1ce2dbc3ad469a17",
       "class": "MySqlActiveNanoRepository",
       "method": "Commit",
       "signature": "(IReadOnlyList\u003CNanoCharacterWrite\u003E characters)",
-      "line": 31,
-      "tables": [
-        "charactersactivenanos"
+      "line": 16,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
-      "existingEquivalent": [],
       "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "MySqlCharacterRepository.LockForTransaction",
-        "MySqlStatRepository.UpsertForCharacter",
-        "character.ActiveNanos.Any",
-        "character.ActiveNanos.Select",
-        "character.ActiveNanos.Select(n =\u003E n.NanoInstance).Distinct",
-        "character.ActiveNanos.Select(n =\u003E n.NanoInstance).Distinct().Count",
-        "character.ActiveNanos.Select(n =\u003E n.Strain).Distinct",
-        "character.ActiveNanos.Select(n =\u003E n.Strain).Distinct().Count",
-        "characters.Any",
-        "characters.OrderBy",
+        "Run",
+        "_persistence.CommitActiveNanos",
+        "c.ActiveNanos.Select",
+        "c.ActiveNanos.Select(v =\u003E new PersistedActiveNanoData { NanoId = v.NanoId, Strain = v.Strain, NanoInstance = v.NanoInstance,\n                DurationCentiseconds = v.DurationCentiseconds, ExpiresAtUtcTicks = v.ExpiresAtUtcTicks }).ToArray",
+        "c.BaseStats.Select",
+        "c.BaseStats.Select(Map).ToArray",
         "characters.Select",
-        "characters.Select(c =\u003E c.CharacterId).Distinct",
-        "characters.Select(c =\u003E c.CharacterId).Distinct().Count",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "insert.ExecuteNonQuery",
-        "insert.Parameters.AddWithValue",
-        "nameof",
-        "remove.ExecuteNonQuery",
-        "remove.Parameters.AddWithValue",
-        "transaction.Commit"
+        "characters.Select(c =\u003E new CharacterActiveNanoData\n        {\n            CharacterId = c.CharacterId, BaseStats = c.BaseStats.Select(Map).ToArray(),\n            ActiveNanos = c.ActiveNanos.Select(v =\u003E new PersistedActiveNanoData { NanoId = v.NanoId, Strain = v.Strain, NanoInstance = v.NanoInstance,\n                DurationCentiseconds = v.DurationCentiseconds, ExpiresAtUtcTicks = v.ExpiresAtUtcTicks }).ToArray()\n        }).ToArray"
       ],
       "migrationTarget": "character nano DAO with aggregate nano/stat transaction",
       "cutoverCritical": "YES",
@@ -214,50 +196,47 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterCoalesceCommit.cs",
-      "sourceSha256": "b047bd01aec4150f98501c4764a108f28b4f90b471001f3c0a68b39bb628b89a",
+      "sourceSha256": "cd0a3562ba1801c54edd698c5658f0b613c8e9179365ae66eec420b4f422041a",
       "class": "MySqlCharacterCoalesceCommit",
       "method": "Persist",
-      "signature": "(\n            IReadOnlyList\u003CItemInstanceRecord\u003E inserts,\n            IReadOnlyList\u003CItemLocationUpdate\u003E updates,\n            int characterId,\n            IReadOnlyList\u003Cint\u003E uploadedNanoIds)",
-      "line": 33,
+      "signature": "(IReadOnlyList\u003CItemInstanceRecord\u003E inserts, IReadOnlyList\u003CItemLocationUpdate\u003E updates, int characterId, IReadOnlyList\u003Cint\u003E uploadedNanoIds)",
+      "line": 19,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
+      ],
+      "calls": [
+        "Run",
+        "_persistence.SaveInventoryAndUploadedNanos",
+        "inserts.Select",
+        "inserts.Select(Map).ToArray",
+        "updates.Select",
+        "updates.Select(Map).ToArray",
+        "uploadedNanoIds.ToArray"
+      ],
+      "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
+      "cutoverCritical": "YES",
+      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
+      "sourceSha256": "71340d2f33c2f347d4a5fd15cfb4c0c07a3a4ac690fcd20611194a2eefbe4dc0",
+      "class": "MySqlCharacterRepository",
+      "method": "MySqlCharacterRepository",
+      "signature": "(IZoneLogger logger, ICharacterDao? directory = null, ICharacterPersistenceDao? persistence = null)",
+      "line": 14,
       "tables": [],
       "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
       "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
-      "existingEquivalent": [
-        "MySqlInventoryRepository",
-        "MySqlUploadedNanoRepository"
-      ],
-      "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "_inventory.WritePersist",
-        "_logger.Error",
-        "_nanos.WriteInsertMissing",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "string.Format",
-        "transaction.Commit"
-      ],
-      "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
-      "class": "MySqlCharacterRepository",
-      "method": "MySqlCharacterRepository",
-      "signature": "(IZoneLogger logger, ICharacterDao? directory = null)",
-      "line": 33,
-      "tables": [
-        "characters"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
       "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
       "existingEquivalent": [],
       "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "MySqlConnectionSettings.GetRequiredConnectionString"
+        "Create",
+        "MySqlConnectionSettings.GetRequiredConnectionString",
+        "nameof"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -265,30 +244,22 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
+      "sourceSha256": "71340d2f33c2f347d4a5fd15cfb4c0c07a3a4ac690fcd20611194a2eefbe4dc0",
       "class": "MySqlCharacterRepository",
       "method": "GetById",
       "signature": "(int characterId)",
-      "line": 43,
-      "tables": [
-        "characters"
+      "line": 21,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
       "calls": [
-        "_logger.Error",
-        "command.ExecuteReader",
-        "command.Parameters.AddWithValue",
-        "connection.Open",
-        "reader.GetFloat",
-        "reader.GetInt32",
-        "reader.GetOrdinal",
-        "reader.GetString",
-        "reader.IsDBNull",
-        "reader.Read",
-        "string.Format"
+        "Map",
+        "Run",
+        "_persistence.LoadCharacter"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -296,25 +267,22 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
+      "sourceSha256": "71340d2f33c2f347d4a5fd15cfb4c0c07a3a4ac690fcd20611194a2eefbe4dc0",
       "class": "MySqlCharacterRepository",
       "method": "SaveLocation",
       "signature": "(CharacterRecord character, int online)",
-      "line": 98,
-      "tables": [
-        "characters"
+      "line": 26,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
       "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "ArgumentOutOfRangeException.ThrowIfNegativeOrZero",
-        "SaveLocation",
-        "_logger.Error",
-        "connection.Open",
-        "string.Format"
+        "Map",
+        "Run",
+        "_persistence.SaveLocation"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -322,22 +290,24 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
+      "sourceSha256": "71340d2f33c2f347d4a5fd15cfb4c0c07a3a4ac690fcd20611194a2eefbe4dc0",
       "class": "MySqlCharacterRepository",
-      "method": "LockForTransaction",
-      "signature": "(MySqlConnection connection, MySqlTransaction transaction, int characterId)",
-      "line": 126,
-      "tables": [
-        "characters"
+      "method": "SaveSnapshot",
+      "signature": "(CharacterRecord character, int online, IReadOnlyList\u003CStatRecord\u003E stats)",
+      "line": 27,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
-      "existingEquivalent": [],
       "calls": [
-        "ArgumentOutOfRangeException.ThrowIfNegativeOrZero",
-        "row.ExecuteScalar",
-        "row.Parameters.AddWithValue"
+        "Map",
+        "Run",
+        "_persistence.SaveSnapshot",
+        "stats.Select",
+        "stats.Select(Map).ToArray"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -345,11 +315,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
+      "sourceSha256": "71340d2f33c2f347d4a5fd15cfb4c0c07a3a4ac690fcd20611194a2eefbe4dc0",
       "class": "MySqlCharacterRepository",
       "method": "SetOnlineState",
       "signature": "(int characterId, int online)",
-      "line": 138,
+      "line": 31,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "REPOSITORY_CONSUMER",
@@ -367,380 +337,56 @@
       "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
     },
     {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
-      "class": "MySqlCharacterRepository",
-      "method": "SaveSnapshot",
-      "signature": "(CharacterRecord character, int online, IReadOnlyList\u003CStatRecord\u003E stats)",
-      "line": 146,
-      "tables": [
-        "characters"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
-      "existingEquivalent": [],
-      "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "ArgumentOutOfRangeException.ThrowIfNegativeOrZero",
-        "MySqlStatRepository.UpsertForCharacter",
-        "SaveLocation",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "transaction.Commit"
-      ],
-      "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
-      "class": "MySqlCharacterRepository",
-      "method": "SaveLocation",
-      "signature": "(MySqlConnection connection, MySqlTransaction? transaction,\n            CharacterRecord character, int online)",
-      "line": 168,
-      "tables": [
-        "characters"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
-      "existingEquivalent": [],
-      "calls": [
-        "command.ExecuteNonQuery",
-        "command.Parameters.AddWithValue"
-      ],
-      "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryMutationPersistence.cs",
-      "sourceSha256": "f0da0e9241878d1d52c4217432bfeed1bc6d6cb5e5d234debfebca1513173a46",
+      "sourceSha256": "2df674d36898e79e1afba7ca00959e3c89d4bcee22b0ae86dc12d6a5a6008a83",
       "class": "MySqlInventoryMutationPersistence",
       "method": "Persist",
       "signature": "(InventoryMutationBatch batch)",
-      "line": 20,
+      "line": 17,
       "tables": [],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
       "existingEquivalent": [
-        "MySqlInventoryRepository",
-        "MySqlUploadedNanoRepository"
+        "ICharacterPersistenceDao"
       ],
       "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "MySqlStatRepository.UpsertForCharacter",
-        "_inventory.AssertContainersEmpty",
-        "_inventory.WritePersist",
-        "_inventory.WriteStackCounts",
-        "_nanos.WriteInsertMissing",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "nameof",
-        "transaction.Commit"
+        "Run",
+        "_persistence.CommitInventoryMutation",
+        "batch.EmptyContainersBeforeRetire.ToArray",
+        "batch.FinalStats.Select",
+        "batch.FinalStats.Select(Map).ToArray",
+        "batch.Inserts.Select",
+        "batch.Inserts.Select(Map).ToArray",
+        "batch.Locations.Select",
+        "batch.Locations.Select(Map).ToArray",
+        "batch.Stacks.Select",
+        "batch.Stacks.Select(v =\u003E new ItemStackData { InstanceId = v.InstanceId, ExpectedCount = v.ExpectedCount, FinalCount = v.FinalCount }).ToArray",
+        "batch.UploadedNanoIds.ToArray"
       ],
       "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "LeaseInstanceIdBlock",
-      "signature": "(int count)",
-      "line": 105,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
-      "existingEquivalent": [],
-      "calls": [
-        "Convert.ToInt32",
-        "_logger.Error",
-        "advance.ExecuteNonQuery",
-        "advance.Parameters.AddWithValue",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "nameof",
-        "readStart.ExecuteScalar",
-        "string.Format",
-        "transaction.Commit"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "Insert",
-      "signature": "(ItemInstanceRecord item)",
-      "line": 154,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
-      "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "ExecuteInsert",
-        "_logger.Error",
-        "connection.Open",
-        "nameof",
-        "string.Format"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "UpdateLocation",
-      "signature": "(int instanceId, int containerType, int containerInstance, int containerPlacement)",
-      "line": 181,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
-      "calls": [
-        "_logger.Error",
-        "command.ExecuteNonQuery",
-        "command.Parameters.AddWithValue",
-        "connection.Open",
-        "nameof",
-        "string.Format"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "PersistNewAndUpdateLocations",
-      "signature": "(\n            IReadOnlyList\u003CItemInstanceRecord\u003E inserts,\n            IReadOnlyList\u003CItemLocationUpdate\u003E updates)",
-      "line": 224,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
-      "existingEquivalent": [],
-      "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "WritePersist",
-        "_logger.Error",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "transaction.Commit"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "WritePersist",
-      "signature": "(\n            IReadOnlyList\u003CItemInstanceRecord\u003E inserts,\n            IReadOnlyList\u003CItemLocationUpdate\u003E updates,\n            MySqlConnection connection,\n            MySqlTransaction transaction)",
-      "line": 248,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
-      "existingEquivalent": [],
-      "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "ExecuteInsert",
-        "commit.ExecuteNonQuery",
-        "commit.Parameters.AddWithValue",
-        "nameof",
-        "park.ExecuteNonQuery",
-        "park.Parameters.AddWithValue",
-        "string.Format"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "WriteStackCounts",
-      "signature": "(IReadOnlyList\u003CItemStackUpdate\u003E updates,\n            MySqlConnection connection, MySqlTransaction transaction)",
-      "line": 307,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
-      "existingEquivalent": [],
-      "calls": [
-        "command.ExecuteNonQuery",
-        "command.Parameters.AddWithValue",
-        "nameof"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "AssertContainersEmpty",
-      "signature": "(IReadOnlyList\u003Cint\u003E containerInstances,\n            MySqlConnection connection, MySqlTransaction transaction)",
-      "line": 325,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
-      "existingEquivalent": [],
-      "calls": [
-        "command.ExecuteScalar",
-        "command.Parameters.AddWithValue"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "ExecuteInsert",
-      "signature": "(\n            ItemInstanceRecord item,\n            MySqlConnection connection,\n            MySqlTransaction? transaction)",
-      "line": 343,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
-      "existingEquivalent": [],
-      "calls": [
-        "command.ExecuteNonQuery",
-        "command.Parameters.AddWithValue"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
-      "sourceSha256": "df3f093e62907c6d800b48ae67bacdde550b8b2f707ef9325003b536c8d69387",
-      "class": "MySqlInventoryRepository",
-      "method": "Query",
-      "signature": "(\n            string sql,\n            string parameterName,\n            int parameterValue,\n            string operation)",
-      "line": 364,
-      "tables": [
-        "item_instance_id_sequence",
-        "item_instances"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
-      "calls": [
-        "ReadItem",
-        "_logger.Error",
-        "command.ExecuteReader",
-        "command.Parameters.AddWithValue",
-        "connection.Open",
-        "items.Add",
-        "reader.Read",
-        "string.Format"
-      ],
-      "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlItemNameRepository.cs",
-      "sourceSha256": "daf35e794b7d86fb3c6f48cbc09a0737197c3834315acbdc2547faff01fe5289",
-      "class": "MySqlItemNameRepository",
-      "method": "LoadAll",
-      "signature": "()",
-      "line": 33,
-      "tables": [
-        "itemnames"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
-      "calls": [
-        "_logger.Error",
-        "_logger.Info",
-        "command.ExecuteReader",
-        "connection.Open",
-        "reader.GetInt32",
-        "reader.GetOrdinal",
-        "reader.GetString",
-        "reader.IsDBNull",
-        "reader.Read",
-        "string.Format"
-      ],
-      "migrationTarget": "existing composition/readiness boundary; separate provider construction from gameplay",
       "cutoverCritical": "YES",
       "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs",
-      "sourceSha256": "c1db836615297b4ab397f32c1ad87bbaeae1ddeb7d127158f144b33ab33b02a1",
+      "sourceSha256": "252304a35646393678bc8ce1e47a55114d7401d9f5c10627af9ccd4166dad488",
       "class": "MySqlStatRepository",
       "method": "GetForCharacter",
       "signature": "(int characterId)",
-      "line": 36,
-      "tables": [
-        "stats",
-        "statvalue"
+      "line": 15,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
       "calls": [
-        "_logger.Error",
-        "command.ExecuteReader",
-        "command.Parameters.AddWithValue",
-        "connection.Open",
-        "reader.GetInt32",
-        "reader.GetOrdinal",
-        "reader.Read",
-        "stats.Add",
-        "string.Format"
+        "Run",
+        "_persistence.LoadStats",
+        "_persistence.LoadStats(characterId).Select",
+        "_persistence.LoadStats(characterId).Select(Map).ToArray"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -748,50 +394,23 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs",
-      "sourceSha256": "c1db836615297b4ab397f32c1ad87bbaeae1ddeb7d127158f144b33ab33b02a1",
+      "sourceSha256": "252304a35646393678bc8ce1e47a55114d7401d9f5c10627af9ccd4166dad488",
       "class": "MySqlStatRepository",
       "method": "UpsertForCharacter",
       "signature": "(int characterId, IReadOnlyList\u003CStatRecord\u003E stats)",
-      "line": 78,
-      "tables": [
-        "stats",
-        "statvalue"
+      "line": 17,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
-      "existingEquivalent": [],
       "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "UpsertForCharacter",
-        "_logger.Error",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "string.Format",
-        "transaction.Commit"
-      ],
-      "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
-      "cutoverCritical": "YES",
-      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
-    },
-    {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs",
-      "sourceSha256": "c1db836615297b4ab397f32c1ad87bbaeae1ddeb7d127158f144b33ab33b02a1",
-      "class": "MySqlStatRepository",
-      "method": "UpsertForCharacter",
-      "signature": "(MySqlConnection connection, MySqlTransaction transaction,\n            int characterId, IReadOnlyList\u003CStatRecord\u003E stats)",
-      "line": 106,
-      "tables": [
-        "stats",
-        "statvalue"
-      ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
-      "existingEquivalent": [],
-      "calls": [
-        "command.ExecuteNonQuery",
-        "command.Parameters.AddWithValue"
+        "Run",
+        "_persistence.SaveStats",
+        "stats.Select",
+        "stats.Select(Map).ToArray"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -799,34 +418,28 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlTradePersistence.cs",
-      "sourceSha256": "14c14800fc9bc35e72d75e8d02992a163b7a76895f8c287dc0468383bc78e033",
+      "sourceSha256": "ef192c3efc820b6e6221484296bdc7559f7a8fba23a456451f268e44c5a949d7",
       "class": "MySqlTradePersistence",
       "method": "Persist",
       "signature": "(TradePersistenceBatch batch)",
-      "line": 22,
+      "line": 17,
       "tables": [],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "OWNS_TRANSACTION_REVIEW_COMMIT_AND_FAILURE_PATHS",
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
       "existingEquivalent": [
-        "MySqlInventoryRepository",
-        "MySqlUploadedNanoRepository"
+        "ICharacterPersistenceDao"
       ],
       "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "MySqlCharacterRepository.LockForTransaction",
-        "MySqlStatRepository.UpsertForCharacter",
-        "_inventory.WritePersist",
-        "_nanos.WriteInsertMissing",
-        "batch.Characters.Any",
-        "batch.Characters.OrderBy",
+        "Run",
+        "_persistence.CommitItemCredits",
         "batch.Characters.Select",
-        "batch.Characters.Select(c =\u003E c.CharacterId).Distinct",
-        "batch.Characters.Select(c =\u003E c.CharacterId).Distinct().Count",
-        "connection.BeginTransaction",
-        "connection.Open",
-        "nameof",
-        "transaction.Commit"
+        "batch.Characters.Select(c =\u003E new CharacterCreditData { CharacterId = c.CharacterId, Cash = c.Cash, UploadedNanoIds = c.UploadedNanoIds.ToArray() }).ToArray",
+        "batch.Inserts.Select",
+        "batch.Inserts.Select(Map).ToArray",
+        "batch.Updates.Select",
+        "batch.Updates.Select(Map).ToArray",
+        "c.UploadedNanoIds.ToArray"
       ],
       "migrationTarget": "shared inventory DAO and existing aggregate trade/inventory transaction owner; no independent participant commits",
       "cutoverCritical": "YES",
@@ -834,55 +447,43 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlUploadedNanoRepository.cs",
-      "sourceSha256": "f4bbaa6580ab2269b6e2415103eaa562115d16385462f800d6975941431cd3b5",
+      "sourceSha256": "f185bd6b7839cfafb0b69ee3cb26a9f1427b0e3ffb598ce5a2e88792f55b3f5d",
       "class": "MySqlUploadedNanoRepository",
       "method": "GetForCharacter",
       "signature": "(int characterId)",
-      "line": 33,
-      "tables": [
-        "charactersuploadednanos",
-        "dual"
+      "line": 15,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterPersistenceDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
       "calls": [
-        "_logger.Error",
-        "command.ExecuteReader",
-        "command.Parameters.AddWithValue",
-        "connection.Open",
-        "nanoIds.Add",
-        "reader.GetInt32",
-        "reader.GetOrdinal",
-        "reader.Read",
-        "string.Format"
+        "Run",
+        "_persistence.LoadUploadedNanos",
+        "_persistence.LoadUploadedNanos(characterId).ToArray"
       ],
       "migrationTarget": "character nano DAO with aggregate nano/stat transaction",
       "cutoverCritical": "YES",
       "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
     },
     {
-      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlUploadedNanoRepository.cs",
-      "sourceSha256": "f4bbaa6580ab2269b6e2415103eaa562115d16385462f800d6975941431cd3b5",
-      "class": "MySqlUploadedNanoRepository",
-      "method": "WriteInsertMissing",
-      "signature": "(\n            int characterId,\n            IReadOnlyList\u003Cint\u003E nanoIds,\n            MySqlConnection connection,\n            MySqlTransaction transaction)",
-      "line": 65,
-      "tables": [
-        "charactersuploadednanos",
-        "dual"
-      ],
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/SharedCharacterPersistence.cs",
+      "sourceSha256": "cb17d360195346210ea0a7438bb91a08fa377044effbf6c7847c60319e6f75f5",
+      "class": "SharedCharacterPersistence",
+      "method": "Create",
+      "signature": "()",
+      "line": 12,
+      "tables": [],
       "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
       "operation": "DIRECT_SQL",
-      "transactionalBehavior": "CALLER_TRANSACTION",
+      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
       "existingEquivalent": [],
       "calls": [
-        "ArgumentNullException.ThrowIfNull",
-        "command.ExecuteNonQuery",
-        "command.Parameters.AddWithValue"
+        "MySqlConnectionSettings.GetRequiredConnectionString"
       ],
-      "migrationTarget": "character nano DAO with aggregate nano/stat transaction",
+      "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
       "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
     },
@@ -2802,7 +2403,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "addba212c93349c473284a16c2c1dc3fa32aeb1b60f02c2325d477485178652b",
+      "sourceSha256": "c38e5b425f28d6ebeaf05bb8e24498f39bae7a61688b61bd9ace9e85b5c71f11",
       "class": "Program",
       "method": "RedirectConsoleLog",
       "signature": "(string[] args, string first, string second, bool error)",
@@ -2825,7 +2426,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "addba212c93349c473284a16c2c1dc3fa32aeb1b60f02c2325d477485178652b",
+      "sourceSha256": "c38e5b425f28d6ebeaf05bb8e24498f39bae7a61688b61bd9ace9e85b5c71f11",
       "class": "Program",
       "method": "BuildRootServices",
       "signature": "()",
@@ -2875,6 +2476,7 @@
         "provider.GetRequiredService\u003CMySqlUploadedNanoRepository\u003E",
         "services.AddSingleton",
         "services.AddSingleton\u003CAORebirth.Interfaces.Persistence.Characters.ICharacterDao\u003E",
+        "services.AddSingleton\u003CAORebirth.Interfaces.Persistence.Characters.ICharacterPersistenceDao\u003E",
         "services.AddSingleton\u003CAuthoredQuestService\u003E",
         "services.AddSingleton\u003CCharacterSnapshotService\u003E",
         "services.AddSingleton\u003CGeneratedMissionAcgService\u003E",
@@ -2941,11 +2543,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "addba212c93349c473284a16c2c1dc3fa32aeb1b60f02c2325d477485178652b",
+      "sourceSha256": "c38e5b425f28d6ebeaf05bb8e24498f39bae7a61688b61bd9ace9e85b5c71f11",
       "class": "Program",
       "method": "StartShutdownFileWatcher",
       "signature": "(string[] args)",
-      "line": 406,
+      "line": 409,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "FILE_OR_SERIALIZATION",

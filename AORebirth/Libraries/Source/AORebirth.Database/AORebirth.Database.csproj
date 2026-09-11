@@ -109,6 +109,10 @@
     <Compile Include="DatabaseDaoFactory.cs" />
     <Compile Include="Domain\Accounts\MySqlAccountDao.cs" />
     <Compile Include="Domain\Characters\MySqlCharacterDao.cs" />
+    <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.cs" />
+    <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.Inventory.cs" />
+    <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.Transactions.cs" />
+    <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.Legacy.cs" />
     <Compile Include="Domain\Characters\MySqlCharacterDao.Legacy.cs" />
     <Compile Include="Domain\Missions\MySqlMissionDao.cs" />
     <Compile Include="Domain\Missions\MySqlMissionDao.Generated.cs" />
@@ -184,6 +188,10 @@
     <ProjectReference Include="..\AORebirth.Enums\AORebirth.Enums.csproj">
       <Project>{0C09AF43-3456-4FD6-9041-D9A6D7C3F36C}</Project>
       <Name>AORebirth.Enums</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">
+      <Project>{3ceac898-bfca-45ea-bf34-c4bbb85d2da4}</Project>
+      <Name>SmokeLounge.AOtomation.Messaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\AORebirth.Interfaces\AORebirth.Interfaces.csproj">
       <Project>{d53f0612-fefe-4eaf-80aa-480f25c8dd76}</Project>

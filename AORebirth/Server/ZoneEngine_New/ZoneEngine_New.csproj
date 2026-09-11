@@ -105,6 +105,11 @@
     <Compile Include="../ZoneEngine/Core/Missions/MissionAcgSpatialAuthority.cs" Link="SharedGameplay/Missions/MissionAcgSpatialAuthority.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs" Link="SharedGameplay/Missions/MySqlMissionDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs" Link="Shared/Characters/MySqlCharacterDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Inventory.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Inventory.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Transactions.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Transactions.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterPersistenceDao.cs" Link="Shared/Characters/ICharacterPersistenceDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterPersistenceData.cs" Link="Shared/Characters/CharacterPersistenceData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterDirectoryData.cs" Link="Shared/Characters/CharacterDirectoryData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterDao.cs" Link="Shared/Characters/ICharacterDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineCharacterData.cs" Link="Shared/Characters/StaleOnlineCharacterData.cs" />

@@ -61,6 +61,8 @@
     <Compile Include="IVector3.cs" />
     <Compile Include="Persistence\Accounts\IAccountDao.cs" />
     <Compile Include="Persistence\Characters\ICharacterDao.cs" />
+    <Compile Include="Persistence\Characters\ICharacterPersistenceDao.cs" />
+    <Compile Include="Persistence\Characters\CharacterPersistenceData.cs" />
     <Compile Include="Persistence\Characters\CharacterDirectoryData.cs" />
     <Compile Include="Persistence\Characters\StaleOnlineCharacterData.cs" />
     <Compile Include="Persistence\Characters\StaleOnlineRecoveryData.cs" />

@@ -58,6 +58,10 @@ static partial class ConnectedAcceptanceSmoke
             FixtureSql.Execute(connection, $"INSERT INTO characters (Id,Username,Name,FirstName,LastName,Playfield,X,Y,Z,HeadingW,HeadingX,HeadingY,HeadingZ,Online) VALUES ({Owner},'{Account}','ConnectedFixture','','',4582,100,0,100,1,0,0,0,0)");
             // Real schema stat IDs from CharacterList and CharacterStat, fixture values only.
             var stats = LifecycleSpawnFixture.Stats();
+            // Disposable fixture permissions; never uses the unsafe legacy SetGM API.
+            stats[CharacterStat.GmLevel] = 1;
+            stats[CharacterStat.ExternalPlayfieldInstance] = 0;
+            stats[CharacterStat.ExternalDoorInstance] = 0;
             foreach (var stat in stats)
                 FixtureSql.Execute(connection, $"INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (50000,{Owner},{(int)stat.Key},{stat.Value})");
             var inventory = new MySqlInventoryRepository(new SilentLogger());
@@ -86,6 +90,7 @@ static partial class ConnectedAcceptanceSmoke
             generated = ConnectedMissionSeed.Create(fixture, Owner);
             missionSnapshot = MissionSnapshot();
             SeedHandoffCases(connection, fixture, password);
+            CharacterPersistenceGameplaySmoke.Prepare(zoneBinary, fixture, Owner);
             persistenceEvidence = LifecyclePersistenceEvidence.Capture(connection, Owner);
             persistenceEvidence.Verify(connection, "SEEDED", 0);
             Console.WriteLine("DATABASE_FIXTURE_ID=" + fixture.FixtureId + " ACCEPTANCE_TIMESTAMP=" + DateTime.UtcNow.ToString("O"));
@@ -127,6 +132,7 @@ static partial class ConnectedAcceptanceSmoke
                     Logout(client, connection);
                     persistenceEvidence.Verify(connection, "FIRST_LOGOUT", 0);
                 }
+                ZonePersistenceRoundTrip(fixture, password, connection);
                 using (var client = Enter(fixture, password))
                 {
                     VerifyConnected(client, identity, 66, "RECONNECT");
@@ -306,7 +312,18 @@ static partial class ConnectedAcceptanceSmoke
             Console.WriteLine("WIRE_ACTIVE_NANO_REMAINING_CENTISECONDS=" + duration + " PERSISTED_INSTANCE=99 PERSISTED_EXPIRY=" + seededNano.ExpiresAtUtcTicks);
         }
         Require(full.UploadedNanoIds.Contains(270542), "wire-uploaded-morph-" + phase);
-        Require(full.InventorySlots.Length == 4, "wire-item-count-" + phase);
+        Require(full.InventorySlots.Length == 6, "wire-item-count-" + phase);
+        Require(full.InventorySlots.Single(i => i.Identity.Instance == CharacterPersistenceGameplaySmoke.SecondItem).Placement == CharacterPersistenceGameplaySmoke.WearSlot,
+            "wire-actually-equipped-item-" + phase);
+        Require(full.InventorySlots.Single(i => i.Identity.Instance == CharacterPersistenceGameplaySmoke.FirstItem).Placement == 69,
+            "wire-actually-swapped-item-" + phase);
+        foreach (int itemId in new[] { CharacterPersistenceGameplaySmoke.FirstItem, CharacterPersistenceGameplaySmoke.SecondItem })
+        {
+            var acquired = full.InventorySlots.Single(i => i.Identity.Instance == itemId);
+            Require(acquired.ItemLowId == CharacterPersistenceGameplaySmoke.TemplateId && acquired.ItemHighId == CharacterPersistenceGameplaySmoke.TemplateId
+                && acquired.Quality == CharacterPersistenceGameplaySmoke.TemplateQuality && acquired.Count == 1
+                && (int)acquired.Identity.Type == CharacterPersistenceGameplaySmoke.ItemType, "wire-actual-loot-metadata-" + phase);
+        }
         var key = full.InventorySlots.Single(i => i.Identity.Instance == generated.KeyInstance);
         Require(key.Placement == 67 && key.Identity.Type == (IdentityType)0xC76D && key.ItemLowId == 28577 && key.ItemHighId == 28577 && key.Quality == 1 && key.Count == 1, "wire-mission-key-" + phase);
         var first = full.InventorySlots.Single(i => i.Identity.Instance == identity);
@@ -319,14 +336,14 @@ static partial class ConnectedAcceptanceSmoke
         Require(second.Placement == 65 && second.ItemLowId == 42423 && second.ItemHighId == 42423 && second.Quality == 4 && second.Count == 1, "wire-second-item-" + phase);
         Require((int)first.Identity.Type == 0xC73D && (int)second.Identity.Type == 0xC73D
             && full.InventorySlots.All(i => i.Flags == 161 && i.Unknown == 0), "wire-item-types-flags-metadata-" + phase);
-        Require(full.Stats1.Concat(full.Stats2).Any(s => s.Value1 == (int)CharacterStat.Cash && s.Value2 == 1234), "wire-cash-" + phase);
+        Require(full.Stats1.Concat(full.Stats2).Any(s => s.Value1 == (int)CharacterStat.Cash && s.Value2 == expectedCash), "wire-cash-" + phase);
         Console.WriteLine("CONNECTED_STATE_" + phase + "=PASS CHARACTER_IDENTITY=PASS INVENTORY_IDENTITY=PASS CREDITS=PASS POSITION=PASS");
         Console.WriteLine("ACTIVE_NANOS_RELOAD=PASS MORPH_RELOAD=PASS AUTHORED_MISSION_RELOAD=PASS GENERATED_MISSION_RELOAD=PASS PROOF=SEEDED_STATE_CONNECTED_RELOAD");
         Console.WriteLine("WIRE_INVENTORY_" + phase + "=" + System.Text.Json.JsonSerializer.Serialize(full.InventorySlots));
     }
     static void VerifyDatabase(MySqlConnection connection, int identity, int slot)
     {
-        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={Owner}") == 4, "persisted-no-phantom-rows");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={Owner}") == 6, "persisted-no-phantom-rows");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity + 2} AND ContainerType={(int)IdentityType.ArmorPage} AND ContainerInstance={Owner} AND ContainerPlacement=17 AND ItemType=0 AND LowId=43384 AND HighId=43384 AND Quality=1 AND StackCount=1 AND Source=1") == 1, "persisted-seeded-equipment-exact");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={generated.KeyInstance} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement=67 AND ItemType={0xC76D} AND LowId=28577 AND HighId=28577 AND Quality=1 AND StackCount=1 AND Source=0") == 1, "persisted-mission-key-exact");
         var nanos = new MySqlActiveNanoRepository().Load(Owner);
@@ -336,7 +353,7 @@ static partial class ConnectedAcceptanceSmoke
         Require(authored != null && authored.State == MissionLifecycleState.Active && authored.CurrentStepId == "active", "persisted-authored-mission");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement={slot} AND ItemType=0 AND LowId=43384 AND HighId=43384 AND Quality=1 AND StackCount=3 AND Source=1") == 1, "persisted-first-item-exact");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity + 1} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement=65 AND ItemType=0 AND LowId=42423 AND HighId=42423 AND Quality=4 AND StackCount=1 AND Source=1") == 1, "persisted-second-item-exact");
-        Require(FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId={(int)CharacterStat.Cash}") == 1234, "persisted-cash-exact");
+        Require(FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId={(int)CharacterStat.Cash}") == expectedCash, "persisted-cash-exact");
         Require(FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId={(int)CharacterStat.MonsterData}") == 0, "persisted-morph-baseline");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM stats WHERE Type=50000 AND Instance={Owner} AND ((StatId={(int)CharacterStat.CATMesh} AND StatValue=111) OR (StatId={(int)CharacterStat.DisplayCATMesh} AND StatValue=222))") == 2, "persisted-morph-mesh-baselines");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM characters WHERE Id={Owner} AND Username='{Account}' AND Name='ConnectedFixture' AND Playfield=4582 AND X=100 AND Y=0 AND Z=100 AND HeadingW=1 AND HeadingX=0 AND HeadingY=0 AND HeadingZ=0") == 1, "persisted-character-exact");

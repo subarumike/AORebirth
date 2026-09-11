@@ -1,38 +1,24 @@
 namespace ZoneEngine_New.Core.Data
 {
     using System;
-    using MySqlConnector;
-
-    /// <summary>Transaction coordinator only; SQL remains in the existing repositories.</summary>
+    using System.Collections.Generic;
+    using System.Linq;
+    using AORebirth.Interfaces.Persistence.Characters;
+    using ZoneEngine_New.Core.Logging;
+    using static SharedCharacterPersistence;
     public sealed class MySqlInventoryMutationPersistence : IInventoryMutationPersistence
     {
-        readonly MySqlInventoryRepository _inventory;
-        readonly MySqlUploadedNanoRepository _nanos;
-        readonly string _connectionString;
-
+        readonly ICharacterPersistenceDao _persistence;
         public MySqlInventoryMutationPersistence(MySqlInventoryRepository inventory, MySqlUploadedNanoRepository nanos)
         {
-            _inventory = inventory ?? throw new ArgumentNullException(nameof(inventory));
-            _nanos = nanos ?? throw new ArgumentNullException(nameof(nanos));
-            _connectionString = MySqlConnectionSettings.GetRequiredConnectionString();
+            ArgumentNullException.ThrowIfNull(nanos);
+            _persistence = (inventory ?? throw new ArgumentNullException(nameof(inventory))).Persistence;
         }
-
-        public void Persist(InventoryMutationBatch batch)
+        public void Persist(InventoryMutationBatch batch) => Run(() => _persistence.CommitInventoryMutation(new CharacterInventoryMutationData
         {
-            ArgumentNullException.ThrowIfNull(batch);
-            if (batch.CharacterId <= 0) throw new ArgumentOutOfRangeException(nameof(batch));
-            using var connection = new MySqlConnection(_connectionString);
-            connection.Open();
-            // The empty-container retirement guard needs gap locks even if the server's
-            // session default is READ COMMITTED; keep its checked child range stable.
-            using var transaction = connection.BeginTransaction(System.Data.IsolationLevel.RepeatableRead);
-            _inventory.WritePersist(batch.Inserts, batch.Locations, connection, transaction);
-            _inventory.AssertContainersEmpty(batch.EmptyContainersBeforeRetire, connection, transaction);
-            _inventory.WriteStackCounts(batch.Stacks, connection, transaction);
-            _nanos.WriteInsertMissing(batch.CharacterId, batch.UploadedNanoIds, connection, transaction);
-            MySqlStatRepository.UpsertForCharacter(connection, transaction, batch.CharacterId, batch.FinalStats);
-            try { transaction.Commit(); }
-            catch (Exception exception) { throw new DatabaseCommitOutcomeUnknownException(exception); }
-        }
+            CharacterId = batch.CharacterId, Inserts = batch.Inserts.Select(Map).ToArray(), Locations = batch.Locations.Select(Map).ToArray(),
+            Stacks = batch.Stacks.Select(v => new ItemStackData { InstanceId = v.InstanceId, ExpectedCount = v.ExpectedCount, FinalCount = v.FinalCount }).ToArray(),
+            UploadedNanoIds = batch.UploadedNanoIds.ToArray(), FinalStats = batch.FinalStats.Select(Map).ToArray(), EmptyContainersBeforeRetire = batch.EmptyContainersBeforeRetire.ToArray()
+        }));
     }
 }

@@ -64,6 +64,14 @@ sealed class LifecyclePersistenceEvidence
         items[key] = destination.ToString(CultureInfo.InvariantCulture);
     }
 
+    public void ExpectBaseStat(CharacterStat stat, int before, int after)
+    {
+        string key = "50000/" + (int)stat + "/StatValue";
+        if (!stats.TryGetValue(key, out string? actual) || actual != before.ToString(CultureInfo.InvariantCulture))
+            throw new FixtureFailure("lifecycle-intentional-stat-source-mismatch-" + key);
+        stats[key] = after.ToString(CultureInfo.InvariantCulture);
+    }
+
     public void Verify(MySqlConnection connection, string phase, int expectedOnline)
     {
         var actual = Capture(connection, owner);
@@ -76,7 +84,7 @@ sealed class LifecyclePersistenceEvidence
         Equal(items, actual.items, phase, "items");
         string serialized = JsonSerializer.Serialize(new { Character = actual.character, Stats = actual.stats, Items = actual.items });
         string hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(serialized))).ToLowerInvariant();
-        Console.WriteLine($"CONNECTED_FULL_PERSISTENCE_{phase}=PASS SHA256={hash} STAT_ROWS={actual.stats.Count / 4} ITEM_ROWS={actual.items.Keys.Count(key => key.EndsWith("/InstanceId", StringComparison.Ordinal))} ONLINE={expectedOnline} EQUIPMENT=SEEDED_STORAGE_PRESERVED");
+        Console.WriteLine($"CONNECTED_FULL_PERSISTENCE_{phase}=PASS SHA256={hash} STAT_ROWS={actual.stats.Count / 4} ITEM_ROWS={actual.items.Keys.Count(key => key.EndsWith("/InstanceId", StringComparison.Ordinal))} ONLINE={expectedOnline} EQUIPMENT=SEEDED_AND_ACTUAL_GAMEPLAY_ROWS_PRESERVED");
     }
 
     static void Equal(SortedDictionary<string, string?> expected, SortedDictionary<string, string?> actual, string phase, string kind)

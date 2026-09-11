@@ -1,26 +1,12 @@
-# Current Task
+# Current task
 
-## Active
+DAO-owned character, stats and inventory persistence, in progress.
 
-No implementation work remains in the authorized DAO integration milestone.
-`codex/dao-stack-cutover-integration-001` is locally accepted at source
-`c47f463d375664d2d7594451b0b8204d9eac6f27`: exact Windows/all mandatory gates,
-DAO suites, connected/schema/restart and Linux publication pass. Linux-host and
-official-client acceptance for this integration remain NOT RUN. Full hydration
-and existing saving are preserved; character/stat/inventory save conversion is
-outside this milestone. No push, merge back, deployment or production changes
-were performed. Final receipt: `docs/reports/DAO_STACK_CUTOVER_INTEGRATION.md`.
-
-Secure LoginEngine to NewEngine admission and
-retail-compatible server-authorized zone redirect are complete on
-`codex/newengine-production-cutover-001`. Exact-source acceptance and the
-remaining production gates are recorded in:
-
-- `docs/reports/NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`
-- `docs/reports/NEWENGINE_ZONE_HANDOFF_SECURITY.md`
-
-The branch is ready for an isolated staging deployment. Master, the other
-developer's branch, production, schemas and the AO client remain unchanged.
-Official-client acceptance against the AORebirth candidate, deployment identity
-and shared handoff-directory verification, database backup/restore readiness,
-Legacy extraction and the remaining DAO conversion are the next cutover work.
+- Branch: `codex/character-inventory-persistence-dao-001`.
+- Worktree: `tools-temp/character-inventory-dao001`.
+- Starting source: `af7e2357544425b630014d29e1c3c4e3dfcce5d8`; accepted c47f463 is an ancestor, intervening changes are receipt documents only.
+- Baseline exact-source Windows acceptance and all 12 mandatory stages: PASS.
+- Shared DAO now owns NewEngine full character/stat/item storage and existing compound nano/item/credit transactions. Gameplay, hydration validation, session ownership and mission authority stay in the runtime.
+- In progress: real MySQL fault tests, actual loot/equipment operations, connected zoning/reconnect/restart and exact-source Windows/Linux publication acceptance.
+- No schema change, unsafe SetGM use, client launch, production operation, merge, deployment or push authorized. Local commits only.
+- Report: `docs/reports/CHARACTER_INVENTORY_PERSISTENCE_DAO.md`.
