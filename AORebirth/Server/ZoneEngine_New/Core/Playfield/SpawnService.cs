@@ -335,6 +335,9 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(hydration);
 
+            // Validate before constructing a player, acquiring Online ownership or touching inventory.
+            CharacterHydrationValidator.RequireValid(hydration);
+
             CharacterRecord character = hydration.Character;
             int characterId = character.Id;
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(characterId);
@@ -355,14 +358,17 @@ namespace ZoneEngine_New.Core.Playfield
                 _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
                 player.Rebase();
                 PlayerSpawnPayloadValidator.RequireValid(player);
+                PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
+                player.NanoRuntime = _playfieldManager.Nanos;
+                if (!_playfieldManager.Nanos.AttachPlayer(player))
+                    throw new InvalidOperationException("Active nano hydration failed; durable state was not replaced.");
+                PlayerSpawnPayloadValidator.RequireValid(player);
+                PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
                 _playfieldManager.RegisterPlayer(player);
                 _registry.Register(player);
                 registered = true;
                 _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
                 player.EnterOnline(session);
-                player.NanoRuntime = _playfieldManager.Nanos;
-                if (!_playfieldManager.Nanos.AttachPlayer(player))
-                    throw new InvalidOperationException("Active nano hydration failed; durable state was not replaced.");
                 player.AttachOnlineOwnership(ownership);
                 ownership = null;
             }
@@ -436,12 +442,14 @@ namespace ZoneEngine_New.Core.Playfield
 
             _playfieldManager.Teams.AttachPlayer(player);
             SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
+            FullCharacterMessage full = player.BuildFullCharacterMessage();
+            PlayerSpawnPayloadValidator.RequireValidMessages(spawn, full);
             ScfuSendLog.Write(spawn);
             session.Send(spawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
             SendRetailWorldEntryReadyBlock(session, player);
-            session.Send(player.BuildFullCharacterMessage());
+            session.Send(full);
             SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
 
@@ -502,6 +510,9 @@ namespace ZoneEngine_New.Core.Playfield
                 return;
             }
 
+            // Reject a damaged retained aggregate before stealing or publishing session ownership.
+            PlayerSpawnPayloadValidator.RequireValid(player);
+            PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
             StealSessionIfNeeded(player, session);
             player.EnterOnline(session);
 
@@ -510,12 +521,14 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerSpawnPayloadValidator.RequireValid(player);
 
             SimpleCharFullUpdateMessage reconnectSpawn = player.BuildSpawnMessage();
+            FullCharacterMessage reconnectFull = player.BuildFullCharacterMessage();
+            PlayerSpawnPayloadValidator.RequireValidMessages(reconnectSpawn, reconnectFull);
             ScfuSendLog.Write(reconnectSpawn);
             session.Send(reconnectSpawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
             SendRetailWorldEntryReadyBlock(session, player);
-            session.Send(player.BuildFullCharacterMessage());
+            session.Send(reconnectFull);
             SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
 

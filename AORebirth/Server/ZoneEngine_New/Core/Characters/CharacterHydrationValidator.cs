@@ -127,6 +127,13 @@ namespace ZoneEngine_New.Core.Characters
             return new CharacterHydrationValidationResult(errors);
         }
 
+        public static void RequireValid(CharacterHydrationResult hydration)
+        {
+            CharacterHydrationValidationResult result = Validate(hydration);
+            if (!result.IsValid)
+                throw new InvalidOperationException("Character spawn aggregate rejected: " + string.Join(",", result.Errors));
+        }
+
         private static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
 
         private static void Positive(Dictionary<CharacterStat, int> stats, CharacterStat stat, List<string> errors)

@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Entities
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Threading;
@@ -702,6 +703,9 @@ namespace ZoneEngine_New.Core.Entities
 
         static GameTuple<int, uint>[] BuildFullCharacterIntStats(StatCollection stats, CharacterStat[] ids)
         {
+            // These are counted (stat id, value) arrays. Absent optional stats are omitted;
+            // an explicit stored zero remains distinct from an absent value.
+            ids = ids.Where(id => stats.TryGetValue(id, out _)).ToArray();
             var tuples = new GameTuple<int, uint>[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
@@ -709,7 +713,7 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<int, uint>
                 {
                     Value1 = (int)id,
-                    Value2 = (uint)stats.GetOrZero(id)
+                    Value2 = (uint)RequireWireStat(stats, id)
                 };
             }
 
@@ -718,6 +722,7 @@ namespace ZoneEngine_New.Core.Entities
 
         static GameTuple<byte, byte>[] BuildFullCharacterByteStats(StatCollection stats, CharacterStat[] ids)
         {
+            ids = ids.Where(id => stats.TryGetValue(id, out _)).ToArray();
             var tuples = new GameTuple<byte, byte>[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
@@ -725,7 +730,7 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<byte, byte>
                 {
                     Value1 = (byte)id,
-                    Value2 = (byte)stats.GetOrZero(id)
+                    Value2 = checked((byte)RequireWireStat(stats, id))
                 };
             }
 
@@ -734,6 +739,7 @@ namespace ZoneEngine_New.Core.Entities
 
         static GameTuple<byte, short>[] BuildFullCharacterShortStats(StatCollection stats, CharacterStat[] ids)
         {
+            ids = ids.Where(id => stats.TryGetValue(id, out _)).ToArray();
             var tuples = new GameTuple<byte, short>[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
@@ -741,11 +747,19 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<byte, short>
                 {
                     Value1 = (byte)id,
-                    Value2 = (short)stats.GetOrZero(id)
+                    Value2 = checked((short)RequireWireStat(stats, id))
                 };
             }
 
             return tuples;
+        }
+
+        static int RequireWireStat(StatCollection stats, CharacterStat id)
+        {
+            int value = stats.Get(id);
+            if (StatCollection.IsUnset(value))
+                throw new InvalidOperationException("Unset FullCharacter stat: " + id);
+            return value;
         }
 
         void LogFullCharacterInventory(FullCharacterMessage message)

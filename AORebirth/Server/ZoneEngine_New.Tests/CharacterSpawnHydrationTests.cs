@@ -4,17 +4,21 @@ namespace ZoneEngine_New.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.IO;
     using System.Runtime.CompilerServices;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
+    using SmokeLounge.AOtomation.Messaging.Serialization;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Network;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -30,6 +34,14 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(validation.Errors.Contains("health-exceeds-max"));
             Assert.IsTrue(((CharacterFlags)(int)CharacterStat.Unset).HasFlag(CharacterFlags.Tower));
             Assert.AreEqual(-981, 19 - 1000);
+            // Exact saved staging rows: pre-hydration-553981c8-stats.sql (23 rows).
+            // Raw historical builder output is evidence; it must never cross publication.
+            var malformed = PlayerFrom(IncompleteReportedHydration());
+            var scfu = malformed.BuildSpawnMessage();
+            Assert.AreEqual((CharacterFlags)(int)CharacterStat.Unset, scfu.CharacterFlags);
+            Assert.AreEqual(-981, scfu.HealthDamage);
+            Assert.ThrowsException<InvalidOperationException>(() =>
+                PlayerSpawnPayloadValidator.RequireValidMessages(scfu, malformed.BuildFullCharacterMessage()));
         }
 
         [TestMethod]
@@ -41,6 +53,7 @@ namespace ZoneEngine_New.Tests
             PlayerSpawnPayloadValidator.RequireValid(player);
             SimpleCharFullUpdateMessage scfu = player.BuildSpawnMessage();
             FullCharacterMessage full = player.BuildFullCharacterMessage();
+            PlayerSpawnPayloadValidator.RequireValidMessages(scfu, full);
 
             Assert.AreEqual(0, (int)scfu.CharacterFlags & (int)CharacterFlags.Tower);
             Assert.AreNotEqual((int)CharacterStat.Unset, (int)scfu.CharacterFlags);
@@ -112,6 +125,132 @@ namespace ZoneEngine_New.Tests
             CharacterHydrationResult tower = With(source, CharacterStat.Flags,
                 Stat(source, CharacterStat.Flags) | (int)CharacterFlags.Tower);
             Assert.IsTrue(CharacterHydrationValidator.Validate(tower).Errors.Contains("player-flags-tower"));
+        }
+
+        [TestMethod]
+        public void Every_missing_required_field_stops_actual_spawn_before_any_owner_or_wire_operation()
+        {
+            // No dependencies are initialized: reaching DAO/world/inventory means the guard failed.
+            var service = (SpawnService)RuntimeHelpers.GetUninitializedObject(typeof(SpawnService));
+            foreach (CharacterStat stat in CharacterHydrationValidator.RequiredSpawnStats)
+            {
+                var session = new RejectingSession();
+                var error = Assert.ThrowsException<InvalidOperationException>(() =>
+                    service.SpawnPlayer(session, Without(ValidHydration(), stat)));
+                StringAssert.Contains(error.Message, "Character spawn aggregate rejected:");
+                Assert.IsNull(session.Player);
+                Assert.AreEqual(SessionState.Loading, session.State);
+            }
+        }
+
+        [TestMethod]
+        public void Sentinel_in_every_persisted_stat_fails_the_actual_publication_boundary()
+        {
+            var service = (SpawnService)RuntimeHelpers.GetUninitializedObject(typeof(SpawnService));
+            foreach (CharacterStat stat in CharacterHydrationValidator.RequiredSpawnStats)
+                Assert.ThrowsException<InvalidOperationException>(() => service.SpawnPlayer(new RejectingSession(),
+                    With(ValidHydration(), stat, (int)CharacterStat.Unset)));
+        }
+
+        [TestMethod]
+        public void Wire_validator_rejects_optional_sentinels_and_conflicting_duplicate_stats()
+        {
+            Player player = PlayerFrom(ValidHydration());
+            var full = player.BuildFullCharacterMessage();
+            full.Stats1 = full.Stats1.Concat(new[] { new GameTuple<int, uint>
+                { Value1 = 10001, Value2 = (uint)(int)CharacterStat.Unset } }).ToArray();
+            Assert.ThrowsException<InvalidOperationException>(() =>
+                PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), full));
+            full = player.BuildFullCharacterMessage();
+            full.Stats2 = full.Stats2.Concat(new[] { new GameTuple<int, uint>
+                { Value1 = (int)CharacterStat.Health, Value2 = 999 } }).ToArray();
+            Assert.ThrowsException<InvalidOperationException>(() =>
+                PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), full));
+        }
+
+        [TestMethod]
+        public void Wire_validator_rejects_sentinel_mesh_and_tower_conditional_payload()
+        {
+            Player player = PlayerFrom(ValidHydration());
+            var spawn = player.BuildSpawnMessage();
+            spawn.Meshes[0].Id = (uint)(int)CharacterStat.Unset;
+            Assert.ThrowsException<InvalidOperationException>(() =>
+                PlayerSpawnPayloadValidator.RequireValidMessages(spawn, player.BuildFullCharacterMessage()));
+            spawn = player.BuildSpawnMessage();
+            spawn.CharacterFlags |= CharacterFlags.Tower;
+            Assert.ThrowsException<InvalidOperationException>(() =>
+                PlayerSpawnPayloadValidator.RequireValidMessages(spawn, player.BuildFullCharacterMessage()));
+        }
+
+        [TestMethod]
+        public void Visible_names_use_the_loaded_character_names_in_the_conditional_pc_block()
+        {
+            Player player = PlayerFrom(With(ValidHydration(), CharacterStat.Flags,
+                0x00081241 | (int)CharacterFlags.HasVisibleName));
+            player.FirstName = "PersistedFirst";
+            player.LastName = "PersistedLast";
+            var spawn = player.BuildSpawnMessage();
+            var pc = (SimplePcInfo)spawn.CharacterInfo;
+            Assert.AreEqual("PersistedFirst", pc.FirstName);
+            Assert.AreEqual("PersistedLast", pc.LastName);
+            PlayerSpawnPayloadValidator.RequireValidMessages(spawn, player.BuildFullCharacterMessage());
+        }
+
+        [TestMethod]
+        public void Large_health_uses_existing_scfu_presentation_without_changing_exact_fullcharacter_values()
+        {
+            Player player = PlayerFrom(With(With(ValidHydration(), CharacterStat.MaxHealth, 100000), CharacterStat.Health, 50000));
+            var spawn = player.BuildSpawnMessage();
+            Assert.AreEqual(65535, spawn.Health);
+            Assert.AreEqual(32768, spawn.HealthDamage);
+            PlayerSpawnPayloadValidator.RequireValidMessages(spawn, player.BuildFullCharacterMessage());
+        }
+
+        [TestMethod]
+        public void Optional_fullcharacter_stat_absence_is_distinct_from_stored_zero_and_sentinel()
+        {
+            Player player = PlayerFrom(ValidHydration());
+            Assert.IsFalse(player.BuildFullCharacterMessage().Stats1.Concat(player.BuildFullCharacterMessage().Stats2)
+                .Any(row => row.Value1 == (int)CharacterStat.Cash));
+            player.Stats.Set(CharacterStat.Cash, 0);
+            Assert.AreEqual(0u, RequiredFullStat(player.BuildFullCharacterMessage(), CharacterStat.Cash));
+            player.Stats.Set(CharacterStat.Cash, (int)CharacterStat.Unset);
+            Assert.ThrowsException<InvalidOperationException>(() => player.BuildFullCharacterMessage());
+        }
+
+        [TestMethod]
+        public void Fullcharacter_and_scfu_codec_roundtrip_preserves_semantic_contract()
+        {
+            Player player = PlayerFrom(ValidHydration());
+            var serializer = new MessageSerializer();
+            T RoundTrip<T>(T body) where T : MessageBody
+            {
+                using var stream = new MemoryStream();
+                serializer.Serialize(stream, new Message { Header = new Header
+                    { MessageId = 0xdfdf, PacketType = body.PacketType, Unknown = 1,
+                      Sender = 4582, Receiver = player.Identity.Instance }, Body = body });
+                stream.Position = 0;
+                return (T)serializer.Deserialize(stream).Body;
+            }
+            var spawn = RoundTrip(player.BuildSpawnMessage());
+            var full = RoundTrip(player.BuildFullCharacterMessage());
+            Assert.IsTrue(spawn.TailFullyDecoded);
+            PlayerSpawnPayloadValidator.RequireValidMessages(spawn, full);
+        }
+
+        private sealed class RejectingSession : IZoneSession
+        {
+            public SessionState State { get; set; } = SessionState.Loading;
+            public Player? Player => null;
+            public void BindPlayer(Player player) => throw new AssertFailedException("Player published before validation");
+            public void UnbindPlayer() => throw new AssertFailedException("Unexpected session mutation");
+            public void TransferToPlayfield(Playfield destination, Vector3 landing) => throw new AssertFailedException();
+            public void Send(byte[] packet) => throw new AssertFailedException("Wire before validation");
+            public void Send(Message message) => throw new AssertFailedException("Wire before validation");
+            public void Send(MessageBody body) => throw new AssertFailedException("Wire before validation");
+            public void Send(MessageBody body, int sender, int receiver) => throw new AssertFailedException("Wire before validation");
+            public void SendInitiateCompression() => throw new AssertFailedException();
+            public void Close() => State = SessionState.Closed;
         }
 
         private static CharacterHydrationResult ValidHydration()
