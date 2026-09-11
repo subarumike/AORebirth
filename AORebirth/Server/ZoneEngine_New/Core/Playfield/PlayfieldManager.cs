@@ -23,6 +23,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Dialogue;
+    using ZoneEngine_New.Core.WorldSimulation;
     using ZoneEngine.Core.Missions;
     using AORebirth.Interfaces.Persistence.Missions;
 
@@ -185,7 +186,7 @@ namespace ZoneEngine_New.Core.Playfield
             };
 
             Playfield created;
-            if (_gameData.GetPlayfieldMetaData(playfieldId) != null)
+            if (RequiresWorldSimulation(_gameData, playfieldId))
             {
                 created = new ACGPlayfield(
                     identity,
@@ -247,6 +248,25 @@ namespace ZoneEngine_New.Core.Playfield
 
             created.StartHeartbeat();
             return created;
+        }
+
+        /// <summary>
+        /// Outdoor playfields carry metadata, while many retail interiors only carry Dynels.dat.
+        /// An interior still needs the world simulation when it contains a portal or is the
+        /// destination of a return-recording TeleportProxy; otherwise its exit boundary can never
+        /// initiate the server-side area change.
+        /// </summary>
+        internal static bool RequiresWorldSimulation(IGameData gameData, int playfieldId)
+        {
+            ArgumentNullException.ThrowIfNull(gameData);
+            if (gameData.GetPlayfieldMetaData(playfieldId) != null
+                || gameData.GetExitProxyDoorInstances(playfieldId).Count > 0)
+            {
+                return true;
+            }
+
+            var dynels = gameData.GetPlayfieldGeometry(playfieldId).Dynels?.Dynels;
+            return dynels != null && dynels.Any(d => PortalDoorLandingResolver.TryReadPortal(d, out _));
         }
 
         public bool TryGet(int playfieldId, out Playfield? playfield)
