@@ -8,7 +8,8 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(IsolatedMissionSources)' == 'true'">
-    <DefineConstants>$(DefineConstants);MISSION_DAO_ISOLATED_TESTS</DefineConstants>
+    <!-- Use the existing NewEngine ownership-guard surface; the isolated host has no legacy CharacterDao. -->
+    <DefineConstants>$(DefineConstants);MISSION_DAO_ISOLATED_TESTS;AOREBIRTH_WIN_NET10</DefineConstants>
   </PropertyGroup>
   <ItemGroup Condition="'$(IsolatedMissionSources)' != 'true'">
     <ProjectReference Include="../../LinuxBuild/Projects/AORebirth.Database.Linux.csproj" />
@@ -24,6 +25,7 @@
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/NewCharacterStartAreaSelectionDao.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Enums/StatIds.cs" />
     <PackageReference Include="Dapper" Version="2.1.79" />
   </ItemGroup>

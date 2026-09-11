@@ -435,7 +435,9 @@ namespace AORebirth.Tools.MissionDaoValidation
         private static MySqlConnection WaitForMySql(string connectionString)
         {
             Exception last = null;
-            for (int attempt = 0; attempt < 60; attempt++)
+            // Cold disposable MySQL initialization can outlast the original 30-second wait.
+            var startup = Stopwatch.StartNew();
+            while (startup.Elapsed < TimeSpan.FromSeconds(120))
             {
                 try
                 {
