@@ -55,11 +55,13 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
         private readonly Lock _exitProxySync = new();
         private Dictionary<int, int[]>? _exitProxyDoorsByPlayfield;
+        private readonly TeleportDestinationCatalog? _teleportDestinations;
 
-        public GameDataStore(IZoneLogger logger)
+        public GameDataStore(IZoneLogger logger, TeleportDestinationCatalog? teleportDestinations = null)
         {
             ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
+            _teleportDestinations = teleportDestinations;
 
             RootPath = Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
@@ -239,6 +241,7 @@ namespace ZoneEngine_New.Core.GameData
                         RootPath,
                         GameDataPaths.PlayfieldDynelsRelativePath(sourcePlayfieldId));
                     PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(dynelsPath);
+                    _teleportDestinations?.Apply(sourcePlayfieldId, dynels);
                     ExitProxyDoorCatalog.CollectFromDynels(dynels, collected);
                 }
 
@@ -739,6 +742,7 @@ namespace ZoneEngine_New.Core.GameData
                 Path.Combine(RootPath, GameDataPaths.PlayfieldWallsRelativePath(playfieldId)));
             PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(
                 Path.Combine(RootPath, GameDataPaths.PlayfieldDynelsRelativePath(playfieldId)));
+            _teleportDestinations?.Apply(playfieldId, dynels);
             PlayfieldDoors? doors = TryDeserializeRdbObject<PlayfieldDoors>(
                 Path.Combine(RootPath, GameDataPaths.PlayfieldDoorsRelativePath(playfieldId)));
 

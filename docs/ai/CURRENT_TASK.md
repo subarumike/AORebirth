@@ -2,7 +2,12 @@
 
 ## Active
 
-No active implementation task. Secure LoginEngine to NewEngine admission and
+Active: repair local NewEngine building-door routing. The existing teleports DAO
+overrides are now applied to portal landings and reverse-exit baking. Fair Trade
+and the implant shop require official-client entrance/exit acceptance after
+deployment. See `docs/reports/NEWENGINE_INTERIOR_DOOR_ROUTING.md`.
+
+Secure LoginEngine to NewEngine admission and
 retail-compatible server-authorized zone redirect are complete on
 `codex/newengine-production-cutover-001`. Exact-source acceptance and the
 remaining production gates are recorded in:

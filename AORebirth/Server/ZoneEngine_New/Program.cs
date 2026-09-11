@@ -174,6 +174,16 @@ namespace ZoneEngine_New
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();
             services.AddSingleton<IItemBuilder, ItemBuilder>();
+            services.AddSingleton(provider =>
+            {
+                using var connection = new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString());
+                connection.Open();
+                var catalog = new TeleportDestinationCatalog(
+                    AORebirth.Database.Dao.TeleportRoutingDao.ReadSnapshot(connection),
+                    provider.GetRequiredService<IZoneLogger>().Warn);
+                provider.GetRequiredService<IZoneLogger>().Info($"Teleport DAO routing snapshot routes={catalog.Count}");
+                return catalog;
+            });
             services.AddSingleton<IGameData, GameDataStore>();
             services.AddSingleton<HashItemMinter>();
             services.AddSingleton<PlayerHydrator>();
