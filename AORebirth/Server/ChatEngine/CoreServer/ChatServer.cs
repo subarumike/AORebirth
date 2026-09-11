@@ -143,10 +143,11 @@ namespace ChatEngine.CoreServer
 
         internal bool RegisterClient(Client client)
         {
-            Action markOnline = client.IsBot
-                ? (Action)(() => CharacterDao.Instance.SetOnline(unchecked((int)client.Character.CharacterId)))
+            Func<IDisposable> acquireOwnership = client.IsBot
+                ? (Func<IDisposable>)(() => CharacterOnlineOwnershipGuard.AcquireZoneOwnership(
+                    unchecked((int)client.Character.CharacterId), CharacterDao.Instance.SetOnline))
                 : null;
-            return this.clientOwnership.Register(client.Character.CharacterId, client, markOnline);
+            return this.clientOwnership.Register(client.Character.CharacterId, client, acquireOwnership);
         }
 
         #endregion

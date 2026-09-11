@@ -13,7 +13,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
         public static void Run(string repositoryRoot)
         {
             HealthyZeroRowsContinuesWithoutUpdate();
-            ZeroRowsWithLoginEngineActiveContinues();
+            LoginEngineGuardBlocksPendingHandoffWithoutOpeningDatabase();
+            OnlineOwnerProcessNamesAreRecognized();
             StaleRowsAreLoggedAndClearedExactly();
             ProcessGuardBlocksWithoutMutation();
             ListenerGuardBlocksWithoutMutation();
@@ -43,18 +44,37 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=YES"), "healthy startup was not allowed");
         }
 
-        private static void ZeroRowsWithLoginEngineActiveContinues()
+        private static void LoginEngineGuardBlocksPendingHandoffWithoutOpeningDatabase()
         {
-            var store = new FakeStore(new FakeCharacter[0]);
-            var runtime = new FakeRuntime(store) { LoginEngineActive = true };
+            foreach (bool pendingHandoff in new[] { false, true })
+            {
+                var store = new FakeStore(pendingHandoff
+                    ? new[] { new FakeCharacter(42, "PendingHandoff", 1) }
+                    : new FakeCharacter[0]);
+                var runtime = new FakeRuntime(store) { LoginEngineActive = true };
 
-            int result = StaleOnlineRecovery.Execute(runtime, 7501);
+                int result = StaleOnlineRecovery.Execute(runtime, 7501);
 
-            Require(runtime.LoginEngineActive, "LoginEngine-active fixture state was not established");
-            Require(result == 0, "LoginEngine-active zero-row recovery blocked ZoneEngine startup");
-            Require(store.ClearCalls == 0, "LoginEngine-active zero-row recovery performed an update");
-            Require(runtime.AuditContains("processDetected=NO"), "LoginEngine was misclassified as a competing ZoneEngine");
-            Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=YES"), "LoginEngine-active startup did not reach database validation");
+                Require(result != 0, "LoginEngine-active recovery did not fail closed");
+                Require(runtime.OpenStoreCalls == 0, "LoginEngine-active recovery opened the database");
+                Require(store.ClearCalls == 0, "LoginEngine-active recovery performed an update");
+                Require(!pendingHandoff || store.Characters[0].Online == 1, "pending login handoff lost online ownership");
+                Require(runtime.AuditContains("processDetected=YES"), "LoginEngine ownership guard was not logged");
+                Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=NO"), "LoginEngine-active recovery allowed validation");
+            }
+        }
+
+        private static void OnlineOwnerProcessNamesAreRecognized()
+        {
+            var runtimeType = typeof(StaleOnlineRecovery).Assembly.GetType("ZoneEngine.SystemStaleOnlineRecoveryRuntime", true);
+            var predicate = runtimeType.GetMethod("IsOnlineOwnerProcessName",
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Require(predicate != null, "production process-name ownership predicate is missing");
+            foreach (string processName in new[] { "ZoneEngine", "LoginEngine", "loginengine", "LOGINENGINE" })
+            {
+                Require((bool)predicate.Invoke(null, new object[] { processName }), "online owner process was not guarded: " + processName);
+            }
+            Require(!(bool)predicate.Invoke(null, new object[] { "UnrelatedProcess" }), "unrelated process was treated as an online owner");
         }
 
         private static void StaleRowsAreLoggedAndClearedExactly()
@@ -347,7 +367,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
             public bool IsOtherZoneEngineProcessRunning()
             {
-                return this.ProcessDetected;
+                return this.ProcessDetected || this.LoginEngineActive;
             }
 
             public bool IsPortListening(int port)

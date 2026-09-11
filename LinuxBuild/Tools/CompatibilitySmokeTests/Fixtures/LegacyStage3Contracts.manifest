@@ -61,6 +61,7 @@ api|type.serializable-attribute|false
 api|type.base|System.Object
 api|type.method|public static AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult TryClearLoginOwnership(System.Int32 characterId)
 api|type.method|public static AORebirth.Database.Dao.LoginOwnedOnlineCleanupResult TryClearLoginOwnership(System.Int32 characterId,System.Action<System.Int32> setOffline)
+api|type.method|public static System.IDisposable AcquireStaleRecoveryOwnership(System.Collections.Generic.IEnumerable<System.Int32> characterIds)
 api|type.method|public static System.IDisposable AcquireZoneOwnership(System.Int32 characterId)
 api|type.method|public static System.IDisposable AcquireZoneOwnership(System.Int32 characterId,System.Action<System.Int32> setOnline)
 api|type.end|AORebirth.Database.Dao.CharacterOnlineOwnershipGuard
@@ -708,8 +709,44 @@ api|type.kind|class
 api|type.modifiers|abstract,sealed
 api|type.serializable-attribute|false
 api|type.base|System.Object
+api|type.method|public static AORebirth.Interfaces.Persistence.Accounts.IAccountDao CreateAccountDao()
+api|type.method|public static AORebirth.Interfaces.Persistence.Characters.ICharacterDao CreateCharacterDao()
 api|type.method|public static AORebirth.Interfaces.Persistence.Missions.IMissionDao CreateMissionDao()
 api|type.end|AORebirth.Database.DatabaseDaoFactory
+api|type.begin|AORebirth.Database.Domain.Accounts.MySqlAccountDao
+api|type.kind|class
+api|type.modifiers|sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|AORebirth.Interfaces.Persistence.Accounts.IAccountDao
+api|type.constructor|public instance .ctor()
+api|type.constructor|public instance .ctor(System.Func<System.Data.IDbConnection> connectionFactory)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Accounts.GameAccountAuthenticationData LoadForAuthentication(System.String username)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Accounts.GameAccountData LoadByUsername(System.String username)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupResult LoadByCharacterId(System.Int32 characterId)
+api|type.method|public instance virtual final System.Boolean UsernameExists(System.String username)
+api|type.method|public instance virtual final System.Int32 ChangePassword(System.String username,System.String passwordHash)
+api|type.method|public instance virtual final System.Int32 CreateGameAccount(AORebirth.Interfaces.Persistence.Accounts.NewGameAccountData account)
+api|type.method|public instance virtual final System.Int32 SetExpansions(System.String username,System.Int32 expansions)
+api|type.method|public instance virtual final System.Int64 CountRegisteredAccounts()
+api|type.end|AORebirth.Database.Domain.Accounts.MySqlAccountDao
+api|type.begin|AORebirth.Database.Domain.Characters.MySqlCharacterDao
+api|type.kind|class
+api|type.modifiers|sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|AORebirth.Interfaces.Persistence.Characters.ICharacterDao
+api|type.constructor|public instance .ctor()
+api|type.constructor|public instance .ctor(System.Func<System.Data.IDbConnection> connectionFactory)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData LoadById(System.Int32 characterId)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData LoadByName(System.String name)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Characters.StaleOnlineRecoveryData RecoverStaleOnline(System.String expectedDatabase)
+api|type.method|public instance virtual final System.Boolean IsOwnedByAccount(System.String accountUsername,System.UInt32 characterId)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData> ListForAccount(System.String accountUsername)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData> ListLoggedIn()
+api|type.method|public instance virtual final System.Int32 MarkOffline(System.Int32 characterId)
+api|type.method|public instance virtual final System.Int32 MarkOnline(System.Int32 characterId)
+api|type.end|AORebirth.Database.Domain.Characters.MySqlCharacterDao
 api|type.begin|AORebirth.Database.Domain.Missions.MySqlMissionDao
 api|type.kind|class
 api|type.modifiers|sealed

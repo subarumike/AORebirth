@@ -34,7 +34,6 @@ namespace AORebirth.Database.Dao
     #region Usings ...
 
     using System;
-    using System.Collections.Generic;
     using System.Data;
     using AORebirth.Database.Entities;
     using AORebirth.Interfaces.Persistence.Accounts;
@@ -97,10 +96,11 @@ namespace AORebirth.Database.Dao
         /// </param>
         public void LogoffChars(string user)
         {
-            IEnumerable<DBCharacter> characters = CharacterDao.Instance.GetAllForUser(user); // LOL
-            foreach (DBCharacter character in characters)
+            var characters = DatabaseDaoFactory.CreateCharacterDao();
+            foreach (var character in characters.ListForAccount(user))
             {
-                CharacterDao.Instance.SetOffline(character.Id);
+                CharacterOnlineOwnershipGuard.TryClearLoginOwnership(
+                    character.CharacterId, id => characters.MarkOffline(id));
             }
         }
 

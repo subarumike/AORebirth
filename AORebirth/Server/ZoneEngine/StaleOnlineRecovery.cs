@@ -23,6 +23,8 @@ namespace ZoneEngine
 
         IDisposable AcquireProcessLock();
 
+        // Retains the existing runtime contract name; also guards LoginEngine because
+        // character selection owns Online while its zone handoff is pending.
         bool IsOtherZoneEngineProcessRunning();
 
         bool IsPortListening(int port);
@@ -234,7 +236,7 @@ namespace ZoneEngine
 
                     try
                     {
-                        if (string.Equals(process.ProcessName, "ZoneEngine", StringComparison.OrdinalIgnoreCase))
+                        if (IsOnlineOwnerProcessName(process.ProcessName))
                         {
                             return true;
                         }
@@ -250,6 +252,12 @@ namespace ZoneEngine
             }
 
             return false;
+        }
+
+        internal static bool IsOnlineOwnerProcessName(string processName)
+        {
+            return string.Equals(processName, "ZoneEngine", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(processName, "LoginEngine", StringComparison.OrdinalIgnoreCase);
         }
 
         public bool IsPortListening(int port)

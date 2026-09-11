@@ -115,9 +115,10 @@ recorded after execution.
 | Chat `LftSearch` | `LoadById` | Persisted playfield lookup only |
 | `CharacterDao.IsOnline` | `LoadById` | Missing/null online value remains zero |
 | `CharacterDao.SetOnline` / `SetOffline` | `MarkOnline` / `MarkOffline` | Existing caller contracts and ownership callbacks |
+| `LoginDataDao.LogoffChars` console command | `ListForAccount` and guarded `MarkOffline` | Directory-only enumeration; active zone/bot leases prevent administrative offline cleanup |
 | NewEngine `MySqlCharacterRepository.SetOnline` / `SetOffline` | `MarkOnline` / `MarkOffline` | Missing/affected-row failure stays fatal; ownership guards retained |
 | NewEngine `ZoneAdmissionGate.Claim` | `LoadById` for current account owner | Existing ticket, endpoint, expiry and replay checks before full hydration |
-| Legacy administrative `StaleOnlineRecovery.Execute` | `RecoverStaleOnline` | Existing exact database/process/port guards plus captured-character ownership fencing |
+| Legacy administrative `StaleOnlineRecovery.Execute` | `RecoverStaleOnline` | Exact database/port guards, LoginEngine and ZoneEngine process refusal, captured-character ownership fencing |
 
 Every migrated operation has one DAO persistence path. There is no direct-SQL
 fallback. Internal account adapter overloads exist solely to exercise injected
@@ -134,8 +135,19 @@ and their online column updates remain part of the unchanged saving boundary.
 Chat session registration/disconnect now serialize ownership checks and writes.
 A delayed callback cannot remove its replacement or clear that replacement's
 online flag. A retired connection cannot register late. Current Chat cleanup
-also honors the existing cross-process ZoneEngine ownership guard. These rules
-do not change credential validation. Four focused Chat ownership tests pass.
+also honors the existing cross-process ZoneEngine ownership guard. Registered
+bots additionally retain that existing ownership lease for their session lifetime,
+so an administrative recovery process cannot mistake an active bot for a stale
+character. These rules do not change credential validation.
+
+LoginEngine selection also marks a character online before sending ZoneInfo,
+while its handoff is pending. Administrative stale recovery now refuses to open
+the database while LoginEngine is running, even if there are currently zero
+online rows. This deliberately requires stopping LoginEngine before that
+maintenance operation; it avoids clearing a valid pending handoff without
+inventing a new handoff protocol. As before, maintenance requires exclusive
+startup/process authority: do not start LoginEngine during recovery. World and
+bot sessions are additionally protected by per-character ownership leases.
 
 ## Fresh baseline lifecycle failures and fixture corrections
 
@@ -236,7 +248,24 @@ commit `5d663b7a`, deployment and arbitrary transport-loss recovery are outside
 this delivery. Linux-host runtime acceptance must remain NOT RUN unless executed
 through its established workflow; Windows publication alone cannot supply it.
 
+The existing `LoginDataDao.SetGM` helper is outside `IAccountDao` and remains
+unchanged. Its SQL updates `login.GM` without a username predicate, despite
+accepting a username argument (`LoginDataDao.cs`, original line 119). The console
+command therefore remains a separate unsafe administrative path requiring a
+scoped repair before use; this integration does not claim that command is safe.
+
 ## Exact-source acceptance history
+
+Before the final source commit, the ownership review additionally repaired bot
+lifetime leases, repeated Chat character selection and guarded account console
+logoff. The full NewEngine suite passes 534 tests, including eight Chat ownership
+tests (`newengine-bot-final.log`). The Account suite passes 303 checks, including
+real-database guarded account logoff and propagated provider failures
+(`account-logoff-ownership-validation.log`), with fixture cleanup PASS. The final
+normal Windows build and rebuilt Stage 5 contracts pass
+(`ownership-windows-build.log`, `stage5-final-ownership-verify.log`). Cutover
+inventory regeneration/check retains 93 edges and 100 scan rows without another
+generated JSON delta. These logs are under `build-verify/dao-stack/`.
 
 The first exact-source attempt at `b8e8d227bddc4af210e70a8ae14a92973e43e0b3`
 verified the SHA, clean entry tree and normal Windows build, then failed public
@@ -250,6 +279,18 @@ types, with no removals or changes to existing API declarations. Legacy public
 contract verification and Linux compatibility smoke pass. Evidence:
 `build-verify/dao-stack/stage2-manifest-write.log` and
 `build-verify/dao-stack/stage2-manifest-verify.log`.
+
+The second attempt at `ef3ac3dfb91cb851731b042087cf40619b1ec62c`
+passed the same SHA/build checks and Stage 2, then failed Stage 3's older DAO
+contract manifest. The mandatory suite was again not reached. Its receipt is
+`build-verify/dao-stack/windows-exact-source-final.log`; the filename does not
+indicate acceptance. Stage 3 regeneration adds 37 lines for the DAO factories,
+implementations and recovery ownership API. Stage 5 regeneration records the
+readonly Chat client view, its Interfaces dependency and the generator's
+synthetic authentication test vector. Correct/wrong-password validation remains
+unchanged. Stages 2, 3, 4, 5 and 7 now pass their comparisons; Stages 4 and 7
+needed no manifest change. Receipts are
+`build-verify/dao-stack/stage{2,3,4,5,7}-manifest-verify.log`.
 
 This milestone does not migrate character/stat/inventory saves, vendor or trade
 systems, Account Broker/unified identity, or every remaining Legacy consumer.
