@@ -711,6 +711,7 @@ api|type.serializable-attribute|false
 api|type.base|System.Object
 api|type.method|public static AORebirth.Interfaces.Persistence.Accounts.IAccountDao CreateAccountDao()
 api|type.method|public static AORebirth.Interfaces.Persistence.Characters.ICharacterDao CreateCharacterDao()
+api|type.method|public static AORebirth.Interfaces.Persistence.Characters.ICharacterPersistenceDao CreateCharacterPersistenceDao()
 api|type.method|public static AORebirth.Interfaces.Persistence.Missions.IMissionDao CreateMissionDao()
 api|type.end|AORebirth.Database.DatabaseDaoFactory
 api|type.begin|AORebirth.Database.Domain.Accounts.MySqlAccountDao
@@ -747,6 +748,34 @@ api|type.method|public instance virtual final System.Collections.Generic.IList<A
 api|type.method|public instance virtual final System.Int32 MarkOffline(System.Int32 characterId)
 api|type.method|public instance virtual final System.Int32 MarkOnline(System.Int32 characterId)
 api|type.end|AORebirth.Database.Domain.Characters.MySqlCharacterDao
+api|type.begin|AORebirth.Database.Domain.Characters.MySqlCharacterPersistenceDao
+api|type.kind|class
+api|type.modifiers|sealed
+api|type.serializable-attribute|false
+api|type.base|System.Object
+api|type.interface|AORebirth.Interfaces.Persistence.Characters.ICharacterPersistenceDao
+api|type.constructor|public instance .ctor()
+api|type.constructor|public instance .ctor(System.Func<System.Data.IDbConnection> connectionFactory)
+api|type.method|public instance virtual final AORebirth.Interfaces.Persistence.Characters.CharacterStateData LoadCharacter(System.Int32 characterId)
+api|type.method|public instance virtual final System.Collections.Generic.IDictionary<System.Int32,System.String> LoadItemNames()
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterStatData> LoadStats(System.Int32 characterId)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedActiveNanoData> LoadActiveNanos(System.Int32 characterId)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> LoadBankItems(System.Int32 characterId)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> LoadCarriedItems(System.Int32 characterId)
+api|type.method|public instance virtual final System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> LoadContainerItems(System.Int32 containerInstanceId)
+api|type.method|public instance virtual final System.Collections.Generic.IList<System.Int32> LoadUploadedNanos(System.Int32 characterId)
+api|type.method|public instance virtual final System.Int32 LeaseItemInstanceIds(System.Int32 count)
+api|type.method|public instance virtual final System.Void CommitActiveNanos(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterActiveNanoData> characters)
+api|type.method|public instance virtual final System.Void CommitInventoryMutation(AORebirth.Interfaces.Persistence.Characters.CharacterInventoryMutationData mutation)
+api|type.method|public instance virtual final System.Void CommitItemCredits(AORebirth.Interfaces.Persistence.Characters.ItemCreditMutationData mutation)
+api|type.method|public instance virtual final System.Void InsertItem(AORebirth.Interfaces.Persistence.Characters.PersistedItemData item)
+api|type.method|public instance virtual final System.Void SaveInventoryAndUploadedNanos(System.Int32 characterId,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations,System.Collections.Generic.IList<System.Int32> uploadedNanoIds)
+api|type.method|public instance virtual final System.Void SaveItemLocations(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations)
+api|type.method|public instance virtual final System.Void SaveLocation(AORebirth.Interfaces.Persistence.Characters.CharacterStateData character,System.Int32 online)
+api|type.method|public instance virtual final System.Void SaveSnapshot(AORebirth.Interfaces.Persistence.Characters.CharacterStateData character,System.Int32 online,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterStatData> stats)
+api|type.method|public instance virtual final System.Void SaveStats(System.Int32 characterId,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterStatData> stats)
+api|type.method|public instance virtual final System.Void UpdateItemLocation(AORebirth.Interfaces.Persistence.Characters.ItemLocationData location)
+api|type.end|AORebirth.Database.Domain.Characters.MySqlCharacterPersistenceDao
 api|type.begin|AORebirth.Database.Domain.Missions.MySqlMissionDao
 api|type.kind|class
 api|type.modifiers|sealed
