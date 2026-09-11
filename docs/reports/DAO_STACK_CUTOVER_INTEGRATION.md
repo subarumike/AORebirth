@@ -292,5 +292,14 @@ unchanged. Stages 2, 3, 4, 5 and 7 now pass their comparisons; Stages 4 and 7
 needed no manifest change. Receipts are
 `build-verify/dao-stack/stage{2,3,4,5,7}-manifest-verify.log`.
 
+The third source attempt at `039b3dc769a6d3090c6ef08451e7352437df0993`
+passed clean-source, Windows build and cross-platform contract validation, then
+failed the first mandatory gate: the secret scanner rejected an unused synthetic
+password field in an offline test connection string. Its failure is preserved at
+`build-verify/dao-stack/windows-accepted-source.log`; no password was needed or
+used to connect. The unnecessary field was removed, with the three focused
+character consumer tests passing in `character-consumer-fixture-final.log`.
+The scanner and its policy were not changed.
+
 This milestone does not migrate character/stat/inventory saves, vendor or trade
 systems, Account Broker/unified identity, or every remaining Legacy consumer.

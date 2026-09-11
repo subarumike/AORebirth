@@ -88,7 +88,7 @@ public sealed class CharacterDaoConsumerTests
         {
             Environment.SetEnvironmentVariable("AO_REBIRTH_SESSION_OWNERSHIP_DIR", root);
             // The injected DAO is the only online-state persistence path; no connection is opened.
-            Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", "Server=127.0.0.1;Database=dao_consumer_unused;User ID=unused;Password=unused");
+            Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", "Server=127.0.0.1;Database=dao_consumer_unused;User ID=unused");
             action();
         }
         finally
