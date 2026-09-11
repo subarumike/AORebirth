@@ -10,6 +10,7 @@ namespace AORebirth.Tools.CharacterDaoValidation
     using System.Threading.Tasks;
     using AORebirth.Database.Dao;
     using AORebirth.Database.Domain.Characters;
+    using ChatEngine.CoreServer;
 
     internal static partial class Program
     {
@@ -79,6 +80,7 @@ namespace AORebirth.Tools.CharacterDaoValidation
                     finally { release.Set(); owner.GetAwaiter().GetResult(); }
                 }
                 Require(Dao().LoadById(103).Online == 1, "ownership-contention-preserves-online");
+                BotRecoveryOwnershipChecks();
             }
             finally
             {
@@ -90,6 +92,39 @@ namespace AORebirth.Tools.CharacterDaoValidation
         private static string RecoverySnapshot()
         {
             return UnrelatedSnapshot() + "\n" + Normalize(Dao().ListForAccount("owner"));
+        }
+
+        private static void BotRecoveryOwnershipChecks()
+        {
+            Reset(); Seed(105, "owner", "ChatBot", 0);
+            var owners = new ChatSessionOwnership<object>();
+            var original = new object();
+            var replacement = new object();
+            Func<IDisposable> acquire = () => CharacterOnlineOwnershipGuard.AcquireZoneOwnership(105, id => Dao().MarkOnline(id));
+            Action<uint> clear = id => CharacterOnlineOwnershipGuard.TryClearLoginOwnership((int)id, value => Dao().MarkOffline(value));
+            try
+            {
+                Require(owners.Register(105, original, acquire), "bot-online-owner-registers");
+                string before = RecoverySnapshot();
+                Expect<InvalidOperationException>(() => Dao().RecoverStaleOnline(DatabaseName), "recovery-refuses-live-chat-only-bot");
+                Require(RecoverySnapshot() == before && Dao().LoadById(105).Online == 1, "recovery-preserves-live-bot-row");
+                Require(OwnershipAttempt(105) == 3, "bot-lease-protects-against-other-process-recovery");
+                Require(owners.Register(105, replacement, acquire), "bot-replacement-registers");
+                Require(!owners.Disconnect(105, original, clear, _ => { }), "old-bot-disconnect-cannot-clear-replacement");
+                Expect<InvalidOperationException>(() => Dao().RecoverStaleOnline(DatabaseName), "recovery-refuses-replacement-bot");
+                Require(Dao().LoadById(105).Online == 1, "replacement-bot-remains-online");
+                Require(owners.Disconnect(105, replacement, clear, _ => { }), "current-bot-disconnect-cleans-up");
+                Require(Dao().LoadById(105).Online == 0 && OwnershipAttempt(105) == 0, "bot-disconnect-clears-online-and-releases-lease");
+                Dao().MarkOnline(105);
+                var recovered = Dao().RecoverStaleOnline(DatabaseName);
+                Require(recovered.RowsUpdated == 1 && recovered.PostUpdateNonzeroCount == 0,
+                    "disconnected-unowned-bot-row-can-be-recovered");
+            }
+            finally
+            {
+                owners.Disconnect(105, replacement, clear, _ => { });
+                owners.Disconnect(105, original, clear, _ => { });
+            }
         }
 
         private static int RunOwnershipChild(string[] args)

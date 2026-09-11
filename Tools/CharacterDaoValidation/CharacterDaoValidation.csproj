@@ -11,6 +11,7 @@
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/**/*.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" />
+    <Compile Include="../../AORebirth/Server/ChatEngine/CoreServer/ChatSessionOwnership.cs" />
     <Compile Include="../../AORebirth/Server/ZoneEngine/StaleOnlineRecovery.cs" />
     <Compile Include="../../AORebirth/Server/LoginEngine/CoreClient/LoginHandoffLifecycle.cs" />
     <Compile Include="../../LinuxBuild/Tools/Stage8OfflineSmokeTests/StaleOnlineRecoveryTests.cs" />

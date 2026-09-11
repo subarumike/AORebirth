@@ -42,7 +42,8 @@ namespace AORebirth.Tools.AccountDaoValidation
                 using (MySqlConnection connection = Open(rootConnection))
                 {
                     foreach (var row in new[] { new { Id = 9801, Owner = expected.Username },
-                        new { Id = 9802, Owner = "AdapterMissing" }, new { Id = 9803, Owner = "" } })
+                        new { Id = 9802, Owner = "AdapterMissing" }, new { Id = 9803, Owner = "" },
+                        new { Id = 9804, Owner = expected.Username } })
                         connection.Execute("INSERT INTO characters (Id,Username,Name,FirstName,LastName,playfield,X,Y,Z,"
                             + "HeadingX,HeadingY,HeadingZ,HeadingW) VALUES (@Id,@Owner,@name,'','',1,0,0,0,0,0,0,1)",
                             new { row.Id, row.Owner, name = "AdapterCharacter" + row.Id });
@@ -50,6 +51,26 @@ namespace AORebirth.Tools.AccountDaoValidation
                 Require(adapter.GetByCharacterId(9801).Id == actual.Id, "character-owner-resolves-account");
                 Require(adapter.GetByCharacterId(9802) == null && adapter.GetByCharacterId(9803) == null
                     && adapter.GetByCharacterId(9899) == null, "missing-character-owner-null-results");
+
+                using (MySqlConnection connection = Open(rootConnection))
+                {
+                    connection.Execute("UPDATE characters SET Online=1 WHERE Id IN (9801,9802,9803,9804)");
+                    using (CharacterOnlineOwnershipGuard.AcquireZoneOwnership(9804))
+                    {
+                        adapter.LogoffChars(expected.Username);
+                        Require(connection.ExecuteScalar<int>("SELECT Online FROM characters WHERE Id=9801") == 0,
+                            "account-logoff-clears-unowned-character");
+                        Require(connection.ExecuteScalar<int>("SELECT Online FROM characters WHERE Id=9804") == 1,
+                            "account-logoff-preserves-active-session-owner");
+                    }
+                    adapter.LogoffChars(expected.Username);
+                    Require(connection.ExecuteScalar<int>("SELECT Online FROM characters WHERE Id=9804") == 0,
+                        "account-logoff-clears-after-session-owner-releases");
+                    adapter.LogoffChars("AdapterNoSuchOwner");
+                    Require(connection.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM characters WHERE Id IN (9802,9803) AND Online=1") == 2,
+                        "account-logoff-never-clears-another-or-missing-account");
+                }
 
                 Require(LoginDataDao.WriteNewPassword(new DBLoginData
                     { Username = expected.Username, Password = "opaque:changed/hash" }) == 1,
@@ -97,6 +118,10 @@ namespace AORebirth.Tools.AccountDaoValidation
                     "lookup-provider-failure-propagates");
                 Require(ReferenceEquals(observed, failure) && attempts == 4 && Utility.LogUtil.ErrorCount == errors,
                     "lookup-does-not-mask-failure-as-missing-account");
+                observed = Expect<InjectedFailure>(() => LoginDataDao.Instance.LogoffChars(expected.Username),
+                    "account-logoff-provider-failure-propagates");
+                Require(ReferenceEquals(observed, failure) && attempts == 5 && Utility.LogUtil.ErrorCount == errors,
+                    "account-logoff-does-not-mask-or-retry-provider-failure");
             }
             finally { Connector.TestConnectionFactory = null; }
         }
