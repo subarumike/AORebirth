@@ -36,9 +36,8 @@ namespace AORebirth.Database.Dao
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Linq;
-
     using AORebirth.Database.Entities;
+    using AORebirth.Interfaces.Persistence.Accounts;
 
     using Dapper;
 
@@ -61,13 +60,7 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public DBLoginData GetByCharacterId(int charId)
         {
-            var character = CharacterDao.Instance.Get(charId);
-            if (character == null || string.IsNullOrEmpty(character.Username))
-            {
-                return null;
-            }
-
-            return this.GetAll(new { character.Username }).FirstOrDefault();
+            return ToLegacy(DatabaseDaoFactory.CreateAccountDao().LoadByCharacterId(charId).Account);
         }
 
         /// <summary>
@@ -81,7 +74,7 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public DBLoginData GetByUsername(string username)
         {
-            return this.GetAll(new { Username = username }).FirstOrDefault();
+            return ToLegacy(DatabaseDaoFactory.CreateAccountDao().LoadByUsername(username));
         }
 
         /// <summary>
@@ -94,11 +87,7 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public long GetRegisteredCount()
         {
-            const string SQL = "SELECT COUNT(*) FROM login";
-            using (IDbConnection conn = Connector.GetConnection())
-            {
-                return conn.Query<long>(SQL).Single();
-            }
+            return DatabaseDaoFactory.CreateAccountDao().CountRegisteredAccounts();
         }
 
 
@@ -138,14 +127,14 @@ namespace AORebirth.Database.Dao
 
         public static void SetExpansions(string user, int expansions)
         {
+            SetExpansions(user, expansions, DatabaseDaoFactory.CreateAccountDao());
+        }
+
+        internal static void SetExpansions(string user, int expansions, IAccountDao accounts)
+        {
             try
             {
-                using (IDbConnection conn = Connector.GetConnection())
-                {
-                    conn.Execute(
-                        "UPDATE login SET Expansions=@expansions WHERE Username=@user",
-                        new { expansions, user });
-                }
+                accounts.SetExpansions(user, expansions);
             }
             catch (Exception e)
             {
@@ -161,27 +150,26 @@ namespace AORebirth.Database.Dao
         /// </param>
         public static void WriteLoginData(DBLoginData login)
         {
+            WriteLoginData(login, DatabaseDaoFactory.CreateAccountDao());
+        }
+
+        internal static void WriteLoginData(DBLoginData login, IAccountDao accounts)
+        {
             try
             {
-                using (IDbConnection conn = Connector.GetConnection())
+                accounts.CreateGameAccount(new NewGameAccountData
                 {
-                    conn.Execute(
-                        "INSERT INTO login (CreationDate, Email, FirstName, LastName, Username, Password, AllowedCharacters, Flags, AccountFlags, Expansions, GM) VALUES (@creationdate, @email, @firstname, @lastname,@username, @password, @allowed_characters, @flags, @accountflags, @expansions, @gm)",
-                        new
-                        {
-                            creationdate = DateTime.Now,
-                            email = login.Email,
-                            firstname = login.FirstName,
-                            lastname = login.LastName,
-                            username = login.Username,
-                            password = login.Password,
-                            allowed_characters = login.AllowedCharacters,
-                            flags = login.Flags,
-                            accountflags = login.AccountFlags,
-                            expansions = login.Expansions,
-                            gm = login.GM
-                        });
-                }
+                    Email = login.Email,
+                    FirstName = login.FirstName,
+                    LastName = login.LastName,
+                    Username = login.Username,
+                    PasswordHash = login.Password,
+                    AllowedCharacters = login.AllowedCharacters,
+                    Flags = login.Flags,
+                    AccountFlags = login.AccountFlags,
+                    Expansions = login.Expansions,
+                    GmLevel = login.GM
+                });
             }
             catch (Exception e)
             {
@@ -200,14 +188,14 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public static int WriteNewPassword(DBLoginData login)
         {
+            return WriteNewPassword(login, DatabaseDaoFactory.CreateAccountDao());
+        }
+
+        internal static int WriteNewPassword(DBLoginData login, IAccountDao accounts)
+        {
             try
             {
-                using (IDbConnection conn = Connector.GetConnection())
-                {
-                    return conn.Execute(
-                        "UPDATE login SET password=@pwd WHERE Username=@user LIMIT 1",
-                        new { pwd = login.Password, user = login.Username });
-                }
+                return accounts.ChangePassword(login.Username, login.Password);
             }
             catch (Exception e)
             {
@@ -218,16 +206,29 @@ namespace AORebirth.Database.Dao
 
         public bool Exists(string username)
         {
-            bool exists = false;
-            using (IDbConnection conn = Connector.GetConnection())
-            {
-                exists =
-                    conn.Query<int>(
-                        string.Format("SELECT ID FROM login where username = @username"),
-                        new { username = username }).Count() == 1;
-            }
+            return DatabaseDaoFactory.CreateAccountDao().UsernameExists(username);
+        }
 
-            return exists;
+        // Existing engine callers still receive the complete legacy account representation.
+        // Authentication, hashing and authorization remain in those callers.
+        private static DBLoginData ToLegacy(GameAccountData account)
+        {
+            if (account == null) return null;
+            return new DBLoginData
+            {
+                Id = account.AccountId,
+                CreationDate = account.CreationDate,
+                Email = account.Email,
+                FirstName = account.FirstName,
+                LastName = account.LastName,
+                Username = account.Username,
+                Password = account.PasswordHash,
+                AllowedCharacters = account.AllowedCharacters,
+                Flags = account.Flags,
+                AccountFlags = account.AccountFlags,
+                Expansions = account.Expansions,
+                GM = account.GmLevel
+            };
         }
 
         #endregion

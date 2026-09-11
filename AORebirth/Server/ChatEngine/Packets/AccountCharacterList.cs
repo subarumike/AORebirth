@@ -59,31 +59,31 @@ namespace ChatEngine.Packets
         public static byte[] Create(string username)
         {
             PacketWriter writer = new PacketWriter(0x07);
-            IEnumerable<DBCharacter> chars = CharacterDao.Instance.GetAllForUser(username);
+            var chars = AORebirth.Database.DatabaseDaoFactory.CreateCharacterDao().ListForAccount(username);
 
             byte[] numberOfCharacters = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((Int16)chars.Count()));
             writer.WriteBytes(numberOfCharacters);
-            foreach (DBCharacter character in chars)
+            foreach (var character in chars)
             {
-                writer.WriteUInt32((UInt32)character.Id);
+                writer.WriteUInt32((UInt32)character.CharacterId);
             }
 
             writer.WriteBytes(numberOfCharacters);
-            foreach (DBCharacter character in chars)
+            foreach (var character in chars)
             {
                 writer.WriteString(character.Name);
             }
 
             writer.WriteBytes(numberOfCharacters);
-            foreach (DBCharacter character in chars)
+            foreach (var character in chars)
             {
-                writer.WriteUInt32((UInt32)StatDao.Instance.GetById(50000, character.Id, 54).StatValue);
+                writer.WriteUInt32((UInt32)StatDao.Instance.GetById(50000, character.CharacterId, 54).StatValue);
             }
 
             writer.WriteBytes(numberOfCharacters);
-            foreach (DBCharacter character in chars)
+            foreach (var character in chars)
             {
-                writer.WriteUInt32((uint)CharacterDao.Instance.IsOnline(character.Id));
+                writer.WriteUInt32((uint)CharacterDao.Instance.IsOnline(character.CharacterId));
             }
 
             return writer.Finish();

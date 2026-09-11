@@ -2,10 +2,13 @@
 
 ## Active
 
-Active: repair local NewEngine building-door routing. The existing teleports DAO
-overrides are now applied to portal landings and reverse-exit baking. Fair Trade
-and the implant shop require official-client entrance/exit acceptance after
-deployment. See `docs/reports/NEWENGINE_INTERIOR_DOOR_ROUTING.md`.
+Active: integrate the existing DAO stack and wire supported account and character
+directory/online-state consumers on `codex/dao-stack-cutover-integration-001`.
+The foundation checkpoint is `a8daaa5e`; consumer wiring and connected acceptance
+pass. Exact-source Windows acceptance and Linux publication are pending. Preserve full gameplay hydration, current saving, secure
+admission and session ownership. This task permits local commits only; no push,
+merge back, deployment or production changes. See
+`docs/reports/DAO_STACK_CUTOVER_INTEGRATION.md`.
 
 Secure LoginEngine to NewEngine admission and
 retail-compatible server-authorized zone redirect are complete on

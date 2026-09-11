@@ -286,7 +286,7 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public bool ExistsByName(string name)
         {
-            return this.GetByCharName(name) != null;
+            return DatabaseDaoFactory.CreateCharacterDao().LoadByName(name) != null;
         }
 
         /// <summary>
@@ -328,19 +328,7 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public string GetCharacterNameById(int characterId)
         {
-            const string SQL = "SELECT Name FROM characters WHERE ID=@characterId";
-            string name = null;
-            using (IDbConnection conn = Connector.GetConnection())
-            {
-                name = conn.Query<string>(SQL, new { characterId }).FirstOrDefault();
-            }
-
-            if (name == null)
-            {
-                name = string.Empty;
-            }
-
-            return name;
+            return DatabaseDaoFactory.CreateCharacterDao().LoadById(characterId)?.Name ?? string.Empty;
         }
 
         /// <summary>
@@ -353,15 +341,7 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public bool IsCharacterOnAccount(string userName, uint characterId)
         {
-            const string SQL = "SELECT id FROM characters where username=@userName AND id=@characterId";
-            bool result;
-
-            using (IDbConnection conn = Connector.GetConnection())
-            {
-                result = conn.Query<int>(SQL, new { userName, characterId }).Count() == 1;
-            }
-
-            return result;
+            return DatabaseDaoFactory.CreateCharacterDao().IsOwnedByAccount(userName, characterId);
         }
 
         /// <summary>
@@ -448,13 +428,7 @@ namespace AORebirth.Database.Dao
         /// </returns>
         public int IsOnline(int id)
         {
-            DBCharacter character = this.Get(id);
-            if (character == null)
-            {
-                return 0;
-            }
-
-            return character.Online;
+            return DatabaseDaoFactory.CreateCharacterDao().LoadById(id)?.Online ?? 0;
         }
 
         /// <summary>
@@ -463,7 +437,7 @@ namespace AORebirth.Database.Dao
         /// </param>
         public void SetOffline(int id)
         {
-            this.Save(new DBCharacter() { Id = id, Online = 0 }, new { Id = id, Online = 0 });
+            DatabaseDaoFactory.CreateCharacterDao().MarkOffline(id);
         }
 
         /// <summary>
@@ -474,7 +448,7 @@ namespace AORebirth.Database.Dao
         /// </param>
         public void SetOnline(int id)
         {
-            this.Save(new DBCharacter() { Id = id, Online = 1 }, new { Id = id, Online = 1 });
+            DatabaseDaoFactory.CreateCharacterDao().MarkOnline(id);
         }
     }
 }

@@ -132,14 +132,16 @@ namespace AORebirth.Tools.AccountDaoValidation
             Require(NewDao(application).LoadByUsername("Concurrent").Expansions == -23,
                 "lost-ack-expansion-already-durable");
 
-            // Preserve characterization of old swallowed failures; do not implement that
-            // ambiguity in the new contract. Runtime cutover must explicitly handle errors.
+            // Preserve the legacy callers' failure behavior in the compatibility adapter.
+            // The imported DAO's explicit seam accepts this instrumented real provider;
+            // the configured production path still rejects non-MySQL providers.
             var legacyFault = new FaultConnection(application) {FailurePoint="execute"};
             Connector.TestConnectionFactory = () => legacyFault;
             int logs = Utility.LogUtil.ErrorCount;
             try
             {
-                Require(LoginDataDao.WriteNewPassword(new DBLoginData {Username="Created", Password="x"}) == 0,
+                Require(LoginDataDao.WriteNewPassword(new DBLoginData {Username="Created", Password="x"},
+                    new MySqlAccountDao(() => legacyFault)) == 0,
                     "legacy-password-error-is-zero");
             }
             finally { Connector.TestConnectionFactory = null; }
@@ -148,7 +150,7 @@ namespace AORebirth.Tools.AccountDaoValidation
             var expansionFault = new FaultConnection(application) {FailurePoint="execute"};
             Connector.TestConnectionFactory = () => expansionFault;
             logs = Utility.LogUtil.ErrorCount;
-            try { LoginDataDao.SetExpansions("Created", 1); }
+            try { LoginDataDao.SetExpansions("Created", 1, new MySqlAccountDao(() => expansionFault)); }
             finally { Connector.TestConnectionFactory = null; }
             Require(Utility.LogUtil.ErrorCount == logs + 1 && expansionFault.Disposed,
                 "legacy-expansions-error-swallowed-characterized");
@@ -156,7 +158,8 @@ namespace AORebirth.Tools.AccountDaoValidation
             Connector.TestConnectionFactory = () => insertFault;
             try
             {
-                Expect<InjectedFailure>(() => LoginDataDao.WriteLoginData(ToLegacy(NewAccount("x"))),
+                Expect<InjectedFailure>(() => LoginDataDao.WriteLoginData(ToLegacy(NewAccount("x")),
+                    new MySqlAccountDao(() => insertFault)),
                     "legacy-create-provider-error-rethrows");
             }
             finally { Connector.TestConnectionFactory = null; }

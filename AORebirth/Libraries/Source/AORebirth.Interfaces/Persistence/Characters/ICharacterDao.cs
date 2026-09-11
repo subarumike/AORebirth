@@ -37,7 +37,8 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// <summary>
         /// Atomically clears captured nonzero online values after an exact expected-database check.
         /// The caller must establish exclusive runtime recovery safety before calling; this method
-        /// does not check processes, ports or session ownership. Commit errors require a fresh read
+        /// retains caller-owned process and port guards. The MySQL implementation fences captured
+        /// session ownership through transaction completion and refuses live owners. Commit errors require a fresh read
         /// to reconcile the outcome before retrying. Empty captures end without a write or commit.
         /// </summary>
         StaleOnlineRecoveryData RecoverStaleOnline(string expectedDatabase);

@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-09-10
+Updated: 2026-09-11
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -8,6 +8,16 @@ state is preserved at
 completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
+
+- Isolated DAO integration candidate: the five-commit account/character/mission
+  stack is integrated at foundation checkpoint `a8daaa5e`. Supported account,
+  character directory and online-state consumers are wired, including guarded
+  stale recovery and Chat disconnect ownership. Fresh connected lifecycle tests
+  preserve the complete character row, 40 stat rows and four seeded item rows.
+  This is local candidate evidence; exact-source Windows/Linux publication
+  receipts are recorded separately in
+  `docs/reports/DAO_STACK_CUTOVER_INTEGRATION.md`. No merge back, push, deployment,
+  schema change or new character/stat/inventory saving system is included.
 
 - NewEngine interior-door diagnosis: raw RDB destinations bypassed existing
   teleports DAO overrides, causing Fair Trade to land in Nano Programs and

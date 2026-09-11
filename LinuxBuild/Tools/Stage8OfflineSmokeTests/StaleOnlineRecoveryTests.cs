@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using ZoneEngine;
+using AORebirth.Interfaces.Persistence.Characters;
 
 namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 {
@@ -359,7 +360,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 return new NoOpDisposable();
             }
 
-            public IStaleOnlineRecoveryStore OpenStore()
+            public ICharacterDao CreateCharacterDao()
             {
                 this.OpenStoreCalls++;
                 return this.store;
@@ -376,7 +377,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             }
         }
 
-        private sealed class FakeStore : IStaleOnlineRecoveryStore
+        // Orchestrator fixture only. SQL atomicity and ownership are checked against the real DAO separately.
+        private sealed class FakeStore : ICharacterDao
         {
             private readonly Dictionary<int, int> originalOnline;
             private bool clearAttempted;
@@ -406,7 +408,31 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 get { return "aorebirth_test"; }
             }
 
-            public IReadOnlyList<StaleOnlineRecoveryRow> ReadNonzeroRows()
+            public StaleOnlineRecoveryData RecoverStaleOnline(string expectedDatabase)
+            {
+                try
+                {
+                    if (expectedDatabase != this.DatabaseName) throw new InvalidDataException("database mismatch");
+                    var rows = this.ReadNonzeroRows();
+                    if (rows.Count == 0) return new StaleOnlineRecoveryData(this.DatabaseName, rows, 0, null);
+                    int updated = this.ClearRows(rows.Select(row => row.CharacterId).ToArray());
+                    long remaining = this.CountNonzeroRows();
+                    if (updated != rows.Count || remaining != 0) throw new InvalidDataException("recovery verification failed");
+                    this.Commit();
+                    return new StaleOnlineRecoveryData(this.DatabaseName, rows, updated, remaining);
+                }
+                finally { this.Dispose(); }
+            }
+
+            public CharacterDirectoryData LoadById(int id) { throw new NotSupportedException(); }
+            public CharacterDirectoryData LoadByName(string name) { throw new NotSupportedException(); }
+            public IList<CharacterDirectoryData> ListForAccount(string account) { throw new NotSupportedException(); }
+            public bool IsOwnedByAccount(string account, uint id) { throw new NotSupportedException(); }
+            public int MarkOnline(int id) { throw new NotSupportedException(); }
+            public int MarkOffline(int id) { throw new NotSupportedException(); }
+            public IList<CharacterDirectoryData> ListLoggedIn() { throw new NotSupportedException(); }
+
+            public IReadOnlyList<StaleOnlineCharacterData> ReadNonzeroRows()
             {
                 if (this.QueryFails)
                 {
@@ -416,7 +442,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 return this.Characters
                     .Where(character => character.Online != 0)
                     .OrderBy(character => character.Id)
-                    .Select(character => new StaleOnlineRecoveryRow(character.Id, character.Online))
+                    .Select(character => new StaleOnlineCharacterData(character.Id, character.Online))
                     .ToArray();
             }
 

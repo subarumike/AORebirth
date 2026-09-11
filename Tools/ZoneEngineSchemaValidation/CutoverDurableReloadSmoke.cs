@@ -26,8 +26,7 @@ static class CutoverDurableReloadSmoke
             var second = new ItemInstanceRecord { InstanceId = identity + 1, ContainerType = (int)IdentityType.Inventory,
                 ContainerInstance = CharacterId, ContainerPlacement = 65, LowId = 22, HighId = 23, Quality = 18, StackCount = 1, Source = 0 };
             inventory.Insert(first); inventory.Insert(second);
-            var stats = new[] { new StatRecord { StatId = (int)CharacterStat.Level, StatValue = 1 },
-                new StatRecord { StatId = (int)CharacterStat.Cash, StatValue = 1234 } };
+            var stats = LifecycleSpawnFixture.Stats().Select(stat => new StatRecord { StatId = (int)stat.Key, StatValue = stat.Value }).ToArray();
             var character = new MySqlCharacterRepository(log).GetById(CharacterId)!;
             new MySqlCharacterRepository(log).SaveSnapshot(character, 0, stats);
             string legacyBefore = FixtureSql.TableFingerprint(connection, "items") + FixtureSql.TableFingerprint(connection, "instanceditems");
@@ -43,14 +42,18 @@ static class CutoverDurableReloadSmoke
             character = new CharacterRecord { Id = CharacterId, Name = "CutoverFixture", FirstName = "", LastName = "",
                 Playfield = 4582, X = 101, Y = 21, Z = 102, HeadingW = 1 };
             new MySqlCharacterRepository(log).SaveSnapshot(character, 0,
-                [stats[0], new StatRecord { StatId = (int)CharacterStat.Cash, StatValue = 1200 }]);
+                [new StatRecord { StatId = (int)CharacterStat.Level, StatValue = 1 }, new StatRecord { StatId = (int)CharacterStat.Cash, StatValue = 1200 }]);
             VerifyFreshReload(fixture, connection, identity);
+            var persistence = LifecyclePersistenceEvidence.Capture(connection, CharacterId);
+            persistence.Verify(connection, "REPOSITORY_RELOAD", 0);
             string durable = FixtureSql.Fingerprint(connection);
             EngineSmoke.Lifecycle(engine, fixture);
             VerifyFreshReload(fixture, connection, identity);
+            persistence.Verify(connection, "REPOSITORY_FIRST_RESTART", 0);
             Require(durable == FixtureSql.Fingerprint(connection), "first-restart-exact-database-fingerprint");
             EngineSmoke.Lifecycle(engine, fixture);
             VerifyFreshReload(fixture, connection, identity);
+            persistence.Verify(connection, "REPOSITORY_SECOND_RESTART", 0);
             Require(durable == FixtureSql.Fingerprint(connection), "second-restart-exact-database-fingerprint");
             Require(legacyBefore == FixtureSql.TableFingerprint(connection, "items") + FixtureSql.TableFingerprint(connection, "instanceditems"), "legacy-tables-remain-stale-after-new-write");
             Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM items WHERE ContainerType={CharacterId}") == 0
@@ -69,8 +72,15 @@ static class CutoverDurableReloadSmoke
         var nanos = new MySqlUploadedNanoRepository(log);
         var loaded = new CharacterHydrationService(characters, stats, inventory, nanos, log).LoadForLogin(CharacterId);
         Require(loaded != null && loaded.Character.Id == CharacterId && loaded.Character.X == 101
-            && loaded.Character.Y == 21 && loaded.Character.Z == 102 && loaded.Character.Playfield == 4582, "fresh-character-reload");
+            && loaded.Character.Y == 21 && loaded.Character.Z == 102 && loaded.Character.Playfield == 4582
+            && loaded.Character.Name == "CutoverFixture" && loaded.Character.FirstName == "" && loaded.Character.LastName == ""
+            && loaded.Character.HeadingW == 1 && loaded.Character.HeadingX == 0 && loaded.Character.HeadingY == 0 && loaded.Character.HeadingZ == 0,
+            "fresh-character-reload");
         Require(loaded!.Stats.Single(s => s.StatId == (int)CharacterStat.Cash).StatValue == 1200, "fresh-credit-reload");
+        var expectedStats = LifecycleSpawnFixture.Stats();
+        expectedStats[CharacterStat.Cash] = 1200;
+        Require(loaded.Stats.Count == expectedStats.Count && loaded.Stats.All(stat =>
+            expectedStats.TryGetValue((CharacterStat)stat.StatId, out int expected) && stat.StatValue == expected), "fresh-all-stats-reload");
         Require(loaded.Items.Count == 2 && loaded.Items.Select(i => i.InstanceId).Distinct().Count() == 2, "no-duplicate-or-missing-items");
         var first = loaded.Items.Single(i => i.InstanceId == identity);
         var second = loaded.Items.Single(i => i.InstanceId == identity + 1);

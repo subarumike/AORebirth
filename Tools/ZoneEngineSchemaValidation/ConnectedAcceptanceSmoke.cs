@@ -26,6 +26,7 @@ static partial class ConnectedAcceptanceSmoke
     static DisposableSchemaDatabase ownedFixture = null!;
     static bool morphActive = true;
     static int previousDuration = int.MaxValue;
+    static LifecyclePersistenceEvidence persistenceEvidence = null!;
     public static bool HandoffRejected { get; private set; }
     public static string RepositoryRoot()
     {
@@ -56,30 +57,19 @@ static partial class ConnectedAcceptanceSmoke
             }
             FixtureSql.Execute(connection, $"INSERT INTO characters (Id,Username,Name,FirstName,LastName,Playfield,X,Y,Z,HeadingW,HeadingX,HeadingY,HeadingZ,Online) VALUES ({Owner},'{Account}','ConnectedFixture','','',4582,100,0,100,1,0,0,0,0)");
             // Real schema stat IDs from CharacterList and CharacterStat, fixture values only.
-            var stats = new Dictionary<CharacterStat, int> {
-                [CharacterStat.Flags] = 0x00081241,
-                [CharacterStat.Level] = 1, [CharacterStat.TitleLevel] = 1,
-                [CharacterStat.Breed] = 1, [CharacterStat.Race] = 1, [CharacterStat.Sex] = 2,
-                [CharacterStat.Profession] = 1, [CharacterStat.Fatness] = 0,
-                [CharacterStat.HeadMesh] = 40683, [CharacterStat.VisualFlags] = 31,
-                [CharacterStat.Side] = 0, [CharacterStat.Expansion] = 171,
-                [CharacterStat.Strength] = 6, [CharacterStat.Agility] = 6, [CharacterStat.Stamina] = 6,
-                [CharacterStat.Intelligence] = 6, [CharacterStat.Sense] = 6, [CharacterStat.Psychic] = 6,
-                [CharacterStat.BodyDevelopment] = 5, [CharacterStat.NanoPool] = 5,
-                [CharacterStat.Cash] = 1234,
-                [CharacterStat.Health] = 25, [CharacterStat.MaxHealth] = 31,
-                [CharacterStat.CurrentNano] = 20, [CharacterStat.MaxNanoEnergy] = 29,
-                [CharacterStat.MonsterData] = 0, [CharacterStat.CATMesh] = 111, [CharacterStat.DisplayCATMesh] = 222,
-                [(CharacterStat)12] = 5907,
-                [CharacterStat.MaxNCU] = 100, [CharacterStat.RunSpeed] = 100 };
+            var stats = LifecycleSpawnFixture.Stats();
             foreach (var stat in stats)
                 FixtureSql.Execute(connection, $"INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (50000,{Owner},{(int)stat.Key},{stat.Value})");
             var inventory = new MySqlInventoryRepository(new SilentLogger());
-            int identity = inventory.LeaseInstanceIdBlock(2);
+            int identity = inventory.LeaseInstanceIdBlock(3);
             inventory.Insert(new ItemInstanceRecord { InstanceId = identity, ContainerType = 104, ContainerInstance = Owner,
                 ContainerPlacement = 64, LowId = 43384, HighId = 43384, Quality = 1, StackCount = 3, Source = (AORebirth.Enums.ItemSource)1 });
             inventory.Insert(new ItemInstanceRecord { InstanceId = identity + 1, ContainerType = 104, ContainerInstance = Owner,
                 ContainerPlacement = 65, LowId = 42423, HighId = 42423, Quality = 4, StackCount = 1, Source = (AORebirth.Enums.ItemSource)1 });
+            // Seed a wear-page row to prove equipment storage/hydration survives the lifecycle.
+            // This does not exercise or claim player-driven equip legality.
+            inventory.Insert(new ItemInstanceRecord { InstanceId = identity + 2, ContainerType = (int)IdentityType.ArmorPage, ContainerInstance = Owner,
+                ContainerPlacement = 17, LowId = 43384, HighId = 43384, Quality = 1, StackCount = 1, Source = (AORebirth.Enums.ItemSource)1 });
             var catalog = NanoCatalog.Load(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(zoneBinary))!, "GameData", "nanos.dat"));
             Require(catalog.TryGet(270542, out var morph), "seed-supported-morph-catalog");
             long expiry = DateTime.UtcNow.AddMilliseconds((long)morph.DurationCentiseconds * 10).Ticks;
@@ -96,6 +86,8 @@ static partial class ConnectedAcceptanceSmoke
             generated = ConnectedMissionSeed.Create(fixture, Owner);
             missionSnapshot = MissionSnapshot();
             SeedHandoffCases(connection, fixture, password);
+            persistenceEvidence = LifecyclePersistenceEvidence.Capture(connection, Owner);
+            persistenceEvidence.Verify(connection, "SEEDED", 0);
             Console.WriteLine("DATABASE_FIXTURE_ID=" + fixture.FixtureId + " ACCEPTANCE_TIMESTAMP=" + DateTime.UtcNow.ToString("O"));
             Console.WriteLine("CONNECTED_FIXTURE_SEEDED=PASS ACCOUNT_ID=9901 CHARACTER_ID=9901");
             using var login = new ConnectedEngineProcess(loginBinary, true, fixture);
@@ -120,27 +112,34 @@ static partial class ConnectedAcceptanceSmoke
                 {
                     VerifyConnected(client, identity, 64, "INITIAL");
                     VerifyDatabase(connection, identity, 64);
+                    persistenceEvidence.Verify(connection, "LOGIN", 1);
                     client.Send(new ClientMoveItemToInventoryMessage { Identity = Character,
                         SourceContainer = new Identity { Type = IdentityType.Inventory, Instance = 9999 }, TargetPlacement = 65 }, Owner);
                     client.Send(new ClientMoveItemToInventoryMessage { Identity = Character,
                         SourceContainer = new Identity { Type = IdentityType.Inventory, Instance = 64 }, TargetPlacement = 66 }, Owner);
                     client.Wait<ContainerAddItemMessage>(m => m.Identity == Character && m.TargetPlacement == 66);
                     Until(() => FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity} AND ContainerPlacement=66") == 1, "connected-inventory-move");
+                    persistenceEvidence.ExpectInventoryMove(identity, 64, 66);
                     VerifyDatabase(connection, identity, 66);
+                    persistenceEvidence.Verify(connection, "INVENTORY_MOVE", 1);
                     Console.WriteLine("CONNECTED_INVALID_INVENTORY_SOURCE_FAIL_CLOSED=PASS");
                     Console.WriteLine("CONNECTED_DURABLE_MUTATION=PASS OPERATION=inventory-move SOURCE=64 TARGET=66");
                     Logout(client, connection);
+                    persistenceEvidence.Verify(connection, "FIRST_LOGOUT", 0);
                 }
                 using (var client = Enter(fixture, password))
                 {
                     VerifyConnected(client, identity, 66, "RECONNECT");
                     VerifyDatabase(connection, identity, 66);
+                    persistenceEvidence.Verify(connection, "FRESH_AUTH", 1);
                     Console.WriteLine("AUTH_RECONNECT=PASS STATE_AFTER_RECONNECT=PASS");
                     Logout(client, connection);
+                    persistenceEvidence.Verify(connection, "FRESH_AUTH_LOGOUT", 0);
                 }
                 ValidateHandoffCases(fixture, password, connection, identity);
                 outstanding = Authorize(fixture, password, "cutoverother", 9903);
                 zone.Stop();
+                persistenceEvidence.Verify(connection, "CLEAN_STOP", 0);
                 Console.WriteLine("ENGINE_PID_BEFORE=" + before + " CLEAN_DISCONNECT=PASS");
             }
             using (var zone = new ConnectedEngineProcess(zoneBinary, false, fixture))
@@ -165,6 +164,7 @@ static partial class ConnectedAcceptanceSmoke
                 {
                     VerifyConnected(client, identity, 66, "RESTART");
                     VerifyDatabase(connection, identity, 66);
+                    persistenceEvidence.Verify(connection, "RESTART_AUTH", 1);
                     Console.WriteLine("AUTHENTICATED_RECONNECT_AFTER_RESTART=PASS STATE_AFTER_RESTART=PASS");
                     client.Send(new CharacterActionMessage { Identity = Character, Action = CharacterActionType.RemoveFriendlyNano,
                         Target = new Identity { Type = IdentityType.NanoProgram, Instance = 270542 } }, Owner);
@@ -174,15 +174,18 @@ static partial class ConnectedAcceptanceSmoke
                     VerifyDatabase(connection, identity, 66);
                     Console.WriteLine("CONNECTED_MORPH_CANCEL=PASS BASELINE_RESTORATION=PASS");
                     Logout(client, connection);
+                    persistenceEvidence.Verify(connection, "MORPH_CANCEL_LOGOUT", 0);
                 }
                 using (var client = Enter(fixture, password))
                 {
                     VerifyConnected(client, identity, 66, "AFTER_CANCEL");
                     VerifyDatabase(connection, identity, 66);
                     Logout(client, connection);
+                    persistenceEvidence.Verify(connection, "FINAL_LOGOUT", 0);
                     Console.WriteLine("MORPH_CANCEL_AUTHENTICATED_RECONNECT=PASS");
                 }
                 zone.Stop();
+                persistenceEvidence.Verify(connection, "FINAL_CLEAN_STOP", 0);
                 Console.WriteLine("ENGINE_PID_AFTER=" + zone.Id + " ENGINE_RESTART_PROVEN=YES");
             }
             login.Stop();
@@ -303,11 +306,15 @@ static partial class ConnectedAcceptanceSmoke
             Console.WriteLine("WIRE_ACTIVE_NANO_REMAINING_CENTISECONDS=" + duration + " PERSISTED_INSTANCE=99 PERSISTED_EXPIRY=" + seededNano.ExpiresAtUtcTicks);
         }
         Require(full.UploadedNanoIds.Contains(270542), "wire-uploaded-morph-" + phase);
-        Require(full.InventorySlots.Length == 3, "wire-item-count-" + phase);
+        Require(full.InventorySlots.Length == 4, "wire-item-count-" + phase);
         var key = full.InventorySlots.Single(i => i.Identity.Instance == generated.KeyInstance);
         Require(key.Placement == 67 && key.Identity.Type == (IdentityType)0xC76D && key.ItemLowId == 28577 && key.ItemHighId == 28577 && key.Quality == 1 && key.Count == 1, "wire-mission-key-" + phase);
         var first = full.InventorySlots.Single(i => i.Identity.Instance == identity);
         var second = full.InventorySlots.Single(i => i.Identity.Instance == identity + 1);
+        var equipped = full.InventorySlots.Single(i => i.Identity.Instance == identity + 2);
+        Require(equipped.Placement == 17 && equipped.ItemLowId == 43384 && equipped.ItemHighId == 43384
+            && equipped.Quality == 1 && equipped.Count == 1 && (int)equipped.Identity.Type == 0xC73D,
+            "wire-seeded-equipment-" + phase);
         Require(first.Placement == slot && first.ItemLowId == 43384 && first.ItemHighId == 43384 && first.Quality == 1 && first.Count == 3, "wire-first-item-" + phase);
         Require(second.Placement == 65 && second.ItemLowId == 42423 && second.ItemHighId == 42423 && second.Quality == 4 && second.Count == 1, "wire-second-item-" + phase);
         Require((int)first.Identity.Type == 0xC73D && (int)second.Identity.Type == 0xC73D
@@ -319,7 +326,8 @@ static partial class ConnectedAcceptanceSmoke
     }
     static void VerifyDatabase(MySqlConnection connection, int identity, int slot)
     {
-        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={Owner}") == 3, "persisted-no-phantom-rows");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={Owner}") == 4, "persisted-no-phantom-rows");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity + 2} AND ContainerType={(int)IdentityType.ArmorPage} AND ContainerInstance={Owner} AND ContainerPlacement=17 AND ItemType=0 AND LowId=43384 AND HighId=43384 AND Quality=1 AND StackCount=1 AND Source=1") == 1, "persisted-seeded-equipment-exact");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={generated.KeyInstance} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement=67 AND ItemType={0xC76D} AND LowId=28577 AND HighId=28577 AND Quality=1 AND StackCount=1 AND Source=0") == 1, "persisted-mission-key-exact");
         var nanos = new MySqlActiveNanoRepository().Load(Owner);
         Require(morphActive ? nanos.Count == 1 && nanos[0] == seededNano : nanos.Count == 0, "persisted-active-nano-exact-expiry");

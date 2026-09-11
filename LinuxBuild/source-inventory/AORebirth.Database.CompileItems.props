@@ -8,6 +8,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Domain/Accounts/MySqlAccountDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.Legacy.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs" />

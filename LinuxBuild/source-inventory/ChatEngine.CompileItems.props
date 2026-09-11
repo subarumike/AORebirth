@@ -22,6 +22,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreClient/CharacterBase.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreClient/Client.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreServer/ChatServer.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/CoreServer/ChatSessionOwnership.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/BuddyList.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/BuddyListEntry.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Lists/LftRegistry.cs" />
