@@ -14,6 +14,22 @@ namespace AORebirth.Database.Domain.Missions
                 IReadOnlyList<MissionItemInstanceData> grants,
                 IReadOnlyList<MissionItemInstanceData> consumed)
             {
+                this.EnsureActive();
+                try
+                {
+                    this.ApplyInventoryMutationCore(grants, consumed);
+                }
+                catch
+                {
+                    this.failed = true;
+                    throw;
+                }
+            }
+
+            private void ApplyInventoryMutationCore(
+                IReadOnlyList<MissionItemInstanceData> grants,
+                IReadOnlyList<MissionItemInstanceData> consumed)
+            {
                 if (grants == null || consumed == null) throw new ArgumentNullException("inventoryPlan");
                 if (grants.Concat(consumed).Any(item => item == null || item.InstanceId <= 0
                     || item.ContainerType != 104 || item.ContainerInstance != this.CharacterId
