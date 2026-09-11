@@ -1,5 +1,17 @@
 # NewEngine production cutover foundation
 
+## Current reconciliation acceptance — 032ee4cd39433bbe124217a745474573e720e820
+
+The shared character/inventory DAO is integrated. Windows exact-source acceptance passes 544 NewEngine tests, 1129 AOtomation tests and all 12 mandatory stages. Account/character/mission/full-isolated DAO checks pass 303/551/261/275; real-MySQL faults, schema/restart, connected lifecycle and Linux publication pass. No new direct SQL violations.
+
+Local Linux container `aorebirth-linux-staging-032ee4cd` replaces only the prior staging applications, with a pre-change database backup and saved rollback arguments under `build-verify/hydration`. Linux binary hashes and complete gates are in [the machine-readable receipt](NEWENGINE_CHARACTER_HYDRATION_RECEIPT.json). Production, master, both source branches and Legacy are unchanged.
+
+Official-client result: NOT_RUN. Local isolated staging prepared on this source. Official-client actions/evidence pending. Production cutover remains **NOT APPROVED**. Do not relabel the historical failed attempt or prior user gameplay as acceptance of this exact source.
+
+See [hydration reconciliation](NEWENGINE_CHARACTER_HYDRATION_RECONCILIATION.md) and [field matrix](NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.md). Unknown Legacy-only stat requirements remain explicit; real armor effects are outside this milestone.
+
+## Historical evidence (preserved)
+
 ## Decision
 
 NewEngine is the default on this Mike-owned branch. Keep Legacy present.

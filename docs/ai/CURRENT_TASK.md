@@ -1,12 +1,3 @@
-# Current task
+# Current Task
 
-DAO-owned character, stats and inventory persistence, in progress.
-
-- Branch: `codex/character-inventory-persistence-dao-001`.
-- Worktree: `tools-temp/character-inventory-dao001`.
-- Starting source: `af7e2357544425b630014d29e1c3c4e3dfcce5d8`; accepted c47f463 is an ancestor, intervening changes are receipt documents only.
-- Baseline exact-source Windows acceptance and all 12 mandatory stages: PASS.
-- Shared DAO now owns NewEngine full character/stat/item storage and existing compound nano/item/credit transactions. Gameplay, hydration validation, session ownership and mission authority stay in the runtime.
-- In progress: real MySQL fault tests, actual loot/equipment operations, connected zoning/reconnect/restart and exact-source Windows/Linux publication acceptance.
-- No schema change, unsafe SetGM use, client launch, production operation, merge, deployment or push authorized. Local commits only.
-- Report: `docs/reports/CHARACTER_INVENTORY_PERSISTENCE_DAO.md`.
+Active: finish official-client acceptance of the character/inventory DAO hydration candidate on `codex/newengine-retail-hydration-dao-001`. All offline exact-source checks pass at `032ee4cd39433bbe124217a745474573e720e820`. Local isolated Linux staging is prepared; require observed client CharInPlay, ChatEngine connection, world entry, two zones and logout/relogin before the production-readiness decision. No master merge, production operation, Legacy removal or full DAO conversion is authorized. See `docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECONCILIATION.md` and its JSON receipt.
