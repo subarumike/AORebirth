@@ -28,6 +28,7 @@ namespace ZoneEngine_New.Core.Characters
                 CharacterStat.Race,
                 CharacterStat.HeadMesh,
                 CharacterStat.VisualFlags,
+                CharacterStat.Scale,
                 CharacterStat.Level,
                 CharacterStat.TitleLevel,
                 CharacterStat.Side,
@@ -104,6 +105,7 @@ namespace ZoneEngine_New.Core.Characters
             Positive(stats, CharacterStat.Race, errors);
             Positive(stats, CharacterStat.HeadMesh, errors);
             Range(stats, CharacterStat.VisualFlags, 0, short.MaxValue, errors);
+            Range(stats, CharacterStat.Scale, 1, short.MaxValue, errors);
             Range(stats, CharacterStat.Level, 1, 220, errors);
             Range(stats, CharacterStat.TitleLevel, 1, 7, errors);
             Range(stats, CharacterStat.Side, 0, 2, errors);
