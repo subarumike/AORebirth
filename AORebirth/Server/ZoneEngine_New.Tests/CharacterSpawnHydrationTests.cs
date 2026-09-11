@@ -81,6 +81,20 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void Complete_starter_vitals_remain_valid_after_player_rebase()
+        {
+            Player player = PlayerFrom(ValidHydration());
+
+            player.Rebase();
+
+            Assert.AreEqual(31, player.Stats.GetOrZero(CharacterStat.MaxHealth));
+            Assert.AreEqual(25, player.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(29, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
+            Assert.AreEqual(20, player.Stats.GetOrZero(CharacterStat.CurrentNano));
+            PlayerSpawnPayloadValidator.RequireValid(player);
+        }
+
+        [TestMethod]
         public void Appearance_identity_primary_ability_and_tower_variants_are_rejected()
         {
             CharacterStat[] missing =
