@@ -1259,12 +1259,13 @@ namespace ZoneEngine_New.Core.Entities
                     PsychicBase = ClampToShort(Stats.GetOrZero(CharacterStat.Psychic, StatDetail.Base))
                 };
 
-                // FirstName / LastName / OrganizationName not on Character yet.
-                // if (scfu.CharacterFlags.HasFlag(CharacterFlags.HasVisibleName))
-                // {
-                //     pcInfo.FirstName = FirstName;
-                //     pcInfo.LastName = LastName;
-                // }
+                // Existing DAO character projection owns these strings. The codec writes
+                // both only when HasVisibleName is set; missing names are legitimate empty strings.
+                if (this is Player namedPlayer && scfu.CharacterFlags.HasFlag(CharacterFlags.HasVisibleName))
+                {
+                    pcInfo.FirstName = namedPlayer.FirstName ?? string.Empty;
+                    pcInfo.LastName = namedPlayer.LastName ?? string.Empty;
+                }
                 // if (!string.IsNullOrEmpty(OrganizationName))
                 // {
                 //     pcInfo.OrgName = OrganizationName;

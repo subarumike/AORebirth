@@ -267,6 +267,7 @@ static partial class ConnectedAcceptanceSmoke
     {
         var spawn = client.Received.OfType<SimpleCharFullUpdateMessage>().First(m => m.Identity == identity);
         var full = client.Received.OfType<FullCharacterMessage>().Single(m => m.Identity == identity);
+        ZoneEngine_New.Core.Characters.PlayerSpawnPayloadValidator.RequireValidMessages(spawn, full);
         Require((int)spawn.CharacterFlags != (int)CharacterStat.Unset, "player-flags-not-unset");
         Require(!spawn.CharacterFlags.HasFlag(CharacterFlags.Tower), "ordinary-player-not-tower");
         Require(spawn.Health > 0 && spawn.HealthDamage >= 0 && spawn.HealthDamage <= spawn.Health,

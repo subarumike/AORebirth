@@ -30,6 +30,8 @@ namespace ZoneEngine_New.Core.Characters
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(hydration);
 
+            CharacterHydrationValidator.RequireValid(hydration);
+
             CharacterRecord character = hydration.Character;
             player.Name = character.Name;
             player.FirstName = character.FirstName ?? string.Empty;
