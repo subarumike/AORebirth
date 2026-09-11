@@ -9,6 +9,13 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
+- NewEngine interior-door diagnosis: raw RDB destinations bypassed existing
+  teleports DAO overrides, causing Fair Trade to land in Nano Programs and
+  registering exits on the wrong interior doors. The candidate now loads a
+  read-only DAO routing snapshot before portal/exit baking and checks each return
+  against the player's recorded entrance. Live client acceptance is pending;
+  see `docs/reports/NEWENGINE_INTERIOR_DOOR_ROUTING.md`.
+
 - Mike's `codex/newengine-production-cutover-001` integrates the full reconciled
   history through `4dac603b` without editing the developer branch or master.
   NewEngine is the candidate default; Legacy remains explicitly selectable.
