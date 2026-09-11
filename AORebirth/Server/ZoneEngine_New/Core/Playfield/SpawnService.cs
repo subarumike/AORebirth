@@ -354,6 +354,7 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
                 player.Rebase();
+                PlayerSpawnPayloadValidator.RequireValid(player);
                 _playfieldManager.RegisterPlayer(player);
                 _registry.Register(player);
                 registered = true;
@@ -505,6 +506,8 @@ namespace ZoneEngine_New.Core.Playfield
             player.EnterOnline(session);
 
             session.State = SessionState.SpawnReady;
+
+            PlayerSpawnPayloadValidator.RequireValid(player);
 
             SimpleCharFullUpdateMessage reconnectSpawn = player.BuildSpawnMessage();
             ScfuSendLog.Write(reconnectSpawn);

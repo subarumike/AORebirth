@@ -18,7 +18,7 @@ namespace LoginEngine.CharacterCreation
 
     /// <summary>
     /// Sets level-1 current HP/NP from the same breed/profession formulas used by ZoneEngine StatLife and StatMaxNanoEnergy.
-    /// Only persists current vitals (stats 27 and 214); max vitals are computed at runtime from abilities.
+    /// Persists current and maximum vitals so NewEngine can reject incomplete aggregates before publication.
     /// </summary>
     internal static class StarterVitalStats
     {
@@ -46,7 +46,9 @@ namespace LoginEngine.CharacterCreation
             int maxNano = CalculateMaxNano(breed, profession, nanoEnergyPool);
 
             UpsertStat(characterId, 27, maxHealth);
+            UpsertStat(characterId, 1, maxHealth);
             UpsertStat(characterId, 214, maxNano);
+            UpsertStat(characterId, 221, maxNano);
         }
 
         private static int CalculateBodyDevelopmentTrickle(int stamina)
