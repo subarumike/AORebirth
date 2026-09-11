@@ -119,13 +119,14 @@ sealed class FixtureFailure(string code) : Exception(code);
 
 static class FixtureSql
 {
-    public static void Execute(MySqlConnection connection, string sql) { using var command = new MySqlCommand(sql, connection); command.ExecuteNonQuery(); }
+    public static void Execute(MySqlConnection connection, string sql, int commandTimeout = 30) { using var command = new MySqlCommand(sql, connection) { CommandTimeout = commandTimeout }; command.ExecuteNonQuery(); }
     public static long Scalar(MySqlConnection connection, string sql) { using var command = new MySqlCommand(sql, connection); return Convert.ToInt64(command.ExecuteScalar(), CultureInfo.InvariantCulture); }
     public static void CreateBaseline(MySqlConnection connection)
     {
         // Minimal exact DAO contract fixture; no unrelated SqlTables bootstrap or seed data.
+        // The canonical bootstrap includes its full teleport seed corpus as individual inserts.
         Execute(connection, File.ReadAllText(Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(),
-            "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/teleports.sql")));
+            "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/teleports.sql")), commandTimeout: 180);
         Execute(connection, "CREATE TABLE charactersactivenanos (Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,CharacterId INT NOT NULL,NanoId INT UNSIGNED NOT NULL,Strain INT UNSIGNED NOT NULL,NanoInstance INT NOT NULL DEFAULT 0,DurationCentiseconds INT NOT NULL DEFAULT 0,ExpiresAtUtcTicks BIGINT NOT NULL DEFAULT 0) ENGINE=InnoDB");
         Execute(connection, "CREATE TABLE missionrewardledger (Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,CharacterId INT NOT NULL,QuestId VARCHAR(128) NOT NULL,RewardKey VARCHAR(191) NOT NULL,RewardType VARCHAR(64) NOT NULL,Status INT NOT NULL,Attempts INT NOT NULL DEFAULT 0,EffectReference VARCHAR(255) NULL,LastError VARCHAR(1024) NULL,ClaimToken VARCHAR(64) NULL,ClaimedAtUtcTicks BIGINT NOT NULL DEFAULT 0,ClaimExpiresAtUtcTicks BIGINT NOT NULL DEFAULT 0,AppliedAtUtcTicks BIGINT NOT NULL DEFAULT 0,CreatedAtUtcTicks BIGINT NOT NULL,UpdatedAtUtcTicks BIGINT NOT NULL,Version BIGINT NOT NULL DEFAULT 1,UNIQUE KEY character_quest_reward(CharacterId,QuestId,RewardKey),KEY character_quest(CharacterId,QuestId)) ENGINE=InnoDB");
         Execute(connection, "CREATE TABLE characters (Id INT PRIMARY KEY,Name VARCHAR(32),FirstName VARCHAR(32),LastName VARCHAR(32),Playfield INT,X FLOAT,Y FLOAT,Z FLOAT,HeadingW FLOAT,HeadingX FLOAT,HeadingY FLOAT,HeadingZ FLOAT,Online SMALLINT) ENGINE=InnoDB; CREATE TABLE stats (Type INT,Instance INT,StatId INT,StatValue INT,UNIQUE KEY main(Type,Instance,StatId)) ENGINE=InnoDB; CREATE TABLE charactersuploadednanos (Id INT AUTO_INCREMENT PRIMARY KEY,CharacterId INT,NanoId INT,INDEX Nanos(CharacterId,NanoId)) ENGINE=InnoDB; CREATE TABLE itemnames (Id INT PRIMARY KEY,Name VARCHAR(250)) ENGINE=InnoDB; CREATE TABLE instanceditems (Id INT PRIMARY KEY,ContainerType INT,ContainerInstance INT,ContainerPlacement INT,Itemtype INT,LowId INT,HighId INT,Quality INT,MultipleCount INT) ENGINE=InnoDB; CREATE TABLE items (Id INT AUTO_INCREMENT PRIMARY KEY,ContainerType INT,ContainerInstance INT,ContainerPlacement INT,LowId INT,HighId INT,Quality INT,MultipleCount INT) ENGINE=InnoDB");

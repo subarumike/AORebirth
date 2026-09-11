@@ -312,5 +312,24 @@ With the obsolete exception removed, all 12 mandatory stages pass, including
 the full 534-test NewEngine suite, in `mandatory-source-precommit.log`. This
 precommit receipt is distinct from the subsequent exact-source acceptance.
 
+Source `db08ae77cb670adb921956d1da0c3857bd7e2092` then passes the full
+exact-source Windows workflow: clean entry, Windows build, cross-platform
+contracts, all 12 mandatory stages, 534 NewEngine tests and 1,129 AOtomation
+tests (`windows-source-db08ae77.log`, final `WINDOWS_ACCEPTANCE=PASS`). Linux
+publication from the same clean source also passes
+(`linux-publication-db08ae77.log`, `linux-publication-source-sha.txt`), producing
+`LinuxBuild/artifacts/zoneengine/linux-x64/self-contained/`. Linux-host execution
+is NOT RUN; the Windows publication/offline markers do not prove host acceptance.
+
+The subsequent exact connected fixture failed twice during its initial bulk
+canonical `teleports.sql` bootstrap, before any engine started. Both disposable
+cleanups passed. That single command includes roughly 1,200 individually
+committed inserts under the provider's default command timeout. The fixture now
+uses a bounded 180-second timeout for that bulk setup only, retaining the full
+canonical schema/data and normal database durability. Runtime code and lifecycle
+assertions are unchanged. This fixture-only correction requires a fresh final
+source commit and acceptance receipt; the passing `db08ae77` receipt remains
+identified by its actual SHA.
+
 This milestone does not migrate character/stat/inventory saves, vendor or trade
 systems, Account Broker/unified identity, or every remaining Legacy consumer.
