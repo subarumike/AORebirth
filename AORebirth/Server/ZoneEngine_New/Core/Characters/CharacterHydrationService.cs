@@ -51,14 +51,16 @@ namespace ZoneEngine_New.Core.Characters
                 UploadedNanoIds = _uploadedNanos.GetForCharacter(characterId)
             };
 
-            if (!result.IsSpawnReady)
+            CharacterHydrationValidationResult validation = CharacterHydrationValidator.Validate(result);
+            if (!validation.IsValid)
             {
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Character hydration incomplete for {0}: stats={1}",
+                        "Character hydration incomplete for {0}: stats={1} errors={2}",
                         characterId,
-                        result.Stats.Count));
+                        result.Stats.Count,
+                        string.Join(",", validation.Errors)));
                 return null;
             }
 

@@ -348,6 +348,11 @@ namespace LoginEngine.Packets
             // Headmesh
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 64, StatValue = this.HeadMesh });
 
+            // Retail player appearance identity
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 33, StatValue = 0 });
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 89, StatValue = 1 });
+            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 673, StatValue = 31 });
+
             // MonsterScale
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 360, StatValue = this.MonsterScale });
 

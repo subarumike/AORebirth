@@ -57,10 +57,18 @@ static partial class ConnectedAcceptanceSmoke
             FixtureSql.Execute(connection, $"INSERT INTO characters (Id,Username,Name,FirstName,LastName,Playfield,X,Y,Z,HeadingW,HeadingX,HeadingY,HeadingZ,Online) VALUES ({Owner},'{Account}','ConnectedFixture','','',4582,100,0,100,1,0,0,0,0)");
             // Real schema stat IDs from CharacterList and CharacterStat, fixture values only.
             var stats = new Dictionary<CharacterStat, int> {
-                [CharacterStat.Level] = 1, [CharacterStat.Breed] = 1, [CharacterStat.Sex] = 2,
-                [CharacterStat.Profession] = 1, [CharacterStat.Cash] = 1234,
-                [CharacterStat.Health] = 1000,
-                [CharacterStat.CurrentNano] = 1000, [CharacterStat.MaxNanoEnergy] = 1000,
+                [CharacterStat.Flags] = 0x00081241,
+                [CharacterStat.Level] = 1, [CharacterStat.TitleLevel] = 1,
+                [CharacterStat.Breed] = 1, [CharacterStat.Race] = 1, [CharacterStat.Sex] = 2,
+                [CharacterStat.Profession] = 1, [CharacterStat.Fatness] = 0,
+                [CharacterStat.HeadMesh] = 40683, [CharacterStat.VisualFlags] = 31,
+                [CharacterStat.Side] = 0, [CharacterStat.Expansion] = 171,
+                [CharacterStat.Strength] = 6, [CharacterStat.Agility] = 6, [CharacterStat.Stamina] = 6,
+                [CharacterStat.Intelligence] = 6, [CharacterStat.Sense] = 6, [CharacterStat.Psychic] = 6,
+                [CharacterStat.BodyDevelopment] = 5, [CharacterStat.NanoPool] = 5,
+                [CharacterStat.Cash] = 1234,
+                [CharacterStat.Health] = 25, [CharacterStat.MaxHealth] = 31,
+                [CharacterStat.CurrentNano] = 20, [CharacterStat.MaxNanoEnergy] = 29,
                 [CharacterStat.MonsterData] = 0, [CharacterStat.CATMesh] = 111, [CharacterStat.DisplayCATMesh] = 222,
                 [(CharacterStat)12] = 5907,
                 [CharacterStat.MaxNCU] = 100, [CharacterStat.RunSpeed] = 100 };
@@ -145,6 +153,7 @@ static partial class ConnectedAcceptanceSmoke
                     pending.Send(outstanding);
                     pending.Wait<FullCharacterMessage>(m => m.Identity.Instance == 9903);
                     var otherCharacter = new Identity { Type = IdentityType.CanbeAffected, Instance = 9903 };
+                    ValidatePlayerPayload(pending, otherCharacter);
                     pending.Send(new CharInPlayMessage { Identity = otherCharacter }, 9903);
                     pending.Wait<CharInPlayMessage>(m => m.Identity == otherCharacter);
                     pending.Send(new CharacterActionMessage { Identity = otherCharacter, Action = CharacterActionType.Logout }, 9903);
@@ -217,6 +226,7 @@ static partial class ConnectedAcceptanceSmoke
             client.Wait<FullCharacterMessage>(m => m.Identity.Instance == Owner);
             client.Wait<SpecialAttackWeaponMessage>(m => m.Identity.Instance == Owner);
             VerifyRetailWorldEntryReadyBlock(client);
+            ValidatePlayerPayload(client, Character);
             Console.WriteLine("ZONE_HANDOFF_VALIDATION=PASS");
             EnterWorld(client);
             return client;
@@ -243,6 +253,36 @@ static partial class ConnectedAcceptanceSmoke
         client.Send(new CharInPlayMessage { Identity = Character }, Owner);
         client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == generated.QuestInstance));
         client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == unchecked((int)0x555BE9F6)));
+    }
+    static void ValidatePlayerPayload(ConnectedWireClient client, Identity identity)
+    {
+        var spawn = client.Received.OfType<SimpleCharFullUpdateMessage>().First(m => m.Identity == identity);
+        var full = client.Received.OfType<FullCharacterMessage>().Single(m => m.Identity == identity);
+        Require((int)spawn.CharacterFlags != (int)CharacterStat.Unset, "player-flags-not-unset");
+        Require(!spawn.CharacterFlags.HasFlag(CharacterFlags.Tower), "ordinary-player-not-tower");
+        Require(spawn.Health > 0 && spawn.HealthDamage >= 0 && spawn.HealthDamage <= spawn.Health,
+            "player-health-relationship");
+        Require(spawn.HeadMesh.HasValue && spawn.HeadMesh.Value > 0 && spawn.VisualFlags >= 0,
+            "player-appearance-required");
+        Require(spawn.CharacterInfo is SimplePcInfo pc && pc.StrengthBase > 0 && pc.AgilityBase > 0
+            && pc.StaminaBase > 0 && pc.IntelligenceBase > 0 && pc.SenseBase > 0 && pc.PsychicBase > 0,
+            "player-primary-abilities");
+
+        var values = new Dictionary<int, long>();
+        foreach (var row in full.Stats1.Concat(full.Stats2)) values[row.Value1] = row.Value2;
+        foreach (var row in full.Stats3) values[row.Value1] = row.Value2;
+        foreach (var row in full.Stats4) values[row.Value1] = row.Value2;
+        foreach (CharacterStat required in ZoneEngine_New.Core.Characters.CharacterHydrationValidator.RequiredSpawnStats)
+        {
+            if (required == CharacterStat.HeadMesh) continue;
+            Require(values.TryGetValue((int)required, out long value)
+                && value != (int)CharacterStat.Unset, "fullcharacter-required-stat-" + (int)required);
+        }
+
+        Require(values[(int)CharacterStat.MaxHealth] == spawn.Health
+            && values[(int)CharacterStat.Health] == spawn.Health - spawn.HealthDamage,
+            "fullcharacter-scfu-health-consistency");
+        Console.WriteLine("SYNTHETIC_ACCEPTANCE_PLAYER_PAYLOAD_VALIDATION=PASS");
     }
     static void VerifyConnected(ConnectedWireClient client, int identity, int slot, string phase)
     {

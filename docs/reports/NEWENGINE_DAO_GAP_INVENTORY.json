@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "sourceFilesScanned": 218,
+  "sourceFilesScanned": 220,
   "persistenceMethodRows": 99,
   "entries": [
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationService.cs",
-      "sourceSha256": "05ac19829c2d5647e0077ea0eaa8634f1135494cbf354f1a869162d2b3714682",
+      "sourceSha256": "0b33e2aa129af2d7f79019c8c17e94321c74799a4aa849fef86f0849191f1511",
       "class": "CharacterHydrationService",
       "method": "LoadForLogin",
       "signature": "(int characterId)",
@@ -21,13 +21,15 @@
         "IUploadedNanoRepository"
       ],
       "calls": [
+        "CharacterHydrationValidator.Validate",
         "_characters.GetById",
         "_inventory.GetCarriedItems",
         "_logger.Info",
         "_logger.Warn",
         "_stats.GetForCharacter",
         "_uploadedNanos.GetForCharacter",
-        "string.Format"
+        "string.Format",
+        "string.Join"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -2415,7 +2417,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
-      "sourceSha256": "884456cee88463f2e99f698ed6d666d3b02b5dd0ce95ac4b16a4dc51b89bc46e",
+      "sourceSha256": "8e8390996af2fe6c3b32cc33e5f39ecb9fdb5e446621c9de0c41834dee1a0dfe",
       "class": "SpawnService",
       "method": "SpawnPlayer",
       "signature": "(IZoneSession session, CharacterHydrationResult hydration)",
@@ -2431,6 +2433,7 @@
         "ActivatorUtilities.CreateInstance\u003CPlayer\u003E",
         "ArgumentNullException.ThrowIfNull",
         "ArgumentOutOfRangeException.ThrowIfNegativeOrZero",
+        "PlayerSpawnPayloadValidator.RequireValid",
         "ReferenceEquals",
         "_logger.Info",
         "_playfield.GetRequiredService\u003CPlayfieldLocality\u003E",
@@ -2458,11 +2461,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
-      "sourceSha256": "884456cee88463f2e99f698ed6d666d3b02b5dd0ce95ac4b16a4dc51b89bc46e",
+      "sourceSha256": "8e8390996af2fe6c3b32cc33e5f39ecb9fdb5e446621c9de0c41834dee1a0dfe",
       "class": "SpawnService",
       "method": "LeaveForTransfer",
       "signature": "(Player player)",
-      "line": 620,
+      "line": 623,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "REPOSITORY_CONSUMER",
@@ -2490,11 +2493,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
-      "sourceSha256": "884456cee88463f2e99f698ed6d666d3b02b5dd0ce95ac4b16a4dc51b89bc46e",
+      "sourceSha256": "8e8390996af2fe6c3b32cc33e5f39ecb9fdb5e446621c9de0c41834dee1a0dfe",
       "class": "SpawnService",
       "method": "DespawnPlayer",
       "signature": "(Player player)",
-      "line": 716,
+      "line": 719,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "REPOSITORY_CONSUMER",
