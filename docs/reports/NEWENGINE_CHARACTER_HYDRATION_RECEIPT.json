@@ -1,0 +1,259 @@
+{
+  "CUTOVER_SOURCE_BRANCH": "codex/newengine-production-cutover-001",
+  "CUTOVER_SOURCE_SHA": "827c7fb50a9d860b6f671c73baebc2447c282dff",
+  "DAO_SOURCE_BRANCH": "codex/character-inventory-persistence-dao-001",
+  "DAO_TESTED_SOURCE_SHA": "29ab800bb3537f9e36f8a7b1273d2e605780065a",
+  "COMMON_ANCESTOR": "827c7fb50a9d860b6f671c73baebc2447c282dff",
+  "DAO_COMMITS_INTEGRATED": [
+    "4ac021764fc932283995f030134a08fd3090eb6d",
+    "15e8941f19c5b8b183b3f75030acee8c094f5088",
+    "29ab800bb3537f9e36f8a7b1273d2e605780065a"
+  ],
+  "STARTING_SHA": "827c7fb50a9d860b6f671c73baebc2447c282dff",
+  "TESTED_SOURCE_SHA": "032ee4cd39433bbe124217a745474573e720e820",
+  "BRANCH": "codex/newengine-retail-hydration-dao-001",
+  "WORKTREE": "C:\\Users\\Mike\\Documents\\AORebirth\\tools-temp\\retail-hydration-dao001",
+  "ORIGIN_MASTER_SHA": "7be49b22b4c0116af9c48dc88a44f86ba802f7c7",
+  "HYDRATION_OLD_GATE": "Historical failed staging: stats.Count > 0; current cutover already had a 26-stat validation contract",
+  "HYDRATION_NEW_GATE": "Required aggregate at service, hydrator and SpawnPlayer; actual SCFU/FullCharacter semantic validation before world/session publication and before reconnect steal",
+  "REQUIRED_PLAYER_FIELDS": "character identity/name/playfield/finite transform; 26 stats; DAO inventory and uploaded/active nanos; conditional persisted first/last names",
+  "REQUIRED_PLAYER_STATS": [
+    "Flags",
+    "Breed",
+    "Sex",
+    "Profession",
+    "Fatness",
+    "Race",
+    "HeadMesh",
+    "VisualFlags",
+    "Scale",
+    "Level",
+    "TitleLevel",
+    "Side",
+    "Expansion",
+    "Strength",
+    "Agility",
+    "Stamina",
+    "Intelligence",
+    "Sense",
+    "Psychic",
+    "BodyDevelopment",
+    "NanoPool",
+    "Health",
+    "MaxHealth",
+    "CurrentNano",
+    "MaxNanoEnergy",
+    "RunSpeed"
+  ],
+  "HEALTH_SEMANTICS": "FullCharacter Health=current, MaxHealth=maximum; SCFU Health=displayed maximum, HealthDamage=displayed maximum-current, retaining existing >65535 scaling",
+  "BREED_RACE_SOURCE": "stats 4/89; character-creation selection/persisted race",
+  "HEAD_MESH_SOURCE": "stats 64 from selected creation HeadMesh",
+  "VISUAL_FLAGS_SOURCE": "stats 673 persisted by creation",
+  "EXPANSION_STATE_SOURCE": "stats 389 copied from account Expansions at creation",
+  "FULLCHARACTER_FIELDS_REVIEWED": "230 unique stats; 19 declared properties",
+  "FULLCHARACTER_REQUIRED_GAPS_FOUND": "No missing entries in inherited 26-stat manifest; bypass and semantic/optional-state gaps remained",
+  "FULLCHARACTER_REQUIRED_GAPS_FIXED": "Bypass, sentinel/optional-stat and paired-message checks; SCFU visible-name fields",
+  "FULLCHARACTER_UNRESOLVED_FIELDS": [
+    {
+      "id": 65,
+      "name": "HairTexture"
+    },
+    {
+      "id": 66,
+      "name": "66"
+    },
+    {
+      "id": 67,
+      "name": "HairColourRGB"
+    },
+    {
+      "id": 68,
+      "name": "NumConstructedQuest"
+    },
+    {
+      "id": 69,
+      "name": "MaxConstructedQuest"
+    },
+    {
+      "id": 75,
+      "name": "StrainOmniTokens"
+    },
+    {
+      "id": 168,
+      "name": "NanoResist"
+    },
+    {
+      "id": 224,
+      "name": "Features"
+    },
+    {
+      "id": 303,
+      "name": "ClanUpkeep"
+    },
+    {
+      "id": 348,
+      "name": "348"
+    },
+    {
+      "id": 349,
+      "name": "349"
+    },
+    {
+      "id": 432,
+      "name": "ErrorCode"
+    },
+    {
+      "id": 544,
+      "name": "544"
+    },
+    {
+      "id": 545,
+      "name": "545"
+    },
+    {
+      "id": 574,
+      "name": "LastSK"
+    },
+    {
+      "id": 575,
+      "name": "NextSK"
+    },
+    {
+      "id": 594,
+      "name": "594"
+    },
+    {
+      "id": 595,
+      "name": "595"
+    },
+    {
+      "id": 596,
+      "name": "596"
+    },
+    {
+      "id": 597,
+      "name": "597"
+    },
+    {
+      "id": 617,
+      "name": "617"
+    },
+    {
+      "id": 618,
+      "name": "618"
+    },
+    {
+      "id": 619,
+      "name": "619"
+    }
+  ],
+  "NEW_DIRECT_SQL_VIOLATIONS": 0,
+  "DAO_METHODS_ADDED_OR_CHANGED": [],
+  "DAO_GAP_INVENTORY_UPDATED": "YES",
+  "ACCOUNT_DAO_VALIDATION": "PASS 303",
+  "CHARACTER_DAO_VALIDATION": "PASS 551",
+  "MISSION_DAO_VALIDATION": "PASS 261",
+  "MISSION_DAO_ISOLATED_VALIDATION": "PASS 275",
+  "SCHEMA_VALIDATION": "PASS",
+  "CONNECTED_ACCEPTANCE": "PASS",
+  "NEWENGINE_TESTS": "PASS 544",
+  "AOTOMATION_TESTS": "PASS 1129",
+  "HYDRATION_TESTS": "PASS 14",
+  "MANDATORY_GATES": "PASS 12/12",
+  "DAO_ARCHITECTURE_GUARD": "PASS",
+  "WINDOWS_ACCEPTANCE": "PASS",
+  "LINUX_PUBLICATION_VALIDATION": "PASS",
+  "SOURCE_SHA": "032ee4cd39433bbe124217a745474573e720e820",
+  "ZONEENGINE_NEW_SHA256": "413c242582c035d9ca8b3819b0801fc81afe43f87337e482e89f0658cdde7377",
+  "LOGINENGINE_SHA256": "46a51f27110f6f60c2603119ef355acab59eb8ebe5e2f7722adffe46cf4e9bd0",
+  "LINUX_BINARY_SHA256": {
+    "source": "032ee4cd39433bbe124217a745474573e720e820",
+    "backupSHA256": "c3e65a17c0c48108b36cde08c539c05d9bf716b93d59b75c35f5a72b6c0caeed",
+    "zoneengine": "175ec95323c9e19010a67cd9228bfa5b0974829bdc3b408e1b12546cb2a076ec",
+    "loginengine": "f06007e9e5af86a2ef6d36310d7778c1f372457957fec1c8fea443527fe1de63",
+    "chatengine": "8afc11c20e93bccc9e76c8be3fe924558737956e70a52217ad70cf386b8d808f",
+    "container": "aorebirth-linux-staging-032ee4cd",
+    "oldContainer": "aorebirth-linux-staging-827c7fb5"
+  },
+  "LOG_SHA256": {
+    "windows-source.log": "afab497847caacaf397b59f43086f2de2dc1dcbcb56ce16fddca1e87e6ac4b20",
+    "linux-source.log": "3a2346132cfa8c40f7f86ace54816d4e24a1e0943b1581dadc6b97f4628d949b",
+    "account-source.log": "d504b41944298fcd77ea2bef5d2dd1d823a0ce866788208242aca8b6926932e2",
+    "character-source.log": "b1700dab87693a6369b454c082a587c751842ee54b63e2315e49ccafd3f9a783",
+    "mission-source.log": "7f7c36df0cb17f023856e2b9e984f18aa7886e10484c4b526c51fd3014fdeb49",
+    "mission-isolated-source.log": "ea9b22ff68337b5ed1e403ff1164529c4fac1e2555c9c89d2a9e796189b913a3",
+    "schema-source.log": "bcddd8a27ad9e385d122d47ee3cfa7773c1f013f90443f3bf0d9faf15955f7e2",
+    "connected-source.log": "af75b27704cdd4495270f368d24ad1e33cabe27fe06c173ee595623e385b9b84",
+    "dao-guard.log": "b85fbeafc62c30e9ebaed31429e73dd9f3fb78f5560e7e8e849c1eca5c3ac66f"
+  },
+  "COMMIT": "032ee4cd39433bbe124217a745474573e720e820",
+  "PUSH_RESULT": "See final delivery; push follows acceptance and receipt commit",
+  "FINAL_WORKTREE_STATUS": "Clean committed source passed exact-source acceptance; receipt-only commit follows",
+  "CHARACTER_DAO_INTEGRATION": "PASS",
+  "PLAYER_HYDRATION_RETAIL_VALID": "NO - awaiting this source official-client evidence",
+  "FULLCHARACTER_RETAIL_VALID": "NO - awaiting this source official-client evidence",
+  "SCFU_RETAIL_VALID": "NO - awaiting this source official-client evidence",
+  "PRODUCTION_CUTOVER_READY": "NO",
+  "CUTOVER_SOURCE_BRANCH_TOUCHED": "NO",
+  "DAO_SOURCE_BRANCH_TOUCHED": "NO",
+  "DEVELOPER_BRANCH_TOUCHED": "NO",
+  "MASTER_MODIFIED_DIRECTLY": "NO",
+  "PRODUCTION_MODIFIED": "NO",
+  "LEGACY_REMOVED": "NO",
+  "LEGACY_REMOVAL_PERFORMED": "NO",
+  "FULL_DAO_CONVERSION_PERFORMED": "NO",
+  "FULL_GAMEPLAY_PARITY_REQUIRED_FOR_CUTOVER": "NO",
+  "PARTIAL_PLAYER_PUBLISHED": "NO",
+  "PLAYER_CLASSIFIED_AS_TOWER": "NO",
+  "TOWER_ONLY_SCFU_FIELDS_EMITTED": "NO",
+  "NEGATIVE_INVALID_HEALTH_DAMAGE_ON_WIRE": "NO",
+  "SECURE_INITIAL_ADMISSION_PRESERVED": "YES",
+  "SECURE_ZONE_ADMISSION_PRESERVED": "YES",
+  "SECURE_ZONE_REDIRECT_PRESERVED": "YES",
+  "MALFORMED_HYDRATION_REPRODUCED": "YES",
+  "INCOMPLETE_CHARACTER_REJECTED_BEFORE_WIRE": "YES",
+  "PLAYER_FLAGS_VALID": "YES",
+  "HEALTH_STATE_VALIDATED": "YES",
+  "BREED_RACE_HYDRATED": "YES",
+  "HEAD_MESH_HYDRATED": "YES",
+  "VISUAL_FLAGS_HYDRATED": "YES",
+  "EXPANSION_STATE_HYDRATED": "YES",
+  "PRIMARY_ABILITIES_HYDRATED": "YES",
+  "SCFU_STRUCTURAL_VALIDATION": "PASS",
+  "SCFU_SEMANTIC_VALIDATION": "PASS",
+  "SYNTHETIC_PLAYER_PAYLOAD_VALIDATION": "PASS",
+  "SYNTHETIC_CONNECTED_ACCEPTANCE": "PASS",
+  "UNSET_SENTINELS_ON_PLAYER_WIRE": 0,
+  "RETAIL_AUTHENTICATION": "NOT_RUN",
+  "RETAIL_CHARACTER_SELECTION": "NOT_RUN",
+  "RETAIL_ZONE_ADMISSION": "NOT_RUN",
+  "RETAIL_CHAR_IN_PLAY": "NOT_RUN",
+  "RETAIL_CHATENGINE_CONNECTION": "NOT_RUN",
+  "RETAIL_WORLD_ENTRY": "NOT_RUN",
+  "RETAIL_ZONE_CHANGE_1": "NOT_RUN",
+  "RETAIL_ZONE_CHANGE_2": "NOT_RUN",
+  "RETAIL_LOGOUT_RELOGIN": "NOT_RUN",
+  "RETAIL_POST_RESTART": "NOT_RUN",
+  "RETAIL_EVIDENCE": "Local isolated staging prepared on this source. Official-client actions/evidence pending.",
+  "FILES_ADDED": [
+    "docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECONCILIATION.md",
+    "docs/reports/NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.json",
+    "docs/reports/NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.md"
+  ],
+  "FILES_MODIFIED": [
+    "AORebirth/Server/ZoneEngine_New.Tests/CharacterSpawnHydrationTests.cs",
+    "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationValidator.cs",
+    "AORebirth/Server/ZoneEngine_New/Core/Characters/PlayerHydrator.cs",
+    "AORebirth/Server/ZoneEngine_New/Core/Characters/PlayerSpawnPayloadValidator.cs",
+    "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+    "AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs",
+    "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+    "Tools/ZoneEngineSchemaValidation/ConnectedAcceptanceSmoke.cs",
+    "docs/reports/NEWENGINE_DAO_GAP_INVENTORY.json"
+  ],
+  "GENERATED_ARTIFACTS": [
+    "NEWENGINE_DAO_GAP_INVENTORY.json",
+    "NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.json",
+    "NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.md"
+  ]
+}
