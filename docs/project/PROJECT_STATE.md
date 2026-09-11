@@ -507,6 +507,14 @@ migrations; details and exact source references are recorded in
   mappings, and runtime hash-to-dynel join remain unresolved. The 207-record
   official overlay authorizes 199 records and blocks eight, including `NCNN`;
   PF4582 runtime materialization remains governed by its specialized catalog.
+- The offline AOSharp capture analyzer now emits `scfu-acg-correlation.csv`.
+  It joins NPC SCFUs to the integrity-validated official placement corpus only
+  when X and Z are exact IEEE-754 float32 matches. Unique records expose the
+  four-character `ACGHash`, official record identity, and `SourceNpcId`;
+  same-coordinate hash collisions remain fail-closed. The 20260911-012605
+  PF4582 capture correlated all 16 NPC SCFUs to unique official records across
+  `SRLZ`, `TPSA`, `GISK`, and `CBSN` without using names, `MonsterData`, or
+  proximity. This is an offline evidence join, not runtime activation authority.
   The heartbeat corpse-spawn queue now uses one synchronization boundary for
   scheduling and draining, preventing concurrent queue corruption while
   preserving same-key replacements.

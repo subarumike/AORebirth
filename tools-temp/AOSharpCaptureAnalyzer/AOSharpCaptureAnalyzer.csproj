@@ -31,6 +31,12 @@
     <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
       <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
     </Compile>
+    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacement.cs">
+      <Link>OfficialPlayfieldPlacement.cs</Link>
+    </Compile>
+    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacementCatalog.cs">
+      <Link>OfficialPlayfieldPlacementCatalog.cs</Link>
+    </Compile>
     <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCollisionGeometry.cs">
       <Link>PlayfieldCollisionGeometry.cs</Link>
     </Compile>
@@ -41,6 +47,7 @@
     <Compile Include="Pf127CaptureSnapshot.cs" />
     <Compile Include="ItemTemplateProjection.cs" />
     <Compile Include="RawInventoryLootProjection.cs" />
+    <Compile Include="ScfuAcgCorrelation.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>

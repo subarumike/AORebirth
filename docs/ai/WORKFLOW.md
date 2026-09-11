@@ -766,6 +766,12 @@ the lifecycle decoder to rebuild correlated NPC lifecycle and corpse-loot output
 Run the movement decoder when movement, idle paths, chase, or range evidence is
 needed. It reconciles the packet log and `raw-packets.csv`, so Mike captures whose
 packet log uses the alternate line format still retain their movement evidence.
+The analyzer also writes `scfu-acg-correlation.csv` by joining NPC SCFUs to the
+integrity-validated official placement corpus only when captured and official X/Z
+are identical IEEE-754 float32 values. A unique record exposes its four-character
+`CanonicalAcgHashText` and exact official record provenance. Duplicate records may
+expose only a common hash; different-hash collisions and non-exact coordinates
+remain unresolved. Names, `MonsterData`, and proximity are never used as the join.
 
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
