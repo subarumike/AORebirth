@@ -72,7 +72,9 @@ namespace AORebirth.Tools.AccountDaoValidation
                 FailureChecks();
                 category = "mock-defensive";
                 SyntheticChecks();
-                Console.WriteLine("ACCOUNT_DAO_TEST_MODE=ISOLATED_PRODUCTION_AND_LEGACY_SOURCES");
+                category = "consumer-adapter";
+                ConsumerAdapterChecks();
+                Console.WriteLine("ACCOUNT_DAO_TEST_MODE=ISOLATED_PRODUCTION_AND_COMPATIBILITY_ADAPTER_SOURCES");
                 Console.WriteLine("ACCOUNT_DAO_CHECKS=" + checks.ToString(CultureInfo.InvariantCulture));
                 Console.WriteLine("ACCOUNT_DAO_MYSQL_INTEGRATION=PASS");
                 result = 0;

@@ -48,6 +48,8 @@ namespace AORebirth.Tools.CharacterDaoValidation
             internal Func<string,IDataReader> ReaderOverride;
             internal Action<CommandObservation> BeforeCommand;
             internal Action<CommandObservation> AfterCommand;
+            internal Action BeforeCommit;
+            internal Action AfterCommit;
             internal ObservedConnection(string value) {inner=new MySqlConnection(value);}
             internal void Fail(string point) {if(FailurePoint==point) throw Error;}
             public string ConnectionString {get{return inner.ConnectionString;}set{inner.ConnectionString=value;}}
@@ -75,7 +77,7 @@ namespace AORebirth.Tools.CharacterDaoValidation
             internal ObservedTransaction(ObservedConnection owner,IDbTransaction inner){this.owner=owner;Inner=inner;}
             public IDbConnection Connection {get{return owner;}}
             public IsolationLevel IsolationLevel {get{return Inner.IsolationLevel;}}
-            public void Commit(){owner.CommitCount++;owner.Fail("commit-before");Inner.Commit();owner.Fail("commit-after");}
+            public void Commit(){owner.CommitCount++;owner.BeforeCommit?.Invoke();owner.Fail("commit-before");Inner.Commit();owner.AfterCommit?.Invoke();owner.Fail("commit-after");}
             public void Rollback()
             {
                 owner.RollbackCount++;

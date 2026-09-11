@@ -850,8 +850,8 @@ namespace ChatEngine.PacketHandlers
 
             try
             {
-                DBCharacter dbCharacter =
-                    CharacterDao.Instance.Get(
+                var dbCharacter =
+                    AORebirth.Database.DatabaseDaoFactory.CreateCharacterDao().LoadById(
                         (int)characterId);
 
                 if (dbCharacter != null

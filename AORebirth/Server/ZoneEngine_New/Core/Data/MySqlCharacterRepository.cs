@@ -5,6 +5,8 @@ namespace ZoneEngine_New.Core.Data
     using System.Globalization;
 
     using MySqlConnector;
+    using AORebirth.Database.Domain.Characters;
+    using AORebirth.Interfaces.Persistence.Characters;
 
     using Utility.Config;
 
@@ -26,14 +28,16 @@ namespace ZoneEngine_New.Core.Data
 
         private readonly IZoneLogger _logger;
         private readonly string _connectionString;
+        private readonly ICharacterDao _directory;
 
-        public MySqlCharacterRepository(IZoneLogger logger)
+        public MySqlCharacterRepository(IZoneLogger logger, ICharacterDao? directory = null)
         {
             ArgumentNullException.ThrowIfNull(logger);
 
             _logger = logger;
 
             _connectionString = MySqlConnectionSettings.GetRequiredConnectionString();
+            _directory = directory ?? new MySqlCharacterDao(() => new MySqlConnection(_connectionString));
         }
 
         public CharacterRecord? GetById(int characterId)
@@ -134,12 +138,8 @@ namespace ZoneEngine_New.Core.Data
         private void SetOnlineState(int characterId, int online)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(characterId);
-            using var connection = new MySqlConnection(_connectionString);
-            connection.Open();
-            using var command = new MySqlCommand("UPDATE characters SET Online = @Online WHERE Id = @Id", connection);
-            command.Parameters.AddWithValue("@Id", characterId);
-            command.Parameters.AddWithValue("@Online", online);
-            if (command.ExecuteNonQuery() != 1)
+            int affected = online == 1 ? _directory.MarkOnline(characterId) : _directory.MarkOffline(characterId);
+            if (affected != 1)
                 throw new InvalidOperationException("Character row is missing during online ownership acquisition.");
         }
 

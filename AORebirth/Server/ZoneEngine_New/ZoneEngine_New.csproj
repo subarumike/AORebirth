@@ -104,6 +104,11 @@
     <Compile Include="../ZoneEngine/Core/Missions/MissionNpcDifficultyPolicy.cs" Link="SharedGameplay/Missions/MissionNpcDifficultyPolicy.cs" />
     <Compile Include="../ZoneEngine/Core/Missions/MissionAcgSpatialAuthority.cs" Link="SharedGameplay/Missions/MissionAcgSpatialAuthority.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs" Link="SharedGameplay/Missions/MySqlMissionDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs" Link="Shared/Characters/MySqlCharacterDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterDirectoryData.cs" Link="Shared/Characters/CharacterDirectoryData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterDao.cs" Link="Shared/Characters/ICharacterDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineCharacterData.cs" Link="Shared/Characters/StaleOnlineCharacterData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineRecoveryData.cs" Link="Shared/Characters/StaleOnlineRecoveryData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Generated.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Inventory.cs" />
     <Compile Include="../ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs" Link="SharedGameplay/Missions/MissionDefinitionCatalog.cs" />

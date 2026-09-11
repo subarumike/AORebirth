@@ -93,6 +93,7 @@
     <Compile Include="CoreClient\CharacterBase.cs" />
     <Compile Include="CoreClient\Client.cs" />
     <Compile Include="CoreServer\ChatServer.cs" />
+    <Compile Include="CoreServer\ChatSessionOwnership.cs" />
     <Compile Include="Lists\BuddyList.cs" />
     <Compile Include="Lists\BuddyListEntry.cs" />
     <Compile Include="Lists\LftRegistry.cs" />
@@ -176,6 +177,10 @@
     <ProjectReference Include="..\..\Libraries\Source\AORebirth.Database\AORebirth.Database.csproj">
       <Project>{63d6c409-58eb-4033-87e0-e0dda6594075}</Project>
       <Name>AORebirth.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\Source\AORebirth.Interfaces\AORebirth.Interfaces.csproj">
+      <Project>{D53F0612-FEFE-4EAF-80AA-480F25C8DD76}</Project>
+      <Name>AORebirth.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Libraries\Source\AORebirth.Enums\AORebirth.Enums.csproj">
       <Project>{0c09af43-3456-4fd6-9041-d9a6d7c3f36c}</Project>

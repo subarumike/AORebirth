@@ -7,8 +7,8 @@ Tools\run_account_dao_validation.cmd
 ```
 
 This suite always compiles the actual account contract/implementation and the
-unchanged legacy LoginDataDao, CharacterDao, generic mapper and required
-dependencies from this checkout. It does not replace the legacy DAO with a mock.
+current LoginDataDao compatibility adapter, CharacterDao, generic mapper and required
+dependencies from this checkout. It does not replace the compatibility adapter with a mock.
 The actual DatabaseDaoFactory is linked; its mission dependencies are linked for
 compilation only. No engine, service host, application configuration, packet
 handler, password policy or runtime initialization is invoked.
@@ -57,6 +57,13 @@ legacy SetGM characterization, is confined to those owned disposable tables.
 
 ## Coverage and interpretation
 
+Following runtime wiring, the retained `legacy`/`parity` case names test compatibility
+between existing engine-facing helpers and the shared account DAO. Those helpers
+now delegate to that DAO, so these comparisons are not independent old-SQL parity.
+Pre-wiring baseline and foundation checkpoint receipts preserve that earlier evidence.
+Mutator fault tests inject the imported DAO through internal adapter overloads; the
+public configured-provider path retains its provider validation. No assertion was removed.
+
 Every assertion emits a readable `PASS [category] case-name` line; failures emit
 the case name or sanitized exception type/MySQL number, never raw credentials.
 
@@ -70,6 +77,7 @@ the case name or sanitized exception type/MySQL number, never raw credentials.
 | concurrency | Unique-name insert has one winner; password/expansion writes do not overwrite each other; concurrent password writes preserve a complete last-writer value. |
 | faults | Each operation twice on one DAO obtains/disposes distinct owned connections; factory/open/command faults for all operations; reader, second-read and partial-buffer failures; mapping/resource errors; legacy error fallbacks; unsupported configured-provider rejection; already-open connections; lost autocommit acknowledgement reconciliation. |
 | mock-defensive | Invalid-schema NULL owner, duplicate character/account rows and invalid numeric conversion are injected readers only. They do not alter or bypass real schema constraints. |
+| consumer-adapter | Complete account field and local timestamp roundtrip; detached reads; missing owner outcomes; opaque password persistence; mutation isolation; real constraint errors; original error/log/return behavior and no retry or direct-SQL fallback. |
 
 The actual legacy SetGM method is unchanged and deliberately has no target API.
 Each observation records supplied-name category, affected-row mode, total fixture
@@ -83,8 +91,8 @@ Canonical login.Username is UNIQUE and NOT NULL. Therefore physical duplicate
 account rows and nullable persisted login fields are not applicable fixtures;
 uniqueness/not-null rejection is tested without changing constraints. The
 multi-row invalid-schema tests execute only the new DAO against synthetic
-readers. Actual legacy FirstOrDefault and Count()==1 behavior is source-inspected;
-real-MySQL legacy/new parity covers zero/one matches. The password LIMIT 1 is
+readers. Original FirstOrDefault and Count()==1 behavior was source-inspected;
+real-MySQL compatibility checks cover zero/one matches. The password LIMIT 1 is
 observed on the real command, not claimed proven by synthetic duplicate reads.
 
 Account mutations are single-statement autocommits; the API has no transaction,
@@ -104,6 +112,7 @@ project-reference tests.
 
 - `Program.cs`: real-MySQL contract, read/create/resolve/mutation/concurrency and legacy GM tests.
 - `FailureChecks.cs`: owned-resource/failure matrix and explicit synthetic readers.
+- `ConsumerAdapterChecks.cs`: configured runtime adapter roundtrip and failure behavior.
 - `DisposableMySql.cs`: scoped Docker fixture and cleanup.
 - `IsolatedHost.cs`: test-only infrastructure dependencies.
 - `AccountDaoValidation.csproj`: exact production/legacy source links.

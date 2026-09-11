@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceFilesScanned": 221,
-  "persistenceMethodRows": 99,
+  "persistenceMethodRows": 100,
   "entries": [
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationService.cs",
@@ -243,11 +243,33 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "0337d8d84f4659e19e4690ed1bbf6e38af5868bbfe52626809e3020ee73c867f",
+      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
+      "class": "MySqlCharacterRepository",
+      "method": "MySqlCharacterRepository",
+      "signature": "(IZoneLogger logger, ICharacterDao? directory = null)",
+      "line": 33,
+      "tables": [
+        "characters"
+      ],
+      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
+      "operation": "DIRECT_SQL",
+      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
+      "existingEquivalent": [],
+      "calls": [
+        "ArgumentNullException.ThrowIfNull",
+        "MySqlConnectionSettings.GetRequiredConnectionString"
+      ],
+      "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
+      "cutoverCritical": "YES",
+      "resolution": "SYNTAX_INVENTORY_NOT_A_PROOF_OF_ATOMICITY"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
+      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
       "class": "MySqlCharacterRepository",
       "method": "GetById",
       "signature": "(int characterId)",
-      "line": 39,
+      "line": 43,
       "tables": [
         "characters"
       ],
@@ -274,11 +296,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "0337d8d84f4659e19e4690ed1bbf6e38af5868bbfe52626809e3020ee73c867f",
+      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
       "class": "MySqlCharacterRepository",
       "method": "SaveLocation",
       "signature": "(CharacterRecord character, int online)",
-      "line": 94,
+      "line": 98,
       "tables": [
         "characters"
       ],
@@ -300,11 +322,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "0337d8d84f4659e19e4690ed1bbf6e38af5868bbfe52626809e3020ee73c867f",
+      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
       "class": "MySqlCharacterRepository",
       "method": "LockForTransaction",
       "signature": "(MySqlConnection connection, MySqlTransaction transaction, int characterId)",
-      "line": 122,
+      "line": 126,
       "tables": [
         "characters"
       ],
@@ -323,23 +345,22 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "0337d8d84f4659e19e4690ed1bbf6e38af5868bbfe52626809e3020ee73c867f",
+      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
       "class": "MySqlCharacterRepository",
       "method": "SetOnlineState",
       "signature": "(int characterId, int online)",
-      "line": 134,
-      "tables": [
-        "characters"
+      "line": 138,
+      "tables": [],
+      "tableResolution": "DELEGATED_OR_FILE_ACCESS",
+      "operation": "REPOSITORY_CONSUMER",
+      "transactionalBehavior": "DELEGATED_TO_RECORDED_REPOSITORY; SEE IMPLEMENTATION ROWS",
+      "existingEquivalent": [
+        "ICharacterDao"
       ],
-      "tableResolution": "FILE_SQL_LITERAL_CANDIDATES_INCLUDES_CONSTANTS; DYNAMIC_OR_HELPER_SQL_REQUIRES_REVIEW",
-      "operation": "DIRECT_SQL",
-      "transactionalBehavior": "NO_METHOD_OWNED_TRANSACTION; READ_OR_SINGLE_WRITE_REQUIRES_REVIEW",
-      "existingEquivalent": [],
       "calls": [
         "ArgumentOutOfRangeException.ThrowIfNegativeOrZero",
-        "command.ExecuteNonQuery",
-        "command.Parameters.AddWithValue",
-        "connection.Open"
+        "_directory.MarkOffline",
+        "_directory.MarkOnline"
       ],
       "migrationTarget": "character/stat DAO; reuse ICharacterDao directory foundation without conflating it with snapshots or leases",
       "cutoverCritical": "YES",
@@ -347,7 +368,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "0337d8d84f4659e19e4690ed1bbf6e38af5868bbfe52626809e3020ee73c867f",
+      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
       "class": "MySqlCharacterRepository",
       "method": "SaveSnapshot",
       "signature": "(CharacterRecord character, int online, IReadOnlyList\u003CStatRecord\u003E stats)",
@@ -374,7 +395,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "sourceSha256": "0337d8d84f4659e19e4690ed1bbf6e38af5868bbfe52626809e3020ee73c867f",
+      "sourceSha256": "ed7091317895f957d172509bbd24a89ba35e2169a02cf2f7cba5a28db805da1b",
       "class": "MySqlCharacterRepository",
       "method": "SaveLocation",
       "signature": "(MySqlConnection connection, MySqlTransaction? transaction,\n            CharacterRecord character, int online)",
@@ -2781,7 +2802,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "e051b97e098d3b11b41fa0e302c6616dd0a900c86bf5b10dcd46b800b6dd224f",
+      "sourceSha256": "addba212c93349c473284a16c2c1dc3fa32aeb1b60f02c2325d477485178652b",
       "class": "Program",
       "method": "RedirectConsoleLog",
       "signature": "(string[] args, string first, string second, bool error)",
@@ -2804,7 +2825,7 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "e051b97e098d3b11b41fa0e302c6616dd0a900c86bf5b10dcd46b800b6dd224f",
+      "sourceSha256": "addba212c93349c473284a16c2c1dc3fa32aeb1b60f02c2325d477485178652b",
       "class": "Program",
       "method": "BuildRootServices",
       "signature": "()",
@@ -2853,6 +2874,7 @@
         "provider.GetRequiredService\u003CMySqlMissionDao\u003E",
         "provider.GetRequiredService\u003CMySqlUploadedNanoRepository\u003E",
         "services.AddSingleton",
+        "services.AddSingleton\u003CAORebirth.Interfaces.Persistence.Characters.ICharacterDao\u003E",
         "services.AddSingleton\u003CAuthoredQuestService\u003E",
         "services.AddSingleton\u003CCharacterSnapshotService\u003E",
         "services.AddSingleton\u003CGeneratedMissionAcgService\u003E",
@@ -2919,11 +2941,11 @@
     },
     {
       "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sourceSha256": "e051b97e098d3b11b41fa0e302c6616dd0a900c86bf5b10dcd46b800b6dd224f",
+      "sourceSha256": "addba212c93349c473284a16c2c1dc3fa32aeb1b60f02c2325d477485178652b",
       "class": "Program",
       "method": "StartShutdownFileWatcher",
       "signature": "(string[] args)",
-      "line": 403,
+      "line": 406,
       "tables": [],
       "tableResolution": "DELEGATED_OR_FILE_ACCESS",
       "operation": "FILE_OR_SERIALIZATION",

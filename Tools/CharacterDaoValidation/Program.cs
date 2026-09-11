@@ -24,6 +24,7 @@ namespace AORebirth.Tools.CharacterDaoValidation
 
         private static int Main(string[] args)
         {
+            if (args.Length == 3 && args[0] == "--ownership-child") return RunOwnershipChild(args);
             if (args.Length != 1 || args[0] != "--run-disposable"
                 || Environment.GetEnvironmentVariable("AO_REBIRTH_ALLOW_DISPOSABLE_CHARACTER_DAO_VALIDATION") != "1")
             {
@@ -59,6 +60,7 @@ namespace AORebirth.Tools.CharacterDaoValidation
                     OnlineChecks(Mode(affected), affected);
                 }
                 category = "stale"; StaleChecks();
+                category = "recovery-session-ownership"; RecoveryOwnershipChecks();
                 category = "ownership"; OwnershipChecks();
                 category = "faults"; FailureChecks();
                 category = "uncertain"; UncertainChecks();
@@ -266,18 +268,12 @@ namespace AORebirth.Tools.CharacterDaoValidation
                 Sql(c=>c.Execute("UPDATE characters SET Online=@Online WHERE Id=101",new{Online=online?1:0}));
                 foreach(int id in new[]{101,999})
                 {
-                    var legacy=new ObservedConnection(connection);
-                    Connector.TestConnectionFactory=()=>{legacy.Open();return legacy;};
-                    try {if(online)CharacterDao.Instance.SetOnline(id);else CharacterDao.Instance.SetOffline(id);}
-                    finally {Connector.TestConnectionFactory=null;}
-                    Require(legacy.LastAffected==(id==999?0:affected?0:1),
-                        "actual-legacy-raw-provider-count-"+online+"-"+id);
-                    Require(legacy.BeginCount==1 && legacy.Isolation==IsolationLevel.Unspecified && legacy.CommitCount==1
-                        && legacy.RollbackCount==0 && legacy.TransactionDisposed && legacy.Disposed,
-                        "actual-legacy-online-owned-transaction-"+online+"-"+id);
-                    Console.WriteLine("CHARACTER_DAO_LEGACY_ONLINE_OBSERVATION MODE="+(affected?"Changed":"Matched")
-                        +" OP="+(online?"Online":"Offline")+" TARGET="+(id==999?"Missing":"SameValue")
-                        +" AFFECTED="+legacy.LastAffected+" TRANSACTION=Owned COMMIT="+legacy.CommitCount);
+                    WithLegacy(() => { if(online)CharacterDao.Instance.SetOnline(id);else CharacterDao.Instance.SetOffline(id); }, connection);
+                    CharacterDirectoryData after = dao.LoadById(id);
+                    Require(id==999 ? after==null : after.Online==(online?1:0),
+                        "migrated-character-consumer-same-value-and-missing-state-"+online+"-"+id);
+                    // Raw provider counts and transaction ownership are verified above through
+                    // the shared DAO's injected observation seam; this consumer returns void.
                 }
             }
             Console.WriteLine("CHARACTER_DAO_AFFECTED_MODE="+(affected?"Changed":"Matched")+" SAME_VALUE="+(affected?0:1)+" MISSING=0");
@@ -334,18 +330,20 @@ namespace AORebirth.Tools.CharacterDaoValidation
                     && !mismatch.Commands.Any(x=>x.Sql.StartsWith("UPDATE",StringComparison.OrdinalIgnoreCase)),
                     "database-refusal-before-mutation-"+InputTag(expected));
             }
-            // Actual unchanged legacy store: equivalent captured rows/update/count on the same schema.
-            using(var connection=new MySqlConnection(application))
-            using(var legacy=new ZoneEngine.AdoNetStaleOnlineRecoveryStore(connection))
+            // The retired legacy SQL store is characterized on the preserved baseline worktree.
+            // Check the production runtime adapter now resolves the shared DAO and exact result.
+            WithLegacy(() =>
             {
-                Require(legacy.DatabaseName==DatabaseName, "actual-legacy-stale-database");
-                var old=legacy.ReadNonzeroRows();
-                Require(old.Count==1 && old[0].CharacterId==101 && old[0].Online==1, "actual-legacy-stale-capture");
-                Require(legacy.ClearRows(old.Select(x=>x.CharacterId).ToArray())==1 && legacy.CountNonzeroRows()==0,
-                    "actual-legacy-stale-bounded-clear-count");
-                legacy.Commit();
-            }
-            Require(Dao().LoadById(101).Online==0, "actual-legacy-stale-commit-durable");
+                var runtime = new ZoneEngine.SystemStaleOnlineRecoveryRuntime(Path.Combine(Path.GetTempPath(), "character-dao-fixture.lock"));
+                ICharacterDao consumer = runtime.CreateCharacterDao();
+                Require(consumer is MySqlCharacterDao, "stale-runtime-resolves-shared-character-dao");
+                var recovered = consumer.RecoverStaleOnline(DatabaseName);
+                Require(recovered.DatabaseName==DatabaseName, "stale-runtime-dao-database");
+                Require(recovered.Rows.Count==1 && recovered.Rows[0].CharacterId==101 && recovered.Rows[0].PreviousOnline==1,
+                    "stale-runtime-dao-capture");
+                Require(recovered.RowsUpdated==1 && recovered.PostUpdateNonzeroCount==0, "stale-runtime-dao-bounded-clear-count");
+            });
+            Require(Dao().LoadById(101).Online==0, "stale-runtime-dao-commit-durable");
         }
 
         private static void Reset() { Sql(c=>c.Execute("DELETE FROM characters")); }

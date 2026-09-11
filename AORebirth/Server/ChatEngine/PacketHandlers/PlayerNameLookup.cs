@@ -79,10 +79,10 @@ namespace ChatEngine.PacketHandlers
                 playerName);
             reader.Finish();
 
-            DBCharacter character = CharacterDao.Instance.GetByCharName(playerName);
+            var character = AORebirth.Database.DatabaseDaoFactory.CreateCharacterDao().LoadByName(playerName);
             if (character != null)
             {
-                playerId = (uint)character.Id;
+                playerId = (uint)character.CharacterId;
             }
             else if (client.ChatServer().BotRouter != null)
             {

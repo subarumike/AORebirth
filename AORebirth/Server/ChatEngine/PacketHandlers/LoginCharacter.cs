@@ -85,18 +85,15 @@ namespace ChatEngine.PacketHandlers
                 return;
             }
 
-            if (client.IsBot)
-            {
-                CharacterDao.Instance.SetOnline((int)playerId);
-            }
-
-            DBCharacter character = CharacterDao.Instance.Get((int)playerId);
+            var character = AORebirth.Database.DatabaseDaoFactory.CreateCharacterDao().LoadById((int)playerId);
 
             client.Character.CharacterId = playerId;
             client.Character.characterName = character.Name;
             client.Character.characterFirstName = character.FirstName;
             client.Character.characterLastName = character.LastName;
             client.ChatAuthenticatedUtc = DateTime.UtcNow;
+
+            if (client.IsBot && !client.ChatServer().RegisterClient(client)) return;
 
             client.Send(LoginOk.Create());
             client.ChatServer().AddClientToChannels(client);
@@ -127,11 +124,6 @@ namespace ChatEngine.PacketHandlers
                         channel.channelFlags,
                         new byte[] { 0x00, 0x00 });
                     client.Send(channelJoin);
-                }
-
-                if (!client.ChatServer().ConnectedClients.ContainsKey(client.Character.CharacterId))
-                {
-                    client.ChatServer().ConnectedClients.Add(client.Character.CharacterId, client);
                 }
 
                 // add yourself to that list
