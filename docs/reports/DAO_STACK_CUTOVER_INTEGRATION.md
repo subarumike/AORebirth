@@ -13,6 +13,7 @@ Exact-source Windows acceptance and Linux publication are pending.
 - Unmodified baseline worktree: `C:\Users\Mike\Documents\AORebirth\tools-temp\dao-stack-baseline001`,
   detached at the same starting SHA.
 - Integration checkpoint: `a8daaa5e74eb3a260d42150da16d84d167d1d16e`.
+- Consumer implementation commit: `b8e8d227bddc4af210e70a8ae14a92973e43e0b3`.
 - Tested SOURCE_SHA and final receipt SHA: pending final source acceptance.
 - The task explicitly requires local-only commits. No push, merge back, deployment,
   production database modification or collision-fix import is authorized.
@@ -234,6 +235,21 @@ buying/selling, player trade implementation, website/Broker ownership, collision
 commit `5d663b7a`, deployment and arbitrary transport-loss recovery are outside
 this delivery. Linux-host runtime acceptance must remain NOT RUN unless executed
 through its established workflow; Windows publication alone cannot supply it.
+
+## Exact-source acceptance history
+
+The first exact-source attempt at `b8e8d227bddc4af210e70a8ae14a92973e43e0b3`
+verified the SHA, clean entry tree and normal Windows build, then failed public
+contract comparison because the checked-in manifest predated the imported
+account/character types. The mandatory suite was not reached. This failure is
+retained at `build-verify/dao-stack/windows-exact-source.log`. The affected
+manifest is regenerated through the existing workflow and reviewed before a
+new SOURCE_SHA is committed; comparisons are not relaxed.
+The generated delta adds 219 lines for six account types and four character
+types, with no removals or changes to existing API declarations. Legacy public
+contract verification and Linux compatibility smoke pass. Evidence:
+`build-verify/dao-stack/stage2-manifest-write.log` and
+`build-verify/dao-stack/stage2-manifest-verify.log`.
 
 This milestone does not migrate character/stat/inventory saves, vendor or trade
 systems, Account Broker/unified identity, or every remaining Legacy consumer.

@@ -1711,6 +1711,225 @@ type.method|public instance abstract virtual special-name System.Void set_x(Syst
 type.method|public instance abstract virtual special-name System.Void set_y(System.Double value)
 type.method|public instance abstract virtual special-name System.Void set_z(System.Double value)
 type.end|AORebirth.Interfaces.IVector3
+type.begin|AORebirth.Interfaces.Persistence.Accounts.GameAccountAuthenticationData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Int32 AccountFlags {get:public;set:public}
+type.property|public instance System.Int32 AccountId {get:public;set:public}
+type.property|public instance System.Int32 AllowedCharacters {get:public;set:public}
+type.property|public instance System.Int32 Expansions {get:public;set:public}
+type.property|public instance System.Int32 Flags {get:public;set:public}
+type.property|public instance System.Int32 GmLevel {get:public;set:public}
+type.property|public instance System.String PasswordHash {get:public;set:public}
+type.property|public instance System.String Username {get:public;set:public}
+type.method|public instance special-name System.Int32 get_AccountFlags()
+type.method|public instance special-name System.Int32 get_AccountId()
+type.method|public instance special-name System.Int32 get_AllowedCharacters()
+type.method|public instance special-name System.Int32 get_Expansions()
+type.method|public instance special-name System.Int32 get_Flags()
+type.method|public instance special-name System.Int32 get_GmLevel()
+type.method|public instance special-name System.String get_PasswordHash()
+type.method|public instance special-name System.String get_Username()
+type.method|public instance special-name System.Void set_AccountFlags(System.Int32 value)
+type.method|public instance special-name System.Void set_AccountId(System.Int32 value)
+type.method|public instance special-name System.Void set_AllowedCharacters(System.Int32 value)
+type.method|public instance special-name System.Void set_Expansions(System.Int32 value)
+type.method|public instance special-name System.Void set_Flags(System.Int32 value)
+type.method|public instance special-name System.Void set_GmLevel(System.Int32 value)
+type.method|public instance special-name System.Void set_PasswordHash(System.String value)
+type.method|public instance special-name System.Void set_Username(System.String value)
+type.end|AORebirth.Interfaces.Persistence.Accounts.GameAccountAuthenticationData
+type.begin|AORebirth.Interfaces.Persistence.Accounts.GameAccountData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.DateTime CreationDate {get:public;set:public}
+type.property|public instance System.Int32 AccountFlags {get:public;set:public}
+type.property|public instance System.Int32 AccountId {get:public;set:public}
+type.property|public instance System.Int32 AllowedCharacters {get:public;set:public}
+type.property|public instance System.Int32 Expansions {get:public;set:public}
+type.property|public instance System.Int32 Flags {get:public;set:public}
+type.property|public instance System.Int32 GmLevel {get:public;set:public}
+type.property|public instance System.String Email {get:public;set:public}
+type.property|public instance System.String FirstName {get:public;set:public}
+type.property|public instance System.String LastName {get:public;set:public}
+type.property|public instance System.String PasswordHash {get:public;set:public}
+type.property|public instance System.String Username {get:public;set:public}
+type.method|public instance special-name System.DateTime get_CreationDate()
+type.method|public instance special-name System.Int32 get_AccountFlags()
+type.method|public instance special-name System.Int32 get_AccountId()
+type.method|public instance special-name System.Int32 get_AllowedCharacters()
+type.method|public instance special-name System.Int32 get_Expansions()
+type.method|public instance special-name System.Int32 get_Flags()
+type.method|public instance special-name System.Int32 get_GmLevel()
+type.method|public instance special-name System.String get_Email()
+type.method|public instance special-name System.String get_FirstName()
+type.method|public instance special-name System.String get_LastName()
+type.method|public instance special-name System.String get_PasswordHash()
+type.method|public instance special-name System.String get_Username()
+type.method|public instance special-name System.Void set_AccountFlags(System.Int32 value)
+type.method|public instance special-name System.Void set_AccountId(System.Int32 value)
+type.method|public instance special-name System.Void set_AllowedCharacters(System.Int32 value)
+type.method|public instance special-name System.Void set_CreationDate(System.DateTime value)
+type.method|public instance special-name System.Void set_Email(System.String value)
+type.method|public instance special-name System.Void set_Expansions(System.Int32 value)
+type.method|public instance special-name System.Void set_FirstName(System.String value)
+type.method|public instance special-name System.Void set_Flags(System.Int32 value)
+type.method|public instance special-name System.Void set_GmLevel(System.Int32 value)
+type.method|public instance special-name System.Void set_LastName(System.String value)
+type.method|public instance special-name System.Void set_PasswordHash(System.String value)
+type.method|public instance special-name System.Void set_Username(System.String value)
+type.end|AORebirth.Interfaces.Persistence.Accounts.GameAccountData
+type.begin|AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupResult
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor(AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupStatus status,System.String characterUsername,AORebirth.Interfaces.Persistence.Accounts.GameAccountData account)
+type.property|public instance AORebirth.Interfaces.Persistence.Accounts.GameAccountData Account {get:public;set:private}
+type.property|public instance AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupStatus Status {get:public;set:private}
+type.property|public instance System.String CharacterUsername {get:public;set:private}
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Accounts.GameAccountData get_Account()
+type.method|public instance special-name AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupStatus get_Status()
+type.method|public instance special-name System.String get_CharacterUsername()
+type.end|AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupResult
+type.begin|AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupStatus
+type.kind|enum
+type.modifiers|sealed
+type.serializable-attribute|not-applicable
+type.enum-underlying|System.Int32
+type.enum-flags-attribute|false
+type.enum-value|AccountNotFound|System.Int32:2
+type.enum-value|CharacterNotFound|System.Int32:0
+type.enum-value|CharacterUsernameMissing|System.Int32:1
+type.enum-value|Found|System.Int32:3
+type.end|AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupStatus
+type.begin|AORebirth.Interfaces.Persistence.Accounts.IAccountDao
+type.kind|interface
+type.modifiers|abstract
+type.serializable-attribute|not-applicable
+type.base|
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Accounts.GameAccountAuthenticationData LoadForAuthentication(System.String username)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Accounts.GameAccountData LoadByUsername(System.String username)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Accounts.GameAccountLookupResult LoadByCharacterId(System.Int32 characterId)
+type.method|public instance abstract virtual System.Boolean UsernameExists(System.String username)
+type.method|public instance abstract virtual System.Int32 ChangePassword(System.String username,System.String passwordHash)
+type.method|public instance abstract virtual System.Int32 CreateGameAccount(AORebirth.Interfaces.Persistence.Accounts.NewGameAccountData account)
+type.method|public instance abstract virtual System.Int32 SetExpansions(System.String username,System.Int32 expansions)
+type.method|public instance abstract virtual System.Int64 CountRegisteredAccounts()
+type.end|AORebirth.Interfaces.Persistence.Accounts.IAccountDao
+type.begin|AORebirth.Interfaces.Persistence.Accounts.NewGameAccountData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Int32 AccountFlags {get:public;set:public}
+type.property|public instance System.Int32 AllowedCharacters {get:public;set:public}
+type.property|public instance System.Int32 Expansions {get:public;set:public}
+type.property|public instance System.Int32 Flags {get:public;set:public}
+type.property|public instance System.Int32 GmLevel {get:public;set:public}
+type.property|public instance System.String Email {get:public;set:public}
+type.property|public instance System.String FirstName {get:public;set:public}
+type.property|public instance System.String LastName {get:public;set:public}
+type.property|public instance System.String PasswordHash {get:public;set:public}
+type.property|public instance System.String Username {get:public;set:public}
+type.method|public instance special-name System.Int32 get_AccountFlags()
+type.method|public instance special-name System.Int32 get_AllowedCharacters()
+type.method|public instance special-name System.Int32 get_Expansions()
+type.method|public instance special-name System.Int32 get_Flags()
+type.method|public instance special-name System.Int32 get_GmLevel()
+type.method|public instance special-name System.String get_Email()
+type.method|public instance special-name System.String get_FirstName()
+type.method|public instance special-name System.String get_LastName()
+type.method|public instance special-name System.String get_PasswordHash()
+type.method|public instance special-name System.String get_Username()
+type.method|public instance special-name System.Void set_AccountFlags(System.Int32 value)
+type.method|public instance special-name System.Void set_AllowedCharacters(System.Int32 value)
+type.method|public instance special-name System.Void set_Email(System.String value)
+type.method|public instance special-name System.Void set_Expansions(System.Int32 value)
+type.method|public instance special-name System.Void set_FirstName(System.String value)
+type.method|public instance special-name System.Void set_Flags(System.Int32 value)
+type.method|public instance special-name System.Void set_GmLevel(System.Int32 value)
+type.method|public instance special-name System.Void set_LastName(System.String value)
+type.method|public instance special-name System.Void set_PasswordHash(System.String value)
+type.method|public instance special-name System.Void set_Username(System.String value)
+type.end|AORebirth.Interfaces.Persistence.Accounts.NewGameAccountData
+type.begin|AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Int32 CharacterId {get:public;set:public}
+type.property|public instance System.Int32 Playfield {get:public;set:public}
+type.property|public instance System.Nullable<System.Int32> Online {get:public;set:public}
+type.property|public instance System.String AccountUsername {get:public;set:public}
+type.property|public instance System.String FirstName {get:public;set:public}
+type.property|public instance System.String LastName {get:public;set:public}
+type.property|public instance System.String Name {get:public;set:public}
+type.method|public instance special-name System.Int32 get_CharacterId()
+type.method|public instance special-name System.Int32 get_Playfield()
+type.method|public instance special-name System.Nullable<System.Int32> get_Online()
+type.method|public instance special-name System.String get_AccountUsername()
+type.method|public instance special-name System.String get_FirstName()
+type.method|public instance special-name System.String get_LastName()
+type.method|public instance special-name System.String get_Name()
+type.method|public instance special-name System.Void set_AccountUsername(System.String value)
+type.method|public instance special-name System.Void set_CharacterId(System.Int32 value)
+type.method|public instance special-name System.Void set_FirstName(System.String value)
+type.method|public instance special-name System.Void set_LastName(System.String value)
+type.method|public instance special-name System.Void set_Name(System.String value)
+type.method|public instance special-name System.Void set_Online(System.Nullable<System.Int32> value)
+type.method|public instance special-name System.Void set_Playfield(System.Int32 value)
+type.end|AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData
+type.begin|AORebirth.Interfaces.Persistence.Characters.ICharacterDao
+type.kind|interface
+type.modifiers|abstract
+type.serializable-attribute|not-applicable
+type.base|
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData LoadById(System.Int32 characterId)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData LoadByName(System.String name)
+type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Characters.StaleOnlineRecoveryData RecoverStaleOnline(System.String expectedDatabase)
+type.method|public instance abstract virtual System.Boolean IsOwnedByAccount(System.String accountUsername,System.UInt32 characterId)
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData> ListForAccount(System.String accountUsername)
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterDirectoryData> ListLoggedIn()
+type.method|public instance abstract virtual System.Int32 MarkOffline(System.Int32 characterId)
+type.method|public instance abstract virtual System.Int32 MarkOnline(System.Int32 characterId)
+type.end|AORebirth.Interfaces.Persistence.Characters.ICharacterDao
+type.begin|AORebirth.Interfaces.Persistence.Characters.StaleOnlineCharacterData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor(System.Int32 characterId,System.Int32 previousOnline)
+type.property|public instance System.Int32 CharacterId {get:public;set:private}
+type.property|public instance System.Int32 PreviousOnline {get:public;set:private}
+type.method|public instance special-name System.Int32 get_CharacterId()
+type.method|public instance special-name System.Int32 get_PreviousOnline()
+type.end|AORebirth.Interfaces.Persistence.Characters.StaleOnlineCharacterData
+type.begin|AORebirth.Interfaces.Persistence.Characters.StaleOnlineRecoveryData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor(System.String databaseName,System.Collections.Generic.IEnumerable<AORebirth.Interfaces.Persistence.Characters.StaleOnlineCharacterData> rows,System.Int32 rowsUpdated,System.Nullable<System.Int64> postUpdateNonzeroCount)
+type.property|public instance System.Boolean CleanupRequired {get:public;set:none}
+type.property|public instance System.Collections.Generic.IReadOnlyList<AORebirth.Interfaces.Persistence.Characters.StaleOnlineCharacterData> Rows {get:public;set:private}
+type.property|public instance System.Int32 RowsUpdated {get:public;set:private}
+type.property|public instance System.Nullable<System.Int64> PostUpdateNonzeroCount {get:public;set:private}
+type.property|public instance System.String DatabaseName {get:public;set:private}
+type.method|public instance special-name System.Boolean get_CleanupRequired()
+type.method|public instance special-name System.Collections.Generic.IReadOnlyList<AORebirth.Interfaces.Persistence.Characters.StaleOnlineCharacterData> get_Rows()
+type.method|public instance special-name System.Int32 get_RowsUpdated()
+type.method|public instance special-name System.Nullable<System.Int64> get_PostUpdateNonzeroCount()
+type.method|public instance special-name System.String get_DatabaseName()
+type.end|AORebirth.Interfaces.Persistence.Characters.StaleOnlineRecoveryData
 type.begin|AORebirth.Interfaces.Persistence.Missions.GeneratedMissionAcceptance
 type.kind|class
 type.modifiers|sealed
