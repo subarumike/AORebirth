@@ -190,9 +190,9 @@
   "PUSH_RESULT": "See final delivery; push follows acceptance and receipt commit",
   "FINAL_WORKTREE_STATUS": "Clean committed source passed exact-source acceptance; receipt-only commit follows",
   "CHARACTER_DAO_INTEGRATION": "PASS",
-  "PLAYER_HYDRATION_RETAIL_VALID": "NO - awaiting this source official-client evidence",
-  "FULLCHARACTER_RETAIL_VALID": "NO - awaiting this source official-client evidence",
-  "SCFU_RETAIL_VALID": "NO - awaiting this source official-client evidence",
+  "PLAYER_HYDRATION_RETAIL_VALID": "YES - tested EP1 player/world entry; not exhaustive field or gameplay parity",
+  "FULLCHARACTER_RETAIL_VALID": "YES - tested EP1 player/world entry; not exhaustive field or gameplay parity",
+  "SCFU_RETAIL_VALID": "YES - tested EP1 player/world entry; not exhaustive field or gameplay parity",
   "PRODUCTION_CUTOVER_READY": "NO",
   "CUTOVER_SOURCE_BRANCH_TOUCHED": "NO",
   "DAO_SOURCE_BRANCH_TOUCHED": "NO",
@@ -224,17 +224,17 @@
   "SYNTHETIC_PLAYER_PAYLOAD_VALIDATION": "PASS",
   "SYNTHETIC_CONNECTED_ACCEPTANCE": "PASS",
   "UNSET_SENTINELS_ON_PLAYER_WIRE": 0,
-  "RETAIL_AUTHENTICATION": "NOT_RUN",
-  "RETAIL_CHARACTER_SELECTION": "NOT_RUN",
-  "RETAIL_ZONE_ADMISSION": "NOT_RUN",
+  "RETAIL_AUTHENTICATION": "PASS",
+  "RETAIL_CHARACTER_SELECTION": "PASS",
+  "RETAIL_ZONE_ADMISSION": "PASS",
   "RETAIL_CHAR_IN_PLAY": "NOT_RUN",
-  "RETAIL_CHATENGINE_CONNECTION": "NOT_RUN",
-  "RETAIL_WORLD_ENTRY": "NOT_RUN",
-  "RETAIL_ZONE_CHANGE_1": "NOT_RUN",
-  "RETAIL_ZONE_CHANGE_2": "NOT_RUN",
-  "RETAIL_LOGOUT_RELOGIN": "NOT_RUN",
+  "RETAIL_CHATENGINE_CONNECTION": "PASS",
+  "RETAIL_WORLD_ENTRY": "PASS",
+  "RETAIL_ZONE_CHANGE_1": "PASS",
+  "RETAIL_ZONE_CHANGE_2": "PASS",
+  "RETAIL_LOGOUT_RELOGIN": "PASS",
   "RETAIL_POST_RESTART": "NOT_RUN",
-  "RETAIL_EVIDENCE": "Local isolated staging prepared on this source. Official-client actions/evidence pending.",
+  "RETAIL_EVIDENCE": "Mike confirmed completion of login, two zone changes and logout/relogin: \"done everything seems to be working\". Server logs confirm EP1 18.8.62, character 9950, PF655 -> PF1136 -> PF655, fresh hydration and the saved return position. Direct CharInPlay capture and official-client post-service-restart acceptance remain unverified.",
   "FILES_ADDED": [
     "docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECONCILIATION.md",
     "docs/reports/NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.json",
@@ -255,5 +255,11 @@
     "NEWENGINE_DAO_GAP_INVENTORY.json",
     "NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.json",
     "NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.md"
-  ]
+  ],
+  "RETAIL_CHAR_IN_PLAY_EVIDENCE": "NOT_CAPTURED: the 600-second capture ended before gameplay and contains zero packets; server logs do not directly record this inbound message.",
+  "RETAIL_LOG_SHA256": {
+    "loginengine": "d679e38e2622e101e836357ddecb14e2aaae466f065aab19211c8e1b6a6b406e",
+    "zoneengine": "6d4cc0267a3f7c35daf27a1929f576b1540aff739e0aadde3e8dbe22c65434b8",
+    "chatengine": "6f2f70539f2710b16741e8c69d8179d0d7b611ecce1f739b74d3c236401b2041"
+  }
 }

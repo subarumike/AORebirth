@@ -6,7 +6,7 @@ The shared character/inventory DAO is integrated. Windows exact-source acceptanc
 
 Local Linux container `aorebirth-linux-staging-032ee4cd` replaces only the prior staging applications, with a pre-change database backup and saved rollback arguments under `build-verify/hydration`. Linux binary hashes and complete gates are in [the machine-readable receipt](NEWENGINE_CHARACTER_HYDRATION_RECEIPT.json). Production, master, both source branches and Legacy are unchanged.
 
-Official-client result: NOT_RUN. Local isolated staging prepared on this source. Official-client actions/evidence pending. Production cutover remains **NOT APPROVED**. Do not relabel the historical failed attempt or prior user gameplay as acceptance of this exact source.
+Official-client gameplay result: **PASS** for EP1 login, world entry, PF655 -> PF1136 -> PF655 and logout/relogin. Mike confirmed completion of login, two zone changes and logout/relogin: "done everything seems to be working". Server logs confirm EP1 18.8.62, character 9950, PF655 -> PF1136 -> PF655, fresh hydration and the saved return position. Direct CharInPlay capture and official-client post-service-restart acceptance remain unverified. See [retail gameplay acceptance](NEWENGINE_RETAIL_GAMEPLAY_ACCEPTANCE.md). Production cutover remains **NOT APPROVED** pending the explicit packet and post-restart gates.
 
 See [hydration reconciliation](NEWENGINE_CHARACTER_HYDRATION_RECONCILIATION.md) and [field matrix](NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.md). Unknown Legacy-only stat requirements remain explicit; real armor effects are outside this milestone.
 

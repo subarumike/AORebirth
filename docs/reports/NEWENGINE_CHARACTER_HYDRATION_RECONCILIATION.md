@@ -137,3 +137,7 @@ recorded in `NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`. The earlier 536-test DAO
 baseline was rerun before this repair. No historical client login/walking report
 is relabelled acceptance of this new source. Production readiness remains NO until
 official client CharInPlay, ChatEngine, world entry and lifecycle are observed.
+
+## Retail gameplay result
+
+Mike completed the requested EP1 gameplay test successfully. Login, world entry, both building transitions and logout/relogin are confirmed by user observation and server logs. See `NEWENGINE_RETAIL_GAMEPLAY_ACCEPTANCE.md` for exact evidence and the still-unverified direct CharInPlay/post-service-restart gates.
