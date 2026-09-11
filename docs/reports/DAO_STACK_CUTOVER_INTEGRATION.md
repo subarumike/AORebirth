@@ -331,5 +331,26 @@ assertions are unchanged. This fixture-only correction requires a fresh final
 source commit and acceptance receipt; the passing `db08ae77` receipt remains
 identified by its actual SHA.
 
+The final mission DAO runs also reproduced the earlier foundation's disposable
+startup timeout twice, before any assertion. Captured server logs showed data
+initialization followed by MySQL's temporary port-0 server; final TCP startup had
+not completed within the fixture's 60 by 500ms polling allowance. Both cleanups
+passed. The mission fixture readiness bound is increased to 120 seconds while
+retaining readiness checks, assertions and owned-resource cleanup. DAO/engine
+code, database durability and test data are unchanged. Failed startup receipts
+remain separate from the eventual full/isolated results.
+The repaired full mission run passes 261 checks and reaches final MySQL TCP
+readiness within the new deadline. The isolated-source build then identifies a
+missing compile link to `CharacterOnlineOwnershipGuard`, which the shared
+character DAO now uses. Its test-project compile list is updated to include that
+existing production helper; this does not alter runtime code or relax the
+isolated assertions. The failed compile receipt is retained separately.
+Both repaired modes pass: 261 full-reference checks and all 275 isolated-source
+checks (`mission-readiness-repair-full.log`, `mission-readiness-repair-isolated.log`).
+Every linked source was checked: the existing `AOREBIRTH_WIN_NET10` symbol only
+removes the ownership helper's two unused parameterless Legacy overloads; no
+mission provider/start-area assertion is omitted. Owned container, network and
+volume cleanup passes. Captured final TCP startup completes within the new bound.
+
 This milestone does not migrate character/stat/inventory saves, vendor or trade
 systems, Account Broker/unified identity, or every remaining Legacy consumer.
