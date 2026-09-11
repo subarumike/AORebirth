@@ -22,8 +22,8 @@ Complete field-by-field result for the requested task. YES/PASS hydration and pa
 | Secure initial admission preserved | YES |
 | Secure retail redirect behavior preserved | YES |
 | Official client sends CharInPlay | NOT_RUN |
-| Official client connects ChatEngine | NOT_RUN |
-| Official client completes world entry | NOT_RUN |
+| Official client connects ChatEngine | PASS |
+| Official client completes world entry | PASS |
 | Full gameplay parity required | NO |
 | Real armor-effect proof required for this milestone | NO |
 | Legacy removed | NO |
@@ -80,9 +80,9 @@ COMMIT=032ee4cd39433bbe124217a745474573e720e820
 PUSH_RESULT=See final delivery; push follows acceptance and receipt commit
 FINAL_WORKTREE_STATUS=Clean committed source passed exact-source acceptance; receipt-only commit follows
 CHARACTER_DAO_INTEGRATION=PASS
-PLAYER_HYDRATION_RETAIL_VALID=NO - awaiting this source official-client evidence
-FULLCHARACTER_RETAIL_VALID=NO - awaiting this source official-client evidence
-SCFU_RETAIL_VALID=NO - awaiting this source official-client evidence
+PLAYER_HYDRATION_RETAIL_VALID=YES - tested EP1 player/world entry; not exhaustive field or gameplay parity
+FULLCHARACTER_RETAIL_VALID=YES - tested EP1 player/world entry; not exhaustive field or gameplay parity
+SCFU_RETAIL_VALID=YES - tested EP1 player/world entry; not exhaustive field or gameplay parity
 PRODUCTION_CUTOVER_READY=NO
 CUTOVER_SOURCE_BRANCH_TOUCHED=NO
 DAO_SOURCE_BRANCH_TOUCHED=NO
@@ -114,17 +114,17 @@ SCFU_SEMANTIC_VALIDATION=PASS
 SYNTHETIC_PLAYER_PAYLOAD_VALIDATION=PASS
 SYNTHETIC_CONNECTED_ACCEPTANCE=PASS
 UNSET_SENTINELS_ON_PLAYER_WIRE=0
-RETAIL_AUTHENTICATION=NOT_RUN
-RETAIL_CHARACTER_SELECTION=NOT_RUN
-RETAIL_ZONE_ADMISSION=NOT_RUN
+RETAIL_AUTHENTICATION=PASS
+RETAIL_CHARACTER_SELECTION=PASS
+RETAIL_ZONE_ADMISSION=PASS
 RETAIL_CHAR_IN_PLAY=NOT_RUN
-RETAIL_CHATENGINE_CONNECTION=NOT_RUN
-RETAIL_WORLD_ENTRY=NOT_RUN
-RETAIL_ZONE_CHANGE_1=NOT_RUN
-RETAIL_ZONE_CHANGE_2=NOT_RUN
-RETAIL_LOGOUT_RELOGIN=NOT_RUN
+RETAIL_CHATENGINE_CONNECTION=PASS
+RETAIL_WORLD_ENTRY=PASS
+RETAIL_ZONE_CHANGE_1=PASS
+RETAIL_ZONE_CHANGE_2=PASS
+RETAIL_LOGOUT_RELOGIN=PASS
 RETAIL_POST_RESTART=NOT_RUN
-RETAIL_EVIDENCE=Local isolated staging prepared on this source. Official-client actions/evidence pending.
+RETAIL_EVIDENCE=Mike confirmed completion of login, two zone changes and logout/relogin: "done everything seems to be working". Server logs confirm EP1 18.8.62, character 9950, PF655 -> PF1136 -> PF655, fresh hydration and the saved return position. Direct CharInPlay capture and official-client post-service-restart acceptance remain unverified.
 ```
 
 ## Files and validation evidence
@@ -133,4 +133,4 @@ Implementation additions/modifications and all log/binary SHA256 values are in `
 
 ## Remaining risks
 
-Official-client interaction is pending on this source. The 23 Legacy-only stat IDs retain unknown retail necessity. Valid values too wide for the current byte/short FullCharacter groups now reject instead of wrapping; no wider encoding was guessed. Existing NanoService normalization remains its own DAO transaction; this task does not claim a cross-source atomic database snapshot or redesign nano restoration. No ISCom/Buckethead failure occurred in final exact-source acceptance. Legacy data does not automatically mirror new item-instance writes, so rollback needs the staging backup rather than a blind engine switch.
+Official-client gameplay passed on this source; direct inbound CharInPlay evidence and post-service-restart client acceptance remain pending. See `NEWENGINE_RETAIL_GAMEPLAY_ACCEPTANCE.md`. The 23 Legacy-only stat IDs retain unknown retail necessity. Valid values too wide for the current byte/short FullCharacter groups now reject instead of wrapping; no wider encoding was guessed. Existing NanoService normalization remains its own DAO transaction; this task does not claim a cross-source atomic database snapshot or redesign nano restoration. No ISCom/Buckethead failure occurred in final exact-source acceptance. Legacy data does not automatically mirror new item-instance writes, so rollback needs the staging backup rather than a blind engine switch.

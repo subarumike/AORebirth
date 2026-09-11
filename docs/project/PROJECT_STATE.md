@@ -9,7 +9,7 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Character/inventory DAO and retail hydration reconciliation: committed source `032ee4cd39433bbe124217a745474573e720e820` passes all offline gates (544 NewEngine, 1129 messaging, 12 mandatory). Local Linux staging is prepared. Exact-source official-client acceptance remains NOT_RUN. Production cutover remains unapproved. See `docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECEIPT.json`.
+- Character/inventory DAO and retail hydration reconciliation: committed source `032ee4cd39433bbe124217a745474573e720e820` passes all offline gates (544 NewEngine, 1129 messaging, 12 mandatory). Local Linux staging is prepared. EP1 retail login, world entry, PF655 -> PF1136 -> PF655 and logout/relogin now pass. Direct inbound CharInPlay capture and post-service-restart retail acceptance remain unverified. Production cutover remains unapproved. See `docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECEIPT.json`.
 
 - Isolated DAO integration candidate: the five-commit account/character/mission
   stack is integrated at foundation checkpoint `a8daaa5e`. Supported account,
