@@ -301,5 +301,16 @@ used to connect. The unnecessary field was removed, with the three focused
 character consumer tests passing in `character-consumer-fixture-final.log`.
 The scanner and its policy were not changed.
 
+At `21563185f12a3a7a6a2e73bb918d2ed50e76fc08`, the first two mandatory
+gates passed, then the DAO architecture guard rejected the obsolete direct-SQL
+exception for `StaleOnlineRecovery.cs`. The migration had reduced actual SQL
+sites to six, while the baseline still listed seven; there were zero new SQL
+violations. The obsolete exception was removed from
+`Tools/DaoArchitectureGuard/known-violations.json`. The guard itself was not
+changed. The failed receipt remains `windows-source-21563185.log`.
+With the obsolete exception removed, all 12 mandatory stages pass, including
+the full 534-test NewEngine suite, in `mandatory-source-precommit.log`. This
+precommit receipt is distinct from the subsequent exact-source acceptance.
+
 This milestone does not migrate character/stat/inventory saves, vendor or trade
 systems, Account Broker/unified identity, or every remaining Legacy consumer.

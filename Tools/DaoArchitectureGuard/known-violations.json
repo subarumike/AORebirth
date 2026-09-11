@@ -35,12 +35,6 @@
       "category": "database-readiness",
       "owner": "readiness-tooling",
       "targetPhase": 8
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine/StaleOnlineRecovery.cs",
-      "category": "character-online-state",
-      "owner": "ICharacterDao",
-      "targetPhase": 3
     }
   ]
 }
