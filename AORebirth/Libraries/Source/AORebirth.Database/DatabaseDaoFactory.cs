@@ -12,6 +12,12 @@ namespace AORebirth.Database
     /// </summary>
     public static class DatabaseDaoFactory
     {
+        /// <summary>Creates full gameplay storage without opening a connection.</summary>
+        public static ICharacterPersistenceDao CreateCharacterPersistenceDao()
+        {
+            return new MySqlCharacterPersistenceDao();
+        }
+
         /// <summary>Creates the MySQL character DAO lazily; no runtime initialization or connection is opened.</summary>
         public static ICharacterDao CreateCharacterDao()
         {

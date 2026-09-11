@@ -88,6 +88,7 @@ try
     Console.WriteLine("TWO_PARTY_TRADE_ATOMIC_COMMIT=PASS TWO_PARTY_TRADE_LATE_FAILURE_ROLLBACK=PASS");
     GeneratedMissionSmoke.Validate(fixture, connection);
     InventoryMutationSmoke.Validate(fixture, connection);
+    CharacterPersistenceFaultSmoke.Validate(fixture, connection);
     ActiveNanoSmoke.Validate(fixture, connection);
     AuthoredMissionSmoke.Validate(fixture, connection);
     CutoverDurableReloadSmoke.Validate(args[2], fixture, connection);

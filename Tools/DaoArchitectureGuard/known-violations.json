@@ -19,18 +19,6 @@
       "targetPhase": 8
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
-      "category": "zoneengine-new-character-persistence",
-      "owner": "ICharacterDao",
-      "targetPhase": 3
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs",
-      "category": "zoneengine-new-character-persistence",
-      "owner": "ICharacterDao",
-      "targetPhase": 3
-    },
-    {
       "path": "AORebirth/Server/ZoneEngine/Program.cs",
       "category": "database-readiness",
       "owner": "readiness-tooling",

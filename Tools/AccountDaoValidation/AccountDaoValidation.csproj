@@ -8,6 +8,8 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/IdentityType.cs" />
+    <Compile Include="../../AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/CharacterStat.cs" />
     <!-- Actual production sources, including the unchanged legacy characterization path.
          Only Connector/log/config hosting is isolated; no alternative DAO is modeled. -->
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/**/*.cs" />

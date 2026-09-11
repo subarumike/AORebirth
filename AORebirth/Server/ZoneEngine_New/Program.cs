@@ -163,6 +163,9 @@ namespace ZoneEngine_New
             ServiceCollection services = new ServiceCollection();
 
             services.AddSingleton<IZoneLogger, NLogZoneLogger>();
+            services.AddSingleton<AORebirth.Interfaces.Persistence.Characters.ICharacterPersistenceDao>(_ =>
+                new AORebirth.Database.Domain.Characters.MySqlCharacterPersistenceDao(() =>
+                    new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
             services.AddSingleton<AORebirth.Interfaces.Persistence.Characters.ICharacterDao>(_ =>
                 new AORebirth.Database.Domain.Characters.MySqlCharacterDao(() =>
                     new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
