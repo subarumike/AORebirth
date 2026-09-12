@@ -1,0 +1,1937 @@
+{
+  "MASTER_BEFORE_SHA": "7be49b22b4c0116af9c48dc88a44f86ba802f7c7",
+  "ORIGIN_MASTER_SHA": "7be49b22b4c0116af9c48dc88a44f86ba802f7c7",
+  "INTEGRATION_BRANCH": "codex/newengine-retail-hydration-dao-001",
+  "INTEGRATION_SHA": "b48c22444aa11d8d77d653bcc5e8903b9a2d92e8",
+  "COMMON_ANCESTOR": "6e90dda030774726aa2060acb9edb756ea1f635c",
+  "RECOVERY_REF": "codex/pre-master-cutover-20260912",
+  "MERGE_COMMIT": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+  "SOURCE_SHA": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+  "mergeParents": "7be49b22b4c0116af9c48dc88a44f86ba802f7c7 b48c22444aa11d8d77d653bcc5e8903b9a2d92e8",
+  "masterCodePreservation": {
+    "tools-temp/AOSharpCaptureAnalyzer/AOSharpCaptureAnalyzer.csproj": true,
+    "tools-temp/AOSharpCaptureAnalyzer/Program.cs": true,
+    "tools-temp/AOSharpCaptureAnalyzer/ScfuAcgCorrelation.cs": true
+  },
+  "unrelatedUntrackedPreservedBeforeBuild": true,
+  "mergeFiles": [
+    "M\tAGENTS.md",
+    "M\tAORebirth/Libraries/Source/AORebirth.Communication/ISComV2Client/ISComV2ClientBase.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Core/Encryption/LoginEncryption.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database.Schema/DatabaseSchemaReadiness.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database.Schema/SchemaContract.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterDao.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/Dao/LoginDataDao.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/Dao/NewCharacterStartAreaSelectionDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Dao/TeleportRoutingDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Dao/ZoneHandoffStore.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Accounts/MySqlAccountDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.Legacy.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Inventory.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Legacy.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Transactions.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Legacy.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+    "M\tAORebirth/Libraries/Source/AORebirth.Database/Misc.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionartifacts.sql",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionbatches.sql",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionbindings.sql",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionobjects.sql",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionobservations.sql",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionoffers.sql",
+    "A\tAORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionsequences.sql",
+    "M\tAORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/GameAccountAuthenticationData.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/GameAccountData.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/GameAccountLookupResult.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/IAccountDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Accounts/NewGameAccountData.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterDirectoryData.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterPersistenceData.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterPersistenceDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineCharacterData.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineRecoveryData.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IGeneratedMissionDao.cs",
+    "M\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionDao.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionInventoryMutationTransaction.cs",
+    "A\tAORebirth/Libraries/Source/AORebirth.World.Package/AORebirth.World.Package.csproj",
+    "A\tAORebirth/Libraries/Source/AORebirth.World.Package/PlayfieldPackageValidator.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/AbmouthEncounterRuntimeServiceTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatActiveCoverageTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatProfileCatalogTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DungeonNamedEncounterCompletionTests.cs",
+    "A\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/LegacyGameplaySource.cs",
+    "A\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/LegacyGameplaySourceTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgTokenProgressRuntimeContractTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OfficialPlayfieldPlacementBuildContractTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PlayfieldCollisionGeometryTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PlayfieldLifecycleTraceTests.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SmokeLounge.AOtomation.Messaging.Tests.csproj",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TypeMetaBuilderTest.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/SystemMessages/ZoneInfoMessage.cs",
+    "M\tAORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/SystemMessages/ZoneLoginMessage.cs",
+    "M\tAORebirth/Libraries/Source/Utility/Config/ConfigReadWrite.cs",
+    "M\tAORebirth/Server/ChatEngine/ChatEngine.csproj",
+    "M\tAORebirth/Server/ChatEngine/CoreClient/CharacterBase.cs",
+    "M\tAORebirth/Server/ChatEngine/CoreServer/ChatServer.cs",
+    "A\tAORebirth/Server/ChatEngine/CoreServer/ChatSessionOwnership.cs",
+    "M\tAORebirth/Server/ChatEngine/PacketHandlers/Authenticate.cs",
+    "M\tAORebirth/Server/ChatEngine/PacketHandlers/LftSearch.cs",
+    "M\tAORebirth/Server/ChatEngine/PacketHandlers/LoginCharacter.cs",
+    "M\tAORebirth/Server/ChatEngine/PacketHandlers/PlayerNameLookup.cs",
+    "M\tAORebirth/Server/ChatEngine/Packets/AccountCharacterList.cs",
+    "M\tAORebirth/Server/LoginEngine/CharacterCreation/StarterVitalStats.cs",
+    "M\tAORebirth/Server/LoginEngine/CoreClient/Client.cs",
+    "M\tAORebirth/Server/LoginEngine/MessageHandlers/SelectCharacterHandler.cs",
+    "M\tAORebirth/Server/LoginEngine/Packets/CharacterName.cs",
+    "M\tAORebirth/Server/LoginEngine/Program.cs",
+    "M\tAORebirth/Server/LoginEngine/QueryBase/CharacterList.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/AdventurerMorphFlightRuntime.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Arete/Quests/SafeQuestFullUpdateSender.AuthoredData.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Arete/Quests/SafeQuestFullUpdateSender.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/CombatCorpseRules.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Doja/DojaChipPacketSender.Data.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Doja/DojaChipPacketSender.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/FlintKneecappingTipWire.Data.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/FlintKneecappingTipWire.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgAcceptedQfuBuilder.Legacy.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgAcceptedQfuBuilder.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgAllocationService.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCorpseCreditPolicy.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCorpsePolicy.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgIdentityRanges.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgTokenProgressState.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Missions/MissionAcgTokenRewardPolicy.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.Legacy.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Packets/CorpseFullUpdate.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Packets/GeneratedMissionCorpseWire.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Packets/MorphCaptureWireCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatData.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.Data.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileData.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileMatching.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatSequenceData.cs",
+    "A\tAORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCombatSetupGenerator.Data.cs",
+    "M\tAORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCombatSetupGenerator.cs",
+    "M\tAORebirth/Server/ZoneEngine/StaleOnlineRecovery.cs",
+    "M\tAORebirth/Server/ZoneEngine/ZoneEngine.csproj",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedAreteVendorTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedGardenVendorTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedNpcActivationTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedQuestPropTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedStandaloneShopRuntimeTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedSubwayMerchantTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedSubwayShopRuntimeTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedVendorDeathTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AcceptedVendorRealCatalogTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AmbientRestorationTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AuthoredMissionTestDao.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/AuthoredQuestTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/BucketheadNanoTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/BuildingExitProxyTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/CapturedNpcCombatResolverTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/CellHeatSchedulerTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/CharacterDaoConsumerTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/CharacterPersistenceOwnershipTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/CharacterSpawnHydrationTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/ChatSessionOwnershipTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/DatabaseSchemaReadinessTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/DialogueTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/ExactSpawnVisibilityTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedCombatCarrierTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionCorpseInteractionTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionCorpseWireTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionLoginPlanTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionMaterializationTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionServiceTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionTokenPolicyTests.cs",
+    "M\tAORebirth/Server/ZoneEngine_New.Tests/HashItemCatalogTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/ISComPortableTransportTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/InventoryActionTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/ItemInstanceAssignmentTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/ItemsDatCompressionCompatibilityTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/MissionCorpseInteractionLeaseTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/MissionNpcCombatPolicyTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/MorphVisualPacketTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/NanoCatalogTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/NpcTemplateLevelPolicyTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/OfficialHashSpawnAuthorizationTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/PlayfieldTransferTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/RetailZoneInfoLayoutTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/RuntimeStartupTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/SessionOwnershipTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/TeamServiceTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/TeleportDestinationCatalogTests.cs",
+    "M\tAORebirth/Server/ZoneEngine_New.Tests/TestDoubles.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/TradePersistenceTests.cs",
+    "M\tAORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/ZoneHandoffStoreTests.cs",
+    "A\tAORebirth/Server/ZoneEngine_New.Tests/ZoneHandoffWireTests.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationResult.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationValidator.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Characters/CharacterSnapshotService.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Characters/PlayerHydrator.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Characters/PlayerSpawnPayloadValidator.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Commands/GiveItemCommand.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Commands/TeleportCommand.cs",
+    "D\tAORebirth/Server/ZoneEngine_New/Core/Data/DatabaseMigrationRunner.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/ICharacterRepository.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Data/IInventoryMutationPersistence.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Data/ITradePersistence.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/ItemInstanceIdAllocator.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlActiveNanoRepository.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterCoalesceCommit.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterRepository.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryMutationPersistence.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlItemNameRepository.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlStatRepository.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlTradePersistence.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Data/MySqlUploadedNanoRepository.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Data/SharedCharacterPersistence.cs",
+    "D\tAORebirth/Server/ZoneEngine_New/Core/Data/SqlTablesBootstrap.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueActionRouter.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueWire.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Entities/Dynel.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Entities/LootableDynel.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/GameData/HashItemCatalog.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Helpers/DamageCalculator.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Inventory/Dat/ItemsDatReader.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryActionService.Vitals.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryActionService.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryFlushService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryMoveService.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Inventory/Item.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Inventory/ItemBuilder.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Inventory/ItemTemplate.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Inventory/ItemUseFunctions.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/AttackMessageHandler.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/DialogueMessageHandlers.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/GenericCmdMessageHandler.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestMessageHandler.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/RaidCmdMessageHandler.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AcceptedQuestPropService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionTransactionScope.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Dialogue.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Sarah.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Stan.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Corpses.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Lifecycle.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Objectives.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionArtifactProjection.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionCorpseDynel.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionCorpseProjection.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionTokenProjection.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWorld.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Missions/MissionCorpseInteractionLease.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteQuestNpcCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedGardenVendorCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedNpcActivationService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedSocialNpcCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedSubwayMerchantCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/BucketheadSummonService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/CapturedNpcCombatResolver.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/GeneratedMissionNpcFactory.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatPolicy.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatRuntime.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Mobs/NpcTemplateLevelPolicy.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/AmbientRestorationNanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/BucketheadNanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/IActiveNanoProjection.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/IActiveNanoRepository.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/INanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/MongoNanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/MorphNanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/MorphVisualPackets.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/NanoCatalog.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/NanoDerivedStats.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/NanoEffectPlan.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/NanoRequirements.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/NanoService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/OverviewMapNanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/SparrowChildNanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Nanos/TeamWarpNanoSpecialization.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Network/IGameTimeSession.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Network/SessionState.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Network/ZoneAdmissionGate.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Network/ZoneMessageDispatcher.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Network/ZoneNetworkHost.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Network/ZoneRedirectEndpoint.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Network/ZoneSession.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/DynelRegistry.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/CellHeatScheduler.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/LocalityVisibility.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/PlayfieldLocality.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Playfield/MissionPlayfield.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Playfield/OfficialHashSpawnAuthorization.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldInboundItem.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldInboundQueue.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldTransfer.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Teams/TeamChatMessageHandler.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/Teams/TeamService.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Trade/ShopStock.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Trade/TradeService.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/Trade/TradeSession.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Core/WorldSimulation/TeleportDestinationCatalog.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Core/WorldSimulation/TriggerVolumeCatalog.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/Program.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/Properties/IntegrationTestVisibility.cs",
+    "A\tAORebirth/Server/ZoneEngine_New/RuntimeStartup.cs",
+    "M\tAORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
+    "M\tDAO_REFACTOR_ROADMAP.md",
+    "M\tLinuxBuild/AORebirth.Linux.slnx",
+    "M\tLinuxBuild/Compatibility/LoginEngine/LinuxProgram.cs",
+    "M\tLinuxBuild/README.md",
+    "A\tLinuxBuild/Tools/BackendIntegrationGuard/BackendIntegrationGuard.csproj",
+    "A\tLinuxBuild/Tools/BackendIntegrationGuard/Program.cs",
+    "M\tLinuxBuild/Tools/CompatibilitySmokeTests/Fixtures/LegacyStage2PublicContracts.manifest",
+    "M\tLinuxBuild/Tools/CompatibilitySmokeTests/Fixtures/LegacyStage3Contracts.manifest",
+    "M\tLinuxBuild/Tools/CompatibilitySmokeTests/Fixtures/LegacyStage4Contracts.manifest",
+    "M\tLinuxBuild/Tools/Stage3OfflineSmokeTests/Program.cs",
+    "M\tLinuxBuild/Tools/Stage5ContractFixtures/LegacyStage5Contracts.manifest",
+    "M\tLinuxBuild/Tools/Stage5RepositoryChecks.cs",
+    "M\tLinuxBuild/Tools/Stage7ContractFingerprint.cs",
+    "M\tLinuxBuild/Tools/Stage7ContractFixtures/LegacyStage7Contracts.manifest",
+    "M\tLinuxBuild/Tools/Stage7RuntimeFixtures.cs",
+    "M\tLinuxBuild/Tools/Stage8OfflineSmokeTests/ProductionDeploymentWorkflowContractTests.cs",
+    "M\tLinuxBuild/Tools/Stage8OfflineSmokeTests/StaleOnlineRecoveryTests.cs",
+    "M\tLinuxBuild/accept-linux-sha.sh",
+    "M\tLinuxBuild/build-linux.cmd",
+    "M\tLinuxBuild/build-linux.sh",
+    "A\tLinuxBuild/deployment/ZONEENGINE_NEW_BACKEND.md",
+    "M\tLinuxBuild/deployment/production-release/README.md",
+    "M\tLinuxBuild/deployment/production-release/create-release-manifest.sh",
+    "M\tLinuxBuild/deployment/production-release/tests/test-upgrade-active-services.sh",
+    "M\tLinuxBuild/deployment/production-release/upgrade-active-services.sh",
+    "A\tLinuxBuild/deployment/systemd/ao-rebirth-zoneengine-legacy.service",
+    "M\tLinuxBuild/deployment/systemd/ao-rebirth-zoneengine.service",
+    "M\tLinuxBuild/deployment/zone-stage9/upgrade-live-service.sh",
+    "M\tLinuxBuild/deployment/zone-stage9/validate-disabled-service.sh",
+    "M\tLinuxBuild/publish-zoneengine.cmd",
+    "M\tLinuxBuild/publish-zoneengine.sh",
+    "M\tLinuxBuild/source-inventory/AORebirth.Database.CompileItems.props",
+    "M\tLinuxBuild/source-inventory/AORebirth.Database.ContentItems.props",
+    "M\tLinuxBuild/source-inventory/AORebirth.Enums.CompileItems.props",
+    "M\tLinuxBuild/source-inventory/AORebirth.Interfaces.CompileItems.props",
+    "M\tLinuxBuild/source-inventory/ChatEngine.CompileItems.props",
+    "M\tLinuxBuild/source-inventory/ZoneEngine.CompileItems.props",
+    "M\tNewZoneEngineBuild/build.cmd",
+    "A\tTools/AcceptedOrdinaryBindingExport/AcceptedOrdinaryBindingExport.csproj",
+    "A\tTools/AcceptedOrdinaryBindingExport/Program.cs",
+    "A\tTools/AccountDaoValidation/AccountDaoValidation.csproj",
+    "A\tTools/AccountDaoValidation/ConsumerAdapterChecks.cs",
+    "A\tTools/AccountDaoValidation/DisposableMySql.cs",
+    "A\tTools/AccountDaoValidation/FailureChecks.cs",
+    "A\tTools/AccountDaoValidation/IsolatedHost.cs",
+    "A\tTools/AccountDaoValidation/Program.cs",
+    "A\tTools/AccountDaoValidation/README.md",
+    "A\tTools/AccountDaoValidation/acceptance-evidence.json",
+    "A\tTools/CharacterDaoValidation/CharacterDaoValidation.csproj",
+    "A\tTools/CharacterDaoValidation/ConcurrencyChecks.cs",
+    "A\tTools/CharacterDaoValidation/DisposableMySql.cs",
+    "A\tTools/CharacterDaoValidation/FailureChecks.cs",
+    "A\tTools/CharacterDaoValidation/IsolatedHost.cs",
+    "A\tTools/CharacterDaoValidation/ObservedConnection.cs",
+    "A\tTools/CharacterDaoValidation/OfflineCompatibilityChecks.cs",
+    "A\tTools/CharacterDaoValidation/Program.cs",
+    "A\tTools/CharacterDaoValidation/README.md",
+    "A\tTools/CharacterDaoValidation/RecoveryOwnershipChecks.cs",
+    "A\tTools/CharacterDaoValidation/acceptance-evidence.json",
+    "M\tTools/DaoArchitectureGuard/dao_architecture_guard.py",
+    "M\tTools/DaoArchitectureGuard/known-violations.json",
+    "A\tTools/DatabaseMigrationTool/DatabaseMigrationTool.csproj",
+    "A\tTools/DatabaseMigrationTool/MigrationCommand.cs",
+    "A\tTools/DatabaseMigrationTool/Program.cs",
+    "M\tTools/LoginAuthenticationValidation/Program.cs",
+    "A\tTools/MissionDaoValidation/HardeningChecks.cs",
+    "A\tTools/MissionDaoValidation/IsolatedHost.cs",
+    "M\tTools/MissionDaoValidation/MissionDaoValidation.csproj",
+    "A\tTools/MissionDaoValidation/ParallelContractChecks.cs",
+    "M\tTools/MissionDaoValidation/Program.cs",
+    "A\tTools/MissionDaoValidation/ReconciliationChecks.cs",
+    "A\tTools/NewEngineCutoverInventory/NewEngineCutoverInventory.csproj",
+    "A\tTools/NewEngineCutoverInventory/Program.cs",
+    "A\tTools/PlayfieldPackage/PackageSelfTests.cs",
+    "A\tTools/PlayfieldPackage/PlayfieldPackage.csproj",
+    "A\tTools/PlayfieldPackage/Program.cs",
+    "M\tTools/RDBDataExtractor/ItemsDatWriter.cs",
+    "M\tTools/RDBDataExtractor/RDBDataExtractor.csproj",
+    "A\tTools/ZoneEngineSchemaValidation/ActiveNanoSmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/CharacterPersistenceFaultSmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/CharacterPersistenceGameplaySmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/ConnectedAcceptanceSmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/ConnectedCharacterPersistence.cs",
+    "A\tTools/ZoneEngineSchemaValidation/ConnectedEngineProcess.cs",
+    "A\tTools/ZoneEngineSchemaValidation/ConnectedHandoffAcceptance.cs",
+    "A\tTools/ZoneEngineSchemaValidation/ConnectedMissionSeed.cs",
+    "A\tTools/ZoneEngineSchemaValidation/ConnectedWireClient.cs",
+    "A\tTools/ZoneEngineSchemaValidation/CutoverDurableReloadSmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/InventoryMutationSmoke.cs",
+    "A\tTools/ZoneEngineSchemaValidation/LifecyclePersistenceEvidence.cs",
+    "A\tTools/ZoneEngineSchemaValidation/Program.cs",
+    "A\tTools/ZoneEngineSchemaValidation/ZoneEngineSchemaValidation.csproj",
+    "M\tTools/accept_windows_source.cmd",
+    "A\tTools/accepted_npc_activation_inventory.ps1",
+    "M\tTools/build_aorebirth_debug.cmd",
+    "M\tTools/engine_status_probe.js",
+    "A\tTools/export_accepted_ordinary_bindings.cmd",
+    "A\tTools/generate_newengine_cutover_inventory.cmd",
+    "M\tTools/generated_combat_pipeline.py",
+    "A\tTools/manage_playfield_package.cmd",
+    "A\tTools/manage_playfield_package.sh",
+    "A\tTools/run_account_dao_validation.cmd",
+    "A\tTools/run_character_dao_validation.cmd",
+    "M\tTools/run_dao_architecture_guard.cmd",
+    "M\tTools/run_mandatory_integration_gate.cmd",
+    "M\tTools/run_mission_dao_validation.cmd",
+    "A\tTools/run_newengine_connected_acceptance.cmd",
+    "A\tTools/run_zoneengine_new_tests.cmd",
+    "A\tTools/run_zoneengine_schema_validation.cmd",
+    "M\tTools/tests/test_engine_management_contracts.py",
+    "M\tTools/tests/test_generated_combat_active_coverage_governance.py",
+    "M\tTools/tests/test_generated_combat_pipeline.py",
+    "M\tWindowsBuildNet10/Projects/AORebirth.Interfaces.ZoneNew.WinNet10.csproj",
+    "M\tWindowsBuildNet10/Projects/Utility.ZoneNew.WinNet10.csproj",
+    "M\tdocs/ai/CURRENT_TASK.md",
+    "M\tdocs/ai/WORKFLOW.md",
+    "A\tdocs/evidence/DELMUS_D2D98446_FILE_RECONCILIATION.json",
+    "A\tdocs/evidence/DELMUS_D2D98446_RUNTIME_RECONCILIATION.md",
+    "A\tdocs/evidence/DELMUS_ZONEENGINE_WINDOWS_LINUX_INTEGRATION_20260908.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_DIALOGUE_GAP_CLOSURE.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_FULL_INTEGRATION_20260908.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_GAMEPLAY_CHECKPOINT_20260908.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_GAP_CLOSURE_20260908.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_INVENTORY_RECONCILIATION.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_MISSIONS_RECONCILIATION.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_MISSION_GAP_CLOSURE.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_NANOS_RECONCILIATION.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_NANO_GAP_CLOSURE.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_NPC_ACTIVATION_INVENTORY.json",
+    "A\tdocs/evidence/ZONEENGINE_NEW_NPC_ACTIVATION_INVENTORY.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_NPC_COMBAT_RECONCILIATION.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_ORDINARY_BINDING_CONSUMERS.json",
+    "A\tdocs/evidence/ZONEENGINE_NEW_RUNTIME_CONSUMER_CHECKPOINT.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_SUBWAY_MERCHANT_GAP_CLOSURE.md",
+    "A\tdocs/evidence/ZONEENGINE_NEW_TEAMS_RECONCILIATION.md",
+    "M\tdocs/generated/capture_backed_npc_combat_active_coverage.json",
+    "M\tdocs/generated/capture_backed_npc_combat_generation_manifest.json",
+    "A\tdocs/generated/playfields/playfield-package-extraction-provenance.json",
+    "A\tdocs/generated/playfields/playfield-package-manifest.json",
+    "A\tdocs/project/PLAYFIELD_PACKAGE_SUPPLY.md",
+    "M\tdocs/project/PROJECT_STATE.md",
+    "A\tdocs/project/ZONEENGINE_NEW_TRANSITION_PLAN.md",
+    "A\tdocs/reports/ACCOUNT_DAO_PARALLEL_HANDOFF.md",
+    "A\tdocs/reports/CHARACTER_DAO_PARALLEL_HANDOFF.md",
+    "A\tdocs/reports/CHARACTER_INVENTORY_PERSISTENCE_DAO.md",
+    "A\tdocs/reports/DAO_STACK_CUTOVER_INTEGRATION.md",
+    "A\tdocs/reports/MISSION_DAO_PARALLEL_HANDOFF.md",
+    "A\tdocs/reports/MISSION_PERSISTENCE_DAO_BUILD_ACCEPTANCE.json",
+    "A\tdocs/reports/MISSION_PERSISTENCE_DAO_BUILD_ACCEPTANCE.md",
+    "A\tdocs/reports/MISSION_PERSISTENCE_DAO_HANDOFF.md",
+    "A\tdocs/reports/NEWENGINE_CHARACTER_HYDRATION_ACCEPTANCE.md",
+    "A\tdocs/reports/NEWENGINE_CHARACTER_HYDRATION_RECEIPT.json",
+    "A\tdocs/reports/NEWENGINE_CHARACTER_HYDRATION_RECONCILIATION.md",
+    "A\tdocs/reports/NEWENGINE_CONNECTED_ACCEPTANCE.md",
+    "A\tdocs/reports/NEWENGINE_CUTOVER_HANDOFF.md",
+    "A\tdocs/reports/NEWENGINE_CUTOVER_RECONCILIATION.json",
+    "A\tdocs/reports/NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md",
+    "A\tdocs/reports/NEWENGINE_DAO_GAP_INVENTORY.json",
+    "A\tdocs/reports/NEWENGINE_DAO_GAP_INVENTORY.md",
+    "A\tdocs/reports/NEWENGINE_DATABASE_CUTOVER_AND_ROLLBACK_PLAN.md",
+    "A\tdocs/reports/NEWENGINE_INTERIOR_DOOR_ROUTING.md",
+    "A\tdocs/reports/NEWENGINE_LEGACY_DEPENDENCY_INVENTORY.json",
+    "A\tdocs/reports/NEWENGINE_LEGACY_DEPENDENCY_INVENTORY.md",
+    "A\tdocs/reports/NEWENGINE_OFFICIAL_CLIENT_STAGING_ACCEPTANCE.md",
+    "A\tdocs/reports/NEWENGINE_OPERATIONAL_ACCEPTANCE.md",
+    "A\tdocs/reports/NEWENGINE_RETAIL_GAMEPLAY_ACCEPTANCE.md",
+    "A\tdocs/reports/NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.json",
+    "A\tdocs/reports/NEWENGINE_RETAIL_SPAWN_FIELD_MATRIX.md",
+    "A\tdocs/reports/NEWENGINE_SUPPORTED_FEATURE_MATRIX.json",
+    "A\tdocs/reports/NEWENGINE_ZONE_HANDOFF_SECURITY.md",
+    "M\trestart-engines.cmd",
+    "M\tstart-engines.ps1",
+    "M\tstatus-engines.cmd",
+    "M\tstop-engines.ps1",
+    "M\ttools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py"
+  ],
+  "WINDOWS_ACCEPTANCE": "PASS",
+  "windowsEvidence": [
+    {
+      "line": 1721,
+      "text": "[AORebirth Gate] PASS 1/12 secret scan"
+    },
+    {
+      "line": 1771,
+      "text": "[AORebirth Gate] PASS 2/12 engine management safety contracts"
+    },
+    {
+      "line": 1777,
+      "text": "NEW_VIOLATIONS=0"
+    },
+    {
+      "line": 1779,
+      "text": "[AORebirth Gate] PASS 3/12 DAO architecture guard"
+    },
+    {
+      "line": 1845,
+      "text": "Total tests: 53"
+    },
+    {
+      "line": 1846,
+      "text": "     Passed: 53"
+    },
+    {
+      "line": 1848,
+      "text": "[AORebirth Gate] PASS 4/12 generated combat runtime contracts"
+    },
+    {
+      "line": 2990,
+      "text": "Total tests: 1129"
+    },
+    {
+      "line": 2991,
+      "text": "     Passed: 1129"
+    },
+    {
+      "line": 2993,
+      "text": "[AORebirth Gate] PASS 5/12 complete AOtomation suite"
+    },
+    {
+      "line": 3012,
+      "text": "Total tests: 6"
+    },
+    {
+      "line": 3013,
+      "text": "     Passed: 6"
+    },
+    {
+      "line": 3079,
+      "text": "Total tests: 53"
+    },
+    {
+      "line": 3080,
+      "text": "     Passed: 53"
+    },
+    {
+      "line": 3100,
+      "text": "Total tests: 7"
+    },
+    {
+      "line": 3101,
+      "text": "     Passed: 7"
+    },
+    {
+      "line": 3117,
+      "text": "Total tests: 3"
+    },
+    {
+      "line": 3118,
+      "text": "     Passed: 3"
+    },
+    {
+      "line": 3170,
+      "text": "Total tests: 39"
+    },
+    {
+      "line": 3171,
+      "text": "     Passed: 39"
+    },
+    {
+      "line": 3222,
+      "text": "Total tests: 38"
+    },
+    {
+      "line": 3223,
+      "text": "     Passed: 38"
+    },
+    {
+      "line": 3253,
+      "text": "Total tests: 17"
+    },
+    {
+      "line": 3254,
+      "text": "     Passed: 17"
+    },
+    {
+      "line": 3268,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3269,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3283,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3284,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3298,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3299,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3313,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3314,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3328,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3329,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3343,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3344,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3358,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3359,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3373,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3374,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3402,
+      "text": "Total tests: 15"
+    },
+    {
+      "line": 3403,
+      "text": "     Passed: 15"
+    },
+    {
+      "line": 3443,
+      "text": "Total tests: 27"
+    },
+    {
+      "line": 3444,
+      "text": "     Passed: 27"
+    },
+    {
+      "line": 3468,
+      "text": "Total tests: 11"
+    },
+    {
+      "line": 3469,
+      "text": "     Passed: 11"
+    },
+    {
+      "line": 3502,
+      "text": "Total tests: 20"
+    },
+    {
+      "line": 3503,
+      "text": "     Passed: 20"
+    },
+    {
+      "line": 3541,
+      "text": "Total tests: 25"
+    },
+    {
+      "line": 3542,
+      "text": "     Passed: 25"
+    },
+    {
+      "line": 3561,
+      "text": "Total tests: 6"
+    },
+    {
+      "line": 3562,
+      "text": "     Passed: 6"
+    },
+    {
+      "line": 3585,
+      "text": "Total tests: 10"
+    },
+    {
+      "line": 3586,
+      "text": "     Passed: 10"
+    },
+    {
+      "line": 3611,
+      "text": "Total tests: 12"
+    },
+    {
+      "line": 3612,
+      "text": "     Passed: 12"
+    },
+    {
+      "line": 3627,
+      "text": "Total tests: 2"
+    },
+    {
+      "line": 3628,
+      "text": "     Passed: 2"
+    },
+    {
+      "line": 3642,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3643,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3657,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3658,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3672,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3673,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3687,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3688,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3702,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3703,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3717,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3718,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3732,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3733,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3735,
+      "text": "[AORebirth Gate] PASS 6/12 Subway acceptance"
+    },
+    {
+      "line": 3751,
+      "text": "Total tests: 3"
+    },
+    {
+      "line": 3752,
+      "text": "     Passed: 3"
+    },
+    {
+      "line": 3766,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 3767,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 3787,
+      "text": "Total tests: 7"
+    },
+    {
+      "line": 3788,
+      "text": "     Passed: 7"
+    },
+    {
+      "line": 3812,
+      "text": "Total tests: 11"
+    },
+    {
+      "line": 3813,
+      "text": "     Passed: 11"
+    },
+    {
+      "line": 3846,
+      "text": "Total tests: 20"
+    },
+    {
+      "line": 3847,
+      "text": "     Passed: 20"
+    },
+    {
+      "line": 3875,
+      "text": "Total tests: 15"
+    },
+    {
+      "line": 3876,
+      "text": "     Passed: 15"
+    },
+    {
+      "line": 3942,
+      "text": "Total tests: 53"
+    },
+    {
+      "line": 3943,
+      "text": "     Passed: 53"
+    },
+    {
+      "line": 3983,
+      "text": "Total tests: 27"
+    },
+    {
+      "line": 3984,
+      "text": "     Passed: 27"
+    },
+    {
+      "line": 4014,
+      "text": "Total tests: 17"
+    },
+    {
+      "line": 4015,
+      "text": "     Passed: 17"
+    },
+    {
+      "line": 4066,
+      "text": "Total tests: 38"
+    },
+    {
+      "line": 4067,
+      "text": "     Passed: 38"
+    },
+    {
+      "line": 4085,
+      "text": "Total tests: 5"
+    },
+    {
+      "line": 4086,
+      "text": "     Passed: 5"
+    },
+    {
+      "line": 4121,
+      "text": "Total tests: 22"
+    },
+    {
+      "line": 4122,
+      "text": "     Passed: 22"
+    },
+    {
+      "line": 4141,
+      "text": "Total tests: 6"
+    },
+    {
+      "line": 4142,
+      "text": "     Passed: 6"
+    },
+    {
+      "line": 4156,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4157,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4171,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4172,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4186,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4187,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4201,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4202,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4216,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4217,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4231,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4232,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4246,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4247,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4261,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4262,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4276,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4277,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4291,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4292,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4306,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4307,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4321,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4322,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4336,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4337,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4351,
+      "text": "Total tests: 1"
+    },
+    {
+      "line": 4352,
+      "text": "     Passed: 1"
+    },
+    {
+      "line": 4354,
+      "text": "[AORebirth Gate] PASS 7/12 Temple acceptance"
+    },
+    {
+      "line": 4726,
+      "text": "Total tests: 358"
+    },
+    {
+      "line": 4727,
+      "text": "     Passed: 358"
+    },
+    {
+      "line": 4729,
+      "text": "[AORebirth Gate] PASS 8/12 mission graph and generated mission reproducibility"
+    },
+    {
+      "line": 4732,
+      "text": "[AORebirth Gate] PASS 9/12 Git LFS integrity"
+    },
+    {
+      "line": 4910,
+      "text": "Passed!  - Failed:     0, Passed:   544, Skipped:     0, Total:   544, Duration: 36 s - ZoneEngine_New.Tests.dll (net10.0)"
+    },
+    {
+      "line": 4913,
+      "text": "[AORebirth Gate] PASS 10/12 default ZoneEngine_New build and offline acceptance"
+    },
+    {
+      "line": 5011,
+      "text": "[AORebirth Gate] PASS 11/12 offline PHP/WebCore compatibility"
+    },
+    {
+      "line": 5013,
+      "text": "[AORebirth Gate] PASS 12/12 clean worktree"
+    },
+    {
+      "line": 5014,
+      "text": "[AORebirth Gate] PASS - all 12 mandatory stages completed."
+    },
+    {
+      "line": 5019,
+      "text": "WINDOWS_ACCEPTANCE=PASS"
+    }
+  ],
+  "NEWENGINE_WINDOWS_TESTS": 544,
+  "AOTOMATION_WINDOWS_TESTS": 1129,
+  "MANDATORY_GATES": "12/12",
+  "LINUX_BUILD_OR_PUBLICATION": "PASS - Linux-host build, linux-x64 self-contained Release",
+  "LINUX_OFFLINE_ACCEPTANCE": "PASS",
+  "LINUX_HOST_RUNTIME_ACCEPTANCE": "PASS - automated Linux tests and isolated startup/database/listener validation; official-client merged-source session pending",
+  "NEWENGINE_LINUX_TESTS": 544,
+  "linuxHost": {
+    "host": "DESKTOP-NFHOK0E",
+    "hostPlatform": "win32",
+    "execution": "Docker Desktop Linux container",
+    "image": "mcr.microsoft.com/dotnet/sdk:10.0.302-noble",
+    "source": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+    "workspace": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace",
+    "args": [
+      "run",
+      "--rm",
+      "--name",
+      "aorebirth-acceptance-bb5dd916",
+      "--mount",
+      "type=bind,source=C:\\Users\\Mike\\Documents\\AORebirth,target=/source,readonly",
+      "--mount",
+      "type=bind,source=C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover,target=/evidence",
+      "--mount",
+      "type=bind,source=C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace,target=/srv/ao-rebirth-linux-acceptance",
+      "mcr.microsoft.com/dotnet/sdk:10.0.302-noble",
+      "bash",
+      "/evidence/linux-acceptance.sh"
+    ]
+  },
+  "linuxAcceptedProvenance": {
+    "AO_REBIRTH_SOURCE_SHA": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+    "EXPECTED_SOURCE_SHA": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+    "SOURCE_SHA_MATCH": "PASS",
+    "TRACKED_SOURCE_CLEAN": "PASS",
+    "RESTORE": "PASS",
+    "BUILD": "PASS",
+    "TESTS": "PASS",
+    "PUBLISH": "PASS",
+    "RUNTIME_IDENTIFIER": "linux-x64",
+    "SELF_CONTAINED": "true",
+    "LINUX_ACCEPTANCE": "PASS",
+    "ZONEENGINE_DEFAULT": "ZoneEngine_New",
+    "PLACEMENT_VALIDATION": "PASS",
+    "EXPECTED_PLACEMENT_BUILD_MANIFEST_SHA256": "19c53c46f657146f760b4ba5afcea97276501f7d54f1e557923c4f1eb6bf518a",
+    "PLACEMENT_BUILD_MANIFEST_SHA256": "19c53c46f657146f760b4ba5afcea97276501f7d54f1e557923c4f1eb6bf518a"
+  },
+  "linuxEvidence": [
+    {
+      "line": 5,
+      "text": "SOURCE_SHA_MATCH=PASS"
+    },
+    {
+      "line": 6,
+      "text": "TRACKED_SOURCE_CLEAN=PASS"
+    },
+    {
+      "line": 7,
+      "text": "PLAYFIELD_PACKAGE_SELF_TESTS=PASS (17/17)"
+    },
+    {
+      "line": 13,
+      "text": "PLAYFIELD_PACKAGE_IMPORT=PASS"
+    },
+    {
+      "line": 35,
+      "text": "DEFAULT_ENGINE_PARITY=PASS"
+    },
+    {
+      "line": 36,
+      "text": "LINUX_SOURCE_INVENTORY_GUARD=PASS"
+    },
+    {
+      "line": 37,
+      "text": "PACKAGE_PARITY_NEGATIVE_FIXTURES=PASS (4/4)"
+    },
+    {
+      "line": 38,
+      "text": "SOURCE_OMISSION_NEGATIVE_FIXTURES=PASS (2/2)"
+    },
+    {
+      "line": 39,
+      "text": "BACKEND_INTEGRATION_GUARD=PASS"
+    },
+    {
+      "line": 2722,
+      "text": "Passed!  - Failed:     0, Passed:   544, Skipped:     0, Total:   544, Duration: 39 s - ZoneEngine_New.Tests.dll (net10.0)"
+    },
+    {
+      "line": 10773,
+      "text": "DEFAULT_ENGINE_PARITY=PASS"
+    },
+    {
+      "line": 10774,
+      "text": "LINUX_SOURCE_INVENTORY_GUARD=PASS"
+    },
+    {
+      "line": 10775,
+      "text": "SQL_PACKAGE_PARITY_GUARD=PASS"
+    },
+    {
+      "line": 10776,
+      "text": "LINUX_NEWENGINE_OFFLINE_STARTUP=PASS"
+    },
+    {
+      "line": 10777,
+      "text": "PACKAGE_PARITY_NEGATIVE_FIXTURES=PASS (4/4)"
+    },
+    {
+      "line": 10778,
+      "text": "SOURCE_OMISSION_NEGATIVE_FIXTURES=PASS (2/2)"
+    },
+    {
+      "line": 10779,
+      "text": "BACKEND_INTEGRATION_GUARD=PASS"
+    },
+    {
+      "line": 12497,
+      "text": "ZONEENGINE_OUTAGE_RECOVERY_PRECONDITION=PASS"
+    },
+    {
+      "line": 12498,
+      "text": "CANDIDATE_DATABASE_COMPATIBILITY=PASS"
+    },
+    {
+      "line": 12499,
+      "text": "DRY_RUN=PASS"
+    },
+    {
+      "line": 12506,
+      "text": "TRANSACTIONAL_DEPLOYMENT=PASS"
+    },
+    {
+      "line": 12509,
+      "text": "TRANSACTIONAL_DEPLOYMENT=PASS"
+    },
+    {
+      "line": 12510,
+      "text": "POST_START_STABILITY=PASS seconds=10 zoneRestarts=0"
+    },
+    {
+      "line": 12512,
+      "text": "ROLLBACK_STEP_RESTORE_ZONE_NOTIFY_DROPIN=PASS"
+    },
+    {
+      "line": 12513,
+      "text": "ROLLBACK_STEP_DAEMON_RELOAD=PASS"
+    },
+    {
+      "line": 12514,
+      "text": "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+    },
+    {
+      "line": 12516,
+      "text": "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+    },
+    {
+      "line": 12517,
+      "text": "TRANSACTIONAL_DEPLOYMENT=PASS"
+    },
+    {
+      "line": 12519,
+      "text": "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+    },
+    {
+      "line": 12520,
+      "text": "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+    },
+    {
+      "line": 12525,
+      "text": "ROLLBACK_ZONEENGINE_EFFECTIVE_UNIT=PASS type=simple notifyAccess=none"
+    },
+    {
+      "line": 12526,
+      "text": "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+    },
+    {
+      "line": 12530,
+      "text": "STOPPED_PAIR_RECOVERY_PRECONDITION=PASS"
+    },
+    {
+      "line": 12531,
+      "text": "STOPPED_PAIR_ROLLBACK_PROVENANCE=PASS sourceSha=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "line": 12532,
+      "text": "DRY_RUN=PASS"
+    },
+    {
+      "line": 12534,
+      "text": "TRANSACTIONAL_DEPLOYMENT=PASS"
+    },
+    {
+      "line": 12535,
+      "text": "ZONEENGINE_EFFECTIVE_READINESS_CONTRACT=PASS type=notify notifyAccess=main dropInPaths=governed-daily-login"
+    },
+    {
+      "line": 12543,
+      "text": "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+    },
+    {
+      "line": 12544,
+      "text": "ROLLBACK_ZONEENGINE_EFFECTIVE_UNIT=PASS type=simple notifyAccess=none"
+    },
+    {
+      "line": 12545,
+      "text": "ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS"
+    },
+    {
+      "line": 12546,
+      "text": "ROLLBACK_ZONEENGINE_EFFECTIVE_UNIT=PASS type=notify notifyAccess=main"
+    },
+    {
+      "line": 12547,
+      "text": "TRANSACTIONAL_DEPLOYMENT=PASS"
+    },
+    {
+      "line": 12548,
+      "text": "READINESS_WAIT=PASS engine=login elapsedSeconds=7 timeoutSeconds=30 pollIntervalSeconds=1 service=ao-rebirth-loginengine.service state=active restarts=0 listenerPort=7500 listenerDetected=YES"
+    },
+    {
+      "line": 12549,
+      "text": "READINESS_WAIT=PASS engine=zone elapsedSeconds=7 timeoutSeconds=30 pollIntervalSeconds=1 service=ao-rebirth-zoneengine.service state=active restarts=0 listenerPort=7501 listenerDetected=YES"
+    },
+    {
+      "line": 12553,
+      "text": "TRANSACTIONAL_DEPLOYMENT=PASS"
+    },
+    {
+      "line": 12554,
+      "text": "READINESS_WAIT=PASS engine=login elapsedSeconds=7 timeoutSeconds=30 pollIntervalSeconds=1 service=ao-rebirth-loginengine.service state=active restarts=0 listenerPort=7500 listenerDetected=YES"
+    },
+    {
+      "line": 12555,
+      "text": "READINESS_WAIT=PASS engine=zone elapsedSeconds=7 timeoutSeconds=30 pollIntervalSeconds=1 service=ao-rebirth-zoneengine.service state=active restarts=0 listenerPort=7501 listenerDetected=YES"
+    },
+    {
+      "line": 12556,
+      "text": "IDEMPOTENT_REDEPLOY=PASS"
+    },
+    {
+      "line": 12557,
+      "text": "OWNERSHIP_DIR_FIXTURE_IDEMPOTENT=PASS"
+    },
+    {
+      "line": 12560,
+      "text": "RELEASE_MANIFEST=/srv/ao-rebirth-linux-acceptance/repo/LinuxBuild/artifacts/production-release/release.manifest"
+    },
+    {
+      "line": 12562,
+      "text": "RELEASE_MANIFEST_RESULT=PASS"
+    },
+    {
+      "line": 12563,
+      "text": "RESTORE=PASS"
+    },
+    {
+      "line": 12564,
+      "text": "BUILD=PASS"
+    },
+    {
+      "line": 12565,
+      "text": "TESTS=PASS"
+    },
+    {
+      "line": 12566,
+      "text": "PUBLISH=PASS"
+    },
+    {
+      "line": 12570,
+      "text": "LINUX_RELEASE_MANIFEST=/srv/ao-rebirth-linux-acceptance/repo/LinuxBuild/artifacts/production-release/release.manifest"
+    },
+    {
+      "line": 12577,
+      "text": "LINUX_ACCEPTANCE=PASS"
+    }
+  ],
+  "artifacts": [
+    {
+      "target": "chatengine",
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\chatengine\\linux-x64\\self-contained",
+      "apphost": "ChatEngine",
+      "apphostSHA256": "a8baa80813624688fc6699150900e555c55a03d01dd433b56a28776b9a34c1ba",
+      "assemblySHA256": "761e60528de388e9734b1689b584055032f0038c7634d9c73f6f852cf0d483fb",
+      "files": 301,
+      "bytes": 122066691,
+      "publishProvenance": null
+    },
+    {
+      "target": "loginengine",
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\loginengine\\linux-x64\\self-contained",
+      "apphost": "LoginEngine",
+      "apphostSHA256": "e7a02b999eb07209f614b02bec2c3ea8f63fc3387c284163cb87734ecb93d849",
+      "assemblySHA256": "66ef9fadbb816a0cbfd30f7a3a5b003b8cdc9f3d92437ccb3ce98ac7d88f394e",
+      "files": 298,
+      "bytes": 121990593,
+      "publishProvenance": {
+        "REPOSITORY": "AORebirth",
+        "COMMIT_SHA": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+        "BUILD_PLATFORM": "linux",
+        "RUNTIME_IDENTIFIER": "linux-x64",
+        "CONFIGURATION": "Release",
+        "SELF_CONTAINED": "true",
+        "DOTNET_SDK_VERSION": "10.0.302",
+        "BUILD_HOST_TYPE": "Linux 6.18.33.1-microsoft-standard-WSL2 x86_64",
+        "BUILD_TIMESTAMP_UTC": "2026-09-12T21:54:50Z",
+        "ACCEPTANCE_RESULT": "PASS"
+      }
+    },
+    {
+      "target": "zoneengine",
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\zoneengine\\linux-x64\\self-contained",
+      "apphost": "ZoneEngine_New",
+      "apphostSHA256": "708d0be649ae7cf46e5e1b0c493fdc49832eed3e0a17b11b15f9413ab31292a2",
+      "assemblySHA256": "d34e60d0671405b072a31bdce15647b9d49a49b2d48f7715aedd480027a80a9b",
+      "files": 5687,
+      "bytes": 471048218,
+      "publishProvenance": {
+        "REPOSITORY": "AORebirth",
+        "COMMIT_SHA": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+        "BUILD_PLATFORM": "linux",
+        "RUNTIME_IDENTIFIER": "linux-x64",
+        "CONFIGURATION": "Release",
+        "SELF_CONTAINED": "true",
+        "DOTNET_SDK_VERSION": "10.0.302",
+        "BUILD_HOST_TYPE": "Linux 6.18.33.1-microsoft-standard-WSL2 x86_64",
+        "BUILD_TIMESTAMP_UTC": "2026-09-12T21:54:50Z",
+        "ACCEPTANCE_RESULT": "PASS",
+        "ZONEENGINE_IMPLEMENTATION": "new",
+        "PLACEMENT_CORPUS_VERSION": "18.8.62_EP1-static-placement-v2",
+        "PLACEMENT_CORPUS_MANIFEST_SHA256": "1e73261240e99f7ae31bfdb59d6c8f5400b0c71cfb3bf44965878aaa0fd58e32",
+        "PLACEMENT_CORPUS_SUMMARY_SHA256": "55a617c79eecfc7590d278e6b65d2353159d391f1587023c9b6ad566be76838e",
+        "PLACEMENT_CORPUS_INDEX_SHA256": "f6b3a4def439a75b90b8aae8de3d7f22008bbd4e2c1d069d18b0f9b913ac7f48",
+        "PLACEMENT_ACGHASH_INVENTORY_SHA256": "f1daa42453a4f9a7c542c193efe10717d2ddc6fe4c0e1beaaba48e92a07afab6",
+        "PLACEMENT_BUILD_MANIFEST_SHA256": "19c53c46f657146f760b4ba5afcea97276501f7d54f1e557923c4f1eb6bf518a",
+        "PLACEMENT_RESOURCE_COUNT": "630",
+        "PLACEMENT_PARSED_RESOURCE_COUNT": "627",
+        "PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT": "3",
+        "PLACEMENT_DISTRICT_COUNT": "4146",
+        "PLACEMENT_RECORD_COUNT": "32805",
+        "PLACEMENT_UNIQUE_ACGHASH_COUNT": "4016",
+        "PLACEMENT_RUNTIME_AUTHORIZED_COUNT": "199"
+      }
+    },
+    {
+      "target": "zoneengine-legacy",
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\zoneengine-legacy\\linux-x64\\self-contained",
+      "apphost": "ZoneEngine",
+      "apphostSHA256": "a143bbf7c92884ebe1ea08d389da628c16abe6708dd35247e19bd96c9417b75c",
+      "assemblySHA256": "4c4eb352baefa92854872eb3e1b7415e86403d89abdc55d9e67a8d525eec9fc6",
+      "files": 1029,
+      "bytes": 270809587,
+      "publishProvenance": {
+        "REPOSITORY": "AORebirth",
+        "ZONEENGINE_IMPLEMENTATION": "legacy",
+        "COMMIT_SHA": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+        "BUILD_PLATFORM": "linux",
+        "RUNTIME_IDENTIFIER": "linux-x64",
+        "CONFIGURATION": "Release",
+        "SELF_CONTAINED": "true",
+        "DOTNET_SDK_VERSION": "10.0.302",
+        "TRACKED_SOURCE_CLEAN": "PASS",
+        "BUILD_TIMESTAMP_UTC": "2026-09-12T21:54:14Z",
+        "ACCEPTANCE_RESULT": "UNVERIFIED",
+        "PLACEMENT_CORPUS_VERSION": "18.8.62_EP1-static-placement-v2",
+        "PLACEMENT_CORPUS_MANIFEST_SHA256": "1e73261240e99f7ae31bfdb59d6c8f5400b0c71cfb3bf44965878aaa0fd58e32",
+        "PLACEMENT_CORPUS_SUMMARY_SHA256": "55a617c79eecfc7590d278e6b65d2353159d391f1587023c9b6ad566be76838e",
+        "PLACEMENT_CORPUS_INDEX_SHA256": "f6b3a4def439a75b90b8aae8de3d7f22008bbd4e2c1d069d18b0f9b913ac7f48",
+        "PLACEMENT_ACGHASH_INVENTORY_SHA256": "f1daa42453a4f9a7c542c193efe10717d2ddc6fe4c0e1beaaba48e92a07afab6",
+        "PLACEMENT_BUILD_MANIFEST_SHA256": "19c53c46f657146f760b4ba5afcea97276501f7d54f1e557923c4f1eb6bf518a",
+        "PLACEMENT_RESOURCE_COUNT": "630",
+        "PLACEMENT_PARSED_RESOURCE_COUNT": "627",
+        "PLACEMENT_PARSER_LIMITED_RESOURCE_COUNT": "3",
+        "PLACEMENT_DISTRICT_COUNT": "4146",
+        "PLACEMENT_RECORD_COUNT": "32805",
+        "PLACEMENT_UNIQUE_ACGHASH_COUNT": "4016",
+        "PLACEMENT_RUNTIME_AUTHORIZED_COUNT": "199"
+      }
+    }
+  ],
+  "artifactManifest": {
+    "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-artifact-sha256.json",
+    "sha256": "03961a5e877045ea33560525d195c5ce18ab157abbf8510d5e460b5b7e6b93c4",
+    "files": 7315
+  },
+  "stage": {
+    "SOURCE_SHA": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+    "container": "aorebirth-linux-staging-bb5dd916",
+    "previousContainer": "aorebirth-linux-staging-032ee4cd",
+    "dbContainerId": "b95ba8cc840e2d02989117d239815acd55f4123ce1fbb61aa4414a223f288a27",
+    "dbStartedAt": "2026-09-10T07:16:24.751364915Z",
+    "backupSHA256": "e71786e81135af4f0441b8cbbbb9b1b94147e82f60d692ca330aaeff3ec8bbc2",
+    "binaryHashes": {
+      "zoneengine": {
+        "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\zoneengine\\linux-x64\\self-contained\\ZoneEngine_New.dll",
+        "sha256": "d34e60d0671405b072a31bdce15647b9d49a49b2d48f7715aedd480027a80a9b"
+      },
+      "loginengine": {
+        "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\loginengine\\linux-x64\\self-contained\\LoginEngine.dll",
+        "sha256": "66ef9fadbb816a0cbfd30f7a3a5b003b8cdc9f3d92437ccb3ce98ac7d88f394e"
+      },
+      "chatengine": {
+        "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\chatengine\\linux-x64\\self-contained\\ChatEngine.dll",
+        "sha256": "761e60528de388e9734b1689b584055032f0038c7634d9c73f6f852cf0d483fb"
+      }
+    },
+    "startedAt": "2026-09-12T21:55:20.094617078Z"
+  },
+  "launchedProcesses": [
+    {
+      "pid": 199,
+      "engine": "ChatEngine",
+      "executable": "/opt/ao-rebirth/chatengine/current/ChatEngine",
+      "workingDirectory": "/opt/ao-rebirth/chatengine/current"
+    },
+    {
+      "pid": 237,
+      "engine": "LoginEngine",
+      "executable": "/opt/ao-rebirth/loginengine/current/LoginEngine",
+      "workingDirectory": "/opt/ao-rebirth/loginengine/current"
+    },
+    {
+      "pid": 276,
+      "engine": "ZoneEngine_New",
+      "executable": "/opt/ao-rebirth/zoneengine/current/ZoneEngine_New",
+      "workingDirectory": "/opt/ao-rebirth/zoneengine/current"
+    }
+  ],
+  "durableStateBaseline": {
+    "targetSource": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+    "binaryContext": "Previous isolated stage, source 032ee4cd39433bbe124217a745474573e720e820",
+    "label": "before-build-switch",
+    "utc": "2026-09-12T21:55:13.786Z",
+    "database": "aorebirth_chatengine_stage6",
+    "character": [
+      {
+        "X": 3197.06005859375,
+        "Y": 35.10000228881836,
+        "Z": 892.2830200195312,
+        "Id": 9950,
+        "Name": "Staging50d",
+        "Online": 0,
+        "HeadingW": 0.18217700719833374,
+        "HeadingX": 0,
+        "HeadingY": 0.9832659959793091,
+        "HeadingZ": 0,
+        "Playfield": 655
+      }
+    ],
+    "stats": [
+      {
+        "Type": 50000,
+        "StatId": 0,
+        "Instance": 9950,
+        "StatValue": 528961
+      },
+      {
+        "Type": 50000,
+        "StatId": 1,
+        "Instance": 9950,
+        "StatValue": 31
+      },
+      {
+        "Type": 50000,
+        "StatId": 4,
+        "Instance": 9950,
+        "StatValue": 1
+      },
+      {
+        "Type": 50000,
+        "StatId": 6,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 12,
+        "Instance": 9950,
+        "StatValue": 5907
+      },
+      {
+        "Type": 50000,
+        "StatId": 16,
+        "Instance": 9950,
+        "StatValue": 6
+      },
+      {
+        "Type": 50000,
+        "StatId": 17,
+        "Instance": 9950,
+        "StatValue": 6
+      },
+      {
+        "Type": 50000,
+        "StatId": 18,
+        "Instance": 9950,
+        "StatValue": 6
+      },
+      {
+        "Type": 50000,
+        "StatId": 19,
+        "Instance": 9950,
+        "StatValue": 6
+      },
+      {
+        "Type": 50000,
+        "StatId": 20,
+        "Instance": 9950,
+        "StatValue": 6
+      },
+      {
+        "Type": 50000,
+        "StatId": 21,
+        "Instance": 9950,
+        "StatValue": 6
+      },
+      {
+        "Type": 50000,
+        "StatId": 27,
+        "Instance": 9950,
+        "StatValue": 31
+      },
+      {
+        "Type": 50000,
+        "StatId": 33,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 37,
+        "Instance": 9950,
+        "StatValue": 1
+      },
+      {
+        "Type": 50000,
+        "StatId": 42,
+        "Instance": 9950,
+        "StatValue": 111
+      },
+      {
+        "Type": 50000,
+        "StatId": 47,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 54,
+        "Instance": 9950,
+        "StatValue": 1
+      },
+      {
+        "Type": 50000,
+        "StatId": 57,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 59,
+        "Instance": 9950,
+        "StatValue": 2
+      },
+      {
+        "Type": 50000,
+        "StatId": 60,
+        "Instance": 9950,
+        "StatValue": 1
+      },
+      {
+        "Type": 50000,
+        "StatId": 61,
+        "Instance": 9950,
+        "StatValue": 1234
+      },
+      {
+        "Type": 50000,
+        "StatId": 64,
+        "Instance": 9950,
+        "StatValue": 40683
+      },
+      {
+        "Type": 50000,
+        "StatId": 89,
+        "Instance": 9950,
+        "StatValue": 1
+      },
+      {
+        "Type": 50000,
+        "StatId": 132,
+        "Instance": 9950,
+        "StatValue": 5
+      },
+      {
+        "Type": 50000,
+        "StatId": 152,
+        "Instance": 9950,
+        "StatValue": 5
+      },
+      {
+        "Type": 50000,
+        "StatId": 156,
+        "Instance": 9950,
+        "StatValue": 100
+      },
+      {
+        "Type": 50000,
+        "StatId": 173,
+        "Instance": 9950,
+        "StatValue": 3
+      },
+      {
+        "Type": 50000,
+        "StatId": 180,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 181,
+        "Instance": 9950,
+        "StatValue": 100
+      },
+      {
+        "Type": 50000,
+        "StatId": 192,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 193,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 213,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 214,
+        "Instance": 9950,
+        "StatValue": 29
+      },
+      {
+        "Type": 50000,
+        "StatId": 215,
+        "Instance": 9950,
+        "StatValue": 511
+      },
+      {
+        "Type": 50000,
+        "StatId": 221,
+        "Instance": 9950,
+        "StatValue": 29
+      },
+      {
+        "Type": 50000,
+        "StatId": 350,
+        "Instance": 9950,
+        "StatValue": 1450
+      },
+      {
+        "Type": 50000,
+        "StatId": 359,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 360,
+        "Instance": 9950,
+        "StatValue": 100
+      },
+      {
+        "Type": 50000,
+        "StatId": 389,
+        "Instance": 9950,
+        "StatValue": 2047
+      },
+      {
+        "Type": 50000,
+        "StatId": 404,
+        "Instance": 9950,
+        "StatValue": 222
+      },
+      {
+        "Type": 50000,
+        "StatId": 521,
+        "Instance": 9950,
+        "StatValue": 4
+      },
+      {
+        "Type": 50000,
+        "StatId": 585,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 587,
+        "Instance": 9950,
+        "StatValue": 0
+      },
+      {
+        "Type": 50000,
+        "StatId": 673,
+        "Instance": 9950,
+        "StatValue": 31
+      }
+    ],
+    "items": [
+      {
+        "LowId": 43384,
+        "HighId": 43384,
+        "Source": 1,
+        "Quality": 1,
+        "ItemType": 51005,
+        "InstanceId": 1,
+        "StackCount": 3,
+        "ContainerType": 104,
+        "ContainerInstance": 9950,
+        "ContainerPlacement": 64
+      }
+    ],
+    "uploadedNanos": [],
+    "credits": {
+      "Type": 50000,
+      "StatId": 61,
+      "Instance": 9950,
+      "StatValue": 1234
+    }
+  },
+  "RETAIL_CHAR_IN_PLAY": "PENDING_USER_ACTION",
+  "capture": {
+    "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\retail-merged-1789250251047.pcapng",
+    "started": "2026-09-12T21:57:31.050Z",
+    "source": "bb5dd9165c6201b15ef1e0cfbfd788a3e205486a",
+    "decodedEvidence": "Not yet available; capture started for requested official-client sequence",
+    "direction": "Client to NewEngine; not yet observed",
+    "characterId": 9950,
+    "sessionCorrelation": "Pending actual capture"
+  },
+  "RETAIL_POST_RESTART_LOGIN": "PENDING_USER_ACTION",
+  "RETAIL_POST_RESTART_ZONING": "PENDING_USER_ACTION",
+  "RETAIL_DURABLE_STATE_COMPARISON": "PENDING_USER_ACTION - baseline recorded; gameplay/save/restart/relogin still pending",
+  "recoveryBoundary": "Clean restart only; no crash or arbitrary TCP-loss recovery claim",
+  "existingManualEvidence": {
+    "source": "032ee4cd39433bbe124217a745474573e720e820",
+    "report": "docs/reports/NEWENGINE_RETAIL_GAMEPLAY_ACCEPTANCE.md",
+    "result": "PASS on prior source, not relabelled as merged-source manual acceptance"
+  },
+  "MERGE_BUILD_COMPLETE": true,
+  "PREDEPLOYMENT_READY": false,
+  "PUSH_PERFORMED": false,
+  "LIVE_DEPLOYMENT_PERFORMED": false,
+  "PRODUCTION_DATABASE_MODIFIED": false,
+  "PRODUCTION_SERVICES_RESTARTED": false,
+  "sourceCorrections": "None. Three inherited documentation trailing-space lines corrected in merge.",
+  "resolvedFailures": [
+    {
+      "phase": "Initial Windows acceptance",
+      "cause": "Pinned ignored Playfields package absent in fresh checkout; 11 building/teleport tests failed.",
+      "resolution": "Approved export and import validated all 4710 files against pinned manifest; full exact-source Windows acceptance rerun PASS.",
+      "sourceChanged": false
+    },
+    {
+      "phase": "Initial Linux workspace setup",
+      "cause": "Bootstrap clone supplied at workspace root; controlled workspace guard refused missing sentinel.",
+      "resolution": "Task-owned clone retained under dedicated sentinel-controlled workspace/repo; existing acceptance wrapper rerun.",
+      "sourceChanged": false
+    }
+  ],
+  "evidence": [
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\windows-source.log",
+      "sha256": "8c3b663eb864bf1e111b93dda721522e099321d57edb62d7415201eb16e0ebaa"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\windows-initial.log",
+      "sha256": "12411939ab7d8aac611a65f76558e41faebe28d93ee47d0ef822de7bd83a99e2"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\package-export.log",
+      "sha256": "ff0e78f6efc9319410922f2b0fdd63015e5a18ea92cf6488c32e9e4ffaf7c57d"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\package-import.log",
+      "sha256": "e967e53014ed5c180f19c4f631cfd5f642ee08c19004385b4e5bbe9151bee6cb"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-host.log",
+      "sha256": "0fb21171525bb7ff3289631f3b57ce87c42e453249369107d9fdcad75e42615a"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-initial-layout.log",
+      "sha256": "8f8085d2c43b224b05032eab68fb67149571b00f0834a7666dbad48da0b43c26"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\staging-validation.log",
+      "sha256": "958e8afa91a7c182a8dd2569168c371b6acd8cc36671bf2d55b4c224e9481e1c"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\staging-launched-hashes.txt",
+      "sha256": "877857a09abeb87a6cdc618e503edbbe058af76e0096bd34a26a6cc8ea8d155c"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\staging-launched-processes.json",
+      "sha256": "ac8f7353d0b43e5c79af2bab4b1460298a7cdd2b8cf8ba7610873742012e1ca6"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\state-before-build-switch.json",
+      "sha256": "31c259436bdc2ed714ed9f076d6ed6c426dc63027af4d6b47ee1e6c10462e758"
+    },
+    {
+      "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\state-merged-before-client.json",
+      "sha256": "52d33f588c402d4dd8d66cd1d34658e8903217abee18f6c91e54a56e7fe32c24"
+    }
+  ],
+  "receiptCommit": "Separate local documentation commit after tested SOURCE_SHA; not a new tested source",
+  "filesInspected": [
+    "AI_START_HERE.md",
+    "AGENTS.md",
+    "docs/project/DEVELOPMENT_AUTHORITY.md",
+    "docs/project/PROJECT_STATE.md",
+    "docs/ai/CURRENT_TASK.md",
+    "docs/project/KNOWN_DECISIONS.md",
+    "docs/project/SUBSYSTEMS.md",
+    "docs/project/ARCHITECTURE.md",
+    "docs/ai/WORKFLOW.md",
+    "docs/reports/NEWENGINE_RETAIL_GAMEPLAY_ACCEPTANCE.md",
+    "docs/reports/NEWENGINE_CHARACTER_HYDRATION_ACCEPTANCE.md",
+    "docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECONCILIATION.md",
+    "docs/reports/NEWENGINE_CUTOVER_HANDOFF.md",
+    "docs/project/PLAYFIELD_PACKAGE_SUPPLY.md",
+    "LinuxBuild/README.md",
+    "LinuxBuild/deployment/ZONEENGINE_NEW_BACKEND.md",
+    "LinuxBuild/accept-linux-sha.sh",
+    "Tools/accept_windows_source.cmd",
+    "Tools/run_mandatory_integration_gate.cmd",
+    "Tools/run_zoneengine_new_tests.cmd",
+    "AORebirth/Server/ZoneEngine_New.Tests/BuildingExitProxyTests.cs",
+    "AORebirth/Server/ZoneEngine_New.Tests/TeleportDestinationCatalogTests.cs",
+    "AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj",
+    "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+    "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.cs",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Inventory.cs",
+    "AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs",
+    "AORebirth/Libraries/Source/AORebirth.Enums/StatIds.cs"
+  ],
+  "initialTestStackStatePreservation": {
+    "character": true,
+    "stats": true,
+    "items": true,
+    "uploadedNanos": true,
+    "credits": true
+  },
+  "releaseManifest": {
+    "path": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\linux-workspace\\repo\\LinuxBuild\\artifacts\\production-release\\release.manifest",
+    "sha256": "3d4a69ff8df39aee40367c98fb00fac34fb4e7cb0923949ac54181262efa6aaf"
+  },
+  "receiptSecretScan": {
+    "result": "PASS",
+    "method": "Existing scanner over clean accepted checkout plus these exact receipt files",
+    "evidence": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\receipt-clean-secrets.log",
+    "mainCheckoutFullScan": "FAIL: seven pre-existing untracked local staging environment files. Preserved; not staged or committed.",
+    "mainCheckoutEvidence": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\master-cutover\\receipt-secrets.log"
+  }
+}
