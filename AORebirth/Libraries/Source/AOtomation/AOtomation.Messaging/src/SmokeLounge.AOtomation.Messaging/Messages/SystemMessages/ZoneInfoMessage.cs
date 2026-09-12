@@ -47,6 +47,12 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.SystemMessages
         [AoMember(4)]
         public uint Cookie2 { get; set; }
 
+        [AoMember(5)]
+        public uint EventServerType { get; set; }
+
+        [AoMember(6)]
+        public uint PlayerId { get; set; }
+
         #endregion
     }
 }

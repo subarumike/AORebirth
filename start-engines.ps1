@@ -3,10 +3,27 @@ param(
     [switch]$WebOnly,
     [switch]$Visible,
     [switch]$NewZoneEngine,
+    [switch]$LegacyZoneEngine,
+    [switch]$PrintEngineSelection,
+    [switch]$ValidateSchemaOnly,
     [int]$StartupTimeoutSeconds = 60
 )
 
 $ErrorActionPreference = "Stop"
+
+if ($LegacyZoneEngine -and ($NewZoneEngine -or $WebOnly)) {
+    throw "LegacyZoneEngine cannot be combined with NewZoneEngine or WebOnly."
+}
+$zoneEngineSelection = if ($LegacyZoneEngine) {
+    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe" }
+}
+else {
+    @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe" }
+}
+if ($PrintEngineSelection) {
+    $zoneEngineSelection | ConvertTo-Json -Compress
+    return
+}
 
 $processPath = [System.Environment]::GetEnvironmentVariable("Path", "Process")
 if ([string]::IsNullOrEmpty($processPath)) {
@@ -24,6 +41,8 @@ $configPath = $env:AO_REBIRTH_CONFIG_PATH
 if ([string]::IsNullOrWhiteSpace($configPath)) {
     $configPath = Join-Path $root "AORebirth\Config\Config.xml"
 }
+$configPath = [System.IO.Path]::GetFullPath($configPath)
+$env:AO_REBIRTH_CONFIG_PATH = $configPath
 $logDir = Join-Path $root "logs\engines"
 $statusProbe = Join-Path $root "Tools\engine_status_probe.js"
 $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
@@ -61,6 +80,9 @@ function Invoke-EngineStatusProbe {
     )
 
     $probeArguments = @("--config", $configPath, "--engine-dir", $engineDir) + $Arguments
+    if ($LegacyZoneEngine) {
+        $probeArguments += "--legacy-zoneengine"
+    }
 
     if ($Quiet) {
         & $cscript //nologo $statusProbe @probeArguments *> $null
@@ -236,21 +258,47 @@ function Get-ProcessesByExecutablePath {
     )
 }
 
-$zoneEngine = if ($NewZoneEngine) {
-    @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe"; Ports = @(7501) }
+$configuration = New-Object System.Xml.XmlDocument
+$configuration.XmlResolver = $null
+$configuration.Load($configPath)
+function Get-ConfiguredPort([string]$Name) {
+    $nodes = $configuration.SelectNodes("/*/$Name")
+    $port = 0
+    if ($nodes.Count -ne 1 -or -not [int]::TryParse($nodes[0].InnerText, [ref]$port) -or $port -lt 1 -or $port -gt 65535) {
+        throw "Configuration must contain one valid $Name port."
+    }
+    return $port
 }
-else {
-    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe"; Ports = @(7501) }
-}
+$zonePort = Get-ConfiguredPort "ZonePort"
+$zoneEngine = $zoneEngineSelection
+$zoneEngine.Ports = @($zonePort)
 
 $coreEngines = @(
-    @{ Name = "ChatEngine"; File = "ChatEngine.exe"; Ports = @(6996, 7012) },
-    @{ Name = "LoginEngine"; File = "LoginEngine.exe"; Ports = @(7500) },
+    @{ Name = "ChatEngine"; File = "ChatEngine.exe"; Ports = @((Get-ConfiguredPort "CommPort"), (Get-ConfiguredPort "ChatPort")) },
+    @{ Name = "LoginEngine"; File = "LoginEngine.exe"; Ports = @((Get-ConfiguredPort "LoginPort")) },
     $zoneEngine
 )
-$webEngine = @{ Name = "WebEngine"; File = "WebEngine.exe"; Ports = @(8181) }
+$webEngine = @{ Name = "WebEngine"; File = "WebEngine.exe"; Ports = @((Get-ConfiguredPort "WebHostPort")) }
 
 $engines = if ($WebOnly) { @($webEngine) } else { @($coreEngines) }
+
+if (-not $WebOnly -and -not $LegacyZoneEngine) {
+    $newZoneExecutable = Join-Path $engineDir $zoneEngine.File
+    if (-not (Test-Path -LiteralPath $newZoneExecutable)) {
+        throw "ZoneEngine_New is missing; run tools\build_aorebirth_debug.cmd."
+    }
+    & $newZoneExecutable --validate-startup
+    if ($LASTEXITCODE -ne 0) {
+        throw "ZoneEngine_New package/configuration readiness failed; no engine was started or stopped."
+    }
+    & $newZoneExecutable --validate-database
+    if ($LASTEXITCODE -ne 0) {
+        throw "ZoneEngine_New schema readiness failed; no engine was started. Use the explicit migration tool status/plan commands."
+    }
+}
+if ($ValidateSchemaOnly) {
+    return
+}
 
 $windowStyle = if ($Visible) { "Normal" } else { "Hidden" }
 
@@ -275,28 +323,14 @@ foreach ($engine in $engines) {
         break
     }
 
-    if ($processName -eq "ZoneEngine_New") {
-        $existingProcesses = @(Get-ProcessesByExecutablePath -ExpectedPath $exePath)
-        $existingListeners = @(
-            foreach ($port in $engine.Ports) {
-                Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
-            }
-        )
-        if ($existingProcesses.Count -gt 0 -or $existingListeners.Count -gt 0) {
-            $failures.Add("ZoneEngine_New pre-start check requires no process from the expected repository executable and a free zone port.")
-            break
-        }
+    $prestartExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $processName)
+    if ($prestartExit -eq 3) {
+        Write-Host "$($engine.File) is already running with verified executable and port ownership."
+        continue
     }
-    else {
-        $prestartExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $processName)
-        if ($prestartExit -eq 3) {
-            Write-Host "$($engine.File) is already running with verified executable and port ownership."
-            continue
-        }
-        if ($prestartExit -ne 0) {
-            $failures.Add("$processName pre-start ownership check failed with exit code $prestartExit.")
-            break
-        }
+    if ($prestartExit -ne 0) {
+        $failures.Add("$processName pre-start ownership check failed with exit code $prestartExit.")
+        break
     }
 
     if (Test-Path $shutdownFile) {
@@ -349,7 +383,7 @@ foreach ($engine in $engines) {
     }
 
     if ($processName -eq "ZoneEngine_New") {
-        Write-Host "[AORebirth Status] engine=ZoneEngine_New processPid=$($process.Id) port=7501 ownership=PASS"
+        Write-Host "[AORebirth Status] engine=ZoneEngine_New processPid=$($process.Id) port=$zonePort ownership=PASS"
     }
     else {
         [void](Invoke-EngineStatusProbe -Arguments @(
@@ -365,7 +399,7 @@ if ($failures.Count -eq 0) {
     if ($WebOnly) {
         $finalStatus = Invoke-EngineStatusProbe -Arguments @("--web-required")
     }
-    elseif ($NewZoneEngine) {
+    elseif (-not $LegacyZoneEngine) {
         $finalStatus = Invoke-EngineStatusProbe -Arguments @("--engine-required", "ChatEngine")
         if ($finalStatus -eq 0) {
             $finalStatus = Invoke-EngineStatusProbe -Arguments @("--engine-required", "LoginEngine")
@@ -373,11 +407,14 @@ if ($failures.Count -eq 0) {
 
         $newZoneExePath = Join-Path $engineDir "ZoneEngine_New\ZoneEngine_New.exe"
         $newZoneProcesses = @(Get-ProcessesByExecutablePath -ExpectedPath $newZoneExePath)
-        $newZoneListeners = @(Get-NetTCPConnection -State Listen -LocalPort 7501 -ErrorAction SilentlyContinue)
+        $newZoneListeners = @(Get-NetTCPConnection -State Listen -LocalPort $zonePort -ErrorAction SilentlyContinue)
         if (($newZoneProcesses.Count -ne 1) -or
             ($newZoneListeners.Count -ne 1) -or
             ($newZoneListeners[0].OwningProcess -ne $newZoneProcesses[0].Id)) {
             $finalStatus = 1
+        }
+        if ($finalStatus -eq 0 -and $WithWeb) {
+            $finalStatus = Invoke-EngineStatusProbe -Arguments @("--web-required")
         }
     }
     else {
@@ -422,8 +459,8 @@ if ($failures.Count -gt 0) {
                 if (-not $entry.Process.HasExited) {
                     $failures.Add("ZoneEngine_New cleanup did not stop its managed process.")
                 }
-                if (Get-NetTCPConnection -State Listen -LocalPort 7501 -ErrorAction SilentlyContinue) {
-                    $failures.Add("ZoneEngine_New cleanup did not release port 7501.")
+                if (Get-NetTCPConnection -State Listen -LocalPort $zonePort -ErrorAction SilentlyContinue) {
+                    $failures.Add("ZoneEngine_New cleanup did not release port $zonePort.")
                 }
             }
             else {

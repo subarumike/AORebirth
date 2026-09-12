@@ -108,6 +108,7 @@ namespace ZoneEngine_New.Core.Trade
             Initiator = initiator;
             Partner = partner;
             Machine = machine;
+            AcceptedShopTransport = machine?.Stock.IsAcceptedSnapshot == true ? initiator.Session : null;
             InitiatorOffer = new TradeOffer();
             PartnerOffer = new TradeOffer();
         }
@@ -123,6 +124,7 @@ namespace ZoneEngine_New.Core.Trade
 
         /// <summary>Machine for <see cref="TradeKind.Shop"/>; null for player trades.</summary>
         public VendingMachine? Machine { get; }
+        internal ZoneEngine_New.Core.Network.IZoneSession? AcceptedShopTransport { get; }
 
         public TradeOffer InitiatorOffer { get; }
 

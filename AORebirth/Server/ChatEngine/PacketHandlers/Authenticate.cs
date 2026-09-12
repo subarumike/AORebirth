@@ -171,13 +171,7 @@ namespace ChatEngine.PacketHandlers
             /*
              * Add client to connected clients list.
              */
-            if (!client.ChatServer().ConnectedClients.ContainsKey(
-                    client.Character.CharacterId))
-            {
-                client.ChatServer().ConnectedClients.Add(
-                    client.Character.CharacterId,
-                    client);
-            }
+            if (!client.ChatServer().RegisterClient(client)) return;
 
             /*
              * Add yourself to known clients.

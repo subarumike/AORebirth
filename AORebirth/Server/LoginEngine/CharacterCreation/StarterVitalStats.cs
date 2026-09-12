@@ -9,8 +9,6 @@ namespace LoginEngine.CharacterCreation
 {
     #region Usings ...
 
-    using System;
-
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
 
@@ -18,7 +16,7 @@ namespace LoginEngine.CharacterCreation
 
     /// <summary>
     /// Sets level-1 current HP/NP from the same breed/profession formulas used by ZoneEngine StatLife and StatMaxNanoEnergy.
-    /// Only persists current vitals (stats 27 and 214); max vitals are computed at runtime from abilities.
+    /// Persists current and maximum vitals so NewEngine can reject incomplete aggregates before publication.
     /// </summary>
     internal static class StarterVitalStats
     {
@@ -33,32 +31,18 @@ namespace LoginEngine.CharacterCreation
                 return;
             }
 
-            int strength = abis[0];
-            int psychic = abis[1];
-            int sense = abis[2];
-            int intelligence = abis[3];
-            int stamina = abis[4];
-            int agility = abis[5];
-
-            int bodyDevelopment = BodyDevelopmentBase + CalculateBodyDevelopmentTrickle(stamina);
-            int nanoEnergyPool = NanoEnergyPoolBase + CalculateNanoEnergyPoolTrickle(sense, intelligence, agility, psychic);
+            // Character creation persists base BodyDevelopment and NanoPool. The zone
+            // calculators consume those same base values, so applying ability trickle
+            // here would make the stored current/max pair exceed the post-rebase max.
+            int bodyDevelopment = BodyDevelopmentBase;
+            int nanoEnergyPool = NanoEnergyPoolBase;
             int maxHealth = CalculateMaxHealth(breed, profession, bodyDevelopment);
             int maxNano = CalculateMaxNano(breed, profession, nanoEnergyPool);
 
             UpsertStat(characterId, 27, maxHealth);
+            UpsertStat(characterId, 1, maxHealth);
             UpsertStat(characterId, 214, maxNano);
-        }
-
-        private static int CalculateBodyDevelopmentTrickle(int stamina)
-        {
-            return (int)Math.Floor(stamina / 4.0);
-        }
-
-        private static int CalculateNanoEnergyPoolTrickle(int sense, int intelligence, int agility, int psychic)
-        {
-            double trickle =
-                (0.1 * sense) + (0.1 * intelligence) + (0.1 * agility) + (0.7 * psychic);
-            return (int)Math.Floor(trickle / 4.0);
+            UpsertStat(characterId, 221, maxNano);
         }
 
         private static int CalculateMaxHealth(int breed, int profession, int bodyDevelopment)

@@ -1,8 +1,10 @@
 namespace ZoneEngine_New.Core.Entities
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Threading;
 
     using AORebirth.Enums;
 
@@ -21,6 +23,30 @@ namespace ZoneEngine_New.Core.Entities
     public class Player : Character
     {
         readonly IItemBuilder _items;
+        private IDisposable? _onlineOwnership;
+        private volatile bool _persistenceQuarantined;
+
+        /// <summary>Serializes durable snapshots, write-behind, and economic transactions.</summary>
+        public object PersistenceGate { get; } = new();
+
+        public bool IsPersistenceQuarantined => _persistenceQuarantined;
+
+        /// <summary>An indeterminate commit must be reloaded from storage, never overwritten from memory.</summary>
+        public void QuarantinePersistence()
+        {
+            lock (PersistenceGate)
+                _persistenceQuarantined = true;
+        }
+
+        public void AttachOnlineOwnership(IDisposable ownership)
+        {
+            ArgumentNullException.ThrowIfNull(ownership);
+            if (Interlocked.CompareExchange(ref _onlineOwnership, ownership, null) != null)
+                throw new InvalidOperationException("Player already has online ownership.");
+        }
+
+        public void ReleaseOnlineOwnership()
+            => Interlocked.Exchange(ref _onlineOwnership, null)?.Dispose();
 
         public Player(Identity identity, IZoneLogger logger, IItemBuilder items)
             : base(identity)
@@ -38,6 +64,7 @@ namespace ZoneEngine_New.Core.Entities
         public string LastName { get; set; } = string.Empty;
 
         public IZoneSession? Session { get; set; }
+        internal ZoneEngine_New.Core.Nanos.NanoService? NanoRuntime { get; set; }
 
         public PlayerConnectionPhase ConnectionPhase { get; set; } = PlayerConnectionPhase.Online;
 
@@ -56,9 +83,10 @@ namespace ZoneEngine_New.Core.Entities
 
         public override void Rebase()
         {
+            RebaseEquipBonuses();
             RebaseMaxHealth();
             RebaseMaxNano();
-            RebaseEquipBonuses();
+            NanoRuntime?.ReapplyBonusesAfterRebase(this);
             RebaseWeapons();
         }
 
@@ -288,10 +316,14 @@ namespace ZoneEngine_New.Core.Entities
         {
             ArgumentNullException.ThrowIfNull(session);
 
-            ConnectionPhase = PlayerConnectionPhase.Online;
-            LinkDeadUntilUtc = null;
-            Session = session;
-            session.BindPlayer(this);
+            lock (session)
+            {
+                // Bind first: a transport closed during hydration must not alter the player.
+                session.BindPlayer(this);
+                ConnectionPhase = PlayerConnectionPhase.Online;
+                LinkDeadUntilUtc = null;
+                Session = session;
+            }
         }
 
         static readonly CharacterStat[] FullCharacterStats1 =
@@ -671,6 +703,9 @@ namespace ZoneEngine_New.Core.Entities
 
         static GameTuple<int, uint>[] BuildFullCharacterIntStats(StatCollection stats, CharacterStat[] ids)
         {
+            // These are counted (stat id, value) arrays. Absent optional stats are omitted;
+            // an explicit stored zero remains distinct from an absent value.
+            ids = ids.Where(id => stats.TryGetValue(id, out _)).ToArray();
             var tuples = new GameTuple<int, uint>[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
@@ -678,7 +713,7 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<int, uint>
                 {
                     Value1 = (int)id,
-                    Value2 = (uint)stats.GetOrZero(id)
+                    Value2 = (uint)RequireWireStat(stats, id)
                 };
             }
 
@@ -687,6 +722,7 @@ namespace ZoneEngine_New.Core.Entities
 
         static GameTuple<byte, byte>[] BuildFullCharacterByteStats(StatCollection stats, CharacterStat[] ids)
         {
+            ids = ids.Where(id => stats.TryGetValue(id, out _)).ToArray();
             var tuples = new GameTuple<byte, byte>[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
@@ -694,7 +730,7 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<byte, byte>
                 {
                     Value1 = (byte)id,
-                    Value2 = (byte)stats.GetOrZero(id)
+                    Value2 = checked((byte)RequireWireStat(stats, id))
                 };
             }
 
@@ -703,6 +739,7 @@ namespace ZoneEngine_New.Core.Entities
 
         static GameTuple<byte, short>[] BuildFullCharacterShortStats(StatCollection stats, CharacterStat[] ids)
         {
+            ids = ids.Where(id => stats.TryGetValue(id, out _)).ToArray();
             var tuples = new GameTuple<byte, short>[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
@@ -710,11 +747,19 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<byte, short>
                 {
                     Value1 = (byte)id,
-                    Value2 = (short)stats.GetOrZero(id)
+                    Value2 = checked((short)RequireWireStat(stats, id))
                 };
             }
 
             return tuples;
+        }
+
+        static int RequireWireStat(StatCollection stats, CharacterStat id)
+        {
+            int value = stats.Get(id);
+            if (StatCollection.IsUnset(value))
+                throw new InvalidOperationException("Unset FullCharacter stat: " + id);
+            return value;
         }
 
         void LogFullCharacterInventory(FullCharacterMessage message)

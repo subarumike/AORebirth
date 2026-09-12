@@ -25,7 +25,6 @@ namespace ZoneEngine_New.Core.Inventory
         private readonly IZoneLogger _logger;
         private readonly object _scheduleGate = new();
         private readonly Dictionary<int, long> _dueAtMs = new();
-        private readonly Dictionary<int, object> _characterGates = new();
         private readonly ManualResetEventSlim _wake = new(false);
         private readonly Thread _writer;
         private volatile bool _disposed;
@@ -57,7 +56,7 @@ namespace ZoneEngine_New.Core.Inventory
         public void NotifyDirty(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
-            if (_disposed || !player.Inventory.IsHydrated)
+            if (_disposed || !player.Inventory.IsHydrated || player.IsPersistenceQuarantined)
                 return;
 
             int characterId = player.Identity.Instance;
@@ -84,6 +83,38 @@ namespace ZoneEngine_New.Core.Inventory
                 _dueAtMs.Remove(characterId);
 
             FlushCharacter(player);
+        }
+
+        /// <summary>
+        /// Trade and snapshot writes share the aggregate's gate with the background writer.
+        /// Ordered acquisition prevents opposing player trades from deadlocking. The caller
+        /// combines pending dirty entries with the final trade in a single transaction.
+        /// </summary>
+        public void WithExclusivePlayers(Player first, Player? second, Action action)
+        {
+            ArgumentNullException.ThrowIfNull(first);
+            ArgumentNullException.ThrowIfNull(action);
+            Player low = second != null && second.Identity.Instance < first.Identity.Instance ? second : first;
+            Player? high = second == null ? null : ReferenceEquals(low, first) ? second : first;
+            lock (low.PersistenceGate)
+            {
+                if (high == null)
+                    Run();
+                else
+                    lock (high.PersistenceGate) Run();
+            }
+
+            void Run()
+            {
+                if (first.IsPersistenceQuarantined || second?.IsPersistenceQuarantined == true)
+                    throw new InvalidOperationException("Trade participant persistence is quarantined.");
+                lock (_scheduleGate)
+                {
+                    _dueAtMs.Remove(first.Identity.Instance);
+                    if (second != null) _dueAtMs.Remove(second.Identity.Instance);
+                }
+                action();
+            }
         }
 
         void WriterLoop()
@@ -161,9 +192,10 @@ namespace ZoneEngine_New.Core.Inventory
             if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
                 return;
 
-            object gate = GateFor(player.Identity.Instance);
-            lock (gate)
+            lock (player.PersistenceGate)
             {
+                if (player.IsPersistenceQuarantined)
+                    throw new InvalidOperationException("Inventory persistence is quarantined pending database reconciliation.");
                 if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
                     return;
 
@@ -181,6 +213,13 @@ namespace ZoneEngine_New.Core.Inventory
                         nanos);
                     inventory?.MarkNewlyPersisted();
                 }
+                catch (DatabaseCommitOutcomeUnknownException exception)
+                {
+                    player.QuarantinePersistence();
+                    player.Session?.Close();
+                    _logger.Error(exception, "Inventory commit outcome is unknown; player persistence quarantined.");
+                    throw;
+                }
                 catch (Exception exception)
                 {
                     if (inventory != null)
@@ -194,19 +233,6 @@ namespace ZoneEngine_New.Core.Inventory
                             player.Identity.Instance));
                     throw;
                 }
-            }
-        }
-
-        object GateFor(int characterId)
-        {
-            lock (_characterGates)
-            {
-                if (_characterGates.TryGetValue(characterId, out object? gate))
-                    return gate;
-
-                gate = new object();
-                _characterGates[characterId] = gate;
-                return gate;
             }
         }
 

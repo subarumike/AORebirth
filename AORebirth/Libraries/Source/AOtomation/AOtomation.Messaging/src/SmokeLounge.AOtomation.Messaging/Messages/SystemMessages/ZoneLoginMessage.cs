@@ -33,6 +33,13 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.SystemMessages
         [AoMember(0)]
         public int CharacterId { get; set; }
 
+        // Retail 18.8.62 Client_t::SendClientCookie: wire offsets 0x18 and 0x1c.
+        [AoMember(1)]
+        public uint Cookie1 { get; set; }
+
+        [AoMember(2)]
+        public uint Cookie2 { get; set; }
+
         #endregion
     }
 }

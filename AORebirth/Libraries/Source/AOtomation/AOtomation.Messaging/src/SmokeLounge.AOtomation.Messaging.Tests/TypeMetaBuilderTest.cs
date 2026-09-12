@@ -322,7 +322,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                                {
                                    CharacterId = 1234567890, 
                                    ServerIpAddress = IPAddress.Loopback, 
-                                   ServerPort = 45678
+                                   ServerPort = 45678,
+                                   Cookie1 = 0x11223344,
+                                   Cookie2 = 0x55667788,
+                                   EventServerType = 1,
+                                   PlayerId = 0x99AABBCC
                                };
 
             var actual = (ZoneInfoMessage)this.SerializeDeserialize(expected);
@@ -331,6 +335,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(expected.CharacterId, actual.CharacterId);
             Assert.AreEqual(expected.ServerIpAddress, actual.ServerIpAddress);
             Assert.AreEqual(expected.ServerPort, actual.ServerPort);
+            Assert.AreEqual(expected.Cookie1, actual.Cookie1);
+            Assert.AreEqual(expected.Cookie2, actual.Cookie2);
+            Assert.AreEqual(expected.EventServerType, actual.EventServerType);
+            Assert.AreEqual(expected.PlayerId, actual.PlayerId);
         }
 
         #endregion

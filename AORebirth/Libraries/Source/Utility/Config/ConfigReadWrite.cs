@@ -97,6 +97,12 @@ namespace Utility.Config
         {
             get
             {
+#if AOREBIRTH_WIN_NET10
+                if (this._config == null)
+                {
+                    this._config = LoadConfig();
+                }
+#else
                 try
                 {
                     if (this._config == null)
@@ -111,6 +117,7 @@ namespace Utility.Config
                     // Still honor AO_REBIRTH_MYSQL_CONNECTION when the config file is missing/invalid.
                     ApplyMysqlConnectionOverride(this._config);
                 }
+#endif
 
                 return this._config;
             }
@@ -185,6 +192,18 @@ namespace Utility.Config
                     new XmlSerializer(typeof(Config)).Deserialize(
                         new MemoryStream(File.ReadAllBytes(GetConfigPath())));
 
+#if AOREBIRTH_WIN_NET10
+            string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
+            if (string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal)
+                && !string.IsNullOrWhiteSpace(config.MysqlConnection)
+                && config.MysqlConnection.IndexOf(
+                    "REPLACE_WITH_",
+                    StringComparison.OrdinalIgnoreCase) < 0)
+            {
+                throw new InvalidDataException(
+                    "Config.xml must contain only a placeholder MySQL connection for the Linux deployment profile.");
+            }
+#endif
             ApplyMysqlConnectionOverride(config);
             return config;
         }

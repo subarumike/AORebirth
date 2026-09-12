@@ -58,16 +58,16 @@ namespace LoginEngine.QueryBase
         {
             var characters = new List<CharacterEntry>();
 
-            foreach (DBCharacter ch in CharacterDao.Instance.GetAllForUser(accountName))
+            foreach (var ch in AORebirth.Database.DatabaseDaoFactory.CreateCharacterDao().ListForAccount(accountName))
             {
                 var charentry = new CharacterEntry();
-                charentry.Id = ch.Id;
+                charentry.Id = ch.CharacterId;
                 charentry.Name = ch.Name;
                 charentry.Playfield = ch.Playfield;
-                charentry.Level = StatDao.Instance.GetById(50000, ch.Id, 54).StatValue; // 54 = Level
-                charentry.Breed = StatDao.Instance.GetById(50000, ch.Id, 4).StatValue; // 4 = Breed
-                charentry.Gender = StatDao.Instance.GetById(50000, ch.Id, 59).StatValue; // 59 = Sex
-                charentry.Profession = StatDao.Instance.GetById(50000, ch.Id, 60).StatValue; // 60 = Profession
+                charentry.Level = StatDao.Instance.GetById(50000, ch.CharacterId, 54).StatValue; // 54 = Level
+                charentry.Breed = StatDao.Instance.GetById(50000, ch.CharacterId, 4).StatValue; // 4 = Breed
+                charentry.Gender = StatDao.Instance.GetById(50000, ch.CharacterId, 59).StatValue; // 59 = Sex
+                charentry.Profession = StatDao.Instance.GetById(50000, ch.CharacterId, 60).StatValue; // 60 = Profession
                 characters.Add(charentry);
             }
 

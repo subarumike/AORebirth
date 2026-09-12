@@ -12,6 +12,8 @@ namespace ZoneEngine_New.Core.Network
     using System.Threading.Channels;
     using System.Threading.Tasks;
 
+    using AORebirth.Database.Dao;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -28,8 +30,10 @@ namespace ZoneEngine_New.Core.Network
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
-    public sealed class ZoneSession : IZoneSession, IAsyncDisposable
+    public sealed class ZoneSession : IZoneSession, IGameTimeSession, IAsyncDisposable
     {
+        public DateTime? GameTimeSynchronizedAtUtc { get; private set; }
+        public void RecordGameTimeSynchronization(DateTime utcNow) => GameTimeSynchronizedAtUtc = utcNow;
         private const int HeaderLength = 16;
         private const int ReceiveChunkSize = 4096;
         private const int MaxPacketSize = 8192;
@@ -65,6 +69,12 @@ namespace ZoneEngine_New.Core.Network
         private short _packetNumber;
         private bool _outboundCompressed;
         private volatile bool _closed;
+        private PlayfieldTransfer? _transfer;
+        private ZoneHandoffStore? _handoffAuthority;
+        private int _handoffCharacter;
+        private uint _handoffCookie1;
+        private uint _handoffCookie2;
+        private int _state;
 
         public ZoneSession(
             Guid id,
@@ -87,18 +97,51 @@ namespace ZoneEngine_New.Core.Network
 
         public Guid Id { get; }
 
-        public SessionState State { get; set; } = SessionState.Connected;
+        public SessionState State
+        {
+            get => (SessionState)Volatile.Read(ref _state);
+            set
+            {
+                lock (this)
+                {
+                    if (_closed && value != SessionState.Closed)
+                        throw new InvalidOperationException("A closed session cannot resume gameplay.");
+                    Volatile.Write(ref _state, (int)value);
+                }
+            }
+        }
 
         public Player? Player { get; private set; }
 
+        internal void BindZoneHandoff(int character, uint cookie1, uint cookie2, ZoneHandoffStore? authority = null)
+        {
+            if (character <= 0 || (cookie1 == 0 && cookie2 == 0))
+                throw new InvalidOperationException("A valid claimed handoff is required.");
+            lock (this)
+            {
+                if (_closed) throw new InvalidOperationException("A closed session cannot accept a handoff.");
+                _handoffCharacter = character;
+                _handoffCookie1 = cookie1;
+                _handoffCookie2 = cookie2;
+                _handoffAuthority = authority ?? ZoneHandoffStore.Configured();
+            }
+        }
+
         public void BindPlayer(Player player)
         {
-            Player = player;
+            lock (this)
+            {
+                if (_closed) throw new InvalidOperationException("A closed session cannot own a player.");
+                if (Player != null && !ReferenceEquals(Player, player))
+                    throw new InvalidOperationException("A session cannot own multiple characters.");
+                Player = player;
+            }
         }
 
         public void UnbindPlayer()
         {
-            Player = null;
+            lock (this)
+                Player = null;
         }
 
         public void Send(byte[] packet)
@@ -206,52 +249,57 @@ namespace ZoneEngine_New.Core.Network
         }
 
         public void TransferToPlayfield(Playfield destination, Vector3 landing)
+            => TransferToPlayfield(destination, landing, Player?.Rotation
+                ?? throw new InvalidOperationException("Session has no bound player."));
+
+        public void TransferToPlayfield(Playfield destination, Vector3 landing, AORebirth.Core.Vector.Quaternion heading)
+            => TransferToPlayfield(destination, landing, heading, null);
+
+        internal void TransferToPlayfield(Playfield destination, Vector3 landing,
+            AORebirth.Core.Vector.Quaternion heading, Func<bool>? stillAuthorized)
         {
             ArgumentNullException.ThrowIfNull(destination);
             ArgumentNullException.ThrowIfNull(landing);
-
-            Player? player = Player;
-            if (player == null)
-                throw new InvalidOperationException("Session has no bound player.");
-
-            Playfield? source = player.Playfield;
-            if (source == null)
-                throw new InvalidOperationException("Player is not on a playfield.");
-
-            if (ReferenceEquals(source, destination))
-                throw new InvalidOperationException("Destination playfield matches current playfield.");
-
-            int characterId = player.Identity.Instance;
-            int destId = destination.Identity.Instance;
-
-            source.LeaveTransferredPlayer(player);
-            destination.ArriveTransferredPlayer(player, landing);
-
-            Send(
-                BuildNormalTeleport(player, landing, destId),
-                destId,
-                characterId);
-            Send(
-                BuildZoneRedirection(),
-                destId,
-                characterId);
-
-            player.Session = null;
-            UnbindPlayer();
-
-            _logger.Info(
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Playfield transfer character={0} from={1} to={2} landing=({3},{4},{5})",
-                    characterId,
-                    source.Identity.Instance,
-                    destId,
-                    landing.xf,
-                    landing.yf,
-                    landing.zf));
+            ArgumentNullException.ThrowIfNull(heading);
+            lock (this)
+            {
+                Player player = Player ?? throw new InvalidOperationException("Session has no bound player.");
+                Playfield source = player.Playfield ?? throw new InvalidOperationException("Player is not on a playfield.");
+                if (_closed || State != SessionState.InPlay || !ReferenceEquals(player.Session, this)
+                    || _transfer != null || player.IsPersistenceQuarantined)
+                    throw new InvalidOperationException("Session is not the current playable transfer owner.");
+                if (ReferenceEquals(source, destination))
+                    throw new InvalidOperationException("Destination playfield matches current playfield.");
+                var transfer = new PlayfieldTransfer(this, player, source, destination, landing, heading, stillAuthorized);
+                _transfer = transfer;
+                if (!source.ScheduleTransfer(transfer))
+                {
+                    _transfer = null;
+                    throw new ObjectDisposedException(nameof(source));
+                }
+            }
         }
 
-        private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId)
+        internal byte[][] PrepareTransferPackets(Player player, Vector3 landing,
+            AORebirth.Core.Vector.Quaternion heading, int destinationId)
+        {
+            ZoneRedirectEndpoint target = ZoneRedirectEndpoint.Configured();
+            AuthorizeZoneRedirect(player.Identity.Instance, target);
+            return
+            [
+                _codec.Serialize(BuildNormalTeleport(player, landing, destinationId, heading), destinationId, player.Identity.Instance),
+                _codec.Serialize(new ZoneRedirectionMessage { ServerIpAddress = target.Address, ServerPort = target.Port },
+                    destinationId, player.Identity.Instance)
+            ];
+        }
+
+        internal void FinishTransfer(PlayfieldTransfer transfer)
+        {
+            if (ReferenceEquals(_transfer, transfer)) _transfer = null;
+        }
+
+        private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId,
+            AORebirth.Core.Vector.Quaternion heading)
         {
             const IdentityType livePlayfieldProxyType = (IdentityType)0x0000C79E;
 
@@ -272,10 +320,10 @@ namespace ZoneEngine_New.Core.Network
                 },
                 Heading = new MsgQuaternion
                 {
-                    X = player.Rotation.xf,
-                    Y = player.Rotation.yf,
-                    Z = player.Rotation.zf,
-                    W = player.Rotation.wf
+                    X = heading.xf,
+                    Y = heading.yf,
+                    Z = heading.zf,
+                    W = heading.wf
                 },
                 Unknown1 = 0x61,
                 Playfield = new Identity
@@ -297,36 +345,25 @@ namespace ZoneEngine_New.Core.Network
             };
         }
 
-        private static ZoneRedirectionMessage BuildZoneRedirection()
+        private void AuthorizeZoneRedirect(int character, ZoneRedirectEndpoint target)
         {
-            Config? config = ConfigReadWrite.Instance.CurrentConfig;
-            string host = config == null || string.IsNullOrWhiteSpace(config.ZoneIP)
-                ? "127.0.0.1"
-                : config.ZoneIP;
-            int port = config == null || config.ZonePort <= 0 ? 7501 : config.ZonePort;
-
-            return new ZoneRedirectionMessage
-            {
-                ServerIpAddress = ResolveZoneRedirectAddress(host),
-                ServerPort = (ushort)port
-            };
-        }
-
-        private static IPAddress ResolveZoneRedirectAddress(string host)
-        {
-            if (IPAddress.TryParse(host, out IPAddress? parsed))
-                return parsed;
-
-            foreach (IPAddress ip in Dns.GetHostEntry(host).AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    return ip;
-            }
-
-            return IPAddress.Loopback;
+            if (_handoffAuthority == null || _handoffCharacter != character)
+                throw new InvalidOperationException("Session has no claimed redirect authority.");
+            ZoneHandoffClaim authorization = _handoffAuthority.AuthorizeRedirect(
+                character, _handoffCookie1, _handoffCookie2, target.Address.ToString(), target.Port);
+            if (!authorization.Accepted)
+                throw new InvalidOperationException("Zone redirect authorization failed: " + authorization.Reason);
         }
 
         public void Close()
+        {
+            lock (this)
+            {
+                CloseCore();
+            }
+        }
+
+        private void CloseCore()
         {
             if (_closed)
             {
@@ -334,6 +371,13 @@ namespace ZoneEngine_New.Core.Network
             }
 
             _closed = true;
+            State = SessionState.Closed;
+            _handoffAuthority = null;
+            _handoffCharacter = 0;
+            _handoffCookie1 = 0;
+            _handoffCookie2 = 0;
+            Playfield? transferSource = _transfer?.Source;
+            _transfer?.RequestReturn();
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -342,7 +386,7 @@ namespace ZoneEngine_New.Core.Network
                     Player?.Identity.Instance ?? 0,
                     State));
             _sendQueue.Writer.TryComplete();
-            _receiveBuffer.Clear();
+            // The receive loop owns this buffer; do not mutate its List from a closing thread.
 
             DisposeCompressionStreams();
 
@@ -367,6 +411,10 @@ namespace ZoneEngine_New.Core.Network
                 Player owned = Player;
                 if (ReferenceEquals(owned.Session, this))
                 {
+                    // Close can race the final PF shutdown/snapshot. The manager-owned team
+                    // authority outlives its disposed child provider and fences exact owners.
+                    (owned.Playfield ?? transferSource)?.NotifyTransportDisconnected(owned, this);
+                    owned.NanoRuntime?.Cancel(owned, this);
                     owned.EnterLinkDead(PlayfieldManager.ResolveLinkDeadTimeout());
                     _logger.Info(
                         string.Format(
@@ -444,7 +492,7 @@ namespace ZoneEngine_New.Core.Network
                     for (int i = 0; i < read; i++)
                         _receiveBuffer.Add(chunk[i]);
 
-                    while (TryPopPacket(out byte[] packet, out bool invalidPacket))
+                    while (!_closed && TryPopPacket(out byte[] packet, out bool invalidPacket))
                     {
                         if (invalidPacket)
                         {

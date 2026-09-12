@@ -23,7 +23,8 @@ namespace ZoneEngine_New.Core.Entities
         Command = 2,
         Player = 3,
         Corpse = 4,
-        StaticDynel = 5
+        StaticDynel = 5,
+        AcceptedPlacement = 6
     }
 
     /// <summary>
@@ -107,6 +108,10 @@ namespace ZoneEngine_New.Core.Entities
             throw new NotSupportedException(
                 GetType().Name + " does not implement BuildSpawnMessage.");
         }
+
+        /// <summary>Exact accepted wire for a spawn not representable by the shared typed codec.
+        /// Ordinary dynels return null and retain the existing typed path.</summary>
+        public virtual byte[]? BuildSpawnPacket(Identity receiver) => null;
 
         /// <summary>
         /// Additional packets sent right after <see cref="BuildSpawnMessage"/> when this dynel enters

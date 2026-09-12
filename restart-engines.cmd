@@ -16,6 +16,15 @@ if not "%PREFLIGHT_EXIT%"=="0" (
     exit /b %PREFLIGHT_EXIT%
 )
 
+rem Validate the selected backend schema before stopping the currently running backend.
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -ValidateSchemaOnly %*
+set "SCHEMA_EXIT=%ERRORLEVEL%"
+if not "%SCHEMA_EXIT%"=="0" (
+    echo [AORebirth Restart] Selected backend schema readiness failed; running engines were not stopped.
+    popd >nul
+    exit /b %SCHEMA_EXIT%
+)
+
 echo [AORebirth Restart] Stopping engines...
 call "%~dp0stop-engines.cmd"
 set STOP_EXIT=%ERRORLEVEL%

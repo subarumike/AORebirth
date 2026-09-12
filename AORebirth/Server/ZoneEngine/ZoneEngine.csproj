@@ -173,6 +173,7 @@
     <Compile Include="Core\Arete\Quests\RexMarcusChainCoordinator.cs" />
     <Compile Include="Core\Arete\Quests\RexQuestPreviewEmitter.cs" />
     <Compile Include="Core\Arete\Quests\SafeQuestFullUpdateSender.cs" />
+    <Compile Include="Core\Arete\Quests\SafeQuestFullUpdateSender.AuthoredData.cs" />
     <Compile Include="Core\GameData\GameDataLoader.cs" />
     <Compile Include="Core\Missions\IMissionRepository.cs" />
     <Compile Include="Core\Missions\InMemoryMissionRepository.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="Core\Nascence\Vendors\AbanGardenVendorInteractionRules.cs" />
     <Compile Include="Core\Doja\DojaChipInteractionRules.cs" />
     <Compile Include="Core\Doja\DojaChipPacketSender.cs" />
+    <Compile Include="Core\Doja\DojaChipPacketSender.Data.cs" />
     <Compile Include="Core\Doja\DojaChipQuestRuntime.cs" />
     <Compile Include="Core\Doja\DojaChipTradeAdapter.cs" />
     <Compile Include="Core\Nascence\Quests\RosenblattHiathlinInteractionRules.cs" />
@@ -330,6 +332,7 @@
     <Compile Include="Core\CombatStartPacketDiagnostics.cs" />
     <Compile Include="Core\ActiveNanoRuntimeService.cs" />
     <Compile Include="Core\AdventurerMorphFlightRuntime.cs" />
+    <Compile Include="Core\Packets\MorphCaptureWireCatalog.cs" />
     <Compile Include="Core\NanoEventRuntimeService.cs" />
     <Compile Include="Core\MongoSlamRuntimeService.cs" />
     <Compile Include="Core\PetRuntimeService.cs" />
@@ -350,6 +353,7 @@
     <Compile Include="Core\PetBureaucratGuardianScfuWire.cs" />
     <Compile Include="Core\SurveillanceDroidScfuWire.cs" />
     <Compile Include="Core\FlintKneecappingTipWire.cs" />
+    <Compile Include="Core\FlintKneecappingTipWire.Data.cs" />
     <Compile Include="Core\PetSummonSpellListBuilder.cs" />
     <Compile Include="Core\PetSummonSpellListService.cs" />
     <Compile Include="Core\PetShellItemService.cs" />
@@ -378,6 +382,7 @@
     <Compile Include="Core\Missions\MissionRewardEvidenceModel.cs" />
     <Compile Include="Core\Missions\MissionOfferTextBuilder.cs" />
     <Compile Include="Core\Missions\MissionRollService.cs" />
+    <Compile Include="Core\Missions\MissionRollService.Legacy.cs" />
     <Compile Include="Core\Missions\MissionRollFeeRules.cs" />
     <Compile Include="Core\Missions\MissionRollFeeService.cs" />
     <Compile Include="Core\Missions\MissionStateDirectory.cs" />
@@ -440,6 +445,8 @@
     <Compile Include="Core\Missions\MissionAcgTokenProgressStore.cs" />
     <Compile Include="Core\Missions\MissionAcgTokenProgressRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgCorpsePolicy.cs" />
+    <Compile Include="Core\Missions\MissionAcgCorpseCreditPolicy.cs" />
+    <Compile Include="Core\Missions\MissionAcgTokenRewardPolicy.cs" />
     <Compile Include="Core\Missions\MissionAcgSpatialAuthority.cs" />
     <Compile Include="Core\Missions\MissionAcgSpatialStateStore.cs" />
     <Compile Include="Core\Missions\MissionAcgSpatialRuntime.cs" />
@@ -448,6 +455,8 @@
     <Compile Include="Core\Missions\MissionAcgObjectiveContracts.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveRuntime.cs" />
     <Compile Include="Core\Missions\MissionAcgAcceptedQfuBuilder.cs" />
+    <Compile Include="Core\Missions\MissionAcgAcceptedQfuBuilder.Legacy.cs" />
+    <Compile Include="Core\Missions\MissionAcgIdentityRanges.cs" />
     <Compile Include="Core\Missions\MissionAcgObjectiveInteractionService.cs" />
     <Compile Include="Core\Missions\MissionAcgCompletionJournalService.cs" />
     <Compile Include="Core\Missions\MissionAcgLayoutCatalog.cs" />
@@ -574,6 +583,7 @@
     <Compile Include="Core\PacketHandlers\TradeSkillReceiver.cs" />
     <Compile Include="Core\Packets\Bulk.cs" />
     <Compile Include="Core\Packets\CorpseFullUpdate.cs" />
+    <Compile Include="Core\Packets\GeneratedMissionCorpseWire.cs" />
     <Compile Include="Core\Packets\Equip.cs" />
     <Compile Include="Core\Packets\SimpleCharFullUpdate.cs" />
     <Compile Include="Core\Packets\Stat.cs" />
@@ -728,11 +738,17 @@
     <Compile Include="Core\Playfields\DocumentedMercenaryCampLootDefinitions.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatContract.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatContract.Data.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatData.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatSequenceData.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatProfileData.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatProfileMatching.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs" />
     <Compile Include="Core\Playfields\CapturedIntObservationCursor.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatProfileCatalog.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatProfileCatalog.g.cs" />
     <Compile Include="Core\Playfields\CapturedEnemyCombatPacketFactory.cs" />
+    <Compile Include="Core\Playfields\CapturedEnemyCombatPacketFactory.Data.cs" />
     <Compile Include="Core\Playfields\CapturedSubwayEncounterRuntimeService.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyCatalog.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyProfile.cs" />
@@ -750,6 +766,7 @@
     <Compile Include="Core\Playfields\NpcCombatAttackRules.cs" />
     <Compile Include="Core\Playfields\NpcCombatSpatialPolicy.cs" />
     <Compile Include="Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs" />
+    <Compile Include="Core\Playfields\OrdinaryEnemyCombatSetupGenerator.Data.cs" />
     <Compile Include="Core\Playfields\NpcCombatTickCoordinator.cs" />
     <Compile Include="Core\Playfields\NpcCombatPlayerFeedback.cs" />
     <Compile Include="Core\Playfields\NpcDamageLineOfSightRuntimeService.cs" />

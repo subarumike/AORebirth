@@ -3,7 +3,6 @@ namespace ZoneEngine.Core.Missions
     #region Usings ...
 
     using System;
-    using AORebirth.Core.Entities;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -34,16 +33,16 @@ namespace ZoneEngine.Core.Missions
     /// <summary>
     /// Separate structured accepted-QFU builders for the five capture-backed mission contracts.
     /// </summary>
-    internal static class MissionAcgAcceptedQfuBuilder
+    internal static partial class MissionAcgAcceptedQfuBuilder
     {
         internal static MissionAcgAcceptedQfuContract Build(
-            ICharacter character,
+            Identity characterIdentity,
             QuestInfo acceptedState,
             MissionAcgInstanceBinding instanceBinding,
             MissionAcgObjectiveRecord objectiveRecord,
             int clientExpirySeconds)
         {
-            if (character == null
+            if (characterIdentity == null
                 || acceptedState == null
                 || instanceBinding == null
                 || objectiveRecord == null)
@@ -62,35 +61,35 @@ namespace ZoneEngine.Core.Missions
             {
                 case MissionRollType.KillPerson:
                     return BuildKill(
-                        character,
+                        characterIdentity,
                         acceptedState,
                         instanceBinding,
                         objectiveRecord,
                         clientExpirySeconds);
                 case MissionRollType.FindPerson:
                     return BuildFindPerson(
-                        character,
+                        characterIdentity,
                         acceptedState,
                         instanceBinding,
                         objectiveRecord,
                         clientExpirySeconds);
                 case MissionRollType.FindItem:
                     return BuildFindItem(
-                        character,
+                        characterIdentity,
                         acceptedState,
                         instanceBinding,
                         objectiveRecord,
                         clientExpirySeconds);
                 case MissionRollType.FindItemReturn:
                     return BuildReturnItem(
-                        character,
+                        characterIdentity,
                         acceptedState,
                         instanceBinding,
                         objectiveRecord,
                         clientExpirySeconds);
                 case MissionRollType.RepairMachine:
                     return BuildRepair(
-                        character,
+                        characterIdentity,
                         acceptedState,
                         instanceBinding,
                         objectiveRecord,
@@ -102,14 +101,14 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static MissionAcgAcceptedQfuContract BuildKill(
-            ICharacter character,
+            Identity characterIdentity,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
             MissionAcgObjectiveRecord objective,
             int clientExpirySeconds)
         {
             return BuildCore(
-                character,
+                characterIdentity,
                 state,
                 binding,
                 objective,
@@ -119,14 +118,14 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static MissionAcgAcceptedQfuContract BuildFindPerson(
-            ICharacter character,
+            Identity characterIdentity,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
             MissionAcgObjectiveRecord objective,
             int clientExpirySeconds)
         {
             return BuildCore(
-                character,
+                characterIdentity,
                 state,
                 binding,
                 objective,
@@ -136,14 +135,14 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static MissionAcgAcceptedQfuContract BuildFindItem(
-            ICharacter character,
+            Identity characterIdentity,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
             MissionAcgObjectiveRecord objective,
             int clientExpirySeconds)
         {
             return BuildCore(
-                character,
+                characterIdentity,
                 state,
                 binding,
                 objective,
@@ -153,14 +152,14 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static MissionAcgAcceptedQfuContract BuildReturnItem(
-            ICharacter character,
+            Identity characterIdentity,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
             MissionAcgObjectiveRecord objective,
             int clientExpirySeconds)
         {
             return BuildCore(
-                character,
+                characterIdentity,
                 state,
                 binding,
                 objective,
@@ -170,7 +169,7 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static MissionAcgAcceptedQfuContract BuildRepair(
-            ICharacter character,
+            Identity characterIdentity,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
             MissionAcgObjectiveRecord objective,
@@ -186,7 +185,7 @@ namespace ZoneEngine.Core.Missions
             }
 
             return BuildCore(
-                character,
+                characterIdentity,
                 state,
                 binding,
                 objective,
@@ -196,7 +195,7 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static MissionAcgAcceptedQfuContract BuildCore(
-            ICharacter character,
+            Identity characterIdentity,
             QuestInfo state,
             MissionAcgInstanceBinding binding,
             MissionAcgObjectiveRecord objective,
@@ -325,12 +324,12 @@ namespace ZoneEngine.Core.Missions
                     Unknown20 = state.Unknown15,
                     Unknown21 = state.Unknown16,
                     QuestActions = new[] { action },
-                    PlayerIds = new[] { Copy(character.Identity) },
+                    PlayerIds = new[] { Copy(characterIdentity) },
                     UnknownArray1 = state.Unknown18 ?? new int[0],
                     UnknownArray2 = state.Unknown19 ?? new int[0],
                     CharacterInfos = new CharacterInfo[0],
                     Unknown22 = state.Unknown20,
-                    PlayerIds2 = new[] { Copy(character.Identity) },
+                    PlayerIds2 = new[] { Copy(characterIdentity) },
                     Unknown23 = state.Unknown21,
                     Unknown24 = state.Unknown22,
                     UnknownId3 = ToIdentity(binding.MissionKeyIdentity),
@@ -344,7 +343,7 @@ namespace ZoneEngine.Core.Missions
             var message =
                 new QuestFullUpdateMessage
                 {
-                    Identity = Copy(character.Identity),
+                    Identity = Copy(characterIdentity),
                     Unknown = 0,
                     Quests = new[] { quest }
                 };

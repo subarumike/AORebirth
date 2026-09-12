@@ -88,7 +88,7 @@ namespace ChatEngine.CoreClient
         public bool ReadNames()
         {
             bool success = false;
-            DBCharacter character = CharacterDao.Instance.Get((int)this.CharacterId);
+            var character = AORebirth.Database.DatabaseDaoFactory.CreateCharacterDao().LoadById((int)this.CharacterId);
             if (character != null)
             {
                 this.characterName = character.Name;

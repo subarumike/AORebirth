@@ -17,6 +17,45 @@ namespace ZoneEngine_New.Core.Inventory
     /// <summary>OnUse FunctionType implementations that ZoneEngine_New can run today.</summary>
     internal static class ItemUseFunctions
     {
+        internal static bool TryReadInt(System.Collections.Generic.List<object> arguments, int index, out int value)
+            => TryGetInt(arguments, index, out value);
+
+        internal static bool CanExecute(Player player, ItemSpell spell)
+        {
+            // This implementation owns player-directed immediate effects only. Do not apply
+            // selected-target, repeating, or compound requirement semantics to the user by default.
+            if (spell.Target != (int)ItemTarget.User && spell.Target != (int)ItemTarget.Self
+                && spell.Target != (int)ItemTarget.Wearer) return false;
+            if (spell.TickCount > 1 || spell.TickInterval != 0) return false;
+            foreach (ItemRequirement requirement in spell.Requirements)
+            {
+                if (requirement.ChildOperator != 0
+                    || (requirement.Target != (int)ItemTarget.User && requirement.Target != (int)ItemTarget.Self
+                        && requirement.Target != (int)ItemTarget.Wearer)
+                    || !ItemTemplate.EvaluateRequirement(player.Stats.Get((CharacterStat)requirement.StatNumber), requirement))
+                    return false;
+            }
+            switch ((FunctionType)spell.FunctionType)
+            {
+                case FunctionType.OpenBank: return player.Session != null;
+                case FunctionType.SystemText:
+                    return player.Session != null && TryGetString(spell.Arguments, 0, out string text) && text.Length != 0;
+                case FunctionType.UploadNano:
+                    return TryGetInt(spell.Arguments, 0, out int nano) && nano > 0;
+                case FunctionType.Set:
+                    return TryGetInt(spell.Arguments, 0, out _) && TryGetInt(spell.Arguments, 1, out _);
+                case FunctionType.SetFlag:
+                case FunctionType.ClearFlag:
+                    return TryGetInt(spell.Arguments, 0, out _) && TryGetInt(spell.Arguments, 1, out int bit) && bit is >= 0 and <= 31;
+                case FunctionType.Hit:
+                    if (!TryGetInt(spell.Arguments, 0, out _) || !TryGetInt(spell.Arguments, 1, out int amount)) return false;
+                    return amount != int.MinValue && amount != int.MaxValue
+                        && (spell.Arguments.Count < 3 || (TryGetInt(spell.Arguments, 2, out int maximum)
+                            && maximum != int.MinValue && maximum != int.MaxValue));
+                default: return false;
+            }
+        }
+
         public static bool TryExecute(
             int templateId,
             Player player,
@@ -259,10 +298,10 @@ namespace ZoneEngine_New.Core.Inventory
                 case int i:
                     result = i;
                     return true;
-                case long l:
+                case long l when l >= int.MinValue && l <= int.MaxValue:
                     result = (int)l;
                     return true;
-                case uint u:
+                case uint u when u <= int.MaxValue:
                     result = (int)u;
                     return true;
                 case short s:

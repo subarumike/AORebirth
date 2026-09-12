@@ -14,6 +14,6 @@ namespace ZoneEngine_New.Core.Characters
 
         public IReadOnlyList<int> UploadedNanoIds { get; init; } = [];
 
-        public bool IsSpawnReady => Character != null && Stats.Count > 0;
+        public bool IsSpawnReady => CharacterHydrationValidator.Validate(this).IsValid;
     }
 }

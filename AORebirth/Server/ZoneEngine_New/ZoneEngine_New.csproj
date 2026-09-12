@@ -26,16 +26,17 @@
 
   <ItemGroup>
     <PackageReference Include="AODB" Version="1.0.6" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="BepuPhysics" Version="2.5.0-beta.25" />
-    <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
     <PackageReference Include="NLog" Version="6.1.4" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../../Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj" />
+    <ProjectReference Include="../../Libraries/Source/AORebirth.World.Package/AORebirth.World.Package.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/Utility.ZoneNew.WinNet10.csproj" />
@@ -45,15 +46,208 @@
   <!-- Sources under this directory are globbed by the SDK. Only the shared assembly info,
        which lives outside the project cone, needs an explicit entry. -->
   <ItemGroup>
+    <!-- Shared evidence-only placement validation, not legacy runtime ownership. -->
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/CharacterOnlineOwnershipGuard.cs" Link="Shared/CharacterOnlineOwnershipGuard.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/ZoneHandoffStore.cs" Link="Shared/ZoneHandoffStore.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/TeleportRoutingDao.cs" Link="Shared/TeleportRoutingDao.cs" />
+    <Compile Include="../ZoneEngine/Core/TeamXpShareWindow.cs" Link="SharedGameplay/TeamXpShareWindow.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Stats/SpecialStats/XPTable.cs" Link="SharedGameplay/Progression/XPTable.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Stats/SkillTrickleTable.cs" Link="SharedGameplay/Nanos/SkillTrickleTable.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatData.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatData.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileData.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatProfileData.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatSequenceData.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatSequenceData.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatContract.Data.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileMatching.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatProfileMatching.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.Data.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs" />
+    <Compile Include="../ZoneEngine/Core/NpcAiProfile.cs" Link="SharedGameplay/Combat/NpcAiProfile.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/OrdinaryEnemyCombatSetupGenerator.Data.cs" Link="SharedGameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs" Link="SharedGameplay/Combat/CapturedEnemyCombatProfileCatalog.g.cs" />
+    <Compile Include="../ZoneEngine/Core/ChatCommandText.cs" Link="SharedGameplay/ChatCommandText.cs" />
+    <Compile Include="../ZoneEngine/Core/Packets/MorphCaptureWireCatalog.cs" Link="SharedGameplay/Nanos/MorphCaptureWireCatalog.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionModels.cs" Link="SharedGameplay/Missions/MissionModels.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/IMissionRepository.cs" Link="SharedGameplay/Missions/IMissionRepository.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionDataMapper.cs" Link="SharedGameplay/Missions/MissionDataMapper.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionDaoRepositoryAdapter.cs" Link="SharedGameplay/Missions/MissionDaoRepositoryAdapter.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/PersistentMissionService.cs" Link="SharedGameplay/Missions/PersistentMissionService.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRewardCoordinator.cs" Link="SharedGameplay/Missions/MissionRewardCoordinator.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRollService.cs" Link="SharedGameplay/Missions/MissionRollService.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionLevelTable.cs" Link="SharedGameplay/Missions/MissionLevelTable.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionLevelGraph.cs" Link="SharedGameplay/Missions/MissionLevelGraph.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionLevelGraphData.g.cs" Link="SharedGameplay/Missions/MissionLevelGraphData.g.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionSliderProfile.cs" Link="SharedGameplay/Missions/MissionSliderProfile.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionLocationPool.cs" Link="SharedGameplay/Missions/MissionLocationPool.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRollEvidenceCatalog.cs" Link="SharedGameplay/Missions/MissionRollEvidenceCatalog.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionOfferCompatibility.cs" Link="SharedGameplay/Missions/MissionOfferCompatibility.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionOfferTextBuilder.cs" Link="SharedGameplay/Missions/MissionOfferTextBuilder.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRewardEvidenceModel.cs" Link="SharedGameplay/Missions/MissionRewardEvidenceModel.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionDiagnostics.cs" Link="SharedGameplay/Missions/MissionDiagnostics.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionTypeCatalog.cs" Link="SharedGameplay/Missions/MissionTypeCatalog.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRollCaptureTemplate.cs" Link="SharedGameplay/Missions/MissionRollCaptureTemplate.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRollCaptureLibrary.cs" Link="SharedGameplay/Missions/MissionRollCaptureLibrary.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRewardCatalog.cs" Link="SharedGameplay/Missions/MissionRewardCatalog.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRareLootCatalog.cs" Link="SharedGameplay/Missions/MissionRareLootCatalog.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionRollFeeRules.cs" Link="SharedGameplay/Missions/MissionRollFeeRules.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgLayoutRecords.cs" Link="SharedGameplay/Missions/MissionAcgLayoutRecords.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgLayoutBundle.cs" Link="SharedGameplay/Missions/MissionAcgLayoutBundle.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgLayoutCatalog.cs" Link="SharedGameplay/Missions/MissionAcgLayoutCatalog.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgLayoutSelector.cs" Link="SharedGameplay/Missions/MissionAcgLayoutSelector.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgCapturedLayoutCatalog.g.cs" Link="SharedGameplay/Missions/MissionAcgCapturedLayoutCatalog.g.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgInstanceBinding.cs" Link="SharedGameplay/Missions/MissionAcgInstanceBinding.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgInstanceState.cs" Link="SharedGameplay/Missions/MissionAcgInstanceState.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgBindingRecord.cs" Link="SharedGameplay/Missions/MissionAcgBindingRecord.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs" Link="SharedGameplay/Missions/MissionAcgRuntimeMaterialization.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgObjectiveBinding.cs" Link="SharedGameplay/Missions/MissionAcgObjectiveBinding.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgObjectiveContracts.cs" Link="SharedGameplay/Missions/MissionAcgObjectiveContracts.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgAcceptedQfuBuilder.cs" Link="SharedGameplay/Missions/MissionAcgAcceptedQfuBuilder.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgIdentityRanges.cs" Link="SharedGameplay/Missions/MissionAcgIdentityRanges.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionNpcDifficultyPolicy.cs" Link="SharedGameplay/Missions/MissionNpcDifficultyPolicy.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgSpatialAuthority.cs" Link="SharedGameplay/Missions/MissionAcgSpatialAuthority.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs" Link="SharedGameplay/Missions/MySqlMissionDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs" Link="Shared/Characters/MySqlCharacterDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Inventory.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Inventory.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Transactions.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Transactions.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterPersistenceDao.cs" Link="Shared/Characters/ICharacterPersistenceDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterPersistenceData.cs" Link="Shared/Characters/CharacterPersistenceData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterDirectoryData.cs" Link="Shared/Characters/CharacterDirectoryData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterDao.cs" Link="Shared/Characters/ICharacterDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineCharacterData.cs" Link="Shared/Characters/StaleOnlineCharacterData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/StaleOnlineRecoveryData.cs" Link="Shared/Characters/StaleOnlineRecoveryData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Generated.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Inventory.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs" Link="SharedGameplay/Missions/MissionDefinitionCatalog.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestModels.cs" Link="SharedGameplay/Missions/QuestModels.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs" Link="SharedGameplay/Dialogue/AreteFrameworkBootstrap.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedSubwayTailorDialogueContent.cs" Link="SharedGameplay/Dialogue/CapturedSubwayTailorDialogueContent.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedSubwayVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedSubwayVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedBucketheadTechnodealerContentProvider.cs" Link="SharedGameplay/Mobs/CapturedBucketheadTechnodealerContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedThrakGardenVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedThrakGardenVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAbanGardenVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedAbanGardenVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteConditionReferenceValidator.cs" Link="SharedGameplay/Dialogue/AreteConditionReferenceValidator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteEnvironmentGate.cs" Link="SharedGameplay/Dialogue/AreteEnvironmentGate.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteNoOpActionRecorder.cs" Link="SharedGameplay/Dialogue/AreteNoOpActionRecorder.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteNoOpConditionEvaluator.cs" Link="SharedGameplay/Dialogue/AreteNoOpConditionEvaluator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueSessionService.cs" Link="SharedGameplay/Dialogue/DialogueSessionService.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueSessionModels.cs" Link="SharedGameplay/Dialogue/DialogueSessionModels.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueModels.cs" Link="SharedGameplay/Dialogue/DialogueModels.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueContentRegistry.cs" Link="SharedGameplay/Dialogue/DialogueContentRegistry.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueContentPackValidator.cs" Link="SharedGameplay/Dialogue/DialogueContentPackValidator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueContentPackLoader.cs" Link="SharedGameplay/Dialogue/DialogueContentPackLoader.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Dialogue/DialogueActionReferenceValidator.cs" Link="SharedGameplay/Dialogue/DialogueActionReferenceValidator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestContentRegistry.cs" Link="SharedGameplay/Missions/QuestContentRegistry.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestContentPackLoader.cs" Link="SharedGameplay/Missions/QuestContentPackLoader.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Quests/QuestContentPackValidator.cs" Link="SharedGameplay/Missions/QuestContentPackValidator.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteValidationResult.cs" Link="SharedGameplay/Missions/AreteValidationResult.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteContentLoadResult.cs" Link="SharedGameplay/Missions/AreteContentLoadResult.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteJsonContentFileLoader.cs" Link="SharedGameplay/Missions/AreteJsonContentFileLoader.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteContentManifest.cs" Link="SharedGameplay/Missions/AreteContentManifest.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/AreteContentManifestLoader.cs" Link="SharedGameplay/Missions/AreteContentManifestLoader.cs" />
+    <Compile Include="../ZoneEngine/Core/Arete/Quests/SafeQuestFullUpdateSender.AuthoredData.cs" Link="SharedGameplay/Missions/SafeQuestFullUpdateSender.AuthoredData.cs" />
+    <Compile Include="../ZoneEngine/Core/FlintKneecappingTipWire.Data.cs" Link="SharedGameplay/Missions/FlintKneecappingTipWire.Data.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteMarcoSpidaVendorContentProvider.cs" Link="SharedGameplay/Missions/CapturedAreteMarcoSpidaVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorStockDefinition.cs" Link="SharedGameplay/Missions/CapturedAreteAlexAreaVendorStockDefinition.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorDefinition.cs" Link="SharedGameplay/Mobs/CapturedAreteAlexAreaVendorDefinition.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedAreteAlexAreaVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteLoreleiVendorContentProvider.cs" Link="SharedGameplay/Mobs/CapturedAreteLoreleiVendorContentProvider.cs" />
+    <Compile Include="../ZoneEngine/Core/Doja/DojaChipInteractionRules.cs" Link="SharedGameplay/Missions/DojaChipInteractionRules.cs" />
+    <Compile Include="../ZoneEngine/Core/Doja/DojaChipPacketSender.Data.cs" Link="SharedGameplay/Missions/DojaChipPacketSender.Data.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/DailyMissionRewardRules.cs" Link="SharedGameplay/Missions/DailyMissionRewardRules.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgCorpseCreditPolicy.cs" Link="SharedGameplay/Missions/MissionAcgCorpseCreditPolicy.cs" />
+    <Compile Include="../ZoneEngine/Core/Missions/MissionAcgTokenRewardPolicy.cs" Link="SharedGameplay/Missions/MissionAcgTokenRewardPolicy.cs" />
+    <Compile Include="../ZoneEngine/Core/Packets/GeneratedMissionCorpseWire.cs" Link="SharedGameplay/Missions/GeneratedMissionCorpseWire.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacement.cs" Link="OfficialPlacements/OfficialPlayfieldPlacement.cs" />
+    <Compile Include="../ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs" Link="OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/LinuxBuild/Compatibility/ZoneEngine/JavaScriptSerializer.Linux.cs" Link="Compatibility/JavaScriptSerializer.cs" />
     <Compile Include="..\..\SolutionAssemblyInfo.cs">
       <Link>Properties\SolutionAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
 
     <ItemGroup>
+    <Content Include="$(AORebirthRepositoryRoot)/docs/generated/playfields/official-placement-corpus-manifest.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/official-placement-index.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/official-placement-summary.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/official-acghash-inventory.json;$(AORebirthRepositoryRoot)/docs/generated/playfields/playfield-package-manifest.json">
+      <Link>Content/Official/PlayfieldPlacements/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="$(AORebirthRepositoryRoot)/docs/generated/playfields/placements/pf_*.json">
+      <Link>Content/Official/PlayfieldPlacements/placements/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="..\..\Config\Config.xml">
       <Link>Config.xml</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../Datafiles/nanos.dat">
+      <Link>GameData/nanos.dat</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Arete/rex-larsson/**/*">
+      <Link>Content/Arete/rex-larsson/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Arete/marcus-stone/**/*">
+      <Link>Content/Arete/marcus-stone/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Subway/windcaller-karrec/**/*">
+      <Link>Content/Subway/windcaller-karrec/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Subway/tailor/**/*">
+      <Link>Content/Subway/tailor/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Thrak/garden-key/**/*">
+      <Link>Content/Thrak/garden-key/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Thrak/garden-vendors/**/*">
+      <Link>Content/Thrak/garden-vendors/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Aban/garden-vendors/**/*">
+      <Link>Content/Aban/garden-vendors/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Nascence/rosenblatt-hiathlin/**/*">
+      <Link>Content/Nascence/rosenblatt-hiathlin/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Nascence/life-dialogs/**/*">
+      <Link>Content/Nascence/life-dialogs/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Andromeda/zyvania-bagh/**/*">
+      <Link>Content/Andromeda/zyvania-bagh/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Arete/flint-novak/**/*">
+      <Link>Content/Arete/flint-novak/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/Content/Doja/nascense-chip/**/*">
+      <Link>Content/Doja/nascense-chip/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../ZoneEngine/XML Data/MissionRewards/ItemDb_Clusters.json;../ZoneEngine/XML Data/MissionRewards/ItemDB_Implants.json;../ZoneEngine/XML Data/MissionRewards/ItemDb_Nanos.json;../ZoneEngine/XML Data/MissionRewards/ItemDb_Refined.json;../ZoneEngine/XML Data/MissionRewards/ItemDb_Rest.json">
+      <Link>XML Data/MissionRewards/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="..\..\Libraries\Source\AORebirth.Database\Migrations\*.sql" Exclude="..\..\Libraries\Source\AORebirth.Database\Migrations\*account*">
       <Link>Migrations\%(Filename)%(Extension)</Link>
@@ -71,6 +265,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../../Libraries/Source/AORebirth.Enums/StatIds.cs" Link="Enums/StatIds.cs" />
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\EventType.cs">
       <Link>Enums\EventType.cs</Link>
     </Compile>

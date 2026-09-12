@@ -112,7 +112,7 @@ namespace LoginEngine
 
         private static bool CheckUsername(string username)
         {
-            return !LoginDataDao.Instance.GetWhere(new { Username = username }).Any();
+            return !LoginDataDao.Instance.Exists(username);
         }
 
         private static bool IsNumber(string number)
@@ -329,7 +329,7 @@ namespace LoginEngine
             bool result = true;
             try
             {
-                LoginDataDao.Instance.GetAll();
+                LoginDataDao.Instance.GetRegisteredCount();
             }
             catch (Exception)
             {

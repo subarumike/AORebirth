@@ -1,0 +1,4036 @@
+{
+  "schemaVersion": 1,
+  "sourceHashes": {
+    "AORebirth/Server/ZoneEngine/Core/MessageHandlers/FullCharacterMessageHandler.cs": "c9ac104b9cac9018dc5f0db75c113ae62567511c11f63528287bb26c46de8cf1",
+    "AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs": "9062956768f6236244a699a31e2170225324f8d94a1ca406a20681057da6c6fc",
+    "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationValidator.cs": "1cdbf14a17218cb86b06092799c03a80c376147e9eba0feff839b65175fea625"
+  },
+  "requiredStats": [
+    "Flags",
+    "Breed",
+    "Sex",
+    "Profession",
+    "Fatness",
+    "Race",
+    "HeadMesh",
+    "VisualFlags",
+    "Scale",
+    "Level",
+    "TitleLevel",
+    "Side",
+    "Expansion",
+    "Strength",
+    "Agility",
+    "Stamina",
+    "Intelligence",
+    "Sense",
+    "Psychic",
+    "BodyDevelopment",
+    "NanoPool",
+    "Health",
+    "MaxHealth",
+    "CurrentNano",
+    "MaxNanoEnergy",
+    "RunSpeed"
+  ],
+  "fullCharacterProperties": [
+    "MsgVersion",
+    "InventorySlots",
+    "UploadedNanoIds",
+    "Unknown2",
+    "Unknown3",
+    "Unknown4",
+    "UnknownI2",
+    "Unknown5",
+    "UnknownI3",
+    "Unknown6",
+    "Stats1",
+    "Stats2",
+    "Stats3",
+    "Stats4",
+    "Unknown9",
+    "Unknown10",
+    "Unknown11",
+    "Unknown12",
+    "Unknown13"
+  ],
+  "legacyEntries": 237,
+  "newEntries": 211,
+  "uniqueStatsReviewed": 230,
+  "unresolvedFullCharacterStats": [
+    {
+      "id": 65,
+      "name": "HairTexture"
+    },
+    {
+      "id": 66,
+      "name": "66"
+    },
+    {
+      "id": 67,
+      "name": "HairColourRGB"
+    },
+    {
+      "id": 68,
+      "name": "NumConstructedQuest"
+    },
+    {
+      "id": 69,
+      "name": "MaxConstructedQuest"
+    },
+    {
+      "id": 75,
+      "name": "StrainOmniTokens"
+    },
+    {
+      "id": 168,
+      "name": "NanoResist"
+    },
+    {
+      "id": 224,
+      "name": "Features"
+    },
+    {
+      "id": 303,
+      "name": "ClanUpkeep"
+    },
+    {
+      "id": 348,
+      "name": "348"
+    },
+    {
+      "id": 349,
+      "name": "349"
+    },
+    {
+      "id": 432,
+      "name": "ErrorCode"
+    },
+    {
+      "id": 544,
+      "name": "544"
+    },
+    {
+      "id": 545,
+      "name": "545"
+    },
+    {
+      "id": 574,
+      "name": "LastSK"
+    },
+    {
+      "id": 575,
+      "name": "NextSK"
+    },
+    {
+      "id": 594,
+      "name": "594"
+    },
+    {
+      "id": 595,
+      "name": "595"
+    },
+    {
+      "id": 596,
+      "name": "596"
+    },
+    {
+      "id": 597,
+      "name": "597"
+    },
+    {
+      "id": 617,
+      "name": "617"
+    },
+    {
+      "id": 618,
+      "name": "618"
+    },
+    {
+      "id": 619,
+      "name": "619"
+    }
+  ],
+  "rows": [
+    {
+      "id": 0,
+      "name": "Flags",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        255
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=0) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 1,
+      "name": "MaxHealth",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        379
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=1) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 2,
+      "name": "Mass",
+      "legacyGroups": [],
+      "legacyLines": [],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=2) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "INTENTIONAL_DIFFERENCE",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 3,
+      "name": "AttackSpeed",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        538
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=3) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 4,
+      "name": "Breed",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        430
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=4) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 6,
+      "name": "Team",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        427
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=6) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 7,
+      "name": "State",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        153
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=7) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 9,
+      "name": "MapFlags",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        870
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=9) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 10,
+      "name": "ProfessionLevel",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        803
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=10) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 11,
+      "name": "PreviousHealth",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        460
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=11) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 12,
+      "name": "Mesh",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        418
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=12) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 16,
+      "name": "Strength",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        397
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=16) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 17,
+      "name": "Agility",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        394
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=17) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 18,
+      "name": "Stamina",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        391
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=18) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 19,
+      "name": "Intelligence",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        388
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=19) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 20,
+      "name": "Sense",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        385
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=20) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 21,
+      "name": "Psychic",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        382
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=21) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 27,
+      "name": "Health",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        376
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=27) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 33,
+      "name": "Side",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        469
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=33) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 34,
+      "name": "DeadTimer",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        424
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=34) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 37,
+      "name": "TitleLevel",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        688
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=37) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 40,
+      "name": "AlienXP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        793
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=40) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 45,
+      "name": "BeltSlots",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        821
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=45) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 47,
+      "name": "Fatness",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        812
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=47) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 49,
+      "name": "InsuranceTime",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        858
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=49) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 51,
+      "name": "AggDef",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        412
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=51) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 52,
+      "name": "XP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        448
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=52) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 53,
+      "name": "IP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        451
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=53) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 54,
+      "name": "Level",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        445
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=54) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 57,
+      "name": "LastXP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        442
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=57) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 58,
+      "name": "Age",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        466
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=58) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 59,
+      "name": "Sex",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        433
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=59) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 60,
+      "name": "Profession",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        409
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=60) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 61,
+      "name": "Cash",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        406
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=61) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 62,
+      "name": "AlignmentClanTokens",
+      "legacyGroups": [
+        2,
+        2
+      ],
+      "legacyLines": [
+        403,
+        682
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=62) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 63,
+      "name": "Attitude",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        400
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=63) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 65,
+      "name": "HairTexture",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        309
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=65) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 66,
+      "name": "66",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        312
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=66) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 67,
+      "name": "HairColourRGB",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        315
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=67) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 68,
+      "name": "NumConstructedQuest",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        358
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=68) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 69,
+      "name": "MaxConstructedQuest",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        361
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=69) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 72,
+      "name": "ItemType",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        457
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=72) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 75,
+      "name": "StrainOmniTokens",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        685
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=75) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 78,
+      "name": "CurrentMass",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        454
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=78) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 79,
+      "name": "Icon",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        415
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=79) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 89,
+      "name": "Race",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        815
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=89) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 90,
+      "name": "ProjectileAC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        715
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=90) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 91,
+      "name": "MeleeAC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        712
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=91) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 92,
+      "name": "EnergyAC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        709
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=92) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 93,
+      "name": "ChemicalAC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        706
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=93) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 94,
+      "name": "RadiationAC",
+      "legacyGroups": [
+        2,
+        2
+      ],
+      "legacyLines": [
+        487,
+        703
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=94) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 95,
+      "name": "ColdAC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        700
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=95) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 96,
+      "name": "PoisonAC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        697
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=96) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 97,
+      "name": "FireAC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        694
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=97) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 100,
+      "name": "MartialArts",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        679
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=100) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 101,
+      "name": "MultiMelee",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        478
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=101) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 102,
+      "name": "_1hBlunt",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        676
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=102) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 103,
+      "name": "_1hEdged",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        673
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=103) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 104,
+      "name": "MeleeEnergy",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        670
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=104) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 105,
+      "name": "Skill2hEdged",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        667
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=105) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 106,
+      "name": "Piercing",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        664
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=106) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 107,
+      "name": "_2hBlunt",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        661
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=107) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 108,
+      "name": "SharpObject",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        658
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=108) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 109,
+      "name": "Grenade",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        655
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=109) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 110,
+      "name": "HeavyWeapons",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        652
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=110) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 111,
+      "name": "Bow",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        649
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=111) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 112,
+      "name": "Pistol",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        646
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=112) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 113,
+      "name": "Rifle",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        643
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=113) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 114,
+      "name": "MGSMG",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        640
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=114) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 115,
+      "name": "Shotgun",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        637
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=115) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 116,
+      "name": "AssaultRifle",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        634
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=116) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 117,
+      "name": "VehicleWater",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        475
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=117) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 118,
+      "name": "MeleeInit",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        631
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=118) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 119,
+      "name": "RangedInit",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        628
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=119) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 120,
+      "name": "PhysicalInit",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        625
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=120) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 121,
+      "name": "BowSpecialAttack",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        493
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=121) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 122,
+      "name": "SensoryImprovement",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        490
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=122) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 123,
+      "name": "FirstAid",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        622
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=123) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 124,
+      "name": "Treatment",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        619
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=124) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 125,
+      "name": "MechanicalEngineering",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        616
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=125) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 126,
+      "name": "ElectricalEngineering",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        613
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=126) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 127,
+      "name": "MaterialMetamorphosis",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        610
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=127) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 128,
+      "name": "BiologicalMetamorphosis",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        607
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=128) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 129,
+      "name": "PsychologicalModification",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        604
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=129) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 130,
+      "name": "MaterialCreation",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        601
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=130) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 131,
+      "name": "SpaceTime",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        598
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=131) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 132,
+      "name": "NanoPool",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        595
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=132) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 133,
+      "name": "RangedEnergy",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        484
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=133) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 134,
+      "name": "MultiRanged",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        481
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=134) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 135,
+      "name": "TrapDisarm",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        592
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=135) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 136,
+      "name": "Perception",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        589
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=136) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 137,
+      "name": "Adventuring",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        586
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=137) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 138,
+      "name": "Swimming",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        583
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=138) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 139,
+      "name": "VehicleAir",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        505
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=139) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 140,
+      "name": "MapNavigation",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        502
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=140) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 141,
+      "name": "Tutoring",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        580
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=141) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 142,
+      "name": "Brawl",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        577
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=142) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 143,
+      "name": "Riposte",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        574
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=143) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 144,
+      "name": "Dimach",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        571
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=144) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 145,
+      "name": "Parry",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        568
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=145) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 146,
+      "name": "SneakAttack",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        565
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=146) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 147,
+      "name": "FastAttack",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        562
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=147) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 148,
+      "name": "Burst",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        496
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=148) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 149,
+      "name": "NanoCInit",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        559
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=149) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 150,
+      "name": "FlingShot",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        556
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=150) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 151,
+      "name": "AimedShot",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        553
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=151) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 152,
+      "name": "BodyDevelopment",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        550
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=152) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 153,
+      "name": "DuckExp",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        547
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=153) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 154,
+      "name": "DodgeRanged",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        544
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=154) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 155,
+      "name": "EvadeClsC",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        541
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=155) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 156,
+      "name": "RunSpeed",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        421
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=156) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 157,
+      "name": "QuantumFT",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        535
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=157) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 158,
+      "name": "WeaponSmithing",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        532
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=158) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 159,
+      "name": "Pharmaceuticals",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        529
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=159) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 160,
+      "name": "NanoProgramming",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        526
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=160) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 161,
+      "name": "ComputerLiteracy",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        523
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=161) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 162,
+      "name": "Psychology",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        520
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=162) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 163,
+      "name": "Chemistry",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        517
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=163) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 164,
+      "name": "Concealment",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        514
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=164) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 165,
+      "name": "BreakingEntry",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        511
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=165) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 166,
+      "name": "VehicleGround",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        508
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=166) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 167,
+      "name": "FullAuto",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        499
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=167) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 168,
+      "name": "NanoResist",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        273
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=168) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 169,
+      "name": "AlienLevel",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        787
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=169) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 173,
+      "name": "CurrentMovementMode",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        809
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=173) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 174,
+      "name": "PrevMovementMode",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        806
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=174) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 178,
+      "name": "AlienNextXP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        790
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=178) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 181,
+      "name": "MaxNCU",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        867
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=181) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 182,
+      "name": "Specialization",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        177
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=182) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 191,
+      "name": "LastConcretePlayfieldInstance",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        279
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=191) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 194,
+      "name": "InPlay",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        373
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=194) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 198,
+      "name": "SessionTime",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        327
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=198) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 199,
+      "name": "RP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        718
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=199) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 213,
+      "name": "TeamSide",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        818
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=213) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 214,
+      "name": "CurrentNano",
+      "legacyGroups": [
+        1,
+        4
+      ],
+      "legacyLines": [
+        275,
+        861
+      ],
+      "newGroups": [
+        1,
+        4
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=214) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 215,
+      "name": "GmLevel",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        691
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=215) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 221,
+      "name": "MaxNanoEnergy",
+      "legacyGroups": [
+        1,
+        4
+      ],
+      "legacyLines": [
+        276,
+        864
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=221) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 224,
+      "name": "Features",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        258
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=224) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 236,
+      "name": "InsurancePercentage",
+      "legacyGroups": [
+        3
+      ],
+      "legacyLines": [
+        800
+      ],
+      "newGroups": [
+        3
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=236) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 237,
+      "name": "ChangeSideCount",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        873
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=237) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 238,
+      "name": "AbsorbProjectileAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        828
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=238) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 239,
+      "name": "AbsorbMeleeAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        831
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=239) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 240,
+      "name": "AbsorbEnergyAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        834
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=240) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 241,
+      "name": "AbsorbChemicalAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        837
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=241) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 242,
+      "name": "AbsorbRadiationAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        840
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=242) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 243,
+      "name": "AbsorbColdAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        843
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=243) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 244,
+      "name": "AbsorbFireAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        849
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=244) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 245,
+      "name": "AbsorbPoisonAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        852
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=245) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 246,
+      "name": "AbsorbNanoAC",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        846
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=246) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 247,
+      "name": "TemporarySkillReduction",
+      "legacyGroups": [
+        4
+      ],
+      "legacyLines": [
+        855
+      ],
+      "newGroups": [
+        4
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=247) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 256,
+      "name": "MissionBits1",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        297
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=256) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 257,
+      "name": "MissionBits2",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        300
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=257) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 263,
+      "name": "PersonalResearchLevel",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        333
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=263) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 264,
+      "name": "GlobalResearchLevel",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        336
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=264) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 265,
+      "name": "PersonalResearchGoal",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        339
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=265) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 266,
+      "name": "GlobalResearchGoal",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        342
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=266) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 275,
+      "name": "XPKillRange",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        370
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=275) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 300,
+      "name": "Members",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        351
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=300) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 303,
+      "name": "ClanUpkeep",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        303
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=303) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 334,
+      "name": "SavedXP",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        252
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=334) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 348,
+      "name": "348",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        721
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=348) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 349,
+      "name": "349",
+      "legacyGroups": [
+        1,
+        2
+      ],
+      "legacyLines": [
+        330,
+        367
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=349) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 350,
+      "name": "NextXP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        439
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=350) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 355,
+      "name": "NanoFocusLevel",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        174
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=355) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 360,
+      "name": "Scale",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        267
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=360) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 368,
+      "name": "VisualProfession",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        270
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=368) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 372,
+      "name": "LastSaveXP",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        436
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=372) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 389,
+      "name": "Expansion",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        733
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=389) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 418,
+      "name": "UnarmedTemplateInstance",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        156
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=418) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 423,
+      "name": "CurrentState",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        463
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=423) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 430,
+      "name": "WaitState",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        472
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=430) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 432,
+      "name": "ErrorCode",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        306
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=432) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 470,
+      "name": "MapOptions",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        282
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=470) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 471,
+      "name": "MapsA",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        285
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=471) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 472,
+      "name": "MapsB",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        288
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=472) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 521,
+      "name": "SocialStatus",
+      "legacyGroups": [
+        1,
+        2
+      ],
+      "legacyLines": [
+        189,
+        775
+      ],
+      "newGroups": [
+        1,
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=521) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 532,
+      "name": "ShadowBreed",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        183
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=532) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 544,
+      "name": "544",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        318
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=544) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 545,
+      "name": "545",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        321
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=545) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 560,
+      "name": "OTArmedForces",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        772
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=560) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 561,
+      "name": "ClanSentinels",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        769
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=561) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 562,
+      "name": "OTMed",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        766
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=562) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 563,
+      "name": "ClanGaia",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        763
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=563) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 564,
+      "name": "OTTrans",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        760
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=564) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 565,
+      "name": "ClanVanguards",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        757
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=565) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 566,
+      "name": "GOS",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        754
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=566) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 567,
+      "name": "OTFollowers",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        751
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=567) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 568,
+      "name": "OTOperator",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        748
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=568) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 569,
+      "name": "OTUnredeemed",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        745
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=569) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 570,
+      "name": "ClanDevoted",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        742
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=570) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 571,
+      "name": "ClanConserver",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        739
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=571) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 572,
+      "name": "ClanRedeemed",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        736
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=572) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 573,
+      "name": "SK",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        724
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=573) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 574,
+      "name": "LastSK",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        727
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=574) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 575,
+      "name": "NextSK",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        730
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=575) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 576,
+      "name": "PlayerOptions",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        192
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=576) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 577,
+      "name": "LastPerkResetTime",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        186
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=577) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 579,
+      "name": "ShadowBreedTemplate",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        180
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=579) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 582,
+      "name": "ApartmentsAllowed",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        261
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=582) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 583,
+      "name": "ApartmentsOwned",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        264
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=583) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 585,
+      "name": "MapsC",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        291
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=585) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 586,
+      "name": "MapsD",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        294
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=586) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 592,
+      "name": "UnsavedXP",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        171
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=592) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 594,
+      "name": "594",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        195
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=594) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 595,
+      "name": "595",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        198
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=595) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 596,
+      "name": "596",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        201
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=596) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 597,
+      "name": "597",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        204
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=597) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 607,
+      "name": "PlayerID",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        778
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=607) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 615,
+      "name": "InvadersKilled",
+      "legacyGroups": [
+        1,
+        2
+      ],
+      "legacyLines": [
+        159,
+        784
+      ],
+      "newGroups": [
+        1,
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=615) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 616,
+      "name": "KilledByInvaders",
+      "legacyGroups": [
+        1,
+        2
+      ],
+      "legacyLines": [
+        162,
+        781
+      ],
+      "newGroups": [
+        1,
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=616) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 617,
+      "name": "617",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        324
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=617) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 618,
+      "name": "618",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        325
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=618) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 619,
+      "name": "619",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        326
+      ],
+      "newGroups": [],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=619) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MISSING_NEWENGINE",
+      "action": "Unresolved retail necessity; no speculative emission"
+    },
+    {
+      "id": 660,
+      "name": "AccountFlags",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        165
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=660) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 668,
+      "name": "BattlestationSide",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        345
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=668) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 669,
+      "name": "VP",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        168
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=669) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 670,
+      "name": "BattlestationRep",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        348
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=670) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 672,
+      "name": "PaidPoints",
+      "legacyGroups": [
+        2
+      ],
+      "legacyLines": [
+        364
+      ],
+      "newGroups": [
+        2
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=672) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 673,
+      "name": "VisualFlags",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        207
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "YES - current spawn consumer/derivation",
+      "source": "stats(Type=50000,Instance=character,StatId=673) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Required persisted base and validated effective state"
+    },
+    {
+      "id": 674,
+      "name": "PVPDuelKills",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        210
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=674) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 675,
+      "name": "PVPDuelDeaths",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        213
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=675) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 676,
+      "name": "PVPProfessionDuelKills",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        216
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=676) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 677,
+      "name": "PVPProfessionDuelDeaths",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        219
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=677) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 678,
+      "name": "PVPRankedSoloKills",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        222
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=678) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 679,
+      "name": "PVPRankedSoloDeaths",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        225
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=679) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 680,
+      "name": "PVPRankedTeamKills",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        228
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=680) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 681,
+      "name": "PVPRankedTeamDeaths",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        231
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=681) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 682,
+      "name": "PVPSoloScore",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        234
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=682) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 683,
+      "name": "PVPTeamScore",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        237
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=683) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    },
+    {
+      "id": 684,
+      "name": "PVPDuelScore",
+      "legacyGroups": [
+        1
+      ],
+      "legacyLines": [
+        240
+      ],
+      "newGroups": [
+        1
+      ],
+      "required": "UNKNOWN - no retail necessity established",
+      "source": "stats(Type=50000,Instance=character,StatId=684) through ICharacterPersistenceDao.LoadStats; derived runtime values where applicable",
+      "classification": "MATCH",
+      "action": "Emit only initialized state; omit absent optional tuple; reject sentinel"
+    }
+  ]
+}

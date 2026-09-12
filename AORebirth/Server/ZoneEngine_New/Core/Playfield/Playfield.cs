@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Playfield
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
@@ -19,6 +20,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Metrics;
+    using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
@@ -51,7 +53,9 @@ namespace ZoneEngine_New.Core.Playfield
         private int _nextContainerInventoryHandle = 1;
         // TEMP: WIFU Identity.Instance until real weapon-instance identity allocation exists.
         private int _nextWeaponInstanceId = 1;
-        private bool _disposed;
+        private volatile bool _disposed;
+        private readonly ConcurrentDictionary<PlayfieldTransfer, byte> _outgoingTransfers = new();
+        private readonly ConcurrentDictionary<PlayfieldTransfer, byte> _incomingTransfers = new();
         private bool _built;
 
         public Playfield(
@@ -148,6 +152,8 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         protected PlayfieldMetrics Metrics => _metrics;
+        protected bool IsBuilt => _built;
+        protected void MarkBuilt() => _built = true;
 
         protected int SpawnStaticDynels()
             => GetRequiredService<SpawnService>().LoadStaticDynels();
@@ -158,6 +164,8 @@ namespace ZoneEngine_New.Core.Playfield
             if (_heartBeat != null || _disposed)
                 return;
 
+            GetRequiredService<AcceptedNpcActivationService>().Activate();
+            GetRequiredService<ZoneEngine_New.Core.Missions.AcceptedQuestPropService>().Activate();
             _heartBeat = new PlayfieldHeartbeat(Identity, Tick);
         }
 
@@ -178,8 +186,6 @@ namespace ZoneEngine_New.Core.Playfield
         public WorldSimulationAccess WorldAccess =>
             _serviceProvider.GetRequiredService<WorldSimulationAccess>();
 
-        protected void MarkBuilt() => _built = true;
-
         protected void RegisterWorldServices(WorldSimulation.PlayfieldWorldSimulation world)
         {
             ArgumentNullException.ThrowIfNull(world);
@@ -190,7 +196,7 @@ namespace ZoneEngine_New.Core.Playfield
         /// Builds a PlayfieldAnarchyF login packet for this playfield.
         /// TEMP: PlayfieldX/Z hardcoded from Playfields.xml 4310; special playfield types not wired yet.
         /// </summary>
-        public PlayfieldAnarchyFMessage CreatePlayfieldAnarchyFMessage(Vector3 characterCoordinates)
+        public virtual PlayfieldAnarchyFMessage CreatePlayfieldAnarchyFMessage(Vector3 characterCoordinates)
         {
             // TEMP: Playfields.xml 4310 (Nascense Frontier) until GameData / Playfields.xml lookup is wired.
             int playfieldX = 32321;
@@ -259,27 +265,119 @@ namespace ZoneEngine_New.Core.Playfield
         /// <summary>Called from async I/O tasks. Handlers run on the playfield tick thread.</summary>
         public bool TryEnqueue(PlayfieldInboundItem item) => _inbound.TryEnqueue(item);
 
-        /// <summary>
-        /// Registers a transferred player on this playfield under the tick lock (safe from another PF tick).
-        /// </summary>
+        // Team projections may originate on another playfield. Never enter the
+        // recipient tick lock synchronously while the caller owns another tick.
+        public void DispatchPlayerProjection(Player player, Action projection)
+        {
+            if (_tickSync.IsHeldByCurrentThread && ReferenceEquals(player.Playfield, this))
+            {
+                projection();
+                return;
+            }
+            if (!_disposed)
+                _inbound.TryEnqueue(new PlayerProjectionInboundItem { Player = player, Projection = projection });
+        }
+
+        internal bool IsDisposed => _disposed;
+        internal void NotifyTransportDisconnected(Player player, IZoneSession session)
+            => _playfieldManager.Teams.OnTransportDisconnected(player, session);
+        internal void RequireTransferTick()
+        {
+            if (!_tickSync.IsHeldByCurrentThread)
+                throw new InvalidOperationException("Transfer world changes require the owning playfield tick.");
+        }
+
+        internal bool IsAuthoritativePlayer(Player player) =>
+            _playfieldManager.FindPlayer(player.Identity.Instance, out Player current) && ReferenceEquals(current, player);
+
+        internal bool ScheduleTransfer(PlayfieldTransfer transfer)
+        {
+            if (_disposed) return false;
+            _outgoingTransfers.TryAdd(transfer, 0);
+            if (_disposed) { _outgoingTransfers.TryRemove(transfer, out _); return false; }
+            // Even an owner-tick request is queued: the caller may hold its session lock,
+            // but departure must acquire PersistenceGate before that lock for the hard flush.
+            _inbound.TryEnqueue(new TransferDepartureInboundItem(transfer));
+            return true;
+        }
+
+        internal bool QueueTransferArrival(PlayfieldTransfer transfer)
+        {
+            if (_disposed) return false;
+            _incomingTransfers.TryAdd(transfer, 0);
+            if (_disposed) { _incomingTransfers.TryRemove(transfer, out _); return false; }
+            return _inbound.TryEnqueue(new TransferArrivalInboundItem(transfer));
+        }
+
+        internal void QueueTransferReturn(PlayfieldTransfer transfer) =>
+            _inbound.TryEnqueue(new TransferReturnInboundItem(transfer));
+        internal void ForgetOutgoingTransfer(PlayfieldTransfer transfer) => _outgoingTransfers.TryRemove(transfer, out _);
+        internal void ForgetIncomingTransfer(PlayfieldTransfer transfer) => _incomingTransfers.TryRemove(transfer, out _);
+
+        /// <summary>Destination-owner operation only; the caller must queue across playfields.</summary>
         public void ArriveTransferredPlayer(Player player, AORebirth.Core.Vector.Vector3 position)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(position);
 
-            lock (_tickSync)
-            {
-                ObjectDisposedException.ThrowIf(_disposed, this);
-                GetRequiredService<SpawnService>().ArriveFromTransfer(player, position);
-            }
+            RequireTransferTick();
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            if (!_dynelRegistry.TryRegister(player))
+                throw new InvalidOperationException("Transfer destination identity is already occupied.");
+            GetRequiredService<SpawnService>().ArriveFromTransfer(player, position);
         }
 
         /// <summary>Soft-leave for playfield transfer. Must run on this playfield's tick thread.</summary>
         public void LeaveTransferredPlayer(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
+            RequireTransferTick();
             GetRequiredService<SpawnService>().LeaveForTransfer(player);
         }
+
+        internal void RemovePartialTransferArrival(Player player)
+        {
+            RequireTransferTick();
+            if (_dynelRegistry.TryGet(player.Identity, out Dynel? current) && ReferenceEquals(current, player))
+            {
+                GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
+                _dynelRegistry.UnregisterExact(player);
+            }
+            if (ReferenceEquals(player.Playfield, this)) player.Playfield = null;
+        }
+
+        internal bool CanRestoreTransfer(Player player) =>
+            (_playfieldManager.FindPlayer(player.Identity.Instance, out Player current) ? ReferenceEquals(current, player) : _disposed)
+            && (!_dynelRegistry.TryGet(player.Identity, out Dynel? resident) || ReferenceEquals(resident, player));
+
+        internal void RestoreTransfer(Player player, AORebirth.Core.Vector.Vector3 origin, AORebirth.Core.Vector.Quaternion heading)
+        {
+            RequireTransferTick();
+            // Shutdown also restores pending departures before its ordinary snapshot/logout pass.
+            GetRequiredService<SpawnService>().ArriveFromTransfer(player, origin);
+            player.Motor.Warp(origin, heading);
+        }
+
+        internal void RefreshReturnedTransfer(Player player) =>
+            GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+
+        internal void AbandonDetachedTransfer(Player player, IZoneSession oldSession)
+        {
+            RequireTransferTick();
+            // A replacement identity must never receive an old aggregate's snapshot or unregister.
+            player.QuarantinePersistence();
+            _playfieldManager.Teams.DetachPlayer(player);
+            _playfieldManager.Nanos.DetachPlayer(player);
+            player.NanoRuntime = null;
+            if (ReferenceEquals(player.Session, oldSession)) player.EnterLinkDead(PlayfieldManager.ResolveLinkDeadTimeout());
+            if (ReferenceEquals(oldSession.Player, player))
+            { oldSession.UnbindPlayer(); oldSession.Close(); }
+            _playfieldManager.UnregisterPlayer(player);
+            player.ReleaseOnlineOwnership();
+        }
+
+        internal void ReportTransferFailure(Player player, Exception exception) =>
+            _logger.Error(exception, "Transfer failed for character " + player.Identity.Instance.ToString(CultureInfo.InvariantCulture));
 
         public void Dispose()
         {
@@ -295,6 +393,10 @@ namespace ZoneEngine_New.Core.Playfield
             lock (_tickSync)
             {
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
+                foreach (PlayfieldTransfer transfer in _incomingTransfers.Keys) transfer.RequestReturn();
+                foreach (PlayfieldTransfer transfer in _outgoingTransfers.Keys) transfer.SourceShutdown();
+                _playfieldManager.Dialogues.Shutdown(this);
+                GetRequiredService<ZoneEngine_New.Core.Missions.AcceptedQuestPropService>().Shutdown();
                 Player[] remaining = [.. _dynelRegistry.PlayerEntities()];
                 foreach (Player player in remaining)
                 {
@@ -313,6 +415,8 @@ namespace ZoneEngine_New.Core.Playfield
                     }
                 }
 
+                GetRequiredService<BucketheadSummonService>().Shutdown();
+                GetRequiredService<AcceptedNpcActivationService>().Shutdown();
                 _dynelRegistry.Clear();
             }
 
@@ -333,8 +437,12 @@ namespace ZoneEngine_New.Core.Playfield
                     return;
 
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
-                _inbound.Drain(_router, spawn);
+                _inbound.Drain(_router, spawn, this);
                 spawn.Tick();
+                GetRequiredService<AcceptedNpcActivationService>().Tick();
+                GetRequiredService<BucketheadSummonService>().Tick();
+                foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
+                    if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Nanos.Tick(player);
                 _inventoryMoves.Tick(this, deltaTime);
                 _trades.Tick(this, deltaTime);
 
@@ -347,6 +455,9 @@ namespace ZoneEngine_New.Core.Playfield
                 }
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
+                _playfieldManager.Dialogues.Tick(this);
+                foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
+                    if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Missions.PollLifecycle(player);
             }
 
             _metrics.TickExecution.Record(ElapsedMilliseconds(tickStart));
@@ -365,6 +476,12 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(this);
             services.AddSingleton(_logger);
             services.AddSingleton(_playfieldManager);
+            services.AddSingleton(_playfieldManager.Teams);
+            services.AddSingleton(_playfieldManager.Nanos);
+            services.AddSingleton(_playfieldManager.Missions);
+            services.AddSingleton(_playfieldManager.AuthoredQuests);
+            services.AddSingleton(_playfieldManager.Dialogues);
+            services.AddSingleton(_playfieldManager.ItemTemplates);
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);
             services.AddSingleton(_items);
@@ -398,6 +515,9 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton<DynelRegistry>();
             services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));
             services.AddSingleton<SpawnService>();
+            services.AddSingleton<AcceptedNpcActivationService>();
+            services.AddSingleton<BucketheadSummonService>();
+            services.AddSingleton<ZoneEngine_New.Core.Missions.AcceptedQuestPropService>();
             services.AddSingleton<HashSpawnSystem>();
             return services;
         }

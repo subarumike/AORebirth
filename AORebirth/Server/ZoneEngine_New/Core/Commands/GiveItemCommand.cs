@@ -131,24 +131,7 @@ namespace ZoneEngine_New.Core.Commands
         }
 
         void AssignInstance(Item item)
-        {
-            item.InstanceId = _ids.Allocate();
-            item.IsPersisted = false;
-
-            int itemType = item.Identity.Type != IdentityType.None
-                ? (int)item.Identity.Type
-                : item.Definition.ItemType;
-            if (itemType != 0)
-            {
-                item.Identity = new Identity
-                {
-                    Type = (IdentityType)itemType,
-                    Instance = item.InstanceId
-                };
-            }
-
-            item.ApplyContainerIdentityIfBag();
-        }
+            => item.AssignInstanceId(_ids.Allocate());
 
         static string SubjectName(Player subject, Player issuer)
         {

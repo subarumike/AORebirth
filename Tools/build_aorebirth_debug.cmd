@@ -44,12 +44,6 @@ if not defined MSBUILD (
     exit /b 1
 )
 
-echo [AORebirth Build] Cleaning stale build processes...
-taskkill /F /T /IM MSBuild.exe >nul 2>&1
-taskkill /F /T /IM dotnet.exe >nul 2>&1
-taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
-taskkill /F /T /IM NuGet.exe >nul 2>&1
-
 call :RestoreDependencies
 if errorlevel 1 (
     set RESTORE_EXIT=!ERRORLEVEL!
@@ -66,12 +60,6 @@ if not "%CORE_EXIT%"=="0" (
     exit /b %CORE_EXIT%
 )
 
-echo [AORebirth Build] Cleaning stale build processes before LoginEngine...
-taskkill /F /T /IM MSBuild.exe >nul 2>&1
-taskkill /F /T /IM dotnet.exe >nul 2>&1
-taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
-taskkill /F /T /IM NuGet.exe >nul 2>&1
-
 echo [AORebirth Build] Building LoginEngine...
 "%MSBUILD%" "AORebirth\Server\LoginEngine\LoginEngine.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 set LOGIN_EXIT=%ERRORLEVEL%
@@ -81,13 +69,7 @@ if not "%LOGIN_EXIT%"=="0" (
     exit /b %LOGIN_EXIT%
 )
 
-echo [AORebirth Build] Cleaning stale build processes before ZoneEngine...
-taskkill /F /T /IM MSBuild.exe >nul 2>&1
-taskkill /F /T /IM dotnet.exe >nul 2>&1
-taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
-taskkill /F /T /IM NuGet.exe >nul 2>&1
-
-echo [AORebirth Build] Building ZoneEngine...
+echo [AORebirth Build] Building legacy ZoneEngine rollback implementation...
 "%MSBUILD%" "AORebirth\Server\ZoneEngine\ZoneEngine.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 set ZONE_EXIT=%ERRORLEVEL%
 if not "%ZONE_EXIT%"=="0" (
@@ -96,7 +78,14 @@ if not "%ZONE_EXIT%"=="0" (
     exit /b %ZONE_EXIT%
 )
 
-set "ZONE_OUTPUT=%CD%\AORebirth\Built\Debug"
+echo [AORebirth Build] Building default ZoneEngine_New backend...
+call NewZoneEngineBuild\build.cmd
+if errorlevel 1 (
+    popd
+    exit /b 1
+)
+
+set "ZONE_OUTPUT=%CD%\AORebirth\Built\Debug\ZoneEngine_New"
 set "PLACEMENT_OUTPUT=%ZONE_OUTPUT%\Content\Official\PlayfieldPlacements"
 set "PLACEMENT_MANIFEST=%PLACEMENT_OUTPUT%\official-placement-build-manifest.json"
 set "PLACEMENT_PROVENANCE=%PLACEMENT_OUTPUT%\PLACEMENT_PROVENANCE.env"
@@ -107,14 +96,14 @@ if not defined SOURCE_SHA (
     popd
     exit /b 1
 )
-if not exist "%ZONE_OUTPUT%\ZoneEngine.exe" (
-    echo [AORebirth Build] Official placement validation could not find the built ZoneEngine.exe.
+if not exist "%ZONE_OUTPUT%\ZoneEngine_New.exe" (
+    echo [AORebirth Build] Official placement validation could not find the built ZoneEngine_New.exe.
     popd
     exit /b 1
 )
 
 echo [AORebirth Build] Validating packaged official playfield placements...
-"%ZONE_OUTPUT%\ZoneEngine.exe" --validate-official-placements --source-sha "%SOURCE_SHA%" --placement-manifest-output "%PLACEMENT_MANIFEST%" --placement-provenance-output "%PLACEMENT_PROVENANCE%" --build-platform windows
+"%ZONE_OUTPUT%\ZoneEngine_New.exe" --validate-official-placements --source-sha "%SOURCE_SHA%" --placement-manifest-output "%PLACEMENT_MANIFEST%" --placement-provenance-output "%PLACEMENT_PROVENANCE%" --build-platform windows
 set PLACEMENT_EXIT=%ERRORLEVEL%
 if not "%PLACEMENT_EXIT%"=="0" (
     echo [AORebirth Build] Official placement validation failed with exit code %PLACEMENT_EXIT%.
@@ -139,12 +128,6 @@ if not "%WEB_EXIT%"=="0" (
     popd
     exit /b %WEB_EXIT%
 )
-
-echo [AORebirth Build] Cleaning stale build processes after successful build...
-taskkill /F /T /IM MSBuild.exe >nul 2>&1
-taskkill /F /T /IM dotnet.exe >nul 2>&1
-taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
-taskkill /F /T /IM NuGet.exe >nul 2>&1
 
 echo [AORebirth Build] Build succeeded.
 popd
@@ -180,11 +163,7 @@ goto RestoreWait
 
 :RestoreTimedOut
 echo [AORebirth Build] MSBuild restore timed out after %RESTORE_TIMEOUT_SECONDS%s.
-echo [AORebirth Build] Killing build processes and failing build validation.
-taskkill /F /T /IM MSBuild.exe >nul 2>&1
-taskkill /F /T /IM dotnet.exe >nul 2>&1
-taskkill /F /T /IM VBCSCompiler.exe >nul 2>&1
-taskkill /F /T /IM NuGet.exe >nul 2>&1
+echo [AORebirth Build] Failing validation; no unrelated build or runtime processes were stopped.
 exit /b 1
 
 :RestoreFinished

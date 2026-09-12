@@ -40627,13 +40627,43 @@
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
+      "sha256": "931aca428499c6cc1fbb1dfd436dd133fd210aafb6e5c98df95fd4997ae3f966"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-      "sha256": "1882eea5e3d90e491688149e1ff19f2c9de6031ea1960c1678041ed25ef85a14"
+      "sha256": "7f76cb87d41005ad4b5390e6120880d899db3d8f109db790b572b976280f2b9f"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatData.cs",
+      "sha256": "913daa1fcc45062476faf1c5b055d83249f58d1ea5380a04f4343b14de80ef40"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.Data.cs",
+      "sha256": "a200d21152bcac170f86c654e11be68dece57dc59ba4a569840ce6431c3c36d9"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
-      "sha256": "9b480e1b8504a3ac61b8365f98db67e6b0894c7d432a286f0047609f3c745e7a"
+      "sha256": "dea76b5cc6249e1c0c639a10dcd596b2bfac07614e811b473cb46939b9a30ab1"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileData.cs",
+      "sha256": "1746f3da33fee95efd635a237eb9a941cb959aa47b45144b162dae2b5f96c242"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileMatching.cs",
+      "sha256": "54699141f7020af8c3ae18b93e8cf47c2b362ab0dfc9a53f1e84fb850fa7ba98"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatSequenceData.cs",
+      "sha256": "37e19837960f3d8f85899377ff0a4f20a95569566d7d7d82a19c78e6160eda2d"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40739,6 +40769,11 @@
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCatalog.cs",
       "sha256": "c6e5a36886c8720d97ab21e3d6390c2fb7370103b90d267fa85b1776e6def226"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCombatSetupGenerator.Data.cs",
+      "sha256": "119e2e4ea4046f125e1d6fdfe8083327c436751b6b35c8b6576992ed0eeda6f4"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -58335,11 +58370,16 @@
     ],
     "owners": [
       {
+        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
+        "requiredMarkers": [
+          "internal CapturedEnemyCombatContract WithCaptureProvenRetaliationEligibility("
+        ]
+      },
+      {
         "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
         "requiredMarkers": [
           "internal static CapturedEnemyCombatContract ForOrdinary(",
-          "ForOrdinarySelectedAtomicGeneration(",
-          "internal CapturedEnemyCombatContract WithCaptureProvenRetaliationEligibility("
+          "ForOrdinarySelectedAtomicGeneration("
         ]
       },
       {
@@ -58565,6 +58605,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.architect_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -58691,6 +58732,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.architect_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -58809,6 +58851,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.architect_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -58927,6 +58970,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.architect_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -59045,6 +59089,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.architect_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -59163,6 +59208,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.architect_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -59289,6 +59335,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.architect_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -59607,6 +59654,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -59737,6 +59785,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -59867,6 +59916,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -59997,6 +60047,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -60127,6 +60178,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -60257,6 +60309,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -60387,6 +60440,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -60517,6 +60571,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -60647,6 +60702,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -60777,6 +60833,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -60903,6 +60960,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61029,6 +61087,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61147,6 +61206,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61265,6 +61325,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61383,6 +61444,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61501,6 +61563,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61623,6 +61686,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61745,6 +61809,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61863,6 +61928,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -61981,6 +62047,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62099,6 +62166,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62217,6 +62285,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62335,6 +62404,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62453,6 +62523,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62571,6 +62642,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62689,6 +62761,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62807,6 +62880,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -62925,6 +62999,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -63043,6 +63118,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.17720",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -64289,6 +64365,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.empty_shell",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -64419,6 +64496,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.empty_shell",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -64541,6 +64619,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.empty_shell",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -64667,6 +64746,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.empty_shell",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -64793,6 +64873,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.empty_shell",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -71398,6 +71479,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.incomplete_rebuild",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -71520,6 +71602,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.incomplete_rebuild",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -71638,6 +71721,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infected_attendant",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -71756,6 +71840,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infected_attendant",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -71878,6 +71963,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infected_attendant",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72000,6 +72086,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infected_attendant",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72122,6 +72209,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infected_attendant",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72240,6 +72328,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72362,6 +72451,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72484,6 +72574,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72606,6 +72697,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72752,6 +72844,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72870,6 +72963,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -72988,6 +73082,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73106,6 +73201,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73252,6 +73348,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73374,6 +73471,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73496,6 +73594,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73618,6 +73717,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.infector",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73744,6 +73844,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73870,6 +73971,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -73996,6 +74098,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74122,6 +74225,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74248,6 +74352,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74374,6 +74479,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74500,6 +74606,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74626,6 +74733,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.looter",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74744,6 +74852,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.lost_thought",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74862,6 +74971,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.lost_thought",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -74984,6 +75094,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.lost_thought",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -75106,6 +75217,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.lost_thought",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -76519,6 +76631,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.molested_molecules",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -76748,6 +76861,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.molested_molecules",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -76874,6 +76988,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.molested_molecules",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -77000,6 +77115,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.molested_molecules",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -77381,6 +77497,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.203734",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -77519,6 +77636,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.203734",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -77657,6 +77775,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.203734",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -77795,6 +77914,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.203734",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -77925,6 +78045,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.supported.203734",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -78691,6 +78812,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.neural_burnout",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -78813,6 +78935,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.neural_burnout",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -78935,6 +79058,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.neural_burnout",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79057,6 +79181,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.neural_burnout",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79179,6 +79304,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.neural_burnout",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79313,6 +79439,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.neural_burnout",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79447,6 +79574,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.neural_burnout",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79569,6 +79697,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.premature_pattern",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79687,6 +79816,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.premature_pattern",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79805,6 +79935,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.premature_pattern",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -79923,6 +80054,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.premature_pattern",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -80041,6 +80173,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.premature_pattern",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -80163,6 +80296,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.premature_pattern",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -80285,6 +80419,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.premature_pattern",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -80797,6 +80932,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -80919,6 +81055,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81041,6 +81178,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81163,6 +81301,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81285,6 +81424,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81407,6 +81547,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81529,6 +81670,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81651,6 +81793,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81773,6 +81916,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -81895,6 +82039,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82017,6 +82162,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82139,6 +82285,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82261,6 +82408,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82383,6 +82531,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82505,6 +82654,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82627,6 +82777,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82753,6 +82904,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -82879,6 +83031,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83005,6 +83158,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83131,6 +83285,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83253,6 +83408,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83375,6 +83531,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83497,6 +83654,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83615,6 +83773,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83733,6 +83892,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83855,6 +84015,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -83977,6 +84138,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -84099,6 +84261,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -84233,6 +84396,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -84367,6 +84531,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -84501,6 +84666,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.shadow",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -84619,6 +84785,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -84749,6 +84916,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -84879,6 +85047,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85009,6 +85178,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85139,6 +85309,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85269,6 +85440,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85399,6 +85571,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85529,6 +85702,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85651,6 +85825,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85781,6 +85956,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -85899,6 +86075,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86017,6 +86194,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86135,6 +86313,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86253,6 +86432,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86371,6 +86551,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86489,6 +86670,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86607,6 +86789,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86725,6 +86908,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86843,6 +87027,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -86961,6 +87146,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -87079,6 +87265,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -87197,6 +87384,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -87315,6 +87503,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -87433,6 +87622,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.slum_runner",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -89345,6 +89535,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.uncontrollable_anger",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -89467,6 +89658,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.uncontrollable_anger",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -89585,6 +89777,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.uncontrollable_anger",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -89703,6 +89896,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.uncontrollable_anger",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -89837,6 +90031,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.uncontrollable_anger",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -89971,6 +90166,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.uncontrollable_anger",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -92602,6 +92798,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -92732,6 +92929,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -93032,6 +93230,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -93158,6 +93357,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -93284,6 +93484,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -93410,6 +93611,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -93536,6 +93738,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -93788,6 +93991,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
@@ -93922,6 +94126,7 @@
           "runtimeMissingEvidence": [],
           "runtimeProfileSelector": "subway.ordinary.workman_striker",
           "runtimeResolverSources": [
+            "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
             "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",

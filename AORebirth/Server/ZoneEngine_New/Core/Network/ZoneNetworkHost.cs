@@ -46,15 +46,13 @@ namespace ZoneEngine_New.Core.Network
             }
 
             Config config = ConfigReadWrite.Instance.CurrentConfig;
-            string host = config == null || string.IsNullOrWhiteSpace(config.ZoneIP)
-                ? "127.0.0.1"
-                : config.ZoneIP;
-            int port = config == null || config.ZonePort <= 0 ? 7501 : config.ZonePort;
-
-            if (!IPAddress.TryParse(host, out IPAddress? address))
+            int port = config.ZonePort;
+            if (port < 1 || port > 65535)
             {
-                address = IPAddress.Any;
+                throw new InvalidOperationException("ZonePort must be between 1 and 65535.");
             }
+            // ZoneIP is the advertised redirect address, never a bind-policy override.
+            IPAddress address = Utility.Network.EngineBindPolicy.ResolveFromEnvironment().Address;
 
             _listener = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             _listener.Bind(new IPEndPoint(address, port));

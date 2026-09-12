@@ -39,6 +39,13 @@ namespace ZoneEngine_New.Core.Network
             MessageBody body = message.Body;
             if (ConnectionScoped.Contains(body.GetType()))
             {
+                var login = (ZoneLoginMessage)body;
+                if (message.Header == null || message.Header.Size != 32 || message.Header.Sender != login.CharacterId || message.Header.Receiver != 2)
+                {
+                    _logger.Warn("Zone admission rejected: reason=invalid_handoff_envelope");
+                    session.Close();
+                    return;
+                }
                 _login.HandleAsync(body, session);
                 return;
             }

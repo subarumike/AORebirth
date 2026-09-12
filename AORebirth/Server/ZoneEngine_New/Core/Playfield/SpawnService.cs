@@ -96,6 +96,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(position);
 
             MobTemplate template = _gameData.RequireMobTemplate(hash);
+            NpcTemplateLevelPolicy.RequireExactLevel(template, level);
             Identity identity = _registry.AllocateNpcIdentity();
             NpcCharacter npc = new NpcCharacter(identity, _items)
             {
@@ -109,9 +110,6 @@ namespace ZoneEngine_New.Core.Playfield
 
             foreach (var entry in template.Stats)
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
-
-            if (level.HasValue)
-                npc.Stats.Set(CharacterStat.Level, level.Value);
 
             npc.Rebase();
             TryAttachShop(npc, template);
@@ -162,7 +160,7 @@ namespace ZoneEngine_New.Core.Playfield
                 };
                 npc.AttachShop(machine);
 
-                _logger.Info(
+            _logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Attached shop to NPC id={0} name={1} shopTemplate={2} machine={3}",
@@ -337,6 +335,9 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(hydration);
 
+            // Validate before constructing a player, acquiring Online ownership or touching inventory.
+            CharacterHydrationValidator.RequireValid(hydration);
+
             CharacterRecord character = hydration.Character;
             int characterId = character.Id;
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(characterId);
@@ -350,14 +351,47 @@ namespace ZoneEngine_New.Core.Playfield
             Player player = ActivatorUtilities.CreateInstance<Player>(_services, identity);
             player.Playfield = _playfield;
             player.SpawnSource = SpawnSource.Player;
-            player.EnterOnline(session);
-
-            _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
-            player.Rebase();
-
-            _registry.Register(player);
-            _playfieldManager.RegisterPlayer(player);
-            _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+            IDisposable? ownership = _snapshot.AcquireOnlineOwnership(characterId);
+            bool registered = false;
+            try
+            {
+                _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
+                player.Rebase();
+                PlayerSpawnPayloadValidator.RequireValid(player);
+                PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
+                player.NanoRuntime = _playfieldManager.Nanos;
+                if (!_playfieldManager.Nanos.AttachPlayer(player))
+                    throw new InvalidOperationException("Active nano hydration failed; durable state was not replaced.");
+                PlayerSpawnPayloadValidator.RequireValid(player);
+                PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
+                _playfieldManager.RegisterPlayer(player);
+                _registry.Register(player);
+                registered = true;
+                _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+                player.EnterOnline(session);
+                player.AttachOnlineOwnership(ownership);
+                ownership = null;
+            }
+            catch
+            {
+                _playfieldManager.Nanos.DetachPlayer(player);
+                player.NanoRuntime = null;
+                if (registered)
+                {
+                    _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
+                    _registry.Unregister(identity);
+                }
+                _playfieldManager.UnregisterPlayer(player);
+                if (ReferenceEquals(session.Player, player)) session.UnbindPlayer();
+                player.Session = null;
+                player.Playfield = null;
+                throw;
+            }
+            finally
+            {
+                if (ownership != null)
+                    _snapshot.AbandonOnlineOwnership(characterId, ownership);
+            }
 
             _logger.Info(
                 string.Format(
@@ -378,24 +412,53 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(command);
 
-            if (session.State is SessionState.InPlay or SessionState.SpawnReady)
+            lock (session)
+            {
+                CompletePendingSpawnCore(session, command);
+            }
+        }
+
+        private void CompletePendingSpawnCore(IZoneSession session, PendingSpawnInboundItem command)
+        {
+            if (session.State != SessionState.Loading)
             {
                 return;
             }
 
             int characterId = command.Hydration.Character.Id;
+            if (_playfieldManager.FindPlayer(characterId, out _))
+            {
+                CompletePendingReconnect(session, new PendingReconnectInboundItem
+                {
+                    Session = session,
+                    CharacterId = characterId
+                });
+                return;
+            }
             Player player = SpawnPlayer(session, command.Hydration);
 
             session.State = SessionState.SpawnReady;
             // InitiateCompression + ChatServerInfo + PlayfieldAnarchyF + GameTime are sent from ZoneLoginHandler.
 
+            _playfieldManager.Teams.AttachPlayer(player);
             SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
+            FullCharacterMessage full = player.BuildFullCharacterMessage();
+            PlayerSpawnPayloadValidator.RequireValidMessages(spawn, full);
             ScfuSendLog.Write(spawn);
             session.Send(spawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
-            session.Send(player.BuildFullCharacterMessage());
+            SendRetailWorldEntryReadyBlock(session, player);
+            session.Send(full);
+            SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
+
+            _playfieldManager.Teams.AttachPlayer(player);
+            _playfieldManager.Teams.RefreshPlayer(player);
+
+            _playfieldManager.Nanos.RefreshPlayer(player);
+            _playfieldManager.Missions.ReplayJournal(player);
+            _playfieldManager.AuthoredQuests.Restore(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
 
@@ -413,7 +476,15 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(session);
             ArgumentNullException.ThrowIfNull(command);
 
-            if (session.State is SessionState.InPlay or SessionState.SpawnReady)
+            lock (session)
+            {
+                CompletePendingReconnectCore(session, command);
+            }
+        }
+
+        private void CompletePendingReconnectCore(IZoneSession session, PendingReconnectInboundItem command)
+        {
+            if (session.State != SessionState.Loading)
                 return;
 
             int characterId = command.CharacterId;
@@ -430,27 +501,112 @@ namespace ZoneEngine_New.Core.Playfield
                 return;
             }
 
+            if (player.IsPersistenceQuarantined)
+            {
+                // An uncertain durable transaction invalidates this in-memory aggregate.
+                // Remove it without writing it back; the next login must hydrate storage.
+                DespawnPlayer(player);
+                session.Close();
+                return;
+            }
+
+            // Reject a damaged retained aggregate before stealing or publishing session ownership.
+            PlayerSpawnPayloadValidator.RequireValid(player);
+            PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
             StealSessionIfNeeded(player, session);
             player.EnterOnline(session);
 
             session.State = SessionState.SpawnReady;
 
+            PlayerSpawnPayloadValidator.RequireValid(player);
+
             SimpleCharFullUpdateMessage reconnectSpawn = player.BuildSpawnMessage();
+            FullCharacterMessage reconnectFull = player.BuildFullCharacterMessage();
+            PlayerSpawnPayloadValidator.RequireValidMessages(reconnectSpawn, reconnectFull);
             ScfuSendLog.Write(reconnectSpawn);
             session.Send(reconnectSpawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
-            session.Send(player.BuildFullCharacterMessage());
+            SendRetailWorldEntryReadyBlock(session, player);
+            session.Send(reconnectFull);
+            SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
+
+            _playfieldManager.Teams.AttachPlayer(player);
+            _playfieldManager.Teams.RefreshPlayer(player);
+
+            _playfieldManager.Nanos.RefreshPlayer(player);
+            _playfieldManager.Missions.ReplayJournal(player);
+            _playfieldManager.AuthoredQuests.Restore(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
 
-            _logger.Info(
+                _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "ZoneReconnect completed character={0} playfield={1}",
                     characterId,
                     _playfield.Identity.Instance));
+        }
+
+        private void SendRetailWorldEntryReadyBlock(IZoneSession session, Player player)
+        {
+            // Official capture 20260623-042326 sends the entering player's SCFU and
+            // weapon state before GameTime, then SocialStatus before FullCharacter.
+            if (session is IGameTimeSession clock)
+                clock.RecordGameTimeSynchronization(DateTime.UtcNow);
+
+            session.Send(
+                new GameTimeMessage
+                {
+                    Identity = player.Identity,
+                    Unknown1 = 30024.0f,
+                    Unknown3 = 185408,
+                    Unknown4 = 80183.3125f
+                },
+                _playfield.Identity.Instance,
+                player.Identity.Instance);
+
+            session.Send(
+                new StatMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 1,
+                    Stats =
+                    [
+                        new GameTuple<CharacterStat, uint>
+                        {
+                            Value1 = CharacterStat.SocialStatus,
+                            Value2 = (uint)player.Stats.GetOrZero(CharacterStat.SocialStatus)
+                        }
+                    ]
+                });
+        }
+
+        private void SendRetailWorldEntryCompletion(IZoneSession session, Player player)
+        {
+            // Both captured retail zone transitions finish the ready block with
+            // towers, cities and SpecialAttackWeapon before the client sends CharInPlay.
+            var playfieldIdentity = new Identity
+            {
+                Type = IdentityType.Playfield2,
+                Instance = _playfield.Identity.Instance
+            };
+
+            session.Send(
+                new PlayfieldAllTowersMessage
+                {
+                    Identity = playfieldIdentity,
+                    Unknown1 = []
+                });
+            session.Send(
+                new PlayfieldAllCitiesMessage
+                {
+                    Identity = playfieldIdentity,
+                    Unknown = 0,
+                    Payload = []
+                });
+            session.Send(player.BuildSpecialAttackWeaponMessage());
         }
 
         void DespawnExpiredLinkDeadPlayers()
@@ -488,6 +644,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             _trades.Cancel(player, "left playfield");
+            _playfieldManager.Dialogues.Detached(player);
             _flush.HardFlush(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
@@ -532,6 +689,9 @@ namespace ZoneEngine_New.Core.Playfield
         {
             ArgumentNullException.ThrowIfNull(npc);
 
+            _playfieldManager.Dialogues.Detached(npc);
+            _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.AcceptedNpcActivationService>().Detached(npc);
+
             npc.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             Identity identity = npc.Identity;
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(npc);
@@ -552,9 +712,15 @@ namespace ZoneEngine_New.Core.Playfield
             if (oldSession == null || ReferenceEquals(oldSession, newSession))
                 return;
 
-            player.Session = null;
-            oldSession.UnbindPlayer();
-            oldSession.Close();
+            _playfieldManager.Dialogues.Detached(player);
+
+            lock (oldSession)
+            {
+                // Closing the old socket cannot race the accepted reconnect's ownership.
+                if (ReferenceEquals(player.Session, oldSession)) player.Session = null;
+                oldSession.UnbindPlayer();
+                oldSession.Close();
+            }
 
             _logger.Info(
                 string.Format(
@@ -566,14 +732,21 @@ namespace ZoneEngine_New.Core.Playfield
         private void DespawnPlayer(Player player)
         {
             int characterId = player.Identity.Instance;
+            _playfieldManager.Dialogues.Detached(player);
+            _playfieldManager.Teams.DetachPlayer(player);
+            _playfieldManager.Nanos.DetachPlayer(player);
+            player.NanoRuntime = null;
 
-            player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
-            // Return offered items before the snapshot so a logout mid-trade cannot eat them.
-            _trades.Cancel(player, "logged out");
-            if (player.Inventory.IsHydrated)
-                _flush.HardFlush(player);
+            if (!player.IsPersistenceQuarantined)
+            {
+                player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
+                // Return offered items before the snapshot so a logout mid-trade cannot eat them.
+                _trades.Cancel(player, "logged out");
+                if (player.Inventory.IsHydrated)
+                    _flush.HardFlush(player);
 
-            _snapshot.Commit(player);
+                _snapshot.Commit(player);
+            }
 
             IZoneSession? session = player.Session;
             if (session != null)
@@ -589,6 +762,9 @@ namespace ZoneEngine_New.Core.Playfield
             player.Playfield = null;
             player.ConnectionPhase = PlayerConnectionPhase.LinkDead;
             player.LinkDeadUntilUtc = null;
+            player.ReleaseOnlineOwnership();
+            if (player.IsPersistenceQuarantined)
+                _snapshot.ClearOnlineIfUnowned(characterId);
 
             _logger.Info(
                 string.Format(

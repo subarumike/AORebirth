@@ -14,6 +14,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Missions;
+    using ZoneEngine_New.Core.Data;
+    using ZoneEngine.Core.Missions;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
@@ -22,11 +25,15 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly ICharacterHydrationService _hydration;
         private readonly PlayfieldManager _playfieldManager;
         private readonly IZoneLogger _logger;
+        private readonly GeneratedMissionAcgService _missions;
+        private readonly IZoneAdmissionGate _admission;
 
         public ZoneLoginHandler(
             ICharacterHydrationService hydration,
             PlayfieldManager playfieldManager,
-            IZoneLogger logger)
+            IZoneLogger logger,
+            GeneratedMissionAcgService missions,
+            IZoneAdmissionGate admission)
         {
             ArgumentNullException.ThrowIfNull(hydration);
             ArgumentNullException.ThrowIfNull(playfieldManager);
@@ -35,6 +42,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _hydration = hydration;
             _playfieldManager = playfieldManager;
             _logger = logger;
+            _missions = missions ?? throw new ArgumentNullException(nameof(missions));
+            _admission = admission ?? throw new ArgumentNullException(nameof(admission));
         }
 
         public void HandleAsync(MessageBody body, IZoneSession session)
@@ -45,6 +54,15 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (body is not ZoneLoginMessage message)
                 return;
 
+            lock (session)
+            {
+                if (session.State != SessionState.Connected)
+                {
+                    session.Close();
+                    return;
+                }
+                session.State = SessionState.Loading;
+            }
             _ = HandleAsyncCore(message, session);
         }
 
@@ -63,9 +81,28 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         private async Task HandleAsyncCoreInner(ZoneLoginMessage message, IZoneSession session)
         {
-            // EXPLOIT
-            // TODO: Validate ZoneLoginMessage session cookies against the login handoff
-            // before loading the character (reject mismatched/missing cookies).
+            AORebirth.Database.Dao.ZoneHandoffClaim claim;
+            try { claim = _admission.Claim(message); }
+            catch
+            {
+                _logger.Warn("Zone admission rejected: reason=authority_unavailable");
+                session.Close();
+                return;
+            }
+            if (!claim.Accepted)
+            {
+                _logger.Warn("Zone admission rejected: reason=" + claim.Reason);
+                session.Close();
+                return;
+            }
+
+            if (session is not ZoneSession zoneSession)
+            {
+                _logger.Warn("Zone admission rejected: reason=unsupported_session");
+                session.Close();
+                return;
+            }
+            zoneSession.BindZoneHandoff(message.CharacterId, message.Cookie1, message.Cookie2);
 
             int characterId = message.CharacterId;
             if (characterId <= 0)
@@ -74,8 +111,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            session.State = SessionState.Loading;
-
             if (_playfieldManager.FindPlayer(characterId, out Player existing))
             {
                 BeginReconnect(session, existing, characterId);
@@ -83,10 +118,20 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             CharacterHydrationResult? hydration = await LoadHydrationAsync(session, characterId).ConfigureAwait(false);
-            if (hydration == null)
+            if (hydration == null || session.State != SessionState.Loading)
                 return;
 
-            Playfield playfield = _playfieldManager.GetOrCreate(hydration.Character.Playfield);
+            Playfield playfield;
+            int storedPlayfield = hydration.Character.Playfield;
+            if (storedPlayfield >= MissionAcgIdentityRanges.MinimumLivePlayfield2
+                && storedPlayfield <= MissionAcgIdentityRanges.MaximumLivePlayfield2)
+            {
+                var plan = _missions.ResolveLogin(characterId, storedPlayfield);
+                hydration = ApplyMissionLoginPlan(hydration, plan);
+                playfield = plan.World != null ? _playfieldManager.GetOrCreateMission(plan.World)
+                    : _playfieldManager.GetOrCreate(plan.PlayfieldId);
+            }
+            else playfield = _playfieldManager.GetOrCreate(storedPlayfield);
 
             session.SendInitiateCompression();
             SendChatServerInfo(session, playfield, characterId);
@@ -100,8 +145,23 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     Z = hydration.Character.Z
                 },
                 characterId);
-            SendGameTime(session, playfield, characterId);
             EnqueueSpawn(session, playfield, hydration);
+        }
+
+        internal static CharacterHydrationResult ApplyMissionLoginPlan(CharacterHydrationResult hydration, GeneratedMissionLoginPlan plan)
+        {
+            if (plan.Position == null) return hydration;
+            var source = hydration.Character;
+            return new CharacterHydrationResult
+            {
+                Character = new CharacterRecord
+                {
+                    Id = source.Id, Name = source.Name, FirstName = source.FirstName, LastName = source.LastName,
+                    Playfield = plan.PlayfieldId, X = plan.Position.xf, Y = plan.Position.yf, Z = plan.Position.zf,
+                    HeadingX = source.HeadingX, HeadingY = source.HeadingY, HeadingZ = source.HeadingZ, HeadingW = source.HeadingW
+                },
+                Stats = hydration.Stats, Items = hydration.Items, UploadedNanoIds = hydration.UploadedNanoIds
+            };
         }
 
         private void BeginReconnect(IZoneSession session, Player player, int characterId)
@@ -126,14 +186,16 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     Z = position.zf
                 },
                 characterId);
-            SendGameTime(session, playfield, characterId);
-
-            playfield.TryEnqueue(
+            if (!playfield.TryEnqueue(
                 new PendingReconnectInboundItem
                 {
                     Session = session,
                     CharacterId = characterId
-                });
+                }))
+            {
+                session.Close();
+                return;
+            }
 
             _logger.Info(
                 string.Format(
@@ -198,35 +260,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 characterId);
         }
 
-        private static void SendGameTime(IZoneSession session, Playfield playfield, int characterId)
-        {
-            session.Send(
-                new GameTimeMessage
-                {
-                    Identity = new Identity
-                    {
-                        Type = IdentityType.CanbeAffected,
-                        Instance = characterId
-                    },
-                    Unknown1 = 30024.0f,
-                    Unknown3 = 185408,
-                    Unknown4 = 80183.3125f
-                },
-                playfield.Identity.Instance,
-                characterId);
-        }
-
         private static void EnqueueSpawn(
             IZoneSession session,
             Playfield playfield,
             CharacterHydrationResult hydration)
         {
-            playfield.TryEnqueue(
+            if (!playfield.TryEnqueue(
                 new PendingSpawnInboundItem
                 {
                     Session = session,
                     Hydration = hydration
-                });
+                })) session.Close();
         }
 
         private void FailLogin(IZoneSession session, int characterId, string error)

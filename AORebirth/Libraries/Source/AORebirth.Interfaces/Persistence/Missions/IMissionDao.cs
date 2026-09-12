@@ -360,6 +360,17 @@ namespace AORebirth.Interfaces.Persistence.Missions
         public const string IccShuttleport = "icc_shuttleport";
     }
 
+    /// <summary>
+    /// Buffered mission persistence, independent of engine/session/packet objects.
+    /// Mutations belong to Execute; the implementation owns connection and commit.
+    /// Not-found reads return null; list reads return an empty list when absent.
+    /// Database failures propagate, except the legacy start-area convenience methods
+    /// which return false/null on failure. They must not be used to infer absence
+    /// after a database outage. No method creates or migrates schema.
+    /// Collections are buffered and ordered by durable keys using database collation,
+    /// not a provider-independent ordinal comparison. Lifecycle transitions belong
+    /// to the caller; there is no automatic expiry or physical mission-delete API.
+    /// </summary>
     public interface IMissionDao
     {
         MissionStateData GetMission(MissionKeyData key);
@@ -368,14 +379,39 @@ namespace AORebirth.Interfaces.Persistence.Missions
         string ResolveCharacterAccountKey(int characterId);
         MissionAccountFlagData GetAccountFlag(string accountKey, string flagKey);
         IList<MissionAccountFlagData> GetAccountFlags(string accountKey);
+        /// <summary>
+        /// Atomically records the supplied fee and debit; does not calculate gameplay costs.
+        /// Business conflicts return a status; provider failures propagate. A secondary
+        /// rollback failure is attached as Data["MissionDao.RollbackFailure"].
+        /// Reconcile an uncertain commit from durable state before retrying.
+        /// </summary>
         MissionRollFeeResult TryChargeRollFee(MissionRollFeeRequest request);
         bool MarkStartAreaSelectionPending(int characterId);
         string GetStartAreaSelectionState(int characterId);
         bool TryCompleteStartAreaSelection(int characterId, string selectedState);
+        /// <summary>
+        /// Runs one synchronous, character-scoped transaction. Keep effects outside
+        /// persistence (packets, inventory items, playfields) outside the callback.
+        /// Do not return a Task or retain/share the transaction. Exceptions should
+        /// escape the callback; failed writes prevent commit even if caught there.
+        /// The DAO does not retry callbacks or perform nested transaction enlistment.
+        /// Character-only scoping is data isolation, not session authentication.
+        /// If rollback also fails, the original exception is rethrown with that
+        /// exception in Data["MissionDao.RollbackFailure"]. Reconcile before retrying.
+        /// </summary>
         T Execute<T>(int characterId, Func<IMissionDaoTransaction, T> operation);
+        /// <summary>As above, with a locked character/account ownership check for account flags.</summary>
         T Execute<T>(int characterId, string accountKey, Func<IMissionDaoTransaction, T> operation);
     }
 
+    /// <summary>
+    /// Valid only during the enclosing Execute callback, on one thread. Save methods
+    /// update DTO Version for subsequent writes in that callback; rollback restores
+    /// those version values. Discard/reload other returned data after any failure.
+    /// After a connection or commit failure the durable outcome may be unknown:
+    /// reconcile from the database before retrying, using the same durable keys.
+    /// An insert uses Version &lt;= 0; an update requires the current positive Version.
+    /// </summary>
     public interface IMissionDaoTransaction
     {
         int CharacterId { get; }

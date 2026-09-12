@@ -77,6 +77,19 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
+        /// <summary>Accepted fixed identities fail on collision instead of replacing another actor.</summary>
+        public bool TryRegister(Dynel dynel)
+        {
+            lock (_sync) return _dynels.TryAdd(dynel.Identity.Long(), dynel);
+        }
+
+        public bool UnregisterExact(Dynel dynel)
+        {
+            lock (_sync)
+                return _dynels.TryGetValue(dynel.Identity.Long(), out var current)
+                    && ReferenceEquals(current, dynel) && _dynels.Remove(dynel.Identity.Long());
+        }
+
         public void Unregister(Identity identity)
         {
             lock (_sync)

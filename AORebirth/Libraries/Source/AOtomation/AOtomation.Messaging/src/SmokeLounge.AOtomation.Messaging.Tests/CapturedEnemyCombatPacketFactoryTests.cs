@@ -877,7 +877,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             const int wifuSourceIdentity = unchecked((int)0x7954512E);
             const int attackSourceIdentity = unchecked((int)0x798037CF);
             const int defenderIdentity = unchecked((int)0x7944C065);
-            string production = File.ReadAllText(Path.Combine(
+            string production = LegacyGameplaySource.ReadAllText(Path.Combine(
                 FindRepositoryRoot(),
                 @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
 
@@ -1627,7 +1627,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 stream.N3Unknown);
             Assert.AreEqual(0, attackInfo.Unknown2);
 
-            string runtime = File.ReadAllText(
+            string runtime = LegacyGameplaySource.ReadAllText(
                 Path.Combine(
                     FindRepositoryRoot(),
                     "AORebirth",
@@ -3048,7 +3048,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     coreDirectory,
                     "Playfields",
                     "MarcusPadAmbientCombat.cs"));
-            string contractRuntime = File.ReadAllText(
+            string contractRuntime = LegacyGameplaySource.ReadAllText(
                 Path.Combine(
                     coreDirectory,
                     "Playfields",
@@ -3090,12 +3090,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(coreDirectory, "Playfields", "ThrakOmniGardenSpawn.cs"),
                 Path.Combine(coreDirectory, "Thrak", "Quests", "ThrakGardenKeySilvertailTransform.cs")
             };
-            string[] combatSources = Directory.GetFiles(
+            string[] combatSources = LegacyGameplaySource.LogicalPaths(Directory.GetFiles(
                 coreDirectory,
                 "*.cs",
-                SearchOption.AllDirectories);
+                SearchOption.AllDirectories));
             string[] sourceOwnedWeaponCallers = combatSources.Where(
-                path => File.ReadAllText(path).Contains(".WithCapturedWeapon(")).ToArray();
+                path => LegacyGameplaySource.ReadAllText(path).Contains(".WithCapturedWeapon(")).ToArray();
 
             Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon("));
             Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateAttack("));
@@ -3181,7 +3181,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 },
                 sourceOwnedWeaponCallers.Select(Path.GetFileName).ToArray());
             Assert.IsFalse(combatSources.Any(
-                path => File.ReadAllText(path).Contains("WithEvidenceSource(")));
+                path => LegacyGameplaySource.ReadAllText(path).Contains("WithEvidenceSource(")));
         }
 
         [TestMethod]
