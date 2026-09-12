@@ -68,7 +68,7 @@ namespace ZoneEngine_New.Core.GameData
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
 
             EnsureRootExists();
-            LoadNpcFamilyStatTemplates();
+            LoadNpcStatTemplates();
             LoadMobTemplates();
             LoadHashItems();
             LoadVendingMachines();
@@ -284,15 +284,15 @@ namespace ZoneEngine_New.Core.GameData
 
         #region Catalog loads
 
-        private void LoadNpcFamilyStatTemplates()
+        private void LoadNpcStatTemplates()
         {
-            string path = Path.Combine(RootPath, GameDataPaths.NpcFamilyStatTemplatesFileName);
+            string path = Path.Combine(RootPath, GameDataPaths.NpcStatTemplatesFileName);
             if (!File.Exists(path))
             {
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "NPCFamilyStatTemplates.json not found at {0}; NPC families unavailable",
+                        "NPCStatTemplates.json not found at {0}; NPC families unavailable",
                         path));
                 return;
             }
@@ -319,7 +319,7 @@ namespace ZoneEngine_New.Core.GameData
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Failed to load NPCFamilyStatTemplates.json from {0}; NPC families unavailable",
+                        "Failed to load NPCStatTemplates.json from {0}; NPC families unavailable",
                         path));
             }
         }

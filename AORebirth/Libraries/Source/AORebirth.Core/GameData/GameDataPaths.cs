@@ -24,7 +24,7 @@ namespace AORebirth.Core.GameData
         public const string NpcTemplateFileName = "NpcTemplate.json";
 
         /// <summary>Level-scaled stat curves shared by NPC templates through their NpcFamily id.</summary>
-        public const string NpcFamilyStatTemplatesFileName = "NPCFamilyStatTemplates.json";
+        public const string NpcStatTemplatesFileName = "NPCStatTemplates.json";
 
         public const string ItemTemplatesFileName = "ItemTemplates.json";
 

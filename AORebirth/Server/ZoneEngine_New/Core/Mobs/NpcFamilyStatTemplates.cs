@@ -5,7 +5,7 @@ namespace ZoneEngine_New.Core.Mobs
     using System.Globalization;
 
     /// <summary>
-    /// JSON shape of one family in GameData/NPCFamilyStatTemplates.json. <see cref="StatCurves"/> is
+    /// JSON shape of one family in GameData/NPCStatTemplates.json. <see cref="StatCurves"/> is
     /// keyed by stat id, then by level, so each stat owns an independent set of keypoints.
     /// </summary>
     public sealed class NpcFamilyStatTemplateData

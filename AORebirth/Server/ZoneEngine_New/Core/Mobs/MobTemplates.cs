@@ -44,7 +44,7 @@ namespace ZoneEngine_New.Core.Mobs
         public Dictionary<int, int> Stats { get; set; } = new();
 
         /// <summary>
-        /// Key into GameData/NPCFamilyStatTemplates.json supplying level-scaled stats.
+        /// Key into GameData/NPCStatTemplates.json supplying level-scaled stats.
         /// Zero means the template is unscaled and uses <see cref="Stats"/> alone.
         /// </summary>
         public int NpcFamily { get; set; }
