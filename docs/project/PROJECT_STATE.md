@@ -9,7 +9,9 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Local master merge `bb5dd9165c6201b15ef1e0cfbfd788a3e205486a`: accepted DAO/retail integration and master SCFU-to-ACG work preserved. Exact Windows acceptance PASS (544 NewEngine, 1,129 AOtomation, 12 mandatory gates); Linux-host acceptance/build/publication PASS (544 NewEngine). Merged binaries are on isolated testing with the persistent database. Official-client CharInPlay and clean-restart state checks are PENDING_USER_ACTION. No push or production changes. Receipt: `docs/reports/NEWENGINE_MASTER_LINUX_BUILD_RECEIPT.md`.
+- Production runs approved `bb5dd9165c6201b15ef1e0cfbfd788a3e205486a`: LoginEngine and ZoneEngine_New pass exact runtime provenance, readiness and stability checks with zero restarts. All four explicitly approved inventory/mission migrations passed, preserving 280 inventory rows and all 40 original tables. Backup restoration and database rollback were proven in isolation; no production restoration was needed. Existing ChatEngine is retained and healthy. Deployment tooling repair `7391bd30` is pushed on `codex/bb5dd916-production-cutover`; remote master was not moved. Official-client gameplay acceptance on this exact live build remains pending. Receipt: `docs/reports/BB5DD916_PRODUCTION_CUTOVER_RECEIPT.md`.
+
+- Accepted build baseline for the deployed source: Windows PASS (544 NewEngine, 1,129 AOtomation, 12 mandatory gates); Linux-host acceptance/build/publication PASS (544 NewEngine). DAO/retail integration and master SCFU-to-ACG work are preserved. Build receipt: `docs/reports/NEWENGINE_MASTER_LINUX_BUILD_RECEIPT.md`.
 
 - Character/inventory DAO and retail hydration reconciliation: committed source `032ee4cd39433bbe124217a745474573e720e820` passes all offline gates (544 NewEngine, 1129 messaging, 12 mandatory). Local Linux staging is prepared. EP1 retail login, world entry, PF655 -> PF1136 -> PF655 and logout/relogin now pass. Direct inbound CharInPlay capture and post-service-restart retail acceptance remain unverified. Production cutover remains unapproved. See `docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECEIPT.json`.
 
