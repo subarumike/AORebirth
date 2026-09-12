@@ -1,9 +1,16 @@
 # Governed active production release
 
-This workflow deploys LoginEngine, ZoneEngine, and both repository-controlled
+This workflow deploys LoginEngine, ZoneEngine_New, and both repository-controlled
 systemd units as one transaction from one accepted source SHA. It preserves the
 current immutable release pair and installed units in a rollback snapshot before
 stopping either service.
+
+The candidate apphost must be `ZoneEngine_New`; its default unit performs only
+read-only schema preflight before starting. Schema changes require the separate
+migration tool and are not part of this transaction. The captured previous
+artifact may be `ZoneEngine_New` or legacy `ZoneEngine`; rollback restores that
+exact apphost identity and prior unit together. Missing or ambiguous previous
+apphosts fail closed. See [backend transition prerequisites](../ZONEENGINE_NEW_BACKEND.md).
 
 `LinuxBuild/accept-linux-sha.sh` publishes both self-contained engines, runs the
 fixture-backed deployment failure suite, writes accepted provenance into both

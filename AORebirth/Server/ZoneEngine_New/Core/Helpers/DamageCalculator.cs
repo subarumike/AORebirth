@@ -41,7 +41,10 @@ namespace ZoneEngine_New.Core.Helpers
             Character attacker,
             Character target,
             Item? weapon,
-            CharacterStat? specialAttackStat = null)
+            CharacterStat? specialAttackStat = null,
+            int? minDamageOverride = null,
+            int? maxDamageOverride = null,
+            int? critBonusOverride = null)
         {
             ArgumentNullException.ThrowIfNull(attacker);
             ArgumentNullException.ThrowIfNull(target);
@@ -78,6 +81,14 @@ namespace ZoneEngine_New.Core.Helpers
                 fullAutoClip = 0;
                 attackDefendSource = null;
             }
+
+            // Existing accepted NPC contracts may own numeric damage while the real
+            // equipped template continues to own its attack/defense skill definition.
+            weaponMin = minDamageOverride ?? weaponMin;
+            weaponMax = maxDamageOverride ?? weaponMax;
+            weaponCritBonus = critBonusOverride ?? weaponCritBonus;
+            if (weaponMin < 0 || weaponMax < weaponMin)
+                throw new ArgumentOutOfRangeException(nameof(minDamageOverride));
 
             int attackRating = ResolveAttackRating(attacker, attackDefendSource, specialAttackStat);
             int defenseRating = ResolveDefenseRating(target, attackDefendSource);

@@ -21,17 +21,28 @@ namespace AORebirth.Database.Dao
         private static readonly object Sync = new object();
         private static readonly Dictionary<int, HeldZoneLease> ZoneLeases =
             new Dictionary<int, HeldZoneLease>();
+        private static readonly HashSet<int> RecoveryCharacters = new HashSet<int>();
 
+#if !AOREBIRTH_WIN_NET10
         public static IDisposable AcquireZoneOwnership(int characterId)
         {
+            return AcquireZoneOwnership(characterId, CharacterDao.Instance.SetOnline);
+        }
+#endif
+
+        public static IDisposable AcquireZoneOwnership(int characterId, Action<int> setOnline)
+        {
             ValidateCharacterId(characterId);
+            if (setOnline == null) throw new ArgumentNullException("setOnline");
             lock (Sync)
             {
+                if (RecoveryCharacters.Contains(characterId))
+                    throw new InvalidOperationException("Character online ownership is reserved for stale recovery.");
                 HeldZoneLease existing;
                 if (ZoneLeases.TryGetValue(characterId, out existing))
                 {
+                    setOnline(characterId);
                     existing.ReferenceCount++;
-                    CharacterDao.Instance.SetOnline(characterId);
                     return new ZoneLeaseReference(characterId);
                 }
 
@@ -57,7 +68,7 @@ namespace AORebirth.Database.Dao
 
                 try
                 {
-                    CharacterDao.Instance.SetOnline(characterId);
+                    setOnline(characterId);
                     ZoneLeases.Add(characterId, new HeldZoneLease(ownershipStream));
                     return new ZoneLeaseReference(characterId);
                 }
@@ -69,23 +80,102 @@ namespace AORebirth.Database.Dao
             }
         }
 
+#if !AOREBIRTH_WIN_NET10
         public static LoginOwnedOnlineCleanupResult TryClearLoginOwnership(int characterId)
         {
-            ValidateCharacterId(characterId);
-            FileStream ownershipStream = TryAcquire(characterId);
-            if (ownershipStream == null)
-            {
-                return LoginOwnedOnlineCleanupResult.ZoneOwned;
-            }
+            return TryClearLoginOwnership(characterId, CharacterDao.Instance.SetOffline);
+        }
+#endif
 
+        public static LoginOwnedOnlineCleanupResult TryClearLoginOwnership(int characterId, Action<int> setOffline)
+        {
+            ValidateCharacterId(characterId);
+            if (setOffline == null) throw new ArgumentNullException("setOffline");
+            lock (Sync)
+            {
+                // Unix byte-range locks are process-scoped. Opening and closing another
+                // descriptor for an already-held file could release the zone's lock.
+                if (ZoneLeases.ContainsKey(characterId) || RecoveryCharacters.Contains(characterId))
+                    return LoginOwnedOnlineCleanupResult.ZoneOwned;
+                FileStream ownershipStream = TryAcquire(characterId);
+                if (ownershipStream == null)
+                {
+                    return LoginOwnedOnlineCleanupResult.ZoneOwned;
+                }
+
+                try
+                {
+                    setOffline(characterId);
+                    return LoginOwnedOnlineCleanupResult.Cleared;
+                }
+                finally
+                {
+                    ReleaseStream(ownershipStream);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reserves captured stale IDs until the synchronous database transaction has finished.
+        /// Never waits behind a zone writer while the recovery transaction holds SQL row locks.
+        /// The lease must be disposed on the acquiring thread after commit or rollback.
+        /// </summary>
+        public static IDisposable AcquireStaleRecoveryOwnership(IEnumerable<int> characterIds)
+        {
+            if (characterIds == null) throw new ArgumentNullException("characterIds");
+            var ids = new SortedSet<int>(characterIds);
+            foreach (int id in ids) ValidateCharacterId(id);
+            if (!Monitor.TryEnter(Sync))
+                throw new InvalidOperationException("Character ownership is busy; stale recovery was refused.");
+
+            var streams = new List<FileStream>();
             try
             {
-                CharacterDao.Instance.SetOffline(characterId);
-                return LoginOwnedOnlineCleanupResult.Cleared;
+                // Check every in-process lease before opening any second descriptor for it.
+                foreach (int id in ids)
+                    if (ZoneLeases.ContainsKey(id) || RecoveryCharacters.Contains(id))
+                        throw new InvalidOperationException("A captured character has live zone ownership; stale recovery was refused.");
+
+                foreach (int id in ids)
+                {
+                    FileStream stream = TryAcquire(id);
+                    if (stream == null)
+                        throw new InvalidOperationException("A captured character has external zone ownership; stale recovery was refused.");
+                    streams.Add(stream);
+                }
+                foreach (int id in ids) RecoveryCharacters.Add(id);
+                return new RecoveryLease(ids, streams);
             }
-            finally
+            catch
             {
-                ReleaseStream(ownershipStream);
+                try { foreach (FileStream stream in streams) ReleaseStream(stream); }
+                finally { Monitor.Exit(Sync); }
+                throw;
+            }
+        }
+
+        private sealed class RecoveryLease : IDisposable
+        {
+            private readonly SortedSet<int> ids;
+            private readonly List<FileStream> streams;
+            private bool disposed;
+
+            public RecoveryLease(SortedSet<int> ids, List<FileStream> streams)
+            {
+                this.ids = ids;
+                this.streams = streams;
+            }
+
+            public void Dispose()
+            {
+                if (this.disposed) return;
+                this.disposed = true;
+                try
+                {
+                    foreach (int id in this.ids) RecoveryCharacters.Remove(id);
+                    foreach (FileStream stream in this.streams) ReleaseStream(stream);
+                }
+                finally { Monitor.Exit(Sync); }
             }
         }
 
@@ -113,6 +203,11 @@ namespace AORebirth.Database.Dao
             {
                 stream.Dispose();
                 return null;
+            }
+            catch
+            {
+                stream.Dispose();
+                throw;
             }
         }
 
@@ -176,7 +271,7 @@ namespace AORebirth.Database.Dao
         private sealed class ZoneLeaseReference : IDisposable
         {
             private readonly int characterId;
-            private bool disposed;
+            private int disposed;
 
             public ZoneLeaseReference(int characterId)
             {
@@ -185,12 +280,11 @@ namespace AORebirth.Database.Dao
 
             public void Dispose()
             {
-                if (this.disposed)
+                if (Interlocked.Exchange(ref this.disposed, 1) != 0)
                 {
                     return;
                 }
 
-                this.disposed = true;
                 ReleaseZoneOwnership(this.characterId);
             }
         }

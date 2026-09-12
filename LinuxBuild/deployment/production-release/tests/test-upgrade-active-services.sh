@@ -115,7 +115,7 @@ SOURCE_SHA_MATCH=PASS
 TRACKED_SOURCE_CLEAN=PASS
 LINUX_ACCEPTANCE=PASS
 EOF
-    if [[ "$2" == "ZoneEngine" ]]; then
+    if [[ "$2" == "ZoneEngine_New" ]]; then
         create_placement_artifact "$1"
     fi
 }
@@ -173,7 +173,7 @@ create_fixture()
     printf '0\n' > "${state}/login.listener-delay"; printf '0\n' > "${state}/zone.listener-delay"
     printf '0\n' > "${state}/login.listener-checks"; printf '0\n' > "${state}/zone.listener-checks"
     create_artifact "${input}/login" LoginEngine
-    create_artifact "${input}/zone" ZoneEngine
+    create_artifact "${input}/zone" ZoneEngine_New
     printf '<Config><ZoneIP>127.0.0.1</ZoneIP></Config>\n' > "${input}/login/Config.xml"
     printf '<Config><ZoneIP>127.0.0.1</ZoneIP></Config>\n' > "${input}/zone/Config.xml"
     cp -- "${login_unit_source}" "${input}/login.service"
@@ -186,7 +186,7 @@ BUILD_TIMESTAMP_UTC=2026-08-24T00:00:00Z
 LOGINENGINE_ARTIFACT_DIR=${input}/login
 LOGINENGINE_ARTIFACT_SHA256=$(sha256sum "${input}/login/LoginEngine" | awk '{print $1}')
 ZONEENGINE_ARTIFACT_DIR=${input}/zone
-ZONEENGINE_ARTIFACT_SHA256=$(sha256sum "${input}/zone/ZoneEngine" | awk '{print $1}')
+ZONEENGINE_ARTIFACT_SHA256=$(sha256sum "${input}/zone/ZoneEngine_New" | awk '{print $1}')
 PLACEMENT_CORPUS_VERSION=${fixture_placement_corpus_version}
 PLACEMENT_CORPUS_MANIFEST_SHA256=${fixture_placement_corpus_manifest_sha}
 PLACEMENT_CORPUS_SUMMARY_SHA256=${fixture_placement_summary_sha}
@@ -218,7 +218,7 @@ EOF
     new_login_unit_hash="$(sha256sum "${input}/login.service" | awk '{print $1}')"
     new_zone_unit_hash="$(sha256sum "${input}/zone.service" | awk '{print $1}')"
     new_login_artifact_hash="$(sha256sum "${input}/login/LoginEngine" | awk '{print $1}')"
-    new_zone_artifact_hash="$(sha256sum "${input}/zone/ZoneEngine" | awk '{print $1}')"
+    new_zone_artifact_hash="$(sha256sum "${input}/zone/ZoneEngine_New" | awk '{print $1}')"
     require test "${old_login_unit_hash}" != "${new_login_unit_hash}"
     require test "${old_zone_unit_hash}" != "${new_zone_unit_hash}"
     require test "${old_login_artifact_hash}" != "${new_login_artifact_hash}"
@@ -399,8 +399,8 @@ create_fixture; rm -f -- "${input}/zone.service"; expect_preflight_failure
 create_fixture; sed -i 's|AO_REBIRTH_SESSION_OWNERSHIP_DIR=/var/lib/ao-rebirth/session-ownership|AO_REBIRTH_SESSION_OWNERSHIP_DIR=/var/lib/ao-rebirth/zone-private|' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i 's|/var/lib/ao-rebirth/session-ownership|/tmp/session-ownership|g' "${input}/login.service" "${input}/zone.service"; set_manifest_value "${manifest}" LOGINENGINE_UNIT_SHA256 "$(sha256sum "${input}/login.service" | awk '{print $1}')"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
 create_fixture; sed -i '/^PrivateTmp=true$/d' "${input}/login.service"; set_manifest_value "${manifest}" LOGINENGINE_UNIT_SHA256 "$(sha256sum "${input}/login.service" | awk '{print $1}')"; expect_preflight_failure
-create_fixture; sed -i '/ZoneEngine --recover-stale-online/d' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
-create_fixture; sed -i 's|ZoneEngine --headless --shutdown-file|ZoneEngine --validate-lifecycle --shutdown-file|' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure; require grep -F 'ZoneEngine production executable contract failed' "${fixture}/output"
+create_fixture; sed -i '/ZoneEngine_New --validate-startup/d' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure
+create_fixture; sed -i 's|ZoneEngine_New --headless --shutdown-file|ZoneEngine_New --validate-lifecycle --shutdown-file|' "${input}/zone.service"; set_manifest_value "${manifest}" ZONEENGINE_UNIT_SHA256 "$(sha256sum "${input}/zone.service" | awk '{print $1}')"; expect_preflight_failure; require grep -F 'ZoneEngine production executable contract failed' "${fixture}/output"
 
 create_fixture
 if run_recovery_upgrade > "${fixture}/output" 2>&1; then fail "outage recovery accepted an active ZoneEngine"; fi

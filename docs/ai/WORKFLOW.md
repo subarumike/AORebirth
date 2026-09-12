@@ -2,6 +2,59 @@
 
 ## First Checks
 
+### NewEngine cutover foundation
+
+The Mike-owned cutover branch accepts a reduced feature set; full gameplay parity
+is not the operational gate. Preserve all durable-state and schema checks.
+Do not merge master, change production, remove Legacy, or alter the developer
+branch during this milestone. Historical all-parity promotion requirements are
+superseded for this explicitly scoped foundation task.
+
+After the normal NewEngine Debug build, generate/check the source inventory:
+
+```cmd
+cmd /d /c Tools\generate_newengine_cutover_inventory.cmd --write
+cmd /d /c Tools\generate_newengine_cutover_inventory.cmd --check
+```
+
+The Roslyn tool reads the NewEngine project-reference graph and source; it does
+not load engine code, access a database, or modify gameplay. It requires the
+normal Debug reference assemblies. Dependency symbols are compiler-resolved;
+DAO method/table candidates retain explicit static-analysis limits.
+
+For disposable schema/transaction/restart validation use the existing wrapper
+with its required explicit engine path:
+
+```cmd
+cmd /d /c Tools\run_zoneengine_schema_validation.cmd --run-disposable --engine <absolute-built-ZoneEngine_New.dll>
+```
+
+This fixture accepts no application connection string and creates its own
+labelled loopback MySQL. It includes exact item/credit/location fresh-repository
+reloads across engine restarts and a Legacy-table staleness check. Its
+`LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED` result must never be relabelled full
+account-login/character-selection/reconnect acceptance. See the operational
+report for that evidence boundary.
+
+For real LoginEngine authentication, character selection, NewEngine TCP entry,
+inventory mutation, reconnect, distinct-process restart, nano/morph/quest reload,
+morph cancellation and negative admission tests:
+
+```cmd
+cmd /d /c Tools\run_newengine_connected_acceptance.cmd --engine <absolute-built-ZoneEngine_New.dll> --login-engine <absolute-built-LoginEngine.exe-or-dll>
+```
+
+Use the normal Windows build's `AORebirth\Built\Debug\ZoneEngine_New\ZoneEngine_New.dll`
+and `AORebirth\Built\Debug\LoginEngine.exe` for an exact-source acceptance run.
+This synthetic client uses AOtomation codecs and the existing login-key encoder;
+it does not start the AO client. Setup writes finish before engine startup.
+After startup only network actions mutate state; SQL/DAO access is read-only.
+The fixture creates and removes its own labelled loopback MySQL/network and
+processes, records source/binary provenance, and returns nonzero if zone admission
+accepts an unauthenticated character. Positive lifecycle PASS does not override
+that negative gate. Retain the console log under `build-verify` and link the
+actual SHA in `NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`.
+
 Run:
 
 ```cmd
@@ -104,6 +157,16 @@ Stop-after-success rule:
 
 ## Build And Engines
 
+### Accepted ordinary binding export (offline)
+
+For the bounded Subway/Temple NewEngine consumer ledger, run
+`cmd /d /c Tools\export_accepted_ordinary_bindings.cmd --write`, then
+`cmd /d /c Tools\export_accepted_ordinary_bindings.cmd --check`.
+This evaluates the existing compiled catalog and exact per-variant combat resolver
+through the shared cross-platform Legacy project on Windows. It does not invoke
+the engine entry point, start listeners, access a database, or activate NPCs.
+It is not the broader capture census or a substitute for consumer lifecycle tests.
+
 After code changes that affect server binaries:
 
 1. Stop engines if running processes are locking build outputs.
@@ -120,7 +183,7 @@ Build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, then builds `AORebirth.Core`, `LoginEngine`, `ZoneEngine`, `DatabasePreflight`, and `WebEngine`, using:
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, preserves unrelated processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, then builds `AORebirth.Core`, `LoginEngine`, legacy `ZoneEngine`, `DatabasePreflight`, and `WebEngine`, using:
 
 ```cmd
 MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
@@ -184,21 +247,36 @@ launched-PID ownership and rolls back only processes launched by that
 invocation. Managed shutdown trusts only PID metadata whose executable path and
 start time match and never falls back to killing processes by name.
 
-`ZoneEngine_New` remains an explicit development route. Build it with:
+On the full-integration candidate branch, normal build/acceptance also builds and
+tests `ZoneEngine_New`, the selected default backend. Build it alone with:
 
 ```cmd
-dotnet build AORebirth\Server\ZoneEngine_New\ZoneEngine_New.csproj --configuration Debug
+cmd /d /c NewZoneEngineBuild\build.cmd
 ```
 
 Then start ChatEngine, LoginEngine, and `ZoneEngine_New` in the governed order
 with:
 
 ```cmd
-cmd /d /c restart-engines.cmd -NewZoneEngine
+cmd /d /c restart-engines.cmd
 ```
 
-This option does not change the default legacy route and does not authorize a
-Linux or production migration.
+Use `restart-engines.cmd -LegacyZoneEngine` and
+`status-engines.cmd --legacy-zoneengine` only for deliberate legacy rollback.
+`-NewZoneEngine` remains a redundant compatibility alias, not a second runtime.
+New startup requires schema-current readiness before services are stopped or
+started. No engine startup can migrate the database. `--validate-startup` checks
+configuration and the packaged world without opening the database;
+`--validate-database` performs read-only schema readiness. Neither is a migration.
+The separate operator command and production boundary are documented in
+`docs/project/ZONEENGINE_NEW_TRANSITION_PLAN.md`.
+
+Clean checkouts must explicitly import the pinned offline Playfields archive
+using `docs/project/PLAYFIELD_PACKAGE_SUPPLY.md` before offline startup acceptance.
+This candidate is not yet accepted for master or deployment: the gameplay route
+audit identifies missing legacy features and unbridged accepted NPC profiles.
+Keep the fail-closed checks; do not start a partially packaged world or substitute
+fixture content. Existing production is unchanged.
 
 WebEngine remains excluded from normal startup. Its explicit optional workflow
 is:

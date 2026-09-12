@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Characters
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using AORebirth.Database.Dao;
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
@@ -39,6 +40,26 @@ namespace ZoneEngine_New.Core.Characters
         public void Commit(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
+
+            lock (player.PersistenceGate)
+            {
+                if (player.IsPersistenceQuarantined)
+                    throw new InvalidOperationException("A quarantined player must be reloaded before persistence.");
+                try
+                {
+                    CommitCore(player);
+                }
+                catch (DatabaseCommitOutcomeUnknownException)
+                {
+                    player.QuarantinePersistence();
+                    player.Session?.Close();
+                    throw;
+                }
+            }
+        }
+
+        private void CommitCore(Player player)
+        {
 
             int characterId = player.Identity.Instance;
             if (characterId <= 0)
@@ -96,8 +117,7 @@ namespace ZoneEngine_New.Core.Characters
                     });
             }
 
-            _characters.SaveLocation(record, online: 0);
-            _stats.UpsertForCharacter(characterId, stats);
+            _characters.SaveSnapshot(record, online: 0, stats);
 
             _logger.Info(
                 string.Format(
@@ -110,5 +130,18 @@ namespace ZoneEngine_New.Core.Characters
                     position.zf,
                     stats.Count));
         }
+
+        public IDisposable AcquireOnlineOwnership(int characterId)
+            => CharacterOnlineOwnershipGuard.AcquireZoneOwnership(characterId, _characters.SetOnline);
+
+        public void AbandonOnlineOwnership(int characterId, IDisposable ownership)
+        {
+            ArgumentNullException.ThrowIfNull(ownership);
+            ownership.Dispose();
+            ClearOnlineIfUnowned(characterId);
+        }
+
+        public void ClearOnlineIfUnowned(int characterId)
+            => CharacterOnlineOwnershipGuard.TryClearLoginOwnership(characterId, _characters.SetOffline);
     }
 }

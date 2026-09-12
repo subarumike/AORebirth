@@ -20,12 +20,28 @@ namespace ZoneEngine_New.Core.Playfield
             _channel.Writer.TryWrite(item);
 
         /// <summary>Called from <see cref="Playfield.Tick"/> only.</summary>
-        public void Drain(IMessageRouter router, SpawnService spawn)
+        public void Drain(IMessageRouter router, SpawnService spawn, Playfield owner)
         {
             while (_channel.Reader.TryRead(out PlayfieldInboundItem? item))
             {
                 switch (item)
                 {
+                    case TransferDepartureInboundItem departure:
+                        departure.Transfer.Depart();
+                        break;
+                    case TransferArrivalInboundItem arrival:
+                        arrival.Transfer.Arrive();
+                        break;
+                    case TransferReturnInboundItem returned:
+                        returned.Transfer.Return();
+                        break;
+                    case PlayerProjectionInboundItem projection:
+                        if (ReferenceEquals(projection.Player.Playfield, owner))
+                            projection.Projection();
+                        else
+                            projection.Player.Playfield?.DispatchPlayerProjection(projection.Player, projection.Projection);
+                        break;
+
                     case PendingSpawnInboundItem pendingSpawn:
                         spawn.CompletePendingSpawn(pendingSpawn.Session, pendingSpawn);
                         break;

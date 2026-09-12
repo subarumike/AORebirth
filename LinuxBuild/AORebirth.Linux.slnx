@@ -23,12 +23,16 @@
   <Folder Name="/Servers/">
     <Project Path="Projects/ChatEngine.Linux.csproj" />
     <Project Path="Projects/LoginEngine.Linux.csproj" />
+    <Project Path="../AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj" />
+  </Folder>
+  <Folder Name="/LegacyRollback/">
     <Project Path="Projects/ZoneEngine.Linux.csproj" />
   </Folder>
   <Folder Name="/Tools/">
     <Project Path="Tools/CompatibilitySmokeTests/CompatibilitySmokeTests.csproj" />
     <Project Path="Tools/PublishDirectoryGuard/PublishDirectoryGuard.csproj" />
     <Project Path="Tools/SourceInventoryGuard/SourceInventoryGuard.csproj" />
+    <Project Path="Tools/BackendIntegrationGuard/BackendIntegrationGuard.csproj" />
     <Project Path="Tools/Stage8OfflineSmokeTests/Stage8OfflineSmokeTests.csproj" />
   </Folder>
 </Solution>

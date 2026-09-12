@@ -78,16 +78,16 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public const float WallProximity = 0.5f;
 
         /// <summary>
-        /// Radius of a door/portal trigger disc (units). Half the legacy statel collision range of
-        /// 2.0, which reached wide enough to catch characters walking past a door.
+        /// Radius of a door/portal trigger disc (units), matching Legacy's measured statel
+        /// collision envelope.
         /// </summary>
-        public const float PortalRadius = 1f;
+        public const float PortalRadius = 2f;
 
         /// <summary>
-        /// Half-height of a door/portal trigger (units). Half the legacy 6.0, which spanned enough
-        /// storeys for a door on another floor to trigger.
+        /// Half-height of a door/portal trigger (units), matching Legacy's measured statel
+        /// collision envelope.
         /// </summary>
-        public const float PortalHalfHeight = 3f;
+        public const float PortalHalfHeight = 6f;
 
         readonly List<ZoneTriggerVolume> _all = new();
         readonly Dictionary<long, List<ZoneTriggerVolume>> _bins = new();

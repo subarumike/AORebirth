@@ -9,11 +9,11 @@ namespace ZoneEngine.Core.Missions
 
     internal sealed class MissionAcgAllocationService
     {
-        internal const int MinimumLivePlayfield2 = 0x160000;
+        internal const int MinimumLivePlayfield2 = MissionAcgIdentityRanges.MinimumLivePlayfield2;
 
-        internal const int MaximumLivePlayfield2 = 0x16FFFF;
+        internal const int MaximumLivePlayfield2 = MissionAcgIdentityRanges.MaximumLivePlayfield2;
 
-        internal const int LegacySharedPlayfield2 = 1419349;
+        internal const int LegacySharedPlayfield2 = MissionAcgIdentityRanges.LegacySharedPlayfield2;
 
         internal const int AcceptedQuestIdentityType = 0xDAC3;
 

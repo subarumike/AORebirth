@@ -33,5 +33,6 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/Config/Config.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/Config/ConfigReadWrite.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/Config/LocalitySettings.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/Network/EngineBindPolicy.cs" />
   </ItemGroup>
 </Project>

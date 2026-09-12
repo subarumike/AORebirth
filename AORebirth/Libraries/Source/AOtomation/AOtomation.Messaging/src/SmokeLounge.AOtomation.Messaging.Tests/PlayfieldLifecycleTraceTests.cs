@@ -312,7 +312,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string npcCombatTickText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string resetCombatTick = ExtractMethodBlock(npcCombatTickText, "internal void ResetCombatTick(");
-            string capturedPacketFactoryText = File.ReadAllText(
+            string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
             string clientConnectedText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
@@ -356,13 +356,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void IccShuttleportBasicCombatPromotesOnlyCaptureBackedIslandReet()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string contractText = File.ReadAllText(
+            string contractText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string npcCombatTickText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string spatialPolicyText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatSpatialPolicy.cs"));
-            string profileCatalogText = File.ReadAllText(
+            string profileCatalogText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileCatalog.cs"));
             string catalogText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportBasicCombatCatalog.g.cs"));
@@ -537,7 +537,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void SubwayThiefCombatContractPreservesLiveEnvelopeMovementAndDeathOrder()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string contractText = File.ReadAllText(
+            string contractText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string coordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
@@ -635,7 +635,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string repositoryRoot = FindRepositoryRoot();
             string coordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
-            string capturedPacketFactoryText = File.ReadAllText(
+            string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
@@ -1514,9 +1514,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string replayPath = provider.FindPatrolReplayPath();
 
             Assert.IsTrue(File.Exists(replayPath));
+            string repositoryRoot = Path.GetFullPath(FindRepositoryRoot())
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            string fullReplayPath = Path.GetFullPath(replayPath);
+            Assert.IsTrue(fullReplayPath.StartsWith(repositoryRoot, StringComparison.OrdinalIgnoreCase));
+            string relativeReplayPath = fullReplayPath.Substring(repositoryRoot.Length);
             Assert.IsTrue(
-                replayPath.IndexOf("tools-temp", StringComparison.OrdinalIgnoreCase) < 0,
+                relativeReplayPath.IndexOf("tools-temp", StringComparison.OrdinalIgnoreCase) < 0,
                 "Runtime replay data must load from committed content, not tools-temp captures.");
+            CollectionAssert.AreEqual(
+                File.ReadAllBytes(Path.Combine(repositoryRoot, CapturedAreteRobotContentProvider.PatrolReplaySourceRelativePath)),
+                File.ReadAllBytes(fullReplayPath),
+                "The selected runtime content must match the committed canonical bytes.");
 
             Assert.AreEqual(39, provider.GetPatrolReplaySegments(0x79866553).Length);
 
@@ -2204,7 +2213,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
             string runtimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string combatContractText = File.ReadAllText(
+            string combatContractText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string combatAttackRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
@@ -2723,17 +2732,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
             string catalogText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
-            string combatContractText = File.ReadAllText(
+            string combatContractText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
             string globalLootText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
             string attackRulesText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
-            string combatSetupGeneratorText = File.ReadAllText(
+            string combatSetupGeneratorText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs"));
             string movementCoordinatorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
-            string capturedPacketFactoryText = File.ReadAllText(
+            string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
             string movementRuntimeText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));

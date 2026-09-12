@@ -74,8 +74,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
             Require(zoneUnit.Contains("Type=notify"), "production ZoneEngine unit does not use readiness notification");
             Require(zoneUnit.Contains("NotifyAccess=main"), "production ZoneEngine unit does not authorize main-process readiness notification");
-            Require(zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown"), "production ZoneEngine unit does not start the headless listener runtime");
-            Require(!zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-lifecycle"), "production ZoneEngine unit incorrectly starts the listener-free lifecycle validator");
+            Require(zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown"), "production ZoneEngine unit does not start the headless listener runtime");
+            Require(!zoneUnit.Contains("ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --validate-lifecycle"), "production ZoneEngine unit incorrectly starts the listener-free lifecycle validator");
 
             int headlessDatabaseGate = zoneProgram.IndexOf("int headlessDatabaseValidation = ValidateDatabase();", StringComparison.Ordinal);
             int databaseValidatedState = zoneProgram.IndexOf("runtimeDatabaseValidated = true;", StringComparison.Ordinal);
@@ -172,7 +172,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(tests.Contains("READINESS_WAIT=PASS engine=login elapsedSeconds=7"), "deployment fixture does not prove delayed LoginEngine readiness");
             Require(tests.Contains("READINESS_WAIT=PASS engine=zone elapsedSeconds=7"), "deployment fixture does not prove delayed ZoneEngine readiness");
             Require(tests.Contains("READINESS_WAIT=TIMEOUT engine=login elapsedSeconds=30"), "deployment fixture does not prove bounded readiness timeout");
-            Require(tests.Contains("ZoneEngine --validate-lifecycle --shutdown-file"), "deployment fixture does not reject the listener-free ZoneEngine validation runtime");
+            Require(tests.Contains("ZoneEngine_New --validate-lifecycle --shutdown-file"), "deployment fixture does not reject the listener-free ZoneEngine validation runtime");
             Require(tests.Contains("prior_login_link_target=\"releases/old-login\""), "deployment fixture suite does not preserve an exact relative LoginEngine symlink target");
             Require(tests.Contains("prior_zone_link_target=\"releases/old-zone\""), "deployment fixture suite does not preserve an exact relative ZoneEngine symlink target");
             Require(tests.Contains("official-placement-build-manifest.json\"; expect_preflight_failure"), "deployment fixture does not reject a missing placement build manifest");

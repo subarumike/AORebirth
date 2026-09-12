@@ -233,7 +233,8 @@ namespace LoginEngine.CoreClient
             buffer[1] = BitConverter.GetBytes(this.packetNumber)[1];
             this.packetNumber++;
 
-            LogUtil.Debug(DebugInfoDetail.Network, "Sent:\r\n" + HexOutput.Output(buffer));
+            LogUtil.Debug(DebugInfoDetail.Network, messageBody is ZoneInfoMessage
+                ? "Sent ZoneInfoMessage (handoff material omitted)" : "Sent:\r\n" + HexOutput.Output(buffer));
 
             if (buffer.Length % 4 > 0)
             {
@@ -313,6 +314,8 @@ namespace LoginEngine.CoreClient
         /// </param>
         /// <returns>
         /// </returns>
+        internal string ZoneHandoffGeneration { get; private set; }
+
         internal bool CompleteAuthentication(string attemptedAccountName, long attemptedGeneration)
         {
             lock (this.authenticationSync)
@@ -328,6 +331,8 @@ namespace LoginEngine.CoreClient
                     return false;
                 }
 
+                try { this.ZoneHandoffGeneration = AORebirth.Database.Dao.ZoneHandoffStore.Configured().BeginLogin(attemptedAccountName); }
+                catch { return false; } // Storage unavailable: never authorize a zone ticket.
                 this.accountName = attemptedAccountName;
                 this.authenticatedAccountName = attemptedAccountName;
                 this.authenticationState = AuthenticationState.Authenticated;
@@ -591,7 +596,7 @@ namespace LoginEngine.CoreClient
             LogUtil.Debug(
                 DebugInfoDetail.Network,
                 "Offset: " + buffer.Offset.ToString() + " -- RemainingLength: " + this._remainingLength);
-            LogUtil.Debug(DebugInfoDetail.Network, HexOutput.Output(packet));
+            LogUtil.Debug(DebugInfoDetail.Network, "Login payload omitted at authentication boundary.");
 
             this._remainingLength = 0;
             try
@@ -605,7 +610,7 @@ namespace LoginEngine.CoreClient
                     this,
                     "Client sent malformed message {0}",
                     messageNumber.ToString(CultureInfo.InvariantCulture));
-                LogUtil.Debug(DebugInfoDetail.Error, HexOutput.Output(packet));
+                LogUtil.Debug(DebugInfoDetail.Error, "Malformed login payload omitted.");
                 return false;
             }
 

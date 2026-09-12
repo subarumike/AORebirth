@@ -70,7 +70,9 @@ namespace ChatEngine.CoreServer
 
         /// <summary>
         /// </summary>
-        public Dictionary<uint, Client> ConnectedClients = new Dictionary<uint, Client>();
+        private readonly ChatSessionOwnership<Client> clientOwnership = new ChatSessionOwnership<Client>();
+
+        public IReadOnlyDictionary<uint, Client> ConnectedClients { get { return this.clientOwnership.Clients; } }
 
         /// <summary>
         /// </summary>
@@ -134,12 +136,18 @@ namespace ChatEngine.CoreServer
         public void OnClientDisconnect(IClient client, bool forced)
         {
             Client cl = (Client)client;
-            if (cl.Character.CharacterId != 0)
-            {
-                LftRegistry.Remove(cl.Character.CharacterId);
-                CharacterDao.Instance.SetOffline((int)cl.Character.CharacterId);
-                this.ConnectedClients.Remove(cl.Character.CharacterId);
-            }
+            this.clientOwnership.Disconnect(cl.Character.CharacterId, cl,
+                id => CharacterOnlineOwnershipGuard.TryClearLoginOwnership(unchecked((int)id), CharacterDao.Instance.SetOffline),
+                LftRegistry.Remove);
+        }
+
+        internal bool RegisterClient(Client client)
+        {
+            Func<IDisposable> acquireOwnership = client.IsBot
+                ? (Func<IDisposable>)(() => CharacterOnlineOwnershipGuard.AcquireZoneOwnership(
+                    unchecked((int)client.Character.CharacterId), CharacterDao.Instance.SetOnline))
+                : null;
+            return this.clientOwnership.Register(client.Character.CharacterId, client, acquireOwnership);
         }
 
         #endregion

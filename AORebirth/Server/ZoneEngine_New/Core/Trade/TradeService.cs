@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Trade
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
 
     using AORebirth.Enums;
 
@@ -34,6 +35,7 @@ namespace ZoneEngine_New.Core.Trade
         readonly HashItemMinter _minter;
         readonly IItemInstanceIdAllocator _ids;
         readonly InventoryFlushService _flush;
+        readonly ITradePersistence _persistence;
 
         public TradeService(
             IZoneLogger logger,
@@ -41,7 +43,8 @@ namespace ZoneEngine_New.Core.Trade
             IItemTemplateCatalog catalog,
             HashItemMinter minter,
             IItemInstanceIdAllocator ids,
-            InventoryFlushService flush)
+            InventoryFlushService flush,
+            ITradePersistence persistence)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(gameData);
@@ -49,6 +52,7 @@ namespace ZoneEngine_New.Core.Trade
             ArgumentNullException.ThrowIfNull(minter);
             ArgumentNullException.ThrowIfNull(ids);
             ArgumentNullException.ThrowIfNull(flush);
+            ArgumentNullException.ThrowIfNull(persistence);
 
             _logger = logger;
             _gameData = gameData;
@@ -56,6 +60,7 @@ namespace ZoneEngine_New.Core.Trade
             _minter = minter;
             _ids = ids;
             _flush = flush;
+            _persistence = persistence;
         }
 
         public bool TryGetSession(Player player, out TradeSession session)
@@ -96,20 +101,24 @@ namespace ZoneEngine_New.Core.Trade
                 Cancel(player, "opening another trade");
 
             int templateId = machine.Template.Id;
-            if (!_gameData.TryGetVendingMachine(templateId, out VendingMachineDefinition definition))
+            if (machine.Stock.IsAcceptedSnapshot)
             {
-                Tell(player, "This shop has no stock list yet.");
-                _logger.Warn(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Vending machine {0} has no VendingMachines.json entry",
-                        templateId));
-                return false;
+                // Frozen stock belongs only to its exact live accepted vendor, never to
+                // a matching template, nearby actor, or stale replacement identity.
+                if (!IsCurrentAcceptedShop(player, machine))
+                    return false;
             }
-
-            // Random.Shared, not a field: playfields tick on their own threads and a shared
-            // Random instance torn across threads silently degrades to returning zeroes.
-            machine.Stock.EnsureFresh(definition, _minter, Random.Shared);
+            else
+            {
+                if (!_gameData.TryGetVendingMachine(templateId, out VendingMachineDefinition definition))
+                {
+                    Tell(player, "This shop has no stock list yet.");
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Vending machine {0} has no VendingMachines.json entry", templateId));
+                    return false;
+                }
+                machine.Stock.EnsureFresh(definition, _minter, Random.Shared);
+            }
 
             Identity bag = player.Playfield.GetRequiredService<DynelRegistry>().AllocateTempBagIdentity();
             var session = new TradeSession(bag, TradeKind.Shop, player, partner: null, machine);
@@ -218,6 +227,13 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
+            if (session.Machine?.Stock.IsAcceptedSnapshot == true
+                && (session.AcceptedShopTransport == null || !IsCurrentAcceptedShop(player, session.Machine, session.AcceptedShopTransport)))
+            {
+                Cancel(player, "accepted vendor ownership changed");
+                return;
+            }
+
             switch (message.Action)
             {
                 case TradeAction.AddItem:
@@ -239,6 +255,24 @@ namespace ZoneEngine_New.Core.Trade
                 default:
                     break;
             }
+        }
+
+        static bool IsCurrentAcceptedShop(Player player, VendingMachine machine,
+            ZoneEngine_New.Core.Network.IZoneSession? expectedTransport = null)
+        {
+            var transport = player.Session;
+            var field = player.Playfield;
+            var owner = machine.OwnerNpc;
+            return transport != null && transport.State == ZoneEngine_New.Core.Network.SessionState.InPlay
+                && ReferenceEquals(transport.Player, player) && (expectedTransport == null || ReferenceEquals(transport, expectedTransport))
+                && field != null && !field.IsDisposed && !player.IsDead && !player.IsPersistenceQuarantined && player.Inventory.IsHydrated
+                && (owner == null || (!owner.IsDead && ReferenceEquals(owner.Shop, machine) && ReferenceEquals(owner.Playfield, field)))
+                && ReferenceEquals(machine.Playfield, field)
+                && player.Distance3D(owner != null ? owner : machine) <= RangeCancelDistance
+                && field.GetRequiredService<DynelRegistry>().TryGet(player.Identity, out var currentPlayer)
+                && ReferenceEquals(currentPlayer, player)
+                && field.GetRequiredService<ZoneEngine_New.Core.Mobs.AcceptedNpcActivationService>()
+                    .TryGetShopBinding(machine, out _);
         }
 
         void HandleAddItem(Player player, TradeSession session, TradeMessage message)
@@ -501,6 +535,8 @@ namespace ZoneEngine_New.Core.Trade
 
         void CommitPlayerTrade(TradeSession session)
         {
+            if (session.Committing)
+                return;
             Player initiator = session.Initiator;
             Player partner = session.Partner!;
 
@@ -517,15 +553,32 @@ namespace ZoneEngine_New.Core.Trade
 
             int initiatorCredits = session.InitiatorOffer.Credits;
             int partnerCredits = session.PartnerOffer.Credits;
-            SetCash(
-                initiator,
-                (long)initiator.Stats.GetOrZero(CharacterStat.Cash) - initiatorCredits + partnerCredits);
-            SetCash(
-                partner,
-                (long)partner.Stats.GetOrZero(CharacterStat.Cash) - partnerCredits + initiatorCredits);
-
-            DeliverOffer(session.InitiatorOffer, partner);
-            DeliverOffer(session.PartnerOffer, initiator);
+            bool durable = false;
+            try
+            {
+                _flush.WithExclusivePlayers(initiator, partner, () =>
+                {
+                    var deliveries = new List<Delivery>();
+                    PlanDeliveries(session.InitiatorOffer.Items.Values, partner, deliveries);
+                    PlanDeliveries(session.PartnerOffer.Items.Values, initiator, deliveries);
+                    int initiatorCash = checked(initiator.Stats.GetOrZero(CharacterStat.Cash) - initiatorCredits + partnerCredits);
+                    int partnerCash = checked(partner.Stats.GetOrZero(CharacterStat.Cash) - partnerCredits + initiatorCredits);
+                    PersistPlan(initiator, initiatorCash, partner, partnerCash, deliveries, [], Identity.None);
+                    durable = true;
+                    session.InitiatorOffer.DrainAll();
+                    session.PartnerOffer.DrainAll();
+                    ApplyDeliveries(deliveries);
+                    SetCash(initiator, initiatorCash);
+                    SetCash(partner, partnerCash);
+                    foreach (Delivery delivery in deliveries)
+                        SendGrant(delivery.Receiver, delivery.Item, delivery.Page);
+                });
+            }
+            catch (Exception exception)
+            {
+                FailedCommit(session, exception, durable);
+                return;
+            }
 
             Unregister(initiator);
             Unregister(partner);
@@ -534,9 +587,6 @@ namespace ZoneEngine_New.Core.Trade
             SendCompleteClose(partner, initiator);
             SendSocialStatus(initiator, 0);
             SendSocialStatus(partner, 0);
-
-            _flush.NotifyDirty(initiator);
-            _flush.NotifyDirty(partner);
 
             _logger.Info(
                 string.Format(
@@ -550,34 +600,134 @@ namespace ZoneEngine_New.Core.Trade
                     partnerCredits));
         }
 
-        /// <summary>
-        /// Hands every item in <paramref name="offer"/> to <paramref name="receiver"/>. Space was
-        /// already checked by <see cref="ValidateSide"/>; a failure here would mean the inventory
-        /// changed mid-commit, so the item is returned to its owner rather than destroyed.
-        /// </summary>
-        void DeliverOffer(TradeOffer offer, Player receiver)
+        // Reserve only durable main-inventory locations. Offers remain untouched until COMMIT.
+        static void PlanDeliveries(IEnumerable<Item> items, Player receiver, List<Delivery> deliveries)
         {
-            foreach (Item item in offer.DrainAll())
+            Container page = receiver.Inventory.Inventory;
+            var occupied = new HashSet<int>(page.Content.Keys);
+            foreach (Delivery delivery in deliveries)
+                if (ReferenceEquals(delivery.Receiver, receiver)) occupied.Add(delivery.Slot);
+            foreach (Item item in items)
             {
-                if (!receiver.Inventory.TryPlace(item, out Container page, out int slot))
-                {
-                    _logger.Error(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Trade delivery failed instance={0} receiver={1}; item held back",
-                            item.InstanceId,
-                            receiver.Identity.Instance));
-                    continue;
-                }
-
-                receiver.Inventory.MarkDirty(item, page, slot);
-                SendGrant(receiver, item, page);
+                int slot = page.Offset;
+                while (slot < page.Offset + page.Capacity && occupied.Contains(slot)) slot++;
+                if (slot == page.Offset + page.Capacity)
+                    throw new InvalidOperationException("Inventory has no durable location for the trade.");
+                occupied.Add(slot);
+                deliveries.Add(new Delivery(item, receiver, page, slot));
             }
+        }
+
+        static void ApplyDeliveries(List<Delivery> deliveries)
+        {
+            foreach (Delivery delivery in deliveries)
+            {
+                if (!delivery.Page.Add(delivery.Slot, delivery.Item))
+                    throw new InvalidOperationException("Reserved trade location changed after durable commit.");
+                delivery.Item.IsPersisted = true;
+            }
+        }
+
+        sealed record Delivery(Item Item, Player Receiver, Container Page, int Slot);
+
+        void PersistPlan(Player first, int firstCash, Player? second, int secondCash,
+            List<Delivery> deliveries, IReadOnlyList<Item> retired, Identity graveyard)
+        {
+            var players = second == null ? new[] { first } : new[] { first, second };
+            var pending = players.Select(p => p.Inventory.TakeDirty()).ToArray();
+            var nanos = players.Select(p => p.DrainDirtyUploadedNanos()).ToArray();
+            try
+            {
+                var inserts = new Dictionary<int, ItemInstanceRecord>();
+                var updates = new Dictionary<int, ItemLocationUpdate>();
+                foreach (var flush in pending)
+                {
+                    if (flush == null) continue;
+                    foreach (var insert in flush.Inserts) inserts[insert.InstanceId] = insert;
+                    foreach (var update in flush.Updates) updates[update.InstanceId] = update;
+                }
+                foreach (Delivery delivery in deliveries)
+                    Place(delivery.Item, delivery.Page.Identity, delivery.Slot);
+                foreach (Item item in retired)
+                {
+                    inserts.Remove(item.InstanceId);
+                    updates.Remove(item.InstanceId);
+                    if (item.IsPersisted) Place(item, graveyard, item.InstanceId);
+                }
+                var characters = new List<TradeCharacterWrite> { new(first.Identity.Instance, firstCash, nanos[0]) };
+                if (second != null) characters.Add(new(second.Identity.Instance, secondCash, nanos[1]));
+                _persistence.Persist(new TradePersistenceBatch(inserts.Values.ToArray(), updates.Values.ToArray(), characters));
+                foreach (var flush in pending) flush?.MarkNewlyPersisted();
+
+                void Place(Item item, Identity container, int slot)
+                {
+                    if (item.InstanceId <= 0) throw new InvalidOperationException("Trade item has no durable instance id.");
+                    inserts.Remove(item.InstanceId);
+                    updates.Remove(item.InstanceId);
+                    if (item.IsPersisted)
+                        updates[item.InstanceId] = new ItemLocationUpdate(item.InstanceId, (int)container.Type, container.Instance, slot);
+                    else
+                        inserts[item.InstanceId] = new ItemInstanceRecord
+                        {
+                            InstanceId = item.InstanceId, ContainerType = (int)container.Type,
+                            ContainerInstance = container.Instance, ContainerPlacement = slot,
+                            ItemType = item.Identity.Type != IdentityType.None ? (int)item.Identity.Type : item.Definition.ItemType,
+                            LowId = item.LowId, HighId = item.HighId, Quality = item.Quality,
+                            StackCount = item.StackCount, Source = item.Source
+                        };
+                }
+            }
+            catch (DatabaseCommitOutcomeUnknownException)
+            {
+                // Do not requeue a transaction whose outcome is unknown.
+                foreach (Player player in players) player.QuarantinePersistence();
+                throw;
+            }
+            catch
+            {
+                for (int i = 0; i < players.Length; i++)
+                {
+                    if (pending[i] != null) players[i].Inventory.RestoreDirty(pending[i]!);
+                    players[i].RestoreDirtyUploadedNanos(nanos[i]);
+                }
+                throw;
+            }
+        }
+
+        void FailedCommit(TradeSession session, Exception exception, bool durable)
+        {
+            _logger.Error(exception, "Trade persistence failed; completion was not acknowledged.");
+            if (durable || exception is DatabaseCommitOutcomeUnknownException
+                || session.Initiator.IsPersistenceQuarantined || session.Partner?.IsPersistenceQuarantined == true)
+            {
+                session.Initiator.QuarantinePersistence();
+                session.Partner?.QuarantinePersistence();
+                Unregister(session.Initiator);
+                if (session.Partner != null) Unregister(session.Partner);
+                session.Machine?.Stock.CloseTrade();
+                session.Initiator.Session?.Close();
+                session.Partner?.Session?.Close();
+                return;
+            }
+            session.Committing = false;
+            session.ClearAcceptances();
+            _flush.NotifyDirty(session.Initiator);
+            if (session.Partner != null) _flush.NotifyDirty(session.Partner);
+            Tell(session.Initiator, "Trade failed: persistence was not committed. Please try again.");
+            if (session.Partner != null) Tell(session.Partner, "Trade failed: persistence was not committed. Please try again.");
         }
 
         void CommitShop(Player player, TradeSession session)
         {
+            if (session.Committing)
+                return;
             VendingMachine machine = session.Machine!;
+            if (machine.Stock.IsAcceptedSnapshot && (!ReferenceEquals(player, session.Initiator)
+                || session.AcceptedShopTransport == null || !IsCurrentAcceptedShop(player, machine, session.AcceptedShopTransport)))
+            {
+                Cancel(player, "accepted vendor ownership changed");
+                return;
+            }
             NpcCharacter? owner = machine.OwnerNpc;
             if (machine.Playfield == null || (owner != null && (owner.IsDead || owner.Playfield == null)))
             {
@@ -633,6 +783,14 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
+            // Overflow is intentionally memory-only; accepting money for a purchase there would
+            // lose the paid-for item on restart. Require real inventory before allocating ids.
+            if (!player.Inventory.HasFreeInventorySlots(purchases.Count))
+            {
+                Tell(player, "Trade failed: not enough free inventory slots.");
+                return;
+            }
+
             // Mint first so unique duplication is checked against real items, and so a rejected
             // purchase costs the player nothing. Ids are allocated here because a bag only gets its
             // container identity once it has an instance id.
@@ -641,9 +799,7 @@ namespace ZoneEngine_New.Core.Trade
             {
                 ShopStockSlot stock = purchase.Stock;
                 Item item = _minter.Create(stock.LowId, stock.HighId, stock.Quality, ItemSource.Vendor);
-                item.InstanceId = _ids.Allocate();
-                item.IsPersisted = false;
-                item.ApplyContainerIdentityIfBag();
+                item.AssignInstanceId(_ids.Allocate());
                 if (TradeRules.IsUnique(item)
                     && (TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId)
                         || ContainsTemplate(minted, item)))
@@ -656,33 +812,27 @@ namespace ZoneEngine_New.Core.Trade
             }
 
             session.Committing = true;
-
-            // Sold items leave first so their slots are available to the purchase.
-            Identity graveyard = machine.Identity;
-            foreach (Item sold in offer.DrainAll())
-                player.Inventory.MarkOrphaned(sold, graveyard);
-
-            int delivered = 0;
-            long charged = buyTotal;
-            foreach (MintedPurchase purchase in minted)
+            bool durable = false;
+            int soldCount = offer.Count;
+            try
             {
-                Item item = purchase.Item;
-                if (!player.Inventory.TryPlace(item, out Container page, out int slot))
+                _flush.WithExclusivePlayers(player, null, () =>
                 {
-                    // Inventory and overflow both filled up mid-commit. Refund rather than charge
-                    // for goods the player never received.
-                    charged -= purchase.Price;
-                    Tell(player, "Could not add " + item.Name + " to inventory. (inventory is full)");
-                    continue;
-                }
-
-                delivered++;
-                player.Inventory.MarkDirty(item, page, slot);
-                SendGrant(player, item, page);
+                    var deliveries = new List<Delivery>();
+                    PlanDeliveries(minted.Select(p => p.Item), player, deliveries);
+                    PersistPlan(player, checked((int)finalCash), null, 0, deliveries, offer.Items.Values.ToArray(), machine.Identity);
+                    durable = true;
+                    offer.DrainAll();
+                    ApplyDeliveries(deliveries);
+                    SetCash(player, finalCash);
+                    foreach (Delivery delivery in deliveries) SendGrant(player, delivery.Item, delivery.Page);
+                });
             }
-
-            SetCash(player, (long)player.Stats.GetOrZero(CharacterStat.Cash) - charged + sellTotal);
-            _flush.NotifyDirty(player);
+            catch (Exception exception)
+            {
+                FailedCommit(session, exception, durable);
+                return;
+            }
 
             Unregister(player);
             machine.Stock.CloseTrade();
@@ -696,9 +846,9 @@ namespace ZoneEngine_New.Core.Trade
                     "Shop trade completed player={0} machine={1} bought={2} sold={3} charged={4} sellTotal={5}",
                     player.Identity.Instance,
                     shopIdentity.Instance,
-                    delivered,
-                    purchases.Count,
-                    charged,
+                    minted.Count,
+                    soldCount,
+                    buyTotal,
                     sellTotal));
         }
 
@@ -910,6 +1060,9 @@ namespace ZoneEngine_New.Core.Trade
             {
                 VendingMachine? machine = session.Machine;
                 if (machine == null || !ReferenceEquals(machine.Playfield, playfield))
+                    return true;
+                if (machine.Stock.IsAcceptedSnapshot && (session.AcceptedShopTransport == null
+                    || !IsCurrentAcceptedShop(initiator, machine, session.AcceptedShopTransport)))
                     return true;
 
                 NpcCharacter? owner = machine.OwnerNpc;

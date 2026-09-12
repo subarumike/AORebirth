@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+[[ "${AO_REBIRTH_LEGACY_ROLLBACK:-}" == "YES" ]] || { echo "Historical legacy validation requires AO_REBIRTH_LEGACY_ROLLBACK=YES." >&2; exit 2; }
+
 readonly SERVICE_NAME="ao-rebirth-zoneengine.service"
 readonly RELEASE_ROOT="/opt/ao-rebirth/zoneengine/releases"
 readonly CURRENT_LINK="/opt/ao-rebirth/zoneengine/current"

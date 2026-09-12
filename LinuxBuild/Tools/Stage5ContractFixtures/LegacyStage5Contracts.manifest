@@ -248,11 +248,12 @@ api|type.modifiers\|
 api|type.serializable-attribute\|false
 api|type.base\|Cell.Core.ServerBase
 api|type.constructor\|public instance .ctor()
-api|type.field\|System.Collections.Generic.Dictionary<System.UInt32,ChatEngine.CoreClient.Client>\|ConnectedClients\|static=false\|initonly=false\|literal=false\|constant=
+api|type.property\|public instance System.Collections.Generic.IReadOnlyDictionary<System.UInt32,ChatEngine.CoreClient.Client> ConnectedClients {get:public;set:none}
 api|type.field\|System.Collections.Generic.HashSet<ChatEngine.Channels.ChannelBase>\|Channels\|static=false\|initonly=false\|literal=false\|constant=
 api|type.field\|System.String\|MessageOfTheDay\|static=false\|initonly=false\|literal=false\|constant=
 api|type.method\|public instance System.Collections.Generic.List<ChatEngine.Channels.ChannelBase> ChannelsByType<!!0:T>() where !!0:T[modifiers=;constraints=]
 api|type.method\|public instance System.Void OnClientDisconnect(Cell.Core.IClient client,System.Boolean forced)
+api|type.method\|public instance special-name System.Collections.Generic.IReadOnlyDictionary<System.UInt32,ChatEngine.CoreClient.Client> get_ConnectedClients()
 api|type.end\|ChatEngine.CoreServer.ChatServer
 api|type.begin\|ChatEngine.Lists.BuddyList
 api|type.kind\|class
@@ -817,11 +818,11 @@ reference|AORebirth.BotService|1.0.0.0|366f6caa557bb5ed
 reference|AORebirth.Communication|1.0.0.0|
 reference|AORebirth.Core|1.0.0.0|
 reference|AORebirth.Database|1.0.0.0|
+reference|AORebirth.Interfaces|1.0.0.0|
 reference|AORebirth.Stats|1.0.0.0|
 reference|Cell.Core|0.5.0.0|
 reference|NBug|1.2.0.0|a4292a325f69b123
 reference|NLog|2.1.0.0|5120e14c03d0593c
-reference|PlayfieldLoader|1.0.0.0|
 reference|SmokeLounge.AOtomation.Messaging|0.62.1.0|366f6caa557bb5ed
 reference|System|4.0.0.0|b77a5c561934e089
 reference|System.Core|4.0.0.0|b77a5c561934e089
@@ -1093,4 +1094,4 @@ parser.mode|source-mapped-only|handlers-not-invoked
 unsafe.excluded|AccountCharacterList.Create
 unsafe.excluded|Authenticate/AuthenticateBot handlers
 unsafe.excluded|ChatServer.Start/Parser.Parse/DAO/Connector.Open
-auth.password-fixture|Stage5-Password-μ|1268:NkoZPh18NQTNRAjipJYK42vjbue1RVAx3kzqt77T:0hjQnQVZjzLm0SgqerfqqqZXOO2Qo5TBP0u91iWD
+auth.password-fixture|Stage5-Password-μ|1141:5ijHG6YwcIJ6O8jQogVgoNvrVXlttTufLo8ATKWs:BTFjVXx56MWIhjvWZsV0LL+XCVYDKZ6PuStBLll5

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -310,7 +311,28 @@ internal static class Stage7RuntimeFixtures
             new DeleteCharacterHandler(),
             new DeleteCharacterMessage { CharacterId = 1 },
             "delete-character");
-        VerifyAuthenticationStateMachine();
+        string previousHandoffDirectory =
+            Environment.GetEnvironmentVariable("AO_REBIRTH_SESSION_OWNERSHIP_DIR");
+        string fixtureHandoffDirectory = Path.Combine(
+            Path.GetTempPath(),
+            "aorebirth-stage7-handoff-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Environment.SetEnvironmentVariable(
+                "AO_REBIRTH_SESSION_OWNERSHIP_DIR",
+                fixtureHandoffDirectory);
+            VerifyAuthenticationStateMachine();
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(
+                "AO_REBIRTH_SESSION_OWNERSHIP_DIR",
+                previousHandoffDirectory);
+            if (Directory.Exists(fixtureHandoffDirectory))
+            {
+                Directory.Delete(fixtureHandoffDirectory, true);
+            }
+        }
 
         AddLine(
             lines,

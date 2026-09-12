@@ -1,0 +1,8 @@
+{
+  "authority": "structural-only-no-runtime-activation",
+  "installedClientVersion": "unasserted",
+  "extractionCommand": "cmd /d /c Tools\\extract-rdb-tilemaps.cmd --ao-path \"D:\\Funcom\\Anarchy Online\" --skip-monster-data --skip-items-dat --output-dir C:\\Users\\Mike\\Documents\\AORebirth-zoneengine-new-full-integration\\AORebirth\\GameData\\Playfields; initial PF4582 invocation additionally used --tilemap-id 4582",
+  "sourceBoundary": "Existing installed resource database was read offline. No client was launched or modified. Per-record hashes are recorded only where exporter metadata supplies them; absent input resource identities are not inferred.",
+  "generationBoundary": "The immutable package preserves the complete supplied Playfields tree, including the nine previously exported PF4582 files. Exporter source/build hashes record the producing tool state inspected during package creation; no commit identity is guessed.",
+  "runtimeBoundary": "Byte-complete geometry, placement, or template source material does not authorize NPC spawning, identity mapping, combat, missions, loot, or any gameplay behavior. Separate runtime activation and capture-backed profile gates remain authoritative."
+}

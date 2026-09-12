@@ -253,8 +253,13 @@ namespace AORebirth.LinuxBuild.Contracts
                 .Select(element => NormalizeInventoryInclude(RequireAttribute(element, "Include")))
                 .ToArray();
 
-            Assert(legacySources.Length == 76, "Legacy ChatEngine compile inventory must contain exactly 76 items.");
-            Assert(linuxSources.Length == 76, "Linux ChatEngine compile inventory must contain exactly 76 items.");
+            Assert(legacySources.Length > 0, "Authoritative ChatEngine project has no compile inventory.");
+            Assert(legacySources.Distinct(StringComparer.OrdinalIgnoreCase).Count() == legacySources.Length,
+                "Authoritative ChatEngine project has duplicate or case-colliding compile identities.");
+            Assert(linuxSources.Distinct(StringComparer.OrdinalIgnoreCase).Count() == linuxSources.Length,
+                "Linux ChatEngine inventory has duplicate or case-colliding compile identities.");
+            // The checked-in Windows project is the authority; retain exact identity,
+            // casing, and order parity as the source set grows instead of pinning a count.
             VerifySequence(legacySources, linuxSources, "ChatEngine compile inventory");
             foreach (string source in linuxSources)
             {
@@ -537,7 +542,14 @@ namespace AORebirth.LinuxBuild.Contracts
             string propsPath = Path.Combine(root, "LinuxBuild", "source-inventory", "AORebirth.Database.ContentItems.props");
             XDocument props = LoadXml(RequireFile(propsPath, "Database SQL content inventory"));
             XElement[] contentItems = props.Descendants().Where(element => element.Name.LocalName == "Content").ToArray();
-            Assert(contentItems.Length == 35, "Database SQL content inventory must contain exactly 35 governed assets.");
+            string databaseProject = Path.Combine(root, "AORebirth", "Libraries", "Source", "AORebirth.Database", "AORebirth.Database.csproj");
+            string[] declared = LoadXml(databaseProject).Descendants().Where(e => e.Name.LocalName == "Content")
+                .Select(e => RequireAttribute(e, "Include").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            string[] packaged = contentItems.Select(e => GetChildValue(e, "Link").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            Assert(declared.SequenceEqual(packaged, StringComparer.Ordinal), "Database SQL inventory identity set differs from the authoritative project.");
+            string[] actual = Directory.GetFiles(Path.Combine(publish, "SqlTables"), "*.sql", SearchOption.AllDirectories)
+                .Select(p => "SqlTables/" + Path.GetRelativePath(Path.Combine(publish, "SqlTables"), p).Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            Assert(packaged.SequenceEqual(actual, StringComparer.Ordinal), "Published SQL identity set contains missing or unexpected assets.");
             Assert(
                 contentItems.Count(
                     content => string.Equals(
@@ -545,6 +557,13 @@ namespace AORebirth.LinuxBuild.Contracts
                         "SqlTables/charactersactivenanos_alter.sql",
                         StringComparison.Ordinal)) == 1,
                 "Database SQL content inventory must include the authoritative active-nano migration exactly once.");
+            Assert(
+                contentItems.Count(
+                    content => string.Equals(
+                        GetChildValue(content, "Link"),
+                        "SqlTables/item_instances.sql",
+                        StringComparison.Ordinal)) == 1,
+                "Database SQL content inventory must include the item-instance table asset exactly once.");
             foreach (XElement content in contentItems)
             {
                 string sourceRelative = NormalizeInventoryInclude(RequireAttribute(content, "Include"));

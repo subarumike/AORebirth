@@ -81,6 +81,8 @@ PF127_ORDINARY_PROFILE_OWNER_MARKERS: Mapping[str, Tuple[str, ...]] = {
     "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs": (
         "internal static CapturedEnemyCombatContract ForOrdinary(",
         "ForOrdinarySelectedAtomicGeneration(",
+    ),
+    "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs": (
         "internal CapturedEnemyCombatContract WithCaptureProvenRetaliationEligibility(",
     ),
     "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs": (
@@ -136,6 +138,22 @@ PF1931_PROFILE_OWNER_MARKERS: Mapping[str, Tuple[str, ...]] = {
         "CapturedEnemyCombatRuntime.Prepare(",
     ),
 }
+
+# These compiled source fragments were extracted without changing generated values,
+# actor activation or classification. Hash every physical dependency, not just the
+# Legacy facade that still owns the production selector entry points.
+CAPTURED_COMBAT_SHARED_SOURCE_INPUTS: Tuple[str, ...] = tuple(
+    "AORebirth/Server/ZoneEngine/Core/Playfields/" + name
+    for name in (
+        "CapturedEnemyCombatData.cs",
+        "CapturedEnemyCombatSequenceData.cs",
+        "CapturedEnemyCombatContract.Data.cs",
+        "CapturedEnemyCombatProfileData.cs",
+        "CapturedEnemyCombatProfileMatching.cs",
+        "CapturedEnemyCombatPacketFactory.Data.cs",
+        "OrdinaryEnemyCombatSetupGenerator.Data.cs",
+    )
+)
 
 SCARLETT_DALQUIST_SOURCE = (
     "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs"
@@ -3388,6 +3406,7 @@ def build_inventory(
         }
         | {row["path"] for row in pf127_ordinary_profile_owners}
         | {row["path"] for row in pf1931_profile_owners}
+        | set(CAPTURED_COMBAT_SHARED_SOURCE_INPUTS)
         | {
             row["path"]
             for row in runtime_prepare_entry_points

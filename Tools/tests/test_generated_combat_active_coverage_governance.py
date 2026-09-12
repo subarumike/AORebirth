@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from unittest import mock
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -31,23 +32,51 @@ class GeneratedCombatActiveCoverageGovernanceTests(unittest.TestCase):
     def setUpClass(cls):
         cls.generator = load_generator()
 
-    def test_icc_shuttleport_has_one_accepted_entry_and_active_remainder(self):
+    def test_pure_split_hashes_every_fragment_and_retains_owner_marker_guard(self):
+        expected_names = {
+            "CapturedEnemyCombatData.cs", "CapturedEnemyCombatSequenceData.cs",
+            "CapturedEnemyCombatContract.Data.cs", "CapturedEnemyCombatProfileData.cs",
+            "CapturedEnemyCombatProfileMatching.cs", "CapturedEnemyCombatPacketFactory.Data.cs",
+            "OrdinaryEnemyCombatSetupGenerator.Data.cs",
+        }
+        paths = set(self.generator.CAPTURED_COMBAT_SHARED_SOURCE_INPUTS)
+        self.assertEqual({Path(path).name for path in paths}, expected_names)
+        document = json.loads((REPO_ROOT / "docs/generated/capture_backed_npc_combat_active_coverage.json").read_text(encoding="utf-8"))
+        self.assertTrue(paths <= {row["path"] for row in document["contentInputs"]})
+        owners = self.generator.discover_pf127_ordinary_profile_owners(REPO_ROOT)
+        fragment = next(path for path in paths if path.endswith("CapturedEnemyCombatContract.Data.cs"))
+        self.assertIn(fragment, {owner["path"] for owner in owners})
+        read_source = self.generator.read_source
+
+        def without_required_marker(repo_root, relative):
+            source = read_source(repo_root, relative)
+            return source.replace("WithCaptureProvenRetaliationEligibility(", "MissingRetaliationContract(") if relative == fragment else source
+
+        with mock.patch.object(self.generator, "read_source", side_effect=without_required_marker):
+            with self.assertRaisesRegex(self.generator.CoverageError, "ownership changed"):
+                self.generator.discover_pf127_ordinary_profile_owners(REPO_ROOT)
+
+    def test_icc_shuttleport_has_eleven_accepted_reet_entries_and_active_remainder(self):
         governance = self.generator.discover_icc_shuttleport_entry_governance(
             REPO_ROOT
         )
 
         self.assertEqual(governance["playfield"], 4582)
-        self.assertEqual(governance["acceptedEntries"], 1)
+        # Already accepted in 6e90dda030774726aa2060acb9edb756ea1f635c;
+        # this source-split repair does not promote any additional actor.
+        self.assertEqual(governance["acceptedEntries"], 11)
         self.assertEqual(governance["activeEvidenceEntries"], 24)
         self.assertEqual(governance["blockedUnauditedEntries"], 0)
-        self.assertEqual(governance["entries"][0]["name"], "Island Reet")
-        self.assertEqual(
-            governance["entries"][0]["state"], "ACCEPTED_RUNTIME_CONTENT"
-        )
+        self.assertEqual(len(governance["entries"]), 35)
+        for ordinal, entry in enumerate(governance["entries"][:11]):
+            self.assertEqual(entry["ordinal"], ordinal)
+            self.assertEqual(entry["name"], "Island Reet")
+            self.assertEqual(entry["coverageKey"], "icc-shuttleport-island-reet-basic-combat")
+            self.assertEqual(entry["state"], "ACCEPTED_RUNTIME_CONTENT")
         self.assertTrue(
             all(
                 entry["state"] == "ACTIVE_EVIDENCE"
-                for entry in governance["entries"][1:]
+                for entry in governance["entries"][11:]
             )
         )
 
@@ -98,7 +127,7 @@ class GeneratedCombatActiveCoverageGovernanceTests(unittest.TestCase):
         }
         self.assertNotIn(self.generator.ICC_SHUTTLEPORT_SOURCE, content_input_paths)
         governance = document["iccShuttleportEntryGovernance"]
-        self.assertEqual(governance["acceptedEntries"], 1)
+        self.assertEqual(governance["acceptedEntries"], 11)
         self.assertEqual(governance["activeEvidenceEntries"], 24)
         self.assertEqual(governance["blockedUnauditedEntries"], 0)
 

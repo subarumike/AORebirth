@@ -221,6 +221,7 @@ api|type.method%7Cpublic instance special-name System.Void set_Level(System.Int3
 api|type.method%7Cpublic instance special-name System.Void set_MonsterScale(System.Int32 value)
 api|type.method%7Cpublic instance special-name System.Void set_Name(System.String value)
 api|type.method%7Cpublic instance special-name System.Void set_Profession(System.Int32 value)
+api|type.method%7Cpublic static System.Void InitializeMissionPersistence(AORebirth.Interfaces.Persistence.Missions.IMissionDao dao)
 api|type.end%7CLoginEngine.Packets.CharacterName
 api|type.begin%7CLoginEngine.Packets.CheckLogin
 api|type.kind%7Cclass
@@ -522,6 +523,7 @@ handler|LoginEngine.MessageHandlers.UserCredentialsHandler|SmokeLounge.AOtomatio
 handler|LoginEngine.MessageHandlers.UserLoginHandler|SmokeLounge.AOtomation.Messaging.Messages.SystemMessages.UserLoginMessage|export=IHandleMessage
 reference|AORebirth.Core|1.0.0.0|
 reference|AORebirth.Database|1.0.0.0|
+reference|AORebirth.Interfaces|1.0.0.0|
 reference|Cell.Core|0.5.0.0|
 reference|NBug|1.2.0.0|a4292a325f69b123
 reference|NLog|2.1.0.0|5120e14c03d0593c
@@ -550,7 +552,7 @@ runtime.wire|server-salt|52|bda0ee4813d47d06734c07724fa3168dc115085cf14effdf03f2
 runtime.wire|suggest-name|32|a7f6f5fe6fb4b8d0e9a224b884a1504087562415b47a28babc592abc41f57faa|398AAQABACAAAAABobLD1AAAAFYAClN0YWdlU2V2ZW4=
 runtime.wire|user-credentials|78|436e06f36441833d44ac71cd7d761d760f8d1e4f191108b23385413e98475b44|398AAQABAE4AAAABobLD1AAAACVTdGFnZTdVc2VyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADmZpeHR1cmUta2V5fD8K
 runtime.wire|user-login|84|d018c9c3007bd1e93671bdf1a854a02f4c93bbe6e7b3cae3238c92ea596c9c8f|398AAQABAFQAAAABobLD1AAAACIAAAACU3RhZ2U3VXNlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADE4LjguNTNfRVAxAAAAAAAAAAAA
-runtime.wire|zone-info|38|34b1776f77269988f9c7e4162a9f4edf869190182155974768aa885321619a7c|398AAQABACYAAAABobLD1AAAABcQIDBAfwAAAR1NESIzRFVmd4g=
+runtime.wire|zone-info|46|aa0d20a22dd08e0d17317ee0870dae65dbd68835519b684d16f1df678b4f3860|398AAQABAC4AAAABobLD1AAAABcQIDBAfwAAAR1NESIzRFVmd4gAAAAAAAAAAA==
 runtime.safe-handler|random-name|receiver=0x0000FFFF|shape=verified|exact-random-bytes=excluded
 runtime.authentication-security|debug-encryption=enabled|disabled-bypass=fail-closed|anonymous-create=reject-before-dao|anonymous-select=reject-before-dao|anonymous-delete=reject-before-dao|challenge-reset=verified|challenge-replay=rejected
 runtime.message-publisher-defense|same-sender=fifo|different-sender=concurrent|different-sender-overlap=2

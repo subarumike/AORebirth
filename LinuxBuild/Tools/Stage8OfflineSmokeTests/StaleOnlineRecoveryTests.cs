@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using ZoneEngine;
+using AORebirth.Interfaces.Persistence.Characters;
 
 namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 {
@@ -12,7 +13,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
         public static void Run(string repositoryRoot)
         {
             HealthyZeroRowsContinuesWithoutUpdate();
-            ZeroRowsWithLoginEngineActiveContinues();
+            LoginEngineGuardBlocksPendingHandoffWithoutOpeningDatabase();
+            OnlineOwnerProcessNamesAreRecognized();
             StaleRowsAreLoggedAndClearedExactly();
             ProcessGuardBlocksWithoutMutation();
             ListenerGuardBlocksWithoutMutation();
@@ -42,18 +44,37 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=YES"), "healthy startup was not allowed");
         }
 
-        private static void ZeroRowsWithLoginEngineActiveContinues()
+        private static void LoginEngineGuardBlocksPendingHandoffWithoutOpeningDatabase()
         {
-            var store = new FakeStore(new FakeCharacter[0]);
-            var runtime = new FakeRuntime(store) { LoginEngineActive = true };
+            foreach (bool pendingHandoff in new[] { false, true })
+            {
+                var store = new FakeStore(pendingHandoff
+                    ? new[] { new FakeCharacter(42, "PendingHandoff", 1) }
+                    : new FakeCharacter[0]);
+                var runtime = new FakeRuntime(store) { LoginEngineActive = true };
 
-            int result = StaleOnlineRecovery.Execute(runtime, 7501);
+                int result = StaleOnlineRecovery.Execute(runtime, 7501);
 
-            Require(runtime.LoginEngineActive, "LoginEngine-active fixture state was not established");
-            Require(result == 0, "LoginEngine-active zero-row recovery blocked ZoneEngine startup");
-            Require(store.ClearCalls == 0, "LoginEngine-active zero-row recovery performed an update");
-            Require(runtime.AuditContains("processDetected=NO"), "LoginEngine was misclassified as a competing ZoneEngine");
-            Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=YES"), "LoginEngine-active startup did not reach database validation");
+                Require(result != 0, "LoginEngine-active recovery did not fail closed");
+                Require(runtime.OpenStoreCalls == 0, "LoginEngine-active recovery opened the database");
+                Require(store.ClearCalls == 0, "LoginEngine-active recovery performed an update");
+                Require(!pendingHandoff || store.Characters[0].Online == 1, "pending login handoff lost online ownership");
+                Require(runtime.AuditContains("processDetected=YES"), "LoginEngine ownership guard was not logged");
+                Require(runtime.AuditContains("DATABASE_VALIDATION_ALLOWED=NO"), "LoginEngine-active recovery allowed validation");
+            }
+        }
+
+        private static void OnlineOwnerProcessNamesAreRecognized()
+        {
+            var runtimeType = typeof(StaleOnlineRecovery).Assembly.GetType("ZoneEngine.SystemStaleOnlineRecoveryRuntime", true);
+            var predicate = runtimeType.GetMethod("IsOnlineOwnerProcessName",
+                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            Require(predicate != null, "production process-name ownership predicate is missing");
+            foreach (string processName in new[] { "ZoneEngine", "LoginEngine", "loginengine", "LOGINENGINE" })
+            {
+                Require((bool)predicate.Invoke(null, new object[] { processName }), "online owner process was not guarded: " + processName);
+            }
+            Require(!(bool)predicate.Invoke(null, new object[] { "UnrelatedProcess" }), "unrelated process was treated as an online owner");
         }
 
         private static void StaleRowsAreLoggedAndClearedExactly()
@@ -291,7 +312,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 "LinuxBuild",
                 "deployment",
                 "systemd",
-                "ao-rebirth-zoneengine.service");
+                "ao-rebirth-zoneengine-legacy.service");
             string[] lines = File.ReadAllLines(unitPath);
             int recoveryIndex = Array.FindIndex(
                 lines,
@@ -346,7 +367,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
 
             public bool IsOtherZoneEngineProcessRunning()
             {
-                return this.ProcessDetected;
+                return this.ProcessDetected || this.LoginEngineActive;
             }
 
             public bool IsPortListening(int port)
@@ -359,7 +380,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 return new NoOpDisposable();
             }
 
-            public IStaleOnlineRecoveryStore OpenStore()
+            public ICharacterDao CreateCharacterDao()
             {
                 this.OpenStoreCalls++;
                 return this.store;
@@ -376,7 +397,8 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             }
         }
 
-        private sealed class FakeStore : IStaleOnlineRecoveryStore
+        // Orchestrator fixture only. SQL atomicity and ownership are checked against the real DAO separately.
+        private sealed class FakeStore : ICharacterDao
         {
             private readonly Dictionary<int, int> originalOnline;
             private bool clearAttempted;
@@ -406,7 +428,31 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 get { return "aorebirth_test"; }
             }
 
-            public IReadOnlyList<StaleOnlineRecoveryRow> ReadNonzeroRows()
+            public StaleOnlineRecoveryData RecoverStaleOnline(string expectedDatabase)
+            {
+                try
+                {
+                    if (expectedDatabase != this.DatabaseName) throw new InvalidDataException("database mismatch");
+                    var rows = this.ReadNonzeroRows();
+                    if (rows.Count == 0) return new StaleOnlineRecoveryData(this.DatabaseName, rows, 0, null);
+                    int updated = this.ClearRows(rows.Select(row => row.CharacterId).ToArray());
+                    long remaining = this.CountNonzeroRows();
+                    if (updated != rows.Count || remaining != 0) throw new InvalidDataException("recovery verification failed");
+                    this.Commit();
+                    return new StaleOnlineRecoveryData(this.DatabaseName, rows, updated, remaining);
+                }
+                finally { this.Dispose(); }
+            }
+
+            public CharacterDirectoryData LoadById(int id) { throw new NotSupportedException(); }
+            public CharacterDirectoryData LoadByName(string name) { throw new NotSupportedException(); }
+            public IList<CharacterDirectoryData> ListForAccount(string account) { throw new NotSupportedException(); }
+            public bool IsOwnedByAccount(string account, uint id) { throw new NotSupportedException(); }
+            public int MarkOnline(int id) { throw new NotSupportedException(); }
+            public int MarkOffline(int id) { throw new NotSupportedException(); }
+            public IList<CharacterDirectoryData> ListLoggedIn() { throw new NotSupportedException(); }
+
+            public IReadOnlyList<StaleOnlineCharacterData> ReadNonzeroRows()
             {
                 if (this.QueryFails)
                 {
@@ -416,7 +462,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
                 return this.Characters
                     .Where(character => character.Online != 0)
                     .OrderBy(character => character.Id)
-                    .Select(character => new StaleOnlineRecoveryRow(character.Id, character.Online))
+                    .Select(character => new StaleOnlineCharacterData(character.Id, character.Online))
                     .ToArray();
             }
 

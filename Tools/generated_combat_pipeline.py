@@ -1888,23 +1888,36 @@ def _build_item_template_projection(
     )
     output.parent.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="aor-scfu-projection-") as runtime_name:
+        runtime_root = Path(runtime_name)
         staged_analyzer = _stage_short_scfu_analyzer(
-            analyzer, Path(runtime_name)
+            analyzer, runtime_root
         )
+        # The legacy .NET projector cannot reliably open deeply nested private
+        # worktree snapshots. Stage the exact verified bytes beside its already
+        # short executable; neither descriptors nor item contents are changed.
+        item_payload = _read_verified_private_input(
+            item_database_path, expected_sha256=item_database_sha256,
+            expected_byte_length=item_database_byte_length, label="projector item database"
+        )
+        short_input = runtime_root / "i.dat"
+        short_output = runtime_root / "p.json"
+        _write_verified_private_input(short_input, item_payload, "short projector item database")
         completed = run_checked(
             (
                 str(staged_analyzer),
                 "--project-item-templates",
-                str(item_database_path),
+                str(short_input),
                 item_database_sha256,
                 str(item_database_byte_length),
                 ",".join(str(template_id) for template_id in template_ids),
-                str(output),
+                str(short_output),
             ),
             repo_root=repo_root,
             lease=lease,
             label="item-template projection",
         )
+        if short_output.is_file():
+            _write_verified_private_input(output, short_output.read_bytes(), "private item-template projection")
     if not output.is_file():
         detail = _bounded_process_detail(completed)
         suffix = f": {detail}" if detail else ""
@@ -1926,6 +1939,12 @@ def _build_item_template_projection(
     except OSError as error:
         raise PipelineError("item-template projection could not be replaced") from error
     _write_verified_private_input(output, payload, "item-template projection")
+    print(
+        "ITEM_TEMPLATE_PROJECTION_STAGING=PASS "
+        f"sourcePathChars={len(str(item_database_path))} "
+        f"stagedPathChars={len(str(short_input))} "
+        f"byteLength={len(item_payload)} sha256={sha256_bytes(item_payload)}"
+    )
     return payload, output
 
 
@@ -2145,6 +2164,45 @@ def _run_active_formula_fixed_point(
     )
 
 
+def _require_candidate_root(repo_root: Path, candidate_root: Path, lease: Any) -> None:
+    """Allow repository-local fixtures or this live writer's exact private staging tree.
+
+    Linked worktrees keep generated-artifact staging in the shared Git control
+    directory, outside the checkout. That is not permission to use arbitrary
+    external paths or another checkout's lease.
+    """
+    try:
+        candidate_root.relative_to(repo_root)
+        return
+    except ValueError:
+        pass
+    transaction = _load_transaction_module()
+    try:
+        if lease.repo_root.resolve(strict=True) != repo_root:
+            raise ValueError("candidate lease belongs to another checkout")
+        if lease._handle is None:
+            raise ValueError("candidate lease is no longer live")
+        owner = transaction.GeneratedArtifactLease.validate_delegation(
+            repo_root, lease.delegation(), required_mode="write"
+        )
+        if owner["domain"] != PIPELINE_NAME:
+            raise ValueError("candidate lease belongs to another artifact domain")
+        control = transaction._control_root(repo_root)
+        # Check lexical ancestors before resolving: resolving a replaced staging
+        # anchor would otherwise bless its foreign symlink/junction destination.
+        control, _ = transaction._contained(Path(control.anchor), control)
+        expected_staging = (
+            control / "staging" / transaction._domain_key(owner["domain"])
+            / owner["generationIdentity"]
+        )
+        staging, _ = transaction._contained(control, lease.staging_root)
+        if staging != expected_staging or not staging.is_dir():
+            raise ValueError("candidate staging does not match the live lease identity")
+        transaction._contained(staging, candidate_root)
+    except (AttributeError, OSError, ValueError, transaction.GeneratedArtifactError) as error:
+        raise PipelineError("candidate root must stay inside the repository or its live owned writer staging") from error
+
+
 def build_candidate_cohort(
     repo_root: Path,
     candidate_root: Path,
@@ -2156,10 +2214,7 @@ def build_candidate_cohort(
 ) -> CandidateCohort:
     repo_root = repo_root.resolve(strict=True)
     candidate_root = candidate_root.resolve(strict=True)
-    try:
-        candidate_root.relative_to(repo_root)
-    except ValueError as error:
-        raise PipelineError("candidate root must stay inside the repository") from error
+    _require_candidate_root(repo_root, candidate_root, lease)
 
     artifacts = _candidate_artifact_paths(candidate_root)
     generators_before = generator_descriptors(repo_root)
@@ -2396,10 +2451,7 @@ def build_accepted_candidate_cohort(
     """Regenerate every derived artifact from promoted repository state."""
     repo_root = repo_root.resolve(strict=True)
     candidate_root = candidate_root.resolve(strict=True)
-    try:
-        candidate_root.relative_to(repo_root)
-    except ValueError as error:
-        raise PipelineError("candidate root must stay inside the repository") from error
+    _require_candidate_root(repo_root, candidate_root, lease)
 
     artifacts = _candidate_artifact_paths(candidate_root)
     generators_before = generator_descriptors(repo_root)

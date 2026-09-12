@@ -4,7 +4,7 @@ namespace ZoneEngine_New.Core.Inventory.Dat
     using System.Collections.Generic;
     using System.IO;
 
-    using Ionic.Zlib;
+    using System.IO.Compression;
 
     using MsgPack.Serialization;
 
@@ -35,7 +35,7 @@ namespace ZoneEngine_New.Core.Inventory.Dat
                     throw new EndOfStreamException("Unexpected EOF reading items.dat slice " + (i + 1));
 
                 using MemoryStream compressed = new MemoryStream(buffer);
-                using ZlibStream zlib = new ZlibStream(compressed, CompressionMode.Decompress);
+                using ZLibStream zlib = new ZLibStream(compressed, CompressionMode.Decompress);
                 using MemoryStream unpacked = new MemoryStream();
                 zlib.CopyTo(unpacked);
                 unpacked.Position = 0;

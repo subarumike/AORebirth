@@ -747,10 +747,43 @@ namespace AORebirth.LinuxBuild.Contracts
             string ownershipGuardPath = RequireFile(
                 Path.Combine(root, "AORebirth", "Libraries", "Source", "AORebirth.Database", "Dao", "CharacterOnlineOwnershipGuard.cs"),
                 "session ownership guard source");
+            string linuxProgramPath = RequireFile(
+                Path.Combine(root, "LinuxBuild", "Compatibility", "LoginEngine", "LinuxProgram.cs"),
+                "LoginEngine Linux program source");
             string unit = File.ReadAllText(unitPath);
             string zoneUnit = File.ReadAllText(zoneUnitPath);
             string environment = File.ReadAllText(environmentPath);
             string ownershipGuard = File.ReadAllText(ownershipGuardPath);
+            string linuxProgram = File.ReadAllText(linuxProgramPath);
+            int allowlistStart = linuxProgram.IndexOf(
+                "private static readonly string[] AllowedExtensionTables",
+                StringComparison.Ordinal);
+            int allowlistEnd = allowlistStart < 0
+                ? -1
+                : linuxProgram.IndexOf("};", allowlistStart, StringComparison.Ordinal);
+            Assert(allowlistStart >= 0 && allowlistEnd > allowlistStart,
+                "LoginEngine Linux database extension allowlist is missing.");
+            string extensionAllowlist = linuxProgram.Substring(
+                allowlistStart,
+                allowlistEnd - allowlistStart);
+            foreach (string tableName in new[]
+            {
+                "generatedmissionartifacts",
+                "generatedmissionbatches",
+                "generatedmissionbindings",
+                "generatedmissionobjects",
+                "generatedmissionobservations",
+                "generatedmissionoffers",
+                "generatedmissionsequences",
+                "item_instance_id_sequence",
+                "item_instances",
+                "schema_migrations"
+            })
+            {
+                Assert(
+                    extensionAllowlist.IndexOf("\"" + tableName + "\"", StringComparison.Ordinal) >= 0,
+                    "LoginEngine Linux database extension allowlist omits current NewEngine table " + tableName + ".");
+            }
             VerifyExactActiveLine(
                 unit,
                 "Environment=AO_REBIRTH_EXPECTED_DATABASE=aorebirth_chatengine_stage6",
@@ -898,7 +931,17 @@ namespace AORebirth.LinuxBuild.Contracts
             string inventoryPath = RequireFile(Path.Combine(root, "LinuxBuild", "source-inventory", "AORebirth.Database.ContentItems.props"), "Database SQL content inventory");
             XDocument inventory = LoadXml(inventoryPath);
             XElement[] content = inventory.Descendants().Where(element => element.Name.LocalName == "Content").ToArray();
-            Assert(content.Length == 35, "Database SQL content inventory must contain exactly 35 governed assets.");
+            string databaseProject = Path.Combine(root, "AORebirth", "Libraries", "Source", "AORebirth.Database", "AORebirth.Database.csproj");
+            string[] declared = LoadXml(databaseProject).Descendants().Where(e => e.Name.LocalName == "Content")
+                .Select(e => RequireAttribute(e, "Include").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            string[] packaged = content.Select(e => RequireAttribute(e, "Link").Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            Assert(declared.SequenceEqual(packaged, StringComparer.Ordinal), "Database SQL inventory identity set differs from the authoritative project.");
+            string sqlRoot = Path.GetFullPath(Path.Combine(publish, "SqlTables"));
+            // GetFiles is rooted here, so removing this exact prefix retains nested
+            // identities/casing without the net10-only Path.GetRelativePath API.
+            string[] actual = Directory.GetFiles(sqlRoot, "*.sql", SearchOption.AllDirectories)
+                .Select(p => "SqlTables/" + p.Substring(sqlRoot.Length + 1).Replace('\\', '/')).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            Assert(packaged.SequenceEqual(actual, StringComparer.Ordinal), "Published SQL identity set contains missing or unexpected assets.");
             Assert(
                 content.Count(
                     item => string.Equals(
@@ -906,6 +949,13 @@ namespace AORebirth.LinuxBuild.Contracts
                         "SqlTables/charactersactivenanos_alter.sql",
                         StringComparison.Ordinal)) == 1,
                 "Database SQL content inventory must include the authoritative active-nano migration exactly once.");
+            Assert(
+                content.Count(
+                    item => string.Equals(
+                        RequireAttribute(item, "Link"),
+                        "SqlTables/item_instances.sql",
+                        StringComparison.Ordinal)) == 1,
+                "Database SQL content inventory must include the item-instance table asset exactly once.");
             foreach (XElement item in content)
             {
                 string source = NormalizeInventoryInclude(RequireAttribute(item, "Include"));

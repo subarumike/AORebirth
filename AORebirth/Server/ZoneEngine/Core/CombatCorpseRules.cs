@@ -539,22 +539,12 @@ namespace ZoneEngine.Core
                 { 209354, 209288 }, // Weaver of Malice
                 { 209136, 208955 }, // Burning Shadow
                 { 209125, 208955 }, // Icy Shadow
-                // L7 gold 20260725-002423 / Find Person 20260725-185432 mission trash corpses.
-                { 26159, 17909 },
-                { 26139, 5914 },
-                { 26155, 23370 },
-                { 26137, 5934 },
-                { 26076, 17530 },
-                { 26101, 23366 },
-                { 26088, 17534 },
-                { 26103, 23366 },
-                { 26135, 5934 },
-                { 26074, 23366 },
-                { 26090, 5934 },
-                { 26092, 17530 },
-                { 26097, 23366 },
-                { 26123, 17530 }
             };
+
+            foreach (KeyValuePair<int, int> mapping in Packets.GeneratedMissionCorpseWire.MissionCatMeshMappings())
+            {
+                map[mapping.Key] = mapping.Value;
+            }
 
             foreach (KeyValuePair<int, int> mapping in CombatTestMobArchetype.CorpseVisualMappings())
             {

@@ -22,7 +22,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
     /// Outdoor cell tick cadence by heat tier. Indoor and disabled-heat paths tick every dynel every heartbeat.
     /// Warm/Cold pass accumulated wall-clock delta since the cell's last successful tick.
     /// Cells default Asleep until Hot/Warm (player proximity or forced hot); Cold is only the
-    /// post-Hot/Warm cooldown before sleep. Heat candidates = occupied ∪ spawn-bearing ∪ cells
+    /// post-Hot/Warm cooldown before sleep, except living vendor cells which stay Cold.
+    /// Heat candidates = occupied ∪ spawn-bearing ∪ cells
     /// within Warm range of connected players (so empty neighbor heat transitions are tracked).
     /// </summary>
     internal sealed class CellHeatScheduler
@@ -36,6 +37,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly HashSet<int> _spawnCellIds = new();
         private readonly List<int> _playerCells = new();
         private readonly HashSet<int> _forcedHotCells = new();
+        private readonly HashSet<int> _vendorCells = new();
         private readonly List<int> _heatCellBuffer = new();
         private readonly List<int> _neighborBuffer = new();
         private readonly List<Dynel> _tickDynelBuffer = new();
@@ -98,6 +100,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             _playerCells.Clear();
             _forcedHotCells.Clear();
+            _vendorCells.Clear();
 
             HashSet<int> connectedPlayerInstances = new();
 
@@ -117,6 +120,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
                 if (IsCombatHot(dynel) || IsPetPinnedToConnectedPlayer(dynel, connectedPlayerInstances))
                     _forcedHotCells.Add(dynel.Cell.Id);
+                if (dynel is VendingMachine || dynel is NpcCharacter { Shop: not null, IsDead: false })
+                    _vendorCells.Add(dynel.Cell.Id);
             }
         }
 
@@ -257,6 +262,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             if (minDistance <= _policy.WarmNeighborLevel)
                 return CellHeat.Warm;
 
+            if (_vendorCells.Contains(cellId)) return CellHeat.Cold;
+
             // No cooling timer → never woken (or fully slept) → Asleep. Cold only while cooling.
             if (!_coldSinceUtcByCell.TryGetValue(cellId, out DateTime coldSince))
                 return CellHeat.Asleep;
@@ -340,6 +347,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             if (dynel.Stats.GetOrZero(CharacterStat.Health) <= 0)
                 return false;
+
+            if (dynel is Character { IsDead: false } character && character.FightingTarget.Instance != 0)
+                return true;
 
             int selectedTarget = dynel.Stats.Get(CharacterStat.SelectedTarget);
             return !StatCollection.IsUnset(selectedTarget) && selectedTarget != 0;

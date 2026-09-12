@@ -355,7 +355,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             {
                 // No return recorded means the character never walked in through a proxy, so there
                 // is nowhere to send them; legacy declines the same way rather than guessing.
-                if (!returnTo.IsSet)
+                if (!returnTo.IsSet || !MatchesRecordedEntrance(returnTo, hit.Volume.DynelInstance))
                     return false;
 
                 if (PortalDoorLandingResolver.TryResolveDoorLanding(
@@ -379,6 +379,23 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 return false;
             }
 
+            return false;
+        }
+
+        bool MatchesRecordedEntrance(ProxyReturn returnTo, int interiorDoor)
+        {
+            var doors = _gameData.GetPlayfieldGeometry(returnTo.PlayfieldId).Dynels?.Dynels;
+            if (doors == null) return false;
+            foreach (PlayfieldDynel door in doors)
+            {
+                if (door.IdentityType != (int)IdentityType.Door || door.IdentityInstance != returnTo.DoorInstance)
+                    continue;
+                // The global index also sees raw routes with no DAO override. Those may name
+                // a different room's door; they cannot redirect this character's recorded entry.
+                return PortalDoorLandingResolver.TryReadPortal(door, out var portal)
+                    && portal.RecordsReturn && portal.Kind == PortalLandingKind.DoorDynel
+                    && portal.PlayfieldId == _playfieldId && portal.DoorInstance == interiorDoor;
+            }
             return false;
         }
 

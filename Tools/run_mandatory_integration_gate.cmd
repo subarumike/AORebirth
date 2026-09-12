@@ -37,6 +37,7 @@ for %%F in (
     "tools\run_temple_acceptance_tests.cmd"
     "tools\generate_mission_level_graph.cmd"
     "tools\build_aorebirth_debug.cmd"
+    "tools\run_zoneengine_new_tests.cmd"
 ) do (
     if not exist "%%~F" (
         echo [AORebirth Gate] FAIL - required file is missing: %%~F
@@ -58,6 +59,8 @@ echo [AORebirth Gate] PASS 1/12 secret scan
 set "CURRENT_STAGE=2/12 engine management safety contracts"
 echo [AORebirth Gate] START %CURRENT_STAGE%
 call tools\run_engine_management_tests.cmd --skip-web-engine-security
+if errorlevel 1 goto :stage_fail
+dotnet run --project LinuxBuild\Tools\BackendIntegrationGuard\BackendIntegrationGuard.csproj --configuration Release -- --repository-root . --self-test
 if errorlevel 1 goto :stage_fail
 echo [AORebirth Gate] PASS 2/12 engine management safety contracts
 
@@ -105,11 +108,13 @@ git lfs fsck
 if errorlevel 1 goto :stage_fail
 echo [AORebirth Gate] PASS 9/12 Git LFS integrity
 
-set "CURRENT_STAGE=10/12 debug server build"
+set "CURRENT_STAGE=10/12 default ZoneEngine_New build and offline acceptance"
 echo [AORebirth Gate] START %CURRENT_STAGE%
 call tools\build_aorebirth_debug.cmd
 if errorlevel 1 goto :stage_fail
-echo [AORebirth Gate] PASS 10/12 debug server build
+call tools\run_zoneengine_new_tests.cmd
+if errorlevel 1 goto :stage_fail
+echo [AORebirth Gate] PASS 10/12 default ZoneEngine_New build and offline acceptance
 
 set "CURRENT_STAGE=11/12 offline PHP/WebCore compatibility"
 echo [AORebirth Gate] START %CURRENT_STAGE%

@@ -1,5 +1,6 @@
 [Unit]
-Description=AORebirth ZoneEngine
+Description=AORebirth ZoneEngine_New authoritative backend
+Conflicts=ao-rebirth-zoneengine-legacy.service
 Wants=network-online.target
 After=network-online.target ao-rebirth-chatengine.service ao-rebirth-loginengine.service
 
@@ -26,10 +27,9 @@ ExecStartPre=/usr/bin/test -r /var/lib/ao-rebirth/session-ownership
 ExecStartPre=/usr/bin/test -w /var/lib/ao-rebirth/session-ownership
 ExecStartPre=/usr/bin/test -x /var/lib/ao-rebirth/session-ownership
 ExecStartPre=/usr/bin/rm -f /run/ao-rebirth-zoneengine/shutdown
-ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-startup
-ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --recover-stale-online --recovery-lock-file /run/ao-rebirth-zoneengine/stale-online-recovery.lock
-ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine --validate-database
-ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown
+ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --validate-startup
+ExecStartPre=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --validate-database
+ExecStart=/opt/ao-rebirth/zoneengine/current/ZoneEngine_New --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown
 ExecStop=/usr/bin/touch /run/ao-rebirth-zoneengine/shutdown
 Restart=on-failure
 RestartSec=5s

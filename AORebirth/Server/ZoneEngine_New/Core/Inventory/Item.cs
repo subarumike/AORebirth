@@ -36,6 +36,26 @@ namespace ZoneEngine_New.Core.Inventory
 
         public Identity Identity { get; set; }
 
+        /// <summary>
+        /// Assign a fresh allocation to an unowned item, including its wire occupancy
+        /// identity. Allocation is not persistence; the existing transaction owns that.
+        /// </summary>
+        public void AssignInstanceId(int instanceId)
+        {
+            if (instanceId <= 0) throw new ArgumentOutOfRangeException(nameof(instanceId));
+            if (InstanceId != 0 || IsPersisted || Identity.Instance != 0)
+                throw new InvalidOperationException("Only an unallocated, unpersisted item may receive a fresh identity.");
+            IdentityType type = Identity.Type;
+            if (type == IdentityType.None)
+                type = (IdentityType)(Definition.DynelType != 0 ? Definition.DynelType : Definition.ItemType);
+            InstanceId = instanceId;
+            // Preserve the existing zero-type representation; do not synthesize a
+            // dynel type for ordinary catalog items that carry no world identity.
+            if (type != IdentityType.None)
+                Identity = new Identity { Type = type, Instance = instanceId };
+            ApplyContainerIdentityIfBag();
+        }
+
         public int LowId { get; init; }
 
         public int HighId { get; init; }
@@ -113,6 +133,15 @@ namespace ZoneEngine_New.Core.Inventory
             if (Locked)
                 return false;
 
+            if (Missions.AuthoredQuestService.IsAuthoredItem(this))
+                return player.Playfield.GetRequiredService<Missions.AuthoredQuestService>().TryUseItem(player, slotIdentity, this);
+
+            if (LowId == 301782 || HighId == 301782)
+                return player.Playfield.GetRequiredService<InventoryActionService>().TryOpenQuabbit(player, slotIdentity, this);
+
+            if (InventoryActionService.IsVitalItem(this))
+                return player.Playfield.GetRequiredService<InventoryActionService>().TryUseVitalItem(player, slotIdentity, this);
+
             if (Identity.Type == IdentityType.Container && Identity.Instance != 0 && Can(CanFlags.Use))
             {
                 if (TryUseBackpack(player, slotIdentity, inventoryRepository, items))
@@ -121,9 +150,11 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (!Can(CanFlags.Use))
                 return false;
-
-            Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
-            return true;
+            if (!Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))
+                return false;
+            if (Can(CanFlags.Consume) && !InventoryActionService.IsPermanentGardenKey(this))
+                return player.Playfield.GetRequiredService<InventoryActionService>().TryUseNanoCrystal(player, slotIdentity, this);
+            return Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
         }
 
         bool TryUseBackpack(

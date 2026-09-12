@@ -29,16 +29,19 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".tp <x> <z> <playfieldId>";
+        public string Usage => ".tp <x> <z> <playfieldId> or .tp <x> <y> <z> <playfieldId>";
 
         public void Execute(GmCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
 
+            bool hasExplicitY = context.Args.Length >= 4;
+            int zIndex = hasExplicitY ? 2 : 1;
+            int playfieldIndex = hasExplicitY ? 3 : 2;
             if (context.Args.Length < 3
                 || !float.TryParse(context.Args[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float x)
-                || !float.TryParse(context.Args[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float z)
-                || !int.TryParse(context.Args[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int playfieldId))
+                || !float.TryParse(context.Args[zIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out float z)
+                || !int.TryParse(context.Args[playfieldIndex], NumberStyles.Integer, CultureInfo.InvariantCulture, out int playfieldId))
             {
                 GmCommandFeedback.Send(context.Session, context.Player, "Usage: " + Usage);
                 return;
@@ -53,6 +56,12 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             float y = subject.Position.yf;
+            if (hasExplicitY
+                && !float.TryParse(context.Args[1], NumberStyles.Float, CultureInfo.InvariantCulture, out y))
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, "Usage: " + Usage);
+                return;
+            }
             Vector3 landing = new Vector3(x, y, z);
             string who = ReferenceEquals(subject, context.Player)
                 ? "self"

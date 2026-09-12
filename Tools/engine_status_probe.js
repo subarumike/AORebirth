@@ -59,6 +59,9 @@
         if (key === "zoneengine") {
             return "ZoneEngine";
         }
+        if (key === "zoneengine_new") {
+            return "ZoneEngine_New";
+        }
         if (key === "webengine") {
             return "WebEngine";
         }
@@ -118,6 +121,7 @@
             prestartEngine: null,
             requiredEngine: null,
             selfTest: false,
+            legacyZoneEngine: false,
             expectedPids: {}
         };
 
@@ -149,6 +153,9 @@
             }
             else if (argument === "--core") {
                 selectMode("core");
+            }
+            else if (argument === "--legacy-zoneengine" || argument === "-LegacyZoneEngine") {
+                options.legacyZoneEngine = true;
             }
             else if (argument === "--web-required" || argument === "--web-only") {
                 selectMode("web");
@@ -236,13 +243,13 @@
         };
     }
 
-    function createDefinitions(engineDirectory, ports) {
+    function createDefinitions(engineDirectory, ports, legacyZoneEngine) {
         var root = getFileSystem().GetAbsolutePathName(engineDirectory);
 
         function definition(key, executable, enginePorts, required) {
             return {
                 key: key,
-                executable: executable,
+                executable: getFileSystem().GetFileName(executable),
                 expectedPath: getFileSystem().BuildPath(root, executable),
                 normalizedExpectedPath: normalizePath(getFileSystem().BuildPath(root, executable)),
                 ports: enginePorts,
@@ -253,7 +260,9 @@
         var definitions = [
             definition("ChatEngine", "ChatEngine.exe", [ports.communication, ports.chat], true),
             definition("LoginEngine", "LoginEngine.exe", [ports.login], true),
-            definition("ZoneEngine", "ZoneEngine.exe", [ports.zone], true),
+            legacyZoneEngine
+                ? definition("ZoneEngine", "ZoneEngine.exe", [ports.zone], true)
+                : definition("ZoneEngine_New", "ZoneEngine_New\\ZoneEngine_New.exe", [ports.zone], true),
             definition("WebEngine", "WebEngine.exe", [ports.web], false)
         ];
 
@@ -673,7 +682,7 @@
     function testDefinitions() {
         return createDefinitions(
             "C:\\AORebirth\\AORebirth\\Built\\Debug",
-            { communication: 6996, chat: 7012, login: 7500, zone: 7501, web: 8181 });
+            { communication: 6996, chat: 7012, login: 7500, zone: 7501, web: 8181 }, true);
     }
 
     function healthySnapshot(includeWeb) {
@@ -995,6 +1004,24 @@
         passed++;
         WScript.Echo("[AORebirth Status Test] PASS case=prestart-conflict");
 
+        definitions = createDefinitions(
+            "C:\\AORebirth\\AORebirth\\Built\\Debug",
+            { communication: 6996, chat: 7012, login: 7500, zone: 7501, web: 8181 });
+        if (definitions[2].key !== "ZoneEngine_New"
+            || definitions[2].executable !== "ZoneEngine_New.exe") {
+            throw new Error("Normal backend selection must use ZoneEngine_New.");
+        }
+        var newSnapshot = healthySnapshot(false);
+        newSnapshot.processes[2].name = "ZoneEngine_New.exe";
+        newSnapshot.processes[2].path = "C:\\AORebirth\\AORebirth\\Built\\Debug\\ZoneEngine_New\\ZoneEngine_New.exe";
+        verify("default-new-backend-exact-ownership", true, newSnapshot, defaultTestOptions(), null);
+        verify("legacy-does-not-satisfy-default-backend", false, healthySnapshot(false), defaultTestOptions(), "expected-process-absent");
+        newSnapshot.processes[2].path = "C:\\Other\\ZoneEngine_New.exe";
+        verify("new-backend-wrong-path-rejected", false, newSnapshot, defaultTestOptions(), null);
+        if (!parseArguments(["--legacy-zoneengine"]).legacyZoneEngine) {
+            throw new Error("Explicit rollback selection was not recognized.");
+        }
+
         WScript.Echo("[AORebirth Status Test] PASS - " + passed + "/" + total + " deterministic cases.");
     }
 
@@ -1016,7 +1043,9 @@
         }
 
         var ports = loadConfigurationPorts(options.configPath);
-        var definitions = createDefinitions(options.engineDirectory, ports);
+        var legacySelection = options.legacyZoneEngine
+            || options.prestartEngine === "ZoneEngine" || options.requiredEngine === "ZoneEngine";
+        var definitions = createDefinitions(options.engineDirectory, ports, legacySelection);
         var snapshot = captureWindowsSnapshot();
 
         if (options.mode === "prestart") {

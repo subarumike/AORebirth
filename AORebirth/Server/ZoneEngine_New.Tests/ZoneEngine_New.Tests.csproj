@@ -15,5 +15,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ZoneEngine_New\ZoneEngine_New.csproj" />
+    <ProjectReference Include="../../../Tools/DatabaseMigrationTool/DatabaseMigrationTool.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../ChatEngine/CoreServer/ChatSessionOwnership.cs" Link="ChatSessionOwnership.cs" />
   </ItemGroup>
 </Project>

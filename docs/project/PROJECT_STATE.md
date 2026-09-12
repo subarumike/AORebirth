@@ -1,6 +1,6 @@
 # AORebirth Project State
 
-Updated: 2026-09-01
+Updated: 2026-09-11
 
 This file is the concise current source of truth. The pre-cleanup long-form
 state is preserved at
@@ -9,13 +9,96 @@ completion matrices and dated evidence retain detailed provenance.
 
 ## Acceptance baseline
 
-- Delmus's nine `origin/zoneengine` commits through `4a5e86e2` are reconciled
-  with the current master line as development-only ZoneEngine_New work. Legacy
-  ZoneEngine remains the production/default route. Both engine builds, the
-  47-test ZoneEngine_New suite, the 1,127-test AOtomation suite, and all 12
-  mandatory repository gates pass. The additive item-instance migrations are
-  tracked but unapplied; no database, Linux production, or live-client action
-  was performed as part of reconciliation.
+- Character/inventory DAO and retail hydration reconciliation: committed source `032ee4cd39433bbe124217a745474573e720e820` passes all offline gates (544 NewEngine, 1129 messaging, 12 mandatory). Local Linux staging is prepared. EP1 retail login, world entry, PF655 -> PF1136 -> PF655 and logout/relogin now pass. Direct inbound CharInPlay capture and post-service-restart retail acceptance remain unverified. Production cutover remains unapproved. See `docs/reports/NEWENGINE_CHARACTER_HYDRATION_RECEIPT.json`.
+
+- Isolated DAO integration candidate: the five-commit account/character/mission
+  stack is integrated at foundation checkpoint `a8daaa5e`. Supported account,
+  character directory and online-state consumers are wired, including guarded
+  stale recovery and Chat disconnect ownership. Fresh connected lifecycle tests
+  preserve the complete character row, 40 stat rows and four seeded item rows.
+  Source `c47f463d375664d2d7594451b0b8204d9eac6f27` passes exact Windows
+  acceptance (all 12 mandatory stages, 534 NewEngine and 1,129 messaging tests),
+  final connected/schema/restart validation and Linux publication. Account,
+  character and full/isolated mission DAO suites pass. Linux-host and official
+  client acceptance for this integration are NOT RUN. Receipts are recorded in
+  `docs/reports/DAO_STACK_CUTOVER_INTEGRATION.md`. No merge back, push, deployment,
+  schema change or new character/stat/inventory saving system is included.
+
+- NewEngine interior-door diagnosis: raw RDB destinations bypassed existing
+  teleports DAO overrides, causing Fair Trade to land in Nano Programs and
+  registering exits on the wrong interior doors. The candidate now loads a
+  read-only DAO routing snapshot before portal/exit baking and checks each return
+  against the player's recorded entrance. Live client acceptance is pending;
+  see `docs/reports/NEWENGINE_INTERIOR_DOOR_ROUTING.md`.
+
+- Mike's `codex/newengine-production-cutover-001` integrates the full reconciled
+  history through `4dac603b` without editing the developer branch or master.
+  NewEngine is the candidate default; Legacy remains explicitly selectable.
+  Cutover policy now permits incomplete gameplay while requiring operational and
+  durable-state integrity. Generic item effects without a transaction owner now
+  reject durable mutations before any effect. Disposable MySQL and authenticated
+  connected inventory/nano/morph/mission reload across a distinct-process restart
+  now pass. The reproduced unauthenticated direct-zone admission is repaired.
+  Source `75a78a88` passes all 505 NewEngine tests, 1129 messaging tests, all 12
+  mandatory gates, Windows acceptance and Linux publication. Connected
+  authentication, admission, negative/concurrent/restart checks and durable-state
+  reload also pass. Official retail capture and static client evidence now prove
+  the 26-byte ZoneInfo body, first-zone and redirect cookie reuse, and redirect
+  connection order. The server emits the complete wire shape and arms a durable,
+  endpoint-bound, expiring, one-use redirect claim immediately before transfer.
+  PlayerID semantics, official-client execution against AORebirth and deployed
+  Linux execution remain unclaimed. Cutover evidence and dependency/DAO
+  inventories live in `docs/reports/NEWENGINE_CUTOVER_HANDOFF.md`. This is not
+  production acceptance.
+
+- The follow-on `codex/zoneengine-final-runtime-consumers` candidate starts at
+  `44fa42fc`. Its deterministic source ledger reconstructs exactly 489 ordinary
+  bindings (322 Subway / 167 Temple), without falsely reporting them connected.
+  Exact Mongo 100198/100194 uses the existing nano transaction and explicit combat
+  NPC eligibility. Mike approved preserved saved appearance for legacy morph
+  records: recognized effects may restore over that baseline without guessing an
+  original look or bypassing new-cast requirements. Precommit Windows passes
+  479/479 NewEngine tests, 1129/1129 AOtomation tests, all 12 mandatory stages
+  and disposable migration/rollback/restart. Exact committed Windows/Linux
+  receipts are separate from these precommit results. Ordinary consumers,
+  27 dialogue routes and N02/N07/N08/N10 remain master blockers. Production and
+  primary master are unchanged. See
+  `docs/evidence/ZONEENGINE_NEW_RUNTIME_CONSUMER_CHECKPOINT.md`.
+- Dedicated `codex/zoneengine-final-delmus-reconciliation` preserves e31142e8 and
+  explicitly reconciles all 77 files introduced by the parallel Delmus d2d98446
+  revision. Narrow rewrites repair reconnect, fresh-item identities, category
+  compatibility and locality scheduling. The exact Buckethead summon/vendor
+  adapter closes N06; five definite nano review units, the accepted Subway/Temple
+  ordinary consumers and 27 dialogue routes remain unresolved. No generic NPC AI,
+  stat-band fallback, parallel nano persistence authority or production change is
+  imported. Broader forensic census completion is not itself a master gate.
+  See `docs/evidence/DELMUS_D2D98446_RUNTIME_RECONCILIATION.md` for dispositions,
+  exact remaining contracts and candidate validation boundaries.
+- The approved gameplay reconciliation branch extends the accepted `05c8d4ef`
+  checkpoint with 22 exact social/vendor NPC adapters, three standalone shops,
+  two Arete quest props and 16 activated dialogue domains. Stan/Sarah hand-ins,
+  captured shops, Sparrow/trickle, team warps, owned-bank mission cleanup and
+  repeated corpse UI retain the existing transaction/ownership boundaries.
+  The broader accepted NPC/ordinary-runtime consumers, 27 specialized dialogue
+  routes, remaining supported nano graphs and general corpse presentation still
+  prevent a master-switch claim. The exhaustive NPC ledger is explicitly incomplete;
+  overlapping evidence views are not added together or called missing data.
+  Current source/parity and validation records are linked from
+  `docs/evidence/ZONEENGINE_NEW_GAP_CLOSURE_20260908.md`; the preceding 308-test
+  checkpoint remains historical evidence, not approval of this changed source.
+  Occupied Legacy sidecar conversion is a separate production-transition prerequisite,
+  not a requirement for theoretical retail completeness. Master, production and
+  the live client remain untouched by this reconciliation.
+- The full-integration candidate builds on Delmus reconciliation
+  `307e87670f9d26b50b1ed26e019684726600c52c`. Its normal Windows/Linux wrappers
+  select `ZoneEngine_New`; Legacy requires explicit rollback selection.
+  Schema startup authority is removed and an acknowledged operator migration
+  tool is provided. The offline world package is pinned and validated. This is
+  not a production-accepted release: missing external gameplay routes and
+  unbridged accepted NPC profiles still block master promotion.
+  Historical build-only acceptance does not establish NewEngine gameplay parity.
+  Production remains unchanged. See
+  `docs/evidence/ZONEENGINE_NEW_FULL_INTEGRATION_20260908.md`.
 - DAO refactor Phase 1 infrastructure and the Phase 2 mission-persistence source
   slice are implemented without schema, packet, or gameplay changes. Mission
   runtime, roll-fee persistence, start-area selection, and mission account-key

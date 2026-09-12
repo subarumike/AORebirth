@@ -4,10 +4,17 @@ namespace ZoneEngine_New
     using System.IO;
     using System.Text;
     using System.Threading;
+    using System.Runtime.InteropServices;
+
+    using AORebirth.Database.Schema;
+    using AORebirth.Database.Domain.Missions;
+    using AORebirth.Interfaces.Persistence.Missions;
+    using AORebirth.Core.Playfields.OfficialPlacements;
 
     using Microsoft.Extensions.DependencyInjection;
 
     using NLog;
+    using MySqlConnector;
 
     using Utility;
 
@@ -21,10 +28,14 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.MessageHandlers;
     using ZoneEngine_New.Core.Metrics;
+    using ZoneEngine_New.Core.Missions;
+    using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.Teams;
 
     using ConfigReadWrite = Utility.Config.ConfigReadWrite;
 
@@ -36,43 +47,54 @@ namespace ZoneEngine_New
         private static PlayfieldManager? playfieldManager;
         private static IChatEngineLink? chatEngineLink;
         private static int shutdownStarted;
+        private static bool shutdownFailed;
 
-        private static void Main(string[] args)
+        private static int Main(string[] args)
         {
             // AODB playfield RDB parsers read strings with Windows-1252.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
+            using PosixSignalRegistration? termination = OperatingSystem.IsWindows() ? null :
+                PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
+                {
+                    context.Cancel = true;
+                    exited = true;
+                });
             Console.CancelKeyPress += ConsoleCancelKeyPress;
-
-            OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
-            Console.WriteLine();
-
-            // Match legacy ZoneEngine: keep console foreground green for the session.
-            Colouring.Push(ConsoleColor.Green);
-            Console.WriteLine("ZoneEngine_New (root DI + PlayfieldManager + ZoneLogin)");
-
-            if (!InitializeLogging())
-            {
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Failed to initialize logging.");
-                Colouring.Pop();
-                Console.WriteLine("Press enter to exit");
-                Console.ReadLine();
-                return;
-            }
-
-            if (!DatabaseMigrationRunner.TryApplyPendingMigrations())
-            {
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Startup aborted due to database migration failure.");
-                Colouring.Pop();
-                Console.WriteLine("Press enter to exit");
-                Console.ReadLine();
-                return;
-            }
-
             try
             {
+                RuntimeStartup.ValidateArguments(args);
+                RedirectConsoleLog(args, "/stdout-log", "--stdout-log", false);
+                RedirectConsoleLog(args, "/stderr-log", "--stderr-log", true);
+                if (HasArgument(args, "--validate-official-placements"))
+                {
+                    var catalog = new OfficialPlayfieldPlacementCatalog(
+                        OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(AppContext.BaseDirectory));
+                    catalog.WriteValidationArtifacts(
+                        GetArgumentValue(args, "--source-sha")!,
+                        GetArgumentValue(args, "--build-platform")!,
+                        GetArgumentValue(args, "--placement-manifest-output")!,
+                        GetArgumentValue(args, "--placement-provenance-output")!);
+                    Console.WriteLine("OFFICIAL_PLACEMENT_VALIDATION_OK");
+                    return 0;
+                }
+
+                RuntimeStartup.ValidateConfiguration();
+                if (HasArgument(args, "--validate-database"))
+                    return CheckDatabase();
+
+                if (HasArgument(args, "--validate-startup"))
+                {
+                    RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+                    Console.WriteLine("ZONEENGINE_NEW_STARTUP_VALIDATION_OK");
+                    return 0;
+                }
+                if (CheckDatabase() != 0)
+                    return 2;
+                RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+
+                if (!InitializeLogging())
+                    return 1;
+                OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Green);
                 rootServices = BuildRootServices();
                 IZoneLogger logger = rootServices.GetRequiredService<IZoneLogger>();
                 IGameData gameData = rootServices.GetRequiredService<IGameData>();
@@ -93,23 +115,47 @@ namespace ZoneEngine_New
                 _ = rootServices.GetRequiredService<InventoryFlushService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
+                RuntimeStartup.NotifyService("READY=1\nSTATUS=ZoneEngine_New ready");
+                Console.WriteLine("ZONEENGINE_NEW_READY");
                 logger.Info("ZoneEngine_New root container started.");
+                StartShutdownFileWatcher(args);
+                CommandLoop(args);
+                return Shutdown() ? 0 : 3;
             }
             catch (Exception exception)
             {
-                LogUtil.ErrorException(exception);
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Startup failed: " + exception.Message);
-                Colouring.Pop();
-                Console.WriteLine("Press enter to exit");
-                Console.ReadLine();
-                Shutdown();
-                return;
+                // Configuration and connector exception messages can contain credentials.
+                Console.Error.WriteLine("ZONEENGINE_NEW_STARTUP_FAILED type=" + exception.GetType().Name);
+                if (exception is StartupValidationException)
+                    Console.Error.WriteLine("CONFIGURATION_VALIDATION_FAILED " + exception.Message);
+                if (exception is InvalidDataException || exception is FileNotFoundException || exception is DirectoryNotFoundException)
+                    Console.Error.WriteLine("PACKAGE_VALIDATION_FAILED " + exception.Message);
+                return 1;
             }
+            finally
+            {
+                exited = true;
+                Shutdown();
+                Console.CancelKeyPress -= ConsoleCancelKeyPress;
+            }
+        }
 
-            StartShutdownFileWatcher(args);
-            CommandLoop(args);
-            Shutdown();
+        private static int CheckDatabase()
+        {
+            SchemaCheckResult result = DatabaseSchemaReadiness.Check(MySqlConnectionSettings.GetRequiredConnectionString(),
+                Environment.GetEnvironmentVariable("AO_REBIRTH_EXPECTED_DATABASE"));
+            Console.WriteLine(result.State.ToString());
+            Console.WriteLine(result.Message);
+            return result.IsCurrent ? 0 : 2;
+        }
+
+        private static void RedirectConsoleLog(string[] args, string first, string second, bool error)
+        {
+            string? path = GetEitherArgumentValue(args, first, second);
+            if (string.IsNullOrWhiteSpace(path)) return;
+            var stream = new StreamWriter(new FileStream(Path.GetFullPath(path), FileMode.Append,
+                FileAccess.Write, FileShare.ReadWrite), new UTF8Encoding(false)) { AutoFlush = true };
+            if (error) Console.SetError(stream); else Console.SetOut(stream);
         }
 
         private static ServiceProvider BuildRootServices()
@@ -117,6 +163,12 @@ namespace ZoneEngine_New
             ServiceCollection services = new ServiceCollection();
 
             services.AddSingleton<IZoneLogger, NLogZoneLogger>();
+            services.AddSingleton<AORebirth.Interfaces.Persistence.Characters.ICharacterPersistenceDao>(_ =>
+                new AORebirth.Database.Domain.Characters.MySqlCharacterPersistenceDao(() =>
+                    new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
+            services.AddSingleton<AORebirth.Interfaces.Persistence.Characters.ICharacterDao>(_ =>
+                new AORebirth.Database.Domain.Characters.MySqlCharacterDao(() =>
+                    new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
             services.AddSingleton<ICharacterRepository, MySqlCharacterRepository>();
             services.AddSingleton<IStatRepository, MySqlStatRepository>();
             services.AddSingleton<MySqlInventoryRepository>();
@@ -128,6 +180,16 @@ namespace ZoneEngine_New
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();
             services.AddSingleton<IItemBuilder, ItemBuilder>();
+            services.AddSingleton(provider =>
+            {
+                using var connection = new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString());
+                connection.Open();
+                var catalog = new TeleportDestinationCatalog(
+                    AORebirth.Database.Dao.TeleportRoutingDao.ReadSnapshot(connection),
+                    provider.GetRequiredService<IZoneLogger>().Warn);
+                provider.GetRequiredService<IZoneLogger>().Info($"Teleport DAO routing snapshot routes={catalog.Count}");
+                return catalog;
+            });
             services.AddSingleton<IGameData, GameDataStore>();
             services.AddSingleton<HashItemMinter>();
             services.AddSingleton<PlayerHydrator>();
@@ -138,12 +200,46 @@ namespace ZoneEngine_New
             // Explicit Lazy so TeleportCommand can break the PlayfieldManager <-> command handler cycle.
             services.AddSingleton(provider => new Lazy<PlayfieldManager>(provider.GetRequiredService<PlayfieldManager>));
             services.AddSingleton<InventoryFlushService>();
+            services.AddSingleton<IInventoryMutationPersistence, MySqlInventoryMutationPersistence>();
+            services.AddSingleton<InventoryActionService>();
+            services.AddSingleton(_ => new MySqlMissionDao(() =>
+            {
+                var connection = new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString());
+                try { connection.Open(); return connection; }
+                catch { connection.Dispose(); throw; }
+            }));
+            services.AddSingleton<IMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
+            services.AddSingleton<IGeneratedMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
+            services.AddSingleton<GeneratedMissionService>();
+            services.AddSingleton(provider => new Lazy<GeneratedMissionAcgService>(provider.GetRequiredService<GeneratedMissionAcgService>));
+            services.AddSingleton<IGeneratedMissionNpcFactory, GeneratedMissionNpcFactory>();
+            services.AddSingleton<GeneratedMissionAcgService>();
+            services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
+            services.AddSingleton<AuthoredQuestService>();
+            services.AddSingleton(_ => ZoneEngine_New.Core.Dialogue.DialogueCatalog.Load(AppContext.BaseDirectory));
+            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueActionRouter>();
+            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueService>();
+            services.AddSingleton<INanoCatalog>(provider => NanoCatalog.Load(
+                Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "nanos.dat")));
+            services.AddSingleton<IActiveNanoRepository, MySqlActiveNanoRepository>();
+            services.AddSingleton<INanoSpecialization, AmbientRestorationNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, OverviewMapNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, MorphNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, SparrowChildNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, TeamWarpNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, BucketheadNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, MongoNanoSpecialization>();
+            services.AddSingleton<NanoService>();
             services.AddSingleton<InventoryMoveService>();
+            services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
             services.AddSingleton<TradeService>();
             services.AddSingleton<ZoneMessageCodec>();
 
             //Chat
             services.AddSingleton<IChatEngineLink, IsComChatEngineLink>();
+            services.AddSingleton(provider => new TeamService(
+                provider.GetRequiredService<IChatEngineLink>(), dispatchOnOwner: (player, action) =>
+                    player.Playfield?.DispatchPlayerProjection(player, action)));
             services.AddSingleton<VicinityChatRelay>();
 
             //Commands
@@ -155,6 +251,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, ServerStatsCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
+            services.AddSingleton<IZoneAdmissionGate, ZoneAdmissionGate>();
 
             //Networking
             AddMessageHandler<CharDCMoveMessageHandler>(services);
@@ -167,6 +264,16 @@ namespace ZoneEngine_New
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<ClientContainerAddItemMessageHandler>(services);
             AddMessageHandler<TradeMessageHandler>(services);
+            AddMessageHandler<KnuBotOpenChatWindowMessageHandler>(services);
+            AddMessageHandler<KnuBotAnswerMessageHandler>(services);
+            AddMessageHandler<KnuBotCloseChatWindowMessageHandler>(services);
+            AddMessageHandler<KnuBotTradeMessageHandler>(services);
+            AddMessageHandler<KnuBotFinishTradeMessageHandler>(services);
+            AddMessageHandler<RaidCmdMessageHandler>(services);
+            AddMessageHandler<TeamChatMessageHandler>(services);
+            AddMessageHandler<QuestAlternativeMessageHandler>(services);
+            AddMessageHandler<CreateQuestMessageHandler>(services);
+            AddMessageHandler<QuestMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();
@@ -181,34 +288,39 @@ namespace ZoneEngine_New
             services.AddSingleton<IMessageHandler, THandler>();
         }
 
-        private static void Shutdown()
+        private static bool Shutdown()
         {
             if (Interlocked.Exchange(ref shutdownStarted, 1) != 0)
             {
-                return;
+                return !shutdownFailed;
             }
-
-            if (networkHost != null)
-            {
-                networkHost.DisposeAsync().AsTask().GetAwaiter().GetResult();
-            }
-
-            networkHost = null;
-
-            playfieldManager?.Dispose();
-            playfieldManager = null;
-
-            chatEngineLink?.Dispose();
-            chatEngineLink = null;
-
+            // Read-only validators must never send a service stop notification.
             if (rootServices != null)
             {
-                rootServices.DisposeAsync().AsTask().GetAwaiter().GetResult();
+                try { RuntimeStartup.NotifyService("STOPPING=1"); }
+                catch (Exception) { Console.Error.WriteLine("ZONEENGINE_NEW_STOP_NOTIFICATION_FAILED"); }
             }
 
+            void Cleanup(Action action)
+            {
+                try { action(); }
+                catch (Exception exception)
+                {
+                    shutdownFailed = true;
+                    Console.Error.WriteLine("ZONEENGINE_NEW_SHUTDOWN_FAILED type=" + exception.GetType().Name);
+                }
+            }
+            Cleanup(() => networkHost?.DisposeAsync().AsTask().GetAwaiter().GetResult());
+            networkHost = null;
+            Cleanup(() => playfieldManager?.Dispose());
+            playfieldManager = null;
+            Cleanup(() => rootServices?.GetRequiredService<TeamService>().Shutdown());
+            Cleanup(() => chatEngineLink?.Dispose());
+            chatEngineLink = null;
+            Cleanup(() => rootServices?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             rootServices = null;
-
-            LogManager.Configuration = null;
+            Cleanup(LogManager.Shutdown);
+            return !shutdownFailed;
         }
 
         private static bool InitializeLogging()
@@ -221,13 +333,9 @@ namespace ZoneEngine_New
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngine_NewLog.txt", LogLevel.Trace);
                 LogActiveConfiguration();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                LogUtil.ErrorException(e);
-                Colouring.Push(ConsoleColor.Red);
-                Console.WriteLine("Error initializing NLog");
-                Console.WriteLine(e.Message);
-                Colouring.Pop();
+                Console.Error.WriteLine("Error initializing NLog.");
                 return false;
             }
 
@@ -315,8 +423,7 @@ namespace ZoneEngine_New
                             {
                                 Console.WriteLine("Shutdown file requested.");
                                 exited = true;
-                                Shutdown();
-                                Environment.Exit(0);
+                                return;
                             }
 
                             Thread.Sleep(1000);
