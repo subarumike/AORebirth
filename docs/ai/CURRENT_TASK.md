@@ -1,5 +1,5 @@
 # Current Task
 
-The character/inventory DAO hydration candidate has passed offline exact-source acceptance and Mike's EP1 retail login, world-entry, two-zone and logout/relogin test. Source: `032ee4cd39433bbe124217a745474573e720e820`.
+Local master has the accepted integration merge. Tested SOURCE_SHA: `bb5dd9165c6201b15ef1e0cfbfd788a3e205486a`. Exact Windows acceptance (12 mandatory gates) and Linux-host build/offline acceptance PASS. No push, production deployment, production database operation or production restart is authorized or performed.
 
-Remaining cutover acceptance: direct inbound CharInPlay evidence (the timed capture ended before gameplay) and official-client login/state verification after a Linux staging service restart. No new restart or client action was performed for this receipt. No master merge, production operation, Legacy removal or full DAO conversion is authorized. See `docs/reports/NEWENGINE_RETAIL_GAMEPLAY_ACCEPTANCE.md`.
+Active work: finish the focused official-client CharInPlay capture and clean test-server restart/login/zoning/durable-state comparison on the merged binaries. Both are PENDING_USER_ACTION. The same test database is preserved; no reseeding or restoration. See `docs/reports/NEWENGINE_MASTER_LINUX_BUILD_RECEIPT.md`.
