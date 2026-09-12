@@ -44,6 +44,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly IZoneLogger _logger;
         private readonly Dictionary<string, MobTemplate> _mobTemplates =
             new(StringComparer.Ordinal);
+        private NpcFamilyStatCatalog _npcFamilies = NpcFamilyStatCatalog.Empty;
         private HashItemCatalog _hashItems = new(
             new Dictionary<string, string[]>(StringComparer.Ordinal),
             new Dictionary<string, HashInstance>(StringComparer.Ordinal));
@@ -67,6 +68,7 @@ namespace ZoneEngine_New.Core.GameData
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
 
             EnsureRootExists();
+            LoadNpcFamilyStatTemplates();
             LoadMobTemplates();
             LoadHashItems();
             LoadVendingMachines();
@@ -79,6 +81,8 @@ namespace ZoneEngine_New.Core.GameData
         public string PlayfieldsPath { get; }
 
         public int MobTemplateCount => _mobTemplates.Count;
+
+        public int NpcFamilyCount => _npcFamilies.Count;
 
         public int HashTemplateCount => _hashItems.CategoryCount;
 
@@ -123,6 +127,9 @@ namespace ZoneEngine_New.Core.GameData
                     "Mob template hash '{0}' not found",
                     hash));
         }
+
+        public bool TryGetNpcFamily(int family, out NpcFamilyStatTemplate template)
+            => _npcFamilies.TryGet(family, out template);
 
         public bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes)
             => _hashItems.TryGetCategory(hash, out childHashes);
@@ -277,6 +284,46 @@ namespace ZoneEngine_New.Core.GameData
 
         #region Catalog loads
 
+        private void LoadNpcFamilyStatTemplates()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.NpcFamilyStatTemplatesFileName);
+            if (!File.Exists(path))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "NPCFamilyStatTemplates.json not found at {0}; NPC families unavailable",
+                        path));
+                return;
+            }
+
+            try
+            {
+                Dictionary<int, NpcFamilyStatTemplateData>? loaded =
+                    JsonSerializer.Deserialize<Dictionary<int, NpcFamilyStatTemplateData>>(
+                        File.ReadAllText(path),
+                        CatalogJsonOptions);
+
+                _npcFamilies = NpcFamilyStatCatalog.Build(loaded, _logger.Warn);
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData NPC families={0} from {1}",
+                        _npcFamilies.Count,
+                        path));
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load NPCFamilyStatTemplates.json from {0}; NPC families unavailable",
+                        path));
+            }
+        }
+
         private void LoadMobTemplates()
         {
             string path = Path.Combine(RootPath, GameDataPaths.NpcTemplateFileName);
@@ -321,7 +368,10 @@ namespace ZoneEngine_New.Core.GameData
                                 "Duplicate mob template hash '{0}' skipped",
                                 template.Hash));
                         skipped++;
+                        continue;
                     }
+
+                    ValidateNpcFamily(template);
                 }
 
                 _logger.Info(
@@ -349,6 +399,34 @@ namespace ZoneEngine_New.Core.GameData
                         "Failed to load NpcTemplate.json from {0}; catalog empty",
                         path));
             }
+        }
+
+        /// <summary>
+        /// Surfaces the two mistakes a template can make about its family: naming one that does not
+        /// exist, and spawning outside the levels its curves actually cover.
+        /// </summary>
+        private void ValidateNpcFamily(MobTemplate template)
+        {
+            if (template.NpcFamily == 0)
+                return;
+
+            if (!_npcFamilies.TryGet(template.NpcFamily, out _))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Mob template '{0}' references unknown NpcFamily {1}; it will use template stats only",
+                        template.Hash,
+                        template.NpcFamily));
+                return;
+            }
+
+            _npcFamilies.ValidateCoverage(
+                template.NpcFamily,
+                template.MinLevel,
+                template.MaxLevel,
+                template.Hash,
+                _logger.Warn);
         }
 
         private void LoadHashItems()

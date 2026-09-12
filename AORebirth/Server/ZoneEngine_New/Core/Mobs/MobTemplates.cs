@@ -14,14 +14,6 @@ namespace ZoneEngine_New.Core.Mobs
         public int LevelMod { get; set; }
     }
 
-    /// <summary>Level keypoint used to lerp scaling stats between adjacent bands.</summary>
-    public sealed class MobStatBand
-    {
-        public int Level { get; set; }
-
-        public Dictionary<int, int> Stats { get; set; } = new();
-    }
-
     /// <summary>NPC template combat weapon: low/high AOID + 4-char SAW hash.</summary>
     public sealed class MobWeaponEntry
     {
@@ -45,9 +37,17 @@ namespace ZoneEngine_New.Core.Mobs
 
         public int TemplateId { get; set; }
 
+        /// <summary>
+        /// Flat stats for this template. Applied on top of the family curve, so anything set here
+        /// wins outright: it is the override layer for bosses and other one-off NPCs.
+        /// </summary>
         public Dictionary<int, int> Stats { get; set; } = new();
 
-        public List<MobStatBand> StatBands { get; set; } = new();
+        /// <summary>
+        /// Key into GameData/NPCFamilyStatTemplates.json supplying level-scaled stats.
+        /// Zero means the template is unscaled and uses <see cref="Stats"/> alone.
+        /// </summary>
+        public int NpcFamily { get; set; }
 
         /// <summary>When false, players cannot fight this NPC and it gets no combat brain.</summary>
         public bool Attackable { get; set; } = true;

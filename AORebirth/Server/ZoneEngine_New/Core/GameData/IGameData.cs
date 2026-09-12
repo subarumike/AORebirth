@@ -15,6 +15,8 @@ namespace ZoneEngine_New.Core.GameData
 
         int MobTemplateCount { get; }
 
+        int NpcFamilyCount { get; }
+
         int HashTemplateCount { get; }
 
         int HashInstanceCount { get; }
@@ -28,6 +30,9 @@ namespace ZoneEngine_New.Core.GameData
         bool TryGetMobTemplate(string hash, out MobTemplate template);
 
         MobTemplate RequireMobTemplate(string hash);
+
+        /// <summary>Level-scaled stat curves for an NpcFamily id. False when the family is unknown or zero.</summary>
+        bool TryGetNpcFamily(int family, out NpcFamilyStatTemplate template);
 
         bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes);
 
