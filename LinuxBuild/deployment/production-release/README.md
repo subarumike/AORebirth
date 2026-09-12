@@ -37,6 +37,11 @@ mutation.
 
 Run non-mutating validation first:
 
+Pre-install systemd validation uses temporary copies of the reviewed units with
+executable paths rebased to the staged artifacts. This supports a first cutover
+from Legacy without modifying the active release. Original unit hashes remain
+enforced; after installation, systemd validates the original deployment paths.
+
 ```bash
 bash LinuxBuild/deployment/production-release/upgrade-active-services.sh \
   --manifest LinuxBuild/artifacts/production-release/release.manifest \
@@ -82,3 +87,16 @@ It recognizes and transactionally removes only the pinned obsolete
 `10-type-simple.conf` ZoneEngine override, proves the effective unit is
 `Type=notify`/`NotifyAccess=main`, preserves the governed daily-login drop-in, and
 restores the obsolete override byte-for-byte if rollback is required.
+
+For a separately approved schema migration, after stopping all writers, verifying
+the backup by restoration, applying only the approved operator migrations and
+validating complete data preservation, use `--prepared-schema-cutover` instead of
+the outage-recovery flags. Both services and ports must already be stopped, both
+previous release paths must be pinned in the accepted release manifest, and both
+previous artifacts must carry valid source identities. Different prior engine
+SHAs are permitted; no fabricated deployed-release marker is needed. All frozen
+state, online, artifact, configuration and candidate database gates still apply.
+Run with `--dry-run` first. On failure the exact previous artifacts and units are
+restored but services stay stopped. Restore and validate the pre-cutover database
+before restarting Legacy; executable-only rollback is never sufficient after
+NewEngine writes. This option does not execute or approve any database operation.

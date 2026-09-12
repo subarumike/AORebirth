@@ -20,6 +20,7 @@ expected_sha=""
 dry_run=false
 recover_zone_outage=false
 resume_stopped_recovery=false
+prepared_schema_cutover=false
 deploy_root="${AO_REBIRTH_DEPLOY_TEST_ROOT:-}"
 test_mode="${AO_REBIRTH_DEPLOY_TEST_MODE:-0}"
 failure_step="${AO_REBIRTH_DEPLOY_TEST_FAIL_STEP:-}"
@@ -35,7 +36,7 @@ ZONE_EFFECTIVE_NOTIFY_ACCESS_BEFORE=""
 ZONE_EFFECTIVE_DROPIN_PATHS_BEFORE=""
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
-usage() { echo "usage: upgrade-active-services.sh --manifest <release.manifest> --expected-sha <sha> [--dry-run] [--recover-zone-outage [--resume-stopped-recovery]]" >&2; }
+usage() { echo "usage: upgrade-active-services.sh --manifest <release.manifest> --expected-sha <sha> [--dry-run] [--recover-zone-outage [--resume-stopped-recovery] | --prepared-schema-cutover]" >&2; }
 root_path() { printf '%s%s' "${deploy_root}" "$1"; }
 
 while [[ "$#" -gt 0 ]]; do
@@ -45,10 +46,21 @@ while [[ "$#" -gt 0 ]]; do
         --dry-run) dry_run=true; shift ;;
         --recover-zone-outage) recover_zone_outage=true; shift ;;
         --resume-stopped-recovery) resume_stopped_recovery=true; shift ;;
+        --prepared-schema-cutover) prepared_schema_cutover=true; shift ;;
         --help) usage; exit 0 ;;
         *) usage; exit 2 ;;
     esac
 done
+
+if [[ "${prepared_schema_cutover}" == true ]]; then
+    [[ "${recover_zone_outage}" == false && "${resume_stopped_recovery}" == false ]] \
+        || fail "prepared schema cutover cannot be combined with outage recovery flags"
+    # The separately approved operator migration has already stopped both writers,
+    # verified its backup/restore path and validated the database. Reuse the frozen
+    # boundary and leave-stopped rollback, without inventing an outage or a marker.
+    recover_zone_outage=true
+    resume_stopped_recovery=true
+fi
 
 [[ "${resume_stopped_recovery}" != true || "${recover_zone_outage}" == true ]] \
     || fail "--resume-stopped-recovery requires --recover-zone-outage"
@@ -543,7 +555,28 @@ daemon_reload()
     fi
     systemctl daemon-reload
 }
-verify_unit_static() { [[ "${test_mode}" == "1" ]] || systemd-analyze verify "${LOGIN_UNIT_SOURCE}" "${ZONE_UNIT_SOURCE}" >/dev/null; }
+verify_unit_static()
+(
+    [[ "${test_mode}" != "1" ]] || exit 0
+    if [[ "${mutation_started}" == true ]]; then
+        systemd-analyze verify "${LOGIN_UNIT_SOURCE}" "${ZONE_UNIT_SOURCE}" >/dev/null
+        exit
+    fi
+    # Verify the reviewed units against the staged executables. The active Legacy
+    # release cannot contain ZoneEngine_New before the transaction switches it.
+    # The original unit hashes are checked separately and originals are installed.
+    temporary_units="$(mktemp -d)"
+    trap 'rm -rf -- "${temporary_units}"' EXIT
+    for unit in "${LOGIN_UNIT_SOURCE}" "${ZONE_UNIT_SOURCE}"; do
+        content="$(cat -- "${unit}")"
+        content="${content//\/opt\/ao-rebirth\/loginengine\/current\//${LOGIN_ARTIFACT_DIR}/}"
+        content="${content//\/opt\/ao-rebirth\/zoneengine\/current\//${ZONE_ARTIFACT_DIR}/}"
+        printf '%s\n' "${content}" > "${temporary_units}/$(basename -- "${unit}")"
+    done
+    systemd-analyze verify \
+        "${temporary_units}/$(basename -- "${LOGIN_UNIT_SOURCE}")" \
+        "${temporary_units}/$(basename -- "${ZONE_UNIT_SOURCE}")" >/dev/null
+)
 
 environment_value()
 {
@@ -837,6 +870,15 @@ require_stopped_recovery_provenance()
     [[ "${resume_stopped_recovery}" == true ]] || return 0
     require_regular_file "${PREVIOUS_LOGIN_RELEASE}/SOURCE_SHA"
     require_regular_file "${PREVIOUS_ZONE_RELEASE}/SOURCE_SHA"
+    if [[ "${prepared_schema_cutover}" == true ]]; then
+        [[ -n "${MANIFEST_PREVIOUS_LOGIN}" && -n "${MANIFEST_PREVIOUS_ZONE}" ]] \
+            || fail "prepared schema cutover requires both exact previous releases pinned in the manifest"
+        [[ "$(tr -d '\r\n\t ' < "${PREVIOUS_LOGIN_RELEASE}/SOURCE_SHA")" =~ ^[0-9a-f]{40}$ \
+            && "$(tr -d '\r\n\t ' < "${PREVIOUS_ZONE_RELEASE}/SOURCE_SHA")" =~ ^[0-9a-f]{40}$ ]] \
+            || fail "prepared schema cutover previous source provenance is invalid"
+        echo "PREPARED_SCHEMA_CUTOVER_PROVENANCE=PASS rollback=DATABASE_RESTORE_REQUIRED"
+        return
+    fi
     require_regular_file "${DEPLOYED_MANIFEST}"
     local prior_login_sha prior_zone_sha deployed_sha
     prior_login_sha="$(tr -d '\r\n\t ' < "${PREVIOUS_LOGIN_RELEASE}/SOURCE_SHA")"

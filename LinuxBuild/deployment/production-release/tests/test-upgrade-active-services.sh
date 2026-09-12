@@ -745,5 +745,69 @@ behavior_hash_after="$(sha256sum "${repository_root}/AORebirth/Server/LoginEngin
     "${repository_root}/AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs")"
 require test "${behavior_hash_before}" = "${behavior_hash_after}"
 tests_run=$((tests_run + 1))
-require test "${tests_run}" = 56
-echo "PASS: production deployment workflow tests (56/56)"
+create_prepared_fixture()
+{
+    create_fixture
+    set_stopped_pair
+    set_manifest_value "${manifest}" PREVIOUS_LOGINENGINE_RELEASE "${prior_login_release}"
+    set_manifest_value "${manifest}" PREVIOUS_ZONEENGINE_RELEASE "${prior_zone_release}"
+    printf '%s\n' cccccccccccccccccccccccccccccccccccccccc > "${prior_zone_release}/SOURCE_SHA"
+    rm -f -- "${root}/opt/ao-rebirth/deployed-release.env"
+}
+run_prepared_upgrade()
+{
+    env MSYS=winsymlinks:sys AO_REBIRTH_DEPLOY_TEST_MODE=1 AO_REBIRTH_DEPLOY_TEST_ROOT="${root}" AO_REBIRTH_DEPLOY_TEST_FAIL_STEP="${prepared_failure:-}" \
+        bash "${upgrader}" --manifest "${manifest}" --expected-sha "${fake_sha}" --prepared-schema-cutover "$@"
+}
+create_prepared_fixture
+run_prepared_upgrade --dry-run > "${fixture}/output"
+require grep -F 'DRY_RUN=PASS' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_prepared_fixture
+run_prepared_upgrade > "${fixture}/output"
+require grep -F 'TRANSACTIONAL_DEPLOYMENT=PASS' "${fixture}/output"
+tests_run=$((tests_run + 1))
+
+create_prepared_fixture
+if prepared_failure=zone_start run_prepared_upgrade > "${fixture}/output" 2>&1; then fail "expected prepared cutover rollback"; fi
+require grep -F 'ROLLBACK_INCOMPATIBLE_PAIR_LEFT_STOPPED=PASS' "${fixture}/output"
+assert_old_targets
+require test "$(cat "${state}/login.active")" = inactive
+require test "$(cat "${state}/zone.active")" = inactive
+tests_run=$((tests_run + 1))
+
+create_prepared_fixture
+set_manifest_value "${manifest}" PREVIOUS_ZONEENGINE_RELEASE ''
+if run_prepared_upgrade > "${fixture}/output" 2>&1; then fail "accepted missing prepared release pin"; fi
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_prepared_fixture
+set_manifest_value "${manifest}" PREVIOUS_ZONEENGINE_RELEASE /wrong-release
+if run_prepared_upgrade > "${fixture}/output" 2>&1; then fail "accepted wrong prepared release pin"; fi
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_prepared_fixture
+printf 'active\n' > "${state}/login.active"
+if run_prepared_upgrade > "${fixture}/output" 2>&1; then fail "accepted active writer for prepared cutover"; fi
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_prepared_fixture
+printf 'FAIL\n' > "${state}/candidate-validation"
+if run_prepared_upgrade > "${fixture}/output" 2>&1; then fail "accepted incompatible migrated schema"; fi
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+create_prepared_fixture
+printf 'PASS_ONLINE\n' > "${state}/candidate-validation"
+if run_prepared_upgrade > "${fixture}/output" 2>&1; then fail "accepted online drift in prepared cutover"; fi
+assert_old_targets
+tests_run=$((tests_run + 1))
+
+require test "${tests_run}" = 64
+echo "PASS: production deployment workflow tests (64/64)"
