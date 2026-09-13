@@ -5,8 +5,8 @@ namespace ZoneEngine_New.Core.Mobs
     using System.Globalization;
 
     /// <summary>
-    /// JSON shape of one family in GameData/NPCStatTemplates.json. <see cref="StatCurves"/> is
-    /// keyed by stat id, then by level, so each stat owns an independent set of keypoints.
+    /// JSON shape of one family entry in GameData/NpcFamilyStatTemplates.json.
+    /// Referenced by MobTemplate.NpcFamily. <see cref="StatCurves"/> is keyed by stat id, then by level.
     /// </summary>
     public sealed class NpcFamilyStatTemplateData
     {
@@ -126,9 +126,9 @@ namespace ZoneEngine_New.Core.Mobs
             Dictionary<int, NpcFamilyStatTemplate> families = new(source.Count);
             foreach (KeyValuePair<int, NpcFamilyStatTemplateData> entry in source)
             {
-                if (entry.Key <= 0)
+                if (entry.Key < 0)
                 {
-                    Report(onError, "NPC family id {0} is not positive; skipped", entry.Key);
+                    Report(onError, "NPC family id {0} is negative; skipped", entry.Key);
                     continue;
                 }
 
@@ -173,13 +173,29 @@ namespace ZoneEngine_New.Core.Mobs
 
         public bool TryGet(int family, out NpcFamilyStatTemplate template)
         {
-            if (family <= 0)
+            if (family < 0)
             {
                 template = null!;
                 return false;
             }
 
             return _families.TryGetValue(family, out template!);
+        }
+
+        /// <summary>
+        /// Looks up <paramref name="family"/>; if missing, falls back to
+        /// <see cref="MobTemplate.DefaultNpcFamilyId"/>.
+        /// </summary>
+        public bool TryResolve(int family, out NpcFamilyStatTemplate template)
+        {
+            if (TryGet(family, out template))
+                return true;
+
+            int fallback = MobTemplate.DefaultNpcFamilyId;
+            if (family == fallback)
+                return false;
+
+            return TryGet(fallback, out template);
         }
 
         /// <summary>

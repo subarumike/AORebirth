@@ -38,16 +38,28 @@ namespace ZoneEngine_New.Core.Mobs
         public int TemplateId { get; set; }
 
         /// <summary>
-        /// Flat stats for this template. Applied on top of the family curve, so anything set here
-        /// wins outright: it is the override layer for bosses and other one-off NPCs.
+        /// Fallback family id when the requested <see cref="NpcFamily"/> is not in the catalog.
+        /// </summary>
+        public const int DefaultNpcFamilyId = 10001;
+
+        /// <summary>
+        /// Flat stats for this template. Applied last (after family and optional NpcStatTemplate
+        /// curves), so anything set here wins outright for bosses and other one-offs.
         /// </summary>
         public Dictionary<int, int> Stats { get; set; } = new();
 
         /// <summary>
-        /// Key into GameData/NPCStatTemplates.json supplying level-scaled stats.
-        /// Zero means the template is unscaled and uses <see cref="Stats"/> alone.
+        /// Key into GameData/NpcFamilyStatTemplates.json (family curve catalog).
+        /// 0 is a valid id. If the id is missing from the catalog, spawn falls back to
+        /// <see cref="DefaultNpcFamilyId"/>.
         /// </summary>
         public int NpcFamily { get; set; }
+
+        /// <summary>
+        /// Optional key into GameData/NpcStatTemplateOverlays.json. Curves sample on top of the family;
+        /// zero means no overlay.
+        /// </summary>
+        public int NpcStatTemplate { get; set; }
 
         /// <summary>When false, players cannot fight this NPC and it gets no combat brain.</summary>
         public bool Attackable { get; set; } = true;

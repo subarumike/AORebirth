@@ -43,7 +43,9 @@ namespace ZoneEngine_New.Tests
 
         public int MobTemplateCount => 0;
 
-        public int NpcFamilyCount => 0;
+        public int NpcFamilyStatTemplateCount => 0;
+
+        public int NpcStatTemplateCount => 0;
 
         public int HashTemplateCount => _hashItems.CategoryCount;
 
@@ -74,7 +76,19 @@ namespace ZoneEngine_New.Tests
 
         public MobTemplate RequireMobTemplate(string hash) => throw new NotSupportedException();
 
-        public bool TryGetNpcFamily(int family, out NpcFamilyStatTemplate template)
+        public bool TryGetNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
+        {
+            template = null!;
+            return false;
+        }
+
+        public bool TryResolveNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
+        {
+            template = null!;
+            return false;
+        }
+
+        public bool TryGetNpcStatTemplate(int id, out NpcStatTemplate template)
         {
             template = null!;
             return false;

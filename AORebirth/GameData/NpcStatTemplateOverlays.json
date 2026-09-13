@@ -1,0 +1,8 @@
+{
+	"1": {
+		"Name": "Example Overlay Stat Template",
+		"StatCurves": {
+			"100": { "1": 12, "200": 200, "250": 280 }
+		}
+	}
+}
