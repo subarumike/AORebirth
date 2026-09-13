@@ -149,8 +149,18 @@ namespace ZoneEngine_New.Core.WorldSimulation
             int doorInstance,
             float clearance,
             out Vector3 landing)
+            => TryResolveDoorLanding(geometry, doorInstance, clearance, out landing, out _);
+
+        /// <summary>Returns the same door heading used to place the arrival away from its frame.</summary>
+        public static bool TryResolveDoorLanding(
+            PlayfieldGeometryData? geometry,
+            int doorInstance,
+            float clearance,
+            out Vector3 landing,
+            out Quaternion heading)
         {
             landing = default!;
+            heading = default!;
             List<PlayfieldDynel>? dynels = geometry?.Dynels?.Dynels;
             if (dynels == null)
                 return false;
@@ -161,7 +171,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 if (door.IdentityInstance != doorInstance || door.IdentityType != (int)IdentityType.Door)
                     continue;
 
-                var heading = new Quaternion(door.Heading.X, door.Heading.Y, door.Heading.Z, door.Heading.W);
+                heading = new Quaternion(door.Heading.X, door.Heading.Y, door.Heading.Z, door.Heading.W);
                 var forward = (Vector3)heading.RotateVector3(Vector3.AxisZ);
                 landing = new Vector3(
                     door.Position.X + (forward.x * clearance),

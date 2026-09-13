@@ -20,6 +20,10 @@ namespace ZoneEngine_New.Core.Network
 
         void TransferToPlayfield(Playfield destination, Vector3 landing);
 
+        /// <summary>Transfers with an explicit destination heading; implementations must not silently discard it.</summary>
+        void TransferToPlayfield(Playfield destination, Vector3 landing, AORebirth.Core.Vector.Quaternion heading)
+            => throw new System.NotSupportedException("This session does not support an explicit transfer heading.");
+
         void Send(byte[] packet);
 
         void Send(Message message);

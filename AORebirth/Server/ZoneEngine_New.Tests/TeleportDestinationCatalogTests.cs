@@ -40,10 +40,18 @@ namespace ZoneEngine_New.Tests
             var returnTo = new ProxyReturn { PlayfieldId = 800, DoorInstance = unchecked((int)sourceDoor) };
             var target = data.GetPlayfieldGeometry(destinationPf).Dynels!.Dynels.Single(d =>
                 d.IdentityType == 51016 && unchecked((uint)d.IdentityInstance) == destinationDoor);
+            using var outside = PlayfieldWorldSimulation.Create(800, data.GetPlayfieldGeometry(800),
+                data.GetPlayfieldMetaData(800), DestinationsCatalog.Instance, data, new StubLogger());
+            Assert.IsTrue(outside.TryResolveZoneCrossing(door.Position.X, door.Position.Z,
+                new AORebirth.Core.Vector.Vector3(door.Position.X, door.Position.Y, door.Position.Z),
+                new HashSet<int>(), default, out var entry));
+            Assert.AreEqual(destinationPf, entry.DestPlayfieldId);
+            AssertFacesAwayFromDoor(entry, target);
             Assert.IsTrue(world.TryResolveZoneCrossing(target.Position.X, target.Position.Z,
                 new AORebirth.Core.Vector.Vector3(target.Position.X, target.Position.Y, target.Position.Z),
                 new HashSet<int>(), returnTo, out var crossing));
             Assert.AreEqual(800, crossing.DestPlayfieldId);
+            AssertFacesAwayFromDoor(crossing, door);
             var wrong = data.GetPlayfieldGeometry(destinationPf).Dynels!.Dynels.Single(d =>
                 d.IdentityType == 51016 && unchecked((uint)d.IdentityInstance) == (0xC0000000u | (uint)destinationPf));
             Assert.IsFalse(world.TryResolveZoneCrossing(wrong.Position.X, wrong.Position.Z,
@@ -94,5 +102,19 @@ namespace ZoneEngine_New.Tests
             Playfield = 800, StatelType = 51016, StatelInstance = source,
             DestinationPlayfield = pf, DestinationType = 51016, DestinationInstance = target
         };
+
+        static void AssertFacesAwayFromDoor(ZoneCrossing crossing, PlayfieldDynel door)
+        {
+            Assert.IsNotNull(crossing.Heading, "Door crossing discarded destination heading.");
+            var forward = (AORebirth.Core.Vector.Vector3)crossing.Heading.RotateVector3(AORebirth.Core.Vector.Vector3.AxisZ);
+            double awayX = crossing.Landing.x - door.Position.X;
+            double awayZ = crossing.Landing.z - door.Position.Z;
+            Assert.IsTrue(awayX * forward.x + awayZ * forward.z > 0,
+                "Arrival must face away from the door frame along its existing landing clearance.");
+            Assert.AreEqual((double)door.Heading.X, crossing.Heading.x);
+            Assert.AreEqual((double)door.Heading.Y, crossing.Heading.y);
+            Assert.AreEqual((double)door.Heading.Z, crossing.Heading.z);
+            Assert.AreEqual((double)door.Heading.W, crossing.Heading.w);
+        }
     }
 }
