@@ -15,7 +15,9 @@ namespace ZoneEngine_New.Core.GameData
 
         int MobTemplateCount { get; }
 
-        int NpcFamilyCount { get; }
+        int NpcFamilyStatTemplateCount { get; }
+
+        int NpcStatTemplateCount { get; }
 
         int HashTemplateCount { get; }
 
@@ -31,8 +33,17 @@ namespace ZoneEngine_New.Core.GameData
 
         MobTemplate RequireMobTemplate(string hash);
 
-        /// <summary>Level-scaled stat curves for an NpcFamily id. False when the family is unknown or zero.</summary>
-        bool TryGetNpcFamily(int family, out NpcFamilyStatTemplate template);
+        /// <summary>Level-scaled family curves. False when the id is unknown or negative.</summary>
+        bool TryGetNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template);
+
+        /// <summary>
+        /// Looks up <paramref name="family"/>; if missing, falls back to
+        /// <see cref="MobTemplate.DefaultNpcFamilyId"/>.
+        /// </summary>
+        bool TryResolveNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template);
+
+        /// <summary>Optional overlay curves on top of the family. False when unknown or zero.</summary>
+        bool TryGetNpcStatTemplate(int id, out NpcStatTemplate template);
 
         bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes);
 

@@ -6,9 +6,9 @@ namespace ZoneEngine_New.Core.Mobs
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     /// <summary>
-    /// Resolves a mob's stat snapshot in three layers: the family curve sampled at the spawn level,
-    /// then <see cref="MobTemplate.Stats"/> overlaid on top, then the level stat itself. Template
-    /// stats always beat the family, which is how bosses and other one-offs deviate from a family.
+    /// Resolves a mob's stat snapshot in layers: family curves, optional NpcStatTemplate overlay,
+    /// then <see cref="MobTemplate.Stats"/>, then the level stat itself. Later layers always beat
+    /// earlier ones for shared keys.
     /// </summary>
     public static class MobStatResolver
     {
@@ -17,7 +17,8 @@ namespace ZoneEngine_New.Core.Mobs
         public static Dictionary<int, int> Resolve(
             MobTemplate template,
             int? level,
-            NpcFamilyStatTemplate? family = null)
+            NpcFamilyStatTemplate? family = null,
+            NpcStatTemplate? statTemplate = null)
         {
             ArgumentNullException.ThrowIfNull(template);
 
@@ -27,6 +28,12 @@ namespace ZoneEngine_New.Core.Mobs
             if (family != null)
             {
                 foreach (KeyValuePair<int, NpcStatCurve> curve in family.Curves)
+                    result[curve.Key] = curve.Value.Sample(resolvedLevel);
+            }
+
+            if (statTemplate != null)
+            {
+                foreach (KeyValuePair<int, NpcStatCurve> curve in statTemplate.Curves)
                     result[curve.Key] = curve.Value.Sample(resolvedLevel);
             }
 

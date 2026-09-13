@@ -109,8 +109,13 @@ namespace ZoneEngine_New.Core.Playfield
                 SpawnSource = spawnSource
             };
 
-            _gameData.TryGetNpcFamily(template.NpcFamily, out NpcFamilyStatTemplate family);
-            foreach (var entry in MobStatResolver.Resolve(template, level, family))
+            _gameData.TryResolveNpcFamilyStatTemplate(
+                template.NpcFamily,
+                out NpcFamilyStatTemplate family);
+            _gameData.TryGetNpcStatTemplate(
+                template.NpcStatTemplate,
+                out NpcStatTemplate statTemplate);
+            foreach (var entry in MobStatResolver.Resolve(template, level, family, statTemplate))
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
             ApplyTextures(npc, template);

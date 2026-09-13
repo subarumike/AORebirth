@@ -23,6 +23,42 @@ namespace ZoneEngine_New.Tests
         };
 
         [TestMethod]
+        public void MissingFamilyFallsBackToDefaultFamilyId()
+        {
+            NpcFamilyStatCatalog catalog = NpcFamilyStatCatalog.Build(
+                new Dictionary<int, NpcFamilyStatTemplateData>
+                {
+                    [MobTemplate.DefaultNpcFamilyId] = new()
+                    {
+                        Name = "Default",
+                        StatCurves = new Dictionary<int, Dictionary<int, int>>
+                        {
+                            [Health] = new() { [1] = 10, [50] = 500 }
+                        }
+                    },
+                    [0] = new()
+                    {
+                        Name = "Zero",
+                        StatCurves = new Dictionary<int, Dictionary<int, int>>
+                        {
+                            [Health] = new() { [1] = 1, [10] = 10 }
+                        }
+                    }
+                });
+
+            Assert.IsTrue(catalog.TryResolve(0, out NpcFamilyStatTemplate zero));
+            Assert.AreEqual(0, zero.Family);
+            Assert.AreEqual("Zero", zero.Name);
+
+            Assert.IsTrue(catalog.TryResolve(999, out NpcFamilyStatTemplate fallback));
+            Assert.AreEqual(MobTemplate.DefaultNpcFamilyId, fallback.Family);
+            Assert.AreEqual("Default", fallback.Name);
+
+            Assert.IsFalse(
+                NpcFamilyStatCatalog.Empty.TryResolve(1, out _));
+        }
+
+        [TestMethod]
         public void NoFamilyUsesTemplateStatsAndOptionalLevelOverride()
         {
             MobTemplate template = Vendor();
@@ -154,17 +190,27 @@ namespace ZoneEngine_New.Tests
                             [Health] = new() { [1] = 10, [50] = 500 }
                         }
                     },
-                    [0] = new() { Name = "Bad id" },
+                    [0] = new()
+                    {
+                        Name = "Zero id",
+                        StatCurves = new Dictionary<int, Dictionary<int, int>>
+                        {
+                            [Health] = new() { [1] = 1, [10] = 10 }
+                        }
+                    },
+                    [-1] = new() { Name = "Bad id" },
                     [7] = new() { Name = "No curves" }
                 },
                 errors.Add);
 
-            Assert.AreEqual(1, catalog.Count);
+            Assert.AreEqual(2, catalog.Count);
             Assert.AreEqual(2, errors.Count);
             Assert.IsTrue(catalog.TryGet(1, out NpcFamilyStatTemplate good));
             Assert.AreEqual("Good", good.Name);
+            Assert.IsTrue(catalog.TryGet(0, out NpcFamilyStatTemplate zero));
+            Assert.AreEqual("Zero id", zero.Name);
             Assert.IsFalse(catalog.TryGet(7, out _));
-            Assert.IsFalse(catalog.TryGet(0, out _));
+            Assert.IsFalse(catalog.TryGet(-1, out _));
         }
 
         [TestMethod]
@@ -213,6 +259,7 @@ namespace ZoneEngine_New.Tests
                   "Hash": "AAAA",
                   "Stats": { "4": 6, "359": 26902 },
                   "NpcFamily": 1,
+                  "NpcStatTemplate": 0,
                   "MinLevel": 1,
                   "MaxLevel": 200
                 }
@@ -229,12 +276,113 @@ namespace ZoneEngine_New.Tests
             MobTemplate? template = JsonSerializer.Deserialize<MobTemplate>(templateJson, JsonOptions);
             Assert.IsNotNull(template);
             Assert.AreEqual(1, template.NpcFamily);
+            Assert.AreEqual(0, template.NpcStatTemplate);
             Assert.IsTrue(template.Attackable);
 
             Dictionary<int, int> mid = MobStatResolver.Resolve(template, 100, family);
             Assert.AreEqual(2493, mid[Health]);
             Assert.AreEqual(6, mid[Breed]);
             Assert.AreEqual(26902, mid[Mesh]);
+        }
+
+        [TestMethod]
+        public void OverlayOnlySamplesWithoutFamily()
+        {
+            MobTemplate template = ScalingMob();
+            template.NpcFamily = 0;
+            NpcStatTemplate overlay = Overlay(new Dictionary<int, Dictionary<int, int>>
+            {
+                [Health] = new() { [1] = 50, [100] = 500 }
+            });
+
+            Dictionary<int, int> resolved = MobStatResolver.Resolve(template, 50, family: null, overlay);
+            Assert.AreEqual(273, resolved[Health]);
+            Assert.AreEqual(6, resolved[Breed]);
+            Assert.AreEqual(50, resolved[Level]);
+        }
+
+        [TestMethod]
+        public void OverlayReplacesFamilyForSharedKeysAndKeepsFamilyOnlyKeys()
+        {
+            MobTemplate template = ScalingMob();
+            NpcFamilyStatTemplate family = GenericFamily();
+            NpcStatTemplate overlay = Overlay(new Dictionary<int, Dictionary<int, int>>
+            {
+                [Health] = new() { [1] = 100, [250] = 1000 }
+            });
+
+            Dictionary<int, int> resolved = MobStatResolver.Resolve(template, 125, family, overlay);
+            Assert.AreEqual(548, resolved[Health]);
+            Assert.AreEqual(103, resolved[Skill]);
+            Assert.AreEqual(6, resolved[Breed]);
+            Assert.AreEqual(125, resolved[Level]);
+        }
+
+        [TestMethod]
+        public void FlatStatsBeatFamilyAndOverlay()
+        {
+            MobTemplate boss = ScalingMob();
+            boss.Stats[Health] = 40000;
+            boss.Stats[CurrentHealth] = 40000;
+
+            NpcStatTemplate overlay = Overlay(new Dictionary<int, Dictionary<int, int>>
+            {
+                [Health] = new() { [1] = 100, [250] = 1000 },
+                [Skill] = new() { [1] = 50, [250] = 500 }
+            });
+
+            Dictionary<int, int> resolved = MobStatResolver.Resolve(boss, 25, GenericFamily(), overlay);
+            Assert.AreEqual(40000, resolved[Health]);
+            Assert.AreEqual(40000, resolved[CurrentHealth]);
+            Assert.AreEqual(93, resolved[Skill]);
+            Assert.AreEqual(25, resolved[Level]);
+        }
+
+        [TestMethod]
+        public void JsonOverlayDeserializesAndResolvesOnTopOfFamily()
+        {
+            const string overlayJson =
+                """
+                {
+                  "2": {
+                    "Name": "Mutant Overlay",
+                    "StatCurves": {
+                      "1": { "1": 100, "200": 1000 }
+                    }
+                  }
+                }
+                """;
+
+            const string templateJson =
+                """
+                {
+                  "Hash": "AAAA",
+                  "Stats": { "4": 6, "359": 26902 },
+                  "NpcFamily": 1,
+                  "NpcStatTemplate": 2,
+                  "MinLevel": 1,
+                  "MaxLevel": 200
+                }
+                """;
+
+            NpcFamilyStatTemplate family = GenericFamily();
+            Dictionary<int, NpcStatTemplateData>? overlays =
+                JsonSerializer.Deserialize<Dictionary<int, NpcStatTemplateData>>(overlayJson, JsonOptions);
+            Assert.IsNotNull(overlays);
+
+            NpcStatTemplateCatalog catalog = NpcStatTemplateCatalog.Build(overlays);
+            Assert.IsTrue(catalog.TryGet(2, out NpcStatTemplate overlay));
+            Assert.AreEqual("Mutant Overlay", overlay.Name);
+
+            MobTemplate? template = JsonSerializer.Deserialize<MobTemplate>(templateJson, JsonOptions);
+            Assert.IsNotNull(template);
+            Assert.AreEqual(1, template.NpcFamily);
+            Assert.AreEqual(2, template.NpcStatTemplate);
+
+            Dictionary<int, int> mid = MobStatResolver.Resolve(template, 100, family, overlay);
+            Assert.AreEqual(548, mid[Health]);
+            Assert.AreEqual(84, mid[Skill]);
+            Assert.AreEqual(6, mid[Breed]);
         }
 
         [TestMethod]
@@ -315,6 +463,18 @@ namespace ZoneEngine_New.Tests
 
             Assert.IsTrue(catalog.TryGet(1, out NpcFamilyStatTemplate family));
             return family;
+        }
+
+        static NpcStatTemplate Overlay(Dictionary<int, Dictionary<int, int>> curves)
+        {
+            NpcStatTemplateCatalog catalog = NpcStatTemplateCatalog.Build(
+                new Dictionary<int, NpcStatTemplateData>
+                {
+                    [1] = new() { Name = "Test Overlay", StatCurves = curves }
+                });
+
+            Assert.IsTrue(catalog.TryGet(1, out NpcStatTemplate overlay));
+            return overlay;
         }
     }
 }
