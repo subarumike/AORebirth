@@ -36,8 +36,11 @@ are introduced.
 
 - Before repair: the regression test fails because the arriving motor still moves.
 - After repair: transfer regression suite PASS.
-- Final exact Windows acceptance: pending.
-- Live deployment and official-client visual verification: pending.
+- Exact Windows acceptance at `701478901f564b31abb5bbe8a96c74ccb05d794e`:
+  PASS, including all 551 NewEngine tests. The optional mandatory integration suite
+  was not rerun. The focused transfer suite passes all 15 tests.
+- Linux acceptance, live deployment and official-client visual verification:
+  pending. Source is pushed on `codex/reset-transfer-movement-input`.
 
 ## Files and evidence inspected
 
@@ -46,7 +49,7 @@ report, capture inventory, `PlayfieldWorldSimulation`, `ZoneSession`,
 `PlayfieldTransfer`, `SpawnService`, `Player`, `Character`, `CharacterMotor`,
 `MovementTypes`, `CharDCMoveMessageHandler` and transfer tests. The capture
 inventory contains 14 PF1186 entries; none of their recorded packet logs is locally
-present, and the current Captures root has no Fair Trade/PF1186 folder. Available
+present, and the repository Captures directory has no Fair Trade/PF1186 folder. Available
 server logs and a deterministic reproduction provide the fallback evidence; no
 client or capture injector was launched. Private evidence is retained under
 `build-verify/fair-trade-movement` and
