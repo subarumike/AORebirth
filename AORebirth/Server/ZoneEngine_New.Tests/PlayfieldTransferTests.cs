@@ -40,6 +40,31 @@ using Quaternion = AORebirth.Core.Vector.Quaternion;
 public sealed class PlayfieldTransferTests
 {
     [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Transfer_heading_reaches_destination_and_teleport_without_rotating_source(bool explicitDoorHeading)
+    {
+        using var f = new Fixture(); var outside = f.World(800); var inside = f.World(1186);
+        var player = f.Player(outside, 1); var session = (ZoneSession)player.Session!;
+        player.Rotation = new Quaternion(0, 0.6, 0, 0.8);
+        var expected = explicitDoorHeading ? new Quaternion(0, 1, 0, 0) : player.Rotation;
+        IZoneSession contract = session;
+        if (explicitDoorHeading)
+            contract.TransferToPlayfield(inside, new Vector3(175.00107, 5.01, 113.01496), expected);
+        else
+            contract.TransferToPlayfield(inside, new Vector3(175.00107, 5.01, 113.01496));
+        Assert.AreEqual(0.6f, player.Rotation.yf, "Scheduling must not rotate the character on the source.");
+        f.Drain(outside);
+        Assert.AreEqual(0.6f, player.Rotation.yf);
+        f.Drain(inside);
+        Assert.AreEqual(expected.y, player.Rotation.y);
+        Assert.AreEqual(expected.w, player.Rotation.w);
+        var teleport = (N3TeleportMessage)new ZoneMessageCodec().Deserialize(f.Packets(session)[0])!.Body;
+        Assert.AreEqual(expected.yf, teleport.Heading.Y);
+        Assert.AreEqual(expected.wf, teleport.Heading.W);
+    }
+
+    [TestMethod]
     public void Transfer_does_not_replay_held_movement_when_release_arrives_during_loading()
     {
         using var f = new Fixture(); var outside = f.World(800); var inside = f.World(1186);

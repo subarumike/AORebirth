@@ -23,12 +23,14 @@ namespace ZoneEngine_New.Core.WorldSimulation
     using ZoneEngine_New.Core.Playfield;
 
     using AoVector3 = AORebirth.Core.Vector.Vector3;
+    using AoQuaternion = AORebirth.Core.Vector.Quaternion;
     using CharacterStat = SmokeLounge.AOtomation.Messaging.GameData.CharacterStat;
     using IdentityType = SmokeLounge.AOtomation.Messaging.GameData.IdentityType;
     using PlayfieldType = ZoneEngine_New.Core.Playfield.Playfield;
 
     /// <summary>A resolved zone transition: where it goes, and which trigger produced it.</summary>
-    public readonly record struct ZoneCrossing(int DestPlayfieldId, AoVector3 Landing, ZoneTriggerVolume Trigger);
+    public readonly record struct ZoneCrossing(int DestPlayfieldId, AoVector3 Landing, ZoneTriggerVolume Trigger,
+        AoQuaternion? Heading = null);
 
     /// <summary>
     /// Per-playfield static collision + soft zoning triggers (query-only Bepu world).
@@ -330,9 +332,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (hit.Volume.Kind == ZoneTriggerKind.PortalDynel)
             {
                 destPlayfieldId = hit.Volume.DestPlayfieldId;
-                if (TryResolvePortalLanding(hit.Volume, out landing))
+                if (TryResolvePortalLanding(hit.Volume, out landing, out var heading))
                 {
-                    crossing = new ZoneCrossing(destPlayfieldId, landing, hit.Volume);
+                    crossing = new ZoneCrossing(destPlayfieldId, landing, hit.Volume, heading);
                     return true;
                 }
 
@@ -362,9 +364,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
                         _gameData.GetPlayfieldGeometry(returnTo.PlayfieldId),
                         returnTo.DoorInstance,
                         PortalDoorLandingResolver.ExitDoorClearance,
-                        out landing))
+                        out landing, out var heading))
                 {
-                    crossing = new ZoneCrossing(returnTo.PlayfieldId, landing, hit.Volume);
+                    crossing = new ZoneCrossing(returnTo.PlayfieldId, landing, hit.Volume, heading);
                     return true;
                 }
 
@@ -463,8 +465,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 RegisterExitProxyDoor(doorInstances[i]);
         }
 
-        bool TryResolvePortalLanding(ZoneTriggerVolume portal, out AoVector3 landing)
+        bool TryResolvePortalLanding(ZoneTriggerVolume portal, out AoVector3 landing, out AoQuaternion? heading)
         {
+            heading = null;
             if (portal.LandingKind == PortalLandingKind.DestinationLine)
             {
                 return PortalDoorLandingResolver.TryResolveLineLanding(
@@ -478,7 +481,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 _gameData.GetPlayfieldGeometry(portal.DestPlayfieldId),
                 portal.DestDoorInstance,
                 portal.DoorClearance,
-                out landing);
+                out landing, out heading);
         }
 
         void TryTransfer(PlayfieldType source, Player player, ZoneCrossing crossing, double now)
@@ -511,7 +514,12 @@ namespace ZoneEngine_New.Core.WorldSimulation
             _logger.Info(
                 $"Zone trigger transfer character={id} from={source.Identity.Instance} to={destPlayfieldId}");
 
-            session.TransferToPlayfield(destination, crossing.Landing);
+            // Door arrivals face along their landing clearance; border/line crossings keep
+            // the character's current heading rather than imposing a global compass direction.
+            if (crossing.Heading is { } heading)
+                session.TransferToPlayfield(destination, crossing.Landing, heading);
+            else
+                session.TransferToPlayfield(destination, crossing.Landing);
         }
 
         static ProxyReturn ReadProxyReturn(Player player)

@@ -1,5 +1,10 @@
 # Current Task
 
+Active repair: carry destination door heading through zoning so Fair Trade and
+other door arrivals face away from the entrance frame. Border/line crossings keep
+the existing character heading. Build passes; packaged-world acceptance remains
+pending. See `docs/reports/NEWENGINE_ZONE_ARRIVAL_HEADING.md`.
+
 Pending acceptance: Mike's official-client held-key/release retry at Fair Trade and another building entrance. Movement reset source `701478901f564b31abb5bbe8a96c74ccb05d794e` is deployed to live LoginEngine/NewEngine after exact Windows and Linux acceptance (551 NewEngine tests each). Runtime provenance and stability pass with zero restarts. Mike explicitly authorized maintenance with players online; graceful shutdown saved state and cleared sessions, preserving all 280 inventory rows and 28 characters. No schema or operator row changes were made. Source is pushed on `codex/reset-transfer-movement-input` and included in local master; remote master was not moved. See `docs/reports/NEWENGINE_TRANSFER_MOVEMENT_RESET.md`. The deployment README records that online characters do not block explicitly authorized maintenance.
 
 The four approved cutover migrations and verified backup/restore evidence remain recorded in `docs/reports/BB5DD916_PRODUCTION_CUTOVER_RECEIPT.md`. After NewEngine writes, Legacy rollback requires the validated database restore/reconciliation path; changing executables alone is unsafe. The agent does not launch or control the official client.
