@@ -1,0 +1,839 @@
+{
+  "summary": {
+    "startingSha": "2dc701f1e114cdd26dbb1e13d89acd4aa3b77a76",
+    "delmusSha": "8b9d36090986dc3ad89b9545a23ff38016c626ab",
+    "templatesFound": 34,
+    "subwayTemplatesFound": 32,
+    "subwayTemplatesImported": 32,
+    "placements": 326,
+    "resolved": 0,
+    "unresolved": 326,
+    "ambiguous": 0,
+    "families": [
+      0,
+      3,
+      63,
+      138,
+      148,
+      149,
+      150,
+      151
+    ],
+    "familyComplete": 0,
+    "familyMissing": 8,
+    "weaponDefinitions": 53,
+    "trueDuplicates": 0,
+    "knownWeaponVariants": 25,
+    "unresolvedWeaponDefinitions": 28,
+    "combatReady": 0,
+    "combatBlocked": 32,
+    "sourceFilesReviewed": 110,
+    "sourceFilesImported": 3,
+    "sourceFilesReconciled": 4,
+    "sourceFilesSkipped": 103,
+    "pink": {
+      "AAAA_templateDefinitions": 1,
+      "AAAA_liveSpawnCount": "NOT_MEASURED",
+      "missingVisualAssetCount": "UNPROVEN",
+      "otherCount": "UNPROVEN"
+    }
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/GameData/ItemTemplates.json",
+      "status": "M",
+      "classification": "GENERATED_DATA",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/GameData/MobTemplates.json",
+      "status": "D",
+      "classification": "CONTENT_DATA",
+      "decision": "RECONCILE",
+      "reason": "Pinned source snapshot; pending templates blocked; sample curves not combat authority."
+    },
+    {
+      "path": "AORebirth/GameData/NpcFamilyStatTemplates.json",
+      "status": "A",
+      "classification": "CONTENT_DATA",
+      "decision": "RECONCILE",
+      "reason": "Pinned source snapshot; pending templates blocked; sample curves not combat authority."
+    },
+    {
+      "path": "AORebirth/GameData/NpcStatTemplateOverlays.json",
+      "status": "A",
+      "classification": "CONTENT_DATA",
+      "decision": "RECONCILE",
+      "reason": "Pinned source snapshot; pending templates blocked; sample curves not combat authority."
+    },
+    {
+      "path": "AORebirth/GameData/NpcTemplate.json",
+      "status": "A",
+      "classification": "CONTENT_DATA",
+      "decision": "RECONCILE",
+      "reason": "Pinned source snapshot; pending templates blocked; sample curves not combat authority."
+    },
+    {
+      "path": "AORebirth/GameData/items.dat",
+      "status": "M",
+      "classification": "GENERATED_DATA",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/AttackInfoRulesTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/BuffApplyRulesTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/BuffTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/CellHeatSchedulerTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/HashItemCatalogTests.cs",
+      "status": "M",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/HateListTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/HitHealthDamageTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/ItemChargeTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/LinkDeadExpiryTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/MobStatResolverTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoCastRulesTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoCostCalculatorTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoDelayCalculatorTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NpcBrainTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NpcWeaponItemFullUpdateTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/PlayerDeathRespawnTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/ReconnectVisibilityTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/ShopStockTests.cs",
+      "status": "M",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/SpecialAttackWeaponTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/TeleportProxy2Tests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/TestDoubles.cs",
+      "status": "M",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/TradeRulesTests.cs",
+      "status": "M",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/UploadNanoTests.cs",
+      "status": "A",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj",
+      "status": "M",
+      "classification": "TEST",
+      "decision": "SKIP",
+      "reason": "Use focused candidate tests; developer tests exercise a different runtime."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/HateList.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcAiActions.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcAiProfiles.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcBehaviourTree.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcBrain.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcFollowTarget.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationResult.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationService.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/PlayerHydrator.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/GiveItemCommand.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/NpcCommand.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/IActiveNanoRepository.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/ICharacterCoalesceCommit.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/IInventoryRepository.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlActiveNanoRepository.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterCoalesceCommit.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/CharacterWeapon.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/LootableDynel.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/HashItemCatalog.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/IGameData.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/AttackInfoRules.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/DamageCalculator.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/NanoCostCalculator.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/NanoDelayCalculator.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Dat/DatItemMapper.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Dat/ItemEventsDatReader.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/HashItemMinter.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/IItemBuilder.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryFlushService.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Item.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemBuilder.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemTemplate.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemTemplateCatalog.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemUseFunctions.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/PlayerInventory.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/StatModifierSpells.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/AttackMessageHandler.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CastNanoSpellMessageHandler.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Metrics/TickStallWatch.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobStatResolver.cs",
+      "status": "A",
+      "classification": "GENERIC_RUNTIME_MECHANIC",
+      "decision": "IMPORT_ADAPTED",
+      "reason": "Stat composition only; remove missing-family fallback."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobTemplates.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcFamilyStatTemplates.cs",
+      "status": "A",
+      "classification": "GENERIC_RUNTIME_MECHANIC",
+      "decision": "IMPORT_ADAPTED",
+      "reason": "Stat composition only; remove missing-family fallback."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcStatTemplates.cs",
+      "status": "A",
+      "classification": "GENERIC_RUNTIME_MECHANIC",
+      "decision": "IMPORT_ADAPTED",
+      "reason": "Stat composition only; remove missing-family fallback."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/Buff.cs",
+      "status": "A",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/BuffApplyRules.cs",
+      "status": "A",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoCastRules.cs",
+      "status": "A",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoRuntime.cs",
+      "status": "A",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoSpell.cs",
+      "status": "A",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/PendingNanoCast.cs",
+      "status": "A",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/IZoneSession.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneSession.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/CellHeatScheduler.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/LocalityVisibility.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/PlayfieldLocality.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "status": "M",
+      "classification": "CONFLICTING",
+      "decision": "SKIP",
+      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Trade/TradeRules.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Trade/TradeService.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DynelEventSpells.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PortalDoorLandingResolver.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/SurfaceCollisionBaker.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Program.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Properties/InternalsVisibleTo.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "Tools/RDBDataExtractor/FunctionSets.cfg",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "Tools/RDBDataExtractor/ItemDatExporter.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "Tools/RDBDataExtractor/ItemRdbMapper.cs",
+      "status": "A",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "Tools/RDBDataExtractor/RDBDataExtractor.csproj",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "Tools/RDBDataExtractor/SelfTests.cs",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    },
+    {
+      "path": "docs/ai/CURRENT_TASK.md",
+      "status": "M",
+      "classification": "UNRELATED",
+      "decision": "SKIP",
+      "reason": "Outside bounded NPC content/stat/cancellation integration."
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/accepted/npc/delmus/NpcTemplate.json",
+      "sha256": "0fc8b2f5bb96b5fe310e64420d041efd15aed2f6b5c5684fd0f6f810b335c692"
+    },
+    {
+      "path": "docs/generated/subway_enemy_combat_contracts.json",
+      "sha256": "747d796e98e146db4946e06e9305a82e6b8e9b25e24c2b0e52ab93c88551a393"
+    },
+    {
+      "path": "docs/generated/capture_backed_npc_combat_inventory.json",
+      "sha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404"
+    },
+    {
+      "path": "docs/generated/playfields/placements/pf_127.json",
+      "sha256": "712088499907e8eba1af0fe42d2350babf41bc02ad4595783a72bceb268ac7e2"
+    },
+    {
+      "path": "docs/evidence/ZONEENGINE_NEW_NPC_ACTIVATION_INVENTORY.json",
+      "sha256": "d55f59f9271df5b40177459a4591980d8ce4b3559e3620183c1d494c4cd666c0"
+    },
+    {
+      "path": "docs/accepted/combat/enemy_combat_formula_packet_evidence.json",
+      "sha256": "06e11db1b229ea619fb45d44c5ece28a24eaf2fee0e2c7955f86ed2c5b3f6486"
+    }
+  ]
+}

@@ -48,10 +48,12 @@ namespace ZoneEngine_New.Core.Nanos
         private readonly Func<DateTime> _utcNow;
         private readonly Func<long> _milliseconds;
         private readonly Func<int, int, int> _next;
+        private readonly Func<TimedActionInterrupt?, int?>? _interruptionCode;
 
         public NanoService(INanoCatalog catalog, IActiveNanoRepository repository,
             IEnumerable<INanoSpecialization>? specialties = null, Func<DateTime>? utcNow = null,
-            Func<long>? monotonicMilliseconds = null, Func<int, int, int>? next = null)
+            Func<long>? monotonicMilliseconds = null, Func<int, int, int>? next = null,
+            Func<TimedActionInterrupt?, int?>? interruptionCode = null)
         {
             _catalog = catalog; _repository = repository;
             _specialties = specialties?.ToArray() ?? [];
@@ -60,6 +62,8 @@ namespace ZoneEngine_New.Core.Nanos
             _utcNow = utcNow ?? (() => DateTime.UtcNow);
             _milliseconds = monotonicMilliseconds ?? (() => Environment.TickCount64);
             _next = next ?? Random.Shared.Next;
+            // No retail reason-to-code mapping is accepted yet. An absent policy sends no guessed notice.
+            _interruptionCode = interruptionCode;
         }
 
         /// <summary>Call once on the accepted owner tick before the initial self full update.</summary>
@@ -137,7 +141,8 @@ namespace ZoneEngine_New.Core.Nanos
                     return false;
                 if (!_states.TryAdd(player.Identity.Instance, state)) return false;
                 ApplyWrites(writes);
-                state.Interrupt = (_, _) => Cancel(player);
+                state.Interrupt = (_, reason) => CancelCore(player, null,
+                    notifyClient: reason != TimedActionInterrupt.LeavePlayfield, reason);
                 player.TimedActionsInterrupted += state.Interrupt;
                 foreach (Active active in state.Active.Values)
                 {
@@ -160,15 +165,46 @@ namespace ZoneEngine_New.Core.Nanos
             foreach (INanoOwnerProjection projection in _specialties.OfType<INanoOwnerProjection>()) projection.Refresh(player);
         }
 
+        /// <summary>Only the captured zero-parameter self-cancellation request can cancel this session's cast.</summary>
+        public bool TryInterrupt(Player player, IZoneSession session, CharacterActionMessage message)
+        {
+            if (message.Action != CharacterActionType.InterruptNanoCasting || message.Identity != player.Identity
+                || message.Target != Identity.None || message.Parameter1 != 0 || message.Parameter2 != 0
+                || message.Unknown != 0 || message.Unknown1 != 0 || message.Unknown2 != 0
+                || session.State != SessionState.InPlay || !ReferenceEquals(session.Player, player)
+                || !ReferenceEquals(player.Session, session)) return false;
+            CancelCore(player, session, notifyClient: true);
+            return true;
+        }
+
         /// <summary>Transport-safe cancellation; does not read/mutate Stats or active state.</summary>
         public void Cancel(Player player, IZoneSession? session = null)
+            => CancelCore(player, session, notifyClient: session == null);
+
+        private void CancelCore(Player player, IZoneSession? session, bool notifyClient, TimedActionInterrupt? reason = null)
         {
             if (!TryState(player, out State state)) return;
             if (session != null && !ReferenceEquals(player.Session, session)) return;
             Interlocked.Increment(ref state.InterruptGeneration);
             Pending? pending = Volatile.Read(ref state.Pending);
-            if (pending != null && (session == null || ReferenceEquals(pending.Session, session)))
-                Interlocked.CompareExchange(ref state.Pending, null, pending);
+            if (pending != null && (session == null || ReferenceEquals(pending.Session, session))
+                && ReferenceEquals(Interlocked.CompareExchange(ref state.Pending, null, pending), pending)
+                && notifyClient
+                && ReferenceEquals(player.Session, pending.Session)
+                && ReferenceEquals(pending.Session.Player, player)
+                && pending.Session.State == SessionState.InPlay)
+            {
+                // Raw retail action 108 pairs Parameter1 with the cast's nano ID. Parameter2 is
+                // evidence-selected; Delmus's constant 1 / nano-ID ordering is not promoted.
+                int? code = _interruptionCode?.Invoke(reason);
+                if (!code.HasValue) return;
+                pending.Session.Send(new CharacterActionMessage
+                {
+                    Identity = player.Identity, Unknown = 0,
+                    Action = CharacterActionType.InterruptNanoCasting, Unknown1 = 0,
+                    Target = Identity.None, Parameter1 = pending.Nano.Id, Parameter2 = code.Value, Unknown2 = 0
+                });
+            }
         }
 
         /// <summary>Actual removal only, not a same-authority zone transfer. Durable rows already own state.</summary>

@@ -29,6 +29,13 @@ namespace ZoneEngine_New.Core.GameData
 
         MobTemplate RequireMobTemplate(string hash);
 
+        Dictionary<int, int> ComposeNpcStats(MobTemplate template, int? level)
+        {
+            if (template.NpcFamily.HasValue || template.NpcStatTemplate != 0)
+                throw new System.InvalidOperationException("NPC family composition is unavailable in this data provider.");
+            return new Dictionary<int, int>(template.Stats);
+        }
+
         bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes);
 
         bool TryGetHashInstance(string hash, out HashInstance instance);

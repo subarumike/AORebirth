@@ -1,0 +1,2464 @@
+{
+  "sourceSha": "8b9d36090986dc3ad89b9545a23ff38016c626ab",
+  "source": "docs/generated/subway_enemy_combat_contracts.json",
+  "npcs": [
+    {
+      "hash": "BQAU",
+      "name": "Basic Quality Armorer",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            1
+          ],
+          "captureEvidence": [
+            "20260709-210452",
+            "20260709-212115",
+            "20260709-212336"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Qualities": [
+            1
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79135F53)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "BQWR",
+      "name": "Basic Quality Weaponsdealer",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            1
+          ],
+          "captureEvidence": [
+            "20260709-210452",
+            "20260709-212115",
+            "20260709-212336"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Qualities": [
+            1
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79135F52)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "BTMV",
+      "name": "Basic Tools Merchant",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            1
+          ],
+          "captureEvidence": [
+            "20260709-210452",
+            "20260709-212115",
+            "20260709-212336"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Qualities": [
+            1
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79135F55)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "CSBI",
+      "name": "Container Supplier",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            1
+          ],
+          "captureEvidence": [
+            "20260709-210452",
+            "20260709-212336"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Qualities": [
+            1
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Container Supplier:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Container Supplier:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79135F56)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "DCQV",
+      "name": "Looter",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 123038,
+          "HighId": 123039,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 123038,
+          "HighId": 123039,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "captureEvidence": [
+            "20260709-210452",
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-210452",
+            "20260709-212336",
+            "20260709-210452",
+            "20260709-212336",
+            "20260709-210452",
+            "20260709-212336",
+            "20260709-210452"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 123038,
+          "HighId": 123039,
+          "Qualities": [
+            9
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:795313CB)",
+            "(SimpleChar:7953AD8D)",
+            "(SimpleChar:79545029)"
+          ]
+        },
+        {
+          "LowId": 123038,
+          "HighId": 123039,
+          "Qualities": [
+            11
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79528F96)",
+            "(SimpleChar:795312BC)",
+            "(SimpleChar:7954503C)"
+          ]
+        },
+        {
+          "LowId": 123038,
+          "HighId": 123039,
+          "Qualities": [
+            12
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:795312DC)",
+            "(SimpleChar:79545034)"
+          ]
+        },
+        {
+          "LowId": 123038,
+          "HighId": 123039,
+          "Qualities": [
+            8
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79528FD6)",
+            "(SimpleChar:7954501B)"
+          ]
+        },
+        {
+          "LowId": 123038,
+          "HighId": 123039,
+          "Qualities": [
+            10
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452"
+          ],
+          "Owners": [
+            "(SimpleChar:7953AD7C)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "DIPE",
+      "name": "Discarded Pet",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        },
+        {
+          "LowId": 43712,
+          "HighId": 144745,
+          "Hash": "MAAT"
+        },
+        {
+          "LowId": 42033,
+          "HighId": 42032,
+          "Hash": "DIIT"
+        },
+        {
+          "LowId": 70292,
+          "HighId": 70293,
+          "Hash": "BRAW"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 43712,
+          "HighId": 144745,
+          "Hash": "MAAT",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 42033,
+          "HighId": 42032,
+          "Hash": "DIIT",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 70292,
+          "HighId": 70293,
+          "Hash": "BRAW",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 4,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "DOPT",
+      "name": "Disobedient Bot",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "EHDL",
+      "name": "Architect Striker",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "EMSE",
+      "name": "Empty Shell",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "FASO",
+      "name": "Fragmented Soul",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 123685,
+          "HighId": 123686,
+          "Hash": ""
+        },
+        {
+          "LowId": 123687,
+          "HighId": 123688,
+          "Hash": ""
+        },
+        {
+          "LowId": 123686,
+          "HighId": 123686,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 123685,
+          "HighId": 123686,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            14,
+            17,
+            18,
+            19
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260716-033326",
+            "20260709-222339",
+            "20260709-222339",
+            "20260716-033326",
+            "20260709-222339"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 123687,
+          "HighId": 123688,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            25,
+            26
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408",
+            "20260709-222339",
+            "20260709-225408"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 123686,
+          "HighId": 123686,
+          "Hash": "",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 123685,
+          "HighId": 123686,
+          "Qualities": [
+            14
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260716-033326"
+          ],
+          "Owners": [
+            "(SimpleChar:7954516A)",
+            "(SimpleChar:7954518B)",
+            "(SimpleChar:796D403E)"
+          ]
+        },
+        {
+          "LowId": 123687,
+          "HighId": 123688,
+          "Qualities": [
+            25
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:7954518A)",
+            "(SimpleChar:795451AE)"
+          ]
+        },
+        {
+          "LowId": 123685,
+          "HighId": 123686,
+          "Qualities": [
+            17
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:7954516F)",
+            "(SimpleChar:7954518E)"
+          ]
+        },
+        {
+          "LowId": 123685,
+          "HighId": 123686,
+          "Qualities": [
+            18
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260716-033326"
+          ],
+          "Owners": [
+            "(SimpleChar:79545248)",
+            "(SimpleChar:796D403F)"
+          ]
+        },
+        {
+          "LowId": 123687,
+          "HighId": 123688,
+          "Qualities": [
+            26
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451AA)"
+          ]
+        },
+        {
+          "LowId": 123685,
+          "HighId": 123686,
+          "Qualities": [
+            19
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:7954517A)"
+          ]
+        },
+        {
+          "LowId": 123687,
+          "HighId": 123687,
+          "Qualities": [
+            21
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260710-211430"
+          ],
+          "Owners": [
+            "(SimpleChar:7957E5F7)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "FLFE",
+      "name": "Filth Flea",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 201059,
+          "HighId": 201060,
+          "Hash": "EPAH"
+        },
+        {
+          "LowId": 201056,
+          "HighId": 201057,
+          "Hash": "AZUS"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 201059,
+          "HighId": 201060,
+          "Hash": "EPAH",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 201056,
+          "HighId": 201057,
+          "Hash": "AZUS",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 2,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "INFE",
+      "name": "Infector",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 201062,
+          "HighId": 201063,
+          "Hash": "DMXF"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 201062,
+          "HighId": 201063,
+          "Hash": "DMXF",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "INPE",
+      "name": "Infected Attendant",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "IORB",
+      "name": "Incomplete Rebuild",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 122655,
+          "HighId": 122655,
+          "Hash": ""
+        },
+        {
+          "LowId": 122653,
+          "HighId": 122654,
+          "Hash": ""
+        },
+        {
+          "LowId": 122655,
+          "HighId": 122656,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 122655,
+          "HighId": 122655,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            21
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122653,
+          "HighId": 122654,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            14,
+            17,
+            18
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408",
+            "20260709-222339",
+            "20260709-222339"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122655,
+          "HighId": 122656,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            22,
+            23,
+            24
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408",
+            "20260716-033326",
+            "20260710-211430"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 122653,
+          "HighId": 122654,
+          "Qualities": [
+            18
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:79545170)",
+            "(SimpleChar:79545177)",
+            "(SimpleChar:795451BC)"
+          ]
+        },
+        {
+          "LowId": 122654,
+          "HighId": 122654,
+          "Qualities": [
+            20
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:79545181)",
+            "(SimpleChar:795451FD)",
+            "(SimpleChar:79545241)"
+          ]
+        },
+        {
+          "LowId": 122655,
+          "HighId": 122655,
+          "Qualities": [
+            21
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451C1)"
+          ]
+        },
+        {
+          "LowId": 122655,
+          "HighId": 122656,
+          "Qualities": [
+            24
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451CB)"
+          ]
+        },
+        {
+          "LowId": 122653,
+          "HighId": 122654,
+          "Qualities": [
+            14
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:79545172)"
+          ]
+        },
+        {
+          "LowId": 122653,
+          "HighId": 122654,
+          "Qualities": [
+            17
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:79545188)"
+          ]
+        },
+        {
+          "LowId": 122655,
+          "HighId": 122656,
+          "Qualities": [
+            22
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260716-033326"
+          ],
+          "Owners": [
+            "(SimpleChar:796D403C)"
+          ]
+        },
+        {
+          "LowId": 122655,
+          "HighId": 122656,
+          "Qualities": [
+            23
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260710-211430"
+          ],
+          "Owners": [
+            "(SimpleChar:7957E5F9)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "LPPE",
+      "name": "Lost Thought",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "MDPA",
+      "name": "Melded Patterns",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121819,
+          "HighId": 121819,
+          "Hash": ""
+        },
+        {
+          "LowId": 121819,
+          "HighId": 121820,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121819,
+          "HighId": 121819,
+          "Hash": "",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 121819,
+          "HighId": 121820,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            23,
+            25,
+            26
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408",
+            "20260709-222339",
+            "20260709-225408",
+            "20260716-222201"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 121818,
+          "HighId": 121818,
+          "Qualities": [
+            20
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:7954508E)",
+            "(SimpleChar:79545190)",
+            "(SimpleChar:79545196)",
+            "(SimpleChar:79545198)"
+          ]
+        },
+        {
+          "LowId": 121817,
+          "HighId": 121818,
+          "Qualities": [
+            19
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408",
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260716-034559"
+          ],
+          "Owners": [
+            "(SimpleChar:7954517C)",
+            "(SimpleChar:795451DD)",
+            "(SimpleChar:796CD186)"
+          ]
+        },
+        {
+          "LowId": 121819,
+          "HighId": 121820,
+          "Qualities": [
+            26
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:79545187)",
+            "(SimpleChar:795451BA)"
+          ]
+        },
+        {
+          "LowId": 121819,
+          "HighId": 121820,
+          "Qualities": [
+            25
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451D8)"
+          ]
+        },
+        {
+          "LowId": 121817,
+          "HighId": 121818,
+          "Qualities": [
+            18
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:79545185)"
+          ]
+        },
+        {
+          "LowId": 121819,
+          "HighId": 121820,
+          "Qualities": [
+            23
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260716-222201"
+          ],
+          "Owners": [
+            "(SimpleChar:797025E8)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "MEML",
+      "name": "Molested Molecules",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 122216,
+          "HighId": 122217,
+          "Hash": ""
+        },
+        {
+          "LowId": 122218,
+          "HighId": 122219,
+          "Hash": ""
+        },
+        {
+          "LowId": 122217,
+          "HighId": 122217,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 122216,
+          "HighId": 122217,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            18,
+            19
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408",
+            "20260709-222339",
+            "20260709-225408"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122218,
+          "HighId": 122219,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            22,
+            23,
+            25,
+            27
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408",
+            "20260716-034104",
+            "20260709-222339",
+            "20260716-222201",
+            "20260709-222339",
+            "20260716-222201"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122217,
+          "HighId": 122217,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            20
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 122217,
+          "HighId": 122217,
+          "Qualities": [
+            20
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795450E5)",
+            "(SimpleChar:79545174)",
+            "(SimpleChar:7954517B)",
+            "(SimpleChar:795451B5)"
+          ]
+        },
+        {
+          "LowId": 122218,
+          "HighId": 122219,
+          "Qualities": [
+            27
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408",
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-034104"
+          ],
+          "Owners": [
+            "(SimpleChar:795451D7)",
+            "(SimpleChar:796D40AB)"
+          ]
+        },
+        {
+          "LowId": 122216,
+          "HighId": 122217,
+          "Qualities": [
+            18
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451C2)"
+          ]
+        },
+        {
+          "LowId": 122216,
+          "HighId": 122217,
+          "Qualities": [
+            19
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451D2)"
+          ]
+        },
+        {
+          "LowId": 122218,
+          "HighId": 122219,
+          "Qualities": [
+            22
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-222201"
+          ],
+          "Owners": [
+            "(SimpleChar:79545139)",
+            "(SimpleChar:797025F2)"
+          ]
+        },
+        {
+          "LowId": 122218,
+          "HighId": 122219,
+          "Qualities": [
+            23
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:795451C7)"
+          ]
+        },
+        {
+          "LowId": 122218,
+          "HighId": 122219,
+          "Qualities": [
+            25
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-222201"
+          ],
+          "Owners": [
+            "(SimpleChar:797025F6)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "MENI",
+      "name": "Eumenides",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 123267,
+          "HighId": 123268,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 123267,
+          "HighId": 123268,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            17,
+            20
+          ],
+          "captureEvidence": [
+            "20260717-215250",
+            "20260709-222339"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 123267,
+          "HighId": 123268,
+          "Qualities": [
+            17
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Eumenides:20260717-215250"
+          ],
+          "Owners": [
+            "(SimpleChar:79748626)"
+          ]
+        },
+        {
+          "LowId": 123267,
+          "HighId": 123268,
+          "Qualities": [
+            20
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Eumenides:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:79545042)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "MUGG",
+      "name": "Mugger",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            1
+          ],
+          "captureEvidence": [
+            "20260709-193914",
+            "20260709-210452",
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260709-225408",
+            "20260710-205400",
+            "20260710-211430",
+            "20260719-021022"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Qualities": [
+            1
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-193914",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-225408",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260710-205400",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260710-211430",
+            "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260719-021022"
+          ],
+          "Owners": [
+            "(SimpleChar:7953AA11)",
+            "(SimpleChar:7953AD2E)",
+            "(SimpleChar:7953AD53)",
+            "(SimpleChar:7953AD55)",
+            "(SimpleChar:7953AD5C)",
+            "(SimpleChar:7953AD6B)",
+            "(SimpleChar:7953ADC6)",
+            "(SimpleChar:7953ADC8)",
+            "(SimpleChar:7953AF3C)",
+            "(SimpleChar:795450D4)",
+            "(SimpleChar:795450EB)",
+            "(SimpleChar:795450ED)",
+            "(SimpleChar:795450EF)",
+            "(SimpleChar:7954512C)",
+            "(SimpleChar:795451FE)",
+            "(SimpleChar:79545329)",
+            "(SimpleChar:7957E627)",
+            "(SimpleChar:7957E632)",
+            "(SimpleChar:797AD6F6)",
+            "(SimpleChar:797AD70D)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "NUBR",
+      "name": "Neural Burnout",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "NXZP",
+      "name": "Shadow",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 201062,
+          "HighId": 201063,
+          "Hash": "DMXF"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 201062,
+          "HighId": 201063,
+          "Hash": "DMXF",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "PMPE",
+      "name": "Premature Pattern",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "RESC",
+      "name": "Redundant Scan",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 122026,
+          "HighId": 122027,
+          "Hash": ""
+        },
+        {
+          "LowId": 122027,
+          "HighId": 122027,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 122026,
+          "HighId": 122027,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            14,
+            16
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408",
+            "20260709-222339"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122027,
+          "HighId": 122027,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            20
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 122026,
+          "HighId": 122027,
+          "Qualities": [
+            14
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451BF)"
+          ]
+        },
+        {
+          "LowId": 122027,
+          "HighId": 122027,
+          "Qualities": [
+            20
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:7953AF85)"
+          ]
+        },
+        {
+          "LowId": 122028,
+          "HighId": 122029,
+          "Qualities": [
+            25
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451C4)"
+          ]
+        },
+        {
+          "LowId": 122026,
+          "HighId": 122027,
+          "Qualities": [
+            16
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339"
+          ],
+          "Owners": [
+            "(SimpleChar:795451D3)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "SLRU",
+      "name": "Slum Runner",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 201053,
+          "HighId": 201054,
+          "Hash": "DBPW"
+        },
+        {
+          "LowId": 43712,
+          "HighId": 144745,
+          "Hash": "MAAT"
+        },
+        {
+          "LowId": 42033,
+          "HighId": 42032,
+          "Hash": "DIIT"
+        },
+        {
+          "LowId": 70292,
+          "HighId": 70293,
+          "Hash": "BRAW"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 201053,
+          "HighId": 201054,
+          "Hash": "DBPW",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 43712,
+          "HighId": 144745,
+          "Hash": "MAAT",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 42033,
+          "HighId": 42032,
+          "Hash": "DIIT",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 70292,
+          "HighId": 70293,
+          "Hash": "BRAW",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 4,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "SS01",
+      "name": "Bloodcreeper",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121094,
+          "HighId": 121095,
+          "Hash": "SKW2"
+        },
+        {
+          "LowId": 121091,
+          "HighId": 121092,
+          "Hash": "SKW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121094,
+          "HighId": 121095,
+          "Hash": "SKW2",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 121091,
+          "HighId": 121092,
+          "Hash": "SKW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 2,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "STFE",
+      "name": "Stim Fiend",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "STFO",
+      "name": "Strike Foreman",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 122767,
+          "HighId": 122768,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 122767,
+          "HighId": 122768,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            17,
+            19
+          ],
+          "captureEvidence": [
+            "20260709-212336",
+            "20260709-220439"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 122767,
+          "HighId": 122768,
+          "Qualities": [
+            17
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Strike Foreman:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79545109)"
+          ]
+        },
+        {
+          "LowId": 122767,
+          "HighId": 122768,
+          "Qualities": [
+            19
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Strike Foreman:20260709-220439"
+          ],
+          "Owners": [
+            "(SimpleChar:7954512E)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "TAIL",
+      "name": "Tailor",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            1
+          ],
+          "captureEvidence": [
+            "20260709-210452",
+            "20260709-212115",
+            "20260709-212336"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 121567,
+          "HighId": 121567,
+          "Qualities": [
+            1
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-212336"
+          ],
+          "Owners": [
+            "(SimpleChar:79135F51)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "UNPE",
+      "name": "Uncontrollable Anger",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 144742,
+          "HighId": 144743,
+          "Hash": "SIW1",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "VEAE",
+      "name": "Vergil Aeneid",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 122123,
+          "HighId": 122124,
+          "Hash": ""
+        },
+        {
+          "LowId": 203781,
+          "HighId": 203782,
+          "Hash": "XOPZ"
+        },
+        {
+          "LowId": 203778,
+          "HighId": 203779,
+          "Hash": "DENW"
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 122123,
+          "HighId": 122124,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            23
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 203781,
+          "HighId": 203782,
+          "Hash": "XOPZ",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 203778,
+          "HighId": 203779,
+          "Hash": "DENW",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 122123,
+          "HighId": 122124,
+          "Qualities": [
+            23
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Vergil Aeneid:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Vergil Aeneid:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451E3)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 2,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "VOVG",
+      "name": "Violent Vagabond",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 130590,
+          "HighId": 130590,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 130590,
+          "HighId": 130590,
+          "Hash": "",
+          "classification": "VALID_VARIANT",
+          "observedQualities": [
+            1
+          ],
+          "captureEvidence": [
+            "20260708-143600",
+            "20260709-193914",
+            "20260709-205921",
+            "20260709-210452",
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260709-225408",
+            "20260710-205400"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 130590,
+          "HighId": 130590,
+          "Qualities": [
+            1
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260708-143600",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-193914",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-205921",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-210452",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-225408",
+            "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260710-205400"
+          ],
+          "Owners": [
+            "(SimpleChar:794CD4CC)",
+            "(SimpleChar:794CD74B)",
+            "(SimpleChar:794CD765)",
+            "(SimpleChar:794DF068)",
+            "(SimpleChar:794DF076)",
+            "(SimpleChar:794DF33F)",
+            "(SimpleChar:79528F80)",
+            "(SimpleChar:7953AA4A)",
+            "(SimpleChar:7953ABA3)",
+            "(SimpleChar:7953ABC5)",
+            "(SimpleChar:7953AD40)",
+            "(SimpleChar:7953AD48)",
+            "(SimpleChar:7953AD49)",
+            "(SimpleChar:7953AD4A)",
+            "(SimpleChar:7953AD4C)",
+            "(SimpleChar:7953AD54)",
+            "(SimpleChar:7953AD58)",
+            "(SimpleChar:7953AD76)",
+            "(SimpleChar:7953AF49)",
+            "(SimpleChar:7953AFA1)",
+            "(SimpleChar:7953AFE0)",
+            "(SimpleChar:7953AFE8)",
+            "(SimpleChar:7953AFE9)",
+            "(SimpleChar:795450FE)",
+            "(SimpleChar:7957E02C)",
+            "(SimpleChar:7957E5BF)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 0,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    },
+    {
+      "hash": "WOST",
+      "name": "Workman Striker",
+      "sourceWeaponDefinitions": [
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Hash": ""
+        },
+        {
+          "LowId": 122907,
+          "HighId": 122907,
+          "Hash": ""
+        },
+        {
+          "LowId": 122906,
+          "HighId": 122906,
+          "Hash": ""
+        },
+        {
+          "LowId": 122907,
+          "HighId": 122908,
+          "Hash": ""
+        }
+      ],
+      "definitions": [
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ],
+          "captureEvidence": [
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260720-031855",
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260720-043018",
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260710-211430",
+            "20260720-031855",
+            "20260720-043018",
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260720-031855",
+            "20260709-212115",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260720-031855",
+            "20260720-042205",
+            "20260720-043018",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260709-225408",
+            "20260720-031855",
+            "20260709-212336",
+            "20260709-220439",
+            "20260709-222339",
+            "20260709-225408",
+            "20260720-031855",
+            "20260709-212115",
+            "20260709-212336",
+            "20260710-211430",
+            "20260720-031855",
+            "20260709-222339",
+            "20260720-031855"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122907,
+          "HighId": 122907,
+          "Hash": "",
+          "classification": "UNKNOWN",
+          "observedQualities": [],
+          "captureEvidence": [],
+          "selection": "BLOCKED",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122906,
+          "HighId": 122906,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            20
+          ],
+          "captureEvidence": [
+            "20260709-212336",
+            "20260709-220439"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        },
+        {
+          "LowId": 122907,
+          "HighId": 122908,
+          "Hash": "",
+          "classification": "QL_VARIANT",
+          "observedQualities": [
+            27
+          ],
+          "captureEvidence": [
+            "20260709-222339",
+            "20260709-225408"
+          ],
+          "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+          "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+        }
+      ],
+      "capturedAlternatives": [
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            16
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+          ],
+          "Owners": [
+            "(SimpleChar:7953A9F7)",
+            "(SimpleChar:7953AB03)",
+            "(SimpleChar:7953AFF9)",
+            "(SimpleChar:7954501A)",
+            "(SimpleChar:79545136)",
+            "(SimpleChar:795451CC)",
+            "(SimpleChar:798036F8)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            14
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+          ],
+          "Owners": [
+            "(SimpleChar:7953AA77)",
+            "(SimpleChar:7953AAE9)",
+            "(SimpleChar:7953AE95)",
+            "(SimpleChar:79545137)",
+            "(SimpleChar:79545146)",
+            "(SimpleChar:79545213)",
+            "(SimpleChar:79545224)",
+            "(SimpleChar:7980F099)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            19
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260710-211430",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+          ],
+          "Owners": [
+            "(SimpleChar:7953A84F)",
+            "(SimpleChar:7953AFBC)",
+            "(SimpleChar:79545134)",
+            "(SimpleChar:79545216)",
+            "(SimpleChar:79545219)",
+            "(SimpleChar:7957E629)",
+            "(SimpleChar:79803683)",
+            "(SimpleChar:7980F096)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            12
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+          ],
+          "Owners": [
+            "(SimpleChar:7953A830)",
+            "(SimpleChar:7953AF95)",
+            "(SimpleChar:7953AFDD)",
+            "(SimpleChar:7954510E)",
+            "(SimpleChar:79803682)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            15
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-042205",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+          ],
+          "Owners": [
+            "(SimpleChar:7953AA16)",
+            "(SimpleChar:79545108)",
+            "(SimpleChar:7954522E)",
+            "(SimpleChar:79803694)",
+            "(SimpleChar:7980F07D)",
+            "(SimpleChar:7980F094)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            17
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+          ],
+          "Owners": [
+            "(SimpleChar:7953A9F0)",
+            "(SimpleChar:7953AFB8)",
+            "(SimpleChar:79545230)",
+            "(SimpleChar:79545313)",
+            "(SimpleChar:79803688)",
+            "(SimpleChar:79803689)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            18
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+          ],
+          "Owners": [
+            "(SimpleChar:7953AA0D)",
+            "(SimpleChar:79545233)",
+            "(SimpleChar:7954531C)",
+            "(SimpleChar:79803673)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            13
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260710-211430",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+          ],
+          "Owners": [
+            "(SimpleChar:7953AABE)",
+            "(SimpleChar:7957E62D)",
+            "(SimpleChar:798036AA)"
+          ]
+        },
+        {
+          "LowId": 122905,
+          "HighId": 122906,
+          "Qualities": [
+            11
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+          ],
+          "Owners": [
+            "(SimpleChar:79545205)",
+            "(SimpleChar:79803685)",
+            "(SimpleChar:798036B2)"
+          ]
+        },
+        {
+          "LowId": 122906,
+          "HighId": 122906,
+          "Qualities": [
+            20
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439"
+          ],
+          "Owners": [
+            "(SimpleChar:79545000)"
+          ]
+        },
+        {
+          "LowId": 122907,
+          "HighId": 122908,
+          "Qualities": [
+            27
+          ],
+          "Evidence": [
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+            "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408"
+          ],
+          "Owners": [
+            "(SimpleChar:795451CA)"
+          ]
+        }
+      ],
+      "unknownDefinitions": 1,
+      "overlappingQualityAlternatives": 0,
+      "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+      "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+    }
+  ]
+}

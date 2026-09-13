@@ -1,0 +1,137 @@
+{
+  "sourceSha": "8b9d36090986dc3ad89b9545a23ff38016c626ab",
+  "composition": [
+    "family",
+    "overlay",
+    "individual"
+  ],
+  "sourceFamilyKeys": [
+    "1",
+    "10001"
+  ],
+  "sourceOverlayKeys": [
+    "1"
+  ],
+  "families": [
+    {
+      "familyId": 0,
+      "npcs": [
+        "Basic Quality Armorer",
+        "Basic Quality Weaponsdealer",
+        "Basic Tools Merchant",
+        "Container Supplier",
+        "Tailor"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    },
+    {
+      "familyId": 3,
+      "npcs": [
+        "Violent Vagabond"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    },
+    {
+      "familyId": 63,
+      "npcs": [
+        "Bloodcreeper"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    },
+    {
+      "familyId": 138,
+      "npcs": [
+        "Looter",
+        "Discarded Pet",
+        "Disobedient Bot",
+        "Filth Flea",
+        "Infected Attendant",
+        "Lost Thought",
+        "Mugger",
+        "Stim Fiend",
+        "Uncontrollable Anger",
+        "Vergil Aeneid"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    },
+    {
+      "familyId": 148,
+      "npcs": [
+        "Empty Shell",
+        "Fragmented Soul",
+        "Incomplete Rebuild",
+        "Melded Patterns",
+        "Molested Molecules",
+        "Eumenides",
+        "Neural Burnout",
+        "Premature Pattern",
+        "Redundant Scan"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    },
+    {
+      "familyId": 149,
+      "npcs": [
+        "Architect Striker",
+        "Strike Foreman",
+        "Workman Striker"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    },
+    {
+      "familyId": 150,
+      "npcs": [
+        "Infector",
+        "Shadow"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    },
+    {
+      "familyId": 151,
+      "npcs": [
+        "Slum Runner"
+      ],
+      "baseFamilyDefined": false,
+      "runtimeFamilyDefined": false,
+      "overlayDefined": false,
+      "individualOverrides": true,
+      "status": "MISSING_FAMILY",
+      "evidenceGap": "Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted."
+    }
+  ]
+}

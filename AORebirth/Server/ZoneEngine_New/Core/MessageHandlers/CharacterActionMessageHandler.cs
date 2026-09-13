@@ -69,6 +69,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     message.Parameter2,
                     player.Identity.Instance));
 
+            if (message.Action == CharacterActionType.InterruptNanoCasting)
+            {
+                _nanos.TryInterrupt(player, session, message);
+                return;
+            }
+
             if (_teams.TryHandle(player, message))
                 return;
 

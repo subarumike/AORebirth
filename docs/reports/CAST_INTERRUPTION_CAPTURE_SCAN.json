@@ -1,0 +1,1337 @@
+{
+  "scope": "All locally available enemy-combat, nano-event and raw-packets CSV artifacts under both known capture roots; historical inventory paths may be absent. Raw field offsets follow the existing AOtomation N3 and CharacterAction contract.",
+  "files": [
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-213046/enemy-combat.csv",
+      "rows": 186,
+      "normalizedSha256": "7bd2be128f342d783b445753946a303d3eede4685b7adc4ef4a8291d77404c3b"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-213046/raw-packets.csv",
+      "rows": 1260,
+      "normalizedSha256": "30db75b1655e350c910687536036c4d01f5588297dc538fa810c2f05f5a8db41"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-233838/enemy-combat.csv",
+      "rows": 103,
+      "normalizedSha256": "0898bb5f36bb2ccc64be3afdd96162e8eafbdd84b97b8c1cb35319bfcea97132"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-233838/raw-packets.csv",
+      "rows": 728,
+      "normalizedSha256": "2c06f991c0223ceb2fe35eac9d417f1fb54a84b4cf6d1ab91ff27b1c752f96a8"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-234614/enemy-combat.csv",
+      "rows": 15,
+      "normalizedSha256": "f8ffcc03280bdeffca5c6ec09a6324d172572d1592c4b4d71457e448bb3bd49d"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-234614/raw-packets.csv",
+      "rows": 150,
+      "normalizedSha256": "fb0753bed000995860aadbacff41aeb0202f10c44a99e9038b11fe196c5dfef6"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-234847/enemy-combat.csv",
+      "rows": 51,
+      "normalizedSha256": "82fe2d5dbce5dcf5eaede9d2b78a58092c620da413f288ede1ddea5b1c681a68"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-234847/raw-packets.csv",
+      "rows": 1041,
+      "normalizedSha256": "a6b9698845b07aab36d617b562995f1da0ee2d4925272c293a84e749c0da0ff4"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-235702/enemy-combat.csv",
+      "rows": 643,
+      "normalizedSha256": "fc03b97281e22d5c172b6094d0616dc2866bf743993f4b2c26cdafb0fb5f5bd9"
+    },
+    {
+      "path": "Captures/Arete Landing [PF 6553] - 20260827-235702/raw-packets.csv",
+      "rows": 4812,
+      "normalizedSha256": "69b6795866c4b0db8ce4a962cba677345d80019f6df22ad489615249d0084fd3"
+    },
+    {
+      "path": "Captures/Borealis Backyard 2 [PF 3081] - 20260826-222425/enemy-combat.csv",
+      "rows": 15,
+      "normalizedSha256": "7f021b092126ce3537338b0727f46d3824c16b3912b198c99694be1b3187b62c"
+    },
+    {
+      "path": "Captures/Borealis Backyard 2 [PF 3081] - 20260826-222425/raw-packets.csv",
+      "rows": 159,
+      "normalizedSha256": "a4fcf877f0820d8d1d8d5511cd66dd066d828588cfd39723f570a97d48c3f929"
+    },
+    {
+      "path": "Captures/Garden_of_unredeemed Nascense [PF 4677] - 20260823-030123/enemy-combat.csv",
+      "rows": 34,
+      "normalizedSha256": "9a2a4c3e3b731da00ebee64f88764aba129be507e1e8b4566998a918bbe09646"
+    },
+    {
+      "path": "Captures/Garden_of_unredeemed Nascense [PF 4677] - 20260823-030123/raw-packets.csv",
+      "rows": 630,
+      "normalizedSha256": "657219b2385ff5898827d1d0c00b0adf4fab0c8558510ade62168d26b32ca8b1"
+    },
+    {
+      "path": "Captures/Garden_of_unredeemed Nascense [PF 4677] - 20260823-030524/enemy-combat.csv",
+      "rows": 192,
+      "normalizedSha256": "f4b94c5e357a0f6cf7816d13865619fda10df6c30af64fe48b37be9aec156cba"
+    },
+    {
+      "path": "Captures/Garden_of_unredeemed Nascense [PF 4677] - 20260823-030524/raw-packets.csv",
+      "rows": 1898,
+      "normalizedSha256": "179422343010e5d7fca8c5f096c2c8365a19ecc0f8018ad80f1683384adc08a4"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "rows": 25851,
+      "normalizedSha256": "81dd48730d256ad3466c8e8088b9d7222d879a14c2b5d880e5f23f2750b23f56"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "rows": 104690,
+      "normalizedSha256": "f2eabfa3b5b22c36271b98a6c7ac67a410b0848b161828911595b5d1a75bebce"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260820-234653/enemy-combat.csv",
+      "rows": 22,
+      "normalizedSha256": "6f391bc0226d51d71d8c8c3fe98b6e331b06b75a846987d71dfd41045f1e0e86"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260820-234653/raw-packets.csv",
+      "rows": 434,
+      "normalizedSha256": "88185654b9d6b5169bb4ea4825ed7ffc4c1c549902c24e22c7dc4ad5533d874b"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260820-235024/enemy-combat.csv",
+      "rows": 302,
+      "normalizedSha256": "67288867ecfe1d5fcf183e0d8de50cc0aa9c51e1f1804e3a118f48270efa9a55"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260820-235024/raw-packets.csv",
+      "rows": 1328,
+      "normalizedSha256": "4931da4f393bb265bc9899e2dfeb3df76dfeca2a8cdde72cffcde688904264b1"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260820-235749/enemy-combat.csv",
+      "rows": 243,
+      "normalizedSha256": "7af0758d1cd6a86744ae02c1af8efd7fe1bf73213f5dcbc8f007514620a1e81c"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260820-235749/raw-packets.csv",
+      "rows": 1028,
+      "normalizedSha256": "76816a716d955f03616295f5aa62370892789fe47847c8cf4782a6e44c4ff835"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-011636/enemy-combat.csv",
+      "rows": 343,
+      "normalizedSha256": "c1fd14ecc40933ca9017156dcf50fbb75b526841a170e212a6ec65e4790eb316"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-011636/raw-packets.csv",
+      "rows": 1907,
+      "normalizedSha256": "d8669c3bf7071dc793fdeedf716b849cdddebdacf9b9598989ef4e051ff5ca8f"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-012157/enemy-combat.csv",
+      "rows": 433,
+      "normalizedSha256": "2c3efd0c98a54f76448112d77b1820b232d56ccc724abb660fd15f952aefff9c"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-012157/raw-packets.csv",
+      "rows": 2284,
+      "normalizedSha256": "d0e89b9111fabb0edb36258a48252ab8b7d1cc0383af1ef252e5fcc36943664b"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-012720/enemy-combat.csv",
+      "rows": 9,
+      "normalizedSha256": "6386ac9ba2051a9b7357566f3bd9350285cc4ff19297d1ce51a6affb288ae60e"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-012720/raw-packets.csv",
+      "rows": 29,
+      "normalizedSha256": "a3048c45440ce78b73de00d975d8e8bc5a24c626355534c44bb70920c62e584d"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-013914/enemy-combat.csv",
+      "rows": 244,
+      "normalizedSha256": "ac9f13c4190949832fbb3248c6c8e92d873d7285caf66acf8d84cbee69c83001"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-013914/raw-packets.csv",
+      "rows": 944,
+      "normalizedSha256": "f5447a4a2ebc051c3d7c80f2113113153901a08ce58c73252b22bb124cdc6922"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-034134/enemy-combat.csv",
+      "rows": 166,
+      "normalizedSha256": "c3c4651b97fde15d8dc48b511206fdd819e6e09951d44a7b842ee3e71472dd2c"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-034134/raw-packets.csv",
+      "rows": 789,
+      "normalizedSha256": "f8897873d34f10e67334ccddfcf20095e6af2fbb627b477507c956957a83fd78"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-212809/enemy-combat.csv",
+      "rows": 1,
+      "normalizedSha256": "8535df244f6797d180a8e1f43f881575c47fc3d06b1b202e6e2c55e77483fa9a"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-212809/raw-packets.csv",
+      "rows": 1,
+      "normalizedSha256": "3eabe28d9f87439b98e8c59b4b529f682b772e18410240e9be74c1142d2ebe89"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-212904/enemy-combat.csv",
+      "rows": 1,
+      "normalizedSha256": "8535df244f6797d180a8e1f43f881575c47fc3d06b1b202e6e2c55e77483fa9a"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-212904/raw-packets.csv",
+      "rows": 1,
+      "normalizedSha256": "3eabe28d9f87439b98e8c59b4b529f682b772e18410240e9be74c1142d2ebe89"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-214401/enemy-combat.csv",
+      "rows": 50,
+      "normalizedSha256": "ee4ab3ff6f1f41cb56b2267283ca705da4bb44a7707f2a6e63c916a0f3e16e38"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-214401/raw-packets.csv",
+      "rows": 131,
+      "normalizedSha256": "a151ea6db9345da897d32d47c5436fb420a6427ef85ef3515a914d5099f4b342"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-221848/enemy-combat.csv",
+      "rows": 311,
+      "normalizedSha256": "a7b040b0ef0166d20261657696248f352989683ae24f1c489f65c4998f0f4aac"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-221848/raw-packets.csv",
+      "rows": 1397,
+      "normalizedSha256": "3a19bbd9949952ecdd0767233f085fb02b78deea6bc7e5a4f44d37c5318a8cc5"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-222657/enemy-combat.csv",
+      "rows": 264,
+      "normalizedSha256": "4f631bc7444f5210b122589ddc28e6151cb370ba5a898c72bd5f478754029e64"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-222657/raw-packets.csv",
+      "rows": 1094,
+      "normalizedSha256": "bc62209cff4e1c5c89d6438e0ca9d5e5f578e2ae01dfe14ebb7f78b5c717c970"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-224042/enemy-combat.csv",
+      "rows": 22,
+      "normalizedSha256": "232b65e8801d12244627445afc8572bdcd0fc30c7bf50b9bab00ccde59dacffc"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-224042/raw-packets.csv",
+      "rows": 78,
+      "normalizedSha256": "12790fe665dd42f778e6403956583156b6c343e7c44082ce74b091450c41607f"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-224352/enemy-combat.csv",
+      "rows": 942,
+      "normalizedSha256": "ada5eb8e874fcfe3084fc4cb3efbf47a2f6e906be898be452a867357e25e65f5"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-224352/raw-packets.csv",
+      "rows": 3225,
+      "normalizedSha256": "aa694faecc4344cff40d0a9c6a88d023473fdcf1cf2e6be3c990ca4cd3839193"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-225212/enemy-combat.csv",
+      "rows": 153,
+      "normalizedSha256": "664af4ecd9a59a525a1ec525569c3de4e80c5407acc2e6d84bf342994707f830"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-225212/raw-packets.csv",
+      "rows": 1070,
+      "normalizedSha256": "c91a5a2c1713250928e963264af41a0a9a2a78bc51076d71cdf98ac75c1e7e1d"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-225854/enemy-combat.csv",
+      "rows": 80,
+      "normalizedSha256": "9c0a800badfab194da4caafca2d27863f10999a2355935d892982f7f593e6c1a"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-225854/raw-packets.csv",
+      "rows": 259,
+      "normalizedSha256": "b40c4e6aaf0725956af1ba7af1cd63954ca4db92410ec5b9c7132a5e306dc705"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-230553/enemy-combat.csv",
+      "rows": 53,
+      "normalizedSha256": "9c0cea6169d90000a505e3429b66593212a15b867cd0f9bbc7590c48452d7ccb"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260821-230553/raw-packets.csv",
+      "rows": 161,
+      "normalizedSha256": "f64a3176f6f40c49b8fd44e6124e234b6ce82264f0e08f5042d9797197d216ce"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-232200/enemy-combat.csv",
+      "rows": 254,
+      "normalizedSha256": "6ae9acf267b45965fa97ce6ab9557933c3f5e8a6d5d340a9038f0bf81929207c"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-232200/raw-packets.csv",
+      "rows": 1063,
+      "normalizedSha256": "97d067d885f3bc5cf1113bc43f9f39e9575dbfab136af1388cdf55460de41037"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-232717/enemy-combat.csv",
+      "rows": 191,
+      "normalizedSha256": "1df8c8fc45529db1dd3e296534a01f7620a68e79f3944d527e0c2e099427fadc"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-232717/raw-packets.csv",
+      "rows": 910,
+      "normalizedSha256": "9fbca6baa558d0b70b3056841412c1c806f554908d19f0a0459265a588e85d98"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-234400/enemy-combat.csv",
+      "rows": 415,
+      "normalizedSha256": "b6fae4475aa272813ef040cba27ebb3c8b288ea0d48b79f302348bd29894ee16"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-234400/raw-packets.csv",
+      "rows": 1725,
+      "normalizedSha256": "2298bbd4864ee50d300453d7a8ab0d3fcabfc874b8370fd64330cdadcd9e5bdd"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-234738/enemy-combat.csv",
+      "rows": 26,
+      "normalizedSha256": "e11d245040b9e1b237142e0bccb9fc3abefd49e1c88c235a9561a2bcd624e098"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-234738/raw-packets.csv",
+      "rows": 123,
+      "normalizedSha256": "186547210914e00a8e1dc1f47232045ec5aa4d43cd251613012de16ccbaa3eb5"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-234846/enemy-combat.csv",
+      "rows": 113,
+      "normalizedSha256": "fe89211025a9403fc135b655a13ad99944924d8fb564f52facbd13e0cb6e88ab"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-234846/raw-packets.csv",
+      "rows": 593,
+      "normalizedSha256": "352e9b6482240a82f4cd15b9df24aa2662bf1a099c8cc94b12f51cc32142dc9f"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-235116/enemy-combat.csv",
+      "rows": 60,
+      "normalizedSha256": "10f4e762d373c9bda7ec4625d238dfe8949e981740afe797efd22400ed09e316"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-235116/raw-packets.csv",
+      "rows": 218,
+      "normalizedSha256": "ce467f33f1941e9e631dd313d6032a0996a5eb0e47a03cb8e7fa4031c028cc18"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-235241/enemy-combat.csv",
+      "rows": 12,
+      "normalizedSha256": "0ce20b77f9ebcef5158fc9a14a4bc5d123b2db43de459489311b7f190032d04e"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-235241/raw-packets.csv",
+      "rows": 45,
+      "normalizedSha256": "470f4273068413a4bbeb3a24a51ab96eae4a89251bac86e0c8723c37c1b897ff"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-235258/enemy-combat.csv",
+      "rows": 22,
+      "normalizedSha256": "a1f914e4eea7bf6e11458490c4aa2840b4d640e5fa5b59b39161e0d621e22bb7"
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260828-235258/raw-packets.csv",
+      "rows": 93,
+      "normalizedSha256": "1eda33e65460dbc6d0ddc977ba9c5b18d07d89fe281aafeb88f2d3d31102ab20"
+    },
+    {
+      "path": "Captures/IPS Interior - Basic [PF 4575] - 20260823-032812/enemy-combat.csv",
+      "rows": 6,
+      "normalizedSha256": "db204c01373b1c99008ce554281f93b0d868478f4ac60df1381306edcb9bdc99"
+    },
+    {
+      "path": "Captures/IPS Interior - Basic [PF 4575] - 20260823-032812/raw-packets.csv",
+      "rows": 194,
+      "normalizedSha256": "8d7f4ada09a706e5f6eb80b0289ee06a91d611d3ba52722ab642562ebc7964ed"
+    },
+    {
+      "path": "Captures/Nascense Frontier [PF 4310] - 20260823-025415/enemy-combat.csv",
+      "rows": 78,
+      "normalizedSha256": "a548801bd3e521624d44e978a4b9c512802ddcbd3fc4259c5dba5f4957573ee3"
+    },
+    {
+      "path": "Captures/Nascense Frontier [PF 4310] - 20260823-025415/raw-packets.csv",
+      "rows": 1444,
+      "normalizedSha256": "eff3b89046e9ce296ad1135953696415fd676373237136a228440149dc634031"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-220829/raw-packets.csv",
+      "rows": 247,
+      "normalizedSha256": "5e7929c8fcd70483e563d8c13bd63619a17aef1b4e9e9edafb0b51f3520634d3"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-221207/raw-packets.csv",
+      "rows": 317,
+      "normalizedSha256": "ceaf42865dfbe89493388d3552637cc9f0704bdb57fe9eb136535166e24c7bfc"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-221519/raw-packets.csv",
+      "rows": 39,
+      "normalizedSha256": "d719b1daa69efbd560b5462570da2d8f40a51354035238652230e5d1954f86ab"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-221903/raw-packets.csv",
+      "rows": 31,
+      "normalizedSha256": "557c222cab4462dff621b548e3b2c4ac46887f4500911b2b1eb9aa57191031bb"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-221929/raw-packets.csv",
+      "rows": 277,
+      "normalizedSha256": "530afbcb558e25de38646d7220d7cc89cf91b0ef770edf6c974d889b9b6afd21"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-222041/raw-packets.csv",
+      "rows": 303,
+      "normalizedSha256": "5e964daf3bfea90085abeb1e8bf6ff37e84e0d29d6ee8186f7fc4ddc4b360e7c"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-222152/raw-packets.csv",
+      "rows": 425,
+      "normalizedSha256": "dba00d1dc299ea0adc893a376854bfa39e91c0b1f7770d1b2daaaeffbc0efe9c"
+    },
+    {
+      "path": "Captures/Sector 10 - Solo Instance [PF 4475] - Mike 2022 - 20260830-222611/raw-packets.csv",
+      "rows": 209,
+      "normalizedSha256": "744b0b0ed643308a2c6aff2105d7d19c41bcb9acf05814ccf4f31ad098e8adb2"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-034033/raw-packets.csv",
+      "rows": 525,
+      "normalizedSha256": "026c43cd7ee2b99afafd6efa7fd7cbfde5fb1e2c2952fe0ffa880814b4bb0e8b"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-040432/raw-packets.csv",
+      "rows": 3412,
+      "normalizedSha256": "1561b7c6a60df159e24e409f6da786bd43be378ab42cb9a51d10ecc3bcfac18f"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-040731/raw-packets.csv",
+      "rows": 4962,
+      "normalizedSha256": "4e68fa1f9bb1fb8423845001c73e49c8acadbe78e5745f038a903b4ae1e4b71a"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-041457/raw-packets.csv",
+      "rows": 681,
+      "normalizedSha256": "147047fbfad63e4507bce45193bb7f91035fffef5b8962b6a765e180c768f76b"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-041643/raw-packets.csv",
+      "rows": 478,
+      "normalizedSha256": "42a8afa7ba0d9e65f5e7e439bd7e2595d667e0a3275d89d361a4a66280a4ecef"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-041816/raw-packets.csv",
+      "rows": 568,
+      "normalizedSha256": "961832fbbdb0309835a681db94c2c5cf49b749233bd5ee7653e50656d780a817"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-041950/raw-packets.csv",
+      "rows": 482,
+      "normalizedSha256": "da1c9516dddc1a7c4145d4197dbdb9ffbc57bc1f86a1a33ce9ccc27e19ce98fe"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-042105/raw-packets.csv",
+      "rows": 404,
+      "normalizedSha256": "ac4a1dc91b1f0cdcbfbdb5577726a9a03037932541dc3b834009f1002e643a7d"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-042257/raw-packets.csv",
+      "rows": 625,
+      "normalizedSha256": "ee5b687e571e9e5a3d58544f8d39d4730eddf2c0a1a3a535518791ae5384d4ea"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-042449/raw-packets.csv",
+      "rows": 616,
+      "normalizedSha256": "3efbc00ebf68b447d8e4ea4ea2501212d844d618ed213889c75104d995dc2fe2"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-042700/raw-packets.csv",
+      "rows": 634,
+      "normalizedSha256": "ae920ea00f6697afcfb54aaea4d1268b3966e670c35a258ae96728d54b0ffea6"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-042926/raw-packets.csv",
+      "rows": 521,
+      "normalizedSha256": "58194950d3a821c09881f2db6d89ad193ff5882c96c017784dee2bf6000cd20f"
+    },
+    {
+      "path": "Captures/Sector 10 - Team Instance [PF 4474] - Mike 2022 - 20260830-043059/raw-packets.csv",
+      "rows": 2765,
+      "normalizedSha256": "25b034329298e99c647b1209d6bd43128aafa7c0b5f0986dfe326054c432e9e4"
+    },
+    {
+      "path": "Captures/Sector 10 [PF 4374] - Mike 2022 - 20260830-034520/raw-packets.csv",
+      "rows": 885,
+      "normalizedSha256": "5a09b5649e3e45c31ccc9bab07c0296ca448ccf87d5f4fe78196a3346469280c"
+    },
+    {
+      "path": "Captures/Sector 10 [PF 4374] - Mike 2022 - 20260830-035031/raw-packets.csv",
+      "rows": 2651,
+      "normalizedSha256": "de9effb4d8426cc12ff4b78fab2f9276e8b8a3fc03792fb5a24ca636ff574a44"
+    },
+    {
+      "path": "Captures/Shuttle to ICC (dng) [PF 7101] - 20260827-234212/enemy-combat.csv",
+      "rows": 1,
+      "normalizedSha256": "8535df244f6797d180a8e1f43f881575c47fc3d06b1b202e6e2c55e77483fa9a"
+    },
+    {
+      "path": "Captures/Shuttle to ICC (dng) [PF 7101] - 20260827-234212/raw-packets.csv",
+      "rows": 4,
+      "normalizedSha256": "ed270ddc341dd3f9d9777232bc7fe3054165ad259794a7f9cf2ba96a217d71d0"
+    },
+    {
+      "path": "Captures/Shuttle to ICC (dng) [PF 7101] - 20260827-234329/enemy-combat.csv",
+      "rows": 1,
+      "normalizedSha256": "8535df244f6797d180a8e1f43f881575c47fc3d06b1b202e6e2c55e77483fa9a"
+    },
+    {
+      "path": "Captures/Shuttle to ICC (dng) [PF 7101] - 20260827-234329/raw-packets.csv",
+      "rows": 16,
+      "normalizedSha256": "54b8e070b8eb1c16fb474b209c73ef9c512ca614fb31046652b7d7bb3ff133b8"
+    },
+    {
+      "path": "Captures/Teleport Tower [PF 4833] - 20260816-173924/enemy-combat.csv",
+      "rows": 4,
+      "normalizedSha256": "8e9a5a74d9b25df5602738dc376c9c3b98851944d727125880d968705b300c66"
+    },
+    {
+      "path": "Captures/Teleport Tower [PF 4833] - 20260816-173924/raw-packets.csv",
+      "rows": 206,
+      "normalizedSha256": "a7f087845d528dd9f6ade0934625bb914740288f5df9bd9487c30c5f8b3a21c7"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007/enemy-combat.csv",
+      "rows": 267,
+      "normalizedSha256": "248a0b2816e7b7af0d6cd856e1ae599bab309fba6fbe1996732f92b48d4b35dd"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-222007/raw-packets.csv",
+      "rows": 1627,
+      "normalizedSha256": "5703167652c294026d7efd7f0fff2d5363bb9a81533906d0dd55fccc1600a6ce"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-214751/enemy-combat.csv",
+      "rows": 229,
+      "normalizedSha256": "28a9b3935aef190402cf55570a605d6f28ba50b2f5538586274a6b7073f5ec28"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-214751/raw-packets.csv",
+      "rows": 1606,
+      "normalizedSha256": "e7106be19df14736719f2597ce50a64f152396148bd28bfc97054966d86f2ad4"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250/enemy-combat.csv",
+      "rows": 93,
+      "normalizedSha256": "787adc86c13e55b567aaf0002ca80efd98517659d516e160912fb0c74b44396d"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-215250/raw-packets.csv",
+      "rows": 913,
+      "normalizedSha256": "430c370f0db7c6f177f13eed8881b897e86f9f34755fc41516112c4e744d5e5b"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-220340/enemy-combat.csv",
+      "rows": 9,
+      "normalizedSha256": "2180b63b85629ca337cf6772d6017c59aa3cc61438449e89e2c9b5f7b8e4ee39"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260717-220340/raw-packets.csv",
+      "rows": 247,
+      "normalizedSha256": "ee752116f16d59d21207df227ed326a08d18989c4d2ca14b57417e3bbb8b5d8e"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "rows": 12493,
+      "normalizedSha256": "16406c74c70cce6566534f70fd80271388131ebb28789da236f6c2fc3bb0e487"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "rows": 100093,
+      "normalizedSha256": "db3e3088c5839cbefd8284c02921097c9a39a61c02b3ae4f411d41ae811d78d6"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/enemy-combat.csv",
+      "rows": 10742,
+      "normalizedSha256": "9f4eb02905af340c65f49b03c766b396ef4a4ea3da97c32686eede9dde00b7cf"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/raw-packets.csv",
+      "rows": 91962,
+      "normalizedSha256": "766ad110f7224dd2a13b7a1266ad991022c3f12d0e0d659a30fd55926635dc07"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-001044/enemy-combat.csv",
+      "rows": 781,
+      "normalizedSha256": "d35950ee8a2e1b24232bc7cca3bd11e6f33cdaa496bf61a205fe87276623e6b4"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-001044/raw-packets.csv",
+      "rows": 4470,
+      "normalizedSha256": "955004818edf4d32e85e9ec264f395a324fbfc6e39ebefcb64b9c934c248cd81"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-003410/enemy-combat.csv",
+      "rows": 625,
+      "normalizedSha256": "d34f10c0c1ac9f6b83e2ae2c899a720f3d27329aa2010696fc18ce6f0bd77b07"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-003410/raw-packets.csv",
+      "rows": 3552,
+      "normalizedSha256": "703abe895e1d5dae03d8f6a827fc51c71572e588485a14275a3d1aee5736c3c4"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-005042/enemy-combat.csv",
+      "rows": 281,
+      "normalizedSha256": "0280691556e6d2d7c4669085ca72d40aab980427efabeefc55d1bfe93ed522b4"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-005042/raw-packets.csv",
+      "rows": 1614,
+      "normalizedSha256": "93ab479477ad0ecebf40335a00d73585c8e83ec6475d4811215d1b32465adc9b"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-010220/enemy-combat.csv",
+      "rows": 376,
+      "normalizedSha256": "18d401c00e8e66820ad1355f65f8f7c68b4983dcab6f51a1fa63106b4c853b85"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-010220/raw-packets.csv",
+      "rows": 4684,
+      "normalizedSha256": "71f59333dd9dbae9b0b7b2f94e811608b4d14a70862ea29c1df0ccbfdfdf5ec3"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-010846/enemy-combat.csv",
+      "rows": 9175,
+      "normalizedSha256": "44c8374135c1b6806659b42f509738c47aa741bfe53d268f4854774bb6b61706"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-010846/raw-packets.csv",
+      "rows": 61966,
+      "normalizedSha256": "835e81ed615c77650c2a4179d94f836a51ca7a65cabdf619156fab1ce5b80ca2"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-012547/enemy-combat.csv",
+      "rows": 491,
+      "normalizedSha256": "fc3e72b9abc9a580cb5a8e3bdbf70293c08883158a7a4c30e8419115b60fa94c"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-012547/raw-packets.csv",
+      "rows": 2434,
+      "normalizedSha256": "28fddfae22652ec29f49c8729ffdf39e05708b0fe1fc088824f14ec57e48b5b7"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-231938/enemy-combat.csv",
+      "rows": 3,
+      "normalizedSha256": "60ec8df1353b39e9615566bb29f9bc9563623a4fd05a3ef5ef6fff7424ae3dae"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-231938/raw-packets.csv",
+      "rows": 108,
+      "normalizedSha256": "4f27fda44d5cf9ebe2ef6ef4a8f2a6ea01e4e9837360911db95f5a1cea3618da"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-233312/enemy-combat.csv",
+      "rows": 3,
+      "normalizedSha256": "f17bdc47c3f29030b9a4ca72893866c4992d445a322752f19465b95cd1204d0f"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260728-233312/raw-packets.csv",
+      "rows": 74,
+      "normalizedSha256": "3940710c4be4e8441b765a03fd8f7d35828e33a827d6b6af7c55ed88f80bdcfd"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260729-000735/enemy-combat.csv",
+      "rows": 23,
+      "normalizedSha256": "b80a627b9286a9d774085da7cebb8222e92986b2cd085efb444a9969d1ead7ae"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260729-000735/raw-packets.csv",
+      "rows": 950,
+      "normalizedSha256": "064c3b815475e706ed7b718b2e226f31f0c165726e6dd732a8f7e97e28ba1489"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-030702/enemy-combat.csv",
+      "rows": 90,
+      "normalizedSha256": "5b0a5197c9d3e5b1350bab53b2ee8e477c5b76aef70a7d832244ef8726bc0116"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-030702/raw-packets.csv",
+      "rows": 1377,
+      "normalizedSha256": "03f4b8e1507a3670e87f74a1178ff21022e67ddb4f7c7e047237e455c7a3f79b"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-035230/enemy-combat.csv",
+      "rows": 3,
+      "normalizedSha256": "eedee55d418c7fc4d5ac8ca23d09f1a0d18d8979097cbb133d6766716f5238ac"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260731-035230/raw-packets.csv",
+      "rows": 464,
+      "normalizedSha256": "07e759290d2e16280857db5bf1139120f0952a77bd6f65f4782ead862de54f12"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/enemy-combat.csv",
+      "rows": 32,
+      "normalizedSha256": "de256202e40fc53451fe2091eb0e51aea456940317de45e5150a23eeb541d2aa"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-014647/raw-packets.csv",
+      "rows": 242,
+      "normalizedSha256": "56ca12297987032e3e2910c5260ec80d04bea441b9d9667c37acb8a86c23a92d"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/enemy-combat.csv",
+      "rows": 50,
+      "normalizedSha256": "984c0868eb0c61da4d69f3079bc0c7b65f1a8a737576c993252872d2e0e02fdb"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856/raw-packets.csv",
+      "rows": 651,
+      "normalizedSha256": "2f644f93a95e9512f697c32611ff618e0c895880d7359c32052d0798029c9524"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260818-202519/enemy-combat.csv",
+      "rows": 4,
+      "normalizedSha256": "84c5f4ea795143a387b6a4df3ab5ab9b604b71df92cd23965e53ab28919052d9"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260818-202519/raw-packets.csv",
+      "rows": 6,
+      "normalizedSha256": "602b40b3885fbb0e03481698965acea0a9b791fb4d33fbc3237cb12b57dbfd84"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260818-202735/enemy-combat.csv",
+      "rows": 4,
+      "normalizedSha256": "c5432714773eba7a613a8bbe54d8247147ed48695b60e739bd14f46f049ad371"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260818-202735/raw-packets.csv",
+      "rows": 14,
+      "normalizedSha256": "02a24ec0f6272b1500f5ced57dd2815604cde9ebdfe9bdd881f0587d391baec4"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260818-203908/enemy-combat.csv",
+      "rows": 4,
+      "normalizedSha256": "0c94ef619044d37ad99092b0dd6edae6b0819a148eead4cc39ab63a37b442dab"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260818-203908/raw-packets.csv",
+      "rows": 6,
+      "normalizedSha256": "8610f3c410cd181b921c9aaad1b2c3b5a97fc2219d24a852b88fd10da9baebc5"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/BrandonThornCapture/enemy-combat.csv",
+      "rows": 149,
+      "normalizedSha256": "f7f3d032b5358a98feb7cb6a773be62cbb94996ae666b910951302d72ea16047"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/BrandonThornCapture/raw-packets.csv",
+      "rows": 1175,
+      "normalizedSha256": "bcb8c55319898176eec80492dd9324b3462f3a1ac26e579a8d41ecd8cc70627b"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/ICC Shuttleport [PF 4582] - 20260819-014109/enemy-combat.csv",
+      "rows": 67,
+      "normalizedSha256": "4c9b3fd9574e17dc99b17da1fc7ad5a5e32ced9226f9a1a2b949b4eeab259f3c"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/ICC Shuttleport [PF 4582] - 20260819-014109/raw-packets.csv",
+      "rows": 5066,
+      "normalizedSha256": "d7334806cab28135591d6e5ee25dd744701d06e984064914a62620d26532ac25"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/ICC Shuttleport [PF 4582] - 20260819-015104/enemy-combat.csv",
+      "rows": 51,
+      "normalizedSha256": "e19761b7cae92f7ddd48ca6ddb4cceda6da848c8bfcb6f7d5c25cb3a378c2f68"
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/ICC Shuttleport [PF 4582] - 20260819-015104/raw-packets.csv",
+      "rows": 4172,
+      "normalizedSha256": "5abe25f414b5cac95613eda52b6264f3a35871e32f2d1d2b754db3d47ed713d9"
+    }
+  ],
+  "findings": [
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "row": 9793,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-08-16T16:11:16.1769181Z\",\"OUT-N3\",3388,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:6E4F490) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "row": 9900,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-08-16T16:13:51.7060799Z\",\"OUT-N3\",3504,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:6E4F490) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "row": 9902,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-08-16T16:13:51.8277154Z\",\"OUT-N3\",3506,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:6E4F490) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "row": 10021,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-08-16T16:15:08.0580609Z\",\"OUT-N3\",3638,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:6E4F490) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "row": 10114,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-08-16T16:16:47.5843814Z\",\"OUT-N3\",3807,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:6E4F490) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "row": 10115,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-08-16T16:16:47.7025590Z\",\"OUT-N3\",3808,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:6E4F490) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/enemy-combat.csv",
+      "row": 10382,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-08-16T16:21:20.3034271Z\",\"OUT-N3\",4161,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:6E4F490) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 2105,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T08:58:03.1472700Z\",\"OUT-N3\",1227,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 2720,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T08:59:59.0247847Z\",\"OUT-N3\",1577,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 3084,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T09:02:22.1919501Z\",\"OUT-N3\",1755,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 3089,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T09:02:23.2184842Z\",\"OUT-N3\",1759,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 3992,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T09:07:03.3588845Z\",\"OUT-N3\",2162,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 3995,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T09:07:03.7570922Z\",\"OUT-N3\",2166,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 6201,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T09:16:32.2420724Z\",\"OUT-N3\",3666,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/enemy-combat.csv",
+      "row": 7188,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T09:21:12.8744985Z\",\"OUT-N3\",4456,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/enemy-combat.csv",
+      "row": 1546,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T13:30:18.3780409Z\",\"OUT-N3\",822,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/enemy-combat.csv",
+      "row": 1721,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T13:31:17.5597886Z\",\"OUT-N3\",956,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/enemy-combat.csv",
+      "row": 5518,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T13:48:30.0047689Z\",\"OUT-N3\",3227,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/enemy-combat.csv",
+      "row": 9150,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T14:12:32.9396949Z\",\"OUT-N3\",6837,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/enemy-combat.csv",
+      "row": 9444,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T14:13:11.0164081Z\",\"OUT-N3\",7010,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/enemy-combat.csv",
+      "row": 9446,
+      "header": "﻿CapturedUtc,Direction,Sequence,MessageType,SourceRole,SourceIdentity,TargetRole,TargetIdentity,AuxRole1,AuxIdentity1,AuxRole2,AuxIdentity2,Action,Amount,TargetHp,Unknown1,Unknown2,Unknown3,Unknown4,Unknown5,Unknown6,Detail",
+      "line": "\"2026-07-22T14:13:11.5471579Z\",\"OUT-N3\",7012,\"CharacterAction\",\"local-player\",\"\",\"None\",\"(None:0000)\",\"\",\"\",\"\",\"\",\"InterruptNanoCasting\",\"\",\"\",\"0\",\"0\",\"\",\"\",\"\",\"\",\"CharacterActionMessage { Action=InterruptNanoCasting Unknown1=0 Target=(None:0000) Parameter1=0 Parameter2=0 Unknown2=0 N3MessageType=CharacterAction Identity=(SimpleChar:797E30DD) Unknown=0 PacketType=N3Message }\""
+    }
+  ],
+  "rawFindings": [
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "row": 36895,
+      "timestamp": "2026-08-16T16:11:16.1769181Z",
+      "direction": "OUT",
+      "sequence": "3433",
+      "rawHex": "0000000A0000000006E4F490000000025E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 115668112,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "row": 38207,
+      "timestamp": "2026-08-16T16:13:51.7060799Z",
+      "direction": "OUT",
+      "sequence": "3554",
+      "rawHex": "0000000A0000000006E4F490000000025E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 115668112,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "row": 38212,
+      "timestamp": "2026-08-16T16:13:51.8277154Z",
+      "direction": "OUT",
+      "sequence": "3556",
+      "rawHex": "0000000A0000000006E4F490000000025E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 115668112,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "row": 39223,
+      "timestamp": "2026-08-16T16:15:08.0580609Z",
+      "direction": "OUT",
+      "sequence": "3691",
+      "rawHex": "0000000A0000000006E4F490000000025E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 115668112,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "row": 40319,
+      "timestamp": "2026-08-16T16:16:47.5833821Z",
+      "direction": "OUT",
+      "sequence": "3863",
+      "rawHex": "0000000A0000000006E4F490000000025E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 115668112,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "row": 40320,
+      "timestamp": "2026-08-16T16:16:47.7025590Z",
+      "direction": "OUT",
+      "sequence": "3864",
+      "rawHex": "0000000A0000000006E4F490000000025E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 115668112,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/ICC Shuttleport [PF 4582] - 20260818-214552/raw-packets.csv",
+      "row": 42855,
+      "timestamp": "2026-08-16T16:21:20.3034271Z",
+      "direction": "OUT",
+      "sequence": "4226",
+      "rawHex": "0000000A0000000006E4F490000000025E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C35006E4F490000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 115668112,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/Sector 10 [PF 4374] - Mike 2022 - 20260830-035031/raw-packets.csv",
+      "row": 1802,
+      "timestamp": "2026-08-30T08:55:14.9905809Z",
+      "direction": "IN",
+      "sequence": "1556",
+      "rawHex": "0364000A0001003700000E310D9041E55E4777700000C3500E871D41000000006C0000000000000000000000000003D093000000070000",
+      "bodyHex": "5E4777700000C3500E871D41000000006C0000000000000000000000000003D093000000070000",
+      "identityType": 50000,
+      "identity": 243735873,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 250003,
+      "parameter2": 7,
+      "unknown2": 0
+    },
+    {
+      "path": "Captures/Sector 10 [PF 4374] - Mike 2022 - 20260830-035031/raw-packets.csv",
+      "row": 2144,
+      "timestamp": "2026-08-30T08:55:44.8679038Z",
+      "direction": "IN",
+      "sequence": "1870",
+      "rawHex": "049E000A0001003700000E310D9041E55E4777700000C3500E871D41000000006C0000000000000000000000000003DF95000000040000",
+      "bodyHex": "5E4777700000C3500E871D41000000006C0000000000000000000000000003DF95000000040000",
+      "identityType": 50000,
+      "identity": 243735873,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 253845,
+      "parameter2": 4,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 24908,
+      "timestamp": "2026-07-22T08:58:03.1472700Z",
+      "direction": "OUT",
+      "sequence": "1246",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 29032,
+      "timestamp": "2026-07-22T08:59:59.0242870Z",
+      "direction": "OUT",
+      "sequence": "1599",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 31649,
+      "timestamp": "2026-07-22T09:02:22.1914508Z",
+      "direction": "OUT",
+      "sequence": "1782",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 31687,
+      "timestamp": "2026-07-22T09:02:23.2184842Z",
+      "direction": "OUT",
+      "sequence": "1786",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 40073,
+      "timestamp": "2026-07-22T09:07:03.3588845Z",
+      "direction": "OUT",
+      "sequence": "2198",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 40093,
+      "timestamp": "2026-07-22T09:07:03.7555889Z",
+      "direction": "OUT",
+      "sequence": "2202",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 58122,
+      "timestamp": "2026-07-22T09:16:32.2420724Z",
+      "direction": "OUT",
+      "sequence": "3722",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-104809/raw-packets.csv",
+      "row": 65675,
+      "timestamp": "2026-07-22T09:21:12.8744985Z",
+      "direction": "OUT",
+      "sequence": "4522",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/raw-packets.csv",
+      "row": 12627,
+      "timestamp": "2026-07-22T13:30:18.3780409Z",
+      "direction": "OUT",
+      "sequence": "830",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/raw-packets.csv",
+      "row": 14132,
+      "timestamp": "2026-07-22T13:31:17.5587852Z",
+      "direction": "OUT",
+      "sequence": "966",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/raw-packets.csv",
+      "row": 43830,
+      "timestamp": "2026-07-22T13:48:30.0047689Z",
+      "direction": "OUT",
+      "sequence": "3271",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/raw-packets.csv",
+      "row": 77916,
+      "timestamp": "2026-07-22T14:12:32.9396949Z",
+      "direction": "OUT",
+      "sequence": "6928",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/raw-packets.csv",
+      "row": 80029,
+      "timestamp": "2026-07-22T14:13:11.0164081Z",
+      "direction": "OUT",
+      "sequence": "7102",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    },
+    {
+      "path": "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260722-152454/raw-packets.csv",
+      "row": 80034,
+      "timestamp": "2026-07-22T14:13:11.5471579Z",
+      "direction": "OUT",
+      "sequence": "7104",
+      "rawHex": "0000000A00000000797E30DD000000025E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "bodyHex": "5E4777700000C350797E30DD000000006C00000000000000000000000000000000000000000000",
+      "identityType": 50000,
+      "identity": 2038313181,
+      "unknown": 0,
+      "action": 108,
+      "unknown1": 0,
+      "targetType": 0,
+      "target": 0,
+      "parameter1": 0,
+      "parameter2": 0,
+      "unknown2": 0
+    }
+  ]
+}

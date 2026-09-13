@@ -200,7 +200,8 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
-                if (!_gameData.TryGetMobTemplate(spawnHash, out _))
+                if (!_gameData.TryGetMobTemplate(spawnHash, out var spawnTemplate)
+                    || !ZoneEngine_New.Core.Mobs.NpcContentAcceptance.CanSpawn(spawnTemplate))
                 {
                     _logger.Warn(
                         string.Format(

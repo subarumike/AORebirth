@@ -157,6 +157,15 @@ Stop-after-success rule:
 
 ## Build And Engines
 
+### Selective Delmus NPC content reconciliation
+
+Run the installed Node runtime with `Tools/reconcile_delmus_npc_content.cjs --write`
+and `--check`. The generator uses pinned source snapshots and accepted repository
+evidence; it never promotes candidate templates into runtime authorization.
+Run `dotnet test AORebirth\Server\ZoneEngine_New.Tests\ZoneEngine_New.Tests.csproj`
+for NPC composition, content boundary, weapon selection and nano cancellation gates.
+The established exact-source and connected acceptance wrappers remain required.
+
 ### Accepted ordinary binding export (offline)
 
 For the bounded Subway/Temple NewEngine consumer ledger, run
