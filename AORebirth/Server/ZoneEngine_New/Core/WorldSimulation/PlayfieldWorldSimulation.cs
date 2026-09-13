@@ -474,7 +474,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
                     _destinations,
                     portal.DestPlayfieldId,
                     portal.DestIndex,
-                    out landing);
+                    out landing, out heading);
             }
 
             return PortalDoorLandingResolver.TryResolveDoorLanding(
@@ -514,7 +514,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             _logger.Info(
                 $"Zone trigger transfer character={id} from={source.Identity.Instance} to={destPlayfieldId}");
 
-            // Door arrivals face along their landing clearance; border/line crossings keep
+            // Door and explicit LineTeleport arrivals face along their landing clearance; borders keep
             // the character's current heading rather than imposing a global compass direction.
             if (crossing.Heading is { } heading)
                 session.TransferToPlayfield(destination, crossing.Landing, heading);

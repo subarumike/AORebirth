@@ -12,6 +12,41 @@ namespace ZoneEngine_New.Tests
     [TestClass]
     public sealed class TeleportDestinationCatalogTests
     {
+        [TestMethod]
+        [DataRow(800, 3081)]
+        [DataRow(3081, 954)]
+        public void Observed_backyard_route_faces_into_destination(int sourcePf, int destinationPf)
+        {
+            var data = new GameDataStore(new StubLogger());
+            DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
+            var source = data.GetPlayfieldGeometry(sourcePf).Dynels!.Dynels.First(d =>
+                PortalDoorLandingResolver.TryReadPortal(d, out var route) && route.PlayfieldId == destinationPf);
+            Assert.IsTrue(PortalDoorLandingResolver.TryReadPortal(source, out var portal));
+            using var world = PlayfieldWorldSimulation.Create(sourcePf, data.GetPlayfieldGeometry(sourcePf),
+                data.GetPlayfieldMetaData(sourcePf), DestinationsCatalog.Instance, data, new StubLogger());
+            Assert.IsTrue(world.TryResolveZoneCrossing(source.Position.X, source.Position.Z,
+                new AORebirth.Core.Vector.Vector3(source.Position.X, source.Position.Y, source.Position.Z),
+                new HashSet<int>(), default, out var crossing));
+            Assert.AreEqual(destinationPf, crossing.DestPlayfieldId);
+            Assert.IsNotNull(crossing.Heading);
+            if (portal.Kind == PortalLandingKind.DoorDynel)
+            {
+                var door = data.GetPlayfieldGeometry(destinationPf).Dynels!.Dynels.Single(d =>
+                    d.IdentityType == 51016 && d.IdentityInstance == portal.DoorInstance);
+                AssertFacesAwayFromDoor(crossing, door);
+            }
+            else
+            {
+                Assert.IsTrue(DestinationsCatalog.Instance.TryGetDestination(destinationPf, portal.DestinationIndex, out var line));
+                Assert.IsNotNull(line);
+                var forward = (AORebirth.Core.Vector.Vector3)crossing.Heading.RotateVector3(AORebirth.Core.Vector.Vector3.AxisZ);
+                double awayX = crossing.Landing.x - ((line.StartX + line.EndX) * 0.5);
+                double awayZ = crossing.Landing.z - ((line.StartZ + line.EndZ) * 0.5);
+                Assert.IsTrue(awayX * forward.x + awayZ * forward.z > 3.99,
+                    "LineTeleport arrival must face along its four-unit clearance into the destination.");
+            }
+        }
+
         // Existing teleports DAO rows, verified against the staging database.
         [TestMethod]
         [DataRow(1186, 0xC0170320u, 0xC00404A2u, 175.00107f, 113.01496f)]

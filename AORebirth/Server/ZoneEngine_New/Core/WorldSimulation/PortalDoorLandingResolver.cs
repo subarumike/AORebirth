@@ -193,9 +193,19 @@ namespace ZoneEngine_New.Core.WorldSimulation
             int playfieldId,
             byte destinationIndex,
             out Vector3 landing)
+            => TryResolveLineLanding(destinations, playfieldId, destinationIndex, out landing, out _);
+
+        /// <summary>Faces an explicit LineTeleport arrival along its existing offset away from the line.</summary>
+        public static bool TryResolveLineLanding(
+            DestinationsCatalog destinations,
+            int playfieldId,
+            byte destinationIndex,
+            out Vector3 landing,
+            out Quaternion heading)
         {
             ArgumentNullException.ThrowIfNull(destinations);
             landing = default!;
+            heading = default!;
             if (!destinations.TryGetDestination(playfieldId, destinationIndex, out PlayfieldDestination? line)
                 || line == null)
                 return false;
@@ -213,6 +223,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
             newZ += spanX / length * LineLandingOffset;
 
             landing = new Vector3(newX, line.EndY, newZ);
+            // Match CharacterMotor's yaw convention: local +Z faces the destination-line normal.
+            float halfYaw = MathF.Atan2(-spanZ, spanX) * 0.5f;
+            heading = new Quaternion(0, MathF.Sin(halfYaw), 0, MathF.Cos(halfYaw));
             return true;
         }
 
