@@ -1,0 +1,491 @@
+{
+  "formatVersion": 1,
+  "result": "PARTIAL",
+  "startingSha": "2dc701f1e114cdd26dbb1e13d89acd4aa3b77a76",
+  "testedSourceSha": "b766f62235cd1c6dc5e201484925be70a8eb4017",
+  "earlierRuntimeValidationSha": "22207743ed89034f6bd2072f37e4f2e0232accf6",
+  "finalReceiptCommit": "Containing commit; documentation-only changes after testedSourceSha",
+  "branch": "codex/delmus-npc-content-001",
+  "worktree": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\delmus-npc-content-001",
+  "delmusSha": "8b9d36090986dc3ad89b9545a23ff38016c626ab",
+  "boundaries": {
+    "delmusBranchTouched": false,
+    "productionModified": false,
+    "masterModifiedDirectly": false,
+    "databaseSchemaChanged": false,
+    "clientLaunched": false,
+    "protocolInvented": false,
+    "npcSpecificRuntimeContentAdded": false,
+    "newDirectSqlViolations": 0
+  },
+  "inspectedFiles": "DELMUS_NPC_IMPORT_MATRIX.json lists all 110 reviewed source files; CAST_INTERRUPTION_CAPTURE_SCAN.json inventories the complete available capture-file union; generated reports retain accepted evidence inputs and hashes.",
+  "import": {
+    "reviewed": 110,
+    "importedGenericSourceFiles": 3,
+    "reconciled": 12,
+    "skipped": 95,
+    "sourceTemplates": 34,
+    "subwayTemplatesFound": 32,
+    "subwayTemplatesImported": 32,
+    "importedTemplatePolicy": "BLOCK_SPAWN"
+  },
+  "aaaa": {
+    "policy": "BLOCK_SPAWN",
+    "realNpcIdentity": false,
+    "unresolvedContent": true,
+    "attackable": false,
+    "combatAiEnabled": false,
+    "sourceTemplateCount": 1,
+    "liveNpcCount": "UNMEASURED"
+  },
+  "hashes": {
+    "knownHashesResolved": 0,
+    "distinctUnresolvedHashes": 37,
+    "unresolvedPlacements": 326,
+    "ambiguousHashes": 0,
+    "officialPlacementAuthorizationPreserved": true
+  },
+  "families": {
+    "ids": [
+      0,
+      3,
+      63,
+      138,
+      148,
+      149,
+      150,
+      151
+    ],
+    "complete": 0,
+    "partial": 0,
+    "missing": 8,
+    "overlayOrder": "family -> overlay -> individual",
+    "missingFamilyFallback": "NONE"
+  },
+  "weapons": {
+    "definitionsReviewed": 53,
+    "trueDuplicates": 0,
+    "matchedCapturedDefinitions": 25,
+    "unresolvedDefinitions": 28,
+    "qualification": "Matching endpoints and captured quality alternatives do not establish simultaneous weapons or an exact official-placement loadout selection."
+  },
+  "combat": {
+    "ready": 0,
+    "blocked": 32,
+    "existingAcceptedBindings": {
+      "subway": 322,
+      "temple": 167,
+      "total": 489
+    }
+  },
+  "pink": {
+    "classifiedSourceTemplates": 1,
+    "aaaaSourceTemplates": 1,
+    "liveAaaaNpcs": "UNMEASURED",
+    "visualAssetCauses": "UNPROVEN",
+    "otherCauses": "UNPROVEN"
+  },
+  "cast": {
+    "rootCauses": [
+      "Incoming action-108 interrupt requests were ignored",
+      "Movement-start cancellation hooks were missing",
+      "Current service created no interruption notification",
+      "Delmus outbound parameter shape disagrees with captured packet bodies"
+    ],
+    "serverCancellation": "PASS",
+    "notificationCreation": "PASS_IN_EVIDENCE_POLICY_FIXTURES_ONLY",
+    "notificationDelivery": "PASS_EXACT_OWNER_IN_FIXTURES_ONLY",
+    "productionNotificationPolicy": "UNSET; no guessed notification is emitted",
+    "localPlayerClientContract": "UNPROVEN",
+    "rawEvidence": {
+      "filesReviewed": 257,
+      "decodedObservations": 21,
+      "rawOccurrences": 56,
+      "uniquePackets": 28,
+      "outgoingPackets": 26,
+      "incomingPackets": 2,
+      "incomingScope": "Remote NPC actors; Parameter1=nano ID, Parameter2=4 or 7. Local-player reason mapping is not proven."
+    }
+  },
+  "validation": {
+    "legacyBuild": {
+      "result": "PASS",
+      "source": "22207743ed89034f6bd2072f37e4f2e0232accf6"
+    },
+    "newEngineBuild": {
+      "result": "PASS",
+      "source": "b766f62235cd1c6dc5e201484925be70a8eb4017"
+    },
+    "newEngineTests": {
+      "result": "PASS",
+      "count": 578,
+      "source": "b766f62235cd1c6dc5e201484925be70a8eb4017"
+    },
+    "npcFamilyWeaponTests": {
+      "result": "PASS",
+      "includedInNewEngineTests": true
+    },
+    "castInterruptionTests": {
+      "result": "PASS",
+      "includedInNewEngineTests": true,
+      "clientUiAcceptance": "UNPROVEN"
+    },
+    "aotomation": {
+      "result": "PASS",
+      "count": 1129,
+      "source": "22207743ed89034f6bd2072f37e4f2e0232accf6"
+    },
+    "mandatoryGates": {
+      "result": "PASS",
+      "count": 12,
+      "source": "22207743ed89034f6bd2072f37e4f2e0232accf6"
+    },
+    "runtimeAndTestSourcesEqualBetweenValidationCommits": true,
+    "daoArchitectureGuard": "PASS",
+    "contentBoundaryGuard": "PASS",
+    "deterministicContentReconciliation": "PASS",
+    "acceptedBindingExport": "PASS",
+    "windowsExactSource": {
+      "result": "PASS",
+      "source": "b766f62235cd1c6dc5e201484925be70a8eb4017",
+      "note": "TESTS=NOT_RUN in the environment file describes the startup wrapper substage; the parent acceptance log records all 578 tests passing."
+    },
+    "linuxPublication": {
+      "result": "PASS",
+      "source": "b766f62235cd1c6dc5e201484925be70a8eb4017",
+      "sourceInventory": "PASS",
+      "sqlPackageParity": "PASS",
+      "offlineStartup": "PASS",
+      "packageNegativeFixtures": 4,
+      "sourceOmissionNegativeFixtures": 2,
+      "backendIntegration": "PASS",
+      "liveLinuxClientAcceptance": "NOT_PERFORMED"
+    },
+    "connectedAcceptance": {
+      "result": "FAIL",
+      "baselineReproduced": true,
+      "candidateRuntimeSource": "22207743ed89034f6bd2072f37e4f2e0232accf6",
+      "candidateHarnessSource": "b766f62235cd1c6dc5e201484925be70a8eb4017",
+      "baselineSource": "cb12160c37507f8318b7e9e39f424f9bf13faa23",
+      "phase": "ZONE_ROUND_TRIP_LOGOUT",
+      "expectedY": 0,
+      "candidateY": -0.0618746,
+      "baselineY": -0.0620676,
+      "exactPhysicsCause": "NOT_ISOLATED",
+      "strictPersistenceGuardUnchanged": true,
+      "disposableCleanup": "PASS",
+      "productionDatabaseTouched": false,
+      "earlierSteps": "Authentication, world entry and earlier persistence steps passed; complete lifecycle acceptance remains failed."
+    }
+  },
+  "unresolvedEvidence": [
+    "An authoritative bridge between the 37 official PF127 placement hashes and exact real templates/actor identities.",
+    "Accepted base stats or measured family curves for all eight family IDs; individual captured effective stats do not establish family-wide values.",
+    "Exact identity, quality, slot and selection evidence for each placement loadout; 28 weapon definitions lack accepted endpoint matches.",
+    "Local-player cast cancellation captures proving reason-code mapping and visible UI completion for movement, jump and manual cancellation; two incoming remote-NPC packets do not prove it.",
+    "The connected fixture position-drift cause, reproduced on both candidate and baseline, before claiming full connected acceptance.",
+    "Live pink NPC counts and asset-related causes; one source AAAA template is not a measured live count."
+  ],
+  "decisionTable": [
+    [
+      "Delmus branch reviewed without modification",
+      "YES"
+    ],
+    [
+      "Integration is selective rather than wholesale merge",
+      "YES"
+    ],
+    [
+      "Subway NPC templates integrated",
+      "YES; blocked candidate data"
+    ],
+    [
+      "AAAA treated as unresolved identity",
+      "YES"
+    ],
+    [
+      "AAAA prevented from accidental combat behavior",
+      "YES"
+    ],
+    [
+      "Known Subway hashes mapped to real templates",
+      "NO"
+    ],
+    [
+      "Subway family IDs inventoried",
+      "YES"
+    ],
+    [
+      "Subway family stats complete",
+      "NO"
+    ],
+    [
+      "Overlay/individual override order validated",
+      "YES"
+    ],
+    [
+      "Duplicate weapons reconciled",
+      "PARTIAL"
+    ],
+    [
+      "Combat-ready NPCs explicitly identified",
+      "YES; zero ready"
+    ],
+    [
+      "Pink NPC root causes classified",
+      "PARTIAL; AAAA classified, live/asset causes unproven"
+    ],
+    [
+      "Cast interruption existing code traced",
+      "YES"
+    ],
+    [
+      "Actual interruption failure identified",
+      "PARTIAL"
+    ],
+    [
+      "Client notification path validated",
+      "PARTIAL; fixtures only"
+    ],
+    [
+      "NPC-specific runtime hard-coding added",
+      "NO"
+    ],
+    [
+      "New direct SQL introduced",
+      "NO"
+    ],
+    [
+      "Production modified",
+      "NO"
+    ],
+    [
+      "Developer branch modified",
+      "NO"
+    ]
+  ],
+  "filesAdded": 22,
+  "filesModified": 17,
+  "files": [
+    {
+      "status": "M",
+      "file": "AORebirth/GameData/MobTemplates.json"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/GameData/NpcFamilyStatTemplates.json"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/GameData/NpcStatTemplateOverlays.json"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/NpcContentIntegrationTests.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.NpcStats.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/IGameData.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobStatResolver.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobTemplates.cs"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcContentAcceptance.cs"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcFamilyStatTemplates.cs"
+    },
+    {
+      "status": "A",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcStatTemplates.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoService.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs"
+    },
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs"
+    },
+    {
+      "status": "A",
+      "file": "docs/accepted/npc/delmus/NpcFamilyStatTemplates.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/accepted/npc/delmus/NpcStatTemplateOverlays.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/accepted/npc/delmus/NpcTemplate.json"
+    },
+    {
+      "status": "M",
+      "file": "docs/ai/CURRENT_TASK.md"
+    },
+    {
+      "status": "M",
+      "file": "docs/ai/WORKFLOW.md"
+    },
+    {
+      "status": "M",
+      "file": "docs/project/PROJECT_STATE.md"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/CAST_INTERRUPTION_CAPTURE_SCAN.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/CAST_INTERRUPTION_RECONCILIATION.md"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/DELMUS_NPC_IMPORT_MATRIX.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/DELMUS_NPC_VALIDATION_RECEIPT.json"
+    },
+    {
+      "status": "M",
+      "file": "docs/reports/NEWENGINE_DAO_GAP_INVENTORY.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/NEWENGINE_DELMUS_NPC_INTEGRATION.md"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/NPC_FAMILY_STAT_COVERAGE.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/NPC_HASH_RESOLUTION_MATRIX.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/NPC_WEAPON_RECONCILIATION.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/SUBWAY_NPC_COMBAT_RECONCILIATION.json"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/SUBWAY_NPC_COMBAT_RECONCILIATION.md"
+    },
+    {
+      "status": "A",
+      "file": "Tools/reconcile_delmus_npc_content.cjs"
+    },
+    {
+      "status": "M",
+      "file": "Tools/ZoneEngineSchemaValidation/ConnectedAcceptanceSmoke.cs"
+    },
+    {
+      "status": "M",
+      "file": "Tools/ZoneEngineSchemaValidation/ConnectedEngineProcess.cs"
+    }
+  ],
+  "generatedArtifacts": [
+    "docs/reports/CAST_INTERRUPTION_CAPTURE_SCAN.json",
+    "docs/reports/CAST_INTERRUPTION_RECONCILIATION.md",
+    "docs/reports/DELMUS_NPC_IMPORT_MATRIX.json",
+    "docs/reports/DELMUS_NPC_VALIDATION_RECEIPT.json",
+    "docs/reports/NEWENGINE_DAO_GAP_INVENTORY.json",
+    "docs/reports/NEWENGINE_DELMUS_NPC_INTEGRATION.md",
+    "docs/reports/NPC_FAMILY_STAT_COVERAGE.json",
+    "docs/reports/NPC_HASH_RESOLUTION_MATRIX.json",
+    "docs/reports/NPC_WEAPON_RECONCILIATION.json",
+    "docs/reports/SUBWAY_NPC_COMBAT_RECONCILIATION.json",
+    "docs/reports/SUBWAY_NPC_COMBAT_RECONCILIATION.md"
+  ],
+  "logs": [
+    {
+      "file": "build-verify-npc-build.log",
+      "sha256": "a08ad4a12cb8583b3f19f4913667993ac9b79f4e7eb3f45783d95517b97b525b"
+    },
+    {
+      "file": "build-verify-newengine-all.log",
+      "sha256": "46386293624bc97357cd0366524c562c4c49a0772993edde25cf80b08bd806df"
+    },
+    {
+      "file": "build-verify-mandatory.log",
+      "sha256": "9d5d1bac4e93fe75ae0b3e389497d9ef24caa62badc5a47224a9af6dd8468fc4"
+    },
+    {
+      "file": "build-verify-ordinary-export.log",
+      "sha256": "8a6b68c760bb9767ef3da60ee7960d757b8e0eccaaa73467296c610de7634200"
+    },
+    {
+      "file": "build-verify-cutover-inventory.log",
+      "sha256": "d1c2c31746347da2042beecea3ee39ffcc4fed5ddd5d637540e91b787e83f1c1"
+    },
+    {
+      "file": "build-verify-windows-final.log",
+      "sha256": "f7efcab27f8c24ad67923b64b23b2ded4b7a109ce914fc9180050de491d59996"
+    },
+    {
+      "file": "build-verify-linux-final.log",
+      "sha256": "e470ca639dd77d50e63da140a2d416316ff4259a4bbac44e92ea4a21cc60e76c"
+    },
+    {
+      "file": "build-verify-connected-fixed.log",
+      "sha256": "8b9db4dffc837d79977003723060545247fc67fab53fa97fd3295886cf62f331"
+    },
+    {
+      "file": "build-verify-connected-baseline-projection-fixed.log",
+      "sha256": "c427135cdf71e79651709313bacb92150261b91847ccc343b2ccf4e8911758db"
+    },
+    {
+      "file": "build-verify/windows-acceptance-b766f622.env",
+      "sha256": "5cbf3b5f09cbc2b91158b1b8229519950d34cc9fda842854101f7138be6ec193"
+    }
+  ],
+  "finalStatus": {
+    "delmusNpcIntegration": "PARTIAL",
+    "subwayTemplateIntegration": "PASS_DATA_ONLY_BLOCKED",
+    "subwayFamilyStatCoverage": "PARTIAL",
+    "subwayWeaponReconciliation": "PARTIAL",
+    "aaaaFallbackSafe": true,
+    "castInterruptionReconciliation": "PARTIAL",
+    "deploymentReady": false
+  }
+}
