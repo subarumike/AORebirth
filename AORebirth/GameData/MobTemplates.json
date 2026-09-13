@@ -1,171 +1,2599 @@
 [
-	{
-		"HasHeadMesh": true,
-		"Hash": "EQVE",
-		"Name": "Vendor Antonio Stacklund",
-		"TemplateId": 0,
-		"Stats": {
-		  "0": 10486272,
-		  "1": 1649,
-		  "4": 1,
-		  "27": 1649,
-		  "33": 0,
-		  "47": 1,
-		  "54": 40,
-		  "59": 2,
-		  "64": 40687,
-		  "89": 1,
-		  "156": 137,
-		  "359": 26088,
-		  "360": 103,
-		  "389": 3,
-		  "455": 137,
-		  "466": 0,
-		  "660": 0,
-		  "673": 31
-		},
-		"MinLevel": 40,
-		"MaxLevel": 40,
-		"Equipment": [[248368, 248368], [121567, 121567]],
-		"KnuBotId": 0,
-		"ItemTable": []
-	},
-	{
-		"HasHeadMesh": false,
-		"Hash": "AAAA",
-		"Name": "To Be Determined",
-		"TemplateId": 43296,
-		"Stats": {
-			"0": 0,
-			"1": 12,
-			"4": 6,
-			"5": 36,
-			"16": 7,
-			"17": 7,
-			"18": 7,
-			"19": 7,
-			"20": 7,
-			"21": 7,
-			"26": 25,
-			"27": 12,
-			"33": 3,
-			"47": 1,
-			"51": 0,
-			"52": 202,
-			"54": 1,
-			"59": 1,
-			"60": 0,
-			"61": 1,
-			"63": 0,
-			"89": 1,
-			"90": 0,
-			"91": 0,
-			"92": 0,
-			"93": 0,
-			"94": 0,
-			"95": 0,
-			"96": 0,
-			"97": 0,
-			"100": 9,
-			"101": 9,
-			"102": 9,
-			"103": 9,
-			"104": 9,
-			"105": 9,
-			"106": 9,
-			"107": 9,
-			"108": 9,
-			"109": 9,
-			"110": 9,
-			"111": 9,
-			"112": 9,
-			"113": 9,
-			"114": 9,
-			"115": 9,
-			"116": 9,
-			"118": 9,
-			"119": 9,
-			"120": 9,
-			"122": 9,
-			"123": 9,
-			"124": 9,
-			"125": 9,
-			"126": 9,
-			"127": 9,
-			"128": 9,
-			"129": 9,
-			"130": 9,
-			"131": 9,
-			"132": 9,
-			"133": 9,
-			"134": 9,
-			"135": 9,
-			"136": 9,
-			"138": 9,
-			"139": 9,
-			"140": 9,
-			"141": 9,
-			"142": 9,
-			"143": 9,
-			"144": 9,
-			"145": 8,
-			"146": 9,
-			"147": 9,
-			"148": 9,
-			"149": 9,
-			"150": 9,
-			"151": 9,
-			"152": 0,
-			"153": 10,
-			"154": 10,
-			"155": 12,
-			"156": 9,
-			"157": 9,
-			"158": 9,
-			"159": 9,
-			"160": 9,
-			"161": 9,
-			"162": 9,
-			"163": 9,
-			"164": 9,
-			"165": 9,
-			"166": 9,
-			"167": 9,
-			"168": 8,
-			"204": 0,
-			"214": 25,
-			"342": 30,
-			"343": 1,
-			"359": 26902,
-			"360": 90,
-			"368": 15,
-			"389": 0,
-			"454": 25,
-			"455": 36,
-			"466": 0,
-			"484": 13,
-			"660": 0,
-			"9016": 80001
-		},
-		"MinLevel": 0,
-		"MaxLevel": 0,
-		"Equipment": [
-			[44008, 44007]
-		],
-		"KnuBotId": 1131,
-		"ItemTable": [
-			{
-				"Hash": "AAAA",
-				"Repeats": 1,
-				"Chance": 100,
-				"LevelMod": 25
-			},
-			{
-				"Hash": "AAAB",
-				"Repeats": 1,
-				"Chance": 50,
-				"LevelMod": 25
-			}
-		]
-	}
+  {
+    "HasHeadMesh": false,
+    "Hash": "AAAA",
+    "Name": "To Be Determined",
+    "TemplateId": 43296,
+    "Stats": {
+      "0": 0,
+      "4": 6,
+      "5": 36,
+      "16": 7,
+      "17": 7,
+      "18": 7,
+      "19": 7,
+      "20": 7,
+      "21": 7,
+      "26": 25,
+      "33": 3,
+      "47": 1,
+      "51": 0,
+      "52": 202,
+      "59": 1,
+      "60": 0,
+      "61": 1,
+      "63": 0,
+      "89": 1,
+      "90": 0,
+      "91": 0,
+      "92": 0,
+      "93": 0,
+      "94": 0,
+      "95": 0,
+      "96": 0,
+      "97": 0,
+      "101": 9,
+      "102": 9,
+      "103": 9,
+      "104": 9,
+      "105": 9,
+      "106": 9,
+      "107": 9,
+      "108": 9,
+      "109": 9,
+      "110": 9,
+      "111": 9,
+      "112": 9,
+      "113": 9,
+      "114": 9,
+      "115": 9,
+      "116": 9,
+      "118": 9,
+      "119": 9,
+      "120": 9,
+      "122": 9,
+      "123": 9,
+      "124": 9,
+      "125": 9,
+      "126": 9,
+      "127": 9,
+      "128": 9,
+      "129": 9,
+      "130": 9,
+      "131": 9,
+      "132": 9,
+      "133": 9,
+      "134": 9,
+      "135": 9,
+      "136": 9,
+      "138": 9,
+      "139": 9,
+      "140": 9,
+      "141": 9,
+      "142": 9,
+      "143": 9,
+      "144": 9,
+      "145": 8,
+      "146": 9,
+      "147": 9,
+      "148": 9,
+      "149": 9,
+      "150": 9,
+      "151": 9,
+      "152": 0,
+      "153": 10,
+      "154": 10,
+      "155": 12,
+      "156": 9,
+      "157": 9,
+      "158": 9,
+      "159": 9,
+      "160": 9,
+      "161": 9,
+      "162": 9,
+      "163": 9,
+      "164": 9,
+      "165": 9,
+      "166": 9,
+      "167": 9,
+      "168": 8,
+      "204": 0,
+      "214": 25,
+      "342": 30,
+      "343": 1,
+      "359": 26902,
+      "360": 90,
+      "368": 15,
+      "389": 0,
+      "454": 25,
+      "455": 36,
+      "466": 0,
+      "484": 13,
+      "660": 0,
+      "9016": 80001
+    },
+    "NpcFamily": 1,
+    "NpcStatTemplate": 0,
+    "MinLevel": 1,
+    "MaxLevel": 250,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 1131,
+    "ItemTable": [
+      {
+        "Hash": "AAAA",
+        "Repeats": 1,
+        "Chance": 100,
+        "LevelMod": 25
+      },
+      {
+        "Hash": "AAAB",
+        "Repeats": 1,
+        "Chance": 50,
+        "LevelMod": 25
+      }
+    ],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": true,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "UNRESOLVED_IDENTITY_PLACEHOLDER"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "BQAU",
+    "Name": "Basic Quality Armorer",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.09903729,
+    "Stats": {
+      "0": 271061505,
+      "1": 17841,
+      "4": 4,
+      "27": 17841,
+      "33": 0,
+      "47": 1,
+      "54": 180,
+      "59": 1,
+      "64": 40111,
+      "89": 1,
+      "156": 448,
+      "359": 26097,
+      "360": 119,
+      "455": 0,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 0,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 30862,
+      "2": 40903,
+      "3": 30839,
+      "4": 30886
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 121567,
+        "HighId": 121567,
+        "Qualities": [
+          1
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-212336"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "BQWR",
+    "Name": "Basic Quality Weaponsdealer",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.09962964,
+    "Stats": {
+      "0": 271061505,
+      "1": 17841,
+      "4": 1,
+      "27": 17841,
+      "33": 0,
+      "47": 1,
+      "54": 180,
+      "59": 2,
+      "64": 40694,
+      "89": 1,
+      "156": 448,
+      "359": 26092,
+      "360": 119,
+      "455": 0,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 0,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 30862,
+      "2": 40903,
+      "3": 30839,
+      "4": 30886
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 121567,
+        "HighId": 121567,
+        "Qualities": [
+          1
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-212336"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "BTMV",
+    "Name": "Basic Tools Merchant",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.099860966,
+    "Stats": {
+      "0": 271061505,
+      "1": 17841,
+      "4": 2,
+      "27": 17841,
+      "33": 0,
+      "47": 1,
+      "54": 180,
+      "59": 3,
+      "64": 40209,
+      "89": 1,
+      "156": 448,
+      "359": 26137,
+      "360": 119,
+      "455": 0,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 0,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 30862,
+      "2": 40903,
+      "3": 30839,
+      "4": 30886
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 121567,
+        "HighId": 121567,
+        "Qualities": [
+          1
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-212336"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "CSBI",
+    "Name": "Container Supplier",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.08864641,
+    "Stats": {
+      "0": 271061505,
+      "1": 17841,
+      "4": 1,
+      "27": 17841,
+      "33": 0,
+      "47": 1,
+      "54": 180,
+      "59": 3,
+      "64": 40634,
+      "89": 1,
+      "156": 448,
+      "359": 26082,
+      "360": 119,
+      "455": 0,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 0,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 30862,
+      "2": 40903,
+      "3": 30839,
+      "4": 30886
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 121567,
+        "HighId": 121567,
+        "Qualities": [
+          1
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Container Supplier:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Container Supplier:20260709-212336"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "DCQV",
+    "Name": "Looter",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.8582679,
+    "Stats": {
+      "0": 268964353,
+      "1": 318,
+      "4": 1,
+      "27": 318,
+      "33": 3,
+      "47": 1,
+      "54": 10,
+      "59": 2,
+      "64": 40695,
+      "89": 1,
+      "156": 34,
+      "359": 203745,
+      "360": 95,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 21824,
+      "3": 21819,
+      "4": 21831
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 123038,
+        "HighId": 123039,
+        "Qualities": [
+          9
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+        ]
+      },
+      {
+        "LowId": 123038,
+        "HighId": 123039,
+        "Qualities": [
+          11
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+        ]
+      },
+      {
+        "LowId": 123038,
+        "HighId": 123039,
+        "Qualities": [
+          12
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+        ]
+      },
+      {
+        "LowId": 123038,
+        "HighId": 123039,
+        "Qualities": [
+          8
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+        ]
+      },
+      {
+        "LowId": 123038,
+        "HighId": 123039,
+        "Qualities": [
+          10
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "DIPE",
+    "Name": "Discarded Pet",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.9036087,
+    "Stats": {
+      "0": 268980737,
+      "1": 227,
+      "4": 6,
+      "27": 227,
+      "33": 3,
+      "47": 1,
+      "54": 10,
+      "59": 0,
+      "89": 1,
+      "156": 44,
+      "359": 17720,
+      "360": 95,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "DOPT",
+    "Name": "Disobedient Bot",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.8397248,
+    "Stats": {
+      "0": 268964353,
+      "1": 183,
+      "4": 6,
+      "27": 183,
+      "33": 3,
+      "47": 1,
+      "54": 8,
+      "59": 0,
+      "89": 1,
+      "156": 28,
+      "359": 17649,
+      "360": 94,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "EHDL",
+    "Name": "Architect Striker",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.7870715,
+    "Stats": {
+      "0": 268964353,
+      "1": 393,
+      "4": 1,
+      "27": 393,
+      "33": 3,
+      "47": 1,
+      "54": 15,
+      "59": 2,
+      "64": 40698,
+      "89": 1,
+      "156": 52,
+      "359": 203743,
+      "360": 97,
+      "455": 149,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 149,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 40976,
+      "1": 22562,
+      "2": 40968,
+      "3": 22537,
+      "4": 22618
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "EMSE",
+    "Name": "Empty Shell",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.92248726,
+    "Stats": {
+      "0": 268964353,
+      "1": 447,
+      "4": 3,
+      "27": 447,
+      "33": 3,
+      "47": 1,
+      "54": 20,
+      "59": 3,
+      "64": 29696,
+      "89": 1,
+      "156": 76,
+      "359": 203731,
+      "360": 99,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9402,
+      "1": 9406,
+      "2": 9407,
+      "3": 9405,
+      "4": 9414
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "EQVE",
+    "Name": "Vendor Antonio Stacklund",
+    "TemplateId": 0,
+    "Stats": {
+      "0": 10486272,
+      "1": 1649,
+      "4": 1,
+      "27": 1649,
+      "33": 0,
+      "47": 1,
+      "54": 40,
+      "59": 2,
+      "64": 40687,
+      "89": 1,
+      "156": 137,
+      "359": 26088,
+      "360": 103,
+      "389": 3,
+      "455": 137,
+      "466": 0,
+      "660": 0,
+      "673": 31
+    },
+    "MinLevel": 40,
+    "MaxLevel": 40,
+    "Equipment": [
+      [
+        248368,
+        248368
+      ],
+      [
+        121567,
+        121567
+      ]
+    ],
+    "KnuBotId": 0,
+    "ItemTable": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "FASO",
+    "Name": "Fragmented Soul",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.954157,
+    "Stats": {
+      "0": 268964353,
+      "1": 368,
+      "4": 3,
+      "27": 368,
+      "33": 3,
+      "47": 1,
+      "54": 17,
+      "59": 2,
+      "64": 29706,
+      "89": 1,
+      "156": 59,
+      "359": 203729,
+      "360": 98,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9402,
+      "1": 9404,
+      "2": 9407,
+      "3": 9405,
+      "4": 9401
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 123685,
+        "HighId": 123686,
+        "Qualities": [
+          14
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260716-033326"
+        ]
+      },
+      {
+        "LowId": 123687,
+        "HighId": 123688,
+        "Qualities": [
+          25
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 123685,
+        "HighId": 123686,
+        "Qualities": [
+          17
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339"
+        ]
+      },
+      {
+        "LowId": 123685,
+        "HighId": 123686,
+        "Qualities": [
+          18
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260716-033326"
+        ]
+      },
+      {
+        "LowId": 123687,
+        "HighId": 123688,
+        "Qualities": [
+          26
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 123685,
+        "HighId": 123686,
+        "Qualities": [
+          19
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339"
+        ]
+      },
+      {
+        "LowId": 123687,
+        "HighId": 123687,
+        "Qualities": [
+          21
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260710-211430"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "FLFE",
+    "Name": "Filth Flea",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.7902366,
+    "Stats": {
+      "0": 268964353,
+      "1": 261,
+      "4": 6,
+      "27": 261,
+      "33": 3,
+      "47": 1,
+      "54": 11,
+      "59": 0,
+      "89": 1,
+      "156": 41,
+      "359": 17657,
+      "360": 130,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "INFE",
+    "Name": "Infector",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.856356,
+    "Stats": {
+      "0": 268964353,
+      "1": 829,
+      "4": 6,
+      "27": 829,
+      "33": 3,
+      "47": 1,
+      "54": 21,
+      "59": 0,
+      "89": 1,
+      "156": 58,
+      "359": 31909,
+      "360": 69,
+      "455": 150,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 150,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "INPE",
+    "Name": "Infected Attendant",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.8493687,
+    "Stats": {
+      "0": 268964353,
+      "1": 691,
+      "4": 6,
+      "27": 691,
+      "33": 3,
+      "47": 1,
+      "54": 24,
+      "59": 0,
+      "89": 1,
+      "156": 83,
+      "359": 96056,
+      "360": 100,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "IORB",
+    "Name": "Incomplete Rebuild",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.82082343,
+    "Stats": {
+      "0": 268964353,
+      "1": 421,
+      "4": 3,
+      "27": 421,
+      "33": 3,
+      "47": 1,
+      "54": 19,
+      "59": 2,
+      "64": 29694,
+      "89": 1,
+      "156": 66,
+      "359": 203728,
+      "360": 98,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9402,
+      "1": 9404,
+      "2": 9407,
+      "3": 9405,
+      "4": 9401
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 122653,
+        "HighId": 122654,
+        "Qualities": [
+          18
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122654,
+        "HighId": 122654,
+        "Qualities": [
+          20
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122655,
+        "HighId": 122655,
+        "Qualities": [
+          21
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122655,
+        "HighId": 122656,
+        "Qualities": [
+          24
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122653,
+        "HighId": 122654,
+        "Qualities": [
+          14
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339"
+        ]
+      },
+      {
+        "LowId": 122653,
+        "HighId": 122654,
+        "Qualities": [
+          17
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339"
+        ]
+      },
+      {
+        "LowId": 122655,
+        "HighId": 122656,
+        "Qualities": [
+          22
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260716-033326"
+        ]
+      },
+      {
+        "LowId": 122655,
+        "HighId": 122656,
+        "Qualities": [
+          23
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260710-211430"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "LPPE",
+    "Name": "Lost Thought",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.82899964,
+    "Stats": {
+      "0": 268964353,
+      "1": 526,
+      "4": 6,
+      "27": 526,
+      "33": 3,
+      "47": 1,
+      "54": 19,
+      "59": 0,
+      "89": 1,
+      "156": 66,
+      "359": 96193,
+      "360": 98,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "MDPA",
+    "Name": "Melded Patterns",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.91472197,
+    "Stats": {
+      "0": 268964353,
+      "1": 559,
+      "4": 3,
+      "27": 559,
+      "33": 3,
+      "47": 1,
+      "54": 20,
+      "59": 3,
+      "64": 29701,
+      "89": 1,
+      "156": 69,
+      "359": 203747,
+      "360": 130,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 9406,
+      "2": 9407,
+      "3": 9405,
+      "4": 9401
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 121818,
+        "HighId": 121818,
+        "Qualities": [
+          20
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 121817,
+        "HighId": 121818,
+        "Qualities": [
+          19
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408",
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260716-034559"
+        ]
+      },
+      {
+        "LowId": 121819,
+        "HighId": 121820,
+        "Qualities": [
+          26
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 121819,
+        "HighId": 121820,
+        "Qualities": [
+          25
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 121817,
+        "HighId": 121818,
+        "Qualities": [
+          18
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339"
+        ]
+      },
+      {
+        "LowId": 121819,
+        "HighId": 121820,
+        "Qualities": [
+          23
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260716-222201"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "MEML",
+    "Name": "Molested Molecules",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.81984395,
+    "Stats": {
+      "0": 268964353,
+      "1": 421,
+      "4": 3,
+      "27": 421,
+      "33": 3,
+      "47": 1,
+      "54": 19,
+      "59": 2,
+      "64": 29704,
+      "89": 1,
+      "156": 66,
+      "359": 203746,
+      "360": 130,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9402,
+      "1": 9404,
+      "2": 9407,
+      "3": 9405,
+      "4": 9401
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 122217,
+        "HighId": 122217,
+        "Qualities": [
+          20
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122218,
+        "HighId": 122219,
+        "Qualities": [
+          27
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408",
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-034104"
+        ]
+      },
+      {
+        "LowId": 122216,
+        "HighId": 122217,
+        "Qualities": [
+          18
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122216,
+        "HighId": 122217,
+        "Qualities": [
+          19
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122218,
+        "HighId": 122219,
+        "Qualities": [
+          22
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-222201"
+        ]
+      },
+      {
+        "LowId": 122218,
+        "HighId": 122219,
+        "Qualities": [
+          23
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339"
+        ]
+      },
+      {
+        "LowId": 122218,
+        "HighId": 122219,
+        "Qualities": [
+          25
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-222201"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "MENI",
+    "Name": "Eumenides",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.63899815,
+    "Stats": {
+      "0": 268964353,
+      "1": 2792,
+      "4": 3,
+      "27": 2792,
+      "33": 3,
+      "47": 1,
+      "54": 20,
+      "59": 2,
+      "64": 29708,
+      "89": 1,
+      "156": 76,
+      "359": 203726,
+      "360": 130,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9620,
+      "1": 9612,
+      "2": 9618,
+      "3": 99779,
+      "4": 9625
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 123267,
+        "HighId": 123268,
+        "Qualities": [
+          17
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Eumenides:20260717-215250"
+        ]
+      },
+      {
+        "LowId": 123267,
+        "HighId": 123268,
+        "Qualities": [
+          20
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Eumenides:20260709-222339"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "MUGG",
+    "Name": "Mugger",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.81246424,
+    "Stats": {
+      "0": 268964353,
+      "1": 182,
+      "4": 1,
+      "27": 182,
+      "33": 3,
+      "47": 1,
+      "54": 10,
+      "59": 2,
+      "64": 40705,
+      "89": 1,
+      "156": 36,
+      "359": 203734,
+      "360": 95,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9418,
+      "1": 8729,
+      "2": 9420,
+      "3": 9419,
+      "4": 9421
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 121567,
+        "HighId": 121567,
+        "Qualities": [
+          1
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-193914",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-225408",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260710-205400",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260710-211430",
+          "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260719-021022"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "NUBR",
+    "Name": "Neural Burnout",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.93905354,
+    "Stats": {
+      "0": 268964353,
+      "1": 643,
+      "4": 3,
+      "27": 643,
+      "33": 3,
+      "47": 1,
+      "54": 17,
+      "59": 3,
+      "64": 29702,
+      "89": 1,
+      "156": 59,
+      "359": 203730,
+      "360": 98,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 9406,
+      "2": 9407,
+      "3": 9405,
+      "4": 9401
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "NXZP",
+    "Name": "Shadow",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.89183086,
+    "Stats": {
+      "0": 268964353,
+      "1": 592,
+      "4": 6,
+      "27": 592,
+      "33": 3,
+      "47": 1,
+      "54": 21,
+      "59": 0,
+      "89": 1,
+      "156": 58,
+      "359": 30464,
+      "360": 99,
+      "455": 150,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 150,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "PMPE",
+    "Name": "Premature Pattern",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.92212796,
+    "Stats": {
+      "0": 268964353,
+      "1": 341,
+      "4": 3,
+      "27": 341,
+      "33": 3,
+      "47": 1,
+      "54": 16,
+      "59": 3,
+      "64": 29699,
+      "89": 1,
+      "156": 61,
+      "359": 203727,
+      "360": 97,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9402,
+      "1": 9406,
+      "2": 9407,
+      "3": 9405,
+      "4": 9401
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "RESC",
+    "Name": "Redundant Scan",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.895804,
+    "Stats": {
+      "0": 268964353,
+      "1": 782,
+      "4": 3,
+      "27": 782,
+      "33": 3,
+      "47": 1,
+      "54": 20,
+      "59": 3,
+      "64": 40660,
+      "89": 1,
+      "156": 69,
+      "359": 204178,
+      "360": 99,
+      "455": 148,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 148,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9402,
+      "1": 9406,
+      "2": 9407,
+      "4": 9414
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 122026,
+        "HighId": 122027,
+        "Qualities": [
+          14
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122027,
+        "HighId": 122027,
+        "Qualities": [
+          20
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122028,
+        "HighId": 122029,
+        "Qualities": [
+          25
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+        ]
+      },
+      {
+        "LowId": 122026,
+        "HighId": 122027,
+        "Qualities": [
+          16
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "SLRU",
+    "Name": "Slum Runner",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.94010943,
+    "Stats": {
+      "0": 268980737,
+      "1": 526,
+      "4": 6,
+      "27": 526,
+      "33": 3,
+      "47": 1,
+      "54": 19,
+      "59": 0,
+      "89": 1,
+      "156": 261,
+      "359": 55648,
+      "360": 98,
+      "455": 151,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 151,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "SS01",
+    "Name": "Bloodcreeper",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.91182566,
+    "Stats": {
+      "0": 268980737,
+      "1": 724,
+      "4": 6,
+      "27": 724,
+      "33": 3,
+      "47": 1,
+      "54": 25,
+      "59": 1,
+      "89": 1,
+      "156": 86,
+      "359": 30379,
+      "360": 70,
+      "455": 63,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 63,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "STFE",
+    "Name": "Stim Fiend",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.8918065,
+    "Stats": {
+      "0": 268964353,
+      "1": 327,
+      "4": 1,
+      "27": 327,
+      "33": 3,
+      "47": 1,
+      "54": 13,
+      "59": 2,
+      "64": 40693,
+      "89": 1,
+      "156": 58,
+      "359": 203739,
+      "360": 96,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 117653,
+      "1": 40898,
+      "2": 40903,
+      "3": 87442,
+      "4": 40907
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "STFO",
+    "Name": "Strike Foreman",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.8086363,
+    "Stats": {
+      "0": 268964353,
+      "1": 736,
+      "4": 1,
+      "27": 736,
+      "33": 3,
+      "47": 1,
+      "54": 19,
+      "59": 2,
+      "64": 40673,
+      "89": 1,
+      "156": 66,
+      "359": 203744,
+      "360": 98,
+      "455": 149,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 149,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 9452,
+      "1": 45759,
+      "2": 9450,
+      "3": 45758,
+      "4": 45760
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 122767,
+        "HighId": 122768,
+        "Qualities": [
+          17
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Strike Foreman:20260709-212336"
+        ]
+      },
+      {
+        "LowId": 122767,
+        "HighId": 122768,
+        "Qualities": [
+          19
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Strike Foreman:20260709-220439"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "TAIL",
+    "Name": "Tailor",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.09998548,
+    "Stats": {
+      "0": 271061505,
+      "1": 17841,
+      "4": 1,
+      "27": 17841,
+      "33": 0,
+      "47": 1,
+      "54": 180,
+      "59": 3,
+      "64": 40635,
+      "89": 1,
+      "156": 448,
+      "359": 26076,
+      "360": 119,
+      "455": 0,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 0,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 30862,
+      "2": 40903,
+      "3": 30839,
+      "4": 30886
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 121567,
+        "HighId": 121567,
+        "Qualities": [
+          1
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-212336"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": false,
+    "Hash": "UNPE",
+    "Name": "Uncontrollable Anger",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.893679,
+    "Stats": {
+      "0": 268964353,
+      "1": 526,
+      "4": 6,
+      "27": 526,
+      "33": 3,
+      "47": 1,
+      "54": 19,
+      "59": 0,
+      "89": 1,
+      "156": 66,
+      "359": 96195,
+      "360": 98,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": []
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "VEAE",
+    "Name": "Vergil Aeneid",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.7077676,
+    "Stats": {
+      "0": 268964353,
+      "1": 6796,
+      "4": 3,
+      "27": 6796,
+      "33": 3,
+      "47": 1,
+      "54": 29,
+      "59": 2,
+      "64": 40171,
+      "89": 1,
+      "156": 130,
+      "359": 203748,
+      "360": 131,
+      "455": 138,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 138,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "0": 117653,
+      "1": 9609,
+      "2": 9615,
+      "3": 9607,
+      "4": 9622
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 122123,
+        "HighId": 122124,
+        "Qualities": [
+          23
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Vergil Aeneid:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Vergil Aeneid:20260709-225408"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "VOVG",
+    "Name": "Violent Vagabond",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.8199594,
+    "Stats": {
+      "0": 268964353,
+      "1": 110,
+      "4": 1,
+      "27": 110,
+      "33": 3,
+      "47": 1,
+      "54": 6,
+      "59": 2,
+      "64": 40676,
+      "89": 1,
+      "156": 18,
+      "359": 203733,
+      "360": 93,
+      "455": 3,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 3,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 21824,
+      "3": 21819,
+      "4": 21831
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 130590,
+        "HighId": 130590,
+        "Qualities": [
+          1
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260708-143600",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-193914",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-205921",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-210452",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-225408",
+          "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260710-205400"
+        ]
+      }
+    ]
+  },
+  {
+    "HasHeadMesh": true,
+    "Hash": "WOST",
+    "Name": "Workman Striker",
+    "TemplateId": 0,
+    "ConfidenceScore": 0.9125311,
+    "Stats": {
+      "0": 268964353,
+      "1": 724,
+      "4": 4,
+      "27": 724,
+      "33": 3,
+      "47": 1,
+      "54": 25,
+      "59": 1,
+      "64": 40127,
+      "89": 1,
+      "156": 86,
+      "359": 203854,
+      "360": 100,
+      "455": 149,
+      "466": 0,
+      "673": 31
+    },
+    "NpcFamily": 149,
+    "NpcStatTemplate": 0,
+    "MinLevel": 0,
+    "MaxLevel": 0,
+    "Equipment": [],
+    "Weapons": [],
+    "Attackable": false,
+    "KnuBotId": 0,
+    "ItemTable": [],
+    "Textures": {
+      "1": 22562,
+      "3": 22537,
+      "4": 22618
+    },
+    "ContentAcceptance": {
+      "Policy": "BLOCK_SPAWN",
+      "IdentityResolved": false,
+      "CombatAccepted": false,
+      "Attackable": false,
+      "CombatAiEnabled": false,
+      "UnresolvedPlaceholder": false,
+      "Source": "8b9d36090986dc3ad89b9545a23ff38016c626ab:AORebirth/GameData/NpcTemplate.json",
+      "Blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT"
+      ]
+    },
+    "WeaponVariants": [
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          16
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          14
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          19
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260710-211430",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          12
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          15
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-042205",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          17
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          18
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          13
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260710-211430",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+        ]
+      },
+      {
+        "LowId": 122905,
+        "HighId": 122906,
+        "Qualities": [
+          11
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+        ]
+      },
+      {
+        "LowId": 122906,
+        "HighId": 122906,
+        "Qualities": [
+          20
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439"
+        ]
+      },
+      {
+        "LowId": 122907,
+        "HighId": 122908,
+        "Qualities": [
+          27
+        ],
+        "Evidence": [
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+          "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408"
+        ]
+      }
+    ]
+  }
 ]

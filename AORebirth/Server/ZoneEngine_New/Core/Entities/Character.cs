@@ -31,6 +31,7 @@ namespace ZoneEngine_New.Core.Entities
     {
         Jump,
         LeavePlayfield,
+        Movement,
     }
 
     public enum XpSource
@@ -79,7 +80,8 @@ namespace ZoneEngine_New.Core.Entities
 
         public void InterruptTimedActions(TimedActionInterrupt reason)
         {
-            Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
+            if (reason != TimedActionInterrupt.Movement)
+                Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
             TimedActionsInterrupted?.Invoke(this, reason);
         }
 

@@ -96,6 +96,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(position);
 
             MobTemplate template = _gameData.RequireMobTemplate(hash);
+            NpcContentAcceptance.RequireSpawnable(template);
             NpcTemplateLevelPolicy.RequireExactLevel(template, level);
             Identity identity = _registry.AllocateNpcIdentity();
             NpcCharacter npc = new NpcCharacter(identity, _items)
@@ -108,7 +109,7 @@ namespace ZoneEngine_New.Core.Playfield
                 SpawnSource = spawnSource
             };
 
-            foreach (var entry in template.Stats)
+            foreach (var entry in _gameData.ComposeNpcStats(template, level))
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
             npc.Rebase();

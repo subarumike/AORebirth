@@ -1,0 +1,5477 @@
+{
+  "summary": {
+    "startingSha": "2dc701f1e114cdd26dbb1e13d89acd4aa3b77a76",
+    "delmusSha": "8b9d36090986dc3ad89b9545a23ff38016c626ab",
+    "templatesFound": 34,
+    "subwayTemplatesFound": 32,
+    "subwayTemplatesImported": 32,
+    "placements": 326,
+    "resolved": 0,
+    "unresolved": 326,
+    "ambiguous": 0,
+    "families": [
+      0,
+      3,
+      63,
+      138,
+      148,
+      149,
+      150,
+      151
+    ],
+    "familyComplete": 0,
+    "familyMissing": 8,
+    "weaponDefinitions": 53,
+    "trueDuplicates": 0,
+    "knownWeaponVariants": 25,
+    "unresolvedWeaponDefinitions": 28,
+    "combatReady": 0,
+    "combatBlocked": 32,
+    "sourceFilesReviewed": 110,
+    "sourceFilesImported": 3,
+    "sourceFilesReconciled": 4,
+    "sourceFilesSkipped": 103,
+    "pink": {
+      "AAAA_templateDefinitions": 1,
+      "AAAA_liveSpawnCount": "NOT_MEASURED",
+      "missingVisualAssetCount": "UNPROVEN",
+      "otherCount": "UNPROVEN"
+    }
+  },
+  "evidence": [
+    {
+      "path": "docs/accepted/npc/delmus/NpcTemplate.json",
+      "sha256": "0fc8b2f5bb96b5fe310e64420d041efd15aed2f6b5c5684fd0f6f810b335c692"
+    },
+    {
+      "path": "docs/generated/subway_enemy_combat_contracts.json",
+      "sha256": "747d796e98e146db4946e06e9305a82e6b8e9b25e24c2b0e52ab93c88551a393"
+    },
+    {
+      "path": "docs/generated/capture_backed_npc_combat_inventory.json",
+      "sha256": "0a65399104a87f5b40fec86e2ab0ce0152225bc10c4dbad6e560de931c0cf404"
+    },
+    {
+      "path": "docs/generated/playfields/placements/pf_127.json",
+      "sha256": "712088499907e8eba1af0fe42d2350babf41bc02ad4595783a72bceb268ac7e2"
+    },
+    {
+      "path": "docs/evidence/ZONEENGINE_NEW_NPC_ACTIVATION_INVENTORY.json",
+      "sha256": "d55f59f9271df5b40177459a4591980d8ce4b3559e3620183c1d494c4cd666c0"
+    },
+    {
+      "path": "docs/accepted/combat/enemy_combat_formula_packet_evidence.json",
+      "sha256": "06e11db1b229ea619fb45d44c5ece28a24eaf2fee0e2c7955f86ed2c5b3f6486"
+    }
+  ],
+  "npcs": [
+    {
+      "name": "Basic Quality Armorer",
+      "hash": "BQAU",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 0,
+      "appearance": {
+        "monsterData": 26097,
+        "headMesh": 40111,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 30862,
+          "2": 40903,
+          "3": 30839,
+          "4": 30886
+        },
+        "scale": 119
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#BQAU",
+      "individualOverrides": {
+        "0": 271061505,
+        "1": 17841,
+        "4": 4,
+        "27": 17841,
+        "33": 0,
+        "47": 1,
+        "54": 180,
+        "59": 1,
+        "64": 40111,
+        "89": 1,
+        "156": 448,
+        "359": 26097,
+        "360": 119,
+        "455": 0,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=26097|level=180|name=Basic Quality Armorer",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "BQAU",
+        "name": "Basic Quality Armorer",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              1
+            ],
+            "captureEvidence": [
+              "20260709-210452",
+              "20260709-212115",
+              "20260709-212336"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Qualities": [
+              1
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Armorer:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79135F53)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Basic Quality Weaponsdealer",
+      "hash": "BQWR",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 0,
+      "appearance": {
+        "monsterData": 26092,
+        "headMesh": 40694,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 30862,
+          "2": 40903,
+          "3": 30839,
+          "4": 30886
+        },
+        "scale": 119
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#BQWR",
+      "individualOverrides": {
+        "0": 271061505,
+        "1": 17841,
+        "4": 1,
+        "27": 17841,
+        "33": 0,
+        "47": 1,
+        "54": 180,
+        "59": 2,
+        "64": 40694,
+        "89": 1,
+        "156": 448,
+        "359": 26092,
+        "360": 119,
+        "455": 0,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=26092|level=180|name=Basic Quality Weaponsdealer",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=26092|level=185|name=Basic Quality Weaponsdealer",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=26092|level=5|name=Thief",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "BQWR",
+        "name": "Basic Quality Weaponsdealer",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              1
+            ],
+            "captureEvidence": [
+              "20260709-210452",
+              "20260709-212115",
+              "20260709-212336"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Qualities": [
+              1
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Quality Weaponsdealer:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79135F52)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Basic Tools Merchant",
+      "hash": "BTMV",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 0,
+      "appearance": {
+        "monsterData": 26137,
+        "headMesh": 40209,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 30862,
+          "2": 40903,
+          "3": 30839,
+          "4": 30886
+        },
+        "scale": 119
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#BTMV",
+      "individualOverrides": {
+        "0": 271061505,
+        "1": 17841,
+        "4": 2,
+        "27": 17841,
+        "33": 0,
+        "47": 1,
+        "54": 180,
+        "59": 3,
+        "64": 40209,
+        "89": 1,
+        "156": 448,
+        "359": 26137,
+        "360": 119,
+        "455": 0,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=26137|level=180|name=Basic Tools Merchant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "BTMV",
+        "name": "Basic Tools Merchant",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              1
+            ],
+            "captureEvidence": [
+              "20260709-210452",
+              "20260709-212115",
+              "20260709-212336"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Qualities": [
+              1
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Basic Tools Merchant:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79135F55)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Container Supplier",
+      "hash": "CSBI",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 0,
+      "appearance": {
+        "monsterData": 26082,
+        "headMesh": 40634,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 30862,
+          "2": 40903,
+          "3": 30839,
+          "4": 30886
+        },
+        "scale": 119
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#CSBI",
+      "individualOverrides": {
+        "0": 271061505,
+        "1": 17841,
+        "4": 1,
+        "27": 17841,
+        "33": 0,
+        "47": 1,
+        "54": 180,
+        "59": 3,
+        "64": 40634,
+        "89": 1,
+        "156": 448,
+        "359": 26082,
+        "360": 119,
+        "455": 0,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=26082|level=180|name=Container Supplier",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=26082|level=194|name=Container Supplier",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "CSBI",
+        "name": "Container Supplier",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              1
+            ],
+            "captureEvidence": [
+              "20260709-210452",
+              "20260709-212336"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Qualities": [
+              1
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Container Supplier:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Container Supplier:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79135F56)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Looter",
+      "hash": "DCQV",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 203745,
+        "headMesh": 40695,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 21824,
+          "3": 21819,
+          "4": 21831
+        },
+        "scale": 95
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#DCQV",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 318,
+        "4": 1,
+        "27": 318,
+        "33": 3,
+        "47": 1,
+        "54": 10,
+        "59": 2,
+        "64": 40695,
+        "89": 1,
+        "156": 34,
+        "359": 203745,
+        "360": 95,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203745|level=10|name=Looter",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203745|level=9|name=Looter",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=unmapped|md=203745|level=10|name=Looter",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203745|level=9|name=Looter",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "DCQV",
+        "name": "Looter",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 123038,
+            "HighId": 123039,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 123038,
+            "HighId": 123039,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "captureEvidence": [
+              "20260709-210452",
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-210452",
+              "20260709-212336",
+              "20260709-210452",
+              "20260709-212336",
+              "20260709-210452",
+              "20260709-212336",
+              "20260709-210452"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 123038,
+            "HighId": 123039,
+            "Qualities": [
+              9
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:795313CB)",
+              "(SimpleChar:7953AD8D)",
+              "(SimpleChar:79545029)"
+            ]
+          },
+          {
+            "LowId": 123038,
+            "HighId": 123039,
+            "Qualities": [
+              11
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79528F96)",
+              "(SimpleChar:795312BC)",
+              "(SimpleChar:7954503C)"
+            ]
+          },
+          {
+            "LowId": 123038,
+            "HighId": 123039,
+            "Qualities": [
+              12
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:795312DC)",
+              "(SimpleChar:79545034)"
+            ]
+          },
+          {
+            "LowId": 123038,
+            "HighId": 123039,
+            "Qualities": [
+              8
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79528FD6)",
+              "(SimpleChar:7954501B)"
+            ]
+          },
+          {
+            "LowId": 123038,
+            "HighId": 123039,
+            "Qualities": [
+              10
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Looter:20260709-210452"
+            ],
+            "Owners": [
+              "(SimpleChar:7953AD7C)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Discarded Pet",
+      "hash": "DIPE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 17720,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 95
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#DIPE",
+      "individualOverrides": {
+        "0": 268980737,
+        "1": 227,
+        "4": 6,
+        "27": 227,
+        "33": 3,
+        "47": 1,
+        "54": 10,
+        "59": 0,
+        "89": 1,
+        "156": 44,
+        "359": 17720,
+        "360": 95,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=17720|level=10|name=Discarded Pet",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17720|level=5|name=Discarded Pet",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17720|level=6|name=Discarded Pet",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17720|level=7|name=Discarded Pet",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17720|level=8|name=Discarded Pet",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17720|level=9|name=Discarded Pet",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17720|level=10|name=Discarded Pet",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17720|level=5|name=Discarded Pet",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17720|level=6|name=Discarded Pet",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17720|level=7|name=Discarded Pet",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17720|level=8|name=Discarded Pet",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17720|level=9|name=Discarded Pet",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "DIPE",
+        "name": "Discarded Pet",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          },
+          {
+            "LowId": 43712,
+            "HighId": 144745,
+            "Hash": "MAAT"
+          },
+          {
+            "LowId": 42033,
+            "HighId": 42032,
+            "Hash": "DIIT"
+          },
+          {
+            "LowId": 70292,
+            "HighId": 70293,
+            "Hash": "BRAW"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 43712,
+            "HighId": 144745,
+            "Hash": "MAAT",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 42033,
+            "HighId": 42032,
+            "Hash": "DIIT",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 70292,
+            "HighId": 70293,
+            "Hash": "BRAW",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 4,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Disobedient Bot",
+      "hash": "DOPT",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 17649,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 94
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#DOPT",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 183,
+        "4": 6,
+        "27": 183,
+        "33": 3,
+        "47": 1,
+        "54": 8,
+        "59": 0,
+        "89": 1,
+        "156": 28,
+        "359": 17649,
+        "360": 94,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=17649|level=10|name=Disobedient Bot",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17649|level=5|name=Disobedient Bot",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17649|level=6|name=Disobedient Bot",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17649|level=7|name=Disobedient Bot",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17649|level=8|name=Disobedient Bot",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17649|level=9|name=Disobedient Bot",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17649|level=10|name=Disobedient Bot",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17649|level=5|name=Disobedient Bot",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17649|level=6|name=Disobedient Bot",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17649|level=7|name=Disobedient Bot",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17649|level=8|name=Disobedient Bot",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17649|level=9|name=Disobedient Bot",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "DOPT",
+        "name": "Disobedient Bot",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Architect Striker",
+      "hash": "EHDL",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 149,
+      "appearance": {
+        "monsterData": 203743,
+        "headMesh": 40698,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 40976,
+          "1": 22562,
+          "2": 40968,
+          "3": 22537,
+          "4": 22618
+        },
+        "scale": 97
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#EHDL",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 393,
+        "4": 1,
+        "27": 393,
+        "33": 3,
+        "47": 1,
+        "54": 15,
+        "59": 2,
+        "64": 40698,
+        "89": 1,
+        "156": 52,
+        "359": 203743,
+        "360": 97,
+        "455": 149,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203743|level=13|name=Architect Striker",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203743|level=14|name=Architect Striker",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203743|level=15|name=Architect Striker",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203743|level=16|name=Architect Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203743|level=17|name=Architect Striker",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203743|level=18|name=Architect Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203743|level=13|name=Architect Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203743|level=14|name=Architect Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203743|level=15|name=Architect Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203743|level=17|name=Architect Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "EHDL",
+        "name": "Architect Striker",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Empty Shell",
+      "hash": "EMSE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203731,
+        "headMesh": 29696,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9402,
+          "1": 9406,
+          "2": 9407,
+          "3": 9405,
+          "4": 9414
+        },
+        "scale": 99
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#EMSE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 447,
+        "4": 3,
+        "27": 447,
+        "33": 3,
+        "47": 1,
+        "54": 20,
+        "59": 3,
+        "64": 29696,
+        "89": 1,
+        "156": 76,
+        "359": 203731,
+        "360": 99,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203731|level=17|name=Empty Shell",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203731|level=18|name=Empty Shell",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203731|level=19|name=Empty Shell",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203731|level=20|name=Empty Shell",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203731|level=21|name=Empty Shell",
+          "status": "capture-certified",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "EMSE",
+        "name": "Empty Shell",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Fragmented Soul",
+      "hash": "FASO",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203729,
+        "headMesh": 29706,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9402,
+          "1": 9404,
+          "2": 9407,
+          "3": 9405,
+          "4": 9401
+        },
+        "scale": 98
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#FASO",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 368,
+        "4": 3,
+        "27": 368,
+        "33": 3,
+        "47": 1,
+        "54": 17,
+        "59": 2,
+        "64": 29706,
+        "89": 1,
+        "156": 59,
+        "359": 203729,
+        "360": 98,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203729|level=17|name=Fragmented Soul",
+          "status": "capture-certified",
+          "variants": 2
+        },
+        {
+          "profileKey": "resource=127|md=203729|level=18|name=Fragmented Soul",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203729|level=19|name=Fragmented Soul",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203729|level=20|name=Fragmented Soul",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203729|level=21|name=Fragmented Soul",
+          "status": "capture-certified",
+          "variants": 2
+        }
+      ],
+      "weapons": {
+        "hash": "FASO",
+        "name": "Fragmented Soul",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 123685,
+            "HighId": 123686,
+            "Hash": ""
+          },
+          {
+            "LowId": 123687,
+            "HighId": 123688,
+            "Hash": ""
+          },
+          {
+            "LowId": 123686,
+            "HighId": 123686,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 123685,
+            "HighId": 123686,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              14,
+              17,
+              18,
+              19
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260716-033326",
+              "20260709-222339",
+              "20260709-222339",
+              "20260716-033326",
+              "20260709-222339"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 123687,
+            "HighId": 123688,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              25,
+              26
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408",
+              "20260709-222339",
+              "20260709-225408"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 123686,
+            "HighId": 123686,
+            "Hash": "",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 123685,
+            "HighId": 123686,
+            "Qualities": [
+              14
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260716-033326"
+            ],
+            "Owners": [
+              "(SimpleChar:7954516A)",
+              "(SimpleChar:7954518B)",
+              "(SimpleChar:796D403E)"
+            ]
+          },
+          {
+            "LowId": 123687,
+            "HighId": 123688,
+            "Qualities": [
+              25
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:7954518A)",
+              "(SimpleChar:795451AE)"
+            ]
+          },
+          {
+            "LowId": 123685,
+            "HighId": 123686,
+            "Qualities": [
+              17
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:7954516F)",
+              "(SimpleChar:7954518E)"
+            ]
+          },
+          {
+            "LowId": 123685,
+            "HighId": 123686,
+            "Qualities": [
+              18
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260716-033326"
+            ],
+            "Owners": [
+              "(SimpleChar:79545248)",
+              "(SimpleChar:796D403F)"
+            ]
+          },
+          {
+            "LowId": 123687,
+            "HighId": 123688,
+            "Qualities": [
+              26
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451AA)"
+            ]
+          },
+          {
+            "LowId": 123685,
+            "HighId": 123686,
+            "Qualities": [
+              19
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:7954517A)"
+            ]
+          },
+          {
+            "LowId": 123687,
+            "HighId": 123687,
+            "Qualities": [
+              21
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Fragmented Soul:20260710-211430"
+            ],
+            "Owners": [
+              "(SimpleChar:7957E5F7)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Filth Flea",
+      "hash": "FLFE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 17657,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 130
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#FLFE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 261,
+        "4": 6,
+        "27": 261,
+        "33": 3,
+        "47": 1,
+        "54": 11,
+        "59": 0,
+        "89": 1,
+        "156": 41,
+        "359": 17657,
+        "360": 130,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=17657|level=10|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=11|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=12|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=13|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=14|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=15|name=Filth Flea",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=16|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=19|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=20|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=21|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=22|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=4|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=5|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=6|name=Filth Flea",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=7|name=Filth Flea",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=17657|level=8|name=Filth Flea",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=10|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=11|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=12|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=13|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=14|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=15|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=19|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=20|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=21|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=4|name=Filth Flea",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=5|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=6|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=7|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=17657|level=8|name=Filth Flea",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "FLFE",
+        "name": "Filth Flea",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 201059,
+            "HighId": 201060,
+            "Hash": "EPAH"
+          },
+          {
+            "LowId": 201056,
+            "HighId": 201057,
+            "Hash": "AZUS"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 201059,
+            "HighId": 201060,
+            "Hash": "EPAH",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 201056,
+            "HighId": 201057,
+            "Hash": "AZUS",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 2,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Infector",
+      "hash": "INFE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 150,
+      "appearance": {
+        "monsterData": 31909,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 69
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#INFE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 829,
+        "4": 6,
+        "27": 829,
+        "33": 3,
+        "47": 1,
+        "54": 21,
+        "59": 0,
+        "89": 1,
+        "156": 58,
+        "359": 31909,
+        "360": 69,
+        "455": 150,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=31909|level=16|name=Infector",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=31909|level=17|name=Infector",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=31909|level=18|name=Infector",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=31909|level=19|name=Infector",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=31909|level=20|name=Infector",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=31909|level=21|name=Infector",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=31909|level=24|name=Infector",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=31909|level=25|name=Infector",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=31909|level=16|name=Infector",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=31909|level=17|name=Infector",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=31909|level=18|name=Infector",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=31909|level=19|name=Infector",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=31909|level=20|name=Infector",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=31909|level=25|name=Infector",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "INFE",
+        "name": "Infector",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 201062,
+            "HighId": 201063,
+            "Hash": "DMXF"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 201062,
+            "HighId": 201063,
+            "Hash": "DMXF",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Infected Attendant",
+      "hash": "INPE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 96056,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 100
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#INPE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 691,
+        "4": 6,
+        "27": 691,
+        "33": 3,
+        "47": 1,
+        "54": 24,
+        "59": 0,
+        "89": 1,
+        "156": 83,
+        "359": 96056,
+        "360": 100,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=96056|level=10|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=11|name=Infected Attendant",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=12|name=Infected Attendant",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=13|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=15|name=Infected Attendant",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=16|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=22|name=Infected Attendant",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=23|name=Infected Attendant",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96056|level=24|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96056|level=11|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96056|level=12|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96056|level=15|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96056|level=23|name=Infected Attendant",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "INPE",
+        "name": "Infected Attendant",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Incomplete Rebuild",
+      "hash": "IORB",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203728,
+        "headMesh": 29694,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9402,
+          "1": 9404,
+          "2": 9407,
+          "3": 9405,
+          "4": 9401
+        },
+        "scale": 98
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#IORB",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 421,
+        "4": 3,
+        "27": 421,
+        "33": 3,
+        "47": 1,
+        "54": 19,
+        "59": 2,
+        "64": 29694,
+        "89": 1,
+        "156": 66,
+        "359": 203728,
+        "360": 98,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203728|level=17|name=Incomplete Rebuild",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203728|level=18|name=Incomplete Rebuild",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203728|level=19|name=Incomplete Rebuild",
+          "status": "capture-certified",
+          "variants": 3
+        },
+        {
+          "profileKey": "resource=127|md=203728|level=20|name=Incomplete Rebuild",
+          "status": "capture-certified",
+          "variants": 2
+        },
+        {
+          "profileKey": "resource=127|md=203728|level=21|name=Incomplete Rebuild",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203728|level=22|name=Incomplete Rebuild",
+          "status": "capture-certified",
+          "variants": 1
+        }
+      ],
+      "weapons": {
+        "hash": "IORB",
+        "name": "Incomplete Rebuild",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 122655,
+            "HighId": 122655,
+            "Hash": ""
+          },
+          {
+            "LowId": 122653,
+            "HighId": 122654,
+            "Hash": ""
+          },
+          {
+            "LowId": 122655,
+            "HighId": 122656,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 122655,
+            "HighId": 122655,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              21
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122653,
+            "HighId": 122654,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              14,
+              17,
+              18
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408",
+              "20260709-222339",
+              "20260709-222339"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122655,
+            "HighId": 122656,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              22,
+              23,
+              24
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408",
+              "20260716-033326",
+              "20260710-211430"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 122653,
+            "HighId": 122654,
+            "Qualities": [
+              18
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:79545170)",
+              "(SimpleChar:79545177)",
+              "(SimpleChar:795451BC)"
+            ]
+          },
+          {
+            "LowId": 122654,
+            "HighId": 122654,
+            "Qualities": [
+              20
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:79545181)",
+              "(SimpleChar:795451FD)",
+              "(SimpleChar:79545241)"
+            ]
+          },
+          {
+            "LowId": 122655,
+            "HighId": 122655,
+            "Qualities": [
+              21
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451C1)"
+            ]
+          },
+          {
+            "LowId": 122655,
+            "HighId": 122656,
+            "Qualities": [
+              24
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451CB)"
+            ]
+          },
+          {
+            "LowId": 122653,
+            "HighId": 122654,
+            "Qualities": [
+              14
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:79545172)"
+            ]
+          },
+          {
+            "LowId": 122653,
+            "HighId": 122654,
+            "Qualities": [
+              17
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:79545188)"
+            ]
+          },
+          {
+            "LowId": 122655,
+            "HighId": 122656,
+            "Qualities": [
+              22
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260716-033326"
+            ],
+            "Owners": [
+              "(SimpleChar:796D403C)"
+            ]
+          },
+          {
+            "LowId": 122655,
+            "HighId": 122656,
+            "Qualities": [
+              23
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Incomplete Rebuild:20260710-211430"
+            ],
+            "Owners": [
+              "(SimpleChar:7957E5F9)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Lost Thought",
+      "hash": "LPPE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 96193,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 98
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#LPPE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 526,
+        "4": 6,
+        "27": 526,
+        "33": 3,
+        "47": 1,
+        "54": 19,
+        "59": 0,
+        "89": 1,
+        "156": 66,
+        "359": 96193,
+        "360": 98,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=96193|level=16|name=Lost Thought",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96193|level=18|name=Lost Thought",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96193|level=19|name=Lost Thought",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96193|level=21|name=Lost Thought",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96193|level=22|name=Lost Thought",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96193|level=16|name=Lost Thought",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96193|level=18|name=Lost Thought",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96193|level=21|name=Lost Thought",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=96193|level=22|name=Lost Thought",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "LPPE",
+        "name": "Lost Thought",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Melded Patterns",
+      "hash": "MDPA",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203747,
+        "headMesh": 29701,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 9406,
+          "2": 9407,
+          "3": 9405,
+          "4": 9401
+        },
+        "scale": 130
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#MDPA",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 559,
+        "4": 3,
+        "27": 559,
+        "33": 3,
+        "47": 1,
+        "54": 20,
+        "59": 3,
+        "64": 29701,
+        "89": 1,
+        "156": 69,
+        "359": 203747,
+        "360": 130,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203747|level=18|name=Melded Patterns",
+          "status": "capture-certified",
+          "variants": 2
+        },
+        {
+          "profileKey": "resource=127|md=203747|level=19|name=Melded Patterns",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203747|level=20|name=Melded Patterns",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203747|level=21|name=Melded Patterns",
+          "status": "capture-certified",
+          "variants": 4
+        },
+        {
+          "profileKey": "resource=127|md=203747|level=22|name=Melded Patterns",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203747|level=23|name=Melded Patterns",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203747|level=24|name=Melded Patterns",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203747|level=25|name=Melded Patterns",
+          "status": "capture-certified",
+          "variants": 1
+        }
+      ],
+      "weapons": {
+        "hash": "MDPA",
+        "name": "Melded Patterns",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121819,
+            "HighId": 121819,
+            "Hash": ""
+          },
+          {
+            "LowId": 121819,
+            "HighId": 121820,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121819,
+            "HighId": 121819,
+            "Hash": "",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 121819,
+            "HighId": 121820,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              23,
+              25,
+              26
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408",
+              "20260709-222339",
+              "20260709-225408",
+              "20260716-222201"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 121818,
+            "HighId": 121818,
+            "Qualities": [
+              20
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:7954508E)",
+              "(SimpleChar:79545190)",
+              "(SimpleChar:79545196)",
+              "(SimpleChar:79545198)"
+            ]
+          },
+          {
+            "LowId": 121817,
+            "HighId": 121818,
+            "Qualities": [
+              19
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408",
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260716-034559"
+            ],
+            "Owners": [
+              "(SimpleChar:7954517C)",
+              "(SimpleChar:795451DD)",
+              "(SimpleChar:796CD186)"
+            ]
+          },
+          {
+            "LowId": 121819,
+            "HighId": 121820,
+            "Qualities": [
+              26
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:79545187)",
+              "(SimpleChar:795451BA)"
+            ]
+          },
+          {
+            "LowId": 121819,
+            "HighId": 121820,
+            "Qualities": [
+              25
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451D8)"
+            ]
+          },
+          {
+            "LowId": 121817,
+            "HighId": 121818,
+            "Qualities": [
+              18
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:79545185)"
+            ]
+          },
+          {
+            "LowId": 121819,
+            "HighId": 121820,
+            "Qualities": [
+              23
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Melded Patterns:20260716-222201"
+            ],
+            "Owners": [
+              "(SimpleChar:797025E8)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Molested Molecules",
+      "hash": "MEML",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203746,
+        "headMesh": 29704,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9402,
+          "1": 9404,
+          "2": 9407,
+          "3": 9405,
+          "4": 9401
+        },
+        "scale": 130
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#MEML",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 421,
+        "4": 3,
+        "27": 421,
+        "33": 3,
+        "47": 1,
+        "54": 19,
+        "59": 2,
+        "64": 29704,
+        "89": 1,
+        "156": 66,
+        "359": 203746,
+        "360": 130,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203746|level=17|name=Molested Molecules",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=18|name=Molested Molecules",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=19|name=Molested Molecules",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=20|name=Molested Molecules",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=21|name=Molested Molecules",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=22|name=Molested Molecules",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=23|name=Molested Molecules",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=24|name=Molested Molecules",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203746|level=25|name=Molested Molecules",
+          "status": "capture-certified",
+          "variants": 1
+        }
+      ],
+      "weapons": {
+        "hash": "MEML",
+        "name": "Molested Molecules",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 122216,
+            "HighId": 122217,
+            "Hash": ""
+          },
+          {
+            "LowId": 122218,
+            "HighId": 122219,
+            "Hash": ""
+          },
+          {
+            "LowId": 122217,
+            "HighId": 122217,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 122216,
+            "HighId": 122217,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              18,
+              19
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408",
+              "20260709-222339",
+              "20260709-225408"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122218,
+            "HighId": 122219,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              22,
+              23,
+              25,
+              27
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408",
+              "20260716-034104",
+              "20260709-222339",
+              "20260716-222201",
+              "20260709-222339",
+              "20260716-222201"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122217,
+            "HighId": 122217,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              20
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 122217,
+            "HighId": 122217,
+            "Qualities": [
+              20
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795450E5)",
+              "(SimpleChar:79545174)",
+              "(SimpleChar:7954517B)",
+              "(SimpleChar:795451B5)"
+            ]
+          },
+          {
+            "LowId": 122218,
+            "HighId": 122219,
+            "Qualities": [
+              27
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408",
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-034104"
+            ],
+            "Owners": [
+              "(SimpleChar:795451D7)",
+              "(SimpleChar:796D40AB)"
+            ]
+          },
+          {
+            "LowId": 122216,
+            "HighId": 122217,
+            "Qualities": [
+              18
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451C2)"
+            ]
+          },
+          {
+            "LowId": 122216,
+            "HighId": 122217,
+            "Qualities": [
+              19
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451D2)"
+            ]
+          },
+          {
+            "LowId": 122218,
+            "HighId": 122219,
+            "Qualities": [
+              22
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-222201"
+            ],
+            "Owners": [
+              "(SimpleChar:79545139)",
+              "(SimpleChar:797025F2)"
+            ]
+          },
+          {
+            "LowId": 122218,
+            "HighId": 122219,
+            "Qualities": [
+              23
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:795451C7)"
+            ]
+          },
+          {
+            "LowId": 122218,
+            "HighId": 122219,
+            "Qualities": [
+              25
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Molested Molecules:20260716-222201"
+            ],
+            "Owners": [
+              "(SimpleChar:797025F6)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Eumenides",
+      "hash": "MENI",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203726,
+        "headMesh": 29708,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9620,
+          "1": 9612,
+          "2": 9618,
+          "3": 99779,
+          "4": 9625
+        },
+        "scale": 130
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#MENI",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 2792,
+        "4": 3,
+        "27": 2792,
+        "33": 3,
+        "47": 1,
+        "54": 20,
+        "59": 2,
+        "64": 29708,
+        "89": 1,
+        "156": 76,
+        "359": 203726,
+        "360": 130,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203726|level=20|name=Eumenides",
+          "status": "capture-certified",
+          "variants": 1
+        }
+      ],
+      "weapons": {
+        "hash": "MENI",
+        "name": "Eumenides",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 123267,
+            "HighId": 123268,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 123267,
+            "HighId": 123268,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              17,
+              20
+            ],
+            "captureEvidence": [
+              "20260717-215250",
+              "20260709-222339"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 123267,
+            "HighId": 123268,
+            "Qualities": [
+              17
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Eumenides:20260717-215250"
+            ],
+            "Owners": [
+              "(SimpleChar:79748626)"
+            ]
+          },
+          {
+            "LowId": 123267,
+            "HighId": 123268,
+            "Qualities": [
+              20
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Eumenides:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:79545042)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Mugger",
+      "hash": "MUGG",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 203734,
+        "headMesh": 40705,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9418,
+          "1": 8729,
+          "2": 9420,
+          "3": 9419,
+          "4": 9421
+        },
+        "scale": 95
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#MUGG",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 182,
+        "4": 1,
+        "27": 182,
+        "33": 3,
+        "47": 1,
+        "54": 10,
+        "59": 2,
+        "64": 40705,
+        "89": 1,
+        "156": 36,
+        "359": 203734,
+        "360": 95,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203734|level=10|name=Mugger",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203734|level=5|name=Mugger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203734|level=7|name=Mugger",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203734|level=8|name=Mugger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203734|level=9|name=Mugger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203734|level=10|name=Mugger",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203734|level=5|name=Mugger",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203734|level=8|name=Mugger",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "MUGG",
+        "name": "Mugger",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              1
+            ],
+            "captureEvidence": [
+              "20260709-193914",
+              "20260709-210452",
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260709-225408",
+              "20260710-205400",
+              "20260710-211430",
+              "20260719-021022"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Qualities": [
+              1
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-193914",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260709-225408",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260710-205400",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260710-211430",
+              "docs/generated/subway_enemy_combat_contracts.json#Mugger:20260719-021022"
+            ],
+            "Owners": [
+              "(SimpleChar:7953AA11)",
+              "(SimpleChar:7953AD2E)",
+              "(SimpleChar:7953AD53)",
+              "(SimpleChar:7953AD55)",
+              "(SimpleChar:7953AD5C)",
+              "(SimpleChar:7953AD6B)",
+              "(SimpleChar:7953ADC6)",
+              "(SimpleChar:7953ADC8)",
+              "(SimpleChar:7953AF3C)",
+              "(SimpleChar:795450D4)",
+              "(SimpleChar:795450EB)",
+              "(SimpleChar:795450ED)",
+              "(SimpleChar:795450EF)",
+              "(SimpleChar:7954512C)",
+              "(SimpleChar:795451FE)",
+              "(SimpleChar:79545329)",
+              "(SimpleChar:7957E627)",
+              "(SimpleChar:7957E632)",
+              "(SimpleChar:797AD6F6)",
+              "(SimpleChar:797AD70D)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Neural Burnout",
+      "hash": "NUBR",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203730,
+        "headMesh": 29702,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 9406,
+          "2": 9407,
+          "3": 9405,
+          "4": 9401
+        },
+        "scale": 98
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#NUBR",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 643,
+        "4": 3,
+        "27": 643,
+        "33": 3,
+        "47": 1,
+        "54": 17,
+        "59": 3,
+        "64": 29702,
+        "89": 1,
+        "156": 59,
+        "359": 203730,
+        "360": 98,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203730|level=16|name=Neural Burnout",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203730|level=17|name=Neural Burnout",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203730|level=18|name=Neural Burnout",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203730|level=19|name=Neural Burnout",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203730|level=21|name=Neural Burnout",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203730|level=22|name=Neural Burnout",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203730|level=24|name=Neural Burnout",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203730|level=25|name=Neural Burnout",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203730|level=17|name=Neural Burnout",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203730|level=18|name=Neural Burnout",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203730|level=22|name=Neural Burnout",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203730|level=25|name=Neural Burnout",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "NUBR",
+        "name": "Neural Burnout",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Shadow",
+      "hash": "NXZP",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 150,
+      "appearance": {
+        "monsterData": 30464,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 99
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#NXZP",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 592,
+        "4": 6,
+        "27": 592,
+        "33": 3,
+        "47": 1,
+        "54": 21,
+        "59": 0,
+        "89": 1,
+        "156": 58,
+        "359": 30464,
+        "360": 99,
+        "455": 150,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=30464|level=10|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=11|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=12|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=13|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=14|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=15|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=16|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=20|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=21|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=22|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=23|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=24|name=Shadow",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30464|level=9|name=Shadow",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=10|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=11|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=13|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=14|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=15|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=21|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=22|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=24|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30464|level=9|name=Shadow",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "NXZP",
+        "name": "Shadow",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 201062,
+            "HighId": 201063,
+            "Hash": "DMXF"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 201062,
+            "HighId": 201063,
+            "Hash": "DMXF",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Premature Pattern",
+      "hash": "PMPE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 203727,
+        "headMesh": 29699,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9402,
+          "1": 9406,
+          "2": 9407,
+          "3": 9405,
+          "4": 9401
+        },
+        "scale": 97
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#PMPE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 341,
+        "4": 3,
+        "27": 341,
+        "33": 3,
+        "47": 1,
+        "54": 16,
+        "59": 3,
+        "64": 29699,
+        "89": 1,
+        "156": 61,
+        "359": 203727,
+        "360": 97,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203727|level=16|name=Premature Pattern",
+          "status": "unresolved-critical-or-non-normal-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203727|level=17|name=Premature Pattern",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203727|level=18|name=Premature Pattern",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203727|level=19|name=Premature Pattern",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203727|level=22|name=Premature Pattern",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203727|level=23|name=Premature Pattern",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "PMPE",
+        "name": "Premature Pattern",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Redundant Scan",
+      "hash": "RESC",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 148,
+      "appearance": {
+        "monsterData": 204178,
+        "headMesh": 40660,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9402,
+          "1": 9406,
+          "2": 9407,
+          "4": 9414
+        },
+        "scale": 99
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#RESC",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 782,
+        "4": 3,
+        "27": 782,
+        "33": 3,
+        "47": 1,
+        "54": 20,
+        "59": 3,
+        "64": 40660,
+        "89": 1,
+        "156": 69,
+        "359": 204178,
+        "360": 99,
+        "455": 148,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=204178|level=19|name=Redundant Scan",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=204178|level=20|name=Redundant Scan",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=204178|level=21|name=Redundant Scan",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=204178|level=22|name=Redundant Scan",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "RESC",
+        "name": "Redundant Scan",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 122026,
+            "HighId": 122027,
+            "Hash": ""
+          },
+          {
+            "LowId": 122027,
+            "HighId": 122027,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 122026,
+            "HighId": 122027,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              14,
+              16
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408",
+              "20260709-222339"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122027,
+            "HighId": 122027,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              20
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 122026,
+            "HighId": 122027,
+            "Qualities": [
+              14
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451BF)"
+            ]
+          },
+          {
+            "LowId": 122027,
+            "HighId": 122027,
+            "Qualities": [
+              20
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:7953AF85)"
+            ]
+          },
+          {
+            "LowId": 122028,
+            "HighId": 122029,
+            "Qualities": [
+              25
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451C4)"
+            ]
+          },
+          {
+            "LowId": 122026,
+            "HighId": 122027,
+            "Qualities": [
+              16
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Redundant Scan:20260709-222339"
+            ],
+            "Owners": [
+              "(SimpleChar:795451D3)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Slum Runner",
+      "hash": "SLRU",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 151,
+      "appearance": {
+        "monsterData": 55648,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 98
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#SLRU",
+      "individualOverrides": {
+        "0": 268980737,
+        "1": 526,
+        "4": 6,
+        "27": 526,
+        "33": 3,
+        "47": 1,
+        "54": 19,
+        "59": 0,
+        "89": 1,
+        "156": 261,
+        "359": 55648,
+        "360": 98,
+        "455": 151,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=55648|level=11|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=12|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=13|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=14|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=15|name=Slum Runner",
+          "status": "unresolved-critical-or-non-normal-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=16|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=17|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=18|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=19|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=20|name=Slum Runner",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=21|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=22|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=55648|level=23|name=Slum Runner",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=11|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=15|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=16|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=17|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=20|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=21|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=22|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=55648|level=23|name=Slum Runner",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "SLRU",
+        "name": "Slum Runner",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 201053,
+            "HighId": 201054,
+            "Hash": "DBPW"
+          },
+          {
+            "LowId": 43712,
+            "HighId": 144745,
+            "Hash": "MAAT"
+          },
+          {
+            "LowId": 42033,
+            "HighId": 42032,
+            "Hash": "DIIT"
+          },
+          {
+            "LowId": 70292,
+            "HighId": 70293,
+            "Hash": "BRAW"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 201053,
+            "HighId": 201054,
+            "Hash": "DBPW",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 43712,
+            "HighId": 144745,
+            "Hash": "MAAT",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 42033,
+            "HighId": 42032,
+            "Hash": "DIIT",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 70292,
+            "HighId": 70293,
+            "Hash": "BRAW",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 4,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Bloodcreeper",
+      "hash": "SS01",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 63,
+      "appearance": {
+        "monsterData": 30379,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 70
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#SS01",
+      "individualOverrides": {
+        "0": 268980737,
+        "1": 724,
+        "4": 6,
+        "27": 724,
+        "33": 3,
+        "47": 1,
+        "54": 25,
+        "59": 1,
+        "89": 1,
+        "156": 86,
+        "359": 30379,
+        "360": 70,
+        "455": 63,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=30379|level=24|name=Bloodcreeper",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=30379|level=25|name=Bloodcreeper",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=30379|level=30|name=Bloodcreeper",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "SS01",
+        "name": "Bloodcreeper",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121094,
+            "HighId": 121095,
+            "Hash": "SKW2"
+          },
+          {
+            "LowId": 121091,
+            "HighId": 121092,
+            "Hash": "SKW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121094,
+            "HighId": 121095,
+            "Hash": "SKW2",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 121091,
+            "HighId": 121092,
+            "Hash": "SKW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 2,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Stim Fiend",
+      "hash": "STFE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 203739,
+        "headMesh": 40693,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 117653,
+          "1": 40898,
+          "2": 40903,
+          "3": 87442,
+          "4": 40907
+        },
+        "scale": 96
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#STFE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 327,
+        "4": 1,
+        "27": 327,
+        "33": 3,
+        "47": 1,
+        "54": 13,
+        "59": 2,
+        "64": 40693,
+        "89": 1,
+        "156": 58,
+        "359": 203739,
+        "360": 96,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203739|level=10|name=Stim Fiend",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=11|name=Stim Fiend",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=12|name=Stim Fiend",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=13|name=Stim Fiend",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=14|name=Stim Fiend",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=15|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=16|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=17|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203739|level=9|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203739|level=10|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203739|level=12|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203739|level=13|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203739|level=14|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203739|level=17|name=Stim Fiend",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "STFE",
+        "name": "Stim Fiend",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Strike Foreman",
+      "hash": "STFO",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 149,
+      "appearance": {
+        "monsterData": 203744,
+        "headMesh": 40673,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 9452,
+          "1": 45759,
+          "2": 9450,
+          "3": 45758,
+          "4": 45760
+        },
+        "scale": 98
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#STFO",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 736,
+        "4": 1,
+        "27": 736,
+        "33": 3,
+        "47": 1,
+        "54": 19,
+        "59": 2,
+        "64": 40673,
+        "89": 1,
+        "156": 66,
+        "359": 203744,
+        "360": 98,
+        "455": 149,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203744|level=19|name=Strike Foreman",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "STFO",
+        "name": "Strike Foreman",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 122767,
+            "HighId": 122768,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 122767,
+            "HighId": 122768,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              17,
+              19
+            ],
+            "captureEvidence": [
+              "20260709-212336",
+              "20260709-220439"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 122767,
+            "HighId": 122768,
+            "Qualities": [
+              17
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Strike Foreman:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79545109)"
+            ]
+          },
+          {
+            "LowId": 122767,
+            "HighId": 122768,
+            "Qualities": [
+              19
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Strike Foreman:20260709-220439"
+            ],
+            "Owners": [
+              "(SimpleChar:7954512E)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Tailor",
+      "hash": "TAIL",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 0,
+      "appearance": {
+        "monsterData": 26076,
+        "headMesh": 40635,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 30862,
+          "2": 40903,
+          "3": 30839,
+          "4": 30886
+        },
+        "scale": 119
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#TAIL",
+      "individualOverrides": {
+        "0": 271061505,
+        "1": 17841,
+        "4": 1,
+        "27": 17841,
+        "33": 0,
+        "47": 1,
+        "54": 180,
+        "59": 3,
+        "64": 40635,
+        "89": 1,
+        "156": 448,
+        "359": 26076,
+        "360": 119,
+        "455": 0,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=26076|level=180|name=Tailor",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=6553|md=26076|level=122|name=Tailor",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=6553|md=26076|level=49|name=Tailor",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=26076|level=122|name=Tailor",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=26076|level=193|name=Tailor",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "TAIL",
+        "name": "Tailor",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              1
+            ],
+            "captureEvidence": [
+              "20260709-210452",
+              "20260709-212115",
+              "20260709-212336"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 121567,
+            "HighId": 121567,
+            "Qualities": [
+              1
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Tailor:20260709-212336"
+            ],
+            "Owners": [
+              "(SimpleChar:79135F51)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Uncontrollable Anger",
+      "hash": "UNPE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 96195,
+        "headMesh": null,
+        "hasHeadMesh": false,
+        "textures": null,
+        "scale": 98
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#UNPE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 526,
+        "4": 6,
+        "27": 526,
+        "33": 3,
+        "47": 1,
+        "54": 19,
+        "59": 0,
+        "89": 1,
+        "156": 66,
+        "359": 96195,
+        "360": 98,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=96195|level=11|name=Uncontrollable Anger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96195|level=12|name=Uncontrollable Anger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96195|level=13|name=Uncontrollable Anger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96195|level=19|name=Uncontrollable Anger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96195|level=20|name=Uncontrollable Anger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96195|level=21|name=Uncontrollable Anger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96195|level=22|name=Uncontrollable Anger",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=96195|level=23|name=Uncontrollable Anger",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "UNPE",
+        "name": "Uncontrollable Anger",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 144742,
+            "HighId": 144743,
+            "Hash": "SIW1",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Vergil Aeneid",
+      "hash": "VEAE",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 138,
+      "appearance": {
+        "monsterData": 203748,
+        "headMesh": 40171,
+        "hasHeadMesh": true,
+        "textures": {
+          "0": 117653,
+          "1": 9609,
+          "2": 9615,
+          "3": 9607,
+          "4": 9622
+        },
+        "scale": 131
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#VEAE",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 6796,
+        "4": 3,
+        "27": 6796,
+        "33": 3,
+        "47": 1,
+        "54": 29,
+        "59": 2,
+        "64": 40171,
+        "89": 1,
+        "156": 130,
+        "359": 203748,
+        "360": 131,
+        "455": 138,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203748|level=30|name=Vergil Aeneid",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203748|level=32|name=Vergil Aeneid",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203748|level=31|name=Vergil Aeneid",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "VEAE",
+        "name": "Vergil Aeneid",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 122123,
+            "HighId": 122124,
+            "Hash": ""
+          },
+          {
+            "LowId": 203781,
+            "HighId": 203782,
+            "Hash": "XOPZ"
+          },
+          {
+            "LowId": 203778,
+            "HighId": 203779,
+            "Hash": "DENW"
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 122123,
+            "HighId": 122124,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              23
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 203781,
+            "HighId": 203782,
+            "Hash": "XOPZ",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 203778,
+            "HighId": 203779,
+            "Hash": "DENW",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 122123,
+            "HighId": 122124,
+            "Qualities": [
+              23
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Vergil Aeneid:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Vergil Aeneid:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451E3)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 2,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Violent Vagabond",
+      "hash": "VOVG",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 3,
+      "appearance": {
+        "monsterData": 203733,
+        "headMesh": 40676,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 21824,
+          "3": 21819,
+          "4": 21831
+        },
+        "scale": 93
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#VOVG",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 110,
+        "4": 1,
+        "27": 110,
+        "33": 3,
+        "47": 1,
+        "54": 6,
+        "59": 2,
+        "64": 40676,
+        "89": 1,
+        "156": 18,
+        "359": 203733,
+        "360": 93,
+        "455": 3,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203733|level=10|name=Violent Vagabond",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203733|level=6|name=Violent Vagabond",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203733|level=7|name=Violent Vagabond",
+          "status": "unresolved-unsupported-sequence-only",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203733|level=8|name=Violent Vagabond",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203733|level=9|name=Violent Vagabond",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203733|level=10|name=Violent Vagabond",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203733|level=6|name=Violent Vagabond",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203733|level=7|name=Violent Vagabond",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203733|level=8|name=Violent Vagabond",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "VOVG",
+        "name": "Violent Vagabond",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 130590,
+            "HighId": 130590,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 130590,
+            "HighId": 130590,
+            "Hash": "",
+            "classification": "VALID_VARIANT",
+            "observedQualities": [
+              1
+            ],
+            "captureEvidence": [
+              "20260708-143600",
+              "20260709-193914",
+              "20260709-205921",
+              "20260709-210452",
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260709-225408",
+              "20260710-205400"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 130590,
+            "HighId": 130590,
+            "Qualities": [
+              1
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260708-143600",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-193914",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-205921",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-210452",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260709-225408",
+              "docs/generated/subway_enemy_combat_contracts.json#Violent Vagabond:20260710-205400"
+            ],
+            "Owners": [
+              "(SimpleChar:794CD4CC)",
+              "(SimpleChar:794CD74B)",
+              "(SimpleChar:794CD765)",
+              "(SimpleChar:794DF068)",
+              "(SimpleChar:794DF076)",
+              "(SimpleChar:794DF33F)",
+              "(SimpleChar:79528F80)",
+              "(SimpleChar:7953AA4A)",
+              "(SimpleChar:7953ABA3)",
+              "(SimpleChar:7953ABC5)",
+              "(SimpleChar:7953AD40)",
+              "(SimpleChar:7953AD48)",
+              "(SimpleChar:7953AD49)",
+              "(SimpleChar:7953AD4A)",
+              "(SimpleChar:7953AD4C)",
+              "(SimpleChar:7953AD54)",
+              "(SimpleChar:7953AD58)",
+              "(SimpleChar:7953AD76)",
+              "(SimpleChar:7953AF49)",
+              "(SimpleChar:7953AFA1)",
+              "(SimpleChar:7953AFE0)",
+              "(SimpleChar:7953AFE8)",
+              "(SimpleChar:7953AFE9)",
+              "(SimpleChar:795450FE)",
+              "(SimpleChar:7957E02C)",
+              "(SimpleChar:7957E5BF)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 0,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    },
+    {
+      "name": "Workman Striker",
+      "hash": "WOST",
+      "templateId": null,
+      "templateIdStatus": "MISSING_TEMPLATE_ID",
+      "familyId": 149,
+      "appearance": {
+        "monsterData": 203854,
+        "headMesh": 40127,
+        "hasHeadMesh": true,
+        "textures": {
+          "1": 22562,
+          "3": 22537,
+          "4": 22618
+        },
+        "scale": 100
+      },
+      "baseStatsSource": "docs/accepted/npc/delmus/NpcTemplate.json#WOST",
+      "individualOverrides": {
+        "0": 268964353,
+        "1": 724,
+        "4": 4,
+        "27": 724,
+        "33": 3,
+        "47": 1,
+        "54": 25,
+        "59": 1,
+        "64": 40127,
+        "89": 1,
+        "156": 86,
+        "359": 203854,
+        "360": 100,
+        "455": 149,
+        "466": 0,
+        "673": 31
+      },
+      "overlayId": 0,
+      "overlayValid": true,
+      "identityStatus": "UNRESOLVED_OFFICIAL_PLACEMENT_BRIDGE",
+      "familyStatus": "MISSING_FAMILY",
+      "combatEvidenceProfiles": [
+        {
+          "profileKey": "resource=127|md=203854|level=13|name=Workman Striker",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203854|level=14|name=Workman Striker",
+          "status": "capture-certified",
+          "variants": 3
+        },
+        {
+          "profileKey": "resource=127|md=203854|level=15|name=Workman Striker",
+          "status": "capture-certified",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203854|level=16|name=Workman Striker",
+          "status": "capture-certified",
+          "variants": 2
+        },
+        {
+          "profileKey": "resource=127|md=203854|level=17|name=Workman Striker",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=127|md=203854|level=18|name=Workman Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=127|md=203854|level=25|name=Workman Striker",
+          "status": "capture-certified",
+          "variants": 1
+        },
+        {
+          "profileKey": "resource=unmapped|md=203854|level=13|name=Workman Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203854|level=14|name=Workman Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203854|level=15|name=Workman Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203854|level=16|name=Workman Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203854|level=17|name=Workman Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        },
+        {
+          "profileKey": "resource=unmapped|md=203854|level=25|name=Workman Striker",
+          "status": "unresolved-incomplete-sequence",
+          "variants": 0
+        }
+      ],
+      "weapons": {
+        "hash": "WOST",
+        "name": "Workman Striker",
+        "sourceWeaponDefinitions": [
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Hash": ""
+          },
+          {
+            "LowId": 122907,
+            "HighId": 122907,
+            "Hash": ""
+          },
+          {
+            "LowId": 122906,
+            "HighId": 122906,
+            "Hash": ""
+          },
+          {
+            "LowId": 122907,
+            "HighId": 122908,
+            "Hash": ""
+          }
+        ],
+        "definitions": [
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19
+            ],
+            "captureEvidence": [
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260720-031855",
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260720-043018",
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260710-211430",
+              "20260720-031855",
+              "20260720-043018",
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260720-031855",
+              "20260709-212115",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260720-031855",
+              "20260720-042205",
+              "20260720-043018",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260709-225408",
+              "20260720-031855",
+              "20260709-212336",
+              "20260709-220439",
+              "20260709-222339",
+              "20260709-225408",
+              "20260720-031855",
+              "20260709-212115",
+              "20260709-212336",
+              "20260710-211430",
+              "20260720-031855",
+              "20260709-222339",
+              "20260720-031855"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122907,
+            "HighId": 122907,
+            "Hash": "",
+            "classification": "UNKNOWN",
+            "observedQualities": [],
+            "captureEvidence": [],
+            "selection": "BLOCKED",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122906,
+            "HighId": 122906,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              20
+            ],
+            "captureEvidence": [
+              "20260709-212336",
+              "20260709-220439"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          },
+          {
+            "LowId": 122907,
+            "HighId": 122908,
+            "Hash": "",
+            "classification": "QL_VARIANT",
+            "observedQualities": [
+              27
+            ],
+            "captureEvidence": [
+              "20260709-222339",
+              "20260709-225408"
+            ],
+            "selection": "EXACT_CAPTURE_QUALITY_ONLY",
+            "namesAndMeshes": "NOT_IN_TEMPLATE_WEAPON_RECORD; NO IDENTITY INFERENCE"
+          }
+        ],
+        "capturedAlternatives": [
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              16
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+            ],
+            "Owners": [
+              "(SimpleChar:7953A9F7)",
+              "(SimpleChar:7953AB03)",
+              "(SimpleChar:7953AFF9)",
+              "(SimpleChar:7954501A)",
+              "(SimpleChar:79545136)",
+              "(SimpleChar:795451CC)",
+              "(SimpleChar:798036F8)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              14
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+            ],
+            "Owners": [
+              "(SimpleChar:7953AA77)",
+              "(SimpleChar:7953AAE9)",
+              "(SimpleChar:7953AE95)",
+              "(SimpleChar:79545137)",
+              "(SimpleChar:79545146)",
+              "(SimpleChar:79545213)",
+              "(SimpleChar:79545224)",
+              "(SimpleChar:7980F099)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              19
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260710-211430",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+            ],
+            "Owners": [
+              "(SimpleChar:7953A84F)",
+              "(SimpleChar:7953AFBC)",
+              "(SimpleChar:79545134)",
+              "(SimpleChar:79545216)",
+              "(SimpleChar:79545219)",
+              "(SimpleChar:7957E629)",
+              "(SimpleChar:79803683)",
+              "(SimpleChar:7980F096)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              12
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+            ],
+            "Owners": [
+              "(SimpleChar:7953A830)",
+              "(SimpleChar:7953AF95)",
+              "(SimpleChar:7953AFDD)",
+              "(SimpleChar:7954510E)",
+              "(SimpleChar:79803682)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              15
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-042205",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-043018"
+            ],
+            "Owners": [
+              "(SimpleChar:7953AA16)",
+              "(SimpleChar:79545108)",
+              "(SimpleChar:7954522E)",
+              "(SimpleChar:79803694)",
+              "(SimpleChar:7980F07D)",
+              "(SimpleChar:7980F094)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              17
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+            ],
+            "Owners": [
+              "(SimpleChar:7953A9F0)",
+              "(SimpleChar:7953AFB8)",
+              "(SimpleChar:79545230)",
+              "(SimpleChar:79545313)",
+              "(SimpleChar:79803688)",
+              "(SimpleChar:79803689)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              18
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+            ],
+            "Owners": [
+              "(SimpleChar:7953AA0D)",
+              "(SimpleChar:79545233)",
+              "(SimpleChar:7954531C)",
+              "(SimpleChar:79803673)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              13
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212115",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260710-211430",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+            ],
+            "Owners": [
+              "(SimpleChar:7953AABE)",
+              "(SimpleChar:7957E62D)",
+              "(SimpleChar:798036AA)"
+            ]
+          },
+          {
+            "LowId": 122905,
+            "HighId": 122906,
+            "Qualities": [
+              11
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260720-031855"
+            ],
+            "Owners": [
+              "(SimpleChar:79545205)",
+              "(SimpleChar:79803685)",
+              "(SimpleChar:798036B2)"
+            ]
+          },
+          {
+            "LowId": 122906,
+            "HighId": 122906,
+            "Qualities": [
+              20
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-212336",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-220439"
+            ],
+            "Owners": [
+              "(SimpleChar:79545000)"
+            ]
+          },
+          {
+            "LowId": 122907,
+            "HighId": 122908,
+            "Qualities": [
+              27
+            ],
+            "Evidence": [
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-222339",
+              "docs/generated/subway_enemy_combat_contracts.json#Workman Striker:20260709-225408"
+            ],
+            "Owners": [
+              "(SimpleChar:795451CA)"
+            ]
+          }
+        ],
+        "unknownDefinitions": 1,
+        "overlappingQualityAlternatives": 0,
+        "runtimeWeaponSelection": "BLOCKED_PENDING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "note": "Captured endpoint pairs are alternatives across actors/qualities, never inferred simultaneous slots. Single-ID endpoint observations are retained separately."
+      },
+      "combatReady": false,
+      "blockers": [
+        "MISSING_EXACT_PLACEMENT_TEMPLATE_BRIDGE",
+        "MISSING_AUTHORITATIVE_FAMILY_STATS",
+        "MISSING_EXACT_ACTOR_TO_PLACEMENT_LOADOUT",
+        "MISSING_TEMPLATE_ID"
+      ]
+    }
+  ]
+}

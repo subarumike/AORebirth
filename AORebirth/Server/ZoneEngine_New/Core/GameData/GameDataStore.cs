@@ -21,7 +21,7 @@ namespace ZoneEngine_New.Core.GameData
     /// Loads and caches the GameData tree from {BaseDirectory}\GameData.
     /// There is no path search. Missing root files log and degrade gracefully.
     /// </summary>
-    public sealed class GameDataStore : IGameData
+    public sealed partial class GameDataStore : IGameData
     {
         private static readonly JsonSerializerOptions CatalogJsonOptions = new()
         {
@@ -70,6 +70,7 @@ namespace ZoneEngine_New.Core.GameData
 
             EnsureRootExists();
             LoadMobTemplates();
+            LoadNpcStatContent();
             LoadHashItems();
             LoadVendingMachines();
             LoadMonsterData();

@@ -33,6 +33,15 @@ namespace ZoneEngine_New.Core.Mobs
 
         public int MaxLevel { get; set; }
 
+        public int? NpcFamily { get; set; }
+
+        public int NpcStatTemplate { get; set; }
+
+        /// <summary>Explicit acceptance for imported content. Null retains existing accepted templates.</summary>
+        public NpcContentAcceptance? ContentAcceptance { get; set; }
+
+        public List<NpcWeaponVariant> WeaponVariants { get; set; } = new();
+
         /// <summary>Per-slot AOID lists from the template Equipment jagged array.</summary>
         public List<List<int>> Equipment { get; set; } = new();
 

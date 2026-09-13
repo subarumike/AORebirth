@@ -18,6 +18,7 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.WorldSimulation;
@@ -198,6 +199,125 @@ namespace ZoneEngine_New.Tests
             f.Service.DetachPlayer(p); var replacement = f.Player();
             Assert.IsFalse(f.Service.TryCast(p, 10, p.Identity)); f.Service.DetachPlayer(p);
             Assert.IsTrue(f.Service.TryCast(replacement, 10, replacement.Identity));
+        }
+
+        [TestMethod]
+        public void Interrupt_notifies_exact_cast_owner_once_without_completion_or_resource_effects()
+        {
+            var f = new Fixture(Buff(10)); var p = f.Player(); var other = f.Player(2);
+            f.InterruptionCode = 7; // Fixture policy only; not a promoted movement/reason mapping.
+            int nano = p.Stats.GetOrZero(CharacterStat.CurrentNano);
+            int health = p.Stats.GetOrZero(CharacterStat.Health);
+            Assert.IsTrue(f.Service.TryCast(p, 10, p.Identity));
+            Assert.IsInstanceOfType<CastNanoSpellMessage>(f.Session(p).Bodies.Single());
+            p.InterruptTimedActions(TimedActionInterrupt.Jump);
+            f.Service.Cancel(p); f.Service.Cancel(p);
+            f.Advance(1000); f.Service.Tick(p); f.Service.Tick(p);
+            var message = f.Session(p).Bodies.OfType<CharacterActionMessage>().Single();
+            Assert.AreEqual(CharacterActionType.InterruptNanoCasting, message.Action);
+            Assert.AreEqual(p.Identity, message.Identity); Assert.AreEqual(Identity.None, message.Target);
+            Assert.AreEqual(10, message.Parameter1); Assert.AreEqual(7, message.Parameter2);
+            Assert.AreEqual(0, message.Unknown1); Assert.AreEqual(0, message.Unknown2);
+            Assert.AreEqual(0, f.Session(other).Bodies.Count);
+            Assert.AreEqual(0, f.Store.Commits); Assert.AreEqual(0, f.Service.GetActive(p).Count);
+            Assert.AreEqual(nano, p.Stats.GetOrZero(CharacterStat.CurrentNano));
+            Assert.AreEqual(health, p.Stats.GetOrZero(CharacterStat.Health));
+            Assert.IsTrue(f.Service.TryCast(p, 10, p.Identity));
+            f.Advance(200); f.Service.Tick(p); Assert.AreEqual(1, f.Store.Commits);
+        }
+
+        [TestMethod]
+        public void Old_cast_interruption_never_notifies_replacement_connection()
+        {
+            var f = new Fixture(Buff(10)); var p = f.Player(); var old = f.Session(p);
+            Assert.IsTrue(f.Service.TryCast(p, 10, p.Identity)); f.ReplaceSession(p);
+            f.Service.Cancel(p); f.Advance(200); f.Service.Tick(p);
+            Assert.AreEqual(0, f.Session(p).Bodies.Count);
+            Assert.AreEqual(1, old.Bodies.Count); Assert.AreEqual(0, f.Store.Commits);
+        }
+
+        [TestMethod]
+        [DataRow(MovementAction.ForwardStart)]
+        [DataRow(MovementAction.BackwardStart)]
+        [DataRow(MovementAction.StrafeLeftStart)]
+        [DataRow(MovementAction.StrafeRightStart)]
+        [DataRow(MovementAction.ElevateUpStart)]
+        [DataRow(MovementAction.ElevateDownStart)]
+        public void Locomotion_start_reaches_cancellation_and_owner_notification(MovementAction action)
+        {
+            var f = new Fixture(Buff(10)); var p = f.Player();
+            f.InterruptionCode = 7;
+            Assert.IsTrue(f.Service.TryCast(p, 10, p.Identity)); p.Motor.ApplyAction(action);
+            f.Advance(200); f.Service.Tick(p);
+            Assert.AreEqual(0, f.Store.Commits);
+            Assert.AreEqual(CharacterActionType.InterruptNanoCasting,
+                f.Session(p).Bodies.OfType<CharacterActionMessage>().Single().Action);
+        }
+
+        [TestMethod]
+        [DataRow(MovementAction.TurnLeftStart)]
+        [DataRow(MovementAction.ForwardStop)]
+        public void Turning_and_stop_input_do_not_gain_new_cancellation_behavior(MovementAction action)
+        {
+            var f = new Fixture(Buff(10)); var p = f.Player();
+            Assert.IsTrue(f.Service.TryCast(p, 10, p.Identity)); p.Motor.ApplyAction(action);
+            f.Advance(200); f.Service.Tick(p); Assert.AreEqual(1, f.Store.Commits);
+            Assert.IsFalse(f.Session(p).Bodies.OfType<CharacterActionMessage>()
+                .Any(m => m.Action == CharacterActionType.InterruptNanoCasting));
+        }
+
+        [TestMethod]
+        public void Captured_self_interrupt_request_reaches_action_handler_and_cannot_cancel_another_owner()
+        {
+            var f = new Fixture(Buff(10)); var p = f.Player(); var other = f.Player(2);
+            f.InterruptionCode = 7;
+            var handler = new ZoneEngine_New.Core.MessageHandlers.CharacterActionMessageHandler(null!, null!, f.Service, null!);
+            var request = new CharacterActionMessage { Identity = other.Identity, Unknown = 0,
+                Action = CharacterActionType.InterruptNanoCasting, Target = Identity.None };
+            Assert.IsTrue(f.Service.TryCast(p, 10, p.Identity));
+            handler.Handle(request, f.Session(p));
+            Assert.AreEqual(1, f.Session(p).Bodies.Count);
+            request.Identity = p.Identity; request.Parameter2 = 10;
+            handler.Handle(request, f.Session(p)); Assert.AreEqual(1, f.Session(p).Bodies.Count);
+            request.Parameter2 = 0;
+            handler.Handle(request, f.Session(p)); handler.Handle(request, f.Session(p));
+            Assert.AreEqual(2, f.Session(p).Bodies.Count); Assert.AreEqual(0, f.Session(other).Bodies.Count);
+            f.Advance(200); f.Service.Tick(p); Assert.AreEqual(0, f.Store.Commits);
+            var body = f.Session(p).Bodies.Last();
+            var resolver = new SerializerResolverBuilder<MessageBody>().Build();
+            using var stream = new MemoryStream();
+            using var writer = new SmokeLounge.AOtomation.Messaging.Serialization.StreamWriter(stream);
+            resolver.GetSerializer(body.GetType()).Serialize(writer, new SerializationContext(resolver), body);
+            Assert.IsTrue(stream.Length > 0, "Interruption must serialize through the real message codec.");
+        }
+
+        [TestMethod]
+        [DataRow(250003, 7, "5E4777700000C3500E871D41000000006C0000000000000000000000000003D093000000070000")]
+        [DataRow(253845, 4, "5E4777700000C3500E871D41000000006C0000000000000000000000000003DF95000000040000")]
+        public void Evidence_selected_notice_matches_captured_retail_body(int nanoId, int code, string bodyHex)
+        {
+            // Sector 10 20260830-035031 IN sequences 1556/1870. This tests the observed shape,
+            // not an unsupported inference that local movement should use either reason code.
+            var f = new Fixture(Buff(nanoId)); f.InterruptionCode = code;
+            var p = f.Player(243735873); Assert.IsTrue(f.Service.TryCast(p, nanoId, p.Identity));
+            f.Service.Cancel(p);
+            var body = f.Session(p).Bodies.OfType<CharacterActionMessage>().Single();
+            var resolver = new SerializerResolverBuilder<MessageBody>().Build();
+            using var stream = new MemoryStream();
+            using var writer = new SmokeLounge.AOtomation.Messaging.Serialization.StreamWriter(stream);
+            resolver.GetSerializer(body.GetType()).Serialize(writer, new SerializationContext(resolver), body);
+            CollectionAssert.AreEqual(Convert.FromHexString(bodyHex), stream.ToArray());
+        }
+
+        [TestMethod]
+        public void Unproven_reason_policy_cancels_server_cast_without_guessing_an_outbound_notice()
+        {
+            var f = new Fixture(Buff(10)); var p = f.Player();
+            Assert.IsTrue(f.Service.TryCast(p, 10, p.Identity));
+            p.Motor.ApplyAction(MovementAction.ForwardStart);
+            f.Advance(200); f.Service.Tick(p);
+            Assert.AreEqual(0, f.Store.Commits);
+            Assert.AreEqual(1, f.Session(p).Bodies.Count);
         }
 
         [TestMethod]
@@ -654,12 +774,14 @@ namespace ZoneEngine_New.Tests
             public readonly NanoService Service; public readonly Store Store = new();
             public DateTime Utc = new(2026, 9, 8, 0, 0, 0, DateTimeKind.Utc); public long Milliseconds;
             public int RandomCalls; public (int, int) LastRange; private readonly NanoDefinition[] _nanos;
+            public int? InterruptionCode;
             public Fixture(params NanoDefinition[] nanos) : this([], nanos) { }
             public Fixture(INanoSpecialization[] specialties, params NanoDefinition[] nanos)
             {
                 _nanos = nanos;
                 Service = new NanoService(new NanoCatalog(nanos), Store, specialties, utcNow: () => Utc,
-                    monotonicMilliseconds: () => Milliseconds, next: (min, max) => { RandomCalls++; LastRange = (min, max); return max - 1; });
+                    monotonicMilliseconds: () => Milliseconds, next: (min, max) => { RandomCalls++; LastRange = (min, max); return max - 1; },
+                    interruptionCode: _ => InterruptionCode);
             }
             public Player Player(int id = 1, bool upload = true, bool attach = true)
             {
