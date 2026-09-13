@@ -141,7 +141,7 @@ namespace AORebirth.LinuxBuild.Stage8OfflineSmokeTests
             Require(manifest.Contains("ZONEENGINE_UNIT_SHA256="), "release manifest lacks ZoneEngine unit hash");
             Require(manifest.Contains("repository HEAD does not match expected source SHA"), "manifest generator lost immutable SHA gate");
 
-            Require(tests.Contains("production deployment workflow tests (56/56)"), "deployment fixture suite count changed");
+            Require(tests.Contains("production deployment workflow tests (64/64)"), "deployment fixture suite count changed");
             Require(tests.Contains("candidate LoginEngine configuration path diverges from the governed production path"), "deployment fixtures do not reject a divergent LoginEngine config path");
             Require(tests.Contains("AO_REBIRTH_CONFIG_PATH is missing or duplicated"), "deployment fixtures do not reject duplicate config-path assignments");
             Require(tests.Contains("outage recovery accepted an active ZoneEngine"), "deployment fixtures do not reject misuse of outage recovery");
