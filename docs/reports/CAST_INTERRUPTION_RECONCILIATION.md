@@ -11,7 +11,7 @@ The accepted DAO-backed `NanoService` and Delmus's `NanoRuntime` are different i
 
 ## Exact packet evidence
 
-`CAST_INTERRUPTION_CAPTURE_SCAN.json` inventories all 153 available raw-packets, enemy-combat and nano-event CSV artifacts under both established local capture roots. It retains 21 decoded observations and 23 raw action-108 packets. The raw evidence includes 21 OUT requests and two IN notifications. Historical generated Subway inventory also contains action-108 observations in 20260710-211430 and 20260717-214612; those historical raw paths are absent locally. Their records were retained as historical evidence, not discarded or labelled proof of a local-player IN response.
+`CAST_INTERRUPTION_CAPTURE_SCAN.json` inventories all 257 available raw-packets CSV, packets.hex.log, enemy-combat and nano-event artifacts under both established local capture roots. It retains 21 decoded observations and 56 raw action-108 occurrences, representing 28 distinct packets across the two raw formats: 26 OUT requests and two IN notifications. All 26 OUT requests have zero parameters. Both raw formats were searched in full; the extra hex-log evidence was included. Historical generated Subway inventory also contains action-108 observations in 20260710-211430 and 20260717-214612; those historical raw paths are absent locally. Their records were retained as historical evidence, not discarded or labelled proof of a local-player IN response.
 
 The two IN notifications are in `Captures/Sector 10 [PF 4374] - Mike 2022 - 20260830-035031/raw-packets.csv`:
 

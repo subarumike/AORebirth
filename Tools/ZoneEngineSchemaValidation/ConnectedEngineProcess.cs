@@ -74,8 +74,9 @@ sealed class ConnectedEngineProcess : IDisposable
         // Persist local diagnostics without ephemeral credentials.
         string secret = new MySqlConnector.MySqlConnectionStringBuilder(fixture.ConnectionString).Password;
         text = text.Replace(fixture.ConnectionString, "<fixture-connection>").Replace(secret, "<fixture-secret>");
-        File.WriteAllText(Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(), "build-verify",
-            "connected-engine-" + process.Id + ".log"), text);
+        string logDirectory = Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(), "build-verify");
+        Directory.CreateDirectory(logDirectory);
+        File.WriteAllText(Path.Combine(logDirectory, "connected-engine-" + process.Id + ".log"), text);
         process.Dispose();
         if (File.Exists(shutdown)) File.Delete(shutdown);
     }

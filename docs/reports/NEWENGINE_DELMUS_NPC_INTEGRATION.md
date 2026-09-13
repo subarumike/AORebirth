@@ -49,7 +49,11 @@ The current service missed incoming action-108 requests and movement-start cance
 
 Validation receipts will record the final tested source SHA and exact results. Initial focused NPC/stat/weapon/content tests and nano-service tests pass. The standard Legacy build and accepted binding export pass. An initial full run exhausted disk during duplicate playfield copying; only identical task-owned copies were replaced with hard links to the verified package. No user capture or source data was deleted. A cancellation regression found by the morph suite was corrected by retaining silent disconnect/lifecycle cancellation.
 
-Final exact-source Windows, Linux publication, mandatory, messaging, DAO and connected gates are pending. This candidate is not approved for deployment.
+Exact-source Windows acceptance for `22207743ed89034f6bd2072f37e4f2e0232accf6` passes, including 578 NewEngine tests. All 12 mandatory gates pass, including the complete messaging suite, DAO architecture, Subway, Temple and mission gates. Exact-source Linux publication and packaged offline startup pass. This is publication validation, not live Linux/client acceptance or deployment approval.
+
+Connected acceptance exposed an existing fixture defect, reproduced with both candidate and accepted pre-integration binaries (`cb12160c`). The fixture directly equated full 32-bit GM health with the existing normalized 16-bit SCFU display. It now calls the existing `PlayerSpawnPayloadValidator` contract, which checks the correct projection without changing runtime health. Fixture disposal also creates its diagnostics directory so a missing directory cannot mask the underlying result. Final connected results and the final tested source are recorded in `DELMUS_NPC_VALIDATION_RECEIPT.json`.
+
+After that harness correction, both binaries reach the same strict zone-round-trip persistence failure: expected Y=0, candidate Y=-0.0618746, baseline Y=-0.0620676. Active world simulation moves the fixture between teleport and logout. The strict persistence comparison and gameplay physics were not changed. Connected acceptance remains **FAIL (reproduced on baseline)**, so this milestone is PARTIAL and is not deployment-ready. Cleanup reports no disposable container/network residue. Authentication, world entry and earlier persistence steps passed before this final failure; they do not override it.
 
 ## Reproduction
 

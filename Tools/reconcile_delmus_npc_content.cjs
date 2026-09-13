@@ -102,11 +102,15 @@ const families=[...new Set(subway.map(t=>t.NpcFamily))].sort((a,b)=>a-b).map(id=
   runtimeFamilyDefined:false,overlayDefined:false,individualOverrides:true,
   status:Object.hasOwn(familySource,String(id))?'PARTIAL':'MISSING_FAMILY',
   evidenceGap:'Captured individual effective stats do not establish an accepted reusable family curve. No generic MMO derivation or sample-family substitution promoted.'}));
+const adaptedConsumers = ['Core/GameData/GameDataStore.cs','Core/GameData/IGameData.cs','Core/Mobs/MobTemplates.cs',
+  'Core/Playfield/SpawnService.cs','Core/Movement/CharacterMotor.cs','Core/Entities/Character.cs',
+  'Core/MessageHandlers/CharacterActionMessageHandler.cs','Core/Nanos/NanoRuntime.cs'];
 const reviewed=git('diff','--name-status',startingSha+'...'+sourceSha).trim().split('\n').map(line=>{
   const [status,p]=line.split('\t');
   let classification='UNRELATED',decision='SKIP',reason='Outside bounded NPC content/stat/cancellation integration.';
   if(/NpcTemplate|MobTemplates|NpcFamilyStatTemplates|NpcStatTemplateOverlays/.test(p)&&p.endsWith('.json')){classification='CONTENT_DATA';decision='RECONCILE';reason='Pinned source snapshot; pending templates blocked; sample curves not combat authority.';}
   else if(/Core\/Mobs\/(NpcFamilyStatTemplates|NpcStatTemplates|MobStatResolver)\.cs$/.test(p)){classification='GENERIC_RUNTIME_MECHANIC';decision='IMPORT_ADAPTED';reason='Stat composition only; remove missing-family fallback.';}
+  else if(adaptedConsumers.some(s=>p.endsWith(s))){classification='CONFLICTING';decision='RECONCILE';reason='Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale.';}
   else if(/Tests\//.test(p)){classification='TEST';reason='Use focused candidate tests; developer tests exercise a different runtime.';}
   else if(/Core\/(Nanos|Movement|Playfield|Entities|GameData|Network)|GameDataPaths|MobTemplates.cs/.test(p)){classification='CONFLICTING';reason='Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only.';}
   else if(/GameData\/|\.g\.cs$/.test(p))classification='GENERATED_DATA';

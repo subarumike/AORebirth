@@ -29,8 +29,8 @@
     "combatBlocked": 32,
     "sourceFilesReviewed": 110,
     "sourceFilesImported": 3,
-    "sourceFilesReconciled": 4,
-    "sourceFilesSkipped": 103,
+    "sourceFilesReconciled": 12,
+    "sourceFilesSkipped": 95,
     "pink": {
       "AAAA_templateDefinitions": 1,
       "AAAA_liveSpawnCount": "NOT_MEASURED",
