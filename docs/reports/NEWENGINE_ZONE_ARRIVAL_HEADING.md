@@ -100,9 +100,9 @@ transfer checksum, graceful shutdown, dry-run, deployment and runtime verificati
 Index SHA-256: `be0b7f5aa2fdf123770af67e801b8370688b7d4425db6bdd14767b988d72e5d2`.
 Remote release stage: `/srv/aorebirth-release-cb12160c-20260913`.
 
-## Remaining risks
+## Client acceptance
 
-Mike's official-client visual retry remains required for Fair Trade and backyard
-entries and exits. Automated tests prove the retained heading, teleport heading,
-and destination geometry relationship; they do not establish final camera or
-animation appearance in the official client.
+Mike confirmed the reported arrival-facing issue fixed in the official client on
+live source `cb12160c37507f8318b7e9e39f424f9bf13faa23`. This closes the reported
+issue; the confirmation does not establish separate manual coverage of every
+zone entrance and exit.
