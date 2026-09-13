@@ -81,6 +81,25 @@ agreement between the deployed-release marker and both rollback artifacts, units
 and source SHAs. It never takes the already-deployed no-op path. A retry failure
 restores the exact prior pair and leaves both engines stopped again.
 
+### Explicitly authorized maintenance with players online
+
+When Mike authorizes stopping the live server to deploy a fix, online characters
+must not block that maintenance or require a separate manual logout. Gracefully
+stop LoginEngine first to close admission, then ZoneEngine to disconnect players
+and save their state. Verify both services and listeners are stopped and persisted
+online state is zero. Never manually clear online rows or bypass persistence checks.
+
+For this intentionally stopped pair, use the existing
+`--recover-zone-outage --resume-stopped-recovery` flags with the exact accepted
+manifest and SHA, first with `--dry-run`, then without it after validation passes.
+This reuses the stopped-pair transaction; it does not imply a schema outage.
+The prior deployed marker, artifacts, units and source identities must agree, and
+candidate database validation and rollback snapshots remain mandatory. Failure
+restores the prior pair but leaves services stopped; diagnose the failure and
+confirm prior NewEngine compatibility before restarting. Do not use
+`--prepared-schema-cutover` for ordinary maintenance. Without explicit maintenance
+authorization, the normal zero-online deployment gate remains unchanged.
+
 The transaction does not modify production environment files, configuration,
 database schema, bind policy, lifecycle behavior, recovery behavior, or gameplay.
 It recognizes and transactionally removes only the pinned obsolete
