@@ -70,7 +70,8 @@ namespace ZoneEngine_New.Core.Nanos
         private static void Add(Dictionary<CharacterStat, int> values, CharacterStat stat, int amount)
             => values[stat] = checked(values.GetValueOrDefault(stat) + amount);
         private static int MaxHealth(IReadOnlyDictionary<CharacterStat, int> stats)
-            => MaxHealthCalculator.Compute(Positive(stats, CharacterStat.Breed), Positive(stats, CharacterStat.Profession),
+            => stats.GetValueOrDefault(CharacterStat.GmLevel) > 0 ? 2_000_000_000
+                : MaxHealthCalculator.Compute(Positive(stats, CharacterStat.Breed), Positive(stats, CharacterStat.Profession),
                 Positive(stats, CharacterStat.TitleLevel), Positive(stats, CharacterStat.Level), Positive(stats, CharacterStat.BodyDevelopment));
         private static int MaxNano(IReadOnlyDictionary<CharacterStat, int> stats)
             => MaxNanoCalculator.Compute(Positive(stats, CharacterStat.Breed), Positive(stats, CharacterStat.Profession),
@@ -82,7 +83,8 @@ namespace ZoneEngine_New.Core.Nanos
             => HealthDelta(player.Stats, bodyDevelopmentDelta);
         internal static int HealthDelta(StatCollection stats, int bodyDevelopmentDelta)
         {
-            if (bodyDevelopmentDelta == 0 || stats.GetOrZero(CharacterStat.NPCFamily) > 0) return 0;
+            if (bodyDevelopmentDelta == 0 || stats.GetOrZero(CharacterStat.NPCFamily) > 0
+                || stats.GetOrZero(CharacterStat.GmLevel) > 0) return 0;
             int body = stats.GetOrZero(CharacterStat.BodyDevelopment);
             int before = MaxHealthCalculator.Compute(Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
                 Value(stats, CharacterStat.TitleLevel), Value(stats, CharacterStat.Level), Math.Max(1, body));

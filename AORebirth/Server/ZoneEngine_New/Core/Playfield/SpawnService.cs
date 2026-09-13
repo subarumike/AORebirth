@@ -357,8 +357,6 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
                 player.Rebase();
-                PlayerSpawnPayloadValidator.RequireValid(player);
-                PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
                 player.NanoRuntime = _playfieldManager.Nanos;
                 if (!_playfieldManager.Nanos.AttachPlayer(player))
                     throw new InvalidOperationException("Active nano hydration failed; durable state was not replaced.");
