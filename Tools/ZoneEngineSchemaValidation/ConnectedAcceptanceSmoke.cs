@@ -289,9 +289,9 @@ static partial class ConnectedAcceptanceSmoke
                 && value != (int)CharacterStat.Unset, "fullcharacter-required-stat-" + (int)required);
         }
 
-        Require(values[(int)CharacterStat.MaxHealth] == spawn.Health
-            && values[(int)CharacterStat.Health] == spawn.Health - spawn.HealthDamage,
-            "fullcharacter-scfu-health-consistency");
+        // The accepted SCFU projection normalizes large health to 16-bit display values.
+        // Reuse its complete packet contract; exact FullCharacter values remain unchanged.
+        ZoneEngine_New.Core.Characters.PlayerSpawnPayloadValidator.RequireValidMessages(spawn, full);
         Console.WriteLine("SYNTHETIC_ACCEPTANCE_PLAYER_PAYLOAD_VALIDATION=PASS");
     }
     static void VerifyConnected(ConnectedWireClient client, int identity, int slot, string phase)

@@ -29,8 +29,8 @@
     "combatBlocked": 32,
     "sourceFilesReviewed": 110,
     "sourceFilesImported": 3,
-    "sourceFilesReconciled": 4,
-    "sourceFilesSkipped": 103,
+    "sourceFilesReconciled": 12,
+    "sourceFilesSkipped": 95,
     "pink": {
       "AAAA_templateDefinitions": 1,
       "AAAA_liveSpawnCount": "NOT_MEASURED",
@@ -386,8 +386,8 @@
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
       "status": "M",
       "classification": "CONFLICTING",
-      "decision": "SKIP",
-      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/CharacterWeapon.cs",
@@ -421,8 +421,8 @@
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
       "status": "M",
       "classification": "CONFLICTING",
-      "decision": "SKIP",
-      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/HashItemCatalog.cs",
@@ -435,8 +435,8 @@
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/IGameData.cs",
       "status": "M",
       "classification": "CONFLICTING",
-      "decision": "SKIP",
-      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/AttackInfoRules.cs",
@@ -567,9 +567,9 @@
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs",
       "status": "M",
-      "classification": "UNRELATED",
-      "decision": "SKIP",
-      "reason": "Outside bounded NPC content/stat/cancellation integration."
+      "classification": "CONFLICTING",
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Metrics/TickStallWatch.cs",
@@ -589,8 +589,8 @@
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobTemplates.cs",
       "status": "M",
       "classification": "CONFLICTING",
-      "decision": "SKIP",
-      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcFamilyStatTemplates.cs",
@@ -610,8 +610,8 @@
       "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs",
       "status": "M",
       "classification": "CONFLICTING",
-      "decision": "SKIP",
-      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/Buff.cs",
@@ -638,8 +638,8 @@
       "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoRuntime.cs",
       "status": "A",
       "classification": "CONFLICTING",
-      "decision": "SKIP",
-      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoSpell.cs",
@@ -701,8 +701,8 @@
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
       "status": "M",
       "classification": "CONFLICTING",
-      "decision": "SKIP",
-      "reason": "Preserve DAO, admission, accepted movement/arrival and content authority; adapt scoped mechanics only."
+      "decision": "RECONCILE",
+      "reason": "Adapt only the reviewed family/content or cancellation seam into current code; retain DAO, persistence, admission and arrival behavior. Developer file not copied wholesale."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Trade/TradeRules.cs",
