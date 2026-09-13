@@ -24,6 +24,8 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Missions;
+using ZoneEngine_New.Core.Movement;
+using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Nanos;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
@@ -37,6 +39,51 @@ using Quaternion = AORebirth.Core.Vector.Quaternion;
 [TestClass]
 public sealed class PlayfieldTransferTests
 {
+    [TestMethod]
+    public void Transfer_does_not_replay_held_movement_when_release_arrives_during_loading()
+    {
+        using var f = new Fixture(); var outside = f.World(800); var inside = f.World(1186);
+        var player = f.Player(outside, 1); var session = (ZoneSession)player.Session!;
+        player.Motor.ApplyAction(MovementAction.ForwardStart);
+        Assert.AreEqual((byte)1, player.Motor.BuildMovementStatus().FwdDir);
+        session.TransferToPlayfield(inside, new Vector3(175.00107, 5.01, 113.01496));
+        f.Drain(outside);
+        new CharDCMoveMessageHandler().Handle(new CharDCMoveMessage { MoveType = (byte)MovementAction.ForwardStop }, session);
+        Assert.AreEqual(SessionState.Loading, session.State);
+        Assert.IsTrue(player.Motor.IsMoving);
+        f.Drain(inside);
+        var movement = player.BuildSpawnMessage().MovementStatus;
+        Assert.IsFalse(player.Motor.IsMoving);
+        Assert.AreEqual((byte)1, movement.FwdState);
+        Assert.AreEqual((byte)0, movement.FwdDir);
+        Assert.AreEqual((byte)MovementState.Run, movement.ModeId);
+        player.Motor.ApplyAction(MovementAction.ForwardStart);
+        Assert.IsTrue(player.Motor.IsMoving);
+    }
+
+    [TestMethod]
+    public void Transfer_clears_old_path_and_directional_input_but_preserves_selected_speed_mode()
+    {
+        using var f = new Fixture(); var outside = f.World(800); var inside = f.World(1186);
+        var player = f.Player(outside, 1);
+        player.Motor.ApplyAction(MovementAction.SwitchToWalk);
+        player.Motor.SetPath(new[] { new Vector3(10, 0, 20) });
+        player.Motor.ApplyAction(MovementAction.StrafeLeftStart);
+        player.Motor.ApplyAction(MovementAction.TurnRightStart);
+        player.Motor.ApplyAction(MovementAction.JumpStart);
+        player.Session!.TransferToPlayfield(inside, new Vector3(175.00107, 5.01, 113.01496));
+        f.Drain(outside); f.Drain(inside);
+        Assert.IsFalse(player.Motor.HasPath);
+        Assert.AreEqual(MovementFlags.None, player.Motor.MovementFlags);
+        var movement = player.BuildSpawnMessage().MovementStatus;
+        Assert.AreEqual((byte)1, movement.FwdState);
+        Assert.AreEqual((byte)1, movement.StrafeState);
+        Assert.AreEqual((byte)1, movement.TurnState);
+        Assert.AreEqual((byte)1, movement.JumpState);
+        Assert.AreEqual((byte)MovementState.Walk, movement.ModeId);
+        Assert.AreEqual((byte)MovementState.Walk, movement.LastSpeedMode);
+    }
+
     [TestMethod]
     public void Departure_flushes_on_source_tick_and_arrival_waits_for_destination_tick()
     {

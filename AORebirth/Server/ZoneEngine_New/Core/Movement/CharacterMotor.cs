@@ -166,6 +166,15 @@ namespace ZoneEngine_New.Core.Movement
             _velocity = new Vector3(0, 0, 0);
         }
 
+        public void ResetForPlayfieldTransfer(Vector3 position)
+        {
+            // Key releases on the old/loading connection may never reach this motor.
+            // The destination must not inherit input or a path from the previous world.
+            ClearPath();
+            StopAllFlags();
+            Warp(position);
+        }
+
         public void Warp(Vector3 position, Quaternion? rotation = null, bool resetVelocity = true)
         {
             float previousYaw = GetYawDegrees();

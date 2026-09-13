@@ -665,7 +665,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(position);
 
-            player.Position = position;
+            player.Motor.ResetForPlayfieldTransfer(position);
             player.Playfield = _playfield;
             player.Logger = _logger;
             _registry.Register(player);
