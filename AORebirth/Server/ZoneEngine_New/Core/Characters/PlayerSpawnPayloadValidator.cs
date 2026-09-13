@@ -107,6 +107,10 @@ namespace ZoneEngine_New.Core.Characters
                     if (maximum <= 0 || current < 0 || current > maximum || spawn.Health != displayMax
                         || spawn.HealthDamage != displayMax - displayCurrent) errors.Add("full-scfu-health-mismatch");
                 }
+                if (values.TryGetValue((int)CharacterStat.CurrentNano, out long currentNano)
+                    && values.TryGetValue((int)CharacterStat.MaxNanoEnergy, out long maximumNano)
+                    && (maximumNano <= 0 || currentNano < 0 || currentNano > maximumNano))
+                    errors.Add("full-nano-invalid");
                 if (values.TryGetValue((int)CharacterStat.Expansion, out long expansions) && expansions != spawn.Expansions)
                     errors.Add("expansion-mismatch");
                 if (values.TryGetValue((int)CharacterStat.VisualFlags, out long visual) && visual != spawn.VisualFlags)

@@ -41,7 +41,7 @@ namespace ZoneEngine_New.Core.Helpers
                 Math.Max(1, stats.GetOrZero(CharacterStat.Profession)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.TitleLevel)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.Level)),
-                Math.Max(1, stats.GetOrZero(CharacterStat.NanoPool)));
+                VitalSkillTrickle.Effective(stats, CharacterStat.NanoPool));
             return maxNano > 0;
         }
 

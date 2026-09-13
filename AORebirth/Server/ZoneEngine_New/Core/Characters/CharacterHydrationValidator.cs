@@ -83,14 +83,10 @@ namespace ZoneEngine_New.Core.Characters
                     errors.Add("missing-stat:" + (int)stat + ":" + stat);
             }
 
-            if (stats.TryGetValue(CharacterStat.Health, out int availableHealth)
-                && stats.TryGetValue(CharacterStat.MaxHealth, out int availableMaxHealth)
-                && availableHealth > availableMaxHealth)
-                errors.Add("health-exceeds-max");
-            if (stats.TryGetValue(CharacterStat.CurrentNano, out int availableNano)
-                && stats.TryGetValue(CharacterStat.MaxNanoEnergy, out int availableMaxNano)
-                && availableNano > availableMaxNano)
-                errors.Add("nano-exceeds-max");
+            // Persistent maxima are base values (Legacy nano is only the breed
+            // base), while current vitals include derived/equipment/nano effects.
+            // Their relative bounds are enforced by PlayerSpawnPayloadValidator
+            // after rebase and active-nano hydration, before player publication.
 
             if (errors.Any(error => error.StartsWith("missing-stat:", StringComparison.Ordinal)
                 || error.StartsWith("unset-sentinel:", StringComparison.Ordinal)))

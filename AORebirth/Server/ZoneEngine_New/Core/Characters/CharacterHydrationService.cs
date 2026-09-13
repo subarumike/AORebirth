@@ -2,6 +2,9 @@ namespace ZoneEngine_New.Core.Characters
 {
     using System;
     using System.Globalization;
+    using System.Collections.Generic;
+    using System.Linq;
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Logging;
@@ -46,7 +49,7 @@ namespace ZoneEngine_New.Core.Characters
             var result = new CharacterHydrationResult
             {
                 Character = character,
-                Stats = _stats.GetForCharacter(characterId),
+                Stats = RestoreLegacyDefaults(_stats.GetForCharacter(characterId)),
                 Items = _inventory.GetCarriedItems(characterId),
                 UploadedNanoIds = _uploadedNanos.GetForCharacter(characterId)
             };
@@ -73,6 +76,24 @@ namespace ZoneEngine_New.Core.Characters
                     result.Items.Count,
                     result.UploadedNanoIds.Count));
 
+            return result;
+        }
+
+        internal static IReadOnlyList<StatRecord> RestoreLegacyDefaults(IReadOnlyList<StatRecord> persisted)
+        {
+            // Legacy Stats.Write omits default-valued rows. Restore only the four
+            // evidenced sparse fields; explicit values, duplicates and sentinels
+            // still reach the validator unchanged. No database writes occur here.
+            var result = new List<StatRecord>(persisted);
+            // Exact Stats/StatNamesDefaults values; no general fallback for
+            // missing identity, appearance, primary abilities or current vitals.
+            foreach ((CharacterStat stat, int value) in new[]
+            {
+                (CharacterStat.Race, 1), (CharacterStat.VisualFlags, 31),
+                (CharacterStat.Side, 0), (CharacterStat.RunSpeed, 5)
+            })
+                if (!persisted.Any(row => row.StatId == (int)stat))
+                    result.Add(new StatRecord { StatId = (int)stat, StatValue = value });
             return result;
         }
     }

@@ -6,6 +6,7 @@ namespace ZoneEngine_New.Tests
     using System.Reflection;
     using System.IO;
     using System.Runtime.CompilerServices;
+    using System.Text.Json;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -31,7 +32,6 @@ namespace ZoneEngine_New.Tests
             CharacterHydrationValidationResult validation = CharacterHydrationValidator.Validate(IncompleteReportedHydration());
             Assert.IsFalse(validation.IsValid);
             Assert.IsTrue(validation.Errors.Contains("missing-stat:0:Flags"));
-            Assert.IsTrue(validation.Errors.Contains("health-exceeds-max"));
             Assert.IsTrue(((CharacterFlags)(int)CharacterStat.Unset).HasFlag(CharacterFlags.Tower));
             Assert.AreEqual(-981, 19 - 1000);
             // Exact saved staging rows: pre-hydration-553981c8-stats.sql (23 rows).
@@ -86,11 +86,12 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void Health_contract_accepts_current_below_or_equal_to_max_and_rejects_invalid_variants()
+        public void Persistent_vitals_require_present_nonnegative_values_but_defer_effective_bounds()
         {
             Assert.IsTrue(CharacterHydrationValidator.Validate(With(ValidHydration(), CharacterStat.Health, 25)).IsValid);
             Assert.IsTrue(CharacterHydrationValidator.Validate(With(ValidHydration(), CharacterStat.Health, 31)).IsValid);
-            Assert.IsFalse(CharacterHydrationValidator.Validate(With(ValidHydration(), CharacterStat.Health, 32)).IsValid);
+            Assert.IsTrue(CharacterHydrationValidator.Validate(With(ValidHydration(), CharacterStat.Health, 32)).IsValid);
+            Assert.IsFalse(CharacterHydrationValidator.Validate(With(ValidHydration(), CharacterStat.Health, -1)).IsValid);
             Assert.IsFalse(CharacterHydrationValidator.Validate(Without(ValidHydration(), CharacterStat.Health)).IsValid);
             Assert.IsFalse(CharacterHydrationValidator.Validate(Without(ValidHydration(), CharacterStat.MaxHealth)).IsValid);
         }
@@ -102,9 +103,9 @@ namespace ZoneEngine_New.Tests
 
             player.Rebase();
 
-            Assert.AreEqual(31, player.Stats.GetOrZero(CharacterStat.MaxHealth));
+            Assert.AreEqual(34, player.Stats.GetOrZero(CharacterStat.MaxHealth));
             Assert.AreEqual(25, player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(29, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
+            Assert.AreEqual(32, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
             Assert.AreEqual(20, player.Stats.GetOrZero(CharacterStat.CurrentNano));
             PlayerSpawnPayloadValidator.RequireValid(player);
         }
@@ -251,6 +252,72 @@ namespace ZoneEngine_New.Tests
             public void Send(MessageBody body, int sender, int receiver) => throw new AssertFailedException("Wire before validation");
             public void SendInitiateCompression() => throw new AssertFailedException();
             public void Close() => State = SessionState.Closed;
+        }
+
+        [DataTestMethod]
+        [DataRow(34, 2_000_000_000, 20)]
+        [DataRow(39, 65, 126)]
+        [DataRow(49, 2_000_000_000, 36)]
+        public void Production_legacy_snapshots_restore_defaults_and_spawn_without_rewriting_saved_stats(int id, int healthMax, int nanoMax)
+        {
+            var assembly = typeof(CharacterSpawnHydrationTests).Assembly;
+            using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames()
+                .Single(name => name.EndsWith("LegacyProductionCharacterStats.json", StringComparison.Ordinal)))!;
+            var snapshots = JsonSerializer.Deserialize<Dictionary<string, Dictionary<int, int>>>(stream)!;
+            var raw = Result(snapshots[id.ToString()].ToDictionary(row => (CharacterStat)row.Key, row => row.Value));
+            var before = raw.Stats.Select(row => (row.StatId, row.StatValue)).ToArray();
+            Assert.IsFalse(CharacterHydrationValidator.Validate(raw).IsValid);
+            var hydration = new CharacterHydrationResult
+            {
+                Character = raw.Character,
+                Stats = CharacterHydrationService.RestoreLegacyDefaults(raw.Stats)
+            };
+            Assert.IsTrue(CharacterHydrationValidator.Validate(hydration).IsValid);
+            Assert.AreEqual(1, Stat(hydration, CharacterStat.Race));
+            Assert.AreEqual(31, Stat(hydration, CharacterStat.VisualFlags));
+            Assert.AreEqual(0, Stat(hydration, CharacterStat.Side));
+            Assert.AreEqual(id == 39 ? 17 : 5, Stat(hydration, CharacterStat.RunSpeed));
+            CollectionAssert.AreEqual(before, raw.Stats.Select(row => (row.StatId, row.StatValue)).ToArray());
+            Player player = PlayerFrom(hydration);
+            player.Rebase();
+            Assert.AreEqual(healthMax, player.Stats.GetOrZero(CharacterStat.MaxHealth));
+            Assert.AreEqual(nanoMax, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
+            Assert.AreEqual(Stat(raw, CharacterStat.Health), player.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(Stat(raw, CharacterStat.CurrentNano), player.Stats.GetOrZero(CharacterStat.CurrentNano));
+            PlayerSpawnPayloadValidator.RequireValid(player);
+            PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
+            player.Rebase();
+            Assert.AreEqual(healthMax, player.Stats.GetOrZero(CharacterStat.MaxHealth));
+            Assert.AreEqual(nanoMax, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
+        }
+
+        [TestMethod]
+        public void Sparse_default_projection_preserves_explicit_values_and_does_not_hide_corruption()
+        {
+            foreach (CharacterStat stat in new[] { CharacterStat.Race, CharacterStat.VisualFlags, CharacterStat.Side, CharacterStat.RunSpeed })
+            {
+                var invalid = With(ValidHydration(), stat, (int)CharacterStat.Unset);
+                var projected = new CharacterHydrationResult { Character = invalid.Character, Stats = CharacterHydrationService.RestoreLegacyDefaults(invalid.Stats) };
+                Assert.IsFalse(CharacterHydrationValidator.Validate(projected).IsValid);
+            }
+            var missingIdentity = Without(ValidHydration(), CharacterStat.HeadMesh);
+            Assert.IsFalse(CharacterHydrationValidator.Validate(new CharacterHydrationResult
+            { Character = missingIdentity.Character, Stats = CharacterHydrationService.RestoreLegacyDefaults(missingIdentity.Stats) }).IsValid);
+            var duplicate = ValidHydration();
+            Assert.IsFalse(CharacterHydrationValidator.Validate(new CharacterHydrationResult
+            { Character = duplicate.Character, Stats = CharacterHydrationService.RestoreLegacyDefaults(duplicate.Stats.Concat(new[] { duplicate.Stats[0] }).ToArray()) }).IsValid);
+        }
+
+        [TestMethod]
+        public void Effective_vital_bounds_still_reject_corruption_before_wire_publication()
+        {
+            foreach (var stat in new[] { CharacterStat.Health, CharacterStat.CurrentNano })
+            {
+                Player player = PlayerFrom(With(ValidHydration(), stat, 1000));
+                player.Rebase();
+                Assert.ThrowsException<InvalidOperationException>(() => PlayerSpawnPayloadValidator.RequireValid(player));
+                Assert.ThrowsException<InvalidOperationException>(() => PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage()));
+            }
         }
 
         private static CharacterHydrationResult ValidHydration()
