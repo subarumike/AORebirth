@@ -27,6 +27,8 @@ static partial class ConnectedAcceptanceSmoke
     static bool morphActive = true;
     static int previousDuration = int.MaxValue;
     static LifecyclePersistenceEvidence persistenceEvidence = null!;
+    static ConnectedEngineProcess positionEngine = null!;
+    static int positionSaveSequence;
     public static bool HandoffRejected { get; private set; }
     public static string RepositoryRoot()
     {
@@ -41,6 +43,9 @@ static partial class ConnectedAcceptanceSmoke
         try
         {
             ownedFixture = fixture;
+            ConnectedPositionEvidence.ValidateContract();
+            ConnectedPositionEvidence.Expected = new(100, 0, 100);
+            positionSaveSequence = 0;
             Console.WriteLine("SOURCE_SHA=" + Git("rev-parse", "HEAD"));
             Console.WriteLine("SOURCE_WORKTREE_TRACKED_CLEAN=" + (Git("status", "--porcelain", "--untracked-files=no").Length == 0 ? "YES" : "NO"));
             Environment.SetEnvironmentVariable("AO_REBIRTH_MYSQL_CONNECTION", fixture.ConnectionString);
@@ -111,6 +116,7 @@ static partial class ConnectedAcceptanceSmoke
             ZoneLoginMessage outstanding;
             using (var zone = new ConnectedEngineProcess(zoneBinary, false, fixture))
             {
+                positionEngine = zone;
                 before = zone.Id;
                 Console.WriteLine("ZONEENGINE_NEW_STARTED=YES ZONEENGINE_NEW_BINARY_SHA256=" + zone.BinarySha256);
                 using (var client = Enter(fixture, password))
@@ -150,6 +156,7 @@ static partial class ConnectedAcceptanceSmoke
             }
             using (var zone = new ConnectedEngineProcess(zoneBinary, false, fixture))
             {
+                positionEngine = zone;
                 Require(zone.Id != before, "restart-process-identity");
                 RejectUnchanged(fixture, connection, consumedHandoff, "replay-after-process-restart");
                 RejectUnchanged(fixture, connection, expiredHandoff, "expired-after-process-restart");
@@ -298,8 +305,7 @@ static partial class ConnectedAcceptanceSmoke
     {
         var full = client.Received.OfType<FullCharacterMessage>().Single(m => m.Identity.Instance == Owner);
         var spawn = client.Received.OfType<SimpleCharFullUpdateMessage>().First(m => m.Identity.Instance == Owner);
-        Require(spawn.Coordinates.X == 100 && spawn.Coordinates.Y == 0 && spawn.Coordinates.Z == 100,
-            $"wire-position-{phase}-actual-{spawn.Coordinates.X}-{spawn.Coordinates.Y}-{spawn.Coordinates.Z}");
+        ConnectedPositionEvidence.VerifySpawn(spawn, phase);
         Require(MorphVisualPackets.TryBuild(270542, false, Character, 4582, false, out byte[] expectedMorph)
             && client.Packets.Any(p => p.AsSpan(16).SequenceEqual(expectedMorph.AsSpan(16))) == morphActive, "wire-captured-morph-projection-" + phase);
         var durations = client.Received.OfType<CharacterActionMessage>().Where(m => m.Identity == Character && m.Action == CharacterActionType.SetNanoDuration && m.Target.Instance == 270542).ToArray();
@@ -357,13 +363,17 @@ static partial class ConnectedAcceptanceSmoke
         Require(FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId={(int)CharacterStat.Cash}") == expectedCash, "persisted-cash-exact");
         Require(FixtureSql.Scalar(connection, $"SELECT StatValue FROM stats WHERE Type=50000 AND Instance={Owner} AND StatId={(int)CharacterStat.MonsterData}") == 0, "persisted-morph-baseline");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM stats WHERE Type=50000 AND Instance={Owner} AND ((StatId={(int)CharacterStat.CATMesh} AND StatValue=111) OR (StatId={(int)CharacterStat.DisplayCATMesh} AND StatValue=222))") == 2, "persisted-morph-mesh-baselines");
-        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM characters WHERE Id={Owner} AND Username='{Account}' AND Name='ConnectedFixture' AND Playfield=4582 AND X=100 AND Y=0 AND Z=100 AND HeadingW=1 AND HeadingX=0 AND HeadingY=0 AND HeadingZ=0") == 1, "persisted-character-exact");
+        Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM characters WHERE Id={Owner} AND Username='{Account}' AND Name='ConnectedFixture' AND Playfield=4582 AND HeadingW=1 AND HeadingX=0 AND HeadingY=0 AND HeadingZ=0") == 1, "persisted-character-exact");
+        ConnectedPositionEvidence.Expected.RequireEqual(ConnectedPositionEvidence.Read(connection, prepared: false), "database-position");
     }
     static void Logout(ConnectedWireClient client, MySqlConnection connection)
     {
+        int mark = positionEngine.OutputMark;
         client.Send(new CharacterActionMessage { Identity = Character, Action = CharacterActionType.Logout }, Owner);
         client.Wait<StartLogoutMessage>();
         Until(() => FixtureSql.Scalar(connection, $"SELECT Online FROM characters WHERE Id={Owner}") == 0, "logout-persistence");
+        ConnectedPositionEvidence.VerifySaved(ownedFixture, connection, positionEngine.WaitForSnapshot(mark),
+            persistenceEvidence, "LOGOUT_" + ++positionSaveSequence);
     }
     static void Until(Func<bool> test, string code)
     {

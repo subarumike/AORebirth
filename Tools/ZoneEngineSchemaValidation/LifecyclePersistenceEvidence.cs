@@ -87,6 +87,15 @@ sealed class LifecyclePersistenceEvidence
         Console.WriteLine($"CONNECTED_FULL_PERSISTENCE_{phase}=PASS SHA256={hash} STAT_ROWS={actual.stats.Count / 4} ITEM_ROWS={actual.items.Keys.Count(key => key.EndsWith("/InstanceId", StringComparison.Ordinal))} ONLINE={expectedOnline} EQUIPMENT=SEEDED_AND_ACTUAL_GAMEPLAY_ROWS_PRESERVED");
     }
 
+    public void ExpectPosition(float x, float y, float z)
+    {
+        // Caller first proves the exact stored FLOAT equals the independent runtime snapshot.
+        // Only explicit simulation-owned coordinates change; every other row/column stays strict.
+        character[owner + "/X"] = x.ToString(CultureInfo.InvariantCulture);
+        character[owner + "/Y"] = y.ToString(CultureInfo.InvariantCulture);
+        character[owner + "/Z"] = z.ToString(CultureInfo.InvariantCulture);
+    }
+
     static void Equal(SortedDictionary<string, string?> expected, SortedDictionary<string, string?> actual, string phase, string kind)
     {
         var differences = expected.Keys.Union(actual.Keys).Order(StringComparer.Ordinal).Where(key =>

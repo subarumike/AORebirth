@@ -13,6 +13,24 @@ sealed class ConnectedEngineProcess : IDisposable
     readonly DisposableSchemaDatabase fixture;
     public int Id => process.Id;
     public string BinarySha256 { get; }
+    public int OutputMark { get { lock (output) return output.Length; } }
+
+    public FixturePosition WaitForSnapshot(int after)
+    {
+        var deadline = Stopwatch.StartNew();
+        while (deadline.Elapsed < TimeSpan.FromSeconds(15))
+        {
+            string text;
+            lock (output) text = output.ToString(after, output.Length - after);
+            var match = System.Text.RegularExpressions.Regex.Match(text,
+                @"Character snapshot character=9901 playfield=4582 pos=\(([^,]+),([^,]+),([^\)]+)\)");
+            if (match.Success)
+                return new FixturePosition(Parse(1), Parse(2), Parse(3));
+            Thread.Sleep(20);
+            float Parse(int group) => float.Parse(match.Groups[group].Value, System.Globalization.CultureInfo.InvariantCulture);
+        }
+        throw new FixtureFailure("position-runtime-snapshot-log-timeout");
+    }
     public ConnectedEngineProcess(string assembly, bool login, DisposableSchemaDatabase fixture)
     {
         this.fixture = fixture;

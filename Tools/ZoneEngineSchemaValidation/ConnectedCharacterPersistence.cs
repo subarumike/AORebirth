@@ -12,6 +12,8 @@ static partial class ConnectedAcceptanceSmoke
         var handoff = Authorize(fixture, password);
         using (var source = EnterWithHandoff(fixture, handoff))
         {
+            ConnectedPositionEvidence.TraceSpawn(source, "SOURCE_PRE_ZONE_WIRE");
+            new FixturePosition(100, 0, 100).Trace("REQUESTED_800");
             Command(source, ".set Cash 1432");
             source.Wait<ChatTextMessage>(m => m.Text.Contains("Set Cash", StringComparison.Ordinal));
             expectedCash = 1432;
@@ -22,6 +24,8 @@ static partial class ConnectedAcceptanceSmoke
         }
         using (var destination = EnterWithHandoff(fixture, handoff))
         {
+            ConnectedPositionEvidence.TraceSpawn(destination, "ARRIVAL_800_WIRE");
+            new FixturePosition(100, 0, 100).Trace("REQUESTED_4582");
             var full = destination.Received.OfType<FullCharacterMessage>().Single(m => m.Identity == Character);
             Require(full.InventorySlots.Single(i => i.Identity.Instance == CharacterPersistenceGameplaySmoke.SecondItem).Placement == CharacterPersistenceGameplaySmoke.WearSlot,
                 "zone-arrival-actual-equipment");
@@ -31,6 +35,7 @@ static partial class ConnectedAcceptanceSmoke
         }
         using (var returned = EnterWithHandoff(fixture, handoff))
         {
+            ConnectedPositionEvidence.TraceSpawn(returned, "RETURN_4582_WIRE");
             Logout(returned, connection);
             persistenceEvidence.Verify(connection, "ZONE_ROUND_TRIP_LOGOUT", 0);
         }

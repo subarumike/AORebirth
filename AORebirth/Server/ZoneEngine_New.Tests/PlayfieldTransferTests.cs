@@ -40,6 +40,38 @@ using Quaternion = AORebirth.Core.Vector.Quaternion;
 public sealed class PlayfieldTransferTests
 {
     [TestMethod]
+    [DataRow(0.015625)]
+    [DataRow(0.03125)]
+    public void Snapshot_after_transfer_uses_simulated_position_not_requested_landing(double dt)
+    {
+        using var f = new Fixture(); var source = f.World(800); var destination = f.World(4582);
+        var data = new ZoneEngine_New.Core.GameData.GameDataStore(new StubLogger());
+        DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
+        using var collision = PlayfieldWorldSimulation.Create(4582, data.GetPlayfieldGeometry(4582),
+            data.GetPlayfieldMetaData(4582), DestinationsCatalog.Instance, data, new StubLogger());
+        destination.WorldAccess.Instance = collision;
+        var player = f.Player(source, 1);
+        var landing = new Vector3(100, 0, 100);
+        player.Session!.TransferToPlayfield(destination, landing);
+        f.Drain(source); f.Drain(destination);
+        Assert.AreEqual(landing.y, player.Position.y, "Transfer publishes the requested coordinate before simulation.");
+        Assert.IsTrue(collision.TryRaycastDown(new Vector3(100, MovementConfig.GroundProbeLift, 100),
+            MovementConfig.GroundProbeLift + MovementConfig.GroundSnapTolerance, out var surface));
+        f.Owner(destination, () => player.Motor.Tick(dt));
+        double authoritativeY = player.Position.y;
+        Assert.AreNotEqual(landing.y, authoritativeY, "This route must exercise a real post-arrival adjustment.");
+        Assert.AreEqual((double)(float)surface.y + MovementConfig.GroundStickVelocity * (float)dt,
+            authoritativeY, "The first delta is the runtime ground-stick step, not DAO rounding.");
+        var snapshot = new CharacterSnapshotService(f.Snapshots, f.Snapshots, new StubLogger());
+        snapshot.Commit(player);
+        var saved = f.Snapshots.Writes.Single();
+        Assert.AreEqual((float)authoritativeY, saved.Y);
+        Assert.AreEqual(authoritativeY, player.Position.y, "Snapshot/logout must not move the player.");
+        Assert.AreEqual(100f, saved.X); Assert.AreEqual(100f, saved.Z);
+        destination.WorldAccess.Instance = null;
+    }
+
+    [TestMethod]
     [DataRow(false)]
     [DataRow(true)]
     public void Transfer_heading_reaches_destination_and_teleport_without_rotating_source(bool explicitDoorHeading)
