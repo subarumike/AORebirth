@@ -134,7 +134,35 @@ and process-restart coverage. No independent fixture physics model was added.
 
 Exact baseline/candidate XYZ traces, binary/text conversion evidence, source and
 log hashes, validation counts, and final acceptance decision are recorded in
-`NEWENGINE_CONNECTED_POSITION_PERSISTENCE_RECEIPT.json` after the final gates.
+`NEWENGINE_CONNECTED_POSITION_PERSISTENCE_RECEIPT.json` from the completed final gates.
 Earlier failed results remain in the original NPC validation receipt as history.
 NPC completeness, full DAO conversion, gameplay parity and Legacy retirement
 are not prerequisites for this focused durable-state acceptance.
+
+<!-- FINAL_POSITION_RECEIPT -->
+
+## Exact connected trace and final acceptance
+
+Tested source: `ead455fd047d28f7835174dbce9261f0632d6079`. Final receipt changes are documentation only.
+
+Immediate runtime arrival is `(100,0,100)` on both legs in both engine logs.
+The SCFU rows below are later observations and may already include motor ticks.
+
+| Stage | Baseline X | Baseline Y | Baseline Z | Candidate X | Candidate Y | Candidate Z |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Seed/start | 100 | 0 | 100 | 100 | 0 | 100 |
+| Pre-zone runtime SCFU | 100 | 0 | 100 | 100 | 0 | 100 |
+| Requested destination PF800 | 100 | 0 | 100 | 100 | 0 | 100 |
+| PF800 arrival SCFU | 100 | 0 | 100 | 100 | 0 | 100 |
+| Requested return PF4582 | 100 | 0 | 100 | 100 | 0 | 100 |
+| PF4582 arrival SCFU after simulation | 100 | -0.0642239972949028 | 100 | 100 | -0.06309240311384201 | 100 |
+| Pre-snapshot runtime / logout save | 100 | -0.05917899310588837 | 100 | 100 | -0.06201399117708206 | 100 |
+| Persisted binary FLOAT | 100 | -0.05917899310588837 | 100 | 100 | -0.06201399117708206 | 100 |
+| DAO reloaded (SQL text representation) | 100 | -0.059179000556468964 | 100 | 100 | -0.06201399862766266 | 100 |
+| Post-relogin runtime SCFU | 100 | -0.059179000556468964 | 100 | 100 | -0.06201399862766266 | 100 |
+
+JSON retains float bits and every logged lifecycle stage, including later logouts and process restart. Values are round-trip representations, not rounded presentation measurements.
+
+Validation: NewEngine 580 tests; AOtomation 1,129 tests; 12 mandatory stages; character DAO 551 checks; mission DAO 261 checks; two deterministic position cases and four negative cases. All PASS. Exact-source Windows, Linux publication, corrected baseline/candidate connected acceptance and disposable schema/persistence validation PASS.
+
+`INTEGRATION_DURABLE_STATE_ACCEPTANCE=PASS`. The 29fde403 height blocker is closed as a test expectation defect. Runtime position code and production remain unchanged. Full gameplay parity and Legacy retirement were not required.

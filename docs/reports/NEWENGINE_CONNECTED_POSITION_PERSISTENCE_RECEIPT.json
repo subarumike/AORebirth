@@ -1,0 +1,1418 @@
+{
+  "formatVersion": 1,
+  "rootCause": "TEST_EXPECTATION_DEFECT",
+  "integrationDurableStateAcceptance": "PASS",
+  "productionRecordedSha": "cb12160c37507f8318b7e9e39f424f9bf13faa23",
+  "candidateInputSha": "29fde403eae3f305e71a69e186587c8d2f15980f",
+  "startingSha": "29fde403eae3f305e71a69e186587c8d2f15980f",
+  "testedSourceSha": "ead455fd047d28f7835174dbce9261f0632d6079",
+  "endingSha": "Containing documentation-only receipt commit",
+  "branch": "codex/delmus-npc-content-001",
+  "worktree": "C:\\Users\\Mike\\Documents\\AORebirth\\build-verify\\delmus-npc-content-001",
+  "originMasterSha": "7be49b22b4c0116af9c48dc88a44f86ba802f7c7",
+  "baselineControlSha": "cb12160c37507f8318b7e9e39f424f9bf13faa23",
+  "commonAncestor": "cb12160c37507f8318b7e9e39f424f9bf13faa23",
+  "integrationStartSha": "2dc701f1e114cdd26dbb1e13d89acd4aa3b77a76",
+  "controlReason": "The integration starts from 2dc701f1, which differs from cb12160c in three documentation files only. The retained baseline binaries are cb12160c; all relevant movement, snapshot and DAO code is unchanged by Delmus integration.",
+  "productionModified": false,
+  "masterModifiedDirectly": false,
+  "developerBranchModified": false,
+  "legacyRemoved": false,
+  "runtimePositionCodeChanged": false,
+  "testExpectationChanged": true,
+  "simulationChanged": false,
+  "arbitraryEpsilonIntroduced": false,
+  "route": [
+    4582,
+    800,
+    4582
+  ],
+  "requestedPosition": {
+    "X": 100,
+    "Y": 0,
+    "Z": 100
+  },
+  "firstHeightDeltaStage": "CharacterMotor.Tick: supported ground-stick movement endpoint after ArriveFromTransfer",
+  "firstDiagnosticHeightBefore": 0,
+  "firstDiagnosticHeightAfter": -0.06280799955129623,
+  "firstDiagnosticHeightDelta": -0.06280799955129623,
+  "firstDiagnosticGroundY": 0,
+  "groundStickVelocity": -2,
+  "diagnosticSteps": [
+    "00:00:07.041 [Info] [pf=4582] POSITION_DIAGNOSTIC pf=4582 character=9901 before=0 dt=0.031404 grounded=True ground=0 vy=-2 proposed=-0.06280799955129623 after=-0.06280799955129623 world=True ",
+    "00:00:07.079 [Info] [pf=4582] POSITION_DIAGNOSTIC pf=4582 character=9901 before=-0.06280799955129623 dt=0.031496 grounded=True ground=7.450581E-09 vy=-2 proposed=-0.06299199163913727 after=-0.06299199163913727 world=True "
+  ],
+  "diagnosticInstrumentationRemoved": true,
+  "groundingCausesDelta": true,
+  "precisionChangePresent": true,
+  "expectedPositionSourceBefore": "Original fixture seed / requested GM destination",
+  "expectedPositionSourceAfter": "Independent runtime snapshot log checked against stored binary FLOAT, then SQL text/DAO representation for reload and wire",
+  "testExpectedWrongLifecycleStage": true,
+  "simulationMatchesRuntime": "YES; corrected fixture runs the real engine and does not duplicate physics",
+  "runtimeToDbPositionMatch": true,
+  "dbTextToDaoPositionMatch": true,
+  "daoToRuntimeWirePositionMatch": true,
+  "dbBinaryToDaoBitIdentity": "NOT_ALWAYS; exact read-conversion errors retained below",
+  "logoutChangesPosition": false,
+  "baselineFirstDeltaStage": "Same unchanged motor path between immediate arrival and observed arrival SCFU",
+  "candidateFirstDeltaStage": "CharacterMotor.Tick ground-stick integration; diagnostic and deterministic regressions prove the operation",
+  "sameFirstDeltaStage": true,
+  "sameHeightDelta": false,
+  "samePersistedValue": false,
+  "sameReloadedValue": false,
+  "numericalDifferenceReason": "Real elapsed tick durations differ between runs. Stage/authority/storage contracts match, not wall-clock samples.",
+  "maximumPermittedSnapshotStorageError": 0,
+  "maximumObservedSqlTextReadError": 7.450580596923828e-9,
+  "precisionPolicy": "Exact float-bit equality at each defined representation boundary; no arithmetic tolerance or reimplemented decimal formatter.",
+  "positionTable": [
+    {
+      "stage": "Seed/start",
+      "baseline": {
+        "Stage": "INITIAL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "INITIAL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "Pre-zone runtime SCFU",
+      "baseline": {
+        "Stage": "SOURCE_PRE_ZONE_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "SOURCE_PRE_ZONE_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "Requested destination PF800",
+      "baseline": {
+        "Stage": "REQUESTED_800",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "REQUESTED_800",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "PF800 arrival SCFU",
+      "baseline": {
+        "Stage": "ARRIVAL_800_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "ARRIVAL_800_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "Requested return PF4582",
+      "baseline": {
+        "Stage": "REQUESTED_4582",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "REQUESTED_4582",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "PF4582 arrival SCFU after simulation",
+      "baseline": {
+        "Stage": "RETURN_4582_WIRE",
+        "X": 100,
+        "Y": -0.0642239972949028,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115453473,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "RETURN_4582_WIRE",
+        "X": 100,
+        "Y": -0.06309240311384201,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115605353,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "Pre-snapshot runtime / logout save",
+      "baseline": {
+        "Stage": "LOGOUT_2_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": -0.05917899310588837,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576340,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "LOGOUT_2_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": -0.06201399117708206,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815326,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "Persisted binary FLOAT",
+      "baseline": {
+        "Stage": "LOGOUT_2_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": -0.05917899310588837,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576340,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "LOGOUT_2_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": -0.06201399117708206,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815326,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "DAO reloaded (SQL text representation)",
+      "baseline": {
+        "Stage": "LOGOUT_2_DAO_RELOADED",
+        "X": 100,
+        "Y": -0.059179000556468964,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576338,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "LOGOUT_2_DAO_RELOADED",
+        "X": 100,
+        "Y": -0.06201399862766266,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815324,
+        "ZBits": 1120403456
+      }
+    },
+    {
+      "stage": "Post-relogin runtime SCFU",
+      "baseline": {
+        "Stage": "RECONNECT_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": -0.059179000556468964,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576338,
+        "ZBits": 1120403456
+      },
+      "candidate": {
+        "Stage": "RECONNECT_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": -0.06201399862766266,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815324,
+        "ZBits": 1120403456
+      }
+    }
+  ],
+  "baseline": {
+    "log": "build-verify-height-baseline-fixed.log",
+    "sha256": "c4460f0c281098069ff6c186ffc5e217104e09978c7b59969190623a04e15fd6",
+    "engineBinarySha256": "6a39489bf987458e23685419c49ace15b36e2d334a3dd8bc8824a06e1609a5e1",
+    "harnessSourceSha": "ead455fd047d28f7835174dbce9261f0632d6079",
+    "engineLog": "build-verify/connected-engine-46860.log",
+    "engineLogSha256": "b04f42efe93d965b323aadb833fc6033be399c1bda84bd4e0858795bee157b18",
+    "trace": [
+      {
+        "Stage": "INITIAL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_DAO_RELOADED",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "SOURCE_PRE_ZONE_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "REQUESTED_800",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "ARRIVAL_800_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "REQUESTED_4582",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RETURN_4582_WIRE",
+        "X": 100,
+        "Y": -0.0642239972949028,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115453473,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": -0.05917899310588837,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576340,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": -0.05917899310588837,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576340,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_DAO_RELOADED",
+        "X": 100,
+        "Y": -0.059179000556468964,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576338,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RECONNECT_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": -0.059179000556468964,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1116576338,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580596923828e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860800,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580596923828e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860800,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "CONCURRENT_WINNER_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RESTART_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "AFTER_CANCEL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      }
+    ],
+    "conversions": [
+      {
+        "Stage": "LOGOUT_1",
+        "StoredY": 0,
+        "TextReadY": 0,
+        "Error": 0,
+        "StoredBits": 0,
+        "TextBits": 0
+      },
+      {
+        "Stage": "LOGOUT_2",
+        "StoredY": -0.05917899310588837,
+        "TextReadY": -0.059179000556468964,
+        "Error": -7.450580596923828e-9,
+        "StoredBits": -1116576340,
+        "TextBits": -1116576338
+      },
+      {
+        "Stage": "LOGOUT_3",
+        "StoredY": 7.450580596923828e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": -4.440892098500626e-16,
+        "StoredBits": 838860800,
+        "TextBits": 838860799
+      },
+      {
+        "Stage": "LOGOUT_4",
+        "StoredY": 7.450580152834618e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": 0,
+        "StoredBits": 838860799,
+        "TextBits": 838860799
+      },
+      {
+        "Stage": "LOGOUT_5",
+        "StoredY": 7.450580152834618e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": 0,
+        "StoredBits": 838860799,
+        "TextBits": 838860799
+      },
+      {
+        "Stage": "LOGOUT_6",
+        "StoredY": 7.450580152834618e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": 0,
+        "StoredBits": 838860799,
+        "TextBits": 838860799
+      }
+    ],
+    "arrivals": [
+      "00:00:08.085 [Info] [pf=800] Player 9901 arrived playfield 800 at (100,0,100) ",
+      "00:00:08.224 [Info] [pf=4582] Player 9901 arrived playfield 4582 at (100,0,100) "
+    ]
+  },
+  "candidate": {
+    "log": "build-verify-height-connected-final.log",
+    "sha256": "86bdbe5f89dcbaf9e4e897fb66b1835d6bc24a02b5830f08d817263ad53b8853",
+    "engineBinarySha256": "28377fccffc3568870cc11b2c7865388727d3df4d25b62ac050143a2ab1650ed",
+    "harnessSourceSha": "ead455fd047d28f7835174dbce9261f0632d6079",
+    "engineLog": "build-verify/connected-engine-624.log",
+    "engineLogSha256": "cd6baa00420b11294a671b7fb36196e29127fd93e5115367184e9cf0b2598cb0",
+    "trace": [
+      {
+        "Stage": "INITIAL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_DAO_RELOADED",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "SOURCE_PRE_ZONE_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "REQUESTED_800",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "ARRIVAL_800_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "REQUESTED_4582",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RETURN_4582_WIRE",
+        "X": 100,
+        "Y": -0.06309240311384201,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115605353,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": -0.06201399117708206,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815326,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": -0.06201399117708206,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815326,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_DAO_RELOADED",
+        "X": 100,
+        "Y": -0.06201399862766266,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815324,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RECONNECT_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": -0.06201399862766266,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115815324,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": -1.4901161193847656e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1300234240,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": -1.4901161193847656e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1300234240,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_DAO_RELOADED",
+        "X": 100,
+        "Y": -1.4901200273698123e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1300234218,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "CONCURRENT_WINNER_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": -1.4901200273698123e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1300234218,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 1.490112211399719e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249364,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 1.490112211399719e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249364,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_DAO_RELOADED",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RESTART_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_DAO_RELOADED",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "AFTER_CANCEL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_DAO_RELOADED",
+        "X": 100,
+        "Y": 1.4901099909536697e-8,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 847249339,
+        "ZBits": 1120403456
+      }
+    ],
+    "conversions": [
+      {
+        "Stage": "LOGOUT_1",
+        "StoredY": 0,
+        "TextReadY": 0,
+        "Error": 0,
+        "StoredBits": 0,
+        "TextBits": 0
+      },
+      {
+        "Stage": "LOGOUT_2",
+        "StoredY": -0.06201399117708206,
+        "TextReadY": -0.06201399862766266,
+        "Error": -7.450580596923828e-9,
+        "StoredBits": -1115815326,
+        "TextBits": -1115815324
+      },
+      {
+        "Stage": "LOGOUT_3",
+        "StoredY": -1.4901161193847656e-8,
+        "TextReadY": -1.4901200273698123e-8,
+        "Error": -3.907985046680551e-14,
+        "StoredBits": -1300234240,
+        "TextBits": -1300234218
+      },
+      {
+        "Stage": "LOGOUT_4",
+        "StoredY": 1.490112211399719e-8,
+        "TextReadY": 1.4901099909536697e-8,
+        "Error": -2.220446049250313e-14,
+        "StoredBits": 847249364,
+        "TextBits": 847249339
+      },
+      {
+        "Stage": "LOGOUT_5",
+        "StoredY": 1.4901099909536697e-8,
+        "TextReadY": 1.4901099909536697e-8,
+        "Error": 0,
+        "StoredBits": 847249339,
+        "TextBits": 847249339
+      },
+      {
+        "Stage": "LOGOUT_6",
+        "StoredY": 1.4901099909536697e-8,
+        "TextReadY": 1.4901099909536697e-8,
+        "Error": 0,
+        "StoredBits": 847249339,
+        "TextBits": 847249339
+      }
+    ],
+    "arrivals": [
+      "00:00:06.522 [Info] [pf=800] Player 9901 arrived playfield 800 at (100,0,100) ",
+      "00:00:06.595 [Info] [pf=4582] Player 9901 arrived playfield 4582 at (100,0,100) "
+    ]
+  },
+  "diagnostic": {
+    "log": "build-verify-height-candidate-diagnostic.log",
+    "sha256": "5d847a5a76102495e718b12c0d7378f86634714e0f03cd4ab5e65effd8a4cc7e",
+    "engineBinarySha256": "2ffcf765fcb42bf406e02365d1304067d47cb609749f05d470bee0fdef10590d",
+    "harnessSourceSha": "ead455fd047d28f7835174dbce9261f0632d6079",
+    "engineLog": "build-verify/connected-engine-24012.log",
+    "engineLogSha256": "2e4dafa6cfe52d5f2bcd3b81adcbead333efa02ba3be485d741340de3607867b",
+    "trace": [
+      {
+        "Stage": "INITIAL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_1_DAO_RELOADED",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "SOURCE_PRE_ZONE_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "REQUESTED_800",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "ARRIVAL_800_WIRE",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "REQUESTED_4582",
+        "X": 100,
+        "Y": 0,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 0,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RETURN_4582_WIRE",
+        "X": 100,
+        "Y": -0.06280799955129623,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115643525,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": -0.06299199163913727,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115618830,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": -0.06299199163913727,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115618830,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_2_DAO_RELOADED",
+        "X": 100,
+        "Y": -0.06299199908971786,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115618829,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RECONNECT_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": -0.06299199908971786,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": -1115618829,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580596923828e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860800,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580596923828e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860800,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_3_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "CONCURRENT_WINNER_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_4_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "RESTART_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_5_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "AFTER_CANCEL_POST_HYDRATION_WIRE",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_PRE_SNAPSHOT_RUNTIME",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_STORED_BINARY_FLOAT",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      },
+      {
+        "Stage": "LOGOUT_6_DAO_RELOADED",
+        "X": 100,
+        "Y": 7.450580152834618e-9,
+        "Z": 100,
+        "XBits": 1120403456,
+        "YBits": 838860799,
+        "ZBits": 1120403456
+      }
+    ],
+    "conversions": [
+      {
+        "Stage": "LOGOUT_1",
+        "StoredY": 0,
+        "TextReadY": 0,
+        "Error": 0,
+        "StoredBits": 0,
+        "TextBits": 0
+      },
+      {
+        "Stage": "LOGOUT_2",
+        "StoredY": -0.06299199163913727,
+        "TextReadY": -0.06299199908971786,
+        "Error": -7.450580596923828e-9,
+        "StoredBits": -1115618830,
+        "TextBits": -1115618829
+      },
+      {
+        "Stage": "LOGOUT_3",
+        "StoredY": 7.450580596923828e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": -4.440892098500626e-16,
+        "StoredBits": 838860800,
+        "TextBits": 838860799
+      },
+      {
+        "Stage": "LOGOUT_4",
+        "StoredY": 7.450580152834618e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": 0,
+        "StoredBits": 838860799,
+        "TextBits": 838860799
+      },
+      {
+        "Stage": "LOGOUT_5",
+        "StoredY": 7.450580152834618e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": 0,
+        "StoredBits": 838860799,
+        "TextBits": 838860799
+      },
+      {
+        "Stage": "LOGOUT_6",
+        "StoredY": 7.450580152834618e-9,
+        "TextReadY": 7.450580152834618e-9,
+        "Error": 0,
+        "StoredBits": 838860799,
+        "TextBits": 838860799
+      }
+    ],
+    "arrivals": [
+      "00:00:06.973 [Info] [pf=800] Player 9901 arrived playfield 800 at (100,0,100) ",
+      "00:00:07.041 [Info] [pf=4582] Player 9901 arrived playfield 4582 at (100,0,100) "
+    ]
+  },
+  "validation": {
+    "baselineOriginalFailureReproduced": true,
+    "candidateOriginalFailureReproduced": true,
+    "baselineCorrectedConnected": "PASS",
+    "candidateCorrectedConnected": "PASS",
+    "deterministicPositionRegression": {
+      "result": "PASS",
+      "cases": 2
+    },
+    "negativePositionFixtures": {
+      "result": "PASS",
+      "cases": 4
+    },
+    "newEngineTests": {
+      "result": "PASS",
+      "runs": [
+        {
+          "passed": 580,
+          "skipped": 0,
+          "total": 580
+        }
+      ]
+    },
+    "aotomation": {
+      "result": "PASS",
+      "count": 1129
+    },
+    "mandatoryGate": {
+      "result": "PASS",
+      "stages": 12
+    },
+    "characterDao": {
+      "result": "PASS",
+      "checks": 551
+    },
+    "missionDao": {
+      "result": "PASS",
+      "checks": 261
+    },
+    "schemaDisposable": {
+      "result": "PASS",
+      "markers": [
+        "SCHEMA_NEGATIVE_TEST=PASS DATABASE_NEGATIVE_FINGERPRINT_UNCHANGED=PASS",
+        "SCHEMA_NEGATIVE_NORMAL_STARTUP=PASS DATABASE_NEGATIVE_NORMAL_FINGERPRINT_UNCHANGED=PASS",
+        "EXPECTED_DATABASE_MISMATCH_REFUSED=PASS DATABASE_TARGET_MISMATCH_FINGERPRINT_UNCHANGED=PASS",
+        "SCHEMA_CURRENT_TEST=PASS EXPLICIT_MIGRATION_TEST=PASS MIGRATION_RERUN=PASS DATABASE_CURRENT_FINGERPRINT_UNCHANGED=PASS",
+        "SCHEMA_INCOMPATIBLE_TEST=PASS INCOMPATIBLE_MIGRATION_REFUSED=PASS DATABASE_INCOMPATIBLE_FINGERPRINT_UNCHANGED=PASS",
+        "COPY_FAILURE_ROLLBACK=PASS LEGACY_SOURCE_PRESERVED=PASS MIGRATION_RETRY_AFTER_REPAIR=PASS",
+        "CHARACTER_SNAPSHOT_ATOMIC_COMMIT=PASS CHARACTER_SNAPSHOT_FAILURE_ROLLBACK=PASS",
+        "TWO_PARTY_TRADE_ATOMIC_COMMIT=PASS TWO_PARTY_TRADE_LATE_FAILURE_ROLLBACK=PASS",
+        "MISSION_POSITION_EXISTING_CHARACTER_AUTHORITY=PASS MISSION_POSITION_ONLINE_PRESERVED=PASS MISSION_POSITION_FAILURE_ROLLBACK=PASS",
+        "MISSION_OBJECT_STATE_ATOMIC_ACCEPT=PASS MISSION_OBJECT_STATE_RESTART=PASS MISSION_OBJECT_STATE_STALE_CAS=PASS",
+        "MISSION_SQL_FROZEN_OFFERS_AND_FEE=PASS MISSION_ACCEPT_ARTIFACT_ROLLBACK=PASS MISSION_EXACT_DESTINATION_RESTART=PASS MISSION_OBJECTIVE_OWNER_IDEMPOTENCE=PASS MISSION_REWARD_ATOMIC_ROLLBACK=PASS MISSION_REWARD_EXACTLY_ONCE=PASS",
+        "MISSION_EXPIRY_RESTART_IDEMPOTENCE=PASS MISSION_CLEANUP_MONOTONIC_CAS=PASS",
+        "MISSION_CLEANUP_ARTIFACT_CHECKPOINT_ATOMIC=PASS MISSION_CLEANUP_FOREIGN_PAGE_PENDING=PASS MISSION_CLEANUP_REWARD_PRESERVED=PASS",
+        "MISSION_BANK_CLEANUP_ATOMIC=PASS MISSION_BANK_CLEANUP_LATE_FAILURE_ROLLBACK=PASS MISSION_BANK_CLEANUP_RESTART_IDEMPOTENCE=PASS",
+        "MISSION_RETURN_FIXTURE_ACCEPT=PASS",
+        "MISSION_RETURN_FIXTURE_PICKUP_FAILURE_ROLLBACK=PASS",
+        "MISSION_PICKUP_OBJECT_ITEM_ATOMIC_ROLLBACK=PASS MISSION_RETURN_EXACT_ITEM_AND_TERMINAL=PASS MISSION_RETURN_RESTART_IDEMPOTENCE=PASS",
+        "MISSION_CORPSE_CREDITS_ATOMIC=PASS MISSION_CORPSE_LATE_FAILURE_ROLLBACK=PASS MISSION_CORPSE_RESTART_EXACTLY_ONCE=PASS",
+        "MISSION_TOKEN_OBJECTIVE_TIME_FREEZE=PASS MISSION_TOKEN_ATOMIC_GRANT_ROLLBACK=PASS MISSION_TOKEN_RESTART_EXACTLY_ONCE=PASS COMPLETED_MISSION_NPC_LIFETIME_GUARD=PASS MAX_LEVEL_MISSION_XP_NOOP=PASS",
+        "INVENTORY_SPLIT_ATOMIC_COMMIT=PASS INVENTORY_SPLIT_STALE_COUNT_ROLLBACK=PASS INVENTORY_SPLIT_LATE_NANO_ROLLBACK=PASS INVENTORY_LATE_STAT_ROLLBACK=PASS INVENTORY_NONEMPTY_BAG_ROLLBACK=PASS INVENTORY_EMPTY_BAG_RETIREMENT=PASS",
+        "CHARACTER_DAO_REAL_MYSQL_FAULTS=PASS PARTIAL_WRITE_CASES=7 SNAPSHOT_ROLLBACK=PASS COMMIT_BEFORE_SEND=UNKNOWN_OLD_STATE COMMIT_LOST_ACK=UNKNOWN_NEW_STATE DUPLICATE_REPLAY=REJECTED DISPOSAL_PRIMARY_FAILURE=PASS",
+        "ACTIVE_NANO_LEGACY_AND_CURRENT_ROUNDTRIP=PASS ACTIVE_NANO_MULTI_OWNER_ATOMIC_COMMIT=PASS ACTIVE_NANO_LATE_STAT_ROLLBACK=PASS",
+        "AUTHORED_MISSION_ATOMIC_ITEMS_STATE_STATS=PASS AUTHORED_MISSION_LATE_FAILURE_ROLLBACK=PASS AUTHORED_MISSION_REWARD_REPLAY=PASS AUTHORED_MISSION_OWNER_ACCOUNT_FENCES=PASS AUTHORED_MISSION_STALE_ITEM_ROLLBACK=PASS AUTHORED_MISSION_CHILD_ROW_ROLLBACK=PASS",
+        "CONNECTED_FULL_PERSISTENCE_REPOSITORY_RELOAD=PASS SHA256=136a7eadaffc57133b98b3f7fa8b8650b07a2a3c9ee4a6a1466e45755299846a STAT_ROWS=40 ITEM_ROWS=2 ONLINE=0 EQUIPMENT=SEEDED_AND_ACTUAL_GAMEPLAY_ROWS_PRESERVED",
+        "CONNECTED_FULL_PERSISTENCE_REPOSITORY_FIRST_RESTART=PASS SHA256=136a7eadaffc57133b98b3f7fa8b8650b07a2a3c9ee4a6a1466e45755299846a STAT_ROWS=40 ITEM_ROWS=2 ONLINE=0 EQUIPMENT=SEEDED_AND_ACTUAL_GAMEPLAY_ROWS_PRESERVED",
+        "CONNECTED_FULL_PERSISTENCE_REPOSITORY_SECOND_RESTART=PASS SHA256=136a7eadaffc57133b98b3f7fa8b8650b07a2a3c9ee4a6a1466e45755299846a STAT_ROWS=40 ITEM_ROWS=2 ONLINE=0 EQUIPMENT=SEEDED_AND_ACTUAL_GAMEPLAY_ROWS_PRESERVED",
+        "CUTOVER_DAO_FRESH_RELOAD=PASS CUTOVER_EXACT_ITEM_STATE=PASS CUTOVER_PERSISTED_STATE_PROCESS_RESTART=PASS POST_NEWENGINE_WRITE_LEGACY_ROLLBACK_SAFE=NO LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED",
+        "RUNTIME_START_STOP=PASS DATABASE_RUNTIME_FINGERPRINT_UNCHANGED=PASS",
+        "SCHEMA_NEGATIVE_TEST=PASS SCHEMA_CURRENT_TEST=PASS EXPLICIT_MIGRATION_TEST=PASS COPY_FAILURE_ROLLBACK=PASS RUNTIME_RESTART=PASS PRODUCTION_CONTACT=NO"
+      ]
+    },
+    "daoArchitectureGuard": "PASS",
+    "windowsExactSource": "PASS",
+    "linuxPublication": "PASS",
+    "productionDeployment": "NOT_PERFORMED",
+    "legacyRetirement": "NOT_PERFORMED",
+    "fullGameplayParityRequired": false
+  },
+  "filesAdded": 3,
+  "filesModified": 8,
+  "files": [
+    {
+      "status": "M",
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/PlayfieldTransferTests.cs"
+    },
+    {
+      "status": "M",
+      "file": "Tools/ZoneEngineSchemaValidation/ConnectedAcceptanceSmoke.cs"
+    },
+    {
+      "status": "M",
+      "file": "Tools/ZoneEngineSchemaValidation/ConnectedCharacterPersistence.cs"
+    },
+    {
+      "status": "M",
+      "file": "Tools/ZoneEngineSchemaValidation/ConnectedEngineProcess.cs"
+    },
+    {
+      "status": "A",
+      "file": "Tools/ZoneEngineSchemaValidation/ConnectedPositionEvidence.cs"
+    },
+    {
+      "status": "M",
+      "file": "Tools/ZoneEngineSchemaValidation/LifecyclePersistenceEvidence.cs"
+    },
+    {
+      "status": "M",
+      "file": "docs/ai/CURRENT_TASK.md"
+    },
+    {
+      "status": "M",
+      "file": "docs/project/PROJECT_STATE.md"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/NEWENGINE_CONNECTED_POSITION_PERSISTENCE_RECONCILIATION.md"
+    },
+    {
+      "status": "M",
+      "file": "docs/reports/NEWENGINE_DELMUS_NPC_INTEGRATION.md"
+    },
+    {
+      "status": "A",
+      "file": "docs/reports/NEWENGINE_CONNECTED_POSITION_PERSISTENCE_RECEIPT.json"
+    }
+  ],
+  "logEvidence": [
+    {
+      "purpose": "baselineOriginal",
+      "file": "build-verify-height-baseline-repro.log",
+      "sha256": "d04158a7ccebfa0abe5a5969c7a7fc846d452d4f8d6a8d3247cfa7c47fbef9ad"
+    },
+    {
+      "purpose": "candidateOriginal",
+      "file": "build-verify-height-candidate-repro.log",
+      "sha256": "40dba493bb37e7625a060af974a7c52cbe6afdbc95a1a22006cc4c4dd8be583d"
+    },
+    {
+      "purpose": "candidateDiagnostic",
+      "file": "build-verify-height-candidate-diagnostic.log",
+      "sha256": "5d847a5a76102495e718b12c0d7378f86634714e0f03cd4ab5e65effd8a4cc7e"
+    },
+    {
+      "purpose": "baseline",
+      "file": "build-verify-height-baseline-fixed.log",
+      "sha256": "c4460f0c281098069ff6c186ffc5e217104e09978c7b59969190623a04e15fd6"
+    },
+    {
+      "purpose": "candidate",
+      "file": "build-verify-height-connected-final.log",
+      "sha256": "86bdbe5f89dcbaf9e4e897fb66b1835d6bc24a02b5830f08d817263ad53b8853"
+    },
+    {
+      "purpose": "windows",
+      "file": "build-verify-height-windows-final.log",
+      "sha256": "bbc1c5eb3b2e53380f2ab92b9923c0f1b67c8f77d81b4224805a34d428c60610"
+    },
+    {
+      "purpose": "linux",
+      "file": "build-verify-height-linux-final.log",
+      "sha256": "6b6312334181b35831265af108d0634a6332ebc95c84b488788c27074f4be4a0"
+    },
+    {
+      "purpose": "schema",
+      "file": "build-verify-height-schema-final.log",
+      "sha256": "cb69a17918c0a012217ef11c77f3b9e4324c6f2c1152183301f539112e48016e"
+    },
+    {
+      "purpose": "characterDao",
+      "file": "build-verify-height-character-dao.log",
+      "sha256": "a43cdef098480d3a94450889f849c15630bc4ee62acc9926a9ef33aea646f3c7"
+    },
+    {
+      "purpose": "missionDao",
+      "file": "build-verify-height-mission-dao.log",
+      "sha256": "e69de5fcb1c32216b443d05f6bc50695f4d37b7e8455d33f3a1dd4cc2af494d2"
+    },
+    {
+      "purpose": "regression",
+      "file": "build-verify-height-regression.log",
+      "sha256": "d6cdc88682bd0b2e256d391edea3f8ab60edd804363152292c1de5700cd1ea49"
+    }
+  ],
+  "decision": "The original 29fde403 height assertion was not a durable-state regression. The derived candidate passes the corrected contract. This does not deploy or authorize a production operation.",
+  "remainingRisks": [
+    "Existing SQL text float read conversion remains measured and unchanged.",
+    "NPC/content and local-player cast-notification evidence gaps remain separate milestones.",
+    "Live production/client verification was not performed in this task."
+  ]
+}
