@@ -99,7 +99,15 @@ namespace ZoneEngine_New.Core.GameData
         public bool TryResolve(string hash, int? level, out MobTemplate template)
         {
             template = null!;
-            if (!TryResolveLeaf(hash, out NpcLeaf leaf))
+            if (TryResolveLeaf(hash, out NpcLeaf leaf))
+            {
+                template = Materialize(leaf, level);
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(hash)
+                || string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal)
+                || !TryResolveLeaf(MobTemplate.FallbackHash, out leaf))
                 return false;
 
             template = Materialize(leaf, level);
@@ -200,10 +208,16 @@ namespace ZoneEngine_New.Core.GameData
             {
                 Hash = leaf.Hash,
                 Name = nearest.Name ?? string.Empty,
+                TemplateId = nearest.TemplateId,
+                HasHeadMesh = nearest.HasHeadMesh,
                 Stats = stats,
+                NpcFamily = nearest.NpcFamily,
+                NpcStatTemplate = nearest.NpcStatTemplate,
+                Attackable = nearest.Attackable,
                 MinLevel = min,
                 MaxLevel = max,
                 Equipment = CopyPairs(nearest.Equipment),
+                KnuBotId = nearest.KnuBotId,
                 ItemTable = CopyLoot(nearest.LootTable)
             };
         }
@@ -347,6 +361,18 @@ namespace ZoneEngine_New.Core.GameData
         public Dictionary<int, int> Stats { get; set; } = new();
 
         public int Level { get; set; }
+
+        public int TemplateId { get; set; }
+
+        public bool HasHeadMesh { get; set; }
+
+        public int NpcFamily { get; set; }
+
+        public int NpcStatTemplate { get; set; }
+
+        public bool Attackable { get; set; } = true;
+
+        public int KnuBotId { get; set; }
 
         public List<List<int>> Equipment { get; set; } = new();
 

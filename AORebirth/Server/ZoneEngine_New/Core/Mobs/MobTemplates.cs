@@ -14,19 +14,8 @@ namespace ZoneEngine_New.Core.Mobs
         public int LevelMod { get; set; }
     }
 
-    /// <summary>NPC template combat weapon: low/high AOID + 4-char SAW hash.</summary>
-    public sealed class MobWeaponEntry
-    {
-        public int LowId { get; set; }
-
-        public int HighId { get; set; }
-
-        public string Hash { get; set; } = string.Empty;
-    }
-
     /// <summary>
-    /// Resolved NPC template used at spawn. Loaded from NpcTemplate.json or materialized from
-    /// NpcTemplates.json.
+    /// Resolved NPC template used at spawn. Materialized from NpcTemplates.json.
     /// </summary>
     public sealed class MobTemplate
     {
@@ -44,21 +33,23 @@ namespace ZoneEngine_New.Core.Mobs
         public const int DefaultNpcFamilyId = 10001;
 
         /// <summary>
+        /// Placeholder leaf used when a spawn hash is not in <c>NpcTemplates.json</c>.
+        /// </summary>
+        public const string FallbackHash = "AAAA";
+
+        /// <summary>
         /// Flat stats for this template. Applied last (after family and optional NpcStatTemplate
         /// curves), so anything set here wins outright for bosses and other one-offs.
         /// </summary>
         public Dictionary<int, int> Stats { get; set; } = new();
 
         /// <summary>
-        /// Key into GameData/NpcFamilyStatTemplates.json (family curve catalog).
-        /// 0 is a valid id. If the id is missing from the catalog, spawn falls back to
-        /// <see cref="DefaultNpcFamilyId"/>.
+        /// Optional family curve id. Unused once NpcTemplates.json supplies per-band stats.
         /// </summary>
         public int NpcFamily { get; set; }
 
         /// <summary>
-        /// Optional key into GameData/NpcStatTemplateOverlays.json. Curves sample on top of the family;
-        /// zero means no overlay.
+        /// Optional overlay curve id. Unused once NpcTemplates.json supplies per-band stats.
         /// </summary>
         public int NpcStatTemplate { get; set; }
 
@@ -71,9 +62,6 @@ namespace ZoneEngine_New.Core.Mobs
 
         /// <summary>Per-slot AOID lists from the template Equipment jagged array.</summary>
         public List<List<int>> Equipment { get; set; } = new();
-
-        /// <summary>Combat weapons as LowId/HighId/Hash for SAW + AttackInfo.</summary>
-        public List<MobWeaponEntry> Weapons { get; set; } = new();
 
         /// <summary>SCFU texture overrides keyed by place. Empty omits the texture block.</summary>
         public Dictionary<int, int> Textures { get; set; } = new();

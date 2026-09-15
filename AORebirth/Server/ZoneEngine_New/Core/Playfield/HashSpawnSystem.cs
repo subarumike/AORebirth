@@ -193,14 +193,26 @@ namespace ZoneEngine_New.Core.Playfield
                 string spawnHash = hashText;
                 if (!_gameData.CanResolveMobHash(hashText))
                 {
+                    if (!_gameData.CanResolveMobHash(MobTemplate.FallbackHash))
+                    {
+                        _logger.Warn(
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "Hash spawn skipped missing npc template hash={0} playfield={1}",
+                                hashText,
+                                _playfield.Identity.Instance));
+                        skipped++;
+                        continue;
+                    }
+
                     _logger.Warn(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "Hash spawn skipped missing npc template hash={0} playfield={1}",
+                            "Hash spawn using fallback hash={0} requested={1} playfield={2}",
+                            MobTemplate.FallbackHash,
                             hashText,
                             _playfield.Identity.Instance));
-                    skipped++;
-                    continue;
+                    spawnHash = MobTemplate.FallbackHash;
                 }
 
                 if (entry.Position == null || entry.Position.Length < 3)

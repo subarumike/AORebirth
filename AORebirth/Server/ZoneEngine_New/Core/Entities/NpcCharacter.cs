@@ -26,6 +26,7 @@ namespace ZoneEngine_New.Core.Entities
         public const int EquipmentCapacity = 50;
 
         readonly IItemBuilder _items;
+        readonly Dictionary<int, string> _equipmentSawHashes = new();
 
         public NpcCharacter(Identity identity, IItemBuilder items)
             : base(identity)
@@ -220,6 +221,7 @@ namespace ZoneEngine_New.Core.Entities
             if (template == null)
                 return;
 
+            _equipmentSawHashes.Clear();
             int quality = Stats.GetOrOne(CharacterStat.Level);
             List<List<int>> pairs = template.Equipment;
             for (int i = 0; i < pairs.Count; i++)
@@ -260,10 +262,13 @@ namespace ZoneEngine_New.Core.Entities
             if (lowId <= 0)
                 return;
 
-            TryAddEquipment(_items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other), logger);
+            TryAddEquipment(
+                _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other),
+                logger,
+                sawHash: weaponHash);
         }
 
-        bool TryAddEquipment(Item item, IZoneLogger? logger)
+        bool TryAddEquipment(Item item, IZoneLogger? logger, string? sawHash = null)
         {
             int slot = Equipment.FindFreeSlot();
             if (slot < 0)
@@ -277,7 +282,13 @@ namespace ZoneEngine_New.Core.Entities
                 return false;
             }
 
-            return Equipment.Add(slot, item);
+            if (!Equipment.Add(slot, item))
+                return false;
+
+            if (!string.IsNullOrEmpty(sawHash))
+                _equipmentSawHashes[slot] = sawHash;
+
+            return true;
         }
 
         internal static bool TryFindEquipMonsterWeaponHash(Item item, out string hash)
@@ -388,9 +399,7 @@ namespace ZoneEngine_New.Core.Entities
             int armed = 0;
             bool maCombined = false;
 
-            // Prefer template Weapons (LowId/HighId/Hash). Then filled equipment, then template IDs.
-            if (!TryArmNpcWeapons(MobTemplate?.Weapons, quality, ref armed, ref maCombined)
-                && !TryArmFromEquipmentContainer(ref armed, ref maCombined))
+            if (!TryArmFromEquipmentContainer(ref armed, ref maCombined))
                 TryArmNpcEquipment(MobTemplate?.Equipment, quality, ref armed, ref maCombined);
 
             if (armed == 0)
@@ -419,44 +428,12 @@ namespace ZoneEngine_New.Core.Entities
                 if (!item.IsWieldableCombatWeapon())
                     continue;
 
+                if (!_equipmentSawHashes.TryGetValue(slot, out string? sawHash)
+                    || string.IsNullOrEmpty(sawHash))
+                    TryFindEquipMonsterWeaponHash(item, out sawHash);
+
                 WeaponSlot hand = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
-                ArmFromItem(hand, item, wireSlot: armed);
-                armed++;
-                armedAny = true;
-                if (item.IsMaCombinedWeapon())
-                    maCombined = true;
-            }
-
-            return armedAny;
-        }
-
-        bool TryArmNpcWeapons(
-            List<MobWeaponEntry>? source,
-            int quality,
-            ref int armed,
-            ref bool maCombined)
-        {
-            if (source == null || source.Count == 0)
-                return false;
-
-            bool armedAny = false;
-            for (int i = 0; i < source.Count && armed < MaxNpcCombatWeapons; i++)
-            {
-                MobWeaponEntry? entry = source[i];
-                if (entry == null)
-                    continue;
-
-                int lowId = entry.LowId;
-                int highId = entry.HighId > 0 ? entry.HighId : lowId;
-                if (lowId <= 0)
-                    continue;
-
-                Item item = _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other);
-                if (!item.IsWieldableCombatWeapon())
-                    continue;
-
-                WeaponSlot slot = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
-                ArmFromItem(slot, item, wireSlot: armed, sawHash: entry.Hash);
+                ArmFromItem(hand, item, wireSlot: armed, sawHash: sawHash);
                 armed++;
                 armedAny = true;
                 if (item.IsMaCombinedWeapon())

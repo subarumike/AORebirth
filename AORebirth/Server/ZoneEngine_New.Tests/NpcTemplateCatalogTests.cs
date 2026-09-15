@@ -126,6 +126,73 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void MaterializeCopiesEquipmentAndIdentityFields()
+        {
+            NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(
+                """
+                {
+                    "AAAA": {
+                        "Templates": [
+                            {
+                                "Name": "To Be Determined",
+                                "Level": 1,
+                                "TemplateId": 43296,
+                                "HasHeadMesh": false,
+                                "NpcFamily": 1,
+                                "Attackable": true,
+                                "KnuBotId": 1131,
+                                "Equipment": [[120912, 120912], [120915, 120915]],
+                                "LootTable": [{ "Hash": "AAAA", "Repeats": 1, "Chance": 100, "LevelMod": 25 }]
+                            },
+                            {
+                                "Name": "To Be Determined",
+                                "Level": 250,
+                                "TemplateId": 43296,
+                                "KnuBotId": 1131,
+                                "Equipment": [[120912, 120912], [120915, 120915]]
+                            }
+                        ]
+                    }
+                }
+                """);
+
+            Assert.IsTrue(catalog.TryResolve("AAAA", 25, out MobTemplate template));
+            Assert.AreEqual("AAAA", template.Hash);
+            Assert.AreEqual("To Be Determined", template.Name);
+            Assert.AreEqual(43296, template.TemplateId);
+            Assert.AreEqual(1, template.NpcFamily);
+            Assert.AreEqual(1131, template.KnuBotId);
+            Assert.IsTrue(template.Attackable);
+            Assert.AreEqual(1, template.MinLevel);
+            Assert.AreEqual(250, template.MaxLevel);
+            Assert.AreEqual(2, template.Equipment.Count);
+            CollectionAssert.AreEqual(new[] { 120912, 120912 }, template.Equipment[0]);
+            CollectionAssert.AreEqual(new[] { 120915, 120915 }, template.Equipment[1]);
+            Assert.AreEqual(1, template.ItemTable.Count);
+            Assert.AreEqual("AAAA", template.ItemTable[0].Hash);
+        }
+
+        [TestMethod]
+        public void MissingHashFallsBackToAaaa()
+        {
+            NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(
+                """
+                {
+                    "AAAA": {
+                        "Templates": [
+                            { "Name": "To Be Determined", "Level": 1 }
+                        ]
+                    }
+                }
+                """);
+
+            Assert.IsFalse(catalog.CanResolve("ZZZZ"));
+            Assert.IsTrue(catalog.TryResolve("ZZZZ", 1, out MobTemplate template));
+            Assert.AreEqual("AAAA", template.Hash);
+            Assert.AreEqual("To Be Determined", template.Name);
+        }
+
+        [TestMethod]
         public void LootTableMapsOntoItemTable()
         {
             NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(SampleJson);
