@@ -21,6 +21,8 @@ The incoming `.gitignore` entry `AORebirth/GameData/NpcTemplates.json` is retain
 
 The companion JSON receipt records file inventory, pinned source identities and final validation outcomes. Exact-source Windows acceptance must pass before master promotion. Disposable schema/restart checks include remaining-charge persistence followed by a location-only update and fresh reloads. Connected acceptance checks login, authenticated admission, inventory, reconnect and restart using synthetic protocol clients.
 
+The first exact-source run built successfully and identified the added nullable charge count as a public-contract baseline change. The approved Stage 2 generator updated only that property's metadata; Windows and Linux compatibility checks both pass against the regenerated contract.
+
 The isolated worktree uses 4,710 existing accepted playfield input files from the earlier AORebirth acceptance worktree. Each was SHA-256 verified during seeding; the local receipt is `build-verify/playfield-inputs.json`. These ignored geometry inputs and the absent NPC catalog are not added to Git.
 
 ## Remaining limits
