@@ -383,14 +383,12 @@ public sealed class PlayfieldTransferTests
             Set(world, "_pendingStatRebases", new ConcurrentDictionary<Character, byte>());
             Set(world, "_dynelRegistry", registry); Set(world, "_logger", logger); Set(world, "_playfieldManager", Manager);
             itemCatalog ??= new StubCatalog(); itemBuilder ??= new StubItemBuilder();
-            var accepted = new AcceptedNpcActivationService(world, registry, locality, itemBuilder, itemCatalog);
             var services = new ServiceCollection().AddSingleton(spawn).AddSingleton(registry).AddSingleton(locality)
                 .AddSingleton(Manager.Teams).AddSingleton(new WorldSimulationAccess())
                 .AddSingleton(new InventoryMoveService(logger, _flush, Blank<InventoryActionService>()))
                 .AddSingleton(_trades)
                 .AddSingleton(new AcceptedQuestPropService(world, registry, locality, new StubCatalog(), null!))
-                .AddSingleton(accepted)
-                .AddSingleton(new BucketheadSummonService(world, registry, locality, accepted, itemBuilder, itemCatalog, milliseconds))
+                .AddSingleton(new BucketheadSummonService(world, registry, locality, itemBuilder, itemCatalog, milliseconds))
                 .BuildServiceProvider();
             Set(world, "_serviceProvider", services);
             Set(spawn, "_registry", registry); Set(spawn, "_logger", logger); Set(spawn, "_playfield", world);

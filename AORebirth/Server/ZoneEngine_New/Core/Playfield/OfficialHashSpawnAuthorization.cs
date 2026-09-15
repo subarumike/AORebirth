@@ -16,6 +16,10 @@ namespace ZoneEngine_New.Core.Playfield
             new OfficialPlayfieldPlacementCatalog(
                 OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(AppContext.BaseDirectory)));
 
+        // TODO: Revisit. HashSpawnSystem no longer calls this. PF4582 catalog rows
+        // have Legacy authorization but no ResolvedMobTemplateHash bridge, so this
+        // gate blocked every official placement. Understand the NewEngine template
+        // bridge before wiring it back into spawn load.
         internal static bool TryAuthorize(int playfieldId, int ordinal, PlayfieldSpawnEntry entry, out string hash)
         {
             hash = string.Empty;

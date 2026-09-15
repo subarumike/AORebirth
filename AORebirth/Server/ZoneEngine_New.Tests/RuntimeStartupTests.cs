@@ -15,6 +15,8 @@ namespace ZoneEngine_New.Tests
         {
             RuntimeStartup.ValidateArguments(["/autostart", "/headless", "/shutdown-file", "shutdown.signal"]);
             RuntimeStartup.ValidateArguments(["--headless", "--shutdown-file", "/tmp/shutdown.signal"]);
+            RuntimeStartup.ValidateArguments(["/autostart", "--skip-playfield-package-pin"]);
+            RuntimeStartup.ValidateArguments(["/skip-playfield-package-pin"]);
         }
 
         [TestMethod]
@@ -25,6 +27,14 @@ namespace ZoneEngine_New.Tests
             Assert.ThrowsException<ArgumentException>(() => RuntimeStartup.ValidateArguments(["--shutdown-file", "--headless"]));
             Assert.ThrowsException<ArgumentException>(() => RuntimeStartup.ValidateArguments(["/headless", "--headless"]));
             Assert.ThrowsException<ArgumentException>(() => RuntimeStartup.ValidateArguments(["--validate-startup", "--validate-database"]));
+        }
+
+        [TestMethod]
+        public void SkipPlayfieldPackagePinIsExplicitOnly()
+        {
+            Assert.IsFalse(RuntimeStartup.SkipPlayfieldPackagePin([]));
+            Assert.IsTrue(RuntimeStartup.SkipPlayfieldPackagePin(["/autostart", "--skip-playfield-package-pin"]));
+            Assert.IsTrue(RuntimeStartup.SkipPlayfieldPackagePin(["/skip-playfield-package-pin"]));
         }
 
         [TestMethod]

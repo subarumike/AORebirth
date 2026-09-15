@@ -24,10 +24,10 @@ internal sealed class AcceptedQuestPropService(Playfield playfield, DynelRegistr
     {
         internal Identity Identity => new() { Type = IdentityType.Terminal, Instance = Instance };
     }
-    internal static IReadOnlyList<Definition> Definitions { get; } = Array.AsReadOnly(new[]
+    internal static IReadOnlyList<Definition> Definitions { get; } = Array.AsReadOnly(new Definition[]
     {
-        new Definition(StrongboxInstance, 295604, 3409.956f, 9.01f, 893.5452f, "20260720-goldman Merchant's Strongbox"),
-        new Definition(RemainsInstance, 295620, 3424.016f, 0.01011355f, 887.8564f, "20260721-sara Remains of Shop Thief")
+        new(StrongboxInstance, 295604, 3409.956f, 9.01f, 893.5452f, "20260720-goldman Merchant's Strongbox"),
+        new(RemainsInstance, 295620, 3424.016f, 0.01011355f, 887.8564f, "20260721-sara Remains of Shop Thief"),
     });
     readonly Dictionary<int, StaticDynel> _bindings = new();
     readonly Dictionary<int, string> _unavailable = new();

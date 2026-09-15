@@ -128,7 +128,7 @@ public sealed class BucketheadNanoTests
     {
         using var f = new Fixture();
         var unsupported = new BucketheadSummonService(f.Pf, f.Registry,
-            f.Pf.GetRequiredService<PlayfieldLocality>(), f.Pf.GetRequiredService<AcceptedNpcActivationService>(),
+            f.Pf.GetRequiredService<PlayfieldLocality>(),
             new StubItemBuilder(), new StubCatalog());
         Assert.IsFalse(unsupported.TryPrepare(f.Player, () => true, out _));
         Assert.IsTrue(f.Nanos.TryGet(300439, out var nano));

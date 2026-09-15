@@ -138,7 +138,6 @@ namespace ZoneEngine_New.Tests
                                 "Level": 1,
                                 "TemplateId": 43296,
                                 "HasHeadMesh": false,
-                                "NpcFamily": 1,
                                 "Attackable": true,
                                 "KnuBotId": 1131,
                                 "Equipment": [[120912, 120912], [120915, 120915]],
@@ -160,7 +159,6 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual("AAAA", template.Hash);
             Assert.AreEqual("To Be Determined", template.Name);
             Assert.AreEqual(43296, template.TemplateId);
-            Assert.AreEqual(1, template.NpcFamily);
             Assert.AreEqual(1131, template.KnuBotId);
             Assert.IsTrue(template.Attackable);
             Assert.AreEqual(1, template.MinLevel);

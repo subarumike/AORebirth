@@ -21,7 +21,7 @@ namespace ZoneEngine_New.Core.GameData
     /// Loads and caches the GameData tree from {BaseDirectory}\GameData.
     /// There is no path search. Missing root files log and degrade gracefully.
     /// </summary>
-    public sealed partial class GameDataStore : IGameData
+    public sealed class GameDataStore : IGameData
     {
         private static readonly JsonSerializerOptions CatalogJsonOptions = new()
         {
@@ -42,8 +42,6 @@ namespace ZoneEngine_New.Core.GameData
 
         private readonly Lock _playfieldSync = new();
         private readonly IZoneLogger _logger;
-        private readonly Dictionary<string, MobTemplate> _mobTemplates =
-            new(StringComparer.Ordinal);
         private NpcTemplateCatalog _npcTemplates = new(
             new Dictionary<string, string[]>(StringComparer.Ordinal),
             new Dictionary<string, NpcLeaf>(StringComparer.Ordinal));
@@ -77,8 +75,6 @@ namespace ZoneEngine_New.Core.GameData
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
 
             EnsureRootExists();
-            LoadNpcStatContent();
-            LoadMobTemplates();
             LoadNpcTemplates();
             LoadMonsterWeapons();
             LoadHashItems();
@@ -91,11 +87,7 @@ namespace ZoneEngine_New.Core.GameData
 
         public string PlayfieldsPath { get; }
 
-        public int MobTemplateCount => _mobTemplates.Count + _npcTemplates.LeafCount;
-
-        public int NpcFamilyStatTemplateCount => _npcFamilies.Count;
-
-        public int NpcStatTemplateCount => _npcOverlays.Count;
+        public int MobTemplateCount => _npcTemplates.LeafCount;
 
         public int HashTemplateCount => _hashItems.CategoryCount;
 
@@ -119,39 +111,31 @@ namespace ZoneEngine_New.Core.GameData
         }
 
         public bool CanResolveMobHash(string hash)
-            => _npcTemplates.CanResolve(hash)
-                || (!string.IsNullOrEmpty(hash) && _mobTemplates.ContainsKey(hash));
+            => _npcTemplates.CanResolve(hash);
 
         public bool TryGetMobTemplate(string hash, out MobTemplate template)
         {
             template = null!;
-            if (string.IsNullOrEmpty(hash))
+            if (string.IsNullOrEmpty(hash) || !_npcTemplates.TryGetLeaf(hash, out NpcLeaf leaf))
                 return false;
 
-            if (_mobTemplates.TryGetValue(hash, out template!)) return true;
-
-            if (_npcTemplates.TryGetLeaf(hash, out NpcLeaf leaf))
-            {
-                template = NpcTemplateCatalog.Materialize(leaf, leaf.MinLevel);
-                return true;
-            }
-
-            return _mobTemplates.TryGetValue(hash, out template!);
+            template = NpcTemplateCatalog.Materialize(leaf, leaf.MinLevel);
+            return true;
         }
 
         public bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template)
         {
-            if (!string.IsNullOrEmpty(hash) && _mobTemplates.TryGetValue(hash, out template!)) return true;
             if (_npcTemplates.CanResolve(hash))
                 return _npcTemplates.TryResolve(hash, level, out template);
 
-            if (string.IsNullOrEmpty(hash) || !_mobTemplates.TryGetValue(hash, out template!))
-            {
-                template = null!;
-                return false;
-            }
+            template = null!;
+            return false;
+        }
 
-            return true;
+        public Dictionary<int, int> ComposeNpcStats(MobTemplate template, int? level)
+        {
+            ArgumentNullException.ThrowIfNull(template);
+            return new Dictionary<int, int>(template.Stats);
         }
 
         public MobTemplate RequireMobTemplate(string hash)
@@ -165,15 +149,6 @@ namespace ZoneEngine_New.Core.GameData
                     "Mob template hash '{0}' not found",
                     hash));
         }
-
-        public bool TryGetNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
-            => _npcFamilies.TryGet(family, out template);
-
-        public bool TryResolveNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
-            => _npcFamilies.TryResolve(family, out template);
-
-        public bool TryGetNpcStatTemplate(int id, out NpcStatTemplate template)
-            => _npcOverlays.TryGet(id, out template);
 
         public bool TryGetMonsterWeapon(string hash, out int[] ids)
         {
@@ -341,83 +316,6 @@ namespace ZoneEngine_New.Core.GameData
 
         #region Catalog loads
 
-        private void LoadMobTemplates()
-        {
-            string path = Path.Combine(RootPath, GameDataPaths.MobTemplatesFileName);
-            if (!File.Exists(path))
-            {
-                _logger.Warn(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                          "MobTemplates.json not found at {0}; catalog empty",
-                        path));
-                return;
-            }
-
-            try
-            {
-                List<MobTemplate>? loaded =
-                    JsonSerializer.Deserialize<List<MobTemplate>>(File.ReadAllText(path), CatalogJsonOptions);
-                if (loaded == null)
-                {
-                    _logger.Warn(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "NpcTemplate.json was empty: {0}",
-                            path));
-                    return;
-                }
-
-                int skipped = 0;
-                foreach (MobTemplate template in loaded)
-                {
-                    if (string.IsNullOrEmpty(template.Hash))
-                    {
-                        skipped++;
-                        continue;
-                    }
-
-                    if (!_mobTemplates.TryAdd(template.Hash, template))
-                    {
-                        _logger.Warn(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "Duplicate mob template hash '{0}' skipped",
-                                template.Hash));
-                        skipped++;
-                        continue;
-                    }
-
-                    ValidateNpcStatRefs(template);
-                }
-
-                _logger.Info(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "GameData mob templates={0} from {1}",
-                        _mobTemplates.Count,
-                        path));
-
-                if (skipped > 0)
-                {
-                    _logger.Warn(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "GameData skipped {0} mob templates (empty or duplicate hash)",
-                            skipped));
-                }
-            }
-            catch (Exception exception)
-            {
-                _logger.Error(
-                    exception,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Failed to load NpcTemplate.json from {0}; catalog empty",
-                        path));
-            }
-        }
-
         private void LoadNpcTemplates()
         {
             string path = Path.Combine(RootPath, GameDataPaths.NpcTemplatesFileName);
@@ -503,66 +401,6 @@ namespace ZoneEngine_New.Core.GameData
                         "Failed to load MonsterWeapons.json from {0}; catalog empty",
                         path));
             }
-        }
-
-        /// <summary>
-        /// Surfaces mistakes a template can make about its family / overlay refs: naming one that
-        /// does not exist, and spawning outside the levels its curves actually cover.
-        /// </summary>
-        private void ValidateNpcStatRefs(MobTemplate template)
-        {
-            if (template.NpcFamily is not { } requestedFamily) return;
-            if (!_npcFamilies.TryResolve(requestedFamily, out NpcFamilyStatTemplate family))
-            {
-                _logger.Warn(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Mob template '{0}' references unknown NpcFamily {1} and default {2} is also missing; family curves will be skipped",
-                        template.Hash,
-                        requestedFamily,
-                        MobTemplate.DefaultNpcFamilyId));
-            }
-            else
-            {
-                if (family.Family != requestedFamily)
-                {
-                    _logger.Warn(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Mob template '{0}' references unknown NpcFamily {1}; using default {2}",
-                            template.Hash,
-                            requestedFamily,
-                            family.Family));
-                }
-
-                _npcFamilies.ValidateCoverage(
-                    family.Family,
-                    template.MinLevel,
-                    template.MaxLevel,
-                    template.Hash,
-                    _logger.Warn);
-            }
-
-            if (template.NpcStatTemplate == 0)
-                return;
-
-            if (!_npcOverlays.TryGet(template.NpcStatTemplate, out _))
-            {
-                _logger.Warn(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Mob template '{0}' references unknown NpcStatTemplate {1}; overlay curves will be skipped",
-                        template.Hash,
-                        template.NpcStatTemplate));
-                return;
-            }
-
-            _npcOverlays.ValidateCoverage(
-                template.NpcStatTemplate,
-                template.MinLevel,
-                template.MaxLevel,
-                template.Hash,
-                _logger.Warn);
         }
 
         private void LoadHashItems()

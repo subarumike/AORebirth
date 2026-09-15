@@ -259,7 +259,7 @@
       <Link>SqlTables\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!-- Full GameData tree (items.dat, MobTemplates, Playfields metadata/spawns). -->
+    <!-- Full GameData tree (items.dat, NpcTemplates, Playfields metadata/spawns). -->
     <Content Include="..\..\GameData\**\*">
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

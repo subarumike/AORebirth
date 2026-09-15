@@ -82,15 +82,16 @@ namespace ZoneEngine_New
                 if (HasArgument(args, "--validate-database"))
                     return CheckDatabase();
 
+                bool skipPlayfieldPackagePin = RuntimeStartup.SkipPlayfieldPackagePin(args);
                 if (HasArgument(args, "--validate-startup"))
                 {
-                    RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+                    RuntimeStartup.ValidatePackage(AppContext.BaseDirectory, skipPlayfieldPackagePin);
                     Console.WriteLine("ZONEENGINE_NEW_STARTUP_VALIDATION_OK");
                     return 0;
                 }
                 if (CheckDatabase() != 0)
                     return 2;
-                RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+                RuntimeStartup.ValidatePackage(AppContext.BaseDirectory, skipPlayfieldPackagePin);
 
                 if (!InitializeLogging())
                     return 1;

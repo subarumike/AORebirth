@@ -13,23 +13,22 @@ namespace ZoneEngine_New.Tests;
 public sealed class DelmusMergeIntegrationTests
 {
     [TestMethod]
-    public void MissingOptionalCatalogRetainsExistingTemplatesAndRejectsUnknownHashes()
+    public void MissingNpcTemplatesCatalogRejectsAllHashes()
     {
         string root = CreateRoot();
         var data = new GameDataStore(new StubLogger(), null, root);
-        Assert.IsTrue(data.TryResolveMobTemplate("KEEP", 5, out var existing));
-        Assert.AreEqual("Accepted", existing.Name);
-        Assert.AreEqual(5, data.ComposeNpcStats(existing, 5)[(int)CharacterStat.Level]);
+        Assert.AreEqual(0, data.MobTemplateCount);
+        Assert.IsFalse(data.TryResolveMobTemplate("KEEP", 5, out _));
         Assert.IsFalse(data.TryResolveMobTemplate("UNKNOWN", 5, out _));
     }
 
     [TestMethod]
-    public void OptionalCatalogAddsNewBandsWithoutReplacingExistingAcceptedHashes()
+    public void NpcTemplatesCatalogIsTheOnlyTemplateAndStatSource()
     {
         string root = CreateRoot();
         File.WriteAllText(Path.Combine(root, "NpcTemplates.json"), """
             {
-              "KEEP":{"Templates":[{"Level":5,"Name":"Replacement","Stats":{"54":5}}]},
+              "KEEP":{"Templates":[{"Level":5,"Name":"Accepted","Stats":{"54":5}}]},
               "NEW":{"Templates":[
                 {"Level":5,"Name":"New","Stats":{"54":5,"1":100}},
                 {"Level":15,"Name":"New","Stats":{"54":15,"1":200}}]}
@@ -39,6 +38,7 @@ public sealed class DelmusMergeIntegrationTests
         var data = new GameDataStore(new StubLogger(), null, root);
         Assert.IsTrue(data.TryResolveMobTemplate("KEEP", 5, out var existing));
         Assert.AreEqual("Accepted", existing.Name);
+        Assert.AreEqual(5, data.ComposeNpcStats(existing, 5)[(int)CharacterStat.Level]);
         Assert.IsTrue(data.TryResolveMobTemplate("NEW", 10, out var added));
         Assert.AreEqual(150, data.ComposeNpcStats(added, 10)[1]);
         Assert.AreEqual(10, data.ComposeNpcStats(added, 10)[(int)CharacterStat.Level]);
@@ -73,7 +73,6 @@ public sealed class DelmusMergeIntegrationTests
     {
         string root = Path.Combine(AppContext.BaseDirectory, "catalog-merge-fixtures", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
-        File.WriteAllText(Path.Combine(root, "MobTemplates.json"), "[{\"Hash\":\"KEEP\",\"Name\":\"Accepted\",\"Stats\":{\"54\":5}}]");
         return root;
     }
 }

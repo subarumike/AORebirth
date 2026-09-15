@@ -21,25 +21,9 @@ namespace AORebirth.Core.GameData
 
         public const string SpawnsFileName = "Spawns.json";
 
-        public const string NpcTemplateFileName = "NpcTemplate.json";
-
-        public const string MobTemplatesFileName = "MobTemplates.json";
-
         public const string NpcTemplatesFileName = "NpcTemplates.json";
 
         public const string MonsterWeaponsFileName = "MonsterWeapons.json";
-
-        /// <summary>
-        /// Family-level scaled stat curves. Referenced by MobTemplate.NpcFamily.
-        /// </summary>
-        public const string NpcFamilyStatTemplatesFileName = "NpcFamilyStatTemplates.json";
-
-        /// <summary>
-        /// Optional per-NPC overlay curves (NpcStatTemplate catalog) applied on top of the family.
-        /// Referenced by MobTemplate.NpcStatTemplate; zero means no overlay.
-        /// Named distinctly from NpcFamilyStatTemplates.json so Windows case-insensitive paths do not collide.
-        /// </summary>
-        public const string NpcStatTemplatesFileName = "NpcStatTemplateOverlays.json";
 
         public const string ItemTemplatesFileName = "ItemTemplates.json";
 

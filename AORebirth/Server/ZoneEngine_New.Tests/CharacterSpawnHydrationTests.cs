@@ -129,6 +129,17 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void Gm_characters_skip_stat_range_validation()
+        {
+            var values = ValidHydration().Stats.ToDictionary(
+                row => (CharacterStat)row.StatId, row => row.StatValue);
+            values[CharacterStat.GmLevel] = 1;
+            values[CharacterStat.Level] = 300;
+            Assert.IsTrue(CharacterHydrationValidator.Validate(Result(values)).IsValid);
+            Assert.IsFalse(CharacterHydrationValidator.Validate(With(ValidHydration(), CharacterStat.Level, 300)).IsValid);
+        }
+
+        [TestMethod]
         public void Every_missing_required_field_stops_actual_spawn_before_any_owner_or_wire_operation()
         {
             // No dependencies are initialized: reaching DAO/world/inventory means the guard failed.

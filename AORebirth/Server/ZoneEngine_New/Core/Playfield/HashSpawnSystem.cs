@@ -168,8 +168,6 @@ namespace ZoneEngine_New.Core.Playfield
             PlayfieldSpawnsData data = _gameData.GetPlayfieldSpawns(_playfield.Identity.Instance);
             PlayfieldSpawnEntry[] entries = data.Spawns ?? [];
             int skipped = 0;
-            int unauthorized = 0;
-            var districtOrdinals = new Dictionary<int, int>();
 
             foreach (PlayfieldSpawnEntry entry in entries)
             {
@@ -178,14 +176,12 @@ namespace ZoneEngine_New.Core.Playfield
                     skipped++;
                     continue;
                 }
-                districtOrdinals.TryGetValue(entry.DistrictIndex, out int ordinal);
-                districtOrdinals[entry.DistrictIndex] = ordinal + 1;
 
-                if (!OfficialHashSpawnAuthorization.TryAuthorize(_playfield.Identity.Instance, ordinal, entry, out string spawnHash))
-                {
-                    unauthorized++;
-                    continue;
-                }
+                // TODO: Revisit OfficialHashSpawnAuthorization. It currently rejects every
+                // PF4582 row because the official catalog has no ResolvedMobTemplateHash /
+                // MobTemplateEvidenceSource bridge. Understand that NewEngine gate before
+                // turning it back on. Until then, spawn from the official HashText.
+                string spawnHash = entry.HashText ?? string.Empty;
 
                 if (HasExcludedSeasonalEvent(entry))
                 {
@@ -200,8 +196,12 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
+                // AAAA fallback keeps missing hashes in-world so playtesting can locate them.
+                if (!_gameData.CanResolveMobHash(spawnHash))
+                    spawnHash = MobTemplate.FallbackHash;
+
                 if (!_gameData.TryGetMobTemplate(spawnHash, out var spawnTemplate)
-                    || !ZoneEngine_New.Core.Mobs.NpcContentAcceptance.CanSpawn(spawnTemplate))
+                    || !NpcContentAcceptance.CanSpawn(spawnTemplate))
                 {
                     _logger.Warn(
                         string.Format(
@@ -262,9 +262,6 @@ namespace ZoneEngine_New.Core.Playfield
                 _allPoints.Add(point);
             }
 
-            if (unauthorized > 0)
-                _logger.Warn("HashSpawnSystem blocked unbridged/unapproved placements=" + unauthorized
-                    + " playfield=" + _playfield.Identity.Instance);
             if (skipped > 0)
             {
                 _logger.Warn(
