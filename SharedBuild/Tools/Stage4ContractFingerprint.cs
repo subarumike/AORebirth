@@ -58,7 +58,7 @@ namespace AORebirth.SharedBuild
                 "AORebirth.Communication",
                 "MemBus",
                 "legacy-package=2.0.2.0",
-                "linux-shim=2.0.2.0",
+                "portable-shim=2.0.2.0",
                 "scope=IBus-identity-and-construction-only",
                 "behavior=inert-unobserved-bus");
             AddDefaultContracts(lines, communicationAssembly);

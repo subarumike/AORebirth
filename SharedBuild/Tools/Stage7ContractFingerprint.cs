@@ -84,7 +84,7 @@ namespace AORebirth.SharedBuild.Contracts
                 "dao=guarded-offline",
                 "authentication=state-gated",
                 "ownership=source-gated",
-                "shutdown-drain=linux-verified");
+                "shutdown-drain=private-build-gate");
             return NormalizeManifest(string.Join("\n", lines) + "\n");
         }
 

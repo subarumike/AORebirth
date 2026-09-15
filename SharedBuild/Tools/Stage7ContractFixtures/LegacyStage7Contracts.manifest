@@ -558,4 +558,4 @@ runtime.authentication-security|debug-encryption=enabled|disabled-bypass=fail-cl
 runtime.message-publisher-defense|same-sender=fifo|different-sender=concurrent|different-sender-overlap=2
 runtime.dispatch-ordering|adapter=MemBusAdapter|actual-handler=MessageReceivedHandler|same-sender=fifo|different-sender=concurrent|different-sender-overlap=2
 runtime.active-dispatch|publish=nonblocking|controlled-handlers=concurrent|controlled-executions=2|user-login=exactly-once|response=ServerSaltMessage|receiver=0x00002B3F|salt-shape=verified|exact-random-bytes=excluded
-safety|listeners=excluded|dao=guarded-offline|authentication=state-gated|ownership=source-gated|shutdown-drain=linux-verified
+safety|listeners=excluded|dao=guarded-offline|authentication=state-gated|ownership=source-gated|shutdown-drain=private-build-gate

@@ -597,7 +597,7 @@ protected.member|AORebirth.Communication.ISComV2Server.ISComV2Server|method%7Cpr
 protected.member|AORebirth.Communication.ISComV2Server.ISComV2Server|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7COnReceiveUDP%7CSystem.Int32 num_bytes,System.Byte[] buf,System.Net.IPEndPoint ip
 protected.member|AORebirth.Communication.ISComV2Server.ISComV2Server|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7COnSendTo%7CSystem.Net.IPEndPoint clientIP,System.Int32 num_bytes
 protected.member|AORebirth.Communication.ZoneComClient|method%7Cprotected%7Cinstance%7Cabstract=false%7Cvirtual=true%7Cfinal=false%7Cspecial=false%7CSystem.Void%7CDispose%7CSystem.Boolean disposing
-reference.mapping|AORebirth.Communication|MemBus|legacy-package=2.0.2.0|linux-shim=2.0.2.0|scope=IBus-identity-and-construction-only|behavior=inert-unobserved-bus
+reference.mapping|AORebirth.Communication|MemBus|legacy-package=2.0.2.0|portable-shim=2.0.2.0|scope=IBus-identity-and-construction-only|behavior=inert-unobserved-bus
 default.instance|AORebirth.Communication.Messages.ChatCommand|CharacterId=0;ChatCommandString=null
 default.instance|AORebirth.Communication.Messages.CpuRamLoad|CpuLoad=0x00000000;RamLoad=0x00000000
 default.instance|AORebirth.Communication.Messages.DynamicMessage|TypeName=null;DataObject=null
