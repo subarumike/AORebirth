@@ -29,7 +29,11 @@ namespace ZoneEngine_New.Core.GameData
 
         bool TryGetXpLevel(int level, out XpLevelEntry entry);
 
+        bool CanResolveMobHash(string hash);
+
         bool TryGetMobTemplate(string hash, out MobTemplate template);
+
+        bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template);
 
         MobTemplate RequireMobTemplate(string hash);
 
@@ -44,6 +48,8 @@ namespace ZoneEngine_New.Core.GameData
 
         /// <summary>Optional overlay curves on top of the family. False when unknown or zero.</summary>
         bool TryGetNpcStatTemplate(int id, out NpcStatTemplate template);
+
+        bool TryGetMonsterWeapon(string hash, out int[] ids);
 
         bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes);
 

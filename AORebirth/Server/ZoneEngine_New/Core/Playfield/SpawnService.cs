@@ -96,7 +96,15 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentException.ThrowIfNullOrEmpty(hash);
             ArgumentNullException.ThrowIfNull(position);
 
-            MobTemplate template = _gameData.RequireMobTemplate(hash);
+            if (!_gameData.TryResolveMobTemplate(hash, level, out MobTemplate template))
+            {
+                throw new KeyNotFoundException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Mob template hash '{0}' not found",
+                        hash));
+            }
+
             Identity identity = _registry.AllocateNpcIdentity();
             NpcCharacter npc = new NpcCharacter(identity, _items)
             {
@@ -119,8 +127,9 @@ namespace ZoneEngine_New.Core.Playfield
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
             ApplyTextures(npc, template);
+            npc.FillEquipment(_gameData, _logger);
             npc.Rebase();
-            TryAttachShop(npc, template);
+            TryAttachShop(npc);
             if (npc.Shop == null && npc.Attackable)
                 NpcBrain.Create(npc, position, NpcAiProfiles.Resolve(template.Hash));
 
@@ -162,8 +171,40 @@ namespace ZoneEngine_New.Core.Playfield
         /// equipment entry with both vendor price modifiers set, which is how the live templates mark
         /// the machine an NPC is standing behind.
         /// </summary>
-        void TryAttachShop(NpcCharacter npc, MobTemplate template)
+        void TryAttachShop(NpcCharacter npc)
         {
+            int last = npc.Equipment.Offset + npc.Equipment.Capacity;
+            for (int slot = npc.Equipment.Offset; slot < last; slot++)
+            {
+                if (!npc.Equipment.Content.TryGetValue(slot, out Item? item) || item == null)
+                    continue;
+                if (!IsShopItem(item.Definition))
+                    continue;
+
+                var machine = new VendingMachine(_registry.AllocateVendingMachineIdentity(), item.Definition)
+                {
+                    Playfield = _playfield,
+                    Position = npc.Position,
+                    Rotation = npc.Rotation,
+                    SpawnSource = SpawnSource.None
+                };
+                npc.AttachShop(machine);
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Attached shop to NPC id={0} name={1} shopTemplate={2} machine={3}",
+                        npc.Identity.Instance,
+                        npc.Name,
+                        item.Definition.Id,
+                        machine.Identity.Instance));
+                return;
+            }
+
+            MobTemplate? template = npc.MobTemplate;
+            if (template == null)
+                return;
+
             List<List<int>> equipment = template.Equipment;
             for (int i = 0; i < equipment.Count; i++)
             {

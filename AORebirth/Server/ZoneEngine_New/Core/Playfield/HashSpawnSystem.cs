@@ -99,8 +99,6 @@ namespace ZoneEngine_New.Core.Playfield
     /// </summary>
     public sealed class HashSpawnSystem
     {
-        private const string FallbackMobHash = "AAAA";
-
         /// <summary>Cap catch-up chance rolls so long sleep cannot explode roll count.</summary>
         private const int MaxCatchUpRolls = 64;
 
@@ -193,29 +191,16 @@ namespace ZoneEngine_New.Core.Playfield
                 }
 
                 string spawnHash = hashText;
-                if (!_gameData.TryGetMobTemplate(hashText, out _))
+                if (!_gameData.CanResolveMobHash(hashText))
                 {
-                    if (!_gameData.TryGetMobTemplate(FallbackMobHash, out _))
-                    {
-                        _logger.Warn(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                "Hash spawn skipped missing mob template hash={0} and fallback={1} playfield={2}",
-                                hashText,
-                                FallbackMobHash,
-                                _playfield.Identity.Instance));
-                        skipped++;
-                        continue;
-                    }
-
                     _logger.Warn(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "Hash spawn missing mob template hash={0}; using fallback={1} playfield={2}",
+                            "Hash spawn skipped missing npc template hash={0} playfield={1}",
                             hashText,
-                            FallbackMobHash,
                             _playfield.Identity.Instance));
-                    spawnHash = FallbackMobHash;
+                    skipped++;
+                    continue;
                 }
 
                 if (entry.Position == null || entry.Position.Length < 3)

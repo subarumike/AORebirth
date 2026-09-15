@@ -25,7 +25,8 @@ namespace ZoneEngine_New.Core.Mobs
     }
 
     /// <summary>
-    /// Full NPC template as stored in GameData/NpcTemplate.json.
+    /// Resolved NPC template used at spawn. Loaded from NpcTemplate.json or materialized from
+    /// NpcTemplates.json.
     /// </summary>
     public sealed class MobTemplate
     {

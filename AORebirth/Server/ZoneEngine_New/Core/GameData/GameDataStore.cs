@@ -44,6 +44,11 @@ namespace ZoneEngine_New.Core.GameData
         private readonly IZoneLogger _logger;
         private readonly Dictionary<string, MobTemplate> _mobTemplates =
             new(StringComparer.Ordinal);
+        private NpcTemplateCatalog _npcTemplates = new(
+            new Dictionary<string, string[]>(StringComparer.Ordinal),
+            new Dictionary<string, NpcLeaf>(StringComparer.Ordinal));
+        private readonly Dictionary<string, int[]> _monsterWeapons =
+            new(StringComparer.Ordinal);
         private NpcFamilyStatCatalog _npcFamilies = NpcFamilyStatCatalog.Empty;
         private NpcStatTemplateCatalog _npcStatTemplates = NpcStatTemplateCatalog.Empty;
         private HashItemCatalog _hashItems = new(
@@ -72,6 +77,8 @@ namespace ZoneEngine_New.Core.GameData
             LoadNpcFamilyStatTemplates();
             LoadNpcStatTemplates();
             LoadMobTemplates();
+            LoadNpcTemplates();
+            LoadMonsterWeapons();
             LoadHashItems();
             LoadVendingMachines();
             LoadMonsterData();
@@ -82,7 +89,7 @@ namespace ZoneEngine_New.Core.GameData
 
         public string PlayfieldsPath { get; }
 
-        public int MobTemplateCount => _mobTemplates.Count;
+        public int MobTemplateCount => _mobTemplates.Count + _npcTemplates.LeafCount;
 
         public int NpcFamilyStatTemplateCount => _npcFamilies.Count;
 
@@ -109,20 +116,42 @@ namespace ZoneEngine_New.Core.GameData
             return _xpLevels.TryGetValue(level, out entry!);
         }
 
+        public bool CanResolveMobHash(string hash)
+            => _npcTemplates.CanResolve(hash)
+                || (!string.IsNullOrEmpty(hash) && _mobTemplates.ContainsKey(hash));
+
         public bool TryGetMobTemplate(string hash, out MobTemplate template)
         {
+            template = null!;
             if (string.IsNullOrEmpty(hash))
-            {
-                template = null!;
                 return false;
+
+            if (_npcTemplates.TryGetLeaf(hash, out NpcLeaf leaf))
+            {
+                template = NpcTemplateCatalog.Materialize(leaf, leaf.MinLevel);
+                return true;
             }
 
             return _mobTemplates.TryGetValue(hash, out template!);
         }
 
+        public bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template)
+        {
+            if (_npcTemplates.CanResolve(hash))
+                return _npcTemplates.TryResolve(hash, level, out template);
+
+            if (string.IsNullOrEmpty(hash) || !_mobTemplates.TryGetValue(hash, out template!))
+            {
+                template = null!;
+                return false;
+            }
+
+            return true;
+        }
+
         public MobTemplate RequireMobTemplate(string hash)
         {
-            if (TryGetMobTemplate(hash, out MobTemplate template))
+            if (TryResolveMobTemplate(hash, null, out MobTemplate template))
                 return template;
 
             throw new KeyNotFoundException(
@@ -140,6 +169,18 @@ namespace ZoneEngine_New.Core.GameData
 
         public bool TryGetNpcStatTemplate(int id, out NpcStatTemplate template)
             => _npcStatTemplates.TryGet(id, out template);
+
+        public bool TryGetMonsterWeapon(string hash, out int[] ids)
+        {
+            if (string.IsNullOrEmpty(hash) || !_monsterWeapons.TryGetValue(hash, out int[]? found))
+            {
+                ids = [];
+                return false;
+            }
+
+            ids = found;
+            return ids.Length > 0;
+        }
 
         public bool TryGetHashTemplate(string hash, out IReadOnlyList<string> childHashes)
             => _hashItems.TryGetCategory(hash, out childHashes);
@@ -447,6 +488,93 @@ namespace ZoneEngine_New.Core.GameData
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Failed to load NpcTemplate.json from {0}; catalog empty",
+                        path));
+            }
+        }
+
+        private void LoadNpcTemplates()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.NpcTemplatesFileName);
+            if (!File.Exists(path))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "NpcTemplates.json not found at {0}; catalog empty",
+                        path));
+                return;
+            }
+
+            try
+            {
+                _npcTemplates = NpcTemplateCatalog.Parse(File.ReadAllText(path));
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData npc templates leaves={0} families={1} from {2}",
+                        _npcTemplates.LeafCount,
+                        _npcTemplates.FamilyCount,
+                        path));
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load NpcTemplates.json from {0}; catalog empty",
+                        path));
+            }
+        }
+
+        private void LoadMonsterWeapons()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.MonsterWeaponsFileName);
+            if (!File.Exists(path))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "MonsterWeapons.json not found at {0}; catalog empty",
+                        path));
+                return;
+            }
+
+            try
+            {
+                Dictionary<string, int[]>? loaded =
+                    JsonSerializer.Deserialize<Dictionary<string, int[]>>(File.ReadAllText(path), CatalogJsonOptions);
+                if (loaded == null)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "MonsterWeapons.json was empty: {0}",
+                            path));
+                    return;
+                }
+
+                foreach (KeyValuePair<string, int[]> pair in loaded)
+                {
+                    if (string.IsNullOrEmpty(pair.Key) || pair.Value == null || pair.Value.Length == 0)
+                        continue;
+                    _monsterWeapons[pair.Key] = pair.Value;
+                }
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData monster weapons={0} from {1}",
+                        _monsterWeapons.Count,
+                        path));
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load MonsterWeapons.json from {0}; catalog empty",
                         path));
             }
         }

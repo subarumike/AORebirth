@@ -743,36 +743,11 @@ namespace ZoneEngine_New.Core.Inventory
             if (!IsHydrated)
                 return;
 
-            ApplyWearPage(Equipment, includeWield: true, stats);
-            ApplyWearPage(Armor, includeWield: false, stats);
-            ApplyWearPage(Implant, includeWield: false, stats);
-            ApplyWearPage(Social, includeWield: false, stats);
+            WearBonusApplier.ApplyContainer(Equipment, includeWield: true, stats);
+            WearBonusApplier.ApplyContainer(Armor, includeWield: false, stats);
+            WearBonusApplier.ApplyContainer(Implant, includeWield: false, stats);
+            WearBonusApplier.ApplyContainer(Social, includeWield: false, stats);
         }
-
-        static void ApplyWearPage(Container page, bool includeWield, StatCollection stats)
-        {
-            int last = page.Offset + page.Capacity;
-            for (int slot = page.Offset; slot < last; slot++)
-            {
-                if (!page.Content.TryGetValue(slot, out Item? item) || item?.Definition == null)
-                    continue;
-
-                ApplyWearItem(item, includeWield, stats);
-            }
-        }
-
-        static void ApplyWearItem(Item item, bool includeWield, StatCollection stats)
-        {
-            Dictionary<EventType, List<ItemSpell>> spells = item.SpellList;
-            if (spells.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
-                ApplyWearSpells(wear, stats);
-
-            if (includeWield && spells.TryGetValue(EventType.OnWield, out List<ItemSpell>? wield))
-                ApplyWearSpells(wield, stats);
-        }
-
-        static void ApplyWearSpells(List<ItemSpell> spells, StatCollection stats)
-            => StatModifierSpells.Apply(spells, stats);
 
         public IEnumerable<InventorySlot> BuildInventorySlots()
         {

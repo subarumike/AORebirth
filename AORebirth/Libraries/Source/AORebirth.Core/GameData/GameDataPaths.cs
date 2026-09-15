@@ -23,6 +23,10 @@ namespace AORebirth.Core.GameData
 
         public const string NpcTemplateFileName = "NpcTemplate.json";
 
+        public const string NpcTemplatesFileName = "NpcTemplates.json";
+
+        public const string MonsterWeaponsFileName = "MonsterWeapons.json";
+
         /// <summary>
         /// Family-level scaled stat curves. Referenced by MobTemplate.NpcFamily.
         /// </summary>

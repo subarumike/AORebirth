@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Entities
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     using AORebirth.Enums;
 
@@ -10,7 +11,9 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Ai;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Trade;
@@ -20,6 +23,8 @@ namespace ZoneEngine_New.Core.Entities
     /// </summary>
     public class NpcCharacter : Character, IUsableDynel
     {
+        public const int EquipmentCapacity = 50;
+
         readonly IItemBuilder _items;
 
         public NpcCharacter(Identity identity, IItemBuilder items)
@@ -27,10 +32,14 @@ namespace ZoneEngine_New.Core.Entities
         {
             ArgumentNullException.ThrowIfNull(items);
             _items = items;
+            Equipment = new Container(IdentityType.WeaponPage, offset: 0, capacity: EquipmentCapacity, instanceId: identity.Instance);
         }
 
         /// <summary>Source mob template when this NPC was spawned from GameData mob templates.</summary>
         public MobTemplate? MobTemplate { get; set; }
+
+        /// <summary>Interpolated worn items and expanded monster weapons. Capacity 50.</summary>
+        public Container Equipment { get; }
 
         /// <summary>False for vendors and other non-combat NPCs.</summary>
         public bool Attackable { get; set; } = true;
@@ -199,6 +208,165 @@ namespace ZoneEngine_New.Core.Entities
             Motor.ClearPath();
         }
 
+        /// <summary>
+        /// Mints template equipment at this NPC's level and expands EquipMonsterWeapon hashes.
+        /// Call after stats are applied and before <see cref="Rebase"/>.
+        /// </summary>
+        public void FillEquipment(IGameData gameData, IZoneLogger? logger = null)
+        {
+            ArgumentNullException.ThrowIfNull(gameData);
+
+            MobTemplate? template = MobTemplate;
+            if (template == null)
+                return;
+
+            int quality = Stats.GetOrOne(CharacterStat.Level);
+            List<List<int>> pairs = template.Equipment;
+            for (int i = 0; i < pairs.Count; i++)
+            {
+                List<int> pair = pairs[i];
+                if (pair == null || pair.Count < 1 || pair[0] <= 0)
+                    continue;
+
+                int lowId = pair[0];
+                int highId = pair.Count >= 2 && pair[1] > 0 ? pair[1] : lowId;
+                Item item = _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other);
+                if (!TryAddEquipment(item, logger))
+                    return;
+
+                TryExpandMonsterWeapon(gameData, item, quality, logger);
+            }
+        }
+
+        void TryExpandMonsterWeapon(IGameData gameData, Item item, int quality, IZoneLogger? logger)
+        {
+            if ((ItemClass)item.GetStat(CharacterStat.ItemClass) != ItemClass.Npc)
+                return;
+            if (!TryFindEquipMonsterWeaponHash(item, out string weaponHash))
+                return;
+            if (!gameData.TryGetMonsterWeapon(weaponHash, out int[] ids))
+            {
+                logger?.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Monster weapon hash '{0}' not found for NPC id={1}",
+                        weaponHash,
+                        Identity.Instance));
+                return;
+            }
+
+            int lowId = ids[0];
+            int highId = ids.Length >= 2 && ids[1] > 0 ? ids[1] : lowId;
+            if (lowId <= 0)
+                return;
+
+            TryAddEquipment(_items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other), logger);
+        }
+
+        bool TryAddEquipment(Item item, IZoneLogger? logger)
+        {
+            int slot = Equipment.FindFreeSlot();
+            if (slot < 0)
+            {
+                logger?.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "NPC equipment full id={0} capacity={1}",
+                        Identity.Instance,
+                        Equipment.Capacity));
+                return false;
+            }
+
+            return Equipment.Add(slot, item);
+        }
+
+        internal static bool TryFindEquipMonsterWeaponHash(Item item, out string hash)
+        {
+            hash = string.Empty;
+            foreach (KeyValuePair<EventType, List<ItemSpell>> pair in item.SpellList)
+            {
+                List<ItemSpell>? spells = pair.Value;
+                if (spells == null)
+                    continue;
+
+                for (int i = 0; i < spells.Count; i++)
+                {
+                    ItemSpell spell = spells[i];
+                    if ((FunctionType)spell.FunctionType != FunctionType.EquipMonsterWeapon)
+                        continue;
+                    if (TryReadAoHash(spell.Arguments, out hash))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        static bool TryReadAoHash(List<object> arguments, out string hash)
+        {
+            hash = string.Empty;
+            if (arguments == null)
+                return false;
+
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                object argument = arguments[i];
+                if (argument is string text && text.Length > 0)
+                {
+                    hash = text;
+                    return true;
+                }
+
+                if (!TryGetInt(argument, out int packed))
+                    continue;
+                if (!TryDecodeAoHash(packed, out hash))
+                    continue;
+                return true;
+            }
+
+            return false;
+        }
+
+        static bool TryGetInt(object? value, out int result)
+        {
+            switch (value)
+            {
+                case int i:
+                    result = i;
+                    return true;
+                case long l:
+                    result = (int)l;
+                    return true;
+                case uint u:
+                    result = (int)u;
+                    return true;
+                default:
+                    result = 0;
+                    return false;
+            }
+        }
+
+        static bool TryDecodeAoHash(int packed, out string hash)
+        {
+            char a = (char)((packed >> 24) & 0xFF);
+            char b = (char)((packed >> 16) & 0xFF);
+            char c = (char)((packed >> 8) & 0xFF);
+            char d = (char)(packed & 0xFF);
+            if (!IsHashChar(a) || !IsHashChar(b) || !IsHashChar(c) || !IsHashChar(d))
+            {
+                hash = string.Empty;
+                return false;
+            }
+
+            hash = string.Concat(a, b, c, d);
+            return true;
+        }
+
+        static bool IsHashChar(char value)
+            => (value >= 'A' && value <= 'Z')
+                || (value >= 'a' && value <= 'z')
+                || (value >= '0' && value <= '9');
+
         public override void Rebase()
         {
             RebaseStats();
@@ -207,8 +375,8 @@ namespace ZoneEngine_New.Core.Entities
 
         public override void RebaseStats()
         {
-            // NPCs carry no equipment bonuses, so buffs own the whole bonus layer.
             Stats.ClearBonuses(dirty: true);
+            WearBonusApplier.ApplyContainer(Equipment, includeWield: true, Stats);
             ApplyBuffBonuses();
         }
 
@@ -220,8 +388,9 @@ namespace ZoneEngine_New.Core.Entities
             int armed = 0;
             bool maCombined = false;
 
-            // Prefer template Weapons (LowId/HighId/Hash). Fall back to Equipment (no SAW hash).
-            if (!TryArmNpcWeapons(MobTemplate?.Weapons, quality, ref armed, ref maCombined))
+            // Prefer template Weapons (LowId/HighId/Hash). Then filled equipment, then template IDs.
+            if (!TryArmNpcWeapons(MobTemplate?.Weapons, quality, ref armed, ref maCombined)
+                && !TryArmFromEquipmentContainer(ref armed, ref maCombined))
                 TryArmNpcEquipment(MobTemplate?.Equipment, quality, ref armed, ref maCombined);
 
             if (armed == 0)
@@ -234,6 +403,31 @@ namespace ZoneEngine_New.Core.Entities
                 ArmMartialArtsFist(_items, WeaponSlot.CombinedMA);
 
             ResetAllWeaponAttacks();
+        }
+
+        bool TryArmFromEquipmentContainer(ref int armed, ref bool maCombined)
+        {
+            if (Equipment.Content.Count == 0)
+                return false;
+
+            bool armedAny = false;
+            int last = Equipment.Offset + Equipment.Capacity;
+            for (int slot = Equipment.Offset; slot < last && armed < MaxNpcCombatWeapons; slot++)
+            {
+                if (!Equipment.Content.TryGetValue(slot, out Item? item) || item == null)
+                    continue;
+                if (!item.IsWieldableCombatWeapon())
+                    continue;
+
+                WeaponSlot hand = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
+                ArmFromItem(hand, item, wireSlot: armed);
+                armed++;
+                armedAny = true;
+                if (item.IsMaCombinedWeapon())
+                    maCombined = true;
+            }
+
+            return armedAny;
         }
 
         bool TryArmNpcWeapons(

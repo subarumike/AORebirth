@@ -30,16 +30,22 @@ namespace ZoneEngine_New.Tests
     {
         readonly HashItemCatalog _hashItems;
         readonly Dictionary<int, VendingMachineDefinition> _machines;
+        readonly Dictionary<string, int[]> _monsterWeapons;
+        readonly string _rootPath;
 
         public StubGameData(
             HashItemCatalog hashItems,
-            Dictionary<int, VendingMachineDefinition>? machines = null)
+            Dictionary<int, VendingMachineDefinition>? machines = null,
+            Dictionary<string, int[]>? monsterWeapons = null,
+            string? rootPath = null)
         {
             _hashItems = hashItems;
             _machines = machines ?? new Dictionary<int, VendingMachineDefinition>();
+            _monsterWeapons = monsterWeapons ?? new Dictionary<string, int[]>(StringComparer.Ordinal);
+            _rootPath = rootPath ?? string.Empty;
         }
 
-        public string RootPath => string.Empty;
+        public string RootPath => _rootPath;
 
         public int MobTemplateCount => 0;
 
@@ -72,7 +78,11 @@ namespace ZoneEngine_New.Tests
 
         public bool TryGetXpLevel(int level, out XpLevelEntry entry) => throw new NotSupportedException();
 
+        public bool CanResolveMobHash(string hash) => throw new NotSupportedException();
+
         public bool TryGetMobTemplate(string hash, out MobTemplate template) => throw new NotSupportedException();
+
+        public bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template) => throw new NotSupportedException();
 
         public MobTemplate RequireMobTemplate(string hash) => throw new NotSupportedException();
 
@@ -92,6 +102,18 @@ namespace ZoneEngine_New.Tests
         {
             template = null!;
             return false;
+        }
+
+        public bool TryGetMonsterWeapon(string hash, out int[] ids)
+        {
+            if (string.IsNullOrEmpty(hash) || !_monsterWeapons.TryGetValue(hash, out int[]? found))
+            {
+                ids = [];
+                return false;
+            }
+
+            ids = found;
+            return ids.Length > 0;
         }
 
         public bool TryGetCatMesh(int monsterData, out int catMesh) => throw new NotSupportedException();
