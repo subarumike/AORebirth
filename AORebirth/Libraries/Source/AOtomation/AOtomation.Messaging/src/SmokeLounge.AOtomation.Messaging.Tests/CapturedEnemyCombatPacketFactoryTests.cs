@@ -877,21 +877,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             const int wifuSourceIdentity = unchecked((int)0x7954512E);
             const int attackSourceIdentity = unchecked((int)0x798037CF);
             const int defenderIdentity = unchecked((int)0x7944C065);
-            string production = LegacyGameplaySource.ReadAllText(Path.Combine(
-                FindRepositoryRoot(),
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
-
-            Assert.IsTrue(
-                production.Contains("case 203744:")
-                && production.Contains("StrikeForeman(level.Value)")
-                && production.Contains(
-                    "subway-strike-foreman-122767-equipped-level-bounded-v1")
-                && production.Contains(
-                    ".WithProductionEquippedWeaponValues()")
-                && production.Contains(".WithProductionWeaponQuality()")
-                && production.Contains(
-                    ".WithProductionActorValuesForPresentationWeapon()"),
-                "The production selector must bind Strike Foreman to the exact categorical contract while leaving item-derived values with production.");
 
             CapturedEnemyWeaponDefinition weaponDefinition =
                 StrikeForemanWeaponDefinition();
@@ -1626,18 +1611,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 stream.WeaponInstance,
                 stream.N3Unknown);
             Assert.AreEqual(0, attackInfo.Unknown2);
-
-            string runtime = LegacyGameplaySource.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    "AORebirth",
-                    "Server",
-                    "ZoneEngine",
-                    "Core",
-                    "Playfields",
-                    "CapturedEnemyCombatContract.cs"));
-            Assert.IsTrue(runtime.Contains("if (energy == 0)"));
-            Assert.IsFalse(runtime.Contains("currentEnergy != -1 && currentEnergy <= 0"));
         }
 
         [TestMethod]
@@ -3011,208 +2984,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void SharedRuntimeOwnsCapturedPacketSemanticsAndSyntheticHitChatIsAbsent()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string coreDirectory = Path.Combine(
-                repositoryRoot,
-                "AORebirth",
-                "Server",
-                "ZoneEngine",
-                "Core");
-            string coordinator = File.ReadAllText(
-                Path.Combine(
-                    coreDirectory,
-                    "Playfields",
-                    "NpcCombatTickCoordinator.cs"));
             string characterCombat = File.ReadAllText(
                 Path.Combine(
-                    coreDirectory,
-                    "Entities",
-                    "Character.Combat.cs"));
-            string visibility = File.ReadAllText(
-                Path.Combine(
-                    coreDirectory,
-                    "Packets",
-                    "WeaponItemFullUpdate.cs"));
-            string functionHit = File.ReadAllText(
-                Path.Combine(
-                    coreDirectory,
-                    "Functions",
-                    "GameFunctions",
-                    "hit.cs"));
-            string templeCatalog = File.ReadAllText(
-                Path.Combine(
-                    coreDirectory,
-                    "Playfields",
-                    "CapturedTempleOfThreeWindsCombatCatalog.cs"));
-            string marcus = File.ReadAllText(
-                Path.Combine(
-                    coreDirectory,
-                    "Playfields",
-                    "MarcusPadAmbientCombat.cs"));
-            string contractRuntime = LegacyGameplaySource.ReadAllText(
-                Path.Combine(
-                    coreDirectory,
-                    "Playfields",
-                    "CapturedEnemyCombatContract.cs"));
-            string npcRuntime = File.ReadAllText(
-                Path.Combine(
-                    coreDirectory,
-                    "Playfields",
-                    "NPCRuntimeService.cs"));
-            string resetTickRuntime = SourceSection(
-                coordinator,
-                "internal void ResetCombatTick(ICharacter attacker)",
-                "internal void ClearTracking(Identity identity)");
-            string processTickRuntime = SourceSection(
-                coordinator,
-                "internal void ProcessCombatTick(ICharacter attacker)",
-                "private bool TryApplyCapturedWeaponAmmo(");
-            string acquireAggroRuntime = SourceSection(
-                npcRuntime,
-                "private void AcquireAggro(",
-                "internal void ForceTauntAggro(ICharacter taunter, ICharacter target)");
-            string forceTauntRuntime = SourceSection(
-                npcRuntime,
-                "internal void ForceTauntAggro(ICharacter taunter, ICharacter target)",
-                "internal void ProcessPatrolTick(ICharacter character)");
-            string[] otherImplementedHostileEntryPoints =
-            {
-                Path.Combine(coreDirectory, "Missions", "MissionInstanceMobCombat.cs"),
-                Path.Combine(coreDirectory, "Playfields", "AlexAreaMobRuntime.cs"),
-                Path.Combine(coreDirectory, "Playfields", "AreteFinishCaptureMobRuntime.cs"),
-                Path.Combine(coreDirectory, "Playfields", "CapturedAreteRobotSpawnOrchestrator.cs"),
-                Path.Combine(coreDirectory, "Playfields", "CapturedSubwayVendorRuntimeService.cs"),
-                Path.Combine(coreDirectory, "Playfields", "JunkyardCleaningRobotRuntime.cs"),
-                Path.Combine(coreDirectory, "Playfields", "NascenceCoreHecklerSpawnOrchestrator.cs"),
-                Path.Combine(coreDirectory, "Playfields", "NascenceLifeSpawn.cs"),
-                Path.Combine(coreDirectory, "Playfields", "LoreleiOasisMobRuntime.cs"),
-                Path.Combine(coreDirectory, "Playfields", "MarcusPadAmbientCombat.cs"),
-                Path.Combine(coreDirectory, "Playfields", "RomeBlueCitySpawn.cs"),
-                Path.Combine(coreDirectory, "Playfields", "ThrakOmniGardenSpawn.cs"),
-                Path.Combine(coreDirectory, "Thrak", "Quests", "ThrakGardenKeySilvertailTransform.cs")
-            };
-            string[] combatSources = LegacyGameplaySource.LogicalPaths(Directory.GetFiles(
-                coreDirectory,
-                "*.cs",
-                SearchOption.AllDirectories));
-            string[] sourceOwnedWeaponCallers = combatSources.Where(
-                path => LegacyGameplaySource.ReadAllText(path).Contains(".WithCapturedWeapon(")).ToArray();
-
-            Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon("));
-            Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateAttack("));
-            Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo("));
-            Assert.IsTrue(
-                coordinator.Contains(
-                    "strikeContext.LethalAttackInfoUnknown = attackSource.LethalAttackInfoUnknown;"));
-            Assert.IsTrue(
-                coordinator.Contains(
-                    "strikeContext.AttackInfoUnknown = attackSource.AttackInfoUnk1;"));
-            Assert.IsTrue(
-                coordinator.Contains(
-                    "strikeContext.AttackInfoN3Unknown = attackSource.AttackInfoN3Unknown;"));
+                    repositoryRoot,
+                    @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs"));
             Assert.IsTrue(
                 characterCombat.Contains(
                     "killingHit && context.LethalAttackInfoUnknown.HasValue")
                 && characterCombat.Contains("context.LethalAttackInfoUnknown.Value")
                 && characterCombat.Contains("context.PreserveAttackInfoWireValues")
                 && characterCombat.Contains("context.AttackInfoHitType"));
-            Assert.IsTrue(coordinator.Contains("CreateCapturedCleaningRobotSpecialAttacks(),"));
-            Assert.IsTrue(visibility.Contains("CapturedEnemyCombatPacketFactory.CreateWeaponDefinition("));
-            Assert.IsTrue(visibility.Contains("item.MultipleCount"));
-            Assert.IsFalse(coordinator.Contains("SendIncomingHitChatIfPlayer"));
-            Assert.IsFalse(coordinator.Contains("new ChatTextMessage"));
-            Assert.IsFalse(templeCatalog.Contains("new AttackInfoMessage"));
-            Assert.IsFalse(templeCatalog.Contains("new AttackMessage"));
-            Assert.IsFalse(templeCatalog.Contains("new SpecialAttackWeaponMessage"));
-            Assert.IsTrue(marcus.Contains("CapturedEnemyCombatContract.CapturedSpecialSequence("));
-            Assert.IsTrue(contractRuntime.Contains("case CapturedEnemyAttackModel.FixedAttackInfo:"));
-            Assert.IsTrue(contractRuntime.Contains("controller.AiProfile = NpcAiProfile.Passive;"));
-            Assert.IsTrue(contractRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Register(character.Identity.Instance, contract);"));
-            Assert.IsTrue(contractRuntime.Contains("TryGetCapturedWeaponEnergy"));
-            Assert.IsTrue(contractRuntime.Contains("HasCapturedRequiredPacketFields"));
-            Assert.IsTrue(coordinator.Contains("&& !registeredCapturedContract.IsCombatReady"));
-            Assert.IsFalse(coordinator.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
-            Assert.IsTrue(resetTickRuntime.Contains("this.ClearTracking(attacker.Identity);"));
-            Assert.IsFalse(resetTickRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
-            Assert.IsTrue(processTickRuntime.Contains("this.playfield.ClearNpcCombatTracking(attacker.Identity);"));
-            Assert.IsFalse(processTickRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
-            Assert.IsTrue(coordinator.Contains("required captured weapon is missing from the live inventory"));
-            Assert.IsTrue(coordinator.Contains("if (movementAttackSource == null)"));
-            Assert.IsTrue(coordinator.Contains("if (attackSource == null)"));
-            Assert.IsTrue(coordinator.Contains("!capturedContract.MatchesCapturedWeapon(weapon)"));
-            Assert.IsTrue(coordinator.Contains("captured weapon Energy is exhausted or unavailable"));
-            Assert.IsTrue(coordinator.Contains("ValidateRequiredCapturedWeapon("));
-            Assert.IsTrue(visibility.Contains("TryGetCapturedWeaponEnergy("));
-            Assert.IsTrue(visibility.Contains("CapturedEnemyCombatRuntimeRegistry.QuarantineRuntime("));
-            Assert.IsTrue(visibility.Contains("CapturedEnemyCombatRuntime.TryValidateLiveCapturedWeapon("));
-            Assert.IsTrue(contractRuntime.Contains("internal bool MatchesCapturedWeapon(IItem item)"));
-            Assert.IsTrue(contractRuntime.Contains("TryGetCapturedWeaponItem"));
-            Assert.IsTrue(contractRuntime.Contains("ReferenceEquals(item, registeredItem)"));
-            Assert.IsTrue(contractRuntime.Contains("if (energy == 0)"));
-            Assert.IsTrue(contractRuntime.Contains("if (currentEnergy < -1"));
-            Assert.IsFalse(contractRuntime.Contains("currentEnergy != -1 && currentEnergy <= 0"));
-            Assert.IsTrue(contractRuntime.Contains("captured weapon Energy is exhausted"));
-            Assert.IsTrue(functionHit.Contains("CapturedEnemyCombatFunctionHitQuarantined"));
-            Assert.IsTrue(npcRuntime.Contains("Captured enemy combat refused"));
-            Assert.IsTrue(npcRuntime.Contains("Captured enemy taunt refused"));
-            Assert.IsFalse(npcRuntime.Contains("Captured enemy combat fallback"));
-            Assert.IsFalse(npcRuntime.Contains("Captured enemy taunt fallback"));
-            Assert.IsFalse(npcRuntime.Contains("npcController.AiProfile = NpcAiProfile.Aggressive;"));
-            Assert.IsTrue(acquireAggroRuntime.Contains("Captured enemy combat refused"));
-            Assert.IsFalse(acquireAggroRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
-            Assert.IsFalse(acquireAggroRuntime.Contains("NpcAiProfile.Aggressive"));
-            Assert.IsTrue(forceTauntRuntime.Contains("Captured enemy taunt refused"));
-            Assert.IsFalse(forceTauntRuntime.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
-            Assert.IsFalse(forceTauntRuntime.Contains("NpcAiProfile.Aggressive"));
-            Assert.IsTrue(contractRuntime.Contains("!contract.IsAuthoredFixedAttackFallback()"));
-            Assert.IsTrue(
-                contractRuntime.Contains(
-                    "source, compatibility, and safety failures must stay quarantined."));
-            Assert.IsTrue(npcRuntime.Contains("!NpcAiProfiles.CanRetaliate(npcController.AiProfile)"));
-            Assert.IsTrue(otherImplementedHostileEntryPoints.All(
-                path => File.ReadAllText(path).Contains("CapturedEnemyCombatRuntime.Prepare")));
-            Assert.AreEqual(4, sourceOwnedWeaponCallers.Length);
-            CollectionAssert.AreEquivalent(
-                new[]
-                {
-                    "CapturedEnemyCombatContract.cs",
-                    "CapturedEnemyCombatProfileCatalog.cs",
-                    "CapturedTempleOfThreeWindsCombatCatalog.cs",
-                    "MissionInstanceMobCombat.cs"
-                },
-                sourceOwnedWeaponCallers.Select(Path.GetFileName).ToArray());
-            Assert.IsFalse(combatSources.Any(
-                path => LegacyGameplaySource.ReadAllText(path).Contains("WithEvidenceSource(")));
         }
 
-        [TestMethod]
-        public void EngineerAutomatonCaptureContractRemainsAnExplicitPassiveExclusion()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string areteFinishRuntime = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    "AORebirth",
-                    "Server",
-                    "ZoneEngine",
-                    "Core",
-                    "Playfields",
-                    "AreteFinishCaptureMobRuntime.cs"));
 
-            Assert.IsTrue(
-                areteFinishRuntime.Contains(
-                    "resource=6553|md=17649|level=5|name=Engineer Automaton I"));
-            Assert.IsTrue(
-                areteFinishRuntime.Contains(
-                    "has no exact source-local combat profile"));
-            Assert.IsTrue(
-                areteFinishRuntime.Contains(
-                    "CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady("));
-            Assert.IsTrue(areteFinishRuntime.Contains("NpcAiProfile.Passive"));
-            Assert.IsTrue(
-                areteFinishRuntime.Contains(
-                    "Engineer Automaton I intentionally quarantined"));
-            Assert.IsFalse(areteFinishRuntime.Contains("Docker"));
-        }
 
         private static string SourceSection(string source, string startMarker, string endMarker)
         {

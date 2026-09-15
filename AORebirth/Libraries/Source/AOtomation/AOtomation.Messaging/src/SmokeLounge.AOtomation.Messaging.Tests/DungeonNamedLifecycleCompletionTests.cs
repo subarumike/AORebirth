@@ -51,12 +51,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(lifecycle.TryMarkSpawned(DungeonNamedLifecycleCatalog.UkleshProfileKey));
             Assert.AreEqual(CapturedTempleMainRoomPhase.UkleshActive, lifecycle.Phase);
             Assert.IsFalse(lifecycle.CanSpawn(DungeonNamedLifecycleCatalog.UkleshProfileKey));
-
-            string temple = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs");
-            Assert.IsTrue(temple.Contains("IsMainRoomStage(state.Definition.ProfileKey)"));
-            Assert.IsTrue(temple.Contains(
-                "&& !this.mainRoomLifecycle.CanSpawn(state.Definition.ProfileKey)"));
         }
 
         [TestMethod]
@@ -137,15 +131,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 value => value.Trigger == DungeonNamedRespawnTrigger.OwnerAction));
         }
 
-        [TestMethod]
-        public void MurialDeathCancelsCombatAndPatrol()
-        {
-            string npcRuntime = Read(@"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
-            Assert.IsTrue(npcRuntime.Contains("this.ordinaryEnemies.NotifyCharacterDied(target);"));
-            Assert.IsTrue(npcRuntime.Contains("this.playfield.StopDyingNpcCombatState(target);"));
-            Assert.IsTrue(npcRuntime.Contains("npcController.StopFollow();"));
-            Assert.IsTrue(npcRuntime.Contains("NpcChaseInvalidationReason.Death"));
-        }
+
 
         [TestMethod]
         public void MurialRespawnPolicyCreatesExactlyOneActor()
@@ -158,11 +144,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 DungeonNamedRespawnClassification.ProvenSharedNamedRespawnRule,
                 murial.Classification);
             Assert.IsTrue(murial.DelayRule.Contains("300 seconds"));
-
-            string population = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs");
-            Assert.IsTrue(population.Contains("state.CurrentRuntimeIdentity.Instance != 0"));
-            Assert.IsTrue(population.Contains("this.scheduler.Contains(spawnKey)"));
         }
 
         [TestMethod]
@@ -173,94 +154,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 value => value.ProfileKey == DungeonNamedLifecycleCatalog.MurialProfileKey);
             Assert.AreEqual(OrdinaryEnemyMovementMode.Patrol, murial.MovementMode);
             Assert.AreEqual(20, murial.Waypoints.Length);
-
-            string ordinary = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs");
-            Assert.IsTrue(ordinary.Contains("this.ApplyMovement(character, controller, spawn);"));
-            Assert.IsTrue(ordinary.Contains(
-                "this.activeRuntimeIdentityBySource[spawn.SourceIdentity] = character.Identity.Instance;"));
         }
 
-        [TestMethod]
-        public void MurialLiveReentryDoesNotDuplicateActorOrPatrol()
-        {
-            string population = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs");
-            Assert.IsTrue(population.Contains("state.CurrentRuntimeIdentity.Instance != 0) return false;"));
-            Assert.IsTrue(population.Contains("this.scheduler.CancelPlayfield(playfieldId);"));
-            string ordinary = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs");
-            Assert.IsTrue(ordinary.Contains(
-                "this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity)"));
-        }
 
-        [TestMethod]
-        public void EveryNamedDeathCreatesAtMostOneCorpse()
-        {
-            string playfield = Read(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            string inventory = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CorpseInventoryService.cs");
-            Assert.IsTrue(playfield.Contains(
-                "this.pendingCorpseSpawns.ContainsKey(target.Identity.Instance)"));
-            Assert.IsTrue(playfield.Contains("this.corpseInventoryService.ContainsDeadNpc("));
-            Assert.IsTrue(inventory.Contains("Duplicate corpse for dead NPC:"));
-        }
 
-        [TestMethod]
-        public void EveryNamedDeathPerformsAtMostOneAtomicLootRoll()
-        {
-            string playfield = Read(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(
-                    playfield,
-                    "GlobalLootRuntimeService.Generate(target, this.Identity.Instance)"));
-            Assert.IsTrue(playfield.IndexOf(
-                "this.corpseInventoryService.ContainsDeadNpc(",
-                StringComparison.Ordinal) < playfield.IndexOf(
-                "GlobalLootRuntimeService.Generate(target, this.Identity.Instance)",
-                StringComparison.Ordinal));
-        }
 
-        [TestMethod]
-        public void CorpseReopenDoesNotRerollLoot()
-        {
-            string playfield = Read(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(
-                    playfield,
-                    "GlobalLootRuntimeService.Generate(target, this.Identity.Instance)"));
-            Assert.IsTrue(playfield.Contains("this.corpseInventoryService.MarkOpened("));
-            string inventory = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CorpseInventoryService.cs");
-            Assert.IsTrue(inventory.Contains("internal CorpseLootItem[] EnumerateItems("));
-        }
 
-        [TestMethod]
-        public void PlayfieldReentryDoesNotRerollExistingCorpseLoot()
-        {
-            string playfield = Read(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            Assert.IsTrue(playfield.Contains(
-                "private readonly CorpseInventoryService corpseInventoryService"));
-            Assert.IsTrue(playfield.Contains("this.corpseInventoryService.ContainsDeadNpc("));
-            Assert.IsFalse(playfield.Contains("GlobalLootRuntimeService.GenerateDeterministic"));
-        }
 
-        [TestMethod]
-        public void ReplacementRuntimeRetainsNoOldLifecycleOwnership()
-        {
-            string npcRuntime = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
-            string playfield = Read(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            Assert.IsTrue(npcRuntime.Contains("this.combatTick.ClearRuntimeState();"));
-            Assert.IsTrue(npcRuntime.Contains("this.worldPopulation.ClearPlayfield("));
-            Assert.IsTrue(npcRuntime.Contains("this.capturedSubwayEncounters.ClearRuntimeState();"));
-            Assert.IsTrue(npcRuntime.Contains("this.capturedTempleEncounters.ClearRuntimeState();"));
-            Assert.IsTrue(playfield.Contains("this.pendingCorpseSpawns.Clear();"));
-            Assert.IsTrue(playfield.Contains("this.pendingCorpseCreditAwards.Clear();"));
-            Assert.IsTrue(playfield.Contains("this.corpseInventoryService.ClearPlayfield("));
-        }
+
+
+
+
+
+
 
         [TestMethod]
         public void Pf127AndPf1931SchedulesRemainIndependent()
@@ -337,7 +243,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "mission",
                     StringComparison.OrdinalIgnoreCase) >= 0));
             string lifecycle = Read(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\DungeonNamedLifecycle.cs");
+                @"Tests\Fixtures\Gameplay\Playfields\DungeonNamedLifecycle.cs");
             Assert.IsFalse(lifecycle.Contains("ZoneEngine.Core.Missions"));
             Assert.IsFalse(lifecycle.Contains("MissionAcg"));
         }

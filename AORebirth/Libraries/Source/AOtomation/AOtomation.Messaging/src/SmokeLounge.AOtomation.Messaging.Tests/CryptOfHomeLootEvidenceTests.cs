@@ -80,21 +80,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void GlobalLootLegacySeamUsesCryptOfHomePlayfieldScopedSupplement()
-        {
-            string source = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
-            StringAssert.Contains(source, "hasDocumentedCryptOfHomeLoot");
-            StringAssert.Contains(
-                source,
-                "DocumentedCryptOfHomeLootDefinitions.ApplyDocumentedLoot");
-            StringAssert.Contains(
-                source,
-                "DocumentedCryptOfHomeLootDefinitions.PlayfieldInstance");
-        }
+
 
         [TestMethod]
         public void WikiAuditArtifactMatchesProductionDefinitions()

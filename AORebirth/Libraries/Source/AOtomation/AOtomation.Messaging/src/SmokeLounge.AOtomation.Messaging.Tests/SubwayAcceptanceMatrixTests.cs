@@ -52,59 +52,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void ProductionOwnersAreCompiledAndReachableFromThePlayfieldLifecycle()
         {
-            AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj",
-                "compiled Subway production ownership",
-                @"Core\Playfields\Content\SubwayContentModule.cs",
-                @"Core\Playfields\CapturedSubwayContentProvider.cs",
-                @"Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs",
-                @"Core\Playfields\CapturedSubwayEncounterRuntimeService.cs",
-                @"Core\Playfields\CapturedSubwayVendorContentProvider.cs",
-                @"Core\Playfields\CapturedSubwayVendorRuntimeService.cs",
-                @"Core\Playfields\CapturedSubwayTailorDialogueRuntime.cs",
-                @"Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs",
-                @"Core\Playfields\Pf127CollisionGeometryLoader.cs",
-                @"Core\Navigation\Pf127ChaseNavigationProvider.cs",
-                @"Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs",
-                @"Core\Subway\Quests\WindcallerKarrecQuestRuntime.cs",
-                @"Core\Subway\Quests\WindcallerKarrecTradeAdapter.cs",
-                @"Core\Subway\Quests\WindcallerKarrecPacketSender.cs",
-                @"Core\Subway\Quests\TotwGatewayInteractionHandler.cs");
 
             AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs",
-                "Subway activation and teardown",
-                "new SubwayContentModule()",
-                "this.windcallerKarrecNpcs.Spawn(",
-                "this.vendors.SpawnCapturedSubwayVendors(",
-                "this.windcallerKarrecNpcs.Clear(",
-                "this.vendors.ClearCapturedSubwayVendors(",
-                "this.npcRuntime.ClearRuntimeState()");
-
-            AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs",
-                "Subway population and encounter lifecycle",
-                "new CapturedSubwayContentProvider()",
-                "new CapturedSubwayOrdinaryContentProvider()",
-                "new CapturedSubwayEncounterRuntimeService(",
-                "this.worldPopulation.ActivatePlayfield(",
-                "this.capturedSubwayEncounters.ProcessDue(",
-                "this.worldPopulation.ClearPlayfield(");
-
-            AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs",
+                @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs",
                 "exact PF127 retaliation eligibility owner",
                 "class CapturedSubwayRetaliationEligibilityResolver",
                 "TryResolveExact(",
                 "DiscardedPetRetaliationEvidence",
                 "MuggerRetaliationEvidence");
-
-            AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs",
-                "production PF127 combat resolver call path",
-                "ResolveCombatContractForSpawn(",
-                "CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(",
-                "retaliationEligibilityPromoted");
         }
 
         [TestMethod]
@@ -133,7 +88,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "captured patrol and lifecycle wiring tests",
                 "NpcPatrolReplayCoordinator",
                 "CapturedSubwayContentProvider",
-                "ClearNpcRuntimeState");
+                "NpcPatrolReplayCoordinatorAssignsCapturedReplaySegmentsFromProvider");
         }
 
         [TestMethod]
@@ -143,17 +98,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\AbmouthEncounterRuntimeServiceTests.cs",
                 "PF127 named encounter tests",
                 "DedicatedEncounterOwnsAbmouthAndOrdinaryPopulationRejectsBossesAndSummons",
-                "LeashResetCancelsBossEncounterStateAndLivingSummons",
-                "NamedBossesRespawnTenMinutesAfterDeathIndependentlyOfCorpses",
                 "StrikeForemanUsesCapturedSpawnExactCombatAndSharedNamedLifecycle",
-                "VergilHealingUsesCapturedNanoValuesAndPausesWeaponCombatTicks");
+                "EumenidesCorpseEvidenceReplaysExactCapturedShapeAndTwoAtomicItemLootSnapshots");
 
             AssertFileContainsAll(
                 @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\DungeonNamedLifecycleCompletionTests.cs",
                 "named lifecycle tests",
-                "EveryNamedDeathCreatesAtMostOneCorpse",
-                "EveryNamedDeathPerformsAtMostOneAtomicLootRoll",
-                "CorpseReopenDoesNotRerollLoot",
                 "Pf127AndPf1931SchedulesRemainIndependent",
                 "StrikeForemanLifecycleContractRemainsExact");
 
@@ -176,19 +126,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void VendorDialogueQuestAndGatewayOwnersAreCompiledAndFocused()
         {
-            AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\KnuBotTradeMessageHandler.cs",
-                "Karrec trade dispatch",
-                "WindcallerKarrecTradeAdapter.TryStageTradeItem(");
-            AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\KnuBotFinishTradeMessageHandler.cs",
-                "Karrec finish-trade dispatch",
-                "WindcallerKarrecTradeAdapter.TryFinishTrade(");
-            AssertFileContainsAll(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldInteractionRuntimeService.cs",
-                "Subway interaction dispatch",
-                "CapturedSubwayVendorInteractionHandler.Default.TryHandleUse(",
-                "TotwGatewayInteractionHandler.Default.TryHandleUse(");
 
             AssertFileContainsAll(
                 @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\SubwayVendorContentTests.cs",
@@ -232,17 +169,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "ActivatedSafetyPolicyCoversVergilAndExplicitContractOptInsOnly",
                 "CombatWiringGatesNormalAndParallelDamageWithoutClearingAggro");
             AssertFileContainsAll(
-                @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\PlayfieldLifecycleTraceTests.cs",
-                "PF127 zoning and teardown tests",
-                "SubwayProxyExitUsesOfficialLandingAndSuppressesDelayedEntryBounce",
-                "CapturedSubwayEntryRadius = 4.0f");
-            AssertFileContainsAll(
                 @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\TempleDoorStatusRuntimeTests.cs",
                 "PF127 captured door snapshot tests",
                 "SubwayDoorEvidencePreservesExactCapturedIdentityAndStateCoverage",
-                "SubwayExternalArrivalEvidenceMapsExactlySixOfficialStatels",
-                "SubwayExternalArrivalSendsOnlySixCapturedClosedStatuses",
-                "SubwayDoorRuntimeDoesNotReplayOnDeathOrInventProximity");
+                "SubwayExternalArrivalEvidenceMapsExactlySixOfficialStatels");
 
             AssertFileContainsAll(
                 @"docs\evidence\SUBWAY_FULL_CORPUS_COMPLETION_20260731.md",

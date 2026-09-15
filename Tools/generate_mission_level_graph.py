@@ -18,24 +18,15 @@ import sys
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SOURCE = (
     REPOSITORY_ROOT
-    / "AORebirth"
-    / "Server"
-    / "ZoneEngine"
-    / "XML Data"
-    / "MissionLevels.csv"
+    / "AORebirth" / "GameData" / "Missions" / "Source" / "MissionLevels.csv"
 )
 DEFAULT_OUTPUT = (
     REPOSITORY_ROOT
-    / "AORebirth"
-    / "Server"
-    / "ZoneEngine"
-    / "Core"
-    / "Missions"
-    / "MissionLevelGraphData.g.cs"
+    / "AORebirth" / "Server" / "ZoneEngine_New" / "SharedGameplay" / "Missions" / "MissionLevelGraphData.g.cs"
 )
 
 SOURCE_REPOSITORY_PATH = (
-    "AORebirth/Server/ZoneEngine/XML Data/MissionLevels.csv"
+    "AORebirth/GameData/Missions/Source/MissionLevels.csv"
 )
 UPSTREAM_ODS_FILE = "Mission_Tables_Level_Restrictions_Teaming_Levels.ods"
 UPSTREAM_ODS_SHA256 = (

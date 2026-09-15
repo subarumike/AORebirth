@@ -20,19 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../ChatEngine/CoreServer/ChatSessionOwnership.cs" Link="ChatSessionOwnership.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs" Link="Fixtures/CapturedEnemyCombatProfileCatalog.g.cs" />
-    <Compile Include="../ZoneEngine/Core/Packets/MorphCaptureWireCatalog.cs" Link="Fixtures/MorphCaptureWireCatalog.cs" />
-    <Compile Include="../ZoneEngine/Core/Doja/DojaChipInteractionRules.cs" Link="Fixtures/DojaChipInteractionRules.cs" />
-    <Compile Include="../ZoneEngine/Core/Doja/DojaChipPacketSender.Data.cs" Link="Fixtures/DojaChipPacketSender.Data.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedSubwayVendorContentProvider.cs" Link="Fixtures/CapturedSubwayVendorContentProvider.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedBucketheadTechnodealerContentProvider.cs" Link="Fixtures/CapturedBucketheadTechnodealerContentProvider.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedThrakGardenVendorContentProvider.cs" Link="Fixtures/CapturedThrakGardenVendorContentProvider.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAbanGardenVendorContentProvider.cs" Link="Fixtures/CapturedAbanGardenVendorContentProvider.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteMarcoSpidaVendorContentProvider.cs" Link="Fixtures/CapturedAreteMarcoSpidaVendorContentProvider.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorStockDefinition.cs" Link="Fixtures/CapturedAreteAlexAreaVendorStockDefinition.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorDefinition.cs" Link="Fixtures/CapturedAreteAlexAreaVendorDefinition.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs" Link="Fixtures/CapturedAreteAlexAreaVendorContentProvider.cs" />
-    <Compile Include="../ZoneEngine/Core/Playfields/CapturedAreteLoreleiVendorContentProvider.cs" Link="Fixtures/CapturedAreteLoreleiVendorContentProvider.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedEnemyCombatProfileCatalog.g.cs" Link="Fixtures/CapturedEnemyCombatProfileCatalog.g.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Packets/MorphCaptureWireCatalog.cs" Link="Fixtures/MorphCaptureWireCatalog.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipInteractionRules.cs" Link="Fixtures/DojaChipInteractionRules.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipPacketSender.Data.cs" Link="Fixtures/DojaChipPacketSender.Data.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedSubwayVendorContentProvider.cs" Link="Fixtures/CapturedSubwayVendorContentProvider.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedBucketheadTechnodealerContentProvider.cs" Link="Fixtures/CapturedBucketheadTechnodealerContentProvider.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedThrakGardenVendorContentProvider.cs" Link="Fixtures/CapturedThrakGardenVendorContentProvider.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAbanGardenVendorContentProvider.cs" Link="Fixtures/CapturedAbanGardenVendorContentProvider.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAreteMarcoSpidaVendorContentProvider.cs" Link="Fixtures/CapturedAreteMarcoSpidaVendorContentProvider.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAreteAlexAreaVendorStockDefinition.cs" Link="Fixtures/CapturedAreteAlexAreaVendorStockDefinition.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAreteAlexAreaVendorDefinition.cs" Link="Fixtures/CapturedAreteAlexAreaVendorDefinition.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs" Link="Fixtures/CapturedAreteAlexAreaVendorContentProvider.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAreteLoreleiVendorContentProvider.cs" Link="Fixtures/CapturedAreteLoreleiVendorContentProvider.cs" />
     <EmbeddedResource Include="Fixtures/LegacyProductionCharacterStats.json" />
   </ItemGroup>
 </Project>

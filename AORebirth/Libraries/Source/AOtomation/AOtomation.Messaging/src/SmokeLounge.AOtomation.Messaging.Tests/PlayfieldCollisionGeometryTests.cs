@@ -394,7 +394,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string root = FindRepositoryRoot();
             string assetPath = Path.Combine(
                 root,
-                @"AORebirth\Server\ZoneEngine\Content\Captured\Subway\pf127-geometry.json");
+                @"Tests\Fixtures\Content\Captured\Subway\pf127-geometry.json");
             string assetSha256;
             using (FileStream stream = File.OpenRead(assetPath))
             using (SHA256 sha256 = SHA256.Create())
@@ -567,28 +567,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void CombatWiringGatesNormalAndParallelDamageWithoutClearingAggro()
         {
             string root = FindRepositoryRoot();
-            string coordinator = ReadPlayfieldSource(root, "NpcCombatTickCoordinator.cs");
-            string contracts = ReadPlayfieldSource(root, "CapturedEnemyCombatContract.cs");
-            string lineOfSight = ReadPlayfieldSource(root, "NpcDamageLineOfSightRuntimeService.cs");
+            string lineOfSight = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\NpcDamageLineOfSightRuntimeService.cs"));
             string characterCombat = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"AORebirth\Server\ZoneEngine\Core\Entities\Character.Combat.cs"));
-            string capturedNormal = ExtractMethodBlock(coordinator, "internal void ProcessCombatTick");
-            string ordinaryNormal = ExtractMethodBlock(coordinator, "internal void ApplyCombatHit");
-            string normalDamageCore = ExtractMethodBlock(coordinator, "private void ApplyNpcCombatHitCore");
-            string parallel = ExtractMethodBlock(
-                coordinator,
-                "private void ProcessCapturedParallelAttackTicks");
-            string gate = ExtractMethodBlock(coordinator, "private bool CanApplyNpcDamage");
+                    @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs"));
             string characterStrike = ExtractMethodBlock(characterCombat, "public CombatStrikeResult Strike(");
             string receiveStrike = ExtractMethodBlock(characterCombat, "internal void ReceiveStrike(");
-            int normalContext = normalDamageCore.IndexOf(
-                "this.BuildStrikeContext(attackerCharacter, attackSource)",
-                StringComparison.Ordinal);
-            int normalStrike = normalDamageCore.IndexOf(
-                "attackerCharacter.Strike(target, strikeContext)",
-                StringComparison.Ordinal);
             int strikeDamageCalculation = characterStrike.IndexOf(
                 "CombatStrikeDamageCalculator.Calculate(",
                 StringComparison.Ordinal);
@@ -601,89 +586,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int healthMutation = receiveStrike.IndexOf(
                 "this.Stats[StatIds.health].Value = newHealth;",
                 StringComparison.Ordinal);
-            int parallelStrike = parallel.IndexOf(
-                "attackerCharacter.Strike(target, strikeContext)",
-                StringComparison.Ordinal);
-            int fallbackAttackSource = capturedNormal.IndexOf(
-                "CombatAttackSource attackSource = this.GetCombatAttackSource(attacker);",
-                StringComparison.Ordinal);
-            int capturedCoreCall = capturedNormal.IndexOf(
-                "this.ApplyNpcCombatHitCore(",
-                StringComparison.Ordinal);
-            int ordinaryCoreCall = ordinaryNormal.IndexOf(
-                "this.ApplyNpcCombatHitCore(",
-                StringComparison.Ordinal);
-            int capturedDamageGate = capturedCoreCall < 0
-                                         ? -1
-                                         : capturedNormal.LastIndexOf(
-                                             "this.CanApplyNpcDamage(",
-                                             capturedCoreCall,
-                                             StringComparison.Ordinal);
-            int ordinaryDamageGate = ordinaryCoreCall < 0
-                                         ? -1
-                                         : ordinaryNormal.LastIndexOf(
-                                             "this.CanApplyNpcDamage(",
-                                             ordinaryCoreCall,
-                                             StringComparison.Ordinal);
-            int parallelDamageGate = parallelStrike < 0
-                                         ? -1
-                                         : parallel.LastIndexOf(
-                                             "this.CanApplyNpcDamage(",
-                                             parallelStrike,
-                                             StringComparison.Ordinal);
-            int vergilStart = contracts.IndexOf("case 203748:", StringComparison.Ordinal);
-            int abmouthStart = contracts.IndexOf("case 155962:", StringComparison.Ordinal);
-            int infectorStart = contracts.IndexOf("case 31909:", StringComparison.Ordinal);
-            string vergilContract = contracts.Substring(vergilStart, abmouthStart - vergilStart);
-            string abmouthContract = contracts.Substring(abmouthStart, infectorStart - abmouthStart);
-
-            Assert.IsTrue(vergilContract.Contains("requiresDamageLineOfSight: true"));
-            Assert.IsFalse(abmouthContract.Contains("requiresDamageLineOfSight: true"));
-            Assert.IsFalse(coordinator.Contains("DamageLineOfSightHeightOffset"));
-            Assert.IsTrue(
-                gate.Contains("attacker.Position.y,")
-                && gate.Contains("target.Position.y,"));
-            Assert.IsTrue(gate.Contains("IsDamageLineOfSightRequired"));
-            Assert.IsTrue(gate.Contains("Pf127DamageLineOfSightActivated"));
-            Assert.IsTrue(gate.Contains("attacker.Stats[StatIds.monsterdata].Value"));
-            Assert.IsTrue(gate.Contains("EvaluateAttackLine"));
-            Assert.IsFalse(gate.Contains("hasCapturedContract"));
             Assert.IsTrue(
                 lineOfSight.Contains("const bool Pf127DamageLineOfSightActivated = true"));
-            string project = File.ReadAllText(
-                Path.Combine(root, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
-            StringAssert.Contains(
-                project,
-                @"<Content Include=""Content\Captured\Subway\pf127-geometry.json"">");
             Assert.IsTrue(
                 lineOfSight.Contains("Geometry.DamageLineOfSightProbeHeight")
                 && lineOfSight.Contains("Pf127ChaseNavigationProvider.AttackLineProbeHeight")
                 && lineOfSight.Contains("start.Y + probeHeight")
                 && lineOfSight.Contains("end.Y + probeHeight"));
-            Assert.IsTrue(normalContext >= 0);
-            Assert.IsTrue(normalStrike > normalContext);
             Assert.IsTrue(strikeDamageCalculation >= 0);
             Assert.IsTrue(strikeHealthSnapshot > strikeDamageCalculation);
             Assert.IsTrue(strikeDelivery > strikeHealthSnapshot);
             Assert.IsTrue(healthMutation >= 0);
-            Assert.IsTrue(fallbackAttackSource >= 0);
-            Assert.AreEqual(
-                2,
-                coordinator.Split(
-                    new[] { "this.ApplyNpcCombatHitCore(" },
-                    StringSplitOptions.None).Length - 1,
-                "Every shared NPC damage-core caller must remain covered by a visibility/LOS gate assertion.");
-            Assert.IsTrue(capturedCoreCall >= 0);
-            Assert.IsTrue(capturedDamageGate > fallbackAttackSource);
-            Assert.IsTrue(ordinaryCoreCall >= 0);
-            Assert.IsTrue(ordinaryDamageGate >= 0);
-            Assert.IsTrue(parallelStrike > 0);
-            Assert.IsTrue(parallelDamageGate >= 0);
-            Assert.IsTrue(gate.Contains("NpcCombatAttackRules.OutOfRangeRetrySeconds"));
-            Assert.IsFalse(gate.Contains("ClearInvalidNpcCombatTarget"));
-            Assert.IsFalse(gate.Contains("ClearFightingTarget"));
-            Assert.IsFalse(gate.Contains("StopFight"));
-            Assert.IsFalse(gate.Contains("StopFollow"));
         }
 
         private static PlayfieldCollisionGeometry Geometry(params CollisionTriangle[] triangles)

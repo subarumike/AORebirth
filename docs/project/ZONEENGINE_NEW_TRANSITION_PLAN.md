@@ -1,5 +1,11 @@
 # ZoneEngine_New schema and release transition plan
 
+Historical plan: the Legacy engine build and launcher choices below are retired
+by Mike's 2026-09-15 removal instruction. Use `docs/ai/WORKFLOW.md` for current
+NewEngine-only commands and `docs/reports/LEGACY_ENGINE_RETIREMENT.md` for the
+retirement receipt. Historical database-restore requirements still apply; this
+document does not authorize executable-only rollback or production operations.
+
 Status: BLOCKED, not an executable production approval. The candidate is based on
 `307e87670f9d26b50b1ed26e019684726600c52c`; there is no approved application SHA,
 matching Windows/Linux acceptance pair, or approved production artifact yet.

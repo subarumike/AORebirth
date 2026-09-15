@@ -8,7 +8,7 @@
     },
     {
       "byteLength": 1016203,
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs",
+      "path": "Tests/Fixtures/Gameplay/Playfields/CapturedEnemyCombatProfileCatalog.g.cs",
       "role": "catalog",
       "sha256": "d6f74e622b05f9fade5fbee2c62f34002d4b5cd59b8b2f5a42ea1cf2937482fb"
     },
@@ -19,10 +19,10 @@
       "sha256": "9fedd1559f84527e8e3702404463b99e2d0fb42583c32d8b5f794a0faa1f2bb8"
     },
     {
-      "byteLength": 11369506,
+      "byteLength": 11360839,
       "path": "docs/generated/capture_backed_npc_combat_active_coverage.json",
       "role": "activeCoverage",
-      "sha256": "cf20612078047b8dc90146c9b741eecf42f92181b0c59b7f9e54fd6a6f48504e"
+      "sha256": "eadf2a6fa214ed696bf87ddd08a8ac45556c6232ac1af2f81e7291e10f3d4f16"
     },
     {
       "byteLength": 9000177,
@@ -59,12 +59,12 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1499
   },
-  "generationIdentity": "9e8e126f583183e3598a114612f8fbef09e8a29e927948447cb341d15d492374",
+  "generationIdentity": "0d0fbb9ee1205d070544fa274c5d4a781bd9b6ef3b1847f84e96570ecce798fe",
   "generators": {
     "activeCoverage": {
-      "byteLength": 163799,
+      "byteLength": 18392,
       "path": "tools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py",
-      "sha256": "3b772d3fe380fd14670deac19557b76f6097838b63a0fa54ca85f0da3d1d79a0"
+      "sha256": "e262dcd98e9471b7dff6f4820d5159c72857c53817c6c6f0c87f92be2d1e2807"
     },
     "attackRangeAudit": {
       "byteLength": 49287,
@@ -82,14 +82,14 @@
       "sha256": "27fabbe630bf32fb856b0b0d02e380cb2b5438b7ecd4ad3e62deb9a47766c9e5"
     },
     "coordinator": {
-      "byteLength": 248638,
+      "byteLength": 249483,
       "path": "Tools/generated_combat_pipeline.py",
-      "sha256": "f6f459399d8360c0e8f27658a22e439f742b2c93aebb40017dcfb87d487aad7c"
+      "sha256": "15def3ff06f12a23eb068a9c765de2662eb06eb671dac9c915506008a3234676"
     },
     "formulaDataset": {
-      "byteLength": 195084,
+      "byteLength": 194985,
       "path": "tools-temp/AOSharpCaptureAnalyzer/analyze_enemy_combat_setup_formula.py",
-      "sha256": "909ae74a974ddad6ade1a5f6f3d8066ae081b34bf41cb2ee684806c64b0df15e"
+      "sha256": "6496b131e3f1d9fbddea349e64e8c4616a5f6940348c09841ce04c3b6f9bab45"
     },
     "itemTemplateProjection": {
       "byteLength": 10073,
@@ -97,14 +97,14 @@
       "sha256": "ac0373c1b604d6f32d2f8216833a73de5f7037734ef435e765b48186c19a6cf2"
     },
     "primary": {
-      "byteLength": 371019,
+      "byteLength": 370730,
       "path": "tools-temp/AOSharpCaptureAnalyzer/extract_capture_backed_npc_combat.py",
-      "sha256": "dee8efb501047de77863cde0a68f217db5becfdf314119426c81f5540c9e8104"
+      "sha256": "1584dfca0e8f2aeb70059adaca7eb319b097474467a7e72611f1c27f4528ade6"
     },
     "scfuAnalyzer": {
-      "byteLength": 3718,
+      "byteLength": 3600,
       "path": "tools-temp/AOSharpCaptureAnalyzer/AOSharpCaptureAnalyzer.csproj",
-      "sha256": "d7e3a8b766931c9cdefc4bf5f51c71ea0574004b2cd320effbb5f0d029e26446"
+      "sha256": "ea253d1d2610708705afde412942e2421e7f609ff6d5cfa80203c0e1ee6a97e1"
     },
     "secondaryEvidenceAudit": {
       "byteLength": 54571,

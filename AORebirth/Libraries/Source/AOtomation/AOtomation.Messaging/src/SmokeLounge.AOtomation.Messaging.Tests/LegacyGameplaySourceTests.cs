@@ -7,29 +7,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     public class LegacyGameplaySourceTests
     {
         [TestMethod]
-        public void LogicalContractIncludesRuntimeAndEveryExtractedPureFragment()
+        public void HistoricalCatalogIncludesEveryRetainedSharedFragment()
         {
             string root = TestRepositoryRootResolver.FindFromCallerFilePath();
-            string directory = Path.Combine(root, "AORebirth", "Server", "ZoneEngine", "Core", "Playfields");
-            string source = LegacyGameplaySource.ReadAllText(Path.Combine(directory, "CapturedEnemyCombatContract.cs"));
-            foreach (string fragment in new[] { "CapturedEnemyCombatContract.cs", "CapturedEnemyCombatData.cs",
-                "CapturedEnemyCombatSequenceData.cs", "CapturedEnemyCombatContract.Data.cs" })
-                Assert.IsTrue(source.Contains(File.ReadAllText(Path.Combine(directory, fragment))));
+            string directory = Path.Combine(root, "Tests", "Fixtures", "Gameplay", "Playfields");
+            string owner = Path.Combine(directory, "CapturedEnemyCombatProfileCatalog.cs");
+            string source = LegacyGameplaySource.ReadAllText(owner);
+            foreach (string fragment in new[] { "CapturedEnemyCombatProfileCatalog.cs", "CapturedEnemyCombatProfileData.cs",
+                "CapturedEnemyCombatProfileMatching.cs" })
+                Assert.IsTrue(source.Contains(File.ReadAllText(LegacyGameplaySource.ResolveFragment(owner, fragment))));
             string[] logical = LegacyGameplaySource.LogicalPaths(new[]
             {
-                Path.Combine(directory, "CapturedEnemyCombatContract.cs"),
-                Path.Combine(directory, "CapturedEnemyCombatData.cs"),
-                Path.Combine(directory, "CapturedEnemyCombatSequenceData.cs"),
-                Path.Combine(directory, "CapturedEnemyCombatContract.Data.cs")
+                owner,
+                LegacyGameplaySource.ResolveFragment(owner, "CapturedEnemyCombatProfileData.cs"),
+                LegacyGameplaySource.ResolveFragment(owner, "CapturedEnemyCombatProfileMatching.cs")
             });
-            CollectionAssert.AreEqual(new[] { Path.Combine(directory, "CapturedEnemyCombatContract.cs") }, logical);
+            CollectionAssert.AreEqual(new[] { owner }, logical);
         }
 
         [TestMethod]
         public void UnrelatedSourceIsUnchangedByLogicalPartialReader()
         {
             string root = TestRepositoryRootResolver.FindFromCallerFilePath();
-            string path = Path.Combine(root, "AORebirth", "Server", "ZoneEngine", "Core", "NpcAiProfile.cs");
+            string path = Path.Combine(root, "AORebirth", "Server", "ZoneEngine_New", "SharedGameplay", "Combat", "NpcAiProfile.cs");
             Assert.AreEqual(File.ReadAllText(path), LegacyGameplaySource.ReadAllText(path));
         }
     }

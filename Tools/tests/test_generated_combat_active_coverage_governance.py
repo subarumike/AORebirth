@@ -2,25 +2,16 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
-GENERATOR_PATH = (
-    REPO_ROOT
-    / "tools-temp"
-    / "AOSharpCaptureAnalyzer"
-    / "generate_capture_backed_npc_active_coverage.py"
-)
+GENERATOR_PATH = REPO_ROOT / "tools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py"
 
 
 def load_generator():
-    spec = importlib.util.spec_from_file_location(
-        "aorebirth_active_coverage_generator", GENERATOR_PATH
-    )
-    if spec is None or spec.loader is None:
-        raise RuntimeError("could not load active-coverage generator")
+    spec = importlib.util.spec_from_file_location("aorebirth_active_coverage_generator", GENERATOR_PATH)
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
@@ -32,124 +23,47 @@ class GeneratedCombatActiveCoverageGovernanceTests(unittest.TestCase):
     def setUpClass(cls):
         cls.generator = load_generator()
 
-    def test_pure_split_hashes_every_fragment_and_retains_owner_marker_guard(self):
-        expected_names = {
-            "CapturedEnemyCombatData.cs", "CapturedEnemyCombatSequenceData.cs",
-            "CapturedEnemyCombatContract.Data.cs", "CapturedEnemyCombatProfileData.cs",
-            "CapturedEnemyCombatProfileMatching.cs", "CapturedEnemyCombatPacketFactory.Data.cs",
-            "OrdinaryEnemyCombatSetupGenerator.Data.cs",
-        }
-        paths = set(self.generator.CAPTURED_COMBAT_SHARED_SOURCE_INPUTS)
-        self.assertEqual({Path(path).name for path in paths}, expected_names)
-        document = json.loads((REPO_ROOT / "docs/generated/capture_backed_npc_combat_active_coverage.json").read_text(encoding="utf-8"))
-        self.assertTrue(paths <= {row["path"] for row in document["contentInputs"]})
-        owners = self.generator.discover_pf127_ordinary_profile_owners(REPO_ROOT)
-        fragment = next(path for path in paths if path.endswith("CapturedEnemyCombatContract.Data.cs"))
-        self.assertIn(fragment, {owner["path"] for owner in owners})
-        read_source = self.generator.read_source
+    def test_current_consumer_audit_rejects_removed_structural_validation(self):
+        original = self.generator.read_source
+        def missing_validation(repo_root, relative):
+            source = original(repo_root, relative)
+            return source.replace("SpawnContentValidation.IsValid(", "MissingValidation(")
+        with mock.patch.object(self.generator, "read_source", side_effect=missing_validation):
+            with self.assertRaisesRegex(self.generator.CoverageError, "consumer contract changed"):
+                self.generator.discover_current_consumers(REPO_ROOT)
 
-        def without_required_marker(repo_root, relative):
-            source = read_source(repo_root, relative)
-            return source.replace("WithCaptureProvenRetaliationEligibility(", "MissingRetaliationContract(") if relative == fragment else source
+    def test_every_shared_combat_fragment_is_hashed_without_legacy_runtime(self):
+        consumers = self.generator.discover_current_consumers(REPO_ROOT)
+        paths = {row["path"] for row in consumers}
+        self.assertTrue(set(self.generator.CAPTURED_COMBAT_SHARED_SOURCE_INPUTS) <= paths)
+        self.assertTrue(all("/Server/ZoneEngine/" not in path for path in paths))
+        self.assertTrue(all(len(row["sha256"]) == 64 for row in consumers))
 
-        with mock.patch.object(self.generator, "read_source", side_effect=without_required_marker):
-            with self.assertRaisesRegex(self.generator.CoverageError, "ownership changed"):
-                self.generator.discover_pf127_ordinary_profile_owners(REPO_ROOT)
+    def test_historical_population_classification_is_preserved_as_evidence(self):
+        document = self.generator.historical_coverage(REPO_ROOT)
+        self.assertEqual(sum(row["actorCount"] for row in document["profiles"]), document["totals"]["initialActorCount"])
+        self.assertEqual(document["totals"]["certified"] + document["totals"]["unresolved"], document["totals"]["initialActorCount"])
 
-    def test_icc_shuttleport_has_eleven_accepted_reet_entries_and_active_remainder(self):
-        governance = self.generator.discover_icc_shuttleport_entry_governance(
-            REPO_ROOT
-        )
+    def test_historical_snapshot_mutation_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            snapshot = root / self.generator.HISTORICAL_COVERAGE_PATH
+            snapshot.parent.mkdir(parents=True)
+            snapshot.write_text('{"totals": {}}\n', encoding="utf-8")
+            with self.assertRaisesRegex(self.generator.CoverageError, "evidence changed"):
+                self.generator.historical_coverage(root)
 
-        self.assertEqual(governance["playfield"], 4582)
-        # Already accepted in 6e90dda030774726aa2060acb9edb756ea1f635c;
-        # this source-split repair does not promote any additional actor.
-        self.assertEqual(governance["acceptedEntries"], 11)
-        self.assertEqual(governance["activeEvidenceEntries"], 24)
-        self.assertEqual(governance["blockedUnauditedEntries"], 0)
-        self.assertEqual(len(governance["entries"]), 35)
-        for ordinal, entry in enumerate(governance["entries"][:11]):
-            self.assertEqual(entry["ordinal"], ordinal)
-            self.assertEqual(entry["name"], "Island Reet")
-            self.assertEqual(entry["coverageKey"], "icc-shuttleport-island-reet-basic-combat")
-            self.assertEqual(entry["state"], "ACCEPTED_RUNTIME_CONTENT")
-        self.assertTrue(
-            all(
-                entry["state"] == "ACTIVE_EVIDENCE"
-                for entry in governance["entries"][11:]
-            )
-        )
-
-    def test_icc_prepare_callsite_is_active_evidence_not_accepted_file_coverage(self):
-        source = self.generator.ICC_SHUTTLEPORT_SOURCE
-        self.assertNotIn(source, self.generator.RUNTIME_PREPARE_AUDIT_REFERENCES)
-        self.assertIn(
-            source, self.generator.RUNTIME_PREPARE_ACTIVE_EVIDENCE_REFERENCES
-        )
-
-        entry = next(
-            row
-            for row in self.generator.discover_runtime_prepare_entry_points(REPO_ROOT)
-            if row["path"] == source
-        )
-        self.assertEqual(entry["prepareCallCount"], 1)
-        self.assertEqual(entry["auditKind"], "active-evidence")
-        self.assertEqual(entry["governanceState"], "ACTIVE_EVIDENCE")
-
-    def test_scarlett_prepare_callsite_is_explicit_non_denominator_governance(self):
-        source = self.generator.SCARLETT_DALQUIST_SOURCE
-        self.assertEqual(
-            self.generator.RUNTIME_PREPARE_AUDIT_REFERENCES[source],
-            (1, "non-denominator-audit", ("captured-dialogue-trade-npcs",)),
-        )
-
-        entry = next(
-            row
-            for row in self.generator.discover_runtime_prepare_entry_points(REPO_ROOT)
-            if row["path"] == source
-        )
-        self.assertEqual(entry["prepareCallCount"], 1)
-        self.assertEqual(entry["auditKind"], "non-denominator-audit")
-        self.assertEqual(
-            entry["auditReferences"], ["captured-dialogue-trade-npcs"]
-        )
-
-    def test_published_coverage_excludes_icc_active_source_from_content_inputs(self):
-        coverage_path = (
-            REPO_ROOT
-            / "docs"
-            / "generated"
-            / "capture_backed_npc_combat_active_coverage.json"
-        )
-        document = json.loads(coverage_path.read_text(encoding="utf-8"))
-        content_input_paths = {
-            row["path"] for row in document["contentInputs"]
-        }
-        self.assertNotIn(self.generator.ICC_SHUTTLEPORT_SOURCE, content_input_paths)
-        governance = document["iccShuttleportEntryGovernance"]
-        self.assertEqual(governance["acceptedEntries"], 11)
-        self.assertEqual(governance["activeEvidenceEntries"], 24)
-        self.assertEqual(governance["blockedUnauditedEntries"], 0)
+    def test_editable_content_audit_does_not_claim_private_or_historical_population(self):
+        current = self.generator.editable_content_inventory(REPO_ROOT)
+        world = json.loads((REPO_ROOT / "AORebirth/GameData/WorldContent.json").read_text())
+        self.assertEqual(len(world["Npcs"]), current["authoredNpcDefinitionCount"])
+        self.assertFalse(current["runtimeActivationPermissionFromEvidence"])
+        self.assertFalse(current["historicalRosterIsCurrentPopulation"])
+        self.assertFalse(current["privateHashCatalogPopulationEvaluated"])
 
     def test_external_staging_output_path_does_not_require_worktree_containment(self):
-        output_path = (
-            REPO_ROOT.parent
-            / ".git"
-            / "worktrees"
-            / "linked"
-            / "staging"
-            / "capture_backed_npc_combat_active_coverage.json"
-        )
-
-        rendered = self.generator.format_generated_output_path(
-            output_path, REPO_ROOT
-        )
-
-        self.assertEqual(
-            rendered,
-            "<external-staging>/capture_backed_npc_combat_active_coverage.json",
-        )
-        self.assertNotIn(str(REPO_ROOT), rendered)
+        output = REPO_ROOT.parent / ".git/worktrees/linked/staging/capture_backed_npc_combat_active_coverage.json"
+        self.assertEqual("<external-staging>/capture_backed_npc_combat_active_coverage.json", self.generator.format_generated_output_path(output, REPO_ROOT))
 
 
 if __name__ == "__main__":

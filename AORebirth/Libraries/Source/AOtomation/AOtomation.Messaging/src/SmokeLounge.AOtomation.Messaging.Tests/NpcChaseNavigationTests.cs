@@ -512,13 +512,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string navigationSource = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"AORebirth\Server\ZoneEngine\Core\Navigation\NpcChaseNavigationRuntimeService.cs"));
-            string controllerSource = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
+                    @"Tests\Fixtures\Gameplay\Navigation\NpcChaseNavigationRuntimeService.cs"));
             StringAssert.Contains(navigationSource, "this.provider.IsSegmentTraversable(current, target)");
-            StringAssert.Contains(controllerSource, "double step = Math.Min(distance, maxDistance);");
         }
 
         [TestMethod]
@@ -753,8 +748,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string root = FindRepositoryRoot();
             string navigationFolder = Path.Combine(
                 root,
-                @"AORebirth\Server\ZoneEngine\Core\Navigation");
-            foreach (string path in Directory.GetFiles(navigationFolder, "*.cs"))
+                @"Tests\Fixtures\Gameplay\Navigation");
+            string[] sources = Directory.GetFiles(navigationFolder, "*.cs");
+            Assert.IsTrue(sources.Length > 0, "The preserved navigation algorithms must be inspected.");
+            foreach (string path in sources)
             {
                 string source = File.ReadAllText(path);
                 Assert.IsFalse(source.Contains("Vergil"), Path.GetFileName(path));
@@ -762,82 +759,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void SharedMovementUsesExistingControllerPipelineAndValidatesBeforeMoveTo()
-        {
-            string root = FindRepositoryRoot();
-            string source = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
 
-            StringAssert.Contains(source, "this.chaseNavigation.UpdatePursuit(");
-            StringAssert.Contains(source, "npcController.MoveTo(");
-            StringAssert.Contains(source, "navigationResult.HasDestination");
-            Assert.IsTrue(
-                source.IndexOf("navigationResult.HasDestination", StringComparison.Ordinal)
-                < source.IndexOf("npcController.MoveTo(", StringComparison.Ordinal));
-        }
 
-        [TestMethod]
-        public void CombatCoordinatorRoutesBlockedAttacksWithoutChangingDamageCalculation()
-        {
-            string root = FindRepositoryRoot();
-            string source = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
 
-            StringAssert.Contains(source, "this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);");
-            StringAssert.Contains(source, "this.playfield.IsNpcAttackPathTraversable(attacker, target)");
-            StringAssert.Contains(source, "this.BuildStrikeContext(attackerCharacter, attackSource)");
-            StringAssert.Contains(source, "attackerCharacter.Strike(target, strikeContext)");
-            StringAssert.Contains(source, "if (!this.CanApplyNpcDamage(");
-            StringAssert.Contains(source, "this.playfield.HoldNpcAtCombatPosition(attacker, target);");
-            Assert.IsFalse(source.Contains("VergilAeneidMonsterData") && source.Contains("TryMoveNpcIntoCombatRange"));
-        }
 
-        [TestMethod]
-        public void LifecycleRuntimeOwnsSharedRouteCleanup()
-        {
-            string root = FindRepositoryRoot();
-            string source = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
 
-            StringAssert.Contains(source, "NpcChaseInvalidationReason.TargetLost");
-            StringAssert.Contains(source, "NpcChaseInvalidationReason.Death");
-            StringAssert.Contains(source, "NpcChaseInvalidationReason.Despawn");
-            StringAssert.Contains(source, "NpcChaseInvalidationReason.LeashReset");
-            StringAssert.Contains(source, "NpcChaseInvalidationReason.EncounterReset");
-            StringAssert.Contains(source, "NpcChaseInvalidationReason.PlayfieldReset");
-            StringAssert.Contains(source, "this.RegisterNpcHome(character);");
-            StringAssert.Contains(source, "home.MaximumNpcDistanceFromHome");
-            StringAssert.Contains(source, "this.TryBeginLeashReturn(attacker)");
-            StringAssert.Contains(source, "home.ReturningHome");
-            StringAssert.Contains(source, "this.chaseNavigation.UpdateReturnToHome(");
-            StringAssert.Contains(source, "new StopFightMessage");
-            StringAssert.Contains(source, "this.capturedSubwayEncounters.NotifyCombatReset(npc)");
-            StringAssert.Contains(source, "owner.Controller is PlayerController");
-            StringAssert.Contains(source, "controller.State = CharacterState.Idle;");
-            StringAssert.Contains(source, "controller.State = home.ControllerStateBeforeReturn;");
-
-            string encounterSource = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
-            StringAssert.Contains(encounterSource, "maximumNpcLeashDistanceFromHome: 40.0");
-            StringAssert.Contains(
-                encounterSource,
-                "20260716-222007 two approximately 40-unit leash resets");
-
-            string systemsSource = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            StringAssert.Contains(systemsSource, "this.npcChaseNavigation.Dispose();");
-        }
 
         private static NpcChaseNavigationRuntimeService Service(IPlayfieldChaseNavigationProvider provider)
         {
@@ -875,7 +801,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string root = FindRepositoryRoot();
             string path = Path.Combine(
                 root,
-                @"AORebirth\Server\ZoneEngine\Content\Captured\Subway\pf127-geometry.json");
+                @"Tests\Fixtures\Content\Captured\Subway\pf127-geometry.json");
             return Pf127CollisionGeometryLoader.LoadPath(path);
         }
 

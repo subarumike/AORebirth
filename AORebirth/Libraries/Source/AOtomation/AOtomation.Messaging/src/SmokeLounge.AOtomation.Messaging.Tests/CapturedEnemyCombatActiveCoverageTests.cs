@@ -29,7 +29,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             new Lazy<Dictionary<string, object>>(LoadCoverageDocument);
 
         [TestMethod]
-        public void EveryFixedActiveHostileBindingIsCertifiedOrHasAnExactUnresolvedAudit()
+        public void EveryHistoricalHostileBindingRetainsItsCaptureClassification()
         {
             Dictionary<string, object> document = ReadCoverageDocument();
             Assert.AreEqual(1, IntMember(document, "schemaVersion"));
@@ -198,7 +198,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void Pf127OrdinaryCoverageIsCompleteThroughExactProductionOwnedProfileResolution()
+        public void HistoricalPf127OrdinaryCoverageRetainsExactProfileResolution()
         {
             Dictionary<string, object> document = ReadCoverageDocument();
             Dictionary<string, object> subwayOrdinary = ArrayMember(document, "surfaces")
@@ -465,7 +465,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void Pf127ProfileResolutionReproducesTheExactProductionContractPath()
+        public void HistoricalPf127ProfileResolutionReproducesTheRetainedContractFixture()
         {
             Dictionary<string, object> document = ReadCoverageDocument();
             Dictionary<string, object> resolverAudit = ObjectMember(
@@ -823,93 +823,22 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void EveryProductionCapturedEnemyCombatPrepareCallSiteHasAnExplicitCoverageAudit()
+        public void CurrentConsumerAuditSeparatesHistoricalEvidenceFromRuntimeActivation()
         {
-            Dictionary<string, object> document = ReadCoverageDocument();
-            Dictionary<string, object> audit = ObjectMember(document, "runtimePrepareAudit");
             string root = FindRepositoryRoot();
-            string productionRoot = Path.Combine(
-                root,
-                StringMember(audit, "productionRoot")
-                    .Replace('/', Path.DirectorySeparatorChar));
-            Assert.IsTrue(Directory.Exists(productionRoot));
-
-            var discovered = new Dictionary<string, int>(StringComparer.Ordinal);
-            var preparePattern = new Regex(
-                @"\bCapturedEnemyCombatRuntime\s*\.\s*Prepare(?:AndRequireCombatReady)?\s*\(",
-                RegexOptions.CultureInvariant);
-            foreach (string path in Directory.GetFiles(
-                productionRoot,
-                "*.cs",
-                SearchOption.AllDirectories))
-            {
-                int callCount = preparePattern.Matches(File.ReadAllText(path)).Count;
-                if (callCount == 0)
-                {
-                    continue;
-                }
-
-                string relativePath = path.Substring(root.Length + 1)
-                    .Replace(Path.DirectorySeparatorChar, '/');
-                discovered.Add(relativePath, callCount);
-            }
-
-            Dictionary<string, Dictionary<string, object>> recorded =
-                ArrayMember(audit, "entries")
-                    .Select(value => JsonObject(value, "runtime Prepare entry point"))
-                    .ToDictionary(
-                        value => StringMember(value, "path"),
-                        StringComparer.Ordinal);
-            CollectionAssert.AreEquivalent(
-                discovered.Keys.ToArray(),
-                recorded.Keys.ToArray(),
-                "A production CapturedEnemyCombatRuntime.Prepare source is missing from the audit.");
-            Assert.AreEqual(discovered.Count, IntMember(audit, "entryPointFileCount"));
-            Assert.AreEqual(discovered.Values.Sum(), IntMember(audit, "entryPointCount"));
-            Assert.AreEqual(22, discovered.Count);
-            Assert.AreEqual(24, discovered.Values.Sum());
-            foreach (KeyValuePair<string, int> entryPoint in discovered)
-            {
-                Dictionary<string, object> record = recorded[entryPoint.Key];
-                Assert.AreEqual(
-                    entryPoint.Value,
-                    IntMember(record, "prepareCallCount"),
-                    entryPoint.Key);
-                Assert.AreEqual(
-                    entryPoint.Value,
-                    ArrayMember(record, "prepareCallSourceLines").Length,
-                    entryPoint.Key);
-                Assert.IsTrue(ArrayMember(record, "auditReferences").Length > 0, entryPoint.Key);
-                string auditKind = StringMember(record, "auditKind");
-                Assert.IsTrue(
-                    auditKind == "fixed-denominator-surfaces"
-                    || auditKind == "non-denominator-audit"
-                    || auditKind == "active-evidence",
-                    entryPoint.Key);
-            }
-
-            Dictionary<string, object> cursedEntry = recorded[
-                "AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeySilvertailTransform.cs"];
-            Assert.AreEqual("non-denominator-audit", StringMember(cursedEntry, "auditKind"));
-            CollectionAssert.AreEqual(
-                new[] { "scripted-hostiles" },
-                StringArrayMember(cursedEntry, "auditReferences"));
-            Dictionary<string, object> elysiumEntry = recorded[
-                "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs"];
-            Assert.AreEqual(
-                "non-denominator-audit",
-                StringMember(elysiumEntry, "auditKind"));
-            CollectionAssert.AreEqual(
-                new[] { "elysium-east-captured-population" },
-                StringArrayMember(elysiumEntry, "auditReferences"));
-            Dictionary<string, object> scarlettEntry = recorded[
-                "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs"];
-            Assert.AreEqual(
-                "non-denominator-audit",
-                StringMember(scarlettEntry, "auditKind"));
-            CollectionAssert.AreEqual(
-                new[] { "captured-dialogue-trade-npcs" },
-                StringArrayMember(scarlettEntry, "auditReferences"));
+            string path = Path.Combine(root, "docs", "generated", "capture_backed_npc_combat_active_coverage.json");
+            var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue, RecursionLimit = 512 };
+            Dictionary<string, object> current = JsonObject(serializer.DeserializeObject(File.ReadAllText(path)), "current consumer audit");
+            Assert.AreEqual(2, IntMember(current, "schemaVersion"));
+            Dictionary<string, object> history = ObjectMember(current, "historicalEvidence");
+            Assert.IsFalse(Convert.ToBoolean(history["currentPopulation"]));
+            Assert.IsFalse(Convert.ToBoolean(history["runtimeActivationPermission"]));
+            Dictionary<string, object> runtime = ObjectMember(current, "runtimePrepareAudit");
+            Assert.IsTrue(Convert.ToBoolean(runtime["legacyRuntimeRetired"]));
+            Assert.AreEqual("AORebirth/Server/ZoneEngine_New", StringMember(runtime, "productionRoot"));
+            Assert.IsFalse(Convert.ToBoolean(runtime["evidenceBasedActivation"]));
+            foreach (object value in ArrayMember(current, "contentInputs"))
+                AssertGeneratedInputHash(root, JsonObject(value, "current content input"), "current content input", true);
         }
 
         private static void AssertCertifiedBindingResolves(
@@ -1290,40 +1219,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             return CoverageDocument.Value;
         }
 
+        // The retained packet/profile tests characterize accepted historical
+        // capture evidence. They never claim that the retired roster is active.
         private static Dictionary<string, object> LoadCoverageDocument()
         {
             string root = FindRepositoryRoot();
-            string path = Path.Combine(
-                root,
-                "docs",
-                "generated",
-                "capture_backed_npc_combat_active_coverage.json");
-            Assert.IsTrue(File.Exists(path), "Missing generated active combat coverage inventory.");
-            var serializer = new JavaScriptSerializer
-            {
-                MaxJsonLength = int.MaxValue,
-                RecursionLimit = 512
-            };
-            Dictionary<string, object> document = JsonObject(
-                serializer.DeserializeObject(File.ReadAllText(path)),
-                "coverage document");
-            Dictionary<string, object> combatInventory = ObjectMember(document, "combatInventory");
-            AssertGeneratedInputHash(root, combatInventory, "combat inventory", false);
-            foreach (object inputObject in ArrayMember(document, "contentInputs"))
-            {
-                Dictionary<string, object> input = JsonObject(inputObject, "coverage content input");
-                Assert.AreEqual(
-                    "utf8-sig-text-lf",
-                    StringMember(input, "hashNormalization"),
-                    "coverage content input hash normalization changed");
-                AssertGeneratedInputHash(
-                    root,
-                    input,
-                    "coverage content input",
-                    true);
-            }
-
-            return document;
+            var serializer = new JavaScriptSerializer { MaxJsonLength = int.MaxValue, RecursionLimit = 512 };
+            string currentPath = Path.Combine(root, "docs", "generated", "capture_backed_npc_combat_active_coverage.json");
+            Dictionary<string, object> current = JsonObject(serializer.DeserializeObject(File.ReadAllText(currentPath)), "current consumer audit");
+            Dictionary<string, object> history = ObjectMember(current, "historicalEvidence");
+            AssertGeneratedInputHash(root, history, "immutable historical coverage", true);
+            string historicalPath = Path.Combine(root, StringMember(history, "path").Replace('/', Path.DirectorySeparatorChar));
+            return JsonObject(serializer.DeserializeObject(File.ReadAllText(historicalPath)), "historical coverage evidence");
         }
 
         private static void AssertGeneratedInputHash(

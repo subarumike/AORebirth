@@ -34,7 +34,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string page = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Inventory\BaseInventoryPage.cs");
             string pages = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Inventory\BaseInventoryPages.cs");
-            string character = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Entities\Character.cs");
+            string character = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs");
             string pageWrite = page.Substring(page.IndexOf("public virtual bool Write()", StringComparison.Ordinal));
             string pagesWrite = pages.Substring(pages.IndexOf("public bool Write()", StringComparison.Ordinal));
 
@@ -49,7 +49,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void GmiMissingOptionalSchemaSkipsLoginPendingWithdrawalProcessing()
         {
             string dao = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Database\Dao\GmiVaultDao.cs");
-            string runtime = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\GMI\GmiRuntimeService.cs");
 
             StringAssert.Contains(dao, "public static bool CanUseVaultSchema()");
             StringAssert.Contains(dao, "information_schema.tables");
@@ -57,59 +56,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(dao, "gmi_vault_item");
             StringAssert.Contains(dao, "IsMissingOptionalGmiTable");
             StringAssert.Contains(dao, "throw;");
-
-            AssertTextBefore(runtime, "if (!GmiVaultDao.CanUseVaultSchema())", "GmiVault vault = GetOrCreate(character);");
-            StringAssert.Contains(runtime, "failureReason = \"Market vault unavailable.\";");
         }
 
-        [TestMethod]
-        public void ClientConnectedUsesTransferAwareMasterSessionSemantics()
-        {
-            string connected = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs");
 
-            StringAssert.Contains(connected, "CombatXpRuntimeService.IsPlayfieldTransferLogin(client)");
-            StringAssert.Contains(connected, "CombatXpRuntimeService.PrepareXpStatsForLogin(");
-            StringAssert.Contains(connected, "isPlayfieldTransfer");
-            StringAssert.Contains(connected, "transferDynel.IsTeleporting = false;");
-            StringAssert.Contains(connected, "InitializeActionableState(client);");
-            StringAssert.Contains(connected, "SendActionableState(client);");
-            AssertTextBefore(connected, "InitializeActionableState(client);", "SendActionableState(client);");
-        }
 
         [TestMethod]
         public void CrashReconnectCancelsLogoutTimerBeforeInventoryReloadAndRejectsZombieInventory()
         {
-            string zoneClient = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs");
-            string createCharacter = zoneClient.Substring(
-                zoneClient.IndexOf("public void CreateCharacter(int charId)", StringComparison.Ordinal));
-            string character = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Entities\Character.cs");
-
-            AssertTextBefore(
-                createCharacter,
-                "pooledCharacter.TryClaimReconnectOwnership(out preserveLogoutSitOnConnect)",
-                "this.Controller.Character.Reconnect(this);");
-            AssertTextBefore(
-                createCharacter,
-                "pooledCharacter.TryClaimReconnectOwnership(out preserveLogoutSitOnConnect)",
-                "inventoryReadSucceeded = playerCharacter.BaseInventory.Read();");
-            AssertTextBefore(
-                createCharacter,
-                "pooledCharacter.WaitForLogoutTimerDisposalToComplete(2000)",
-                "this.Controller.Character = new PlayerCharacter(");
-            StringAssert.Contains(createCharacter, "Reconnect refused because the pending logout timer still owns");
-            StringAssert.Contains(createCharacter, "pending logout timer disposal already claimed ownership");
-            StringAssert.Contains(createCharacter, "HasRequiredPlayerInventoryPages(playerCharacter)");
-            StringAssert.Contains(createCharacter, "DiscardUntrustedPooledCharacter(pooledCharacter");
-            StringAssert.Contains(createCharacter, "this.IsPlayfieldTransferLogin = false;");
-            StringAssert.Contains(createCharacter, "this.Controller.Character = new PlayerCharacter(");
-            StringAssert.Contains(zoneClient, "private static bool HasRequiredPlayerInventoryPages(Character character)");
-            StringAssert.Contains(zoneClient, "(int)IdentityType.Inventory");
-            StringAssert.Contains(zoneClient, "(int)IdentityType.WeaponPage");
-            StringAssert.Contains(zoneClient, "(int)IdentityType.ArmorPage");
-            StringAssert.Contains(zoneClient, "(int)IdentityType.ImplantPage");
-            StringAssert.Contains(zoneClient, "(int)IdentityType.SocialPage");
-            StringAssert.Contains(zoneClient, "(int)IdentityType.BankByRef");
-            StringAssert.Contains(zoneClient, "|| !page.IsHydrated");
+            string character = ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs");
             StringAssert.Contains(character, "public bool TryClaimReconnectOwnership(out bool preserveLogoutSitPosture)");
             StringAssert.Contains(character, "public bool WaitForLogoutTimerDisposalToComplete(int timeoutMilliseconds)");
             StringAssert.Contains(character, "this.logoutTimerDisposeInProgress");

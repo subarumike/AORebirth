@@ -5,23 +5,28 @@ param(
     [switch]$NewZoneEngine,
     [switch]$LegacyZoneEngine,
     [switch]$PrintEngineSelection,
+    [switch]$ValidateEngineSelectionOnly,
     [switch]$ValidateSchemaOnly,
     [int]$StartupTimeoutSeconds = 60
 )
 
 $ErrorActionPreference = "Stop"
 
-if ($LegacyZoneEngine -and ($NewZoneEngine -or $WebOnly)) {
-    throw "LegacyZoneEngine cannot be combined with NewZoneEngine or WebOnly."
+if ($LegacyZoneEngine) {
+    throw "Legacy ZoneEngine has been retired. ZoneEngine_New is the only supported zone backend; no engine was started or stopped."
 }
-$zoneEngineSelection = if ($LegacyZoneEngine) {
-    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe" }
+if ($WithWeb -and $WebOnly) {
+    throw "WithWeb and WebOnly cannot be combined."
 }
-else {
-    @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe" }
+if ($NewZoneEngine -and $WebOnly) {
+    throw "NewZoneEngine and WebOnly cannot be combined."
 }
+$zoneEngineSelection = @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe" }
 if ($PrintEngineSelection) {
     $zoneEngineSelection | ConvertTo-Json -Compress
+    return
+}
+if ($ValidateEngineSelectionOnly) {
     return
 }
 
@@ -46,14 +51,6 @@ $env:AO_REBIRTH_CONFIG_PATH = $configPath
 $logDir = Join-Path $root "logs\engines"
 $statusProbe = Join-Path $root "Tools\engine_status_probe.js"
 $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
-
-if ($WithWeb -and $WebOnly) {
-    throw "WithWeb and WebOnly cannot be combined."
-}
-
-if ($NewZoneEngine -and $WebOnly) {
-    throw "NewZoneEngine and WebOnly cannot be combined."
-}
 
 if (-not (Test-Path $engineDir)) {
     throw "Engine build folder not found: $engineDir"
@@ -80,10 +77,6 @@ function Invoke-EngineStatusProbe {
     )
 
     $probeArguments = @("--config", $configPath, "--engine-dir", $engineDir) + $Arguments
-    if ($LegacyZoneEngine) {
-        $probeArguments += "--legacy-zoneengine"
-    }
-
     if ($Quiet) {
         & $cscript //nologo $statusProbe @probeArguments *> $null
         $probeExit = $LASTEXITCODE
@@ -282,7 +275,7 @@ $webEngine = @{ Name = "WebEngine"; File = "WebEngine.exe"; Ports = @((Get-Confi
 
 $engines = if ($WebOnly) { @($webEngine) } else { @($coreEngines) }
 
-if (-not $WebOnly -and -not $LegacyZoneEngine) {
+if (-not $WebOnly) {
     $newZoneExecutable = Join-Path $engineDir $zoneEngine.File
     if (-not (Test-Path -LiteralPath $newZoneExecutable)) {
         throw "ZoneEngine_New is missing; run tools\build_aorebirth_debug.cmd."
@@ -399,7 +392,7 @@ if ($failures.Count -eq 0) {
     if ($WebOnly) {
         $finalStatus = Invoke-EngineStatusProbe -Arguments @("--web-required")
     }
-    elseif (-not $LegacyZoneEngine) {
+    else {
         $finalStatus = Invoke-EngineStatusProbe -Arguments @("--engine-required", "ChatEngine")
         if ($finalStatus -eq 0) {
             $finalStatus = Invoke-EngineStatusProbe -Arguments @("--engine-required", "LoginEngine")
@@ -417,13 +410,6 @@ if ($failures.Count -eq 0) {
             $finalStatus = Invoke-EngineStatusProbe -Arguments @("--web-required")
         }
     }
-    else {
-        $finalStatus = Invoke-EngineStatusProbe -Arguments @("--core")
-        if ($finalStatus -eq 0 -and $WithWeb) {
-            $finalStatus = Invoke-EngineStatusProbe -Arguments @("--web-required")
-        }
-    }
-
     if ($finalStatus -ne 0) {
         $failures.Add("Final PID-to-port ownership verification failed with exit code $finalStatus.")
     }

@@ -1658,12 +1658,7 @@ CAPTURE_SPAWN_IDENTITY_FILTERS = {
 }
 OUTPUT = (
     REPO
-    / "AORebirth"
-    / "Server"
-    / "ZoneEngine"
-    / "Core"
-    / "Playfields"
-    / "CapturedSubwayOrdinaryContentProvider.cs"
+    / "Tests" / "Fixtures" / "Gameplay" / "Playfields" / "CapturedSubwayOrdinaryContentProvider.cs"
 )
 
 ARCHETYPES = {

@@ -19,8 +19,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod] public void SchedulerOrderingIsStableAndBounded() { var s = new WorldRespawnScheduler(); DateTime due = new DateTime(2030, 1, 1); s.Schedule(Schedule("z", 1, due)); s.Schedule(Schedule("a", 2, due)); s.Schedule(Schedule("b", 1, due)); CollectionAssert.AreEqual(new[] { "b", "z" }, s.TakeDue(due, 2).Select(x => x.SpawnKey).ToArray()); Assert.AreEqual(1, s.Count); }
         [TestMethod] public void SchedulerPreventsDuplicatesAndSupportsCancellationScopes() { var s = new WorldRespawnScheduler(); DateTime due = DateTime.UtcNow; Assert.IsTrue(s.Schedule(Schedule("a", 1, due))); Assert.IsFalse(s.Schedule(Schedule("a", 1, due))); Assert.IsTrue(s.Cancel("a")); s.Schedule(Schedule("a", 1, due)); s.Schedule(Schedule("b", 2, due)); s.CancelPlayfield(1); Assert.IsFalse(s.Contains("a")); Assert.IsTrue(s.Contains("b")); }
         [TestMethod] public void FixedAndRandomDelaysAreDeterministic() { Assert.AreEqual(60, WorldRespawnScheduler.SelectDelay(Fixed("p", 60), null).TotalSeconds); RespawnPolicyDefinition range = Fixed("r", 1); range.Mode = WorldRespawnMode.RandomDelayRange; range.FixedDelaySeconds = null; range.MinimumDelaySeconds = 10; range.MaximumDelaySeconds = 20; Assert.AreEqual(12.5, WorldRespawnScheduler.SelectDelay(range, new FixedRandom(0.25)).TotalSeconds); AssertThrows(() => WorldRespawnScheduler.SelectDelay(range, null)); var state = new PopulationRuntimeState { SpawnKey = "random", PlayfieldId = 127, Generation = 1, CurrentRuntimeIdentity = Identity.None }; Assert.IsFalse(WorldRespawnScheduler.TryScheduleForLifecycle(new WorldRespawnScheduler(), state, range, RespawnDelayStartsAt.NpcDespawn, DateTime.UtcNow, new FixedRandom(double.NaN))); }
-        [TestMethod] public void ArchitectureGuardrailsKeepPacketsLootAndPerSpawnTimersOut() { string root = FindRepositoryRoot(); string controller = Read(root, "WorldPopulationController.cs"); string scheduler = Read(root, "WorldRespawnScheduler.cs"); string ordinary = Read(root, "OrdinaryEnemyRuntimeService.cs"); Assert.IsFalse(controller.Contains("MessageHandler") || controller.Contains("LootGenerationService") || controller.Contains("System.Threading.Timer")); Assert.IsFalse(scheduler.Contains("System.Threading.Timer")); Assert.IsFalse(ordinary.Contains("ScheduleRespawnAfterDespawn") || ordinary.Contains("pendingRespawns")); }
-        [TestMethod] public void MigrationUsesControllerNotificationsDataQuarantineAndDbAdapter() { string root = FindRepositoryRoot(); string controller = Read(root, "WorldPopulationController.cs"); string npc = Read(root, "NPCRuntimeService.cs"); string db = Read(root, "PlayfieldDbMobSpawnRuntimeService.cs"); Assert.IsTrue(controller.Contains("Enabled = row.Disposition == OrdinaryEnemyRuntimeDisposition.Active") && controller.Contains("Quarantined = row.Disposition == OrdinaryEnemyRuntimeDisposition.Quarantined")); Assert.IsTrue(npc.Contains("this.worldPopulation.ActivatePlayfield") && npc.Contains("this.worldPopulation.NotifyDeath") && npc.Contains("this.worldPopulation.NotifyNpcDespawn")); Assert.IsTrue(db.Contains("WorldSpawnDefinition AdaptDefinition") && db.Contains("ActivationPolicy = WorldSpawnActivationPolicy.Disabled")); }
+        [TestMethod] public void ArchitectureGuardrailsKeepPacketsLootAndPerSpawnTimersOut() { string root = FindRepositoryRoot(); string scheduler = LegacyGameplaySource.ReadAllText(System.IO.Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\WorldRespawnScheduler.cs")); Assert.IsFalse(scheduler.Contains("System.Threading.Timer")); }
+
 
         [TestMethod]
         public void FixedAndInclusiveLevelDefinitionsAreDeterministicAndValidated()
@@ -673,20 +673,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(CapturedEnemyAttackModel.Unresolved, incomplete.Combat.Contract.AttackModel);
             Assert.AreEqual(OrdinaryEnemyDamageSource.WeaponRoll, incomplete.Combat.DamageSource);
             Assert.IsTrue(incomplete.Combat.VisibleWeapon);
-
-            string source = Read(FindRepositoryRoot(), "CapturedEnemyCombatContract.cs");
-            int methodStart = source.IndexOf(
-                "private static CapturedEnemyCombatContract ForMeldedPatterns",
-                StringComparison.Ordinal);
-            int methodEnd = source.IndexOf(
-                "internal static CapturedEnemyCombatContract ForOrdinary",
-                methodStart,
-                StringComparison.Ordinal);
-            Assert.IsTrue(methodStart >= 0 && methodEnd > methodStart);
-            string implementation = source.Substring(methodStart, methodEnd - methodStart);
-            Assert.IsTrue(implementation.Contains("CapturedEnemyCombatContract.EquippedWeapon("));
-            Assert.IsFalse(implementation.Contains("EquippedWeaponWithEmptySpecialAttackContext"));
-            Assert.IsFalse(implementation.Contains("CapturedEnemyCombatContract.FixedAttack("));
         }
 
         [TestMethod]
@@ -2282,14 +2268,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string root = FindRepositoryRoot();
             string[] owners =
                 {
-                    @"Locality\PlayfieldLocalityVisibility.cs",
-                    "NpcCombatTickCoordinator.cs",
-                    "NpcCorpseLifecycleCoordinator.cs",
-                    "PlayfieldNpcCombatMovementRuntimeService.cs"
+                    @"Core\Playfield\Locality\LocalityVisibility.cs",
+                    @"Core\Entities\Corpse.cs",
+                    @"Core\Movement\CharacterMotor.cs"
                 };
             foreach (string owner in owners)
             {
-                string source = Read(root, owner);
+                string source = System.IO.File.ReadAllText(System.IO.Path.Combine(
+                    root, @"AORebirth\Server\ZoneEngine_New", owner));
                 Assert.IsFalse(source.Contains("ResolveForGeneration("), owner);
                 Assert.IsFalse(source.Contains("SelectVariant("), owner);
                 Assert.IsFalse(source.Contains("nextGeneration"), owner);
@@ -2300,17 +2286,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void SharedLevelAndRespawnOwnersContainNoEnemySpecificSelectionLogic()
         {
             string root = FindRepositoryRoot();
-            string model = Read(root, "OrdinaryEnemyProfile.cs");
-            string runtime = Read(root, "OrdinaryEnemyRuntimeService.cs");
-            string population = Read(root, "WorldPopulationDefinitions.cs");
-            string controller = Read(root, "WorldPopulationController.cs");
+            string model = LegacyGameplaySource.ReadAllText(System.IO.Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyProfile.cs"));
+            string population = LegacyGameplaySource.ReadAllText(System.IO.Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\WorldPopulationDefinitions.cs"));
             Assert.IsFalse(model.Contains("Bloodcreeper") || model.Contains("30379"));
-            Assert.IsFalse(runtime.Contains("Bloodcreeper") || runtime.Contains("30379"));
             Assert.IsFalse(population.Contains("Bloodcreeper") || population.Contains("30379"));
-            Assert.IsFalse(controller.Contains("Bloodcreeper") || controller.Contains("30379"));
             Assert.IsFalse(population.Contains("MonsterData"));
-            Assert.IsFalse(controller.Contains("MonsterData"));
-            Assert.IsTrue(controller.Contains("WorldRespawnPolicyResolver.ApplyGroupConfiguration"));
         }
 
         private static void AssertCapturedDamage(OrdinaryEnemyCatalog catalog, string displayName, int minimumDamage, int maximumDamage) { OrdinaryEnemyProfile profile = catalog.GetProfiles().Single(value => value.DisplayName == displayName); Assert.AreEqual(OrdinaryEnemyEvidenceState.Observed, profile.Combat.EvidenceState); Assert.AreEqual(minimumDamage, profile.Combat.Contract.MinDamage); Assert.AreEqual(maximumDamage, profile.Combat.Contract.MaxDamage); Assert.IsFalse(profile.Combat.Contract.IsCombatReady); Assert.IsTrue(profile.Combat.Contract.IsQuarantined); }

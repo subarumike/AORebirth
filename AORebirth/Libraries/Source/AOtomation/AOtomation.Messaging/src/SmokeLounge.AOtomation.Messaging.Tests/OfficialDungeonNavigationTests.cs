@@ -276,7 +276,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string path = Path.Combine(
                 FindRepositoryRoot(),
-                @"AORebirth\Server\ZoneEngine\Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json");
+                @"Tests\Fixtures\Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json");
             return Pf1931OfficialDungeonGeometryLoader.LoadPath(path);
         }
 

@@ -114,17 +114,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(table.AllowsDocumentedSupplement);
         }
 
-        [TestMethod]
-        public void GlobalLootLegacySeamUsesMercenaryCampPlayfieldScopedSupplement()
-        {
-            string source = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
-            StringAssert.Contains(source, "hasDocumentedMercenaryCampLoot");
-            StringAssert.Contains(source, "DocumentedMercenaryCampLootDefinitions.ApplyDocumentedLoot");
-            StringAssert.Contains(source, "DocumentedMercenaryCampLootDefinitions.PlayfieldInstance");
-        }
+
 
         [TestMethod]
         public void WikiAuditArtifactMatchesProductionDefinitions()

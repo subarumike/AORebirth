@@ -52,12 +52,7 @@ LEGACY_CAPTURE_ROOT = CAPTURE_REPO_ROOT / "For Repo"
 OUTPUT = REPO_ROOT / "docs" / "generated" / "capture_backed_npc_combat_inventory.json"
 CATALOG_OUTPUT = (
     REPO_ROOT
-    / "AORebirth"
-    / "Server"
-    / "ZoneEngine"
-    / "Core"
-    / "Playfields"
-    / "CapturedEnemyCombatProfileCatalog.g.cs"
+    / "Tests" / "Fixtures" / "Gameplay" / "Playfields" / "CapturedEnemyCombatProfileCatalog.g.cs"
 )
 FIXTURE_OUTPUT = (
     REPO_ROOT
@@ -2574,7 +2569,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260510-030142",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AndromedaIccHqContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int AndromedaPlayfieldInstance = 655;",
         "mappingBasis": "captured realm and server runtime content resource are both ICC HQ Andromeda 655",
     },
@@ -2582,7 +2577,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260528-190456",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/TempleOfThreeWindsContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int TempleOfThreeWindsPlayfieldInstance = 1931;",
         "mappingBasis": "captured Temple population is bound by the dedicated Temple content module",
     },
@@ -2590,7 +2585,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260614-202500",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AreteContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int PrivateAretePlayfieldInstance = 6553;",
         "mappingBasis": "captured Arete population is bound by the dedicated Arete content module",
     },
@@ -2598,7 +2593,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260721-033006",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/TempleOfThreeWindsContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int TempleOfThreeWindsPlayfieldInstance = 1931;",
         "mappingBasis": "docs/evidence/TEMPLE_OF_THREE_WINDS_20260721_ENTRANCE_TO_FIRST_BOSS.md records official-live realm 938000 as Temple resource 1931",
     },
@@ -2606,7 +2601,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260618-075746",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AreteContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int PrivateAretePlayfieldInstance = 6553;",
         "mappingBasis": "captured Arete population is bound by the dedicated Arete content module",
     },
@@ -2614,7 +2609,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260708-143600",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/SubwayContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int SubwayPlayfieldInstance = 127;",
         "mappingBasis": "docs/project/PROJECT_STATE.md records official-live realm 1187842 as Subway content resource 127",
     },
@@ -2622,7 +2617,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260629-142800",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AreteContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int PrivateAretePlayfieldInstance = 6553;",
         "mappingBasis": "captured Arete population is bound by the dedicated Arete content module",
     },
@@ -2630,7 +2625,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260629-193121",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AreteContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int PrivateAretePlayfieldInstance = 6553;",
         "mappingBasis": "captured Arete robot population is bound by the dedicated Arete content module",
     },
@@ -2638,7 +2633,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260710-202553",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/SubwayContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int SubwayPlayfieldInstance = 127;",
         "mappingBasis": "captured Subway population is bound by the dedicated Subway content module",
     },
@@ -2646,7 +2641,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260712-154941",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/SubwayContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int SubwayPlayfieldInstance = 127;",
         "mappingBasis": "captured Subway population is bound by the dedicated Subway content module",
     },
@@ -2654,7 +2649,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260716-034104",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/SubwayContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int SubwayPlayfieldInstance = 127;",
         "mappingBasis": "captured Subway population is bound by the dedicated Subway content module",
     },
@@ -2662,7 +2657,7 @@ RESOURCE_MAPPING_PROVENANCE = {
         "captureEvidenceSessions": (
             "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260719-021022",
         ),
-        "runtimeBindingSource": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/SubwayContentModule.cs",
+        "runtimeBindingSource": "Tests/Fixtures/Combat/RetiredRealmResourceBindings.json",
         "runtimeBindingLiteral": "private const int SubwayPlayfieldInstance = 127;",
         "mappingBasis": "captured Subway population is bound by the dedicated Subway content module",
     },

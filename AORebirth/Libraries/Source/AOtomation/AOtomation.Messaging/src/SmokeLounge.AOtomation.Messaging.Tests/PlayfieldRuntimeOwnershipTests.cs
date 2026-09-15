@@ -141,65 +141,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(2, constructionCount);
         }
 
-        [TestMethod]
-        public void ProductionOwnershipAndRetirementPathsAreConnected()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string zoneServerText = Read(repositoryRoot, @"Core\ZoneServer.cs");
-            string playfieldText = Read(repositoryRoot, @"Core\Playfields\Playfield.cs");
-            string runtimeSystemsText = Read(repositoryRoot, @"Core\Playfields\PlayfieldRuntimeSystems.cs");
-            string npcRuntimeText = Read(repositoryRoot, @"Core\Playfields\NPCRuntimeService.cs");
-            string corpseLifecycleText = Read(
-                repositoryRoot,
-                @"Core\Playfields\NpcCorpseLifecycleCoordinator.cs");
-            string combatTickText = Read(repositoryRoot, @"Core\Playfields\NpcCombatTickCoordinator.cs");
-            string dynelRegistryText = Read(repositoryRoot, @"Core\Playfields\PlayfieldDynelRegistry.cs");
-            string localityText = Read(repositoryRoot, @"Core\Playfields\Locality\PlayfieldLocality.cs");
 
-            Assert.IsTrue(zoneServerText.Contains("RuntimeOwnershipRegistry<int, IPlayfield> playfields"));
-            Assert.IsTrue(zoneServerText.Contains("this.playfields.GetOrCreate(id.Instance)"));
-            Assert.IsTrue(zoneServerText.Contains("Type = IdentityType.Playfield"));
-            Assert.IsTrue(zoneServerText.Contains("this.playfields.Replace(playfieldIdentity.Instance)"));
-            Assert.IsTrue(zoneServerText.Contains("this.playfields.Dispose()"));
-
-            Assert.IsTrue(playfieldText.Contains("return this.server.PlayfieldById(playfield);"));
-            Assert.IsFalse(
-                ExtractMethod(playfieldText, "private IPlayfield ResolveOrCreatePlayfieldTransferDestination")
-                    .Contains("new Playfield("));
-            Assert.IsTrue(playfieldText.Contains("private readonly object heartBeatSync"));
-            Assert.IsTrue(playfieldText.Contains("if (!this.disposed)"));
-            Assert.IsTrue(playfieldText.Contains("this.heartBeat.Dispose();"));
-            Assert.IsTrue(playfieldText.Contains("lock (this.heartBeatSync)"));
-
-            Assert.IsTrue(npcRuntimeText.Contains("character.DoNotDoTimers = true;"));
-            Assert.IsTrue(npcRuntimeText.Contains("character.SetFightingTarget(Identity.None);"));
-            Assert.IsTrue(npcRuntimeText.Contains("controller.StopFollow();"));
-            Assert.IsTrue(npcRuntimeText.Contains("this.combatTick.ClearRuntimeState();"));
-            Assert.IsTrue(npcRuntimeText.Contains("this.worldPopulation.ClearPlayfield"));
-            Assert.IsTrue(npcRuntimeText.Contains("this.capturedTempleEncounters.ClearRuntimeState();"));
-            Assert.IsTrue(combatTickText.Contains("internal void ClearRuntimeState()"));
-            Assert.IsTrue(combatTickText.Contains("this.pendingCapturedAttackStarts.Clear();"));
-            Assert.IsTrue(combatTickText.Contains("this.pendingCapturedMovementTransitions.Clear();"));
-            Assert.IsTrue(corpseLifecycleText.Contains("this.deadNpcDespawnTicks.Clear();"));
-            Assert.IsTrue(playfieldText.Contains("this.locality.Clear();"));
-            Assert.IsTrue(localityText.Contains("this.visibility.Clear();"));
-            Assert.IsTrue(localityText.Contains("this.cells.Clear();"));
-            Assert.IsTrue(runtimeSystemsText.Contains("this.dynelRegistry.Clear();"));
-            Assert.IsTrue(dynelRegistryText.Contains("internal void Clear()"));
-        }
 
         [TestMethod]
         public void TemplePopulationContractHasOneHundredSixtySevenOrdinaryAndTwelveInitiallyActiveNamed()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string encounterText = Read(
-                repositoryRoot,
-                @"Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs");
 
             Assert.AreEqual(167, new CapturedTempleOfThreeWindsContentProvider().GetSpawns().Length);
-            Assert.AreEqual(12, CountOccurrences(encounterText, "new NamedEncounterState("));
-            Assert.AreEqual(2, CountOccurrences(encounterText, "spawnOnActivation: false"));
-            Assert.AreEqual(2, CountOccurrences(encounterText, "new ReanimatedSlotState("));
         }
 
         private static string Read(string repositoryRoot, string relativePath)

@@ -8,22 +8,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class PlayfieldHydrationCharacterizationTests
     {
-        [TestMethod]
-        public void CurrentPlayfieldMaterializationOrderRemainsExplicitAndStable()
-        {
-            string root = FindRepositoryRoot();
-            string source = ReadRepositoryFile(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs");
 
-            AssertOrdered(
-                source,
-                "this.MaterializeDbMobSpawns(",
-                "registerContent(playfieldIdentity);",
-                "this.MaterializeVendors(",
-                "this.MaterializeStaticDynels(",
-                "refreshDynelRegistry();");
-        }
 
         [TestMethod]
         public void CurrentLegacySourcePrecedenceRemainsCharacterized()
@@ -32,9 +17,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string loader = ReadRepositoryFile(
                 root,
                 @"AORebirth\Libraries\Source\PlayfieldLoader\PlayfieldLoader.cs");
-            string contentData = ReadRepositoryFile(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs");
 
             AssertOrdered(
                 loader,
@@ -42,37 +24,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "TeleportDao.Instance.GetWhere(",
                 "resolvedDestinationPlayfieldId == SubwayPlayfieldId",
                 "ShouldSynthesizeReverseProxyExit(");
-            AssertOrdered(
-                contentData,
-                "PlayfieldLoader.PFData.TryGetValue(",
-                "this.isPrivateCityPlayfieldCandidate(",
-                "MissionInstanceService.IsMissionInstancePlayfield(",
-                "playfieldIdentity.Instance == 7001",
-                "IsLuxuryApartmentPlayfield(",
-                "return PlayfieldLoader.PFData[playfieldIdentity.Instance].Statels;");
         }
 
         [TestMethod]
         public void CurrentRuntimeCreationUsesOneOwnedLegacyFactory()
         {
             string root = FindRepositoryRoot();
-            string zoneServer = ReadRepositoryFile(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\ZoneServer.cs");
             string registry = ReadRepositoryFile(
                 root,
-                @"AORebirth\Server\ZoneEngine\Core\RuntimeOwnershipRegistry.cs");
-
-            Assert.AreEqual(
-                1,
-                CountOccurrences(
-                    zoneServer,
-                    "new RuntimeOwnershipRegistry<int, IPlayfield>(this.CreateOwnedPlayfield)"),
-                "ZoneServer must retain one owned playfield factory registration.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(zoneServer, "new Playfield("),
-                "The characterized production source must contain one legacy Playfield construction site.");
+                @"Tests\Fixtures\Gameplay\RuntimeOwnershipRegistry.cs");
             AssertOrdered(
                 registry,
                 "if (this.runtimes.TryGetValue(key, out runtime))",

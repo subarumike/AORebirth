@@ -27,136 +27,27 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void DedicatedEncounterOwnsAbmouthAndOrdinaryPopulationRejectsBossesAndSummons()
         {
             string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string npcRuntime = ReadPlayfieldSource(root, "NPCRuntimeService.cs");
-            string ordinaryProvider = ReadPlayfieldSource(root, "CapturedSubwayOrdinaryContentProvider.cs");
-            string populationDefinitions = ReadPlayfieldSource(root, "WorldPopulationDefinitions.cs");
-
-            Assert.IsTrue(
-                encounter.Contains("internal sealed class CapturedSubwayEncounterRuntimeService")
-                && encounter.Contains("internal const int SubwayPlayfieldId = 127;")
-                && encounter.Contains("internal const string EncounterKey = \"subway.127.encounter.abmouth\";")
-                && encounter.Contains("if (playfieldIdentity.Instance != SubwayPlayfieldId"),
-                "Abmouth must remain owned by one PF127-only dedicated encounter runtime.");
-            Assert.IsTrue(
-                npcRuntime.Contains("private readonly CapturedSubwayEncounterRuntimeService capturedSubwayEncounters;")
-                && npcRuntime.Contains("new CapturedSubwayEncounterRuntimeService(")
-                && npcRuntime.Contains("this.worldPopulation.ActivatePlayfield(playfieldIdentity);\n            this.capturedSubwayEncounters.ActivatePlayfield(playfieldIdentity);")
-                && npcRuntime.Contains("this.capturedSubwayEncounters.ProcessDue(utcNow, this.AcquireAggro);"),
-                "NPCRuntimeService must retain the dedicated encounter owner after ordinary population activation.");
+            string ordinaryProvider = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+            string populationDefinitions = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\WorldPopulationDefinitions.cs"));
             Assert.IsFalse(
                 ordinaryProvider.Contains("Abmouth Supremus") || ordinaryProvider.Contains("155962"),
                 "Abmouth must not be reintroduced through ordinary Subway population rows.");
             Assert.IsTrue(
                 populationDefinitions.Contains("spawn.OwnedSummon || spawn.BossOrScripted"),
                 "The normalized ordinary-world validator must continue rejecting owned summons and scripted bosses.");
-            Assert.IsTrue(
-                encounter.Contains("IsEncounterSummon")
-                && encounter.Contains("InfectorProfileKey = \"subway.127.encounter.abmouth-infector\""),
-                "Abmouth-owned Infectors must remain encounter summons, separate from ordinary Infector rows.");
         }
 
-        [TestMethod]
-        public void CapturedBossAndSummonDefinitionsPreserveExactScfuSpawnFacts()
-        {
-            string encounter = ReadPlayfieldSource(FindRepositoryRoot(), "CapturedSubwayEncounterRuntimeService.cs");
 
-            Assert.IsTrue(
-                encounter.Contains("internal const int AbmouthMonsterData = 155962;")
-                && encounter.Contains("\"Abmouth Supremus\",")
-                && encounter.Contains("30,\n                10324,\n                162,\n                115,\n                114,\n                0,\n                3,")
-                && encounter.Contains("357.088409f,\n                76.107948f,\n                99.123543f,")
-                && encounter.Contains("-0.713226199f")
-                && encounter.Contains("0.700933933f"),
-                "The boss definition must preserve the captured template, stats, position, and heading.");
-            Assert.IsTrue(
-                encounter.Contains("internal const int InfectorMonsterData = 31909;")
-                && encounter.Contains("24,\n                968,\n                70,\n                162,\n                105,\n                10,\n                0,")
-                && encounter.Contains("355.542145f,\n                68.955902f,\n                99.459953f,")
-                && encounter.Contains("350.425507f,\n                71.647079f,\n                99.786812f,")
-                && encounter.Contains("-0.673485816f")
-                && encounter.Contains("0.739200115f")
-                && encounter.Contains("-0.715518296f")
-                && encounter.Contains("0.698594034f"),
-                "Both initial Infector slots must preserve their distinct captured SCFU positions and headings.");
-            Assert.IsTrue(
-                encounter.Contains("0x04CB,")
-                && encounter.Contains("0x04C8,")
-                && CountOccurrences(encounter, "unchecked((int)0x022A4A43)") == 2
-                && encounter.Contains("HexToBytes(\"80000000000000008000000003010001000100010001000000020000\")")
-                && encounter.Contains("FirstInfectorUnknown1")
-                && encounter.Contains("SecondInfectorUnknown1")
-                && encounter.Contains("ReplacementInfectorUnknown1"),
-                "Captured appearance values, SCFU flags, and unknown blocks must not drift.");
-        }
 
-        [TestMethod]
-        public void EncounterCapsTwoSlotsRefillsOnlyDuringCombatAndCleansOnBossDeath()
-        {
-            string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string npcRuntime = ReadPlayfieldSource(root, "NPCRuntimeService.cs");
 
-            Assert.IsTrue(
-                encounter.Contains("new InfectorSlotState(0)")
-                && encounter.Contains("new InfectorSlotState(1)")
-                && !encounter.Contains("new InfectorSlotState(2)"),
-                "The encounter must remain capped at two owned Infector slots.");
-            Assert.IsTrue(
-                encounter.Contains("FirstInfectorDelaySeconds = 1.212281")
-                && encounter.Contains("SecondInfectorDelaySeconds = 2.326367")
-                && encounter.Contains("CapturedRefillDelays = { 0.830, 0.380, 3.322, 3.490 }")
-                && encounter.Contains("CapturedReplacementInfectorOffsetX = 3.0f")
-                && encounter.Contains("(float)boss.Position.x + CapturedReplacementInfectorOffsetX")
-                && encounter.Contains("slot.ActiveIdentity.Instance != 0")
-                && encounter.Contains("if (!this.abmouthDead && this.combatActive && this.abmouthIdentity.Instance != 0)"),
-                "Initial summon timing and captured live-fight refill gating must remain explicit.");
-            Assert.IsTrue(
-                encounter.Contains("this.abmouthDead = true;")
-                && encounter.Contains("this.combatActive = false;")
-                && encounter.Contains("slot.SpawnDueAtUtc = null;")
-                && encounter.Contains("summon.Stats[StatIds.petmaster].Value = 0;")
-                && encounter.Contains("SetStat(character, StatIds.flags, unchecked((int)0x18081201));")
-                && encounter.Contains("return livingSummons.ToArray();"),
-                "Boss death must cancel refills, clear summon ownership, and return every living summon for despawn.");
-            Assert.IsTrue(
-                npcRuntime.Contains("foreach (ICharacter summon in this.capturedSubwayEncounters.NotifyDeath(target, diedAtUtc))")
-                && npcRuntime.Contains("this.playfield.DespawnNpcImmediately(summon);")
-                && npcRuntime.Contains("this.capturedSubwayEncounters.NotifyNpcDespawn(target, utcNow);")
-                && npcRuntime.Contains("CapturedEncounterRuntimeRegistry.Remove(target.Identity.Instance);"),
-                "NPCRuntimeService must immediately despawn both living summons and remove encounter registration.");
-        }
 
-        [TestMethod]
-        public void LeashResetCancelsBossEncounterStateAndLivingSummons()
-        {
-            string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string npcRuntime = ReadPlayfieldSource(root, "NPCRuntimeService.cs");
 
-            Assert.IsTrue(
-                encounter.Contains("internal ICharacter[] NotifyCombatReset(ICharacter npc)")
-                && encounter.Contains("this.ClearVergilCombatState();")
-                && encounter.Contains("this.combatActive = false;")
-                && encounter.Contains("this.refillDelayIndex = 0;")
-                && encounter.Contains("slot.SpawnDueAtUtc = null;")
-                && encounter.Contains("slot.ActiveIdentity = Identity.None;")
-                && encounter.Contains("slot.Generation = 0;")
-                && encounter.Contains("return activeSummons.ToArray();"),
-                "Leashing a captured boss must cancel pending combat-only encounter state.");
-            Assert.IsTrue(
-                npcRuntime.Contains("this.capturedSubwayEncounters.NotifyCombatReset(npc)")
-                && npcRuntime.Contains("this.playfield.DespawnNpcImmediately(summon);"),
-                "The shared NPC leash must immediately remove Abmouth's living encounter summons.");
-        }
 
         [TestMethod]
         public void AbmouthUsesIndependentXopzAndDenwStreamsWhileSummonsUseDmxf()
         {
             string root = FindRepositoryRoot();
-            string rules = ReadPlayfieldSource(root, "NpcCombatAttackRules.cs");
-            string contracts = ReadPlayfieldSource(root, "CapturedEnemyCombatContract.cs");
-            string coordinator = ReadPlayfieldSource(root, "NpcCombatTickCoordinator.cs");
+            string rules = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\NpcCombatAttackRules.cs"));
 
             Assert.IsTrue(
                 rules.Contains("CapturedSubwayAbmouthXopzMinimumDamage = 73")
@@ -167,352 +58,35 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && rules.Contains("CapturedSubwayAbmouthDenwTag = 0x44454E57")
                 && rules.Contains("CapturedSubwayAbmouthAttackCycleSeconds = 6.3"),
                 "Captured XOPZ and DENW damage, tags, and independent cadence must remain exact.");
-            Assert.IsTrue(
-                contracts.Contains("case 155962:")
-                && contracts.Contains("CapturedEnemyCombatContract.CapturedParallelAttackSequence")
-                && contracts.Contains("CapturedSubwayAbmouthXopzFirstInitialSeconds")
-                && contracts.Contains("CapturedSubwayAbmouthDenwInitialSeconds")
-                && contracts.Contains("CapturedSubwayAbmouthXopzSecondInitialSeconds")
-                && CountOccurrences(contracts, "abmouthXopzAttack)") == 2
-                && CountOccurrences(contracts, "abmouthDenwAttack)") == 1,
-                "The boss contract must preserve two XOPZ clocks and one DENW clock instead of flattening them.");
-            Assert.IsTrue(
-                coordinator.Contains("nextCapturedParallelAttackTicks")
-                && coordinator.Contains("nextTicks[index] <= now && nextTicks[index] < dueAt")
-                && coordinator.Contains(
-                    "nextTicks[dueIndex] = streams[dueIndex].ResolveNextTickAfterHit(now);"),
-                "Parallel captured streams must schedule and recharge independently.");
-            Assert.IsTrue(
-                rules.Contains("CapturedSubwayAbmouthInfectorMinimumDamage = 21")
-                && rules.Contains("CapturedSubwayAbmouthInfectorMaximumDamage = 26")
-                && rules.Contains("CapturedSubwayAbmouthInfectorRechargeSeconds = 3.7")
-                && rules.Contains("CapturedSubwayAbmouthInfectorTag = 0x444D5846")
-                && contracts.Contains("case 31909:")
-                && contracts.Contains("Abmouth-owned Infector DMXF attacks"),
-                "Owned Infector combat must retain its distinct DMXF stream and captured damage range.");
         }
 
-        [TestMethod]
-        public void CapturedAppearanceCorpseAndLootContextRemainDedicatedToTheBoss()
-        {
-            string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string npcRuntime = ReadPlayfieldSource(root, "NPCRuntimeService.cs");
-            string scfu = ReadPacketSource(root, "SimpleCharFullUpdate.cs");
-            string corpse = ReadPacketSource(root, "CorpseFullUpdate.cs");
-            string playfield = ReadPlayfieldSource(root, "Playfield.cs");
-            string lootDefinitions = ReadPlayfieldSource(root, "LootDefinitions.cs");
-            string globalLoot = ReadPlayfieldSource(root, "GlobalLootRuntimeService.cs");
-            string lootRules = ReadPlayfieldSource(root, "SubwayLootPoolRules.cs");
-            string lootGeneration = ReadPlayfieldSource(root, "LootGenerationService.cs");
 
-            Assert.IsTrue(
-                encounter.Contains("CapturedScfuFlags")
-                && encounter.Contains("CapturedScfuFlags2")
-                && encounter.Contains("CapturedScfuUnknown1")
-                && encounter.Contains("CapturedScfuUnknown2")
-                && encounter.Contains("155548,\n                1800.0,\n                1800.0,")
-                && encounter.Contains("31868,\n                120.0,\n                30.0,"),
-                "Runtime SCFU and corpse definitions must retain captured boss/summon constants and corpse lifetimes.");
-            Assert.IsTrue(
-                scfu.Contains("CapturedEncounterRuntimeRegistry.TryGet")
-                && scfu.Contains("scfu.Version = 58;")
-                && scfu.Contains("scfu.Appearance.Value = encounterRuntime.AppearanceValue;")
-                && scfu.Contains("encounterRuntime.CapturedScfuRunSpeedBase")
-                && scfu.Contains("scfu.Flags2 = (byte)encounterRuntime.CapturedScfuFlags2;")
-                && scfu.Contains("scfu.Unknown1 = encounterRuntime.CapturedScfuUnknown1.ToArray();")
-                && scfu.Contains("capturedNpcInfo.UnknownData = (byte)encounterRuntime.CapturedScfuNpcUnknownData;")
-                && scfu.Contains("encounterRuntime.Textures.Select(")
-                && scfu.Contains("encounterRuntime.Meshes.Select(")
-                && scfu.Contains("encounterRuntime.Waypoints.Select("),
-                "SCFU serialization must consume the dedicated encounter definition without generic appearance fallback.");
-            Assert.IsTrue(
-                npcRuntime.Contains("this.capturedSubwayEncounters.FindAutomaticAggroTarget(character)")
-                && npcRuntime.Contains("?? this.ordinaryEnemies.FindAutomaticAggroTarget(character)")
-                && npcRuntime.Contains("this.capturedSubwayEncounters.NotifyCombatStarted(target, attacker, DateTime.UtcNow);"),
-                "Captured proactive aggro and summon timing must start through the encounter before ordinary fallback.");
-            Assert.IsTrue(
-                corpse.Contains("CapturedSubwayAbmouthPacketLength = 415")
-                && corpse.Contains("CapturedSubwayAbmouthMonsterDataOffset = 331")
-                && corpse.Contains("CapturedSubwayAbmouthTailDeadNpcInstanceOffset = 343")
-                && corpse.Contains("BuildCapturedSubwayAbmouth(")
-                && corpse.Contains("WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);")
-                && corpse.Contains("CapturedSubwayAbmouthMonsterDataOffset, corpseMonsterData")
-                && playfield.Contains("CapturedEncounterRuntimeRegistry.TryGet")
-                && playfield.Contains("encounterDefinition.CorpseCatMesh")
-                && playfield.Contains("encounterDefinition.UnlootedCorpseLifetimeSeconds")
-                && playfield.Contains("encounterDefinition.LootedCleanupSeconds"),
-                "Corpse serialization/state must preserve the 415-byte Abmouth template and encounter-owned visual/lifetimes.");
-            Assert.IsTrue(
-                encounter.Contains("AbmouthProfileKey = \"subway.127.boss.abmouth-supremus\"")
-                && encounter.Contains("EncounterKey = \"subway.127.encounter.abmouth\"")
-                && lootRules.Contains("if (context.IsBoss)")
-                && lootRules.Contains("SubwayLootPoolKind.Boss")
-                && lootGeneration.Contains("case LootAssignmentTargetType.Boss:")
-                && lootGeneration.Contains("context.IsBoss && Same(assignment.TargetKey, context.EnemyProfileKey)"),
-                "Abmouth loot must resolve through its dedicated boss profile rather than ordinary dungeon/enemy fallback.");
-            Assert.IsTrue(
-                lootDefinitions.Contains("ObservedSnapshot")
-                && lootDefinitions.Contains("ItemPoolUnresolved")
-                && globalLoot.Contains("AbmouthEncounterRuntimeService.AbmouthProfileKey")
-                && globalLoot.Contains("ItemPoolUnresolved = true")
-                && globalLoot.Contains("ObservedCorpseSnapshots = snapshots")
-                && globalLoot.Contains("\"capture.20260712-232137\",")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260712-232137\", 136622, 136623, 30, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260712-232137\", 202717, 202718, 28, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260712-232137\", 107933, 107934, 23, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260712-232137\", 85693, 27389, 30, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260712-232137\", 287146, 287146, 200, 1)")
-                && globalLoot.Contains("\"capture.20260716-220400\",")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260716-220400\", 202741, 202742, 32, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260716-220400\", 202734, 202735, 32, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260716-220400\", 202717, 202718, 32, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260716-220400\", 85723, 85722, 32, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260716-220400\", 123968, 123970, 25, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(CapturedAbmouthLootEvidence, \"capture.20260716-220400\", 287146, 287146, 200, 1)")
-                && globalLoot.Contains("CapturedAbmouthCredits = 587")
-                && globalLoot.Contains("Mode = CreditsPolicyMode.Unresolved")
-                && globalLoot.Contains("SelectionProbabilityEvidence = LootEvidenceConfidence.Unresolved"),
-                "Both exact Abmouth item-plus-credit snapshots must remain atomic while the wider pool and selection probabilities stay unresolved.");
-        }
 
-        [TestMethod]
-        public void NamedBossesRespawnTenMinutesAfterDeathIndependentlyOfCorpses()
-        {
-            string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string npcRuntime = ReadPlayfieldSource(root, "NPCRuntimeService.cs");
 
-            Assert.IsTrue(
-                encounter.Contains("CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10)")
-                && encounter.Contains("private readonly DungeonNamedRespawnScheduler namedRespawns")
-                && encounter.Contains("this.ScheduleNamedRespawn(\n                AbmouthProfileKey,\n                diedAtUtc.Add(CapturedNamedBossRespawnDelay));")
-                && encounter.Contains("this.ScheduleNamedRespawn(\n                    VergilAeneidProfileKey,\n                    diedAtUtc.Add(CapturedNamedBossRespawnDelay));")
-                && encounter.Contains("this.ProcessNamedBossRespawns(utcNow);")
-                && CountOccurrences(encounter, "CreateBossDefinition()") == 3
-                && CountOccurrences(encounter, "CreateVergilAeneidDefinition()") == 3,
-                "Abmouth and Vergil must use the confirmed ten-minute post-death named-boss respawn path.");
-            Assert.IsTrue(
-                encounter.Contains("!this.namedRespawns.Contains(AbmouthProfileKey)")
-                && encounter.Contains("!this.namedRespawns.Contains(VergilAeneidProfileKey)")
-                && encounter.Contains("this.namedRespawns.IsDue(AbmouthProfileKey, utcNow)")
-                && encounter.Contains("this.namedRespawns.IsDue(VergilAeneidProfileKey, utcNow)"),
-                "Playfield activation must not bypass a pending boss timer, and due retries must wait for the dead NPC identity to clear.");
-            Assert.IsTrue(
-                npcRuntime.Contains("DateTime diedAtUtc = DateTime.UtcNow;")
-                && npcRuntime.Contains("this.worldPopulation.NotifyDeath(target, corpseIdentity, diedAtUtc);")
-                && npcRuntime.Contains("this.capturedSubwayEncounters.NotifyDeath(target, diedAtUtc)"),
-                "Ordinary population and named encounters must receive the same death-time boundary.");
-            Assert.IsTrue(
-                encounter.IndexOf("this.ProcessNamedBossRespawns(utcNow);", StringComparison.Ordinal)
-                < encounter.IndexOf(
-                    "if (!this.combatActive || this.abmouthDead || this.abmouthIdentity.Instance == 0)",
-                    StringComparison.Ordinal),
-                "Named-boss respawn processing must run before the Abmouth combat-only early return.");
-        }
 
-        [TestMethod]
-        public void VergilProfileCannotActivateAbmouthAggroSummonsOrDeathCleanup()
-        {
-            string encounter = ReadPlayfieldSource(
-                FindRepositoryRoot(),
-                "CapturedSubwayEncounterRuntimeService.cs");
-            int automaticAggro = encounter.IndexOf(
-                "internal ICharacter FindAutomaticAggroTarget",
-                StringComparison.Ordinal);
-            int notifyCombat = encounter.IndexOf(
-                "internal void NotifyCombatStarted",
-                automaticAggro,
-                StringComparison.Ordinal);
-            int processDue = encounter.IndexOf(
-                "internal void ProcessDue",
-                notifyCombat,
-                StringComparison.Ordinal);
-            int notifyDeath = encounter.IndexOf(
-                "internal ICharacter[] NotifyDeath",
-                processDue,
-                StringComparison.Ordinal);
 
-            Assert.IsTrue(
-                encounter.Contains("VergilAeneidProfileKey = \"subway.127.boss.vergil-aeneid\"")
-                && encounter.Contains("VergilAeneidEncounterKey = \"subway.127.encounter.vergil-aeneid\"")
-                && automaticAggro >= 0
-                && notifyCombat > automaticAggro
-                && processDue > notifyCombat
-                && notifyDeath > processDue
-                && encounter.IndexOf("AbmouthProfileKey", automaticAggro, StringComparison.Ordinal) < notifyCombat
-                && encounter.IndexOf("AbmouthProfileKey", notifyCombat, StringComparison.Ordinal) < processDue
-                && encounter.IndexOf("AbmouthProfileKey", notifyDeath, StringComparison.Ordinal) > notifyDeath
-                && encounter.Contains("if (!this.combatActive || this.abmouthDead || this.abmouthIdentity.Instance == 0)"),
-                "Only the Abmouth profile may activate proactive aggro, Infector timers, or summon cleanup.");
-            Assert.IsTrue(
-                encounter.Contains("VergilAeneidProfileKey,\n                \"subway.127.boss.vergil-aeneid.spawn\",")
-                && encounter.Contains("VergilAeneidMonsterData,\n                true,\n                false,")
-                && !encounter.Contains("this.abmouthIdentity = vergil.Identity")
-                && !encounter.Contains("this.combatActive = true;\n                    this.vergilAeneidIdentity"),
-                "Vergil must remain a separate boss profile and never become an Abmouth-owned summon source.");
-        }
 
-        [TestMethod]
-        public void VergilPreservesExactPf127SpawnAppearanceAndObservedLevelHealthVariants()
-        {
-            string encounter = ReadPlayfieldSource(
-                FindRepositoryRoot(),
-                "CapturedSubwayEncounterRuntimeService.cs");
 
-            Assert.IsTrue(
-                encounter.Contains("internal const int SubwayPlayfieldId = 127;")
-                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                29,\n                6796,\n                131,\n                131,")
-                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                30,\n                7227,\n                132,\n                135,")
-                && encounter.Contains("new CapturedEncounterLevelHealthVariant(\n                31,\n                7659,\n                132,\n                140,")
-                && encounter.Contains("variant = VergilAeneidVariants[this.spawnRandom.Next(VergilAeneidVariants.Length)]")
-                && encounter.Contains("variant.Level,\n                variant.Health,\n                variant.MonsterScale,\n                variant.RunSpeed,"),
-                "Vergil must select only the three captured level, health, scale, and RunSpeed variants in PF127.");
-            Assert.IsTrue(
-                encounter.Contains("278.045074f,\n                73.01795f,\n                98.80104f,")
-                && encounter.Contains("-0.7096085f")
-                && encounter.Contains("0.704596162f")
-                && encounter.Contains("1643u,\n                unchecked((int)0x020B4ACB)")
-                && encounter.Contains("HexToBytes(\"00000000000000000000000002010001000100010001000000020000\")")
-                && encounter.Contains("npcFamily: 138")
-                && encounter.Contains("breed: 3")
-                && encounter.Contains("sex: 2")
-                && encounter.Contains("race: 1")
-                && encounter.Contains("headMesh: 40171")
-                && encounter.Contains("new CapturedSubwayTextureDefinition(0, 117653, 0)")
-                && encounter.Contains("new CapturedSubwayTextureDefinition(4, 9622, 0)")
-                && encounter.Contains("new CapturedSubwayMeshDefinition(0, 40171u, 0, 4)")
-                && encounter.Contains("new CapturedSubwayMeshDefinition(1, 21126u, 0, 2)"),
-                "Vergil's captured spawn coordinates, heading, SCFU appearance, textures, and meshes must remain exact.");
-        }
 
         [TestMethod]
         public void EumenidesPreservesAtomicScfuAndDedicatedNamedEnemyLifecyclePolicy()
         {
             string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string ordinary = ReadPlayfieldSource(root, "CapturedSubwayOrdinaryContentProvider.cs");
-
-            Assert.IsTrue(
-                encounter.Contains("EumenidesMonsterData = 203726")
-                && encounter.Contains("EumenidesProfileKey = \"subway.127.named.eumenides\"")
-                && encounter.Contains("EumenidesEncounterKey = \"subway.127.encounter.eumenides\"")
-                && encounter.Contains("CapturedEumenidesAggroRadius = 23.359f")
-                && encounter.Contains("EumenidesObservedRespawnDelay = TimeSpan.FromMinutes(10)")
-                && encounter.Contains("this.ScheduleNamedRespawn(\n                    EumenidesProfileKey,\n                    diedAtUtc.Add(EumenidesObservedRespawnDelay))")
-                && encounter.Contains("this.ProcessEumenidesRespawn(utcNow);")
-                && encounter.Contains("maximumNpcLeashDistanceFromHome: 100.0"),
-                "Eumenides must use its own named profile, the 23.358918-unit capture-proven acquisition lower bound, and Mike-observed official-live respawn timing.");
-            Assert.IsTrue(
-                encounter.Contains("EumenidesProfileKey,\n                \"subway.127.named.eumenides.spawn\",\n                EumenidesEncounterKey,\n                \"Eumenides\",\n                EumenidesMonsterData,\n                false,\n                false,")
-                && encounter.Contains("20,\n                2792,\n                130,\n                76,\n                76,")
-                && encounter.Contains("241.105133f,\n                73.0453949f,\n                44.0469055f,")
-                && encounter.Contains("0.250876963f")
-                && encounter.Contains("-0.96801883f")
-                && encounter.Contains("1643u,\n                unchecked((int)0x020A4ACB)")
-                && encounter.Contains("HexToBytes(\"80000000000000000000000002010001000100010001000000020000\")")
-                && encounter.Contains("17905,\n                1800.0,\n                3.0,")
-                && encounter.Contains("npcFamily: 148")
-                && encounter.Contains("breed: 3")
-                && encounter.Contains("sex: 2")
-                && encounter.Contains("headMesh: 29708")
-                && encounter.Contains("new CapturedSubwayTextureDefinition(0, 9620, 0)")
-                && encounter.Contains("new CapturedSubwayTextureDefinition(4, 9625, 0)")
-                && encounter.Contains("new CapturedSubwayMeshDefinition(0, 29708u, 0, 4)")
-                && encounter.Contains("new CapturedSubwayMeshDefinition(1, 35564u, 0, 2)"),
-                "Eumenides must preserve one atomic 20260716-034559 SCFU plus the captured corpse CATMesh and observed corpse timing.");
+            string ordinary = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
             Assert.IsFalse(
                 ordinary.Contains("Eumenides") || ordinary.Contains("203726"),
                 "Eumenides must remain outside ordinary population generation.");
-            Assert.IsTrue(
-                encounter.Contains("active nano refresh unresolved and omitted"),
-                "The two observed active nanos must remain explicitly omitted until refresh semantics are known.");
         }
 
         [TestMethod]
         public void StrikeForemanUsesCapturedSpawnExactCombatAndSharedNamedLifecycle()
         {
             string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(
-                root,
-                "CapturedSubwayEncounterRuntimeService.cs");
-            string ordinary = ReadPlayfieldSource(
-                root,
-                "CapturedSubwayOrdinaryContentProvider.cs");
-            string contracts = ReadPlayfieldSource(
-                root,
-                "CapturedEnemyCombatContract.cs");
-            string rules = ReadPlayfieldSource(root, "NpcCombatAttackRules.cs");
-
-            Assert.IsTrue(
-                encounter.Contains("StrikeForemanMonsterData = 203744")
-                && encounter.Contains(
-                    "StrikeForemanProfileKey = \"subway.127.named.strike-foreman\"")
-                && encounter.Contains(
-                    "StrikeForemanEncounterKey = \"subway.127.encounter.strike-foreman\"")
-                && encounter.Contains(
-                    "CapturedStrikeForemanAggroRadius = 20.250672f")
-                && encounter.Contains("CreateStrikeForemanDefinition()")
-                && encounter.Contains("this.ProcessStrikeForemanRespawn(utcNow);")
-                && encounter.Contains("this.ScheduleNamedRespawn(\n                    StrikeForemanProfileKey,\n                    diedAtUtc.Add(CapturedNamedBossRespawnDelay))")
-                && encounter.Contains(
-                    "this.strikeForemanIdentity = Identity.None;")
-                && encounter.Contains(
-                    "this.namedRespawns.Cancel(StrikeForemanProfileKey);")
-                && encounter.Contains(
-                    "maximumNpcLeashDistanceFromHome: 100.0"),
-                "Strike Foreman must use the shared PF127 named lifecycle, ten-minute respawn, captured acquisition radius, and shared leash.");
-            Assert.IsTrue(
-                encounter.Contains(
-                    "StrikeForemanProfileKey,\n                \"subway.127.named.strike-foreman.spawn\",\n                StrikeForemanEncounterKey,\n                \"Strike Foreman\",\n                StrikeForemanMonsterData,\n                false,\n                false,")
-                && encounter.Contains(
-                    "19,\n                736,\n                98,\n                67,\n                66,")
-                && encounter.Contains(
-                    "333.719055f,\n                109.015f,\n                206.525848f,")
-                && encounter.Contains("0.32742402f")
-                && encounter.Contains("0.944877505f")
-                && encounter.Contains(
-                    "1579u,\n                unchecked((int)0x020A4ACB)")
-                && encounter.Contains(
-                    "HexToBytes(\"00000000000000000000000003010001000100010001000000020000\")")
-                && encounter.Contains(
-                    "17870,\n                60.0,\n                0.0,")
-                && encounter.Contains("npcFamily: 149")
-                && encounter.Contains("race: 1")
-                && encounter.Contains("headMesh: 40673")
-                && encounter.Contains(
-                    "new CapturedSubwayMeshDefinition(1, 27723u, 0, 2)"),
-                "Strike Foreman must preserve the exact active L19 SCFU and corpse presentation.");
+            string ordinary = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+            string rules = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\NpcCombatAttackRules.cs"));
             Assert.IsFalse(
                 ordinary.Contains("Strike Foreman") || ordinary.Contains("203744"),
                 "Strike Foreman must remain outside the locked ordinary population denominator.");
-
-            Assert.IsTrue(
-                contracts.Contains("case 203744:")
-                && contracts.Contains("StrikeForeman(level.Value)")
-                && contracts.Contains("level != 19")
-                && contracts.Contains(
-                    "subway-strike-foreman-122767-equipped-level-bounded-v1")
-                && contracts.Contains(
-                    "CapturedWeaponStat(CharacterStat.ACGItemLevel, quality)")
-                && contracts.Contains(
-                    "CapturedWeaponStat(CharacterStat.AttackDelay, 235)")
-                && contracts.Contains(
-                    "CapturedWeaponStat(CharacterStat.RechargeDelay, 235)")
-                && contracts.Contains(".WithProductionEquippedWeaponValues()")
-                && contracts.Contains(".WithProductionWeaponQuality()")
-                && contracts.Contains(
-                    ".WithProductionActorValuesForPresentationWeapon()")
-                && contracts.Contains("bool retainProductionTiming")
-                && contracts.Contains("if (!retainProductionTiming)")
-                && contracts.Contains(
-                    "!this.UsesProductionActorValuesForPresentationWeapon")
-                && contracts.Contains(
-                    "normal hit wire 3, damage wire 0, slot 6")
-                && contracts.Contains("WIFU -> SAW -> Attack -> ")
-                && contracts.Contains(
-                    "AttackInfo ordering; actor level owns"),
-                "The active profile must resolve its exact capture-backed packet semantics while production owns item-derived QL, damage, range, cadence, and mutable state.");
             Assert.IsTrue(
                 rules.Contains(
                     "CapturedSubwayStrikeForemanWeaponLowTemplate = 122767")
@@ -536,8 +110,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void EumenidesUsesCapturedWeaponContextButLeavesDamageAndRechargeItemOwned()
         {
             string root = FindRepositoryRoot();
-            string rules = ReadPlayfieldSource(root, "NpcCombatAttackRules.cs");
-            string contracts = ReadPlayfieldSource(root, "CapturedEnemyCombatContract.cs");
+            string rules = LegacyGameplaySource.ReadAllText(Path.Combine(root, @"Tests\Fixtures\Gameplay\Playfields\NpcCombatAttackRules.cs"));
             string generated = File.ReadAllText(
                     Path.Combine(root, @"docs\generated\subway_enemy_combat_contracts.json"))
                 .Replace("\r\n", "\n");
@@ -562,13 +135,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && rules.Contains("CapturedSubwayEumenidesSpecialAttackWeaponUnknown1 = 143")
                 && rules.Contains("CapturedSubwayEumenidesSpecialAttackWeaponUnknown2 = 143"),
                 "Eumenides must retain runtime QL20, record the alternate observed QL17 weapon, and use the corrected initial SIW shape without hard-coded runtime rolls.");
-            Assert.IsTrue(
-                contracts.Contains("case 203726:")
-                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponLowTemplate")
-                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayEumenidesWeaponHighTemplate")
-                && contracts.Contains("requiresDamageLineOfSight: true")
-                && contracts.Contains("exact packet sequence is resolved from the generated capture catalog"),
-                "The runtime contract must preserve both observed weapon variants without inventing their selection rule and require PF127 damage LOS.");
             Assert.IsTrue(
                 eumenides.Contains("\"normalAttackInfoRows\": 21")
                 && eumenides.Contains("\"normalMinDamage\": 25")
@@ -597,9 +163,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void EumenidesCorpseEvidenceReplaysExactCapturedShapeAndTwoAtomicItemLootSnapshots()
         {
             string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string corpse = ReadPacketSource(root, "CorpseFullUpdate.cs");
-            string loot = ReadPlayfieldSource(root, "GlobalLootRuntimeService.cs");
             string captured = File.ReadAllText(
                 Path.Combine(
                     root,
@@ -644,94 +207,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && membershipLoot.Contains("234875:234875:1:1;202717:202718:15:1;301717:301717:1:1;163426:163427:23:1;85521:85520:15:1;287146:287146:200:1")
                 && membershipLoot.Contains("unlinked"),
                 "The later capture must retain exact item membership while remaining unlinked to credits, dead-NPC identity, and playfield context.");
-            Assert.IsTrue(
-                encounter.Contains("17905,\n                1800.0,\n                3.0,")
-                && corpse.Contains("CapturedSubwayEumenidesPacketLength = 416")
-                && corpse.Contains("CapturedSubwayEumenidesMonsterDataOffset = 332")
-                && corpse.Contains("CapturedSubwayEumenidesTailDeadNpcInstanceOffset = 344")
-                && corpse.Contains("CapturedSubwayEumenidesTemplate")
-                && corpse.Contains("BuildCapturedSubwayEumenides(")
-                && corpse.Contains("WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);")
-                && corpse.Contains("WriteInt32(buffer, CorpseCatMeshOffset, corpseCatMesh);")
-                && corpse.Contains("WriteInt32(buffer, CorpseCashValueOffset, Math.Max(0, corpseCredits));")
-                && corpse.Contains("WriteInt32(buffer, CapturedSubwayEumenidesMonsterDataOffset, corpseMonsterData);")
-                && corpse.Contains("CapturedSubwayEumenidesTailDeadNpcInstanceOffset"),
-                "Eumenides must replay the captured 416-byte corpse visual while patching only runtime state fields.");
-            Assert.IsTrue(
-                encounter.Contains("20260717-220340-associated Mike observation (not packet-timestamp encoded): official-live exact 10-minute respawn and Temporary 30m loot-bearing corpse")
-                && encounter.Contains("active nano refresh unresolved and omitted"),
-                "Mike-observed official-live timing and the capture's packet-timestamp limitation must both remain explicit.");
-            Assert.IsTrue(
-                loot.Contains("CapturedEumenidesCredits = 186")
-                && loot.Contains("CapturedEumenidesLootEvidence")
-                && loot.Contains("CapturedSubwayEncounterRuntimeService.EumenidesProfileKey")
-                && loot.Contains("\"capture.20260717-214751\",\n                        CapturedEumenidesCredits,")
-                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 163430, 163431, 22, 1)")
-                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 301714, 301714, 1, 1)")
-                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-214751\", 287146, 287146, 200, 1)")
-                && loot.Contains("\"capture.20260717-215250\",\n                        CapturedEumenidesCredits,")
-                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-215250\", 301715, 301715, 1, 1)")
-                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-215250\", 160051, 160050, 16, 1)")
-                && loot.Contains("ObservedCorpseSnapshotEntry(CapturedEumenidesLootEvidence, \"capture.20260717-215250\", 287146, 287146, 200, 1)")
-                && loot.Contains("20260717-220340 adds exact local-name/identity-linked item membership")
-                && loot.Contains("ItemPoolUnresolved = true"),
-                "Eumenides must replay both exact captured item-plus-credit snapshots without claiming wider-pool probabilities.");
-            Assert.IsFalse(
-                loot.Contains("\"capture.20260717-220340\""),
-                "The unlinked membership-only rows must not become an atomic runtime snapshot.");
         }
 
-        [TestMethod]
-        public void VergilUsesCapturedWeaponTimingCorpseAndThreeAtomicLootSnapshots()
-        {
-            string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string rules = ReadPlayfieldSource(root, "NpcCombatAttackRules.cs");
-            string contracts = ReadPlayfieldSource(root, "CapturedEnemyCombatContract.cs");
-            string corpse = ReadPacketSource(root, "CorpseFullUpdate.cs");
-            string globalLoot = ReadPlayfieldSource(root, "GlobalLootRuntimeService.cs");
 
-            Assert.IsTrue(
-                rules.Contains("CapturedSubwayVergilWeaponTemplate = 122123")
-                && rules.Contains("CapturedSubwayVergilWeaponQuality = 23")
-                && rules.Contains("CapturedSubwayVergilWeaponDamageMinimumOverride = 0")
-                && rules.Contains("CapturedSubwayVergilWeaponDamageMaximumOverride = 0")
-                && rules.Contains("CapturedSubwayVergilRechargeOverrideSeconds = 0.0")
-                && rules.Contains("CapturedSubwayVergilAttackStartDelaySeconds = 0.646433")
-                && rules.Contains("CapturedSubwayVergilMovementTransitionDelaySeconds = 0.001000")
-                && rules.Contains("CapturedSubwayVergilFirstHitDelaySeconds = 2.787410")
-                && contracts.Contains("case 203748:")
-                && contracts.Contains("EquippedWeaponWithEmptySpecialAttackContext(")
-                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayVergilWeaponDamageMinimumOverride")
-                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayVergilWeaponDamageMaximumOverride")
-                && contracts.Contains("NpcCombatAttackRules.CapturedSubwayVergilRechargeOverrideSeconds"),
-                "Vergil must equip captured weapon 122123 QL23 while damage and recharge remain weapon-owned.");
-            Assert.IsTrue(
-                encounter.Contains("5921,\n                1800.0,\n                1800.0,")
-                && corpse.Contains("CapturedSubwayVergilPacketLength = 420")
-                && corpse.Contains("CapturedSubwayVergilTemplate")
-                && corpse.Contains("BuildCapturedSubwayVergil(")
-                && corpse.Contains("corpseMonsterData == NpcCombatAttackRules.CapturedSubwayVergilMonsterData")
-                && corpse.Contains("WriteInt32(buffer, MonsterScaleOffset, deadNpc.Stats[StatIds.monsterscale].Value);"),
-                "Vergil must retain the exact 420-byte corpse template and CATMesh 5921.");
-            Assert.IsTrue(
-                globalLoot.Contains("ObservedCorpseSnapshots = new[]")
-                && globalLoot.Contains("\"capture.20260712-232711\",\n                        610,")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-232711\", 301713, 301713, 1, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-232711\", 202743, 202744, 32, 1)")
-                && globalLoot.Contains("\"capture.20260712-234401\",\n                        587,")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-234401\", 301714, 301714, 1, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260712-234401\", 123571, 123572, 23, 1)")
-                && globalLoot.Contains("\"capture.20260716-034433\",\n                        563,")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 202734, 202735, 33, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 301715, 301715, 1, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 160051, 160050, 24, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 21605, 21605, 1, 100)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 287146, 287146, 200, 1)")
-                && globalLoot.Contains("Mode = CreditsPolicyMode.Unresolved")
-                && globalLoot.Contains("ItemPoolUnresolved = true"),
-                "Vergil loot must replay only the three exact item-plus-credit corpse snapshots, including QL1 bullets quantity 100.");
-        }
 
         [TestMethod]
         public void FilthFleaReviewedCombatEvidenceAddsOnlyRequested205921Source()
@@ -862,8 +340,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 ? analyzer.Substring(targetRoleStart, targetRoleEnd - targetRoleStart)
                 : string.Empty;
 
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-
             Assert.IsTrue(
                 analyzer.Contains("\"20260716-220400\": frozenset({\"Abmouth Supremus\"})")
                 && analyzer.Contains("\"20260720-053802\": frozenset({\"Abmouth Supremus\"})")
@@ -880,13 +356,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && abmouth.Contains("\"weaponInstance\": 1481592922"),
                 "Top-level Abmouth evidence must retain local-player hits and both independent attack shapes.");
             Assert.IsTrue(
-                encounter.Contains("AbmouthWarpNanoId = 286237")
-                && encounter.Contains("AbmouthWarpDelaySeconds = 21.8")
-                && encounter.Contains("SendCapturedNpcCast")
-                && encounter.Contains("TeleportMessageHandler.Default.SendLocal")
-                && encounter.Contains("StatIds.petmaster"),
-                "Abmouth must replay the captured one-per-fight warp and reposition the player-owned pets with the player.");
-            Assert.IsTrue(
                 petStart >= 0
                 && abmouth.Substring(petStart).Contains("\"(SimpleChar:7970253A)\"")
                 && abmouth.Substring(petStart).Contains("\"(SimpleChar:7970253C)\"")
@@ -896,48 +365,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Abmouth's ten pet-facing hits must remain separate from player-facing runtime damage.");
         }
 
-        [TestMethod]
-        public void VergilHealingUsesCapturedNanoValuesAndPausesWeaponCombatTicks()
-        {
-            string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
-            string npcRuntime = ReadPlayfieldSource(root, "NPCRuntimeService.cs");
 
-            Assert.IsTrue(
-                encounter.Contains("VergilDirectHealNanoId = 43827")
-                && encounter.Contains("VergilDirectHealAmount = 187")
-                && encounter.Contains("VergilDirectHealCastSeconds = 1.480007")
-                && encounter.Contains("VergilDirectHealCooldownSeconds = 30.654")
-                && encounter.Contains("if (level == 31)")
-                && encounter.Contains("VergilDirectHealNanoId,\n                    VergilDirectHealAmount,\n                    VergilDirectHealCastSeconds,")
-                && encounter.Contains("utcNow.AddSeconds(VergilDirectHealCooldownSeconds)"),
-                "Level-31 Vergil must retain captured nano 43827, 187 healing, 1.480007-second cast, and 30.654-second cooldown.");
-            Assert.IsTrue(
-                encounter.Contains("VergilSelfHealNanoId = 43880")
-                && encounter.Contains("VergilSelfHealAmount = 34")
-                && encounter.Contains("VergilSelfHealDurationMilliseconds = 14000")
-                && encounter.Contains("VergilSelfHealCastSeconds = 1.763334")
-                && encounter.Contains("if (level != 30)\n            {\n                return;\n            }")
-                && encounter.Contains("VergilSelfHealNanoId,\n                VergilSelfHealAmount,\n                VergilSelfHealCastSeconds,\n                VergilSelfHealDurationMilliseconds,")
-                && encounter.Contains("this.vergilNextHealAtUtc = DateTime.MaxValue;"),
-                "Level-30 Vergil must retain captured nano 43880 without repetition, while level 29 fails closed instead of inheriting an unobserved heal.");
-            Assert.IsTrue(
-                encounter.Contains("internal bool IsCapturedNanoCastInProgress(ICharacter character)")
-                && encounter.Contains("this.vergilPendingHeal != null")
-                && encounter.Contains("CastNanoSpellMessageHandler.Default.Send(vergil, nanoId, target.Identity);")
-                && encounter.Contains("CharacterActionMessageHandler.Default.FinishNanoCasting(")
-                && encounter.Contains("pending.DurationMilliseconds")
-                && encounter.Contains("Unknown2 = appliedHeal")
-                && npcRuntime.Contains("if (this.capturedSubwayEncounters.IsCapturedNanoCastInProgress(attacker)\n                || this.capturedTempleEncounters.IsCapturedNanoCastInProgress(attacker))\n            {\n                return;\n            }")
-                && npcRuntime.Contains("this.combatTick.ProcessCombatTick(attacker);"),
-                "Vergil weapon ticks must pause during captured nano casting and resume through the normal combat coordinator afterward.");
-        }
 
         [TestMethod]
         public void VergilUsesConfirmedRespawnAndCaptureProjectionsRemainAlwaysOn()
         {
             string root = FindRepositoryRoot();
-            string encounter = ReadPlayfieldSource(root, "CapturedSubwayEncounterRuntimeService.cs");
             string captureTool = File.ReadAllText(
                     Path.Combine(root, @"tools-temp\AOSharpLiveCapture\Main.cs"))
                 .Replace("\r\n", "\n");
@@ -948,13 +381,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "this.ExportEnemyN3Evidence(direction, sequence, message)",
                 evidenceStage,
                 StringComparison.Ordinal);
-
-            Assert.IsTrue(
-                encounter.Contains("this.vergilAeneidIdentity = Identity.None;")
-                && encounter.Contains("this.ScheduleNamedRespawn(\n                    VergilAeneidProfileKey,\n                    diedAtUtc.Add(CapturedNamedBossRespawnDelay));")
-                && encounter.Contains("this.namedRespawns.IsDue(VergilAeneidProfileKey, utcNow)")
-                && CountOccurrences(encounter, "CreateVergilAeneidDefinition()") == 3,
-                "Vergil must become absent after despawn and return on the confirmed ten-minute death-based schedule.");
             Assert.IsTrue(
                 annotationStage >= 0
                 && evidenceStage > annotationStage

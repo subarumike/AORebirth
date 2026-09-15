@@ -1,8 +1,10 @@
 from pathlib import Path
 import json
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,12 +41,27 @@ def main():
     windows_acceptance = read("Tools/accept_windows_source.cmd")
     build_cmd = read("tools/build_aorebirth_debug.cmd")
     preflight_cmd = read("preflight-database.cmd")
+    solution = read("AORebirth/AORebirth.sln").replace("\\", "/")
 
-    ordered(start_cmd, "preflight-database.cmd", "start-engines.ps1")
+    retired_root = ROOT / "AORebirth/Server/ZoneEngine"
+    for retired_file in ("ZoneEngine.csproj", "Program.cs"):
+        require(not (retired_root / retired_file).exists(),
+            "retired engine project/entry point must not return: " + retired_file)
+    normalized_build = build_cmd.replace("\\", "/").lower()
+    require("zoneengine.csproj" not in normalized_build
+        and "server/zoneengine/packages.config" not in normalized_build,
+        "normal build must not build or restore the retired engine")
+    require('"Server/ZoneEngine_New/ZoneEngine_New.csproj"' in solution
+        and '"Server/ZoneEngine/ZoneEngine.csproj"' not in solution,
+        "solution must contain only the supported NewEngine zone project")
+
+    ordered(start_cmd, "-ValidateEngineSelectionOnly", "preflight-database.cmd",
+            'start-engines.ps1" %*')
     require("-WebOnly" not in start_cmd and "-WithWeb" not in start_cmd,
             "normal startup must not opt into WebEngine")
 
-    ordered(restart_cmd, "preflight-database.cmd", "stop-engines.cmd", "start-engines.cmd")
+    ordered(restart_cmd, "-ValidateEngineSelectionOnly", "preflight-database.cmd",
+            "stop-engines.cmd", "start-engines.cmd")
     ordered(restart_cmd, "-ValidateSchemaOnly", "stop-engines.cmd", "start-engines.cmd")
     require("running engines were not stopped" in restart_cmd,
             "restart preflight failure must preserve running engines")
@@ -81,19 +98,54 @@ def main():
     require(json.loads(normal.stdout) == {
         "Name": "ZoneEngine_New", "File": "ZoneEngine_New\\ZoneEngine_New.exe"},
         "normal Windows launcher must select the exact ZoneEngine_New backend")
-    rollback = select_backend("-LegacyZoneEngine")
-    require(rollback.returncode == 0, "explicit rollback selection failed")
-    require(json.loads(rollback.stdout) == {"Name": "ZoneEngine", "File": "ZoneEngine.exe"},
-        "legacy backend must require explicit rollback selection")
+    compatibility = select_backend("-NewZoneEngine")
+    require(compatibility.returncode == 0 and json.loads(compatibility.stdout) == json.loads(normal.stdout),
+        "NewZoneEngine compatibility switch must select the same sole backend")
+    retired = select_backend("-LegacyZoneEngine")
+    require(retired.returncode != 0 and "retired" in retired.stderr,
+        "retired backend selection must fail before environment or process access")
     require(select_backend("-LegacyZoneEngine", "-NewZoneEngine").returncode != 0,
-        "ambiguous backend selection must fail closed")
+        "retired selection combined with the compatibility switch must fail closed")
+    ordered(start_ps, "if ($LegacyZoneEngine)", "if ($ValidateEngineSelectionOnly)",
+        "$processPath =", "$configuration.Load($configPath)")
+
+    # Exercise real wrappers against inert fixtures. A retired selector must not
+    # reach database preflight, a stop wrapper, or startup, regardless of installed binaries.
+    with tempfile.TemporaryDirectory(prefix="aorebirth-retired-engine-") as directory:
+        fixture = Path(directory)
+        for name in ("start-engines.ps1", "start-engines.cmd", "restart-engines.cmd",
+                     "start-engines-with-web.cmd", "start-web-engine.cmd"):
+            shutil.copyfile(ROOT / name, fixture / name)
+        for name in ("preflight-database.cmd", "stop-engines.cmd"):
+            (fixture / name).write_text(
+                '@echo off\necho touched>"%~dp0unexpected-operation.txt"\nexit /b 71\n',
+                encoding="ascii")
+        for name in ("start-engines.cmd", "restart-engines.cmd",
+                     "start-engines-with-web.cmd", "start-web-engine.cmd"):
+            rejected = subprocess.run(["cmd", "/d", "/c", str(fixture / name), "-LegacyZoneEngine"],
+                capture_output=True, text=True, check=False)
+            require(rejected.returncode != 0 and "retired" in rejected.stderr,
+                name + " must reject the retired backend explicitly")
+            require(not (fixture / "unexpected-operation.txt").exists(),
+                name + " must reject the retired backend before preflight or shutdown")
+
+    retired_stop = subprocess.run(
+        ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+         str(ROOT / "stop-engines.ps1"), "-EngineName", "ZoneEngine"],
+        capture_output=True, text=True, check=False)
+    require(retired_stop.returncode != 0 and "ParameterArgumentValidationError" in retired_stop.stderr,
+        "retired shutdown selection must fail parameter validation before process access")
+    require('Name = "ZoneEngine"' not in start_ps + stop_ps,
+        "engine management must not retain a runnable retired backend definition")
+    require('status-engines.cmd") @args' in read("status-engines.ps1"),
+        "PowerShell status compatibility entry point must use the exact ownership probe")
     require("taskkill" not in build_cmd.lower(),
         "normal backend build must not kill unrelated dotnet/runtime processes")
     require("run_zoneengine_new_tests.cmd" in mandatory_gate,
         "normal mandatory acceptance must exercise NewEngine tests and startup validation")
     ordered(start_ps, "$newZoneExecutable --validate-startup", "$newZoneExecutable --validate-database", "if ($ValidateSchemaOnly)")
     require(start_ps.count('$prestartExit = Invoke-EngineStatusProbe -Arguments @("--prestart", $processName)') == 1,
-        "all backends must use the same ownership-safe and idempotent prestart")
+        "all engines must use the same ownership-safe and idempotent prestart")
     require("pre-start check requires no process" not in start_ps,
         "a healthy managed New backend must not be rejected by an obsolete special prestart")
     require("call Tools\\run_newengine_content_architecture_guard.cmd --check" in windows_acceptance
@@ -112,8 +164,9 @@ def main():
     require("metadataIsTrusted" in stop_ps and "StartedAt" in stop_ps and "--prestart" in stop_ps,
             "shutdown must validate managed PID path/start identity and released ports")
     require(stop_ps.count("foreach ($engine in $engines)") == 2,
-            "shared zone port release checks must run after all selected engines stop")
-    ordered(stop_ps, "Stop-EngineProcess -Process $metadataProcess", "# Both zone implementations share one port", "--prestart ZoneEngine_New")
+            "port release checks must run after all selected engines stop")
+    ordered(stop_ps, "Stop-EngineProcess -Process $metadataProcess",
+            "# Stop every selected managed process", "--prestart ZoneEngine_New")
     require('$configPath = Join-Path $root "AORebirth\\Config\\Config.xml"' in stop_ps,
             "shutdown status probes must use the repository configuration")
     require("$statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name" in stop_ps,

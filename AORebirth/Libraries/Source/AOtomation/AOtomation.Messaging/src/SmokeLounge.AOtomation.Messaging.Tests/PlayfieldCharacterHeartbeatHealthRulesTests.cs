@@ -122,29 +122,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(
                 statsSource,
                 "return this.all.Single(x => x.StatId == (int)i);");
-
-            string heartbeatSource = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    "AORebirth",
-                    "Server",
-                    "ZoneEngine",
-                    "Core",
-                    "Playfields",
-                    "PlayfieldCharacterHeartbeatRuntimeService.cs"));
-            int targetGuardIndex = heartbeatSource.IndexOf(
-                "bool targetsNpc = character.FightingTarget.Instance == targetInstance",
-                StringComparison.Ordinal);
-            Assert.IsTrue(targetGuardIndex >= 0);
-            int candidateRuleIndex = heartbeatSource.IndexOf(
-                "PlayfieldCharacterHeartbeatHealthRules.IsLivingNpcAttackCandidate(",
-                targetGuardIndex,
-                StringComparison.Ordinal);
-            Assert.IsTrue(candidateRuleIndex > targetGuardIndex);
-            StringAssert.Contains(
-                heartbeatSource,
-                "candidate => candidate.Stats[StatIds.health].Value");
-            Assert.IsFalse(heartbeatSource.Contains("catch (InvalidOperationException)"));
         }
 
         private static int CountOccurrences(string source, string value)

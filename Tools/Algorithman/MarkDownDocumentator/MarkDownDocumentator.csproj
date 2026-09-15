@@ -84,10 +84,6 @@
       <Project>{cb56f285-02ae-4816-9e8a-ec69991400e5}</Project>
       <Name>Utility</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\AORebirth\Server\ZoneEngine\ZoneEngine.csproj">
-      <Project>{60385925-84f5-4893-a5e0-c8c1d1190790}</Project>
-      <Name>ZoneEngine</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

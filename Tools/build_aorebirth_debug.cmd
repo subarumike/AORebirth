@@ -69,15 +69,6 @@ if not "%LOGIN_EXIT%"=="0" (
     exit /b %LOGIN_EXIT%
 )
 
-echo [AORebirth Build] Building legacy ZoneEngine rollback implementation...
-"%MSBUILD%" "AORebirth\Server\ZoneEngine\ZoneEngine.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
-set ZONE_EXIT=%ERRORLEVEL%
-if not "%ZONE_EXIT%"=="0" (
-    echo [AORebirth Build] ZoneEngine failed with exit code %ZONE_EXIT%.
-    popd
-    exit /b %ZONE_EXIT%
-)
-
 echo [AORebirth Build] Building default ZoneEngine_New backend...
 call NewZoneEngineBuild\build.cmd
 if errorlevel 1 (
@@ -165,7 +156,7 @@ exit /b 0
 
 :VerifyPackagesRestored
 set MISSING_PACKAGES=0
-echo [AORebirth Build] Checking package folders for AORebirth.Core and ZoneEngine dependencies...
+echo [AORebirth Build] Checking package folders for the shared libraries and remaining engines...
 call :CheckPackageConfig "AORebirth\Libraries\Source\AORebirth.Core\packages.config"
 call :CheckPackageConfig "AORebirth\Libraries\Source\AORebirth.Database\packages.config"
 call :CheckPackageConfig "AORebirth\Libraries\Source\AORebirth.Interfaces\packages.config"
@@ -173,7 +164,6 @@ call :CheckPackageConfig "AORebirth\Libraries\Source\AORebirth.Communication\pac
 call :CheckPackageConfig "AORebirth\Libraries\Source\Cell.Core\packages.config"
 call :CheckPackageConfig "AORebirth\Libraries\Source\Exceptions\packages.config"
 call :CheckPackageConfig "AORebirth\Libraries\Source\Utility\packages.config"
-call :CheckPackageConfig "AORebirth\Server\ZoneEngine\packages.config"
 call :CheckPackageConfig "AORebirth\Server\WebEngine\packages.config"
 
 if "%MISSING_PACKAGES%"=="0" (

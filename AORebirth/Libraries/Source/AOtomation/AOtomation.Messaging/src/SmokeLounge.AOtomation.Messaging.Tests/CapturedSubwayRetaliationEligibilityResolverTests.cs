@@ -86,31 +86,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void ProductionCallPathUsesExactEligibilityBridgeBeforeCombatPrepare()
-        {
-            string source = File.ReadAllText(RepositoryPath(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            int exactResolverCall = source.IndexOf(
-                "CapturedEnemyCombatContract combatContract = ResolveCombatContractForSpawn(",
-                StringComparison.Ordinal);
-            int prepare = source.IndexOf(
-                "CapturedEnemyCombatRuntime.Prepare(",
-                StringComparison.Ordinal);
-            Assert.IsTrue(exactResolverCall >= 0);
-            Assert.IsTrue(prepare > exactResolverCall);
-            StringAssert.Contains(source, "profile.Combat.ResolveContract(");
-            StringAssert.Contains(
-                source,
-                "CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(");
-            StringAssert.Contains(source, "retaliationEligibilityPromoted");
-        }
+
 
         [TestMethod]
         public void ExactBindingGuardRejectsCrossPlayfieldWrongMetadataAndUnknownSources()
         {
             string source = File.ReadAllText(RepositoryPath(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs"));
+                @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs"));
             Assert.AreEqual(
                 34,
                 Regex.Matches(

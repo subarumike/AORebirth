@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "scope": "historical captured-realm to resource evidence; not current runtime ownership or spawn permission",
+  "sourceCommit": "c5af4ac18a1378dc41c37d31b9ac62ac46c5f8a0",
+  "originalSources": [
+    "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AndromedaIccHqContentModule.cs",
+    "AORebirth/Server/ZoneEngine/Core/Playfields/Content/TempleOfThreeWindsContentModule.cs",
+    "AORebirth/Server/ZoneEngine/Core/Playfields/Content/AreteContentModule.cs",
+    "AORebirth/Server/ZoneEngine/Core/Playfields/Content/SubwayContentModule.cs"
+  ],
+  "exactSourceLiterals": [
+    "private const int AndromedaPlayfieldInstance = 655;",
+    "private const int TempleOfThreeWindsPlayfieldInstance = 1931;",
+    "private const int PrivateAretePlayfieldInstance = 6553;",
+    "private const int SubwayPlayfieldInstance = 127;"
+  ]
+}

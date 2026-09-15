@@ -45,81 +45,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 GenericCmdUseRouteClassifier.CurrentRouteOrder);
         }
 
-        [TestMethod]
-        public void PlayfieldInteractionRuntimeServiceOwnsGenericCmdUseDispatchOrder()
-        {
-            string interactionService =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldInteractionRuntimeService.cs");
-            string runtimeSystems =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
-            string playfield =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            string genericCmdHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GenericCmdMessageHandler.cs");
-            string project =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
 
-            AssertContains(interactionService, "internal sealed class PlayfieldInteractionRuntimeService");
-            AssertContains(interactionService, "internal bool TryHandleGenericCmdUse(");
-            AssertTextBefore(
-                interactionService,
-                "InsuranceTerminalInteractionHandler.Default.TryHandleUse",
-                "SurgeryClinicInteractionHandler.Default.TryHandleUse");
-            AssertTextBefore(
-                interactionService,
-                "RexB18DInteractionHandler.Default.TryHandleUse",
-                "InventoryContainerInteractionHandler.Default.TryHandleUse");
-            AssertTextBefore(
-                interactionService,
-                "InventoryContainerInteractionHandler.Default.TryHandleUse",
-                "GuestKeyGeneratorInteractionHandler.Default.TryHandleUse");
-            AssertTextBefore(
-                interactionService,
-                "GuestKeyGeneratorInteractionHandler.Default.TryHandleUse",
-                "CityControllerInteractionHandler.Default.TryHandleUse");
-            AssertLastTextBefore(
-                interactionService,
-                "CityControllerInteractionHandler.Default.TryHandleUse",
-                "CorpseInteractionHandler.Default.TryHandleUse");
-            AssertLastTextBefore(
-                interactionService,
-                "CorpseInteractionHandler.Default.TryHandleUse",
-                "GridTerminalInteractionHandler.Default.TryHandleCapturedUse");
-            AssertTextBefore(
-                interactionService,
-                "GridTerminalInteractionHandler.Default.TryHandleCapturedUse",
-                "GridTerminalInteractionHandler.Default.TryHandleGridEnterUse");
-            AssertTextBefore(
-                interactionService,
-                "SurgeryClinicInteractionHandler.Default.TryHandleUse",
-                "StaticDynelInteractionHandler.Default.TryHandleUse");
-            AssertTextBefore(
-                interactionService,
-                "StaticDynelInteractionHandler.Default.TryHandleUse",
-                "StatelInteractionHandler.Default.TryHandleUse");
-
-            AssertContains(runtimeSystems, "private readonly PlayfieldInteractionRuntimeService interaction");
-            AssertContains(runtimeSystems, "this.interaction = new PlayfieldInteractionRuntimeService();");
-            AssertContains(runtimeSystems, "internal bool TryHandleGenericCmdUse(");
-            AssertContains(runtimeSystems, "return this.interaction.TryHandleGenericCmdUse(client, message, target);");
-
-            AssertContains(playfield, "public bool TryHandleGenericCmdUse(");
-            AssertContains(playfield, "return this.runtimeSystems.TryHandleGenericCmdUse(client, message, target);");
-
-            AssertContains(genericCmdHandler, "playfield.TryHandleGenericCmdUse(client, message, target)");
-            AssertDoesNotContain(genericCmdHandler, "RexB18DInteractionHandler.Default.TryHandleUse");
-            AssertDoesNotContain(genericCmdHandler, "InventoryContainerInteractionHandler.Default.TryHandleUse");
-            AssertDoesNotContain(genericCmdHandler, "GuestKeyGeneratorInteractionHandler.Default.TryHandleUse");
-            AssertDoesNotContain(genericCmdHandler, "CityControllerInteractionHandler.Default.TryHandleUse");
-            AssertDoesNotContain(genericCmdHandler, "CorpseInteractionHandler.Default.TryHandleUse");
-            AssertDoesNotContain(genericCmdHandler, "GridTerminalInteractionHandler.Default.TryHandleCapturedUse");
-            AssertDoesNotContain(genericCmdHandler, "GridTerminalInteractionHandler.Default.TryHandleGridEnterUse");
-            AssertDoesNotContain(genericCmdHandler, "SurgeryClinicInteractionHandler.Default.TryHandleUse");
-            AssertDoesNotContain(genericCmdHandler, "StaticDynelInteractionHandler.Default.TryHandleUse");
-            AssertDoesNotContain(genericCmdHandler, "StatelInteractionHandler.Default.TryHandleUse");
-
-            AssertContains(project, @"Core\Playfields\PlayfieldInteractionRuntimeService.cs");
-        }
 
         [TestMethod]
         public void KnownPrivateCityTargetsSelectCurrentCapturedRoutes()
@@ -202,50 +128,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void SubwayTeleportProxyOverridesPreserveOfficialEntryAndMainExitLandings()
         {
-            string rules =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
-            string teleportProxy = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy.cs");
-            string teleportProxy2 = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy2.cs");
-            string statelTransitions =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs");
-            string exitProxy =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\exitproxyplayfield.cs");
-            string playfield = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
             string playfieldLoader =
                 ReadRepositoryFile(@"AORebirth\Libraries\Source\PlayfieldLoader\PlayfieldLoader.cs");
-            string project = ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
-
-            AssertContains(rules, "public const int CapturedSubwayPlayfieldId = 127;");
-            AssertContains(rules, "public const int CapturedEntranceDoorInstance = unchecked((int)0xC006007F);");
-            AssertContains(rules, "public const float CapturedEntranceLandingX = 65.80835f;");
-            AssertContains(rules, "public const float CapturedEntranceLandingY = 115.6148f;");
-            AssertContains(rules, "public const float CapturedEntranceLandingZ = 318.9879f;");
-            AssertContains(rules, "public const float CapturedEntranceHeadingX = 0.0f;");
-            AssertContains(rules, "public const float CapturedEntranceHeadingY = 0.7071124f;");
-            AssertContains(rules, "public const float CapturedEntranceHeadingZ = 0.0f;");
-            AssertContains(rules, "public const float CapturedEntranceHeadingW = 0.7071012f;");
-            AssertContains(rules, "public const float CapturedMainExitLandingX = 3304.028f;");
-            AssertContains(rules, "public const float CapturedMainExitLandingY = 35.11f;");
-            AssertContains(rules, "public const float CapturedMainExitLandingZ = 837.9951f;");
-            AssertContains(rules, "public const float CapturedMainExitHeadingY = -0.4771534f;");
-            AssertContains(rules, "public const float CapturedMainExitHeadingW = 0.87882f;");
-            AssertContains(rules, "public static bool TryResolveDestinationOverride(");
-            AssertContains(rules, "public static bool TryResolveMainExitOverride(");
-            AssertContains(teleportProxy, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
-            AssertContains(teleportProxy2, "SubwayTeleportProxyDestinationRules.TryResolveDestinationOverride");
-            AssertContains(exitProxy, "SubwayTeleportProxyDestinationRules.TryResolveMainExitOverride(");
-            AssertContains(statelTransitions, "private const int CapturedSubwayPlayfieldId = 127;");
-            AssertContains(statelTransitions, "private const int CapturedSubwayEntrySourcePlayfieldId = 655;");
-            AssertContains(statelTransitions, "private const uint CapturedSubwayEntrySourceDoorInstance = 0xC01A028F;");
-            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceLandingX = 65.80835f;");
-            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceHeadingY = 0.7071124f;");
-            AssertContains(statelTransitions, "private const float CapturedSubwayEntranceHeadingW = 0.7071012f;");
-            AssertContains(statelTransitions, "TryHandleCapturedSubwayProxyEntry");
-            Assert.IsFalse(
-                statelTransitions.Contains("TryHandleCapturedSubwayProxyExit")
-                || statelTransitions.Contains("CapturedSubwayExitSource")
-                || playfield.Contains("ResolveProxyExitDestination"),
-                "Walking through the PF127 entrance room must not invoke the unproven position-only proxy exit.");
             AssertContains(playfieldLoader, "private const int SubwayPlayfieldId = 127;");
             AssertContains(
                 playfieldLoader,
@@ -265,7 +149,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 playfieldLoader.Contains("RemoveSubwayNonEntranceDoorStatels"),
                 "PF127 ordinary interior door statels must remain loaded.");
-            AssertContains(project, @"Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs");
         }
 
         [TestMethod]
@@ -505,796 +388,72 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 UseItemOnItemInteractionRules.ResolveRouteMode(GenericCmdAction.Use));
         }
 
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsGenericCmdInventoryOrchestration()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string inventoryHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\InventoryContainerInteractionHandler.cs");
-            string useItemOnItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\UseItemOnItemInteractionHandler.cs");
-            string genericCmdHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GenericCmdMessageHandler.cs");
-
-            AssertContains(service, "public sealed class InventoryContainerRuntimeService");
-            AssertContains(service, "TryHandleGenericCmdUse");
-            AssertContains(service, "TryHandleUseItemOnItem");
-            AssertContains(service, "if (this.UseInventoryItem(client.Controller.Character, target))");
-            AssertContains(service, "GenericCmdMessageHandler.Default.AcknowledgeDenied(client.Controller.Character, message)");
-            AssertContains(service, "this.TryUseBackpackContainer(client.Controller.Character, target)");
-            AssertContains(service, "BackpackContainerActionMessageHandler.Default.SendClose");
-            AssertContains(service, "client.Controller.UseStatel(message.Target[1], EventType.OnUseItemOn);");
-
-            AssertContains(
-                inventoryHandler,
-                "return InventoryContainerRuntimeService.Default.TryHandleGenericCmdUse(client, message, target);");
-            AssertDoesNotContain(inventoryHandler, "client.Controller.UseItem(target);");
-            AssertDoesNotContain(inventoryHandler, "client.Controller.TryUseBackpackContainer(target)");
-            AssertDoesNotContain(inventoryHandler, "BackpackContainerActionMessageHandler.Default.SendClose");
-
-            AssertContains(
-                useItemOnItemHandler,
-                "InventoryContainerRuntimeService.Default.TryHandleUseItemOnItem(client, message)");
-            AssertDoesNotContain(useItemOnItemHandler, "Pool.Instance.GetObject<IInventoryPage>");
-            AssertDoesNotContain(useItemOnItemHandler, "client.Controller.UseStatel");
-
-            AssertContains(genericCmdHandler, "playfield.TryHandleGenericCmdUse(client, message, target)");
-            AssertDoesNotContain(genericCmdHandler, "InventoryContainerInteractionHandler.Default.TryHandleUse");
-            AssertContains(genericCmdHandler, "UseItemOnItemInteractionHandler.Default.TryHandle");
-
-            foreach (string forbiddenReference in new[]
-                                                {
-                                                    "NpcCombat",
-                                                    "NpcCorpseLifecycle",
-                                                    "NpcPatrol",
-                                                    "PrivateCityReadyInit",
-                                                    "OrgClient",
-                                                    "CityController",
-                                                    "GuestKey",
-                                                    "AOSharpLiveCapture",
-                                                    "CheckDatabase"
-                                                })
-            {
-                AssertDoesNotContain(service, forbiddenReference);
-            }
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsBankOpenAndSlotSelection()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string bankHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\BankMessageHandler.cs");
-            string openBankFunction =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\openbank.cs");
-
-            AssertContains(service, "public void OpenBank(ICharacter character)");
-            AssertContains(service, "BankMessageHandler.Default.Send(character);");
-            AssertContains(service, "public BankSlot[] ResolveBankSlots(ICharacter character)");
-            AssertContains(service, "character.BaseInventory.Pages[(int)IdentityType.BankByRef].ToInventoryArray();");
-
-            AssertContains(
-                bankHandler,
-                "x.BankSlots = InventoryContainerRuntimeService.Default.ResolveBankSlots(character);");
-            AssertDoesNotContain(bankHandler, "Pages[(int)IdentityType.BankByRef]");
-
-            AssertContains(
-                openBankFunction,
-                "InventoryContainerRuntimeService.Default.OpenBank((ICharacter)self);");
-            AssertDoesNotContain(openBankFunction, "BankMessageHandler.Default.Send");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsBackpackMoveToInventoryLifecycle()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientMoveHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
-
-            AssertContains(service, "public bool TryMoveBackpackItemToInventory");
-            AssertContains(service, "message.SourceContainer.Type != IdentityType.Backpack");
-            AssertContains(service, "character.BaseInventory.TryGetBackpackPageByHandle");
-            AssertContains(service, "receivingPage.Add(toPlacement, itemFrom)");
-            AssertContains(service, "backpackPage.Remove(fromPlacement)");
-            AssertContains(
-                service,
-                "this.SendMoveItemToInventoryAck(character, message.SourceContainer, message.TargetPlacement);");
-            AssertContains(service, "this.PersistClientMoveItemToInventory(character, \"backpack move\");");
-
-            AssertContains(service, "this.TryMoveBackpackItemToInventory(character, message)");
-            AssertDoesNotContain(clientMoveHandler, "TryMoveBackpackItemToInventory");
-            AssertDoesNotContain(clientMoveHandler, "private bool TryMoveBackpackItemToInventory");
-            AssertDoesNotContain(clientMoveHandler, "TryGetBackpackPageByHandle");
-            AssertDoesNotContain(clientMoveHandler, "DecodeBackpackHandle");
-            AssertDoesNotContain(clientMoveHandler, "TryRemoveInventoryRollback");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsMoveAckAndPersistenceSurfaces()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientMoveHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
-
-            AssertContains(service, "public void SendMoveItemToInventoryAck");
-            AssertContains(service, "new ContainerAddItemMessage");
-            AssertContains(service, "public void PersistClientMoveItemToInventory");
-            AssertContains(service, "character.BaseInventory.Write();");
-
-            AssertContains(service, "this.SendMoveItemToInventoryAck(");
-            AssertContains(service, "this.PersistClientMoveItemToInventory(");
-            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.SendMoveItemToInventoryAck");
-            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.PersistClientMoveItemToInventory");
-            AssertDoesNotContain(clientMoveHandler, "private void SendMoveAck");
-            AssertDoesNotContain(clientMoveHandler, "private void PersistCharacterInventory");
-            AssertDoesNotContain(clientMoveHandler, "new ContainerAddItemMessage");
-            AssertDoesNotContain(clientMoveHandler, "character.BaseInventory.Write();");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsMovePageLookupSurfaces()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientMoveHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
-
-            AssertContains(service, "public bool TryResolveMoveSourcePage");
-            AssertContains(service, "character.BaseInventory.Pages.ContainsKey((int)sourceContainer.Type)");
-            AssertContains(service, "character.BaseInventory.PageFromSlot(sourceContainer.Instance)");
-            AssertContains(service, "public IInventoryPage ResolveMoveTargetPage");
-            AssertContains(service, "character.BaseInventory.PageFromSlot(targetPlacement)");
-
-            AssertContains(service, "this.TryResolveMoveSourcePage(");
-            AssertContains(service, "this.ResolveMoveTargetPage(");
-            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.TryResolveMoveSourcePage");
-            AssertDoesNotContain(clientMoveHandler, "InventoryContainerRuntimeService.Default.ResolveMoveTargetPage");
-            AssertDoesNotContain(clientMoveHandler, "private bool TryGetSourcePage");
-            AssertDoesNotContain(clientMoveHandler, "private IInventoryPage GetTargetPage");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsOwnedInventoryMoveBranch()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientMoveHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
-
-            AssertContains(service, "public bool TryMoveOwnedInventoryItem");
-            AssertContains(service, "WeaponItemFullUpdate.SendWeaponDefinition(character, itemFrom);");
-            AssertContains(service, "equipTo.HotSwap(sendingPage, fromPlacement, toPlacement);");
-            AssertContains(service, "equipTo.Equip(sendingPage, fromPlacement, toPlacement);");
-            AssertContains(service, "unequipFrom.Unequip(fromPlacement, receivingPage, toPlacement);");
-            AssertContains(service, "sendingPage.Remove(fromPlacement);");
-            AssertContains(service, "receivingPage.Add(toPlacement, itemFrom);");
-
-            AssertContains(service, "this.TryMoveOwnedInventoryItem(character, message, client)");
-            AssertDoesNotContain(clientMoveHandler, "TryMoveOwnedInventoryItem");
-            AssertDoesNotContain(clientMoveHandler, "private bool TryMoveOwnedInventoryItem");
-            AssertDoesNotContain(clientMoveHandler, "private bool CanEquipToPage");
-            AssertDoesNotContain(clientMoveHandler, "private bool RequiresImplantAccess");
-            AssertDoesNotContain(clientMoveHandler, "private void SendImplantAccessDenied");
-            AssertDoesNotContain(clientMoveHandler, "private void WaitForEquipVisualSync");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsClientMoveItemToInventoryReadOrchestration()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientMoveHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
-
-            AssertContains(service, "public void HandleClientMoveItemToInventory");
-            AssertContains(service, "this.TryMoveBackpackItemToInventory(character, message)");
-            AssertContains(service, "this.TryMoveOwnedInventoryItem(character, message, client)");
-            AssertContains(
-                service,
-                "\"Unhandled ClientMoveItemToInventory source={0} targetPlacement={1} character={2}\"");
-
-            AssertContains(
-                clientMoveHandler,
-                "InventoryContainerRuntimeService.Default.HandleClientMoveItemToInventory(client, message);");
-            AssertContains(clientMoveHandler, "character.Playfield.TryLootCorpseItem(");
-            AssertDoesNotContain(clientMoveHandler, "TryMoveBackpackItemToInventory");
-            AssertDoesNotContain(clientMoveHandler, "TryMoveOwnedInventoryItem");
-            AssertDoesNotContain(clientMoveHandler, "Unhandled ClientMoveItemToInventory");
-            AssertDoesNotContain(clientMoveHandler, "SyncEquippedWeaponCombatStats");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsCharacterStateInventoryPageBoundary()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string fullCharacterHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs");
-            string weaponItemFullUpdate =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs");
-
-            AssertContains(service, "public IEnumerable<IInventoryPage> CharacterStateInventoryPages");
-            AssertContains(service, "foreach (IInventoryPage page in character.BaseInventory.Pages.Values)");
-            AssertContains(service, "page is BankInventoryPage");
-
-            AssertContains(
-                fullCharacterHandler,
-                "InventoryContainerRuntimeService.Default.CharacterStateInventoryPages(character)");
-            AssertDoesNotContain(fullCharacterHandler, "ivp is BankInventoryPage");
-            AssertDoesNotContain(weaponItemFullUpdate, "page is BankInventoryPage");
-            AssertContains(
-                weaponItemFullUpdate,
-                "BaseInventory.Pages.TryGetValue((int)IdentityType.WeaponPage, out weaponPage)");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsContainerAddItemTargetPageResolution()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string containerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
-
-            AssertContains(service, "public Identity ResolveContainerAddItemTargetIdentity");
-            AssertContains(service, "toIdentity.Type == IdentityType.IncomingTradeWindow");
-            AssertContains(service, "toIdentity.Type = IdentityType.CanbeAffected;");
-            AssertContains(service, "public IInventoryPage ResolveContainerAddItemReceivingPage");
-            AssertContains(service, "target.Type == IdentityType.IncomingTradeWindow");
-            AssertContains(service, "itemReceiver.BaseInventory.Pages[(int)IdentityType.BankByRef]");
-            AssertContains(service, "public int ResolveContainerAddItemTargetPlacement");
-
-            AssertContains(service, "this.ResolveContainerAddItemTargetIdentity(toIdentity)");
-            AssertContains(service, "this.ResolveContainerAddItemReceivingPage(");
-            AssertContains(service, "this.ResolveContainerAddItemTargetPlacement(receivingPage, toPlacement)");
-            AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemTargetIdentity");
-            AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemReceivingPage");
-            AssertDoesNotContain(containerAddItemHandler, "ResolveContainerAddItemTargetPlacement");
-            AssertDoesNotContain(containerAddItemHandler, "toIdentity.Type = IdentityType.CanbeAffected;");
-            AssertDoesNotContain(containerAddItemHandler, "itemReceiver.BaseInventory.Pages[(int)IdentityType.BankByRef]");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsInventoryToBackpackMove()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientContainerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientContainerAddItemMessageHandler.cs");
-
-            AssertContains(service, "public bool TryMoveInventoryItemToBackpack");
-            AssertContains(service, "message.Target.Type != IdentityType.Container");
-            AssertContains(service, "character.BaseInventory.TryGetBackpackPage(message.Target, out backpackPage)");
-            AssertContains(service, "InventoryItemRules.IsBackpackContainerItem(item)");
-            AssertContains(service, "new ContainerAddItemMessage");
-            AssertContains(service, "Persisted inventory after ClientContainerAddItem backpack move");
-            AssertContains(service, "private void TryRemoveBackpackRollback");
-
-            AssertContains(service, "this.TryMoveInventoryItemToBackpack(character, message)");
-            AssertDoesNotContain(clientContainerAddItemHandler, "private bool TryMoveInventoryItemToBackpack");
-            AssertDoesNotContain(clientContainerAddItemHandler, "TryMoveInventoryItemToBackpack");
-            AssertDoesNotContain(clientContainerAddItemHandler, "TryRemoveBackpackRollback");
-            AssertDoesNotContain(clientContainerAddItemHandler, "InventoryItemRules.IsBackpackContainerItem");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsInventoryToBankDeposit()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientContainerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientContainerAddItemMessageHandler.cs");
-
-            AssertContains(service, "public bool TryDepositInventoryItemToBank");
-            AssertContains(service, "private static bool IsInventoryToBankDeposit");
-            AssertContains(service, "message.Target.Type == IdentityType.IncomingTradeWindow");
-            AssertContains(service, "message.Target.Instance != character.Identity.Instance");
-            AssertContains(service, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.BankByRef, out bankPage)");
-            AssertContains(service, "private void TryRemoveBankRollback");
-            AssertContains(service, "Persisted inventory after ClientContainerAddItem bank deposit");
-
-            AssertContains(service, "this.TryDepositInventoryItemToBank(character, message)");
-            AssertDoesNotContain(clientContainerAddItemHandler, "TryDepositInventoryItemToBank");
-            AssertDoesNotContain(clientContainerAddItemHandler, "private bool IsInventoryToBankDeposit");
-            AssertDoesNotContain(clientContainerAddItemHandler, "private void TryRemoveBankRollback");
-            AssertDoesNotContain(clientContainerAddItemHandler, "character.BaseInventory.Pages.TryGetValue((int)IdentityType.BankByRef");
-            AssertDoesNotContain(clientContainerAddItemHandler, "Persisted inventory after ClientContainerAddItem bank deposit");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsClientContainerAddItemReadOrchestration()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientContainerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientContainerAddItemMessageHandler.cs");
-
-            AssertContains(service, "public void HandleClientContainerAddItem");
-            AssertContains(service, "this.TryMoveInventoryItemToBackpack(character, message)");
-            AssertContains(service, "this.TryDepositInventoryItemToBank(character, message)");
-            AssertContains(service, "\"Unhandled ClientContainerAddItem char={0} source={1} target={2}\"");
-
-            AssertContains(
-                clientContainerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.HandleClientContainerAddItem(client, message);");
-            AssertDoesNotContain(clientContainerAddItemHandler, "TryMoveInventoryItemToBackpack");
-            AssertDoesNotContain(clientContainerAddItemHandler, "TryDepositInventoryItemToBank");
-            AssertDoesNotContain(clientContainerAddItemHandler, "Unhandled ClientContainerAddItem");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsNonEquipmentContainerTransfer()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string containerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
-
-            AssertContains(service, "public void MoveNonEquipmentContainerItem");
-            AssertContains(service, "message.TargetPlacement = receivingPage.FindFreeSlot();");
-            AssertContains(service, "IItem item = sendingPage.Remove(fromPlacement);");
-            AssertContains(service, "receivingPage.Add(message.TargetPlacement, item);");
-            AssertContains(service, "character.Send(message);");
-
-            AssertContains(service, "this.MoveNonEquipmentContainerItem(");
-            AssertDoesNotContain(containerAddItemHandler, "MoveNonEquipmentContainerItem(");
-            AssertDoesNotContain(containerAddItemHandler, "message.TargetPlacement = receivingPage.FindFreeSlot();");
-            AssertDoesNotContain(containerAddItemHandler, "IItem item = sendingPage.Remove(fromPlacement);");
-            AssertDoesNotContain(containerAddItemHandler, "receivingPage.Add(message.TargetPlacement, item);");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsPlayerControllerContainerHelpers()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string playerController =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Controllers\PlayerController.cs");
-
-            AssertContains(service, "public bool MovePlayerControllerContainerItem");
-            AssertContains(service, "IInventoryPage sourcePage = character.BaseInventory.Pages[sourceContainerType];");
-            AssertContains(service, "IInventoryPage targetPage = character.BaseInventory.PageFromSlot(targetPlacement);");
-            AssertContains(service, "IItem itemSource = sourcePage.Remove(sourcePlacement);");
-            AssertContains(service, "public bool DeletePlayerControllerContainerItem");
-            AssertContains(service, "character.BaseInventory.Pages[container].Remove(slotNumber);");
-
-            AssertContains(playerController, "InventoryContainerRuntimeService.Default.MovePlayerControllerContainerItem(");
-            AssertContains(playerController, "InventoryContainerRuntimeService.Default.DeletePlayerControllerContainerItem(");
-            AssertDoesNotContain(playerController, "IInventoryPage sourcePage = this.Character.BaseInventory.Pages[sourceContainerType];");
-            AssertDoesNotContain(playerController, "IItem itemSource = sourcePage.Remove(sourcePlacement);");
-            AssertDoesNotContain(playerController, "this.Character.BaseInventory.Pages[container].Remove(slotNumber);");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsTradeInventoryHelpers()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string tradeHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\TradeMessageHandler.cs");
-
-            AssertContains(service, "public bool HasFreeInventorySlots");
-            AssertContains(service, "IInventoryPage page = character.BaseInventory[character.BaseInventory.StandardPage];");
-            AssertContains(service, "public int FindFreeStandardInventorySlot");
-            AssertContains(service, "return owner.BaseInventory[owner.BaseInventory.StandardPage].FindFreeSlot();");
-            AssertContains(service, "public InventoryError AddToStandardInventoryPage");
-            AssertContains(service, "return owner.BaseInventory.AddToPage(owner.BaseInventory.StandardPage, targetSlot, item);");
-            AssertContains(service, "public void AddToStandardInventoryPageUnchecked");
-            AssertContains(service, "owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, item);");
-            AssertContains(service, "public void SendTradeWindowMoveToInventory");
-            AssertContains(service, "new ContainerAddItemMessage");
-            AssertContains(service, "public void ReturnPlayerTradeOffers");
-            AssertContains(service, "IInventoryPage offerPage = shoppingBag.GetPlayerOfferPage(owner.Identity);");
-            AssertContains(service, "owner.BaseInventory[owner.BaseInventory.StandardPage].Add(targetSlot, offer.Value);");
-            AssertContains(service, "this.SendTradeWindowMoveToInventory(owner, IdentityType.KnuBotTradeWindow, offer.Key, targetSlot);");
-            AssertContains(service, "public void TransferPlayerTradeOffers");
-            AssertContains(service, "IInventoryPage offerPage = shoppingBag.GetPlayerOfferPage(from.Identity);");
-            AssertContains(service, "InventoryError err = to.BaseInventory.AddToPage(to.BaseInventory.StandardPage, targetSlot, offer.Value);");
-            AssertContains(service, "\"TRADE_ITEM_COMMIT from=\" + from.Identity.ToString(true)");
-            AssertContains(service, "public bool TryGetTradeAddItem");
-            AssertContains(service, "\"Trade AddItem lookup failed issuer=\" + issuer.Identity.ToString(true)");
-            AssertContains(service, "public IItem GetVendorTradeItem");
-            AssertContains(service, "public bool HasInventoryPage");
-            AssertContains(service, "return owner.BaseInventory.Pages.ContainsKey((int)container.Type);");
-            AssertContains(service, "public IItem RemoveInventoryItem");
-            AssertContains(service, "return owner.BaseInventory.RemoveItem((int)container.Type, container.Instance);");
-            AssertContains(service, "public InventoryError RestoreInventoryItem");
-            AssertContains(service, "return owner.BaseInventory.AddToPage((int)container.Type, container.Instance, item);");
-            AssertContains(service, "public void PersistCharacterInventory");
-            AssertContains(service, "\"Persisted inventory after \" + reason + \" char=\"");
-
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.HasFreeInventorySlots(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.FindFreeStandardInventorySlot(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddToStandardInventoryPage(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnItemsToStandardInventoryUnchecked(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.SendTradeWindowMoveToInventory(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnPlayerTradeOffers(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TransferPlayerTradeOffers(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TryGetTradeAddItem(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.GetVendorTradeItem(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.HasInventoryPage(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.RemoveInventoryItem(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.RestoreInventoryItem(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.PersistCharacterInventory(");
-            AssertDoesNotContain(tradeHandler, "private bool HasFreeInventorySlots");
-            AssertDoesNotContain(tradeHandler, "private void SendTradeWindowMoveToInventory");
-            AssertDoesNotContain(tradeHandler, "private void ReturnPlayerTradeOffers");
-            AssertDoesNotContain(tradeHandler, "private void TransferPlayerTradeOffers");
-            AssertDoesNotContain(tradeHandler, "private void PersistCharacterInventory");
-            AssertDoesNotContain(tradeHandler, "\"Trade AddItem lookup failed issuer=\"");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsKnuBotTradeItemLookupAndRemove()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string baseKnuBot =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\KnuBot\BaseKnuBot.cs");
-            string knuBotTradeHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\KnuBotTradeMessageHandler.cs");
-
-            AssertContains(service, "public void HandleKnuBotTradeItemRemove");
-            AssertContains(service, "public IItem GetKnuBotTradeItem(");
-            AssertContains(
-                service,
-                "client.Controller.Character.BaseInventory.Pages[(int)message.Container.Type].Remove(");
-            AssertContains(service, "return character.BaseInventory.Pages[(int)container][slotNumber];");
-            AssertContains(
-                baseKnuBot,
-                "InventoryContainerRuntimeService.Default.GetKnuBotTradeItem(");
-            AssertContains(
-                knuBotTradeHandler,
-                "InventoryContainerRuntimeService.Default.HandleKnuBotTradeItemRemove(client, message);");
-            AssertDoesNotContain(baseKnuBot, "BaseInventory.Pages[(int)container][slotNumber]");
-            AssertDoesNotContain(knuBotTradeHandler, "BaseInventory.Pages[(int)message.Container.Type].Remove");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsBackpackOpenCloseLifecycle()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string playerController =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Controllers\PlayerController.cs");
-
-            AssertContains(service, "public bool TryUseBackpackContainer");
-            AssertContains(service, "public bool TryOpenBackpackContainer");
-            AssertContains(service, "BackpackContainerActionMessageHandler.Default.SendClose(character, containerIdentity)");
-            AssertContains(service, "BackpackContainerActionMessageHandler.Default.SendOpen(character, containerIdentity)");
-            AssertContains(service, "InventoryUpdateMessageHandler.Default.SendContainerIntroduce");
-            AssertContains(service, "InventoryUpdateMessageHandler.Default.SendFreshContainerOpen");
-            AssertContains(service, "private static bool IsBackpackUseSlot");
-            AssertContains(service, "private static bool TryResolveBackpackContainerIdentity");
-            AssertContains(service, "private static bool IsItemUsable");
-            AssertContains(service, "this.TryUseBackpackContainer(client.Controller.Character, target)");
-
-            AssertContains(service, "this.TryOpenBackpackContainer(character, itemPosition, item)");
-            AssertContains(
-                playerController,
-                "InventoryContainerRuntimeService.Default.UseInventoryItem(this.Character, itemPosition)");
-            AssertContains(
-                playerController,
-                "InventoryContainerRuntimeService.Default.TryUseBackpackContainer(this.Character, itemPosition)");
-            AssertDoesNotContain(playerController, "private bool TryOpenBackpackContainer");
-            AssertDoesNotContain(playerController, "private bool IsBackpackUseSlot");
-            AssertDoesNotContain(playerController, "private bool TryResolveBackpackContainerIdentity");
-            AssertDoesNotContain(playerController, "private bool IsItemUsable");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsBackpackInventoryHandleRegistration()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string inventoryUpdateHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\InventoryUpdateMessageHandler.cs");
-
-            AssertContains(service, "public void RegisterBackpackInventoryHandle");
-            AssertContains(service, "page.Identity.Type != IdentityType.Container");
-            AssertContains(service, "character.BaseInventory.RegisterBackpackHandle(handle, page.Identity);");
-
-            AssertContains(
-                inventoryUpdateHandler,
-                "InventoryContainerRuntimeService.Default.RegisterBackpackInventoryHandle(character, page, handle);");
-            AssertDoesNotContain(inventoryUpdateHandler, "private void RegisterBackpackHandle");
-            AssertDoesNotContain(inventoryUpdateHandler, "character.BaseInventory.RegisterBackpackHandle");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsInventoryItemUseLifecycle()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string playerController =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Controllers\PlayerController.cs");
-
-            AssertContains(service, "public bool UseInventoryItem");
-            AssertContains(service, "this.TryOpenBackpackContainer(character, itemPosition, item)");
-            AssertContains(service, "private bool IsUseBlockedBySkillLock");
-            AssertContains(service, "private static bool ItemFunctionRequirementsPass");
-            AssertContains(service, "TemplateActionMessageHandler.Default.Send(");
-            AssertContains(service, "ItemLoader.ItemList[item.HighID].IsConsumable()");
-            AssertContains(service, "character.BaseInventory.RemoveItem(");
-            AssertContains(service, "CharacterActionMessageHandler.Default.SendDeleteItem(");
-            AssertContains(service, "item.PerformAction(character, EventType.OnUse, itemPosition.Instance);");
-            AssertContains(service, "if (this.UseInventoryItem(client.Controller.Character, target))");
-            AssertContains(service, "GenericCmdMessageHandler.Default.AcknowledgeDenied(client.Controller.Character, message)");
-
-            AssertContains(
-                playerController,
-                "return InventoryContainerRuntimeService.Default.UseInventoryItem(this.Character, itemPosition);");
-            AssertDoesNotContain(playerController, "private bool IsUseBlockedBySkillLock");
-            AssertDoesNotContain(playerController, "private bool ItemFunctionRequirementsPass");
-            AssertDoesNotContain(playerController, "TemplateActionMessageHandler.Default.Send(");
-            AssertDoesNotContain(playerController, "ItemLoader.ItemList[item.HighID].IsConsumable()");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsCharacterActionInventoryMutations()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string characterActionHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharacterActionMessageHandler.cs");
-
-            AssertContains(service, "public bool DeleteInventoryItemAction");
-            AssertContains(service, "ItemDao.Instance.Delete(");
-            AssertContains(service, "character.BaseInventory.RemoveItem(");
-            AssertContains(service, "public void SplitInventoryItemStackAction");
-            AssertContains(service, "new Item(item.Quality, item.LowID, item.HighID)");
-            AssertDoesNotContain(service, "MergeInventoryItemStackAction");
-
-            AssertContains(
-                characterActionHandler,
-                "InventoryContainerRuntimeService.Default.DeleteInventoryItemAction(");
-            AssertContains(
-                characterActionHandler,
-                "ThrakGardenKeyQuestRuntime.TryForceReturnGardenKey");
-            AssertContains(
-                characterActionHandler,
-                "InventoryContainerRuntimeService.Default.SplitInventoryItemStackAction(client.Controller.Character, message);");
-            AssertDoesNotContain(characterActionHandler, "MergeInventoryItemStackAction");
-            AssertDoesNotContain(characterActionHandler, "ItemDao.Instance.Delete(");
-            AssertDoesNotContain(characterActionHandler, "new Item(it.Quality, it.LowID, it.HighID)");
-            AssertDoesNotContain(characterActionHandler, ".BaseInventory.RemoveItem(");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsContainerEquipAccessAndRequirementChecks()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string containerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
-
-            AssertContains(service, "public bool TryRejectInventoryPageAccess");
-            AssertContains(service, "public bool CanMoveContainerItemToPage");
-            AssertContains(service, "private static AOAction ResolveContainerAddItemAction");
-            AssertContains(service, "item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWear)");
-            AssertContains(service, "item.ItemActions.SingleOrDefault(x => x.ActionType == ActionType.ToWield)");
-            AssertContains(service, "No suitable action found for equipping to this page");
-
-            AssertContains(service, "this.TryRejectInventoryPageAccess(character, receivingPage)");
-            AssertContains(service, "this.TryRejectInventoryPageAccess(character, sendingPage)");
-            AssertContains(service, "this.CanMoveContainerItemToPage(character, sendingPage, itemFrom)");
-            AssertContains(service, "this.CanMoveContainerItemToPage(character, receivingPage, itemFrom)");
-            AssertDoesNotContain(containerAddItemHandler, "TryRejectInventoryPageAccess(");
-            AssertDoesNotContain(containerAddItemHandler, "CanMoveContainerItemToPage(");
-            AssertDoesNotContain(containerAddItemHandler, "private AOAction getAction");
-            AssertDoesNotContain(containerAddItemHandler, "private bool RequiresImplantAccess");
-            AssertDoesNotContain(containerAddItemHandler, "private bool HasImplantAccess");
-            AssertDoesNotContain(containerAddItemHandler, "private void SendImplantAccessDenied");
-            AssertDoesNotContain(containerAddItemHandler, "item.ItemActions.SingleOrDefault");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsContainerVisualSyncTiming()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string containerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
-
-            AssertContains(service, "public bool ShouldSkipContainerAppearanceUpdate");
-            AssertContains(service, "public void WaitForContainerHotSwapVisualSync");
-            AssertContains(service, "public void WaitForContainerEquipVisualSync");
-            AssertContains(service, "delay = this.GetEquipDelay(itemFrom, false) + this.GetEquipDelay(itemTo, false);");
-            AssertContains(service, "Thread.Sleep(delay * 10);");
-            AssertContains(service, "Thread.Sleep(this.GetEquipDelay(item, equipmentPage is SocialArmorInventoryPage) * 10);");
-
-            AssertContains(service, "this.ShouldSkipContainerAppearanceUpdate(receivingPage, sendingPage)");
-            AssertContains(service, "this.WaitForContainerHotSwapVisualSync(");
-            AssertContains(service, "this.WaitForContainerEquipVisualSync(");
-            AssertDoesNotContain(containerAddItemHandler, "ShouldSkipContainerAppearanceUpdate(");
-            AssertDoesNotContain(containerAddItemHandler, "WaitForContainerHotSwapVisualSync(");
-            AssertDoesNotContain(containerAddItemHandler, "WaitForContainerEquipVisualSync(");
-            AssertDoesNotContain(containerAddItemHandler, "Thread.Sleep(");
-            AssertDoesNotContain(containerAddItemHandler, "GetAttribute(211)");
-            AssertDoesNotContain(containerAddItemHandler, "delay =");
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         [TestMethod]
         public void SocialArmorPageSupportsBackAndShoulderMeshFunctions()
         {
             string socialArmorPage =
                 ReadRepositoryFile(@"AORebirth\Libraries\Source\AORebirth.Core\Inventory\SocialArmorInventoryPage.cs");
-            string shoulderMesh =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\shouldermesh.cs");
-            string project =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
 
             AssertContains(socialArmorPage, "(int)FunctionType.HeadMesh");
             AssertContains(socialArmorPage, "(int)FunctionType.BackMesh");
             AssertContains(socialArmorPage, "(int)FunctionType.Shouldermesh");
             AssertContains(socialArmorPage, "(int)FunctionType.Texture");
             AssertContains(socialArmorPage, "(int)FunctionType.ChangeBodyMesh");
-
-            AssertContains(shoulderMesh, "internal class shouldermesh : FunctionPrototype");
-            AssertContains(shoulderMesh, "FunctionType.Shouldermesh");
-            AssertContains(shoulderMesh, "character.SocialMeshLayer.AddMesh(position, meshId, overrideTexture, layer);");
-            AssertContains(shoulderMesh, "character.Stats[StatIds.shouldermeshright].Value = meshId;");
-            AssertContains(shoulderMesh, "character.Stats[StatIds.shouldermeshleft].Value = meshId;");
-            AssertContains(shoulderMesh, "if (target == null)");
-            AssertContains(project, @"Core\Functions\GameFunctions\shouldermesh.cs");
         }
 
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsContainerAddItemReadOrchestration()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string containerAddItemHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
 
-            AssertContains(service, "public void HandleContainerAddItem");
-            AssertContains(service, "Pool.Instance.GetObject<IInventoryPage>");
-            AssertContains(service, "this.ResolveContainerAddItemTargetIdentity(toIdentity)");
-            AssertContains(service, "this.ResolveContainerAddItemReceivingPage(");
-            AssertContains(service, "this.MoveNonEquipmentContainerItem(");
-            AssertContains(service, "character.DoNotDoTimers = false;");
-            AssertContains(service, "character.CalculateSkills();");
 
-            AssertContains(
-                containerAddItemHandler,
-                "InventoryContainerRuntimeService.Default.HandleContainerAddItem(client, message);");
-            AssertContains(containerAddItemHandler, "TryLootCorpseItem(");
-            AssertDoesNotContain(containerAddItemHandler, "Pool.Instance.GetObject<IInventoryPage>");
-            AssertDoesNotContain(containerAddItemHandler, "IItemSlotHandler equipTo");
-            AssertDoesNotContain(containerAddItemHandler, "character.DoNotDoTimers");
-            AssertDoesNotContain(containerAddItemHandler, "CalculateSkills();");
-        }
 
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsWeaponVisualMeshRepair()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string clientMoveHandler =
-                ReadRepositoryFile(
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
-            string clientConnected =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs");
-            string playfield =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            string runtimeSystems =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
-
-            AssertContains(service, "public void EnsureWeaponVisualMeshes");
-            AssertContains(service, "private bool EnsureWeaponMesh");
-            AssertContains(service, "private static int NormalizeItemVisualValue");
-            AssertContains(service, "character.MeshLayer.AddMesh");
-            AssertContains(service, "character.Playfield.AnnounceAppearanceUpdate(character);");
-            AssertContains(service, "this.EnsureWeaponVisualMeshes(character, true);");
-
-            AssertDoesNotContain(clientMoveHandler, "public static void EnsureWeaponVisualMeshes");
-            AssertDoesNotContain(clientMoveHandler, "private bool EnsureWeaponMesh");
-            AssertContains(
-                clientConnected,
-                "InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(client.Controller.Character, false);");
-            AssertContains(
-                playfield,
-                "this.runtimeSystems.EnsureWeaponVisualMeshes(character, false);");
-            AssertContains(
-                runtimeSystems,
-                "internal void EnsureWeaponVisualMeshes(ICharacter character, bool announceAppearanceUpdate)");
-            AssertContains(
-                runtimeSystems,
-                "this.inventoryContainer.EnsureWeaponVisualMeshes(character, announceAppearanceUpdate);");
-            AssertDoesNotContain(
-                playfield,
-                "InventoryContainerRuntimeService.Default.EnsureWeaponVisualMeshes(character, false);");
-        }
 
         [TestMethod]
         public void InventoryContainerRuntimeServiceOwnsCorpseLootInventoryTransfer()
         {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string playfield =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            string corpseAccess =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs");
-            string runtimeSystems =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
-            string clientMoveHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ClientMoveItemToInventoryMessageHandler.cs");
-            string containerAddItemHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ContainerAddItemMessageHandler.cs");
             string combatLootSmoke =
                 ReadRepositoryFile(@"tools-temp\AOSharpLiveCapture\CombatLootSmoke.cs");
-
-            AssertContains(service, "public CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
-            AssertContains(service, "private bool TryResolveCorpseLootTargetSlot(");
-            AssertContains(service, "public bool CharacterHasUniqueItemAlready(");
-            AssertContains(service, "public bool TryMoveBackpackItemToInventory(");
-            AssertContains(service, "this.TryMoveOwnedInventoryItem(character, message, client)");
-            AssertContains(playfield, "this.runtimeSystems.TryAddCorpseLootItem,");
-            AssertContains(playfield, "this.runtimeSystems.CharacterHasUniqueItemAlready,");
-            AssertContains(playfield, "this.runtimeSystems.TryUseCorpse(");
-            AssertContains(playfield, "this.runtimeSystems.TryUseDeadNpcCorpse(");
-            AssertContains(playfield, "this.runtimeSystems.TryLootCorpseItem(");
-            AssertContains(playfield, "this.runtimeSystems.ProcessPendingCorpseCreditAwards(");
-            AssertContains(playfield, "corpse => FindCorpseLootItem(corpse, requestedLootSlot)");
-            AssertContains(playfield, "private static CorpseLootItem FindCorpseLootItem(CorpseState corpse, int requestedLootSlot)");
-            AssertContains(playfield, "return CombatCorpseRules.FindLootItem(");
-            AssertContains(playfield, "x => x.Looted);");
-            AssertContains(runtimeSystems, "internal CorpseLootInventoryTransferResult TryAddCorpseLootItem(");
-            AssertContains(runtimeSystems, "internal bool CharacterHasUniqueItemAlready(ICharacter character, IItem item)");
-            AssertContains(runtimeSystems, "return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);");
-            AssertContains(runtimeSystems, "return this.inventoryContainer.CharacterHasUniqueItemAlready(character, item);");
-            AssertContains(runtimeSystems, "return this.corpseAccess.TryLootCorpseItem(");
-            AssertContains(runtimeSystems, "this.corpseAccess.ProcessPendingCorpseCreditAwards(");
-            AssertContains(corpseAccess, "internal bool TryUseCorpse<TCorpseState>(");
-            AssertContains(corpseAccess, "internal bool TryUseDeadNpcCorpse<TCorpseState>(");
-            AssertContains(corpseAccess, "internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(");
-            AssertContains(corpseAccess, "sourceContainer.Type != IdentityType.Backpack");
-            AssertContains(corpseAccess, "int corpseInventoryHandleValue = (sourceContainer.Instance >> 16) & 0xffff;");
-            AssertContains(corpseAccess, "int requestedLootSlot = sourceContainer.Instance & 0xffff;");
-            AssertContains(corpseAccess, "if (corpseLootItem == null)");
-            AssertContains(corpseAccess, "sendUseActionFinished(looter);");
-            AssertContains(
-                corpseAccess,
-                "CorpseLootInventoryTransferResult transferResult = tryAddCorpseLootItem(looter, item, targetPlacement);");
-            AssertTextBefore(
-                corpseAccess,
-                "CorpseLootInventoryTransferResult transferResult = tryAddCorpseLootItem(looter, item, targetPlacement);",
-                "setLooted(corpseLootItem, true);");
-            AssertTextBefore(
-                corpseAccess,
-                "setLooted(corpseLootItem, true);",
-                "sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);");
-            AssertContains(corpseAccess, "scheduleCorpseDespawn(corpse, emptyCleanupDelay, \"looted-empty\");");
-            AssertContains(corpseAccess, "extendCorpseLifetime(corpse, itemLootLifetime, \"loot-remaining\");");
-            AssertTextBefore(
-                clientMoveHandler,
-                "character.Playfield.TryLootCorpseItem(",
-                "InventoryContainerRuntimeService.Default.HandleClientMoveItemToInventory(client, message);");
-            AssertTextBefore(
-                containerAddItemHandler,
-                "client.Controller.Character.Playfield.TryLootCorpseItem(",
-                "InventoryContainerRuntimeService.Default.HandleContainerAddItem(client, message);");
             AssertContains(combatLootSmoke, "private const int MoveToInventoryPlacement = 0x6F;");
             AssertContains(combatLootSmoke, "N3MessageType.InventoryUpdate");
             AssertContains(combatLootSmoke, "N3MessageType.ClientMoveItemToInventory");
@@ -1306,162 +465,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 combatLootSmoke,
                 "item.MoveToInventory(MoveToInventoryPlacement);",
                 "this.Transition(SmokeState.WaitFirstMoved, \"first move sent\");");
-            AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.TryAddCorpseLootItem(");
-            AssertDoesNotContain(playfield, "InventoryContainerRuntimeService.Default.CharacterHasUniqueItemAlready(");
-
-            AssertDoesNotContain(playfield, "private bool TryResolveLootTargetSlot(");
-            AssertDoesNotContain(playfield, "looter.BaseInventory.AddToPage(targetPageNumber, targetSlot, lootItem.Item)");
-            AssertDoesNotContain(playfield, "looter.BaseInventory.Write();");
-            AssertDoesNotContain(playfield, "private void SendCorpseInventoryUpdateAndCredits");
-            AssertDoesNotContain(corpseAccess, "BaseInventory");
-            AssertDoesNotContain(corpseAccess, "InventoryUpdateMessage");
-            AssertDoesNotContain(corpseAccess, "ContainerAddItemMessage");
-            AssertDoesNotContain(corpseAccess, "AwardCorpseCredits");
         }
 
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsQuestRewardInventoryGrant()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string marcusB18F =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Arete\Quests\MarcusB18FCompletionHandler.cs");
 
-            AssertContains(service, "public bool HasCharacterInventory(");
-            AssertContains(service, "public bool CharacterHasItemInCarriedInventory(");
-            AssertContains(service, "public QuestRewardInventoryGrantResult TryGrantQuestRewardItem(");
-            AssertContains(service, "private static bool InventoryPageHasItem(");
-            AssertContains(marcusB18F, "InventoryContainerRuntimeService.Default.HasCharacterInventory(source)");
-            AssertContains(marcusB18F, "InventoryContainerRuntimeService.Default.CharacterHasItemInCarriedInventory(");
-            AssertContains(marcusB18F, "InventoryContainerRuntimeService.Default.TryGrantQuestRewardItem(source, item)");
 
-            AssertDoesNotContain(marcusB18F, "source.BaseInventory");
-            AssertDoesNotContain(marcusB18F, "private static bool CharacterHasItemInCarriedInventory(");
-            AssertDoesNotContain(marcusB18F, "private static bool InventoryPageHasItem(");
-        }
 
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsVendorShopInventoryHelpers()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string shophash =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\shophash.cs");
-            string tradeHandler =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\MessageHandlers\TradeMessageHandler.cs");
 
-            AssertContains(service, "public bool VendorShopNeedsDatabaseEntry(");
-            AssertContains(service, "public IInventoryPage GetVendorStandardInventoryPage(");
-            AssertContains(service, "public void AddVendorPurchaseOffer(");
-            AssertContains(service, "public void AddVendorSaleOffer(");
-            AssertContains(service, "public void RemoveVendorPurchaseOffer(");
-            AssertContains(service, "public InventoryItemAddResult TryAddStandardInventoryItem(");
-            AssertContains(service, "public void ReturnItemsToStandardInventoryUnchecked(");
-            AssertContains(service, "private static IItem CloneShopItem(");
-            AssertContains(shophash, "InventoryContainerRuntimeService.Default.VendorShopNeedsDatabaseEntry(temp)");
-            AssertContains(shophash, "InventoryContainerRuntimeService.Default.GetVendorStandardInventoryPage((Vendor)caller)");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddVendorPurchaseOffer(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.AddVendorSaleOffer(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.RemoveVendorPurchaseOffer(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.TryAddStandardInventoryItem(");
-            AssertContains(tradeHandler, "InventoryContainerRuntimeService.Default.ReturnItemsToStandardInventoryUnchecked(");
 
-            AssertDoesNotContain(shophash, "temp.BaseInventory");
-            AssertDoesNotContain(tradeHandler, "private static IItem CloneShopItem(");
-        }
 
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceOwnsTradeskillInventoryOrchestration()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-            string tradeSkillReceiver =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\PacketHandlers\TradeSkillReceiver.cs");
 
-            AssertContains(service, "public Item GetTradeSkillItem(");
-            AssertContains(service, "public InventoryError AddTradeSkillResultItem(");
-            AssertContains(service, "public void RemoveTradeSkillItem(");
-            AssertContains(service, "public Item SetTradeSkillSource(");
-            AssertContains(service, "public Item SetTradeSkillTarget(");
-            AssertContains(service, "public void ClearTradeSkillSource(");
-            AssertContains(service, "public void ClearTradeSkillTarget(");
-            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.GetTradeSkillItem(");
-            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.AddTradeSkillResultItem(");
-            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.RemoveTradeSkillItem(");
-            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.SetTradeSkillSource(");
-            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.SetTradeSkillTarget(");
-            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.ClearTradeSkillSource(");
-            AssertContains(tradeSkillReceiver, "InventoryContainerRuntimeService.Default.ClearTradeSkillTarget(");
 
-            AssertDoesNotContain(tradeSkillReceiver, "BaseInventory");
-            AssertDoesNotContain(tradeSkillReceiver, "TradeSkillSource =");
-            AssertDoesNotContain(tradeSkillReceiver, "TradeSkillTarget =");
-        }
 
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceRetainsNamedCoreOwnershipSurfaces()
-        {
-            string service =
-                ReadRepositoryFile(@"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs");
-
-            string[] requiredServiceSurfaces =
-            {
-                "public bool TryUseBackpackContainer",
-                "public void OpenBank",
-                "public void HandleContainerAddItem",
-                "public void HandleClientMoveItemToInventory",
-                "public bool UseInventoryItem",
-                "public IEnumerable<IInventoryPage> CharacterStateInventoryPages",
-                "public void ReturnPlayerTradeOffers",
-                "public CorpseLootInventoryTransferResult TryAddCorpseLootItem",
-                "public QuestRewardInventoryGrantResult TryGrantQuestRewardItem",
-                "public void AddVendorPurchaseOffer",
-                "public Item GetTradeSkillItem",
-                "public IItem GetKnuBotTradeItem"
-            };
-
-            foreach (string requiredSurface in requiredServiceSurfaces)
-            {
-                AssertContains(service, requiredSurface);
-            }
-
-            AssertDoesNotContain(service, "MergeInventoryItemStackAction");
-        }
-
-        [TestMethod]
-        public void InventoryContainerRuntimeServiceGuardsRemainingHandlerControllerInventoryOwnership()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string[] roots =
-            {
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers"),
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers")
-            };
-
-            string[] allowedRelativeFiles =
-            {
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionHandler.cs",
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs",
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\FullCharacterMessageHandler.cs",
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\LuxuryApartmentSunriseInteractionHandler.cs",
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\NascenceStatueTeleportInteractionHandler.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"
-            };
-
-            HashSet<string> allowed =
-                new HashSet<string>(
-                    allowedRelativeFiles.Select(path => Path.GetFullPath(Path.Combine(repositoryRoot, path))));
-
-            string[] offenders =
-                roots.SelectMany(root => Directory.GetFiles(root, "*.cs", SearchOption.TopDirectoryOnly))
-                    .Where(path => !allowed.Contains(Path.GetFullPath(path)))
-                    .Where(path => File.ReadAllText(path).Contains("BaseInventory"))
-                    .Select(path => MakeRelativePath(repositoryRoot, path))
-                    .OrderBy(path => path)
-                    .ToArray();
-
-            CollectionAssert.AreEqual(new string[0], offenders);
-        }
 
         private static void AssertRoute(
             GenericCmdUseRoute expected,

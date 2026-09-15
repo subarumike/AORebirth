@@ -1,6 +1,9 @@
 @echo off
 setlocal EnableExtensions
 
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -ValidateEngineSelectionOnly %*
+if errorlevel 1 exit /b 1
+
 pushd "%~dp0" >nul
 if errorlevel 1 (
     echo [AORebirth Start] Failed to switch to repository root.

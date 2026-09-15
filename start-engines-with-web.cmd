@@ -1,2 +1,3 @@
 @echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -WithWeb
+call "%~dp0start-engines.cmd" -WithWeb %*
+exit /b %ERRORLEVEL%

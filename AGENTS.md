@@ -62,7 +62,7 @@ Do not spend command budget on these unless the approved workflow has already fa
 Active task discipline:
 
 - Stay on the active gameplay task.
-- Current active priority is the NewEngine cutover foundation on Mike's separate integration branch. Full gameplay parity is not a cutover prerequisite; operational and durable-state integrity are required. Keep Legacy present during this milestone, leave the developer branch/worktree and master untouched, and perform no production operation. See `docs/ai/CURRENT_TASK.md`.
+- Current active priority is Mike's authorized Legacy engine retirement after the NewEngine content cleanup reached master. Preserve shared mechanics, editable content and durable DAO state while removing the obsolete engine and its build/launch paths. Leave the developer branch/worktree untouched and perform no production operation. See `docs/ai/CURRENT_TASK.md`.
 - Prefer visible gameplay improvements over architectural refactoring.
 - Use live AO captures as the authoritative source for Subway behavior and content.
 - Do not resume Playfield decomposition unless Mike explicitly requests it.

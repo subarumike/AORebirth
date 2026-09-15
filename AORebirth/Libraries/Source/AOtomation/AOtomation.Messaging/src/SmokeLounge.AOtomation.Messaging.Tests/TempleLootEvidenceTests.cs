@@ -166,7 +166,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string sourcePath = Path.Combine(
                 FindRepositoryRoot(),
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs");
+                @"Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs");
             string source = File.ReadAllText(sourcePath);
 
             StringAssert.Contains(

@@ -38,60 +38,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             StringAssert.Contains(dao, "AND `Value`=@PendingState");
         }
 
-        [TestMethod]
-        public void RuntimeOffersExactDestinationsAndPersistsBeforeTransfer()
-        {
-            string root = FindRepositoryRoot();
-            string runtime = Read(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\NewCharacterStartAreaSelectionRuntime.cs");
-            string areteSpawn = Read(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteLandingSpawn.cs");
 
-            StringAssert.Contains(runtime, "AreteOption = \"Arete\"");
-            StringAssert.Contains(runtime, "IccShuttleportOption = \"ICC Shuttleport\"");
-            StringAssert.Contains(runtime, "PromptSpeakerName = \"ICC Shuttleport Commander\"");
-            StringAssert.Contains(areteSpawn, "Name = \"ICC Shuttleport Commander\"");
-            StringAssert.Contains(runtime, "IccShuttleportPlayfieldId = 4582");
-            StringAssert.Contains(runtime, "IccShuttleportX = 939.0f");
-            StringAssert.Contains(runtime, "IccShuttleportY = 20.3f");
-            StringAssert.Contains(runtime, "IccShuttleportZ = 732.0f");
-            AssertTextBefore(
-                runtime,
-                "character.DoNotDoTimers = false;",
-                "sourcePlayfield.Teleport(");
-            AssertTextBefore(
-                runtime,
-                "TryCompleteStartAreaSelection",
-                "TeleportToIccShuttleport(character)");
-        }
 
-        [TestMethod]
-        public void LoginAndKnuBotHandlersOwnTheSelectionBeforeNpcDialogue()
-        {
-            string root = FindRepositoryRoot();
-            string login = Read(root, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs");
-            string answer = Read(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\KnuBotAnswerMessageHandler.cs");
-            string close = Read(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\KnuBotCloseChatWindowMessageHandler.cs");
 
-            AssertTextBefore(
-                login,
-                "CompleteSessionInitialization",
-                "NewCharacterStartAreaSelectionRuntime.Schedule(client)");
-            AssertTextBefore(
-                answer,
-                "NewCharacterStartAreaSelectionRuntime.TryHandleAnswer",
-                "ContentDrivenNpcDialogueRouter.TryHandleAnswer");
-            AssertTextBefore(
-                close,
-                "NewCharacterStartAreaSelectionRuntime.TryHandleClose",
-                "ContentDrivenNpcDialogueRouter.TryHandleClose");
-        }
 
         private static string Read(string root, string relativePath)
         {

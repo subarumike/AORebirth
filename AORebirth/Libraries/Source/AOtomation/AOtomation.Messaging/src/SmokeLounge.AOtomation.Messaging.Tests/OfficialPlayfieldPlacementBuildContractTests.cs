@@ -7,37 +7,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class OfficialPlayfieldPlacementBuildContractTests
     {
-        [TestMethod]
-        public void WindowsProjectPackagesExactlyOneTrackedOfficialCorpus()
-        {
-            string project = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj").Replace('\\', '/');
 
-            StringAssert.Contains(
-                project,
-                "../../../docs/generated/playfields/official-placement-corpus-manifest.json");
-            StringAssert.Contains(
-                project,
-                "../../../docs/generated/playfields/official-placement-index.json");
-            StringAssert.Contains(
-                project,
-                "../../../docs/generated/playfields/official-placement-summary.json");
-            StringAssert.Contains(
-                project,
-                "../../../docs/generated/playfields/official-acghash-inventory.json");
-            Assert.IsFalse(project.Contains("../../../docs/generated/playfields/placements/*.json"));
-            Assert.AreEqual(
-                630,
-                CountOccurrences(
-                    project,
-                    "../../../docs/generated/playfields/placements/pf_"));
-            Assert.AreEqual(
-                630,
-                CountOccurrences(
-                    project,
-                    "Content/Official/PlayfieldPlacements/placements/pf_"));
-            Assert.IsFalse(project.Contains("official-playfield-reconciliation.json"));
-        }
 
         [TestMethod]
         public void WindowsBuildGuardsContentArchitectureWithoutPinningEditableWorldData()
