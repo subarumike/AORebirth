@@ -1,0 +1,273 @@
+{
+  "generatedAt": "2026-09-15T03:43:52.431Z",
+  "status": "MASTER_RELEASE_HISTORY_RECONCILED_DELMUS_INTEGRATION_OPEN",
+  "refs": {
+    "originalRemoteMaster": "7be49b22b4c0116af9c48dc88a44f86ba802f7c7",
+    "originalLocalMaster": "31c73fc142be2e12994f2af6b23095c0f541e032",
+    "integratedReleaseHistory": "9e57985c1bc8cc79465bcb6016e2097aaafbb3b0",
+    "deployedArtifactSource": "4b03fedc0c81779e8897453c23974b4b9ad52100",
+    "previouslyReviewedDelmus": "8b9d36090986dc3ad89b9545a23ff38016c626ab",
+    "initialDelmusTip": "fa5129fa3665ef6465afd26e61d9978d5ca97c82",
+    "delmus": "39aab0e908f74697aa69bcd0b93bd6c13e6a5777"
+  },
+  "before": {
+    "remoteMasterVsInitialDelmus": {
+      "leftOnly": 1,
+      "rightOnly": 8
+    },
+    "remoteMasterVsLatestDelmus": {
+      "leftOnly": 1,
+      "rightOnly": 9
+    },
+    "remoteMasterVsReleaseHistory": {
+      "leftOnly": 0,
+      "rightOnly": 84
+    }
+  },
+  "afterReleaseCatchup": {
+    "masterVsDelmus": {
+      "leftOnly": 85,
+      "rightOnly": 9
+    }
+  },
+  "actions": {
+    "remoteMasterFastForward": "PASS",
+    "forcedUpdate": false,
+    "delmusRefChanged": false,
+    "runtimeSourceChanged": false,
+    "productionOperation": false,
+    "databaseOperation": false
+  },
+  "acceptedGameplaySource": "31c73fc142be2e12994f2af6b23095c0f541e032",
+  "officialClientAndPostClientAcceptance": "PENDING_FROM_EXISTING_RELEASE_RECEIPT",
+  "wholeBranchMergePreview": {
+    "status": "CONFLICTS",
+    "tree": "420654c4097de174caa08d5659cba40cf9283d78",
+    "conflictCount": 32,
+    "conflictPaths": [
+      "AORebirth/GameData/MobTemplates.json",
+      "AORebirth/Server/ZoneEngine_New.Tests/CellHeatSchedulerTests.cs",
+      "AORebirth/Server/ZoneEngine_New.Tests/TestDoubles.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationResult.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Commands/GiveItemCommand.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlActiveNanoRepository.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterCoalesceCommit.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Entities/LootableDynel.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/GameData/HashItemCatalog.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/GameData/IGameData.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryFlushService.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Inventory/Item.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemTemplate.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcFamilyStatTemplates.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Network/IZoneSession.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneSession.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/CellHeatScheduler.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/LocalityVisibility.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/PlayfieldLocality.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Trade/TradeService.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PortalDoorLandingResolver.cs",
+      "docs/ai/CURRENT_TASK.md"
+    ],
+    "applied": false
+  },
+  "delmusExclusiveCommits": [
+    {
+      "sha": "d2d9844673a766c02aa768623db9f0ab5b6ea01c",
+      "subject": "ZoneEngine_New: nano casting, buffs, NPC AI brain, mob stat resolver"
+    },
+    {
+      "sha": "53c858d9900266fb6740975dbb2b5011a5792e66",
+      "subject": "ZoneEngine_New: item events/charges, attack info, specials, nano upload, portal landings"
+    },
+    {
+      "sha": "ced79688bc9ad1011119b77e033e37530bd56941",
+      "subject": "ZoneEngine_New: NPC FollowTarget pathing, weapon/LOS combat fixes, dual-sided collision bake"
+    },
+    {
+      "sha": "5d663b7a01d14d58d67a44a42e9a8c1fc7592650",
+      "subject": "ZoneEngine_New: load cell-surface collision by setting SurfaceResource version 5"
+    },
+    {
+      "sha": "e40c687a4470fd59b971ec4b026acd1aaa450ef1",
+      "subject": "Replace NPC StatBands with NpcFamily stat curves"
+    },
+    {
+      "sha": "f8505f173db852930c4e4a66a277e2fa2d53100f",
+      "subject": "Rename NPCFamilyStatTemplates.json to NPCStatTemplates.json"
+    },
+    {
+      "sha": "8b9d36090986dc3ad89b9545a23ff38016c626ab",
+      "subject": "﻿Layer NPC family and optional overlay stat templates."
+    },
+    {
+      "sha": "fa5129fa3665ef6465afd26e61d9978d5ca97c82",
+      "subject": "ZoneEngine_New: NpcTemplates catalog, equipment fill, and .npc equipment."
+    },
+    {
+      "sha": "39aab0e908f74697aa69bcd0b93bd6c13e6a5777",
+      "subject": "ZoneEngine_New: drop template Weapons; spawn missing hashes as AAAA."
+    }
+  ],
+  "latestCommitFiles": [
+    {
+      "file": "AORebirth/GameData/NpcFamilyStatTemplates.json",
+      "conflictsInWholeBranchPreview": false,
+      "integratedBlob": "0967ef424bce6791893e9a57bb952f80fd536e93",
+      "delmusBlob": null
+    },
+    {
+      "file": "AORebirth/GameData/NpcStatTemplateOverlays.json",
+      "conflictsInWholeBranchPreview": false,
+      "integratedBlob": "0967ef424bce6791893e9a57bb952f80fd536e93",
+      "delmusBlob": null
+    },
+    {
+      "file": "AORebirth/GameData/NpcTemplate.json",
+      "conflictsInWholeBranchPreview": false,
+      "integratedBlob": null,
+      "delmusBlob": null
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New.Tests/NpcTemplateCatalogTests.cs",
+      "conflictsInWholeBranchPreview": false,
+      "integratedBlob": null,
+      "delmusBlob": "c38d9605131ab0b11a508499db1b8d9443d13dd5"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Commands/NpcCommand.cs",
+      "conflictsInWholeBranchPreview": false,
+      "integratedBlob": "b975bfd8621fa7ad81117ddfbf406ffaf68bb66b",
+      "delmusBlob": "debfa350ced99a51d2a7ab01c4c345cf933c801e"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs",
+      "conflictsInWholeBranchPreview": true,
+      "integratedBlob": "059641d2de7e9a8be7041b6153dd687990f7184b",
+      "delmusBlob": "bdc29c39b71818e46f830fb2075cd21af6cd9981"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs",
+      "conflictsInWholeBranchPreview": false,
+      "integratedBlob": null,
+      "delmusBlob": "47d8976df9be8f476b191bb86184a003d29f0038"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobTemplates.cs",
+      "conflictsInWholeBranchPreview": false,
+      "integratedBlob": "85dcaaeda57554c1cf8d166f6da5af24f872e0ca",
+      "delmusBlob": "90a11061898e94937c5a31f6be46bc69b613d346"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+      "conflictsInWholeBranchPreview": true,
+      "integratedBlob": "d031f18eb8869467f90588f0766cbdbe2826c08f",
+      "delmusBlob": "1869ed20c766737fd9cf6317e917c076bac10c34"
+    }
+  ],
+  "contentFiles": [
+    {
+      "file": "AORebirth/GameData/NpcTemplates.json",
+      "integratedBlob": null,
+      "delmusBlob": null
+    },
+    {
+      "file": "AORebirth/GameData/NpcTemplate.json",
+      "integratedBlob": null,
+      "delmusBlob": null
+    },
+    {
+      "file": "AORebirth/GameData/MobTemplates.json",
+      "integratedBlob": "60c9ea044a6e017740c8c76013afbd9cc6b4e014",
+      "delmusBlob": null
+    },
+    {
+      "file": "AORebirth/GameData/MonsterWeapons.json",
+      "integratedBlob": null,
+      "delmusBlob": "7ee151b3a1a49cf52fdc0c783fb98a1caa5c3d25"
+    },
+    {
+      "file": "AORebirth/GameData/NpcFamilyStatTemplates.json",
+      "integratedBlob": "0967ef424bce6791893e9a57bb952f80fd536e93",
+      "delmusBlob": null
+    },
+    {
+      "file": "AORebirth/GameData/NpcStatTemplateOverlays.json",
+      "integratedBlob": "0967ef424bce6791893e9a57bb952f80fd536e93",
+      "delmusBlob": null
+    }
+  ],
+  "monsterWeaponAliases": {
+    "LEW1": [
+      120910,
+      120911
+    ],
+    "LEW2": [
+      120913,
+      120914
+    ]
+  },
+  "evidence": [
+    {
+      "source": "39aab0e908f74697aa69bcd0b93bd6c13e6a5777",
+      "file": ".gitignore",
+      "line": 115,
+      "text": "AORebirth/GameData/NpcTemplates.json"
+    },
+    {
+      "source": "39aab0e908f74697aa69bcd0b93bd6c13e6a5777",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+      "line": 503,
+      "text": "\"NpcTemplates.json not found at {0}; catalog empty\","
+    },
+    {
+      "source": "39aab0e908f74697aa69bcd0b93bd6c13e6a5777",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+      "line": 426,
+      "text": "\"NpcTemplate.json not found at {0}; catalog empty\","
+    },
+    {
+      "source": "9e57985c1bc8cc79465bcb6016e2097aaafbb3b0",
+      "file": "docs/reports/NEWENGINE_DELMUS_NPC_INTEGRATION.md",
+      "line": 29,
+      "text": "`AAAA_POLICY=BLOCK_SPAWN`. The baseline already contained an AAAA appearance template, but the current placement guard prevented the developer's fallback behavior. The placeholder is now explicitly unresolved, non-attackable, without combat AI or concurrent weapons, and rejected by `SpawnService` before identity allocation. It cannot become an authorized actor just because its hash is present in a template file."
+    },
+    {
+      "source": "9e57985c1bc8cc79465bcb6016e2097aaafbb3b0",
+      "file": "docs/reports/NEWENGINE_DELMUS_NPC_INTEGRATION.md",
+      "line": 38,
+      "text": "- Family IDs: 0, 3, 63, 138, 148, 149, 150, 151. Eight missing accepted family definitions; no fabricated curves."
+    },
+    {
+      "source": "9e57985c1bc8cc79465bcb6016e2097aaafbb3b0",
+      "file": "docs/reports/NEWENGINE_SYSTEMD_DEPLOYMENT_RECONCILIATION.md",
+      "line": 3,
+      "text": "Status: Release 4b03fedc is installed and operationally healthy. Official-client and post-client durable-state acceptance remain pending; it is not yet promoted as accepted production authority."
+    }
+  ],
+  "existingReconciliation": {
+    "sources": [
+      "docs/reports/NEWENGINE_CUTOVER_RECONCILIATION.json",
+      "docs/reports/NEWENGINE_CUTOVER_HANDOFF.md",
+      "docs/reports/NEWENGINE_DELMUS_NPC_INTEGRATION.md",
+      "docs/reports/DELMUS_NPC_IMPORT_MATRIX.json"
+    ],
+    "conclusion": "Earlier Delmus inputs were selectively integrated and adapted. Commit counts do not measure missing functionality. Do not create a merge that silently marks unreviewed changes as integrated."
+  },
+  "pending": [
+    "Obtain or publish the generated NpcTemplates.json with provenance and its generation procedure. The latest commit deletes the singular catalog and family/overlay JSON without adding the replacement plural catalog.",
+    "Adapt catalog/equipment and review remaining item/combat/pathing/collision differences on an integration branch while retaining accepted DAO, admission, placement, movement and persistence ownership.",
+    "Resolve AAAA fallback as an explicit development-only diagnostic policy; do not silently replace the accepted BLOCK_SPAWN policy or activate unaccepted combat actors.",
+    "Run the documented Windows regression and connected DAO acceptance for any runtime integration; build Linux only from its exact accepted source.",
+    "Complete the existing deployed release official-client and durable-state check separately."
+  ]
+}
