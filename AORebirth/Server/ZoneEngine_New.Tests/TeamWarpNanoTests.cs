@@ -122,7 +122,7 @@ public sealed class TeamWarpNanoTests
         f.Join(caster, blocked); f.Join(caster, missing); f.Join(caster, last);
         f.World.Manager.UnregisterPlayer(missing);
         f.Cast(caster, 154913, Identity.None);
-        Vector3 expected = TeamWarpNanoSpecialization.ComputeLanding(caster.Position, caster.Rotation, 1);
+        Vector3 expected = TeamTeleportNanoSpecialization.ComputeLanding(caster.Position, caster.Rotation, 1);
         Assert.AreEqual(expected.x, last.Position.x); Assert.AreEqual(expected.z, last.Position.z);
         Assert.AreEqual(0d, blocked.Position.z); Assert.AreEqual(0d, missing.Position.z);
         f.World.Manager.RegisterPlayer(missing);
@@ -222,7 +222,7 @@ public sealed class TeamWarpNanoTests
         long _time;
         internal Fixture()
         {
-            Service = new(Catalog, Store, [new TeamWarpNanoSpecialization(World.Manager.Teams, new Lazy<PlayfieldManager>(() => World.Manager))],
+            Service = new(Catalog, Store, [new TeamTeleportNanoSpecialization(World.Manager.Teams, new Lazy<PlayfieldManager>(() => World.Manager))],
                 utcNow: () => new DateTime(2026, 9, 8, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(_time), monotonicMilliseconds: () => _time);
             typeof(PlayfieldManager).GetField("<Nanos>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(World.Manager, Service);
         }

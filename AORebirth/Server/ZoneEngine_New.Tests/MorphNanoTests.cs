@@ -10,6 +10,7 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Movement;
@@ -20,6 +21,20 @@ namespace ZoneEngine_New.Tests
     [TestClass]
     public sealed class MorphNanoTests
     {
+        [TestMethod]
+        public void Duplicate_child_spells_cannot_authorize_a_missing_configured_child()
+        {
+            var f = new Fixture(82835);
+            var spells = f.Nano.Template.SpellList[EventType.OnUse];
+            var child = spells.Single(s => s.FunctionType == (int)FunctionType.CastNano);
+            spells.Add(child);
+            var mechanics = NanoMechanicCatalog.LoadDefault();
+            mechanics.Get(82835, NanoMechanicKind.Morph).ChildNanoIds = [273292, 273293];
+            var morph = new MorphNanoSpecialization(mechanics);
+            Assert.IsFalse(morph.TryPrepare(f.Player, f.Player, f.Nano, out _));
+            Assert.AreEqual(0, f.Store.Commits);
+        }
+
         [TestMethod]
         [DataRow(270542, 270497, 150, 360000)]
         [DataRow(288546, 288538, 150, 1440000)]
@@ -503,14 +518,14 @@ namespace ZoneEngine_New.Tests
                 Player.Stats.Set(CharacterStat.MaxHealth, 100); Player.Stats.Set(CharacterStat.MaxNCU, 100);
                 Player.Stats.Set(CharacterStat.AggDef, 25); Player.Stats.Set(CharacterStat.NanoCInit, 0);
                 Player.TryAddUploadedNano(id); Session.BindPlayer(Player); Player.Session = Session;
-                Service = new(catalog, Store, [Morph, new SparrowChildNanoSpecialization()], utcNow: () => Now, monotonicMilliseconds: () => Milliseconds);
+                Service = new(catalog, Store, [Morph, new DurationOnlyNanoSpecialization()], utcNow: () => Now, monotonicMilliseconds: () => Milliseconds);
                 if (attach) Assert.IsTrue(Service.AttachPlayer(Player)); Player.Stats.DrainDirty();
             }
             public void Cast()
             {
                 bool prepared = Morph.TryPrepare(Player, Player, Nano, out _);
                 bool childPrepared = _catalog.TryGet(273292, out var child)
-                    && new SparrowChildNanoSpecialization().TryPrepare(Player, Player, child, out _);
+                    && new DurationOnlyNanoSpecialization().TryPrepare(Player, Player, child, out _);
                 Assert.IsTrue(Service.TryCast(Player, Nano.Id, Player.Identity),
                     $"MorphPrepared={prepared}; ActionRequirements={NanoEffectPlan.ActionRequirements(Player, Player, Nano)}; "
                     + $"ChildPrepared={childPrepared}; ParentDefend={Nano.Template.Defend.Count}; ChildDefend={child?.Template.Defend.Count}");

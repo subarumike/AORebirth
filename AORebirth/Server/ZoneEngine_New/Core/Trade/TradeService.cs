@@ -101,7 +101,7 @@ namespace ZoneEngine_New.Core.Trade
                 Cancel(player, "opening another trade");
 
             int templateId = machine.Template.Id;
-            if (machine.Stock.IsAcceptedSnapshot)
+            if (machine.Stock.IsConfiguredSnapshot)
             {
                 // Frozen stock belongs only to its exact live accepted vendor, never to
                 // a matching template, nearby actor, or stale replacement identity.
@@ -227,7 +227,7 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
-            if (session.Machine?.Stock.IsAcceptedSnapshot == true
+            if (session.Machine?.Stock.IsConfiguredSnapshot == true
                 && (session.AcceptedShopTransport == null || !IsCurrentAcceptedShop(player, session.Machine, session.AcceptedShopTransport)))
             {
                 Cancel(player, "accepted vendor ownership changed");
@@ -271,7 +271,7 @@ namespace ZoneEngine_New.Core.Trade
                 && player.Distance3D(owner != null ? owner : machine) <= RangeCancelDistance
                 && field.GetRequiredService<DynelRegistry>().TryGet(player.Identity, out var currentPlayer)
                 && ReferenceEquals(currentPlayer, player)
-                && field.GetRequiredService<ZoneEngine_New.Core.Mobs.AcceptedNpcActivationService>()
+                && field.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>()
                     .TryGetShopBinding(machine, out _);
         }
 
@@ -722,7 +722,7 @@ namespace ZoneEngine_New.Core.Trade
             if (session.Committing)
                 return;
             VendingMachine machine = session.Machine!;
-            if (machine.Stock.IsAcceptedSnapshot && (!ReferenceEquals(player, session.Initiator)
+            if (machine.Stock.IsConfiguredSnapshot && (!ReferenceEquals(player, session.Initiator)
                 || session.AcceptedShopTransport == null || !IsCurrentAcceptedShop(player, machine, session.AcceptedShopTransport)))
             {
                 Cancel(player, "accepted vendor ownership changed");
@@ -1061,7 +1061,7 @@ namespace ZoneEngine_New.Core.Trade
                 VendingMachine? machine = session.Machine;
                 if (machine == null || !ReferenceEquals(machine.Playfield, playfield))
                     return true;
-                if (machine.Stock.IsAcceptedSnapshot && (session.AcceptedShopTransport == null
+                if (machine.Stock.IsConfiguredSnapshot && (session.AcceptedShopTransport == null
                     || !IsCurrentAcceptedShop(initiator, machine, session.AcceptedShopTransport)))
                     return true;
 

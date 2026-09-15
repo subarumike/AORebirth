@@ -26,11 +26,10 @@ public static class GeneratedMissionCorpseProjection
             throw new InvalidOperationException("Corpse source appearance is not fully decoded.");
         int catMesh = GeneratedMissionCorpseWire.MissionCatMeshMappings()
             .Where(pair => pair.Key == evidence.MonsterData).Select(pair => pair.Value).SingleOrDefault();
-        // Existing generated mission consumer explicitly uses BART Sex/Breed/Race and the
-        // accepted Tilda mesh when the mission remix MD has no map; never use MD as CATMesh.
+        var appearance = MissionCorpseContent.Current;
         byte[] wire = GeneratedMissionCorpseWire.Build(evidence.Name, state.RuntimeInstance, state.RuntimeInstance,
             receiver.Instance, livePlayfield, state.X, state.Y, state.Z, livePlayfield,
-            source.MonsterScale, 2, 1, 1, catMesh, evidence.MonsterData,
+            source.MonsterScale, appearance.Sex, appearance.Breed, appearance.Race, catMesh, evidence.MonsterData,
             state.CorpseClaimed ? 0 : state.CorpseCredits);
         // The shared typed CFU decoder cannot represent this accepted name/material tail.
         // Preserve the body exactly; replace only the ordinary current transport marker.

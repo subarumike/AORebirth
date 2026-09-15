@@ -77,7 +77,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic; post RejectedItems → leave options",
               "NextNodeId": "vaughn_leave",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

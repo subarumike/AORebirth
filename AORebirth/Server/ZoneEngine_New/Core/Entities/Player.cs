@@ -53,10 +53,6 @@ namespace ZoneEngine_New.Core.Entities
 
         // Temporary hardcoded hospital until real respawn tables exist.
         public const int RespawnGracePeriodMilliseconds = 3000;
-        public const int TemporaryRespawnPlayfieldId = 800;
-        public const float TemporaryRespawnX = 665f;
-        public const float TemporaryRespawnY = 72.6f;
-        public const float TemporaryRespawnZ = 570f;
 
         // Live DeathRespawn action parameters (CharacterAction 0xAB).
         const int DeathRespawnActionParameter1 = 1000020;
@@ -164,25 +160,26 @@ namespace ZoneEngine_New.Core.Entities
 
         void Respawn()
         {
-            Revive();
-
             Playfield? playfield = Playfield;
             if (playfield == null)
-                return;
+            { Revive(); return; }
 
-            Vector3 landing = new Vector3(TemporaryRespawnX, TemporaryRespawnY, TemporaryRespawnZ);
+            var respawn = playfield.WorldContent.Respawn
+                ?? throw new InvalidOperationException("No respawn destination is configured in world content.");
+            Vector3 landing = new Vector3(respawn.Position[0], respawn.Position[1], respawn.Position[2]);
+            Revive();
 
             Logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "Player respawn character={0} to ({1},{2},{3}) pf={4}",
                     Identity.Instance,
-                    TemporaryRespawnX,
-                    TemporaryRespawnY,
-                    TemporaryRespawnZ,
-                    TemporaryRespawnPlayfieldId));
+                    landing.xf,
+                    landing.yf,
+                    landing.zf,
+                    respawn.PlayfieldId));
 
-            if (playfield.Identity.Instance == TemporaryRespawnPlayfieldId)
+            if (playfield.Identity.Instance == respawn.PlayfieldId)
             {
                 playfield.GetRequiredService<SpawnService>().CompleteSamePlayfieldDeathRespawn(this, landing);
                 return;
@@ -190,7 +187,7 @@ namespace ZoneEngine_New.Core.Entities
 
             AnnounceDeathCleared();
 
-            Playfield destination = playfield.GetRequiredService<PlayfieldManager>().GetOrCreate(TemporaryRespawnPlayfieldId);
+            Playfield destination = playfield.GetRequiredService<PlayfieldManager>().GetOrCreate(respawn.PlayfieldId);
             if (Session != null)
             {
                 Session.TransferToPlayfield(destination, landing);

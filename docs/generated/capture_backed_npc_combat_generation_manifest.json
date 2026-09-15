@@ -22,7 +22,7 @@
       "byteLength": 11369506,
       "path": "docs/generated/capture_backed_npc_combat_active_coverage.json",
       "role": "activeCoverage",
-      "sha256": "169cee714ca32aa1381b4ecf16d8845bc3af7e6ea46d1b1299f2374f1411f29e"
+      "sha256": "cf20612078047b8dc90146c9b741eecf42f92181b0c59b7f9e54fd6a6f48504e"
     },
     {
       "byteLength": 9000177,
@@ -59,7 +59,7 @@
     "semanticDefinitions": 309,
     "unresolvedProfiles": 1499
   },
-  "generationIdentity": "b580c816f081af3f8a497509d3e875160eac19740f71c42dda12d0000406b137",
+  "generationIdentity": "9e8e126f583183e3598a114612f8fbef09e8a29e927948447cb341d15d492374",
   "generators": {
     "activeCoverage": {
       "byteLength": 163799,
@@ -102,9 +102,9 @@
       "sha256": "dee8efb501047de77863cde0a68f217db5becfdf314119426c81f5540c9e8104"
     },
     "scfuAnalyzer": {
-      "byteLength": 3282,
+      "byteLength": 3718,
       "path": "tools-temp/AOSharpCaptureAnalyzer/AOSharpCaptureAnalyzer.csproj",
-      "sha256": "c2d0aa7306a5596f8233be41f89f132cfb7ff33c14f816f18f1ce9bb4d8b4a76"
+      "sha256": "d7e3a8b766931c9cdefc4bf5f51c71ea0574004b2cd320effbb5f0d029e26446"
     },
     "secondaryEvidenceAudit": {
       "byteLength": 54571,

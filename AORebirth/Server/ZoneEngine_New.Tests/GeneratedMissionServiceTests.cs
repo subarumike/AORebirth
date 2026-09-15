@@ -233,9 +233,19 @@ public sealed class GeneratedMissionServiceTests
         }
     }
 
-    static Item AddKey(World w, Container page)
+    [TestMethod]
+    public void AcceptedKeyUsesFrozenOwnedArtifactInsteadOfCurrentContentTemplate()
     {
-        var key = TestWorld.CreateItem(lowId: 28577, highId: 28577, instanceId: 200);
+        using var w = new World();
+        var key = AddKey(w, w.Player.Inventory.Inventory, lowId: 87654, highId: 87655);
+        Assert.IsTrue(w.Service.HasPhysicalKey(w.Player, w.Dao.Binding));
+        w.Dao.Artifacts[0].HighId++;
+        Assert.IsFalse(w.Service.HasPhysicalKey(w.Player, w.Dao.Binding));
+    }
+
+    static Item AddKey(World w, Container page, int lowId = 28577, int highId = 28577)
+    {
+        var key = TestWorld.CreateItem(lowId: lowId, highId: highId, instanceId: 200);
         key.Identity = new() { Type = (IdentityType)0xC76D, Instance = key.InstanceId };
         w.Dao.Binding.KeyInstance = key.InstanceId;
         page.Content[page.Offset] = key;

@@ -9,7 +9,6 @@ namespace ZoneEngine_New
     using AORebirth.Database.Schema;
     using AORebirth.Database.Domain.Missions;
     using AORebirth.Interfaces.Persistence.Missions;
-    using AORebirth.Core.Playfields.OfficialPlacements;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -65,19 +64,6 @@ namespace ZoneEngine_New
                 RuntimeStartup.ValidateArguments(args);
                 RedirectConsoleLog(args, "/stdout-log", "--stdout-log", false);
                 RedirectConsoleLog(args, "/stderr-log", "--stderr-log", true);
-                if (HasArgument(args, "--validate-official-placements"))
-                {
-                    var catalog = new OfficialPlayfieldPlacementCatalog(
-                        OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(AppContext.BaseDirectory));
-                    catalog.WriteValidationArtifacts(
-                        GetArgumentValue(args, "--source-sha")!,
-                        GetArgumentValue(args, "--build-platform")!,
-                        GetArgumentValue(args, "--placement-manifest-output")!,
-                        GetArgumentValue(args, "--placement-provenance-output")!);
-                    Console.WriteLine("OFFICIAL_PLACEMENT_VALIDATION_OK");
-                    return 0;
-                }
-
                 RuntimeStartup.ValidateConfiguration();
                 if (HasArgument(args, "--validate-database"))
                     return CheckDatabase();
@@ -222,13 +208,15 @@ namespace ZoneEngine_New
             services.AddSingleton<INanoCatalog>(provider => NanoCatalog.Load(
                 Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "nanos.dat")));
             services.AddSingleton<IActiveNanoRepository, MySqlActiveNanoRepository>();
-            services.AddSingleton<INanoSpecialization, AmbientRestorationNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, OverviewMapNanoSpecialization>();
+            services.AddSingleton(provider => NanoMechanicCatalog.Load(
+                Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "NanoMechanics.json")));
+            services.AddSingleton<INanoSpecialization, PeriodicTeamHealNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, ActiveStatOverlayNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, MorphNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, SparrowChildNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, TeamWarpNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, BucketheadNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, MongoNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, DurationOnlyNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, TeamTeleportNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, SummonNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, AreaTauntNanoSpecialization>();
             services.AddSingleton<NanoService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "repository source hashes; no timestamps or machine paths",
-  "dependencyEdges": 93,
+  "dependencyEdges": 57,
   "semanticErrors": [],
   "dependencies": [
     {
@@ -36,7 +36,7 @@
     {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatData.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "913daa1fcc45062476faf1c5b055d83249f58d1ea5380a04f4343b14de80ef40",
+      "sourceSha256": "dc5267a37982682ee88ab96606257a20e0ee49383677bf25fa5ce8b63d4577c2",
       "declaredSymbols": [
         "CapturedEnemySpecialAttackDefinition",
         "CapturedEnemyWeaponDefinition",
@@ -51,6 +51,7 @@
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.HighId",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.InitialEnergy",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.InventorySlot",
+          "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.IsRuntimeValid",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.IsValid",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.LowId",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.Quality"
@@ -62,6 +63,7 @@
           "AORebirth.Core.Playfields.CapturedEnemySpecialAttackDefinition.Name",
           "AORebirth.Core.Playfields.CapturedEnemySpecialAttackDefinition.Tag",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition",
+          "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.IsRuntimeValid",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.IsValid",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.N3Unknown",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.StateMachineInstance",
@@ -72,11 +74,6 @@
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.Unknown3",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponStatDefinition.Stat",
           "AORebirth.Core.Playfields.CapturedEnemyWeaponStatDefinition.Value"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs": [
-          "AORebirth.Core.Playfields.CapturedEnemySpecialAttackDefinition",
-          "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition",
-          "AORebirth.Core.Playfields.CapturedEnemyWeaponStatDefinition"
         ],
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileData.cs": [
           "AORebirth.Core.Playfields.CapturedEnemySpecialAttackDefinition",
@@ -111,7 +108,8 @@
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatPolicy.cs": [
           "AORebirth.Core.Playfields.CapturedEnemySpecialAttackDefinition",
-          "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition"
+          "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition",
+          "AORebirth.Core.Playfields.CapturedEnemyWeaponStatDefinition"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatRuntime.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition.HighId",
@@ -124,7 +122,8 @@
           "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatPolicy.cs",
           "symbols": [
             "CapturedEnemySpecialAttackDefinition",
-            "CapturedEnemyWeaponDefinition"
+            "CapturedEnemyWeaponDefinition",
+            "CapturedEnemyWeaponStatDefinition"
           ]
         }
       ],
@@ -144,10 +143,6 @@
         "CapturedEnemyCombatProfileStreamDefinition"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs": [
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileStreamDefinition"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileMatching.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatAttackDefinition attack",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract contract",
@@ -283,26 +278,9 @@
           "terminalStream",
           "terminalStreams",
           "totalCentiseconds"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/CapturedNpcCombatResolver.cs": [
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.CaptureRuntimeEvidenceSafe",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.Level",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.MonsterData",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.Name",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.ProfileId",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.ResourceId",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.SourceIdentities"
         ]
       },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/CapturedNpcCombatResolver.cs",
-          "symbols": [
-            "CapturedEnemyCombatProfileDefinition"
-          ]
-        }
-      ],
+      "symbolsUsedCandidates": [],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "SHARED_MODEL",
       "contentSeparationRequired": true,
@@ -446,7 +424,7 @@
     {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "931aca428499c6cc1fbb1dfd436dd133fd210aafb6e5c98df95fd4997ae3f966",
+      "sourceSha256": "42c7e8c9cb892174c787b73608370f0da90aeab057680cb712c106c5c8757335",
       "declaredSymbols": [
         "CapturedBasicCombatContractDefinition",
         "CapturedBasicCombatDamageObservation",
@@ -464,6 +442,7 @@
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.HasCapturedAttackStartContext",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.HasCapturedSpecialAttackWeaponContext",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsCombatReady",
+          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsRuntimeReady",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.SpecialAttackWeaponN3Unknown",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.SpecialAttackWeaponUnknown1",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.SpecialAttackWeaponUnknown2",
@@ -487,7 +466,7 @@
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/GeneratedMissionNpcFactory.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsCombatReady",
+          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsRuntimeReady",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.SendStopFightOnDeath",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.WeaponDefinition"
         ],
@@ -495,8 +474,7 @@
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.CapturedFixedPacketSequence(string, int, ZoneEngine.Core.NpcAiProfile, int, int, double, AORebirth.Core.Playfields.CapturedEnemySpecialAttackDefinition[], byte, int, int, int, int, int, byte, byte, int, int, int, int, int, byte, bool, int[], double[], double[], double[], int?, bool?, double?, bool?)",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.EquippedWeaponWithCapturedPacketSequence(string, int, int, int, int, int, bool, int, int, int, double?, double, double, double, double, bool, bool, int, int, int, int, int, int, int, int, byte, byte, byte, byte, bool, bool, ZoneEngine.Core.NpcAiProfile)",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsCombatReady",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.QuarantineReason",
+          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsRuntimeReady",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.WithCapturedWeapon(AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition)"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatRuntime.cs": [
@@ -517,7 +495,7 @@
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.CapturedDamageObservations",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.CapturedLandedIntervalObservationsSeconds",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.FirstHitDelaySeconds",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsCombatReady",
+          "AORebirth.Core.Playfields.CapturedEnemyCombatContract.IsRuntimeReady",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.MaxDamage",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.MinDamage",
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract.ParallelAttackSequence",
@@ -559,10 +537,6 @@
         "CapturedEnemyCombatProfileStreamDefinition"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs": [
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileStreamDefinition"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileData.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.AttackAction",
           "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.AttackN3Unknown",
@@ -651,26 +625,9 @@
           "string evidence",
           "string name",
           "string profileId"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/CapturedNpcCombatResolver.cs": [
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.CaptureRuntimeEvidenceSafe",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.Level",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.MonsterData",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.Name",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.ProfileId",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.ResourceId",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatProfileDefinition.SourceIdentities"
         ]
       },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/CapturedNpcCombatResolver.cs",
-          "symbols": [
-            "CapturedEnemyCombatProfileDefinition"
-          ]
-        }
-      ],
+      "symbolsUsedCandidates": [],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "SHARED_MODEL",
       "contentSeparationRequired": true,
@@ -681,7 +638,7 @@
     {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "321969805a7ee7a492e3fc1bf1db997140351cdd58a7ac934b0a15389f409317",
+      "sourceSha256": "eb42ffaba670c5eeca01ed9006abc69d911811647e8797a5523673b0b0f7a9cb",
       "declaredSymbols": [
         "CapturedEnemyCombatPacketFactory"
       ],
@@ -701,6 +658,7 @@
           "SmokeLounge.AOtomation.Messaging.GameData.Identity owner",
           "SmokeLounge.AOtomation.Messaging.GameData.Identity target",
           "SmokeLounge.AOtomation.Messaging.GameData.Identity weaponIdentity",
+          "bool requireEvidence",
           "byte action",
           "byte n3Unknown",
           "int aggDef",
@@ -720,13 +678,15 @@
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/GeneratedMissionNpcFactory.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(SmokeLounge.AOtomation.Messaging.GameData.Identity, int, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition, int?, int?)"
+          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(SmokeLounge.AOtomation.Messaging.GameData.Identity, int, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition, int?, int?, bool)",
+          "bool requireEvidence"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatRuntime.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateAttack(SmokeLounge.AOtomation.Messaging.GameData.Identity, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract)",
+          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateAttack(SmokeLounge.AOtomation.Messaging.GameData.Identity, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract, bool)",
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateAttackInfo(SmokeLounge.AOtomation.Messaging.GameData.Identity, SmokeLounge.AOtomation.Messaging.GameData.Identity, int, int, int, int, int, int, byte)",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract)"
+          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract, bool)",
+          "bool requireEvidence"
         ]
       },
       "symbolsUsedCandidates": [
@@ -753,7 +713,7 @@
     {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.Data.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "a200d21152bcac170f86c654e11be68dece57dc59ba4a569840ce6431c3c36d9",
+      "sourceSha256": "0dbb0fcf85f13e50936795a090bc02c5c893841511ea0f82dc07d38f7d05aacb",
       "declaredSymbols": [
         "CapturedEnemyCombatPacketFactory"
       ],
@@ -761,21 +721,24 @@
         "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatContract contract",
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateAttack(SmokeLounge.AOtomation.Messaging.GameData.Identity, SmokeLounge.AOtomation.Messaging.GameData.Identity, byte, byte)",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract, int)",
+          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract, int, bool)",
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemySpecialAttackDefinition[], byte, int, int, int, int, int)",
           "SmokeLounge.AOtomation.Messaging.GameData.Identity attacker",
           "SmokeLounge.AOtomation.Messaging.GameData.Identity target",
+          "bool requireEvidence",
           "int aggDef"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/GeneratedMissionNpcFactory.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(SmokeLounge.AOtomation.Messaging.GameData.Identity, int, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition, int?, int?)"
+          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(SmokeLounge.AOtomation.Messaging.GameData.Identity, int, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyWeaponDefinition, int?, int?, bool)",
+          "bool requireEvidence"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatRuntime.cs": [
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateAttack(SmokeLounge.AOtomation.Messaging.GameData.Identity, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract)",
+          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateAttack(SmokeLounge.AOtomation.Messaging.GameData.Identity, SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract, bool)",
           "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateAttackInfo(SmokeLounge.AOtomation.Messaging.GameData.Identity, SmokeLounge.AOtomation.Messaging.GameData.Identity, int, int, int, int, int, int, byte)",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract)"
+          "AORebirth.Core.Playfields.CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(SmokeLounge.AOtomation.Messaging.GameData.Identity, AORebirth.Core.Playfields.CapturedEnemyCombatContract, bool)",
+          "bool requireEvidence"
         ]
       },
       "symbolsUsedCandidates": [
@@ -820,9 +783,34 @@
       },
       "symbolsUsedCandidates": [
         {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcAiProfiles.cs",
+          "symbols": [
+            "NpcAiProfile"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcBehaviourTree.cs",
+          "symbols": [
+            "NpcAiProfile"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcBrain.cs",
+          "symbols": [
+            "NpcAiProfile",
+            "NpcAiProfiles"
+          ]
+        },
+        {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatPolicy.cs",
           "symbols": [
             "NpcAiProfile"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "symbols": [
+            "NpcAiProfiles"
           ]
         }
       ],
@@ -863,34 +851,6 @@
       "newEngineProjectDirectLink": true
     },
     {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "d6f74e622b05f9fade5fbee2c62f34002d4b5cd59b8b2f5a42ea1cf2937482fb",
-      "declaredSymbols": [
-        "CapturedEnemyCombatGeneratedProfiles"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/CapturedNpcCombatResolver.cs": [
-          "AORebirth.Core.Playfields.CapturedEnemyCombatGeneratedProfiles",
-          "AORebirth.Core.Playfields.CapturedEnemyCombatGeneratedProfiles.Create()"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/CapturedNpcCombatResolver.cs",
-          "symbols": [
-            "CapturedEnemyCombatGeneratedProfiles"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/ChatCommandText.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
       "sourceSha256": "1baa5ca4e9cd130f93f076ab1a5999e5e3255d5f6b4b508934c58b691627c33d",
@@ -916,37 +876,6 @@
       "contentSeparationRequired": false,
       "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
       "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Packets/MorphCaptureWireCatalog.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "3ca9516eb615aa924ac25989fffdc5442403346708479468bd04ef6c58d6b770",
-      "declaredSymbols": [
-        "MorphCaptureWireCatalog"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Nanos/MorphVisualPackets.cs": [
-          "ZoneEngine.Core.Packets.MorphCaptureWireCatalog",
-          "ZoneEngine.Core.Packets.MorphCaptureWireCatalog.GetCanFlyEffectBlock()",
-          "ZoneEngine.Core.Packets.MorphCaptureWireCatalog.GetWire(int, bool)",
-          "ZoneEngine.Core.Packets.MorphCaptureWireCatalog.PhasefrontCapturedCharacterInstance",
-          "ZoneEngine.Core.Packets.MorphCaptureWireCatalog.SparrowCapturedCharacterInstance"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Nanos/MorphVisualPackets.cs",
-          "symbols": [
-            "MorphCaptureWireCatalog"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_PROTOCOL",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "existing shared communication/protocol layer",
       "newEngineProjectDirectLink": true
     },
     {
@@ -1110,20 +1039,6 @@
           "ZoneEngine.Core.Missions.MissionStateRecord.UpdatedAtUtcTicks",
           "ZoneEngine.Core.Missions.MissionStateRecord.Version"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs": [
-          "ZoneEngine.Core.Missions.MissionDefinition",
-          "ZoneEngine.Core.Missions.MissionDefinition.InitialStepId",
-          "ZoneEngine.Core.Missions.MissionDefinition.IsResolved",
-          "ZoneEngine.Core.Missions.MissionDefinition.Objectives",
-          "ZoneEngine.Core.Missions.MissionDefinition.PrerequisiteQuestIds",
-          "ZoneEngine.Core.Missions.MissionDefinition.QuestId",
-          "ZoneEngine.Core.Missions.MissionDefinition.StepIds",
-          "ZoneEngine.Core.Missions.MissionObjectiveDefinition",
-          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.IsResolved",
-          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.ObjectiveId",
-          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.RequiredCount",
-          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.StepId"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionRewardCoordinator.cs": [
           "ZoneEngine.Core.Missions.MissionAtomicRewardStatus",
           "ZoneEngine.Core.Missions.MissionAtomicRewardStatus.AlreadyApplied",
@@ -1259,9 +1174,20 @@
           "ZoneEngine.Core.Missions.MissionStateRecord.UpdatedAtUtcTicks"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
-          "ZoneEngine.Core.Missions.MissionDefinition"
+          "ZoneEngine.Core.Missions.MissionDefinition",
+          "ZoneEngine.Core.Missions.MissionDefinition.InitialStepId",
+          "ZoneEngine.Core.Missions.MissionDefinition.IsResolved",
+          "ZoneEngine.Core.Missions.MissionDefinition.Objectives",
+          "ZoneEngine.Core.Missions.MissionDefinition.PrerequisiteQuestIds",
+          "ZoneEngine.Core.Missions.MissionDefinition.QuestId",
+          "ZoneEngine.Core.Missions.MissionDefinition.StepIds",
+          "ZoneEngine.Core.Missions.MissionObjectiveDefinition",
+          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.IsResolved",
+          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.ObjectiveId",
+          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.RequiredCount",
+          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.StepId"
         ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs": [
           "ZoneEngine.Core.Missions.MissionObjectiveObservation",
           "ZoneEngine.Core.Missions.MissionObjectiveObservation.Amount",
           "ZoneEngine.Core.Missions.MissionObjectiveObservation.CharacterId",
@@ -1293,40 +1219,29 @@
           "ZoneEngine.Core.Missions.MissionOperationStatus.Applied",
           "ZoneEngine.Core.Missions.MissionStateRecord",
           "ZoneEngine.Core.Missions.MissionStateRecord.State"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
+          "ZoneEngine.Core.Missions.MissionDefinition",
+          "ZoneEngine.Core.Missions.MissionDefinition.Objectives",
+          "ZoneEngine.Core.Missions.MissionDefinition.QuestId",
+          "ZoneEngine.Core.Missions.MissionObjectiveDefinition.ObjectiveId"
         ]
       },
       "symbolsUsedCandidates": [
         {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
           "symbols": [
-            "MissionDefinition"
+            "MissionDefinition",
+            "MissionObjectiveDefinition"
           ]
         },
         {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Dialogue.cs",
-          "symbols": [
-            "MissionLifecycleState"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
           "symbols": [
             "MissionAtomicRewardStatus",
             "MissionLifecycleState",
             "MissionObjectiveObservation",
             "MissionStatMutationKind"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Sarah.cs",
-          "symbols": [
-            "MissionLifecycleState"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Stan.cs",
-          "symbols": [
-            "MissionLifecycleState"
           ]
         },
         {
@@ -1338,6 +1253,13 @@
             "MissionOperationResult",
             "MissionOperationStatus",
             "MissionStatMutationKind"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+          "symbols": [
+            "MissionDefinition",
+            "MissionLifecycleState"
           ]
         }
       ],
@@ -1479,7 +1401,7 @@
         "PersistentMissionService"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs": [
           "ZoneEngine.Core.Missions.PersistentMissionService",
           "ZoneEngine.Core.Missions.PersistentMissionService.CompleteMission(int, string)",
           "ZoneEngine.Core.Missions.PersistentMissionService.ObserveObjective(ZoneEngine.Core.Missions.MissionObjectiveObservation)",
@@ -1496,7 +1418,7 @@
       },
       "symbolsUsedCandidates": [
         {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
           "symbols": [
             "PersistentMissionService"
           ]
@@ -1601,10 +1523,6 @@
         "MissionLevelTable"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgTokenRewardPolicy.cs": [
-          "ZoneEngine.Core.Missions.MissionLevelTable",
-          "ZoneEngine.Core.Missions.MissionLevelTable.TryGetTokenReward(int, out int, out string)"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
           "ZoneEngine.Core.Missions.MissionLevelTable",
           "ZoneEngine.Core.Missions.MissionLevelTable.ClampCharacterLevel(int)",
@@ -1614,11 +1532,21 @@
         "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs": [
           "ZoneEngine.Core.Missions.MissionLevelTable",
           "ZoneEngine.Core.Missions.MissionLevelTable.TryGetMissionQuality(int, int, out int)"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgTokenRewardPolicy.cs": [
+          "ZoneEngine.Core.Missions.MissionLevelTable",
+          "ZoneEngine.Core.Missions.MissionLevelTable.TryGetTokenReward(int, out int, out string)"
         ]
       },
       "symbolsUsedCandidates": [
         {
           "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+          "symbols": [
+            "MissionLevelTable"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgTokenRewardPolicy.cs",
           "symbols": [
             "MissionLevelTable"
           ]
@@ -1701,19 +1629,6 @@
         "MissionSliderProfile"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferCompatibility.cs": [
-          "ZoneEngine.Core.Missions.MissionSliderProfile"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRewardEvidenceModel.cs": [
-          "ZoneEngine.Core.Missions.MissionSliderProfile",
-          "ZoneEngine.Core.Missions.MissionSliderProfile.Matches(int, int, int, int, int, int)",
-          "ZoneEngine.Core.Missions.MissionSliderProfile.SemanticDistance(int, int, int, int, int, int)"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollEvidenceCatalog.cs": [
-          "ZoneEngine.Core.Missions.MissionSliderProfile",
-          "ZoneEngine.Core.Missions.MissionSliderProfile.Matches(int, int, int, int, int, int)",
-          "ZoneEngine.Core.Missions.MissionSliderProfile.SemanticDistance(int, int, int, int, int, int)"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
           "ZoneEngine.Core.Missions.MissionSliderProfile",
           "ZoneEngine.Core.Missions.MissionSliderProfile.EvidenceProfile",
@@ -1722,6 +1637,19 @@
         "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs": [
           "ZoneEngine.Core.Missions.MissionSliderProfile",
           "ZoneEngine.Core.Missions.MissionSliderProfile.TryCreate(SmokeLounge.AOtomation.Messaging.Messages.N3Messages.QuestAlternativeMessage, out ZoneEngine.Core.Missions.MissionSliderProfile, out string)"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs": [
+          "ZoneEngine.Core.Missions.MissionSliderProfile"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs": [
+          "ZoneEngine.Core.Missions.MissionSliderProfile",
+          "ZoneEngine.Core.Missions.MissionSliderProfile.Matches(int, int, int, int, int, int)",
+          "ZoneEngine.Core.Missions.MissionSliderProfile.SemanticDistance(int, int, int, int, int, int)"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs": [
+          "ZoneEngine.Core.Missions.MissionSliderProfile",
+          "ZoneEngine.Core.Missions.MissionSliderProfile.Matches(int, int, int, int, int, int)",
+          "ZoneEngine.Core.Missions.MissionSliderProfile.SemanticDistance(int, int, int, int, int, int)"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs": [
           "ZoneEngine.Core.Missions.MissionSliderProfile",
@@ -1742,6 +1670,24 @@
           ]
         },
         {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+          "symbols": [
+            "MissionSliderProfile"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "symbols": [
+            "MissionSliderProfile"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "symbols": [
+            "MissionSliderProfile"
+          ]
+        },
+        {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
           "symbols": [
             "MissionSliderProfile"
@@ -1750,177 +1696,6 @@
       ],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionLocationPool.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "e672c7948c39d56befc781fc3207c80ce3895961b53ada04ef4a68b7aa62fd0d",
-      "declaredSymbols": [
-        "MissionLocationPool",
-        "MissionLocationSide",
-        "Spot"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionLocationPool",
-          "ZoneEngine.Core.Missions.MissionLocationPool.ApproxTravelMeters(int, int)",
-          "ZoneEngine.Core.Missions.MissionLocationPool.IsSpotAllowedForTerminal(int, ZoneEngine.Core.Missions.MissionLocationSide)",
-          "ZoneEngine.Core.Missions.MissionLocationPool.NearClusterRank(int, int)",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spot",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spot.EntranceHigh",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spot.EntranceLow",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spot.Playfield",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spot.X",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spot.Y",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spot.Z",
-          "ZoneEngine.Core.Missions.MissionLocationPool.Spots",
-          "ZoneEngine.Core.Missions.MissionLocationPool.TryGetCityAffiliation(int, out ZoneEngine.Core.Missions.MissionLocationSide)",
-          "ZoneEngine.Core.Missions.MissionLocationSide"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs": [
-          "ZoneEngine.Core.Missions.MissionLocationPool",
-          "ZoneEngine.Core.Missions.MissionLocationPool.CanCharacterRollAtTerminal(ZoneEngine.Core.Missions.MissionLocationSide, int)",
-          "ZoneEngine.Core.Missions.MissionLocationPool.ResolveCharacterSide(int)",
-          "ZoneEngine.Core.Missions.MissionLocationSide"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
-          "symbols": [
-            "MissionLocationPool"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollEvidenceCatalog.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "2fd48b5829f5346c85f5fe639ad676342ffe7a1b276d52a63f9bd103df3b8930",
-      "declaredSymbols": [
-        "EvidenceRank",
-        "MissionRollEvidenceCatalog",
-        "RollMixEvidence"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionRollEvidenceCatalog",
-          "ZoneEngine.Core.Missions.MissionRollEvidenceCatalog.SelectTypeMix(int, int, int, ZoneEngine.Core.Missions.MissionSliderProfile, System.Random)"
-        ]
-      },
-      "symbolsUsedCandidates": [],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_DATA_LOADER",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferCompatibility.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "d53f61e07519fdc7bbb7be303da348bd77ec415db41fa9c17b90c3936d846f09",
-      "declaredSymbols": [
-        "MissionObjectiveCategory",
-        "MissionOfferCompatibility",
-        "MissionOfferDescriptor",
-        "MissionRewardCategory"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferTextBuilder.cs": [
-          "ZoneEngine.Core.Missions.MissionOfferDescriptor",
-          "ZoneEngine.Core.Missions.MissionOfferDescriptor.TargetName",
-          "ZoneEngine.Core.Missions.MissionOfferDescriptor.Type"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionOfferCompatibility",
-          "ZoneEngine.Core.Missions.MissionOfferCompatibility.IsCompatibleWithSliders(ZoneEngine.Core.Missions.MissionOfferDescriptor, ZoneEngine.Core.Missions.MissionSliderProfile)",
-          "ZoneEngine.Core.Missions.MissionOfferCompatibility.TryDescribeCaptured(SmokeLounge.AOtomation.Messaging.GameData.QuestInfo, SmokeLounge.AOtomation.Messaging.GameData.Identity, out ZoneEngine.Core.Missions.MissionOfferDescriptor, out string)",
-          "ZoneEngine.Core.Missions.MissionOfferCompatibility.TryValidateGenerated(SmokeLounge.AOtomation.Messaging.GameData.QuestInfo, ZoneEngine.Core.Missions.MissionOfferDescriptor, ZoneEngine.Core.Missions.MissionSliderProfile, SmokeLounge.AOtomation.Messaging.GameData.Identity, out ZoneEngine.Core.Missions.MissionOfferDescriptor, out string)",
-          "ZoneEngine.Core.Missions.MissionOfferDescriptor",
-          "ZoneEngine.Core.Missions.MissionOfferDescriptor.Type"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs": [
-          "ZoneEngine.Core.Missions.MissionOfferCompatibility",
-          "ZoneEngine.Core.Missions.MissionOfferCompatibility.TryDescribe(SmokeLounge.AOtomation.Messaging.GameData.QuestInfo, out ZoneEngine.Core.Missions.MissionOfferDescriptor, out string)",
-          "ZoneEngine.Core.Missions.MissionOfferDescriptor",
-          "ZoneEngine.Core.Missions.MissionOfferDescriptor.Type"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
-          "symbols": [
-            "MissionOfferCompatibility"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferTextBuilder.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "e680c96aa36a5cd3f88d090fbd95a14f25ef004db27cbdb0f9efbe2e3a24647b",
-      "declaredSymbols": [
-        "MissionOfferTextBuilder",
-        "Snapshot"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionOfferTextBuilder",
-          "ZoneEngine.Core.Missions.MissionOfferTextBuilder.Apply(SmokeLounge.AOtomation.Messaging.GameData.QuestInfo, ZoneEngine.Core.Missions.MissionOfferDescriptor, ZoneEngine.Core.Missions.MissionOfferTextBuilder.Snapshot)",
-          "ZoneEngine.Core.Missions.MissionOfferTextBuilder.Capture(SmokeLounge.AOtomation.Messaging.GameData.QuestInfo)",
-          "ZoneEngine.Core.Missions.MissionOfferTextBuilder.Snapshot"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Metrics/PlayfieldMetricsRegistry.cs",
-          "symbols": [
-            "Snapshot"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionRewardEvidenceModel.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "376fa213fc508626c9190116a684cbd7235ee513f9756cac4feb5e5d4bc0e365",
-      "declaredSymbols": [
-        "EvidenceRank",
-        "MissionRewardEvidenceModel",
-        "RewardEvidence"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionRewardEvidenceModel",
-          "ZoneEngine.Core.Missions.MissionRewardEvidenceModel.Apply(SmokeLounge.AOtomation.Messaging.GameData.QuestInfo, ZoneEngine.Core.Missions.MissionRollType, int, int, int, ZoneEngine.Core.Missions.MissionSliderProfile, int, System.Random)"
-        ]
-      },
-      "symbolsUsedCandidates": [],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
       "contentSeparationRequired": false,
       "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
       "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
@@ -1972,24 +1747,12 @@
           "ZoneEngine.Core.Missions.MissionRollType.KillPerson",
           "ZoneEngine.Core.Missions.MissionRollType.RepairMachine"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCapturedLayoutCatalog.g.cs": [
-          "ZoneEngine.Core.Missions.MissionRollType",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItem",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItemReturn",
-          "ZoneEngine.Core.Missions.MissionRollType.FindPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.KillPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.RepairMachine"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgInstanceBinding.cs": [
           "ZoneEngine.Core.Missions.MissionRollType",
           "ZoneEngine.Core.Missions.MissionRollType.Unknown"
         ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutBundle.cs": [
           "ZoneEngine.Core.Missions.MissionRollType"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutCatalog.cs": [
-          "ZoneEngine.Core.Missions.MissionRollType",
-          "ZoneEngine.Core.Missions.MissionRollType.Unknown"
         ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutRecords.cs": [
           "ZoneEngine.Core.Missions.MissionRollType",
@@ -2003,7 +1766,16 @@
           "ZoneEngine.Core.Missions.MissionRollType",
           "ZoneEngine.Core.Missions.MissionRollType.Unknown"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgObjectiveContracts.cs": [
+        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
+          "ZoneEngine.Core.Missions.MissionRollType",
+          "ZoneEngine.Core.Missions.MissionTypeCatalog",
+          "ZoneEngine.Core.Missions.MissionTypeCatalog.TypeName(ZoneEngine.Core.Missions.MissionRollType)"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgLayoutCatalog.cs": [
+          "ZoneEngine.Core.Missions.MissionRollType",
+          "ZoneEngine.Core.Missions.MissionRollType.Unknown"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgObjectiveContracts.cs": [
           "ZoneEngine.Core.Missions.MissionRollType",
           "ZoneEngine.Core.Missions.MissionRollType.FindItem",
           "ZoneEngine.Core.Missions.MissionRollType.FindItemReturn",
@@ -2011,7 +1783,7 @@
           "ZoneEngine.Core.Missions.MissionRollType.KillPerson",
           "ZoneEngine.Core.Missions.MissionRollType.RepairMachine"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferCompatibility.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs": [
           "ZoneEngine.Core.Missions.MissionRollType",
           "ZoneEngine.Core.Missions.MissionRollType.FindItem",
           "ZoneEngine.Core.Missions.MissionRollType.FindItemReturn",
@@ -2024,34 +1796,14 @@
           "ZoneEngine.Core.Missions.MissionTypeCatalog.TryTypeFromIcon(int, out ZoneEngine.Core.Missions.MissionRollType)",
           "ZoneEngine.Core.Missions.MissionTypeCatalog.TypeName(ZoneEngine.Core.Missions.MissionRollType)"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionOfferTextBuilder.cs": [
-          "ZoneEngine.Core.Missions.MissionRollType",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItem",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItemReturn",
-          "ZoneEngine.Core.Missions.MissionRollType.FindPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.KillPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.RepairMachine"
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferTextBuilder.cs": [
+          "ZoneEngine.Core.Missions.MissionRollType"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRewardEvidenceModel.cs": [
-          "ZoneEngine.Core.Missions.MissionRollType",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItem",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItemReturn",
-          "ZoneEngine.Core.Missions.MissionRollType.FindPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.KillPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.RepairMachine"
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs": [
+          "ZoneEngine.Core.Missions.MissionRollType"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollEvidenceCatalog.cs": [
-          "ZoneEngine.Core.Missions.MissionRollType",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItem",
-          "ZoneEngine.Core.Missions.MissionRollType.FindItemReturn",
-          "ZoneEngine.Core.Missions.MissionRollType.FindPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.KillPerson",
-          "ZoneEngine.Core.Missions.MissionRollType.RepairMachine"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionRollType",
-          "ZoneEngine.Core.Missions.MissionTypeCatalog",
-          "ZoneEngine.Core.Missions.MissionTypeCatalog.TypeName(ZoneEngine.Core.Missions.MissionRollType)"
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs": [
+          "ZoneEngine.Core.Missions.MissionRollType"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
           "ZoneEngine.Core.Missions.MissionRollType",
@@ -2065,6 +1817,43 @@
         ]
       },
       "symbolsUsedCandidates": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgLayoutCatalog.cs",
+          "symbols": [
+            "MissionRollType"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgObjectiveContracts.cs",
+          "symbols": [
+            "MissionRollType"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+          "symbols": [
+            "MissionRollType",
+            "MissionTypeCatalog"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferTextBuilder.cs",
+          "symbols": [
+            "MissionRollType"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "symbols": [
+            "MissionRollType"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "symbols": [
+            "MissionRollType"
+          ]
+        },
         {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
           "symbols": [
@@ -2087,49 +1876,6 @@
       "newEngineProjectDirectLink": true
     },
     {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollCaptureTemplate.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "d675c9717035a5f6eb385e85fdcade2a21ded63a8470db4ccf683c7011c0d6f7",
-      "declaredSymbols": [
-        "MissionRollCaptureTemplate"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionRollCaptureTemplate",
-          "ZoneEngine.Core.Missions.MissionRollCaptureTemplate.CapturedPacketHex",
-          "ZoneEngine.Core.Missions.MissionRollCaptureTemplate.TransportHeaderLength"
-        ]
-      },
-      "symbolsUsedCandidates": [],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollCaptureLibrary.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "f79af21c956a8c6af362c955e5f6acceb62a7cf1248701aecea968226f4ee74e",
-      "declaredSymbols": [
-        "MissionRollCaptureLibrary"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRollService.cs": [
-          "ZoneEngine.Core.Missions.MissionRollCaptureLibrary",
-          "ZoneEngine.Core.Missions.MissionRollCaptureLibrary.CapturedRollBodiesHex"
-        ]
-      },
-      "symbolsUsedCandidates": [],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionRewardCatalog.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
       "sourceSha256": "c0b273039307dd766ea71d07c5565eec4ee11bd916ad0f51f07fe992fa72812e",
@@ -2145,28 +1891,6 @@
           "ZoneEngine.Core.Missions.MissionRewardCatalog.ItemCount",
           "ZoneEngine.Core.Missions.MissionRewardCatalog.LastLoadError",
           "ZoneEngine.Core.Missions.MissionRewardCatalog.TryPickReward(int, System.Random, out SmokeLounge.AOtomation.Messaging.GameData.QuestItemShort, out string, out bool)"
-        ]
-      },
-      "symbolsUsedCandidates": [],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_DATA_LOADER",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionRareLootCatalog.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "51ff27b9ffad8608ad0729585d70360e8b5e5877ddab27a90a6d784df6dfcb8a",
-      "declaredSymbols": [
-        "MissionRareLootCatalog",
-        "RareDrop"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionRewardCatalog.cs": [
-          "ZoneEngine.Core.Missions.MissionRareLootCatalog",
-          "ZoneEngine.Core.Missions.MissionRareLootCatalog.IsRareLootTemplate(int)"
         ]
       },
       "symbolsUsedCandidates": [],
@@ -2238,32 +1962,6 @@
           "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Instance",
           "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Type"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCapturedLayoutCatalog.g.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgCaptureCountsRecord",
-          "ZoneEngine.Core.Missions.MissionAcgCompatibilityRecord",
-          "ZoneEngine.Core.Missions.MissionAcgCompletenessRecord",
-          "ZoneEngine.Core.Missions.MissionAcgDynelRecord",
-          "ZoneEngine.Core.Missions.MissionAcgExitRecord",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCompletenessState",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCompletenessState.CompleteSelectable",
-          "ZoneEngine.Core.Missions.MissionAcgNpcMeshRecord",
-          "ZoneEngine.Core.Missions.MissionAcgNpcSlotRecord",
-          "ZoneEngine.Core.Missions.MissionAcgNpcTextureRecord",
-          "ZoneEngine.Core.Missions.MissionAcgObjectiveSlotRecord",
-          "ZoneEngine.Core.Missions.MissionAcgPointRecord",
-          "ZoneEngine.Core.Missions.MissionAcgProvenanceRecord",
-          "ZoneEngine.Core.Missions.MissionAcgRetargetCategory",
-          "ZoneEngine.Core.Missions.MissionAcgRetargetCategory.CharacterInstance",
-          "ZoneEngine.Core.Missions.MissionAcgRetargetCategory.DynelIdentityInstance",
-          "ZoneEngine.Core.Missions.MissionAcgRetargetCategory.DynelIdentityType",
-          "ZoneEngine.Core.Missions.MissionAcgRetargetCategory.Playfield2Instance",
-          "ZoneEngine.Core.Missions.MissionAcgRetargetSlotRecord",
-          "ZoneEngine.Core.Missions.MissionAcgRotationRecord",
-          "ZoneEngine.Core.Missions.MissionAcgWireCategory",
-          "ZoneEngine.Core.Missions.MissionAcgWireCategory.Chest",
-          "ZoneEngine.Core.Missions.MissionAcgWireCategory.Door"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgInstanceBinding.cs": [
           "ZoneEngine.Core.Missions.MissionAcgCompletenessRecord.IsSelectionComplete",
           "ZoneEngine.Core.Missions.MissionAcgHash",
@@ -2300,7 +1998,28 @@
           "ZoneEngine.Core.Missions.MissionAcgWireRecord",
           "ZoneEngine.Core.Missions.MissionAcgWireRecord.Category"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutCatalog.cs": [
+        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutSelector.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgCompletenessRecord.IsSelectionComplete",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Instance",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Type",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutExclusion"
+        ],
+        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgObjectiveBinding.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord"
+        ],
+        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgSpatialAuthority.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgDynelRecord.Position",
+          "ZoneEngine.Core.Missions.MissionAcgExitRecord.Position",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord",
+          "ZoneEngine.Core.Missions.MissionAcgNpcSlotRecord.Position",
+          "ZoneEngine.Core.Missions.MissionAcgObjectiveSlotRecord.Position",
+          "ZoneEngine.Core.Missions.MissionAcgPointRecord",
+          "ZoneEngine.Core.Missions.MissionAcgPointRecord.X",
+          "ZoneEngine.Core.Missions.MissionAcgPointRecord.Y",
+          "ZoneEngine.Core.Missions.MissionAcgPointRecord.Z"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgLayoutCatalog.cs": [
           "ZoneEngine.Core.Missions.MissionAcgCaptureCountsRecord",
           "ZoneEngine.Core.Missions.MissionAcgCaptureCountsRecord.NormalizedChestSlotCount",
           "ZoneEngine.Core.Missions.MissionAcgCaptureCountsRecord.NormalizedDoorSlotCount",
@@ -2374,7 +2093,6 @@
           "ZoneEngine.Core.Missions.MissionAcgPointRecord.Y",
           "ZoneEngine.Core.Missions.MissionAcgPointRecord.Z",
           "ZoneEngine.Core.Missions.MissionAcgProvenanceRecord",
-          "ZoneEngine.Core.Missions.MissionAcgProvenanceRecord.RawPacketSha256",
           "ZoneEngine.Core.Missions.MissionAcgRetargetCategory",
           "ZoneEngine.Core.Missions.MissionAcgRetargetCategory.CharacterInstance",
           "ZoneEngine.Core.Missions.MissionAcgRetargetCategory.DynelIdentityInstance",
@@ -2408,22 +2126,12 @@
           "ZoneEngine.Core.Missions.MissionAcgWireRecord.RetargetSlots",
           "ZoneEngine.Core.Missions.MissionAcgWireRecord.Slot"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutSelector.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgCompletenessRecord.IsSelectionComplete",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Instance",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Type",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutExclusion"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgObjectiveBinding.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgObjectiveContracts.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgObjectiveContracts.cs": [
           "ZoneEngine.Core.Missions.MissionAcgIdentityRecord",
           "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Equals(ZoneEngine.Core.Missions.MissionAcgIdentityRecord)",
           "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Instance"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs": [
           "ZoneEngine.Core.Missions.MissionAcgCompletenessRecord.IsSelectionComplete",
           "ZoneEngine.Core.Missions.MissionAcgDynelRecord",
           "ZoneEngine.Core.Missions.MissionAcgDynelRecord.CapturedIdentity",
@@ -2485,17 +2193,6 @@
           "ZoneEngine.Core.Missions.MissionAcgWireRecord.CopyPacketBytes()",
           "ZoneEngine.Core.Missions.MissionAcgWireRecord.RetargetSlots"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgSpatialAuthority.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgDynelRecord.Position",
-          "ZoneEngine.Core.Missions.MissionAcgExitRecord.Position",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRecord",
-          "ZoneEngine.Core.Missions.MissionAcgNpcSlotRecord.Position",
-          "ZoneEngine.Core.Missions.MissionAcgObjectiveSlotRecord.Position",
-          "ZoneEngine.Core.Missions.MissionAcgPointRecord",
-          "ZoneEngine.Core.Missions.MissionAcgPointRecord.X",
-          "ZoneEngine.Core.Missions.MissionAcgPointRecord.Y",
-          "ZoneEngine.Core.Missions.MissionAcgPointRecord.Z"
-        ],
         "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
           "ZoneEngine.Core.Missions.MissionAcgIdentityRecord",
           "ZoneEngine.Core.Missions.MissionAcgIdentityRecord.Equals(ZoneEngine.Core.Missions.MissionAcgIdentityRecord)",
@@ -2532,6 +2229,50 @@
       },
       "symbolsUsedCandidates": [
         {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgLayoutCatalog.cs",
+          "symbols": [
+            "MissionAcgCaptureCountsRecord",
+            "MissionAcgCompletenessRecord",
+            "MissionAcgDynelRecord",
+            "MissionAcgHash",
+            "MissionAcgIdentityRecord",
+            "MissionAcgLayoutCompletenessState",
+            "MissionAcgLayoutExclusion",
+            "MissionAcgNpcSlotRecord",
+            "MissionAcgObjectiveSlotRecord",
+            "MissionAcgPointRecord",
+            "MissionAcgProvenanceRecord",
+            "MissionAcgRetargetCategory",
+            "MissionAcgRetargetSlotRecord",
+            "MissionAcgRotationRecord",
+            "MissionAcgWireCategory",
+            "MissionAcgWireRecord"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgObjectiveContracts.cs",
+          "symbols": [
+            "MissionAcgIdentityRecord"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs",
+          "symbols": [
+            "MissionAcgDynelRecord",
+            "MissionAcgExitRecord",
+            "MissionAcgHash",
+            "MissionAcgIdentityRecord",
+            "MissionAcgNpcSlotRecord",
+            "MissionAcgObjectiveSlotRecord",
+            "MissionAcgPointRecord",
+            "MissionAcgRetargetCategory",
+            "MissionAcgRetargetSlotRecord",
+            "MissionAcgRotationRecord",
+            "MissionAcgWireCategory",
+            "MissionAcgWireRecord"
+          ]
+        },
+        {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
           "symbols": [
             "MissionAcgIdentityRecord"
@@ -2553,10 +2294,6 @@
         "MissionAcgLayoutBundle"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCapturedLayoutCatalog.g.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.CurrentFormatVersion"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgInstanceBinding.cs": [
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.BuildingIdentity",
@@ -2566,7 +2303,27 @@
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.LayoutId",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.SupportsMission(ZoneEngine.Core.Missions.MissionRollType, int)"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutCatalog.cs": [
+        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutSelector.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Completeness",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.GeneratorPayloadSha256",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.IsSelectable",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.LayoutId",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.SupportsMission(ZoneEngine.Core.Missions.MissionRollType, int)"
+        ],
+        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgSpatialAuthority.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Dynels",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.EntryPoint",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Exit",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.LayoutId",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.NpcSlots",
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.ObjectiveSlots"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgCapturedLayoutCatalog.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgLayoutCatalog.cs": [
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.BuildingIdentity",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.BundleFormatVersion",
@@ -2587,21 +2344,12 @@
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.LayoutId",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.NpcSlots",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.ObjectiveSlots",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Provenance",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.SelectionExclusionReason",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.SourcePlayfield2",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Terminals",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.WireRecords"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutSelector.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Completeness",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.GeneratorPayloadSha256",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.IsSelectable",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.LayoutId",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.SupportsMission(ZoneEngine.Core.Missions.MissionRollType, int)"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs": [
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.BuildingIdentity",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.CapturedPlayerIdentity",
@@ -2615,15 +2363,6 @@
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.NpcSlots",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.ObjectiveSlots",
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.SourcePlayfield2"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgSpatialAuthority.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Dynels",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.EntryPoint",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.Exit",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.LayoutId",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.NpcSlots",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutBundle.ObjectiveSlots"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
           "ZoneEngine.Core.Missions.MissionAcgLayoutBundle",
@@ -2644,6 +2383,24 @@
       },
       "symbolsUsedCandidates": [
         {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgCapturedLayoutCatalog.cs",
+          "symbols": [
+            "MissionAcgLayoutBundle"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgLayoutCatalog.cs",
+          "symbols": [
+            "MissionAcgLayoutBundle"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs",
+          "symbols": [
+            "MissionAcgLayoutBundle"
+          ]
+        },
+        {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
           "symbols": [
             "MissionAcgLayoutBundle"
@@ -2658,55 +2415,6 @@
       ],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutCatalog.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "4ffd0b8b67ec1465bdce6db37e2f1c888e5ce087d9d95a78e2cbd24e105ebd78",
-      "declaredSymbols": [
-        "MissionAcgCatalogValidationCode",
-        "MissionAcgCatalogValidationIssue",
-        "MissionAcgCatalogValidationResult",
-        "MissionAcgLayoutCatalog",
-        "MissionAcgLayoutCatalogLoader",
-        "StructuredIdentityEvidence"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgLayoutSelector.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgCatalogValidationIssue",
-          "ZoneEngine.Core.Missions.MissionAcgCatalogValidationIssue.Code",
-          "ZoneEngine.Core.Missions.MissionAcgCatalogValidationIssue.Message",
-          "ZoneEngine.Core.Missions.MissionAcgCatalogValidationResult",
-          "ZoneEngine.Core.Missions.MissionAcgCatalogValidationResult.IsValid",
-          "ZoneEngine.Core.Missions.MissionAcgCatalogValidationResult.Issues",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalog",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalog.Layouts",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalogLoader",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalogLoader.Validate(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Missions.MissionAcgLayoutBundle\u003E, System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Missions.MissionAcgLayoutExclusion\u003E)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalog",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalog.FindByLayoutId(string)",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalog.Layouts",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalogLoader",
-          "ZoneEngine.Core.Missions.MissionAcgLayoutCatalogLoader.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Missions.MissionAcgLayoutBundle\u003E, System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Missions.MissionAcgLayoutExclusion\u003E)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-          "symbols": [
-            "MissionAcgLayoutCatalog",
-            "MissionAcgLayoutCatalogLoader"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_DATA_LOADER",
       "contentSeparationRequired": false,
       "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
       "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
@@ -2744,34 +2452,6 @@
       "newEngineProjectDirectLink": true
     },
     {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCapturedLayoutCatalog.g.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "3a954d5bbcc146be7575d9e1d11617931d13099c8ed32b4cd1bd98ee4a9dd665",
-      "declaredSymbols": [
-        "MissionAcgCapturedLayoutCatalog"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgCapturedLayoutCatalog",
-          "ZoneEngine.Core.Missions.MissionAcgCapturedLayoutCatalog.CreateBundles()"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-          "symbols": [
-            "MissionAcgCapturedLayoutCatalog"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgInstanceBinding.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
       "sourceSha256": "3dd94e1ad88abaae2a11a355a27dabac7f4c99000351dd95a8e117cfc3eafdd0",
@@ -2805,7 +2485,7 @@
           "ZoneEngine.Core.Missions.MissionAcgInstanceBinding.ExteriorY",
           "ZoneEngine.Core.Missions.MissionAcgInstanceBinding.ExteriorZ"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs": [
           "ZoneEngine.Core.Missions.MissionAcgInstanceBinding",
           "ZoneEngine.Core.Missions.MissionAcgInstanceBinding.AcceptedQuestIdentity",
           "ZoneEngine.Core.Missions.MissionAcgInstanceBinding.AcgBuildingIdentity",
@@ -2828,6 +2508,12 @@
         ]
       },
       "symbolsUsedCandidates": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs",
+          "symbols": [
+            "MissionAcgInstanceBinding"
+          ]
+        },
         {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
           "symbols": [
@@ -2856,7 +2542,7 @@
         "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgBindingRecord.cs": [
           "ZoneEngine.Core.Missions.MissionAcgInstanceState"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs": [
           "ZoneEngine.Core.Missions.MissionAcgInstanceState.CanEnter(System.DateTime, System.DateTime)"
         ],
         "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
@@ -2892,7 +2578,7 @@
         "MissionAcgBindingRecord"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs": [
           "ZoneEngine.Core.Missions.MissionAcgBindingRecord",
           "ZoneEngine.Core.Missions.MissionAcgBindingRecord.Binding",
           "ZoneEngine.Core.Missions.MissionAcgBindingRecord.State"
@@ -2904,113 +2590,11 @@
           "ZoneEngine.Core.Missions.MissionAcgBindingRecord.Binding"
         ]
       },
-      "symbolsUsedCandidates": [],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "e280f18c947acbc96d1866a1433298dbaceb2b9ce39923a46b970b9a9f108e94",
-      "declaredSymbols": [
-        "IdentitySeed",
-        "MissionAcgMaterializedInstance",
-        "MissionAcgRuntimeChestState",
-        "MissionAcgRuntimeDoorState",
-        "MissionAcgRuntimeIdentityEntry",
-        "MissionAcgRuntimeMaterializer",
-        "MissionAcgRuntimeObject",
-        "MissionAcgRuntimeObjectKind",
-        "MissionAcgRuntimeRegistry",
-        "MissionAcgRuntimeState"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCorpseCreditPolicy.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeMaterializer",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeMaterializer.TryReverseRuntimeInstance(int, out int, out int)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Objectives.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.AmbientNpc"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance",
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance.BindingRecord",
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance.Bundle",
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance.Objects",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeIdentityEntry.CapturedIdentity",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeIdentityEntry.Kind",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeIdentityEntry.RuntimeIdentity",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeMaterializer",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeMaterializer.TryMaterialize(ZoneEngine.Core.Missions.MissionAcgBindingRecord, ZoneEngine.Core.Missions.MissionAcgLayoutBundle, ZoneEngine.Core.Missions.MissionAcgRuntimeState, System.DateTime, out ZoneEngine.Core.Missions.MissionAcgMaterializedInstance, out string)",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.CopyPacket()",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.Heading",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.Identity",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.Position",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.TemplateId",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.AmbientNpc",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.Chest",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.Door",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.Exit",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.ObjectiveNpc",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.StaticObjective"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.AmbientNpc"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWorld.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance",
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance.BindingRecord",
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance.Bundle",
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance.Objects",
-          "ZoneEngine.Core.Missions.MissionAcgMaterializedInstance.Spawn",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeIdentityEntry.CapturedIdentity",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeIdentityEntry.Kind",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeIdentityEntry.RuntimeIdentity",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.CopyPacket()",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.Identity",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.Name",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObject.TemplateId",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.AmbientNpc",
-          "ZoneEngine.Core.Missions.MissionAcgRuntimeObjectKind.ObjectiveNpc"
-        ]
-      },
       "symbolsUsedCandidates": [
         {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Objectives.cs",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs",
           "symbols": [
-            "MissionAcgRuntimeObjectKind"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-          "symbols": [
-            "MissionAcgMaterializedInstance",
-            "MissionAcgRuntimeMaterializer",
-            "MissionAcgRuntimeObjectKind"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
-          "symbols": [
-            "MissionAcgRuntimeObjectKind"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWorld.cs",
-          "symbols": [
-            "MissionAcgMaterializedInstance",
-            "MissionAcgRuntimeObject",
-            "MissionAcgRuntimeObjectKind"
+            "MissionAcgBindingRecord"
           ]
         }
       ],
@@ -3047,7 +2631,7 @@
           "ZoneEngine.Core.Missions.MissionAcgObjectiveRecord.State",
           "ZoneEngine.Core.Missions.MissionAcgObjectiveState.MissionItemIdentity"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgObjectiveContracts.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgObjectiveContracts.cs": [
           "ZoneEngine.Core.Missions.MissionAcgCompletionPhase",
           "ZoneEngine.Core.Missions.MissionAcgCompletionPhase.Action59Sent",
           "ZoneEngine.Core.Missions.MissionAcgCompletionPhase.CreditsGranted",
@@ -3169,6 +2753,21 @@
       },
       "symbolsUsedCandidates": [
         {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgObjectiveContracts.cs",
+          "symbols": [
+            "MissionAcgCompletionPhase",
+            "MissionAcgDeliveryPhase",
+            "MissionAcgDurableClaimPhase",
+            "MissionAcgDurableRewardClaim",
+            "MissionAcgGrantState",
+            "MissionAcgObjectiveBinding",
+            "MissionAcgObjectiveInteraction",
+            "MissionAcgObjectiveLifecycle",
+            "MissionAcgObjectiveRecord",
+            "MissionAcgObjectiveState"
+          ]
+        },
+        {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
           "symbols": [
             "MissionAcgCompletionPhase",
@@ -3178,41 +2777,6 @@
             "MissionAcgObjectiveLifecycle",
             "MissionAcgObjectiveRecord",
             "MissionAcgObjectiveState"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgObjectiveContracts.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "37b1fc708cd7b4f8664e4df6175a893053fdc1128d9a30bff4340f8a37b3614e",
-      "declaredSymbols": [
-        "MissionAcgCompletionRules",
-        "MissionAcgObjectiveContract",
-        "MissionAcgObjectiveEvent"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgAcceptedQfuBuilder.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgObjectiveContract",
-          "ZoneEngine.Core.Missions.MissionAcgObjectiveContract.RepairComponentTemplateId",
-          "ZoneEngine.Core.Missions.MissionAcgObjectiveContract.RepairMachineTemplateId"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgObjectiveContract",
-          "ZoneEngine.Core.Missions.MissionAcgObjectiveContract.InteractionFor(ZoneEngine.Core.Missions.MissionRollType)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-          "symbols": [
-            "MissionAcgObjectiveContract"
           ]
         }
       ],
@@ -3262,19 +2826,19 @@
         "MissionAcgIdentityRanges"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCorpseCreditPolicy.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MaximumLivePlayfield2",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MinimumLivePlayfield2"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgRuntimeMaterialization.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.LegacySharedPlayfield2",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MaximumLivePlayfield2",
-          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MinimumLivePlayfield2"
-        ],
         "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs": [
           "ZoneEngine.Core.Missions.MissionAcgIdentityRanges",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MaximumLivePlayfield2",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MinimumLivePlayfield2"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgCorpseCreditPolicy.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MaximumLivePlayfield2",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MinimumLivePlayfield2"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs": [
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges",
+          "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.LegacySharedPlayfield2",
           "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MaximumLivePlayfield2",
           "ZoneEngine.Core.Missions.MissionAcgIdentityRanges.MinimumLivePlayfield2"
         ],
@@ -3292,6 +2856,18 @@
       "symbolsUsedCandidates": [
         {
           "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
+          "symbols": [
+            "MissionAcgIdentityRanges"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgCorpseCreditPolicy.cs",
+          "symbols": [
+            "MissionAcgIdentityRanges"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs",
           "symbols": [
             "MissionAcgIdentityRanges"
           ]
@@ -3381,34 +2957,6 @@
       "newEngineProjectDirectLink": true
     },
     {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "5e782fc385842d9096a80b7571770a9e7793509dff94e8c9f726d746974523b8",
-      "declaredSymbols": [
-        "MissionDefinitionCatalog"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
-          "ZoneEngine.Core.Missions.MissionDefinitionCatalog",
-          "ZoneEngine.Core.Missions.MissionDefinitionCatalog.Build(ZoneEngine.Core.Arete.Quests.QuestContentRegistry)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
-          "symbols": [
-            "MissionDefinitionCatalog"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_DATA_LOADER",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Arete/Quests/QuestModels.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
       "sourceSha256": "3c5acd8d151920db0ae8425f4e25f704feb792bad8fa7d2760f30f78e3249857",
@@ -3437,9 +2985,6 @@
           "ZoneEngine.Core.Arete.Quests.QuestStep",
           "ZoneEngine.Core.Arete.Quests.QuestStep.Conditions",
           "ZoneEngine.Core.Arete.Quests.QuestStep.Objectives"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.Quests.QuestContentPack"
         ],
         "AORebirth/Server/ZoneEngine/Core/Arete/AreteNoOpActionRecorder.cs": [
           "ZoneEngine.Core.Arete.Quests.QuestAction",
@@ -3491,20 +3036,15 @@
           "ZoneEngine.Core.Arete.Quests.QuestDefinition",
           "ZoneEngine.Core.Arete.Quests.QuestDefinition.QuestId"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs": [
-          "ZoneEngine.Core.Arete.Quests.QuestDefinition",
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
+          "ZoneEngine.Core.Arete.Quests.QuestContentPack",
           "ZoneEngine.Core.Arete.Quests.QuestDefinition.InitialStepId",
           "ZoneEngine.Core.Arete.Quests.QuestDefinition.QuestId",
           "ZoneEngine.Core.Arete.Quests.QuestDefinition.Steps",
-          "ZoneEngine.Core.Arete.Quests.QuestObjective",
           "ZoneEngine.Core.Arete.Quests.QuestObjective.ObjectiveId",
           "ZoneEngine.Core.Arete.Quests.QuestObjective.RequiredCount",
-          "ZoneEngine.Core.Arete.Quests.QuestStep",
           "ZoneEngine.Core.Arete.Quests.QuestStep.Objectives",
           "ZoneEngine.Core.Arete.Quests.QuestStep.StepId"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
-          "ZoneEngine.Core.Arete.Quests.QuestContentPack"
         ]
       },
       "symbolsUsedCandidates": [
@@ -3547,292 +3087,6 @@
       "newEngineProjectDirectLink": true
     },
     {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "b9b890be91633a9f9a2f2a6d499d125458a4e69305a5850e503eaf7a0e5243b7",
-      "declaredSymbols": [
-        "AreteFrameworkBootstrap",
-        "AreteFrameworkRegistries"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs": [
-          "ZoneEngine.Core.Arete.AreteFrameworkBootstrap",
-          "ZoneEngine.Core.Arete.AreteFrameworkBootstrap.InitializeCheckedInContent(string)",
-          "ZoneEngine.Core.Arete.AreteFrameworkRegistries.DialogueRegistry"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs",
-          "symbols": [
-            "AreteFrameworkBootstrap"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "LEGACY_SPECIFIC",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayTailorDialogueContent.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "c92bcf9961d7bb6b3c8d5b867e29f03fe93ebce01345b49af427db0345f1c728",
-      "declaredSymbols": [
-        "CapturedSubwayTailorDialogueContent"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueActionRouter.cs": [
-          "ZoneEngine.Core.Playfields.CapturedSubwayTailorDialogueContent",
-          "ZoneEngine.Core.Playfields.CapturedSubwayTailorDialogueContent.MeasurementNodeId",
-          "ZoneEngine.Core.Playfields.CapturedSubwayTailorDialogueContent.ResolveRootNodeId(bool)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Dialogue.cs": [
-          "ZoneEngine.Core.Playfields.CapturedSubwayTailorDialogueContent",
-          "ZoneEngine.Core.Playfields.CapturedSubwayTailorDialogueContent.TryGetMeasurementItemId(int, out int)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueActionRouter.cs",
-          "symbols": [
-            "CapturedSubwayTailorDialogueContent"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Dialogue.cs",
-          "symbols": [
-            "CapturedSubwayTailorDialogueContent"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorContentProvider.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "95f97a6e57fc6c45dc084ad7c6d94dc8eacf059c7c08e55af0fb954f59407ff8",
-      "declaredSymbols": [
-        "CapturedSubwayVendorContentProvider",
-        "CapturedSubwayVendorDefinition",
-        "CapturedSubwayVendorMeshDefinition",
-        "CapturedSubwayVendorStockDefinition",
-        "CapturedSubwayVendorStockSnapshot",
-        "CapturedSubwayVendorStockSnapshotEntry",
-        "CapturedSubwayVendorTextureDefinition",
-        "CapturedSubwayVendorWaypointDefinition"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedSubwayMerchantCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorContentProvider.Definitions",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorContentProvider.SubwayPlayfieldResource",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.AppearanceValue",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Breed",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.CapturedScfuFlags",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.CapturedScfuUnknown1",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.CharacterFlags",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.DisplayName",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Evidence",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Fatness",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.HasCapturedStock",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.HeadMesh",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.HeadingW",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.HeadingX",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.HeadingY",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.HeadingZ",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Health",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Level",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Meshes",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.MonsterData",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.MonsterScale",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Race",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.RunSpeed",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Sex",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Side",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.SourceNpcInstance",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.SourceVendorInstance",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Stock",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Textures",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.VendorTemplateId",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.VisualFlags",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Waypoints",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.X",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Y",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorDefinition.Z",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorMeshDefinition",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorMeshDefinition.Id",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorMeshDefinition.Layer",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorMeshDefinition.OverrideTextureId",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorMeshDefinition.Position",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorStockDefinition",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorStockDefinition.HighId",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorStockDefinition.LowId",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorStockDefinition.Quality",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorStockDefinition.Slot",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorTextureDefinition",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorTextureDefinition.Id",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorTextureDefinition.Place",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorTextureDefinition.Unknown",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorWaypointDefinition.X",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorWaypointDefinition.Y",
-          "ZoneEngine.Core.Playfields.CapturedSubwayVendorWaypointDefinition.Z"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedSubwayMerchantCatalog.cs",
-          "symbols": [
-            "CapturedSubwayVendorContentProvider",
-            "CapturedSubwayVendorDefinition"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedBucketheadTechnodealerContentProvider.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "aad0efb355201a93c1b81a43bd0d549935843c7857c0b333f112632c80f92a2a",
-      "declaredSymbols": [
-        "CapturedBucketheadTechnodealerContentProvider",
-        "CapturedBucketheadTechnodealerStockDefinition"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/BucketheadSummonService.cs": [
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.CharacterFlags",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.DisplayName",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.Evidence",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.Health",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.Level",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.MonsterData",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.MonsterScale",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.RunSpeed",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.Stock",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.VendorTemplateId",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.VisualFlags",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerStockDefinition.HighId",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerStockDefinition.LowId",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerStockDefinition.Quality",
-          "ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerStockDefinition.Slot"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/BucketheadSummonService.cs",
-          "symbols": [
-            "CapturedBucketheadTechnodealerContentProvider"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedThrakGardenVendorContentProvider.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "503b5eb2ceff3a5456d9fe0925e3bf7810192455b8227dbcde53b4140728c4cc",
-      "declaredSymbols": [
-        "CapturedThrakGardenVendorContentProvider",
-        "CapturedThrakGardenVendorDefinition",
-        "CapturedThrakGardenVendorStockDefinition"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedGardenVendorCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorContentProvider.Definitions",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition.DisplayName",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition.Evidence",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition.RequiresCompletedGardenKeyQuest",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition.SourceNpcInstance",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition.SourceVendorInstance",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition.Stock",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorDefinition.VendorTemplateId",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorStockDefinition.HighId",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorStockDefinition.LowId",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorStockDefinition.Quality",
-          "ZoneEngine.Core.Playfields.CapturedThrakGardenVendorStockDefinition.Slot"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedGardenVendorCatalog.cs",
-          "symbols": [
-            "CapturedThrakGardenVendorContentProvider"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAbanGardenVendorContentProvider.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "4b5c654100516b743acccaf6749e7ad46f9d8d9e9ab5f5b21933f4c37df33b78",
-      "declaredSymbols": [
-        "CapturedAbanGardenVendorContentProvider",
-        "CapturedAbanGardenVendorDefinition",
-        "CapturedAbanGardenVendorStockDefinition"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedGardenVendorCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorContentProvider.Definitions",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.DisplayName",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.Evidence",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.ExpectedX",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.ExpectedZ",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.RequiresGardenKey",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.SourceNpcInstance",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.SourceVendorInstance",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.Stock",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorDefinition.VendorTemplateId",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorStockDefinition.HighId",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorStockDefinition.LowId",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorStockDefinition.Quality",
-          "ZoneEngine.Core.Playfields.CapturedAbanGardenVendorStockDefinition.Slot"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedGardenVendorCatalog.cs",
-          "symbols": [
-            "CapturedAbanGardenVendorContentProvider"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Arete/AreteConditionReferenceValidator.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
       "sourceSha256": "8c97b791add1c72f25fb40b3499b02e24cca58ca9e6fa7904f0d46542a804cd8",
@@ -3840,12 +3094,19 @@
         "AreteConditionReferenceValidator"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
           "ZoneEngine.Core.Arete.AreteConditionReferenceValidator",
           "ZoneEngine.Core.Arete.AreteConditionReferenceValidator.Validate(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E, System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E, ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry, ZoneEngine.Core.Arete.Quests.QuestContentRegistry)"
         ]
       },
-      "symbolsUsedCandidates": [],
+      "symbolsUsedCandidates": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+          "symbols": [
+            "AreteConditionReferenceValidator"
+          ]
+        }
+      ],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "SHARED_GAMEPLAY_MECHANIC",
       "contentSeparationRequired": false,
@@ -3860,20 +3121,8 @@
       "declaredSymbols": [
         "AreteEnvironmentGate"
       ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs": [
-          "ZoneEngine.Core.Arete.AreteEnvironmentGate",
-          "ZoneEngine.Core.Arete.AreteEnvironmentGate.IsDefaultEnabled(string)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs",
-          "symbols": [
-            "AreteEnvironmentGate"
-          ]
-        }
-      ],
+      "symbolsUsed": null,
+      "symbolsUsedCandidates": [],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "UNKNOWN",
       "contentSeparationRequired": false,
@@ -4034,7 +3283,7 @@
     {
       "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Arete/Dialogue/DialogueModels.cs",
       "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "0517ad345b188c7ed30d7483373db557f7920b0977a7ab77f459f86c69811753",
+      "sourceSha256": "744847d91ed4c27516676f7fac1bbb5954de9370683bc7069e69cabd5ad495a1",
       "declaredSymbols": [
         "DialogueAction",
         "DialogueCondition",
@@ -4059,9 +3308,6 @@
           "ZoneEngine.Core.Arete.Dialogue.DialogueNpcEntry.Nodes",
           "ZoneEngine.Core.Arete.Dialogue.DialogueOption",
           "ZoneEngine.Core.Arete.Dialogue.DialogueOption.Conditions"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.Dialogue.DialogueContentPack"
         ],
         "AORebirth/Server/ZoneEngine/Core/Arete/AreteNoOpActionRecorder.cs": [
           "ZoneEngine.Core.Arete.Dialogue.DialogueAction",
@@ -4141,6 +3387,7 @@
         "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs": [
           "ZoneEngine.Core.Arete.Dialogue.DialogueNpcEntry",
           "ZoneEngine.Core.Arete.Dialogue.DialogueOption",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueOption.Hidden",
           "ZoneEngine.Core.Arete.Dialogue.DialogueOption.Index",
           "ZoneEngine.Core.Arete.Dialogue.DialogueOption.Text"
         ],
@@ -4155,6 +3402,14 @@
           "ZoneEngine.Core.Arete.Dialogue.DialoguePromptSegment",
           "ZoneEngine.Core.Arete.Dialogue.DialoguePromptSegment.Text",
           "ZoneEngine.Core.Arete.Dialogue.DialoguePromptSegment.Unknown2"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
+          "ZoneEngine.Core.Arete.Dialogue.DialogueNode",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueNode.Id",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueNode.Options",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueNpcEntry",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueNpcEntry.Nodes",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueOption.Index"
         ]
       },
       "symbolsUsedCandidates": [
@@ -4184,10 +3439,6 @@
         "AORebirth/Server/ZoneEngine/Core/Arete/AreteConditionReferenceValidator.cs": [
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry",
-          "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E)"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/Dialogue/DialogueSessionService.cs": [
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry",
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry.TryGetNpc(string, out ZoneEngine.Core.Arete.Dialogue.DialogueNpcEntry)"
@@ -4195,11 +3446,22 @@
         "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs": [
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry",
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry.TryGetNpc(string, out ZoneEngine.Core.Arete.Dialogue.DialogueNpcEntry)"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
+          "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E)",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueContentRegistry.TryGetNpc(string, out ZoneEngine.Core.Arete.Dialogue.DialogueNpcEntry)"
         ]
       },
       "symbolsUsedCandidates": [
         {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs",
+          "symbols": [
+            "DialogueContentRegistry"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
           "symbols": [
             "DialogueContentRegistry"
           ]
@@ -4241,19 +3503,26 @@
         "DialogueContentPackLoader"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader",
-          "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader.LoadFiles(System.Collections.Generic.IEnumerable\u003Cstring\u003E)"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/Dialogue/DialogueContentRegistry.cs": [
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader",
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E)",
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader.LoadDirectory(string)",
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader.LoadFiles(System.Collections.Generic.IEnumerable\u003Cstring\u003E)",
           "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader.LoadManifest(string)"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
+          "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader",
+          "ZoneEngine.Core.Arete.Dialogue.DialogueContentPackLoader.LoadFiles(System.Collections.Generic.IEnumerable\u003Cstring\u003E)"
         ]
       },
-      "symbolsUsedCandidates": [],
+      "symbolsUsedCandidates": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+          "symbols": [
+            "DialogueContentPackLoader"
+          ]
+        }
+      ],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "SHARED_DATA_LOADER",
       "contentSeparationRequired": false,
@@ -4269,12 +3538,19 @@
         "DialogueActionReferenceValidator"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
           "ZoneEngine.Core.Arete.Dialogue.DialogueActionReferenceValidator",
           "ZoneEngine.Core.Arete.Dialogue.DialogueActionReferenceValidator.Validate(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E, ZoneEngine.Core.Arete.Quests.QuestContentRegistry)"
         ]
       },
-      "symbolsUsedCandidates": [],
+      "symbolsUsedCandidates": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+          "symbols": [
+            "DialogueActionReferenceValidator"
+          ]
+        }
+      ],
       "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
       "classification": "SHARED_GAMEPLAY_MECHANIC",
       "contentSeparationRequired": false,
@@ -4294,19 +3570,16 @@
           "ZoneEngine.Core.Arete.Quests.QuestContentRegistry",
           "ZoneEngine.Core.Arete.Quests.QuestContentRegistry.TryGetQuest(string, out ZoneEngine.Core.Arete.Quests.QuestDefinition)"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.Quests.QuestContentRegistry",
-          "ZoneEngine.Core.Arete.Quests.QuestContentRegistry.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E)"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/Dialogue/DialogueActionReferenceValidator.cs": [
           "ZoneEngine.Core.Arete.Quests.QuestContentRegistry",
           "ZoneEngine.Core.Arete.Quests.QuestContentRegistry.TryGetQuest(string, out ZoneEngine.Core.Arete.Quests.QuestDefinition)"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Missions/MissionDefinitionCatalog.cs": [
-          "ZoneEngine.Core.Arete.Quests.QuestContentRegistry",
-          "ZoneEngine.Core.Arete.Quests.QuestContentRegistry.GetQuests()"
-        ],
         "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
+          "ZoneEngine.Core.Arete.Quests.QuestContentRegistry",
+          "ZoneEngine.Core.Arete.Quests.QuestContentRegistry.GetQuests()",
+          "ZoneEngine.Core.Arete.Quests.QuestContentRegistry.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E)"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
           "ZoneEngine.Core.Arete.Quests.QuestContentRegistry",
           "ZoneEngine.Core.Arete.Quests.QuestContentRegistry.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E)"
         ]
@@ -4314,6 +3587,12 @@
       "symbolsUsedCandidates": [
         {
           "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+          "symbols": [
+            "QuestContentRegistry"
+          ]
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
           "symbols": [
             "QuestContentRegistry"
           ]
@@ -4334,10 +3613,6 @@
         "QuestContentPackLoader"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader",
-          "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader.LoadFiles(System.Collections.Generic.IEnumerable\u003Cstring\u003E)"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/Quests/QuestContentRegistry.cs": [
           "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader",
           "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader.Load(System.Collections.Generic.IEnumerable\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E)",
@@ -4345,14 +3620,14 @@
           "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader.LoadFiles(System.Collections.Generic.IEnumerable\u003Cstring\u003E)",
           "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader.LoadManifest(string)"
         ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
           "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader",
           "ZoneEngine.Core.Arete.Quests.QuestContentPackLoader.LoadFiles(System.Collections.Generic.IEnumerable\u003Cstring\u003E)"
         ]
       },
       "symbolsUsedCandidates": [
         {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
           "symbols": [
             "QuestContentPackLoader"
           ]
@@ -4410,13 +3685,6 @@
           "ZoneEngine.Core.Arete.AreteValidationResult",
           "ZoneEngine.Core.Arete.AreteValidationResult.AddError(string, string)"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.AreteValidationResult",
-          "ZoneEngine.Core.Arete.AreteValidationResult.AddError(string, string)",
-          "ZoneEngine.Core.Arete.AreteValidationResult.AddErrors(ZoneEngine.Core.Arete.AreteValidationResult)",
-          "ZoneEngine.Core.Arete.AreteValidationResult.Errors",
-          "ZoneEngine.Core.Arete.AreteValidationResult.IsValid"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/AreteJsonContentFileLoader.cs": [
           "ZoneEngine.Core.Arete.AreteValidationResult",
           "ZoneEngine.Core.Arete.AreteValidationResult.AddError(string, string)",
@@ -4461,6 +3729,12 @@
           "ZoneEngine.Core.Arete.AreteValidationResult",
           "ZoneEngine.Core.Arete.AreteValidationResult.Errors",
           "ZoneEngine.Core.Arete.AreteValidationResult.IsValid"
+        ],
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
+          "ZoneEngine.Core.Arete.AreteValidationResult",
+          "ZoneEngine.Core.Arete.AreteValidationResult.AddErrors(ZoneEngine.Core.Arete.AreteValidationResult)",
+          "ZoneEngine.Core.Arete.AreteValidationResult.Errors",
+          "ZoneEngine.Core.Arete.AreteValidationResult.IsValid"
         ]
       },
       "symbolsUsedCandidates": [],
@@ -4479,12 +3753,6 @@
         "AreteContentLoadResult"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E.Packs",
-          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E.Validation",
-          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E.Packs",
-          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E.Validation"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/Dialogue/DialogueContentPackLoader.cs": [
           "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E.Packs",
           "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E.Validation"
@@ -4503,7 +3771,11 @@
           "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E.Packs",
           "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E.Validation"
         ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
+          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E",
+          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E.IsValid",
+          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E.Packs",
+          "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Dialogue.DialogueContentPack\u003E.Validation",
           "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E",
           "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E.IsValid",
           "ZoneEngine.Core.Arete.AreteContentLoadResult\u003CZoneEngine.Core.Arete.Quests.QuestContentPack\u003E.Packs",
@@ -4556,13 +3828,6 @@
           "ZoneEngine.Core.Arete.AreteContentManifest.QuestPacks",
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult"
         ],
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.AreteContentManifestLoadResult",
-          "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.DialoguePackFiles",
-          "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.IsValid",
-          "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.QuestPackFiles",
-          "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.Validation"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/Dialogue/DialogueContentPackLoader.cs": [
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult",
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.DialoguePackFiles",
@@ -4575,8 +3840,9 @@
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.QuestPackFiles",
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.Validation"
         ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult",
+          "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.DialoguePackFiles",
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.IsValid",
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.QuestPackFiles",
           "ZoneEngine.Core.Arete.AreteContentManifestLoadResult.Validation"
@@ -4598,10 +3864,6 @@
         "AreteContentManifestLoader"
       ],
       "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Arete/AreteFrameworkBootstrap.cs": [
-          "ZoneEngine.Core.Arete.AreteContentManifestLoader",
-          "ZoneEngine.Core.Arete.AreteContentManifestLoader.Load(string)"
-        ],
         "AORebirth/Server/ZoneEngine/Core/Arete/Dialogue/DialogueContentPackLoader.cs": [
           "ZoneEngine.Core.Arete.AreteContentManifestLoader",
           "ZoneEngine.Core.Arete.AreteContentManifestLoader.Load(string)"
@@ -4610,744 +3872,16 @@
           "ZoneEngine.Core.Arete.AreteContentManifestLoader",
           "ZoneEngine.Core.Arete.AreteContentManifestLoader.Load(string)"
         ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs": [
           "ZoneEngine.Core.Arete.AreteContentManifestLoader",
           "ZoneEngine.Core.Arete.AreteContentManifestLoader.Load(string)"
         ]
       },
       "symbolsUsedCandidates": [
         {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
           "symbols": [
             "AreteContentManifestLoader"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_DATA_LOADER",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Arete/Quests/SafeQuestFullUpdateSender.AuthoredData.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "2d52f770878ceb5bd8c9abd3e9bd23cbd3e22a93d9fc7876a622fdebf02cb16b",
-      "declaredSymbols": [
-        "SafeQuestFullUpdateSender"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs": [
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateBuyLockpickPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateBuyNanoProgramsPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateDeliverAntonioFactoryPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateDeliverDnaLockedArmorPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateFindTheThiefPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateSpeakToVernonGodfrayPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateStrongboxContentsPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateTalkToSarahGreenePreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)",
-          "ZoneEngine.Core.Arete.Quests.SafeQuestFullUpdateSender.CreateTalkToStanPreviewMessage(SmokeLounge.AOtomation.Messaging.GameData.Identity)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
-          "symbols": [
-            "SafeQuestFullUpdateSender"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/FlintKneecappingTipWire.Data.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "33eb9b8c2acf8a39dda445a53dca5928665d7daa2fe6ae0f5aec820dbfcfcad1",
-      "declaredSymbols": [
-        "FlintKneecappingTipWire"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs": [
-          "ZoneEngine.Core.FlintKneecappingTipWire",
-          "ZoneEngine.Core.FlintKneecappingTipWire.CreateDeletePackets(int, int)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
-          "symbols": [
-            "FlintKneecappingTipWire"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteMarcoSpidaVendorContentProvider.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "bf3e1c5233fe6a2c68cd6d7eb6823c8b411d2a0dca9bc1bdda24dcc779002ca4",
-      "declaredSymbols": [
-        "CapturedAreteMarcoSpidaNanoPackageContent",
-        "CapturedAreteMarcoSpidaNanoPackageContentEntry",
-        "CapturedAreteMarcoSpidaVendorContentProvider"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaNanoPackageContent",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaNanoPackageContent.Contents",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaNanoPackageContentEntry.ItemId",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaNanoPackageContentEntry.Quality",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.TryGetNanoPackage(int, out ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaNanoPackageContent)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.CaptureVendorTemplateId",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.DisplayName",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.Evidence",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.SourceNpcInstance",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.SourceVendorInstance",
-          "ZoneEngine.Core.Playfields.CapturedAreteMarcoSpidaVendorContentProvider.Stock"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
-          "symbols": [
-            "CapturedAreteMarcoSpidaVendorContentProvider"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs",
-          "symbols": [
-            "CapturedAreteMarcoSpidaVendorContentProvider"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorStockDefinition.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "79e2584994ae58a48816ffc9826de643c1a0436ab254bd899446556e0f7d040b",
-      "declaredSymbols": [
-        "CapturedAreteAlexAreaVendorStockDefinition"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorDefinition.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteLoreleiVendorContentProvider.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition"
-        ],
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteMarcoSpidaVendorContentProvider.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition.HighId",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition.LowId"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition.HighId",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition.LowId",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition.Quality",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorStockDefinition.Slot"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs",
-          "symbols": [
-            "CapturedAreteAlexAreaVendorStockDefinition"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorDefinition.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "f22d559ad5b0deebf4047e8d4069cf64f39c0bd6448e30f42b895ad7683f51cb",
-      "declaredSymbols": [
-        "CapturedAreteAlexAreaVendorDefinition"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.HeadingW",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.HeadingX",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.HeadingY",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.HeadingZ",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.SourceVendorInstance",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.Stock",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.TemplateId",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.X",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.Y",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorDefinition.Z"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs",
-          "symbols": [
-            "CapturedAreteAlexAreaVendorDefinition"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "1af3f6d49b5aee3d123e32486761a0aa05bacdf9036330391bf701932e2c02b3",
-      "declaredSymbols": [
-        "CapturedAreteAlexAreaVendorContentProvider"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorContentProvider.AreteLandingPlayfieldId",
-          "ZoneEngine.Core.Playfields.CapturedAreteAlexAreaVendorContentProvider.Vendors"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs",
-          "symbols": [
-            "CapturedAreteAlexAreaVendorContentProvider"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteLoreleiVendorContentProvider.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "d7158c35590a2bbbac576cc15d9b98b890d389263f699bb288eb0ae83d4a2ca6",
-      "declaredSymbols": [
-        "CapturedAreteLoreleiVendorContentProvider"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs": [
-          "ZoneEngine.Core.Playfields.CapturedAreteLoreleiVendorContentProvider",
-          "ZoneEngine.Core.Playfields.CapturedAreteLoreleiVendorContentProvider.CaptureVendorTemplateId",
-          "ZoneEngine.Core.Playfields.CapturedAreteLoreleiVendorContentProvider.DisplayName",
-          "ZoneEngine.Core.Playfields.CapturedAreteLoreleiVendorContentProvider.Evidence",
-          "ZoneEngine.Core.Playfields.CapturedAreteLoreleiVendorContentProvider.SourceNpcInstance",
-          "ZoneEngine.Core.Playfields.CapturedAreteLoreleiVendorContentProvider.SourceVendorInstance",
-          "ZoneEngine.Core.Playfields.CapturedAreteLoreleiVendorContentProvider.Stock"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedAreteVendorCatalog.cs",
-          "symbols": [
-            "CapturedAreteLoreleiVendorContentProvider"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Doja/DojaChipInteractionRules.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "0bf7429246317cf396c971ddb7837f9347ac2c722e0a1cdd276298cf479a38af",
-      "declaredSymbols": [
-        "DojaChipDefinition",
-        "DojaChipInteractionRules"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Doja/DojaChipPacketSender.Data.cs": [
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.QuestCooldown",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.QuestTurnIn"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueService.cs": [
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.NascenseChipItemId"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Dialogue.cs": [
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.NascenseChipItemId",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.QuestTurnIn"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs": [
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.CooldownFlag",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.DojaChipDefinition",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.DojaChipDefinition.IsImplemented",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.DojaChipDefinition.ZoneName",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.IsLevelEligible(ZoneEngine.Core.Doja.DojaChipInteractionRules.DojaChipDefinition, int)",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.IsNascenseChip(int, int)",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.QuestCooldown",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.QuestTurnIn",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.ScarlettPlayfieldId",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.TryResolveChip(int, int, out ZoneEngine.Core.Doja.DojaChipInteractionRules.DojaChipDefinition)",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.TurnInGrantedFlag"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs": [
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.IsKnownDojaChip(int, int)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedSocialNpcCatalog.cs": [
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.ScarlettInstance",
-          "ZoneEngine.Core.Doja.DojaChipInteractionRules.ScarlettName"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueService.cs",
-          "symbols": [
-            "DojaChipInteractionRules"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Dialogue.cs",
-          "symbols": [
-            "DojaChipInteractionRules"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs",
-          "symbols": [
-            "DojaChipInteractionRules"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
-          "symbols": [
-            "DojaChipInteractionRules"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Mobs/AcceptedSocialNpcCatalog.cs",
-          "symbols": [
-            "DojaChipInteractionRules"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_GAMEPLAY_MECHANIC",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Doja/DojaChipPacketSender.Data.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "e60ec9798db9377b84d19c51046b99656631e2183e8662e5952764a8d638fa87",
-      "declaredSymbols": [
-        "DojaChipPacketSender"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs": [
-          "ZoneEngine.Core.Doja.DojaChipPacketSender",
-          "ZoneEngine.Core.Doja.DojaChipPacketSender.CreateDeletePackets(int, string)",
-          "ZoneEngine.Core.Doja.DojaChipPacketSender.CreateJournalPacket(int, string, int, long)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs",
-          "symbols": [
-            "DojaChipPacketSender"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_MODEL",
-      "contentSeparationRequired": true,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "validated content data with shared neutral model/loader; do not move embedded content into NewEngine C#",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/DailyMissionRewardRules.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "93f66d85baa0b15d6daf5304b1caebc22c52cd2adb6dc6795e24c6306ffa0dcc",
-      "declaredSymbols": [
-        "DailyMissionRewardRules",
-        "DailyMissionRewardSnapshot"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs": [
-          "ZoneEngine.Core.Missions.DailyMissionRewardRules",
-          "ZoneEngine.Core.Missions.DailyMissionRewardRules.CreateFullLevelXpEffectReference(int, int)",
-          "ZoneEngine.Core.Missions.DailyMissionRewardRules.CreateSideTokenEffectReference(int, int)",
-          "ZoneEngine.Core.Missions.DailyMissionRewardRules.TryCreateCompletionSnapshot(int, int, out ZoneEngine.Core.Missions.DailyMissionRewardSnapshot)",
-          "ZoneEngine.Core.Missions.DailyMissionRewardSnapshot",
-          "ZoneEngine.Core.Missions.DailyMissionRewardSnapshot.LevelBefore",
-          "ZoneEngine.Core.Missions.DailyMissionRewardSnapshot.SideTokenReward",
-          "ZoneEngine.Core.Missions.DailyMissionRewardSnapshot.SideTokenStatId",
-          "ZoneEngine.Core.Missions.DailyMissionRewardSnapshot.XpReward"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.Doja.cs",
-          "symbols": [
-            "DailyMissionRewardRules"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_GAMEPLAY_MECHANIC",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgCorpseCreditPolicy.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "e4d4c516a5adc9f69f34d16e423e428b2f5309f5f8d669ccbc9ad310531af58a",
-      "declaredSymbols": [
-        "MissionAcgCorpseCreditPolicy"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Corpses.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy",
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy.DeadNpcDespawnMilliseconds"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Objectives.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy",
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy.LifetimeMilliseconds",
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy.SpawnDelayMilliseconds",
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy.TryResolve(int, int, out int)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWorld.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy",
-          "ZoneEngine.Core.Missions.MissionAcgCorpseCreditPolicy.SpawnDelayMilliseconds"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Corpses.cs",
-          "symbols": [
-            "MissionAcgCorpseCreditPolicy"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Objectives.cs",
-          "symbols": [
-            "MissionAcgCorpseCreditPolicy"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWorld.cs",
-          "symbols": [
-            "MissionAcgCorpseCreditPolicy"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_GAMEPLAY_MECHANIC",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Missions/MissionAcgTokenRewardPolicy.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "d73d674eba2bfc0a61c5d6f5cc60d8c1745e5d3cca60db2540486685db0c5bd5",
-      "declaredSymbols": [
-        "MissionAcgTokenRewardData",
-        "MissionAcgTokenRewardPolicy"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Objectives.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardPolicy",
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardPolicy.CalculatePercent(int, int)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs": [
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardData",
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardData.Count",
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardData.Disposition",
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardPolicy",
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardPolicy.CalculatePercent(int, int)",
-          "ZoneEngine.Core.Missions.MissionAcgTokenRewardPolicy.TryResolve(int, int, SmokeLounge.AOtomation.Messaging.GameData.Side, out ZoneEngine.Core.Missions.MissionAcgTokenRewardData, out string)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.Objectives.cs",
-          "symbols": [
-            "MissionAcgTokenRewardPolicy"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
-          "symbols": [
-            "MissionAcgTokenRewardPolicy"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_GAMEPLAY_MECHANIC",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Packets/GeneratedMissionCorpseWire.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "e5d3605054f2a57586aa9703f1a84673e8e6cc9c70a4c1e7a4e42f362243e161",
-      "declaredSymbols": [
-        "GeneratedMissionCorpseWire"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionCorpseProjection.cs": [
-          "ZoneEngine.Core.Packets.GeneratedMissionCorpseWire",
-          "ZoneEngine.Core.Packets.GeneratedMissionCorpseWire.Build(string, int, int, int, int, float, float, float, int, int, int, int, int, int, int, int)",
-          "ZoneEngine.Core.Packets.GeneratedMissionCorpseWire.MissionCatMeshMappings()"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionCorpseProjection.cs",
-          "symbols": [
-            "GeneratedMissionCorpseWire"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "SHARED_PROTOCOL",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "existing shared communication/protocol layer",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacement.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "1af30e6c169aded49a1850fb60810bd087e6d1ed3fab2f89d341613f0be0b926",
-      "declaredSymbols": [
-        "OfficialPlayfieldPlacement",
-        "OfficialPlayfieldPlacementCorpusManifest",
-        "OfficialPlayfieldPlacementCorpusMetrics",
-        "OfficialPlayfieldPlacementCorpusPolicy",
-        "OfficialPlayfieldPlacementDistrict",
-        "OfficialPlayfieldPlacementManifestEntry",
-        "OfficialPlayfieldPlacementShard"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs": [
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.BehaviorReadiness",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.BehaviorReady",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.CanonicalAcgHashText",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.CurrentRuntimeActive",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.DistrictIndex",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.DistrictName",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.DistrictRecordOrdinal",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.IdentityResolutionStatus",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.IdentityResolved",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.LevelMaximum",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.LevelMinimum",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.OfficialAcgHashNativeUInt32",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.OfficialAcgHashWireBytes",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.OfficialSpawnRecordId",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.ParseStatus",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PlacementKnown",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PlayfieldId",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PositionX",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PositionY",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PositionZ",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.ResourceInstance",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.ResourceType",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.RuntimeActivationAuthorized",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.SerializedSize",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.SourceClientBuild",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.SourceClientVariant",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.AcgHashInventorySha256",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.CorpusVersion",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.IndexSha256",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.Metrics",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.ParserLimitedPlayfieldIds",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.Playfields",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.Policy",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.ResourceType",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.SchemaVersion",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.SourceClientBuild",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.SourceClientVariant",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.SourceManifestSha256",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusManifest.SummarySha256",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics.DistrictCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics.ParsedResourceCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics.ParserLimitedResourceCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics.PlacementCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics.ResourceCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics.RuntimeActivationAuthorizedCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusMetrics.UniqueAcgHashCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusPolicy",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusPolicy.ExistingRuntimeBehaviorChanged",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusPolicy.MassPlacementActivation",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCorpusPolicy.UnresolvedAcgHashActivated",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.DistrictIndex",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.DistrictName",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.DistrictRecordOffset",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.DistrictSerializedSize",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.HashSpawnRecordCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.OfficialDistrictId",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.OfficialResourceId",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.OtherCollectionCountsWhereDecoded",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementDistrict.RecordSha256",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.DistrictCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.ParseStatus",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.Path",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.PlacementCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.PlayfieldId",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.RuntimeActivationAuthorizedCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.ShardSha256",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementManifestEntry.SourceResourceSha256",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.DistrictCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.Districts",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.OfficialSpawnCount",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.ParseError",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.ParseStatus",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.PlayfieldId",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.Records",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.ResourceInstance",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.ResourceType",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.SchemaVersion",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.SourceClientBuild",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.SourceClientVariant"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Core/Playfield/OfficialHashSpawnAuthorization.cs": [
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.BehaviorReady",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.CanonicalAcgHashText",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.DistrictIndex",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.DistrictRecordOrdinal",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.ExistingAoRebirthProfile",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.IdentityResolved",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.LevelMaximum",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.LevelMinimum",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.MobTemplateEvidenceSource",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.OfficialAcgHashNativeUInt32",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PlayfieldId",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PositionX",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PositionY",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.PositionZ",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.Radius",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.ResolvedMobTemplateHash",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.RespawnChance",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.RespawnTime",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.RotationMidEncoded",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.RotationWidthEncoded",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacement.RuntimeActivationAuthorized",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard.Records"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/OfficialHashSpawnAuthorization.cs",
-          "symbols": [
-            "OfficialPlayfieldPlacement"
-          ]
-        }
-      ],
-      "symbolResolution": "ROSLYN_RESOLVED_ENGINE_COMPILATION",
-      "classification": "UNKNOWN",
-      "contentSeparationRequired": false,
-      "classificationBasis": "conservative extraction category; UNKNOWN and LEGACY_SPECIFIC require owner review before movement",
-      "recommendedDestination": "neutral shared domain module after content/mechanic classification; never copy into NewEngine",
-      "newEngineProjectDirectLink": true
-    },
-    {
-      "legacySourceFile": "AORebirth/Server/ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs",
-      "consumerProject": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
-      "sourceSha256": "e368762dc46ba0f4ab7580d94dcae24b34e49b5012e048847957026cefebd3ec",
-      "declaredSymbols": [
-        "OfficialPlayfieldPlacementCatalog"
-      ],
-      "symbolsUsed": {
-        "AORebirth/Server/ZoneEngine_New/Core/Playfield/OfficialHashSpawnAuthorization.cs": [
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(string)",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog.TryGetPlayfield(int, out AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementShard, out string)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/Program.cs": [
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(string)",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog.WriteValidationArtifacts(string, string, string, string)"
-        ],
-        "AORebirth/Server/ZoneEngine_New/RuntimeStartup.cs": [
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog",
-          "AORebirth.Core.Playfields.OfficialPlacements.OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(string)"
-        ]
-      },
-      "symbolsUsedCandidates": [
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/OfficialHashSpawnAuthorization.cs",
-          "symbols": [
-            "OfficialPlayfieldPlacementCatalog"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
-          "symbols": [
-            "OfficialPlayfieldPlacementCatalog"
-          ]
-        },
-        {
-          "file": "AORebirth/Server/ZoneEngine_New/RuntimeStartup.cs",
-          "symbols": [
-            "OfficialPlayfieldPlacementCatalog"
           ]
         }
       ],

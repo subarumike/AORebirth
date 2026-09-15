@@ -78,7 +78,7 @@ namespace ZoneEngine_New.Core.GameData
 
         public bool CanResolve(string hash)
         {
-            if (string.IsNullOrEmpty(hash))
+            if (string.IsNullOrEmpty(hash) || string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal))
                 return false;
 
             return CanResolveCore(hash, new HashSet<string>(StringComparer.Ordinal));
@@ -99,19 +99,14 @@ namespace ZoneEngine_New.Core.GameData
         public bool TryResolve(string hash, int? level, out MobTemplate template)
         {
             template = null!;
+            if (string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal)) return false;
             if (TryResolveLeaf(hash, out NpcLeaf leaf))
             {
                 template = Materialize(leaf, level);
                 return true;
             }
 
-            if (string.IsNullOrEmpty(hash)
-                || string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal)
-                || !TryResolveLeaf(MobTemplate.FallbackHash, out leaf))
-                return false;
-
-            template = Materialize(leaf, level);
-            return true;
+            return false;
         }
 
         bool CanResolveCore(string hash, HashSet<string> seen)

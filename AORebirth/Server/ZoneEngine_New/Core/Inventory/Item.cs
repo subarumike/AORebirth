@@ -135,11 +135,11 @@ namespace ZoneEngine_New.Core.Inventory
             if (Locked)
                 return false;
 
-            if (Missions.AuthoredQuestService.IsAuthoredItem(this))
+            if (player.Playfield.GetRequiredService<Missions.AuthoredQuestService>().IsAuthoredItem(this))
                 return player.Playfield.GetRequiredService<Missions.AuthoredQuestService>().TryUseItem(player, slotIdentity, this);
 
-            if (LowId == 301782 || HighId == 301782)
-                return player.Playfield.GetRequiredService<InventoryActionService>().TryOpenQuabbit(player, slotIdentity, this);
+            if (ItemBehaviorContent.Current.FindPackage(this) != null)
+                return player.Playfield.GetRequiredService<InventoryActionService>().TryOpenPackage(player, slotIdentity, this);
 
             if (InventoryActionService.IsVitalItem(this))
                 return player.Playfield.GetRequiredService<InventoryActionService>().TryUseVitalItem(player, slotIdentity, this);
@@ -154,7 +154,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
             if (!Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))
                 return false;
-            if (Can(CanFlags.Consume) && !InventoryActionService.IsPermanentGardenKey(this))
+            if (Can(CanFlags.Consume) && !InventoryActionService.IsProtectedItem(this))
                 return player.Playfield.GetRequiredService<InventoryActionService>().TryUseNanoCrystal(player, slotIdentity, this);
             return Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
         }

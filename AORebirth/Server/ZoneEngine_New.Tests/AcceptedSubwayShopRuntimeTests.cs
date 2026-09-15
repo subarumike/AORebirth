@@ -109,7 +109,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
         internal readonly Persistence Persistence = new();
         internal readonly DynelRegistry Registry = new();
         internal readonly TradeService Trade;
-        internal readonly AcceptedNpcActivationService Activation;
+        internal readonly NpcContentActivationService Activation;
         internal readonly NpcCharacter Merchant;
         internal readonly PlayfieldTransferTests.SnapshotStore Snapshots = new();
         internal SpawnService Spawns => _services.GetRequiredService<SpawnService>();
@@ -130,7 +130,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
                     if (row.HighId != missingTemplate) catalog.Add(row.HighId, row.Quality, price: 100);
                 }
             }
-            void AddAreteStock(int template, IReadOnlyList<CapturedAreteAlexAreaVendorStockDefinition> stock)
+            void AddAreteStock(int template, IEnumerable<(int LowId, int HighId, int Quality)> stock)
             {
                 if (template != missingTemplate) catalog.Add(template, 1);
                 foreach (var row in stock)
@@ -142,11 +142,11 @@ public sealed class AcceptedSubwayShopRuntimeTests
             if (playfieldId == 6553)
             {
                 AddAreteStock(CapturedAreteMarcoSpidaVendorContentProvider.CaptureVendorTemplateId,
-                    CapturedAreteMarcoSpidaVendorContentProvider.Stock);
+                    CapturedAreteMarcoSpidaVendorContentProvider.Stock.Select(row => (row.LowId, row.HighId, row.Quality)));
                 AddAreteStock(CapturedAreteLoreleiVendorContentProvider.CaptureVendorTemplateId,
-                    CapturedAreteLoreleiVendorContentProvider.Stock);
-                foreach (var definition in AcceptedAreteVendorCatalog.StandaloneDefinitions)
-                    AddAreteStock(definition.Content.TemplateId, definition.Content.Stock);
+                    CapturedAreteLoreleiVendorContentProvider.Stock.Select(row => (row.LowId, row.HighId, row.Quality)));
+                foreach (var definition in AreteVendorFixture.StandaloneDefinitions)
+                    AddAreteStock(definition.Content.TemplateId, definition.Content.Stock.Select(row => (row.LowId, row.HighId, row.Quality)));
             }
             var manager = (PlayfieldManager)RuntimeHelpers.GetUninitializedObject(typeof(PlayfieldManager));
             typeof(PlayfieldManager).GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Lock());
@@ -159,7 +159,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
             var ids = new Ids();
             var actions = new InventoryActionService(new NoInventoryMutation(), _flush, ids, new StubLogger(), catalog, items);
             Trade = new TradeService(new StubLogger(), data, catalog, minter, ids, _flush, Persistence);
-            Activation = new AcceptedNpcActivationService(playfield, Registry, locality, items, catalog);
+            Activation = new NpcContentActivationService(playfield, Registry, locality, items, catalog);
             _services = new ServiceCollection().AddSingleton(Registry).AddSingleton(locality).AddSingleton(Activation).AddSingleton(Trade)
                 .AddSingleton<IGameData>(data)
                 .AddSingleton(new WorldSimulationAccess())

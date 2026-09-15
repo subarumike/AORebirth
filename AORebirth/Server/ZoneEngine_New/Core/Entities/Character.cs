@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Entities
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Text;
@@ -1771,10 +1772,11 @@ namespace ZoneEngine_New.Core.Entities
             scfu.Health = displayMaxHealth;
             scfu.HealthDamage = displayMaxHealth - displayCurrentHealth;
 
-            // Grid / fixer-grid: upside-down pyramid mesh.
-            if (playfieldId == 152 || playfieldId == 4107)
+            var appearanceOverride = Playfield?.WorldContent.CharacterAppearanceOverrides
+                .FirstOrDefault(value => value.PlayfieldId == playfieldId);
+            if (appearanceOverride != null)
             {
-                scfu.MonsterData = 99902;
+                scfu.MonsterData = appearanceOverride.MonsterData;
             }
             else if (!StatCollection.IsUnset(monsterData) && monsterData != 0)
             {

@@ -17,9 +17,7 @@ namespace ZoneEngine_New.Core.Inventory
         readonly Dictionary<(Player Player, int Stat), DateTimeOffset> _skillLocks = new();
         internal TimeProvider Clock { get; set; } = TimeProvider.System;
 
-        static bool IsStim(Item item) => item.LowId is 291043 or 291044 || item.HighId is 291043 or 291044;
-        public static bool IsVitalItem(Item item) => IsStim(item)
-            || item.LowId is 291082 or 291083 || item.HighId is 291082 or 291083;
+        public static bool IsVitalItem(Item item) => ItemBehaviorContent.Current.FindVitalItem(item) != null;
 
         /// <summary>Exact Legacy health/nano stim and reusable recharger specialization.</summary>
         public bool TryUseVitalItem(Player player, Identity slot, Item item)
@@ -31,8 +29,9 @@ namespace ZoneEngine_New.Core.Inventory
 
             // Legacy's specialization deliberately resolves template Hit/LockSkill directly;
             // its generic Sitting/InDuel requirement evaluator was not the accepted route.
-            bool consumed = IsStim(item);
-            if (!TryResolveVitalEffects(item, consumed, out int health, out int nano, out int skill, out int seconds))
+            var content = ItemBehaviorContent.Current.FindVitalItem(item)!;
+            bool consumed = content.Consumed;
+            if (!TryResolveVitalEffects(item, content, out int health, out int nano, out int skill, out int seconds))
                 return false;
             lock (player.PersistenceGate)
             {
@@ -117,11 +116,11 @@ namespace ZoneEngine_New.Core.Inventory
             }
         }
 
-        static bool TryResolveVitalEffects(Item item, bool stim, out int health, out int nano, out int skill, out int seconds)
+        static bool TryResolveVitalEffects(Item item, VitalItemContent content, out int health, out int nano, out int skill, out int seconds)
         {
             health = nano = 0;
-            skill = (int)(stim ? CharacterStat.FirstAid : CharacterStat.Treatment);
-            seconds = stim ? 40 : 15;
+            skill = (int)content.LockStat;
+            seconds = content.LockSeconds;
             if (item.SpellList.TryGetValue(EventType.OnUse, out var spells))
             {
                 foreach (ItemSpell spell in spells)
@@ -149,10 +148,7 @@ namespace ZoneEngine_New.Core.Inventory
                     }
                 }
             }
-            // Existing accepted Legacy QL interpolation, not a new guessed fallback.
-            int quality = Math.Clamp(item.Quality, 1, stim ? 200 : 100);
-            int fallback = stim ? 30 + (2400 - 30) * (quality - 1) / 199
-                : 200 + (5000 - 200) * (quality - 1) / 99;
+            int fallback = content.RestoreAt(item.Quality);
             if (health <= 0) health = fallback;
             if (nano <= 0) nano = fallback;
             return true;

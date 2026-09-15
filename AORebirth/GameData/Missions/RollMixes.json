@@ -1,0 +1,380 @@
+[
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      2,
+      2,
+      2,
+      0,
+      1
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      0,
+      0,
+      0,
+      4,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      3,
+      3,
+      3,
+      4,
+      1
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      1,
+      1,
+      1,
+      3,
+      0
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      1,
+      1,
+      1,
+      3,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      0,
+      0,
+      0,
+      3,
+      1
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      2,
+      2,
+      2,
+      3,
+      1
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      0,
+      0,
+      0,
+      3,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 154,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      1,
+      1,
+      1,
+      3,
+      4
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 2,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 165,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      4,
+      4,
+      4,
+      3,
+      1
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 4,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 187,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      4,
+      4,
+      4,
+      3,
+      1
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 6,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 220,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      0,
+      0,
+      0,
+      1,
+      3
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 8,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 250,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      1,
+      1,
+      0,
+      3,
+      4
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 10,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 250,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      0,
+      0,
+      0,
+      1,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 220,
+    "Difficulty": 11,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 250,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      1,
+      1,
+      1,
+      0,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 60,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 42,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      1,
+      1,
+      1,
+      0,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 60,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 42,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      2,
+      2,
+      2,
+      4,
+      1
+    ]
+  },
+  {
+    "CharacterLevel": 60,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 42,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      4,
+      4,
+      4,
+      0,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 60,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 42,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      0,
+      0,
+      0,
+      4,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 60,
+    "Difficulty": 1,
+    "GoodBad": 0,
+    "HeadOnStealth": 0,
+    "MissionQuality": 42,
+    "MoneyExperience": 0,
+    "OpenHidden": 0,
+    "OrderChaos": 0,
+    "PhysicalMystical": 0,
+    "Types": [
+      1,
+      1,
+      1,
+      3,
+      2
+    ]
+  },
+  {
+    "CharacterLevel": 60,
+    "Difficulty": 1,
+    "GoodBad": -100,
+    "HeadOnStealth": 0,
+    "MissionQuality": 42,
+    "MoneyExperience": -100,
+    "OpenHidden": 0,
+    "OrderChaos": -100,
+    "PhysicalMystical": 0,
+    "Types": [
+      3,
+      3,
+      3,
+      0,
+      1
+    ]
+  }
+]

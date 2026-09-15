@@ -82,7 +82,7 @@ public sealed class AcceptedStandaloneShopRuntimeTests
         using var world = new AcceptedSubwayShopRuntimeTests.World(playfieldId: 6553,
             beforeActivate: (registry, playfield, catalog) =>
             {
-                var content = AcceptedAreteVendorCatalog.StandaloneDefinitions.Single(value => value.Content.SourceVendorInstance == IccTechSource).Content;
+                var content = AreteVendorFixture.StandaloneDefinitions.Single(value => value.Content.SourceVendorInstance == IccTechSource).Content;
                 loaded = new VendingMachine(ShopIdentity, catalog.Require(content.TemplateId))
                 {
                     Playfield = playfield, SpawnSource = SpawnSource.StaticDynel,
@@ -105,7 +105,7 @@ public sealed class AcceptedStandaloneShopRuntimeTests
     {
         using var world = new AcceptedSubwayShopRuntimeTests.World(missingTemplate: 295999, playfieldId: 6553);
         Assert.IsFalse(world.Registry.TryGet(ShopIdentity, out _));
-        var definition = AcceptedAreteVendorCatalog.StandaloneDefinitions.Single(value => value.Content.SourceVendorInstance == IccTechSource);
+        var definition = AreteVendorFixture.StandaloneDefinitions.Single(value => value.Content.SourceVendorInstance == IccTechSource);
         Assert.IsTrue(world.Activation.UnavailableVendorEndpoints.ContainsKey(definition.PlacementIdentity));
         Assert.AreEqual(0, world.Persistence.Calls);
     }

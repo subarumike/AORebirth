@@ -274,7 +274,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic; post RejectedItems → AnswerList Is this legal?",
               "NextNodeId": "vernon_after_hack_turnin",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -400,7 +401,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic; post RejectedItems → AnswerList Great!/Goodbye",
               "NextNodeId": "vernon_return_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

@@ -15,9 +15,9 @@ public sealed class AcceptedSubwayMerchantTests
     [TestMethod]
     public void AllSixCompiledPlacementsKeepExactSourceCapabilitiesAndCapturedScfu()
     {
-        Assert.AreEqual(6, AcceptedSubwayMerchantCatalog.Definitions.Count);
-        Assert.AreEqual(1, AcceptedSubwayMerchantCatalog.Definitions.Count(definition => definition.Binding.HasDialogue));
-        foreach (var pair in AcceptedSubwayMerchantCatalog.Definitions.Zip(CapturedSubwayVendorContentProvider.Definitions))
+        Assert.AreEqual(6, SubwayMerchantFixture.Definitions.Count);
+        Assert.AreEqual(1, SubwayMerchantFixture.Definitions.Count(definition => definition.Binding.HasDialogue));
+        foreach (var pair in SubwayMerchantFixture.Definitions.Zip(CapturedSubwayVendorContentProvider.Definitions))
         {
             var definition = pair.First; var expected = pair.Second;
             var npc = definition.Create(new StubItemBuilder());
@@ -55,14 +55,14 @@ public sealed class AcceptedSubwayMerchantTests
     {
         var catalog = Catalog();
         int total = 0;
-        foreach (var pair in AcceptedSubwayMerchantCatalog.Definitions.Zip(CapturedSubwayVendorContentProvider.Definitions))
+        foreach (var pair in SubwayMerchantFixture.Definitions.Zip(CapturedSubwayVendorContentProvider.Definitions))
         {
             var npc = pair.First.Create(new StubItemBuilder());
-            Assert.IsTrue(AcceptedSubwayMerchantCatalog.TryAttachShop(npc, new StubItemBuilder(), catalog, out string failure), failure);
+            Assert.IsTrue(SubwayMerchantFixture.TryAttachShop(npc, new StubItemBuilder(), catalog, out string failure), failure);
             Assert.IsNotNull(npc.Shop); Assert.AreSame(npc, npc.Shop.OwnerNpc);
             Assert.AreEqual(pair.Second.SourceVendorInstance, npc.Shop.Identity.Instance);
             Assert.AreEqual(pair.Second.VendorTemplateId, npc.Shop.Template.Id);
-            Assert.IsTrue(npc.Shop.Stock.IsAcceptedSnapshot);
+            Assert.IsTrue(npc.Shop.Stock.IsConfiguredSnapshot);
             Assert.AreEqual(pair.Second.Stock.Count, npc.Shop.Stock.Slots.Count);
             for (int slot = 0; slot < pair.Second.Stock.Count; slot++)
             {
@@ -73,7 +73,7 @@ public sealed class AcceptedSubwayMerchantTests
             }
             Assert.AreEqual(pair.Second.CharacterFlags, npc.Stats.GetOrZero(CharacterStat.Flags));
             Assert.AreEqual(npc.Identity, ((SmokeLounge.AOtomation.Messaging.Messages.N3Messages.VendingMachineFullUpdateMessage)npc.Shop.BuildSpawnMessage()).NpcIdentity);
-            Assert.IsFalse(AcceptedSubwayMerchantCatalog.TryAttachShop(npc, new StubItemBuilder(), catalog, out _), "Cannot replace a live endpoint.");
+            Assert.IsFalse(SubwayMerchantFixture.TryAttachShop(npc, new StubItemBuilder(), catalog, out _), "Cannot replace a live endpoint.");
             total += npc.Shop.Stock.Slots.Count;
         }
         Assert.AreEqual(202, total, "Every accepted baseline stock row must be consumed exactly once.");
@@ -85,21 +85,21 @@ public sealed class AcceptedSubwayMerchantTests
         var content = CapturedSubwayVendorContentProvider.Definitions[0];
         foreach (int missing in new[] { content.VendorTemplateId, content.Stock[0].LowId, content.Stock[0].HighId })
         {
-            var npc = AcceptedSubwayMerchantCatalog.Definitions[0].Create(new StubItemBuilder());
-            Assert.IsFalse(AcceptedSubwayMerchantCatalog.TryAttachShop(npc, new StubItemBuilder(), Catalog(missing), out string failure));
+            var npc = SubwayMerchantFixture.Definitions[0].Create(new StubItemBuilder());
+            Assert.IsFalse(SubwayMerchantFixture.TryAttachShop(npc, new StubItemBuilder(), Catalog(missing), out string failure));
             Assert.IsFalse(string.IsNullOrWhiteSpace(failure)); Assert.IsNull(npc.Shop);
             Assert.AreEqual(content.DisplayName, npc.BuildSpawnMessage().Name);
             Assert.AreEqual(content.Health, npc.Stats.GetOrZero(CharacterStat.Health));
         }
         var impostor = new NpcCharacter(new() { Type = IdentityType.CanbeAffected, Instance = content.SourceNpcInstance }, new StubItemBuilder())
         { Name = content.DisplayName };
-        Assert.IsFalse(AcceptedSubwayMerchantCatalog.TryAttachShop(impostor, new StubItemBuilder(), Catalog(), out _));
+        Assert.IsFalse(SubwayMerchantFixture.TryAttachShop(impostor, new StubItemBuilder(), Catalog(), out _));
     }
 
     [TestMethod]
     public void CombatUnresolvedMerchantsRemainVisibleWithoutFallbackRebasePatrolOrRegeneration()
     {
-        foreach (var definition in AcceptedSubwayMerchantCatalog.Definitions)
+        foreach (var definition in SubwayMerchantFixture.Definitions)
         {
             var npc = definition.Create(new StubItemBuilder());
             var original = (npc.Position.xf, npc.Position.yf, npc.Position.zf);

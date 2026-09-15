@@ -7,15 +7,16 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine.Core.Arete.Dialogue;
+using ZoneEngine_New.Core.Missions;
 
 /// <summary>Exact existing KnuBot handler fields and content-router formatting; no reconstructed raw packets.</summary>
 public static class DialogueWire
 {
-    public static KnuBotOpenChatWindowMessage Open(Identity player, Identity npc, string contentIdentity) => new()
+    public static KnuBotOpenChatWindowMessage Open(Identity player, Identity npc, int openMode) => new()
     {
         Identity = player, Target = npc, Unknown1 = 2,
-        // ContentDrivenNpcDialogueRouter.SendOpenChatWindow: captured Rex and Tailor use zero.
-        Unknown2 = contentIdentity is "SimpleChar:782DE568" or "SimpleChar:79135F51" ? 0 : 1
+        // Wire presentation mode is supplied by the editable dialogue binding.
+        Unknown2 = openMode
     };
 
     public static KnuBotCloseChatWindowMessage Close(Identity player, Identity npc) => new()
@@ -48,17 +49,8 @@ public static class DialogueWire
 
     static string Format(string text, string? name) => text.Replace("{player}", string.IsNullOrWhiteSpace(name) ? "stranger" : name);
 
-    public static KnuBotStartTradeMessage StartTrade(Identity player, Identity npc, DialogueActionOutcome trade) => new()
-    {
-        Identity = player, Target = npc, Unknown1 = 2, NumberOfItemSlotsInTradeWindow = trade == DialogueActionOutcome.StanTrade ? 4 : 1,
-        Message = trade switch
-        {
-            DialogueActionOutcome.DojaTrade => "Drag and drop the item(s) you want to give to Scarlett Dalquist into one of the slots available and press \"accept\"",
-            DialogueActionOutcome.StanTrade => "Drag and drop the item(s) you want to give to Stanley Goodman into one of the slots available and press \"accept\"",
-            DialogueActionOutcome.SarahTrade => "Drag and drop the item(s) you want to give to Sarah Greene into one of the slots available and press \"accept\"",
-            _ => throw new InvalidOperationException("Unsupported NPC trade prompt.")
-        }
-    };
+    public static KnuBotStartTradeMessage StartTrade(Identity player, Identity npc, DialogueRoute route) => new()
+    { Identity = player, Target = npc, Unknown1 = 2, NumberOfItemSlotsInTradeWindow = route.TradeSlots, Message = route.TradePrompt };
 
     public static KnuBotRejectedItemsMessage AcceptedTrade(Identity player, Identity npc) => new()
     { Identity = player, Target = npc, Unknown1 = 2, Unknown2 = 0, Items = Array.Empty<KnuBotRejectedItem>() };

@@ -42,15 +42,10 @@ public sealed partial class GeneratedMissionAcgService
 
     Item CreateRepairComponent()
     {
-        int[] available = new[] { 100292, 100299, 100344, 100348, 100349, 100361 }.Where(id => _templates.TryGet(id, out _)).ToArray();
-        int low, high;
-        if (available.Length != 0) low = high = available[Random.Shared.Next(available.Length)];
-        else if (_templates.TryGet(87810, out _) && _templates.TryGet(87814, out _)) { low = 87810; high = 87814; }
-        else if (_templates.TryGet(87810, out _)) low = high = 87810;
-        else if (_templates.TryGet(95576, out _)) low = high = 95576;
-        else throw new InvalidOperationException("No accepted repair component template exists in the item catalog.");
+        var content = MissionArtifactContent.Current;
+        var selected = content.SelectRepairComponent(id => _templates.TryGet(id, out _), Random.Shared);
         int id = _ids.Allocate();
-        return _items.Create(low, high, 1, ItemSource.Other, 1, id, new() { Type = (IdentityType)0xC73D, Instance = id });
+        return _items.Create(selected.LowId, selected.HighId, selected.Quality, ItemSource.Other, 1, id, new() { Type = (IdentityType)0xC73D, Instance = id });
     }
 
     bool TryPickup(Player player, GeneratedMissionBinding binding, GeneratedMissionObject state)

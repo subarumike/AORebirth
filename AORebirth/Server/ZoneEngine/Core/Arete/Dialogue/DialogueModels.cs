@@ -103,6 +103,8 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
         public string TextEvidence { get; set; }
 
+        public bool Hidden { get; set; }
+
         public string NextNodeId { get; set; }
 
         public IList<DialogueCondition> Conditions { get; set; }

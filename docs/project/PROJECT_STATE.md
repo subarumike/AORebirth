@@ -2,6 +2,15 @@
 
 Updated: 2026-09-15
 
+The candidate `codex/data-driven-world-20260915` moves NewEngine's compiled
+NPC/vendor/quest/dialogue/mission/nano content into existing editable content
+sources and removes runtime evidence authorization for spawning. The source audit
+records 83 content-bearing files and 74 bridges migrated, with no unresolved
+semantic candidates. Generic mechanics, player DAO persistence and Legacy remain.
+Automated release acceptance is in progress; staging/official-client acceptance
+is required before production. Production is unchanged by this candidate. See
+`docs/reports/NEWENGINE_LEGACY_CONTENT_BRIDGE_REMOVAL.md`.
+
 Windows is the authoritative development and acceptance platform. NewEngine is
 the default server engine; shared gameplay, DAO persistence, login admission and
 zoning behavior remain unchanged by the build separation.

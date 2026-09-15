@@ -46,7 +46,7 @@ public sealed class GeneratedMissionMaterializationTests
                 Assert.AreEqual(bundle.SourcePlayfield2, evidence.SourcePlayfield2);
                 Assert.AreEqual(source.Identity.CapturedIdentity.Instance, evidence.CapturedInstance);
                 if (evidence.IsFindPerson) { Assert.IsNull(npc.Combat); passiveObjectives++; }
-                else { Assert.IsNotNull(npc.Combat); Assert.IsTrue(npc.Combat.Contract.IsCombatReady); }
+                else { Assert.IsNotNull(npc.Combat); Assert.IsTrue(npc.Combat.Contract.IsRuntimeReady); }
             }
             var packet = world.CreateZoneMessage(new() { X = world.Spawn.xf, Y = world.Spawn.yf, Z = world.Spawn.zf });
             Assert.AreEqual(binding.LivePlayfield, packet.PlayfieldId2.Instance);

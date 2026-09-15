@@ -1,0 +1,17 @@
+{
+  "Objectives": {
+    "0": "Go to {0} and terminate {1} within 48 hours.",
+    "1": "Go to {0} and observe {1} by selecting them within 48 hours.",
+    "2": "Go to {0} and locate the assigned item within 48 hours. The objective is complete when you pick it up.",
+    "3": "Go to {0} and repair the disabled machine with the supplied component within 48 hours.",
+    "4": "Go to {0} and recover the assigned item, then bring it back to this mission terminal within 48 hours."
+  },
+  "RewardFormat": "{0} Reward: {1} XP and {2} credits.",
+  "RequiredObjectiveText": {
+    "0": " and terminate ",
+    "1": " and observe ",
+    "2": " and locate the assigned item ",
+    "3": " and repair the disabled machine with the supplied component ",
+    "4": " and recover the assigned item, then bring it back to this mission terminal "
+  }
+}

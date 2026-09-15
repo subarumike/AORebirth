@@ -159,7 +159,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic continue option; post-trade resumes to Thanks again per capture RejectedItems → AnswerList.",
               "NextNodeId": "marcus_return_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -319,7 +320,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic continue option; post-trade resumes to You are welcome per capture RejectedItems → AnswerList.",
               "NextNodeId": "marcus_heal_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

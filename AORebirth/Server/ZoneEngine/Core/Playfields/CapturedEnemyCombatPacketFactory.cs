@@ -10,21 +10,21 @@ namespace AORebirth.Core.Playfields
     {
         internal static SpecialAttackWeaponMessage CreateSpecialAttackWeapon(
             Identity attacker,
-            CapturedEnemyCombatContract contract)
+            CapturedEnemyCombatContract contract, bool requireEvidence = true)
         {
             return CreateSpecialAttackWeapon(
                 attacker,
                 contract,
-                contract == null ? 0 : contract.SpecialAttackWeaponUnknown5);
+                contract == null ? 0 : contract.SpecialAttackWeaponUnknown5, requireEvidence);
         }
 
         internal static SpecialAttackWeaponMessage CreateSpecialAttackWeapon(
             Identity attacker,
             CapturedEnemyCombatContract contract,
-            int aggDef)
+            int aggDef, bool requireEvidence = true)
         {
             if (contract == null
-                || !contract.IsCombatReady
+                || !(requireEvidence ? contract.IsCombatReady : contract.IsRuntimeReady)
                 || !contract.HasCapturedSpecialAttackWeaponContext)
             {
                 throw new InvalidOperationException("A complete captured attack-start context is required.");
@@ -44,9 +44,9 @@ namespace AORebirth.Core.Playfields
         internal static AttackMessage CreateAttack(
             Identity attacker,
             Identity target,
-            CapturedEnemyCombatContract contract)
+            CapturedEnemyCombatContract contract, bool requireEvidence = true)
         {
-            if (contract == null || !contract.IsCombatReady || !contract.HasCapturedAttackStartContext)
+            if (contract == null || !(requireEvidence ? contract.IsCombatReady : contract.IsRuntimeReady) || !contract.HasCapturedAttackStartContext)
             {
                 throw new InvalidOperationException("A complete captured attack-start context is required.");
             }

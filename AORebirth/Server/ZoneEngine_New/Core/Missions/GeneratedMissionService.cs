@@ -149,8 +149,8 @@ public sealed class GeneratedMissionService
             Item? token = null;
             if (binding.TokenDisposition == 2)
             {
-                int low = binding.TokenClaimSide == 1 ? 103910 : 103908;
-                token = _items.Create(low, low + 1, 1, ItemSource.Other, binding.TokenCount!.Value, _ids.Allocate());
+                var reward = MissionArtifactContent.Current.Tokens[binding.TokenClaimSide!.Value];
+                token = _items.Create(reward.LowId, reward.HighId, reward.Quality, ItemSource.Other, binding.TokenCount!.Value, _ids.Allocate());
                 grant.Add(token);
             }
             if (!InventoryGrantPlan.TryCreate(player, grant, out var plan)) return Rejected("No durable capacity for the frozen reward; mission remains incomplete.");
@@ -175,7 +175,7 @@ public sealed class GeneratedMissionService
                 plan.PublishAfterCommit(notify: false);
                 foreach (var item in grant)
                     GeneratedMissionArtifactProjection.Send(player, item, plan.Rows.Single(row => row.InstanceId == item.InstanceId).ContainerPlacement, false,
-                        ReferenceEquals(item, token) ? binding.TokenClaimSide == 1 ? "Clan Token" : "Omni Token" : "Mission Reward");
+                        ReferenceEquals(item, token) ? MissionArtifactContent.Current.Tokens[binding.TokenClaimSide!.Value].Name : "Mission Reward");
                 SetStat(player, CharacterStat.Cash, result.Cash);
                 progression.PublishAfterCommit(player);
             });
@@ -196,7 +196,9 @@ public sealed class GeneratedMissionService
             _flush.HardFlush(player);
             var key = _dao.ReadArtifacts(player.Identity.Instance, binding.QuestType, binding.QuestInstance)
                 .SingleOrDefault(row => row.InstanceId == binding.KeyInstance);
-            return key != null && key.LowId == 28577 && key.HighId == 28577
+            // The accepted artifact row freezes the key definition. Editing future
+            // content must not invalidate an already-owned durable mission key.
+            return key != null && key.LowId > 0 && key.HighId > 0
                 && TryResolveArtifactPage(player, key, out _, out _)
                 ? new() { Status = GeneratedMissionResultStatus.Applied }
                 : Rejected("The exact mission key is not in an owned top-level page.");

@@ -1,9 +1,11 @@
 namespace ZoneEngine_New.Core.Missions;
 
+using System.Linq;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine.Core.Missions;
 
 /// <summary>The existing MissionKeyGrantService packet order, after the owning SQL transaction.</summary>
 internal static class GeneratedMissionArtifactProjection
@@ -18,7 +20,9 @@ internal static class GeneratedMissionArtifactProjection
                 Identity = item.Identity, Unknown = 0, MsgVersion = 0x0B,
                 Identitytype = (int)player.Identity.Type, Instance = player.Identity.Instance, Playfield = player.Playfield!.Identity.Instance,
                 Unknown1 = new() { Type = (IdentityType)0xF424F, Instance = 0 }, Unknown2 = 0x71, Unknown3 = 0x6F,
-                Name = name + '\0', Stats = [Stat(CharacterStat.Flags, item.LowId == 28577 ? 0x80000205u : 0x80000003u),
+                Name = name + '\0', Stats = [Stat(CharacterStat.Flags, item.LowId == MissionArtifactContent.Current.Key.LowId
+                    ? MissionArtifactContent.Current.Key.Flags : MissionArtifactContent.Current.RepairPool.Concat(MissionArtifactContent.Current.RepairFallbacks)
+                        .First(value => value.LowId == item.LowId && value.HighId == item.HighId).Flags),
                     Stat(CharacterStat.StaticInstance, (uint)item.LowId), Stat(CharacterStat.ACGItemLevel, (uint)item.Quality),
                     Stat(CharacterStat.ACGItemTemplateID, (uint)item.LowId), Stat(CharacterStat.ACGItemTemplateID2, (uint)item.HighId),
                     Stat(CharacterStat.MultipleCount, (uint)item.StackCount)]

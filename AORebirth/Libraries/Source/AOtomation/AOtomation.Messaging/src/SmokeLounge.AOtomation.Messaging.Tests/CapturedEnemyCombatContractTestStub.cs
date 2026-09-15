@@ -108,6 +108,9 @@ namespace AORebirth.Core.Playfields
             get { return this.SignedStatValue(CharacterStat.Energy); }
         }
 
+        // This evidence-only fixture retains strict validation for both packet-factory paths.
+        internal bool IsRuntimeValid { get { return this.IsValid; } }
+
         internal bool IsValid
         {
             get
@@ -925,6 +928,8 @@ namespace AORebirth.Core.Playfields
         internal bool SendCapturedAttackInfo { get; set; }
 
         internal bool HasCapturedFixedAttackBehavior { get; set; }
+
+        internal bool IsRuntimeReady { get { return this.IsCombatReady; } }
 
         internal bool IsCombatReady
         {

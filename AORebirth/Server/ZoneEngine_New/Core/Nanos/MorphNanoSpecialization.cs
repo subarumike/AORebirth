@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Nanos
 {
     using System;
+    using ZoneEngine_New.Core.GameData;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
@@ -14,13 +15,14 @@ namespace ZoneEngine_New.Core.Nanos
     using ZoneEngine_New.Core.Playfield.Locality;
 
     /// <summary>
-    /// Exact catalog-driven Phasefront/hoverboard self morphs. Scalar modifiers belong to the
+    /// Exact catalog-driven data-configured self morphs. Scalar modifiers belong to the
     /// nano transaction; presentation is a reversible owner-only overlay, never persisted over
-    /// the original character/equipment base. No inferred template, hoverboard SpellList or pet.
+    /// the original character/equipment base. No inferred template, morph SpellList or pet.
     /// </summary>
-    public sealed class MorphNanoSpecialization : INanoSpecialization, INanoOwnerProjection, INanoActiveSetValidator
+    public sealed class MorphNanoSpecialization(NanoMechanicCatalog? mechanics = null) : INanoSpecialization, INanoOwnerProjection, INanoActiveSetValidator
     {
-        private sealed record Description(Dictionary<CharacterStat, int> Modifiers, int Shape, bool Flight, int Restrictions);
+        private readonly NanoMechanicCatalog _mechanics = mechanics ?? NanoMechanicCatalog.LoadDefault();
+        private sealed record Description(Dictionary<CharacterStat, int> Modifiers, int Shape, bool Flight, int Restrictions, NanoMechanicDefinition Mechanic);
         private sealed class State(Player player, int nanoId, Description description)
         {
             public Player Player = player;
@@ -30,7 +32,7 @@ namespace ZoneEngine_New.Core.Nanos
             public bool FlightAllowed;
         }
         private readonly ConcurrentDictionary<int, State> _states = new();
-        public bool Handles(int nanoId) => nanoId is 82835 or 281569 or 288546 or 270542;
+        public bool Handles(int nanoId) => _mechanics.TryGet(nanoId, NanoMechanicKind.Morph, out _);
 
         public bool TryPrepare(Player caster, Player target, NanoDefinition nano, out NanoSpecializationPlan plan)
         {
@@ -46,7 +48,7 @@ namespace ZoneEngine_New.Core.Nanos
             // that exact saved baseline, not a purported recovered original look.
             if (!CanOverlay(target, description, old)) return false;
             plan = plan with { Modifiers = description.Modifiers,
-                ScriptedChildren = nano.Id == 82835 ? [SparrowChildNanoSpecialization.NanoId] : [] };
+                ScriptedChildren = description.Mechanic.ChildNanoIds };
             return true;
         }
 
@@ -58,7 +60,7 @@ namespace ZoneEngine_New.Core.Nanos
             foreach (CharacterStat stat in new[] { CharacterStat.MonsterData, CharacterStat.CATMesh,
                 CharacterStat.DisplayCATMesh, CharacterStat.IsVehicle })
             {
-                if (stat == CharacterStat.IsVehicle && (!description.Flight || !AllowFlight(player))) continue;
+                if (stat == CharacterStat.IsVehicle && (!description.Flight || !AllowFlight(player, description))) continue;
                 int desired = stat == CharacterStat.IsVehicle ? 1 : description.Shape;
                 int prior = old?.Overlay.GetValueOrDefault(stat) ?? 0;
                 long delta = desired - ((long)player.Stats.GetOrZero(stat) - prior);
@@ -68,11 +70,13 @@ namespace ZoneEngine_New.Core.Nanos
             return true;
         }
 
-        private static bool TryDescribe(Player player, NanoDefinition nano, out Description description)
+        private bool TryDescribe(Player player, NanoDefinition nano, out Description description)
         {
             var modifiers = new Dictionary<CharacterStat, int>();
-            int shape = 0, restrictions = 0, children = 0; bool flight = false;
-            description = new(modifiers, 0, false, 0);
+            int shape = 0, restrictions = 0; bool flight = false;
+            var children = new HashSet<int>();
+            description = null!;
+            if (!_mechanics.TryGet(nano.Id, NanoMechanicKind.Morph, out var mechanic)) return false;
             if (!nano.Template.SpellList.TryGetValue(EventType.OnUse, out var spells) || spells.Count == 0) return false;
             try
             {
@@ -81,7 +85,7 @@ namespace ZoneEngine_New.Core.Nanos
                     if (spell.Target is not ((int)ItemTarget.User or (int)ItemTarget.Self or (int)ItemTarget.Wearer)
                         || spell.TickCount is < 0 or > 1 || spell.TickInterval != 0
                         || !NanoRequirements.TryEvent(player, player, spell.Requirements, out bool met)) return false;
-                    if (nano.Id == 82835 && spell.FunctionType == (int)FunctionType.CanFly)
+                    if (spell.FunctionType == (int)FunctionType.CanFly && spell.Requirements.Count != 0)
                     {
                         if (spell.Arguments.Count != 0 || spell.Requirements.Count != 2
                             || spell.Requirements[0] is not { ChildOperator: (int)Operator.Unknown,
@@ -114,17 +118,17 @@ namespace ZoneEngine_New.Core.Nanos
                                 || flags != 2) return false;
                             restrictions |= flags; break;
                         case FunctionType.CastNano:
-                            if (nano.Id != 82835 || spell.Requirements.Count != 0 || spell.Arguments.Count != 1
+                            if (spell.Requirements.Count != 0 || spell.Arguments.Count != 1
                                 || !ItemUseFunctions.TryReadInt(spell.Arguments, 0, out int child)
-                                || child != SparrowChildNanoSpecialization.NanoId || ++children != 1) return false;
+                                || !mechanic.ChildNanoIds.Contains(child) || !children.Add(child)) return false;
                             break; // NanoService owns this exact nested duration/wire transaction.
                         default: return false;
                     }
                 }
             }
             catch (OverflowException) { return false; }
-            if (shape == 0 || (nano.Id == 82835 && children != 1)) return false; // No guessed morph/child mapping.
-            description = new(modifiers, shape, flight, restrictions); return true;
+            if (shape == 0 || !children.SetEquals(mechanic.ChildNanoIds)) return false; // No guessed morph/child mapping.
+            description = new(modifiers, shape, flight, restrictions, mechanic); return true;
         }
 
         public void Applied(Player caster, Player target, NanoDefinition nano, ActiveNanoRecord? active)
@@ -158,7 +162,7 @@ namespace ZoneEngine_New.Core.Nanos
         public void Refresh(Player player)
         {
             if (!TryState(player, out State state)) return;
-            if (state.FlightAllowed != AllowFlight(player)) { RemoveOverlay(state); ApplyOverlay(state); }
+            if (state.FlightAllowed != AllowFlight(player, state.Description)) { RemoveOverlay(state); ApplyOverlay(state); }
             player.Motor.RefreshFlightAuthority(); SendVisual(state, remove: false); SendAppearance(player, clearing: false);
         }
         public void ReapplyAfterRebase(Player player)
@@ -169,18 +173,18 @@ namespace ZoneEngine_New.Core.Nanos
         }
         public void Tick(Player player)
         {
-            if (TryState(player, out State state) && state.FlightAllowed != AllowFlight(player)) Refresh(player);
+            if (TryState(player, out State state) && state.FlightAllowed != AllowFlight(player, state.Description)) Refresh(player);
         }
         public bool IsFightingRestricted(Player player) => TryState(player, out State state)
             && (state.Description.Restrictions & 2) != 0;
         private bool TryState(Player player, out State state) => _states.TryGetValue(player.Identity.Instance, out state!)
             && ReferenceEquals(state.Player, player);
-        private static bool AllowFlight(Player player) => player.Playfield != null
-            ? player.Playfield.Identity.Instance is < 4000 or > 4999 : player.Stats.GetOrZero((CharacterStat)531) == 0;
+        private static bool AllowFlight(Player player, Description description) => player.Playfield != null
+            ? description.Mechanic.AllowsPlayfield(player.Playfield.Identity.Instance) : player.Stats.GetOrZero((CharacterStat)531) == 0;
 
         private static void ApplyOverlay(State state)
         {
-            state.FlightAllowed = AllowFlight(state.Player);
+            state.FlightAllowed = AllowFlight(state.Player, state.Description);
             SetFull(CharacterStat.MonsterData, state.Description.Shape);
             SetFull(CharacterStat.CATMesh, state.Description.Shape);
             SetFull(CharacterStat.DisplayCATMesh, state.Description.Shape);
@@ -198,11 +202,11 @@ namespace ZoneEngine_New.Core.Nanos
         }
         private static bool Online(Player player) => !player.IsPersistenceQuarantined
             && player.Session is { State: SessionState.InPlay } session && ReferenceEquals(session.Player, player);
-        private static void SendVisual(State state, bool remove)
+        private void SendVisual(State state, bool remove)
         {
             Player player = state.Player;
             if (Online(player) && player.Playfield != null && MorphVisualPackets.TryBuild(state.NanoId, remove,
-                player.Identity, player.Playfield.Identity.Instance, state.FlightAllowed, out byte[] packet)) player.Session!.Send(packet);
+                player.Identity, player.Playfield.Identity.Instance, state.FlightAllowed, out byte[] packet, _mechanics)) player.Session!.Send(packet);
         }
         private static void SendAppearance(Player player, bool clearing)
         {

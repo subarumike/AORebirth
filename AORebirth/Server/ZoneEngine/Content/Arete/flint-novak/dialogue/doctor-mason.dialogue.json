@@ -657,7 +657,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic; post RejectedItems → install tip",
               "NextNodeId": "mason_show_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -818,7 +819,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic; post RejectedItems → DNA unlock / Lorelei",
               "NextNodeId": "mason_chip_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

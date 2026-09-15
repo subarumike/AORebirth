@@ -8,7 +8,7 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
 
-/// <summary>Owner-tick execution of the existing mission fixed/pistol policy only.</summary>
+/// <summary>Owner-tick execution of configured procedural mission attack sequences.</summary>
 internal sealed class MissionNpcCombatRuntime
 {
     readonly CapturedEnemyCombatContract _contract;
@@ -20,11 +20,11 @@ internal sealed class MissionNpcCombatRuntime
 
     internal MissionNpcCombatRuntime(CapturedEnemyCombatContract contract, Item? weapon)
     {
-        if (!contract.IsCombatReady || !contract.CapturedAttackRange.HasValue
+        if (!contract.IsRuntimeReady || !contract.CapturedAttackRange.HasValue
             || contract.RechargeSeconds <= 0 || contract.RequiresDamageLineOfSight
             || contract.ParallelAttackSequence != null || contract.SpecialAttackSequence != null
             || contract.BasicCombat != null || contract.UsesEquippedWeaponTiming)
-            throw new InvalidOperationException("Mission combat requires its complete accepted fixed/pistol policy.");
+            throw new InvalidOperationException("Mission combat requires a complete supported attack sequence.");
         if (contract.WeaponDefinition != null && (weapon == null || weapon.LowId != contract.WeaponDefinition.LowId
             || weapon.HighId != contract.WeaponDefinition.HighId || weapon.Quality != contract.WeaponDefinition.Quality))
             throw new InvalidOperationException("Mission WIFU does not match its actual equipped template.");
@@ -41,15 +41,15 @@ internal sealed class MissionNpcCombatRuntime
         _untilHit = _contract.FirstHitDelaySeconds;
         actor.SetFightingTarget(target);
         if (_contract.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo)
-            actor.Cell?.Announce(CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(actor.Identity, _contract));
+            actor.Cell?.Announce(CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(actor.Identity, _contract, requireEvidence: false));
         if (_untilAttack <= 0) SendAttack(actor);
     }
 
     void SendAttack(NpcCharacter actor)
     {
         if (_contract.AttackModel != CapturedEnemyAttackModel.FixedAttackInfo)
-            actor.Cell?.Announce(CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(actor.Identity, _contract));
-        actor.Cell?.Announce(CapturedEnemyCombatPacketFactory.CreateAttack(actor.Identity, _target, _contract));
+            actor.Cell?.Announce(CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(actor.Identity, _contract, requireEvidence: false));
+        actor.Cell?.Announce(CapturedEnemyCombatPacketFactory.CreateAttack(actor.Identity, _target, _contract, requireEvidence: false));
         _attackSent = true;
         // Like the Legacy coordinator, anchor first-hit delay to actual Attack release,
         // not an overdue timer, so a late heartbeat cannot collapse packet ordering.

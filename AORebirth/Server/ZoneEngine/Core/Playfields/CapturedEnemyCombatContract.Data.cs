@@ -43,12 +43,14 @@ namespace AORebirth.Core.Playfields
         internal string Evidence { get; private set; }
 
         internal bool IsValid
+            => !string.IsNullOrWhiteSpace(this.Evidence) && this.IsRuntimeValid;
+
+        internal bool IsRuntimeValid
         {
             get
             {
                 return this.Amount > 0
-                       && this.AttackInfoDamageTypeWire >= 0
-                       && !string.IsNullOrWhiteSpace(this.Evidence);
+                       && this.AttackInfoDamageTypeWire >= 0;
             }
         }
     }
@@ -104,6 +106,9 @@ namespace AORebirth.Core.Playfields
         internal CapturedBasicCombatDamageObservation[] DamageObservations { get; private set; }
 
         internal bool IsValid
+            => this.IsRuntimeValid && this.DamageObservations.All(value => value.IsValid);
+
+        internal bool IsRuntimeValid
         {
             get
             {
@@ -117,7 +122,7 @@ namespace AORebirth.Core.Playfields
                        && this.LandedIntervalObservationsSeconds.Length > 0
                        && this.LandedIntervalObservationsSeconds.All(IsFinitePositive)
                        && this.DamageObservations.Length > 0
-                       && this.DamageObservations.All(value => value != null && value.IsValid);
+                       && this.DamageObservations.All(value => value != null && value.IsRuntimeValid);
             }
         }
 
@@ -223,21 +228,26 @@ namespace AORebirth.Core.Playfields
         internal CapturedBasicCombatStreamDefinition[] Streams { get; private set; }
 
         internal bool IsValid
+            => this.Validate(requireEvidence: true);
+
+        internal bool IsRuntimeValid
+            => this.Validate(requireEvidence: false);
+
+        private bool Validate(bool requireEvidence)
         {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(this.CohortName)
-                    || this.PlayfieldId <= 0
+                if (this.PlayfieldId <= 0
                     || this.MonsterData <= 0
                     || this.Level <= 0
-                    || string.IsNullOrWhiteSpace(this.AggregateAuditSha256)
-                    || this.SourceCaptures.Length == 0
-                    || this.SourceCaptures.Any(string.IsNullOrWhiteSpace)
                     || this.Streams.Length == 0
-                    || this.Streams.Any(stream => stream == null || !stream.IsValid))
+                    || this.Streams.Any(stream => stream == null || !stream.IsRuntimeValid)
+                    || !this.UsesGenericBasicMeleeSpatialPolicy)
                 {
                     return false;
                 }
+                if (!requireEvidence) return true;
+                if (string.IsNullOrWhiteSpace(this.CohortName) || string.IsNullOrWhiteSpace(this.AggregateAuditSha256)
+                    || this.SourceCaptures.Length == 0 || this.SourceCaptures.Any(string.IsNullOrWhiteSpace)
+                    || this.Streams.Any(stream => !stream.IsValid)) return false;
 
                 int observedDamageCount = this.Streams.Sum(
                     stream => stream.DamageObservations.Length);
@@ -258,7 +268,6 @@ namespace AORebirth.Core.Playfields
                        && this.AttackRangeAuthority == CapturedBasicCombatFieldAuthority.GenericRuntimePolicy
                        && this.SpawnAttachmentAuthority
                           == CapturedBasicCombatFieldAuthority.OptionalPositiveBehavior;
-            }
         }
 
         internal string QuarantineReason
@@ -422,9 +431,13 @@ namespace AORebirth.Core.Playfields
         internal CapturedBasicCombatContractDefinition BasicCombat { get; private set; }
 
         internal bool IsCombatReady
+            => this.IsReady(requireEvidence: true);
+
+        internal bool IsRuntimeReady
+            => this.IsReady(requireEvidence: false);
+
+        private bool IsReady(bool requireEvidence)
         {
-            get
-            {
                 if (!this.Retaliates)
                 {
                     return false;
@@ -435,12 +448,12 @@ namespace AORebirth.Core.Playfields
                     case CapturedEnemyAttackModel.FixedAttackInfo:
                         // Authored FixedAttackOnSight (mission/Arete/Lorelei): combat-ready without
                         // full corpus observations so mobs can retaliate with real AttackInfo.
-                        if (this.IsAuthoredFixedAttackFallback())
+                        if (this.IsAuthoredFixedAttackFallback(requireEvidence))
                         {
                             return true;
                         }
 
-                        return this.EvidenceSourceIdentity > 0
+                        return (!requireEvidence || this.EvidenceSourceIdentity > 0)
                                && this.HasCapturedRequiredPacketFields
                                && this.HasCapturedSpecialAttackWeaponContext
                                && this.HasCapturedAttackStartContext
@@ -448,21 +461,21 @@ namespace AORebirth.Core.Playfields
                                && this.MaxDamage >= this.MinDamage
                                && this.RechargeSeconds > 0
                                && this.HasCompleteCapturedFixedRuntimeObservations()
-                               && this.FixedAttackHasCompleteSource()
+                               && this.FixedAttackHasCompleteSource(requireEvidence)
                                && (this.WeaponDefinition == null
-                                   || (this.WeaponDefinition.IsValid
-                                       && this.WeaponDefinition.EvidenceSourceIdentity
-                                          == this.EvidenceSourceIdentity
+                                   || (this.WeaponDefinition.IsRuntimeValid
+                                       && (!requireEvidence || this.WeaponDefinition.IsValid
+                                           && this.WeaponDefinition.EvidenceSourceIdentity == this.EvidenceSourceIdentity)
                                        && this.AttackInfoAmmoMatchesCapturedEnergy()));
                     case CapturedEnemyAttackModel.EquippedWeapon:
-                        return this.EvidenceSourceIdentity > 0
+                        return (!requireEvidence || this.EvidenceSourceIdentity > 0)
                                && this.HasCapturedRequiredPacketFields
                                && this.HasCapturedEquippedAttackInfo
                                && this.HasCapturedAttackStartContext
                                && this.WeaponDefinition != null
-                               && this.WeaponDefinition.IsValid
-                               && this.WeaponDefinition.EvidenceSourceIdentity
-                               == this.EvidenceSourceIdentity
+                               && this.WeaponDefinition.IsRuntimeValid
+                               && (!requireEvidence || this.WeaponDefinition.IsValid
+                                   && this.WeaponDefinition.EvidenceSourceIdentity == this.EvidenceSourceIdentity)
                                && this.WeaponLowId > 0
                                && this.WeaponHighId > 0
                                && this.WeaponQuality > 0
@@ -482,17 +495,16 @@ namespace AORebirth.Core.Playfields
                                        && this.MaxDamage >= this.MinDamage))
                                && this.AttackInfoAmmoMatchesCapturedEnergy();
                     case CapturedEnemyAttackModel.Specialized:
-                        return this.EvidenceSourceIdentity > 0
-                               && (this.HasCompleteSpecialAttackSequence()
-                                   || this.HasCompleteParallelAttackSequence());
+                        return (!requireEvidence || this.EvidenceSourceIdentity > 0)
+                               && (this.HasCompleteSpecialAttackSequence(requireEvidence)
+                                   || this.HasCompleteParallelAttackSequence(requireEvidence));
                     case CapturedEnemyAttackModel.BasicCaptureBackedOrdinary:
-                        return this.EvidenceSourceIdentity > 0
+                        return (!requireEvidence || this.EvidenceSourceIdentity > 0)
                                && this.BasicCombat != null
-                               && this.BasicCombat.IsValid;
+                               && (requireEvidence ? this.BasicCombat.IsValid : this.BasicCombat.IsRuntimeValid);
                     default:
                         return false;
                 }
-            }
         }
 
         internal bool IsQuarantined
@@ -883,7 +895,7 @@ namespace AORebirth.Core.Playfields
         /// <summary>
         /// Production FixedAttackOnSight: damage + attack-start without corpus WIFU observations.
         /// </summary>
-        internal bool IsAuthoredFixedAttackFallback()
+        internal bool IsAuthoredFixedAttackFallback(bool requireEvidence = true)
         {
             return this.AttackModel == CapturedEnemyAttackModel.FixedAttackInfo
                    && this.Retaliates
@@ -892,7 +904,7 @@ namespace AORebirth.Core.Playfields
                    && this.RechargeSeconds > 0
                    && this.HasCapturedAttackStartContext
                    && this.HasCapturedSpecialAttackWeaponContext
-                   && this.EvidenceSourceIdentity <= 0
+                   && (!requireEvidence || this.EvidenceSourceIdentity <= 0)
                    && !this.HasCapturedRequiredPacketFields;
         }
 
@@ -917,7 +929,7 @@ namespace AORebirth.Core.Playfields
             this.WeaponInventorySlot = weaponDefinition.InventorySlot;
         }
 
-        private bool HasCompleteSpecialAttackSequence()
+        private bool HasCompleteSpecialAttackSequence(bool requireEvidence = true)
         {
             if (this.SpecialAttackSequence == null || !this.SpecialAttackSequence.IsValid)
             {
@@ -926,19 +938,19 @@ namespace AORebirth.Core.Playfields
 
             return this.AttackHasCompleteSource(
                        this.SpecialAttackSequence.OpeningAttack,
-                       this.SpecialAttackSequence.SpecialAttacks)
+                       this.SpecialAttackSequence.SpecialAttacks, requireEvidence)
                    && this.AttackHasCompleteSource(
                        this.SpecialAttackSequence.RepeatingAttack,
-                       this.SpecialAttackSequence.SpecialAttacks);
+                       this.SpecialAttackSequence.SpecialAttacks, requireEvidence);
         }
 
-        private bool FixedAttackHasCompleteSource()
+        private bool FixedAttackHasCompleteSource(bool requireEvidence = true)
         {
             if (this.AttackInfoWeaponSlot == (int)WeaponSlots.Righthand
                 && this.AttackInfoWeaponInstance == 0)
             {
                 return this.WeaponDefinition != null
-                       && this.WeaponDefinition.IsValid
+                       && (requireEvidence ? this.WeaponDefinition.IsValid : this.WeaponDefinition.IsRuntimeValid)
                        && this.WeaponDefinition.InventorySlot == this.AttackInfoWeaponSlot;
             }
 
@@ -952,7 +964,7 @@ namespace AORebirth.Core.Playfields
                        value => value != null && value.Tag == this.AttackInfoWeaponInstance);
         }
 
-        private bool HasCompleteParallelAttackSequence()
+        private bool HasCompleteParallelAttackSequence(bool requireEvidence = true)
         {
             if (this.ParallelAttackSequence == null || !this.ParallelAttackSequence.IsValid)
             {
@@ -962,12 +974,12 @@ namespace AORebirth.Core.Playfields
             return this.ParallelAttackSequence.Streams.All(
                 stream => this.AttackHasCompleteSource(
                     stream.Attack,
-                    this.ParallelAttackSequence.SpecialAttacks));
+                    this.ParallelAttackSequence.SpecialAttacks, requireEvidence));
         }
 
         private bool AttackHasCompleteSource(
             CapturedEnemyCombatAttackDefinition attack,
-            CapturedEnemySpecialAttackDefinition[] specials)
+            CapturedEnemySpecialAttackDefinition[] specials, bool requireEvidence = true)
         {
             if (attack == null)
             {
@@ -978,7 +990,7 @@ namespace AORebirth.Core.Playfields
                 && attack.AttackInfoWeaponInstance == 0)
             {
                 return this.WeaponDefinition != null
-                       && this.WeaponDefinition.IsValid
+                       && (requireEvidence ? this.WeaponDefinition.IsValid : this.WeaponDefinition.IsRuntimeValid)
                        && this.WeaponDefinition.InventorySlot == attack.AttackInfoWeaponSlot;
             }
 

@@ -21,10 +21,10 @@ public sealed class DialogueTests
     {
         var catalog = DialogueCatalog.Load(AppContext.BaseDirectory);
         Assert.AreEqual(44, catalog.Registry.NpcCount);
-        Assert.IsTrue(catalog.TryGet(DialogueActionRouter.Scarlett, out var scarlett));
+        Assert.IsTrue(catalog.TryGet(DialogueFixture.Scarlett, out var scarlett));
         Assert.AreEqual("scarlett_001", scarlett.RootNodeId);
         Assert.IsTrue(catalog.TryGet("SimpleChar:78CCD541", out _)); // Prince Creehan data is not registered activation.
-        using var w = new World(DialogueActionRouter.Scarlett, 7010, accepted: false);
+        using var w = new World(DialogueFixture.Scarlett, 7010, accepted: false);
         w.Npc.Name = "Scarlett Dalquist";
         Assert.IsFalse(w.Service.Open(w.State.Session, w.Npc.Identity));
         Assert.AreEqual(0, w.State.Session.Messages.Count);
@@ -33,7 +33,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void AcceptedActorOpensExactContentAndDuplicateOpenCannotResetConversation()
     {
-        using var w = new World(DialogueActionRouter.Stan, 6553);
+        using var w = new World(DialogueFixture.Stan, 6553);
         Assert.IsTrue(w.Open());
         var open = w.State.Session.Messages.OfType<KnuBotOpenChatWindowMessage>().Single();
         Assert.AreEqual(w.State.Player.Identity, open.Identity); Assert.AreEqual(w.Npc.Identity, open.Target);
@@ -50,7 +50,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void StanAcceptedNodeTriggersExistingQuestTransactionExactlyOnceBeforeNextDialogue()
     {
-        using var w = new World(DialogueActionRouter.Stan, 6553);
+        using var w = new World(DialogueFixture.Stan, 6553);
         Assert.IsTrue(w.Open()); w.Drain();
         Assert.IsTrue(w.Answer(0)); w.Drain(); // stan_goldman_002
         Assert.IsTrue(w.Answer(0)); w.Drain(); // stan_goldman_003
@@ -58,19 +58,19 @@ public sealed class DialogueTests
         w.State.Dao.BeforeCommit = pending =>
         {
             Assert.AreEqual(0, w.State.Session.Messages.Count);
-            Assert.AreEqual(DaoState.Active, pending.GetMission(new(111, AuthoredQuestService.BuyLockpick)).State);
+            Assert.AreEqual(DaoState.Active, pending.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
         };
         Assert.IsTrue(w.Answer(0));
         Assert.IsFalse(w.Answer(0)); // Duplicate while the next node is queued cannot rerun acceptance.
         Assert.AreEqual(before + 1, w.State.Dao.Calls);
-        Assert.AreEqual(DaoState.Active, w.State.Dao.GetMission(new(111, AuthoredQuestService.BuyLockpick)).State);
+        Assert.AreEqual(DaoState.Active, w.State.Dao.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
         Assert.AreEqual(1, w.State.Session.Messages.OfType<QuestFullUpdateMessage>().Count());
     }
 
     [TestMethod]
     public void CloseOptionAndExplicitCloseDiscardTheSessionWithoutInventedOptions()
     {
-        using var w = new World(DialogueActionRouter.Scarlett, 7010);
+        using var w = new World(DialogueFixture.Scarlett, 7010);
         Assert.IsTrue(w.Open()); w.Drain(); w.State.Session.Messages.Clear();
         Assert.IsTrue(w.Answer(1)); w.Drain();
         Assert.IsFalse(w.Service.HasSession(w.State.Player));
@@ -85,7 +85,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void DisconnectAndTransportReplacementCannotInheritDialogueOwnership()
     {
-        using var w = new World(DialogueActionRouter.Stan, 6553);
+        using var w = new World(DialogueFixture.Stan, 6553);
         Assert.IsTrue(w.Open()); w.Drain();
         var replacement = new AuthoredQuestTests.Session(); replacement.BindPlayer(w.State.Player);
         w.State.Player.Session = replacement;
@@ -102,7 +102,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void ZoningAndShutdownRemoveQueuedPacketsAndStagedOwnership()
     {
-        using var w = new World(DialogueActionRouter.Stan, 6553);
+        using var w = new World(DialogueFixture.Stan, 6553);
         using var destination = new AuthoredQuestTests.World(7010);
         Assert.IsTrue(w.Open()); var source = w.State.Player.Playfield!;
         w.State.Player.Playfield = destination.Player.Playfield;
@@ -116,11 +116,11 @@ public sealed class DialogueTests
     [TestMethod]
     public void NpcDespawnAndSameIdentityReplacementDoNotTransferCapabilityOrSession()
     {
-        using var w = new World(DialogueActionRouter.Stan, 6553);
+        using var w = new World(DialogueFixture.Stan, 6553);
         Assert.IsTrue(w.Open()); w.State.Session.Messages.Clear();
         w.State.Registry.Unregister(w.Npc.Identity); w.Drain();
         Assert.IsFalse(w.Service.HasSession(w.State.Player)); Assert.AreEqual(0, w.State.Session.Messages.Count);
-        var replacement = w.State.AddNpc(DialogueActionRouter.Stan, accepted: false);
+        var replacement = w.State.AddNpc(DialogueFixture.Stan, accepted: false);
         replacement.Name = w.Npc.Name;
         Assert.IsFalse(w.Service.Open(w.State.Session, replacement.Identity));
         Assert.IsFalse(w.Answer(0));
@@ -129,7 +129,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void ForeignPlayerCannotAnswerOrCloseEvenWhenBothAreNearTheSameAcceptedNpc()
     {
-        using var w = new World(DialogueActionRouter.Stan, 6553);
+        using var w = new World(DialogueFixture.Stan, 6553);
         Assert.IsTrue(w.Open()); w.Drain();
         var other = TestWorld.CreatePlayer(333); var session = new AuthoredQuestTests.Session();
         other.Playfield = w.State.Player.Playfield; other.Session = session; session.BindPlayer(other); w.State.Registry.Register(other);
@@ -141,7 +141,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void RealTeamJoinLeaveAndRejoinCannotTransferDialogueOrStagedRewardOwnership()
     {
-        using var w = new World(DialogueActionRouter.Scarlett, 7010);
+        using var w = new World(DialogueFixture.Scarlett, 7010);
         var chip = w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
         var other = TestWorld.CreatePlayer(333);
         var session = new AuthoredQuestTests.Session();
@@ -199,7 +199,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void DojaTradePinsStagedItemAndDeclineLeavesInventoryAndMissionUntouched()
     {
-        using var w = new World(DialogueActionRouter.Scarlett, 7010); var chip = w.PrepareDoja();
+        using var w = new World(DialogueFixture.Scarlett, 7010); var chip = w.PrepareDoja();
         w.BeginDoja();
         Assert.AreEqual(1, w.State.Session.Messages.OfType<KnuBotStartTradeMessage>().Single().NumberOfItemSlotsInTradeWindow);
         Assert.AreEqual(0, w.State.Session.Messages.OfType<KnuBotAnswerListMessage>().Count());
@@ -214,7 +214,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void DojaTradeCommitPublishesAcceptedOnceAndReplayCannotAwardAgain()
     {
-        using var w = new World(DialogueActionRouter.Scarlett, 7010); w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
+        using var w = new World(DialogueFixture.Scarlett, 7010); w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
         w.State.Session.Messages.Clear();
         w.State.Dao.BeforeCommit = pending => Assert.AreEqual(0, w.State.Session.Messages.Count);
         Assert.IsTrue(w.Finish(), w.State.Logger.LastError);
@@ -228,7 +228,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void DojaTradeStaleItemAndLateFailureDoNotConsumeOrAcknowledge()
     {
-        using var w = new World(DialogueActionRouter.Scarlett, 7010); var chip = w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
+        using var w = new World(DialogueFixture.Scarlett, 7010); var chip = w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
         w.State.Session.Messages.Clear(); w.State.Player.Inventory.Inventory.Content[64] = TestWorld.CreateItem(lowId: 284954, highId: 284954, instanceId: 99);
         Assert.IsFalse(w.Finish()); Assert.AreEqual(0, w.State.Session.Messages.Count);
         w.State.Player.Inventory.Inventory.Content[64] = chip; w.State.Dao.Failure = new InvalidOperationException("late durable failure");
@@ -240,7 +240,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void DojaTradeUnknownCommitQuarantinesAndDropsTheSessionWithoutRetryOrAcknowledgement()
     {
-        using var w = new World(DialogueActionRouter.Scarlett, 7010); w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
+        using var w = new World(DialogueFixture.Scarlett, 7010); w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
         w.State.Session.Messages.Clear(); w.State.Dao.UnknownCommit = true;
         Assert.IsFalse(w.Finish()); Assert.IsTrue(w.State.Player.IsPersistenceQuarantined);
         Assert.AreEqual(0, w.State.Session.Messages.Count); Assert.IsFalse(w.Service.HasSession(w.State.Player));
@@ -250,8 +250,8 @@ public sealed class DialogueTests
     [TestMethod]
     public void StanFactoryTradeUsesFourSlotsAndDurableRewardBeforeAcceptedContinuation()
     {
-        using var w = new World(DialogueActionRouter.Stan, 6553); var factory = w.State.Add(248306);
-        w.State.Activate(AuthoredQuestService.DeliverFactory);
+        using var w = new World(DialogueFixture.Stan, 6553); var factory = w.State.Add(248306);
+        w.State.Activate(AuthoredQuestFixture.DeliverFactory);
         Assert.IsTrue(w.Open()); w.Drain(); w.State.Session.Messages.Clear();
         Assert.IsTrue(w.Answer(0)); w.Drain();
         var start = w.State.Session.Messages.OfType<KnuBotStartTradeMessage>().Single();
@@ -261,8 +261,8 @@ public sealed class DialogueTests
         {
             Assert.AreSame(factory, w.State.Player.Inventory.Inventory.Content[64]);
             Assert.AreEqual(0, w.State.Session.Messages.Count); Assert.AreEqual(0, pending.Items[10].ContainerType);
-            Assert.AreEqual(DaoState.Completed, pending.GetMission(new(111, AuthoredQuestService.DeliverFactory)).State);
-            Assert.AreEqual(DaoState.Active, pending.GetMission(new(111, AuthoredQuestService.TalkSarah)).State);
+            Assert.AreEqual(DaoState.Completed, pending.GetMission(new(111, AuthoredQuestFixture.DeliverFactory)).State);
+            Assert.AreEqual(DaoState.Active, pending.GetMission(new(111, AuthoredQuestFixture.TalkSarah)).State);
         };
         Assert.IsTrue(w.Finish(), w.State.Logger.LastError);
         Assert.IsTrue(w.State.Session.Messages[0] is CharacterActionMessage { Action: CharacterActionType.DeleteItem });
@@ -276,12 +276,12 @@ public sealed class DialogueTests
     [TestMethod]
     public void SarahAcceptedDialogueRecoveryTradeAndVernonHandoffUseOneTransactionPerAction()
     {
-        using var w = new World(DialogueActionRouter.Sarah, 6553); w.State.Activate(AuthoredQuestService.TalkSarah);
+        using var w = new World(DialogueFixture.Sarah, 6553); w.State.Activate(AuthoredQuestFixture.TalkSarah);
         Assert.IsTrue(w.Open()); w.Drain(); w.State.Session.Messages.Clear();
         w.State.Dao.BeforeCommit = pending => Assert.AreEqual(0, w.State.Session.Messages.Count);
         Assert.IsTrue(w.Answer(0), w.State.Logger.LastError); w.Drain();
-        Assert.AreEqual(DaoState.Completed, w.State.Dao.GetMission(new(111, AuthoredQuestService.TalkSarah)).State);
-        Assert.AreEqual(DaoState.Active, w.State.Dao.GetMission(new(111, AuthoredQuestService.FindThief)).State);
+        Assert.AreEqual(DaoState.Completed, w.State.Dao.GetMission(new(111, AuthoredQuestFixture.TalkSarah)).State);
+        Assert.AreEqual(DaoState.Active, w.State.Dao.GetMission(new(111, AuthoredQuestFixture.FindThief)).State);
         Assert.AreEqual(1, w.State.Session.Messages.OfType<QuestFullUpdateMessage>().Count());
         Assert.IsTrue(w.Service.Close(w.State.Session, w.Npc.Identity)); w.State.Session.Messages.Clear();
         int ack = 0;
@@ -293,8 +293,8 @@ public sealed class DialogueTests
         };
         Assert.IsTrue(w.State.Service.TryUseShopThiefRemains(w.State.Player, () => ack++), w.State.Logger.LastError);
         Assert.AreEqual(1, ack); Assert.AreEqual(200, w.State.Player.Inventory.Inventory.Content[64].Quality);
-        Assert.AreEqual(DaoState.Completed, w.State.Dao.GetMission(new(111, AuthoredQuestService.FindThief)).State);
-        Assert.AreEqual(DaoState.Active, w.State.Dao.GetMission(new(111, AuthoredQuestService.DeliverArmor)).State);
+        Assert.AreEqual(DaoState.Completed, w.State.Dao.GetMission(new(111, AuthoredQuestFixture.FindThief)).State);
+        Assert.AreEqual(DaoState.Active, w.State.Dao.GetMission(new(111, AuthoredQuestFixture.DeliverArmor)).State);
         w.State.Dao.BeforeCommit = null; w.State.Session.Messages.Clear();
         Assert.IsTrue(w.Open()); w.Drain(); w.State.Session.Messages.Clear();
         Assert.IsTrue(w.Answer(0)); w.Drain();
@@ -305,8 +305,8 @@ public sealed class DialogueTests
         {
             Assert.AreEqual(0, w.State.Session.Messages.Count);
             Assert.AreEqual(295618, w.State.Player.Inventory.Inventory.Content[64].LowId);
-            Assert.AreEqual(DaoState.Completed, pending.GetMission(new(111, AuthoredQuestService.DeliverArmor)).State);
-            Assert.AreEqual(DaoState.Active, pending.GetMission(new(111, AuthoredQuestService.TalkVernon)).State);
+            Assert.AreEqual(DaoState.Completed, pending.GetMission(new(111, AuthoredQuestFixture.DeliverArmor)).State);
+            Assert.AreEqual(DaoState.Active, pending.GetMission(new(111, AuthoredQuestFixture.TalkVernon)).State);
             Assert.AreEqual(1280L, pending.Stats[(int)CharacterStat.Cash]);
         };
         Assert.IsTrue(w.Finish(), w.State.Logger.LastError);
@@ -323,13 +323,13 @@ public sealed class DialogueTests
     [TestMethod]
     public void SarahTradeRollbackPreservesExactArmorAndHasNoAcceptedFrame()
     {
-        using var w = new World(DialogueActionRouter.Sarah, 6553); var armor = w.State.Add(295618);
-        w.State.Activate(AuthoredQuestService.DeliverArmor);
+        using var w = new World(DialogueFixture.Sarah, 6553); var armor = w.State.Add(295618);
+        w.State.Activate(AuthoredQuestFixture.DeliverArmor);
         Assert.IsTrue(w.Open()); w.Drain(); Assert.IsTrue(w.Answer(0)); w.Drain(); Assert.IsTrue(w.Stage());
         w.State.Session.Messages.Clear(); w.State.Dao.Failure = new InvalidOperationException("late Sarah handoff failure");
         Assert.IsFalse(w.Finish()); Assert.AreSame(armor, w.State.Player.Inventory.Inventory.Content[64]);
         Assert.AreEqual(104, w.State.Dao.Items[10].ContainerType); Assert.AreEqual(0, w.State.Dao.Rewards.Count);
-        Assert.IsNull(w.State.Dao.GetMission(new(111, AuthoredQuestService.TalkVernon)));
+        Assert.IsNull(w.State.Dao.GetMission(new(111, AuthoredQuestFixture.TalkVernon)));
         Assert.AreEqual(0, w.State.Session.Messages.Count); Assert.IsFalse(w.State.Player.IsPersistenceQuarantined);
         w.State.Dao.Failure = null; Assert.IsTrue(w.Finish(), w.State.Logger.LastError);
     }
@@ -337,8 +337,8 @@ public sealed class DialogueTests
     [TestMethod]
     public void SarahTradeUnknownCommitKeepsStaleMemoryQuarantinedAndNeverAcknowledgesOrRetries()
     {
-        using var w = new World(DialogueActionRouter.Sarah, 6553); var armor = w.State.Add(295618);
-        w.State.Activate(AuthoredQuestService.DeliverArmor);
+        using var w = new World(DialogueFixture.Sarah, 6553); var armor = w.State.Add(295618);
+        w.State.Activate(AuthoredQuestFixture.DeliverArmor);
         Assert.IsTrue(w.Open()); w.Drain(); Assert.IsTrue(w.Answer(0)); w.Drain(); Assert.IsTrue(w.Stage());
         w.State.Session.Messages.Clear(); w.State.Dao.UnknownCommit = true;
         Assert.IsFalse(w.Finish()); Assert.IsTrue(w.State.Player.IsPersistenceQuarantined);
@@ -351,7 +351,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void ZyvaniaCannotClaimSuccessfulDialogueWithoutItsRequiredTransportAdapter()
     {
-        using var w = new World(DialogueActionRouter.Zyvania, 655);
+        using var w = new World(DialogueFixture.Zyvania, 655);
         Assert.IsTrue(w.State.Npcs.TryGetBinding(w.Npc, out _));
         Assert.IsFalse(w.Open()); Assert.IsFalse(w.Answer(0));
         Assert.AreEqual(0, w.State.Session.Messages.Count); Assert.AreEqual(0, w.State.Dao.Calls);
@@ -361,7 +361,7 @@ public sealed class DialogueTests
     [TestMethod]
     public void MarcoPreservesAcceptedBlankPromptAndTwoChoicesWithoutInventingNanoExplanation()
     {
-        using var w = new World(DialogueActionRouter.Marco, 6553);
+        using var w = new World(DialogueFixture.Marco, 6553);
         Assert.IsTrue(w.Open()); w.Drain();
         Assert.AreEqual(0, w.State.Session.Messages.OfType<KnuBotAppendTextMessage>().Count());
         var choices = w.State.Session.Messages.OfType<KnuBotAnswerListMessage>().Single().DialogOptions;

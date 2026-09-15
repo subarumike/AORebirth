@@ -168,26 +168,16 @@ namespace ZoneEngine_New.Core.Playfield
             PlayfieldSpawnsData data = _gameData.GetPlayfieldSpawns(_playfield.Identity.Instance);
             PlayfieldSpawnEntry[] entries = data.Spawns ?? [];
             int skipped = 0;
-            int unauthorized = 0;
-            var districtOrdinals = new Dictionary<int, int>();
 
             foreach (PlayfieldSpawnEntry entry in entries)
             {
-                if (entry == null)
+                if (!SpawnContentValidation.IsValid(entry))
                 {
                     skipped++;
                     continue;
                 }
-                districtOrdinals.TryGetValue(entry.DistrictIndex, out int ordinal);
-                districtOrdinals[entry.DistrictIndex] = ordinal + 1;
-
-                if (!OfficialHashSpawnAuthorization.TryAuthorize(_playfield.Identity.Instance, ordinal, entry, out string spawnHash))
-                {
-                    unauthorized++;
-                    continue;
-                }
-
-                if (HasExcludedSeasonalEvent(entry))
+                string spawnHash = entry.HashText;
+                if (HasInactiveEvent(entry))
                 {
                     skipped++;
                     continue;
@@ -200,13 +190,14 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
-                if (!_gameData.TryGetMobTemplate(spawnHash, out var spawnTemplate)
-                    || !ZoneEngine_New.Core.Mobs.NpcContentAcceptance.CanSpawn(spawnTemplate))
+                if (!_gameData.CanResolveMobHash(spawnHash)
+                    || !_gameData.TryResolveMobTemplate(spawnHash, entry.MinLevel, out var spawnTemplate)
+                    || !NpcTemplateValidation.CanSpawn(spawnTemplate))
                 {
                     _logger.Warn(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "Authorized hash spawn blocked: mapped template={0} missing, playfield={1}",
+                            "Hash spawn skipped: unresolved or invalid template={0}, playfield={1}",
                             spawnHash,
                             _playfield.Identity.Instance));
                     skipped++;
@@ -262,9 +253,6 @@ namespace ZoneEngine_New.Core.Playfield
                 _allPoints.Add(point);
             }
 
-            if (unauthorized > 0)
-                _logger.Warn("HashSpawnSystem blocked unbridged/unapproved placements=" + unauthorized
-                    + " playfield=" + _playfield.Identity.Instance);
             if (skipped > 0)
             {
                 _logger.Warn(
@@ -276,7 +264,7 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
-        private static bool HasExcludedSeasonalEvent(PlayfieldSpawnEntry entry)
+        private bool HasInactiveEvent(PlayfieldSpawnEntry entry)
         {
             PlayfieldHashSpawnExtensionEvent[]? events = entry.Extensions?.Events;
             if (events == null)
@@ -287,8 +275,8 @@ namespace ZoneEngine_New.Core.Playfield
                 string? name = events[i]?.Name;
                 if (string.IsNullOrEmpty(name))
                     continue;
-                if (name.StartsWith("christmas", StringComparison.OrdinalIgnoreCase)
-                    || name.StartsWith("halloween", StringComparison.OrdinalIgnoreCase))
+                if (Array.FindIndex(_gameData.WorldContent.ActiveSpawnEvents,
+                    active => string.Equals(active, name, StringComparison.OrdinalIgnoreCase)) < 0)
                     return true;
             }
 

@@ -12,6 +12,7 @@ using ZoneEngine.Core.Arete.Dialogue;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Mobs;
+using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Trade;
@@ -26,7 +27,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
     const int PacketPacingMilliseconds = 20; // ContentDrivenNpcDialogueRouter.KnuBotPacketPacingMilliseconds.
     readonly Func<long> _milliseconds = milliseconds ?? (() => Environment.TickCount64);
     readonly ConcurrentDictionary<int, Conversation> _sessions = new();
-    readonly ConditionalWeakTable<Player, object> _tailorHistory = new();
+    readonly ConditionalWeakTable<Player, HashSet<string>> _openHistory = new();
 
     sealed class Conversation(Player player, IZoneSession transport, NpcCharacter npc, Playfield playfield,
         string contentIdentity, DialogueSession dialogue)
@@ -42,6 +43,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
         public long NextPacketAt;
         public bool Closing;
         public DialogueActionOutcome Trade;
+        public DialogueRoute? TradeRoute;
         public Identity StagedSlot;
         public Item? StagedItem;
     }
@@ -59,14 +61,14 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
                 if (Valid(previous)) return false; // Duplicate opens cannot reset a live trade or quest transition.
                 Remove(previous);
             }
-            bool priorOpen = _tailorHistory.TryGetValue(player, out _);
+            bool priorOpen = _openHistory.TryGetValue(player, out var history) && history.Contains(binding.ContentNpcIdentity);
             if (!actions.TryOpen(player, binding.ContentNpcIdentity, priorOpen, out string? startNode)) return false;
             var result = catalog.Sessions.StartSessionAtNode(binding.ContentNpcIdentity, startNode);
             if (!SafeResult(result)) return false;
             var conversation = new Conversation(player, transport, npc, playfield, binding.ContentNpcIdentity, result.Session);
             if (!_sessions.TryAdd(player.Identity.Instance, conversation)) return false;
-            if (binding.ContentNpcIdentity == DialogueActionRouter.Tailor) _tailorHistory.GetValue(player, _ => new object());
-            conversation.Packets.Enqueue(DialogueWire.Open(player.Identity, target, binding.ContentNpcIdentity));
+            _openHistory.GetValue(player, _ => new HashSet<string>(StringComparer.Ordinal)).Add(binding.ContentNpcIdentity);
+            conversation.Packets.Enqueue(DialogueWire.Open(player.Identity, target, actions.Binding(binding.ContentNpcIdentity)!.OpenMode));
             QueueNode(conversation, result);
             Pump(conversation);
             return true;
@@ -93,13 +95,15 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
                     || conversation.Npc.Shop is not { } shop
                     || !conversation.Playfield.GetRequiredService<TradeService>().TryOpenShop(conversation.Player, shop)) return false;
             }
+            var chosenRoute = actions.Route(conversation.ContentIdentity, conversation.Dialogue.CurrentNodeId, contentAnswer);
             conversation.Dialogue = next.Session;
             conversation.WireOptions = [];
-            if (effect is DialogueActionOutcome.StanTrade or DialogueActionOutcome.DojaTrade or DialogueActionOutcome.SarahTrade)
+            if (effect is DialogueActionOutcome.Trade)
             {
                 conversation.Trade = effect;
+                conversation.TradeRoute = chosenRoute;
                 // The accepted trade hold has no AppendText/AnswerList after StartTrade: those remove Accept/slots.
-                conversation.Packets.Enqueue(DialogueWire.StartTrade(conversation.Player.Identity, target, effect));
+                conversation.Packets.Enqueue(DialogueWire.StartTrade(conversation.Player.Identity, target, conversation.TradeRoute!));
             }
             else QueueNode(conversation, next);
             Pump(conversation);
@@ -128,13 +132,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
             if (!ValidTrade(conversation) || message.Container.Type != IdentityType.Inventory
                 || !conversation.Player.Inventory.Inventory.Content.TryGetValue(message.Container.Instance, out var item)
                 || !item.IsPersisted || item.Locked || item.StackCount != 1 || InventoryMoveService.IsBagItem(item)) return false;
-            int expectedTemplate = conversation.Trade switch
-            {
-                DialogueActionOutcome.StanTrade => 248306,
-                DialogueActionOutcome.SarahTrade => 295618,
-                DialogueActionOutcome.DojaTrade => ZoneEngine.Core.Doja.DojaChipInteractionRules.NascenseChipItemId,
-                _ => 0
-            };
+            int expectedTemplate = conversation.TradeRoute?.TradeItem ?? 0;
             if (expectedTemplate == 0 || (item.LowId != expectedTemplate && item.HighId != expectedTemplate)) return false;
             // Exact object and exact slot are revalidated at FinishTrade and again by the durable service.
             conversation.StagedSlot = message.Container;
@@ -158,7 +156,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
             var item = conversation.StagedItem;
             if (item == null || !conversation.Player.Inventory.Inventory.Content.TryGetValue(conversation.StagedSlot.Instance, out var current)
                 || !ReferenceEquals(item, current)) return false;
-            if (!actions.CompleteTrade(conversation.Player, conversation.Trade, conversation.StagedSlot, item, () =>
+            if (!actions.CompleteTrade(conversation.Player, conversation.TradeRoute!, conversation.StagedSlot, item, () =>
                 {
                     if (!Valid(conversation)) throw new InvalidOperationException("Dialogue owner changed during durable NPC trade completion.");
                     transport.Send(DialogueWire.AcceptedTrade(conversation.Player.Identity, message.Target));
@@ -254,7 +252,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
     }
 
     bool ValidTrade(Conversation conversation) => Valid(conversation) && !conversation.Closing && conversation.Packets.Count == 0
-        && conversation.Trade is DialogueActionOutcome.StanTrade or DialogueActionOutcome.DojaTrade or DialogueActionOutcome.SarahTrade;
+        && conversation.Trade == DialogueActionOutcome.Trade && conversation.TradeRoute != null;
 
     bool Valid(Conversation conversation) => Current(conversation.Transport, out var player, out var playfield)
         && ReferenceEquals(player, conversation.Player) && ReferenceEquals(playfield, conversation.Playfield)
@@ -271,13 +269,13 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
             && ReferenceEquals(current, player);
     }
 
-    static bool TryCapability(Player player, NpcCharacter npc, out AcceptedNpcBinding binding)
+    bool TryCapability(Player player, NpcCharacter npc, out NpcContentBinding binding)
     {
         binding = null!;
         return npc.Playfield != null && ReferenceEquals(player.Playfield, npc.Playfield) && !npc.IsDead
             && player.Distance3D(npc) <= LootableDynel.OpenRange
-            && npc.Playfield.GetRequiredService<AcceptedNpcActivationService>().TryGetBinding(npc, out binding)
-            && binding.HasDialogue && DialogueCatalog.IsEnabled(binding.ContentNpcIdentity);
+            && npc.Playfield.GetRequiredService<NpcContentActivationService>().TryGetBinding(npc, out binding)
+            && binding.HasDialogue && catalog.IsEnabled(binding.ContentNpcIdentity);
     }
 
     static bool SafeResult(DialogueSessionResult result) => result.IsValid && result.Session != null

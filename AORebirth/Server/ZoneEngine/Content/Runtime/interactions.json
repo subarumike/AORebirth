@@ -1,0 +1,2600 @@
+{
+  "Version": 1,
+  "Manifests": [
+    "Arete/rex-larsson/manifest.json",
+    "Arete/marcus-stone/manifest.json",
+    "Arete/flint-novak/manifest.json",
+    "Subway/windcaller-karrec/manifest.json",
+    "Subway/tailor/manifest.json",
+    "Thrak/garden-key/manifest.json",
+    "Thrak/garden-vendors/manifest.json",
+    "Aban/garden-vendors/manifest.json",
+    "Doja/nascense-chip/manifest.json",
+    "Nascence/rosenblatt-hiathlin/manifest.json",
+    "Nascence/life-dialogs/manifest.json",
+    "Andromeda/zyvania-bagh/manifest.json"
+  ],
+  "MissionDefinitions": [
+    {
+      "QuestId": "Mission:5514B19B",
+      "InitialStepId": "kill_junkyard_robots",
+      "IsResolved": true,
+      "StepIds": [
+        "kill_junkyard_robots"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514B19B_kill_junkyard_robots",
+          "StepId": "kill_junkyard_robots",
+          "RequiredCount": 7,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19C",
+      "InitialStepId": "deliver_bio_com",
+      "IsResolved": true,
+      "StepIds": [
+        "deliver_bio_com"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514B19C_deliver_to_alex",
+          "StepId": "deliver_bio_com",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19D",
+      "InitialStepId": "use_sectec_monitor",
+      "IsResolved": true,
+      "StepIds": [
+        "use_sectec_monitor"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514B19D_use_sectec_monitor",
+          "StepId": "use_sectec_monitor",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19E",
+      "InitialStepId": "plant_rc_p_device",
+      "IsResolved": true,
+      "StepIds": [
+        "plant_rc_p_device"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514B19E_plant_rc_p_device",
+          "StepId": "plant_rc_p_device",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19F",
+      "InitialStepId": "deliver_hc12_bill",
+      "IsResolved": true,
+      "StepIds": [
+        "deliver_hc12_bill"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514B19F_deliver_hc12_bill",
+          "StepId": "deliver_hc12_bill",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B1A0",
+      "InitialStepId": "kneecapping_tip",
+      "IsResolved": true,
+      "StepIds": [
+        "kneecapping_tip"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514B1A0_kneecapping_tip",
+          "StepId": "kneecapping_tip",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4365",
+      "InitialStepId": "report_to_alex",
+      "IsResolved": true,
+      "StepIds": [
+        "report_to_alex"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555B4365_report_to_alex",
+          "StepId": "report_to_alex",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4366",
+      "InitialStepId": "talk_to_stan_goodman",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_to_stan_goodman"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555B4366_talk_to_stan",
+          "StepId": "talk_to_stan_goodman",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BD124",
+      "InitialStepId": "buy_a_lockpick",
+      "IsResolved": true,
+      "StepIds": [
+        "buy_a_lockpick"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BD124_buy_lockpick",
+          "StepId": "buy_a_lockpick",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9C5",
+      "InitialStepId": "take_strongbox_contents",
+      "IsResolved": true,
+      "StepIds": [
+        "take_strongbox_contents"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9C5_strongbox",
+          "StepId": "take_strongbox_contents",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F2",
+      "InitialStepId": "deliver_antonio_factory",
+      "IsResolved": true,
+      "StepIds": [
+        "deliver_antonio_factory"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F2_deliver_factory",
+          "StepId": "deliver_antonio_factory",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F3",
+      "InitialStepId": "talk_to_sarah_greene",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_to_sarah_greene"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F3_talk_sarah",
+          "StepId": "talk_to_sarah_greene",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F5",
+      "InitialStepId": "find_the_thief",
+      "IsResolved": true,
+      "StepIds": [
+        "find_the_thief"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F5_find_thief",
+          "StepId": "find_the_thief",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F6",
+      "InitialStepId": "deliver_dna_locked_armor",
+      "IsResolved": true,
+      "StepIds": [
+        "deliver_dna_locked_armor"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F6_deliver_armor",
+          "StepId": "deliver_dna_locked_armor",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F7",
+      "InitialStepId": "speak_to_vernon_godfray",
+      "IsResolved": true,
+      "StepIds": [
+        "speak_to_vernon_godfray"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F7_speak_vernon",
+          "StepId": "speak_to_vernon_godfray",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F8",
+      "InitialStepId": "hacking_skills",
+      "IsResolved": true,
+      "StepIds": [
+        "hacking_skills"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F8_hacking_skills",
+          "StepId": "hacking_skills",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F9",
+      "InitialStepId": "give_hacked_technical_library",
+      "IsResolved": true,
+      "StepIds": [
+        "give_hacked_technical_library"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F9_give_hacked_library",
+          "StepId": "give_hacked_technical_library",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FA",
+      "InitialStepId": "cargo_lifting",
+      "IsResolved": true,
+      "StepIds": [
+        "cargo_lifting"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9FA_cargo_lifting",
+          "StepId": "cargo_lifting",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FB",
+      "InitialStepId": "return_to_vernon_godfray",
+      "IsResolved": true,
+      "StepIds": [
+        "return_to_vernon_godfray"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9FB_return_vernon",
+          "StepId": "return_to_vernon_godfray",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FC",
+      "InitialStepId": "talk_to_doctor_mason",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_to_doctor_mason"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9FC_talk_doctor_mason",
+          "StepId": "talk_to_doctor_mason",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FD",
+      "InitialStepId": "assemble_implant_1",
+      "IsResolved": true,
+      "StepIds": [
+        "assemble_implant_1"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9FD_assemble_1",
+          "StepId": "assemble_implant_1",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FE",
+      "InitialStepId": "assemble_implant_2",
+      "IsResolved": true,
+      "StepIds": [
+        "assemble_implant_2"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9FE_assemble_2",
+          "StepId": "assemble_implant_2",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9FF",
+      "InitialStepId": "assemble_implant_3",
+      "IsResolved": true,
+      "StepIds": [
+        "assemble_implant_3"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9FF_assemble_3",
+          "StepId": "assemble_implant_3",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA00",
+      "InitialStepId": "show_dr_mason_implant",
+      "IsResolved": true,
+      "StepIds": [
+        "show_dr_mason_implant"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BEA00_show_implant",
+          "StepId": "show_dr_mason_implant",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA01",
+      "InitialStepId": "install_the_implant",
+      "IsResolved": true,
+      "StepIds": [
+        "install_the_implant"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BEA01_install_implant",
+          "StepId": "install_the_implant",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA02",
+      "InitialStepId": "talk_to_doctor_mason_after_install",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_to_doctor_mason_after_install"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BEA02_talk_mason_chip",
+          "StepId": "talk_to_doctor_mason_after_install",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA03",
+      "InitialStepId": "talk_to_lorelei",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_to_lorelei"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BEA03_talk_lorelei",
+          "StepId": "talk_to_lorelei",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BE9F4",
+      "InitialStepId": "buy_nano_programs",
+      "IsResolved": true,
+      "StepIds": [
+        "buy_nano_programs"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BE9F4_buy_nano",
+          "StepId": "buy_nano_programs",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4367",
+      "InitialStepId": "tradeskill_assemble_nano_sensor",
+      "IsResolved": true,
+      "StepIds": [
+        "tradeskill_assemble_nano_sensor"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555B4367_assemble_nano_sensor",
+          "StepId": "tradeskill_assemble_nano_sensor",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4368",
+      "InitialStepId": "tradeskill_assemble_basic_brain",
+      "IsResolved": true,
+      "StepIds": [
+        "tradeskill_assemble_basic_brain"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555B4368_assemble_basic_brain",
+          "StepId": "tradeskill_assemble_basic_brain",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B4369",
+      "InitialStepId": "tradeskill_assemble_personalized_brain",
+      "IsResolved": true,
+      "StepIds": [
+        "tradeskill_assemble_personalized_brain"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555B4369_assemble_personalized_brain",
+          "StepId": "tradeskill_assemble_personalized_brain",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555B436A",
+      "InitialStepId": "tradeskill_show_brain_to_alex",
+      "IsResolved": true,
+      "StepIds": [
+        "tradeskill_show_brain_to_alex"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555B436A_show_brain",
+          "StepId": "tradeskill_show_brain_to_alex",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA04",
+      "InitialStepId": "capture_lolly",
+      "IsResolved": true,
+      "StepIds": [
+        "capture_lolly"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BEA04_lost_pet",
+          "StepId": "capture_lolly",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA05",
+      "InitialStepId": "deliver_reet",
+      "IsResolved": true,
+      "StepIds": [
+        "deliver_reet"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BEA05_deliver_reet",
+          "StepId": "deliver_reet",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:555BEA06",
+      "InitialStepId": "talk_vaughn",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_vaughn"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_555BEA06_talk_vaughn",
+          "StepId": "talk_vaughn",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:55AA2421",
+      "InitialStepId": "return_chip",
+      "IsResolved": true,
+      "StepIds": [
+        "return_chip"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_55AA2421_turnin",
+          "StepId": "return_chip",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:55AA2803",
+      "InitialStepId": "cooldown",
+      "IsResolved": true,
+      "StepIds": [
+        "cooldown"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_55AA2803_cooldown",
+          "StepId": "cooldown",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B18F",
+      "InitialStepId": "talk_to_marcus",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_to_marcus"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514b18f_objective_questfullupdate",
+          "StepId": "talk_to_marcus",
+          "RequiredCount": 0,
+          "IsResolved": false
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B194",
+      "InitialStepId": "captured_preview",
+      "IsResolved": true,
+      "StepIds": [
+        "captured_preview"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514b194_objective_questfullupdate",
+          "StepId": "captured_preview",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B196",
+      "InitialStepId": "return_to_marcus",
+      "IsResolved": true,
+      "StepIds": [
+        "return_to_marcus"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514b196_objective_questfullupdate",
+          "StepId": "return_to_marcus",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B198",
+      "InitialStepId": "talk_to_flint_novak",
+      "IsResolved": true,
+      "StepIds": [
+        "talk_to_flint_novak"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514b198_objective_questfullupdate",
+          "StepId": "talk_to_flint_novak",
+          "RequiredCount": 0,
+          "IsResolved": false
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B199",
+      "InitialStepId": "use_stim_wounded_dockworker",
+      "IsResolved": true,
+      "StepIds": [
+        "use_stim_wounded_dockworker"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514b199_objective_questfullupdate",
+          "StepId": "use_stim_wounded_dockworker",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    },
+    {
+      "QuestId": "Mission:5514B19A",
+      "InitialStepId": "return_marcus_stim",
+      "IsResolved": true,
+      "StepIds": [
+        "return_marcus_stim"
+      ],
+      "PrerequisiteQuestIds": [],
+      "Objectives": [
+        {
+          "ObjectiveId": "mission_5514b19a_objective_questfullupdate",
+          "StepId": "return_marcus_stim",
+          "RequiredCount": 1,
+          "IsResolved": true
+        }
+      ]
+    }
+  ],
+  "Actions": {
+    "accept-stan-job": {
+      "RejectMissions": [
+        {
+          "Quest": "Mission:555BD124",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9C5",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9F2",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9F3",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9F4",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555B4366",
+          "Objective": "mission_555B4366_talk_to_stan",
+          "Observation": "stan-goodman-force-complete",
+          "Event": "StanGoodmanQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555B4366"
+      ],
+      "Accept": [
+        "Mission:555BD124"
+      ],
+      "SendJournals": [
+        "Mission:555BD124"
+      ]
+    },
+    "open-sealed-lockpick": {
+      "ItemIds": [
+        295999
+      ],
+      "Consume": true,
+      "UseProjection": true,
+      "Grants": [
+        {
+          "ItemId": 95577,
+          "Quality": 1,
+          "SkipIfCarried": true,
+          "PublishBeforeConsumption": true
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555BD124",
+          "Objective": "mission_555BD124_buy_lockpick",
+          "Observation": "stan-goodman-force-complete",
+          "Event": "StanGoodmanQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555BD124"
+      ],
+      "Accept": [
+        "Mission:555BE9C5"
+      ],
+      "SendJournals": [
+        "Mission:555BE9C5"
+      ],
+      "DirectItemUse": true
+    },
+    "unlock-strongbox": {
+      "ItemIds": [
+        95577
+      ],
+      "Playfields": [
+        6553
+      ],
+      "RejectMissions": [
+        {
+          "Quest": "Mission:555BE9F2",
+          "States": [
+            "Completed"
+          ]
+        }
+      ],
+      "Grants": [
+        {
+          "ItemId": 248306,
+          "Quality": 1,
+          "SkipIfCarried": true
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555BE9C5",
+          "Objective": "mission_555BE9C5_strongbox",
+          "Observation": "stan-goodman-force-complete",
+          "Event": "StanGoodmanQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555BE9C5"
+      ],
+      "Accept": [
+        "Mission:555BE9F2"
+      ],
+      "SendJournals": [
+        "Mission:555BE9F2"
+      ],
+      "Feedback": "~&!!!\":!!!)<sOYou successfully picked this lock and obtained the Antonio's Adaption Factory."
+    },
+    "deliver-factory": {
+      "ItemIds": [
+        248306
+      ],
+      "Playfields": [
+        6553
+      ],
+      "Consume": true,
+      "RequireMissions": [
+        {
+          "Quest": "Mission:555BE9F2",
+          "States": [
+            "Active",
+            "Offered"
+          ]
+        }
+      ],
+      "Grants": [
+        {
+          "ItemId": 296572,
+          "Quality": 1,
+          "SkipIfCarried": true
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555BE9F2",
+          "Objective": "mission_555BE9F2_deliver_factory",
+          "Observation": "stan-goodman-force-complete",
+          "Event": "StanGoodmanQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555BE9F2"
+      ],
+      "Accept": [
+        "Mission:555BE9F3",
+        "Mission:555BE9F4"
+      ],
+      "SendJournals": [
+        "Mission:555BE9F3",
+        "Mission:555BE9F4"
+      ],
+      "StatReward": {
+        "Quest": "Mission:555BE9F2",
+        "Key": "captured-stan-factory-turnin-xp-credits",
+        "Xp": 2596,
+        "Cash": 1240,
+        "Evidence": "capture:20260721-afgter-dog-lockpick-goodman:stan-turnin-xp-credits",
+        "EffectReference": "capture:20260721-afgter-dog-lockpick-goodman:stan-turnin-xp-credits"
+      },
+      "Feedback": "~&!!!\":$'O\"ui!!!?Oi!!!/S~",
+      "FeedbackCategory": 110,
+      "FeedbackMessage": 108871108
+    },
+    "accept-sarah-job": {
+      "Playfields": [
+        6553
+      ],
+      "RejectCarried": [
+        295618
+      ],
+      "RejectMissions": [
+        {
+          "Quest": "Mission:555BE9F5",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9F6",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9F7",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555BE9F3",
+          "Objective": "mission_555BE9F3_talk_sarah",
+          "Observation": "sarah-greene-force-complete",
+          "Event": "SarahGreeneQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555BE9F3"
+      ],
+      "Accept": [
+        "Mission:555BE9F5"
+      ],
+      "SendJournals": [
+        "Mission:555BE9F5"
+      ]
+    },
+    "recover-stolen-armor": {
+      "Playfields": [
+        6553
+      ],
+      "RejectMissions": [
+        {
+          "Quest": "Mission:555BE9F6",
+          "States": [
+            "Completed"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9F7",
+          "States": [
+            "Active",
+            "Completed"
+          ]
+        }
+      ],
+      "AnyMissions": [
+        {
+          "Quest": "Mission:555BE9F5",
+          "States": [
+            "Active"
+          ]
+        },
+        {
+          "Quest": "Mission:555BE9F6",
+          "States": [
+            "Active"
+          ]
+        }
+      ],
+      "AnyCarried": [
+        295618
+      ],
+      "Grants": [
+        {
+          "ItemId": 295618,
+          "Quality": 200,
+          "SkipIfCarried": true
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555BE9F5",
+          "Objective": "mission_555BE9F5_find_thief",
+          "Observation": "sarah-greene-force-complete",
+          "Event": "SarahGreeneQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555BE9F5"
+      ],
+      "Accept": [
+        "Mission:555BE9F6"
+      ],
+      "SendJournals": [
+        "Mission:555BE9F6"
+      ]
+    },
+    "deliver-armor": {
+      "Playfields": [
+        6553
+      ],
+      "ItemIds": [
+        295618
+      ],
+      "Consume": true,
+      "RequireMissions": [
+        {
+          "Quest": "Mission:555BE9F6",
+          "States": [
+            "Active",
+            "Offered"
+          ]
+        }
+      ],
+      "Grants": [
+        {
+          "ItemId": 296574,
+          "Quality": 1,
+          "SkipIfCarried": true,
+          "NotifyIfCarried": true
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555BE9F6",
+          "Objective": "mission_555BE9F6_deliver_armor",
+          "Observation": "sarah-greene-force-complete",
+          "Event": "SarahGreeneQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555BE9F6"
+      ],
+      "Accept": [
+        "Mission:555BE9F7"
+      ],
+      "SendJournals": [
+        "Mission:555BE9F7"
+      ],
+      "StatReward": {
+        "Quest": "Mission:555BE9F6",
+        "Key": "captured-sarah-armor-turnin-xp-credits",
+        "Xp": 2229,
+        "Cash": 1280,
+        "Evidence": "capture:20260721-sara:sarah-turnin-xp-credits",
+        "EffectReference": "capture:20260721-sara:sarah-turnin-xp-credits"
+      },
+      "Feedback": "~&!!!\":$'O\"ui!!!;4i!!!0&~",
+      "FeedbackCategory": 110,
+      "FeedbackMessage": 108871108
+    },
+    "finish-buy-nano": {
+      "RequireMissions": [
+        {
+          "Quest": "Mission:555BE9F4",
+          "States": [
+            "Active"
+          ]
+        }
+      ],
+      "Grants": [
+        {
+          "ItemId": 223373,
+          "Quality": 25,
+          "SkipIfCarried": true
+        }
+      ],
+      "Complete": [
+        {
+          "Quest": "Mission:555BE9F4",
+          "Objective": "mission_555BE9F4_buy_nano",
+          "Observation": "stan-goodman-force-complete",
+          "Event": "StanGoodmanQuestRuntime"
+        }
+      ],
+      "DeleteJournals": [
+        "Mission:555BE9F4"
+      ],
+      "StatReward": {
+        "Quest": "Mission:555BE9F4",
+        "Key": "captured-buy-nano-tip-xp-credits",
+        "Xp": 2569,
+        "Cash": 1240,
+        "Evidence": "capture:20260721-nanoprogramsvendor:buy-nano-tip-xp-credits",
+        "EffectReference": "capture:20260721-nanoprogramsvendor:buy-nano-tip-xp-credits"
+      },
+      "Feedback": "~&!!!\":$'O\"ui!!!?4i!!!/S~",
+      "FeedbackCategory": 110,
+      "FeedbackMessage": 108871108
+    },
+    "unpack-enforcer-nanos": {
+      "ItemIds": [
+        248259
+      ],
+      "Consume": true,
+      "UseProjection": true,
+      "Grants": [
+        {
+          "ItemId": 43379,
+          "Quality": 1,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        },
+        {
+          "ItemId": 55762,
+          "Quality": 4,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        },
+        {
+          "ItemId": 49821,
+          "Quality": 4,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        },
+        {
+          "ItemId": 100202,
+          "Quality": 17,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        }
+      ],
+      "OptionalActions": [
+        "finish-buy-nano"
+      ],
+      "DirectItemUse": true
+    },
+    "unpack-doctor-nanos": {
+      "ItemIds": [
+        248258
+      ],
+      "Consume": true,
+      "UseProjection": true,
+      "Grants": [
+        {
+          "ItemId": 43384,
+          "Quality": 1,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        },
+        {
+          "ItemId": 42423,
+          "Quality": 4,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        },
+        {
+          "ItemId": 99589,
+          "Quality": 7,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        },
+        {
+          "ItemId": 43960,
+          "Quality": 1,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        },
+        {
+          "ItemId": 43978,
+          "Quality": 4,
+          "HonorUnique": true,
+          "PublishBeforeConsumption": true
+        }
+      ],
+      "OptionalActions": [
+        "finish-buy-nano"
+      ],
+      "DirectItemUse": true
+    },
+    "tailor-measurement-0": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256415,
+          "Quality": 1
+        }
+      ]
+    },
+    "tailor-measurement-1": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256416,
+          "Quality": 1
+        }
+      ]
+    },
+    "tailor-measurement-2": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256417,
+          "Quality": 1
+        }
+      ]
+    },
+    "tailor-measurement-3": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256418,
+          "Quality": 1
+        }
+      ]
+    },
+    "tailor-measurement-4": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256419,
+          "Quality": 1
+        }
+      ]
+    },
+    "tailor-measurement-5": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256420,
+          "Quality": 1
+        }
+      ]
+    },
+    "tailor-measurement-6": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256421,
+          "Quality": 1
+        }
+      ]
+    },
+    "tailor-measurement-7": {
+      "Playfields": [
+        127
+      ],
+      "Grants": [
+        {
+          "ItemId": 256422,
+          "Quality": 1
+        }
+      ]
+    }
+  },
+  "Dialogues": {
+    "SimpleChar:78E0FC65": {
+      "Enabled": true,
+      "Starts": [
+        {
+          "Node": "stan_deliver_001",
+          "Carried": [
+            248306
+          ],
+          "Missions": [
+            {
+              "Quest": "Mission:555BE9F2",
+              "States": [
+                "Active"
+              ]
+            }
+          ]
+        }
+      ],
+      "Routes": [
+        {
+          "Node": "stan_goldman_003",
+          "Answer": 0,
+          "Action": "accept-stan-job"
+        },
+        {
+          "Node": "stan_deliver_001",
+          "Answer": 0,
+          "Action": "deliver-factory",
+          "TradeItem": 248306,
+          "TradeSlots": 4,
+          "TradePrompt": "Drag and drop the item(s) you want to give to Stanley Goodman into one of the slots available and press \"accept\""
+        }
+      ]
+    },
+    "SimpleChar:78E0FC69": {
+      "Enabled": true,
+      "Playfields": [
+        6553
+      ],
+      "Starts": [
+        {
+          "Node": "sarah_deliver_001",
+          "Carried": [
+            295618
+          ],
+          "Missions": [
+            {
+              "Quest": "Mission:555BE9F6",
+              "States": [
+                "Active"
+              ]
+            }
+          ]
+        }
+      ],
+      "Routes": [
+        {
+          "Node": "sarah_greene_001",
+          "Answer": 0,
+          "Action": "accept-sarah-job"
+        },
+        {
+          "Node": "sarah_deliver_001",
+          "Answer": 0,
+          "Action": "deliver-armor",
+          "TradeItem": 295618,
+          "TradePrompt": "Drag and drop the item(s) you want to give to Sarah Greene into one of the slots available and press \"accept\""
+        }
+      ]
+    },
+    "SimpleChar:7A18B924": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "scarlett_001",
+          "Answer": 0,
+          "Action": "doja-nascense",
+          "TradeItem": 284954,
+          "TradePrompt": "Drag and drop the item(s) you want to give to Scarlett Dalquist into one of the slots available and press \"accept\""
+        }
+      ]
+    },
+    "SimpleChar:79135F51": {
+      "Enabled": true,
+      "OpenMode": 0,
+      "ReopenNode": "tailor_root_reopen",
+      "Routes": [
+        {
+          "Node": "tailor_parts",
+          "Answer": 0,
+          "Action": "tailor-measurement-0"
+        },
+        {
+          "Node": "tailor_parts",
+          "Answer": 1,
+          "Action": "tailor-measurement-1"
+        },
+        {
+          "Node": "tailor_parts",
+          "Answer": 2,
+          "Action": "tailor-measurement-2"
+        },
+        {
+          "Node": "tailor_parts",
+          "Answer": 3,
+          "Action": "tailor-measurement-3"
+        },
+        {
+          "Node": "tailor_parts",
+          "Answer": 4,
+          "Action": "tailor-measurement-4"
+        },
+        {
+          "Node": "tailor_parts",
+          "Answer": 5,
+          "Action": "tailor-measurement-5"
+        },
+        {
+          "Node": "tailor_parts",
+          "Answer": 6,
+          "Action": "tailor-measurement-6"
+        },
+        {
+          "Node": "tailor_parts",
+          "Answer": 7,
+          "Action": "tailor-measurement-7"
+        }
+      ]
+    },
+    "SimpleChar:78E0FC81": {
+      "Enabled": true
+    },
+    "SimpleChar:79758F3F": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "craig_or_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:79758F3E": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "craig_or_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:79758F3B": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "craig_or_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:79758F3C": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "craig_or_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:79758F3D": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "craig_or_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:7A2013B7": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "or_mada_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:7A2013B4": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "or_mada_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:7A2013B5": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "or_mada_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:7A2013B8": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "or_mada_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:7A2013B6": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "or_mada_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    },
+    "SimpleChar:7A2013B9": {
+      "Enabled": true,
+      "Routes": [
+        {
+          "Node": "or_mada_001",
+          "Answer": 0,
+          "Action": "",
+          "Vendor": true
+        }
+      ]
+    }
+  },
+  "Journals": {
+    "Mission:555BE9F5": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432087029
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Find the thief",
+            "LongInfo": "Find the thief<BR><BR>Sarah recently had one of her custom-built suits of armor stolen from her. The thief was last seen in the underground.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Locate the thief and recover the DNA-Locked Armor.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010601
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555BE9F6": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432087030
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Deliver DNA-Locked Armor to ...",
+            "LongInfo": "Deliver DNA-Locked Armor to Sarah Greene<BR><BR>You have found the stolen suit of armor. <BR><BR><a href='itemref://295618/295618/1'><img src=\"rdb://88053\"></a><BR><font color=\"#FFFFFF\">Return the DNA-Locked Armor to Sarah Greene.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010601
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 158429,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555BE9F7": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432087031
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Speak to Vernon Godfray",
+            "LongInfo": "Speak to Vernon Godfray<BR><BR><font color=\"#63ad63\">Identity Crisis:</font><BR>In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. Your mission is to create a fake ID Card to you can leave this place..<BR><BR>Sarah told you to speak to Vernon Godfray, a local hacker, who should be able to help with aquiring more parts needed for your ID card.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Talk to Vernon Godfray.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010600
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555B4366": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432044390
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Talk to Stan Goodman",
+            "LongInfo": "Talk to Stan Goodman<BR><BR><font color=\"#63ad63\">Identity Crisis:</font><BR>In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. Your mission is to create a fake ID Card to you can leave this place..<BR><BR>Alex told you to go talk to Stan Goodman, a local 'purveyer of recently used merchandise'. He should be able to help with aquiring more parts for your ID card.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Talk to Stan Goodman.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010595
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555BD124": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432080676
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Buy a Lockpick",
+            "LongInfo": "Buy a Lockpick<BR><BR>Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetected, but in order to do so you need to buy a <a href='itemref://95577/95577/1'>Lock Pick</a>.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Find the <a href='itemref://297290/297290/3'>ICC Tech Supplies</a> vending machine and buy a <a href='itemref://95577/95577/1'>Lock Pick</a>.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010595
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555BE9C5": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432086981
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Take the contents of the Str...",
+            "LongInfo": "Take the contents of the Strongbox <BR><BR>Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetetected. Now that you have bought a <a href='itemref://95577/95577/1'>Lock Pick</a>, this should be an easy task.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Pick up (Left Click) your <a href='itemref://95577/95577/1'>Lock Pick</a> from your inventory and drop it (Left Click) on the <a href='itemref://295604/295604/1'>Merchant's Strongbox</a>.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010595
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555BE9F2": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432087026
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Deliver Antonio's Adaptatio...",
+            "LongInfo": "Deliver Antonio's Adaptation Factory to Stan Goodman.<BR><BR>Stan told you to Pick the Lock on the Strongbox in the Merchant's Storage undetetected. Now that you have found <a href='itemref://248306/248306/1'>Antonio's Adaptation Factory</a>, bring it back to Stan.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Bring <a href='itemref://248306/248306/1'>Antonio's Adaptation Factory</a> to Stan Goodman.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010595
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555BE9F3": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432087027
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Talk to Sarah Greene",
+            "LongInfo": "Talk to Sarah Greene<BR><BR><font color=\"#63ad63\">Identity Crisis:</font><BR>In order to leave Arete Landing and become a citizen of Rubi-Ka, you need an identity. Your mission is to create a fake ID Card to you can leave this place..<BR><BR>Stab told you that Sarah Greene, a local armorsmith, should be able to help you with aquiring more parts needed for your ID card.<BR><BR><font color=\"#FF0000\">Mission Objective:<BR>Talk to Sarah Greene.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010595
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:555BE9F4": {
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1432087028
+            },
+            "Unknown1": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Unknown4": 2,
+            "ShortInfo": "Buy some Nano Programs",
+            "LongInfo": "Buy some Nano Programs<BR><BR>Stanley Goodman told you to go talk to Marco Spida to buy a Nanoprogram Container.<BR><BR><font color=\"#FF0000\">Mission Objective: Talk to Marco Spida and buy a Nanoprogram Container for your profession. Open the Container to complete your mission.</font>",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2028010597
+            },
+            "Unknown5": 6,
+            "Unknown6": 0,
+            "Unknown7": 0,
+            "Unknown8": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 1201618627,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 111
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 172800,
+            "Unknown21": 172800,
+            "QuestActions": [],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "UnknownArray1": [
+              85360450
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 111
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 105040,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 0,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 111
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
+      "RecipientMarker": 111,
+      "DeleteHex": [
+        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
+        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
+      ],
+      "DeleteQuestMarker": 1431734586,
+      "DeleteRecipientMarker": 1985636618,
+      "TypedDelete": true,
+      "SynchronizeClock": true,
+      "ClockTime": 30024,
+      "ClockUnknown3": 185408,
+      "ClockUnknown4": 80183.3125,
+      "DurationSeconds": 172800
+    },
+    "Mission:55AA2421": {
+      "Hex": "00D6000A000102A100000DB478D84040465A40610000C35078D8404001000007E20000DAC355AA24210000000F000000000000000000000002596F7527766520666F756E64206120444F4A412D436869700000000102596F7527766520666F756E64206120444F4A412D436869703C42523E596F75206861766520666F756E642061207069656365206F662068617264776172652075736564206279204A4F4245206669656C6420736369656E746973747320746F2074616720616E6420747261636B2063726561747572657320696E2074686520536861646F776C616E64732E20596F75276C6C20626520726577617264656420666F722072657475726E696E6720746865206368697020746F2074686520776F6D616E2077686F7365207369676E617475726520697320696D7072696E746564206F6E2074686520636869702C2022536361726C6574742044616C7175697374222E000000C35078D8404000000006000000000000000000000000000003F1000003F1000007E200045BAC00045BAC00000001000000005847434B0000000000000000335452380000003C000000000000000000000000000000000000C35078D840400003BC520000000000000000000007E20000001800000000000000000000000000000000000111D3000196BA0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D861E3C00009C5000000FA1000186A0000186A0446940000000000044630000000007E20000C35078D840400000000105861E3C000000000000000000000006000007E20000C35078D8404000000000000196BA000000000000000000000000000000000000000000000007000003F101",
+      "RecipientMarker": 2027438144,
+      "DeleteHex": [
+        "003C000A0001003700000DB878D840405E4777700000C35078D84040000000003B000000000000DAC355AA24210000DAC355AA24210000",
+        "003D000A0001003500000DB878D84040212C487A0000C35078D840400000000001000000000000DAC355AA24210000000000000000"
+      ],
+      "DeleteRecipientMarker": 2027438144,
+      "DeleteQuestMarker": 1437213729,
+      "ClockBaseSeconds": 1201445827,
+      "DurationSeconds": 43200,
+      "ExpiryOffset": -1
+    },
+    "Mission:55AA2803": {
+      "Hex": "003E000A000101C000000DB878D84040465A40610000C35078D8404001000007E20000DAC355AA28030000000F000000000000000000000402596F752063616E206F6E6C79207475726E20696E206F6E6520444F4A2E2E2E000000002A596F752063616E206F6E6C79207475726E20696E206F6E6520444F4A41206368697020746F6461792E000000C35078D8404000000006000000000000000000000000000003F1000003F1000003F13654464200000000000000000000000000000000000000000000000000000000000000000000C35078D840400003BC520000043800000438000007E20000001800000000000000000000000000000000000111D3000196D4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006A89B128000000000000D2F14D87A81500000000000000000000000000000000000000000000000000000000000007E20000C35078D84040000000010587A815000000000000000000000006000007E20000C35078D8404000000000000196D4000000000000000000000000000000000000000000000007000003F101",
+      "RecipientMarker": 2027438144,
+      "DeleteHex": [
+        "003C000A0001003700000DB878D840405E4777700000C35078D84040000000003B000000000000DAC355AA24210000DAC355AA24210000",
+        "003D000A0001003500000DB878D84040212C487A0000C35078D840400000000001000000000000DAC355AA24210000000000000000"
+      ],
+      "DeleteRecipientMarker": 2027438144,
+      "DeleteQuestMarker": 1437213729,
+      "ClockBaseSeconds": 1201445827,
+      "DurationSeconds": 64800,
+      "ExpiryOffset": 323
+    }
+  },
+  "TimedTurnIns": [
+    {
+      "Key": "doja-nascense",
+      "Quest": "Mission:55AA2421",
+      "Objective": "mission_55AA2421_turnin",
+      "CooldownQuest": "Mission:55AA2803",
+      "CooldownObjective": "mission_55AA2803_cooldown",
+      "CooldownFlag": "doja-shared-cooldown-until-utc",
+      "GrantedFlag": "doja-nascense-turnin-granted",
+      "CooldownSeconds": 64800,
+      "TurnInPlayfields": [
+        7010
+      ],
+      "XpRewardKey": "doja-nascense-full-level-xp-v1",
+      "TokenRewardKey": "doja-nascense-side-tokens-v1",
+      "ObservationPrefix": "doja:",
+      "EventType": "DojaChip:ForceClose",
+      "IneligibleText": "You are not eligible to turn in this DOJA chip.",
+      "CooldownText": "You've already turned in a DOJA chip today.",
+      "UnavailableText": "DOJA Chip {name} is not available yet.",
+      "TokenText": "Side tokens collected: {value}.",
+      "Items": [
+        {
+          "ItemId": 284954,
+          "Name": "Nascense",
+          "MinLevel": 1,
+          "MaxLevel": 60,
+          "Enabled": true
+        },
+        {
+          "ItemId": 284955,
+          "Name": "Elysium",
+          "MinLevel": 61,
+          "MaxLevel": 100,
+          "Enabled": false
+        },
+        {
+          "ItemId": 284956,
+          "Name": "Scheol",
+          "MinLevel": 101,
+          "MaxLevel": 130,
+          "Enabled": false
+        },
+        {
+          "ItemId": 284957,
+          "Name": "Adonis",
+          "MinLevel": 131,
+          "MaxLevel": 160,
+          "Enabled": false
+        },
+        {
+          "ItemId": 284958,
+          "Name": "Penumbra",
+          "MinLevel": 161,
+          "MaxLevel": 204,
+          "Enabled": false
+        },
+        {
+          "ItemId": 284959,
+          "Name": "Inferno",
+          "MinLevel": 205,
+          "MaxLevel": 220,
+          "Enabled": false
+        },
+        {
+          "ItemId": 284960,
+          "Name": "Pandemonium",
+          "MinLevel": 220,
+          "MaxLevel": 220,
+          "Enabled": false
+        },
+        {
+          "ItemId": 284961,
+          "Name": "Alappaa",
+          "MinLevel": 201,
+          "MaxLevel": 210,
+          "Enabled": false
+        },
+        {
+          "ItemId": 284962,
+          "Name": "Albtraum",
+          "MinLevel": 211,
+          "MaxLevel": 219,
+          "Enabled": false
+        }
+      ]
+    }
+  ],
+  "Props": [
+    {
+      "Instance": 1463912398,
+      "TemplateId": 295604,
+      "Position": [
+        3409.956,
+        9.01,
+        893.5452
+      ],
+      "Rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "Playfield": 6553,
+      "Action": "unlock-strongbox",
+      "ItemTarget": true,
+      "Stats": {
+        "0": 2147496449,
+        "23": 295604,
+        "412": 1,
+        "500": 0,
+        "501": 0,
+        "701": 1,
+        "702": 295604,
+        "703": 295604
+      }
+    },
+    {
+      "Instance": 1463912399,
+      "TemplateId": 295620,
+      "Position": [
+        3424.016,
+        0.01011355,
+        887.8564
+      ],
+      "Rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "Playfield": 6553,
+      "Action": "recover-stolen-armor",
+      "ItemTarget": false,
+      "Stats": {
+        "0": 2147496449,
+        "23": 295620,
+        "412": 1,
+        "500": 0,
+        "501": 0,
+        "701": 1,
+        "702": 295620,
+        "703": 295620
+      }
+    }
+  ]
+}

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AORebirth.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -103,8 +104,46 @@ public sealed class MongoNanoTests
         using var f = new Fixture(); f.Player.Stats.Set((CharacterStat)129, 9);
         Assert.IsFalse(f.Service.TryCast(f.Player, 100198, Identity.None)); f.Player.Stats.Set((CharacterStat)129, 10);
         Assert.IsTrue(f.Catalog.TryGet(100194, out var child));
-        child.Template.SpellList[AORebirth.Enums.EventType.OnUse][0].Arguments[0] = 2001;
+        child.Template.SpellList[EventType.OnUse][0].FunctionType = (int)FunctionType.Hit;
         Assert.IsFalse(f.Service.TryCast(f.Player, 100198, Identity.None)); Assert.AreEqual(0, f.Store.Commits);
+    }
+
+    [TestMethod]
+    public void Edited_taunt_magnitude_is_content_and_never_converted_to_health_damage()
+    {
+        using var f = new Fixture(); var npc = f.Npc(2);
+        Assert.IsTrue(f.Catalog.TryGet(100194, out var child));
+        child.Template.SpellList[EventType.OnUse][0].Arguments[0] = 2001;
+        f.Begin(); f.Advance(1000);
+        Assert.AreEqual(1, f.Store.Commits); Assert.AreEqual(1, npc.Engagements);
+        Assert.AreEqual(99, npc.Stats.GetOrZero(CharacterStat.Health));
+    }
+
+    [TestMethod]
+    [DataRow("target")] [DataRow("operation")] [DataRow("requirement-target")]
+    public void Unsupported_child_taunt_graph_is_rejected_before_cost(string invalid)
+    {
+        using var f = new Fixture(); Assert.IsTrue(f.Catalog.TryGet(100194, out var child));
+        var spell = child.Template.SpellList[EventType.OnUse][0];
+        if (invalid == "target") spell.Target = (int)ItemTarget.User;
+        if (invalid == "operation") spell.Requirements[0].Operator = (int)Operator.HasMaster;
+        if (invalid == "requirement-target") spell.Requirements[0].Target = int.MaxValue;
+        Assert.IsFalse(f.Service.TryCast(f.Player, 100198, Identity.None));
+        Assert.AreEqual(0, f.Store.Commits); Assert.AreEqual(100, f.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
+    }
+
+    [TestMethod]
+    public void Child_requirements_select_actual_recipients_and_unmet_branches_never_taunt()
+    {
+        using var f = new Fixture(); var eligible = f.Npc(2); var ineligible = f.Npc(2);
+        eligible.Stats.Set(CharacterStat.Level, 15); ineligible.Stats.Set(CharacterStat.Level, 5);
+        Assert.IsTrue(f.Catalog.TryGet(100194, out var child));
+        foreach (var spell in child.Template.SpellList[EventType.OnUse])
+            spell.Requirements = [new() { ChildOperator = (int)Operator.And, Operator = (int)Operator.GreaterThan,
+                StatNumber = (int)CharacterStat.Level, Target = (int)ItemTarget.Target, Value = 10 }];
+        f.Begin(); f.Advance(1000);
+        Assert.AreEqual(1, eligible.Engagements); Assert.AreEqual(0, ineligible.Engagements);
+        Assert.AreEqual(100, ineligible.Stats.GetOrZero(CharacterStat.Health));
     }
 
     sealed class TestNpc(Identity identity, bool combat) : NpcCharacter(identity, new StubItemBuilder())
@@ -124,7 +163,7 @@ public sealed class MongoNanoTests
         long _time;
         internal Fixture()
         {
-            Service = new(Catalog, Store, [new MongoNanoSpecialization(Catalog)],
+            Service = new(Catalog, Store, [new AreaTauntNanoSpecialization(Catalog)],
                 utcNow: () => new DateTime(2026, 9, 9, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(_time), monotonicMilliseconds: () => _time);
             typeof(PlayfieldManager).GetField("<Nanos>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(World.Manager, Service);
             Pf = World.World(500); Player = World.Player(Pf, 1);

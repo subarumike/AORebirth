@@ -42,10 +42,10 @@ namespace ZoneEngine_New.Core.Trade
         public IReadOnlyList<ShopStockSlot> Slots => _slots.AsReadOnly();
 
         public bool IsGenerated { get; private set; }
-        internal bool IsAcceptedSnapshot { get; private set; }
+        internal bool IsConfiguredSnapshot { get; private set; }
 
         /// <summary>An exact accepted vendor adapter installs its entire frozen stock once.</summary>
-        internal void SetAcceptedSnapshot(IReadOnlyList<ShopStockSlot> slots)
+        internal void SetConfiguredSnapshot(IReadOnlyList<ShopStockSlot> slots)
         {
             ArgumentNullException.ThrowIfNull(slots);
             if (IsGenerated || _openTrades != 0 || slots.Count == 0)
@@ -58,7 +58,7 @@ namespace ZoneEngine_New.Core.Trade
                 copy.Add(slot);
             }
             _slots.Clear(); _slots.AddRange(copy);
-            IsGenerated = true; IsAcceptedSnapshot = true;
+            IsGenerated = true; IsConfiguredSnapshot = true;
         }
 
         /// <summary>Shoppers currently holding this machine's trade window open.</summary>
@@ -78,7 +78,7 @@ namespace ZoneEngine_New.Core.Trade
             ArgumentNullException.ThrowIfNull(minter);
             ArgumentNullException.ThrowIfNull(random);
 
-            if (IsAcceptedSnapshot || (IsGenerated && !IsIdleExpired()))
+            if (IsConfiguredSnapshot || (IsGenerated && !IsIdleExpired()))
                 return;
 
             Generate(definition, minter, random);

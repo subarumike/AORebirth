@@ -164,8 +164,8 @@ namespace ZoneEngine_New.Core.Playfield
             if (_heartBeat != null || _disposed)
                 return;
 
-            GetRequiredService<AcceptedNpcActivationService>().Activate();
-            GetRequiredService<ZoneEngine_New.Core.Missions.AcceptedQuestPropService>().Activate();
+            GetRequiredService<NpcContentActivationService>().Activate();
+            GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Activate();
             _heartBeat = new PlayfieldHeartbeat(Identity, Tick);
         }
 
@@ -234,6 +234,10 @@ namespace ZoneEngine_New.Core.Playfield
         public T GetRequiredService<T>()
             where T : class
             => _serviceProvider.GetRequiredService<T>();
+
+        internal ZoneEngine_New.Core.GameData.WorldContentCatalog WorldContent
+            => _serviceProvider?.GetService<ZoneEngine_New.Core.GameData.IGameData>()?.WorldContent
+                ?? ZoneEngine_New.Core.GameData.WorldContentCatalog.Empty;
 
         /// <summary>Client inventory handle for an opened container (bags, corpses, chests). Range 1..ushort.MaxValue.</summary>
         public int AllocateContainerInventoryHandle()
@@ -396,7 +400,7 @@ namespace ZoneEngine_New.Core.Playfield
                 foreach (PlayfieldTransfer transfer in _incomingTransfers.Keys) transfer.RequestReturn();
                 foreach (PlayfieldTransfer transfer in _outgoingTransfers.Keys) transfer.SourceShutdown();
                 _playfieldManager.Dialogues.Shutdown(this);
-                GetRequiredService<ZoneEngine_New.Core.Missions.AcceptedQuestPropService>().Shutdown();
+                GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Shutdown();
                 Player[] remaining = [.. _dynelRegistry.PlayerEntities()];
                 foreach (Player player in remaining)
                 {
@@ -415,8 +419,8 @@ namespace ZoneEngine_New.Core.Playfield
                     }
                 }
 
-                GetRequiredService<BucketheadSummonService>().Shutdown();
-                GetRequiredService<AcceptedNpcActivationService>().Shutdown();
+                GetRequiredService<SummonService>().Shutdown();
+                GetRequiredService<NpcContentActivationService>().Shutdown();
                 _pendingStatRebases.Clear();
                 _dynelRegistry.Clear();
             }
@@ -473,8 +477,8 @@ namespace ZoneEngine_New.Core.Playfield
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inbound.drain");
                 _inbound.Drain(_router, spawn, this);
                 spawn.Tick();
-                GetRequiredService<AcceptedNpcActivationService>().Tick();
-                GetRequiredService<BucketheadSummonService>().Tick();
+                GetRequiredService<NpcContentActivationService>().Tick();
+                GetRequiredService<SummonService>().Tick();
                 foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
                     if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Nanos.Tick(player);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inventory.moves");
@@ -553,9 +557,9 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton<DynelRegistry>();
             services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));
             services.AddSingleton<SpawnService>();
-            services.AddSingleton<AcceptedNpcActivationService>();
-            services.AddSingleton<BucketheadSummonService>();
-            services.AddSingleton<ZoneEngine_New.Core.Missions.AcceptedQuestPropService>();
+            services.AddSingleton<NpcContentActivationService>();
+            services.AddSingleton<SummonService>();
+            services.AddSingleton<ZoneEngine_New.Core.Missions.QuestPropService>();
             services.AddSingleton<HashSpawnSystem>();
             return services;
         }

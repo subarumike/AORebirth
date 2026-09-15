@@ -370,7 +370,8 @@
               "TextEvidence": "20260718-185306",
               "NextNodeId": "prophet_002",
               "Conditions": [],
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -544,7 +545,8 @@
               "TextEvidence": "20260718-185306",
               "NextNodeId": "prophet_006",
               "Conditions": [],
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -676,7 +678,8 @@
               "TextEvidence": "20260718-185306",
               "NextNodeId": "hyp_004",
               "Conditions": [],
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -762,7 +765,8 @@
               "TextEvidence": "20260718-185306",
               "NextNodeId": "hyp_return_after",
               "Conditions": [],
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

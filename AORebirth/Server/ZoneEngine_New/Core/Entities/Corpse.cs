@@ -25,9 +25,6 @@ namespace ZoneEngine_New.Core.Entities
         private const int DefaultDeadTimer = 60;
         public const int LootReserveSeconds = 60;
 
-        /// <summary>Live Biofreak-style Flags when source Flags is missing/zero.</summary>
-        private const int DefaultCorpseFlags = 1579013;
-
         private readonly IGameData _gameData;
         private bool _cashClaimed;
 
@@ -130,35 +127,13 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown5 = 0x32,
                 UnknownArray = [],
                 Unknown6 = 0x03,
-                // TEMP: live Biofreak Remains anim/spell row
-                AnimationEffects = [BuildHardcodedAnimEffect()],
+                AnimationEffects = _gameData.WorldContent.CorpseDefaults.AnimationEffects,
                 // Dead character identity (AOSharp IdentityType.Character == CanbeAffected).
                 UnknownIdentity = Owner,
                 Textures = BuildDefaultTextures(),
                 Unknown7 = 0
             };
         }
-
-        /// <summary>TEMP: one GfxEffect-style row from live Biofreak Remains CFU.</summary>
-        static AnimationEffect BuildHardcodedAnimEffect() =>
-            new()
-            {
-                IdentityType = 0xCF27,
-                NanoId = unchecked((int)0x39EFD385),
-                NanoInstance = 4,
-                Time1 = 0,
-                Time2 = 1,
-                Unknown2 = 0,
-                Unknown3 = 0,
-                Unknown4 = 0,
-                Unknown5 = 0,
-                Unknown6 = 0,
-                Unknown7 = 0x1F4,
-                Unknown8 = 1,
-                Unknown9 = 4,
-                VisualDataId = 0x7632,
-                Unknown10 = 0
-            };
 
         static Texture[] BuildDefaultTextures()
         {
@@ -213,9 +188,8 @@ namespace ZoneEngine_New.Core.Entities
             if (!SourceStats.TryGetValue(CharacterStat.MonsterData, out int monsterData))
                 return false;
 
-            //DefaultMob Override
-            if (monsterData == 26902)
-                monsterData = 30258;
+            if (_gameData.WorldContent.CorpseDefaults.MonsterDataAliases.TryGetValue(monsterData, out int alias))
+                monsterData = alias;
 
             return _gameData.TryGetCatMesh(monsterData, out catMesh);
         }
@@ -225,7 +199,7 @@ namespace ZoneEngine_New.Core.Entities
             if (SourceStats.TryGetValue(CharacterStat.Flags, out int flags) && flags != 0)
                 return flags;
 
-            return DefaultCorpseFlags;
+            return _gameData.WorldContent.CorpseDefaults.Flags;
         }
 
         void CopySourceStats(Character dead)

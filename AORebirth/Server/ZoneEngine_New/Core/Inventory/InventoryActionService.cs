@@ -57,7 +57,7 @@ namespace ZoneEngine_New.Core.Inventory
         public bool TryDelete(Player player, Identity slot, int expectedInstanceId)
         {
             if (!TryResolveOwnedSlot(player, slot, out Container page, out Item item)
-                || item.InstanceId != expectedInstanceId || IsPermanentGardenKey(item)) return false;
+                || item.InstanceId != expectedInstanceId || IsProtectedItem(item)) return false;
             if (InventoryMoveService.IsBagItem(item)
                 && player.Inventory.TryGetBackpackPage(item.Identity, out Container bagPage)
                 && bagPage.Content.Count != 0) return false;
@@ -106,29 +106,27 @@ namespace ZoneEngine_New.Core.Inventory
                 });
         }
 
-        // These are accepted permanent passage keys, not arbitrary exemptions inferred from names.
-        // Legacy NascenceStatueTeleportCatalog.IsPermanentGardenPassageItem and Thrak key rules.
-        public static bool IsPermanentGardenKey(Item item)
-            => item.LowId is 226994 or 226824 || item.HighId is 226994 or 226824;
+        // Protection is an explicit editable binding, never inferred from an item name.
+        public static bool IsProtectedItem(Item item)
+            => ItemBehaviorContent.Current.IsProtected(item);
 
         /// <summary>
-        /// Capture-backed standalone package 301782 -> 301749 (20260806-rabbit).
-        /// Mirrors the accepted Legacy main-inventory storage + Overflow presentation contract,
-        /// but never consumes a package when the durable grant fails.
+        /// Apply a configured package conversion in one durable inventory transaction.
         /// </summary>
-        public bool TryOpenQuabbit(Player player, Identity slot, Item sealedItem)
+        public bool TryOpenPackage(Player player, Identity slot, Item sealedItem)
         {
-            const int sealedId = 301782, openedId = 301749;
+            var content = ItemBehaviorContent.Current.FindPackage(sealedItem);
+            if (content == null) return false;
             if (player.Session?.State != SessionState.InPlay || player.IsPersistenceQuarantined || player.IsDead
-                || (sealedItem.LowId != sealedId && sealedItem.HighId != sealedId)
                 || sealedItem.StackCount != 1 || !TryResolveOwnedSlot(player, slot, out Container source, out Item current)
-                || !ReferenceEquals(current, sealedItem) || !_catalog.TryGet(openedId, out _)) return false;
-            bool alreadyOwned = player.Inventory.Inventory.Content.Values.Concat(player.Inventory.Overflow.Content.Values)
-                .Any(i => i.LowId == openedId || i.HighId == openedId);
+                || !ReferenceEquals(current, sealedItem) || !_catalog.TryGet(content.ProductLowId, out _)
+                || !_catalog.TryGet(content.ProductHighId, out _)) return false;
+            bool alreadyOwned = content.Unique && player.Inventory.Inventory.Content.Values.Concat(player.Inventory.Overflow.Content.Values)
+                .Any(i => i.LowId == content.ProductLowId && i.HighId == content.ProductHighId);
             Container destination = player.Inventory.Inventory;
             int destinationSlot = alreadyOwned ? -1 : destination.FindFreeSlot();
             if (!alreadyOwned && destinationSlot < 0) return false;
-            Item? opened = alreadyOwned ? null : _items.Create(openedId, openedId, 1, ItemSource.Other, instanceId: _ids.Allocate());
+            Item? opened = alreadyOwned ? null : _items.Create(content.ProductLowId, content.ProductHighId, content.Quality, ItemSource.Other, instanceId: _ids.Allocate());
             var changes = new List<InventoryRowChange>
             {
                 new(sealedItem, new Identity { Type = IdentityType.None, Instance = player.Identity.Instance },
@@ -142,11 +140,11 @@ namespace ZoneEngine_New.Core.Inventory
                 {
                     if (opened != null)
                     {
-                        if (!destination.Add(destinationSlot, opened)) throw new InvalidOperationException("Reserved Quabbit grant slot changed.");
+                        if (!destination.Add(destinationSlot, opened)) throw new InvalidOperationException("Reserved package grant slot changed.");
                         player.Session?.Send(new TemplateActionMessage
                         {
-                            Identity = player.Identity, ItemLowId = openedId, ItemHighId = openedId,
-                            Quality = 1, Unknown1 = 1, Unknown2 = 87,
+                            Identity = player.Identity, ItemLowId = opened.LowId, ItemHighId = opened.HighId,
+                            Quality = opened.Quality, Unknown1 = 1, Unknown2 = 87,
                             Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 }
                         });
                         player.Session?.Send(new ContainerAddItemMessage
@@ -158,7 +156,7 @@ namespace ZoneEngine_New.Core.Inventory
                     source.Content.Remove(slot.Instance);
                     player.Session?.Send(new TemplateActionMessage
                     {
-                        Identity = player.Identity, ItemLowId = sealedId, ItemHighId = sealedId,
+                        Identity = player.Identity, ItemLowId = sealedItem.LowId, ItemHighId = sealedItem.HighId,
                         Quality = sealedItem.Quality > 0 ? sealedItem.Quality : 1, Unknown1 = 1,
                         Unknown2 = 3, Placement = slot, Unknown3 = 50000, Unknown4 = player.Identity.Instance
                     });
@@ -175,7 +173,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         public bool TryUseNanoCrystal(Player player, Identity slot, Item item)
         {
-            if (!item.Can(CanFlags.Consume) || IsPermanentGardenKey(item)
+            if (!item.Can(CanFlags.Consume) || IsProtectedItem(item)
                 || !TryResolveOwnedSlot(player, slot, out Container page, out Item current)
                 || !ReferenceEquals(current, item) || item.StackCount <= 0
                 || !item.SpellList.TryGetValue(EventType.OnUse, out var spells) || spells.Count == 0

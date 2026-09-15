@@ -108,7 +108,7 @@ namespace ZoneEngine_New.Core.Trade
             Initiator = initiator;
             Partner = partner;
             Machine = machine;
-            AcceptedShopTransport = machine?.Stock.IsAcceptedSnapshot == true ? initiator.Session : null;
+            AcceptedShopTransport = machine?.Stock.IsConfiguredSnapshot == true ? initiator.Session : null;
             InitiatorOffer = new TradeOffer();
             PartnerOffer = new TradeOffer();
         }

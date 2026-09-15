@@ -77,6 +77,7 @@ namespace ZoneEngine_New.Core.GameData
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
 
             EnsureRootExists();
+            WorldContent = WorldContentCatalog.Load(RootPath);
             LoadNpcStatContent();
             LoadMobTemplates();
             LoadNpcTemplates();
@@ -88,6 +89,8 @@ namespace ZoneEngine_New.Core.GameData
         }
 
         public string RootPath { get; }
+
+        public WorldContentCatalog WorldContent { get; }
 
         public string PlayfieldsPath { get; }
 
@@ -303,7 +306,7 @@ namespace ZoneEngine_New.Core.GameData
                         GameDataPaths.PlayfieldDynelsRelativePath(sourcePlayfieldId));
                     PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(dynelsPath);
                     _teleportDestinations?.Apply(sourcePlayfieldId, dynels);
-                    ExitProxyDoorCatalog.CollectFromDynels(dynels, collected);
+                    ExitProxyDoorCatalog.CollectFromDynels(dynels, collected, WorldContent.ExitDoorRules);
                 }
 
                 Dictionary<int, int[]> index = new(collected.Count);
@@ -517,24 +520,12 @@ namespace ZoneEngine_New.Core.GameData
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Mob template '{0}' references unknown NpcFamily {1} and default {2} is also missing; family curves will be skipped",
+                        "Mob template '{0}' references unknown NpcFamily {1}; template composition requires a valid configured family",
                         template.Hash,
-                        requestedFamily,
-                        MobTemplate.DefaultNpcFamilyId));
+                        requestedFamily));
             }
             else
             {
-                if (family.Family != requestedFamily)
-                {
-                    _logger.Warn(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "Mob template '{0}' references unknown NpcFamily {1}; using default {2}",
-                            template.Hash,
-                            requestedFamily,
-                            family.Family));
-                }
-
                 _npcFamilies.ValidateCoverage(
                     family.Family,
                     template.MinLevel,
@@ -886,6 +877,10 @@ namespace ZoneEngine_New.Core.GameData
 
             if (data == null)
                 throw new InvalidDataException("Playfield spawns was empty: " + spawnsPath);
+
+            if (data.SchemaVersion != PlayfieldSpawnsData.SupportedSchemaVersion
+                || (data.PlayfieldId != 0 && data.PlayfieldId != playfieldId))
+                throw new InvalidDataException("Playfield spawn schema or playfield identity is invalid: " + spawnsPath);
 
             data.Spawns ??= [];
             if (data.PlayfieldId == 0)

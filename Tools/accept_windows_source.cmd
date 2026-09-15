@@ -91,41 +91,9 @@ for %%S in (2 3 4 5 7) do (
 )
 echo WINDOWS_CONTRACTS=PASS
 
-set "PLACEMENT_OUTPUT=AORebirth\Built\Debug\ZoneEngine_New\Content\Official\PlayfieldPlacements"
-set "PLACEMENT_MANIFEST=%PLACEMENT_OUTPUT%\official-placement-build-manifest.json"
-set "PLACEMENT_PROVENANCE=%PLACEMENT_OUTPUT%\PLACEMENT_PROVENANCE.env"
-if not exist "%PLACEMENT_MANIFEST%" goto :placement_failed
-if not exist "%PLACEMENT_PROVENANCE%" goto :placement_failed
-set "PLACEMENT_SOURCE_SHA="
-set "PLACEMENT_BUILD_PLATFORM="
-set "PLACEMENT_BUILD_MANIFEST_SHA256="
-set "PLACEMENT_BUILD_MANIFEST_SHA256_ASSIGNMENTS=0"
-for /f "usebackq tokens=1,* delims==" %%A in ("%PLACEMENT_PROVENANCE%") do (
-    if /i "%%A"=="SOURCE_SHA" set "PLACEMENT_SOURCE_SHA=%%B"
-    if /i "%%A"=="BUILD_PLATFORM" set "PLACEMENT_BUILD_PLATFORM=%%B"
-    if /i "%%A"=="PLACEMENT_BUILD_MANIFEST_SHA256" (
-        set /a PLACEMENT_BUILD_MANIFEST_SHA256_ASSIGNMENTS+=1 >nul
-        set "PLACEMENT_BUILD_MANIFEST_SHA256=%%B"
-    )
-)
-if /i not "%PLACEMENT_SOURCE_SHA%"=="%ACTUAL_SHA%" goto :placement_failed
-if /i not "%PLACEMENT_BUILD_PLATFORM%"=="windows" goto :placement_failed
-if not "%PLACEMENT_BUILD_MANIFEST_SHA256_ASSIGNMENTS%"=="1" goto :placement_failed
-if not defined PLACEMENT_BUILD_MANIFEST_SHA256 goto :placement_failed
-if "%PLACEMENT_BUILD_MANIFEST_SHA256:~63,1%"=="" goto :placement_failed
-if not "%PLACEMENT_BUILD_MANIFEST_SHA256:~64,1%"=="" goto :placement_failed
-echo(%PLACEMENT_BUILD_MANIFEST_SHA256%| %SystemRoot%\System32\findstr.exe /r /x "[0-9a-f][0-9a-f]*" >nul
-if errorlevel 1 goto :placement_failed
-set "PLACEMENT_ACTUAL_BUILD_MANIFEST_SHA256="
-for /f "skip=1 tokens=*" %%H in ('%SystemRoot%\System32\certutil.exe -hashfile "%PLACEMENT_MANIFEST%" SHA256 2^>nul') do (
-    set "PLACEMENT_ACTUAL_BUILD_MANIFEST_SHA256=%%H"
-    goto :placement_hash_ready
-)
-:placement_hash_ready
-if not defined PLACEMENT_ACTUAL_BUILD_MANIFEST_SHA256 goto :placement_failed
-if not "%PLACEMENT_ACTUAL_BUILD_MANIFEST_SHA256%"=="%PLACEMENT_BUILD_MANIFEST_SHA256%" goto :placement_failed
-echo PLACEMENT_CORPUS=PASS
-echo PLACEMENT_BUILD_MANIFEST_SHA256=%PLACEMENT_BUILD_MANIFEST_SHA256%
+call Tools\run_newengine_content_architecture_guard.cmd --check
+if errorlevel 1 goto :content_failed
+echo CONTENT_ARCHITECTURE_GUARD=PASS
 
 set "TEST_RESULT=NOT_RUN"
 if "%RUN_MANDATORY_GATE%"=="0" (
@@ -162,8 +130,7 @@ set "EVIDENCE=build-verify\windows-acceptance-%SHORT_SHA%.env"
 >> "%EVIDENCE%" echo GENERATED_COMBAT_INTEGRITY=PASS
 >> "%EVIDENCE%" echo WINDOWS_CONTRACTS=PASS
 >> "%EVIDENCE%" echo BUILD=%BUILD_RESULT%
->> "%EVIDENCE%" echo PLACEMENT_CORPUS=PASS
->> "%EVIDENCE%" echo PLACEMENT_BUILD_MANIFEST_SHA256=%PLACEMENT_BUILD_MANIFEST_SHA256%
+>> "%EVIDENCE%" echo CONTENT_ARCHITECTURE_GUARD=PASS
 >> "%EVIDENCE%" echo TESTS=%TEST_RESULT%
 >> "%EVIDENCE%" echo DEFAULT_ZONEENGINE=ZoneEngine_New
 >> "%EVIDENCE%" echo ZONEENGINE_NEW_ACCEPTANCE=PASS
@@ -189,8 +156,8 @@ echo WINDOWS_ACCEPTANCE=FAIL
 popd
 exit /b 22
 
-:placement_failed
-echo PLACEMENT_CORPUS=FAIL
+:content_failed
+echo CONTENT_ARCHITECTURE_GUARD=FAIL
 echo WINDOWS_ACCEPTANCE=FAIL
 popd
 exit /b 21

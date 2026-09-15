@@ -28,7 +28,7 @@ namespace ZoneEngine_New.Tests
             NpcFamilyStatCatalog catalog = NpcFamilyStatCatalog.Build(
                 new Dictionary<int, NpcFamilyStatTemplateData>
                 {
-                    [MobTemplate.DefaultNpcFamilyId] = new()
+                    [10001] = new()
                     {
                         Name = "Default",
                         StatCurves = new Dictionary<int, Dictionary<int, int>>
@@ -51,7 +51,7 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual("Zero", zero.Name);
 
             Assert.IsFalse(catalog.TryResolve(999, out _));
-            Assert.IsTrue(catalog.TryResolve(MobTemplate.DefaultNpcFamilyId, out var explicitDefault));
+            Assert.IsTrue(catalog.TryResolve(10001, out var explicitDefault));
             Assert.AreEqual("Default", explicitDefault.Name);
 
             Assert.IsFalse(

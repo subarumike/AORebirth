@@ -142,7 +142,8 @@
               "TextEvidence": "20260822-082554",
               "NextNodeId": "rosenblatt_papagena_offer",
               "Conditions": [],
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -409,7 +410,8 @@
               "TextEvidence": "20260822-070136",
               "NextNodeId": "rosenblatt_turnin_done",
               "Conditions": [],
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

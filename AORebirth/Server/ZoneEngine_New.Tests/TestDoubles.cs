@@ -51,6 +51,9 @@ namespace ZoneEngine_New.Tests
 
         public string RootPath { get; init; } = string.Empty;
 
+        public WorldContentCatalog WorldContent => string.IsNullOrEmpty(RootPath)
+            ? WorldContentFixtures.Content : WorldContentCatalog.Load(RootPath);
+
         public int MobTemplateCount => 0;
 
         public int NpcFamilyStatTemplateCount => 0;

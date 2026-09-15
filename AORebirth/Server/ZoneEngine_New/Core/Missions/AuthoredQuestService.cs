@@ -8,7 +8,6 @@ using AORebirth.Interfaces.Persistence.Missions;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine.Core.Missions;
-using ZoneEngine.Core.Playfields;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
@@ -18,11 +17,9 @@ using DomainState = ZoneEngine.Core.Missions.MissionLifecycleState;
 using DomainStatus = ZoneEngine.Core.Missions.MissionOperationStatus;
 using DaoState = AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState;
 
-/// <summary>Accepted authored item transitions, using the existing mission service inside ONE DAO transaction.</summary>
+/// <summary>Generic editable authored actions; inventory, rewards and mission transitions commit together.</summary>
 public sealed partial class AuthoredQuestService
 {
-    public const string TalkStan = "Mission:555B4366", BuyLockpick = "Mission:555BD124", Strongbox = "Mission:555BE9C5";
-    public const string DeliverFactory = "Mission:555BE9F2", TalkSarah = "Mission:555BE9F3", BuyNano = "Mission:555BE9F4";
     readonly IMissionDao _dao;
     readonly InventoryFlushService _flush;
     readonly IItemBuilder _items;
@@ -31,104 +28,134 @@ public sealed partial class AuthoredQuestService
     readonly AuthoredQuestCatalog _catalog;
     readonly IZoneLogger _logger;
     readonly Func<DateTime> _now;
-
+    public InteractionContent Content => _catalog.Content;
     public AuthoredQuestService(IMissionDao dao, InventoryFlushService flush, IItemBuilder items,
         IItemTemplateCatalog templates, IItemInstanceIdAllocator ids, AuthoredQuestCatalog catalog, IZoneLogger logger)
         : this(dao, flush, items, templates, ids, catalog, logger, () => DateTime.UtcNow) { }
-
     public AuthoredQuestService(IMissionDao dao, InventoryFlushService flush, IItemBuilder items,
         IItemTemplateCatalog templates, IItemInstanceIdAllocator ids, AuthoredQuestCatalog catalog, IZoneLogger logger, Func<DateTime> now)
     { _dao = dao; _flush = flush; _items = items; _templates = templates; _ids = ids; _catalog = catalog; _logger = logger; _now = now; }
 
-    public static bool IsAuthoredItem(Item item) => item.LowId == 295999 || item.HighId == 295999
-        || CapturedAreteMarcoSpidaVendorContentProvider.TryGetNanoPackage(item.LowId, out _)
-        || CapturedAreteMarcoSpidaVendorContentProvider.TryGetNanoPackage(item.HighId, out _)
-        || ZoneEngine.Core.Doja.DojaChipInteractionRules.IsKnownDojaChip(item.LowId, item.HighId);
+    public bool IsAuthoredItem(Item item) => Content.Actions.Values.Any(x => x.DirectItemUse
+        && (x.ItemIds.Contains(item.LowId) || x.ItemIds.Contains(item.HighId)))
+        || Content.TimedTurnIns.Any(x => x.Items.Any(y => y.ItemId == item.LowId || y.ItemId == item.HighId));
 
     public bool TryUseItem(Player player, Identity slot, Item item)
     {
-        if (!IsAuthoredItem(item)) return false;
-        if (ZoneEngine.Core.Doja.DojaChipInteractionRules.IsKnownDojaChip(item.LowId, item.HighId)) return TryUseDoja(player, slot, item);
+        var timed = Content.TimedTurnIns.FirstOrDefault(x => x.Items.Any(y => y.ItemId == item.LowId || y.ItemId == item.HighId));
+        if (timed != null) return TryUseTimedItem(player, slot, item, timed);
+        // NPC and prop interactions require their bound owner route; carrying an item is not authority to turn it in.
+        var action = Content.Actions.FirstOrDefault(x => x.Value.DirectItemUse && x.Value.ItemIds.Any(id => id == item.LowId || id == item.HighId));
+        return action.Key != null && TryExecuteAction(player, action.Key, slot, item);
+    }
+
+    public bool CanExecuteAction(Player player, string key)
+    {
+        if (Content.TimedTurnIns.FirstOrDefault(x => x.Key == key) is { } timed) return CanOpenTimedTrade(player, timed);
+        if (!Content.Actions.TryGetValue(key, out var action)) return false;
+        lock (player.PersistenceGate)
+        {
+            if (!IsCurrent(player)) return false;
+            try { return _dao.Execute(player.Identity.Instance, null!, tx => Conditions(player, action, tx)); }
+            catch (Exception e) { _logger.Error(e, "Interaction state could not be read."); return false; }
+        }
+    }
+
+    public bool TryExecuteAction(Player player, string key, Identity slot = default, Item? item = null, Action? acknowledge = null)
+    {
+        if (Content.TimedTurnIns.FirstOrDefault(x => x.Key == key) is { } timed)
+            return item != null && TryTurnInTimedItem(player, slot, item, acknowledge ?? (() => { }), timed);
+        if (!Content.Actions.TryGetValue(key, out var action)) return false;
         return Mutate(player, null, (tx, service) =>
         {
-            RequireSource(player, slot, item);
-            if (item.LowId == 295999 || item.HighId == 295999)
+            if (!Conditions(player, action, tx)) throw new InvalidOperationException("Interaction conditions are not satisfied.");
+            if (action.ItemIds.Length != 0)
             {
-                var grants = HasCarried(player, 95577) ? Array.Empty<Item>() : new[] { CreateItem(95577, 1) };
-                var plan = Plan(player, grants);
-                CompleteIfPresent(service, player.Identity.Instance, BuyLockpick, "mission_555BD124_buy_lockpick");
-                Accept(service, player.Identity.Instance, Strongbox);
-                ApplyRows(tx, plan, player, slot, item);
-                return () =>
-                {
-                    plan.PublishAfterCommit(false);
-                    foreach (var grant in grants) SendOverflowGrant(player, grant);
-                    PublishConsumption(player, slot, item);
-                    AuthoredQuestJournal.Delete(player, unchecked((int)0x555BD124));
-                    AuthoredQuestJournal.Send(player, Strongbox, _now());
-                };
+                if (item == null || !action.ItemIds.Any(id => id == item.LowId || id == item.HighId)) throw new InvalidOperationException("Wrong source item.");
+                RequireSource(player, slot, item);
             }
-
-            if (!CapturedAreteMarcoSpidaVendorContentProvider.TryGetNanoPackage(item.LowId, out var package)
-                && !CapturedAreteMarcoSpidaVendorContentProvider.TryGetNanoPackage(item.HighId, out package))
-                throw new InvalidOperationException("Unsupported authored package.");
-            bool completeTip = tx.GetMission(new(player.Identity.Instance, BuyNano))?.State == DaoState.Active;
-            // Validate every accepted template even when its unique item is already owned.
-            var contents = package.Contents.Select(entry => CreateItem(entry.ItemId, entry.Quality)).ToArray();
-            var grantsList = contents.Where(value => !ZoneEngine_New.Core.Trade.TradeRules.IsUnique(value)
-                || !ZoneEngine_New.Core.Trade.TradeRules.WouldDuplicateUnique(player, value.LowId, value.HighId)).ToList();
-            Item? reward = null;
-            if (completeTip)
+            var actions = new[] { action }.Concat(action.OptionalActions.Select(x => Content.Actions[x]).Where(x => Conditions(player, x, tx))).ToArray();
+            var grantPairs = actions.SelectMany(x => x.Grants).Select(x => (Definition: x, Item: CreateItem(x.ItemId, x.Quality))).ToArray();
+            var granted = grantPairs.Where(x => (!x.Definition.SkipIfCarried || !HasCarried(player, x.Item.LowId))
+                && (!x.Definition.HonorUnique || !ZoneEngine_New.Core.Trade.TradeRules.IsUnique(x.Item)
+                    || !ZoneEngine_New.Core.Trade.TradeRules.WouldDuplicateUnique(player, x.Item.LowId, x.Item.HighId))).ToArray();
+            var plan = Plan(player, granted.Select(x => x.Item).ToArray());
+            var stats = new List<MissionStatValueData>();
+            foreach (var entry in actions)
             {
-                reward = CreateItem(CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardItemId,
-                    CapturedAreteMarcoSpidaVendorContentProvider.BuyNanoTipRewardQuality);
-                if (!HasCarried(player, reward.LowId)) grantsList.Add(reward);
+                foreach (var completion in entry.Complete) CompleteIfPresent(service, player.Identity.Instance, completion.Quest,
+                    completion.Objective, completion.Observation, completion.Event);
+                foreach (var quest in entry.Accept) Accept(service, player.Identity.Instance, quest);
+                if (entry.StatReward is { } reward) stats.AddRange(ApplyStatReward(tx, player, reward.Quest, reward.Key, reward.Xp, reward.Cash,
+                    string.IsNullOrWhiteSpace(reward.EffectReference) ? "content-action:" + reward.Quest + ":" + reward.Key : reward.EffectReference, _now().Ticks));
             }
-            var grantPlan = Plan(player, grantsList);
-            IList<MissionStatValueData> stats = Array.Empty<MissionStatValueData>();
-            if (completeTip)
+            if (action.Consume) ApplyRows(tx, plan, player, slot, item!);
+            else
             {
-                CompleteIfPresent(service, player.Identity.Instance, BuyNano, "mission_555BE9F4_buy_nano");
-                stats = ApplyStanStats(tx, player, BuyNano, "captured-buy-nano-tip-xp-credits", 2569, 1240,
-                    "capture:20260721-nanoprogramsvendor:buy-nano-tip-xp-credits", _now().Ticks);
+                if (tx is not IMissionInventoryMutationTransaction inventory) throw new InvalidOperationException("Mission DAO lacks atomic item effects.");
+                inventory.ApplyInventoryMutation(plan.Rows.Select(ToMissionItem).ToArray(), []);
             }
-            ApplyRows(tx, grantPlan, player, slot, item);
             return () =>
             {
-                grantPlan.PublishAfterCommit(false);
-                foreach (var value in grantsList.Where(value => !ReferenceEquals(value, reward))) SendOverflowGrant(player, value);
-                PublishConsumption(player, slot, item);
-                if (completeTip)
+                plan.PublishAfterCommit(false);
+                var notifications = grantPairs.Where(x => granted.Any(y => ReferenceEquals(y.Item, x.Item)) || x.Definition.NotifyIfCarried).ToArray();
+                if (action.AcknowledgementBeforeConsumption) acknowledge?.Invoke();
+                foreach (var grant in notifications.Where(x => x.Definition.PublishBeforeConsumption)) SendOverflowGrant(player, grant.Item);
+                if (action.Consume)
                 {
-                    PublishStats(player, stats);
-                    player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1,
-                        FormattedMessage = "~&!!!\":$'O\"ui!!!?4i!!!/S~" });
-                    SendOverflowGrant(player, reward!);
-                    player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, MessageId = 108871108, CategoryId = 110 });
-                    AuthoredQuestJournal.Delete(player, unchecked((int)0x555BE9F4));
+                    if (action.UseProjection) PublishConsumption(player, slot, item!);
+                    else { player.Inventory.Inventory.Content.Remove(slot.Instance); player.Session?.Send(new CharacterActionMessage { Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot }); }
+                }
+                if (!action.AcknowledgementBeforeConsumption) acknowledge?.Invoke();
+                PublishStats(player, stats);
+                foreach (var entry in actions)
+                    if (!string.IsNullOrEmpty(entry.Feedback)) player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1, FormattedMessage = entry.Feedback });
+                foreach (var grant in notifications.Where(x => !x.Definition.PublishBeforeConsumption)) SendOverflowGrant(player, grant.Item);
+                foreach (var entry in actions)
+                {
+                    if (entry.FeedbackMessage != 0) player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, CategoryId = entry.FeedbackCategory, MessageId = entry.FeedbackMessage });
+                    foreach (var quest in entry.DeleteJournals) AuthoredQuestJournal.Delete(player, quest, Content);
+                    foreach (var quest in entry.SendJournals) AuthoredQuestJournal.Send(player, quest, _now(), Content);
                 }
             };
         });
     }
 
-    /// <summary>Trusted accepted Stan dialogue branch; packet/NPC identity validation is the caller's responsibility.</summary>
-    public bool AcceptStanJob(Player player) => Mutate(player, null, (tx, service) =>
+    bool Conditions(Player player, InteractionAction action, IMissionDaoTransaction tx)
     {
-        if (new[] { BuyLockpick, Strongbox, DeliverFactory, TalkSarah, BuyNano }.Any(quest =>
-            tx.GetMission(new(player.Identity.Instance, quest))?.State is DaoState.Active or DaoState.Completed)) return null;
-        CompleteIfPresent(service, player.Identity.Instance, TalkStan, "mission_555B4366_talk_to_stan");
-        Accept(service, player.Identity.Instance, BuyLockpick);
-        return () => { AuthoredQuestJournal.Delete(player, unchecked((int)0x555B4366)); AuthoredQuestJournal.Send(player, BuyLockpick, _now()); };
-    });
+        bool Matches(MissionCondition c) => c.States.Contains(tx.GetMission(new(player.Identity.Instance, c.Quest))?.State.ToString(), StringComparer.Ordinal);
+        return (action.Playfields.Length == 0 || action.Playfields.Contains(player.Playfield!.Identity.Instance))
+            && action.RequireMissions.All(Matches) && !action.RejectMissions.Any(Matches)
+            && !action.RejectCarried.Any(x => HasCarried(player, x))
+            && (action.AnyMissions.Length + action.AnyCarried.Length == 0 || action.AnyMissions.Any(Matches) || action.AnyCarried.Any(x => HasCarried(player, x)));
+    }
+
+    public bool TryResolveDialogueStart(Player player, DialogueBinding binding, bool priorOpen, out string? node)
+    {
+        node = null;
+        lock (player.PersistenceGate)
+        {
+            if (!IsCurrent(player) || !binding.Enabled || (binding.Playfields.Length != 0 && !binding.Playfields.Contains(player.Playfield!.Identity.Instance))) return false;
+            try
+            {
+                var missions = _dao.GetMissions(player.Identity.Instance);
+                node = binding.Starts.FirstOrDefault(x => x.Carried.Any(id => HasCarried(player, id)) || x.Missions.Any(c => missions.Any(m => m.QuestId == c.Quest && c.States.Contains(m.State.ToString()))))?.Node;
+                if (node == null && priorOpen && !string.IsNullOrEmpty(binding.ReopenNode)) node = binding.ReopenNode;
+                return true;
+            }
+            catch (Exception e) { _logger.Error(e, "Dialogue state could not be read."); return false; }
+        }
+    }
 
     public void Restore(Player player)
     {
         lock (player.PersistenceGate)
         {
             if (!IsCurrent(player)) return;
-            foreach (var mission in _dao.GetMissions(player.Identity.Instance).Where(value => value.State == DaoState.Active))
-                AuthoredQuestJournal.Send(player, mission.QuestId, _now());
-            RestoreDoja(player);
+            var timedIds = Content.TimedTurnIns.SelectMany(x => new[] { x.Quest, x.CooldownQuest }).ToHashSet(StringComparer.Ordinal);
+            foreach (var mission in _dao.GetMissions(player.Identity.Instance).Where(x => x.State == DaoState.Active && !timedIds.Contains(x.QuestId)))
+                AuthoredQuestJournal.Send(player, mission.QuestId, _now(), Content);
+            foreach (var timed in Content.TimedTurnIns) RestoreTimedTurnIn(player, timed);
         }
     }
 
@@ -200,7 +227,7 @@ public sealed partial class AuthoredQuestService
     }
 
     static void CompleteIfPresent(PersistentMissionService service, int owner, string quest, string objective,
-        string observationKey = "stan-goodman-force-complete", string eventType = "StanGoodmanQuestRuntime")
+        string observationKey = "content-action-complete", string eventType = "ContentAction")
     {
         var state = service.GetMission(owner, quest);
         if (state == null || state.State == DomainState.Completed) return;
@@ -213,7 +240,7 @@ public sealed partial class AuthoredQuestService
     static void RequireSuccess(MissionOperationResult result)
     { if (result.Status is not (DomainStatus.Applied or DomainStatus.AlreadyApplied)) throw new InvalidOperationException(result.Message); }
 
-    static IList<MissionStatValueData> ApplyStanStats(IMissionDaoTransaction tx, Player player, string quest, string rewardKey, int xp, int cash, string evidence, long now)
+    static IList<MissionStatValueData> ApplyStatReward(IMissionDaoTransaction tx, Player player, string quest, string rewardKey, int xp, int cash, string evidence, long now)
     {
         // Use the owner-gated live values, not potentially older snapshot rows. The accepted
         // AddClamped arithmetic is unchanged; its final values join the same ledger transaction.

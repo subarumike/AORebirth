@@ -22,6 +22,7 @@ using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Dialogue;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Movement;
@@ -383,14 +384,16 @@ public sealed class PlayfieldTransferTests
             Set(world, "_pendingStatRebases", new ConcurrentDictionary<Character, byte>());
             Set(world, "_dynelRegistry", registry); Set(world, "_logger", logger); Set(world, "_playfieldManager", Manager);
             itemCatalog ??= new StubCatalog(); itemBuilder ??= new StubItemBuilder();
-            var accepted = new AcceptedNpcActivationService(world, registry, locality, itemBuilder, itemCatalog);
+            var accepted = new NpcContentActivationService(world, registry, locality, itemBuilder, itemCatalog);
+            var contentData = new StubGameData(HashItemCatalog.Parse("{}", "{}")) { RootPath = Path.Combine(AppContext.BaseDirectory, "GameData") };
             var services = new ServiceCollection().AddSingleton(spawn).AddSingleton(registry).AddSingleton(locality)
+                .AddSingleton<IGameData>(contentData)
                 .AddSingleton(Manager.Teams).AddSingleton(new WorldSimulationAccess())
                 .AddSingleton(new InventoryMoveService(logger, _flush, Blank<InventoryActionService>()))
                 .AddSingleton(_trades)
-                .AddSingleton(new AcceptedQuestPropService(world, registry, locality, new StubCatalog(), null!))
+                .AddSingleton(new QuestPropService(world, registry, locality, new StubCatalog(), null!))
                 .AddSingleton(accepted)
-                .AddSingleton(new BucketheadSummonService(world, registry, locality, accepted, itemBuilder, itemCatalog, milliseconds))
+                .AddSingleton(new SummonService(world, registry, locality, accepted, itemBuilder, itemCatalog, contentData, milliseconds))
                 .BuildServiceProvider();
             Set(world, "_serviceProvider", services);
             Set(spawn, "_registry", registry); Set(spawn, "_logger", logger); Set(spawn, "_playfield", world);

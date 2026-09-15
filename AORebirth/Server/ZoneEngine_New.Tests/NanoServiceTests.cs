@@ -487,14 +487,14 @@ namespace ZoneEngine_New.Tests
         [TestMethod]
         public void Overview_map_flag_is_committed_with_ncu_and_clears_only_after_actual_removal()
         {
-            var f = new Fixture([new OverviewMapNanoSpecialization()], Buff(OverviewMapNanoSpecialization.NanoId));
-            var p = f.Player(); f.Cast(p, OverviewMapNanoSpecialization.NanoId);
-            Assert.AreEqual(OverviewMapNanoSpecialization.MapsMask, p.Stats.GetOrZero(CharacterStat.MapsC));
-            Assert.AreEqual(OverviewMapNanoSpecialization.MapsMask,
+            var f = new Fixture([new ActiveStatOverlayNanoSpecialization()], Buff(223767));
+            var p = f.Player(); f.Cast(p, 223767);
+            Assert.AreEqual(403669119, p.Stats.GetOrZero(CharacterStat.MapsC));
+            Assert.AreEqual(403669119,
                 f.Store.Last.Single().BaseStats.Single(s => s.StatId == (int)CharacterStat.MapsC).StatValue);
             StatMessage map = f.Session(p).Bodies.OfType<StatMessage>().Single(s => s.Stats.Any(t => t.Value1 == CharacterStat.MapsC));
             Assert.AreEqual(0, map.Unknown); Assert.AreEqual(1, map.Stats.Length);
-            f.Session(p).Bodies.Clear(); Assert.IsTrue(f.Service.Remove(p, OverviewMapNanoSpecialization.NanoId));
+            f.Session(p).Bodies.Clear(); Assert.IsTrue(f.Service.Remove(p, 223767));
             Assert.AreEqual(0, p.Stats.GetOrZero(CharacterStat.MapsC));
             Assert.AreEqual(0, f.Store.Last.Single().ActiveNanos.Count);
             Assert.AreEqual(0, f.Store.Last.Single().BaseStats.Single(s => s.StatId == (int)CharacterStat.MapsC).StatValue);
@@ -506,21 +506,21 @@ namespace ZoneEngine_New.Tests
         [TestMethod]
         public void Overview_login_clears_stale_unlock_without_buff_remove_and_restores_only_active_mask()
         {
-            var f = new Fixture([new OverviewMapNanoSpecialization()], Buff(OverviewMapNanoSpecialization.NanoId));
-            var p = f.Player(attach: false); p.Stats.Set(CharacterStat.MapsC, OverviewMapNanoSpecialization.MapsMask);
+            var f = new Fixture([new ActiveStatOverlayNanoSpecialization()], Buff(223767));
+            var p = f.Player(attach: false); p.Stats.Set(CharacterStat.MapsC, 403669119);
             Assert.IsTrue(f.Service.AttachPlayer(p)); Assert.AreEqual(0, p.Stats.GetOrZero(CharacterStat.MapsC));
             Assert.AreEqual(1, f.Store.Commits); Assert.AreEqual(0, f.Session(p).Bodies.Count);
             f.Service.DetachPlayer(p);
-            f.Store.Rows[1] = [new ActiveNanoRecord(OverviewMapNanoSpecialization.NanoId, 7, 8, 1000, f.Utc.AddSeconds(4).Ticks)];
-            var restored = f.Player(); Assert.AreEqual(OverviewMapNanoSpecialization.MapsMask, restored.Stats.GetOrZero(CharacterStat.MapsC));
+            f.Store.Rows[1] = [new ActiveNanoRecord(223767, 7, 8, 1000, f.Utc.AddSeconds(4).Ticks)];
+            var restored = f.Player(); Assert.AreEqual(403669119, restored.Stats.GetOrZero(CharacterStat.MapsC));
             f.Service.RefreshPlayer(restored); Assert.AreEqual(0, f.Session(restored).Bodies.OfType<BuffMessage>().Count());
         }
 
         [TestMethod]
         public void Overview_transaction_failure_never_unlocks_map_in_memory_or_on_wire()
         {
-            var f = new Fixture([new OverviewMapNanoSpecialization()], Buff(OverviewMapNanoSpecialization.NanoId));
-            var p = f.Player(); f.Store.Failure = new IOException(); f.Cast(p, OverviewMapNanoSpecialization.NanoId);
+            var f = new Fixture([new ActiveStatOverlayNanoSpecialization()], Buff(223767));
+            var p = f.Player(); f.Store.Failure = new IOException(); f.Cast(p, 223767);
             Assert.AreEqual(0, p.Stats.GetOrZero(CharacterStat.MapsC)); Assert.AreEqual(0, f.Service.GetActive(p).Count);
             Assert.AreEqual(0, f.Session(p).Bodies.OfType<StatMessage>().Count());
         }

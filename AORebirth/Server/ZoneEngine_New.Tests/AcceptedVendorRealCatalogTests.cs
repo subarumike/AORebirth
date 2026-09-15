@@ -59,26 +59,19 @@ public sealed class AcceptedVendorRealCatalogTests
         Assert.AreEqual(22, endpoints.Count);
         Assert.AreEqual(0, missing.Count, string.Join(Environment.NewLine, missing));
 
-        var definitions = AcceptedSocialNpcCatalog.Definitions.Where(definition => definition.Binding.HasVendor).ToArray();
+        var definitions = SocialNpcFixture.Definitions.Where(definition => definition.Binding.HasVendor).ToArray();
         Assert.AreEqual(19, definitions.Length);
         foreach (var definition in definitions)
         {
             var npc = definition.Create(items);
-            bool attached;
-            string failure;
-            if (npc is AcceptedSubwayMerchantCatalog.AcceptedSubwayMerchantCharacter)
-                attached = AcceptedSubwayMerchantCatalog.TryAttachShop(npc, items, catalog, out failure);
-            else if (npc is AcceptedAreteVendorCatalog.AcceptedAreteVendorCharacter)
-                attached = AcceptedAreteVendorCatalog.TryAttachShop(npc, items, catalog, out failure);
-            else
-                attached = AcceptedGardenVendorCatalog.TryAttachShop(npc, items, catalog, out failure);
+            bool attached = WorldContentFixtures.Attach(npc, items, catalog, out string failure);
             Assert.IsTrue(attached, definition.Binding.ContentNpcIdentity + ": " + failure);
             AssertTemplatePricing(npc.Shop!, catalog);
         }
         using var world = new AuthoredQuestTests.World(6553);
-        foreach (var definition in AcceptedAreteVendorCatalog.StandaloneDefinitions)
+        foreach (var definition in AreteVendorFixture.StandaloneDefinitions)
         {
-            Assert.IsTrue(AcceptedAreteVendorCatalog.TryCreateStandaloneShop(definition, world.Player.Playfield!, catalog,
+            Assert.IsTrue(AreteVendorFixture.TryCreateStandaloneShop(definition, world.Player.Playfield!, catalog,
                 out var shop, out var failure), definition.SourceIdentity + ": " + failure);
             AssertTemplatePricing(shop, catalog);
         }
@@ -94,7 +87,7 @@ public sealed class AcceptedVendorRealCatalogTests
         Assert.AreEqual(buy, shop.BuyModifier); Assert.AreEqual(sell, shop.SellModifier);
         Assert.IsTrue(sell > 0, "Nonpositive actual sell modifier requires explicit review: " + source.Id + " value=" + sell);
         Assert.IsTrue(buy >= 0, "Negative actual buy modifier requires explicit review: " + source.Id + " value=" + buy);
-        Assert.IsTrue(shop.Stock.IsAcceptedSnapshot);
+        Assert.IsTrue(shop.Stock.IsConfiguredSnapshot);
     }
 
     sealed record Endpoint(string Source, int TemplateId, IReadOnlyList<ShopStockSlot> Stock);
@@ -110,10 +103,10 @@ public sealed class AcceptedVendorRealCatalogTests
         result.Add(new("npc:" + CapturedAreteLoreleiVendorContentProvider.SourceNpcInstance.ToString("X8"),
             CapturedAreteLoreleiVendorContentProvider.CaptureVendorTemplateId,
             CapturedAreteLoreleiVendorContentProvider.Stock.Select(row => new ShopStockSlot(row.LowId, row.HighId, row.Quality)).ToArray()));
-        foreach (var row in AcceptedGardenVendorCatalog.Placements)
+        foreach (var row in GardenVendorFixture.Placements)
             result.Add(new("npc:" + row.SourceNpcInstance.ToString("X8"), row.VendorTemplateId,
                 row.Stock.Select(stock => new ShopStockSlot(stock.LowId, stock.HighId, stock.Quality)).ToArray()));
-        foreach (var row in AcceptedAreteVendorCatalog.StandaloneDefinitions)
+        foreach (var row in AreteVendorFixture.StandaloneDefinitions)
             result.Add(new("machine:" + row.SourceVendorInstance.ToString("X8"), row.Content.TemplateId,
                 row.Content.Stock.Select(stock => new ShopStockSlot(stock.LowId, stock.HighId, stock.Quality)).ToArray()));
         return result;

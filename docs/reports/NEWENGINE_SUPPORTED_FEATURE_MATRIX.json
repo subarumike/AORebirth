@@ -123,18 +123,18 @@
     {
       "feature": "NPC interaction",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Connected actors only; unbound placements remain inactive.",
+      "boundary": "Validated editable actors and resolved spawn templates; unresolved or structurally invalid records remain inactive. Interaction ownership and range checks remain required.",
       "tests": [
         "AcceptedNpcActivationTests.cs",
-        "OfficialHashSpawnAuthorizationTests.cs"
+        "EditableWorldContentTests.cs"
       ]
     },
     {
       "feature": "combat",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Supported mission/captured capabilities only; missing consumers do not authorize generic activation.",
+      "boundary": "Configured NPC and mission combat mechanics; structural packet/stat validation remains required. Content provenance is informational; unresolved placeholders cannot enter combat.",
       "tests": [
-        "CapturedNpcCombatResolverTests.cs",
+        "NpcContentIntegrationTests.cs",
         "MissionNpcCombatPolicyTests.cs"
       ]
     },

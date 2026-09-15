@@ -131,10 +131,10 @@ namespace ZoneEngine_New.Tests
             NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(
                 """
                 {
-                    "AAAA": {
+                    "LEAF": {
                         "Templates": [
                             {
-                                "Name": "To Be Determined",
+                                "Name": "Editable Fixture",
                                 "Level": 1,
                                 "TemplateId": 43296,
                                 "HasHeadMesh": false,
@@ -142,10 +142,10 @@ namespace ZoneEngine_New.Tests
                                 "Attackable": true,
                                 "KnuBotId": 1131,
                                 "Equipment": [[120912, 120912], [120915, 120915]],
-                                "LootTable": [{ "Hash": "AAAA", "Repeats": 1, "Chance": 100, "LevelMod": 25 }]
+                                "LootTable": [{ "Hash": "LEAF", "Repeats": 1, "Chance": 100, "LevelMod": 25 }]
                             },
                             {
-                                "Name": "To Be Determined",
+                                "Name": "Editable Fixture",
                                 "Level": 250,
                                 "TemplateId": 43296,
                                 "KnuBotId": 1131,
@@ -156,9 +156,9 @@ namespace ZoneEngine_New.Tests
                 }
                 """);
 
-            Assert.IsTrue(catalog.TryResolve("AAAA", 25, out MobTemplate template));
-            Assert.AreEqual("AAAA", template.Hash);
-            Assert.AreEqual("To Be Determined", template.Name);
+            Assert.IsTrue(catalog.TryResolve("LEAF", 25, out MobTemplate template));
+            Assert.AreEqual("LEAF", template.Hash);
+            Assert.AreEqual("Editable Fixture", template.Name);
             Assert.AreEqual(43296, template.TemplateId);
             Assert.AreEqual(1, template.NpcFamily);
             Assert.AreEqual(1131, template.KnuBotId);
@@ -169,11 +169,11 @@ namespace ZoneEngine_New.Tests
             CollectionAssert.AreEqual(new[] { 120912, 120912 }, template.Equipment[0]);
             CollectionAssert.AreEqual(new[] { 120915, 120915 }, template.Equipment[1]);
             Assert.AreEqual(1, template.ItemTable.Count);
-            Assert.AreEqual("AAAA", template.ItemTable[0].Hash);
+            Assert.AreEqual("LEAF", template.ItemTable[0].Hash);
         }
 
         [TestMethod]
-        public void MissingHashFallsBackToAaaa()
+        public void MissingHashNeverFallsBackToAaaa()
         {
             NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(
                 """
@@ -187,9 +187,8 @@ namespace ZoneEngine_New.Tests
                 """);
 
             Assert.IsFalse(catalog.CanResolve("ZZZZ"));
-            Assert.IsTrue(catalog.TryResolve("ZZZZ", 1, out MobTemplate template));
-            Assert.AreEqual("AAAA", template.Hash);
-            Assert.AreEqual("To Be Determined", template.Name);
+            Assert.IsFalse(catalog.TryResolve("ZZZZ", 1, out _));
+            Assert.IsFalse(catalog.TryResolve("AAAA", 1, out _));
         }
 
         [TestMethod]

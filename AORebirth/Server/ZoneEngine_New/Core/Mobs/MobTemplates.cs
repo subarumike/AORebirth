@@ -28,12 +28,7 @@ namespace ZoneEngine_New.Core.Mobs
         public int TemplateId { get; set; }
 
         /// <summary>
-        /// Fallback family id when the requested <see cref="NpcFamily"/> is not in the catalog.
-        /// </summary>
-        public const int DefaultNpcFamilyId = 10001;
-
-        /// <summary>
-        /// Placeholder leaf used when a spawn hash is not in <c>NpcTemplates.json</c>.
+        /// Reserved diagnostic placeholder; never a resolved runtime actor or fallback.
         /// </summary>
         public const string FallbackHash = "AAAA";
 
@@ -66,8 +61,11 @@ namespace ZoneEngine_New.Core.Mobs
         [System.Text.Json.Serialization.JsonIgnore]
         public bool HasResolvedStatBands { get; internal set; }
 
-        /// <summary>Explicit acceptance for imported content. Null retains existing accepted templates.</summary>
-        public NpcContentAcceptance? ContentAcceptance { get; set; }
+        /// <summary>Historical evidence metadata is preserved but does not authorize runtime activation.</summary>
+        [System.Text.Json.Serialization.JsonPropertyName("ContentAcceptance")]
+        public JsonElement? ContentProvenance { get; set; }
+
+        public bool UnresolvedPlaceholder { get; set; }
 
         public List<NpcWeaponVariant> WeaponVariants { get; set; } = new();
 

@@ -1,0 +1,14 @@
+{
+  "SourceSha": "323652db3b07d9640dca5b084a3cfd807baa6b0c",
+  "SourceFiles": [
+    "MissionAcgCapturedLayoutCatalog.g.cs",
+    "MissionRollCaptureLibrary.cs",
+    "MissionRollEvidenceCatalog.cs",
+    "MissionRewardEvidenceModel.cs",
+    "MissionRareLootCatalog.cs",
+    "MissionLocationPool.cs",
+    "MissionOfferTextBuilder.cs",
+    "MissionAcgTokenRewardPolicy.cs"
+  ],
+  "Method": "Public compiled content exported through existing immutable records; source-level algorithms preserved in generic JSON consumers. Original reconstruction provenance remains in Layouts.json records."
+}

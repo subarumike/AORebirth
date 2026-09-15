@@ -10,11 +10,14 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Playfield;
 
-public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Lazy<GeneratedMissionAcgService> missions) : IGeneratedMissionNpcFactory
+public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Lazy<GeneratedMissionAcgService> missions,
+    IGameData? gameData = null) : IGeneratedMissionNpcFactory
 {
+    readonly MissionNpcContent _content = MissionNpcContent.Load(gameData?.RootPath);
     public NpcCharacter Create(GeneratedMissionNpcEvidence evidence, GeneratedMissionObject state, IItemBuilder items)
     {
         if (state.Level is not > 0 || state.MaxHealth is not > 0 || state.CurrentHealth is not > 0
@@ -25,18 +28,9 @@ public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Laz
         if (!source.TailFullyDecoded || source.UndecodedTail?.Length > 0)
             throw new InvalidOperationException("Mission NPC appearance must be a completely decoded accepted spawn.");
         var npc = new GeneratedMissionNpcCharacter(new Identity { Type = (IdentityType)state.RuntimeType,
-            Instance = state.RuntimeInstance }, items, missions) { Name = evidence.Name };
+            Instance = state.RuntimeInstance }, items, missions) { Name = evidence.Name, AggroRadius = _content.AggroRadius };
 
-        // Exact BART production-shell fields from SqlTables/mobtemplate.sql, selected
-        // explicitly by Legacy MissionAcgOperationalRuntime, not by NPC appearance.
-        // Level and life are replaced with durable mission difficulty state below.
-        npc.Stats.Set(CharacterStat.NPCFamily, 137); npc.Stats.Set(CharacterStat.Side, 0);
-        npc.Stats.Set(CharacterStat.Fatness, 1); npc.Stats.Set(CharacterStat.Breed, 1);
-        npc.Stats.Set(CharacterStat.Sex, 2); npc.Stats.Set(CharacterStat.Race, 1);
-        npc.Stats.Set(CharacterStat.Flags, 271061505); npc.Stats.Set(CharacterStat.Profession, 15);
-        npc.Stats.Set(CharacterStat.VisualProfession, 15); npc.Stats.Set(CharacterStat.AccountFlags, 0);
-        npc.Stats.Set(CharacterStat.Expansion, 0); npc.Stats.Set(CharacterStat.RunSpeed, 513);
-        npc.Stats.Set((CharacterStat)466, 15);
+        foreach (var stat in _content.Stats) npc.Stats.Set(stat.Key, stat.Value);
         npc.Stats.Set(CharacterStat.Level, state.Level.Value);
         npc.Stats.Set(CharacterStat.MaxHealth, state.MaxHealth.Value);
         npc.Stats.Set(CharacterStat.Health, state.CurrentHealth.Value);
@@ -48,7 +42,7 @@ public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Laz
         if (!evidence.IsFindPerson)
         {
             var contract = MissionNpcCombatPolicy.Create(state.RuntimeInstance, state.Level.Value,
-                (source.Meshes ?? []).Any(mesh => mesh.Layer == 2 && mesh.Id > 0), items, catalog, out var weapon);
+                (source.Meshes ?? []).Any(mesh => mesh.Layer == _content.WeaponMeshLayer && mesh.Id > 0), items, catalog, out var weapon, _content);
             npc.Combat = new MissionNpcCombatRuntime(contract, weapon);
         }
         npc.Motor.RefreshFromStats();
@@ -60,7 +54,8 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
     Lazy<GeneratedMissionAcgService> missions) : NpcCharacter(identity, items)
 {
     internal MissionNpcCombatRuntime? Combat { get; set; }
-    public override bool AcceptsPlayerCombatNanos => Combat?.Contract.IsCombatReady == true;
+    internal double AggroRadius { get; set; }
+    public override bool AcceptsPlayerCombatNanos => Combat?.Contract.IsRuntimeReady == true;
     bool _deathCommitted;
     protected override bool UsesPassiveRegen => false;
     protected override int DeathAnimationKey => 501; // MissionInstanceMobCombat.DeathParameter2.
@@ -72,7 +67,7 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
     public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
         => Combat?.Contract.WeaponDefinition is { } definition && Combat.Weapon is { } weapon
             ? [CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(Identity,
-                Playfield?.Identity.Instance ?? 0, weapon.Identity, definition)] : [];
+                Playfield?.Identity.Instance ?? 0, weapon.Identity, definition, requireEvidence: false)] : [];
 
     public override void StartFighting(Identity target, byte action)
     {
@@ -87,7 +82,7 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
         {
             var target = Playfield.GetRequiredService<DynelRegistry>().PlayerEntities()
                 .Where(player => !player.IsDead && !player.IsPersistenceQuarantined && player.Playfield == Playfield
-                    && Distance3D(player) <= MissionNpcCombatPolicy.AggroRadius)
+                    && Distance3D(player) <= AggroRadius)
                 .OrderBy(player => Distance3D(player)).ThenBy(player => player.Identity.Instance).FirstOrDefault();
             if (target != null) Combat.Start(this, target.Identity);
         }

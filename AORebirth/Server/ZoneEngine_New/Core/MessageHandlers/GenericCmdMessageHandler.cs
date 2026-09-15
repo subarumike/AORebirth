@@ -113,9 +113,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     break;
 
                 case GenericCmdAction.UseItemOnItem:
-                    if (message.Target is { Length: >= 2 } && playfield.GetRequiredService<AcceptedQuestPropService>().ClaimsStrongbox(message.Target[1]))
+                    if (message.Target is { Length: >= 2 } && playfield.GetRequiredService<QuestPropService>().ClaimsItemTarget(message.Target[1]))
                     {
-                        if (!playfield.GetRequiredService<AcceptedQuestPropService>().TryUseStrongbox(session, message.Target[0], message.Target[1],
+                        if (!playfield.GetRequiredService<QuestPropService>().TryUseItemOnProp(session, message.Target[0], message.Target[1],
                             () => Acknowledge(session, message, message.Target[1])))
                             Deny(session, message, player, "accepted Strongbox item/target is not eligible");
                     }
@@ -256,9 +256,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 () => Deny(session, message, player, "generated mission corpse is not eligible")))
                 return;
 
-            if (playfield.GetRequiredService<AcceptedQuestPropService>().ClaimsRemains(target))
+            if (playfield.GetRequiredService<QuestPropService>().ClaimsUseTarget(target))
             {
-                if (!playfield.GetRequiredService<AcceptedQuestPropService>().TryUseRemains(session, target,
+                if (!playfield.GetRequiredService<QuestPropService>().TryUseProp(session, target,
                     () => Acknowledge(session, message, target)))
                     Deny(session, message, player, "accepted thief-remains target is not eligible");
                 return;

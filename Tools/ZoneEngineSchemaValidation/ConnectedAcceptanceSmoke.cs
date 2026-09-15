@@ -17,6 +17,8 @@ using AORebirth.Interfaces.Persistence.Missions;
 /// <summary>Administrative setup ends before startup. Every subsequent mutation is sent over TCP.</summary>
 static partial class ConnectedAcceptanceSmoke
 {
+    // Fixture identity for the authored mission stored in editable interaction content.
+    const string AuthoredMissionFixtureId = "Mission:555BE9F6";
     const int Owner = 9901;
     const string Account = "cutoverconnected";
     static readonly Identity Character = new() { Type = IdentityType.CanbeAffected, Instance = Owner };
@@ -88,8 +90,8 @@ static partial class ConnectedAcceptanceSmoke
             FixtureSql.Execute(connection, $"INSERT INTO charactersuploadednanos (CharacterId,NanoId) VALUES ({Owner},{morph.Id})");
             IMissionDao missions = new MySqlMissionDao(() => fixture.Open());
             long now = DateTime.UtcNow.Ticks;
-            missions.Execute(Owner, Account, tx => { tx.SaveMission(new MissionKeyData(Owner, AuthoredQuestService.DeliverArmor),
-                new MissionStateData { CharacterId = Owner, QuestId = AuthoredQuestService.DeliverArmor,
+            missions.Execute(Owner, Account, tx => { tx.SaveMission(new MissionKeyData(Owner, AuthoredMissionFixtureId),
+                new MissionStateData { CharacterId = Owner, QuestId = AuthoredMissionFixtureId,
                     State = MissionLifecycleState.Active, CurrentStepId = "active", OfferedAtUtcTicks = now,
                     AcceptedAtUtcTicks = now, CreatedAtUtcTicks = now, UpdatedAtUtcTicks = now }); return true; });
             generated = ConnectedMissionSeed.Create(fixture, Owner);
@@ -356,7 +358,7 @@ static partial class ConnectedAcceptanceSmoke
         var nanos = new MySqlActiveNanoRepository().Load(Owner);
         Require(morphActive ? nanos.Count == 1 && nanos[0] == seededNano : nanos.Count == 0, "persisted-active-nano-exact-expiry");
         Require(MissionSnapshot() == missionSnapshot, "persisted-generated-binding-objects-exact");
-        var authored = ((IMissionDao)new MySqlMissionDao(() => ownedFixture.Open())).GetMission(new MissionKeyData(Owner, AuthoredQuestService.DeliverArmor));
+        var authored = ((IMissionDao)new MySqlMissionDao(() => ownedFixture.Open())).GetMission(new MissionKeyData(Owner, AuthoredMissionFixtureId));
         Require(authored != null && authored.State == MissionLifecycleState.Active && authored.CurrentStepId == "active", "persisted-authored-mission");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement={slot} AND ItemType=0 AND LowId=43384 AND HighId=43384 AND Quality=1 AND StackCount=3 AND Source=1") == 1, "persisted-first-item-exact");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity + 1} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement=65 AND ItemType=0 AND LowId=42423 AND HighId=42423 AND Quality=4 AND StackCount=1 AND Source=1") == 1, "persisted-second-item-exact");

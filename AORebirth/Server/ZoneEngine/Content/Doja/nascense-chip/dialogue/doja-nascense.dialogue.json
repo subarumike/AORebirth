@@ -53,7 +53,8 @@
               "TextEvidence": "20260821-222107",
               "NextNodeId": "scarlett_done",
               "Conditions": [],
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

@@ -402,7 +402,7 @@ namespace ZoneEngine_New.Tests
                 Assert.AreEqual((int)IdentityType.Inventory, batch.Inserts.Single().ContainerType);
                 Assert.AreEqual((int)IdentityType.None, batch.Locations.Single().ContainerType);
             };
-            Assert.IsTrue(w.Actions.TryOpenQuabbit(w.Player, Slot(), package));
+            Assert.IsTrue(w.Actions.TryOpenPackage(w.Player, Slot(), package));
             Assert.AreEqual(301749, w.Player.Inventory.Inventory.Content.Values.Single().LowId);
             Assert.AreEqual(4, w.Session.Messages.Count);
             var grant = (TemplateActionMessage)w.Session.Messages[0];
@@ -413,7 +413,7 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(301782, consume.ItemLowId); Assert.AreEqual(3, consume.Unknown2);
             Assert.AreEqual(50000, consume.Unknown3); Assert.AreEqual(w.Player.Identity.Instance, consume.Unknown4);
             Assert.AreEqual(CharacterActionType.DeleteItem, ((CharacterActionMessage)w.Session.Messages[3]).Action);
-            Assert.IsFalse(w.Actions.TryOpenQuabbit(w.Player, Slot(), package));
+            Assert.IsFalse(w.Actions.TryOpenPackage(w.Player, Slot(), package));
             Assert.AreEqual(1, w.Persistence.Calls);
         }
 
@@ -422,13 +422,13 @@ namespace ZoneEngine_New.Tests
         {
             using var w = new World(); Item package = w.Add(11, 1, lowId: 301782);
             w.Persistence.Failure = new InvalidOperationException("grant write failure");
-            Assert.IsFalse(w.Actions.TryOpenQuabbit(w.Player, Slot(), package));
+            Assert.IsFalse(w.Actions.TryOpenPackage(w.Player, Slot(), package));
             Assert.AreSame(package, w.Player.Inventory.Inventory.Content[64]);
             Assert.AreEqual(0, w.Session.Messages.Count);
             Assert.AreEqual(1, w.Persistence.Rows.Count);
             w.Flush.HardFlush(w.Player);
             TestWorld.FillInventory(w.Player);
-            Assert.IsFalse(w.Actions.TryOpenQuabbit(w.Player, Slot(), package));
+            Assert.IsFalse(w.Actions.TryOpenPackage(w.Player, Slot(), package));
             Assert.AreEqual(1, w.Persistence.Calls);
         }
 
@@ -437,7 +437,7 @@ namespace ZoneEngine_New.Tests
         {
             using var w = new World(); Item package = w.Add(11, 1, lowId: 301782);
             w.Add(12, 1, 65, 301749);
-            Assert.IsTrue(w.Actions.TryOpenQuabbit(w.Player, Slot(), package));
+            Assert.IsTrue(w.Actions.TryOpenPackage(w.Player, Slot(), package));
             Assert.AreEqual(1, w.Player.Inventory.Inventory.Content.Count);
             Assert.AreEqual(2, w.Session.Messages.Count);
             Assert.AreEqual(301782, ((TemplateActionMessage)w.Session.Messages[0]).ItemLowId);

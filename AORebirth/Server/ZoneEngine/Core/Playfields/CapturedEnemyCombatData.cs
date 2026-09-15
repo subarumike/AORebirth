@@ -97,12 +97,14 @@ namespace AORebirth.Core.Playfields
         }
 
         internal bool IsValid
+            => !string.IsNullOrWhiteSpace(this.Evidence) && this.EvidenceSourceIdentity != 0 && this.IsRuntimeValid;
+
+        // Runtime packet integrity is independent of historical capture attribution.
+        internal bool IsRuntimeValid
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(this.Evidence)
-                    || this.EvidenceSourceIdentity == 0
-                    || this.Unknown1 != 0x0b
+                if (this.Unknown1 != 0x0b
                     || this.InventorySlot <= 0
                     || this.StateMachineType == 0
                     || this.Unknown2 != (short)(0x0100 | (this.InventorySlot & 0xff))

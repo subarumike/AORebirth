@@ -1,0 +1,114 @@
+{
+  "Stats": {
+    "466": 15,
+    "NPCFamily": 137,
+    "Side": 0,
+    "Fatness": 1,
+    "Breed": 1,
+    "Sex": 2,
+    "Race": 1,
+    "Flags": 271061505,
+    "Profession": 15,
+    "VisualProfession": 15,
+    "AccountFlags": 0,
+    "Expansion": 0,
+    "RunSpeed": 513
+  },
+  "AggroRadius": 2,
+  "WeaponMeshLayer": 2,
+  "Melee": {
+    "Id": "mission-instance-mob-siw1-20260725-185432",
+    "Slot": 0,
+    "WeaponInstance": 1397315377,
+    "Ammo": -1,
+    "HitType": 3,
+    "Initiative": 20,
+    "SpecialWeaponUnknown": 20,
+    "Range": 8,
+    "StartDelay": 0,
+    "FirstHitDelay": 0.25,
+    "Interval": 2,
+    "SpecialLowId": 144742,
+    "SpecialHighId": 144743,
+    "SpecialName": "SIW1"
+  },
+  "Ranged": {
+    "Id": "mission-instance-gun-equipped-20260725-185432",
+    "Slot": 6,
+    "WeaponInstance": 0,
+    "Ammo": -1,
+    "HitType": 3,
+    "Initiative": 30,
+    "SpecialWeaponUnknown": 30,
+    "Range": 8,
+    "StartDelay": 0.25,
+    "FirstHitDelay": 0.5,
+    "Interval": 2
+  },
+  "Weapons": [
+    {
+      "LowId": 121564,
+      "HighId": 121564,
+      "MaximumQuality": 23,
+      "Stats": {
+        "Flags": 67109889,
+        "MultipleCount": 1,
+        "Energy": 4294967295,
+        "AttackDelay": 235,
+        "RechargeDelay": 235
+      }
+    },
+    {
+      "LowId": 121567,
+      "HighId": 121567,
+      "MaximumQuality": 23,
+      "Stats": {
+        "Flags": 67109889,
+        "MultipleCount": 1,
+        "Energy": 4294967295,
+        "AttackDelay": 235,
+        "RechargeDelay": 235
+      }
+    },
+    {
+      "LowId": 121568,
+      "HighId": 121568,
+      "MaximumQuality": 23,
+      "Stats": {
+        "Flags": 67109889,
+        "MultipleCount": 1,
+        "Energy": 4294967295,
+        "AttackDelay": 235,
+        "RechargeDelay": 235
+      }
+    },
+    {
+      "LowId": 121570,
+      "HighId": 121570,
+      "MaximumQuality": 23,
+      "Stats": {
+        "Flags": 67110401,
+        "MultipleCount": 1,
+        "Energy": 4294967295,
+        "AttackDelay": 235,
+        "RechargeDelay": 235
+      }
+    },
+    {
+      "LowId": 121571,
+      "HighId": 121571,
+      "MaximumQuality": 23,
+      "Stats": {
+        "Flags": 67109889,
+        "MultipleCount": 1,
+        "Energy": 4294967295,
+        "AttackDelay": 235,
+        "RechargeDelay": 235
+      }
+    }
+  ],
+  "Provenance": [
+    "Preserved from GeneratedMissionNpcFactory BART production-shell fields in SqlTables/mobtemplate.sql.",
+    "Preserved explicit MissionNpcCombatPolicy captured attack sequences, 20260725-185432; evidence is descriptive and does not authorize runtime content."
+  ]
+}

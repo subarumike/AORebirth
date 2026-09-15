@@ -2,26 +2,24 @@ namespace ZoneEngine_New.Core.WorldSimulation
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using AODB.Common.RDBObjects;
+    using ZoneEngine_New.Core.GameData;
 
     /// <summary>
     /// Discovers destination doors that become ExitProxy surfaces: TeleportProxy landings with
-    /// <see cref="PortalDestination.RecordsReturn"/>. Matches legacy PlayfieldLoader synthesis,
-    /// including the Subway restriction that only the confirmed entrance door may exit PF 127.
+    /// <see cref="PortalDestination.RecordsReturn"/> and optional editable per-playfield door rules.
     /// </summary>
     public static class ExitProxyDoorCatalog
     {
-        public const int SubwayPlayfieldId = 127;
-
-        public const int SubwayEntranceDestinationDoorInstance = unchecked((int)0xC006007F);
-
         /// <summary>
-        /// PF 127 has ordinary interior doors; only the confirmed entrance may be an exit surface.
+        /// A configured door rule selects exit surfaces; unconfigured playfields use portal data.
         /// </summary>
-        public static bool ShouldRegister(int destinationPlayfieldId, int destinationDoorInstance)
-            => destinationPlayfieldId != SubwayPlayfieldId
-               || destinationDoorInstance == SubwayEntranceDestinationDoorInstance;
+        public static bool ShouldRegister(int destinationPlayfieldId, int destinationDoorInstance,
+            IReadOnlyList<WorldExitDoorRule>? rules = null)
+            => rules?.FirstOrDefault(rule => rule.PlayfieldId == destinationPlayfieldId) is not { } rule
+                || rule.AllowedDoorInstances.Contains(destinationDoorInstance);
 
         /// <summary>
         /// Scans source-playfield dynels for TeleportProxy returns and records their destination
@@ -29,7 +27,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// </summary>
         public static void CollectFromDynels(
             PlayfieldDynels? dynels,
-            Dictionary<int, HashSet<int>> destinationDoorsByPlayfield)
+            Dictionary<int, HashSet<int>> destinationDoorsByPlayfield,
+            IReadOnlyList<WorldExitDoorRule>? rules = null)
         {
             ArgumentNullException.ThrowIfNull(destinationDoorsByPlayfield);
             List<PlayfieldDynel>? list = dynels?.Dynels;
@@ -47,7 +46,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
                     || portal.DoorInstance == 0)
                     continue;
 
-                if (!ShouldRegister(portal.PlayfieldId, portal.DoorInstance))
+                if (!ShouldRegister(portal.PlayfieldId, portal.DoorInstance, rules))
                     continue;
 
                 if (!destinationDoorsByPlayfield.TryGetValue(portal.PlayfieldId, out HashSet<int>? doors))

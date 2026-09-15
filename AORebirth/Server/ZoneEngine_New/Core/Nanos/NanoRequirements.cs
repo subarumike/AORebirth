@@ -29,7 +29,7 @@ namespace ZoneEngine_New.Core.Nanos
             return true;
         }
 
-        public static bool TryEvent(Player caster, Player target, IReadOnlyList<ItemRequirement> requirements, out bool met)
+        public static bool TryEvent(Character caster, Character target, IReadOnlyList<ItemRequirement> requirements, out bool met)
         {
             met = requirements.Count == 0 || requirements[0].ChildOperator != (int)Operator.Or;
             foreach (ItemRequirement requirement in requirements)
@@ -42,16 +42,19 @@ namespace ZoneEngine_New.Core.Nanos
             return true;
         }
 
-        private static bool TryOne(Player caster, Player target, ItemRequirement requirement, out bool met)
+        private static bool TryOne(Character caster, Character target, ItemRequirement requirement, out bool met)
         {
             met = false;
             Operator op = (Operator)requirement.Operator;
             if (requirement.StatNumber == 0 && op is Operator.And or Operator.Or or Operator.Not)
             { met = true; return true; } // Requirement.IsRequirementLinkOperator
-            Player? subject = (ItemTarget)requirement.Target switch
+            Character? subject = (ItemTarget)requirement.Target switch
             {
                 ItemTarget.User or ItemTarget.Self or ItemTarget.Wearer => caster,
                 ItemTarget.Target or ItemTarget.Selectedtarget => target,
+                // Existing scalar nano requirements also encode caster as 100. Legacy
+                // RequirementLambdaCreator.GetTarget resolves that encoding to self.
+                (ItemTarget)100 => caster,
                 _ => null
             };
             if (subject == null) return false;

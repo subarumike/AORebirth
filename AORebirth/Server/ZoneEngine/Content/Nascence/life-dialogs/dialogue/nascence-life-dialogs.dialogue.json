@@ -786,7 +786,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "capture 20260822-224319",
               "NextNodeId": "fala_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -942,7 +943,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "capture 20260822-224319",
               "NextNodeId": "fala_turnin",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -1075,7 +1077,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "capture 20260822-224319",
               "NextNodeId": "lux_wei_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []
@@ -1130,7 +1133,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "capture 20260822-224319",
               "NextNodeId": "lux_wei_farewell",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

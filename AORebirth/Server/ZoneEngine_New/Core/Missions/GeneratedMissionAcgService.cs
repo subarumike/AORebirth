@@ -31,9 +31,8 @@ public sealed partial class GeneratedMissionAcgService
     readonly IZoneLogger _logger;
     readonly MissionAcgLayoutCatalog _catalog;
 
-    // Exact nonselectable Legacy source PFs and Nascence leases; they must not be allocated as new worlds.
-    static readonly HashSet<int> Reserved = [1441800,1443840,1460226,1456133,1419310,1419335,1419382,1419349,1441804,
-        0x208038,0x2080D9,0x209103,0x2090C1,0x1F900B,0x208047];
+    // Operator-owned world identifiers must not be allocated as new mission worlds.
+    static readonly HashSet<int> Reserved = new(MissionArtifactContent.Current.ReservedPlayfields);
 
     public GeneratedMissionAcgService(IGeneratedMissionDao dao, GeneratedMissionService missions,
         IGeneratedMissionNpcFactory npcs, IItemBuilder items, IItemInstanceIdAllocator ids,
@@ -93,7 +92,8 @@ public sealed partial class GeneratedMissionAcgService
                 binding.ObjectiveType = objective.Identity.RuntimeIdentity.Type; binding.ObjectiveInstance = objective.Identity.RuntimeIdentity.Instance;
                 binding.ObjectiveTemplateId = objectiveSlot.TemplateId; binding.ObjectiveInteraction = (int)MissionAcgObjectiveContract.InteractionFor((MissionRollType)offer.MissionType);
                 var objects = InitialObjects(binding, materialized);
-                var keyItem = _items.Create(28577, 28577, 1, ItemSource.Other, 1, key, new Identity { Type = (IdentityType)0xC76D, Instance = key });
+                var keyContent = MissionArtifactContent.Current.Key;
+                var keyItem = _items.Create(keyContent.LowId, keyContent.HighId, keyContent.Quality, ItemSource.Other, 1, key, new Identity { Type = (IdentityType)0xC76D, Instance = key });
                 var artifacts = new List<Item>();
                 if (offer.MissionType == (int)MissionRollType.RepairMachine) artifacts.Add(CreateRepairComponent());
                 artifacts.Add(keyItem);
@@ -113,7 +113,7 @@ public sealed partial class GeneratedMissionAcgService
                     {
                         foreach (var item in artifacts)
                             GeneratedMissionArtifactProjection.Send(player, item, player.Inventory.Inventory.Content.Single(entry => entry.Value.InstanceId == item.InstanceId).Key,
-                                true, item.InstanceId == key ? "Mission key" : "Mission Repair Kit");
+                                true, item.InstanceId == key ? keyContent.Name : MissionArtifactContent.Current.RepairPool.Concat(MissionArtifactContent.Current.RepairFallbacks).First(value => value.LowId == item.LowId && value.HighId == item.HighId).Name);
                         ReplayJournal(player, result.Binding);
                     }
                     catch (Exception exception)
@@ -302,36 +302,6 @@ public sealed partial class GeneratedMissionAcgService
             int value = 17; value = value * 31 + offer.OfferType; value = value * 31 + offer.OfferInstance;
             value = value * 31 + 50000; value = value * 31 + offer.OwnerId; value = value * 31 + offer.MissionType; return value * 31 + offer.Quality;
         }
-    }
-    static void SendKeyProjection(Player player, GeneratedMissionBinding binding)
-    {
-        GameTuple<CharacterStat,uint> Stat(CharacterStat stat, uint value) => new() { Value1 = stat, Value2 = value };
-        player.Session?.Send(new SimpleItemFullUpdateMessage
-        {
-            Identity = new() { Type = (IdentityType)0xC76D, Instance = binding.KeyInstance }, Unknown = 0, MsgVersion = 0x0B,
-            Identitytype = (int)player.Identity.Type, Instance = player.Identity.Instance, Playfield = player.Playfield!.Identity.Instance,
-            Unknown1 = new() { Type = (IdentityType)0xF424F, Instance = 0 }, Unknown2 = 0x71, Unknown3 = 0x6F,
-            Name = "Mission key\0", Stats = [Stat(CharacterStat.Flags,0x80000205),Stat(CharacterStat.StaticInstance,28577),
-                Stat(CharacterStat.ACGItemLevel,1),Stat(CharacterStat.ACGItemTemplateID,28577),Stat(CharacterStat.ACGItemTemplateID2,28577),Stat(CharacterStat.MultipleCount,1)]
-        });
-        int slot = player.Inventory.Inventory.Content.Single(entry => entry.Value.InstanceId == binding.KeyInstance).Key;
-        player.Session?.Send(new ContainerAddItemMessage
-        {
-            Identity = player.Identity, Unknown = 0,
-            SourceContainer = new() { Type = IdentityType.OverflowWindow, Instance = 0 },
-            Target = new() { Type = IdentityType.OverflowWindow, Instance = player.Identity.Instance }, TargetPlacement = 0x6F
-        });
-        player.Session?.Send(new TemplateActionMessage
-        {
-            Identity = player.Identity, Unknown = 0, ItemLowId = 28577, ItemHighId = 28577, Quality = 1,
-            Unknown1 = 1, Unknown2 = 87, Placement = new() { Type = IdentityType.OverflowWindow, Instance = 0 }, Unknown3 = 0, Unknown4 = 0
-        });
-        player.Session?.Send(new TemplateActionMessage
-        {
-            Identity = player.Identity, Unknown = 0, ItemLowId = 28577, ItemHighId = 28577, Quality = 1,
-            Unknown1 = 1, Unknown2 = 3, Placement = new() { Type = IdentityType.Inventory, Instance = slot },
-            Unknown3 = (int)player.Identity.Type, Unknown4 = player.Identity.Instance
-        });
     }
     void Quarantine(Player player, Exception exception) { player.QuarantinePersistence(); player.Session?.Close(); _logger.Error(exception, "Mission world commit outcome requires reconciliation."); }
     static GeneratedMissionResult Rejected(string reason) => new() { Status = GeneratedMissionResultStatus.Rejected, Reason = reason };

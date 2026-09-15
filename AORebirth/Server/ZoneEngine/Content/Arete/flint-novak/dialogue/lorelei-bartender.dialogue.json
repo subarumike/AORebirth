@@ -244,7 +244,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic; post RejectedItems → lorelei_thanks",
               "NextNodeId": "lorelei_thanks",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

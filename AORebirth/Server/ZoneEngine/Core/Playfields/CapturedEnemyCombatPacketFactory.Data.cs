@@ -13,9 +13,9 @@ namespace AORebirth.Core.Playfields
             Identity weaponIdentity,
             CapturedEnemyWeaponDefinition definition,
             int? currentEnergy = null,
-            int? currentMultipleCount = null)
+            int? currentMultipleCount = null, bool requireEvidence = true)
         {
-            if (definition == null || !definition.IsValid)
+            if (definition == null || !(requireEvidence ? definition.IsValid : definition.IsRuntimeValid))
             {
                 throw new InvalidOperationException(
                     "A complete capture-backed WeaponItemFullUpdate definition is required.");

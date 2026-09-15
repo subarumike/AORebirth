@@ -1,0 +1,112 @@
+{
+  "Key": {
+    "LowId": 28577,
+    "HighId": 28577,
+    "Quality": 1,
+    "Name": "Mission key",
+    "Flags": 2147484165
+  },
+  "RepairPool": [
+    {
+      "LowId": 100292,
+      "HighId": 100292,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    },
+    {
+      "LowId": 100299,
+      "HighId": 100299,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    },
+    {
+      "LowId": 100344,
+      "HighId": 100344,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    },
+    {
+      "LowId": 100348,
+      "HighId": 100348,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    },
+    {
+      "LowId": 100349,
+      "HighId": 100349,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    },
+    {
+      "LowId": 100361,
+      "HighId": 100361,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    }
+  ],
+  "RepairFallbacks": [
+    {
+      "LowId": 87810,
+      "HighId": 87814,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    },
+    {
+      "LowId": 87810,
+      "HighId": 87810,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    },
+    {
+      "LowId": 95576,
+      "HighId": 95576,
+      "Quality": 1,
+      "Name": "Mission Repair Kit",
+      "Flags": 2147483651
+    }
+  ],
+  "Tokens": {
+    "1": {
+      "LowId": 103910,
+      "HighId": 103911,
+      "Name": "Clan Token",
+      "Quality": 1
+    },
+    "2": {
+      "LowId": 103908,
+      "HighId": 103909,
+      "Name": "Omni Token",
+      "Quality": 1
+    }
+  },
+  "ReservedPlayfields": [
+    1441800,
+    1443840,
+    1460226,
+    1456133,
+    1419310,
+    1419335,
+    1419382,
+    1419349,
+    1441804,
+    2129976,
+    2130137,
+    2134275,
+    2134209,
+    2068491,
+    2129991
+  ],
+  "MinimumCorpseCredits": 21,
+  "MaximumCorpseCredits": 87,
+  "RepairComponentTemplateId": 100348,
+  "RepairMachineTemplateId": 100358,
+  "BrokenMachineTemplateId": 162631
+}

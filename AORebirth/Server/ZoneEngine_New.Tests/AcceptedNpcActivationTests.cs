@@ -112,20 +112,20 @@ public sealed class AcceptedNpcActivationTests
         Assert.AreEqual(0, npc.BuildWeaponInstanceMessages().Count);
     }
 
-    static AcceptedSocialNpcCatalog.Definition Scarlett() => AcceptedSocialNpcCatalog.Definitions.Single(d => d.Binding.PlayfieldId == 7010);
+    static SocialNpcFixture.Definition Scarlett() => SocialNpcFixture.Definitions.Single(d => d.Binding.PlayfieldId == 7010);
 
     sealed class Fixture
     {
         internal readonly Playfield Playfield;
         internal readonly DynelRegistry Registry = new();
-        internal readonly AcceptedNpcActivationService Service;
+        internal readonly NpcContentActivationService Service;
         internal Fixture(int id)
         {
             // No listener, database, heartbeat or client is required for owner-reference tests.
             Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(Playfield, new Identity { Type = IdentityType.Playfield2, Instance = id });
-            Service = new AcceptedNpcActivationService(Playfield, Registry, new PlayfieldLocality(id, null), new StubItemBuilder(), new StubCatalog());
+            Service = new NpcContentActivationService(Playfield, Registry, new PlayfieldLocality(id, null), new StubItemBuilder(), new StubCatalog());
         }
     }
 }

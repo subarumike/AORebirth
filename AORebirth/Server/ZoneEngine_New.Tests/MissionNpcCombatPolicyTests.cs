@@ -30,12 +30,12 @@ public sealed class MissionNpcCombatPolicyTests
     public void MeleePreservesExistingMissionDifficultyAndPacketPolicy(int level, int minimum, int maximum)
     {
         var contract = MissionNpcCombatPolicy.Create(1_000_001, level, false, new StubItemBuilder(), new StubCatalog(), out var weapon);
-        Assert.IsNull(weapon); Assert.IsTrue(contract.IsCombatReady);
+        Assert.IsNull(weapon); Assert.IsTrue(contract.IsRuntimeReady);
         Assert.AreEqual(minimum, contract.MinDamage); Assert.AreEqual(maximum, contract.MaxDamage);
         Assert.AreEqual(0.0, contract.AttackStartDelaySeconds); Assert.AreEqual(0.25, contract.FirstHitDelaySeconds);
         Assert.AreEqual(2.0, contract.RechargeSeconds); Assert.AreEqual(8.0, contract.CapturedAttackRange);
         CollectionAssert.AreEqual(new[] { minimum, maximum }, contract.CapturedDamageObservations);
-        var saw = CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(new() { Type = IdentityType.CanbeAffected, Instance = 1_000_001 }, contract);
+        var saw = CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(new() { Type = IdentityType.CanbeAffected, Instance = 1_000_001 }, contract, requireEvidence: false);
         Assert.AreEqual(20, saw.CloseCombatInitiative); Assert.AreEqual(20, saw.DistanceWeaponInitiative);
         Assert.AreEqual(0, saw.AggDef); Assert.AreEqual(1, saw.Specials.Length);
         Assert.AreEqual(0x53495731, contract.AttackInfoWeaponInstance);
@@ -47,7 +47,7 @@ public sealed class MissionNpcCombatPolicyTests
     {
         var catalog = new StubCatalog().Add(121570, 23);
         var contract = MissionNpcCombatPolicy.Create(1_000_001, 100, true, new StubItemBuilder(), catalog, out var weapon);
-        Assert.IsNotNull(weapon); Assert.IsTrue(contract.IsCombatReady);
+        Assert.IsNotNull(weapon); Assert.IsTrue(contract.IsRuntimeReady);
         Assert.AreEqual(121570, weapon.LowId); Assert.AreEqual(23, weapon.Quality);
         Assert.AreEqual(weapon.Quality, contract.WeaponQuality);
         Assert.AreEqual(67110401, contract.WeaponDefinition.SignedStatValue(CharacterStat.Flags));

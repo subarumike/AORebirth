@@ -85,30 +85,11 @@ if errorlevel 1 (
     exit /b 1
 )
 
-set "ZONE_OUTPUT=%CD%\AORebirth\Built\Debug\ZoneEngine_New"
-set "PLACEMENT_OUTPUT=%ZONE_OUTPUT%\Content\Official\PlayfieldPlacements"
-set "PLACEMENT_MANIFEST=%PLACEMENT_OUTPUT%\official-placement-build-manifest.json"
-set "PLACEMENT_PROVENANCE=%PLACEMENT_OUTPUT%\PLACEMENT_PROVENANCE.env"
-set "SOURCE_SHA="
-for /f "usebackq delims=" %%I in (`git rev-parse HEAD`) do set "SOURCE_SHA=%%I"
-if not defined SOURCE_SHA (
-    echo [AORebirth Build] Official placement validation could not resolve the source SHA.
+echo [AORebirth Build] Validating runtime content architecture...
+call Tools\run_newengine_content_architecture_guard.cmd --check
+if errorlevel 1 (
     popd
     exit /b 1
-)
-if not exist "%ZONE_OUTPUT%\ZoneEngine_New.exe" (
-    echo [AORebirth Build] Official placement validation could not find the built ZoneEngine_New.exe.
-    popd
-    exit /b 1
-)
-
-echo [AORebirth Build] Validating packaged official playfield placements...
-"%ZONE_OUTPUT%\ZoneEngine_New.exe" --validate-official-placements --source-sha "%SOURCE_SHA%" --placement-manifest-output "%PLACEMENT_MANIFEST%" --placement-provenance-output "%PLACEMENT_PROVENANCE%" --build-platform windows
-set PLACEMENT_EXIT=%ERRORLEVEL%
-if not "%PLACEMENT_EXIT%"=="0" (
-    echo [AORebirth Build] Official placement validation failed with exit code %PLACEMENT_EXIT%.
-    popd
-    exit /b %PLACEMENT_EXIT%
 )
 
 echo [AORebirth Build] Building DatabasePreflight...

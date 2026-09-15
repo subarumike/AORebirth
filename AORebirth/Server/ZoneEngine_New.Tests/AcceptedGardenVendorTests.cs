@@ -24,11 +24,11 @@ public sealed class AcceptedGardenVendorTests
     [TestMethod]
     public void ComposedCatalogHasTwentyTwoNpcActorsButOnlySixteenImplementedDialogueDomains()
     {
-        Assert.AreEqual(22, AcceptedSocialNpcCatalog.Definitions.Count);
-        Assert.AreEqual(17, AcceptedSocialNpcCatalog.Definitions.Count(value => value.Binding.HasDialogue));
-        Assert.AreEqual(3, AcceptedAreteVendorCatalog.StandaloneDefinitions.Count);
+        Assert.AreEqual(22, SocialNpcFixture.Definitions.Count);
+        Assert.AreEqual(17, SocialNpcFixture.Definitions.Count(value => value.Binding.HasDialogue));
+        Assert.AreEqual(3, AreteVendorFixture.StandaloneDefinitions.Count);
         int enabled = 0;
-        foreach (var definition in AcceptedSocialNpcCatalog.Definitions)
+        foreach (var definition in SocialNpcFixture.Definitions)
         {
             using var state = new AuthoredQuestTests.World(definition.Binding.PlayfieldId);
             if (new DialogueActionRouter(state.Service).TryOpen(state.Player, definition.Binding.ContentNpcIdentity, false, out _)) enabled++;
@@ -39,12 +39,12 @@ public sealed class AcceptedGardenVendorTests
     [TestMethod]
     public void ExactlyElevenUngatedSourcesKeepEachExistingStockRowAndExcludeBothKeyGatedOfficials()
     {
-        Assert.AreEqual(11, AcceptedGardenVendorCatalog.Definitions.Count);
-        Assert.AreEqual(5, AcceptedGardenVendorCatalog.Placements.Count(value => value.PlayfieldId == 4677));
-        Assert.AreEqual(6, AcceptedGardenVendorCatalog.Placements.Count(value => value.PlayfieldId == 4676));
-        Assert.AreEqual(11, AcceptedGardenVendorCatalog.Placements.Select(value => value.SourceNpcInstance).Distinct().Count());
-        Assert.IsFalse(AcceptedGardenVendorCatalog.Placements.Any(value => value.SourceNpcInstance is 0x79758F40 or 0x7A2013BA));
-        foreach (var placement in AcceptedGardenVendorCatalog.Placements)
+        Assert.AreEqual(11, GardenVendorFixture.Definitions.Count);
+        Assert.AreEqual(5, GardenVendorFixture.Placements.Count(value => value.PlayfieldId == 4677));
+        Assert.AreEqual(6, GardenVendorFixture.Placements.Count(value => value.PlayfieldId == 4676));
+        Assert.AreEqual(11, GardenVendorFixture.Placements.Select(value => value.SourceNpcInstance).Distinct().Count());
+        Assert.IsFalse(GardenVendorFixture.Placements.Any(value => value.SourceNpcInstance is 0x79758F40 or 0x7A2013BA));
+        foreach (var placement in GardenVendorFixture.Placements)
         {
             (int Slot, int LowId, int HighId, int Quality)[] expected;
             if (placement.PlayfieldId == 4677)
@@ -68,7 +68,7 @@ public sealed class AcceptedGardenVendorTests
     [TestMethod]
     public void SourceFactoriesRetainActualLegacySeedOverridesMeshLayerAndPassiveLifetime()
     {
-        foreach (var pair in AcceptedGardenVendorCatalog.Definitions.Zip(AcceptedGardenVendorCatalog.Placements))
+        foreach (var pair in GardenVendorFixture.Definitions.Zip(GardenVendorFixture.Placements))
         {
             var npc = pair.First.Create(new StubItemBuilder()); var content = pair.Second; bool aban = content.PlayfieldId == 4676;
             Assert.AreEqual(content.SourceNpcInstance, npc.Identity.Instance);
@@ -89,8 +89,8 @@ public sealed class AcceptedGardenVendorTests
     [TestMethod]
     public void BothOrMadaProtectionActorsKeepDistinctSourceEndpointPoseAndFrozenStock()
     {
-        var a = AcceptedGardenVendorCatalog.Placements.Single(value => value.SourceNpcInstance == 0x7A2013B4);
-        var b = AcceptedGardenVendorCatalog.Placements.Single(value => value.SourceNpcInstance == 0x7A2013B6);
+        var a = GardenVendorFixture.Placements.Single(value => value.SourceNpcInstance == 0x7A2013B4);
+        var b = GardenVendorFixture.Placements.Single(value => value.SourceNpcInstance == 0x7A2013B6);
         Assert.AreEqual(a.Name, b.Name); Assert.AreNotEqual(a.SourceVendorInstance, b.SourceVendorInstance);
         Assert.AreEqual(0x130B7810, a.SourceVendorInstance); Assert.AreEqual(0x130B7812, b.SourceVendorInstance);
         Assert.AreEqual(404.2271f, a.X); Assert.AreEqual(421.6585f, b.X); Assert.AreNotEqual(a.HeadingY, b.HeadingY);
@@ -100,23 +100,23 @@ public sealed class AcceptedGardenVendorTests
     [TestMethod]
     public void MissingAnyGardenEndpointRejectsWholeShopAndImpersonationCannotAttach()
     {
-        foreach (var pair in AcceptedGardenVendorCatalog.Definitions.Zip(AcceptedGardenVendorCatalog.Placements))
+        foreach (var pair in GardenVendorFixture.Definitions.Zip(GardenVendorFixture.Placements))
         {
             foreach (int missing in new[] { pair.Second.VendorTemplateId, pair.Second.Stock[0].LowId, pair.Second.Stock[0].HighId })
             {
                 var npc = pair.First.Create(new StubItemBuilder());
-                Assert.IsFalse(AcceptedGardenVendorCatalog.TryAttachShop(npc, new StubItemBuilder(), Catalog(missing), out var failure));
+                Assert.IsFalse(GardenVendorFixture.TryAttachShop(npc, new StubItemBuilder(), Catalog(missing), out var failure));
                 Assert.IsNull(npc.Shop); Assert.IsFalse(string.IsNullOrWhiteSpace(failure));
             }
             var impostor = new NpcCharacter(new() { Type = IdentityType.CanbeAffected, Instance = pair.Second.SourceNpcInstance }, new StubItemBuilder()) { Name = pair.Second.Name };
-            Assert.IsFalse(AcceptedGardenVendorCatalog.TryAttachShop(impostor, new StubItemBuilder(), Catalog(), out _));
+            Assert.IsFalse(GardenVendorFixture.TryAttachShop(impostor, new StubItemBuilder(), Catalog(), out _));
         }
     }
 
     [TestMethod]
     public void EveryAcceptedGardenActorOpensExactShopFromBothBusinessAnswerAndGenericUse()
     {
-        foreach (var placement in AcceptedGardenVendorCatalog.Placements)
+        foreach (var placement in GardenVendorFixture.Placements)
         {
             using (var w = new World(placement))
             {
@@ -134,7 +134,7 @@ public sealed class AcceptedGardenVendorTests
     [TestMethod]
     public void DespawnedOrForeignLifetimeGardenActorCannotOpenShopOrContinueBusinessDialogue()
     {
-        var placement = AcceptedGardenVendorCatalog.Placements[0];
+        var placement = GardenVendorFixture.Placements[0];
         using var w = new World(placement); Assert.IsTrue(w.Dialogue.Open(w.State.Session, w.Npc.Identity)); w.Drain();
         var impostor = new NpcCharacter(w.Npc.Identity, new StubItemBuilder()) { Name = w.Npc.Name, Playfield = w.Npc.Playfield };
         w.State.Registry.Register(impostor);
@@ -144,7 +144,7 @@ public sealed class AcceptedGardenVendorTests
         Assert.AreEqual(0, w.State.Dao.Calls);
     }
 
-    static void AssertShop(World w, AcceptedGardenVendorCatalog.Placement placement)
+    static void AssertShop(World w, GardenVendorFixture.Placement placement)
     {
         Assert.IsTrue(w.Trade.TryGetSession(w.State.Player, out var session)); Assert.AreSame(w.Npc.Shop, session.Machine);
         var packet = w.State.Session.Messages.OfType<ShopUpdateMessage>().Single();
@@ -157,7 +157,7 @@ public sealed class AcceptedGardenVendorTests
     static StubCatalog Catalog(int missing = 0)
     {
         var catalog = new StubCatalog();
-        foreach (var placement in AcceptedGardenVendorCatalog.Placements)
+        foreach (var placement in GardenVendorFixture.Placements)
         {
             if (placement.VendorTemplateId != missing) catalog.Add(placement.VendorTemplateId, 1);
             foreach (var row in placement.Stock)
@@ -177,7 +177,7 @@ public sealed class AcceptedGardenVendorTests
         internal readonly TradeService Trade;
         readonly ServiceProvider _services;
         long _now;
-        internal World(AcceptedGardenVendorCatalog.Placement placement)
+        internal World(GardenVendorFixture.Placement placement)
         {
             State = new(placement.PlayfieldId); var catalog = Catalog(); var items = new StubItemBuilder();
             var data = new StubGameData(HashItemCatalog.Parse("{}", "{}"));

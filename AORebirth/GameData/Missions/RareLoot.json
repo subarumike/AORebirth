@@ -1,0 +1,26 @@
+[
+  {
+    "HighId": 155198,
+    "LowId": 155198,
+    "Name": "Instruction Disc (Summon Grid Armor Mk I)",
+    "Quality": 60
+  },
+  {
+    "HighId": 155200,
+    "LowId": 155200,
+    "Name": "Instruction Disc (Summon Grid Armor Mk II)",
+    "Quality": 93
+  },
+  {
+    "HighId": 155199,
+    "LowId": 155199,
+    "Name": "Instruction Disc (Summon Grid Armor Mk III)",
+    "Quality": 116
+  },
+  {
+    "HighId": 155201,
+    "LowId": 155201,
+    "Name": "Instruction Disc (Summon Grid Armor Mk IV)",
+    "Quality": 140
+  }
+]

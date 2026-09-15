@@ -23,6 +23,15 @@ namespace ZoneEngine_New.Tests
             NpcTemplateLevelPolicy.RequireExactLevel(Template(), null);
         }
 
+        [TestMethod]
+        public void ComposedFamilyLevelIsCheckedAfterGenericInterpolation()
+        {
+            MobTemplate template = Template();
+            NpcTemplateLevelPolicy.RequireExactLevel(template, 12,
+                new System.Collections.Generic.Dictionary<int, int> { [(int)CharacterStat.Level] = 12, [(int)CharacterStat.MaxHealth] = 250 });
+            Assert.AreEqual(7, template.Stats[(int)CharacterStat.Level]);
+        }
+
         [DataTestMethod]
         [DataRow(6)]
         [DataRow(8)]

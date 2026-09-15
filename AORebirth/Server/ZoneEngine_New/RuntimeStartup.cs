@@ -7,7 +7,6 @@ namespace ZoneEngine_New
     using System.Net.Sockets;
     using System.Text;
     using System.Text.Json;
-    using AORebirth.Core.Playfields.OfficialPlacements;
     using MySqlConnector;
     using Utility.Config;
     using Utility.Network;
@@ -21,13 +20,12 @@ namespace ZoneEngine_New
             var flags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "/headless", "--headless", "/autostart", "--autostart",
-                "--validate-startup", "--validate-database", "--validate-official-placements"
+                "--validate-startup", "--validate-database"
             };
             var values = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "/shutdown-file", "--shutdown-file", "/stdout-log", "--stdout-log",
-                "/stderr-log", "--stderr-log", "--source-sha", "--build-platform",
-                "--placement-manifest-output", "--placement-provenance-output"
+                "/stderr-log", "--stderr-log"
             };
             var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             int validationModes = 0;
@@ -90,12 +88,12 @@ namespace ZoneEngine_New
                 using FileStream stream = File.OpenRead(Path.Combine(gameData, file));
                 using JsonDocument document = JsonDocument.Parse(stream);
             }
-            AORebirth.World.Package.PlayfieldPackageValidator.Validate(Path.Combine(gameData, "Playfields"),
-                Path.Combine(baseDirectory, "Content", "Official", "PlayfieldPlacements", "playfield-package-manifest.json"));
+            if (!Directory.Exists(Path.Combine(gameData, "Playfields")))
+                throw new DirectoryNotFoundException("Editable playfield data directory is missing.");
+            _ = ZoneEngine_New.Core.GameData.WorldContentCatalog.Load(gameData);
+            _ = ZoneEngine_New.Core.GameData.NanoMechanicCatalog.Load(Path.Combine(gameData, "NanoMechanics.json"));
             using (FileStream items = File.OpenRead(Path.Combine(gameData, "items.dat")))
                 if (items.Length == 0) throw new InvalidDataException("Packaged item catalog is empty.");
-            _ = new OfficialPlayfieldPlacementCatalog(
-                OfficialPlayfieldPlacementCatalog.ResolveRuntimeCorpusRoot(baseDirectory));
         }
 
         public static void ValidatePort(int port)

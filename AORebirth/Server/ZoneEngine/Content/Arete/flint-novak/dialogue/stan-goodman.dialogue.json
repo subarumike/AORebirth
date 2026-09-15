@@ -295,7 +295,8 @@
               "Text": "(Continue after trade)",
               "TextEvidence": "Synthetic; post RejectedItems → AnswerList Thanks/can't believe/Goodbye",
               "NextNodeId": "stan_deliver_002",
-              "Actions": []
+              "Actions": [],
+              "Hidden": true
             }
           ],
           "EnterActions": []

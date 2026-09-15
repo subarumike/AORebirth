@@ -41,14 +41,11 @@ public sealed class NpcContentIntegrationTests
     [TestMethod]
     public void Unresolved_placeholder_cannot_become_combat_content_through_a_policy_typo()
     {
-        var npc = new MobTemplate { Hash = "TEST", ContentAcceptance = new() { Policy = "ACCEPTED", IdentityResolved = true,
-            CombatAccepted = true, UnresolvedPlaceholder = true, Attackable = true, CombatAiEnabled = true, Source = "fixture" } };
-        Assert.IsFalse(NpcContentAcceptance.CanSpawn(npc));
-        Assert.ThrowsExactly<InvalidOperationException>(() => NpcContentAcceptance.RequireSpawnable(npc));
-        npc.ContentAcceptance.UnresolvedPlaceholder = false;
-        Assert.IsTrue(NpcContentAcceptance.CanSpawn(npc));
-        npc.ContentAcceptance.Blockers = ["missing loadout"];
-        Assert.IsFalse(NpcContentAcceptance.CanSpawn(npc));
+        var npc = new MobTemplate { Hash = "TEST", Name = "Fixture", UnresolvedPlaceholder = true };
+        Assert.IsFalse(NpcTemplateValidation.CanSpawn(npc));
+        Assert.ThrowsExactly<InvalidOperationException>(() => NpcTemplateValidation.RequireSpawnable(npc));
+        npc.UnresolvedPlaceholder = false;
+        Assert.IsTrue(NpcTemplateValidation.CanSpawn(npc));
     }
 
     [TestMethod]
@@ -70,18 +67,10 @@ public sealed class NpcContentIntegrationTests
     {
         var rows = JsonSerializer.Deserialize<List<MobTemplate>>(File.ReadAllText(Path.Combine(Root(), "AORebirth/GameData/MobTemplates.json")))!;
         var placeholder = rows.Single(r => r.Hash == "AAAA");
-        Assert.IsNotNull(placeholder.ContentAcceptance);
-        Assert.IsTrue(placeholder.ContentAcceptance.UnresolvedPlaceholder);
-        Assert.IsFalse(placeholder.ContentAcceptance.Attackable);
-        Assert.IsFalse(placeholder.ContentAcceptance.CombatAiEnabled);
-        Assert.IsFalse(NpcContentAcceptance.CanSpawn(placeholder));
-        foreach (var imported in rows.Where(r => r.ContentAcceptance != null))
-        {
-            Assert.IsFalse(NpcContentAcceptance.CanSpawn(imported));
-            using var source = JsonDocument.Parse(File.ReadAllText(Path.Combine(Root(), "AORebirth/GameData/MobTemplates.json")));
-            var raw = source.RootElement.EnumerateArray().Single(row => row.GetProperty("Hash").GetString() == imported.Hash);
-            Assert.AreEqual(0, raw.GetProperty("Weapons").GetArrayLength(), "Retained source alternatives must never become concurrent slots.");
-        }
+        Assert.IsNotNull(placeholder.ContentProvenance);
+        Assert.IsFalse(NpcTemplateValidation.CanSpawn(placeholder));
+        foreach (var imported in rows.Where(r => r.Hash != "AAAA" && r.ContentProvenance != null))
+            Assert.IsTrue(NpcTemplateValidation.CanSpawn(imported), "Historical review status is not runtime permission.");
         foreach (string hash in new[] { "MENI", "VEAE", "STFO" })
             Assert.IsTrue(rows.Any(r => r.Hash == hash));
     }
@@ -93,7 +82,7 @@ public sealed class NpcContentIntegrationTests
         using var matrix = JsonDocument.Parse(File.ReadAllText(Path.Combine(root,"docs/reports/SUBWAY_NPC_COMBAT_RECONCILIATION.json")));
         string[] names = matrix.RootElement.GetProperty("npcs").EnumerateArray().Select(r => r.GetProperty("name").GetString()!).ToArray();
         string[] files = ["Mobs/MobStatResolver.cs", "Mobs/NpcFamilyStatTemplates.cs", "Mobs/NpcStatTemplates.cs",
-            "Mobs/NpcContentAcceptance.cs", "GameData/GameDataStore.NpcStats.cs", "Playfield/SpawnService.cs", "Nanos/NanoService.cs"];
+            "Mobs/NpcTemplateValidation.cs", "GameData/GameDataStore.NpcStats.cs", "Playfield/SpawnService.cs", "Nanos/NanoService.cs"];
         foreach (string file in files)
         {
             string source = File.ReadAllText(Path.Combine(root,"AORebirth/Server/ZoneEngine_New/Core",file));

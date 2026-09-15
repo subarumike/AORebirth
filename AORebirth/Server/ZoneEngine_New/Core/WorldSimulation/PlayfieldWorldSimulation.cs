@@ -410,7 +410,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public void RegisterExitProxyDoor(int doorInstance)
         {
             if (doorInstance == 0
-                || !ExitProxyDoorCatalog.ShouldRegister(_playfieldId, doorInstance)
+                || !ExitProxyDoorCatalog.ShouldRegister(_playfieldId, doorInstance, _gameData.WorldContent.ExitDoorRules)
                 || !_exitProxyDoors.Add(doorInstance))
                 return;
 

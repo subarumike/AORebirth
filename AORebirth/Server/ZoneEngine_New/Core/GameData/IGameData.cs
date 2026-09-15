@@ -13,6 +13,8 @@ namespace ZoneEngine_New.Core.GameData
     {
         string RootPath { get; }
 
+        WorldContentCatalog WorldContent => WorldContentCatalog.Load(RootPath);
+
         int MobTemplateCount { get; }
 
         int NpcFamilyStatTemplateCount => 0;

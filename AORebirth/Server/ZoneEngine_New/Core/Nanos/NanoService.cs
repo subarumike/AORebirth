@@ -273,10 +273,10 @@ namespace ZoneEngine_New.Core.Nanos
 
         public bool TryCast(Player caster, int nanoId, Identity targetIdentity)
         {
-            nanoId = BucketheadNanoSpecialization.NormalizeNanoId(nanoId);
+            nanoId = NormalizeNanoId(nanoId);
             if (!TryState(caster, out State state) || !Online(caster) || state.Pending != null
                 || _milliseconds() < state.ReadyAt || !_catalog.TryGet(nanoId, out NanoDefinition nano)
-                || !BucketheadNanoSpecialization.IsUploaded(caster, nanoId)) return false;
+                || !IsUploaded(caster, nanoId)) return false;
             var castContext = Specialty(nanoId) as INanoCastContextSpecialization;
             Player? target = castContext != null || targetIdentity == Identity.None || targetIdentity == caster.Identity ? caster
                 : _states.TryGetValue(targetIdentity.Instance, out State? targetState)
@@ -333,7 +333,7 @@ namespace ZoneEngine_New.Core.Nanos
             if (!Online(caster) || !Online(target) || !TryState(target, out State state)
                 || !ReferenceEquals(caster.Playfield, target.Playfield)
                 || caster.Stats.GetOrZero(CharacterStat.CurrentNano) < nano.NanoCost
-                || !nano.TryCalculateAttackTime(0, 0, out _) || !NanoEffectPlan.ActionRequirements(caster, target, nano)) return false;
+                || !nano.TryCalculateAttackTime(0, 0, out _) || !(Specialty(nano.Id) is INanoActionRequirements requirements ? requirements.ActionRequirements(caster, target, nano) : NanoEffectPlan.ActionRequirements(caster, target, nano))) return false;
             if (!ReferenceEquals(caster, target) && (nano.RangeMeters <= 0
                 || caster.Distance3D(target) > nano.RangeMeters || !caster.HasLineOfSightTo(target))) return false;
             if (specialty != null)
@@ -363,16 +363,14 @@ namespace ZoneEngine_New.Core.Nanos
         {
             children = new();
             if (plan.ScriptedChildren.Count == 0) return true;
-            // This is not a recursive arbitrary-script interpreter. Only Sparrow's exact child
-            // has a proven no-OnUse duration contract in the currently supported Legacy runtime.
-            if (parent.Id != 82835 || plan.ScriptedChildren.Count != 1
-                || plan.ScriptedChildren[0] != SparrowChildNanoSpecialization.NanoId
+            // Only duration-only children are supported; reject recursion, duplicate effects and self cycles.
+            if (plan.ScriptedChildren.Count != plan.ScriptedChildren.Distinct().Count() || plan.ScriptedChildren.Contains(parent.Id)
                 || !ReferenceEquals(caster, target)) return false;
             foreach (int id in plan.ScriptedChildren)
             {
                 if (!_catalog.TryGet(id, out NanoDefinition child) || child.Strain == parent.Strain
                     || !child.TryCalculateAttackTime(0, 0, out _)
-                    || Specialty(id) is not SparrowChildNanoSpecialization specialty
+                    || Specialty(id) is not { } specialty
                     || !specialty.TryPrepare(caster, target, child, out var childPlan)
                     || !childPlan.UsesActiveNano || childPlan.DurationCentiseconds <= 0
                     || childPlan.DurationCentiseconds > MaximumDurationCentiseconds
@@ -400,7 +398,7 @@ namespace ZoneEngine_New.Core.Nanos
         {
             Player caster = casterState.Player; Player target = pending.Target;
             if (!ReferenceEquals(caster.Session, pending.Session) || !ReferenceEquals(target.Session, pending.TargetSession)
-                || !ReferenceEquals(caster.Playfield, pending.Playfield) || !BucketheadNanoSpecialization.IsUploaded(caster, pending.Nano.Id)
+                || !ReferenceEquals(caster.Playfield, pending.Playfield) || !IsUploaded(caster, pending.Nano.Id)
                 || !Validate(caster, target, pending.Nano, out var specialty, out int duration, out bool usesActive)
                 || !TryState(target, out State targetState)) return;
             var effects = new NanoEffectPlan();
@@ -664,6 +662,8 @@ namespace ZoneEngine_New.Core.Nanos
             && player.Stats.GetOrZero(CharacterStat.Health) > 0
             && player.ConnectionPhase == PlayerConnectionPhase.Online && player.Session is { State: SessionState.InPlay } session
             && ReferenceEquals(session.Player, player);
+        private int NormalizeNanoId(int nanoId) => _specialties.OfType<SummonNanoSpecialization>().Select(x => x.NormalizeNanoId(nanoId)).FirstOrDefault(x => x != nanoId, nanoId);
+        private bool IsUploaded(Player player, int nanoId) => player.UploadedNanoIds.Contains(nanoId) || _specialties.OfType<SummonNanoSpecialization>().Any(x => x.IsUploaded(player, nanoId));
         private INanoSpecialization? Specialty(int nanoId) => _specialties.SingleOrDefault(s => s.Handles(nanoId));
         private int NcuCost(int nanoId) => _catalog.TryGet(nanoId, out var nano) ? nano.NcuCost : 0;
         private void SyncNcu(State state) => state.Player.Stats.Set(CharacterStat.CurrentNCU,

@@ -33,7 +33,7 @@ public sealed class AuthoredQuestTests
     public void PackagedAcceptedAuthoredCatalogPreservesExactObjectives()
     {
         var catalog = LoadCatalog();
-        Assert.IsTrue(catalog.Definitions.Single(value => value.QuestId == AuthoredQuestService.BuyLockpick).Objectives
+        Assert.IsTrue(catalog.Definitions.Single(value => value.QuestId == AuthoredQuestFixture.BuyLockpick).Objectives
             .Any(value => value.ObjectiveId == "mission_555BD124_buy_lockpick" && value.RequiredCount == 1 && value.IsResolved));
         Assert.IsTrue(catalog.Definitions.Single(value => value.QuestId == DojaChipInteractionRules.QuestTurnIn).Objectives
             .Any(value => value.ObjectiveId == "mission_55AA2421_turnin" && value.RequiredCount == 1 && value.IsResolved));
@@ -42,12 +42,12 @@ public sealed class AuthoredQuestTests
     [TestMethod]
     public void LockpickGrantRetirementAndMissionHandoffShareOneCommit()
     {
-        using var w = new World(); w.Activate(AuthoredQuestService.BuyLockpick); var sealedItem = w.Add(295999);
+        using var w = new World(); w.Activate(AuthoredQuestFixture.BuyLockpick); var sealedItem = w.Add(295999);
         bool checkedBefore = false, isolated = false, fullPlan = false;
         w.Dao.BeforeCommit = working => { checkedBefore = true; isolated = w.Player.Inventory.Inventory.Content[64] == sealedItem && w.Session.Messages.Count == 0;
             fullPlan = working.Items[10].ContainerType == 0 && working.Items.Values.Any(value => value.LowId == 95577)
-                && working.GetMission(new(111, AuthoredQuestService.BuyLockpick)).State == DaoState.Completed
-                && working.GetMission(new(111, AuthoredQuestService.Strongbox)).State == DaoState.Active; };
+                && working.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State == DaoState.Completed
+                && working.GetMission(new(111, AuthoredQuestFixture.Strongbox)).State == DaoState.Active; };
         Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, sealedItem));
         Assert.IsTrue(checkedBefore && isolated && fullPlan); Assert.AreEqual(1, w.Dao.Calls);
         Assert.IsFalse(w.Player.Inventory.Inventory.Content.ContainsKey(64));
@@ -64,19 +64,19 @@ public sealed class AuthoredQuestTests
     [TestMethod]
     public void FailedLockpickCommitPreservesSourceMissionInventoryAndNoAcknowledgement()
     {
-        using var w = new World(); w.Activate(AuthoredQuestService.BuyLockpick); var item = w.Add(295999);
+        using var w = new World(); w.Activate(AuthoredQuestFixture.BuyLockpick); var item = w.Add(295999);
         w.Dao.Failure = new InvalidOperationException("late mission write failure");
         Assert.IsFalse(w.Service.TryUseItem(w.Player, Slot, item));
         Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]); Assert.AreEqual(104, w.Dao.Items[10].ContainerType);
-        Assert.AreEqual(1, w.Dao.Items.Count); Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.BuyLockpick)).State);
-        Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestService.Strongbox))); Assert.AreEqual(0, w.Session.Messages.Count);
+        Assert.AreEqual(1, w.Dao.Items.Count); Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
+        Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestFixture.Strongbox))); Assert.AreEqual(0, w.Session.Messages.Count);
         Assert.IsFalse(w.Player.IsPersistenceQuarantined);
     }
 
     [TestMethod]
     public void UnknownAuthoredCommitQuarantinesWithoutMemoryReplayOrSuccessFrames()
     {
-        using var w = new World(); w.Activate(AuthoredQuestService.BuyLockpick); var item = w.Add(295999); w.Dao.UnknownCommit = true;
+        using var w = new World(); w.Activate(AuthoredQuestFixture.BuyLockpick); var item = w.Add(295999); w.Dao.UnknownCommit = true;
         Assert.IsFalse(w.Service.TryUseItem(w.Player, Slot, item)); Assert.IsTrue(w.Player.IsPersistenceQuarantined);
         Assert.AreEqual(SessionState.Closed, w.Session.State); Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
         Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(0, w.Dao.Items[10].ContainerType);
@@ -86,7 +86,7 @@ public sealed class AuthoredQuestTests
     [TestMethod]
     public void MarcoContentsTipRewardAndLiveStatsCommitTogetherWithoutLosingUnsnapshottedValues()
     {
-        using var w = new World(); w.Activate(AuthoredQuestService.BuyNano); var item = w.Add(248258);
+        using var w = new World(); w.Activate(AuthoredQuestFixture.BuyNano); var item = w.Add(248258);
         w.Player.Stats.Set(CharacterStat.Cash, 123); w.Player.Stats.Set(CharacterStat.XP, 300);
         w.Dao.Stats[(int)CharacterStat.Cash] = 1; w.Dao.Stats[(int)CharacterStat.XP] = 2;
         bool isolated = false;
@@ -98,32 +98,32 @@ public sealed class AuthoredQuestTests
         Assert.AreEqual(2869, w.Player.Stats.GetOrZero(CharacterStat.XP));
         CollectionAssert.AreEqual(new[] { 43384, 42423, 99589, 43960, 43978, 223373 },
             w.Session.Messages.OfType<TemplateActionMessage>().Where(value => value.Unknown2 == 87).Select(value => value.ItemLowId).ToArray());
-        Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestService.BuyNano)).State);
+        Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyNano)).State);
         Assert.AreEqual(1, w.Dao.Calls);
     }
 
     [TestMethod]
     public void LateMarcoFailureRollsBackEveryGrantSourceMissionAndRewardStat()
     {
-        using var w = new World(); w.Activate(AuthoredQuestService.BuyNano); var item = w.Add(248258);
+        using var w = new World(); w.Activate(AuthoredQuestFixture.BuyNano); var item = w.Add(248258);
         w.Player.Stats.Set(CharacterStat.Cash, 123); w.Dao.Stats[(int)CharacterStat.Cash] = 123;
         w.Dao.Failure = new InvalidOperationException("late insert failure");
         Assert.IsFalse(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreEqual(1, w.Dao.Items.Count);
         Assert.AreEqual(0, w.Dao.Rewards.Count); Assert.AreEqual(123L, w.Dao.Stats[(int)CharacterStat.Cash]);
         Assert.AreEqual(123, w.Player.Stats.GetOrZero(CharacterStat.Cash)); Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
-        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.BuyNano)).State); Assert.AreEqual(0, w.Session.Messages.Count);
+        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyNano)).State); Assert.AreEqual(0, w.Session.Messages.Count);
     }
 
     [TestMethod]
     public void FullInventoryAndStaleRowsCannotConsumeOrAdvanceQuest()
     {
-        using var w = new World(); w.Activate(AuthoredQuestService.BuyLockpick); var item = w.Add(295999); TestWorld.FillInventory(w.Player);
+        using var w = new World(); w.Activate(AuthoredQuestFixture.BuyLockpick); var item = w.Add(295999); TestWorld.FillInventory(w.Player);
         Assert.IsFalse(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreEqual(0, w.Session.Messages.Count);
-        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.BuyLockpick)).State);
-        using var stale = new World(); stale.Activate(AuthoredQuestService.BuyLockpick); var moved = stale.Add(295999);
+        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
+        using var stale = new World(); stale.Activate(AuthoredQuestFixture.BuyLockpick); var moved = stale.Add(295999);
         stale.Dao.Items[10].ContainerPlacement = 65;
         Assert.IsFalse(stale.Service.TryUseItem(stale.Player, Slot, moved)); Assert.AreEqual(0, stale.Session.Messages.Count);
-        Assert.IsNull(stale.Dao.GetMission(new(111, AuthoredQuestService.Strongbox)));
+        Assert.IsNull(stale.Dao.GetMission(new(111, AuthoredQuestFixture.Strongbox)));
     }
 
     [TestMethod]
@@ -253,12 +253,12 @@ public sealed class AuthoredQuestTests
     {
         using (var w = new World())
         {
-            var lockpick = w.Add(95577); w.Activate(AuthoredQuestService.Strongbox); int ack = 0;
+            var lockpick = w.Add(95577); w.Activate(AuthoredQuestFixture.Strongbox); int ack = 0;
             w.Dao.Failure = new InvalidOperationException("late Strongbox handoff failure");
             Assert.IsFalse(w.Service.TryUseLockpickOnStrongbox(w.Player, Slot, lockpick, () => ack++));
             Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count);
             Assert.AreSame(lockpick, w.Player.Inventory.Inventory.Content[64]); Assert.AreEqual(1, w.Dao.Items.Count);
-            Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestService.DeliverFactory)));
+            Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestFixture.DeliverFactory)));
             w.Dao.Failure = null;
             w.Dao.BeforeCommit = pending => Assert.AreEqual(0, ack);
             Assert.IsTrue(w.Service.TryUseLockpickOnStrongbox(w.Player, Slot, lockpick, () => ack++), w.Logger.LastError);
@@ -266,12 +266,12 @@ public sealed class AuthoredQuestTests
         }
         using (var w = new World())
         {
-            w.Activate(AuthoredQuestService.FindThief); int ack = 0;
+            w.Activate(AuthoredQuestFixture.FindThief); int ack = 0;
             w.Dao.Failure = new InvalidOperationException("late thief handoff failure");
             Assert.IsFalse(w.Service.TryUseShopThiefRemains(w.Player, () => ack++));
             Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(0, w.Dao.Items.Count);
-            Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.FindThief)).State);
-            Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestService.DeliverArmor)));
+            Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.FindThief)).State);
+            Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestFixture.DeliverArmor)));
             Assert.IsFalse(w.Player.IsPersistenceQuarantined);
         }
     }
@@ -281,8 +281,8 @@ public sealed class AuthoredQuestTests
     {
         using (var w = new World())
         {
-            var lockpick = w.Add(95577); w.Activate(AuthoredQuestService.DeliverFactory);
-            w.Dao.Missions[new(111, AuthoredQuestService.DeliverFactory)].State = DaoState.Completed;
+            var lockpick = w.Add(95577); w.Activate(AuthoredQuestFixture.DeliverFactory);
+            w.Dao.Missions[new(111, AuthoredQuestFixture.DeliverFactory)].State = DaoState.Completed;
             int ack = 0;
             Assert.IsFalse(w.Service.TryUseLockpickOnStrongbox(w.Player, Slot, lockpick, () => ack++));
             Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(1, w.Dao.Items.Count);
@@ -290,43 +290,43 @@ public sealed class AuthoredQuestTests
         }
         using (var w = new World())
         {
-            w.Activate(AuthoredQuestService.DeliverArmor);
-            w.Dao.Missions[new(111, AuthoredQuestService.DeliverArmor)].State = DaoState.Completed;
+            w.Activate(AuthoredQuestFixture.DeliverArmor);
+            w.Dao.Missions[new(111, AuthoredQuestFixture.DeliverArmor)].State = DaoState.Completed;
             int ack = 0;
             Assert.IsFalse(w.Service.TryUseShopThiefRemains(w.Player, () => ack++));
             Assert.AreEqual(0, ack); Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(0, w.Dao.Items.Count);
-            Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestService.DeliverArmor)).State);
+            Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.DeliverArmor)).State);
         }
     }
 
     [TestMethod]
     public void SarahRestoreUsesExistingExactJournalBuildersForOnlyActiveMissions()
     {
-        using var w = new World(); w.Activate(AuthoredQuestService.DeliverArmor);
+        using var w = new World(); w.Activate(AuthoredQuestFixture.DeliverArmor);
         w.Service.Restore(w.Player);
         var tip = w.Session.Messages.OfType<QuestFullUpdateMessage>().Single().Quests.Single();
         Assert.AreEqual(unchecked((int)0x555BE9F6), tip.QuestId.Instance); Assert.AreEqual(158429, tip.MissionIconId);
         Assert.AreEqual(unchecked((int)0x78E0FC69), tip.UnknownId1.Instance);
-        w.Session.Messages.Clear(); w.Dao.Missions[new(111, AuthoredQuestService.DeliverArmor)].State = DaoState.Completed;
+        w.Session.Messages.Clear(); w.Dao.Missions[new(111, AuthoredQuestFixture.DeliverArmor)].State = DaoState.Completed;
         w.Service.Restore(w.Player); Assert.AreEqual(0, w.Session.Messages.Count);
     }
 
     [TestMethod]
     public void StrongboxPreservesLockpickAndFactoryTurnInPublishesOnlyAfterCommit()
     {
-        using var w = new World(); var lockpick = w.Add(95577); w.Activate(AuthoredQuestService.Strongbox);
+        using var w = new World(); var lockpick = w.Add(95577); w.Activate(AuthoredQuestFixture.Strongbox);
         Assert.IsTrue(w.Service.TryUseLockpickOnStrongbox(w.Player, Slot, lockpick));
         Assert.AreSame(lockpick, w.Player.Inventory.Inventory.Content[64]); Assert.AreEqual(104, w.Dao.Items[10].ContainerType);
-        Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestService.Strongbox)).State);
-        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.DeliverFactory)).State);
+        Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.Strongbox)).State);
+        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.DeliverFactory)).State);
         var factory = w.Player.Inventory.Inventory.Content.Single(pair => pair.Value.LowId == 248306);
         w.Session.Messages.Clear(); w.Player.Stats.Set(CharacterStat.Cash, 20); int accepted = 0;
         w.Dao.BeforeCommit = pending => { Assert.AreEqual(0, accepted); Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(20, w.Player.Stats.GetOrZero(CharacterStat.Cash)); };
         Assert.IsTrue(w.Service.TryTurnInFactory(w.Player, new() { Type = IdentityType.Inventory, Instance = factory.Key }, factory.Value, () => accepted++));
         Assert.AreEqual(1, accepted); Assert.AreEqual(1260, w.Player.Stats.GetOrZero(CharacterStat.Cash));
-        Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestService.DeliverFactory)).State);
-        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.TalkSarah)).State);
-        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestService.BuyNano)).State);
+        Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.DeliverFactory)).State);
+        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.TalkSarah)).State);
+        Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyNano)).State);
         Assert.IsTrue(w.Player.Inventory.Inventory.Content.Values.Any(item => item.LowId == 296572));
     }
 
@@ -338,17 +338,18 @@ public sealed class AuthoredQuestTests
         internal readonly Player Player = TestWorld.CreatePlayer(111);
         internal readonly Session Session = new();
         internal readonly AuthoredMissionTestDao Dao = new();
-        internal readonly AuthoredQuestCatalog Catalog = LoadCatalog();
+        internal readonly AuthoredQuestCatalog Catalog;
         internal readonly AuthoredQuestService Service;
         internal readonly ErrorLogger Logger = new();
         internal readonly DynelRegistry Registry = new();
-        internal readonly AcceptedNpcActivationService Npcs;
+        internal readonly NpcContentActivationService Npcs;
         internal DateTime Now = new(2026, 9, 8, 12, 0, 0, DateTimeKind.Utc);
         readonly InventoryFlushService _flush;
         internal InventoryFlushService Flush => _flush;
         readonly ServiceProvider _services;
-        internal World(int playfield = 6553)
+        internal World(int playfield = 6553, InteractionContent? content = null)
         {
+            Catalog = content == null ? LoadCatalog() : new(content);
             Player.Session = Session; Session.BindPlayer(Player);
             Player.Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Player.Playfield, new Identity { Type = IdentityType.Playfield, Instance = playfield });

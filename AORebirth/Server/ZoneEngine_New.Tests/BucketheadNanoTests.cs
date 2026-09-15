@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -21,6 +22,37 @@ using ZoneEngine_New.Core.Playfield.Locality;
 [TestClass]
 public sealed class BucketheadNanoTests
 {
+    [TestMethod]
+    public void Edited_summon_template_choice_and_lifetime_are_used_after_file_reload_without_rebuild()
+    {
+        using var f = new Fixture();
+        var content = f.Pf.GetRequiredService<IGameData>().WorldContent;
+        var rule = content.Summons.Single();
+        var alternative = JsonSerializer.Deserialize<WorldNpcDefinition>(JsonSerializer.Serialize(content.Npcs.Single(x => x.Key == rule.NpcDefinitionKey)))!;
+        alternative.Key = "fixture:alternate-summon"; alternative.Name = "Editable summon fixture";
+        content.Npcs = content.Npcs.Append(alternative).ToArray(); rule.NpcDefinitionKey = alternative.Key;
+        rule.RelativeOffset = [2, 0, 0]; rule.LifetimeSeconds = 3;
+        string root = Path.Combine(Path.GetTempPath(), "aor-summon-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        SummonService? service = null;
+        try
+        {
+            File.WriteAllText(Path.Combine(root, "WorldContent.json"), JsonSerializer.Serialize(content));
+            var data = new StubGameData(HashItemCatalog.Parse("{}", "{}")) { RootPath = root };
+            service = new(f.Pf, f.Registry, f.Pf.GetRequiredService<PlayfieldLocality>(), f.Pf.GetRequiredService<NpcContentActivationService>(),
+                new ItemBuilder(f.Items, new StubLogger()), f.Items, data, () => f.Time);
+            f.World.Owner(f.Pf, () =>
+            {
+                Assert.IsTrue(service.TryPrepare(f.Player, data.WorldContent.Summons.Single(), () => true, out var publish));
+                publish();
+                Assert.AreEqual("Editable summon fixture", service.ForOwner(f.Player)!.Name);
+                Assert.AreEqual(f.Player.Position.x + 2, service.ForOwner(f.Player)!.Position.x);
+                f.Time += 3000; service.Tick(); Assert.AreEqual(0, service.Count);
+            });
+        }
+        finally { if (service != null) f.World.Owner(f.Pf, service.Shutdown); Directory.Delete(root, true); }
+    }
+
     [TestMethod]
     public void Real_catalog_cast_commits_once_then_publishes_exact_vendor_without_ncu()
     {
@@ -41,7 +73,7 @@ public sealed class BucketheadNanoTests
         Assert.AreEqual(101861, npc.Stats.GetOrZero(CharacterStat.Health));
         Assert.AreEqual(271061505, npc.Stats.GetOrZero(CharacterStat.Flags));
         Assert.AreEqual(f.Player.Position.x + 1, npc.Position.x);
-        Assert.AreEqual(99566, npc.Shop!.Template.Id); Assert.IsTrue(npc.Shop.Stock.IsAcceptedSnapshot);
+        Assert.AreEqual(99566, npc.Shop!.Template.Id); Assert.IsTrue(npc.Shop.Stock.IsConfiguredSnapshot);
         Assert.AreEqual(46, npc.Shop.Stock.Slots.Count);
         foreach (var source in ZoneEngine.Core.Playfields.CapturedBucketheadTechnodealerContentProvider.Stock)
         {
@@ -115,11 +147,11 @@ public sealed class BucketheadNanoTests
     public void Deferred_callback_is_one_shot_and_rechecks_owner_authority()
     {
         using var f = new Fixture(); Action publish = null!;
-        f.World.Owner(f.Pf, () => Assert.IsTrue(f.Summons.TryPrepare(f.Player, () => true, out publish)));
+        f.World.Owner(f.Pf, () => Assert.IsTrue(f.Summons.TryPrepare(f.Player, f.Pf.GetRequiredService<IGameData>().WorldContent.Summons.Single(x => x.NanoId == 300439), () => true, out publish)));
         f.World.Owner(f.Pf, () => { publish(); publish(); }); Assert.AreEqual(1, f.Summons.Count);
         var old = f.Summons.ForOwner(f.Player);
         bool current = true;
-        f.World.Owner(f.Pf, () => Assert.IsTrue(f.Summons.TryPrepare(f.Player, () => current, out publish)));
+        f.World.Owner(f.Pf, () => Assert.IsTrue(f.Summons.TryPrepare(f.Player, f.Pf.GetRequiredService<IGameData>().WorldContent.Summons.Single(x => x.NanoId == 300439), () => current, out publish)));
         current = false; f.World.Owner(f.Pf, publish); Assert.AreSame(old, f.Summons.ForOwner(f.Player));
     }
 
@@ -127,10 +159,10 @@ public sealed class BucketheadNanoTests
     public void Unsupported_graph_and_missing_real_stock_fail_before_cost()
     {
         using var f = new Fixture();
-        var unsupported = new BucketheadSummonService(f.Pf, f.Registry,
-            f.Pf.GetRequiredService<PlayfieldLocality>(), f.Pf.GetRequiredService<AcceptedNpcActivationService>(),
-            new StubItemBuilder(), new StubCatalog());
-        Assert.IsFalse(unsupported.TryPrepare(f.Player, () => true, out _));
+        var unsupported = new SummonService(f.Pf, f.Registry,
+            f.Pf.GetRequiredService<PlayfieldLocality>(), f.Pf.GetRequiredService<NpcContentActivationService>(),
+            new StubItemBuilder(), new StubCatalog(), f.Pf.GetRequiredService<IGameData>());
+        Assert.IsFalse(unsupported.TryPrepare(f.Player, f.Pf.GetRequiredService<IGameData>().WorldContent.Summons.Single(x => x.NanoId == 300439), () => true, out _));
         Assert.IsTrue(f.Nanos.TryGet(300439, out var nano));
         nano.Template.SpellList[AORebirth.Enums.EventType.OnUse][0].Arguments.Add(1);
         Assert.IsFalse(f.Service.TryCast(f.Player, 300439, f.Player.Identity));
@@ -153,10 +185,10 @@ public sealed class BucketheadNanoTests
         f.Player.Rotation = rotation;
         Assert.IsTrue(f.Nanos.TryGet(300439, out var nano));
         Assert.IsTrue(StatCollection.IsUnset(f.Player.Stats.Get(CharacterStat.PlayfieldType)));
-        Assert.IsTrue(BucketheadNanoSpecialization.ActionRequirements(f.Player, f.Player, nano));
+        Assert.IsTrue(new SummonNanoSpecialization().ActionRequirements(f.Player, f.Player, nano));
         // The accepted dedicated Legacy path does not read a persisted/stale PF type.
         f.Player.Stats.Set(CharacterStat.PlayfieldType, 2);
-        Assert.IsTrue(BucketheadNanoSpecialization.ActionRequirements(f.Player, f.Player, nano));
+        Assert.IsTrue(new SummonNanoSpecialization().ActionRequirements(f.Player, f.Player, nano));
         nano.Template.Actions[0].Requirements[0].Value = 3;
         Assert.IsFalse(f.Service.TryCast(f.Player, 300439, f.Player.Identity));
         Assert.AreEqual(0, f.Store.Commits); Assert.AreEqual(0, f.Summons.Count);
@@ -191,13 +223,13 @@ public sealed class BucketheadNanoTests
         internal readonly Playfield Pf;
         internal readonly Player Player;
         internal long Time;
-        internal BucketheadSummonService Summons => Pf.GetRequiredService<BucketheadSummonService>();
+        internal SummonService Summons => Pf.GetRequiredService<SummonService>();
         internal DynelRegistry Registry => Pf.GetRequiredService<DynelRegistry>();
         internal Fixture(int uploaded = 300439)
         {
             var data = new StubGameData(HashItemCatalog.Parse("{}", "{}")) { RootPath = Path.Combine(AppContext.BaseDirectory, "GameData") };
             Items = new(new NoNames(), data, new StubLogger());
-            Service = new(Nanos, Store, [new BucketheadNanoSpecialization()],
+            Service = new(Nanos, Store, [new SummonNanoSpecialization()],
                 utcNow: () => new DateTime(2026, 9, 9, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(Time), monotonicMilliseconds: () => Time);
             typeof(PlayfieldManager).GetField("<Nanos>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(World.Manager, Service);
             Pf = World.World(500, Items, new ItemBuilder(Items, new StubLogger()), () => Time);
@@ -212,9 +244,9 @@ public sealed class BucketheadNanoTests
         internal void Begin() => World.Owner(Pf, () =>
         {
             Assert.IsTrue(Nanos.TryGet(300439, out var nano));
-            Assert.IsTrue(new BucketheadNanoSpecialization().TryPrepare(Player, Player, nano, out _), "Exact spell graph");
-            Assert.IsTrue(BucketheadNanoSpecialization.ActionRequirements(Player, Player, nano), "Exact action criteria");
-            Assert.IsTrue(Summons.TryPrepare(Player, () => true, out _), "World and stock admission");
+            Assert.IsTrue(new SummonNanoSpecialization().TryPrepare(Player, Player, nano, out _), "Exact spell graph");
+            Assert.IsTrue(new SummonNanoSpecialization().ActionRequirements(Player, Player, nano), "Exact action criteria");
+            Assert.IsTrue(Summons.TryPrepare(Player, Pf.GetRequiredService<IGameData>().WorldContent.Summons.Single(x => x.NanoId == 300439), () => true, out _), "World and stock admission");
             Assert.IsTrue(Service.TryCast(Player, 300439, Player.Identity), "Nano cast admission");
         });
         internal void Advance(int milliseconds) { Time += milliseconds; World.Owner(Pf, () => Service.Tick(Player)); }

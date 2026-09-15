@@ -105,8 +105,9 @@ namespace ZoneEngine_New.Core.Playfield
                         hash));
             }
 
-            NpcContentAcceptance.RequireSpawnable(template);
-            NpcTemplateLevelPolicy.RequireExactLevel(template, level);
+            NpcTemplateValidation.RequireSpawnable(template);
+            var resolvedStats = _gameData.ComposeNpcStats(template, level);
+            NpcTemplateLevelPolicy.RequireExactLevel(template, level, resolvedStats);
             Identity identity = _registry.AllocateNpcIdentity();
             NpcCharacter npc = new NpcCharacter(identity, _items)
             {
@@ -119,7 +120,7 @@ namespace ZoneEngine_New.Core.Playfield
                 SpawnSource = spawnSource
             };
 
-            foreach (var entry in _gameData.ComposeNpcStats(template, level))
+            foreach (var entry in resolvedStats)
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
             ApplyTextures(npc, template);
@@ -806,7 +807,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(npc);
 
             _playfieldManager.Dialogues.Detached(npc);
-            _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.AcceptedNpcActivationService>().Detached(npc);
+            _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>().Detached(npc);
 
             npc.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             Identity identity = npc.Identity;

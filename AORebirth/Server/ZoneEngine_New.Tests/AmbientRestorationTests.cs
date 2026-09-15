@@ -66,7 +66,7 @@ namespace ZoneEngine_New.Tests
         [DataRow(150, 300498, 243)] [DataRow(220, 300498, 243)]
         public void UsesExactlyOneAcceptedTier(int level, int child, int amount)
         {
-            Assert.AreEqual((child, amount), AmbientRestorationNanoSpecialization.ResolveTier(level));
+            Assert.AreEqual((child, amount), PeriodicTeamHealNanoSpecialization.ResolveTier(level, ZoneEngine_New.Core.GameData.NanoMechanicCatalog.LoadDefault().Get(302365, ZoneEngine_New.Core.GameData.NanoMechanicKind.PeriodicTeamHeal)));
         }
 
         [TestMethod]
@@ -94,7 +94,9 @@ namespace ZoneEngine_New.Tests
         public void ExactVisualFieldsMatchAcceptedSpellList()
         {
             using var w = new World(); Player player = w.Add(7);
-            SpellListMessage visual = AmbientRestorationNanoSpecialization.BuildVisual(player);
+            SpellListMessage visual = PeriodicTeamHealNanoSpecialization.BuildVisual(player,
+                ZoneEngine_New.Core.GameData.NanoMechanicCatalog.LoadDefault().Get(302365,
+                    ZoneEngine_New.Core.GameData.NanoMechanicKind.PeriodicTeamHeal).PulseVisual!);
             Assert.AreEqual(player.Identity, visual.Identity); Assert.AreEqual(player.Identity, visual.Character);
             Assert.AreEqual("Ambient Restoration", visual.NanoName);
             var effect = visual.NanoEffects.Single();
@@ -127,7 +129,7 @@ namespace ZoneEngine_New.Tests
             // This fixture executes all playfield work on its single simulated owner thread.
             public readonly TeamService Teams = new(dispatchOnOwner: (_, action) => action());
             public readonly Clock Clock = new();
-            public readonly AmbientRestorationNanoSpecialization Aura;
+            public readonly PeriodicTeamHealNanoSpecialization Aura;
             readonly Playfield _playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             readonly ServiceProvider _services;
             public World()
@@ -137,7 +139,7 @@ namespace ZoneEngine_New.Tests
                 var manager = (PlayfieldManager)RuntimeHelpers.GetUninitializedObject(typeof(PlayfieldManager));
                 typeof(PlayfieldManager).GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Lock());
                 typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, Players);
-                Aura = new AmbientRestorationNanoSpecialization(Teams, new Lazy<PlayfieldManager>(() => manager)) { Clock = Clock };
+                Aura = new PeriodicTeamHealNanoSpecialization(Teams, new Lazy<PlayfieldManager>(() => manager)) { Clock = Clock };
             }
             public Player Add(int id)
             {
