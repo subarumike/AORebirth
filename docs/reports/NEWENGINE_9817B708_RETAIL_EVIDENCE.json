@@ -1,0 +1,980 @@
+{
+  "source": "9817b708aef60027649b54cb06ea9ce2fd2c6a64",
+  "retail": {
+    "userResult": "looks good to me after instructed post-restart login and logout",
+    "characterId": 9950,
+    "zoneChanges": [
+      {
+        "from": 655,
+        "to": 1186
+      },
+      {
+        "from": 1186,
+        "to": 655
+      }
+    ],
+    "equippedItem": {
+      "instanceId": 4,
+      "templateId": 27383,
+      "quality": 1,
+      "containerType": 102,
+      "slot": 21
+    },
+    "inventoryInstanceIds": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "wireCaptures": [
+      {
+        "file": "official-client-9817b708.pcapng",
+        "sha256": "9ea480d13f67736be20a043d37b40bbeff4b3dcc9c87b82b4167849870197bce"
+      },
+      {
+        "file": "official-client-9817b708-post-restart.pcapng",
+        "sha256": "3078f9fb725deb2cf13234f7ae48854d6a83fe4bed80f17b1b629422facd4cc3"
+      }
+    ],
+    "clientCharInPlay": [
+      {
+        "file": "official-client-9817b708.pcapng",
+        "count": 7
+      },
+      {
+        "file": "official-client-9817b708-post-restart.pcapng",
+        "count": 1
+      }
+    ],
+    "inventoryRequests": [
+      {
+        "stream": 13,
+        "sourceType": 104,
+        "sourceSlot": 67,
+        "targetSlot": 21
+      },
+      {
+        "stream": 13,
+        "sourceType": 102,
+        "sourceSlot": 21,
+        "targetSlot": 111
+      },
+      {
+        "stream": 13,
+        "sourceType": 104,
+        "sourceSlot": 67,
+        "targetSlot": 21
+      },
+      {
+        "stream": 13,
+        "sourceType": 102,
+        "sourceSlot": 21,
+        "targetSlot": 111
+      },
+      {
+        "stream": 13,
+        "sourceType": 104,
+        "sourceSlot": 67,
+        "targetSlot": 21
+      }
+    ],
+    "normalHealthRegeneration": {
+      "stat": "27",
+      "before": "500000039",
+      "after": "500000045"
+    },
+    "allOtherDurableStateUnchanged": true
+  },
+  "restart": {
+    "container": "aorebirth-linux-staging-9817b708",
+    "containerId": "41888b3b45f60fb68927fd5cb53da30abdcbbcf337ec8b4e69c5a1978ab4799b",
+    "source": "9817b708aef60027649b54cb06ea9ce2fd2c6a64",
+    "beforeStartedAt": "2026-09-14T22:55:08.721770008Z",
+    "engineHostPidBefore": 98925,
+    "processesBefore": "PID                 ELAPSED             USER                COMMAND             COMMAND\n97878               3706                root                bash                bash /run-services.sh\n98812               3636                root                ChatEngine          ./ChatEngine --headless\n98868               3634                root                LoginEngine         ./LoginEngine --headless\n98925               3632                root                ZoneEngine_New      ./ZoneEngine_New --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown\n",
+    "productionTouched": false,
+    "stoppedAt": "2026-09-14T23:56:55.779032407Z",
+    "exitCode": 143,
+    "processExitConfirmed": true,
+    "stoppedStateUnchanged": true,
+    "startedAt": "2026-09-14T23:57:00.141995966Z",
+    "engineHostPidAfter": 33215,
+    "processesAfter": "PID                 ELAPSED             USER                COMMAND             COMMAND\n32433               102                 root                bash                bash /run-services.sh\n33101               52                  root                ChatEngine          ./ChatEngine --headless\n33157               50                  root                LoginEngine         ./LoginEngine --headless\n33215               48                  root                ZoneEngine_New      ./ZoneEngine_New --headless --shutdown-file /run/ao-rebirth-zoneengine/shutdown\n",
+    "readiness": "PASS",
+    "durableStateFingerprintComparison": "PASS",
+    "officialClientLoginAfterRestart": "PENDING",
+    "completedAt": "2026-09-14T23:58:45.567Z"
+  },
+  "comparison": {
+    "tableChanges": [
+      "stats"
+    ],
+    "statChanges": [
+      {
+        "stat": "27",
+        "before": "500000039",
+        "after": "500000045"
+      }
+    ],
+    "moves": [
+      {
+        "stream": 13,
+        "sourceType": 104,
+        "sourceSlot": 67,
+        "targetSlot": 21
+      },
+      {
+        "stream": 13,
+        "sourceType": 102,
+        "sourceSlot": 21,
+        "targetSlot": 111
+      },
+      {
+        "stream": 13,
+        "sourceType": 104,
+        "sourceSlot": 67,
+        "targetSlot": 21
+      },
+      {
+        "stream": 13,
+        "sourceType": 102,
+        "sourceSlot": 21,
+        "targetSlot": 111
+      },
+      {
+        "stream": 13,
+        "sourceType": 104,
+        "sourceSlot": 67,
+        "targetSlot": 21
+      }
+    ],
+    "unchangedItemInstanceIds": true,
+    "unchangedCharacter": true,
+    "clientCharInPlay": [
+      {
+        "file": "official-client-9817b708.pcapng",
+        "count": 7
+      },
+      {
+        "file": "official-client-9817b708-post-restart.pcapng",
+        "count": 1
+      }
+    ]
+  },
+  "wire": [
+    {
+      "file": "official-client-9817b708.pcapng",
+      "sha256": "9ea480d13f67736be20a043d37b40bbeff4b3dcc9c87b82b4167849870197bce",
+      "flows": [
+        {
+          "stream": 6,
+          "src": 38154,
+          "dst": 7500,
+          "bytes": 560,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 6,
+          "src": 7500,
+          "dst": 38154,
+          "bytes": 252,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 7,
+          "src": 9912,
+          "dst": 7501,
+          "bytes": 4108,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 64,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 408,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 696,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 868,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 1768,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 1940,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "decompressedBytes": 4108,
+          "framedBytes": 4108
+        },
+        {
+          "stream": 7,
+          "src": 7501,
+          "dst": 9912,
+          "bytes": 2682,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 407,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 5401,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 5640,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 6063,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 7291,
+          "framedBytes": 7291
+        },
+        {
+          "stream": 8,
+          "src": 7012,
+          "dst": 9913,
+          "bytes": 214,
+          "duplicateSegments": 6,
+          "messages": []
+        },
+        {
+          "stream": 8,
+          "src": 9913,
+          "dst": 7012,
+          "bytes": 418,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 9,
+          "src": 3072,
+          "dst": 7501,
+          "bytes": 2128,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "decompressedBytes": 2128,
+          "framedBytes": 2128
+        },
+        {
+          "stream": 9,
+          "src": 7501,
+          "dst": 3072,
+          "bytes": 5170,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 407,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 18645,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 19225,
+          "framedBytes": 19225
+        },
+        {
+          "stream": 10,
+          "src": 3073,
+          "dst": 7501,
+          "bytes": 896,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 640,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 696,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 840,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "decompressedBytes": 896,
+          "framedBytes": 896
+        },
+        {
+          "stream": 10,
+          "src": 7501,
+          "dst": 3073,
+          "bytes": 1861,
+          "duplicateSegments": 1,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 407,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 4304,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 4507,
+          "framedBytes": 4507
+        },
+        {
+          "stream": 12,
+          "src": 52190,
+          "dst": 7500,
+          "bytes": 560,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 12,
+          "src": 7500,
+          "dst": 52190,
+          "bytes": 252,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 13,
+          "src": 52191,
+          "dst": 7501,
+          "bytes": 1156,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 244,
+              "size": 41,
+              "type": "0x5469373f",
+              "name": "ClientMoveItemToInventory",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "000000680000004300000015"
+            },
+            {
+              "offset": 288,
+              "size": 41,
+              "type": "0x5469373f",
+              "name": "ClientMoveItemToInventory",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "00000066000000150000006f"
+            },
+            {
+              "offset": 332,
+              "size": 41,
+              "type": "0x5469373f",
+              "name": "ClientMoveItemToInventory",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "000000680000004300000015"
+            },
+            {
+              "offset": 376,
+              "size": 41,
+              "type": "0x5469373f",
+              "name": "ClientMoveItemToInventory",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "00000066000000150000006f"
+            },
+            {
+              "offset": 420,
+              "size": 41,
+              "type": "0x5469373f",
+              "name": "ClientMoveItemToInventory",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "000000680000004300000015"
+            }
+          ],
+          "decompressedBytes": 1156,
+          "framedBytes": 1156
+        },
+        {
+          "stream": 13,
+          "src": 7501,
+          "dst": 52191,
+          "bytes": 2383,
+          "duplicateSegments": 9,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 407,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 4304,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 5103,
+              "size": 49,
+              "type": "0x47537a24",
+              "name": "ContainerAddItem",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "00000068000000430000c350000026de00000015"
+            },
+            {
+              "offset": 5152,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 5207,
+              "size": 49,
+              "type": "0x47537a24",
+              "name": "ContainerAddItem",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "00000066000000150000c350000026de00000043"
+            },
+            {
+              "offset": 5297,
+              "size": 49,
+              "type": "0x47537a24",
+              "name": "ContainerAddItem",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "00000068000000430000c350000026de00000015"
+            },
+            {
+              "offset": 5346,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 5401,
+              "size": 49,
+              "type": "0x47537a24",
+              "name": "ContainerAddItem",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "00000066000000150000c350000026de00000043"
+            },
+            {
+              "offset": 5450,
+              "size": 49,
+              "type": "0x47537a24",
+              "name": "ContainerAddItem",
+              "identityType": 50000,
+              "identityInstance": 9950,
+              "bodyHex": "00000068000000430000c350000026de00000015"
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 5688,
+          "framedBytes": 5688
+        },
+        {
+          "stream": 14,
+          "src": 7012,
+          "dst": 15984,
+          "bytes": 242,
+          "duplicateSegments": 16,
+          "messages": []
+        },
+        {
+          "stream": 14,
+          "src": 15984,
+          "dst": 7012,
+          "bytes": 445,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 15,
+          "src": 39182,
+          "dst": 7501,
+          "bytes": 640,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "decompressedBytes": 640,
+          "framedBytes": 640
+        },
+        {
+          "stream": 15,
+          "src": 7501,
+          "dst": 39182,
+          "bytes": 5070,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 503,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 18741,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 19000,
+          "framedBytes": 19000
+        },
+        {
+          "stream": 16,
+          "src": 22721,
+          "dst": 7501,
+          "bytes": 480,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 424,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "decompressedBytes": 480,
+          "framedBytes": 480
+        },
+        {
+          "stream": 16,
+          "src": 7501,
+          "dst": 22721,
+          "bytes": 1857,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 503,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 4400,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 4457,
+          "framedBytes": 4457
+        },
+        {
+          "stream": 18,
+          "src": 5249,
+          "dst": 7500,
+          "bytes": 536,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 18,
+          "src": 7500,
+          "dst": 5249,
+          "bytes": 76,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 19,
+          "src": 5251,
+          "dst": 7500,
+          "bytes": 560,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 19,
+          "src": 7500,
+          "dst": 5251,
+          "bytes": 252,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 20,
+          "src": 5254,
+          "dst": 7501,
+          "bytes": 192,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 136,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "decompressedBytes": 192,
+          "framedBytes": 192
+        },
+        {
+          "stream": 20,
+          "src": 7501,
+          "dst": 5254,
+          "bytes": 1875,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 503,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 4400,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 4498,
+          "framedBytes": 4498
+        },
+        {
+          "stream": 21,
+          "src": 7012,
+          "dst": 5255,
+          "bytes": 207,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 21,
+          "src": 5255,
+          "dst": 7012,
+          "bytes": 411,
+          "duplicateSegments": 0,
+          "messages": []
+        }
+      ]
+    },
+    {
+      "file": "official-client-9817b708-post-restart.pcapng",
+      "sha256": "3078f9fb725deb2cf13234f7ae48854d6a83fe4bed80f17b1b629422facd4cc3",
+      "flows": [
+        {
+          "stream": 1,
+          "src": 53295,
+          "dst": 7500,
+          "bytes": 560,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 1,
+          "src": 7500,
+          "dst": 53295,
+          "bytes": 252,
+          "duplicateSegments": 0,
+          "messages": []
+        },
+        {
+          "stream": 2,
+          "src": 40662,
+          "dst": 7501,
+          "bytes": 120,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 32,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 64,
+              "size": 55,
+              "type": "0x5e477770",
+              "name": "CharacterAction",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "decompressedBytes": 120,
+          "framedBytes": 120
+        },
+        {
+          "stream": 2,
+          "src": 7501,
+          "dst": 40662,
+          "bytes": 1885,
+          "duplicateSegments": 0,
+          "messages": [
+            {
+              "offset": 131,
+              "size": 269,
+              "type": "0x271b3a6b",
+              "name": "SimpleCharFullUpdate",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 486,
+              "size": 503,
+              "type": "0x29304349",
+              "name": "FullCharacter",
+              "identityType": 50000,
+              "identityInstance": 9950
+            },
+            {
+              "offset": 4400,
+              "size": 29,
+              "type": "0x570c2039",
+              "name": "CharInPlay",
+              "identityType": 50000,
+              "identityInstance": 9950
+            }
+          ],
+          "compression": "verified negotiation then zlib",
+          "decompressedBytes": 4539,
+          "framedBytes": 4539
+        },
+        {
+          "stream": 3,
+          "src": 7012,
+          "dst": 40663,
+          "bytes": 207,
+          "duplicateSegments": 2,
+          "messages": []
+        },
+        {
+          "stream": 3,
+          "src": 40663,
+          "dst": 7012,
+          "bytes": 411,
+          "duplicateSegments": 0,
+          "messages": []
+        }
+      ]
+    }
+  ]
+}
