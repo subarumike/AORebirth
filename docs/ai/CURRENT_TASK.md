@@ -1,7 +1,8 @@
 # Current Task
 
-Active: separate private production build/deployment tooling from public Windows
-source without changing gameplay. Preserve the complete original history and
-operations privately, validate the standalone Windows build and private build,
-then perform the coordinated public-history cleanup. Existing developer
-checkouts and the running server remain intact during preparation.
+Active: finish hosted-history privacy follow-up and developer checkout
+resynchronization. Windows/shared source separation, build acceptance and public
+branch-history cleanup are complete. Original source and developer work are
+preserved privately. Old checkouts must be rebased onto the cleaned source before
+publishing further changes. No production deployment or gameplay change is part
+of this task.
