@@ -45,7 +45,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ISComV2Client/ISComV2ClientBase.cs",
-      "sha256": "c37f517f7797cba570495c07d34332fbab35077db7a2cb37af72b52c3c4bb0ff",
+      "sha256": "e0d84510f6e9c75240db406c5b2be201cb9ba56ba3765ce5debce981533f546b",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],

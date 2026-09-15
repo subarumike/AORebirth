@@ -38,6 +38,8 @@ delete outside the owned worktree was performed.
 No compiled per-NPC/vendor/quest content was reintroduced into NewEngine. Its
 runtime content guard still audits 716 files with zero violations and no missing
 project inputs. The dependency inventory now reports zero Legacy edges.
+Existing namespaces on retained shared contracts are preserved for compatibility;
+they do not select, build or load the removed engine executable.
 
 ## Build, launch and recovery
 
@@ -77,6 +79,14 @@ empty filter fail instead of silently succeeding. Current engine behavior remain
 covered by the mandatory NewEngine suite.
 
 ## Validation
+
+The first exact-source gate at `ecefa6737c6cd60853706e9599568f75c52ee0ee`
+passed stages 1–9, then exposed a pre-existing ISCom socket-disposal race in
+stage 10. The transport and its test were unchanged by the retirement. A peer
+disconnect callback could close or replace the socket while `Dispose` was using
+the same mutable field. The scoped follow-up makes ownership and disposal
+idempotent and adds focused lifecycle regressions; packet behavior is unchanged.
+The failed gate is retained as evidence and is not counted as acceptance.
 
 Completed during implementation:
 
