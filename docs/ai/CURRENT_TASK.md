@@ -1,12 +1,5 @@
 # Current Task
 
-Official-client acceptance and release preparation for 9817b708 is complete.
-Local master 31c73fc142be2e12994f2af6b23095c0f541e032 passes exact Windows/Linux, connected
-persistence, DAO/schema and deployment acceptance. The Linux release and verified
-prior-production rollback archives are ready. The accepted review branch is pushed;
-remote master remains unchanged. No production deployment is authorized or performed.
+Active: complete official-client and durable-state acceptance for installed release 4b03fedc0c81779e8897453c23974b4b9ad52100. Mike must test Enforcement: login/world entry, two zone changes, reversible inventory/equipment, logout/relogin and state, then log out for the final durable snapshot. Release acceptance authority remains pending.
 
-Production remains independently verified cb12160c. No new migrations are required.
-Legacy remains present. No further active work in this task. See
-docs/reports/NEWENGINE_RELEASE_PREPARATION.md and
-docs/reports/NEWENGINE_FINAL_RELEASE_MANIFEST.json.
+Release 4b03fedc is installed and operationally healthy. Official-client and post-client durable-state acceptance remain pending; it is not yet promoted as accepted production authority. See docs/reports/NEWENGINE_SYSTEMD_DEPLOYMENT_RECONCILIATION.md. Legacy is retained; no new DAO conversion or schema work is authorized by this task.

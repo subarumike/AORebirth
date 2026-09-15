@@ -1,6 +1,6 @@
 {
   "accepted_runtime_source_sha": "31c73fc142be2e12994f2af6b23095c0f541e032",
-  "corrected_release_source_sha": "a7d5b6f8f0a69d190189140e242847f01eeb9c4b",
+  "corrected_release_source_sha": "4b03fedc0c81779e8897453c23974b4b9ad52100",
   "tracked_source_clean": true,
   "windows_acceptance": "PASS",
   "native_linux_acceptance": "PASS",
@@ -10,7 +10,7 @@
   },
   "aotomation_tests": 1129,
   "mandatory_gates": 12,
-  "deployment_tests": 64,
+  "deployment_tests": 81,
   "package_regressions": 14,
   "character_dao_checks": 551,
   "account_dao_checks": 303,
@@ -23,7 +23,7 @@
   "logs": [
     {
       "file": "windows-windows.log",
-      "sha256": "4cab3dbfd2ae58af912783db3a526d5356a751738d7d5cfbc264e7c611e2bd1b",
+      "sha256": "ec8175acda1740ecc12eea171236c945a7de0b9b3f4a0bfeb4a4ddd6129c6776",
       "required_markers": [
         "WINDOWS_ACCEPTANCE=PASS",
         "DAO_ARCHITECTURE_GUARD=PASS"
@@ -32,17 +32,17 @@
     },
     {
       "file": "linux-host.log",
-      "sha256": "139ed77a122b76f59fb51e0fca8cf0730dffb5051b90895f8389fa0fc9dc8f39",
+      "sha256": "7995285fb20a427792e55eb34946a28e6e55e2af09175a7dfa3b30aab72a7522",
       "required_markers": [
         "LINUX_ACCEPTANCE=PASS",
-        "production deployment workflow tests (64/64)",
+        "production deployment workflow tests (81/81)",
         "RELEASE_PACKAGE_REGRESSIONS=PASS"
       ],
       "result": "PASS"
     },
     {
       "file": "windows-connected.log",
-      "sha256": "004c2828a6b49b0966130a45d216e6defeae175216ea97a900ac388e67dedd28",
+      "sha256": "b4f3a89a3666d9ab2c3f8c75fcee208856bc4f108fcbe258453e26303f92f335",
       "required_markers": [
         "LOGIN_WIRE_ACCEPTANCE=PASS CONNECTED_POSITIVE_LIFECYCLE=PASS",
         "DISPOSABLE_CLEANUP=PASS"
@@ -60,7 +60,7 @@
     },
     {
       "file": "windows-character-dao.log",
-      "sha256": "a43cdef098480d3a94450889f849c15630bc4ee62acc9926a9ef33aea646f3c7",
+      "sha256": "d98d32803d5fef48bd7582799e7c5e292b16395a6b6583f1e8f7e1e57ed856db",
       "required_markers": [
         "CHARACTER_DAO_CHECKS=551",
         "CHARACTER_DAO_MYSQL_INTEGRATION=PASS",
@@ -70,7 +70,7 @@
     },
     {
       "file": "windows-account-dao.log",
-      "sha256": "7723a79f2cec9850afdf680d0836c0ad650d7483129ee7104a6e0d31aaf043b9",
+      "sha256": "8ec2013619db0502268bdd39094d467b5bbffe9b92d967ea1fcd922a856db14c",
       "required_markers": [
         "ACCOUNT_DAO_CHECKS=303",
         "ACCOUNT_DAO_MYSQL_INTEGRATION=PASS",
@@ -89,7 +89,7 @@
     },
     {
       "file": "windows-mission-isolated.log",
-      "sha256": "fcf4c78decb771fd43bdbb2fb4ca644c1e412a5e44bedad93028633e2e917489",
+      "sha256": "9beae18ab888a32a15bba14624c777418b6a501797e9f51c8190c2bcb3b80430",
       "required_markers": [
         "MISSION_DAO_CHECKS=275",
         "MISSION_DAO_MYSQL_INTEGRATION=PASS"
