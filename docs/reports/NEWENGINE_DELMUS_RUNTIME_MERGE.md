@@ -19,7 +19,14 @@ The incoming `.gitignore` entry `AORebirth/GameData/NpcTemplates.json` is retain
 
 ## Validation and evidence
 
-The companion JSON receipt records file inventory, pinned source identities and final validation outcomes. Exact-source Windows acceptance must pass before master promotion. Disposable schema/restart checks include remaining-charge persistence followed by a location-only update and fresh reloads. Connected acceptance checks login, authenticated admission, inventory, reconnect and restart using synthetic protocol clients.
+Accepted runtime source: `b09e80dc09f4aa5081d5f64b141587acab2332ee`, containing true merge `f62ce6754a5b29f980d1c1e28a6e8297f190fb7a` and the compatibility-contract update. The companion JSON receipt records changed files, inspected files, source identities and evidence hashes. The subsequent receipt commit changes documentation only.
+
+- Exact-source Windows acceptance, all 12 mandatory stages and 703 NewEngine tests: PASS.
+- Windows/Linux assembly compatibility, accepted placement corpus and DAO architecture guards: PASS.
+- Character DAO validation, 551 checks and real disposable MySQL integration: PASS.
+- Disposable schema, transaction, remaining-charge persistence, location-only count preservation and two process restarts: PASS. This ran on merge source f62ce675; the subsequent contract update changes no runtime code.
+- Connected LoginEngine authentication, character selection, NewEngine entry, admission negatives, concurrent claims, inventory/equipment, logout/reconnect, distinct-process restart, nano/morph/mission reload and final durable state: PASS on b09e80dc.
+- Disposable cleanup: PASS. No production contact. Native Linux build and official-client gameplay acceptance were not run for this merge.
 
 The first exact-source run built successfully and identified the added nullable charge count as a public-contract baseline change. The approved Stage 2 generator updated only that property's metadata; Windows and Linux compatibility checks both pass against the regenerated contract.
 

@@ -1,6 +1,6 @@
 # Current Task
 
-Active: validate and promote the authorized merge of Delmus tip 39aab0e908f74697aa69bcd0b93bd6c13e6a5777 into master baseline 864db2b7823cf1d9bd7094bc02aced057eb510cc. The isolated integration resolves 32 conflicted paths while retaining accepted DAO, admission, transfer and content ownership. Mike authorized keeping the absent optional NpcTemplates.json ignored for now. Exact-source Windows and disposable connected/persistence gates precede master promotion. See docs/reports/NEWENGINE_DELMUS_RUNTIME_MERGE.md. No production operation is included.
+Pending for any release of integrated Delmus runtime b09e80dc09f4aa5081d5f64b141587acab2332ee: native Linux build and official-client acceptance. The master integration's exact-source Windows, mandatory, DAO and disposable connected/persistence gates are complete. Keep optional NpcTemplates.json ignored until its data and provenance are supplied. See docs/reports/NEWENGINE_DELMUS_RUNTIME_MERGE.md. No deployment is included in the merge authorization.
 
 Pending from the installed release: complete official-client and durable-state acceptance for 4b03fedc0c81779e8897453c23974b4b9ad52100. Mike must test Enforcement: login/world entry, two zone changes, reversible inventory/equipment, logout/relogin and state, then log out for the final durable snapshot. Release acceptance authority remains pending.
 
