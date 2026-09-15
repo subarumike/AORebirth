@@ -206,11 +206,6 @@ namespace ZoneEngine_New.Core.GameData
                 TemplateId = nearest.TemplateId,
                 HasHeadMesh = nearest.HasHeadMesh,
                 Stats = stats,
-                // This catalog already materializes its complete per-level stats. Legacy
-                // family/overlay references must not apply those modifiers a second time.
-                NpcFamily = nearest.NpcFamily,
-                NpcStatTemplate = nearest.NpcStatTemplate,
-                HasResolvedStatBands = true,
                 Attackable = nearest.Attackable,
                 MinLevel = min,
                 MaxLevel = max,
@@ -363,10 +358,6 @@ namespace ZoneEngine_New.Core.GameData
         public int TemplateId { get; set; }
 
         public bool HasHeadMesh { get; set; }
-
-        public int NpcFamily { get; set; }
-
-        public int NpcStatTemplate { get; set; }
 
         public bool Attackable { get; set; } = true;
 

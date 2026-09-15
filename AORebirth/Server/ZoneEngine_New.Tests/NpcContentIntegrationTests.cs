@@ -1,7 +1,6 @@
 namespace ZoneEngine_New.Tests;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -11,33 +10,6 @@ using ZoneEngine_New.Core.Mobs;
 [TestClass]
 public sealed class NpcContentIntegrationTests
 {
-    [TestMethod]
-    [DataRow(false, false, 100)]
-    [DataRow(true, false, 200)]
-    [DataRow(false, true, 300)]
-    [DataRow(true, true, 300)]
-    public void Composition_is_family_then_optional_overlay_then_individual(bool overlay, bool individual, int expected)
-    {
-        var family = new NpcFamilyStatTemplate(700, "fixture", new() { [27] = Curve(100), [100] = Curve(50) });
-        var extra = overlay ? new NpcStatTemplate(800, "fixture", new() { [27] = Curve(200), [101] = Curve(60) }) : null;
-        var npc = new MobTemplate { Hash = "TEST", MinLevel = 10, Stats = individual ? new() { [27] = 300 } : new() };
-        var first = MobStatResolver.Resolve(npc, 10, family, extra);
-        Assert.AreEqual(expected, first[27]); Assert.AreEqual(50, first[100]);
-        if (overlay) Assert.AreEqual(60, first[101]);
-        first[27] = -999;
-        Assert.AreEqual(expected, MobStatResolver.Resolve(npc, 10, family, extra)[27]);
-        Assert.AreEqual(100, family.Curves[27].Sample(10));
-        Assert.AreEqual(individual ? 300 : 0, npc.Stats.GetValueOrDefault(27));
-    }
-
-    [TestMethod]
-    public void Missing_family_does_not_use_developer_default()
-    {
-        var catalog = NpcFamilyStatCatalog.Build(new() { [1] = new() { StatCurves = new() { [27] = new() { [1] = 1, [10] = 10 } } } }, _ => Assert.Fail());
-        Assert.IsTrue(catalog.TryResolve(1, out _));
-        Assert.IsFalse(catalog.TryResolve(138, out _));
-    }
-
     [TestMethod]
     public void Unresolved_placeholder_cannot_become_combat_content_through_a_policy_typo()
     {
@@ -63,26 +35,12 @@ public sealed class NpcContentIntegrationTests
     }
 
     [TestMethod]
-    public void Imported_content_preserves_unknown_fields_as_blockers_and_disables_fallback_combat()
-    {
-        var rows = JsonSerializer.Deserialize<List<MobTemplate>>(File.ReadAllText(Path.Combine(Root(), "AORebirth/GameData/MobTemplates.json")))!;
-        var placeholder = rows.Single(r => r.Hash == "AAAA");
-        Assert.IsNotNull(placeholder.ContentProvenance);
-        Assert.IsFalse(NpcTemplateValidation.CanSpawn(placeholder));
-        foreach (var imported in rows.Where(r => r.Hash != "AAAA" && r.ContentProvenance != null))
-            Assert.IsTrue(NpcTemplateValidation.CanSpawn(imported), "Historical review status is not runtime permission.");
-        foreach (string hash in new[] { "MENI", "VEAE", "STFO" })
-            Assert.IsTrue(rows.Any(r => r.Hash == hash));
-    }
-
-    [TestMethod]
     public void Imported_npc_content_is_outside_generic_runtime_files()
     {
         string root = Root();
         using var matrix = JsonDocument.Parse(File.ReadAllText(Path.Combine(root,"docs/reports/SUBWAY_NPC_COMBAT_RECONCILIATION.json")));
         string[] names = matrix.RootElement.GetProperty("npcs").EnumerateArray().Select(r => r.GetProperty("name").GetString()!).ToArray();
-        string[] files = ["Mobs/MobStatResolver.cs", "Mobs/NpcFamilyStatTemplates.cs", "Mobs/NpcStatTemplates.cs",
-            "Mobs/NpcTemplateValidation.cs", "GameData/GameDataStore.NpcStats.cs", "Playfield/SpawnService.cs", "Nanos/NanoService.cs"];
+        string[] files = ["Mobs/NpcTemplateValidation.cs", "Playfield/SpawnService.cs", "Nanos/NanoService.cs"];
         foreach (string file in files)
         {
             string source = File.ReadAllText(Path.Combine(root,"AORebirth/Server/ZoneEngine_New/Core",file));
@@ -97,11 +55,10 @@ public sealed class NpcContentIntegrationTests
         }
     }
 
-    static NpcStatCurve Curve(int value) => NpcStatCurve.Create(new() { [10] = value })!;
     static string Root()
     {
         for (DirectoryInfo? directory = new(AppContext.BaseDirectory); directory != null; directory = directory.Parent)
-            if (File.Exists(Path.Combine(directory.FullName,"AORebirth/GameData/MobTemplates.json"))) return directory.FullName;
+            if (File.Exists(Path.Combine(directory.FullName,"AORebirth/GameData/NpcTemplates.json"))) return directory.FullName;
         throw new DirectoryNotFoundException("Repository content root unavailable.");
     }
 }

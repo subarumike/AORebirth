@@ -20,7 +20,8 @@ namespace ZoneEngine_New
             var flags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "/headless", "--headless", "/autostart", "--autostart",
-                "--validate-startup", "--validate-database"
+                "--validate-startup", "--validate-database", "--validate-official-placements",
+                "/skip-playfield-package-pin", "--skip-playfield-package-pin"
             };
             var values = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -79,10 +80,23 @@ namespace ZoneEngine_New
                 throw new StartupValidationException("Selected database does not match AO_REBIRTH_EXPECTED_DATABASE.");
         }
 
-        public static void ValidatePackage(string baseDirectory)
+        public static bool SkipPlayfieldPackagePin(string[] args)
+        {
+            foreach (string argument in args)
+            {
+                if (string.Equals(argument, "--skip-playfield-package-pin", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(argument, "/skip-playfield-package-pin", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            string? configured = Environment.GetEnvironmentVariable("AO_REBIRTH_SKIP_PLAYFIELD_PACKAGE_PIN");
+            return configured == "1" || string.Equals(configured, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static void ValidatePackage(string baseDirectory, bool skipPlayfieldPackagePin = false)
         {
             string gameData = Path.Combine(baseDirectory, "GameData");
-            foreach (string file in new[] { "MobTemplates.json", "ItemTemplates.json", "HashInstances.json",
+            foreach (string file in new[] { "NpcTemplates.json", "ItemTemplates.json", "HashInstances.json",
                 "VendingMachines.json", "MonsterData.json", "Xp.json" })
             {
                 using FileStream stream = File.OpenRead(Path.Combine(gameData, file));
@@ -90,6 +104,8 @@ namespace ZoneEngine_New
             }
             if (!Directory.Exists(Path.Combine(gameData, "Playfields")))
                 throw new DirectoryNotFoundException("Editable playfield data directory is missing.");
+            if (skipPlayfieldPackagePin)
+                Console.WriteLine("PLAYFIELD_PACKAGE_PIN_SKIPPED local GameData/Playfields is not checked against the pinned manifest.");
             _ = ZoneEngine_New.Core.GameData.WorldContentCatalog.Load(gameData);
             _ = ZoneEngine_New.Core.GameData.NanoMechanicCatalog.Load(Path.Combine(gameData, "NanoMechanics.json"));
             using (FileStream items = File.OpenRead(Path.Combine(gameData, "items.dat")))

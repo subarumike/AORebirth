@@ -28,23 +28,12 @@ namespace ZoneEngine_New.Core.Mobs
         public int TemplateId { get; set; }
 
         /// <summary>
-        /// Reserved diagnostic placeholder; never a resolved runtime actor or fallback.
+        /// Placeholder leaf used when a spawn hash is not in <c>NpcTemplates.json</c>.
         /// </summary>
         public const string FallbackHash = "AAAA";
 
-        /// <summary>
-        /// Flat stats for this template. Applied last (after family and optional NpcStatTemplate
-        /// curves), so anything set here wins outright for bosses and other one-offs.
-        /// </summary>
+        /// <summary>Per-band stats copied from NpcTemplates.json.</summary>
         public Dictionary<int, int> Stats { get; set; } = new();
-
-        /// <summary>
-        /// Optional family curve id. Unused once NpcTemplates.json supplies per-band stats.
-        /// </summary>
-
-        /// <summary>
-        /// Optional overlay curve id. Unused once NpcTemplates.json supplies per-band stats.
-        /// </summary>
 
         /// <summary>When false, players cannot fight this NPC and it gets no combat brain.</summary>
         public bool Attackable { get; set; } = true;
@@ -52,14 +41,6 @@ namespace ZoneEngine_New.Core.Mobs
         public int MinLevel { get; set; }
 
         public int MaxLevel { get; set; }
-
-        public int? NpcFamily { get; set; }
-
-        public int NpcStatTemplate { get; set; }
-
-        /// <summary>Stats have already been materialized from the optional catalog's level bands.</summary>
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool HasResolvedStatBands { get; internal set; }
 
         /// <summary>Historical evidence metadata is preserved but does not authorize runtime activation.</summary>
         [System.Text.Json.Serialization.JsonPropertyName("ContentAcceptance")]

@@ -51,7 +51,7 @@ public sealed class EditableWorldContentTests
     public void EditablePlacementAndResolvedTemplateRegisterWithoutEvidenceRow(int playfieldId)
     {
         using var fixture = new TempContent();
-        File.WriteAllText(Path.Combine(fixture.Root, "MobTemplates.json"), "[{\"Hash\":\"TEST\",\"Name\":\"Editable fixture\",\"Stats\":{\"54\":10,\"1\":100}}]");
+        File.WriteAllText(Path.Combine(fixture.Root, "NpcTemplates.json"), "{\"TEST\":{\"Templates\":[{\"Name\":\"Editable fixture\",\"Level\":10,\"Stats\":{\"54\":10,\"1\":100}}]}}");
         var path = Path.Combine(fixture.Root, "Playfields", playfieldId.ToString()); Directory.CreateDirectory(path);
         var entry = new PlayfieldSpawnEntry { HashText = "TEST", Position = [4, 5, 6], Radius = 0, MinLevel = 10, MaxLevel = 10, RespawnChance = 100, RespawnTime = 30 };
         File.WriteAllText(Path.Combine(path, "Spawns.json"), JsonSerializer.Serialize(new PlayfieldSpawnsData { SchemaVersion = 1, PlayfieldId = playfieldId, Spawns = [entry] }));

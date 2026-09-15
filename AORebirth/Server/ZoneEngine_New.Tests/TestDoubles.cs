@@ -56,10 +56,6 @@ namespace ZoneEngine_New.Tests
 
         public int MobTemplateCount => 0;
 
-        public int NpcFamilyStatTemplateCount => 0;
-
-        public int NpcStatTemplateCount => 0;
-
         public int HashTemplateCount => _hashItems.CategoryCount;
 
         public int HashInstanceCount => _hashItems.InstanceCount;
@@ -99,24 +95,6 @@ namespace ZoneEngine_New.Tests
             catMesh = 0;
             return false;
         }
-        public bool TryGetNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
-        {
-            template = null!;
-            return false;
-        }
-
-        public bool TryResolveNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
-        {
-            template = null!;
-            return false;
-        }
-
-        public bool TryGetNpcStatTemplate(int id, out NpcStatTemplate template)
-        {
-            template = null!;
-            return false;
-        }
-
         public bool TryGetMonsterWeapon(string hash, out int[] ids)
         {
             if (string.IsNullOrEmpty(hash) || !_monsterWeapons.TryGetValue(hash, out int[]? found))

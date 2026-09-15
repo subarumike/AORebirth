@@ -176,7 +176,7 @@ namespace ZoneEngine_New.Core.Playfield
                     skipped++;
                     continue;
                 }
-                string spawnHash = entry.HashText;
+                string spawnHash = entry.HashText ?? string.Empty;
                 if (HasInactiveEvent(entry))
                 {
                     skipped++;
