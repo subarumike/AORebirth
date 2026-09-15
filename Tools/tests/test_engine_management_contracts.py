@@ -96,8 +96,10 @@ def main():
         "all backends must use the same ownership-safe and idempotent prestart")
     require("pre-start check requires no process" not in start_ps,
         "a healthy managed New backend must not be rejected by an obsolete special prestart")
-    require("Built\\Debug\\ZoneEngine_New\\Content" in windows_acceptance,
-        "Windows acceptance must validate the default NewEngine package")
+    require("call Tools\\run_newengine_content_architecture_guard.cmd --check" in windows_acceptance
+        and "if errorlevel 1 goto :content_failed" in windows_acceptance
+        and "echo CONTENT_ARCHITECTURE_GUARD=PASS" in windows_acceptance,
+        "Windows acceptance must validate the default NewEngine content architecture")
     require("for %%S in (2 3 4 5 7) do (" in windows_acceptance
         and "call SharedBuild\\verify-stage%%S-contracts.cmd" in windows_acceptance
         and "if errorlevel 1 goto :contracts_failed" in windows_acceptance,
