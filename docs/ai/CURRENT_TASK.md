@@ -1,15 +1,12 @@
 # Current Task
 
-Official-client acceptance of exact candidate 9817b708 is PASS. Actual client:
-C:\Funcom\Anarchy Online, 18.8.62_EP2. Login, CharInPlay/chat, zoning,
-inventory/equipment, logout/relogin and post-service-restart integrity are accepted.
-All four item identities survive; the QL1 shirt remains equipped. The only stat
-delta is the explicitly logged normal +6 health regeneration.
+Official-client acceptance and release preparation for 9817b708 is complete.
+Local master 31c73fc142be2e12994f2af6b23095c0f541e032 passes exact Windows/Linux, connected
+persistence, DAO/schema and deployment acceptance. The Linux release and verified
+prior-production rollback archives are ready. The accepted review branch is pushed;
+remote master remains unchanged. No production deployment is authorized or performed.
 
-Active work: reconcile into a clean Mike-owned master-integration worktree, run
-full exact-result Windows/Linux and connected/DAO/schema acceptance, then prepare
-final release and rollback manifests. origin/master is still 7be49b22; independently
-verified live Login/NewEngine remain cb12160c. No new migrations are required.
-Direct master push and production deployment are not authorized. Keep Legacy.
-Do not reopen the resolved position fixture issue without a new deterministic failure.
-See docs/reports/NEWENGINE_9817B708_OFFICIAL_CLIENT_ACCEPTANCE.md.
+Production remains independently verified cb12160c. No new migrations are required.
+Legacy remains present. No further active work in this task. See
+docs/reports/NEWENGINE_RELEASE_PREPARATION.md and
+docs/reports/NEWENGINE_FINAL_RELEASE_MANIFEST.json.
