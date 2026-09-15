@@ -16,22 +16,18 @@ namespace ZoneEngine_New.Core.Commands
     {
         private readonly IItemBuilder _items;
         private readonly IItemTemplateCatalog _catalog;
-        private readonly IItemInstanceIdAllocator _ids;
         private readonly InventoryFlushService _flush;
 
         public GiveItemCommand(
             IItemBuilder items,
             IItemTemplateCatalog catalog,
-            IItemInstanceIdAllocator ids,
             InventoryFlushService flush)
         {
             ArgumentNullException.ThrowIfNull(items);
             ArgumentNullException.ThrowIfNull(catalog);
-            ArgumentNullException.ThrowIfNull(ids);
             ArgumentNullException.ThrowIfNull(flush);
             _items = items;
             _catalog = catalog;
-            _ids = ids;
             _flush = flush;
         }
 
@@ -82,8 +78,7 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            Item item = _items.Create(lowId, highId, quality, ItemSource.Command);
-            AssignInstance(item);
+            Item item = _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Command);
             if (!subject.Inventory.Inventory.Add(slot, item))
             {
                 GmCommandFeedback.Send(context.Session, context.Player, "Could not add item to inventory.");
@@ -129,9 +124,6 @@ namespace ZoneEngine_New.Core.Commands
                         item.Quality));
             }
         }
-
-        void AssignInstance(Item item)
-            => item.AssignInstanceId(_ids.Allocate());
 
         static string SubjectName(Player subject, Player issuer)
         {

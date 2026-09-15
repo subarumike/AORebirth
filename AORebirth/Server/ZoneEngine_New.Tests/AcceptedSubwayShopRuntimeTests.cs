@@ -165,7 +165,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
                 .AddSingleton(new WorldSimulationAccess())
                 .AddSingleton(actions).AddSingleton(new InventoryMoveService(new StubLogger(), _flush, actions))
                 .AddSingleton<SpawnService>(services => new SpawnService(services, Registry, new StubLogger(), playfield,
-                    manager, data, items, minter, ids, _flush, Trade,
+                    manager, data, items, minter, _flush, Trade,
                     new CharacterSnapshotService(Snapshots, Snapshots, new StubLogger())))
                 .BuildServiceProvider();
             typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(playfield, _services);

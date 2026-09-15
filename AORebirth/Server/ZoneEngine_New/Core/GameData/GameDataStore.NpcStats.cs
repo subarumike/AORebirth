@@ -23,6 +23,7 @@ public sealed partial class GameDataStore
 
     public Dictionary<int, int> ComposeNpcStats(MobTemplate template, int? level)
     {
+        if (template.HasResolvedStatBands) return new Dictionary<int, int>(template.Stats);
         NpcFamilyStatTemplate? family = null;
         NpcStatTemplate? overlay = null;
         if (template.NpcFamily is { } familyId && !_npcFamilies.TryGet(familyId, out family))

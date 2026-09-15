@@ -7,6 +7,7 @@ namespace ZoneEngine_New.Tests
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Data;
@@ -15,6 +16,11 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Playfield;
+
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     /// <summary>
     /// Serves a fixed <see cref="HashItemCatalog"/> and vending machine table. Everything a hash roll
@@ -25,20 +31,31 @@ namespace ZoneEngine_New.Tests
         readonly HashItemCatalog _hashItems;
         readonly Dictionary<int, VendingMachineDefinition> _machines;
         readonly bool _allowMissingCatMesh;
+        readonly Dictionary<string, int[]> _monsterWeapons;
+        readonly string _rootPath;
 
         public StubGameData(
             HashItemCatalog hashItems,
             Dictionary<int, VendingMachineDefinition>? machines = null,
-            bool allowMissingCatMesh = false)
+            bool allowMissingCatMesh = false,
+            Dictionary<string, int[]>? monsterWeapons = null,
+            string? rootPath = null)
         {
             _hashItems = hashItems;
             _machines = machines ?? new Dictionary<int, VendingMachineDefinition>();
             _allowMissingCatMesh = allowMissingCatMesh;
+            _monsterWeapons = monsterWeapons ?? new Dictionary<string, int[]>(StringComparer.Ordinal);
+            _rootPath = rootPath ?? string.Empty;
+            RootPath = _rootPath;
         }
 
         public string RootPath { get; init; } = string.Empty;
 
         public int MobTemplateCount => 0;
+
+        public int NpcFamilyStatTemplateCount => 0;
+
+        public int NpcStatTemplateCount => 0;
 
         public int HashTemplateCount => _hashItems.CategoryCount;
 
@@ -65,7 +82,11 @@ namespace ZoneEngine_New.Tests
 
         public bool TryGetXpLevel(int level, out XpLevelEntry entry) => throw new NotSupportedException();
 
+        public bool CanResolveMobHash(string hash) => throw new NotSupportedException();
+
         public bool TryGetMobTemplate(string hash, out MobTemplate template) => throw new NotSupportedException();
+
+        public bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template) => throw new NotSupportedException();
 
         public MobTemplate RequireMobTemplate(string hash) => throw new NotSupportedException();
 
@@ -75,6 +96,36 @@ namespace ZoneEngine_New.Tests
             catMesh = 0;
             return false;
         }
+        public bool TryGetNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
+        {
+            template = null!;
+            return false;
+        }
+
+        public bool TryResolveNpcFamilyStatTemplate(int family, out NpcFamilyStatTemplate template)
+        {
+            template = null!;
+            return false;
+        }
+
+        public bool TryGetNpcStatTemplate(int id, out NpcStatTemplate template)
+        {
+            template = null!;
+            return false;
+        }
+
+        public bool TryGetMonsterWeapon(string hash, out int[] ids)
+        {
+            if (string.IsNullOrEmpty(hash) || !_monsterWeapons.TryGetValue(hash, out int[]? found))
+            {
+                ids = [];
+                return false;
+            }
+
+            ids = found;
+            return ids.Length > 0;
+        }
+
 
         public PlayfieldMetaData? GetPlayfieldMetaData(int playfieldId) => throw new NotSupportedException();
 
@@ -90,14 +141,19 @@ namespace ZoneEngine_New.Tests
     {
         readonly Dictionary<int, ItemTemplate> _templates = new();
 
-        public StubCatalog Add(int id, int quality, int price = 0, int flags = 0)
+        public StubCatalog Add(int id, int quality, int price = 0, int flags = 0, int multipleCount = 0)
         {
+            var stats = new Dictionary<CharacterStat, int> { [CharacterStat.Value] = price };
+            if (multipleCount > 0)
+                stats[CharacterStat.MultipleCount] = multipleCount;
+
             _templates[id] = new ItemTemplate
             {
                 Id = id,
                 Quality = quality,
                 Flags = flags,
-                Stats = new Dictionary<CharacterStat, int> { [CharacterStat.Value] = price }
+                MultipleCount = multipleCount,
+                Stats = stats
             };
             return this;
         }
@@ -160,23 +216,35 @@ namespace ZoneEngine_New.Tests
             ItemFlags flags = 0,
             int instanceId = 1,
             bool persisted = true,
-            string name = "Item")
-            => new()
+            string name = "Item",
+            CanFlags can = 0,
+            int stackCount = 1,
+            IEnumerable<ItemSpell>? onUse = null)
+        {
+            var spellList = new Dictionary<EventType, List<ItemSpell>>();
+            if (onUse != null)
+                spellList[EventType.OnUse] = new List<ItemSpell>(onUse);
+
+            return new Item
             {
                 InstanceId = instanceId,
                 IsPersisted = persisted,
                 LowId = lowId,
                 HighId = highId,
                 Quality = quality,
+                StackCount = stackCount,
                 Source = ItemSource.Command,
                 Definition = new ItemTemplate
                 {
                     Id = lowId,
                     Name = name,
                     Quality = quality,
-                    Flags = (int)flags
+                    Flags = (int)flags,
+                    Stats = new Dictionary<CharacterStat, int> { [CharacterStat.Can] = unchecked((int)can) },
+                    SpellList = spellList
                 }
             };
+        }
 
         /// <summary>Fills main inventory so the next placement has to fall through to overflow.</summary>
         public static void FillInventory(Player player)
@@ -191,8 +259,68 @@ namespace ZoneEngine_New.Tests
         }
     }
 
+    /// <summary>Builds nano definitions from the item attribute ids a real nano template uses.</summary>
+    internal static class TestNanos
+    {
+        public static NanoSpell Create(
+            int nanoId,
+            int durationCentiseconds = 6000,
+            int ncuCost = 10,
+            int strain = 0,
+            int stackingOrder = 0,
+            int nanoPointCost = 0,
+            int attackDelay = 0,
+            int attackDelayCap = 0,
+            int rechargeDelay = 0,
+            int rechargeDelayCap = 0,
+            CanFlags can = CanFlags.ApplyOnFriendly,
+            bool canCancel = true,
+            IEnumerable<ItemSpell>? modifiers = null)
+        {
+            var stats = new Dictionary<CharacterStat, int>
+            {
+                [CharacterStat.TimeExist] = durationCentiseconds,
+                [NanoSpell.NcuCostStat] = ncuCost,
+                [NanoSpell.NanoStrainStat] = strain,
+                [CharacterStat.StackingOrder] = stackingOrder,
+                [CharacterStat.NanoPoints] = nanoPointCost,
+                [CharacterStat.AttackDelay] = attackDelay,
+                [CharacterStat.AttackDelayCap] = attackDelayCap,
+                [CharacterStat.RechargeDelay] = rechargeDelay,
+                [CharacterStat.RechargeDelayCap] = rechargeDelayCap,
+                [CharacterStat.Can] = unchecked((int)can)
+            };
+
+            var spellList = new Dictionary<EventType, List<ItemSpell>>();
+            if (modifiers != null)
+                spellList[EventType.OnUse] = new List<ItemSpell>(modifiers);
+
+            return NanoSpell.From(
+                new ItemTemplate
+                {
+                    Id = nanoId,
+                    Name = "Nano " + nanoId,
+                    Quality = 1,
+                    Stats = stats,
+                    SpellList = spellList,
+                    CanCancel = canCancel
+                });
+        }
+
+        /// <summary>A Modify function, the same shape worn equipment uses for stat bonuses.</summary>
+        public static ItemSpell Modify(CharacterStat stat, int delta)
+            => new()
+            {
+                FunctionType = (int)FunctionType.Modify,
+                Arguments = new List<object> { (int)stat, delta },
+                Requirements = new List<ItemRequirement>()
+            };
+    }
+
     internal sealed class StubItemBuilder : IItemBuilder
     {
+        int _nextInstanceId = 90000;
+
         public Item Create(
             int lowId,
             int highId,
@@ -214,6 +342,18 @@ namespace ZoneEngine_New.Tests
                 Definition = CreateTemplate(lowId, highId, quality)
             };
 
+        public Item CreateWithNewInstance(
+            int lowId,
+            int highId,
+            int quality,
+            ItemSource source,
+            int stackCount = 1)
+        {
+            Item item = Create(lowId, highId, quality, source, stackCount);
+            item.AssignInstanceId(++_nextInstanceId);
+            return item;
+        }
+
         public ItemTemplate CreateTemplate(int lowId, int highId, int quality)
             => new()
             {
@@ -223,5 +363,85 @@ namespace ZoneEngine_New.Tests
 
         public bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item)
             => throw new NotSupportedException();
+    }
+
+    /// <summary>Every call throws: item use paths must not reach the database.</summary>
+    internal sealed class StubInventoryRepository : IInventoryRepository
+    {
+        public IReadOnlyList<ItemInstanceRecord> GetCarriedItems(int characterId)
+            => throw new NotSupportedException();
+
+        public IReadOnlyList<ItemInstanceRecord> GetBankItems(int characterId)
+            => throw new NotSupportedException();
+
+        public IReadOnlyList<ItemInstanceRecord> GetContainerItems(int containerInstanceId)
+            => throw new NotSupportedException();
+
+        public int LeaseInstanceIdBlock(int count) => throw new NotSupportedException();
+
+        public ItemInstanceRecord Insert(ItemInstanceRecord item) => throw new NotSupportedException();
+
+        public void UpdateLocation(int instanceId, int containerType, int containerInstance, int containerPlacement)
+            => throw new NotSupportedException();
+
+        public void UpdateLocations(IReadOnlyList<ItemLocationUpdate> locations)
+            => throw new NotSupportedException();
+
+        public void PersistNewAndUpdateLocations(
+            IReadOnlyList<ItemInstanceRecord> inserts,
+            IReadOnlyList<ItemLocationUpdate> updates)
+            => throw new NotSupportedException();
+    }
+
+    internal sealed class StubInstanceIdAllocator : IItemInstanceIdAllocator
+    {
+        int _next = 500000;
+
+        public int Allocate() => ++_next;
+    }
+
+    internal sealed class RecordingZoneSession : IZoneSession
+    {
+        public SessionState State { get; set; } = SessionState.Connected;
+
+        public Player? Player { get; private set; }
+
+        public bool IsClosed { get; private set; }
+
+        public List<MessageBody> Sent { get; } = new();
+
+        public void BindPlayer(Player player) => Player = player;
+
+        public void UnbindPlayer() => Player = null;
+
+        public void TransferToPlayfield(Playfield destination, Vector3 landing)
+            => throw new NotSupportedException();
+
+        public void SendSamePlayfieldRespawnTeleport(Vector3 landing)
+            => throw new NotSupportedException();
+
+        public void Send(byte[] packet)
+        {
+        }
+
+        public void Send(Message message)
+        {
+            if (message?.Body != null)
+                Sent.Add(message.Body);
+        }
+
+        public void Send(MessageBody body)
+        {
+            if (body != null)
+                Sent.Add(body);
+        }
+
+        public void Send(MessageBody body, int sender, int receiver) => Send(body);
+
+        public void SendInitiateCompression()
+        {
+        }
+
+        public void Close() => IsClosed = true;
     }
 }

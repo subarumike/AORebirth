@@ -72,10 +72,9 @@ namespace ZoneEngine_New.Core.Entities
         /// Each rolled item gets a unique in-memory <see cref="Item.InstanceId"/> (no DB write).
         /// Persistence happens on loot via MarkDirty / flush.
         /// </summary>
-        public void ResolveLoot(HashItemMinter minter, IItemInstanceIdAllocator ids)
+        public void ResolveLoot(HashItemMinter minter)
         {
             ArgumentNullException.ThrowIfNull(minter);
-            ArgumentNullException.ThrowIfNull(ids);
 
             if (ItemTable == null || ItemTable.Count == 0)
                 return;
@@ -98,7 +97,6 @@ namespace ZoneEngine_New.Core.Entities
                     if (!minter.TryMint(entry.Hash, quality, ItemSource.Loot, out Item item))
                         continue;
 
-                    AssignEphemeralInstanceId(item, ids);
                     if (!Loot.Add(nextSlot, item))
                         return;
 
@@ -106,9 +104,6 @@ namespace ZoneEngine_New.Core.Entities
                 }
             }
         }
-
-        static void AssignEphemeralInstanceId(Item item, IItemInstanceIdAllocator ids)
-            => item.AssignInstanceId(ids.Allocate());
 
         public bool TryUse(Player player)
         {

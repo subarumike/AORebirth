@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
     using Utility;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Metrics;
 
     public sealed class PlayfieldLocality
     {
@@ -21,6 +22,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly LocalityVisibility _visibility;
         private readonly CellHeatScheduler _heatScheduler;
         private readonly HashSet<Dynel> _tracked = [];
+        private readonly List<Dynel> _tickBuffer = [];
 
         public PlayfieldLocality(int playfieldId, PlayfieldMetaData? metaData)
         {
@@ -108,10 +110,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         public void Tick(double deltaTime)
         {
-            // Visibility delivery can remove an actor. Iterate a snapshot but do
-            // not reposition a removed actor or let it consume a replacement's visibility.
-            foreach (Dynel dynel in new List<Dynel>(_tracked))
+            TickStallWatch.Stage("locality.cells");
+            _tickBuffer.Clear();
+            foreach (Dynel dynel in _tracked)
+                _tickBuffer.Add(dynel);
+
+            for (int i = 0; i < _tickBuffer.Count; i++)
             {
+                Dynel dynel = _tickBuffer[i];
                 if (!_tracked.Contains(dynel) || !dynel.Transform.PositionChangedSinceLastTick)
                     continue;
 
@@ -123,7 +129,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                     _visibility.Reconcile(dynel);
             }
 
-            _heatScheduler.Tick(_tracked, deltaTime);
+            TickStallWatch.Stage("locality.heat");
+            _heatScheduler.Tick(_tickBuffer, deltaTime);
         }
 
         private void PlaceInCell(Dynel dynel, bool logPlayerCellChange)

@@ -85,8 +85,9 @@ namespace AORebirth.Database.Domain.Characters
         private static void WriteItemLocation(IDbConnection c, IDbTransaction t, ItemLocationData v, int placement)
         {
             if (v.InstanceId <= 0) throw new ArgumentOutOfRangeException(nameof(v));
-            if (Execute(c, t, "UPDATE item_instances SET ContainerType=@Type,ContainerInstance=@Owner,ContainerPlacement=@Slot WHERE InstanceId=@Id",
-                "@Type", v.ContainerType, "@Owner", v.ContainerInstance, "@Slot", placement, "@Id", v.InstanceId) == 0)
+            if (v.StackCount.HasValue && v.StackCount.Value <= 0) throw new ArgumentOutOfRangeException(nameof(v), "Stored counts must remain positive, including retired rows.");
+            if (Execute(c, t, "UPDATE item_instances SET ContainerType=@Type,ContainerInstance=@Owner,ContainerPlacement=@Slot,StackCount=COALESCE(@Count,StackCount) WHERE InstanceId=@Id",
+                "@Type", v.ContainerType, "@Owner", v.ContainerInstance, "@Slot", placement, "@Count", (object)v.StackCount ?? DBNull.Value, "@Id", v.InstanceId) == 0)
                 throw new InvalidOperationException("UpdateLocations found no row for InstanceId=" + v.InstanceId);
         }
 

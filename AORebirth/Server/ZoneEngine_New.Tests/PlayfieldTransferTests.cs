@@ -51,7 +51,9 @@ public sealed class PlayfieldTransferTests
             data.GetPlayfieldMetaData(4582), DestinationsCatalog.Instance, data, new StubLogger());
         destination.WorldAccess.Instance = collision;
         var player = f.Player(source, 1);
-        var landing = new Vector3(100, 0, 100);
+        // Start just above the surface so the new horizontal grounded sweep still
+        // exercises a real correction, rather than requiring the old downward drift.
+        var landing = new Vector3(100, 0.015625, 100);
         player.Session!.TransferToPlayfield(destination, landing);
         f.Drain(source); f.Drain(destination);
         Assert.AreEqual(landing.y, player.Position.y, "Transfer publishes the requested coordinate before simulation.");
@@ -60,8 +62,8 @@ public sealed class PlayfieldTransferTests
         f.Owner(destination, () => player.Motor.Tick(dt));
         double authoritativeY = player.Position.y;
         Assert.AreNotEqual(landing.y, authoritativeY, "This route must exercise a real post-arrival adjustment.");
-        Assert.AreEqual((double)(float)surface.y + MovementConfig.GroundStickVelocity * (float)dt,
-            authoritativeY, "The first delta is the runtime ground-stick step, not DAO rounding.");
+        Assert.AreEqual((double)(float)surface.y,
+            authoritativeY, "The grounded sweep snaps to the surface; DAO persistence must preserve that exact result.");
         var snapshot = new CharacterSnapshotService(f.Snapshots, f.Snapshots, new StubLogger());
         snapshot.Commit(player);
         var saved = f.Snapshots.Writes.Single();
@@ -378,6 +380,7 @@ public sealed class PlayfieldTransferTests
             Set(world, "_tickSync", new Lock()); Set(world, "_inbound", new PlayfieldInboundQueue());
             Set(world, "_outgoingTransfers", new ConcurrentDictionary<PlayfieldTransfer, byte>());
             Set(world, "_incomingTransfers", new ConcurrentDictionary<PlayfieldTransfer, byte>());
+            Set(world, "_pendingStatRebases", new ConcurrentDictionary<Character, byte>());
             Set(world, "_dynelRegistry", registry); Set(world, "_logger", logger); Set(world, "_playfieldManager", Manager);
             itemCatalog ??= new StubCatalog(); itemBuilder ??= new StubItemBuilder();
             var accepted = new AcceptedNpcActivationService(world, registry, locality, itemBuilder, itemCatalog);

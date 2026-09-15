@@ -126,6 +126,7 @@ namespace ZoneEngine_New.Core.Network
                 _handoffAuthority = authority ?? ZoneHandoffStore.Configured();
             }
         }
+        public bool IsClosed => _closed;
 
         public void BindPlayer(Player player)
         {
@@ -296,6 +297,25 @@ namespace ZoneEngine_New.Core.Network
         internal void FinishTransfer(PlayfieldTransfer transfer)
         {
             if (ReferenceEquals(_transfer, transfer)) _transfer = null;
+        }
+
+        public void SendSamePlayfieldRespawnTeleport(Vector3 landing)
+        {
+            ArgumentNullException.ThrowIfNull(landing);
+
+            Player? player = Player;
+            if (player == null)
+                throw new InvalidOperationException("Session has no bound player.");
+
+            Playfield? playfield = player.Playfield;
+            if (playfield == null)
+                throw new InvalidOperationException("Player is not on a playfield.");
+
+            int playfieldId = playfield.Identity.Instance;
+            Send(
+                BuildNormalTeleport(player, landing, playfieldId, player.Rotation),
+                playfieldId,
+                player.Identity.Instance);
         }
 
         private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId,

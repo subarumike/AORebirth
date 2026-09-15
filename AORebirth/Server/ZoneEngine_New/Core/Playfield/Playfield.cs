@@ -417,6 +417,7 @@ namespace ZoneEngine_New.Core.Playfield
 
                 GetRequiredService<BucketheadSummonService>().Shutdown();
                 GetRequiredService<AcceptedNpcActivationService>().Shutdown();
+                _pendingStatRebases.Clear();
                 _dynelRegistry.Clear();
             }
 
@@ -428,7 +429,39 @@ namespace ZoneEngine_New.Core.Playfield
         {
         }
 
+        private readonly ConcurrentDictionary<Character, byte> _pendingStatRebases = new();
+
+        public void QueueRebase(Character character)
+        {
+            ArgumentNullException.ThrowIfNull(character);
+            if (ReferenceEquals(character.Playfield, this)) _pendingStatRebases.TryAdd(character, 0);
+        }
+
+        private void DrainRebases()
+        {
+            foreach (Character character in _pendingStatRebases.Keys)
+            {
+                if (!_pendingStatRebases.TryRemove(character, out _) || !ReferenceEquals(character.Playfield, this)) continue;
+                try
+                {
+                    character.RebaseStats();
+                    character.FlushDirtyStats();
+                }
+                catch (Exception exception)
+                {
+                    _logger.Error(exception, $"Stat rebase failed for character {character.Identity.Instance}");
+                }
+            }
+        }
+
         public void Tick(double deltaTime)
+        {
+            ZoneEngine_New.Core.Metrics.TickStallWatch.BeginTick(Identity.Instance);
+            try { TickCore(deltaTime); }
+            finally { ZoneEngine_New.Core.Metrics.TickStallWatch.EndTick(); }
+        }
+
+        private void TickCore(double deltaTime)
         {
             long tickStart = Stopwatch.GetTimestamp();
             lock (_tickSync)
@@ -437,24 +470,29 @@ namespace ZoneEngine_New.Core.Playfield
                     return;
 
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inbound.drain");
                 _inbound.Drain(_router, spawn, this);
                 spawn.Tick();
                 GetRequiredService<AcceptedNpcActivationService>().Tick();
                 GetRequiredService<BucketheadSummonService>().Tick();
                 foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
                     if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Nanos.Tick(player);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inventory.moves");
                 _inventoryMoves.Tick(this, deltaTime);
                 _trades.Tick(this, deltaTime);
 
                 WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
                 if (world != null)
                 {
+                    ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("world.softtriggers");
                     long worldStart = Stopwatch.GetTimestamp();
                     world.TickSoftTriggers(this, deltaTime);
                     _metrics.WorldSimTick.Record(ElapsedMilliseconds(worldStart));
                 }
 
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("stats.rebase");
+                DrainRebases();
                 _playfieldManager.Dialogues.Tick(this);
                 foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
                     if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Missions.PollLifecycle(player);

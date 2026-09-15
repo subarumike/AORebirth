@@ -295,12 +295,16 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(w.Session.Messages.OfType<CharacterActionMessage>().Any(m => m.Action == CharacterActionType.UploadNano));
             w.Persistence.BeforeCommit = null;
             w.Persistence.Failure = new InvalidOperationException();
+            // Retrying a known nano now rejects before persistence. Use a distinct
+            // program to continue exercising a genuine transaction failure.
+            item.SpellList[EventType.OnUse][0].Arguments[0] = 12346;
             int messagesBeforeFailure = w.Session.Messages.Count;
             Assert.IsFalse(w.Actions.TryUseNanoCrystal(w.Player, Slot(), item));
             Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
             Assert.AreEqual(1, item.StackCount);
             Assert.AreEqual(2, w.Persistence.Calls);
             Assert.AreEqual(messagesBeforeFailure, w.Session.Messages.Count);
+            Assert.IsFalse(w.Player.UploadedNanoIds.Contains(12346));
             w.Flush.HardFlush(w.Player);
         }
 
@@ -528,7 +532,7 @@ namespace ZoneEngine_New.Tests
             public void Advance(int seconds) => _now = _now.AddSeconds(seconds);
         }
 
-        sealed class World : IDisposable
+        internal sealed class World : IDisposable
         {
             public readonly Player Player = TestWorld.CreatePlayer(111);
             public readonly Session Session = new();
@@ -561,12 +565,12 @@ namespace ZoneEngine_New.Tests
             }
             public void Dispose() { Flush.Dispose(); _services.Dispose(); }
         }
-        sealed class Ids : IItemInstanceIdAllocator { int _next = 100; public int Calls; public int Allocate() { Calls++; return _next++; } }
+        internal sealed class Ids : IItemInstanceIdAllocator { int _next = 100; public int Calls; public int Allocate() { Calls++; return _next++; } }
         sealed class Coalesce : ICharacterCoalesceCommit
         {
             public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds) => throw new InvalidOperationException("No unexpected independent flush.");
         }
-        sealed class Persistence : IInventoryMutationPersistence
+        internal sealed class Persistence : IInventoryMutationPersistence
         {
             public Dictionary<int, ItemInstanceRecord> Rows = new();
             public Dictionary<int, int> Stats = new();
@@ -604,7 +608,7 @@ namespace ZoneEngine_New.Tests
                 ItemType = r.ItemType, LowId = r.LowId, HighId = r.HighId, Quality = r.Quality, StackCount = count, Source = r.Source
             };
         }
-        sealed class Session : IZoneSession
+        internal sealed class Session : IZoneSession
         {
             public readonly List<MessageBody> Messages = new();
             public SessionState State { get; set; } = SessionState.InPlay;

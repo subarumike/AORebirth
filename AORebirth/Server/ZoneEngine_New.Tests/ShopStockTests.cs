@@ -19,8 +19,8 @@ namespace ZoneEngine_New.Tests
             """
             {
                 "WEAP": {
-                    "PSTL": { "Description": "Pistols", "Hash": "PSTL", "ParentHash": "WEPN" },
-                    "RIFL": { "Description": "Rifles", "Hash": "RIFL", "ParentHash": "WEPN" }
+                    "PSTL": { "Description": "Pistols", "ParentHash": "WEPN" },
+                    "RIFL": { "Description": "Rifles", "ParentHash": "WEPN" }
                 }
             }
             """;

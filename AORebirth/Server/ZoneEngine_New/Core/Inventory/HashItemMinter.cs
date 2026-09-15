@@ -26,13 +26,16 @@ namespace ZoneEngine_New.Core.Inventory
             _items = items;
         }
 
+        /// <summary>
+        /// Rolls <paramref name="hash"/> into an item carrying a freshly allocated instance id.
+        /// </summary>
         public bool TryMint(string hash, int desiredQuality, ItemSource source, out Item item)
         {
             item = null!;
             if (!TryRollIds(hash, desiredQuality, out int lowId, out int highId, out int quality))
                 return false;
 
-            item = _items.Create(lowId, highId, quality, source);
+            item = _items.CreateWithNewInstance(lowId, highId, quality, source);
             return true;
         }
 
@@ -70,6 +73,9 @@ namespace ZoneEngine_New.Core.Inventory
         /// <summary>Every leaf item family reachable from <paramref name="hash"/>.</summary>
         public void CollectLeafInstances(string hash, List<HashInstance> into)
             => _gameData.CollectHashLeafInstances(hash, into);
+
+        public Item CreateWithNewInstance(int lowId, int highId, int quality, ItemSource source)
+            => _items.CreateWithNewInstance(lowId, highId, quality, source);
 
         public Item Create(int lowId, int highId, int quality, ItemSource source)
             => _items.Create(lowId, highId, quality, source);

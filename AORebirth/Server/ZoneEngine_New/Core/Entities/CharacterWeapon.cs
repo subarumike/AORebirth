@@ -4,6 +4,7 @@ namespace ZoneEngine_New.Core.Entities
 
     using AORebirth.Enums;
 
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -13,7 +14,17 @@ namespace ZoneEngine_New.Core.Entities
         None = 0,
         MainHand = 1,
         OffHand = 2,
-        CombinedMA = 3
+        CombinedMA = 3,
+
+        /// <summary>NPC template weapon indices 0..7 (not player WeaponPage slots).</summary>
+        Npc0 = 10,
+        Npc1 = 11,
+        Npc2 = 12,
+        Npc3 = 13,
+        Npc4 = 14,
+        Npc5 = 15,
+        Npc6 = 16,
+        Npc7 = 17
     }
 
     public enum WeaponState
@@ -39,6 +50,29 @@ namespace ZoneEngine_New.Core.Entities
         double _timer;
 
         public Item? Item { get; set; }
+
+        /// <summary>
+        /// Value written to AttackInfo / WIFU slot fields. Negative means derive from
+        /// <see cref="LogicalSlot"/> (players). NPCs set 0..7 for template weapon ordinals.
+        /// </summary>
+        public int WireSlot { get; set; } = -1;
+
+        /// <summary>
+        /// NPC SAW / AttackInfo weapon tag (4-char packed int). Zero for player hands / fists.
+        /// Must match SpecialAttack.Unknown3 when non-zero.
+        /// </summary>
+        public int SawTag { get; set; }
+
+        /// <summary>NPC SAW SpecialAttack.Unknown4 (e.g. SIW1, EPAH). Empty when unused.</summary>
+        public string SawTagName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// True when this is a server-minted MA fist, not an inventory WeaponPage item.
+        /// </summary>
+        public bool IsSyntheticFist { get; set; }
+
+        /// <summary>Dictionary key this weapon was armed under.</summary>
+        public WeaponSlot LogicalSlot { get; set; } = WeaponSlot.None;
 
         public double BaseAttackSpeed { get; private set; } = DefaultAttackSpeedSeconds;
 
@@ -86,9 +120,7 @@ namespace ZoneEngine_New.Core.Entities
             if (deltaTime <= 0.0)
                 return false;
 
-            if (Item != null
-                && (Item.GetWeaponFlags() & WeaponFlags.Ranged) != 0
-                && Wielder?.Motor.IsMoving == true)
+            if (IsRanged() && Wielder?.Motor.IsMoving == true)
                 return false;
 
             _timer += deltaTime;
@@ -113,6 +145,20 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// RangedInit flag, or non-melee ammo presentation when InitiativeType is missing.
+        /// </summary>
+        public bool IsRanged()
+        {
+            if (Item == null)
+                return false;
+
+            if ((Item.GetWeaponFlags() & WeaponFlags.Ranged) != 0)
+                return true;
+
+            return Item.IsWieldableCombatWeapon() && !AttackInfoRules.UsesMeleeAmmo(Item);
         }
 
         public void ResetAttack()

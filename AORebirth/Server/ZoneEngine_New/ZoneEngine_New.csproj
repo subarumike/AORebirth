@@ -28,6 +28,8 @@
     <PackageReference Include="AODB" Version="1.0.6" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="BepuPhysics" Version="2.5.0-beta.25" />
+    <PackageReference Include="GroveGames.BehaviourTree" Version="1.1.1" />
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
@@ -260,6 +262,11 @@
     <!-- Full GameData tree (items.dat, MobTemplates, Playfields metadata/spawns). -->
     <Content Include="..\..\GameData\**\*">
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Legacy item events overlay (RDB items.dat now carries events; nanos are not in this file). -->
+    <Content Include="..\..\Datafiles\items.dat">
+      <Link>GameData\ItemEvents.dat</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -39,6 +39,10 @@ static class CutoverDurableReloadSmoke
             mutation.Persist(new InventoryMutationBatch(CharacterId, [],
                 [new(identity + 1, (int)IdentityType.WeaponPage, CharacterId, 6)], [new(identity, 9, 7)], [])
                 { FinalStats = [new StatRecord { StatId = (int)CharacterStat.Cash, StatValue = 1200 }] });
+            // Delmus's remaining-charge count crosses the shared DAO together with its
+            // location. A subsequent location-only update must preserve that count.
+            inventory.UpdateLocations([new(identity, (int)IdentityType.Inventory, CharacterId, 66, 5)]);
+            inventory.UpdateLocations([new(identity, (int)IdentityType.Inventory, CharacterId, 65)]);
             character = new CharacterRecord { Id = CharacterId, Name = "CutoverFixture", FirstName = "", LastName = "",
                 Playfield = 4582, X = 101, Y = 21, Z = 102, HeadingW = 1 };
             new MySqlCharacterRepository(log).SaveSnapshot(character, 0,
@@ -85,7 +89,7 @@ static class CutoverDurableReloadSmoke
         var first = loaded.Items.Single(i => i.InstanceId == identity);
         var second = loaded.Items.Single(i => i.InstanceId == identity + 1);
         Require(first.ContainerType == (int)IdentityType.Inventory && first.ContainerInstance == CharacterId && first.ContainerPlacement == 65
-            && first.LowId == 20 && first.HighId == 21 && first.Quality == 17 && first.StackCount == 7 && (int)first.Source == 1, "exact-first-item-state");
+            && first.LowId == 20 && first.HighId == 21 && first.Quality == 17 && first.StackCount == 5 && (int)first.Source == 1, "exact-first-item-state-including-spent-charges");
         Require(second.ContainerType == (int)IdentityType.WeaponPage && second.ContainerInstance == CharacterId && second.ContainerPlacement == 6
             && second.LowId == 22 && second.HighId == 23 && second.Quality == 18 && second.StackCount == 1 && second.Source == 0, "exact-equipped-item-state");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={CharacterId}") == 2, "no-phantom-owned-rows");

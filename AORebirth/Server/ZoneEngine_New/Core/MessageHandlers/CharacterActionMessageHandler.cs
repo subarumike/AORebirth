@@ -80,6 +80,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
             switch (message.Action)
             {
+                case CharacterActionType.Die:
+                case CharacterActionType.DeathRespawn:
+                    player.RequestRespawn();
+                    break;
+
                 case CharacterActionType.CastNano:
                     _nanos.TryCast(player, message.Parameter2, message.Target);
                     break;

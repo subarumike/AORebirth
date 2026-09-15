@@ -54,6 +54,31 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void PricingSkillStepsClampsComputerLiteracyToZeroThroughThreeThousand()
+        {
+            Assert.AreEqual(0, TradeRules.PricingSkillSteps(-100));
+            Assert.AreEqual(0, TradeRules.PricingSkillSteps(0));
+            Assert.AreEqual(25, TradeRules.PricingSkillSteps(1000));
+            Assert.AreEqual(75, TradeRules.PricingSkillSteps(TradeRules.MaxPricingComputerLiteracy));
+            Assert.AreEqual(75, TradeRules.PricingSkillSteps(TradeRules.MaxPricingComputerLiteracy + 1));
+            Assert.AreEqual(75, TradeRules.PricingSkillSteps(int.MaxValue));
+        }
+
+        [TestMethod]
+        public void ShopPricesStopChangingOnceComputerLiteracyHitsTheCap()
+        {
+            int atCap = TradeRules.PricingSkillSteps(TradeRules.MaxPricingComputerLiteracy);
+            int overCap = TradeRules.PricingSkillSteps(9000);
+
+            Assert.AreEqual(
+                TradeRules.BuyPrice(1000, sellModifier: 100, skillSteps: atCap),
+                TradeRules.BuyPrice(1000, sellModifier: 100, skillSteps: overCap));
+            Assert.AreEqual(
+                TradeRules.SellPrice(1000, buyModifier: 10, skillSteps: atCap),
+                TradeRules.SellPrice(1000, buyModifier: 10, skillSteps: overCap));
+        }
+
+        [TestMethod]
         public void BuyPriceDropsAsComputerLiteracyStepsRise()
         {
             // value 1000, sellmodifier 100 => 1000 credits with no skill discount.

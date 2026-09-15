@@ -5,6 +5,7 @@ namespace ZoneEngine_New.Core.Commands
     using System.Globalization;
 
     using AORebirth.Core.GameData;
+    using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -34,7 +35,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".npc source|template|loot";
+        public string Usage => ".npc source|template|loot|equipment";
 
         public void Execute(GmCommandContext context)
         {
@@ -65,6 +66,12 @@ namespace ZoneEngine_New.Core.Commands
             if (string.Equals(verb, "loot", StringComparison.OrdinalIgnoreCase))
             {
                 GmCommandFeedback.SendLines(context.Session, context.Player, DumpLoot(npc));
+                return;
+            }
+
+            if (string.Equals(verb, "equipment", StringComparison.OrdinalIgnoreCase))
+            {
+                GmCommandFeedback.SendLines(context.Session, context.Player, DumpEquipment(npc));
                 return;
             }
 
@@ -237,12 +244,13 @@ namespace ZoneEngine_New.Core.Commands
             lines.Add(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Template: {0} hash={1} templateId={2} knuBot={3} hasHeadMesh={4} levels={5}-{6}",
+                    "Template: {0} hash={1} templateId={2} knuBot={3} hasHeadMesh={4} attackable={5} levels={6}-{7}",
                     template.Name,
                     template.Hash,
                     template.TemplateId,
                     template.KnuBotId,
                     template.HasHeadMesh,
+                    template.Attackable,
                     template.MinLevel,
                     template.MaxLevel));
 
@@ -261,7 +269,24 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             AppendIdLists(lines, "equipment", template.Equipment);
-            AppendIdLists(lines, "weapon", template.Weapons);
+
+            Dictionary<int, int> textures = template.Textures;
+            if (textures == null || textures.Count == 0)
+            {
+                lines.Add("  textures (empty)");
+            }
+            else
+            {
+                foreach (KeyValuePair<int, int> texture in textures)
+                {
+                    lines.Add(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "  texture place={0} id={1}",
+                            texture.Key,
+                            texture.Value));
+                }
+            }
 
             List<MobItemTableEntry> itemTable = template.ItemTable;
             if (itemTable == null || itemTable.Count == 0)
@@ -284,6 +309,60 @@ namespace ZoneEngine_New.Core.Commands
                         table.Repeats,
                         table.Chance,
                         table.LevelMod));
+            }
+
+            return lines;
+        }
+
+        List<string> DumpEquipment(NpcCharacter npc)
+        {
+            List<string> lines = new();
+            Container equipment = npc.Equipment;
+            lines.Add(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Equipment: {0} id={1} items={2}/{3}",
+                    npc.Name ?? string.Empty,
+                    npc.Identity.Instance,
+                    equipment.Content.Count,
+                    equipment.Capacity));
+
+            if (equipment.Content.Count == 0)
+            {
+                lines.Add("  (empty)");
+                return lines;
+            }
+
+            int last = equipment.Offset + equipment.Capacity;
+            for (int slot = equipment.Offset; slot < last; slot++)
+            {
+                if (!equipment.Content.TryGetValue(slot, out Item? item) || item == null)
+                    continue;
+
+                int itemClass = item.GetStat(CharacterStat.ItemClass);
+                string className = Enum.IsDefined(typeof(ItemClass), itemClass)
+                    ? ((ItemClass)itemClass).ToString()
+                    : itemClass.ToString(CultureInfo.InvariantCulture);
+                string line = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "  slot[{0}] {1} ql={2} class={3}",
+                    slot,
+                    FormatLiveItem(item),
+                    item.Quality,
+                    className);
+                if (NpcCharacter.TryFindEquipMonsterWeaponHash(item, out string weaponHash))
+                {
+                    line = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0} hash={1}{2}",
+                        line,
+                        weaponHash,
+                        _gameData.TryGetMonsterWeapon(weaponHash, out _)
+                            ? string.Empty
+                            : " (unresolved)");
+                }
+
+                lines.Add(line);
             }
 
             return lines;
@@ -390,6 +469,29 @@ namespace ZoneEngine_New.Core.Commands
                         i,
                         FormatItemId(ids[0])));
             }
+        }
+
+        string FormatLiveItem(Item item)
+        {
+            string name = item.Name;
+            if (string.IsNullOrEmpty(name))
+                name = ItemName(item.LowId);
+
+            if (item.LowId == item.HighId || item.HighId <= 0)
+            {
+                return string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} {1}",
+                    item.LowId,
+                    name);
+            }
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}/{1} {2}",
+                item.LowId,
+                item.HighId,
+                name);
         }
 
         string FormatItemPair(int lowId, int highId)

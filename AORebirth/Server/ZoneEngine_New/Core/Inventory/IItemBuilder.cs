@@ -20,6 +20,18 @@ namespace ZoneEngine_New.Core.Inventory
             byte[]? statsBlob = null);
 
         /// <summary>
+        /// Creates an item holding a freshly allocated <see cref="Item.InstanceId"/> and the matching
+        /// occupancy identity. Not persisted until a flush inserts its row, so an abandoned item
+        /// (unlooted corpse, rejected purchase) only burns an id.
+        /// </summary>
+        Item CreateWithNewInstance(
+            int lowId,
+            int highId,
+            int quality,
+            ItemSource source,
+            int stackCount = 1);
+
+        /// <summary>
         /// Interpolated catalog definition only. No instance id or occupancy identity.
         /// </summary>
         ItemTemplate CreateTemplate(int lowId, int highId, int quality);

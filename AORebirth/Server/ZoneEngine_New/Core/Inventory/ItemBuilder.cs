@@ -14,6 +14,7 @@ namespace ZoneEngine_New.Core.Inventory
     public sealed class ItemBuilder : IItemBuilder
     {
         private readonly IItemTemplateCatalog _catalog;
+        private readonly IItemInstanceIdAllocator? _ids;
         private readonly IZoneLogger _logger;
 
         public ItemBuilder(IItemTemplateCatalog catalog, IZoneLogger logger)
@@ -22,6 +23,12 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(logger);
             _catalog = catalog;
             _logger = logger;
+        }
+
+        public ItemBuilder(IItemTemplateCatalog catalog, IItemInstanceIdAllocator ids, IZoneLogger logger)
+            : this(catalog, logger)
+        {
+            _ids = ids ?? throw new ArgumentNullException(nameof(ids));
         }
 
         public Item Create(
@@ -39,8 +46,12 @@ namespace ZoneEngine_New.Core.Inventory
 
             int clampedQuality = definition.Quality;
 
+            // A stored item owns its own count: it may have spent charges. Only a fresh mint takes
+            // the full count off the template.
             int resolvedStack = stackCount;
-            if (definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats) && stackFromStats > 0)
+            if (instanceId == 0
+                && definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats)
+                && stackFromStats > 0)
                 resolvedStack = stackFromStats;
 
             Item item = new()
@@ -71,6 +82,18 @@ namespace ZoneEngine_New.Core.Inventory
                     item.GetStat(CharacterStat.ItemType),
                     item.Identity.Type,
                     item.Identity.Instance));
+            return item;
+        }
+
+        public Item CreateWithNewInstance(
+            int lowId,
+            int highId,
+            int quality,
+            ItemSource source,
+            int stackCount = 1)
+        {
+            Item item = Create(lowId, highId, quality, source, stackCount);
+            item.AssignInstanceId((_ids ?? throw new InvalidOperationException("Item allocation requires the configured instance-id allocator.")).Allocate());
             return item;
         }
 

@@ -189,12 +189,18 @@ namespace ZoneEngine_New.Core.Inventory
                     return false;
                 if (!nanoIds.Contains(nanoId)) nanoIds.Add(nanoId);
             }
+            if (nanoIds.TrueForAll(player.UploadedNanoIds.Contains))
+            {
+                player.Session?.Send(new ChatTextMessage { Identity = player.Identity, Text = "You already know that nano program." });
+                return false;
+            }
             int before = item.StackCount;
             bool retired = before == 1;
             Identity destination = retired ? new Identity { Type = IdentityType.None, Instance = player.Identity.Instance } : page.Identity;
             bool applied = TryCommit(player,
                 [new InventoryRowChange(item, destination, retired ? item.InstanceId : slot.Instance, retired ? before : before - 1, retired)],
-                () => IsCurrent(page, slot.Instance, item, item.InstanceId) && item.StackCount == before,
+                () => IsCurrent(page, slot.Instance, item, item.InstanceId) && item.StackCount == before
+                    && nanoIds.Exists(id => !player.UploadedNanoIds.Contains(id)),
                 () =>
                 {
                     if (retired) page.Content.Remove(slot.Instance);

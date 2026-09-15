@@ -46,6 +46,8 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public int ContainerType { get; set; }
         public int ContainerInstance { get; set; }
         public int ContainerPlacement { get; set; }
+        /// <summary>Null preserves the stored count for a location-only operation.</summary>
+        public int? StackCount { get; set; }
     }
 
     public sealed class ItemStackData

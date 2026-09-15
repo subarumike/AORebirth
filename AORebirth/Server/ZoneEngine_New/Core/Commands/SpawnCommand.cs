@@ -5,7 +5,6 @@ namespace ZoneEngine_New.Core.Commands
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
-    using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Playfield;
 
     public sealed class SpawnCommand : IGmCommand
@@ -42,7 +41,7 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            if (!_gameData.TryGetMobTemplate(hash, out MobTemplate _))
+            if (!_gameData.CanResolveMobHash(hash))
             {
                 GmCommandFeedback.Send(
                     context.Session,

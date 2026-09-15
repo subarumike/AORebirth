@@ -78,7 +78,9 @@ public sealed class NpcContentIntegrationTests
         foreach (var imported in rows.Where(r => r.ContentAcceptance != null))
         {
             Assert.IsFalse(NpcContentAcceptance.CanSpawn(imported));
-            Assert.AreEqual(0, imported.Weapons.Count, "Alternatives must never become concurrent slots.");
+            using var source = JsonDocument.Parse(File.ReadAllText(Path.Combine(Root(), "AORebirth/GameData/MobTemplates.json")));
+            var raw = source.RootElement.EnumerateArray().Single(row => row.GetProperty("Hash").GetString() == imported.Hash);
+            Assert.AreEqual(0, raw.GetProperty("Weapons").GetArrayLength(), "Retained source alternatives must never become concurrent slots.");
         }
         foreach (string hash in new[] { "MENI", "VEAE", "STFO" })
             Assert.IsTrue(rows.Any(r => r.Hash == hash));

@@ -14,9 +14,11 @@ namespace ZoneEngine_New.Core.Entities
 
     using Utility;
 
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Helpers;
+    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.GameData;
 
@@ -25,7 +27,7 @@ namespace ZoneEngine_New.Core.Entities
 
     /// <summary>
     /// Why delayed character actions are being interrupted.
-    /// Jump cancels most (equip, nano cast). LeavePlayfield cancels every timed action.
+    /// Jump and locomotion cancel most (equip, nano cast). LeavePlayfield cancels every timed action.
     /// </summary>
     public enum TimedActionInterrupt
     {
@@ -50,9 +52,6 @@ namespace ZoneEngine_New.Core.Entities
         const int QuestXpCapPercent = 20;
         const double SoftRangeGraceMeters = 1.5;
         const double HardRangeMultiplier = 3.0;
-        const int NormalAttackInfoAmmoCount = 40;
-        const int PlayerUnarmedAttackInfoAmmoCount = -1;
-        const int PlayerUnarmedAttackInfoWeaponInstance = 100;
         const int MartialArtsSpecialLowId = 211357;
         const int MartialArtsSpecialHighId = 211358;
         const int DimachSpecialLowId = 42033;
@@ -69,8 +68,6 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         //TODO: Put cooldowns here
-        //TODO: Put buffs here
-        //TODO: Nano casting should live here
 
         /// <summary>
         /// Subscribe for delayed actions. Honor <see cref="TimedActionInterrupt.LeavePlayfield"/>
@@ -82,6 +79,7 @@ namespace ZoneEngine_New.Core.Entities
         {
             if (reason != TimedActionInterrupt.Movement)
                 Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
+            if (this is not Player) NanoRuntime.InterruptCast(this);
             TimedActionsInterrupted?.Invoke(this, reason);
         }
 
@@ -131,6 +129,7 @@ namespace ZoneEngine_New.Core.Entities
             _deathNotified = true;
             InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             SetFightingTarget(Identity.None);
+            if (this is not Player) NanoRuntime.ClearBuffsOnDeath(this);
 
             Cell?.Announce(
                 new CharacterActionMessage
@@ -146,6 +145,32 @@ namespace ZoneEngine_New.Core.Entities
             _corpseSwapRemainingSeconds = CorpseSpawnDelayMilliseconds / 1000.0;
 
             AwardKillRewards();
+        }
+
+        /// <summary>
+        /// Clears death and restores health/nano so the character can live again.
+        /// </summary>
+        public virtual void Revive()
+        {
+            _deathNotified = false;
+            _corpseSwapPending = false;
+            _corpseSwapRemainingSeconds = 0;
+            ClearNanoRecharge();
+
+            int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
+            Stats.Set(CharacterStat.Health, maxHealth > 0 ? maxHealth : 1, StatDetail.Base, dirty: true);
+
+            int maxNano = Stats.GetOrZero(CharacterStat.MaxNanoEnergy);
+            if (maxNano > 0)
+                Stats.Set(CharacterStat.CurrentNano, maxNano, StatDetail.Base, dirty: true);
+
+            Stats.Set(CharacterStat.DeadTimer, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.State, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.CurrentState, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.ActionCategory, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.SocialStatus, 0, StatDetail.Base, dirty: true);
+
+            FlushDirtyStats();
         }
 
         /// <summary>
@@ -485,6 +510,38 @@ namespace ZoneEngine_New.Core.Entities
                     IsPlayer,
                     Weapons.Count));
 
+            // NPC template weapons: emit live-shaped low/high/tag entries first so AttackInfo
+            // Unknown6 can match SpecialAttack.Unknown3.
+            foreach (KeyValuePair<WeaponSlot, CharacterWeapon> pair in Weapons)
+            {
+                CharacterWeapon? armed = pair.Value;
+                Item? item = armed?.Item;
+                if (armed == null || item == null || armed.WireSlot < 0 || armed.SawTag == 0)
+                    continue;
+
+                string tagName = string.IsNullOrEmpty(armed.SawTagName)
+                    ? "SIW1"
+                    : armed.SawTagName;
+                specials.Add(
+                    new SpecialAttack
+                    {
+                        Unknown1 = item.LowId,
+                        Unknown2 = item.HighId > 0 ? item.HighId : item.LowId,
+                        Unknown3 = armed.SawTag,
+                        Unknown4 = tagName
+                    });
+                LogSaw(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "SAW npc-weapon slot={0} wire={1} low={2} high={3} tag={4}({5})",
+                        pair.Key,
+                        armed.WireSlot,
+                        item.LowId,
+                        item.HighId,
+                        tagName,
+                        armed.SawTag));
+            }
+
             foreach (KeyValuePair<WeaponSlot, CharacterWeapon> pair in Weapons)
             {
                 Item? item = pair.Value?.Item;
@@ -498,12 +555,12 @@ namespace ZoneEngine_New.Core.Entities
                     continue;
                 }
 
-                bool martialArtsItem = item.IsMaCombinedWeapon();
+                bool martialArtsItem = item.IsMaCombinedWeapon() || (pair.Value?.IsSyntheticFist == true);
                 int can = item.GetStat(CharacterStat.Can);
                 LogSaw(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "SAW weapon slot={0} name={1} low={2} high={3} ql={4} can=0x{5:X} specials={6} ma={7}",
+                        "SAW weapon slot={0} name={1} low={2} high={3} ql={4} can=0x{5:X} specials={6} ma={7} synthetic={8}",
                         pair.Key,
                         item.Name,
                         item.LowId,
@@ -511,7 +568,8 @@ namespace ZoneEngine_New.Core.Entities
                         item.Quality,
                         can,
                         FormatSpecialCanFlags((CanFlags)(uint)can),
-                        martialArtsItem));
+                        martialArtsItem,
+                        pair.Value?.IsSyntheticFist == true));
 
                 if (!maat && martialArtsItem)
                 {
@@ -544,6 +602,41 @@ namespace ZoneEngine_New.Core.Entities
                             CharacterStat.Dimach,
                             "DIIT"));
                     dimach = true;
+                }
+            }
+
+            // Capture 20260724-001643 / ZoneEngine AttackMessageHandler: players always advertise
+            // MAAT/BRAW/DIIT on combat start. Synthetic fists often lack MartialArts>0 in catalog.
+            if (IsPlayer)
+            {
+                if (!maat)
+                {
+                    specials.Add(
+                        CreateSpecialAttack(
+                            MartialArtsSpecialLowId,
+                            MartialArtsSpecialHighId,
+                            CharacterStat.MartialArts,
+                            "MAAT"));
+                }
+
+                if (!brawl)
+                {
+                    specials.Add(
+                        CreateSpecialAttack(
+                            BrawlSpecialLowId,
+                            BrawlSpecialHighId,
+                            CharacterStat.Brawl,
+                            "BRAW"));
+                }
+
+                if (!dimach)
+                {
+                    specials.Add(
+                        CreateSpecialAttack(
+                            DimachSpecialLowId,
+                            DimachSpecialHighId,
+                            CharacterStat.Dimach,
+                            "DIIT"));
                 }
             }
 
@@ -638,7 +731,9 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             weapon.Wielder = this;
-            Action handler = () => ProcessWeaponSwing(slot);
+            weapon.LogicalSlot = slot;
+            CharacterWeapon armed = weapon;
+            Action handler = () => ProcessWeaponSwing(armed);
             _weaponAttackHandlers[slot] = handler;
             Weapons[slot] = weapon;
             weapon.Attacked += handler;
@@ -688,6 +783,7 @@ namespace ZoneEngine_New.Core.Entities
                 TickCombat(deltaTime);
             if (!IsDead && UsesPassiveRegen)
                 TickPassiveRegen(deltaTime);
+            if (this is not Player) NanoRuntime.Tick(this, DateTime.UtcNow);
             base.Tick(deltaTime);
         }
 
@@ -759,10 +855,22 @@ namespace ZoneEngine_New.Core.Entities
 
         void TickWeapons(double deltaTime)
         {
+            // Parked full bars (waiting on LOS/range) must still Tick so they can fire,
+            // but must not monopolize the exclusive charge slot.
+            foreach (CharacterWeapon weapon in Weapons.Values)
+            {
+                if (weapon == null || !weapon.IsFullyCharged)
+                    continue;
+                if (weapon.Tick(deltaTime))
+                    return;
+            }
+
             CharacterWeapon? charging = null;
             foreach (CharacterWeapon weapon in Weapons.Values)
             {
-                if (weapon != null && weapon.State == WeaponState.Attacking)
+                if (weapon != null
+                    && weapon.State == WeaponState.Attacking
+                    && !weapon.IsFullyCharged)
                 {
                     charging = weapon;
                     break;
@@ -777,18 +885,18 @@ namespace ZoneEngine_New.Core.Entities
 
             foreach (CharacterWeapon weapon in Weapons.Values)
             {
-                if (weapon != null && weapon.Tick(deltaTime))
-                    break;
+                if (weapon != null && weapon.State == WeaponState.Recharging)
+                    weapon.Tick(deltaTime);
             }
         }
 
-        void ProcessWeaponSwing(WeaponSlot slot)
+        void ProcessWeaponSwing(CharacterWeapon characterWeapon)
         {
             Character? target = TryResolveFightingTarget();
             if (target == null)
                 return;
 
-            if (!Weapons.TryGetValue(slot, out CharacterWeapon? characterWeapon) || characterWeapon == null)
+            if (!HasLineOfSightTo(target))
                 return;
 
             Item? weapon = characterWeapon.Item;
@@ -806,6 +914,11 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             DamageCalculator.DamageResult result = DamageCalculator.CalculateFromWeapon(this, target, weapon);
+            int attackInfoSlot = AttackInfoRules.ResolveWeaponSlot(
+                characterWeapon,
+                characterWeapon.LogicalSlot,
+                weapon,
+                IsPlayer);
             if (!result.IsHit)
             {
                 Cell?.Announce(
@@ -813,7 +926,7 @@ namespace ZoneEngine_New.Core.Entities
                     {
                         Identity = Identity,
                         Unknown1 = -1,
-                        Unknown2 = MapAttackInfoWeaponSlot(slot, weapon),
+                        Unknown2 = attackInfoSlot,
                         Unknown3 = Identity,
                         Unknown4 = target.Identity,
                         Unknown5 = 0
@@ -828,13 +941,13 @@ namespace ZoneEngine_New.Core.Entities
                     Identity = Identity,
                     Target = target.Identity,
                     Unknown1 = result.Damage,
-                    Unknown2 = weapon != null ? NormalAttackInfoAmmoCount : PlayerUnarmedAttackInfoAmmoCount,
-                    Unknown3 = MapAttackInfoWeaponSlot(slot, weapon),
+                    Unknown2 = AttackInfoRules.ResolveAmmoCount(characterWeapon, weapon, IsPlayer),
+                    Unknown3 = attackInfoSlot,
                     Unknown4 = killingHit ? 4 : 0,
                     Unknown5 = (int)result.HitType,
-                    Unknown6 = weapon != null ? 0 : PlayerUnarmedAttackInfoWeaponInstance
+                    Unknown6 = AttackInfoRules.ResolveWeaponInstance(characterWeapon, weapon, IsPlayer)
                 });
-            AnnounceHealthDamage(target, result.Damage);
+            // Weapon/unarmed auto-attacks stay AttackInfo-only. HealthDamage is for Hit/nano/status.
         }
 
         /// <summary>
@@ -853,11 +966,55 @@ namespace ZoneEngine_New.Core.Entities
 
             Stats.Set(CharacterStat.Health, newHealth, StatDetail.Base, dirty: true);
 
+            if (hpRemoved > 0)
+                OnDamaged(attacker, hpRemoved, hitType);
+
             if (newHealth > 0)
                 return false;
 
             OnDeath(attacker);
             return true;
+        }
+
+        /// <summary>
+        /// Client combat/status text for FunctionType.Hit health changes (nano damage/heals).
+        /// AOEmu field layout: TargetHealth, signed DamageAmount, DamageType=AC on damage else 0.
+        /// </summary>
+        public void AnnounceHealthDamage(
+            Character? source,
+            int targetHealthAfter,
+            int signedAmount,
+            int damageTypeStat)
+        {
+            if (signedAmount == 0)
+                return;
+
+            var message = new HealthDamageMessage
+            {
+                Identity = Identity,
+                Unknown1 = targetHealthAfter,
+                Unknown2 = signedAmount,
+                Unknown3 = signedAmount < 0 ? damageTypeStat : 0,
+                Unknown4 = 0,
+                Target = source?.Identity ?? Identity,
+                Unknown5 = 0
+            };
+
+            if (Cell != null)
+            {
+                Cell.Announce(message);
+                return;
+            }
+
+            if (this is Player targetPlayer)
+                targetPlayer.Session?.Send(message);
+
+            if (source is Player sourcePlayer && !ReferenceEquals(sourcePlayer, this))
+                sourcePlayer.Session?.Send(message);
+        }
+
+        protected virtual void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
+        {
         }
 
         internal Character? TryResolveFightingTarget()
@@ -879,33 +1036,6 @@ namespace ZoneEngine_New.Core.Entities
             return null;
         }
 
-        static int MapAttackInfoWeaponSlot(WeaponSlot slot, Item? weapon)
-        {
-            if (weapon == null)
-                return 0;
-
-            return slot switch
-            {
-                WeaponSlot.OffHand => (int)WeaponSlots.LeftHand,
-                _ => (int)WeaponSlots.Righthand
-            };
-        }
-
-        void AnnounceHealthDamage(Character target, int damage)
-        {
-            Cell?.Announce(
-                new HealthDamageMessage
-                {
-                    Identity = target.Identity,
-                    Unknown1 = target.Stats.GetOrZero(CharacterStat.Health),
-                    Unknown2 = damage,
-                    Unknown3 = (int)CharacterStat.Health,
-                    Unknown4 = 0,
-                    Target = Identity,
-                    Unknown5 = 0
-                });
-        }
-
         void OnStatChanged(CharacterStat stat, int previous, int next, bool isInitialSet)
         {
             Motor.OnStatChanged(stat, previous, next, isInitialSet);
@@ -918,7 +1048,303 @@ namespace ZoneEngine_New.Core.Entities
         }
 
 
+        #region Nano casting and buffs
+
+        readonly List<Buff> _buffs = [];
+        DateTime _nanoRechargeUntilUtc = DateTime.MinValue;
+        int _nextNanoInstance;
+        int _lastLandedNanoId;
+        int _lastLandedTargetInstance;
+        DateTime _lastLandedAtUtc = DateTime.MinValue;
+
+        /// <summary>Active NCU entries, oldest first.</summary>
+        public IReadOnlyList<Buff> Buffs => _buffs;
+
+        /// <summary>NCU consumed by friendly buffs; mirrored into CurrentNCU for the client.</summary>
+        public int UsedNcu { get; private set; }
+
+        /// <summary>0 means unlimited: NPCs carry no NCU stat.</summary>
+        public int MaxNcu => Stats.GetOrZero(CharacterStat.MaxNCU);
+
+        /// <summary>Cast bar in flight, or null when idle.</summary>
+        public PendingNanoCast? PendingCast { get; private set; }
+
+        public bool IsCastingNano => PendingCast != null;
+
+        public bool IsInNanoRecharge(DateTime nowUtc) => nowUtc < _nanoRechargeUntilUtc;
+
+        public void BeginNanoCast(PendingNanoCast cast)
+        {
+            ArgumentNullException.ThrowIfNull(cast);
+            if (this is Player) throw new InvalidOperationException("Player casts belong to the DAO-backed NanoService.");
+            PendingCast = cast;
+        }
+
+        /// <summary>
+        /// Drops a cast bar in flight. An interrupted cast never charges nano and never starts
+        /// a recharge lockout, so spam-cancelling a cast buys nothing. Callers that need the
+        /// client cast bar cleared should go through <see cref="NanoRuntime.InterruptCast"/>.
+        /// </summary>
+        public void CancelNanoCast() => PendingCast = null;
+
+        /// <summary>
+        /// Post-cast lockout before the next nano. Caster-wide rather than per-nano, a UTC
+        /// deadline rather than a countdown, and never persisted: a relog clears it.
+        /// It does not gate weapon attacks or specials.
+        /// </summary>
+        public void StartNanoRecharge(int centiseconds, DateTime nowUtc)
+        {
+            if (centiseconds <= 0)
+                return;
+
+            _nanoRechargeUntilUtc = nowUtc.AddMilliseconds(centiseconds * 10L);
+        }
+
+        public void ClearNanoRecharge() => _nanoRechargeUntilUtc = DateTime.MinValue;
+
+        /// <summary>
+        /// Client often emits CastNano + CastNanoSpell (or duplicates) for one click. A second
+        /// land of the same nano on the same target inside this window is treated as a no-op.
+        /// </summary>
+        public const int DuplicateNanoLandWindowMilliseconds = 500;
+
+        public void RememberNanoLanded(int nanoId, Identity target, DateTime nowUtc)
+        {
+            _lastLandedNanoId = nanoId;
+            _lastLandedTargetInstance = target.Instance == 0 ? Identity.Instance : target.Instance;
+            _lastLandedAtUtc = nowUtc;
+        }
+
+        public bool IsDuplicateRecentNanoLand(int nanoId, Identity target, DateTime nowUtc)
+        {
+            if (_lastLandedNanoId != nanoId)
+                return false;
+
+            int targetInstance = target.Instance == 0 ? Identity.Instance : target.Instance;
+            if (_lastLandedTargetInstance != targetInstance)
+                return false;
+
+            return (nowUtc - _lastLandedAtUtc).TotalMilliseconds < DuplicateNanoLandWindowMilliseconds;
+        }
+
+        /// <summary>
+        /// Claims a nano land for this window. Returns false when the same nano/target already
+        /// landed recently so duplicate Complete paths do not spend nano or hit the wire twice.
+        /// </summary>
+        public bool TryClaimNanoLand(int nanoId, Identity target, DateTime nowUtc)
+        {
+            if (IsDuplicateRecentNanoLand(nanoId, target, nowUtc))
+                return false;
+
+            RememberNanoLanded(nanoId, target, nowUtc);
+            return true;
+        }
+
+        /// <summary>
+        /// Runs the strain / stacking / NCU gate and lands <paramref name="spell"/> when it passes.
+        /// <paramref name="replaced"/> is the entry this buff pushed out, which the caller still
+        /// has to announce as removed.
+        /// </summary>
+        public BuffApplyDecision TryApplyBuff(
+            NanoSpell spell,
+            Identity source,
+            DateTime nowUtc,
+            out Buff? applied,
+            out Buff? replaced)
+        {
+            ArgumentNullException.ThrowIfNull(spell);
+            if (this is Player) throw new InvalidOperationException("Player buffs belong to the DAO-backed NanoService.");
+
+            applied = null;
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, _buffs, MaxNcu, out replaced);
+            if (decision != BuffApplyDecision.Apply && decision != BuffApplyDecision.Replace)
+                return decision;
+
+            if (replaced != null)
+                _buffs.Remove(replaced);
+
+            applied = Buff.Create(spell, source, ++_nextNanoInstance, nowUtc);
+            _buffs.Add(applied);
+
+            OnBuffsChanged();
+            return decision;
+        }
+
+        /// <summary>
+        /// Puts a persisted buff back in NCU at login. Skips strain and NCU checks: the set was
+        /// already legal when it was stored, and an expired deadline is dropped by the caller.
+        /// </summary>
+        public Buff? TryRestoreBuff(NanoSpell spell, Identity source, int nanoInstance, DateTime expiresAtUtc)
+        {
+            ArgumentNullException.ThrowIfNull(spell);
+            if (this is Player) throw new InvalidOperationException("Player hydration belongs to the DAO-backed NanoService.");
+
+            if (!spell.IsBuff || TryGetBuff(spell.Id, out _))
+                return null;
+
+            Buff buff = Buff.Restore(spell, source, nanoInstance, expiresAtUtc);
+            _buffs.Add(buff);
+            if (nanoInstance > _nextNanoInstance)
+                _nextNanoInstance = nanoInstance;
+
+            OnBuffsChanged();
+            return buff;
+        }
+
+        public bool TryGetBuff(int nanoId, out Buff? buff)
+        {
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                if (_buffs[i].Id != nanoId)
+                    continue;
+
+                buff = _buffs[i];
+                return true;
+            }
+
+            buff = null;
+            return false;
+        }
+
+        public BuffRemovalOutcome TryRemoveBuff(int nanoId, BuffRemovalReason reason, out Buff? removed)
+        {
+            removed = null;
+            if (!TryGetBuff(nanoId, out Buff? buff) || buff == null)
+                return BuffRemovalOutcome.NotFound;
+
+            if (!buff.TryCancel(reason))
+                return BuffRemovalOutcome.NotCancellable;
+
+            _buffs.Remove(buff);
+            removed = buff;
+            OnBuffsChanged();
+            return BuffRemovalOutcome.Removed;
+        }
+
+        /// <summary>
+        /// Empties NCU. Used by death and playfield exit, which ignore
+        /// <see cref="ItemTemplate.CanCancel"/>.
+        /// </summary>
+        public List<Buff> RemoveAllBuffs(BuffRemovalReason reason)
+        {
+            if (_buffs.Count == 0)
+                return [];
+
+            var removed = new List<Buff>(_buffs);
+            _buffs.Clear();
+            OnBuffsChanged();
+            return removed;
+        }
+
+        /// <summary>Removes and returns every buff whose deadline has passed.</summary>
+        public List<Buff> DrainExpiredBuffs(DateTime nowUtc)
+        {
+            List<Buff>? expired = null;
+            for (int i = _buffs.Count - 1; i >= 0; i--)
+            {
+                if (!_buffs[i].IsExpired(nowUtc))
+                    continue;
+
+                expired ??= [];
+                expired.Add(_buffs[i]);
+                _buffs.RemoveAt(i);
+            }
+
+            if (expired == null)
+                return [];
+
+            OnBuffsChanged();
+            return expired;
+        }
+
+        void OnBuffsChanged()
+        {
+            SyncUsedNcu();
+            MarkRebaseDirty();
+        }
+
+        void SyncUsedNcu()
+        {
+            int used = 0;
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                if (!_buffs[i].IsHostile)
+                    used += _buffs[i].NcuCost;
+            }
+
+            if (used == UsedNcu)
+                return;
+
+            UsedNcu = used;
+            Stats.Set(CharacterStat.CurrentNCU, used, StatDetail.Base, dirty: true);
+        }
+
+        /// <summary>
+        /// NCU entries for a spawn packet, so a client that just gained visibility sees the same
+        /// buffs and remaining durations as one that watched them land.
+        /// </summary>
+        protected ActiveNano[] BuildActiveNanos()
+        {
+            if (_buffs.Count == 0)
+                return [];
+
+            DateTime nowUtc = DateTime.UtcNow;
+            var nanos = new ActiveNano[_buffs.Count];
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                Buff buff = _buffs[i];
+                int remaining = buff.RemainingCentiseconds(nowUtc);
+                nanos[i] = new ActiveNano
+                {
+                    NanoIdentity = new Identity
+                    {
+                        Type = IdentityType.NanoProgram,
+                        Instance = buff.Id
+                    },
+                    NanoInstance = buff.NanoInstance,
+                    Time1 = remaining,
+                    Time2 = remaining
+                };
+            }
+
+            return nanos;
+        }
+
+        /// <summary>
+        /// Adds active buff bonuses. Runs at the end of a rebase, after the equipment pass has
+        /// cleared bonuses, so buffs never need an inverse operation when they drop.
+        /// </summary>
+        protected void ApplyBuffBonuses()
+        {
+            for (int i = 0; i < _buffs.Count; i++)
+                StatModifierSpells.Apply(_buffs[i].ModifierSpells, Stats);
+        }
+
+        /// <summary>
+        /// Requests a stat rebase at the next safe point in the tick. Batched so a burst of buff
+        /// changes recomputes bonuses once. Playfield-less characters rebase inline.
+        /// </summary>
+        public void MarkRebaseDirty()
+        {
+            Playfield? playfield = Playfield;
+            if (playfield == null)
+            {
+                RebaseStats();
+                return;
+            }
+
+            playfield.QueueRebase(this);
+        }
+
+        #endregion
+
         public abstract void Rebase();
+
+        /// <summary>
+        /// Recomputes the bonus layer and anything derived from it, without touching weapons.
+        /// Buff changes take this path: re-arming would reset swing timers mid-fight.
+        /// </summary>
+        public abstract void RebaseStats();
 
         public abstract void RebaseWeapons();
 
@@ -931,11 +1357,22 @@ namespace ZoneEngine_New.Core.Entities
             return Math.Max(0.05, delayCentiseconds / 100.0);
         }
 
-        protected void ArmFromItem(WeaponSlot slot, Item item)
+        protected void ArmFromItem(WeaponSlot slot, Item item, int wireSlot = -1, string? sawHash = null)
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            var weapon = new CharacterWeapon { Item = item };
+            var weapon = new CharacterWeapon
+            {
+                Item = item,
+                WireSlot = wireSlot
+            };
+
+            if (wireSlot >= 0 && TryPackSawHash(sawHash, out int tag, out string tagName))
+            {
+                weapon.SawTag = tag;
+                weapon.SawTagName = tagName;
+            }
+
             weapon.ConfigureBaseSpeeds(
                 NormalizeDelayCentisecondsToSeconds(
                     item.GetStat(CharacterStat.AttackDelay),
@@ -944,6 +1381,25 @@ namespace ZoneEngine_New.Core.Entities
                     item.GetStat(CharacterStat.RechargeDelay),
                     CharacterWeapon.DefaultRechargeSpeedSeconds));
             SetWeapon(slot, weapon);
+        }
+
+        /// <summary>Packs a 4-char SAW hash (e.g. SIW1) into the AttackInfo/SAW int + name.</summary>
+        protected static bool TryPackSawHash(string? hash, out int tag, out string tagName)
+        {
+            tag = 0;
+            tagName = string.Empty;
+            if (string.IsNullOrWhiteSpace(hash))
+                return false;
+
+            tagName = hash.Trim().ToUpperInvariant();
+            if (tagName.Length > 4)
+                tagName = tagName.Substring(0, 4);
+            else if (tagName.Length < 4)
+                tagName = tagName.PadRight(4);
+
+            byte[] bytes = Encoding.ASCII.GetBytes(tagName);
+            tag = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+            return tag != 0;
         }
 
         protected void ArmMartialArtsFist(IItemBuilder items, WeaponSlot slot)
@@ -956,6 +1412,8 @@ namespace ZoneEngine_New.Core.Entities
             (int lowId, int highId, int quality) = MartialArtsFistResolver.Resolve(profession, maSkill);
             Item fist = items.Create(lowId, highId, quality, ItemSource.Other);
             ArmFromItem(slot, fist);
+            if (Weapons.TryGetValue(slot, out CharacterWeapon? armed) && armed != null)
+                armed.IsSyntheticFist = true;
         }
 
         /// <summary>
@@ -1046,20 +1504,27 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Equipped-hand WeaponItemFullUpdate messages for observers (after SCFU).
-        /// Default empty; <see cref="Player"/> builds from inventory; NPCs stub empty for now.
+        /// Default empty; <see cref="Player"/> and <see cref="NpcCharacter"/> override.
         /// </summary>
         public virtual List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
             => new();
 
         /// <summary>
         /// Builds one WIFU for an equipped hand-slot item, or null when the item should not be announced.
+        /// Fists and NPC tag-backed natural weapons are omitted — AttackInfo/SAW carry those hits.
         /// </summary>
-        protected WeaponItemFullUpdateMessage? TryBuildWeaponItemFullUpdate(Item item, int equipmentSlot)
+        protected WeaponItemFullUpdateMessage? TryBuildWeaponItemFullUpdate(
+            Item item,
+            int equipmentSlot,
+            CharacterWeapon? armed = null)
         {
-            if (item == null
-                || item.InstanceId == 0
-                || !item.IsWieldableCombatWeapon())
+            if (!AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(item, armed))
                 return null;
+
+            int weaponInstanceId = Playfield != null
+                ? Playfield.AllocateWeaponInstanceId()
+                : item.InstanceId;
+            int playfieldId = Playfield != null ? Playfield.Identity.Instance : 0;
 
             int flags = item.Flags > 0 ? item.Flags : 0x403;
             int multipleCount = item.StackCount > 0 ? item.StackCount : 1;
@@ -1082,13 +1547,16 @@ namespace ZoneEngine_New.Core.Entities
             if (rechargeDelay > 0)
                 stats.Add(StatTuple(CharacterStat.RechargeDelay, (uint)rechargeDelay));
 
-            // TEMP: playfield-scoped incrementing WeaponInstance id (not inventory item.InstanceId).
+            int damageType = item.GetStat(CharacterStat.DamageType);
+            if (damageType > 0)
+                stats.Add(StatTuple(CharacterStat.DamageType, (uint)damageType));
+
             return new WeaponItemFullUpdateMessage
             {
                 Identity = new Identity
                 {
                     Type = IdentityType.WeaponInstance,
-                    Instance = Playfield!.AllocateWeaponInstanceId()
+                    Instance = weaponInstanceId
                 },
                 Unknown = 0,
                 Unknown1 = 0x0b,
@@ -1097,7 +1565,7 @@ namespace ZoneEngine_New.Core.Entities
                     Type = IdentityType.CanbeAffected,
                     Instance = Identity.Instance
                 },
-                PlayfieldId = Playfield != null ? Playfield.Identity.Instance : 0,
+                PlayfieldId = playfieldId,
                 StateMachine = new Identity
                 {
                     Type = (IdentityType)0x000F424F,
@@ -1221,7 +1689,8 @@ namespace ZoneEngine_New.Core.Entities
                 RunSpeedBase = (short)runSpeedBase,
                 Flags2 = 0,
                 Unknown2 = 0,
-                ActiveNanos = [],
+                ActiveNanos = BuildActiveNanos(),
+                Waypoints = Motor.CopyRemainingWaypoints(),
                 Textures = BuildTextures(isNpc),
                 Meshes = BuildMeshes(headMesh)
             };
@@ -1330,8 +1799,6 @@ namespace ZoneEngine_New.Core.Entities
             {
                 scfu.HeadMesh = (uint)headMesh;
             }
-
-            // ActiveNanos / Waypoints not wired on Character yet.
 
             return scfu;
         }

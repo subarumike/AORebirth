@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
     using Utility;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Metrics;
 
     internal enum CellHeat
     {
@@ -85,14 +86,21 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                     _tickDynelBuffer.Add(dynel);
 
                 for (int i = 0; i < _tickDynelBuffer.Count; i++)
-                    _tickDynelBuffer[i].Tick(heartbeatDeltaTime);
+                {
+                    Dynel dynel = _tickDynelBuffer[i];
+                    TickStallWatch.Stage("heat.dynel.indoor", dynel.Identity.Instance);
+                    dynel.Tick(heartbeatDeltaTime);
+                }
 
+                TickStallWatch.Stage("heat.indoorspawn");
                 _onIndoorSpawnTick?.Invoke();
                 return;
             }
 
             DateTime now = DateTime.UtcNow;
+            TickStallWatch.Stage("heat.context");
             CollectHeatContext(tracked);
+            TickStallWatch.Stage("heat.transitions");
             TrackHeatTransitions(now, heartbeatDeltaTime);
         }
 
@@ -153,7 +161,10 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 if (heat == CellHeat.Asleep)
                 {
                     if (!isNewCell && previousHeat != CellHeat.Asleep)
+                    {
+                        TickStallWatch.Stage("heat.cellsleep", cellId);
                         _onCellSleep?.Invoke(cellId);
+                    }
 
                     // Keep last-tick current so wake does not dump the full sleep duration as delta.
                     _lastTickUtcByCell[cellId] = now;
@@ -172,6 +183,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 }
 
                 _lastTickUtcByCell[cellId] = now;
+                TickStallWatch.Stage("heat.cellspawn", cellId);
                 _onCellTick?.Invoke(cellId);
 
                 // Snapshot: Tick may despawn NPCs and spawn corpses into this cell.
@@ -180,7 +192,11 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                     _tickDynelBuffer.Add(dynel);
 
                 for (int i = 0; i < _tickDynelBuffer.Count; i++)
-                    _tickDynelBuffer[i].Tick(elapsed);
+                {
+                    Dynel dynel = _tickDynelBuffer[i];
+                    TickStallWatch.Stage("heat.dynel", dynel.Identity.Instance);
+                    dynel.Tick(elapsed);
+                }
             }
 
             List<int> staleCells = new();
@@ -351,6 +367,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             if (dynel is Character { IsDead: false } character && character.FightingTarget.Instance != 0)
                 return true;
 
+            if (dynel is NpcCharacter { IsDead: false, IsAiBusy: true })
+                return true;
+
             int selectedTarget = dynel.Stats.Get(CharacterStat.SelectedTarget);
             return !StatCollection.IsUnset(selectedTarget) && selectedTarget != 0;
         }
@@ -361,6 +380,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             return !StatCollection.IsUnset(petMaster)
                    && petMaster != 0
                    && connectedPlayerInstances.Contains(petMaster);
+        }
+
+        private static bool IsVendor(Dynel dynel)
+        {
+            if (dynel is VendingMachine)
+                return true;
+
+            return dynel is NpcCharacter npc && npc.Shop != null && !npc.IsDead;
         }
     }
 }

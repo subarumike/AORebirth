@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Playfield
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.Core.Textures;
+
     using AODB.Common.RDBObjects;
 
     using Microsoft.Extensions.DependencyInjection;
@@ -11,16 +13,19 @@ namespace ZoneEngine_New.Core.Playfield
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -38,7 +43,6 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IGameData _gameData;
         private readonly IItemBuilder _items;
         private readonly HashItemMinter _hashItems;
-        private readonly IItemInstanceIdAllocator _ids;
         private readonly InventoryFlushService _flush;
         private readonly TradeService _trades;
         private readonly CharacterSnapshotService _snapshot;
@@ -52,7 +56,6 @@ namespace ZoneEngine_New.Core.Playfield
             IGameData gameData,
             IItemBuilder items,
             HashItemMinter hashItems,
-            IItemInstanceIdAllocator ids,
             InventoryFlushService flush,
             TradeService trades,
             CharacterSnapshotService snapshot)
@@ -65,7 +68,6 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
             ArgumentNullException.ThrowIfNull(hashItems);
-            ArgumentNullException.ThrowIfNull(ids);
             ArgumentNullException.ThrowIfNull(flush);
             ArgumentNullException.ThrowIfNull(trades);
             ArgumentNullException.ThrowIfNull(snapshot);
@@ -78,7 +80,6 @@ namespace ZoneEngine_New.Core.Playfield
             _gameData = gameData;
             _hashItems = hashItems;
             _items = items;
-            _ids = ids;
             _flush = flush;
             _trades = trades;
             _snapshot = snapshot;
@@ -95,7 +96,15 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentException.ThrowIfNullOrEmpty(hash);
             ArgumentNullException.ThrowIfNull(position);
 
-            MobTemplate template = _gameData.RequireMobTemplate(hash);
+            if (!_gameData.TryResolveMobTemplate(hash, level, out MobTemplate template))
+            {
+                throw new KeyNotFoundException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Mob template hash '{0}' not found",
+                        hash));
+            }
+
             NpcContentAcceptance.RequireSpawnable(template);
             NpcTemplateLevelPolicy.RequireExactLevel(template, level);
             Identity identity = _registry.AllocateNpcIdentity();
@@ -104,6 +113,7 @@ namespace ZoneEngine_New.Core.Playfield
                 Playfield = _playfield,
                 Name = template.Name,
                 MobTemplate = template,
+                Attackable = template.Attackable,
                 Position = position,
                 Rotation = heading ?? new Quaternion(),
                 SpawnSource = spawnSource
@@ -112,8 +122,12 @@ namespace ZoneEngine_New.Core.Playfield
             foreach (var entry in _gameData.ComposeNpcStats(template, level))
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
+            ApplyTextures(npc, template);
+            npc.FillEquipment(_gameData, _logger);
             npc.Rebase();
-            TryAttachShop(npc, template);
+            TryAttachShop(npc);
+            if (npc.Shop == null && npc.Attackable)
+                NpcBrain.Create(npc, position, NpcAiProfiles.Resolve(template.Hash));
 
             _registry.Register(npc);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(npc);
@@ -121,10 +135,11 @@ namespace ZoneEngine_New.Core.Playfield
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Spawned mob hash={0} name={1} id={2} at ({3},{4},{5})",
+                    "Spawned mob hash={0} name={1} id={2} level={3} at ({4},{5},{6})",
                     template.Hash,
                     template.Name,
                     identity.Instance,
+                    npc.Stats.GetOrZero(CharacterStat.Level),
                     position.xf,
                     position.yf,
                     position.zf));
@@ -132,13 +147,60 @@ namespace ZoneEngine_New.Core.Playfield
             return npc;
         }
 
+        static void ApplyTextures(NpcCharacter npc, MobTemplate template)
+        {
+            Dictionary<int, int>? textures = template.Textures;
+            if (textures == null)
+                return;
+
+            foreach (KeyValuePair<int, int> entry in textures)
+            {
+                if (entry.Value <= 0)
+                    continue;
+
+                npc.Textures.Add(new AOTextures(entry.Key, entry.Value));
+            }
+        }
+
         /// <summary>
         /// Turns an NPC into a vendor when its equipment carries a shop item. A shop item is an
         /// equipment entry with both vendor price modifiers set, which is how the live templates mark
         /// the machine an NPC is standing behind.
         /// </summary>
-        void TryAttachShop(NpcCharacter npc, MobTemplate template)
+        void TryAttachShop(NpcCharacter npc)
         {
+            int last = npc.Equipment.Offset + npc.Equipment.Capacity;
+            for (int slot = npc.Equipment.Offset; slot < last; slot++)
+            {
+                if (!npc.Equipment.Content.TryGetValue(slot, out Item? item) || item == null)
+                    continue;
+                if (!IsShopItem(item.Definition))
+                    continue;
+
+                var machine = new VendingMachine(_registry.AllocateVendingMachineIdentity(), item.Definition)
+                {
+                    Playfield = _playfield,
+                    Position = npc.Position,
+                    Rotation = npc.Rotation,
+                    SpawnSource = SpawnSource.None
+                };
+                npc.AttachShop(machine);
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Attached shop to NPC id={0} name={1} shopTemplate={2} machine={3}",
+                        npc.Identity.Instance,
+                        npc.Name,
+                        item.Definition.Id,
+                        machine.Identity.Instance));
+                return;
+            }
+
+            MobTemplate? template = npc.MobTemplate;
+            if (template == null)
+                return;
+
             List<List<int>> equipment = template.Equipment;
             for (int i = 0; i < equipment.Count; i++)
             {
@@ -199,7 +261,7 @@ namespace ZoneEngine_New.Core.Playfield
                 corpse.ReservedUntilUtc = DateTime.UtcNow.AddSeconds(Corpse.LootReserveSeconds);
             }
 
-            corpse.ResolveLoot(_hashItems, _ids);
+            corpse.ResolveLoot(_hashItems);
 
             _registry.Register(corpse);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(corpse);
@@ -254,6 +316,7 @@ namespace ZoneEngine_New.Core.Playfield
             };
 
             ItemTemplate template = _items.CreateTemplate(record.TemplateId, record.TemplateId, 1);
+            template = DynelEventSpells.WithOnUseFromDynel(template, record);
             StaticDynel dynel;
             if (MissionTerminal.IsMissionTerminalType(identity.Type))
                 dynel = new MissionTerminal(identity, template);
@@ -613,9 +676,7 @@ namespace ZoneEngine_New.Core.Playfield
             DateTime now = DateTime.UtcNow;
             foreach (Player player in _registry.PlayerEntities())
             {
-                if (player.ConnectionPhase != PlayerConnectionPhase.LinkDead)
-                    continue;
-                if (player.LinkDeadUntilUtc == null || player.LinkDeadUntilUtc > now)
+                if (!player.HasLinkDeadExpired(now))
                     continue;
 
                 DespawnPlayer(player);
@@ -656,6 +717,62 @@ namespace ZoneEngine_New.Core.Playfield
                     "Player {0} left playfield {1} for transfer",
                     player.Identity.Instance,
                     _playfield.Identity.Instance));
+        }
+
+        /// <summary>
+        /// Death respawn when the hospital is on the current playfield. Mirrors live in-zone respawn:
+        /// N3Teleport, playfield ready block, self spawn packets, then DeathRespawn action.
+        /// </summary>
+        public void CompleteSamePlayfieldDeathRespawn(Player player, Vector3 landing)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(landing);
+
+            IZoneSession? session = player.Session;
+            if (session == null)
+                return;
+
+            int characterId = player.Identity.Instance;
+            int playfieldId = _playfield.Identity.Instance;
+
+            session.SendSamePlayfieldRespawnTeleport(landing);
+            player.Position = landing;
+
+            session.Send(
+                _playfield.CreatePlayfieldAnarchyFMessage(
+                    new SmokeLounge.AOtomation.Messaging.GameData.Vector3
+                    {
+                        X = landing.xf,
+                        Y = landing.yf,
+                        Z = landing.zf
+                    }),
+                playfieldId,
+                characterId);
+
+            SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
+            ScfuSendLog.Write(spawn);
+            session.Send(spawn);
+            foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
+                session.Send(wifu);
+            session.Send(player.BuildFullCharacterMessage());
+
+            session.Send(
+                new GameTimeMessage
+                {
+                    Identity = new Identity
+                    {
+                        Type = IdentityType.CanbeAffected,
+                        Instance = characterId
+                    },
+                    Unknown1 = 30024.0f,
+                    Unknown3 = 185408,
+                    Unknown4 = 80183.3125f
+                },
+                playfieldId,
+                characterId);
+
+            _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+            player.SendDeathRespawnAction();
         }
 
         /// <summary>

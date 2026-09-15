@@ -33,6 +33,7 @@ namespace ZoneEngine_New.Core.Data
         internal static PersistedItemData Map(ItemInstanceRecord v) => new PersistedItemData { InstanceId = v.InstanceId, ContainerType = v.ContainerType, ContainerInstance = v.ContainerInstance, ContainerPlacement = v.ContainerPlacement, ItemType = v.ItemType, LowId = v.LowId, HighId = v.HighId, Quality = v.Quality, StackCount = v.StackCount, Source = (int)v.Source };
         internal static ItemInstanceRecord Map(PersistedItemData v) => new ItemInstanceRecord { InstanceId = v.InstanceId, ContainerType = v.ContainerType, ContainerInstance = v.ContainerInstance, ContainerPlacement = v.ContainerPlacement, ItemType = v.ItemType, LowId = v.LowId, HighId = v.HighId, Quality = v.Quality, StackCount = v.StackCount, Source = (AORebirth.Enums.ItemSource)v.Source };
 
-        internal static ItemLocationData Map(ItemLocationUpdate v) => new() { InstanceId = v.InstanceId, ContainerType = v.ContainerType, ContainerInstance = v.ContainerInstance, ContainerPlacement = v.ContainerPlacement };
+        internal static ItemLocationData Map(ItemLocationUpdate v) => new() { InstanceId = v.InstanceId, ContainerType = v.ContainerType, ContainerInstance = v.ContainerInstance, ContainerPlacement = v.ContainerPlacement,
+            StackCount = v.StackCount is { } count ? Math.Max(1, count) : null };
     }
 }

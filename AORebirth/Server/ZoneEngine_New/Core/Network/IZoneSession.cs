@@ -13,6 +13,8 @@ namespace ZoneEngine_New.Core.Network
 
         Player? Player { get; }
 
+        bool IsClosed => State == SessionState.Closed;
+
         void BindPlayer(Player player);
 
         /// <summary>Clears session→player without world teardown (used after LinkDead / steal / despawn).</summary>
@@ -23,6 +25,11 @@ namespace ZoneEngine_New.Core.Network
         /// <summary>Transfers with an explicit destination heading; implementations must not silently discard it.</summary>
         void TransferToPlayfield(Playfield destination, Vector3 landing, AORebirth.Core.Vector.Quaternion heading)
             => throw new System.NotSupportedException("This session does not support an explicit transfer heading.");
+        /// <summary>
+        /// In-zone death respawn: N3Teleport with ChangePlayfield set to the current playfield.
+        /// </summary>
+        void SendSamePlayfieldRespawnTeleport(Vector3 landing)
+            => throw new System.NotSupportedException("This session does not support a same-playfield respawn.");
 
         void Send(byte[] packet);
 

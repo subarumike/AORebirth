@@ -577,6 +577,28 @@ namespace ZoneEngine_New.Core.Inventory
                 _dirty[item.InstanceId] = entry;
         }
 
+        /// <summary>
+        /// Retires an item that no longer exists anywhere. A persisted item is re-homed under
+        /// <paramref name="graveyard"/>; an item that was never written is dropped from the pending
+        /// set instead, so no row is ever created for it.
+        /// </summary>
+        public void Discard(Item item, Identity graveyard)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            if (item.InstanceId <= 0)
+                return;
+
+            if (item.IsPersisted)
+            {
+                MarkOrphaned(item, graveyard);
+                return;
+            }
+
+            lock (_dirtyGate)
+                _dirty.Remove(item.InstanceId);
+        }
+
         public bool HasDirtyEntries
         {
             get
@@ -636,10 +658,6 @@ namespace ZoneEngine_New.Core.Inventory
 
                 if (!item.IsPersisted)
                 {
-                    int itemType = item.Identity.Type != IdentityType.None
-                        ? (int)item.Identity.Type
-                        : item.Definition.ItemType;
-
                     inserts.Add(
                         new ItemInstanceRecord
                         {
@@ -647,7 +665,7 @@ namespace ZoneEngine_New.Core.Inventory
                             ContainerType = entry.ContainerType,
                             ContainerInstance = entry.ContainerInstance,
                             ContainerPlacement = entry.ContainerPlacement,
-                            ItemType = itemType,
+                            ItemType = item.ResolvedItemType,
                             LowId = item.LowId,
                             HighId = item.HighId,
                             Quality = item.Quality,
@@ -663,7 +681,8 @@ namespace ZoneEngine_New.Core.Inventory
                             item.InstanceId,
                             entry.ContainerType,
                             entry.ContainerInstance,
-                            entry.ContainerPlacement));
+                            entry.ContainerPlacement,
+                            item.StackCount));
                 }
             }
 
@@ -724,102 +743,10 @@ namespace ZoneEngine_New.Core.Inventory
             if (!IsHydrated)
                 return;
 
-            ApplyWearPage(Equipment, includeWield: true, stats);
-            ApplyWearPage(Armor, includeWield: false, stats);
-            ApplyWearPage(Implant, includeWield: false, stats);
-            ApplyWearPage(Social, includeWield: false, stats);
-        }
-
-        static void ApplyWearPage(Container page, bool includeWield, StatCollection stats)
-        {
-            int last = page.Offset + page.Capacity;
-            for (int slot = page.Offset; slot < last; slot++)
-            {
-                if (!page.Content.TryGetValue(slot, out Item? item) || item?.Definition == null)
-                    continue;
-
-                ApplyWearItem(item, includeWield, stats);
-            }
-        }
-
-        static void ApplyWearItem(Item item, bool includeWield, StatCollection stats)
-        {
-            Dictionary<EventType, List<ItemSpell>> spells = item.SpellList;
-            if (spells.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
-                ApplyWearSpells(wear, stats);
-
-            if (includeWield && spells.TryGetValue(EventType.OnWield, out List<ItemSpell>? wield))
-                ApplyWearSpells(wield, stats);
-        }
-
-        static void ApplyWearSpells(List<ItemSpell> spells, StatCollection stats)
-        {
-            for (int i = 0; i < spells.Count; i++)
-            {
-                ItemSpell spell = spells[i];
-                FunctionType function = (FunctionType)spell.FunctionType;
-                if (function != FunctionType.Modify && function != FunctionType.ScalingModify)
-                    continue;
-                if (!MeetsSpellRequirements(spell, stats))
-                    continue;
-                if (!TryReadModify(spell, out CharacterStat stat, out int delta))
-                    continue;
-                if (stat == CharacterStat.Cash)
-                    continue;
-
-                stats.AddBonus(stat, delta, dirty: true);
-            }
-        }
-
-        static bool MeetsSpellRequirements(ItemSpell spell, StatCollection stats)
-        {
-            for (int i = 0; i < spell.Requirements.Count; i++)
-            {
-                ItemRequirement requirement = spell.Requirements[i];
-                int value = stats.Get((CharacterStat)requirement.StatNumber);
-                if (!ItemTemplate.EvaluateRequirement(value, requirement))
-                    return false;
-            }
-
-            return true;
-        }
-
-        static bool TryReadModify(ItemSpell spell, out CharacterStat stat, out int delta)
-        {
-            stat = default;
-            delta = 0;
-            if (spell.Arguments.Count < 2)
-                return false;
-            if (!TryGetInt(spell.Arguments[0], out int statId) || !TryGetInt(spell.Arguments[1], out delta))
-                return false;
-
-            stat = (CharacterStat)statId;
-            return true;
-        }
-
-        static bool TryGetInt(object? value, out int result)
-        {
-            switch (value)
-            {
-                case int i:
-                    result = i;
-                    return true;
-                case long l:
-                    result = (int)l;
-                    return true;
-                case uint u:
-                    result = (int)u;
-                    return true;
-                case short s:
-                    result = s;
-                    return true;
-                case byte b:
-                    result = b;
-                    return true;
-                default:
-                    result = 0;
-                    return false;
-            }
+            WearBonusApplier.ApplyContainer(Equipment, includeWield: true, stats);
+            WearBonusApplier.ApplyContainer(Armor, includeWield: false, stats);
+            WearBonusApplier.ApplyContainer(Implant, includeWield: false, stats);
+            WearBonusApplier.ApplyContainer(Social, includeWield: false, stats);
         }
 
         public IEnumerable<InventorySlot> BuildInventorySlots()
