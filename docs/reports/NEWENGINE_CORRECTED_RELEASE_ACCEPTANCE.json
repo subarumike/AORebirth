@@ -1,0 +1,110 @@
+{
+  "accepted_runtime_source_sha": "31c73fc142be2e12994f2af6b23095c0f541e032",
+  "corrected_release_source_sha": "a7d5b6f8f0a69d190189140e242847f01eeb9c4b",
+  "tracked_source_clean": true,
+  "windows_acceptance": "PASS",
+  "native_linux_acceptance": "PASS",
+  "newengine_tests": {
+    "windows": 580,
+    "linux": 580
+  },
+  "aotomation_tests": 1129,
+  "mandatory_gates": 12,
+  "deployment_tests": 64,
+  "package_regressions": 14,
+  "character_dao_checks": 551,
+  "account_dao_checks": 303,
+  "mission_dao_checks": 261,
+  "mission_isolated_checks": 275,
+  "connected_acceptance": "PASS",
+  "disposable_schema_acceptance": "PASS",
+  "dao_architecture_guard": "PASS",
+  "runtime_source_change_required": false,
+  "logs": [
+    {
+      "file": "windows-windows.log",
+      "sha256": "4cab3dbfd2ae58af912783db3a526d5356a751738d7d5cfbc264e7c611e2bd1b",
+      "required_markers": [
+        "WINDOWS_ACCEPTANCE=PASS",
+        "DAO_ARCHITECTURE_GUARD=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "linux-host.log",
+      "sha256": "139ed77a122b76f59fb51e0fca8cf0730dffb5051b90895f8389fa0fc9dc8f39",
+      "required_markers": [
+        "LINUX_ACCEPTANCE=PASS",
+        "production deployment workflow tests (64/64)",
+        "RELEASE_PACKAGE_REGRESSIONS=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "windows-connected.log",
+      "sha256": "004c2828a6b49b0966130a45d216e6defeae175216ea97a900ac388e67dedd28",
+      "required_markers": [
+        "LOGIN_WIRE_ACCEPTANCE=PASS CONNECTED_POSITIVE_LIFECYCLE=PASS",
+        "DISPOSABLE_CLEANUP=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "windows-schema.log",
+      "sha256": "1f02488c5b26b23a21785a82ae7c371bd046b241d90c3b8e13d9a34cdfb4c2ee",
+      "required_markers": [
+        "SCHEMA_NEGATIVE_TEST=PASS SCHEMA_CURRENT_TEST=PASS",
+        "DISPOSABLE_CLEANUP=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "windows-character-dao.log",
+      "sha256": "a43cdef098480d3a94450889f849c15630bc4ee62acc9926a9ef33aea646f3c7",
+      "required_markers": [
+        "CHARACTER_DAO_CHECKS=551",
+        "CHARACTER_DAO_MYSQL_INTEGRATION=PASS",
+        "CHARACTER_DAO_DISPOSABLE_CLEANUP=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "windows-account-dao.log",
+      "sha256": "7723a79f2cec9850afdf680d0836c0ad650d7483129ee7104a6e0d31aaf043b9",
+      "required_markers": [
+        "ACCOUNT_DAO_CHECKS=303",
+        "ACCOUNT_DAO_MYSQL_INTEGRATION=PASS",
+        "ACCOUNT_DAO_DISPOSABLE_CLEANUP=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "windows-mission-dao.log",
+      "sha256": "7f7c36df0cb17f023856e2b9e984f18aa7886e10484c4b526c51fd3014fdeb49",
+      "required_markers": [
+        "MISSION_DAO_CHECKS=261",
+        "MISSION_DAO_MYSQL_INTEGRATION=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "windows-mission-isolated.log",
+      "sha256": "fcf4c78decb771fd43bdbb2fb4ca644c1e412a5e44bedad93028633e2e917489",
+      "required_markers": [
+        "MISSION_DAO_CHECKS=275",
+        "MISSION_DAO_MYSQL_INTEGRATION=PASS"
+      ],
+      "result": "PASS"
+    },
+    {
+      "file": "extracted-package.log",
+      "sha256": "7dbc9d4270c35da67535f1394e64d884f807e7050c51ddb0fd87915cca15ef88",
+      "required_markers": [
+        "FINAL_ARCHIVE_PROVENANCE=PASS",
+        "GAMEDATA_INVENTORY=PASS",
+        "NO_CHECKOUT_DEPENDENCY=YES"
+      ],
+      "result": "PASS"
+    }
+  ]
+}
