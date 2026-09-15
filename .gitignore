@@ -112,7 +112,6 @@ UpgradeLog*.XML
 /*/AO.Core.XML
 /AORebirth/Built
 AORebirth/GameData/Playfields/
-# Private operator data must not be committed.
 AORebirth/GameData/items.dat
 AORebirth/_dotMemory.AORebirth/
 AORebirth/AORebirth.sln.DotSettings
