@@ -160,7 +160,7 @@
     <Compile Include="../ZoneEngine/Core/Packets/GeneratedMissionCorpseWire.cs" Link="SharedGameplay/Missions/GeneratedMissionCorpseWire.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacement.cs" Link="OfficialPlacements/OfficialPlayfieldPlacement.cs" />
     <Compile Include="../ZoneEngine/Core/Playfields/OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs" Link="OfficialPlacements/OfficialPlayfieldPlacementCatalog.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/LinuxBuild/Compatibility/ZoneEngine/JavaScriptSerializer.Linux.cs" Link="Compatibility/JavaScriptSerializer.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/SharedBuild/Compatibility/JavaScriptSerializer.Portable.cs" Link="Compatibility/JavaScriptSerializer.cs" />
     <Compile Include="..\..\SolutionAssemblyInfo.cs">
       <Link>Properties\SolutionAssemblyInfo.cs</Link>
     </Compile>

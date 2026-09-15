@@ -2,6 +2,59 @@
 
 ## First Checks
 
+### NewEngine cutover foundation
+
+The Mike-owned cutover branch accepts a reduced feature set; full gameplay parity
+is not the operational gate. Preserve all durable-state and schema checks.
+Do not merge master, change production, remove Legacy, or alter the developer
+branch during this milestone. Historical all-parity promotion requirements are
+superseded for this explicitly scoped foundation task.
+
+After the normal NewEngine Debug build, generate/check the source inventory:
+
+```cmd
+cmd /d /c Tools\generate_newengine_cutover_inventory.cmd --write
+cmd /d /c Tools\generate_newengine_cutover_inventory.cmd --check
+```
+
+The Roslyn tool reads the NewEngine project-reference graph and source; it does
+not load engine code, access a database, or modify gameplay. It requires the
+normal Debug reference assemblies. Dependency symbols are compiler-resolved;
+DAO method/table candidates retain explicit static-analysis limits.
+
+For disposable schema/transaction/restart validation use the existing wrapper
+with its required explicit engine path:
+
+```cmd
+cmd /d /c Tools\run_zoneengine_schema_validation.cmd --run-disposable --engine <absolute-built-ZoneEngine_New.dll>
+```
+
+This fixture accepts no application connection string and creates its own
+labelled loopback MySQL. It includes exact item/credit/location fresh-repository
+reloads across engine restarts and a Legacy-table staleness check. Its
+`LOGIN_WIRE_ACCEPTANCE=NOT_EXERCISED` result must never be relabelled full
+account-login/character-selection/reconnect acceptance. See the operational
+report for that evidence boundary.
+
+For real LoginEngine authentication, character selection, NewEngine TCP entry,
+inventory mutation, reconnect, distinct-process restart, nano/morph/quest reload,
+morph cancellation and negative admission tests:
+
+```cmd
+cmd /d /c Tools\run_newengine_connected_acceptance.cmd --engine <absolute-built-ZoneEngine_New.dll> --login-engine <absolute-built-LoginEngine.exe-or-dll>
+```
+
+Use the normal Windows build's `AORebirth\Built\Debug\ZoneEngine_New\ZoneEngine_New.dll`
+and `AORebirth\Built\Debug\LoginEngine.exe` for an exact-source acceptance run.
+This synthetic client uses AOtomation codecs and the existing login-key encoder;
+it does not start the AO client. Setup writes finish before engine startup.
+After startup only network actions mutate state; SQL/DAO access is read-only.
+The fixture creates and removes its own labelled loopback MySQL/network and
+processes, records source/binary provenance, and returns nonzero if zone admission
+accepts an unauthenticated character. Positive lifecycle PASS does not override
+that negative gate. Retain the console log under `build-verify` and link the
+actual SHA in `NEWENGINE_CUTOVER_VALIDATION_RECEIPT.md`.
+
 Run:
 
 ```cmd
@@ -104,6 +157,25 @@ Stop-after-success rule:
 
 ## Build And Engines
 
+### Selective Delmus NPC content reconciliation
+
+Run the installed Node runtime with `Tools/reconcile_delmus_npc_content.cjs --write`
+and `--check`. The generator uses pinned source snapshots and accepted repository
+evidence; it never promotes candidate templates into runtime authorization.
+Run `dotnet test AORebirth\Server\ZoneEngine_New.Tests\ZoneEngine_New.Tests.csproj`
+for NPC composition, content boundary, weapon selection and nano cancellation gates.
+The established exact-source and connected acceptance wrappers remain required.
+
+### Accepted ordinary binding export (offline)
+
+For the bounded Subway/Temple NewEngine consumer ledger, run
+`cmd /d /c Tools\export_accepted_ordinary_bindings.cmd --write`, then
+`cmd /d /c Tools\export_accepted_ordinary_bindings.cmd --check`.
+This evaluates the existing compiled catalog and exact per-variant combat resolver
+through the shared cross-platform Legacy project on Windows. It does not invoke
+the engine entry point, start listeners, access a database, or activate NPCs.
+It is not the broader capture census or a substitute for consumer lifecycle tests.
+
 After code changes that affect server binaries:
 
 1. Stop engines if running processes are locking build outputs.
@@ -120,7 +192,7 @@ Build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, kills stale `MSBuild.exe`, `dotnet.exe`, `VBCSCompiler.exe`, and `NuGet.exe` processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, then builds `AORebirth.Core`, `LoginEngine`, `ZoneEngine`, `DatabasePreflight`, and `WebEngine`, using:
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, preserves unrelated processes, verifies required packages under `AORebirth\packages`, restores packages explicitly before build only when required package folders are missing, then builds `AORebirth.Core`, `LoginEngine`, legacy `ZoneEngine`, `DatabasePreflight`, and `WebEngine`, using:
 
 ```cmd
 MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
@@ -183,6 +255,37 @@ restart runs it before stopping any healthy engine. Startup verifies exact
 launched-PID ownership and rolls back only processes launched by that
 invocation. Managed shutdown trusts only PID metadata whose executable path and
 start time match and never falls back to killing processes by name.
+
+On the full-integration candidate branch, normal build/acceptance also builds and
+tests `ZoneEngine_New`, the selected default backend. Build it alone with:
+
+```cmd
+cmd /d /c NewZoneEngineBuild\build.cmd
+```
+
+Then start ChatEngine, LoginEngine, and `ZoneEngine_New` in the governed order
+with:
+
+```cmd
+cmd /d /c restart-engines.cmd
+```
+
+Use `restart-engines.cmd -LegacyZoneEngine` and
+`status-engines.cmd --legacy-zoneengine` only for deliberate legacy rollback.
+`-NewZoneEngine` remains a redundant compatibility alias, not a second runtime.
+New startup requires schema-current readiness before services are stopped or
+started. No engine startup can migrate the database. `--validate-startup` checks
+configuration and the packaged world without opening the database;
+`--validate-database` performs read-only schema readiness. Neither is a migration.
+The separate operator command and production boundary are documented in
+`docs/project/ZONEENGINE_NEW_TRANSITION_PLAN.md`.
+
+Clean checkouts must explicitly import the pinned offline Playfields archive
+using `docs/project/PLAYFIELD_PACKAGE_SUPPLY.md` before offline startup acceptance.
+This candidate is not yet accepted for master or deployment: the gameplay route
+audit identifies missing legacy features and unbridged accepted NPC profiles.
+Keep the fail-closed checks; do not start a partially packaged world or substitute
+fixture content. Existing production is unchanged.
 
 WebEngine remains excluded from normal startup. Its explicit optional workflow
 is:
@@ -263,10 +366,14 @@ the manifest as one recoverable transaction. The manifest is the commit marker
 and is replaced last. A changed input before publication or before commit aborts
 and preserves or restores the prior complete cohort.
 
-`--validate-current` remains the strict historical raw validator and must not be
-weakened to pass when required capture roots are unavailable. Use
-`--validate-legacy-baseline` to prove that the accepted generated artifact cohort
-has not drifted while historical raw is missing. Use
+`--check` validates the committed accepted generated-combat artifacts without
+reading historical raw captures. `--write` regenerates and publishes generated
+artifacts from capture evidence. `--validate-current` remains the strict
+historical raw validator and must not be weakened to pass when required capture
+roots are unavailable. Use `--validate-legacy-baseline` only as a forensic audit
+of the immutable legacy cohort; it may run with zero, some, or all historical
+raw roots present and reports the observed availability.
+Use
 `--audit-combat-capture-readiness` before new combat recapture planning; it is a
 non-mutating instrumentation readiness report and must distinguish
 `CAPTURE_READY`, `ANALYZER_READY`, and `NOT_PROTOCOL_PROVEN` without claiming a
@@ -360,6 +467,139 @@ cmd /d /c tools\generate_mission_level_graph.cmd --check
 The upstream ODS is provenance only because its mission cells after level 133
 were precision-coerced. Do not generate the complete graph from that ODS and do
 not make production depend on either spreadsheet file.
+
+## Database-Wide Official Playfield Placement Import
+
+Import the verified official type-`1000014` placement corpus from the read-only
+AO Stripdown extraction with:
+
+```cmd
+cmd /d /c Tools\import_official_playfield_placements.cmd --write
+```
+
+Validate every pinned source artifact and shard, then verify the checked-in
+normalized cohort byte-for-byte without writing with:
+
+```cmd
+cmd /d /c Tools\import_official_playfield_placements.cmd --check
+cmd /d /c Tools\import_official_playfield_placements.cmd --test
+```
+
+The importer verifies all six global source hashes and all 630 source-shard
+hashes before rendering. It preserves 32,805 independent official placement
+records, including duplicate positions and exact duplicate records, and emits
+one normalized shard per resource instance under
+`docs\generated\playfields\placements`. The wrapper then regenerates or checks
+the offline AORebirth representation/reconciliation inventory across the
+official index, `Playfields.xml`, compiled registered content, bounded dynamic
+descriptors, and exact PF4582 bridge. Counts that cannot be enumerated offline
+remain null. Resources 103, 615, and 4805 remain explicit parser-limited shards
+with zero synthetic placements.
+
+The offline AORebirth inventory is declared in
+`docs\reference\playfields\aorebirth-playfield-representation-manifest.json`
+and rendered to
+`docs\generated\playfields\official-playfield-reconciliation.json`. A null
+count means the adapter cannot honestly enumerate that dynamic or external
+representation offline; it must not be treated as zero.
+
+The generated corpus remains an evidence layer and never authorizes identity or
+behavior. The Windows project is the single content-inventory owner and copies
+the four canonical global files plus all 630 exact-cased shards to
+`Content\Official\PlayfieldPlacements`; the governed Linux inventory is derived
+from that project and copies the same files. `ZoneEngine
+--validate-official-placements` loads the packaged files relative to the built
+binary, verifies every pinned digest and global/per-playfield invariant, and
+emits the deterministic `official-placement-build-manifest.json` plus
+`PLACEMENT_PROVENANCE.env`. Normal startup and spawn materialization do not
+consume the catalog. `ResourceInstance -> PlayfieldId` is accepted only for
+this build-validated corpus, with the original resource instance retained. The
+source build label `18.8.62_EP1` means the official old-graphics-client
+extraction source; it is not a gameplay-content or spawn-content partition.
+
+## PF4582 Authoritative Placement Import
+
+Regenerate the normalized ICC Shuttleport placement catalog and audit report
+from the checked-in authoritative source and runtime evidence map with:
+
+```cmd
+cmd /d /c Tools\generate_pf4582_placements.cmd
+```
+
+Verify byte-for-byte reproducibility, strict source validation, duplicate-position
+retention, and fail-closed runtime activation with:
+
+```cmd
+cmd /d /c Tools\run_pf4582_placement_tests.cmd
+```
+
+The general official placement shard is the authoritative static official
+source for PF4582. The specialized PF4582 source, reconciliation report, and
+overlay remain the governed `SourceNpcId` crosswalk and historical evidence
+layer and must agree with the general shard record-for-record.
+
+The accepted placement source proves 206 placement records. `NpcId` is the
+stable AORebirth source-placement key, not a proven native Funcom field.
+Candidate respawn timing, names, flags, and unknown fields remain metadata; they
+do not authorize movement, combat, loot, scripts, or runtime activation. Only
+explicitly mapped existing runtime definitions may be active.
+
+Audit all 38 numeric PF4582 `TemplateHash` groups against the governed evidence
+ledger without changing runtime activation:
+
+```cmd
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd --check
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd --test
+```
+
+The audit pins its structured inputs, emits deterministic JSON and Markdown, and
+fails closed on drift or conflicting evidence. The 24 baseline-unresolved hashes
+account for 171 blocked placements. Ten additional blocked Island Reet rows use
+the baseline-mapped ISRE hash, so the complete runtime blocked count remains 181.
+Its accepted enemy-dossier projection is tracked under `docs/reference/pf4582`
+and is tied to the complete raw dossier by SHA-256, allowing `--check` and
+`--test` to run in clean or linked worktrees without the ignored capture folder.
+Refresh that projection only when a newly accepted complete dossier supersedes
+the current source:
+
+```cmd
+cmd /d /c Tools\audit_pf4582_template_hashes.cmd --refresh-capture-fixture-from "<accepted-enemy-dossier.json>"
+```
+
+No audit classification authorizes activation; promotion requires a separate
+task with a stable source key to AO identity/profile bridge. `TemplateHash` is a
+legacy AORebirth field name. Official EP1 evidence proves that the represented
+value is a packed four-byte `ACGHash_t` scalar/tag, not a cryptographic hash or
+a terminal mob-template identity.
+
+Import reconciliation against the governed local 207-record official snapshot,
+including the additional blocked `NCNN` record, is generated and checked with:
+
+```cmd
+cmd /d /c Tools\reconcile_pf4582_official_source.cmd
+cmd /d /c Tools\reconcile_pf4582_official_source.cmd --check
+cmd /d /c Tools\reconcile_pf4582_official_source.cmd --test
+```
+
+The generated official overlay and `IccShuttleportOfficialPlacementCatalog*.cs`
+are evidence/future-generation layers only. They are not consumed by
+`IccShuttleportSpawn`; the current runtime catalog remains 206 records, 25
+active, and 181 blocked. `NCNN` has no `SourceNpcId`, profile, or activation.
+
+Regenerate and test the corrected structural bridge report with:
+
+```cmd
+cmd /d /c Tools\analyze_pf4582_template_identity_bridge.cmd
+cmd /d /c Tools\analyze_pf4582_template_identity_bridge.cmd --check
+cmd /d /c Tools\analyze_pf4582_template_identity_bridge.cmd --test
+```
+
+The current outcome is `STRUCTURAL_SOURCE_AND_CONSUMER_FOUND`, superseding the
+historical `NO_BRIDGE_LOCATED` result. This proves the official source record,
+parser/native consumer, field locations, vector, and accessors. It does not
+prove an `ACGHash_t`-to-mob-template, `MonsterData`, dynel, or AORebirth profile
+join. Do not call `GetHash` or `GetHashSpawnPoints` terminal identity consumers.
 
 ## AOtomation Messaging Tests
 
@@ -465,6 +705,105 @@ Build the capture plugin after capture-tool source changes with:
 cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.csproj /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
+For Mike's multi-plugin legacy AOSharp runtime, build the dedicated x86
+compatibility plugin directly against that installation's existing
+`AOSharp.Core.dll` and `AOSharp.Common.dll`:
+
+```cmd
+set MIKE_AOSHARP_RUNTIME=<exact legacy AOSharp runtime directory>
+cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\AOSharpLiveCapture.Mike2022.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
+```
+
+For the separate manual NPC Inspect plugin, use the build and offline test
+commands in [NPC Inspect Probe](../../Tools/aosharp_npc_inspect/README.md#rebuild-and-checks-no-client-execution).
+Its package is `.local/npc-inspect-probe/package/NpcInspectProbe.dll`.
+It targets the same installed runtime without replacing AOSharp assemblies;
+native Inspect and in-game behavior still require Mike's manual validation.
+
+For Mike2022 spawn-stat health changes, keep the same `MIKE_AOSHARP_RUNTIME`
+setting and run the offline CSV export regression:
+
+```cmd
+cmd /d /c MSBuild.exe tools-temp\AOSharpLiveCapture\Tests\Mike2022HealthExportTests.csproj /t:Build /p:Configuration=Release /m:1 /nr:false /v:minimal
+cmd /d /c tools-temp\AOSharpLiveCapture\Tests\bin\Release\Mike2022HealthExportTests.exe
+cmd /d /c python tools-temp\AOSharpLiveCapture\validate_mike2022_projection_guards.py
+```
+
+The test invokes the compiled CSV writer without starting the plugin or client.
+Stat 1 (`Life`) is the full health pool; stat 27 (`Health`) is the pool minus
+health damage, clamped to zero.
+
+Load `AOSharpLiveCapture.Mike2022.dll` in the same assembly selection as the
+other plugins. Do not also load `AOSharpLiveCapture.dll`. The compatibility
+plugin registers `/aocap start|stop|status|flush|mark|snapshot` plus
+`/aocap auto on|off|status`. It loads idle so it can coexist with other plugins
+without creating capture folders until requested. `/aocap start` begins a manual,
+crash-recoverable session and disables automatic continuation. `/aocap stop`
+drains and finalizes the current folder, writes `capture-validation.json`, and
+stays stopped. Every evidence row is auto-flushed and an atomic checkpoint is
+written every two seconds. `/aocap auto on` is the explicit opt-in for immediate
+continuous capture and playfield-change rotation; `/aocap auto off` leaves the
+current session running until `/aocap stop`.
+
+The plugin retains the complete inbound and outbound raw stream in
+`packets.hex.log` and `raw-packets.csv`. It directly projects raw
+`FollowTarget`, `SetPos`, `StopMovingCmd`, and `CharDCMove` packets into
+`movement-packets.csv`, raw `SimpleCharFullUpdate` packets into
+`scfu-appearance.csv`, current AOSharp dynels plus exact raw entity/corpse
+evidence into `world-snapshot.csv`, and decoded spawn/death plus live observations
+into `enemy-state.csv`. The fourteen stat fields carried by each NPC SCFU are
+normalized into `enemy-stat-snapshots.csv` with `transmitted` presence. Every
+additional actual entry exposed by an NPC's AOSharp `Stats` collection is written
+to the same file with `runtime-entry` presence
+and source provenance. When that legacy collection is unavailable, the plugin
+enumerates the installed runtime's `GetStat` enum once per NPC and records every
+result as `runtime-query`. A zero in such a row is an AOSharp API result, not proof
+that the server transmitted the stat. `unavailable` is used only when neither
+read path exists; an omitted stat is never silently converted to zero. Decoded network
+`StatMessage` tuples are kept separately in `enemy-stat-updates.csv` with
+`transmitted` presence, while decoded attack, hit, and miss messages are written
+to `enemy-combat.csv` with source/target roles and all exposed packet fields.
+The plugin also writes player position/stats/evades/armor/buffs/
+weapons into `player-combat-context.csv`, and attack-boundary distance evidence
+into `aggro-observations.csv`. Every live visibility sample also preserves the
+entity heading quaternion and derived horizontal forward vector. Before an
+attack boundary can update or turn the NPC, the plugin retains the immediately
+preceding source/target sample; each aggro row includes that pre-aggro heading,
+positions, distance, sample age, and relative approach angle alongside the
+event-time heading. Unprovoked aggro without this pre-aggro heading correlation
+validates incomplete. Capture start/end, manual marks/snapshots, and
+opened-container updates write the main inventory plus every loaded open
+backpack into `inventory-snapshots.csv`, including the complete slot and unique
+identities, low/high template IDs, QL, name, charges, and container provenance.
+For every outbound item-slot `GenericCmd Use`, `item-use-observations.csv`
+resolves that exact slot before a consumable can be deleted, then correlates the
+server acknowledgment and `DeleteItem` by complete identity. An unresolved item
+use is retained explicitly and makes validation incomplete without changing raw
+recapture policy. Items may be used normally from an open backpack; moving them
+to the main inventory is not required. While a session is active, the compatibility
+plugin samples the AOSharp live dynel set every 500 milliseconds and writes
+baseline, appeared, and disappeared observations with player/entity position
+brackets and distances to `visibility-observations.csv`. For every non-local
+character in the installed runtime's `DynelManager.Characters` set, each complete
+sample writes a `CLIENT_STATE` row containing the native-client
+`SimpleChar.IsInLineOfSight` and `SimpleChar.IsInPlay` values. It also emits
+`LOS_GAINED`, `LOS_LOST`, `INPLAY_GAINED`, or `INPLAY_LOST` when either value
+changes. Raw Despawn rows preserve the packet identity without presenting stale
+coordinates as current evidence. These are three separate evidence channels:
+gamecode line-of-sight/in-play state, AOSharp dynel-set presence, and server
+removal packets. AOSharp does not expose a per-dynel renderer/frustum visibility
+property, so none of these rows alone proves that pixels were drawn.
+Stop-time validation reports coverage for raw,
+spawn identity, NPC runtime stats, decoded combat, enemy state, world/player
+context, periodic presence, LOS/in-play state,
+movement, combat start, NPC-to-player and unprovoked aggro, death/corpse, and
+identity-linked loot. A projection gap with an intact raw stream remains an
+offline-decode issue rather than an automatic recapture request. The packet log
+uses the canonical format consumed by the repository decoders. The legacy 2022
+runtime still lacks newer AOSharp APIs required by the remaining optional
+in-process geometry projections; the repository analyzer remains responsible
+for those projections.
+
 Build the injector and its capture-safe Bootstrap only through:
 
 ```cmd
@@ -503,10 +842,23 @@ cmd /d /c MSBuild.exe tools-temp\AOSharpCaptureAnalyzer\AOSharpCaptureAnalyzer.c
 cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe --self-test
 cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py --self-test
 cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe "<capture-folder>"
+cmd /d /c tools-temp\AOSharpCaptureAnalyzer\bin\Debug\AOSharpCaptureAnalyzer.exe --decode-loot "<capture-folder>"
 cmd /d /c python tools-temp\AOSharpLiveCapture\decode_npc_lifecycle_capture.py <capture-folder>
+cmd /d /c python tools-temp\AOSharpLiveCapture\decode_movement_capture.py <capture-folder>
 ```
 
-Run the analyzer first to recover direct SCFU evidence from raw packets, then run the lifecycle decoder to rebuild correlated NPC lifecycle outputs.
+Run the analyzer first to recover direct SCFU evidence from raw packets, run
+`--decode-loot` to recover raw inventory snapshots and item transfers, then run
+the lifecycle decoder to rebuild correlated NPC lifecycle and corpse-loot outputs.
+Run the movement decoder when movement, idle paths, chase, or range evidence is
+needed. It reconciles the packet log and `raw-packets.csv`, so Mike captures whose
+packet log uses the alternate line format still retain their movement evidence.
+The analyzer also writes `scfu-acg-correlation.csv` by joining NPC SCFUs to the
+integrity-validated official placement corpus only when captured and official X/Z
+are identical IEEE-754 float32 values. A unique record exposes its four-character
+`CanonicalAcgHashText` and exact official record provenance. Duplicate records may
+expose only a common hash; different-hash collisions and non-exact coordinates
+remain unresolved. Names, `MonsterData`, and proximity are never used as the join.
 
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
@@ -619,6 +971,35 @@ cmd /d /c tools\validate_capture_evidence_fixtures.cmd
 This is a Windows-lane gate. After it passes, the same tracked fixture files can
 be reconciled into the Linux branch before any gameplay code is promoted.
 
+### Raw capture retention authority
+
+`docs/evidence/aosharp_capture_retention.csv` is the tracked source of truth for
+whether accepted AOSharp raw evidence must be retained. Its synchronized report
+is `docs/generated/aosharp_capture_retention.md`.
+
+Normal inventory regeneration appends every newly accepted capture as
+`retain/unreviewed`; it preserves reviewed records and fills a previously blank
+digest only when the accepted inventory proves that identity. An identity or
+digest mismatch fails closed. A local capture that is absent from the accepted
+inventory or retention report is still retained by default.
+
+Only `discard_approved` is discard authority. It requires an evidence digest,
+complete analysis and evidence coverage, tracked `used_by` paths, an immutable
+raw archive path plus SHA-256 or complete tracked derived artifacts, and an
+approval name, date, and reason. Repository references, generated inventory
+rows, implementation references, or fixture existence alone are not discard
+authority.
+
+Regenerate and validate with:
+
+```cmd
+cmd /d /c python Tools\inventory_aosharp_captures.py
+cmd /d /c python Tools\inventory_aosharp_captures.py --validate-current
+```
+
+The generator has no prune or delete operation. Raw-folder removal is never an
+inventory side effect and must not be automated from inferred usage.
+
 ## Windows/Linux server repair parity
 
 Server repairs are Windows-authoritative first and Linux-deployed second.
@@ -639,3 +1020,30 @@ Required workflow for every server repair or gameplay/runtime source change:
 Client-patch-only and docs-only commits after a deployed server SHA do not
 require a Linux server redeploy, but they must be explicitly identified as
 non-server changes before declaring Windows/Linux server parity.
+
+## SHA-gated Windows/Linux synchronization
+
+AORebirth has one authoritative source history. Windows remains the development
+and acceptance platform; `master` is the integrated source authority; Linux
+consumes exact accepted SHAs from controlled build workspaces.
+
+For Windows integration evidence after a commit is on the intended integration
+line, run:
+
+```cmd
+cmd /d /c Tools\accept_windows_source.cmd --expected-sha <sha>
+```
+
+Add `--mandatory-gate` only when the full mandatory integration gate is required
+for that acceptance event. The wrapper fails closed on a source SHA mismatch,
+tracked-source dirt, `git diff --check`, build failure, or mandatory-gate
+failure. It writes non-secret evidence under ignored `build-verify`.
+The wrapper also validates raw-independent accepted generated-combat integrity
+with `--check`; it must not call the strict historical `--validate-current` gate.
+
+Production build, packaging, target-platform acceptance and deployment commands
+are maintained in the private operations repository. They consume the exact
+Windows-accepted source SHA and preserve the Windows placement-manifest identity.
+Public Windows acceptance verifies Windows metadata contracts and runtime tests;
+it does not claim private production-platform acceptance. See
+`docs/project/BUILD_ACCEPTANCE_BOUNDARY.md`.

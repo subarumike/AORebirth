@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Xml.Linq;
 using MySqlConnector;
 using AORebirth.Core.Encryption;
-using AORebirth.LinuxBuild.Stage7MySqlSecurityIntegrationTests;
+using AORebirth.SharedBuild.Stage7MySqlSecurityIntegrationTests;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;

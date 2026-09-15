@@ -4,7 +4,7 @@ namespace AORebirth.Tools.CharacterDaoValidation
     using System.Data;
     using System.IO;
     using AORebirth.Database;
-    using AORebirth.LinuxBuild.Stage8OfflineSmokeTests;
+    using AORebirth.SharedBuild.Stage8OfflineSmokeTests;
     using SmokeLounge.AOtomation.Messaging.Tests;
 
     internal static partial class Program

@@ -13,5 +13,5 @@
     <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
   </PropertyGroup>
 
-  <Import Project="$(AORebirthRepositoryRoot)/LinuxBuild/source-inventory/Cell.Util.CompileItems.props" />
+  <Import Project="$(AORebirthRepositoryRoot)/SharedBuild/source-inventory/Cell.Util.CompileItems.props" />
 </Project>

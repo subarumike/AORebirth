@@ -41,7 +41,7 @@
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/SqlMapperUtil.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/Exceptions/DataBaseException.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Enums/StatIds.cs" />
-    <Compile Include="../../LinuxBuild/Compatibility/Database/SystemDataLinqBinary.Linux.cs" />
+    <Compile Include="../../SharedBuild/Compatibility/SystemDataLinqBinary.Portable.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Database/DatabaseDaoFactory.cs" />
     <Compile Include="../../AORebirth/Libraries/Source/AORebirth.Core/Encryption/PasswordHash.cs" />
   </ItemGroup>

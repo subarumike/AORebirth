@@ -15,5 +15,5 @@
     <AssemblyOriginatorKeyFile>$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-  <Import Project="$(AORebirthRepositoryRoot)/LinuxBuild/source-inventory/SmokeLounge.AOtomation.Messaging.CompileItems.props" />
+  <Import Project="$(AORebirthRepositoryRoot)/SharedBuild/source-inventory/SmokeLounge.AOtomation.Messaging.CompileItems.props" />
 </Project>

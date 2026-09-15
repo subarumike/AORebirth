@@ -1,0 +1,90 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../Stage2ContractFingerprint.cs" Link="Stage2ContractFingerprint.cs" />
+    <Compile Include="../Stage3ContractFingerprint.cs" Link="Stage3ContractFingerprint.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AORebirth.Database">
+      <HintPath>../../../AORebirth/Libraries/Source/AORebirth.Database/bin/Debug/AORebirth.Database.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="AORebirth.Stats">
+      <HintPath>../../../AORebirth/Libraries/Source/AORebirth.Stats/bin/Debug/AORebirth.Stats.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="AORebirth.Enums">
+      <HintPath>../../../AORebirth/Libraries/Source/AORebirth.Enums/bin/Debug/AORebirth.Enums.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="AORebirth.Core.Exceptions">
+      <HintPath>../../../AORebirth/Libraries/Source/Exceptions/bin/Debug/AORebirth.Core.Exceptions.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="AORebirth.Interfaces">
+      <HintPath>../../../AORebirth/Libraries/Source/AORebirth.Interfaces/bin/Debug/AORebirth.Interfaces.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="AORebirth.ObjectManager">
+      <HintPath>../../../AORebirth/Libraries/Source/AORebirth.ObjectManager/bin/Debug/AORebirth.ObjectManager.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Cell.Core">
+      <HintPath>../../../AORebirth/Libraries/Source/Cell.Core/Bin/Debug/Cell.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Cell.Util">
+      <HintPath>../../../AORebirth/Libraries/Source/Cell.Util/bin/Debug/Cell.Util.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Dapper">
+      <HintPath>../../../AORebirth/packages/Dapper.1.13/lib/net40/Dapper.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Ionic.Zlib">
+      <HintPath>../../../AORebirth/packages/Ionic.Zlib.1.9.1.5/lib/Ionic.Zlib.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="MemBus">
+      <HintPath>../../../AORebirth/packages/MemBus.2.0.2/lib/Net40-Client/MemBus.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="MsgPack">
+      <HintPath>../../../AORebirth/Libraries/Source/msgpack-cli/src/MsgPack.Mono/bin/Debug/MsgPack.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="MySqlConnector">
+      <HintPath>../../../AORebirth/packages/MySqlConnector.2.6.0/lib/net48/MySqlConnector.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="NLog">
+      <HintPath>../../../AORebirth/packages/NLog.2.1.0/lib/net40/NLog.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>../../../AORebirth/packages/Npgsql.4.0.14/lib/net451/Npgsql.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SmokeLounge.AOtomation.Messaging">
+      <HintPath>../../../AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/bin/Debug/SmokeLounge.AOtomation.Messaging.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Utility">
+      <HintPath>../../../AORebirth/Libraries/Source/Utility/bin/Debug/Utility.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="locales">
+      <HintPath>../../../AORebirth/Libraries/Source/Translations/bin/Debug/locales.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

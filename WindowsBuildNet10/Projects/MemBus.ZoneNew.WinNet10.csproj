@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="$(AORebirthRepositoryRoot)/LinuxBuild/Compatibility/Communication/MemBusCompatibility.cs">
+    <Compile Include="$(AORebirthRepositoryRoot)/SharedBuild/Compatibility/MemBusCompatibility.cs">
       <Link>MemBusCompatibility.cs</Link>
     </Compile>
   </ItemGroup>

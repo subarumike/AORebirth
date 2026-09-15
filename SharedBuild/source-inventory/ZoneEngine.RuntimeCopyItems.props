@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Scripts/KnuBotFlappy.cs" Link="Scripts/KnuBotFlappy.cs" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Scripts/InfoBot.cs" Link="Scripts/InfoBot.cs" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Scripts/KnuBotItemGiver.cs" Link="Scripts/KnuBotItemGiver.cs" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ZoneEngine/Scripts/PerkResetService.cs" Link="Scripts/PerkResetService.cs" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Config/NBug.ZoneEngine.config" Link="NBug.ZoneEngine.config" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Datafiles/items.dat" Link="items.dat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Datafiles/nanos.dat" Link="nanos.dat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Datafiles/playfields.dat" Link="playfields.dat" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

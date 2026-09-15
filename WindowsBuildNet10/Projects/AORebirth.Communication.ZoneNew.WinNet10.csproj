@@ -22,5 +22,5 @@
     <ProjectReference Include="Utility.ZoneNew.WinNet10.csproj" />
   </ItemGroup>
 
-  <Import Project="$(AORebirthRepositoryRoot)/LinuxBuild/source-inventory/AORebirth.Communication.CompileItems.props" />
+  <Import Project="$(AORebirthRepositoryRoot)/SharedBuild/source-inventory/AORebirth.Communication.CompileItems.props" />
 </Project>

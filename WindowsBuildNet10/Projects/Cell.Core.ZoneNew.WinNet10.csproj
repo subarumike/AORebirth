@@ -20,7 +20,7 @@
     <ProjectReference Include="Cell.Util.ZoneNew.WinNet10.csproj" />
   </ItemGroup>
 
-  <Import Project="$(AORebirthRepositoryRoot)/LinuxBuild/source-inventory/Cell.Core.CompileItems.props" />
+  <Import Project="$(AORebirthRepositoryRoot)/SharedBuild/source-inventory/Cell.Core.CompileItems.props" />
 
   <ItemGroup>
     <EmbeddedResource Update="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Cell.Core/Localization/Cell.Core.resx">

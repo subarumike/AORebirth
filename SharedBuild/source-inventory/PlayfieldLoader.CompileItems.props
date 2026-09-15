@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/SolutionAssemblyInfo.cs">
+      <Link>Properties/SolutionAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/PlayfieldLoader/PlayfieldLoader.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/PlayfieldLoader/Properties/AssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

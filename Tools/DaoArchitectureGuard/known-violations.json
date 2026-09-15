@@ -17,12 +17,6 @@
       "category": "database-readiness",
       "owner": "readiness-tooling",
       "targetPhase": 8
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine/Program.cs",
-      "category": "database-readiness",
-      "owner": "readiness-tooling",
-      "targetPhase": 8
     }
   ]
 }

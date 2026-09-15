@@ -116,7 +116,7 @@ project-reference tests.
 - `DisposableMySql.cs`: scoped Docker fixture and cleanup.
 - `IsolatedHost.cs`: test-only infrastructure dependencies.
 - `AccountDaoValidation.csproj`: exact production/legacy source links.
-- `acceptance-evidence.json`: machine-recorded acceptance case inventory, baseline
+- Historical machine-recorded acceptance case inventory and baseline (retained in private operations),
   commands/diagnostics and retained log hashes; local raw logs remain under ignored build-verify.
 - `../run_account_dao_validation.cmd`: sole run entry point.
 

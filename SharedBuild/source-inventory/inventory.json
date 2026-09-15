@@ -1,0 +1,79 @@
+{
+  "projects": [
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/SmokeLounge.AOtomation.Messaging.csproj",
+      "output": "SharedBuild/source-inventory/SmokeLounge.AOtomation.Messaging.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Cell.Util/Cell.Util.csproj",
+      "output": "SharedBuild/source-inventory/Cell.Util.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Cell.Core/Cell.Core.csproj",
+      "output": "SharedBuild/source-inventory/Cell.Core.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/msgpack-cli/src/MsgPack.Mono/MsgPack.Mono.csproj",
+      "output": "SharedBuild/source-inventory/MsgPack.Mono.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Translations/Translations.csproj",
+      "output": "SharedBuild/source-inventory/Translations.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Utility/Utility.csproj",
+      "output": "SharedBuild/source-inventory/Utility.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Enums/AORebirth.Enums.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.Enums.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/Exceptions/AORebirth.Exceptions.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.Exceptions.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Interfaces/AORebirth.Interfaces.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.Interfaces.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.ObjectManager/AORebirth.ObjectManager.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.ObjectManager.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Database/AORebirth.Database.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.Database.CompileItems.props",
+      "contentOutput": "SharedBuild/source-inventory/AORebirth.Database.ContentItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Stats/AORebirth.Stats.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.Stats.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Communication/AORebirth.Communication.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.Communication.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/AORebirth.Core/AORebirth.Core.csproj",
+      "output": "SharedBuild/source-inventory/AORebirth.Core.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Libraries/Source/PlayfieldLoader/PlayfieldLoader.csproj",
+      "output": "SharedBuild/source-inventory/PlayfieldLoader.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Server/ChatEngine/ChatEngine.csproj",
+      "output": "SharedBuild/source-inventory/ChatEngine.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Server/LoginEngine/LoginEngine.csproj",
+      "output": "SharedBuild/source-inventory/LoginEngine.CompileItems.props"
+    },
+    {
+      "legacyProject": "AORebirth/Server/ZoneEngine/ZoneEngine.csproj",
+      "output": "SharedBuild/source-inventory/ZoneEngine.CompileItems.props",
+      "contentOutput": "SharedBuild/source-inventory/ZoneEngine.ContentItems.props",
+      "runtimeCopyOutput": "SharedBuild/source-inventory/ZoneEngine.RuntimeCopyItems.props"
+    }
+  ]
+}

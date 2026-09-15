@@ -75,7 +75,7 @@ scope and explicitly rejected.
 - `docs/project/DEVELOPMENT_AUTHORITY.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/project/PROJECT_STATE.md`
-- `docs/evidence/LOGIN_INVENTORY_DAILYLOGIN_FOLLOWUP_20260817.md`
+- `docs/project/BUILD_ACCEPTANCE_BOUNDARY.md`
 - `docs/generated/arete_web_window_loading_future_work.md`
 - `docs/reference/client-dll-function-map/ghidra/GUI.dll.ghidra_functions.csv`
 - `docs/reference/client-dll-function-map/ao_client_dll_decorated_function_strings.csv`

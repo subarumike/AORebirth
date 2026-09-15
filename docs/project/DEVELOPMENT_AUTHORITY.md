@@ -4,7 +4,10 @@ Status: Permanent project policy.
 
 ## Authority
 
-AORebirth has one authoritative source tree and one authoritative codebase.
+AORebirth has one authoritative gameplay source tree and one authoritative codebase.
+Production build and deployment tooling is maintained in a separate private
+operations repository. A private build consumes an exact accepted gameplay
+commit; it is not a second gameplay implementation.
 Windows is the authoritative development platform and source of truth. Linux is
 the production deployment platform.
 
