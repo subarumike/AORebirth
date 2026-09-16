@@ -1,11 +1,13 @@
 # Current Task
 
-Active: retire the Legacy ZoneEngine executable, project, build and launch paths
-on `codex/retire-legacy-engine-20260915`, starting from accepted master `c5af4ac1`.
-Mike explicitly authorized removal after the content cleanup reached master.
+Active remaining step: promote the validated private operations candidate
+`2a9287d4` after explicit user authorization. Automatic approval review blocked
+that shared-branch update; the candidate is committed and pushed, and the default
+remains unchanged.
 
-Retain shared mechanics, editable content and useful offline fixtures under their
-current owners; remove the obsolete engine implementation. Preserve player DAO
-semantics and prior NewEngine release/database-restore rollback requirements.
-Run Windows and private-platform acceptance. No production operation or database
-schema change is part of this task.
+Legacy runtime retirement is implemented on accepted public source `bf7ce16b`.
+Windows exact-source, native private-platform packaging and frozen-binary
+disposable schema/connected acceptance passed. Historical recovery remains.
+See `docs/reports/LEGACY_ENGINE_RETIREMENT.md` for exact source/package identities.
+
+No production operation or production database schema change is part of this task.
