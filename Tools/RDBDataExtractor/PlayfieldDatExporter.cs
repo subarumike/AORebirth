@@ -40,9 +40,9 @@ namespace AORebirth.Tools.RDBDataExtractor
             string collisionPath = Path.Combine(folder, GameDataPaths.CollisionFileName);
             string surfacesPath = Path.Combine(folder, GameDataPaths.SurfacesFileName);
 
-            byte[] wallsPayload = TryGetRaw((int)ResourceTypeId.PlayfieldWall, playfieldId);
+            byte[] wallsPayload = TryGetRaw((int)ResourceTypeId.PlayfieldWalls, playfieldId);
             byte[] dynelsPayload = TryGetRaw((int)ResourceTypeId.PlayfieldDynels, playfieldId);
-            byte[] doorsPayload = TryGetRaw((int)ResourceTypeId.PlayfieldDoor, playfieldId);
+            byte[] doorsPayload = TryGetRaw((int)ResourceTypeId.PlayfieldDoors, playfieldId);
             byte[] destinationsPayload = TryGetRaw(PlayfieldDestinationResourceTypeId, playfieldId);
             byte[] tilemapPayload = TryGetRaw(TilemapRecordType, playfieldId);
             byte[] surfacePayload = TryGetRaw((int)ResourceTypeId.SurfaceResource, playfieldId);

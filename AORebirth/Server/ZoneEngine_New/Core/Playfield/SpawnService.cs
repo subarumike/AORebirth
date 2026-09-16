@@ -27,6 +27,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.WorldSimulation;
 
+    using Dynel = ZoneEngine_New.Core.Entities.Dynel;
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 

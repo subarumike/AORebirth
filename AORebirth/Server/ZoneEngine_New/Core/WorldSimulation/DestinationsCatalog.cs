@@ -24,7 +24,10 @@ namespace ZoneEngine_New.Core.WorldSimulation
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(gameDataRoot);
             lock (_sync)
+            {
                 _rootPath = gameDataRoot;
+                _byPlayfield.Clear();
+            }
         }
 
         public bool TryGetDestination(
@@ -82,13 +85,27 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 if (record?.Destinations == null)
                     return result;
 
-                foreach (KeyValuePair<byte, Destination> pair in record.Destinations)
+                // AODB 1.0.7+ keys Destinations by DestinationId = (lineIndex << 16) | playfieldId.
+                // Wall borders and LineTeleport look up by that lineIndex (same as AODB 1.0.6
+                // Dictionary<byte, Destination> keys). Do not re-number by foreach order —
+                // Destinations.dat is not sorted by line index (e.g. playfield 800).
+                foreach (KeyValuePair<int, Destination> pair in record.Destinations)
                 {
                     Destination src = pair.Value;
                     if (src == null)
                         continue;
 
-                    result[pair.Key] = new PlayfieldDestination
+                    int lineIndex = src.DestinationId >> 16;
+                    if (lineIndex < 1 || lineIndex > byte.MaxValue)
+                    {
+                        // Legacy / unexpected ids: keep only when the dictionary key is already a byte index.
+                        if (pair.Key < 1 || pair.Key > byte.MaxValue)
+                            continue;
+
+                        lineIndex = pair.Key;
+                    }
+
+                    result[(byte)lineIndex] = new PlayfieldDestination
                     {
                         DestinationId = src.DestinationId,
                         StartX = src.StartX,

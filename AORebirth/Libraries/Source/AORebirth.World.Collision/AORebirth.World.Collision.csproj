@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AODB" Version="1.0.6" />
+    <PackageReference Include="AODB" Version="1.0.7" />
   </ItemGroup>
 
   <!-- Framing / paths / metadata stay in AORebirth.Core (single type identity with ZoneEngine). -->
