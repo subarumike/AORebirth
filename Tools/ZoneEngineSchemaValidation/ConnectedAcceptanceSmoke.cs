@@ -9,7 +9,6 @@ using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Data;
-using ZoneEngine_New.Core.Nanos;
 using ZoneEngine_New.Core.Missions;
 using AORebirth.Database.Domain.Missions;
 using AORebirth.Interfaces.Persistence.Missions;
@@ -81,13 +80,19 @@ static partial class ConnectedAcceptanceSmoke
             // This does not exercise or claim player-driven equip legality.
             inventory.Insert(new ItemInstanceRecord { InstanceId = identity + 2, ContainerType = (int)IdentityType.ArmorPage, ContainerInstance = Owner,
                 ContainerPlacement = 17, LowId = 43384, HighId = 43384, Quality = 1, StackCount = 1, Source = (AORebirth.Enums.ItemSource)1 });
-            var catalog = NanoCatalog.Load(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(zoneBinary))!, "GameData", "nanos.dat"));
-            Require(catalog.TryGet(270542, out var morph), "seed-supported-morph-catalog");
-            long expiry = DateTime.UtcNow.AddMilliseconds((long)morph.DurationCentiseconds * 10).Ticks;
-            var active = new ActiveNanoRecord(morph.Id, morph.Strain, 99, morph.DurationCentiseconds, expiry);
+            // Seed a durable NCU row for reload proof. Template details are restored through ItemTemplateCatalog at login.
+            long expiry = DateTime.UtcNow.AddHours(2).Ticks;
+            var active = new ActiveNanoRecord
+            {
+                NanoId = 270542,
+                Strain = 75,
+                NanoInstance = 99,
+                DurationCentiseconds = 720000,
+                ExpiresAtUtcTicks = expiry
+            };
             seededNano = active;
-            new MySqlActiveNanoRepository().Commit([new NanoCharacterWrite(Owner, [active], [])]);
-            FixtureSql.Execute(connection, $"INSERT INTO charactersuploadednanos (CharacterId,NanoId) VALUES ({Owner},{morph.Id})");
+            new MySqlActiveNanoRepository().WriteReplaceAll(Owner, [active]);
+            FixtureSql.Execute(connection, $"INSERT INTO charactersuploadednanos (CharacterId,NanoId) VALUES ({Owner},270542)");
             IMissionDao missions = new MySqlMissionDao(() => fixture.Open());
             long now = DateTime.UtcNow.Ticks;
             missions.Execute(Owner, Account, tx => { tx.SaveMission(new MissionKeyData(Owner, AuthoredMissionFixtureId),
@@ -308,13 +313,11 @@ static partial class ConnectedAcceptanceSmoke
         var full = client.Received.OfType<FullCharacterMessage>().Single(m => m.Identity.Instance == Owner);
         var spawn = client.Received.OfType<SimpleCharFullUpdateMessage>().First(m => m.Identity.Instance == Owner);
         ConnectedPositionEvidence.VerifySpawn(spawn, phase);
-        Require(MorphVisualPackets.TryBuild(270542, false, Character, 4582, false, out byte[] expectedMorph)
-            && client.Packets.Any(p => p.AsSpan(16).SequenceEqual(expectedMorph.AsSpan(16))) == morphActive, "wire-captured-morph-projection-" + phase);
-        var durations = client.Received.OfType<CharacterActionMessage>().Where(m => m.Identity == Character && m.Action == CharacterActionType.SetNanoDuration && m.Target.Instance == 270542).ToArray();
-        Require(durations.Length == (morphActive ? 1 : 0), "wire-active-nano-count-" + phase);
+        var actives = spawn.ActiveNanos ?? [];
+        Require(actives.Count(a => a.NanoIdentity.Instance == 270542) == (morphActive ? 1 : 0), "wire-active-nano-count-" + phase);
         if (morphActive)
         {
-            int duration = durations[0].Parameter2;
+            int duration = actives.Single(a => a.NanoIdentity.Instance == 270542).Time1;
             Require(duration > 0 && duration <= seededNano.DurationCentiseconds && duration <= previousDuration,
                 "wire-active-nano-expiry-not-reset-" + phase);
             previousDuration = duration;
@@ -355,8 +358,15 @@ static partial class ConnectedAcceptanceSmoke
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE ContainerInstance={Owner}") == 6, "persisted-no-phantom-rows");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={identity + 2} AND ContainerType={(int)IdentityType.ArmorPage} AND ContainerInstance={Owner} AND ContainerPlacement=17 AND ItemType=0 AND LowId=43384 AND HighId=43384 AND Quality=1 AND StackCount=1 AND Source=1") == 1, "persisted-seeded-equipment-exact");
         Require(FixtureSql.Scalar(connection, $"SELECT COUNT(*) FROM item_instances WHERE InstanceId={generated.KeyInstance} AND ContainerType=104 AND ContainerInstance={Owner} AND ContainerPlacement=67 AND ItemType={0xC76D} AND LowId=28577 AND HighId=28577 AND Quality=1 AND StackCount=1 AND Source=0") == 1, "persisted-mission-key-exact");
-        var nanos = new MySqlActiveNanoRepository().Load(Owner);
-        Require(morphActive ? nanos.Count == 1 && nanos[0] == seededNano : nanos.Count == 0, "persisted-active-nano-exact-expiry");
+        var nanos = new MySqlActiveNanoRepository().GetForCharacter(Owner);
+        Require(morphActive
+            ? nanos.Count == 1
+                && nanos[0].NanoId == seededNano.NanoId
+                && nanos[0].Strain == seededNano.Strain
+                && nanos[0].NanoInstance == seededNano.NanoInstance
+                && nanos[0].DurationCentiseconds == seededNano.DurationCentiseconds
+                && nanos[0].ExpiresAtUtcTicks == seededNano.ExpiresAtUtcTicks
+            : nanos.Count == 0, "persisted-active-nano-exact-expiry");
         Require(MissionSnapshot() == missionSnapshot, "persisted-generated-binding-objects-exact");
         var authored = ((IMissionDao)new MySqlMissionDao(() => ownedFixture.Open())).GetMission(new MissionKeyData(Owner, AuthoredMissionFixtureId));
         Require(authored != null && authored.State == MissionLifecycleState.Active && authored.CurrentStepId == "active", "persisted-authored-mission");

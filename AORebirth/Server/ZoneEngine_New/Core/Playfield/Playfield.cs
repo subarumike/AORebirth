@@ -371,8 +371,6 @@ namespace ZoneEngine_New.Core.Playfield
             // A replacement identity must never receive an old aggregate's snapshot or unregister.
             player.QuarantinePersistence();
             _playfieldManager.Teams.DetachPlayer(player);
-            _playfieldManager.Nanos.DetachPlayer(player);
-            player.NanoRuntime = null;
             if (ReferenceEquals(player.Session, oldSession)) player.EnterLinkDead(PlayfieldManager.ResolveLinkDeadTimeout());
             if (ReferenceEquals(oldSession.Player, player))
             { oldSession.UnbindPlayer(); oldSession.Close(); }
@@ -419,7 +417,6 @@ namespace ZoneEngine_New.Core.Playfield
                     }
                 }
 
-                GetRequiredService<SummonService>().Shutdown();
                 GetRequiredService<NpcContentActivationService>().Shutdown();
                 _pendingStatRebases.Clear();
                 _dynelRegistry.Clear();
@@ -478,9 +475,6 @@ namespace ZoneEngine_New.Core.Playfield
                 _inbound.Drain(_router, spawn, this);
                 spawn.Tick();
                 GetRequiredService<NpcContentActivationService>().Tick();
-                GetRequiredService<SummonService>().Tick();
-                foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
-                    if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Nanos.Tick(player);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inventory.moves");
                 _inventoryMoves.Tick(this, deltaTime);
                 _trades.Tick(this, deltaTime);
@@ -519,7 +513,6 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_logger);
             services.AddSingleton(_playfieldManager);
             services.AddSingleton(_playfieldManager.Teams);
-            services.AddSingleton(_playfieldManager.Nanos);
             services.AddSingleton(_playfieldManager.Missions);
             services.AddSingleton(_playfieldManager.AuthoredQuests);
             services.AddSingleton(_playfieldManager.Dialogues);
@@ -558,7 +551,6 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));
             services.AddSingleton<SpawnService>();
             services.AddSingleton<NpcContentActivationService>();
-            services.AddSingleton<SummonService>();
             services.AddSingleton<ZoneEngine_New.Core.Missions.QuestPropService>();
             services.AddSingleton<HashSpawnSystem>();
             return services;

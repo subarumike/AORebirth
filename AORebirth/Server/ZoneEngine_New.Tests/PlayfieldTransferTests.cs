@@ -27,7 +27,6 @@ using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Movement;
 using ZoneEngine_New.Core.MessageHandlers;
-using ZoneEngine_New.Core.Nanos;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Playfield.Locality;
@@ -367,7 +366,6 @@ public sealed class PlayfieldTransferTests
             Set(Manager, "_sync", new Lock()); Set(Manager, "_playersByCharacterId", new Dictionary<int, Player>());
             Set(Manager, "<Teams>k__BackingField", new TeamService(dispatchOnOwner: (player, action) =>
                 player.Playfield?.DispatchPlayerProjection(player, action)));
-            Set(Manager, "<Nanos>k__BackingField", new NanoService(new EmptyCatalog(), new EmptyNanos()));
             Set(Manager, "<Dialogues>k__BackingField", new DialogueService(null!, null!));
             _flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => Manager), Persist, new StubLogger());
             Set(_trades, "_gate", new object()); Set(_trades, "_byPlayer", new Dictionary<int, TradeSession>());
@@ -393,7 +391,6 @@ public sealed class PlayfieldTransferTests
                 .AddSingleton(_trades)
                 .AddSingleton(new QuestPropService(world, registry, locality, new StubCatalog(), null!))
                 .AddSingleton(accepted)
-                .AddSingleton(new SummonService(world, registry, locality, accepted, itemBuilder, itemCatalog, contentData, milliseconds))
                 .BuildServiceProvider();
             Set(world, "_serviceProvider", services);
             Set(spawn, "_registry", registry); Set(spawn, "_logger", logger); Set(spawn, "_playfield", world);
@@ -452,7 +449,7 @@ public sealed class PlayfieldTransferTests
     internal sealed class PersistStore : ICharacterCoalesceCommit
     {
         public int Count; public bool Fail; public Action? Before;
-        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds)
+        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos)
         { Before?.Invoke(); if (Fail) throw new InvalidOperationException("fixture flush failure"); Interlocked.Increment(ref Count); }
     }
     internal sealed class SnapshotStore : ICharacterRepository, IStatRepository
@@ -468,7 +465,4 @@ public sealed class PlayfieldTransferTests
         public IReadOnlyList<StatRecord> GetForCharacter(int id) => [];
         public void UpsertForCharacter(int id, IReadOnlyList<StatRecord> stats) => throw new NotSupportedException();
     }
-    sealed class EmptyCatalog : INanoCatalog { public bool TryGet(int id, out NanoDefinition definition) { definition = null!; return false; } }
-    sealed class EmptyNanos : IActiveNanoRepository
-    { public IReadOnlyList<ActiveNanoRecord> Load(int id) => []; public void Commit(IReadOnlyList<NanoCharacterWrite> characters) => throw new NotSupportedException(); }
 }

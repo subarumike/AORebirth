@@ -1,5 +1,6 @@
 namespace ZoneEngine_New.Core.Inventory
 {
+    using System;
     using System.Collections.Generic;
 
     using AORebirth.Enums;
@@ -39,38 +40,12 @@ namespace ZoneEngine_New.Core.Inventory
 
         public static bool MeetsRequirements(ItemSpell spell, StatCollection stats)
         {
-            bool result = true;
-            bool hasReal = false;
-            for (int i = 0; i < spell.Requirements.Count; i++)
-            {
-                ItemRequirement requirement = spell.Requirements[i];
+            ArgumentNullException.ThrowIfNull(spell);
+            ArgumentNullException.ThrowIfNull(stats);
 
-                // Dynels.dat Criteria use Stat=0 rows as structural And/Or/Not markers.
-                if (requirement.StatNumber == 0)
-                {
-                    if (hasReal && (Operator)requirement.Operator == Operator.Not)
-                        result = !result;
-                    continue;
-                }
-
-                bool pass = ItemTemplate.EvaluateRequirement(
-                    stats.Get((CharacterStat)requirement.StatNumber),
-                    requirement);
-
-                if (!hasReal)
-                {
-                    result = pass;
-                    hasReal = true;
-                    continue;
-                }
-
-                if ((Operator)requirement.ChildOperator == Operator.Or)
-                    result |= pass;
-                else
-                    result &= pass;
-            }
-
-            return !hasReal || result;
+            return ItemTemplate.MeetsRequirements(
+                spell.Requirements,
+                stat => stats.Get(stat));
         }
 
         static bool TryReadModify(ItemSpell spell, out CharacterStat stat, out int delta)

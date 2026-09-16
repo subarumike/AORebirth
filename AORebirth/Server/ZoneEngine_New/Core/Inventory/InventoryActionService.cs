@@ -12,24 +12,20 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Network;
 
     /// <summary>Plan first, commit all durable rows, then publish one inventory mutation.</summary>
-    public sealed partial class InventoryActionService
+    public sealed class InventoryActionService
     {
         readonly IInventoryMutationPersistence _persistence;
         readonly InventoryFlushService _flush;
         readonly IItemInstanceIdAllocator _ids;
         readonly IZoneLogger _logger;
-        readonly IItemTemplateCatalog _catalog;
-        readonly IItemBuilder _items;
 
         public InventoryActionService(IInventoryMutationPersistence persistence, InventoryFlushService flush,
-            IItemInstanceIdAllocator ids, IZoneLogger logger, IItemTemplateCatalog catalog, IItemBuilder items)
+            IItemInstanceIdAllocator ids, IZoneLogger logger)
         {
             _persistence = persistence ?? throw new ArgumentNullException(nameof(persistence));
             _flush = flush ?? throw new ArgumentNullException(nameof(flush));
             _ids = ids ?? throw new ArgumentNullException(nameof(ids));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
-            _items = items ?? throw new ArgumentNullException(nameof(items));
         }
 
         public void Handle(Player player, CharacterActionMessage message)
@@ -57,7 +53,7 @@ namespace ZoneEngine_New.Core.Inventory
         public bool TryDelete(Player player, Identity slot, int expectedInstanceId)
         {
             if (!TryResolveOwnedSlot(player, slot, out Container page, out Item item)
-                || item.InstanceId != expectedInstanceId || IsProtectedItem(item)) return false;
+                || item.InstanceId != expectedInstanceId) return false;
             if (InventoryMoveService.IsBagItem(item)
                 && player.Inventory.TryGetBackpackPage(item.Identity, out Container bagPage)
                 && bagPage.Content.Count != 0) return false;
@@ -106,125 +102,6 @@ namespace ZoneEngine_New.Core.Inventory
                 });
         }
 
-        // Protection is an explicit editable binding, never inferred from an item name.
-        public static bool IsProtectedItem(Item item)
-            => ItemBehaviorContent.Current.IsProtected(item);
-
-        /// <summary>
-        /// Apply a configured package conversion in one durable inventory transaction.
-        /// </summary>
-        public bool TryOpenPackage(Player player, Identity slot, Item sealedItem)
-        {
-            var content = ItemBehaviorContent.Current.FindPackage(sealedItem);
-            if (content == null) return false;
-            if (player.Session?.State != SessionState.InPlay || player.IsPersistenceQuarantined || player.IsDead
-                || sealedItem.StackCount != 1 || !TryResolveOwnedSlot(player, slot, out Container source, out Item current)
-                || !ReferenceEquals(current, sealedItem) || !_catalog.TryGet(content.ProductLowId, out _)
-                || !_catalog.TryGet(content.ProductHighId, out _)) return false;
-            bool alreadyOwned = content.Unique && player.Inventory.Inventory.Content.Values.Concat(player.Inventory.Overflow.Content.Values)
-                .Any(i => i.LowId == content.ProductLowId && i.HighId == content.ProductHighId);
-            Container destination = player.Inventory.Inventory;
-            int destinationSlot = alreadyOwned ? -1 : destination.FindFreeSlot();
-            if (!alreadyOwned && destinationSlot < 0) return false;
-            Item? opened = alreadyOwned ? null : _items.Create(content.ProductLowId, content.ProductHighId, content.Quality, ItemSource.Other, instanceId: _ids.Allocate());
-            var changes = new List<InventoryRowChange>
-            {
-                new(sealedItem, new Identity { Type = IdentityType.None, Instance = player.Identity.Instance },
-                    sealedItem.InstanceId, sealedItem.StackCount, Retired: true)
-            };
-            if (opened != null) changes.Add(new InventoryRowChange(opened, destination.Identity, destinationSlot, opened.StackCount));
-            return TryCommit(player, changes,
-                () => IsCurrent(source, slot.Instance, sealedItem, sealedItem.InstanceId)
-                    && (opened == null || !destination.Content.ContainsKey(destinationSlot)),
-                () =>
-                {
-                    if (opened != null)
-                    {
-                        if (!destination.Add(destinationSlot, opened)) throw new InvalidOperationException("Reserved package grant slot changed.");
-                        player.Session?.Send(new TemplateActionMessage
-                        {
-                            Identity = player.Identity, ItemLowId = opened.LowId, ItemHighId = opened.HighId,
-                            Quality = opened.Quality, Unknown1 = 1, Unknown2 = 87,
-                            Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 }
-                        });
-                        player.Session?.Send(new ContainerAddItemMessage
-                        {
-                            Identity = player.Identity, SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
-                            Target = new Identity { Type = IdentityType.OverflowWindow, Instance = player.Identity.Instance }, TargetPlacement = 0x6f
-                        });
-                    }
-                    source.Content.Remove(slot.Instance);
-                    player.Session?.Send(new TemplateActionMessage
-                    {
-                        Identity = player.Identity, ItemLowId = sealedItem.LowId, ItemHighId = sealedItem.HighId,
-                        Quality = sealedItem.Quality > 0 ? sealedItem.Quality : 1, Unknown1 = 1,
-                        Unknown2 = 3, Placement = slot, Unknown3 = 50000, Unknown4 = player.Identity.Instance
-                    });
-                    player.Session?.Send(new CharacterActionMessage
-                    {
-                        Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot
-                    });
-                });
-        }
-
-        /// <summary>
-        /// Existing UploadNano OnUse contract: consume one crystal and store all newly uploaded
-        /// programs together. Mixed/specialized package effects are not silently approximated.
-        /// </summary>
-        public bool TryUseNanoCrystal(Player player, Identity slot, Item item)
-        {
-            if (!item.Can(CanFlags.Consume) || IsProtectedItem(item)
-                || !TryResolveOwnedSlot(player, slot, out Container page, out Item current)
-                || !ReferenceEquals(current, item) || item.StackCount <= 0
-                || !item.SpellList.TryGetValue(EventType.OnUse, out var spells) || spells.Count == 0
-                || !item.Definition.MeetsActionRequirements(s => player.Stats.Get(s), ActionType.ToUse)) return false;
-            var nanoIds = new List<int>();
-            foreach (ItemSpell spell in spells)
-            {
-                if (spell.FunctionType != (int)FunctionType.UploadNano
-                    || !ItemUseFunctions.CanExecute(player, spell)
-                    || !ItemUseFunctions.TryReadInt(spell.Arguments, 0, out int nanoId) || nanoId <= 0)
-                    return false;
-                if (!nanoIds.Contains(nanoId)) nanoIds.Add(nanoId);
-            }
-            if (nanoIds.TrueForAll(player.UploadedNanoIds.Contains))
-            {
-                player.Session?.Send(new ChatTextMessage { Identity = player.Identity, Text = "You already know that nano program." });
-                return false;
-            }
-            int before = item.StackCount;
-            bool retired = before == 1;
-            Identity destination = retired ? new Identity { Type = IdentityType.None, Instance = player.Identity.Instance } : page.Identity;
-            bool applied = TryCommit(player,
-                [new InventoryRowChange(item, destination, retired ? item.InstanceId : slot.Instance, retired ? before : before - 1, retired)],
-                () => IsCurrent(page, slot.Instance, item, item.InstanceId) && item.StackCount == before
-                    && nanoIds.Exists(id => !player.UploadedNanoIds.Contains(id)),
-                () =>
-                {
-                    if (retired) page.Content.Remove(slot.Instance);
-                    else item.StackCount = before - 1;
-                    player.Session?.Send(new TemplateActionMessage
-                    {
-                        Identity = player.Identity, ItemLowId = item.LowId, ItemHighId = item.HighId,
-                        Quality = item.Quality, Placement = slot, Unknown1 = 1, Unknown2 = 3
-                    });
-                    if (retired) player.Session?.Send(new CharacterActionMessage
-                    {
-                        Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot
-                    });
-                    foreach (int nanoId in nanoIds)
-                    {
-                        if (!player.TryAddUploadedNano(nanoId)) continue;
-                        player.Session?.Send(new CharacterActionMessage
-                        {
-                            Identity = player.Identity, Action = CharacterActionType.UploadNano,
-                            Target = player.Identity, Parameter1 = (int)IdentityType.NanoProgram, Parameter2 = nanoId
-                        });
-                    }
-                }, nanoIds);
-            return applied;
-        }
-
         public static bool TryResolveOwnedSlot(Player player, Identity slot, out Container page, out Item item)
         {
             page = null!; item = null!;
@@ -250,8 +127,7 @@ namespace ZoneEngine_New.Core.Inventory
                 && page.Content.TryGetValue(slot, out Item? current) && ReferenceEquals(current, expected);
 
         internal bool TryCommit(Player player, IReadOnlyList<InventoryRowChange> changes,
-            Func<bool> validate, Action publish, IReadOnlyList<int>? additionalNanoIds = null,
-            IReadOnlyList<StatRecord>? finalStats = null)
+            Func<bool> validate, Action publish, IReadOnlyList<StatRecord>? finalStats = null)
         {
             bool committed = false;
             bool successful = false;
@@ -286,11 +162,11 @@ namespace ZoneEngine_New.Core.Inventory
                                 if (change.FinalCount != item.StackCount)
                                     stacks.Add(new ItemStackUpdate(item.InstanceId, item.StackCount, change.FinalCount));
                             }
-                            else inserts[item.InstanceId] = ToRecord(item, change.Container, change.Placement, change.FinalCount);
+                            else inserts[item.InstanceId] = item.ToRecord(change.Container, change.Placement, change.FinalCount);
                         }
                         _persistence.Persist(new InventoryMutationBatch(player.Identity.Instance,
                             inserts.Values.ToArray(), locations.Values.ToArray(), stacks,
-                            additionalNanoIds == null ? nanos : nanos.Concat(additionalNanoIds).Distinct().ToArray())
+                            nanos)
                         {
                             FinalStats = finalStats ?? [],
                             EmptyContainersBeforeRetire = changes.Where(change => change.Retired
@@ -331,15 +207,6 @@ namespace ZoneEngine_New.Core.Inventory
             }
             return successful;
         }
-
-        public static ItemInstanceRecord ToRecord(Item item, Identity container, int placement, int count)
-            => new()
-            {
-                InstanceId = item.InstanceId, ContainerType = (int)container.Type,
-                ContainerInstance = container.Instance, ContainerPlacement = placement,
-                ItemType = item.Identity.Type != IdentityType.None ? (int)item.Identity.Type : item.Definition.ItemType,
-                LowId = item.LowId, HighId = item.HighId, Quality = item.Quality, StackCount = count, Source = item.Source
-            };
     }
 
     internal sealed record InventoryRowChange(Item Item, Identity Container, int Placement, int FinalCount, bool Retired = false);

@@ -138,7 +138,6 @@ namespace ZoneEngine_New.Tests
                                 "Level": 1,
                                 "TemplateId": 43296,
                                 "HasHeadMesh": false,
-                                "NpcFamily": 1,
                                 "Attackable": true,
                                 "KnuBotId": 1131,
                                 "Equipment": [[120912, 120912], [120915, 120915]],
@@ -160,7 +159,6 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual("LEAF", template.Hash);
             Assert.AreEqual("Editable Fixture", template.Name);
             Assert.AreEqual(43296, template.TemplateId);
-            Assert.AreEqual(1, template.NpcFamily);
             Assert.AreEqual(1131, template.KnuBotId);
             Assert.IsTrue(template.Attackable);
             Assert.AreEqual(1, template.MinLevel);
@@ -173,7 +171,7 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void MissingHashNeverFallsBackToAaaa()
+        public void MissingHashFallsBackToAaaa()
         {
             NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(
                 """
@@ -182,13 +180,23 @@ namespace ZoneEngine_New.Tests
                         "Templates": [
                             { "Name": "To Be Determined", "Level": 1 }
                         ]
-                    }
+                    },
+                    "CYCLE": { "Children": ["CYCLE"] }
                 }
                 """);
 
-            Assert.IsFalse(catalog.CanResolve("ZZZZ"));
-            Assert.IsFalse(catalog.TryResolve("ZZZZ", 1, out _));
-            Assert.IsFalse(catalog.TryResolve("AAAA", 1, out _));
+            Assert.IsTrue(catalog.CanResolve("AAAA"));
+            Assert.IsTrue(catalog.TryResolve("AAAA", 1, out MobTemplate aaaa));
+            Assert.AreEqual("AAAA", aaaa.Hash);
+            Assert.AreEqual("To Be Determined", aaaa.Name);
+
+            Assert.IsTrue(catalog.CanResolve("ZZZZ"));
+            Assert.IsTrue(catalog.TryResolve("ZZZZ", 1, out MobTemplate fallback));
+            Assert.AreEqual("AAAA", fallback.Hash);
+            Assert.AreEqual("To Be Determined", fallback.Name);
+
+            Assert.IsFalse(catalog.CanResolve("CYCLE"));
+            Assert.IsFalse(catalog.TryResolve("CYCLE", 1, out _));
         }
 
         [TestMethod]

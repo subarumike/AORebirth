@@ -23,7 +23,7 @@ namespace ZoneEngine_New.Core.Nanos
     /// <summary>
     /// Drives nano casts and NCU entries: gates a cast, runs the cast bar, lands or refuses the
     /// buff, starts the recharge lockout, and tells the clients involved.
-    /// This actor-local runtime is for NPCs. Player casting and persistence belong to NanoService.
+    /// State lives on <see cref="Character"/>; this type owns the sequencing and the packets.
     /// </summary>
     public static class NanoRuntime
     {
@@ -67,29 +67,39 @@ namespace ZoneEngine_New.Core.Nanos
             DateTime nowUtc)
         {
             ArgumentNullException.ThrowIfNull(caster);
-            if (caster is Player) throw new InvalidOperationException("Player casts belong to the DAO-backed NanoService.");
 
             if (nanoId <= 0)
+            {
+                LogCastRefused(caster, nanoId, target, NanoCastRefusal.NotUploaded, phase: "start", detail: "nanoId<=0");
                 return NanoCastRefusal.NotUploaded;
+            }
 
+            //This is smelly! - Delmus
             // Same click often delivers two start packets; the second must not refresh/remove.
-            if (caster.IsDuplicateRecentNanoLand(nanoId, target, nowUtc))
-                return NanoCastRefusal.None;
+            // if (caster.IsDuplicateRecentNanoLand(nanoId, target, nowUtc))
+            //     return NanoCastRefusal.None;
 
             if (!TryResolveSpell(caster, nanoId, out NanoSpell? spell) || spell == null)
             {
+                LogCastRefused(
+                    caster,
+                    nanoId,
+                    target,
+                    NanoCastRefusal.NotUploaded,
+                    phase: "start",
+                    detail: "spell resolve failed");
                 Refuse(caster, NanoCastRules.Describe(NanoCastRefusal.NotUploaded));
                 return NanoCastRefusal.NotUploaded;
             }
 
             Character? recipient = ResolveTarget(caster, target);
-            if (recipient is Player) throw new InvalidOperationException("NPC nanos targeting durable player state require a DAO-backed effect owner.");
             int nanoCost = ResolveNanoCost(caster, spell);
-            NanoCastRefusal refusal = NanoCastRules.Evaluate(
-                BuildAttempt(caster, spell, recipient, nanoCost, nowUtc));
+            NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, nanoCost, nowUtc);
+            NanoCastRefusal refusal = NanoCastRules.Evaluate(attempt);
 
             if (refusal != NanoCastRefusal.None)
             {
+                LogCastRefused(caster, nanoId, target, refusal, phase: "start", attempt: attempt, spell: spell);
                 Refuse(caster, NanoCastRules.Describe(refusal));
                 return refusal;
             }
@@ -166,11 +176,19 @@ namespace ZoneEngine_New.Core.Nanos
             Character? recipient = ResolveTarget(caster, cast.Target);
 
             // Everything the up-front gate checked can have changed while the bar ran.
-            NanoCastRefusal refusal = NanoCastRules.Evaluate(
-                BuildAttempt(caster, spell, recipient, cast.NanoCost, nowUtc));
+            NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, cast.NanoCost, nowUtc);
+            NanoCastRefusal refusal = NanoCastRules.Evaluate(attempt);
             // Cast bar already went out via CastNanoSpell; refusal must clear it.
             if (refusal != NanoCastRefusal.None)
             {
+                LogCastRefused(
+                    caster,
+                    spell.Id,
+                    cast.Target,
+                    refusal,
+                    phase: "complete",
+                    attempt: attempt,
+                    spell: spell);
                 AnnounceCastInterrupted(caster, spell.Id);
                 Refuse(caster, NanoCastRules.Describe(refusal));
                 return;
@@ -178,7 +196,17 @@ namespace ZoneEngine_New.Core.Nanos
 
             // Duplicate instant-cast packets can both reach Complete before the land window closes.
             if (!caster.TryClaimNanoLand(spell.Id, cast.Target, nowUtc))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Nano cast duplicate land suppressed caster={0} nano={1} target={2}",
+                        caster.Identity.Instance,
+                        spell.Id,
+                        cast.Target.Instance));
                 return;
+            }
 
             SpendNano(caster, cast.NanoCost);
             AnnounceCastFinished(caster, spell.Id);
@@ -211,6 +239,20 @@ namespace ZoneEngine_New.Core.Nanos
 
             if (applied == null)
             {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Nano apply refused caster={0} nano={1} target={2} decision={3} ncu={4}/{5} strain={6} stacking={7} ncuCost={8}",
+                        caster.Identity.Instance,
+                        spell.Id,
+                        recipient.Identity.Instance,
+                        decision,
+                        recipient.UsedNcu,
+                        recipient.MaxNcu,
+                        spell.NanoStrain,
+                        spell.StackingOrder,
+                        spell.NcuCost));
                 Refuse(caster, DescribeApplyRefusal(decision));
                 return;
             }
@@ -370,12 +412,17 @@ namespace ZoneEngine_New.Core.Nanos
 
             IInventoryRepository inventory = playfield.GetRequiredService<IInventoryRepository>();
             IItemBuilder items = playfield.GetRequiredService<IItemBuilder>();
-            spell.ExecuteOnUseSpells(recipient, inventory, items, skipPassiveModifiers, source: caster);
-            recipient.FlushDirtyStats();
+            spell.ExecuteOnUseSpells(
+                recipient,
+                inventory,
+                items,
+                skipPassiveModifiers,
+                source: caster);
         }
 
         static void ExecuteBuffEnd(Character owner, Buff buff)
         {
+            //Shouldn't this happen as part of the rebase?
             buff.ReverseOnUseSetFlags(owner);
 
             Playfield? playfield = owner.Playfield;
@@ -386,9 +433,7 @@ namespace ZoneEngine_New.Core.Nanos
                 buff.ExecuteTerminateSpells(owner, inventory, items);
             }
 
-            if (owner is Player)
-                owner.FlushDirtyStats();
-            else
+            if (owner is not Player)
                 owner.MarkRebaseDirty();
         }
 
@@ -431,6 +476,111 @@ namespace ZoneEngine_New.Core.Nanos
             SessionOf(caster)?.Send(message);
             if (!ReferenceEquals(caster, owner))
                 SessionOf(owner)?.Send(message);
+        }
+
+        static void LogCastRefused(
+            Character caster,
+            int nanoId,
+            Identity target,
+            NanoCastRefusal refusal,
+            string phase,
+            NanoCastAttempt? attempt = null,
+            NanoSpell? spell = null,
+            string? detail = null)
+        {
+            string attemptText = attempt is NanoCastAttempt a
+                ? string.Format(
+                    CultureInfo.InvariantCulture,
+                    " dead={0} casting={1} recharging={2} uploaded={3} reqs={4} targetOk={5} targetDead={6} nano={7}/{8}",
+                    a.CasterIsDead,
+                    a.CasterIsCasting,
+                    a.CasterIsRecharging,
+                    a.IsUploaded,
+                    a.RequirementsMet,
+                    a.TargetExists,
+                    a.TargetIsDead,
+                    a.CurrentNano,
+                    a.NanoCost)
+                : string.Empty;
+
+            string spellText = spell != null
+                ? string.Format(
+                    CultureInfo.InvariantCulture,
+                    " templateId={0} name={1} actions={2} isBuff={3}",
+                    spell.Id,
+                    spell.Name ?? string.Empty,
+                    spell.Actions.Count,
+                    spell.IsBuff)
+                : string.Empty;
+
+            string uploadedText = string.Format(
+                CultureInfo.InvariantCulture,
+                " uploadedCount={0} hasNano={1}",
+                caster.UploadedNanoIds.Count,
+                caster.UploadedNanoIds.Contains(nanoId));
+
+            string reqDetail = string.Empty;
+            if (refusal == NanoCastRefusal.RequirementsNotMet && spell != null)
+                reqDetail = DescribeFailedRequirements(caster, spell);
+
+            LogUtil.Debug(
+                DebugInfoDetail.Engine,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Nano cast refused phase={0} caster={1} nano={2} target={3}:{4} reason={5}{6}{7}{8}{9}{10}",
+                    phase,
+                    caster.Identity.Instance,
+                    nanoId,
+                    target.Type,
+                    target.Instance,
+                    refusal,
+                    attemptText,
+                    spellText,
+                    uploadedText,
+                    reqDetail,
+                    detail != null ? " detail=" + detail : string.Empty));
+        }
+
+        static string DescribeFailedRequirements(Character caster, NanoSpell spell)
+        {
+            ItemAction? action = null;
+            foreach (ItemAction candidate in spell.Actions)
+            {
+                if (candidate.ActionType == (int)ActionType.ToUse)
+                {
+                    action = candidate;
+                    break;
+                }
+            }
+
+            if (action == null)
+                return " failedReqs=(no ToUse action)";
+
+            var parts = new List<string>();
+            foreach (ItemRequirement requirement in action.Requirements)
+            {
+                if (ItemTemplate.IsRequirementLinkOperator(requirement))
+                    continue;
+
+                int have = caster.Stats.Get((CharacterStat)requirement.StatNumber);
+                if (ItemTemplate.EvaluateRequirement(have, requirement))
+                    continue;
+
+                parts.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "stat={0}({1}) have={2} op={3} need={4} child={5}",
+                        (CharacterStat)requirement.StatNumber,
+                        requirement.StatNumber,
+                        have,
+                        requirement.Operator,
+                        requirement.Value,
+                        requirement.ChildOperator));
+            }
+
+            return parts.Count == 0
+                ? " failedReqs=(expression/link fold)"
+                : " failedReqs=[" + string.Join("; ", parts) + "]";
         }
 
         static void Refuse(Character caster, string text)

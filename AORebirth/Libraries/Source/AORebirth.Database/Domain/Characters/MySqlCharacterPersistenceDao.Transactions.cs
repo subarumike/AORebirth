@@ -10,11 +10,31 @@ namespace AORebirth.Database.Domain.Characters
     public sealed partial class MySqlCharacterPersistenceDao
     {
         public void SaveInventoryAndUploadedNanos(int characterId, IList<PersistedItemData> inserts,
-            IList<ItemLocationData> locations, IList<int> uploadedNanoIds)
+            IList<ItemLocationData> locations, IList<int> uploadedNanoIds,
+            IList<PersistedActiveNanoData>? activeNanos = null)
         {
             if (inserts == null || locations == null || uploadedNanoIds == null) throw new ArgumentNullException("batch");
-            if (inserts.Count == 0 && locations.Count == 0 && uploadedNanoIds.Count == 0) return;
-            Transaction((c, t) => { WriteItems(c, t, inserts, locations); WriteUploadedNanos(c, t, characterId, uploadedNanoIds); return 0; });
+            if (inserts.Count == 0 && locations.Count == 0 && uploadedNanoIds.Count == 0 && activeNanos == null) return;
+            if (activeNanos != null
+                && (activeNanos.Any(n => n.NanoId <= 0 || n.NanoInstance <= 0 || n.DurationCentiseconds < 0 || n.ExpiresAtUtcTicks < 0)
+                    || activeNanos.Select(n => n.Strain).Distinct().Count() != activeNanos.Count
+                    || activeNanos.Select(n => n.NanoInstance).Distinct().Count() != activeNanos.Count))
+                throw new ArgumentException("Invalid or duplicate active nano identity.", nameof(activeNanos));
+            Transaction((c, t) =>
+            {
+                WriteItems(c, t, inserts, locations);
+                WriteUploadedNanos(c, t, characterId, uploadedNanoIds);
+                if (activeNanos != null)
+                {
+                    Execute(c, t, "DELETE FROM charactersactivenanos WHERE CharacterId=@Id", "@Id", characterId);
+                    foreach (var nano in activeNanos)
+                        Execute(c, t, "INSERT INTO charactersactivenanos (CharacterId,NanoId,Strain,NanoInstance,DurationCentiseconds,ExpiresAtUtcTicks) "
+                            + "VALUES (@Id,@Nano,@Strain,@Instance,@Duration,@Expiry)", "@Id", characterId,
+                            "@Nano", nano.NanoId, "@Strain", nano.Strain, "@Instance", nano.NanoInstance,
+                            "@Duration", nano.DurationCentiseconds, "@Expiry", nano.ExpiresAtUtcTicks);
+                }
+                return 0;
+            });
         }
 
         public void CommitInventoryMutation(CharacterInventoryMutationData mutation)

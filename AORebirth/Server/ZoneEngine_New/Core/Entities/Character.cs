@@ -80,7 +80,7 @@ namespace ZoneEngine_New.Core.Entities
         {
             if (reason != TimedActionInterrupt.Movement)
                 Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
-            if (this is not Player) NanoRuntime.InterruptCast(this);
+            NanoRuntime.InterruptCast(this);
             TimedActionsInterrupted?.Invoke(this, reason);
         }
 
@@ -130,7 +130,7 @@ namespace ZoneEngine_New.Core.Entities
             _deathNotified = true;
             InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             SetFightingTarget(Identity.None);
-            if (this is not Player) NanoRuntime.ClearBuffsOnDeath(this);
+            NanoRuntime.ClearBuffsOnDeath(this);
 
             Cell?.Announce(
                 new CharacterActionMessage
@@ -461,8 +461,7 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public virtual void StartFighting(Identity target, byte action)
         {
-            if (this is Player player && (player.IsPersistenceQuarantined
-                || player.NanoRuntime?.IsFightingRestricted(player) == true))
+            if (this is Player player && player.IsPersistenceQuarantined)
                 return;
             SetFightingTarget(target);
             ResetAllWeaponAttacks();
@@ -784,7 +783,7 @@ namespace ZoneEngine_New.Core.Entities
                 TickCombat(deltaTime);
             if (!IsDead && UsesPassiveRegen)
                 TickPassiveRegen(deltaTime);
-            if (this is not Player) NanoRuntime.Tick(this, DateTime.UtcNow);
+            NanoRuntime.Tick(this, DateTime.UtcNow);
             base.Tick(deltaTime);
         }
 
@@ -1037,15 +1036,73 @@ namespace ZoneEngine_New.Core.Entities
             return null;
         }
 
+        bool _applyingVitalFromPercent;
+
         void OnStatChanged(CharacterStat stat, int previous, int next, bool isInitialSet)
         {
             Motor.OnStatChanged(stat, previous, next, isInitialSet);
+
+            if (!_applyingVitalFromPercent)
+            {
+                if (stat == CharacterStat.Health)
+                    SyncVitalPercent(next, CharacterStat.MaxHealth, CharacterStat.PercentRemainingHealth);
+                else if (stat == CharacterStat.CurrentNano)
+                    SyncVitalPercent(next, CharacterStat.MaxNanoEnergy, CharacterStat.PercentRemainingNano);
+            }
 
             if (stat != CharacterStat.AggDef)
                 return;
 
             foreach (CharacterWeapon weapon in Weapons.Values)
                 weapon?.RefreshEffectiveSpeeds();
+        }
+
+        /// <summary>0–100 remaining fraction of <paramref name="maxStat"/> after a current-vital change.</summary>
+        void SyncVitalPercent(int current, CharacterStat maxStat, CharacterStat percentStat)
+        {
+            int max = Stats.GetOrZero(maxStat);
+            if (max <= 0)
+                return;
+
+            int percent = (int)Math.Clamp((long)current * 100 / max, 0, 100);
+            Stats.Set(percentStat, percent, StatDetail.Base, dirty: true);
+        }
+
+        /// <summary>
+        /// Stored percent when set; otherwise derive from current/max. Missing max → 100.
+        /// </summary>
+        protected int ResolveVitalPercent(CharacterStat percentStat, CharacterStat currentStat, CharacterStat maxStat)
+        {
+            int stored = Stats.Get(percentStat);
+            if (!StatCollection.IsUnset(stored))
+                return Math.Clamp(stored, 0, 100);
+
+            int max = Stats.GetOrZero(maxStat);
+            if (max <= 0)
+                return 100;
+
+            return (int)Math.Clamp((long)Stats.GetOrZero(currentStat) * 100 / max, 0, 100);
+        }
+
+        /// <summary>Sets current vital from an already-resolved 0–100 percent of <paramref name="newMax"/>.</summary>
+        protected void ApplyVitalFromPercent(CharacterStat currentStat, int newMax, int percent)
+        {
+            int clampedPercent = Math.Clamp(percent, 0, 100);
+            int value = newMax <= 0 ? 0 : (int)((long)newMax * clampedPercent / 100);
+            if (value < 0)
+                value = 0;
+            else if (value > newMax)
+                value = newMax;
+
+            _applyingVitalFromPercent = true;
+            try
+            {
+                Stats.Set(currentStat, value, StatDetail.Base, dirty: true);
+            }
+            finally
+            {
+                _applyingVitalFromPercent = false;
+            }
         }
 
 
@@ -1077,7 +1134,6 @@ namespace ZoneEngine_New.Core.Entities
         public void BeginNanoCast(PendingNanoCast cast)
         {
             ArgumentNullException.ThrowIfNull(cast);
-            if (this is Player) throw new InvalidOperationException("Player casts belong to the DAO-backed NanoService.");
             PendingCast = cast;
         }
 
@@ -1154,7 +1210,6 @@ namespace ZoneEngine_New.Core.Entities
             out Buff? replaced)
         {
             ArgumentNullException.ThrowIfNull(spell);
-            if (this is Player) throw new InvalidOperationException("Player buffs belong to the DAO-backed NanoService.");
 
             applied = null;
             BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, _buffs, MaxNcu, out replaced);
@@ -1178,7 +1233,6 @@ namespace ZoneEngine_New.Core.Entities
         public Buff? TryRestoreBuff(NanoSpell spell, Identity source, int nanoInstance, DateTime expiresAtUtc)
         {
             ArgumentNullException.ThrowIfNull(spell);
-            if (this is Player) throw new InvalidOperationException("Player hydration belongs to the DAO-backed NanoService.");
 
             if (!spell.IsBuff || TryGetBuff(spell.Id, out _))
                 return null;
@@ -1262,6 +1316,7 @@ namespace ZoneEngine_New.Core.Entities
         {
             SyncUsedNcu();
             MarkRebaseDirty();
+            SnapshotActiveNanosForPersistence();
         }
 
         void SyncUsedNcu()
@@ -1278,6 +1333,72 @@ namespace ZoneEngine_New.Core.Entities
 
             UsedNcu = used;
             Stats.Set(CharacterStat.CurrentNCU, used, StatDetail.Base, dirty: true);
+        }
+
+        readonly object _activeNanoDirtyGate = new();
+        List<ActiveNanoRecord>? _dirtyActiveNanos;
+
+        public bool HasDirtyActiveNanos
+        {
+            get
+            {
+                lock (_activeNanoDirtyGate)
+                    return _dirtyActiveNanos != null;
+            }
+        }
+
+        /// <summary>
+        /// Snapshots NCU for the write-behind flush, which runs off the tick thread and so must
+        /// never walk the live buff list. Only players persist NCU.
+        /// </summary>
+        void SnapshotActiveNanosForPersistence()
+        {
+            if (this is not Player player)
+                return;
+
+            var snapshot = new List<ActiveNanoRecord>(_buffs.Count);
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                Buff buff = _buffs[i];
+                snapshot.Add(
+                    new ActiveNanoRecord
+                    {
+                        NanoId = buff.Id,
+                        Strain = buff.NanoStrain,
+                        NanoInstance = buff.NanoInstance,
+                        DurationCentiseconds = buff.DurationCentiseconds,
+                        ExpiresAtUtcTicks = buff.ExpiresAtUtc.Ticks
+                    });
+            }
+
+            lock (_activeNanoDirtyGate)
+                _dirtyActiveNanos = snapshot;
+
+            Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);
+        }
+
+        /// <summary>Takes ownership of the pending NCU snapshot; null when nothing changed.</summary>
+        public List<ActiveNanoRecord>? TakeDirtyActiveNanos()
+        {
+            lock (_activeNanoDirtyGate)
+            {
+                List<ActiveNanoRecord>? snapshot = _dirtyActiveNanos;
+                _dirtyActiveNanos = null;
+                return snapshot;
+            }
+        }
+
+        /// <summary>
+        /// Returns a failed snapshot for a later retry. A newer snapshot wins: it already
+        /// describes the current NCU set.
+        /// </summary>
+        public void RestoreDirtyActiveNanos(List<ActiveNanoRecord>? snapshot)
+        {
+            if (snapshot == null)
+                return;
+
+            lock (_activeNanoDirtyGate)
+                _dirtyActiveNanos ??= snapshot;
         }
 
         /// <summary>

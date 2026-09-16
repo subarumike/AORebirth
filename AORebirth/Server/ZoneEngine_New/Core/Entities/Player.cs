@@ -78,7 +78,6 @@ namespace ZoneEngine_New.Core.Entities
         public string LastName { get; set; } = string.Empty;
 
         public IZoneSession? Session { get; set; }
-        internal ZoneEngine_New.Core.Nanos.NanoService? NanoRuntime { get; set; }
 
         public PlayerConnectionPhase ConnectionPhase { get; set; } = PlayerConnectionPhase.Online;
 
@@ -231,9 +230,9 @@ namespace ZoneEngine_New.Core.Entities
             // Bonuses first: max health and max nano read the full (base + bonus) ability values,
             // so equipment and buffs have to be in place before those are recomputed.
             RebaseEquipBonuses();
+            ApplyBuffBonuses();
             RebaseMaxHealth();
             RebaseMaxNano();
-            NanoRuntime?.ReapplyBonusesAfterRebase(this);
         }
 
         void RebaseMaxHealth()
@@ -241,7 +240,12 @@ namespace ZoneEngine_New.Core.Entities
             if (!MaxHealthCalculator.TryCompute(Stats, out int maxHealth))
                 return;
 
+            int percent = ResolveVitalPercent(
+                CharacterStat.PercentRemainingHealth,
+                CharacterStat.Health,
+                CharacterStat.MaxHealth);
             Stats.Set(CharacterStat.MaxHealth, maxHealth, StatDetail.Base, dirty: true);
+            ApplyVitalFromPercent(CharacterStat.Health, maxHealth, percent);
         }
 
         void RebaseMaxNano()
@@ -249,7 +253,12 @@ namespace ZoneEngine_New.Core.Entities
             if (!MaxNanoCalculator.TryCompute(Stats, out int maxNano))
                 return;
 
+            int percent = ResolveVitalPercent(
+                CharacterStat.PercentRemainingNano,
+                CharacterStat.CurrentNano,
+                CharacterStat.MaxNanoEnergy);
             Stats.Set(CharacterStat.MaxNanoEnergy, maxNano, StatDetail.Base, dirty: true);
+            ApplyVitalFromPercent(CharacterStat.CurrentNano, maxNano, percent);
         }
 
         void RebaseEquipBonuses()

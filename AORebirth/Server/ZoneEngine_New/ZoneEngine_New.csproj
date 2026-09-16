@@ -82,7 +82,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="../../GameData/NanoMechanics.json;../../GameData/WorldContent.json;../../GameData/ItemBehavior.json">
+    <Content Include="../../GameData/WorldContent.json;../../GameData/ItemBehavior.json">
       <Link>GameData/%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -170,7 +170,7 @@
       <Link>SqlTables\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!-- Full GameData tree (items.dat, MobTemplates, Playfields metadata/spawns). -->
+    <!-- Full GameData tree (items.dat, NpcTemplates, Playfields metadata/spawns). -->
     <Content Include="..\..\GameData\**\*">
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

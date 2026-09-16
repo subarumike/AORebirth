@@ -92,33 +92,36 @@ namespace ZoneEngine_New.Core.Characters
                 || error.StartsWith("unset-sentinel:", StringComparison.Ordinal)))
                 return new CharacterHydrationValidationResult(errors);
 
-            int flags = stats[CharacterStat.Flags];
-            if (((CharacterFlags)flags).HasFlag(CharacterFlags.Tower)) errors.Add("player-flags-tower");
-            Range(stats, CharacterStat.Breed, 1, 4, errors);
-            Range(stats, CharacterStat.Sex, 0, 3, errors);
-            Range(stats, CharacterStat.Profession, 1, (int)Profession.Shade, errors);
-            Range(stats, CharacterStat.Fatness, 0, 2, errors);
-            Positive(stats, CharacterStat.Race, errors);
-            Positive(stats, CharacterStat.HeadMesh, errors);
-            Range(stats, CharacterStat.VisualFlags, 0, short.MaxValue, errors);
-            Range(stats, CharacterStat.Scale, 1, short.MaxValue, errors);
-            Range(stats, CharacterStat.Level, 1, 220, errors);
-            Range(stats, CharacterStat.TitleLevel, 1, 7, errors);
-            Range(stats, CharacterStat.Side, 0, 2, errors);
-            Range(stats, CharacterStat.Expansion, 0, short.MaxValue, errors);
-            Positive(stats, CharacterStat.Strength, errors);
-            Positive(stats, CharacterStat.Agility, errors);
-            Positive(stats, CharacterStat.Stamina, errors);
-            Positive(stats, CharacterStat.Intelligence, errors);
-            Positive(stats, CharacterStat.Sense, errors);
-            Positive(stats, CharacterStat.Psychic, errors);
-            Positive(stats, CharacterStat.BodyDevelopment, errors);
-            Positive(stats, CharacterStat.NanoPool, errors);
-            Positive(stats, CharacterStat.MaxHealth, errors);
-            NonNegative(stats, CharacterStat.Health, errors);
-            Positive(stats, CharacterStat.MaxNanoEnergy, errors);
-            NonNegative(stats, CharacterStat.CurrentNano, errors);
-            NonNegative(stats, CharacterStat.RunSpeed, errors);
+            if (!stats.TryGetValue(CharacterStat.GmLevel, out int gmLevel) || gmLevel <= 0)
+            {
+                int flags = stats[CharacterStat.Flags];
+                if (((CharacterFlags)flags).HasFlag(CharacterFlags.Tower)) errors.Add("player-flags-tower");
+                Range(stats, CharacterStat.Breed, 1, 4, errors);
+                Range(stats, CharacterStat.Sex, 0, 3, errors);
+                Range(stats, CharacterStat.Profession, 1, (int)Profession.Shade, errors);
+                Range(stats, CharacterStat.Fatness, 0, 2, errors);
+                Positive(stats, CharacterStat.Race, errors);
+                Positive(stats, CharacterStat.HeadMesh, errors);
+                Range(stats, CharacterStat.VisualFlags, 0, short.MaxValue, errors);
+                Range(stats, CharacterStat.Scale, 1, short.MaxValue, errors);
+                Range(stats, CharacterStat.Level, 1, 220, errors);
+                Range(stats, CharacterStat.TitleLevel, 1, 7, errors);
+                Range(stats, CharacterStat.Side, 0, 2, errors);
+                Range(stats, CharacterStat.Expansion, 0, short.MaxValue, errors);
+                Positive(stats, CharacterStat.Strength, errors);
+                Positive(stats, CharacterStat.Agility, errors);
+                Positive(stats, CharacterStat.Stamina, errors);
+                Positive(stats, CharacterStat.Intelligence, errors);
+                Positive(stats, CharacterStat.Sense, errors);
+                Positive(stats, CharacterStat.Psychic, errors);
+                Positive(stats, CharacterStat.BodyDevelopment, errors);
+                Positive(stats, CharacterStat.NanoPool, errors);
+                Positive(stats, CharacterStat.MaxHealth, errors);
+                NonNegative(stats, CharacterStat.Health, errors);
+                Positive(stats, CharacterStat.MaxNanoEnergy, errors);
+                NonNegative(stats, CharacterStat.CurrentNano, errors);
+                NonNegative(stats, CharacterStat.RunSpeed, errors);
+            }
 
             return new CharacterHydrationValidationResult(errors);
         }

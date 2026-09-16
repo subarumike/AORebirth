@@ -314,7 +314,7 @@ namespace ZoneEngine_New.Tests
         {
             public int Calls;
             public Exception? Failure;
-            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds)
+            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos)
             {
                 Calls++;
                 if (Failure != null) throw Failure;

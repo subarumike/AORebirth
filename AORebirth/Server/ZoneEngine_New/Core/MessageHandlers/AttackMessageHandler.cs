@@ -29,8 +29,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
             Player? player = session.Player;
             if (player == null || player.IsDead || player.IsPersistenceQuarantined
-                || !ReferenceEquals(player.Session, session)
-                || player.NanoRuntime?.IsFightingRestricted(player) == true)
+                || !ReferenceEquals(player.Session, session))
                 return;
 
             Playfield? playfield = player.Playfield;

@@ -103,6 +103,16 @@ namespace ZoneEngine_New.Core.Inventory
             return unchecked((short)flags);
         }
 
+        /// <summary>Durable <c>item_instances</c> row for this instance at the given location.</summary>
+        public ItemInstanceRecord ToRecord(Identity container, int placement, int count)
+            => new()
+            {
+                InstanceId = InstanceId, ContainerType = (int)container.Type,
+                ContainerInstance = container.Instance, ContainerPlacement = placement,
+                ItemType = ResolvedItemType,
+                LowId = LowId, HighId = HighId, Quality = Quality, StackCount = count, Source = Source
+            };
+
         /// <summary>True when the item's Can stat includes all of <paramref name="flags"/>.</summary>
         public bool Can(CanFlags flags)
             => ((CanFlags)(uint)GetStat(CharacterStat.Can) & flags) == flags;
@@ -118,6 +128,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// Inventory/worn GenericCmd Use entry point. Bag open/reopen/close-toggle, then OnUse spells.
+        /// Consumable items spend one charge after those functions succeed.
         /// </summary>
         public bool Use(
             Player player,
@@ -135,15 +146,6 @@ namespace ZoneEngine_New.Core.Inventory
             if (Locked)
                 return false;
 
-            if (player.Playfield.GetRequiredService<Missions.AuthoredQuestService>().IsAuthoredItem(this))
-                return player.Playfield.GetRequiredService<Missions.AuthoredQuestService>().TryUseItem(player, slotIdentity, this);
-
-            if (ItemBehaviorContent.Current.FindPackage(this) != null)
-                return player.Playfield.GetRequiredService<InventoryActionService>().TryOpenPackage(player, slotIdentity, this);
-
-            if (InventoryActionService.IsVitalItem(this))
-                return player.Playfield.GetRequiredService<InventoryActionService>().TryUseVitalItem(player, slotIdentity, this);
-
             if (Identity.Type == IdentityType.Container && Identity.Instance != 0 && Can(CanFlags.Use))
             {
                 if (TryUseBackpack(player, slotIdentity, inventoryRepository, items))
@@ -154,9 +156,11 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
             if (!Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))
                 return false;
-            if (Can(CanFlags.Consume) && !InventoryActionService.IsProtectedItem(this))
-                return player.Playfield.GetRequiredService<InventoryActionService>().TryUseNanoCrystal(player, slotIdentity, this);
-            return Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
+            if (!Definition.ExecuteOnUseSpells(player, inventoryRepository, items))
+                return false;
+            if (Can(CanFlags.Consume))
+                ConsumeCharge(player, slotIdentity);
+            return true;
         }
 
         /// <summary>

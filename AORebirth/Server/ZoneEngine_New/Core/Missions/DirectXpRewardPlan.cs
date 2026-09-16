@@ -114,7 +114,6 @@ public sealed class DirectXpRewardPlan
         bool nanoKnown = MaxNanoCalculator.TryCompute(equipment, out int nano);
         if (healthKnown) equipment.Set(CharacterStat.MaxHealth, health);
         if (nanoKnown) equipment.Set(CharacterStat.MaxNanoEnergy, nano);
-        player.NanoRuntime?.ProjectBonusesAfterRebase(player, equipment);
         if (healthKnown)
         {
             values[CharacterStat.MaxHealth] = health;

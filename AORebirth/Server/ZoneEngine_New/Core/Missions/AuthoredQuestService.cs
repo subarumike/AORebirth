@@ -213,7 +213,7 @@ public sealed partial class AuthoredQuestService
     {
         if (tx is not IMissionInventoryMutationTransaction inventory) throw new InvalidOperationException("Mission DAO does not support atomic item effects.");
         inventory.ApplyInventoryMutation(plan.Rows.Select(ToMissionItem).ToArray(),
-            [ToMissionItem(InventoryActionService.ToRecord(consumed, player.Inventory.Inventory.Identity, slot.Instance, consumed.StackCount))]);
+            [ToMissionItem(consumed.ToRecord(player.Inventory.Inventory.Identity, slot.Instance, consumed.StackCount))]);
     }
 
     static MissionItemInstanceData ToMissionItem(ItemInstanceRecord row) => new()

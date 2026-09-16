@@ -68,15 +68,16 @@ namespace ZoneEngine_New
                 if (HasArgument(args, "--validate-database"))
                     return CheckDatabase();
 
+                bool skipPlayfieldPackagePin = RuntimeStartup.SkipPlayfieldPackagePin(args);
                 if (HasArgument(args, "--validate-startup"))
                 {
-                    RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+                    RuntimeStartup.ValidatePackage(AppContext.BaseDirectory, skipPlayfieldPackagePin);
                     Console.WriteLine("ZONEENGINE_NEW_STARTUP_VALIDATION_OK");
                     return 0;
                 }
                 if (CheckDatabase() != 0)
                     return 2;
-                RuntimeStartup.ValidatePackage(AppContext.BaseDirectory);
+                RuntimeStartup.ValidatePackage(AppContext.BaseDirectory, skipPlayfieldPackagePin);
 
                 if (!InitializeLogging())
                     return 1;
@@ -161,6 +162,8 @@ namespace ZoneEngine_New
             services.AddSingleton<IInventoryRepository>(provider => provider.GetRequiredService<MySqlInventoryRepository>());
             services.AddSingleton<MySqlUploadedNanoRepository>();
             services.AddSingleton<IUploadedNanoRepository>(provider => provider.GetRequiredService<MySqlUploadedNanoRepository>());
+            services.AddSingleton<MySqlActiveNanoRepository>();
+            services.AddSingleton<IActiveNanoRepository>(provider => provider.GetRequiredService<MySqlActiveNanoRepository>());
             services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();
             services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemNameRepository, MySqlItemNameRepository>();
@@ -205,19 +208,6 @@ namespace ZoneEngine_New
             services.AddSingleton(_ => ZoneEngine_New.Core.Dialogue.DialogueCatalog.Load(AppContext.BaseDirectory));
             services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueActionRouter>();
             services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueService>();
-            services.AddSingleton<INanoCatalog>(provider => NanoCatalog.Load(
-                Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "nanos.dat")));
-            services.AddSingleton<IActiveNanoRepository, MySqlActiveNanoRepository>();
-            services.AddSingleton(provider => NanoMechanicCatalog.Load(
-                Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "NanoMechanics.json")));
-            services.AddSingleton<INanoSpecialization, PeriodicTeamHealNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, ActiveStatOverlayNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, MorphNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, DurationOnlyNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, TeamTeleportNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, SummonNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, AreaTauntNanoSpecialization>();
-            services.AddSingleton<NanoService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
             services.AddSingleton<TradeService>();

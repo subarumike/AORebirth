@@ -434,7 +434,6 @@ namespace ZoneEngine_New.Core.Network
                     // Close can race the final PF shutdown/snapshot. The manager-owned team
                     // authority outlives its disposed child provider and fences exact owners.
                     (owned.Playfield ?? transferSource)?.NotifyTransportDisconnected(owned, this);
-                    owned.NanoRuntime?.Cancel(owned, this);
                     owned.EnterLinkDead(PlayfieldManager.ResolveLinkDeadTimeout());
                     _logger.Info(
                         string.Format(

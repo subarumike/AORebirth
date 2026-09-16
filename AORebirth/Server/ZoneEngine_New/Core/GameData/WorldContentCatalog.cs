@@ -14,7 +14,6 @@ public sealed class WorldContentCatalog
     public int SchemaVersion { get; set; } = 1;
     public WorldNpcDefinition[] Npcs { get; set; } = [];
     public WorldShopDefinition[] Shops { get; set; } = [];
-    public WorldSummonDefinition[] Summons { get; set; } = [];
     public string[] ActiveSpawnEvents { get; set; } = [];
     public WorldDestination? Respawn { get; set; }
     public WorldAppearanceOverride[] CharacterAppearanceOverrides { get; set; } = [];
@@ -36,7 +35,7 @@ public sealed class WorldContentCatalog
     }
     public void Validate()
     {
-        if (SchemaVersion != 1 || Npcs == null || Shops == null || Summons == null || ActiveSpawnEvents == null
+        if (SchemaVersion != 1 || Npcs == null || Shops == null || ActiveSpawnEvents == null
             || CharacterAppearanceOverrides == null || ExitDoorRules == null || CorpseDefaults == null)
             throw new InvalidDataException("Unsupported or incomplete world content document.");
         var keys = new HashSet<string>(StringComparer.Ordinal);
@@ -79,13 +78,6 @@ public sealed class WorldContentCatalog
             if (!shopIdentities.Add((shop.PlayfieldId, shop.Vendor.InstanceId)))
                 throw new InvalidDataException("Duplicate world shop identity.");
         }
-        var summonNanos = new HashSet<int>();
-        foreach (var summon in Summons)
-            if (summon == null || summon.NanoId <= 0 || !summonNanos.Add(summon.NanoId)
-                || summon.LifetimeSeconds <= 0 || summon.Level <= 0 || string.IsNullOrWhiteSpace(summon.Hash)
-                || !Npcs.Any(n => n.Key == summon.NpcDefinitionKey)
-                || summon.RelativeOffset is not { Length: 3 } || summon.RelativeOffset.Any(v => !float.IsFinite(v)))
-                throw new InvalidDataException("Invalid or unresolved summon definition.");
     }
     internal static void RequireTransform(float[] position, float[] rotation, string key)
     {
@@ -166,17 +158,4 @@ public sealed class WorldShopDefinition
     public float[] Position { get; set; } = [];
     public float[] Rotation { get; set; } = [];
     public WorldVendorDefinition Vendor { get; set; } = new();
-}
-public sealed class WorldSummonDefinition
-{
-    public int NanoId { get; set; }
-    public int[] Aliases { get; set; } = [];
-    public string Hash { get; set; } = string.Empty;
-    public int Level { get; set; }
-    public int LifetimeSeconds { get; set; }
-    public string NpcDefinitionKey { get; set; } = string.Empty;
-    public float[] RelativeOffset { get; set; } = [];
-    public float Distance { get; set; }
-    public bool IgnoreActionRequirements { get; set; }
-    public ZoneEngine_New.Core.Inventory.ItemAction[] RequiredActions { get; set; } = [];
 }
