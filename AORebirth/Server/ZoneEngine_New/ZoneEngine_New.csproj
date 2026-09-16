@@ -38,6 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj" />
+    <ProjectReference Include="../../Libraries/Source/AORebirth.World.Collision/AORebirth.World.Collision.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/Utility.ZoneNew.WinNet10.csproj" />

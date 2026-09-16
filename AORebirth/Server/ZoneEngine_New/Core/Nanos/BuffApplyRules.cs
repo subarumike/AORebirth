@@ -28,8 +28,8 @@ namespace ZoneEngine_New.Core.Nanos
     public static class BuffApplyRules
     {
         /// <summary>
-        /// Decides whether <paramref name="spell"/> can land. <paramref name="maxNcu"/> of 0 or less
-        /// means unlimited (NPCs carry no NCU stat). Hostile nanos never consume the target's NCU.
+        /// Decides whether <paramref name="spell"/> can land. Friendly buffs must fit
+        /// <paramref name="maxNcu"/>; hostile nanos never consume the target's NCU.
         /// </summary>
         public static BuffApplyDecision Evaluate(
             NanoSpell spell,
@@ -71,7 +71,7 @@ namespace ZoneEngine_New.Core.Nanos
 
             replaced = sameNano ?? strainConflict;
 
-            if (!spell.IsHostile && maxNcu > 0)
+            if (!spell.IsHostile)
             {
                 int freed = replaced != null && !replaced.IsHostile ? replaced.NcuCost : 0;
                 if (usedNcu - freed + spell.NcuCost > maxNcu)

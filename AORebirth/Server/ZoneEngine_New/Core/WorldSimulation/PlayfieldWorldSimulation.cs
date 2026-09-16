@@ -93,6 +93,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             ArgumentNullException.ThrowIfNull(destinations);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
+            _ = meta;
 
             var pool = new BufferPool();
             var simulation = Simulation.Create(
@@ -109,13 +110,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 destinations,
                 gameData,
                 logger);
-            int surfaceStatics = SurfaceCollisionBaker.BakeAll(geometry.Surface, pool, simulation);
-            foreach (SurfaceResource cellSurface in geometry.CellSurfaces)
-                surfaceStatics += SurfaceCollisionBaker.BakeAll(cellSurface, pool, simulation);
-
+            int surfaceStatics = SurfaceCollisionBaker.BakeAll(geometry.Collision, pool, simulation);
             int tileStatics = TileCollisionBaker.BakeAll(
-                geometry.Tilemap,
-                meta,
+                geometry.Collision?.Terrain,
                 pool,
                 simulation,
                 out TileBakeReport tiles);
@@ -128,7 +125,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 $"World bake playfield={playfieldId} terrain[{tiles}] surfaceStatics={surfaceStatics}"
                 + $" wallTriggers={world.WallTriggerCount} portalTriggers={world.PortalTriggerCount}"
                 + $" exitTriggers={world.ExitTriggerCount}");
-            if (geometry.Tilemap != null && !tiles.Complete)
+            if (geometry.Collision?.Terrain != null && !tiles.Complete)
             {
                 logger.Warn(
                     $"World bake playfield={playfieldId} baked only {tiles.ChunksBaked}/{tiles.ChunksExpected}"

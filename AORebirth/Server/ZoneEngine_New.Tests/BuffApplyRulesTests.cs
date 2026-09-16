@@ -119,6 +119,32 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void FullNcuRefusesAnotherBuff()
+        {
+            Buff running = Running(TestNanos.Create(2015, ncuCost: 60));
+
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(
+                TestNanos.Create(2016, ncuCost: 1),
+                [running],
+                maxNcu: 60,
+                out _);
+
+            Assert.AreEqual(BuffApplyDecision.RefusedNotEnoughNcu, decision);
+        }
+
+        [TestMethod]
+        public void ZeroMaxNcuRefusesAnyPositiveCostBuff()
+        {
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(
+                TestNanos.Create(2017, ncuCost: 1),
+                [],
+                maxNcu: 0,
+                out _);
+
+            Assert.AreEqual(BuffApplyDecision.RefusedNotEnoughNcu, decision);
+        }
+
+        [TestMethod]
         public void HostileNanosIgnoreTheTargetsNcu()
         {
             Buff running = Running(TestNanos.Create(2012, ncuCost: 55));
@@ -127,18 +153,6 @@ namespace ZoneEngine_New.Tests
                 TestNanos.Create(2013, ncuCost: 40, can: CanFlags.ApplyOnHostile),
                 [running],
                 maxNcu: 60,
-                out _);
-
-            Assert.AreEqual(BuffApplyDecision.Apply, decision);
-        }
-
-        [TestMethod]
-        public void CharactersWithoutAnNcuStatAreUnlimited()
-        {
-            BuffApplyDecision decision = BuffApplyRules.Evaluate(
-                TestNanos.Create(2014, ncuCost: 500),
-                [],
-                maxNcu: 0,
                 out _);
 
             Assert.AreEqual(BuffApplyDecision.Apply, decision);

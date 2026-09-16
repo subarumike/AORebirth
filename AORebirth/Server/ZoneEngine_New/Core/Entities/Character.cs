@@ -1121,7 +1121,7 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>NCU consumed by friendly buffs; mirrored into CurrentNCU for the client.</summary>
         public int UsedNcu { get; private set; }
 
-        /// <summary>0 means unlimited: NPCs carry no NCU stat.</summary>
+        /// <summary>NCU capacity from MaxNCU. Always enforced for friendly buffs.</summary>
         public int MaxNcu => Stats.GetOrZero(CharacterStat.MaxNCU);
 
         /// <summary>Cast bar in flight, or null when idle.</summary>
@@ -1558,8 +1558,356 @@ namespace ZoneEngine_New.Core.Entities
             ResetAllWeaponAttacks();
         }
 
-        public List<AOTextures> Textures { get; } = new();
-        public List<Mesh> Meshes { get; } = new();
+        #region Appearance
+
+        const int ShowSocialVisualFlag = 0x20;
+        const int SocialOnlyVisualFlag = 0x40;
+
+        // Capture 20260718-125957: Awakened Burden of Competence wears BackMesh 245106 with
+        // override texture 302715. items.dat stores the mesh alone, so the worn look stays orange
+        // unless the override is supplied here.
+        const int AwakenedBurdenItemId = 302730;
+        const int AwakenedBurdenBackMeshId = 245106;
+        const int AwakenedBurdenOverrideTextureId = 302715;
+
+        readonly Dictionary<int, int> _spawnTextures = new();
+        readonly Dictionary<int, int> _wearTextures = new();
+        readonly List<Mesh> _spawnMeshes = new();
+        readonly Dictionary<(int Position, int Layer), Mesh> _wearMeshes = new();
+        readonly Dictionary<int, Mesh> _handMeshes = new();
+        readonly List<AOTextures> _textures = new();
+        readonly List<Mesh> _meshes = new();
+        bool _appearanceViewStale = true;
+
+        /// <summary>
+        /// Texture places on the wire: spawn/template places overlaid by worn cloth.
+        /// </summary>
+        public IReadOnlyList<AOTextures> Textures
+        {
+            get
+            {
+                RefreshAppearanceView();
+                return _textures;
+            }
+        }
+
+        /// <summary>
+        /// Meshes on the wire: spawn/template meshes, worn cloth, then hand weapons.
+        /// </summary>
+        public IReadOnlyList<Mesh> Meshes
+        {
+            get
+            {
+                RefreshAppearanceView();
+                return _meshes;
+            }
+        }
+
+        /// <summary>True once the wire appearance changed and no announce has claimed it yet.</summary>
+        public bool AppearanceDirty { get; private set; }
+
+        public bool ConsumeAppearanceDirty()
+        {
+            bool dirty = AppearanceDirty;
+            AppearanceDirty = false;
+            return dirty;
+        }
+
+        /// <summary>
+        /// Template or authored-content texture, used by characters whose look is declared rather
+        /// than derived from worn items.
+        /// </summary>
+        public void SetSpawnTexture(int place, int textureId)
+        {
+            if (place < 0)
+                return;
+
+            _spawnTextures[place] = textureId;
+            _appearanceViewStale = true;
+        }
+
+        /// <summary>Template or authored-content mesh.</summary>
+        public void AddSpawnMesh(Mesh mesh)
+        {
+            _spawnMeshes.Add(mesh);
+            _appearanceViewStale = true;
+        }
+
+        /// <summary>Hand weapon mesh, owned by the weapon pass of a rebase.</summary>
+        protected bool SetHandMesh(int position, int meshId, int overrideTextureId)
+        {
+            var mesh = new Mesh
+            {
+                Position = (byte)position,
+                Id = (uint)meshId,
+                OverrideTextureId = overrideTextureId,
+                Layer = (byte)MeshLayer.Equipment
+            };
+
+            if (_handMeshes.TryGetValue(position, out Mesh existing)
+                && existing.Id == mesh.Id
+                && existing.OverrideTextureId == mesh.OverrideTextureId
+                && existing.Layer == mesh.Layer)
+            {
+                return false;
+            }
+
+            _handMeshes[position] = mesh;
+            InvalidateAppearance();
+            return true;
+        }
+
+        protected bool ClearHandMesh(int position)
+        {
+            if (!_handMeshes.Remove(position))
+                return false;
+
+            InvalidateAppearance();
+            return true;
+        }
+
+        /// <summary>
+        /// Pages whose OnWear spells drive this character's look, applied in order so a later page
+        /// overrides an earlier one.
+        /// </summary>
+        protected abstract IEnumerable<Container> AppearanceWearPages { get; }
+
+        protected bool ShowSocialAppearance => (VisualFlagsOrZero() & ShowSocialVisualFlag) != 0;
+
+        protected bool SocialOnlyAppearance =>
+            ShowSocialAppearance && (VisualFlagsOrZero() & SocialOnlyVisualFlag) != 0;
+
+        int VisualFlagsOrZero()
+        {
+            int flags = Stats.Get(CharacterStat.VisualFlags);
+            return StatCollection.IsUnset(flags) || flags < 0 ? 0 : flags;
+        }
+
+        /// <summary>
+        /// Recomputes worn textures and meshes from <see cref="AppearanceWearPages"/>. Hand
+        /// positions are untouched: those follow weapon stats in <see cref="RebaseWeapons"/>, which
+        /// a stats-only rebase does not run.
+        /// </summary>
+        protected void RebaseWearAppearance()
+        {
+            var textures = new Dictionary<int, int>();
+            var meshes = new Dictionary<(int Position, int Layer), Mesh>();
+
+            foreach (Container page in AppearanceWearPages)
+            {
+                if (page == null)
+                    continue;
+
+                foreach (KeyValuePair<int, Item> slot in page.EnumerateSlots())
+                    ApplyWearAppearance(slot.Key, slot.Value, textures, meshes);
+            }
+
+            if (SameWearAppearance(textures, meshes))
+                return;
+
+            _wearTextures.Clear();
+            foreach (KeyValuePair<int, int> texture in textures)
+                _wearTextures[texture.Key] = texture.Value;
+
+            _wearMeshes.Clear();
+            foreach (KeyValuePair<(int Position, int Layer), Mesh> mesh in meshes)
+                _wearMeshes[mesh.Key] = mesh.Value;
+
+            InvalidateAppearance();
+        }
+
+        void ApplyWearAppearance(
+            int slot,
+            Item item,
+            Dictionary<int, int> textures,
+            Dictionary<(int Position, int Layer), Mesh> meshes)
+        {
+            foreach (ItemSpell spell in item.WearSpells)
+            {
+                if (!spell.MeetsRequirements(Stats))
+                    continue;
+
+                if (spell.Is(FunctionType.Texture))
+                {
+                    if (spell.TryReadTexture(out int place, out int textureId) && place >= 0 && textureId > 0)
+                        textures[place] = textureId;
+
+                    continue;
+                }
+
+                if (TryReadWearMesh(slot, item, spell, out Mesh mesh))
+                    meshes[(mesh.Position, mesh.Layer)] = mesh;
+            }
+        }
+
+        static bool TryReadWearMesh(int slot, Item item, ItemSpell spell, out Mesh mesh)
+        {
+            mesh = default;
+
+            MeshLayer layer;
+            if (spell.Is(FunctionType.AttractorMesh))
+            {
+                // Live SCFU stacks an attractor below the head instead of replacing it.
+                layer = MeshLayer.Head;
+            }
+            else if (spell.Is(FunctionType.Mesh)
+                || spell.Is(FunctionType.HeadMesh)
+                || spell.Is(FunctionType.BackMesh)
+                || spell.Is(FunctionType.Shouldermesh))
+            {
+                layer = MeshLayer.Equipment;
+            }
+            else
+            {
+                return false;
+            }
+
+            if (!spell.TryReadMesh(out int meshId, out int overrideTextureId) || meshId <= 0)
+                return false;
+            if (!TryResolveMeshPosition(slot, spell, out int position))
+                return false;
+
+            if (overrideTextureId == 0
+                && meshId == AwakenedBurdenBackMeshId
+                && (item.LowId == AwakenedBurdenItemId || item.HighId == AwakenedBurdenItemId))
+            {
+                overrideTextureId = AwakenedBurdenOverrideTextureId;
+            }
+
+            mesh = new Mesh
+            {
+                Position = (byte)position,
+                Id = (uint)meshId,
+                OverrideTextureId = overrideTextureId,
+                Layer = (byte)layer
+            };
+            return true;
+        }
+
+        /// <summary>
+        /// Wear page slot numbers are the client placements (armor 17-31, social 49-63), so the slot
+        /// gives the mesh position directly. Hands are excluded; weapon stats own those.
+        /// </summary>
+        static bool TryResolveMeshPosition(int slot, ItemSpell spell, out int position)
+        {
+            switch (slot)
+            {
+                case 18:
+                case 50:
+                    position = 0;
+                    return true;
+                case 19:
+                case 51:
+                    position = 5;
+                    return true;
+                case 20:
+                case 52:
+                    position = 3;
+                    return true;
+                case 22:
+                case 54:
+                    position = 4;
+                    return true;
+                case 6:
+                case 8:
+                case 56:
+                case 58:
+                    position = 0;
+                    return false;
+                default:
+                    if (spell.Is(FunctionType.BackMesh))
+                    {
+                        position = 5;
+                        return true;
+                    }
+
+                    if (spell.Is(FunctionType.Shouldermesh))
+                    {
+                        position = 3;
+                        return true;
+                    }
+
+                    if (spell.Is(FunctionType.HeadMesh) || spell.Is(FunctionType.AttractorMesh))
+                    {
+                        position = 0;
+                        return true;
+                    }
+
+                    position = 0;
+                    return false;
+            }
+        }
+
+        bool SameWearAppearance(
+            Dictionary<int, int> textures,
+            Dictionary<(int Position, int Layer), Mesh> meshes)
+        {
+            if (textures.Count != _wearTextures.Count || meshes.Count != _wearMeshes.Count)
+                return false;
+
+            foreach (KeyValuePair<int, int> texture in textures)
+            {
+                if (!_wearTextures.TryGetValue(texture.Key, out int current) || current != texture.Value)
+                    return false;
+            }
+
+            foreach (KeyValuePair<(int Position, int Layer), Mesh> mesh in meshes)
+            {
+                if (!_wearMeshes.TryGetValue(mesh.Key, out Mesh current)
+                    || current.Id != mesh.Value.Id
+                    || current.OverrideTextureId != mesh.Value.OverrideTextureId)
+                    return false;
+            }
+
+            return true;
+        }
+
+        void InvalidateAppearance()
+        {
+            _appearanceViewStale = true;
+            AppearanceDirty = true;
+        }
+
+        void RefreshAppearanceView()
+        {
+            if (!_appearanceViewStale)
+                return;
+
+            _appearanceViewStale = false;
+
+            _textures.Clear();
+            if (_spawnTextures.Count > 0 || _wearTextures.Count > 0)
+            {
+                var places = new SortedSet<int>(_spawnTextures.Keys);
+                foreach (int place in _wearTextures.Keys)
+                    places.Add(place);
+
+                foreach (int place in places)
+                {
+                    int textureId = _wearTextures.TryGetValue(place, out int worn)
+                        ? worn
+                        : _spawnTextures[place];
+                    _textures.Add(new AOTextures(place, textureId));
+                }
+            }
+
+            _meshes.Clear();
+            foreach (Mesh mesh in _spawnMeshes)
+            {
+                if (!_wearMeshes.ContainsKey((mesh.Position, mesh.Layer)))
+                    _meshes.Add(mesh);
+            }
+
+            foreach (KeyValuePair<(int Position, int Layer), Mesh> mesh in
+                _wearMeshes.OrderBy(entry => entry.Key.Position).ThenBy(entry => entry.Key.Layer))
+                _meshes.Add(mesh.Value);
+
+            foreach (KeyValuePair<int, Mesh> mesh in _handMeshes.OrderBy(entry => entry.Key))
+                _meshes.Add(mesh.Value);
+        }
+
+        #endregion
+
         public List<int> UploadedNanoIds { get; } = new();
 
         readonly List<int> _dirtyUploadedNanoIds = [];
@@ -1969,39 +2317,32 @@ namespace ZoneEngine_New.Core.Entities
         {
             var meshes = new List<Mesh>(Meshes);
 
-            if (!StatCollection.IsUnset(headMesh) && headMesh != 0)
+            // The head slot is only filled from the stat when nothing worn occupies it: a helmet
+            // mesh must survive, and unequipping it brings the character's own head back.
+            if (!StatCollection.IsUnset(headMesh) && headMesh != 0 && !HasHeadSlotMesh(meshes))
             {
-                bool replaced = false;
-                for (int i = 0; i < meshes.Count; i++)
-                {
-                    if (meshes[i].Position != 0 || meshes[i].Layer != (byte)MeshLayer.Equipment)
-                        continue;
-
-                    meshes[i] = new Mesh
+                meshes.Add(
+                    new Mesh
                     {
                         Position = 0,
                         Id = (uint)headMesh,
                         OverrideTextureId = 0,
                         Layer = (byte)MeshLayer.Equipment
-                    };
-                    replaced = true;
-                    break;
-                }
-
-                if (!replaced)
-                {
-                    meshes.Add(
-                        new Mesh
-                        {
-                            Position = 0,
-                            Id = (uint)headMesh,
-                            OverrideTextureId = 0,
-                            Layer = (byte)MeshLayer.Equipment
-                        });
-                }
+                    });
             }
 
             return meshes.ToArray();
+        }
+
+        static bool HasHeadSlotMesh(List<Mesh> meshes)
+        {
+            for (int i = 0; i < meshes.Count; i++)
+            {
+                if (meshes[i].Position == 0 && meshes[i].Layer == (byte)MeshLayer.Equipment)
+                    return true;
+            }
+
+            return false;
         }
 
         protected static byte ClampToByte(int value)

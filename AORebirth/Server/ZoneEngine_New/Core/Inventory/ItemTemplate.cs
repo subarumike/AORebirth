@@ -206,7 +206,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// Runs every <see cref="EventType.OnUse"/> function on this template.
-        /// Reject unsupported functions before applying any part of a compound use.
+        /// An empty OnUse list is a successful no-op; only present but unhandled functions fail.
         /// </summary>
         /// <param name="skipPassiveModifiers">
         /// When true, <see cref="FunctionType.Modify"/> and ScalingModify are skipped because NCU
@@ -227,7 +227,7 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(items);
 
             if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells) || spells.Count == 0)
-                return false;
+                return true;
 
             bool executed = false;
             foreach (ItemSpell spell in spells)
@@ -269,10 +269,9 @@ namespace ZoneEngine_New.Core.Inventory
             for (int i = 0; i < spells.Count; i++)
             {
                 ItemSpell spell = spells[i];
-                if ((FunctionType)spell.FunctionType != FunctionType.SetFlag
-                    || spell.Arguments.Count < 2
-                    || !TryGetIntArgument(spell.Arguments[0], out int statId)
-                    || !TryGetIntArgument(spell.Arguments[1], out int bitIndex)
+                if (!spell.Is(FunctionType.SetFlag)
+                    || !spell.TryReadInt(0, out int statId)
+                    || !spell.TryReadInt(1, out int bitIndex)
                     || bitIndex < 0
                     || bitIndex > 31)
                     continue;
@@ -291,11 +290,10 @@ namespace ZoneEngine_New.Core.Inventory
             IItemBuilder items,
             bool skipPassiveModifiers)
         {
-            if (!StatModifierSpells.MeetsRequirements(spell, target.Stats))
+            if (!spell.MeetsRequirements(target.Stats))
                 return false;
 
-            FunctionType function = (FunctionType)spell.FunctionType;
-            if (function is FunctionType.Modify or FunctionType.ScalingModify)
+            if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify))
             {
                 if (skipPassiveModifiers)
                     return true;
@@ -305,31 +303,6 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items);
-        }
-
-        static bool TryGetIntArgument(object? value, out int result)
-        {
-            switch (value)
-            {
-                case int i:
-                    result = i;
-                    return true;
-                case long l:
-                    result = (int)l;
-                    return true;
-                case uint u:
-                    result = (int)u;
-                    return true;
-                case short s:
-                    result = s;
-                    return true;
-                case byte b:
-                    result = b;
-                    return true;
-                default:
-                    result = 0;
-                    return false;
-            }
         }
 
         public static bool EvaluateRequirement(int statValue, ItemRequirement requirement)

@@ -20,7 +20,7 @@ namespace ZoneEngine_New.Core.Commands
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.Args.Length < 2
-                || !TryParseStat(context.Args[0], out CharacterStat stat)
+                || !CharacterStatParser.TryParse(context.Args[0], out CharacterStat stat)
                 || !int.TryParse(context.Args[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
             {
                 GmCommandFeedback.Send(context.Session, context.Player, "Usage: " + Usage);
@@ -40,24 +40,6 @@ namespace ZoneEngine_New.Core.Commands
                     stat,
                     (int)stat,
                     value));
-        }
-
-        static bool TryParseStat(string token, out CharacterStat stat)
-        {
-            if (int.TryParse(token, NumberStyles.Integer, CultureInfo.InvariantCulture, out int statId))
-            {
-                if (Enum.IsDefined(typeof(CharacterStat), statId))
-                {
-                    stat = (CharacterStat)statId;
-                    return true;
-                }
-
-                stat = default;
-                return false;
-            }
-
-            return Enum.TryParse(token, ignoreCase: true, out stat)
-                && Enum.IsDefined(typeof(CharacterStat), stat);
         }
     }
 }

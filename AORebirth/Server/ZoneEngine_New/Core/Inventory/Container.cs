@@ -75,6 +75,20 @@ namespace ZoneEngine_New.Core.Inventory
             return item;
         }
 
+        /// <summary>
+        /// Occupied slots in ascending slot order. The slot number is the client placement, which
+        /// callers such as appearance rebuilds need to resolve a mesh position.
+        /// </summary>
+        public IEnumerable<KeyValuePair<int, Item>> EnumerateSlots()
+        {
+            int last = Offset + Capacity;
+            for (int slot = Offset; slot < last; slot++)
+            {
+                if (Content.TryGetValue(slot, out Item? item) && item != null)
+                    yield return new KeyValuePair<int, Item>(slot, item);
+            }
+        }
+
         public int FindFreeSlot()
         {
             for (int slot = Offset; slot < Offset + Capacity; slot++)

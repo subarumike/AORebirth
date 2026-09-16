@@ -10,6 +10,7 @@ namespace ZoneEngine_New.Core.GameData
     using AODB.Common.RDBObjects;
 
     using AORebirth.Core.GameData;
+    using AORebirth.World.Collision;
 
     using Utility;
 
@@ -802,129 +803,15 @@ namespace ZoneEngine_New.Core.GameData
             PlayfieldDoors? doors = TryDeserializeRdbObject<PlayfieldDoors>(
                 Path.Combine(RootPath, GameDataPaths.PlayfieldDoorsRelativePath(playfieldId)));
 
-            Tilemap? tilemap = null;
-            SurfaceResource? surface = null;
-            string collisionPath = Path.Combine(
-                RootPath,
-                GameDataPaths.PlayfieldCollisionRelativePath(playfieldId));
-            if (File.Exists(collisionPath))
-            {
-                byte[] framed;
-                try
-                {
-                    framed = File.ReadAllBytes(collisionPath);
-                }
-                catch (Exception exception)
-                {
-                    throw new InvalidDataException(
-                        "Playfield Collision.dat could not be read: "
-                        + collisionPath
-                        + " ("
-                        + exception.GetType().Name
-                        + ": "
-                        + exception.Message
-                        + ")",
-                        exception);
-                }
-
-                byte[] tilemapPayload;
-                byte[] surfacePayload;
-                try
-                {
-                    PlayfieldCollisionDat.Parse(framed, out tilemapPayload, out surfacePayload);
-                }
-                catch (Exception exception)
-                {
-                    throw new InvalidDataException(
-                        "Playfield Collision.dat framing is invalid: "
-                        + collisionPath
-                        + " ("
-                        + exception.GetType().Name
-                        + ": "
-                        + exception.Message
-                        + ")",
-                        exception);
-                }
-
-                if (tilemapPayload.Length > 0)
-                    tilemap = DeserializeRdbObject<Tilemap>(tilemapPayload, collisionPath + "#tilemap");
-
-                if (surfacePayload.Length > 0)
-                {
-                    surface = DeserializeRdbObject<SurfaceResource>(
-                        surfacePayload,
-                        collisionPath + "#surface");
-                }
-            }
+            PlayfieldCollisionSet collision = PlayfieldCollisionLoader.Load(RootPath, playfieldId);
 
             return new PlayfieldGeometryData
             {
                 Walls = walls,
                 Dynels = dynels,
                 Doors = doors,
-                Tilemap = tilemap,
-                Surface = surface,
-                CellSurfaces = ReadCellSurfaces(playfieldId)
+                Collision = collision.HasCollision ? collision : null
             };
-        }
-
-        /// <summary>
-        /// Loads Surfaces.dat, the per-locality-cell SurfaceResource records. A cell whose payload
-        /// fails to deserialize is skipped so one bad record cannot cost the whole playfield its
-        /// static geometry.
-        /// </summary>
-        private IReadOnlyList<SurfaceResource> ReadCellSurfaces(int playfieldId)
-        {
-            string surfacesPath = Path.Combine(
-                RootPath,
-                GameDataPaths.PlayfieldSurfacesRelativePath(playfieldId));
-            if (!File.Exists(surfacesPath))
-                return [];
-
-            List<PlayfieldSurfaceEntry> entries;
-            try
-            {
-                entries = PlayfieldSurfacesDat.Parse(File.ReadAllBytes(surfacesPath));
-            }
-            catch (Exception exception)
-            {
-                throw new InvalidDataException(
-                    "Playfield Surfaces.dat framing is invalid: "
-                    + surfacesPath
-                    + " ("
-                    + exception.GetType().Name
-                    + ": "
-                    + exception.Message
-                    + ")",
-                    exception);
-            }
-
-            List<SurfaceResource> surfaces = new(entries.Count);
-            for (int i = 0; i < entries.Count; i++)
-            {
-                if (entries[i].Payload == null || entries[i].Payload.Length == 0)
-                    continue;
-
-                try
-                {
-                    surfaces.Add(DeserializeRdbObject<SurfaceResource>(
-                        entries[i].Payload,
-                        surfacesPath + "#cell" + entries[i].CellId.ToString(CultureInfo.InvariantCulture)));
-                }
-                catch (Exception exception)
-                {
-                    LogUtil.Debug(
-                        DebugInfoDetail.Engine,
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "GameData skipped unreadable surface playfield={0} cell={1}: {2}",
-                            playfieldId,
-                            entries[i].CellId,
-                            exception.Message));
-                }
-            }
-
-            return surfaces;
         }
 
         private static T? TryDeserializeRdbObject<T>(string path)

@@ -96,6 +96,10 @@ namespace ZoneEngine_New.Core.Nanos
             int nanoCost = ResolveNanoCost(caster, spell);
             NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, nanoCost, nowUtc);
             NanoCastRefusal refusal = NanoCastRules.Evaluate(attempt);
+            // Start-only: do not begin a cast the target cannot hold. Land-time NCU is checked
+            // again in TryApplyBuff; a mid-cast capacity change still finishes the cast.
+            if (refusal == NanoCastRefusal.None && !TargetCanHoldBuff(spell, recipient))
+                refusal = NanoCastRefusal.NotEnoughNcu;
 
             if (refusal != NanoCastRefusal.None)
             {
@@ -232,11 +236,7 @@ namespace ZoneEngine_New.Core.Nanos
                 out Buff? applied,
                 out Buff? replaced);
 
-            // Player casts use SetNanoDuration for NCU display (legacy never Buff-adds on land).
-            // Buff remove is only for a different nano leaving the same strain.
-            if (replaced != null && replaced.Id != spell.Id)
-                AnnounceBuffRemoved(recipient, replaced);
-
+            // Cast already finished and spent nano. Apply refusal (e.g. NCU) does not interrupt it.
             if (applied == null)
             {
                 LogUtil.Debug(
@@ -256,6 +256,11 @@ namespace ZoneEngine_New.Core.Nanos
                 Refuse(caster, DescribeApplyRefusal(decision));
                 return;
             }
+
+            // Player casts use SetNanoDuration for NCU display (legacy never Buff-adds on land).
+            // Buff remove is only for a different nano leaving the same strain.
+            if (replaced != null && replaced.Id != spell.Id)
+                AnnounceBuffRemoved(recipient, replaced);
 
             SendNanoDuration(caster, recipient, applied);
             ExecuteOnUseEffects(caster, recipient, spell, skipPassiveModifiers: true);
@@ -294,6 +299,23 @@ namespace ZoneEngine_New.Core.Nanos
                 CurrentNano = caster.Stats.GetOrZero(CharacterStat.CurrentNano),
                 NanoCost = nanoCost
             };
+
+        /// <summary>
+        /// Start-time NCU preview. Instant and hostile nanos skip it. Land still re-checks via
+        /// <see cref="BuffApplyRules"/>; failure there finishes the cast without applying.
+        /// </summary>
+        static bool TargetCanHoldBuff(NanoSpell spell, Character? recipient)
+        {
+            if (recipient == null || !spell.IsBuff || spell.IsHostile)
+                return true;
+
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(
+                spell,
+                recipient.Buffs,
+                recipient.MaxNcu,
+                out _);
+            return decision != BuffApplyDecision.RefusedNotEnoughNcu;
+        }
 
         static bool TryResolveSpell(Character caster, int nanoId, out NanoSpell? spell)
         {

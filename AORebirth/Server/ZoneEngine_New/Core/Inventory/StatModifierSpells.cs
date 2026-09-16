@@ -1,6 +1,5 @@
 namespace ZoneEngine_New.Core.Inventory
 {
-    using System;
     using System.Collections.Generic;
 
     using AORebirth.Enums;
@@ -24,10 +23,9 @@ namespace ZoneEngine_New.Core.Inventory
             for (int i = 0; i < spells.Count; i++)
             {
                 ItemSpell spell = spells[i];
-                FunctionType function = (FunctionType)spell.FunctionType;
-                if (function != FunctionType.Modify && function != FunctionType.ScalingModify)
+                if (!spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify))
                     continue;
-                if (!MeetsRequirements(spell, stats))
+                if (!spell.MeetsRequirements(stats))
                     continue;
                 if (!TryReadModify(spell, out CharacterStat stat, out int delta))
                     continue;
@@ -38,52 +36,15 @@ namespace ZoneEngine_New.Core.Inventory
             }
         }
 
-        public static bool MeetsRequirements(ItemSpell spell, StatCollection stats)
-        {
-            ArgumentNullException.ThrowIfNull(spell);
-            ArgumentNullException.ThrowIfNull(stats);
-
-            return ItemTemplate.MeetsRequirements(
-                spell.Requirements,
-                stat => stats.Get(stat));
-        }
-
         static bool TryReadModify(ItemSpell spell, out CharacterStat stat, out int delta)
         {
             stat = default;
             delta = 0;
-            if (spell.Arguments.Count < 2)
-                return false;
-            if (!TryGetInt(spell.Arguments[0], out int statId) || !TryGetInt(spell.Arguments[1], out delta))
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out delta))
                 return false;
 
             stat = (CharacterStat)statId;
             return true;
-        }
-
-        static bool TryGetInt(object? value, out int result)
-        {
-            switch (value)
-            {
-                case int i:
-                    result = i;
-                    return true;
-                case long l:
-                    result = (int)l;
-                    return true;
-                case uint u:
-                    result = (int)u;
-                    return true;
-                case short s:
-                    result = s;
-                    return true;
-                case byte b:
-                    result = b;
-                    return true;
-                default:
-                    result = 0;
-                    return false;
-            }
         }
     }
 }

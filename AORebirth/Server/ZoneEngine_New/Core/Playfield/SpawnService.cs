@@ -159,7 +159,7 @@ namespace ZoneEngine_New.Core.Playfield
                 if (entry.Value <= 0)
                     continue;
 
-                npc.Textures.Add(new AOTextures(entry.Key, entry.Value));
+                npc.SetSpawnTexture(entry.Key, entry.Value);
             }
         }
 

@@ -101,11 +101,11 @@ namespace ZoneEngine_New.Tests
 
             var high = new StatCollection();
             high.Set(CharacterStat.ComputerLiteracy, 100, StatDetail.Base);
-            Assert.IsFalse(StatModifierSpells.MeetsRequirements(spell, high));
+            Assert.IsFalse(spell.MeetsRequirements(high));
 
             var low = new StatCollection();
             low.Set(CharacterStat.ComputerLiteracy, 50, StatDetail.Base);
-            Assert.IsTrue(StatModifierSpells.MeetsRequirements(spell, low));
+            Assert.IsTrue(spell.MeetsRequirements(low));
         }
     }
 }

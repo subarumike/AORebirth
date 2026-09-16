@@ -119,13 +119,12 @@ namespace ZoneEngine_New.Core.Playfield
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Playfield created metadata={0} walls={1} dynels={2} doors={3} tilemap={4} surface={5}",
+                    "Playfield created metadata={0} walls={1} dynels={2} doors={3} collision={4}",
                     MetaData == null ? "null(indoor)" : "loaded",
                     Geometry.Walls != null,
                     Geometry.Dynels != null,
                     Geometry.Doors != null,
-                    Geometry.Tilemap != null,
-                    Geometry.Surface != null));
+                    Geometry.Collision?.HasCollision ?? false));
         }
 
         /// <summary>
@@ -541,10 +540,8 @@ namespace ZoneEngine_New.Core.Playfield
                 services.AddSingleton(Geometry.Dynels);
             if (Geometry.Doors != null)
                 services.AddSingleton(Geometry.Doors);
-            if (Geometry.Tilemap != null)
-                services.AddSingleton(Geometry.Tilemap);
-            if (Geometry.Surface != null)
-                services.AddSingleton(Geometry.Surface);
+            if (Geometry.Collision != null)
+                services.AddSingleton(Geometry.Collision);
 
             services.AddSingleton<IUploadedNanoRepository, MySqlUploadedNanoRepository>();
             services.AddSingleton<DynelRegistry>();

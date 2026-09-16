@@ -105,6 +105,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     CancelNano(player, message);
                     break;
 
+                case CharacterActionType.ChangeVisualFlag:
+                    // Client pad/helmet/social toggles; Parameter2 carries the whole flag word.
+                    player.TryApplyVisualFlags(message.Parameter2);
+                    break;
+
                 case CharacterActionType.DeleteItem:
                 case CharacterActionType.Split:
                     _inventoryActions.Handle(player, message);

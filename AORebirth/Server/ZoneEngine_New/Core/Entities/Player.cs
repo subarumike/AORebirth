@@ -219,20 +219,95 @@ namespace ZoneEngine_New.Core.Entities
                 });
         }
 
+        bool _inFullRebase;
+
         public override void Rebase()
         {
-            RebaseStats();
-            RebaseWeapons();
+            _inFullRebase = true;
+            try
+            {
+                RebaseStats();
+                RebaseWeapons();
+            }
+            finally
+            {
+                _inFullRebase = false;
+            }
+
+            AnnounceAppearanceIfChanged();
         }
 
         public override void RebaseStats()
         {
             // Bonuses first: max health and max nano read the full (base + bonus) ability values,
-            // so equipment and buffs have to be in place before those are recomputed.
+            // so equipment and buffs have to be in place before those are recomputed. Worn
+            // appearance follows the bonus pass because its spells carry stat requirements.
             RebaseEquipBonuses();
             ApplyBuffBonuses();
+            RebaseWearAppearance();
             RebaseMaxHealth();
             RebaseMaxNano();
+
+            if (!_inFullRebase)
+                AnnounceAppearanceIfChanged();
+        }
+
+        /// <summary>
+        /// Armor carries the worn look, Social replaces it per slot once the client asks for social
+        /// clothes, and social-only drops the armor layer entirely.
+        /// </summary>
+        protected override IEnumerable<Container> AppearanceWearPages
+        {
+            get
+            {
+                if (!Inventory.IsHydrated)
+                    yield break;
+
+                if (!SocialOnlyAppearance)
+                    yield return Inventory.Armor;
+
+                if (ShowSocialAppearance)
+                    yield return Inventory.Social;
+            }
+        }
+
+        /// <summary>
+        /// Client pad/social toggle from CharacterAction ChangeVisualFlag. The social bits choose
+        /// the wear pages, so the look is rebuilt before the flags go back out on the wire.
+        /// </summary>
+        public bool TryApplyVisualFlags(int visualFlags)
+        {
+            if (visualFlags < 0 || visualFlags > short.MaxValue)
+                return false;
+
+            if (Stats.Get(CharacterStat.VisualFlags) == visualFlags)
+                return true;
+
+            Stats.Set(CharacterStat.VisualFlags, visualFlags, StatDetail.Base, dirty: true);
+            RebaseWearAppearance();
+            AnnounceAppearance();
+            return true;
+        }
+
+        void AnnounceAppearanceIfChanged()
+        {
+            if (ConsumeAppearanceDirty())
+                SendAppearanceUpdate();
+        }
+
+        void AnnounceAppearance()
+        {
+            ConsumeAppearanceDirty();
+            SendAppearanceUpdate();
+        }
+
+        void SendAppearanceUpdate()
+        {
+            if (Session?.State != SessionState.InPlay)
+                return;
+
+            AppearanceUpdateMessage appearance = BuildAppearanceUpdateMessage();
+            Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, appearance, includeSelf: true);
         }
 
         void RebaseMaxHealth()
@@ -357,14 +432,10 @@ namespace ZoneEngine_New.Core.Entities
             bool maCombined = (right?.IsMaCombinedWeapon() == true) || (left?.IsMaCombinedWeapon() == true);
             FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
 
-            if (!SyncHandWeaponMeshes())
-                return;
+            SyncHandWeaponMeshes();
 
-            if (Session?.State != SessionState.InPlay)
-                return;
-
-            AppearanceUpdateMessage appearance = BuildAppearanceUpdateMessage();
-            Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, appearance, includeSelf: true);
+            if (!_inFullRebase)
+                AnnounceAppearanceIfChanged();
         }
 
         bool SyncHandWeaponMeshes()
@@ -400,55 +471,17 @@ namespace ZoneEngine_New.Core.Entities
                 overrideTexture = NormalizeVisualValue(item.GetStat(overrideTextureStat));
             }
 
-            int existingIndex = -1;
-            for (int i = 0; i < Meshes.Count; i++)
-            {
-                if (Meshes[i].Position != meshPosition)
-                    continue;
-
-                existingIndex = i;
-                break;
-            }
-
             if (meshId <= 0)
             {
-                if (existingIndex < 0)
+                if (!ClearHandMesh(meshPosition))
                     return false;
 
-                Meshes.RemoveAt(existingIndex);
                 Stats.Set(meshStat, 0, StatDetail.Base, dirty: true);
                 return true;
             }
 
-            if (existingIndex >= 0)
-            {
-                Mesh existing = Meshes[existingIndex];
-                if (existing.Id == (uint)meshId
-                    && existing.OverrideTextureId == overrideTexture
-                    && existing.Layer == (byte)MeshLayer.Equipment)
-                {
-                    return false;
-                }
-
-                Meshes[existingIndex] = new Mesh
-                {
-                    Position = meshPosition,
-                    Id = (uint)meshId,
-                    OverrideTextureId = overrideTexture,
-                    Layer = (byte)MeshLayer.Equipment
-                };
-            }
-            else
-            {
-                Meshes.Add(
-                    new Mesh
-                    {
-                        Position = meshPosition,
-                        Id = (uint)meshId,
-                        OverrideTextureId = overrideTexture,
-                        Layer = (byte)MeshLayer.Equipment
-                    });
-            }
+            if (!SetHandMesh(meshPosition, meshId, overrideTexture))
+                return false;
 
             Stats.Set(meshStat, meshId, StatDetail.Base, dirty: true);
             return true;
@@ -486,7 +519,7 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
-        static readonly CharacterStat[] FullCharacterStats1 =
+        internal static readonly CharacterStat[] FullCharacterStats1 =
         [
             CharacterStat.State,
             CharacterStat.UnarmedTemplateInstance,
@@ -559,7 +592,7 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.Members,
         ];
 
-        static readonly CharacterStat[] FullCharacterStats2 =
+        internal static readonly CharacterStat[] FullCharacterStats2 =
         [
             // CharacterStat.VeteranPoints,
             // CharacterStat.MonthsPaid,
@@ -706,7 +739,7 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.AlienXP,
         ];
 
-        static readonly CharacterStat[] FullCharacterStats3 =
+        internal static readonly CharacterStat[] FullCharacterStats3 =
         [
             CharacterStat.InsurancePercentage,
             CharacterStat.ProfessionLevel,
@@ -718,7 +751,7 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.BeltSlots,
         ];
 
-        static readonly CharacterStat[] FullCharacterStats4 =
+        internal static readonly CharacterStat[] FullCharacterStats4 =
         [
             CharacterStat.AbsorbProjectileAC,
             CharacterStat.AbsorbMeleeAC,
@@ -735,6 +768,15 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.CurrentNano,
             CharacterStat.MapFlags,
             CharacterStat.ChangeSideCount,
+        ];
+
+        /// <summary>FullCharacter spawn sheet groups (Sets 1–4), single source of truth.</summary>
+        internal static IReadOnlyList<CharacterStat[]> FullCharacterStatSets { get; } =
+        [
+            FullCharacterStats1,
+            FullCharacterStats2,
+            FullCharacterStats3,
+            FullCharacterStats4,
         ];
 
         public override InfoPacketMessage BuildInfoPacket()

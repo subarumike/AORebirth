@@ -1,12 +1,9 @@
 namespace ZoneEngine_New.Core.WorldSimulation
 {
     using System;
-    using System.Collections;
     using System.Globalization;
 
-    using AODB.Common.RDBObjects;
-
-    using AORebirth.Core.GameData;
+    using AORebirth.World.Collision;
 
     using BepuPhysics;
     using BepuPhysics.Collidables;
@@ -64,115 +61,47 @@ namespace ZoneEngine_New.Core.WorldSimulation
     }
 
     /// <summary>
-    /// Builds Bepu static meshes from Tilemap CHGA heightmap data.
+    /// Builds Bepu static meshes from normalized terrain heightfields.
     /// <para>
-    /// Two conventions are load bearing here and both were validated against live client poses
-    /// (see tools-temp/WorldSimSmoke): chunk <c>i</c> of <c>Heightmap</c> sits at grid
-    /// (<c>i % gridWidth</c>, <c>i / gridWidth</c>), and samples are indexed <c>[x, z]</c>.
+    /// Chunk origins and sample indexing are established by
+    /// <see cref="AORebirth.World.Collision.PlayfieldCollisionLoader"/> conventions:
+    /// chunk <c>i</c> at grid (<c>i % gridWidth</c>, <c>i / gridWidth</c>), samples <c>[x, z]</c>.
     /// </para>
     /// <para>
-    /// Bepu triangles are one-sided: a ray or sweep only hits the face whose winding appears
-    /// clockwise from the ray's side. For an upward-facing terrain face the winding must be
-    /// origin → +x → +z, matching Bepu's own deformed-plane heightmap sample.
+    /// Bepu triangles are one-sided: upward-facing terrain winding is origin → +x → +z.
     /// </para>
     /// </summary>
     public static class TileCollisionBaker
     {
         public static int BakeAll(
-            Tilemap? tilemap,
-            PlayfieldMetaData? meta,
+            TerrainHeightfield? terrain,
             BufferPool pool,
             Simulation simulation,
             out TileBakeReport report)
         {
             report = default;
-            if (tilemap == null)
+            if (terrain == null || terrain.Chunks.Count == 0)
                 return 0;
 
-            float tileSize = meta?.TileSize > 0
-                ? meta.TileSize
-                : GetFloatField(tilemap, "MapScale", 1f);
-            float heightScale = meta?.HeightScale > 0
-                ? meta.HeightScale
-                : GetFloatField(tilemap, "HeightMod", 1f);
-            if (tileSize <= 0)
-                tileSize = 1f;
-            if (heightScale <= 0)
-                heightScale = 1f;
-
-            int chunkSize = GetIntField(tilemap, "ChunkSize", 0);
-            int gridWidth = GetIntField(tilemap, "GridWidth", 0);
-
-            // AODB CHGA: Heightmap is List<ushort[,]> of chunkSize×chunkSize grids.
-            if (GetField(tilemap, "Heightmap") is IList heightList && heightList.Count > 0)
-            {
-                if (heightList[0] is ushort[,] first)
-                {
-                    if (chunkSize <= 0)
-                        chunkSize = first.GetLength(0);
-                    if (gridWidth <= 0)
-                        gridWidth = (int)MathF.Ceiling(MathF.Sqrt(heightList.Count));
-
-                    return BakeHeightmapList(
-                        heightList,
-                        chunkSize,
-                        gridWidth,
-                        tileSize,
-                        heightScale,
-                        pool,
-                        simulation,
-                        out report);
-                }
-
-                if (heightList[0] is float[,] floats)
-                {
-                    return BakeSingleGrid(floats, 0f, 0f, tileSize, heightScale, pool, simulation, out report);
-                }
-            }
-
-            Array? heightmap = GetProp(tilemap, "Heightmap") as Array;
-            if (heightmap is float[,] heights2d)
-                return BakeSingleGrid(heights2d, 0f, 0f, tileSize, heightScale, pool, simulation, out report);
-
-            if (heightmap is ushort[,] uheights)
-                return BakeSingleGrid(ToFloatGrid(uheights), 0f, 0f, tileSize, heightScale, pool, simulation, out report);
-
-            return 0;
-        }
-
-        static int BakeHeightmapList(
-            IList chunks,
-            int chunkSize,
-            int gridWidth,
-            float tileSize,
-            float heightScale,
-            BufferPool pool,
-            Simulation simulation,
-            out TileBakeReport report)
-        {
-            report = default;
-            if (chunkSize < 2 || gridWidth <= 0)
-                return 0;
-
-            // Adjacent chunks share their border sample row, so a chunk spans chunkSize-1 tiles.
-            float chunkSpan = (chunkSize - 1) * tileSize;
-            int gridHeight = (int)MathF.Ceiling(chunks.Count / (float)gridWidth);
+            float tileSize = terrain.TileSize > 0 ? terrain.TileSize : 1f;
+            float heightScale = terrain.HeightScale > 0 ? terrain.HeightScale : 1f;
+            float chunkSpan = terrain.ChunkSize > 1
+                ? (terrain.ChunkSize - 1) * tileSize
+                : 0f;
+            int gridWidth = terrain.GridWidth > 0 ? terrain.GridWidth : 1;
+            int gridHeight = (int)MathF.Ceiling(terrain.Chunks.Count / (float)gridWidth);
 
             int added = 0;
             int triangles = 0;
             float minHeight = float.MaxValue;
             float maxHeight = float.MinValue;
-            for (int i = 0; i < chunks.Count; i++)
+            for (int i = 0; i < terrain.Chunks.Count; i++)
             {
-                if (chunks[i] is not ushort[,] heights)
-                    continue;
-
-                int gridX = i % gridWidth;
-                int gridZ = i / gridWidth;
+                TerrainHeightChunk chunk = terrain.Chunks[i];
                 int chunkTriangles = BakeSingleGrid(
-                    ToFloatGrid(heights),
-                    gridX * chunkSpan,
-                    gridZ * chunkSpan,
+                    chunk.Heights,
+                    chunk.OriginX,
+                    chunk.OriginZ,
                     tileSize,
                     heightScale,
                     pool,
@@ -188,7 +117,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             }
 
             report = new TileBakeReport(
-                chunks.Count,
+                terrain.Chunks.Count,
                 added,
                 triangles,
                 added > 0 ? minHeight : 0f,
@@ -259,38 +188,6 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 (sizeX - 1) * tileSize,
                 (sizeZ - 1) * tileSize);
             return 1;
-        }
-
-        static float[,] ToFloatGrid(ushort[,] heights)
-        {
-            int sizeX = heights.GetLength(0);
-            int sizeZ = heights.GetLength(1);
-            float[,] floats = new float[sizeX, sizeZ];
-            for (int z = 0; z < sizeZ; z++)
-            {
-                for (int x = 0; x < sizeX; x++)
-                    floats[x, z] = heights[x, z];
-            }
-
-            return floats;
-        }
-
-        static object? GetProp(object obj, string name) =>
-            obj.GetType().GetProperty(name)?.GetValue(obj);
-
-        static object? GetField(object obj, string name) =>
-            obj.GetType().GetField(name)?.GetValue(obj);
-
-        static float GetFloatField(object obj, string name, float fallback)
-        {
-            object? v = GetField(obj, name) ?? GetProp(obj, name);
-            return v is float f ? f : fallback;
-        }
-
-        static int GetIntField(object obj, string name, int fallback)
-        {
-            object? v = GetField(obj, name) ?? GetProp(obj, name);
-            return v is int i ? i : fallback;
         }
     }
 }

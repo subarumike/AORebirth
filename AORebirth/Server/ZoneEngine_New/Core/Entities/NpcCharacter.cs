@@ -305,9 +305,9 @@ namespace ZoneEngine_New.Core.Entities
                 for (int i = 0; i < spells.Count; i++)
                 {
                     ItemSpell spell = spells[i];
-                    if ((FunctionType)spell.FunctionType != FunctionType.EquipMonsterWeapon)
+                    if (!spell.Is(FunctionType.EquipMonsterWeapon))
                         continue;
-                    if (TryReadAoHash(spell.Arguments, out hash))
+                    if (TryReadAoHash(spell, out hash))
                         return true;
                 }
             }
@@ -315,22 +315,18 @@ namespace ZoneEngine_New.Core.Entities
             return false;
         }
 
-        static bool TryReadAoHash(List<object> arguments, out string hash)
+        static bool TryReadAoHash(ItemSpell spell, out string hash)
         {
             hash = string.Empty;
-            if (arguments == null)
-                return false;
-
-            for (int i = 0; i < arguments.Count; i++)
+            for (int i = 0; i < spell.ArgumentCount; i++)
             {
-                object argument = arguments[i];
-                if (argument is string text && text.Length > 0)
+                if (spell.TryReadString(i, out string text) && text.Length > 0)
                 {
                     hash = text;
                     return true;
                 }
 
-                if (!TryGetInt(argument, out int packed))
+                if (!spell.TryReadInt(i, out int packed))
                     continue;
                 if (!TryDecodeAoHash(packed, out hash))
                     continue;
@@ -338,25 +334,6 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             return false;
-        }
-
-        static bool TryGetInt(object? value, out int result)
-        {
-            switch (value)
-            {
-                case int i:
-                    result = i;
-                    return true;
-                case long l:
-                    result = (int)l;
-                    return true;
-                case uint u:
-                    result = (int)u;
-                    return true;
-                default:
-                    result = 0;
-                    return false;
-            }
         }
 
         static bool TryDecodeAoHash(int packed, out string hash)
@@ -391,7 +368,14 @@ namespace ZoneEngine_New.Core.Entities
             Stats.ClearBonuses(dirty: true);
             WearBonusApplier.ApplyContainer(Equipment, includeWield: true, Stats);
             ApplyBuffBonuses();
+            RebaseWearAppearance();
         }
+
+        /// <summary>
+        /// NPCs keep one inventory rather than player wear pages, so everything they carry feeds
+        /// their look.
+        /// </summary>
+        protected override IEnumerable<Container> AppearanceWearPages => [Equipment];
 
         public override void RebaseWeapons()
         {

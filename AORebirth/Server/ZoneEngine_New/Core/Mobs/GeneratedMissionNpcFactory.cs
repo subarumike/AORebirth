@@ -37,8 +37,8 @@ public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Laz
         npc.Stats.Set(CharacterStat.MonsterData, evidence.MonsterData);
         npc.Stats.Set(CharacterStat.Scale, source.MonsterScale);
         npc.Stats.Set(CharacterStat.HeadMesh, checked((int)(source.HeadMesh ?? 0)));
-        foreach (var texture in source.Textures ?? []) npc.Textures.Add(new AOTextures(texture.Place, texture.Id));
-        foreach (var mesh in source.Meshes ?? []) npc.Meshes.Add(mesh);
+        foreach (var texture in source.Textures ?? []) npc.SetSpawnTexture(texture.Place, texture.Id);
+        foreach (var mesh in source.Meshes ?? []) npc.AddSpawnMesh(mesh);
         if (!evidence.IsFindPerson)
         {
             var contract = MissionNpcCombatPolicy.Create(state.RuntimeInstance, state.Level.Value,

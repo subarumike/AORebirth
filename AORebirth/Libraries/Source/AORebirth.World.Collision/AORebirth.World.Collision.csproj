@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+    <RootNamespace>AORebirth.World.Collision</RootNamespace>
+    <AssemblyName>AORebirth.World.Collision</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AODB" Version="1.0.6" />
+  </ItemGroup>
+
+  <!-- Framing / paths / metadata stay in AORebirth.Core (single type identity with ZoneEngine). -->
+  <ItemGroup>
+    <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
+  </ItemGroup>
+</Project>

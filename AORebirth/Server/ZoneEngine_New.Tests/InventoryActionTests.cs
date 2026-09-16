@@ -294,6 +294,18 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void EmptyOnUseSpellListStillAllowsSuccessfulUse()
+        {
+            using var w = new World();
+            Item item = w.Add(11, 2);
+            item.Definition.Stats[CharacterStat.Can] |= (int)(CanFlags.Consume | CanFlags.Use);
+            item.SpellList.Remove(EventType.OnUse);
+            Assert.IsTrue(w.Use(item));
+            Assert.AreEqual(1, item.StackCount);
+            Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
+        }
+
+        [TestMethod]
         public void UnsupportedOnUseAloneDoesNotCountAsExecuted()
         {
             using var w = new World(); Item item = w.Add(11, 1);

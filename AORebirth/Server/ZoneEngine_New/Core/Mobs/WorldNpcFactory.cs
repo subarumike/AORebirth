@@ -27,8 +27,8 @@ public static class WorldNpcFactory
             Rotation = new(definition.Rotation[0], definition.Rotation[1], definition.Rotation[2], definition.Rotation[3])
         };
         foreach (var stat in definition.Stats) npc.Stats.Set((CharacterStat)stat.Key, stat.Value);
-        foreach (var texture in definition.Textures) npc.Textures.Add(new AOTextures(texture.Place, texture.Id));
-        foreach (var mesh in definition.Meshes) npc.Meshes.Add(Clone(mesh));
+        foreach (var texture in definition.Textures) npc.SetSpawnTexture(texture.Place, texture.Id);
+        foreach (var mesh in definition.Meshes) npc.AddSpawnMesh(Clone(mesh));
         npc.Motor.RefreshFromStats();
         return npc;
     }

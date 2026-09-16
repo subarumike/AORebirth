@@ -82,6 +82,10 @@ namespace ZoneEngine_New.Core.Inventory
 
         public Dictionary<EventType, List<ItemSpell>> SpellList => Definition.SpellList;
 
+        /// <summary>Spells this item runs while worn.</summary>
+        public IReadOnlyList<ItemSpell> WearSpells =>
+            SpellList.TryGetValue(EventType.OnWear, out List<ItemSpell>? spells) ? spells : [];
+
         public int GetStat(CharacterStat stat)
             => Definition.Stats.TryGetValue(stat, out int value) ? value : 0;
 

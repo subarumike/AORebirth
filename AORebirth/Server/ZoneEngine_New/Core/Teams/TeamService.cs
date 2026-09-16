@@ -35,7 +35,7 @@ namespace ZoneEngine_New.Core.Teams
         // Updated only from that player's attach/refresh/stat-change callback on its owner tick.
         // Team operations on another playfield never enumerate or read this player's mutable Stats.
         private sealed record MemberData(string Name, int Level, int Profession, int MaxHealth,
-            int MaxNano, bool HasVitals, InfoPacketMessage Info);
+            int MaxNano, bool HasVitals);
 
         private readonly object _sync = new();
         private readonly Dictionary<int, Player> _players = new();
@@ -81,7 +81,7 @@ namespace ZoneEngine_New.Core.Teams
                 Action<CharacterStat, int, int, bool> observer = (stat, _, _, _) =>
                 {
                     if (stat is not (CharacterStat.Level or CharacterStat.Profession or CharacterStat.MaxHealth
-                        or CharacterStat.MaxNanoEnergy or CharacterStat.Health)) return;
+                        or CharacterStat.MaxNanoEnergy)) return;
                     lock (_sync) { if (Owns(player)) CaptureData(player); }
                 };
                 _statObservers[player.Identity.Instance] = observer;
@@ -288,7 +288,7 @@ namespace ZoneEngine_New.Core.Teams
             _invitations[target.Identity.Instance] = new Invitation(inviter, target,
                 inviter.Session!, target.Session!, team?.Id ?? 0);
             // Names/levels come from current actors; no off-map SCFU ghosts or historical capture reads.
-            Send(inviter, _data[target.Identity.Instance].Info);
+            Send(inviter, target.BuildInfoPacket());
             Send(inviter, new StatMessage { Identity = target.Identity, Stats =
                 [new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.Level, Value2 = (uint)targetLevel }] });
             if (!ReferenceEquals(inviter.Playfield, target.Playfield))
@@ -522,7 +522,7 @@ namespace ZoneEngine_New.Core.Teams
                 && nano >= 0 && !StatCollection.IsUnset(nano);
             _data[player.Identity.Instance] = new MemberData(player.Name ?? player.FirstName,
                 player.Stats.GetOrZero(CharacterStat.Level), player.Stats.GetOrZero(CharacterStat.Profession),
-                health, nano, hasVitals, player.BuildInfoPacket());
+                health, nano, hasVitals);
         }
         private static Identity CharacterIdentity(int id) => new() { Type = IdentityType.CanbeAffected, Instance = id };
         private void CancelInvitations(int id)

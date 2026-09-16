@@ -22,9 +22,6 @@ namespace ZoneEngine_New.Core.Inventory
     /// <summary>OnUse FunctionType implementations that ZoneEngine_New can run today.</summary>
     internal static class ItemUseFunctions
     {
-        internal static bool TryReadInt(System.Collections.Generic.List<object> arguments, int index, out int value)
-            => TryGetInt(arguments, index, out value);
-
         public static bool TryExecute(
             int templateId,
             Character target,
@@ -86,23 +83,23 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool Hit(Character target, Character? source, ItemSpell spell)
         {
-            if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int minHit))
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int minHit))
                 return false;
 
             // Hit args: Stat, Min, Max [, AC]. Collapsed Stat, Amount, ACType when Amount<0 and third>0.
             int maxHit = minHit;
             int acStat = 0;
-            if (TryGetInt(spell.Arguments, 2, out int third))
+            if (spell.TryReadInt(2, out int third))
             {
                 maxHit = third;
-                if (spell.Arguments.Count == 3 && minHit < 0 && third > 0)
+                if (spell.ArgumentCount == 3 && minHit < 0 && third > 0)
                 {
                     acStat = third;
                     maxHit = minHit;
                 }
-                else if (spell.Arguments.Count >= 4)
+                else if (spell.ArgumentCount >= 4)
                 {
-                    if (TryGetInt(spell.Arguments, 3, out int fourth))
+                    if (spell.TryReadInt(3, out int fourth))
                         acStat = fourth;
 
                     if (minHit < 0 && maxHit > 0)
@@ -182,7 +179,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool Set(Character target, ItemSpell spell)
         {
-            if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int value))
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int value))
                 return false;
 
             target.Stats.Set((CharacterStat)statId, value, StatDetail.Base, dirty: true);
@@ -191,7 +188,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool SetFlag(Character target, ItemSpell spell)
         {
-            if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int bitIndex))
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int bitIndex))
                 return false;
 
             if (bitIndex < 0 || bitIndex > 31)
@@ -205,7 +202,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool ClearFlag(Character target, ItemSpell spell)
         {
-            if (!TryGetInt(spell.Arguments, 0, out int statId) || !TryGetInt(spell.Arguments, 1, out int bitIndex))
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int bitIndex))
                 return false;
 
             if (bitIndex < 0 || bitIndex > 31)
@@ -219,7 +216,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool SystemText(Player player, ItemSpell spell)
         {
-            if (player.Session == null || !TryGetString(spell.Arguments, 0, out string text) || text.Length == 0)
+            if (player.Session == null || !spell.TryReadString(0, out string text) || text.Length == 0)
                 return false;
 
             player.Session.Send(
@@ -278,7 +275,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool UploadNano(Player player, ItemSpell spell)
         {
-            if (!TryGetInt(spell.Arguments, 0, out int nanoId) || nanoId <= 0)
+            if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
                 return false;
 
             // A nano already in the list is not uploaded again, and the crystal is not spent.
@@ -325,47 +322,5 @@ namespace ZoneEngine_New.Core.Inventory
                 });
         }
 
-        static bool TryGetInt(System.Collections.Generic.List<object> arguments, int index, out int result)
-        {
-            result = 0;
-            if (arguments == null || index < 0 || index >= arguments.Count)
-                return false;
-
-            switch (arguments[index])
-            {
-                case int i:
-                    result = i;
-                    return true;
-                case long l when l >= int.MinValue && l <= int.MaxValue:
-                    result = (int)l;
-                    return true;
-                case uint u when u <= int.MaxValue:
-                    result = (int)u;
-                    return true;
-                case short s:
-                    result = s;
-                    return true;
-                case byte b:
-                    result = b;
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        static bool TryGetString(System.Collections.Generic.List<object> arguments, int index, out string result)
-        {
-            result = string.Empty;
-            if (arguments == null || index < 0 || index >= arguments.Count)
-                return false;
-
-            if (arguments[index] is string text)
-            {
-                result = text;
-                return true;
-            }
-
-            return false;
-        }
     }
 }

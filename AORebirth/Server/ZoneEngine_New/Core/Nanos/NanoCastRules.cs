@@ -10,6 +10,8 @@ namespace ZoneEngine_New.Core.Nanos
         NotUploaded,
         RequirementsNotMet,
         NotEnoughNano,
+        /// <summary>Start-only: target cannot hold the buff. Land-time NCU failure still completes the cast.</summary>
+        NotEnoughNcu,
         InvalidTarget,
         TargetDead,
     }
@@ -17,7 +19,8 @@ namespace ZoneEngine_New.Core.Nanos
     /// <summary>
     /// The cast gate, as a pure decision over already-resolved facts. The same gate runs twice:
     /// once when the client asks to cast, and once when the cast bar finishes, because nano,
-    /// target and recharge state can all change while the bar runs.
+    /// target and recharge state can all change while the bar runs. Target NCU is not part of
+    /// this gate: start checks it separately, and land refuses apply without interrupting finish.
     /// </summary>
     public static class NanoCastRules
     {
@@ -52,6 +55,7 @@ namespace ZoneEngine_New.Core.Nanos
             NanoCastRefusal.NotUploaded => "You do not have that nano program uploaded.",
             NanoCastRefusal.RequirementsNotMet => "You do not meet the requirements for that nano program.",
             NanoCastRefusal.NotEnoughNano => "You do not have enough nano energy.",
+            NanoCastRefusal.NotEnoughNcu => "Not enough NCU.",
             NanoCastRefusal.InvalidTarget => "That is not a valid target for that nano program.",
             NanoCastRefusal.TargetDead => "Your target is dead.",
             _ => string.Empty,

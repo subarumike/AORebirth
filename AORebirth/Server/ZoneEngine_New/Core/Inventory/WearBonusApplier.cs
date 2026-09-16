@@ -19,13 +19,12 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(stats);
 
-            int last = page.Offset + page.Capacity;
-            for (int slot = page.Offset; slot < last; slot++)
+            foreach (KeyValuePair<int, Item> slot in page.EnumerateSlots())
             {
-                if (!page.Content.TryGetValue(slot, out Item? item) || item?.Definition == null)
+                if (slot.Value.Definition == null)
                     continue;
 
-                ApplyItem(item, includeWield, stats);
+                ApplyItem(slot.Value, includeWield, stats);
             }
         }
 
