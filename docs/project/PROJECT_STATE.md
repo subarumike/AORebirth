@@ -2,11 +2,16 @@
 
 Updated: 2026-09-15
 
-An isolated retained-implementation purge is IN PROGRESS on
-`codex/purge-retained-legacy-001`. Its starting master is `4159a00c`.
-Mike authorized unavailable optional gameplay instead of preserving old implementations.
-This branch has not passed release acceptance and must not be deployed. Production is
-unchanged. The earlier retirement acceptance below describes the baseline, not this purge.
+The isolated retained-implementation purge passed acceptance on
+`codex/purge-retained-legacy-001`, tested public source `d265e618` from master `4159a00c`.
+All 57 relocated files are deleted. Optional missions/dialogue/combat/item-use/new-cast
+paths are unavailable instead of preserving old implementations. Windows/all 12
+mandatory stages, 520 NewEngine and 339 AOtomation tests, frozen disposable schema/
+connected acceptance and private native Linux build/520 tests/package acceptance passed.
+Private assembled source is `c30ec82d`, with operations `2a9287d4`. Master, Delmus's
+branch and production were not modified. This is an accepted candidate, not a deployed
+release. See `docs/reports/NEWENGINE_RETAINED_LEGACY_PURGE.md` and its acceptance receipt.
+The earlier retirement acceptance below describes the baseline, not this purge.
 
 The accepted NewEngine content cleanup reached master at
 `c5af4ac18a1378dc41c37d31b9ac62ac46c5f8a0`: editable

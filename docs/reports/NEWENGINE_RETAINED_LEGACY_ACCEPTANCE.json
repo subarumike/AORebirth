@@ -1,0 +1,65 @@
+{
+  "starting_sha": "4159a00c0e7c59f3139fa7ce3054d722f001e6a6",
+  "tested_source_sha": "d265e6188c6642004eb9c4ddb2a5254b83840cad",
+  "branch": "codex/purge-retained-legacy-001",
+  "production_modified": false,
+  "windows": {
+    "acceptance": "PASS",
+    "mandatory_stages": 12,
+    "newengine_tests": 520,
+    "aotomation_tests": 339,
+    "frozen_file_count": 5027,
+    "freeze_all_files_matched": true,
+    "engine_sha256": "25e2c52d825878cd234f3b556fc1fa61487c2cbf549ddc54bbcbee393730147e",
+    "login_sha256": "bc0488d5a33f100774d8ba0e0890b367ad885e5c6cbfee7500a4c8cfcd29ae98",
+    "binaries_unchanged_after_disposable_gates": true
+  },
+  "schema": {
+    "acceptance": "PASS",
+    "negative_current_schema_and_explicit_disposable_migration": "PASS",
+    "copy_failure_rollback": "PASS",
+    "fresh_dao_reload_and_two_restarts": "PASS",
+    "stats_preserved": 40,
+    "items_preserved": 2,
+    "snapshot_sha256": "42fdb6f1d8a0932209b75d57272e7f4fbe89ec025d1b6ebb222c770192399c8a",
+    "production_contact": false,
+    "residue": "NONE"
+  },
+  "connected": {
+    "acceptance": "PASS",
+    "authenticated_login_zoning_relogin_and_process_restart": "PASS",
+    "saved_morph_cancel_and_reconnect": "PASS",
+    "final_stats": 44,
+    "final_items": 6,
+    "final_online": false,
+    "final_snapshot_sha256": "7cb102c76d606f49c45cbd2a31fb29710aea142894624a9f2debc7ab5eb10137",
+    "residue": "NONE"
+  },
+  "linux": {
+    "acceptance": "PASS",
+    "private_source_sha": "c30ec82dcbd8ba9220e20ef0e86a23f95d081831",
+    "private_operations_sha": "2a9287d4d72367f86d376b80183b7620d37ef554",
+    "newengine_tests": 520,
+    "engine_sha256": "aecbb37500fd3ac7a33fb61a14c4691dae7414d5e447a2f3591118fc0e9413ac",
+    "archive_sha256": "ef7ae9accea09c5230968c05f44417eec7f7bf2d204466cebc44ee9f77066a11",
+    "archive_members": 6529,
+    "legacy_engine_executables": 0,
+    "content_manifest_sha256": "35ea53e3b5fca052de6221eae335fb141aacc837240b55d58314dd2fe373bd55",
+    "content_files": 4787,
+    "artifact_directory_name": "native-data-driven-purge-retained-legacy-20260915",
+    "release_manifest_format": 3
+  },
+  "limitations": [
+    "No production deployment or official-client gameplay acceptance was performed.",
+    "Optional gameplay removals are listed in NEWENGINE_CLEAN_REIMPLEMENTATION_BACKLOG.json.",
+    "Origin/source guards are conservative static and lexical checks; package binaries and arbitrary compilation profiles are outside that source-origin classification.",
+    "DAO guard has zero new violations and retains three pre-existing provider exceptions."
+  ],
+  "initial_attempts": [
+    {
+      "gate": "native container prerequisites",
+      "result": "STOPPED_BEFORE_BUILD",
+      "reason": "git-lfs absent in the base SDK image; documented prerequisites installed only in the disposable container before the successful run."
+    }
+  ]
+}

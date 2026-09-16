@@ -116,16 +116,115 @@ session security, inventory/DAO integrity, saved-state compatibility and rejecti
 without mutation. The AOtomation repository-root resolver now selects this
 NewEngine checkout instead of accidentally walking to the parent checkout.
 
-Current worktree verification: NewEngine **520 PASS** including offline startup;
-expanded retained guard and six mutations **PASS**; DAO guard **PASS**; cutover
-inventory **PASS**, zero Legacy dependency edges. Earlier AOtomation **339 PASS**
-and disposable schema/connected acceptance **PASS** are intermediate receipts;
-they must not substitute for final exact-source acceptance.
+Tested public source: `d265e6188c6642004eb9c4ddb2a5254b83840cad`.
+The source purge is `d5f8ace4`; the approved obsolete fixture retirement is
+`d265e618`. Both were pushed to the isolated branch. Subsequent completion
+receipt/project-state edits contain no runtime or test changes.
 
-Exact-source Windows/mandatory acceptance, final disposable schema/connected
-acceptance and private native package acceptance are **PENDING**. This candidate
-is not authorized for production deployment. Final immutable receipts and tested
-source identities will be appended after those gates run.
+Final exact-source acceptance:
+
+| Gate | Result |
+| --- | --- |
+| Full Windows build and all 12 mandatory stages | PASS |
+| NewEngine tests and offline startup | PASS, 520 tests |
+| AOtomation tests | PASS, 339 tests |
+| Retained source guard and six mutation/negative controls | PASS |
+| Content architecture and DAO guards | PASS |
+| Dependency inventory | PASS, zero Legacy edges |
+| Disposable schema, explicit migration, failed-copy rollback and two restarts | PASS |
+| Authenticated login, zoning, logout/relogin, saved morph cancellation and process restart | PASS |
+| Exact-source native restore/build/tests/publication/package | PASS, 520 NewEngine tests |
+
+The Windows output freeze compared all **5,027** files byte-for-byte. NewEngine
+SHA256 is `25e2c52d825878cd234f3b556fc1fa61487c2cbf549ddc54bbcbee393730147e`;
+LoginEngine SHA256 is `bc0488d5a33f100774d8ba0e0890b367ad885e5c6cbfee7500a4c8cfcd29ae98`.
+Both binaries retained those hashes after disposable acceptance. Schema restart
+checks preserved 40 stat rows and two items; the final connected snapshot preserved
+44 stat rows and six items with the character offline. These are disposable fixture
+counts, not production population counts. Container/network residue was none.
+
+Private native source `c30ec82dcbd8ba9220e20ef0e86a23f95d081831` combines the tested
+public source with private operations `2a9287d4d72367f86d376b80183b7620d37ef554`.
+Native build/test/package acceptance passed. The archive contains no Legacy engine
+executable. Exact native engine/archive hashes and manifest identities are in
+`NEWENGINE_RETAINED_LEGACY_ACCEPTANCE.json`; private content paths and private
+tooling are not copied into this public receipt.
+
+An initial native container attempt stopped before build because its base image
+lacked git-lfs. Installing the documented prerequisites inside the disposable
+container resolved it; the complete rerun passed. That stopped attempt is not
+counted as acceptance. No source workaround or production change was made.
+
+Remaining risks: optional systems listed above are deliberately unavailable;
+official-client gameplay was not exercised; the DAO guard retains three existing
+provider exceptions with zero new violations; static-origin analysis has the
+stated scope limits. This is an accepted source/package candidate, not a production
+deployment. Saved-data DTO/interface compatibility remains separately allowed.
+
+## Required final accounting
+
+```text
+KNOWN_RETAINED_LEGACY_FILES=57
+ADDITIONAL_REMOVED_OR_REWRITTEN_FILES=69
+RETAINED_LEGACY_FILES_DELETED=57
+RETAINED_LEGACY_FILES_REPLACED_WITH_DATA=1
+RETAINED_LEGACY_FILES_CLEAN_REIMPLEMENTED=1
+RETAINED_LEGACY_FILES_MOVED_TO_PERSISTENCE_COMPATIBILITY=0
+RETAINED_LEGACY_IMPLEMENTATIONS_REMAINING=0
+SHAREDGAMEPLAY_RETAINED_LEGACY_FILES=0
+RETAINED_LEGACY_COMBAT_FILES=0
+RETAINED_LEGACY_MISSION_FILES=0
+RETAINED_LEGACY_DIALOGUE_FILES=0
+RETAINED_LEGACY_TEAM_XP_FILES=0
+RETAINED_LEGACY_CHAT_COMMAND_FILES=0
+MISSION_LEVEL_TABLE_COMPILED_IN_CSHARP=NO
+MISSION_LEVEL_TABLE_EDITABLE_WITHOUT_RECOMPILE=YES
+GENERATED_GAME_CONTENT_CSHARP_FILES=0
+RUNTIME_GAME_CONTENT_HARDCODE_VIOLATIONS=0
+RUNTIME_CONTENT_SPECIFIC_SPECIAL_CASES=0
+LEGACY_MISSION_ORCHESTRATION_BEHIND_DAO=0
+LEGACY_BEHAVIOR_FALLBACKS=0
+LEGACY_GAMEPLAY_COMPATIBILITY_TYPES=0
+SAVED_DATA_COMPATIBILITY_PRESENT=YES
+SAVED_DATA_COMPATIBILITY_CONTAINS_GAMEPLAY_CODE=NO
+LEGACY_NEAR_COPY_REPLACEMENTS=0
+LEGACY_BEHAVIOR_AS_SOLE_TEST_ORACLE=0
+RETAINED_57_FILES_IN_COMPILE_GRAPH=0
+PRODUCTION_MODIFIED=NO
+```
+
+Deleted-file counts describe physical removal. The two replacement counts describe
+the disposition of those deleted files, not additional deleted files. One current
+source is explicitly classified directly retained **data-only** DTO/interface
+compatibility; it is not hidden in the gameplay-implementation zero.
+
+| Decision | Result |
+| --- | --- |
+| All 57 relocated files individually accounted for and reviewed | YES |
+| Retained combat, missions and dialogue removed | YES |
+| Retained team-XP window and chat parser removed | YES |
+| SharedGameplay preserves a Legacy implementation | NO |
+| Mission graph moved out of compiled C# | YES |
+| Generated game-content C# remains | NO |
+| Old orchestration remains behind DAO | NO |
+| Near-copy replacements remain | NO |
+| Runtime game-content hardcoding remains | NO |
+| Legacy gameplay fallback remains | NO |
+| Unsupported request paths reject before mutation | YES |
+| Saved-data compatibility remains separately identified | YES |
+| Automated login/inventory/zoning/persistence acceptance | PASS |
+| Production modified | NO |
+
+```text
+RETAINED_LEGACY_IMPLEMENTATIONS: 0
+RETAINED_57_FILES_IN_COMPILE_GRAPH: 0
+RUNTIME_GAME_CONTENT_HARDCODING: 0
+GENERATED_GAME_CONTENT_CSHARP: 0
+LEGACY_GAMEPLAY_FALLBACKS: 0
+LEGACY_NEAR_COPY_REPLACEMENTS: 0
+NEWENGINE_ARCHITECTURE_PURGED_OF_LEGACY_IMPLEMENTATION: YES
+PRODUCTION_MODIFIED: NO
+```
 
 ## Artifact index
 
@@ -137,6 +236,8 @@ source identities will be appended after those gates run.
   `NEWENGINE_CONTENT_ARCHITECTURE_GUARD.json`: compiled source/content review.
 - `NEWENGINE_CLEAN_REIMPLEMENTATION_BACKLOG.json` and
   `NEWENGINE_SUPPORTED_FEATURE_MATRIX.json`: honest current boundaries.
+- `NEWENGINE_RETAINED_LEGACY_ACCEPTANCE.json`: tested source/package identities,
+  final gate results and disposable-state preservation receipts.
 - `NEWENGINE_*TEST_TRANSITION.json`, `NEWENGINE_RETIRED_TEST_FILTERS.json`,
   `NEWENGINE_REMOVED_TEST_COMPILE_LINKS.json` and
   `NEWENGINE_PURGE_REMOVED_CONSUMERS.json`: retired fixture/consumer accounting.
