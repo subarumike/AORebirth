@@ -44,7 +44,7 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public int Unknown1 { get; set; }
 
         [AoMember(4)]
-        public int Unknown2 { get; set; }
+        public TemplateActionType Action { get; set; }
 
         [AoMember(5)]
         public Identity Placement { get; set; }

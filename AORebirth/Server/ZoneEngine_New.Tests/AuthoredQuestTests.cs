@@ -52,9 +52,9 @@ public sealed class AuthoredQuestTests
         Assert.IsTrue(checkedBefore && isolated && fullPlan); Assert.AreEqual(1, w.Dao.Calls);
         Assert.IsFalse(w.Player.Inventory.Inventory.Content.ContainsKey(64));
         Assert.AreEqual(95577, w.Player.Inventory.Inventory.Content.Values.Single().LowId);
-        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Unknown2: 87 });
+        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Action: TemplateActionType.Overflow });
         Assert.IsTrue(w.Session.Messages[1] is ContainerAddItemMessage);
-        Assert.IsTrue(w.Session.Messages[2] is TemplateActionMessage { Unknown2: 3 });
+        Assert.IsTrue(w.Session.Messages[2] is TemplateActionMessage { Action: TemplateActionType.Use });
         Assert.IsTrue(w.Session.Messages[3] is CharacterActionMessage { Action: CharacterActionType.DeleteItem });
         Assert.AreEqual(2, w.Session.Messages.OfType<byte[]>().Count());
         Assert.IsTrue(w.Session.Messages.OfType<QuestFullUpdateMessage>().Single().Quests.Single().QuestId.Instance == unchecked((int)0x555BE9C5));
@@ -97,7 +97,7 @@ public sealed class AuthoredQuestTests
         Assert.AreEqual(6, w.Player.Inventory.Inventory.Content.Count); Assert.AreEqual(1363, w.Player.Stats.GetOrZero(CharacterStat.Cash));
         Assert.AreEqual(2869, w.Player.Stats.GetOrZero(CharacterStat.XP));
         CollectionAssert.AreEqual(new[] { 43384, 42423, 99589, 43960, 43978, 223373 },
-            w.Session.Messages.OfType<TemplateActionMessage>().Where(value => value.Unknown2 == 87).Select(value => value.ItemLowId).ToArray());
+            w.Session.Messages.OfType<TemplateActionMessage>().Where(value => value.Action == TemplateActionType.Overflow).Select(value => value.ItemLowId).ToArray());
         Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyNano)).State);
         Assert.AreEqual(1, w.Dao.Calls);
     }
@@ -132,7 +132,7 @@ public sealed class AuthoredQuestTests
         using var w = new World(); var item = w.Add(284954); w.Player.Stats.Set(CharacterStat.Level, 10);
         Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
         Assert.AreEqual(104, w.Dao.Items[10].ContainerType); Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, DojaChipInteractionRules.QuestTurnIn)).State);
-        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Unknown2: 3 }); Assert.IsTrue(w.Session.Messages[1] is byte[]);
+        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Action: TemplateActionType.Use }); Assert.IsTrue(w.Session.Messages[1] is byte[]);
         int sent = w.Session.Messages.Count; Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreEqual(sent, w.Session.Messages.Count);
         Assert.AreEqual(0, w.Session.Messages.OfType<CharacterActionMessage>().Count());
     }

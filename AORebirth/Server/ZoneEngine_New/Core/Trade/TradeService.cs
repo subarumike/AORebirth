@@ -1224,16 +1224,8 @@ namespace ZoneEngine_New.Core.Trade
             SendSocialStatus(viewer, 0);
         }
 
-        /// <summary>
-        /// Capture 20260806-rabbit: an item that lands in overflow is announced with a TemplateAction
-        /// on the overflow window followed by a ContainerAddItem to the next free slot marker.
-        /// </summary>
-        const int OverflowTemplateActionUnknown2 = 87;
-
         /// <summary>Placement marker meaning "next free slot"; the client picks the real slot.</summary>
         const int NextFreeSlotMarker = 0x6F;
-
-        const int TradeRenderTemplateActionUnknown2 = 0x55;
 
         static void SendItemRender(Player viewer, Item item, Identity source)
             => viewer.Session?.Send(
@@ -1245,7 +1237,7 @@ namespace ZoneEngine_New.Core.Trade
                     ItemHighId = item.HighId,
                     Quality = item.Quality,
                     Unknown1 = 1,
-                    Unknown2 = TradeRenderTemplateActionUnknown2,
+                    Action = TemplateActionType.TradeRender,
                     Placement = source,
                     Unknown3 = 0,
                     Unknown4 = 0
@@ -1304,7 +1296,7 @@ namespace ZoneEngine_New.Core.Trade
                     ItemHighId = item.HighId,
                     Quality = item.Quality,
                     Unknown1 = 1,
-                    Unknown2 = OverflowTemplateActionUnknown2,
+                    Action = TemplateActionType.Overflow,
                     Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
                     Unknown3 = 0,
                     Unknown4 = 0

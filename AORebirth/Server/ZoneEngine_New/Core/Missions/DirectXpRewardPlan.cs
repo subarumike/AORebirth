@@ -138,9 +138,9 @@ public sealed class DirectXpRewardPlan
         if (LevelAfter > LevelBefore)
         {
             player.Rebase();
-            SendStat(player, CharacterStat.MaxHealth, player.Stats.GetOrZero(CharacterStat.MaxHealth), 0);
-            SendStat(player, CharacterStat.MaxNanoEnergy, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy), 0);
-            SendStat(player, CharacterStat.CurrentNano, player.Stats.GetOrZero(CharacterStat.CurrentNano), 0);
+            SendStat(player, CharacterStat.MaxHealth, player.Stats.GetOrZero(CharacterStat.MaxHealth, StatDetail.Base), 0);
+            SendStat(player, CharacterStat.MaxNanoEnergy, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy, StatDetail.Base), 0);
+            SendStat(player, CharacterStat.CurrentNano, player.Stats.GetOrZero(CharacterStat.CurrentNano, StatDetail.Base), 0);
             for (int level = LevelBefore + 1; level <= LevelAfter; level++)
                 player.Session?.Send(new NewLevelMessage
                 {

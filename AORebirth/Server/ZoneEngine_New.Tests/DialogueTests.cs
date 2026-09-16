@@ -379,7 +379,7 @@ public sealed class DialogueTests
         w.Dao.BeforeCommit = pending => { Assert.AreEqual(0, w.Session.Messages.Count); Assert.AreEqual(0, w.Player.Inventory.Inventory.Content.Count); };
         Assert.IsTrue(w.Service.TryGrantTailorMeasurement(w.Player, 7));
         Assert.AreEqual(256422, w.Player.Inventory.Inventory.Content.Values.Single().LowId);
-        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Unknown2: 87, Quality: 1 });
+        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Action: TemplateActionType.Overflow, Quality: 1 });
         Assert.IsTrue(w.Session.Messages[1] is ContainerAddItemMessage { TargetPlacement: 0x6f });
         int calls = w.Dao.Calls; Assert.IsFalse(w.Service.TryGrantTailorMeasurement(w.Player, 8)); Assert.AreEqual(calls, w.Dao.Calls);
     }

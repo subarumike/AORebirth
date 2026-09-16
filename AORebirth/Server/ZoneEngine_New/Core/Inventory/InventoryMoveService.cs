@@ -22,6 +22,8 @@ namespace ZoneEngine_New.Core.Inventory
     {
         const int DefaultEquipDelay = 20;
 
+        const int TemplateActionUnknown1 = 1;
+
         private readonly object _gate = new();
         private readonly Dictionary<int, PendingEquip> _pending = new();
         private readonly IZoneLogger _logger;
@@ -578,22 +580,68 @@ namespace ZoneEngine_New.Core.Inventory
                 return;
             }
 
+            // Live finish order (surgery-clinic + pants captures):
+            // unequip CharacterAction/TemplateAction → ContainerAddItem → equip CharacterAction/TemplateAction.
+            // TemplateAction Unequip/Equip; Placement=(WearPage:absoluteSlot); cell-announced.
             SendUnequipActions(player, pending);
             player.Rebase();
             SendAck(player, pending.AckSource, pending.AckTarget, pending.AckTargetPlacement);
+            SendEquipActions(player, pending);
             NotifyEquipmentChanged(player, pending);
         }
 
         static void SendUnequipActions(Player player, PendingEquip pending)
         {
             if (pending.SourcePage.Identity.Type.IsWearPage())
-                SendUnequipAction(player, pending.SourceSlot);
+            {
+                SendUnequipCharacterAction(player, pending.SourceSlot);
+                AnnounceWearTemplateAction(
+                    player,
+                    pending.Item,
+                    pending.SourcePage.Identity.Type,
+                    pending.SourceSlot,
+                    TemplateActionType.Remove);
+            }
 
             if (pending.SwappedItem != null && pending.DestPage.Identity.Type.IsWearPage())
-                SendUnequipAction(player, pending.DestSlot);
+            {
+                SendUnequipCharacterAction(player, pending.DestSlot);
+                AnnounceWearTemplateAction(
+                    player,
+                    pending.SwappedItem,
+                    pending.DestPage.Identity.Type,
+                    pending.DestSlot,
+                    TemplateActionType.Remove);
+            }
         }
 
-        static void SendUnequipAction(Player player, int slot)
+        static void SendEquipActions(Player player, PendingEquip pending)
+        {
+            if (pending.DestPage.Identity.Type.IsWearPage())
+            {
+                SendEquipCharacterAction(player, pending.Item, pending.DestSlot);
+                AnnounceWearTemplateAction(
+                    player,
+                    pending.Item,
+                    pending.DestPage.Identity.Type,
+                    pending.DestSlot,
+                    TemplateActionType.Wear);
+            }
+
+            // Wear→wear swap: the vacated source slot now holds the swapped item.
+            if (pending.SwappedItem != null && pending.SourcePage.Identity.Type.IsWearPage())
+            {
+                SendEquipCharacterAction(player, pending.SwappedItem, pending.SourceSlot);
+                AnnounceWearTemplateAction(
+                    player,
+                    pending.SwappedItem,
+                    pending.SourcePage.Identity.Type,
+                    pending.SourceSlot,
+                    TemplateActionType.Wear);
+            }
+        }
+
+        static void SendUnequipCharacterAction(Player player, int slot)
         {
             player.Session?.Send(
                 new CharacterActionMessage
@@ -607,6 +655,61 @@ namespace ZoneEngine_New.Core.Inventory
                     Parameter2 = slot,
                     Unknown2 = 0
                 });
+        }
+
+        static void SendEquipCharacterAction(Player player, Item item, int slot)
+        {
+            player.Session?.Send(
+                new CharacterActionMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.Equip,
+                    Unknown1 = 0,
+                    Target = ResolveEquipTarget(item),
+                    Parameter1 = 0,
+                    Parameter2 = slot,
+                    Unknown2 = 0
+                });
+        }
+
+        static void AnnounceWearTemplateAction(
+            Player player,
+            Item item,
+            IdentityType wearPage,
+            int slot,
+            TemplateActionType action)
+        {
+            player.Cell?.Announce(
+                new TemplateActionMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 0,
+                    ItemLowId = item.LowId,
+                    ItemHighId = item.HighId,
+                    Quality = item.Quality,
+                    Unknown1 = TemplateActionUnknown1,
+                    Action = action,
+                    Placement = new Identity { Type = wearPage, Instance = slot },
+                    Unknown3 = 0,
+                    Unknown4 = 0
+                });
+        }
+
+        /// <summary>
+        /// Live Equip Target is the item wire identity (e.g. armor instance type 51022 / 0xC74E).
+        /// Prefer the assigned occupancy identity; fall back to catalog type + InstanceId.
+        /// </summary>
+        static Identity ResolveEquipTarget(Item item)
+        {
+            if (item.Identity.Type != IdentityType.None && item.Identity.Instance != 0)
+                return item.Identity;
+
+            int type = item.ResolvedItemType;
+            if (type != 0 && item.InstanceId > 0)
+                return new Identity { Type = (IdentityType)type, Instance = item.InstanceId };
+
+            return item.Identity;
         }
 
         static void NotifyEquipmentChanged(Player player, PendingEquip pending)

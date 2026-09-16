@@ -958,7 +958,8 @@ namespace ZoneEngine_New.Core.Entities
 
         static int RequireWireStat(StatCollection stats, CharacterStat id)
         {
-            int value = stats.Get(id);
+            // FullCharacter carries base only; the client derives full from gear/buffs.
+            int value = stats.Get(id, StatDetail.Base);
             if (StatCollection.IsUnset(value))
                 throw new InvalidOperationException("Unset FullCharacter stat: " + id);
             return value;

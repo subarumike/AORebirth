@@ -265,7 +265,7 @@ public sealed partial class AuthoredQuestService
     static void SendOverflowGrant(Player player, Item item)
     {
         player.Session?.Send(new TemplateActionMessage { Identity = player.Identity, ItemLowId = item.LowId, ItemHighId = item.HighId,
-            Quality = item.Quality, Unknown1 = 1, Unknown2 = 87, Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 } });
+            Quality = item.Quality, Unknown1 = 1, Action = TemplateActionType.Overflow, Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 } });
         player.Session?.Send(new ContainerAddItemMessage { Identity = player.Identity,
             SourceContainer = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
             Target = new Identity { Type = IdentityType.OverflowWindow, Instance = player.Identity.Instance }, TargetPlacement = 0x6f });
@@ -275,7 +275,7 @@ public sealed partial class AuthoredQuestService
     {
         player.Inventory.Inventory.Content.Remove(slot.Instance);
         player.Session?.Send(new TemplateActionMessage { Identity = player.Identity, ItemLowId = item.LowId, ItemHighId = item.HighId, Quality = item.Quality,
-            Placement = slot, Unknown1 = 1, Unknown2 = 3, Unknown3 = (int)player.Identity.Type, Unknown4 = player.Identity.Instance });
+            Placement = slot, Unknown1 = 1, Action = TemplateActionType.Use, Unknown3 = (int)player.Identity.Type, Unknown4 = player.Identity.Instance });
         player.Session?.Send(new CharacterActionMessage { Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot });
     }
 }

@@ -153,7 +153,7 @@ namespace ZoneEngine.Core.Packets
                                                                  ItemLowId = rightHandItem.LowID,
                                                                  Quality = rightHandItem.Quality,
                                                                  Unknown1 = 1,
-                                                                 Unknown2 = 6,
+                                                                 Action = TemplateActionType.Wear,
                                                                  Placement =
                                                                      new Identity()
                                                                      {
@@ -175,10 +175,10 @@ namespace ZoneEngine.Core.Packets
                                                     ItemLowId = item.LowID,
                                                     Quality = item.Quality,
                                                     Unknown1 = 1,
-                                                    Unknown2 =
+                                                    Action =
                                                         page is SocialArmorInventoryPage
-                                                            ? 3
-                                                            : 6,
+                                                            ? TemplateActionType.Use
+                                                            : TemplateActionType.Wear,
                                                     Placement =
                                                         new Identity()
                                                         {

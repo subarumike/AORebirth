@@ -28,8 +28,22 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             Player player = context.Player;
-            player.Stats.Set(stat, value, StatDetail.Base, dirty: true);
-            player.FlushDirtyStats();
+            if (stat == CharacterStat.Level)
+            {
+                if (!player.TrySetLevel(value))
+                {
+                    GmCommandFeedback.Send(
+                        context.Session,
+                        context.Player,
+                        "Invalid level or XP table unavailable.");
+                    return;
+                }
+            }
+            else
+            {
+                player.Stats.Set(stat, value, StatDetail.Base, dirty: true);
+                player.FlushDirtyStats();
+            }
 
             GmCommandFeedback.Send(
                 context.Session,

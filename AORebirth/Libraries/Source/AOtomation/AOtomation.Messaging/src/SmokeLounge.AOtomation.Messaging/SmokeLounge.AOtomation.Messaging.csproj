@@ -317,6 +317,7 @@
     <Compile Include="Messages\N3Messages\TeamMemberMessage.cs" />
     <Compile Include="Messages\N3Messages\TeamInviteMessage.cs" />
     <Compile Include="Messages\N3Messages\TemplateActionMessage.cs" />
+    <Compile Include="Messages\N3Messages\TemplateActionType.cs" />
     <Compile Include="Messages\N3Messages\TradeAction.cs" />
     <Compile Include="Messages\N3Messages\TradeMessage.cs" />
     <Compile Include="Messages\N3Messages\VendingMachineFullUpdateMessage.cs" />

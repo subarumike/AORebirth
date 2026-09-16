@@ -90,9 +90,9 @@ namespace ZoneEngine.Core.Packets
                                                                  ItemHighId = rightHandItem.HighID,
                                                                  ItemLowId = rightHandItem.LowID,
                                                                  Quality = rightHandItem.Quality,
-                                                                 Unknown1 = 1,
-                                                                 Unknown2 = 7,
-                                                                 Placement =
+                                                    Unknown1 = 1,
+                                                    Action = TemplateActionType.Remove,
+                                                    Placement =
                                                                      new Identity()
                                                                      {
                                                                          Type = page.Identity.Type,
@@ -113,10 +113,10 @@ namespace ZoneEngine.Core.Packets
                                                     ItemLowId = item.LowID,
                                                     Quality = item.Quality,
                                                     Unknown1 = 1,
-                                                    Unknown2 =
+                                                    Action =
                                                         page is SocialArmorInventoryPage
-                                                            ? 3
-                                                            : 7,
+                                                            ? TemplateActionType.Use
+                                                            : TemplateActionType.Remove,
                                                     Placement =
                                                         new Identity()
                                                         {

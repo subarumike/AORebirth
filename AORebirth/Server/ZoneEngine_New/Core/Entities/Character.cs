@@ -223,6 +223,55 @@ namespace ZoneEngine_New.Core.Entities
                 ApplyLevelUp(gameData, levelBefore, level, amount);
         }
 
+        /// <summary>
+        /// GM/admin level set: snaps XP to the start of <paramref name="level"/> and syncs
+        /// LastXP/NextXP, title level, and IP for the level delta.
+        /// </summary>
+        /// <returns>False if level is out of range or XP table data is missing.</returns>
+        public bool TrySetLevel(int level)
+        {
+            if (!IsPlayer || level < 1 || level > MaxXpLevel)
+                return false;
+
+            IGameData? gameData = Playfield?.GetRequiredService<IGameData>();
+            if (gameData == null || !gameData.TryGetXpLevel(level, out XpLevelEntry entry))
+                return false;
+
+            int levelBefore = Stats.GetOrOne(CharacterStat.Level);
+
+            Stats.Set(CharacterStat.XP, entry.FloorXp, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.Level, level, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.LastXP, entry.FloorXp, StatDetail.Base, dirty: true);
+            Stats.Set(
+                CharacterStat.NextXP,
+                entry.NextLevelXp > 0 ? entry.FloorXp + entry.NextLevelXp : 0,
+                StatDetail.Base,
+                dirty: true);
+
+            if (level > levelBefore)
+            {
+                ApplyLevelUp(gameData, levelBefore, level, lastGain: 0);
+                return true;
+            }
+
+            if (level < levelBefore)
+            {
+                Stats.Set(CharacterStat.TitleLevel, TitleLevelFor(level), StatDetail.Base, dirty: true);
+
+                int ipDelta = TotalIpEarnedAtLevel(level) - TotalIpEarnedAtLevel(levelBefore);
+                if (ipDelta != 0)
+                {
+                    int ip = Math.Max(0, Stats.GetOrZero(CharacterStat.IP) + ipDelta);
+                    Stats.Set(CharacterStat.IP, ip, StatDetail.Base, dirty: true);
+                }
+
+                ApplyLevelVitals();
+            }
+
+            FlushDirtyStats();
+            return true;
+        }
+
         void ApplyLevelUp(IGameData gameData, int levelBefore, int levelAfter, int lastGain)
         {
             Stats.Set(CharacterStat.TitleLevel, TitleLevelFor(levelAfter), StatDetail.Base, dirty: true);
@@ -231,6 +280,18 @@ namespace ZoneEngine_New.Core.Entities
             if (ipGain > 0)
                 Stats.Set(CharacterStat.IP, Stats.GetOrZero(CharacterStat.IP) + ipGain, StatDetail.Base, dirty: true);
 
+            ApplyLevelVitals();
+            FlushDirtyStats();
+
+            if (this is not Player player || player.Session == null)
+                return;
+
+            for (int gained = levelBefore + 1; gained <= levelAfter; gained++)
+                player.Session.Send(BuildNewLevelMessage(gameData, gained, lastGain));
+        }
+
+        void ApplyLevelVitals()
+        {
             Rebase();
             int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
             if (maxHealth > 0)
@@ -239,14 +300,6 @@ namespace ZoneEngine_New.Core.Entities
             int maxNano = Stats.GetOrZero(CharacterStat.MaxNanoEnergy);
             if (maxNano > 0)
                 Stats.Set(CharacterStat.CurrentNano, maxNano, StatDetail.Base, dirty: true);
-
-            FlushDirtyStats();
-
-            if (this is not Player player || player.Session == null)
-                return;
-
-            for (int gained = levelBefore + 1; gained <= levelAfter; gained++)
-                player.Session.Send(BuildNewLevelMessage(gameData, gained, lastGain));
         }
 
         NewLevelMessage BuildNewLevelMessage(IGameData gameData, int level, int lastGain)

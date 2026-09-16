@@ -115,6 +115,7 @@ namespace ZoneEngine_New.Core.Entities
             existing ??= new StatValue();
 
             int previousFull = existing.Full;
+            int previousBase = existing.Base;
 
             if (detail == StatDetail.Bonus)
                 existing.Bonus = value;
@@ -125,7 +126,8 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             _values[stat] = existing;
-            if (dirty)
+            // Client recomputes full from base + gear/buffs; only base changes go on the wire.
+            if (dirty && previousBase != existing.Base)
                 _dirty.Add(stat);
 
             StatChanged?.Invoke(stat, previousFull, existing.Full, isInitialSet);
@@ -156,7 +158,8 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
-        /// Takes ownership of all dirty stats (latest full values) and clears the dirty set.
+        /// Takes ownership of all dirty stats (latest base values) and clears the dirty set.
+        /// The client applies gear/buff modifiers and derives full values itself.
         /// </summary>
         public GameTuple<CharacterStat, uint>[] DrainDirty()
         {
@@ -170,7 +173,7 @@ namespace ZoneEngine_New.Core.Entities
                 drained[index++] = new GameTuple<CharacterStat, uint>
                 {
                     Value1 = stat,
-                    Value2 = (uint)Get(stat)
+                    Value2 = (uint)Get(stat, StatDetail.Base)
                 };
             }
 

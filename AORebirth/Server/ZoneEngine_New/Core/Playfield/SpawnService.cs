@@ -668,7 +668,7 @@ namespace ZoneEngine_New.Core.Playfield
                         new GameTuple<CharacterStat, uint>
                         {
                             Value1 = CharacterStat.SocialStatus,
-                            Value2 = (uint)player.Stats.GetOrZero(CharacterStat.SocialStatus)
+                            Value2 = (uint)player.Stats.GetOrZero(CharacterStat.SocialStatus, StatDetail.Base)
                         }
                     ]
                 });
