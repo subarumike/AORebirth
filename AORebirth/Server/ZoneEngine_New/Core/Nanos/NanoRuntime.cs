@@ -400,7 +400,11 @@ namespace ZoneEngine_New.Core.Nanos
                     Unknown2 = 0
                 });
 
-        static void AnnounceCastInterrupted(Character caster, int nanoId)
+        // Live IN InterruptNanoCasting: Parameter1=nanoId, Parameter2=reason (observed 7 / 4).
+        // FinishNanoCasting keeps Parameter1=1, Parameter2=nanoId — do not reuse that layout here.
+        const int DefaultInterruptReason = 7;
+
+        static void AnnounceCastInterrupted(Character caster, int nanoId, int reason = DefaultInterruptReason)
         {
             var message = new CharacterActionMessage
             {
@@ -409,8 +413,8 @@ namespace ZoneEngine_New.Core.Nanos
                 Action = CharacterActionType.InterruptNanoCasting,
                 Unknown1 = 0,
                 Target = Identity.None,
-                Parameter1 = 1,
-                Parameter2 = nanoId,
+                Parameter1 = nanoId,
+                Parameter2 = reason,
                 Unknown2 = 0
             };
 
