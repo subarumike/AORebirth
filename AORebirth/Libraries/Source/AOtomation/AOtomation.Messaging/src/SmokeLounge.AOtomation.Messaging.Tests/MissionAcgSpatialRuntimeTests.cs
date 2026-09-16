@@ -409,101 +409,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 this.FirstPf());
         }
 
-        [TestMethod]
-        public void PlayerMovementIsValidatedBeforeControllerMove()
-        {
-            string source = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharDCMoveMessageHandler.cs");
-            AssertTextBefore(
-                source,
-                "MissionAcgSpatialRuntime.TryValidatePlayerMove",
-                "client.Controller.Move(moveType, coordinates, heading)");
-        }
 
-        [TestMethod]
-        public void DoorChestObjectiveAndExitUseCentralSpatialValidation()
-        {
-            string source = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgRuntimeInteractionService.cs");
-            Assert.IsTrue(source.Contains("MissionAcgSpatialRuntime.TryValidateInteraction"));
-            Assert.IsTrue(source.Contains("MissionAcgRuntimeObjectKind.Door"));
-            Assert.IsTrue(source.Contains("MissionAcgRuntimeObjectKind.Chest"));
-            Assert.IsTrue(source.Contains("MissionAcgRuntimeObjectKind.Exit"));
-        }
 
-        [TestMethod]
-        public void FindPersonAndRepairHaveExactSpatialChecks()
-        {
-            string source = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveInteractionService.cs");
-            Assert.IsTrue(source.Contains("\"find-person-info\""));
-            Assert.IsTrue(source.Contains("\"repair-machine\""));
-            Assert.IsTrue(
-                source.Contains("MissionAcgSpatialRuntime.TryValidateObjectiveRuntimeInteraction"));
-        }
 
-        [TestMethod]
-        public void PlayerAndNpcDamageBoundariesBothUseSpatialAuthority()
-        {
-            string attack = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs");
-            string playfield = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            string npc = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs");
-            Assert.IsTrue(attack.Contains("MissionAcgSpatialRuntime.TryValidateCombatPair"));
-            Assert.IsTrue(playfield.Contains("MissionAcgSpatialRuntime.TryValidateCombatPair"));
-            Assert.IsTrue(npc.Contains("MissionAcgSpatialRuntime.TryValidateCombatPair"));
-        }
 
-        [TestMethod]
-        public void MissionNpcPursuitUsesExplicitStationaryFallback()
-        {
-            string movement = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs");
-            Assert.IsTrue(movement.Contains("MissionAcgSpatialRuntime.RequiresStationaryNpc"));
-            Assert.IsTrue(movement.Contains("npcController.StopFollow()"));
-            Assert.IsFalse(movement.Contains("MissionAcgRandom"));
-        }
 
-        [TestMethod]
-        public void StartupRestoresSpatialAuthorityAfterOperationalState()
-        {
-            string source = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgBindingRuntime.cs");
-            AssertTextBefore(
-                source,
-                "MissionAcgOperationalRuntime.Initialize",
-                "MissionAcgSpatialRuntime.Initialize");
-        }
 
-        [TestMethod]
-        public void EntryAndExitResolveTheExactSpatialBinding()
-        {
-            string source = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionInstanceService.cs");
-            Assert.IsTrue(source.Contains("MissionAcgSpatialRuntime.TryResolveEntryPosition"));
-            Assert.IsTrue(source.Contains("MissionAcgSpatialRuntime.TryValidateExitPosition"));
-            Assert.IsFalse(
-                source.Contains(
-                    "MissionAcgSpatialRuntime.TryValidateExitPosition(latest"));
-        }
 
-        [TestMethod]
-        public void SpatialImplementationContainsNoGenerationSchemaRewardOrLootWork()
-        {
-            string authority = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgSpatialAuthority.cs");
-            string runtime = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgSpatialRuntime.cs");
-            string combined = authority + runtime;
-            Assert.IsFalse(combined.Contains("Random("));
-            Assert.IsFalse(combined.Contains("CREATE TABLE"));
-            Assert.IsFalse(combined.Contains("ALTER TABLE"));
-            Assert.IsFalse(combined.Contains("Reward"));
-            Assert.IsFalse(combined.Contains("Loot"));
-            Assert.IsFalse(combined.Contains("C79F"));
-        }
+
+
+
+
+
+
+
+
 
         private MissionAcgSpatialEnvelope Derive(MissionAcgLayoutBundle bundle)
         {

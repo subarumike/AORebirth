@@ -16,26 +16,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     [TestClass]
     public class TempleDoorStatusRuntimeTests
     {
-        [TestMethod]
-        public void TempleEntrySendsOneCapturedClosedStatusPerOfficialDoorStatel()
-        {
-            string service = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs");
-            string playfield = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
 
-            StringAssert.Contains(service, "TempleOfThreeWindsPlayfieldId = 1931");
-            StringAssert.Contains(service, "ExpectedTempleInternalDoorCount = 43");
-            StringAssert.Contains(service, "TempleExteriorEntryDoorInstance");
-            StringAssert.Contains(service, "statel.Identity.Type == IdentityType.Door");
-            StringAssert.Contains(service, ".GroupBy(statel => statel.Identity)");
-            StringAssert.Contains(
-                service,
-                "DoorStatusUpdateMessageHandler.Default.SendStatus(character, door.Identity, false)");
-            StringAssert.Contains(playfield, "this.statels");
-            StringAssert.Contains(playfield, "SendInitialDoorStatuses(");
-            StringAssert.Contains(playfield, "this.SendStaticDynelsToClient(character);");
-        }
 
         [TestMethod]
         public void SubwayDoorEvidencePreservesExactCapturedIdentityAndStateCoverage()
@@ -146,24 +127,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     318.987945557f));
         }
 
-        [TestMethod]
-        public void SubwayExternalArrivalSendsOnlySixCapturedClosedStatuses()
-        {
-            string service = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs");
-            string clientConnected = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs");
 
-            StringAssert.Contains(service, "CapturedSubwayArrivalDoorEvidenceSet.ResolveInitialStatusStatels(");
-            StringAssert.Contains(service, "playfieldId == SubwayPlayfieldId && isExternalPlayfieldArrival");
-            StringAssert.Contains(
-                service,
-                "DoorStatusUpdateMessageHandler.Default.SendStatus(character, door.Identity, false)");
-            StringAssert.Contains(
-                clientConnected,
-                "currentPlayfield.SendStaticDynelsToClientAfterExternalPlayfieldArrival(");
-            StringAssert.Contains(clientConnected, "client.Controller.Character);");
-        }
 
         [TestMethod]
         public void SubwayInitialStatusResolverReturnsExactlySixOnlyForExternalPf127Arrival()
@@ -224,43 +188,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     true).Length);
         }
 
-        [TestMethod]
-        public void SubwayDoorRuntimeDoesNotReplayOnDeathOrInventProximity()
-        {
-            string service = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedPlayfieldDoorStatusRuntimeService.cs");
-            string playfield = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
 
-            StringAssert.Contains(
-                service,
-                "this.doors = playfieldId == TempleOfThreeWindsPlayfieldId");
-            StringAssert.Contains(service, ": new TempleDoorDefinition[0]");
-            StringAssert.Contains(
-                playfield,
-                "public void SendStaticDynelsToClient(ICharacter character)");
-            StringAssert.Contains(
-                playfield,
-                "this.SendStaticDynelsToClient(character, false);");
-            StringAssert.Contains(
-                playfield,
-                "this.SendStaticDynelsToClient(character, true);");
-            StringAssert.Contains(playfield, "this.SendStaticDynelsToClient(character);");
-        }
 
-        [TestMethod]
-        public void DoorStatusHandlerPreservesCapturedMutableAndCategoricalFields()
-        {
-            string handler = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\DoorStatusUpdateMessageHandler.cs");
 
-            StringAssert.Contains(handler, "door.Type != IdentityType.Door");
-            StringAssert.Contains(handler, "message.Identity = door");
-            StringAssert.Contains(handler, "message.Unknown = 0");
-            StringAssert.Contains(handler, "message.Unknown1 = 2");
-            StringAssert.Contains(handler, "message.Unknown3 = isOpen ? (byte)1 : (byte)0");
-            StringAssert.Contains(handler, "message.Unknown6 = new Identity[0]");
-        }
 
         [TestMethod]
         public void TempleDoorContactOpensOnceAndExpiryClosesOnce()
@@ -356,81 +286,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void TempleWorldInteractionInventoryIsExactAndOfficial()
         {
-            string rules = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs");
             string geometry = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Navigation\OfficialDungeonGeometry.cs");
-
-            StringAssert.Contains(rules, "TemplePlayfieldId = 1931");
-            StringAssert.Contains(rules, "TempleGatewayPlayfieldId = 647");
-            StringAssert.Contains(rules, "TempleGatewayDoorInstance = unchecked((int)0xC0080287)");
-            StringAssert.Contains(rules, "TempleExteriorDoorInstance = unchecked((int)0xC024078B)");
-            StringAssert.Contains(rules, "templeDoors.Length == 44");
-            StringAssert.Contains(rules, "temple.Destinations.Count == 1");
-            StringAssert.Contains(rules, "TempleExteriorGeometryDoorIndex = 4468");
+                @"Tests\Fixtures\Gameplay\Navigation\OfficialDungeonGeometry.cs");
             StringAssert.Contains(geometry, "ExteriorDoorConnectionCount");
             StringAssert.Contains(geometry, "door.RoomIndex == -1");
         }
 
-        [TestMethod]
-        public void TempleProxyEntryPreservesExactLandingAndPacketOwnership()
-        {
-            string rules = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs");
-            string teleportProxy = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\teleportproxy.cs");
-            string teleportHandler = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\TeleportMessageHandler.cs");
-            string playfieldAnarchy = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\PlayfieldAnarchyFMessageHandler.cs");
 
-            StringAssert.Contains(rules, "CapturedEntryX = 172.989990234375f");
-            StringAssert.Contains(rules, "CapturedEntryY = 24.011247634887695f");
-            StringAssert.Contains(rules, "CapturedEntryZ = 7.81494140625f");
-            StringAssert.Contains(teleportProxy, "character.Rotation");
-            StringAssert.Contains(teleportProxy, "character.Position");
-            StringAssert.Contains(teleportHandler, "SendOfficialDungeonProxyTransfer");
-            StringAssert.Contains(teleportHandler, "sourceDoor.Instance,");
-            StringAssert.Contains(teleportHandler, "x.SgId = sgId");
-            StringAssert.Contains(teleportHandler, "Instance = destinationPlayfieldId");
-            StringAssert.Contains(playfieldAnarchy, "Type = IdentityType.Playfield1");
-            Assert.IsFalse(playfieldAnarchy.Contains("IsTempleProxyArrival(character)"));
-            Assert.IsFalse(playfieldAnarchy.Contains("Type = (IdentityType)51102"));
-        }
 
-        [TestMethod]
-        public void TempleExteriorExitIsEdgeTriggeredAndUsesSharedExitOwner()
-        {
-            string transitions = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs");
-            string content = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs");
-            string exitProxy = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\exitproxyplayfield.cs");
 
-            StringAssert.Contains(content, "TempleWorldInteractionRules.IsExteriorLinkStatel(statel)");
-            StringAssert.Contains(content, "IsGatewayEntryStatel");
-            StringAssert.Contains(content, "TempleDoorProximityRuntime.TriggerRadius");
-            StringAssert.Contains(content, "CapturedExitX = 1813.9990234375f");
-            StringAssert.Contains(content, "CapturedExitY = 26.806131362915039f");
-            StringAssert.Contains(content, "CapturedExitZ = 2715.84521484375f");
-            StringAssert.Contains(transitions, "if (!initialized)");
-            StringAssert.Contains(transitions, "if (wasInRange)");
-            StringAssert.Contains(transitions, "activeEnterContacts.Add(statelKey)");
-            StringAssert.Contains(transitions, "exitproxyplayfield.TryExecute(dynel, sd)");
-            StringAssert.Contains(transitions, "this.statelEnterContacts.Remove(dynelId)");
-            StringAssert.Contains(exitProxy, "internal static bool TryExecute");
-            StringAssert.Contains(exitProxy, "externaldoorinstance");
-            StringAssert.Contains(exitProxy, "externalplayfieldinstance");
-            StringAssert.Contains(exitProxy, "TryResolveProxyExit");
-            StringAssert.Contains(exitProxy, "SendOfficialDungeonProxyExit");
-
-            string teleportHandler = ReadRepositoryFile(
-                @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\TeleportMessageHandler.cs");
-            StringAssert.Contains(teleportHandler, "Type = (IdentityType)51100");
-            StringAssert.Contains(teleportHandler, "Type = (IdentityType)100003");
-            StringAssert.Contains(teleportHandler, "new byte[] { 0, 0, 0, 1 }");
-        }
 
         [TestMethod]
         public void ExistingCorpusDecoderRecoversWorldInteractionFamilies()

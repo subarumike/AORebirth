@@ -106,6 +106,8 @@ namespace AORebirth.Communication.ISComV2Client
 
         private bool disposed = false;
 
+        private readonly object lifecycleLock = new object();
+
         #endregion
 
         #region Constructors and Destructors
@@ -464,27 +466,22 @@ namespace AORebirth.Communication.ISComV2Client
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            lock (this.lifecycleLock)
             {
-                if (!this.disposed)
+                if (this.disposed)
                 {
-                    if (this._tcpSock != null && this._tcpSock.Connected)
-                    {
-                        try
-                        {
-                            this._bufferSegment.DecrementUsage();
-                            this._tcpSock.Shutdown(SocketShutdown.Both);
-                            this._tcpSock.Close();
-                            this._tcpSock = null;
-                        }
-                        catch (SocketException /* exception*/)
-                        {
-                            // TODO: Check what exceptions we need to handle
-                        }
-                    }
+                    return;
+                }
+
+                // A receive-completion callback must not replace a socket after
+                // disposal starts, even if the peer closes at the same time.
+                this.disposed = true;
+                if (disposing)
+                {
+                    this.CloseSocketQuietly();
+                    this._bufferSegment.DecrementUsage();
                 }
             }
-            this.disposed = true;
         }
 
         /// <summary>
@@ -702,12 +699,19 @@ namespace AORebirth.Communication.ISComV2Client
         /// </summary>
         private void ServerDisconnected()
         {
-            // Peer close / 0-byte receive. Replace socket so Connector can redial.
-            // Capture gap: Zone "PetSystemChat sent" while ChatEngineLog had zero delivery.
-            this.CloseSocketQuietly();
-            this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            this._offset = 0;
-            this._remainingLength = 0;
+            lock (this.lifecycleLock)
+            {
+                if (this.disposed)
+                {
+                    return;
+                }
+
+                // Peer close / 0-byte receive. Replace socket so Connector can redial.
+                this.CloseSocketQuietly();
+                this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                this._offset = 0;
+                this._remainingLength = 0;
+            }
 
             if (this.Disconnected != null)
             {
@@ -717,16 +721,19 @@ namespace AORebirth.Communication.ISComV2Client
 
         private void CloseSocketQuietly()
         {
-            if (this._tcpSock == null)
+            // Detach exactly the owned socket. Another close path may run while
+            // shutdown completes, but must never close a replacement socket.
+            Socket socket = Interlocked.Exchange(ref this._tcpSock, null);
+            if (socket == null)
             {
                 return;
             }
 
             try
             {
-                if (this._tcpSock.Connected)
+                if (socket.Connected)
                 {
-                    this._tcpSock.Shutdown(SocketShutdown.Both);
+                    socket.Shutdown(SocketShutdown.Both);
                 }
             }
             catch (SocketException)
@@ -738,13 +745,11 @@ namespace AORebirth.Communication.ISComV2Client
 
             try
             {
-                this._tcpSock.Close();
+                socket.Close();
             }
             catch (Exception)
             {
             }
-
-            this._tcpSock = null;
         }
 
         #endregion

@@ -1,12 +1,9 @@
 # Current Task
 
-No implementation work remains active for the content bridge removal task.
+No active implementation work remains for Legacy engine retirement.
 
-Candidate `e7a306c566c853ae72a7e9e55a39b889b2a6902f` on
-`codex/data-driven-world-20260915` has passed automated Windows, connected,
-disposable database and private-platform acceptance. It still requires a
-separately authorized staging/official-client acceptance before production.
-No production operation is authorized by this task.
+Accepted public runtime source: `bf7ce16b`. The approved private build tooling is
+the default at `2a9287d4`. Windows, native packaging and disposable persistence
+acceptance passed. Historical recovery remains; production is unchanged.
 
-See `docs/reports/NEWENGINE_LEGACY_CONTENT_BRIDGE_REMOVAL.md` for the exact
-receipts, content activation impact and remaining gameplay limitations.
+See `docs/reports/LEGACY_ENGINE_RETIREMENT.md` for exact source/package identities.

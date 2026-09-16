@@ -126,21 +126,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(18, innerSanctum.RollGroups.Length);
         }
 
-        [TestMethod]
-        public void GlobalLootLegacySeamUsesForemansPlayfieldScopedSupplement()
-        {
-            string source = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
-            StringAssert.Contains(source, "hasDocumentedForemansLoot");
-            StringAssert.Contains(
-                source,
-                "DocumentedForemansLootDefinitions.ApplyDocumentedMembership");
-            StringAssert.Contains(
-                source,
-                "DocumentedForemansLootDefinitions.PlayfieldInstance");
-        }
+
 
         [TestMethod]
         public void WikiAuditArtifactMatchesProductionDefinitions()

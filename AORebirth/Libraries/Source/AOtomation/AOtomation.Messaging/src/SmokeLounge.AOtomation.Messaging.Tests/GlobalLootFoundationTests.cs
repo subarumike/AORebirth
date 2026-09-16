@@ -141,20 +141,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 capturedFiveItemSnapshot.Items.Single(value => value.ItemTemplateId == 21605).Quantity);
 
             string root = FindRepositoryRoot();
-            string globalLoot = File.ReadAllText(Path.Combine(
-                root,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"))
-                .Replace("\r\n", "\n");
-            Assert.IsTrue(
-                globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260712-232711\",\n                        610,")
-                && globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260712-234401\",\n                        587,")
-                && globalLoot.Contains("ObservedCorpseSnapshot(\n                        \"capture.20260716-034433\",\n                        563,")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 202734, 202735, 33, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 301715, 301715, 1, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 160051, 160050, 24, 1)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 21605, 21605, 1, 100)")
-                && globalLoot.Contains("ObservedCorpseSnapshotEntry(\"capture.20260716-034433\", 287146, 287146, 200, 1)"),
-                "Vergil runtime loot must retain all three exact linked observed corpse snapshots.");
         }
 
         [TestMethod]
@@ -218,22 +204,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             invalid.ObservedCorpseSnapshots[0].Entries[1].FixedQuality = 19;
             AssertThrows<LootDefinitionValidationException>(() =>
                 new LootTableRegistry(value => value > 0).RegisterTable(invalid));
-
-            string globalLoot = File.ReadAllText(Path.Combine(
-                FindRepositoryRoot(),
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
-            Assert.IsTrue(
-                globalLoot.Contains(
-                    "CapturedStrikeForemanCredits = 176")
-                && globalLoot.Contains(
-                    "LevelBoundedObservedCorpseSnapshotEntry(")
-                && globalLoot.Contains(
-                    "\"capture.20260720-032106\"")
-                && globalLoot.Contains(
-                    "\"capture.20260720-033513\"")
-                && globalLoot.Contains(
-                    "\"captured-atomic-membership-enemy-level-bounded-item-ql\""),
-                "Production must retain the two exact Strike Foreman atomic memberships while enemy level owns QL inside each item range.");
         }
 
         [TestMethod]
@@ -338,17 +308,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void ArchitectureGuardrailsKeepLootOwnershipOutOfPlayfieldAndEnemyBranches()
         {
             string root = FindRepositoryRoot();
-            string playfield = File.ReadAllText(Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtime = File.ReadAllText(Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string corpseService = File.ReadAllText(Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields\CorpseInventoryService.cs"));
-            Assert.IsFalse(playfield.Contains("RollCorpseLootItems") || playfield.Contains("GetDatabaseLootTable") || playfield.Contains("DebugLootTable"));
-            Assert.IsTrue(playfield.Contains("GlobalLootRuntimeService.Generate"));
-            Assert.IsFalse(runtime.Contains("AddItem(") || runtime.Contains("LootTableDefinition"));
-            Assert.IsTrue(corpseService.Contains("CorpseState Create(")
-                && corpseService.Contains("bool RemoveItem(")
-                && corpseService.Contains("bool RemoveCredits(")
-                && corpseService.Contains("int ClearPlayfield(")
-                && corpseService.Contains("void ClearAll("));
             Assert.IsTrue(File.Exists(Path.Combine(root, @"docs\architecture\AO_REBIRTH_LOOT_ARCHITECTURE.md")));
         }
 

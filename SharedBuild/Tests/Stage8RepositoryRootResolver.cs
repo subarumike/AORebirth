@@ -10,7 +10,7 @@ namespace AORebirth.SharedBuild.Stage8OfflineSmokeTests
         private static readonly string[] RepositorySentinels =
         {
             "AI_START_HERE.md",
-            Path.Combine("AORebirth", "Server", "ZoneEngine", "Program.cs"),
+            Path.Combine("AORebirth", "Server", "ZoneEngine_New", "Program.cs"),
             Path.Combine(
                 "SharedBuild",
                 "Tests",

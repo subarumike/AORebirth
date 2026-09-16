@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("ChatEngine", "LoginEngine", "ZoneEngine", "ZoneEngine_New", "WebEngine")]
+    [ValidateSet("ChatEngine", "LoginEngine", "ZoneEngine_New", "WebEngine")]
     [string[]]$EngineName
 )
 
@@ -18,7 +18,6 @@ $failed = $false
 
 $engineDefinitions = @(
     @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe" },
-    @{ Name = "ZoneEngine"; File = "ZoneEngine.exe" },
     @{ Name = "WebEngine"; File = "WebEngine.exe" },
     @{ Name = "LoginEngine"; File = "LoginEngine.exe" },
     @{ Name = "ChatEngine"; File = "ChatEngine.exe" }
@@ -190,12 +189,11 @@ foreach ($engine in $engines) {
     }
 }
 
-# Both zone implementations share one port. Stop every selected managed process
-# before checking released listeners, including explicit Legacy rollback sessions.
+# Stop every selected managed process before checking released listeners.
 foreach ($engine in $engines) {
     $expectedPath = [System.IO.Path]::GetFullPath((Join-Path $engineDir $engine.File))
     if ($engine.Name -eq "ZoneEngine_New") {
-        # Both implementations share a zone port; always verify this exact backend path.
+        # Verify the exact backend path as well as released listener ownership.
         $stillRunning = @(Get-ProcessesByExecutablePath -ExpectedPath $expectedPath)
         if ($stillRunning) {
             Write-Warning "ZoneEngine_New is still running after stop (pid=$($stillRunning.Id -join ','))."

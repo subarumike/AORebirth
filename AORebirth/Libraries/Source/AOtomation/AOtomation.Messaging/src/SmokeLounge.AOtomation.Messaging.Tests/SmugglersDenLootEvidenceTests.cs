@@ -130,21 +130,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0, captured.RollGroups.Length);
         }
 
-        [TestMethod]
-        public void GlobalLootLegacySeamUsesSmugglersDenPlayfieldScopedSupplement()
-        {
-            string source = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
-            StringAssert.Contains(source, "hasDocumentedSmugglersDenLoot");
-            StringAssert.Contains(
-                source,
-                "DocumentedSmugglersDenLootDefinitions.ApplyDocumentedLoot");
-            StringAssert.Contains(
-                source,
-                "DocumentedSmugglersDenLootDefinitions.PlayfieldInstance");
-        }
+
 
         [TestMethod]
         public void WikiAuditArtifactMatchesProductionDefinitions()

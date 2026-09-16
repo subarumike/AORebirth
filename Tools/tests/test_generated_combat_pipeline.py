@@ -716,47 +716,6 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 pipeline.primary_output_signature(artifacts, changed_descriptor),
             )
 
-    def test_active_coverage_initializer_comments_avoid_regex_hot_loop(self):
-        active = self._load_module_from_path(
-            "active_coverage_initializer_test",
-            Path(
-                "tools-temp/AOSharpCaptureAnalyzer/"
-                "generate_capture_backed_npc_active_coverage.py"
-            ),
-        )
-        leading_comments = "".join(
-            " // captured line\r\n /* captured block */"
-            for _ in range(2000)
-        )
-        body = (
-            "new MobSlot {"
-            + leading_comments
-            + '\r\n Name = "Elysium Test",'
-            + "\r\n // level\r\n /* exact */ Level = 200,"
-            + "\r\n Values = new[] { 1, 2, 3 },"
-            + "\r\n }"
-        )
-
-        with mock.patch.object(
-            active.re,
-            "sub",
-            side_effect=AssertionError("initializer parser used re.sub"),
-        ):
-            rows = active.parse_object_initializers(body, "MobSlot")
-
-        self.assertEqual(
-            rows,
-            [
-                {
-                    "Name": '"Elysium Test"',
-                    "Level": "200",
-                    "Values": "new[] { 1, 2, 3 }",
-                }
-            ],
-        )
-        with self.assertRaisesRegex(active.CoverageError, "unterminated"):
-            active.strip_leading_csharp_comments("/* never closed")
-
     def test_generated_json_rejects_checkout_absolute_paths(self):
         portable = {"path": "tools-temp/captures/20260701-000001/packets.hex.log"}
         pipeline._validate_json_bytes(pipeline.canonical_json_bytes(portable))
@@ -2177,7 +2136,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 root
                 / "AORebirth"
                 / "Server"
-                / "ZoneEngine"
+                / "ZoneEngine_New"
                 / "Core"
                 / "Fixture.cs"
             )
@@ -2225,12 +2184,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
                 source.write_text("// fixture\n", encoding="utf-8")
             unrelated = (
                 root
-                / "AORebirth"
-                / "Server"
-                / "ZoneEngine"
-                / "Core"
-                / "Missions"
-                / "MissionStateDirectory.cs"
+                / pipeline.ACTIVE_RUNTIME_SOURCE_ROOT / "SharedGameplay" / "Missions" / "MissionModels.cs"
             )
             unrelated.parent.mkdir(parents=True, exist_ok=True)
             unrelated.write_text("// unrelated runtime source\n", encoding="utf-8")

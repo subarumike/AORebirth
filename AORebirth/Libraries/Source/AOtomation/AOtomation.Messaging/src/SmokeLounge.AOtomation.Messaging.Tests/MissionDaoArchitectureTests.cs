@@ -90,7 +90,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void MissionRuntimeBoundaryContainsNoSqlOrProviderConstruction()
         {
             string root = FindRepositoryRoot();
-            string missionRoot = Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Missions");
+            string missionRoot = Path.Combine(root, @"AORebirth\Server\ZoneEngine_New\Core\Missions");
             string[] forbidden =
             {
                 "System.Data",
@@ -102,7 +102,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "MissionRollFeeClaimRepository"
             };
 
-            foreach (string path in Directory.GetFiles(missionRoot, "*.cs", SearchOption.TopDirectoryOnly))
+            string[] missionSources = Directory.GetFiles(missionRoot, "*.cs", SearchOption.AllDirectories);
+            Assert.IsTrue(missionSources.Length > 0, "The live mission runtime boundary must not be an empty directory.");
+            foreach (string path in missionSources)
             {
                 string source = File.ReadAllText(path);
                 foreach (string token in forbidden)

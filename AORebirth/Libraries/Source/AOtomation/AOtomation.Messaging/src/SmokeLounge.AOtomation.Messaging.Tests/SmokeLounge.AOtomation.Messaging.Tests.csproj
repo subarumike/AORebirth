@@ -72,10 +72,10 @@
     <Compile Include="TestRepositoryRootResolverTests.cs" />
     <Compile Include="OfficialPlayfieldPlacementBuildContractTests.cs" />
     <Compile Include="OfficialPlayfieldPlacementCatalogTests.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacement.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tools\Shared\Playfields\OfficialPlayfieldPlacement.cs">
       <Link>OfficialPlayfieldPlacement.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacementCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tools\Shared\Playfields\OfficialPlayfieldPlacementCatalog.cs">
       <Link>OfficialPlayfieldPlacementCatalog.cs</Link>
     </Compile>
     <Compile Include="DamageCalculationTests.cs" />
@@ -91,7 +91,7 @@
     </Compile>
     <Compile Include="CapturedEnemyCombatActiveCoverageTests.cs" />
     <Compile Include="CapturedEnemyCombatContractTestStub.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedSubwayRetaliationEligibilityResolver.cs">
       <Link>CapturedSubwayRetaliationEligibilityResolver.cs</Link>
     </Compile>
     <Compile Include="CapturedEnemyCombatPacketFactoryTests.cs" />
@@ -100,14 +100,14 @@
     <Compile Include="CapturedEnemyCombatProfileCatalogTestStubs.cs" />
     <Compile Include="CapturedEnemyCombatProfileCatalogTests.cs" />
     <Compile Include="AreteRegularMobCombatAcceptanceTests.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\AreteRegularMobCombatProfileSelector.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\AreteRegularMobCombatProfileSelector.cs">
       <Link>AreteRegularMobCombatProfileSelector.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\AreteCombatLootIdentityPolicy.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\AreteCombatLootIdentityPolicy.cs">
       <Link>AreteCombatLootIdentityPolicy.cs</Link>
     </Compile>
     <Compile Include="CapturedSubwayRetaliationEligibilityResolverTests.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedIntObservationCursor.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedIntObservationCursor.cs">
       <Link>CapturedIntObservationCursor.cs</Link>
     </Compile>
     <Compile Include="CaptureRuntimeSafetyTests.cs" />
@@ -137,184 +137,184 @@
     <Compile Include="MissionLevelGraphTests.cs" />
     <Compile Include="MissionRollTemplateContractTests.cs" />
     <Compile Include="MissionRollSemanticsTests.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutRecords.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgLayoutRecords.cs">
       <Link>MissionAcgLayoutRecords.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutBundle.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgLayoutBundle.cs">
       <Link>MissionAcgLayoutBundle.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgInstanceBinding.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgInstanceBinding.cs">
       <Link>MissionAcgInstanceBinding.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgInstanceState.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgInstanceState.cs">
       <Link>MissionAcgInstanceState.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLifecyclePolicy.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgLifecyclePolicy.cs">
       <Link>MissionAcgLifecyclePolicy.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionKeyStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionKeyStore.cs">
       <Link>MissionKeyStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingRecord.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgBindingRecord.cs">
       <Link>MissionAcgBindingRecord.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgBindingStore.cs">
       <Link>MissionAcgBindingStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAcceptedProjection.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgAcceptedProjection.cs">
       <Link>MissionAcgAcceptedProjection.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAcceptedProjectionStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgAcceptedProjectionStore.cs">
       <Link>MissionAcgAcceptedProjectionStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferIdentityStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferIdentityStore.cs">
       <Link>MissionOfferIdentityStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionStateDirectory.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionStateDirectory.cs">
       <Link>MissionStateDirectory.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferStore.cs">
       <Link>MissionOfferStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgExpiryState.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgExpiryState.cs">
       <Link>MissionAcgExpiryState.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgExpiryStateStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgExpiryStateStore.cs">
       <Link>MissionAcgExpiryStateStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgAllocationService.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgAllocationService.cs">
       <Link>MissionAcgAllocationService.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon1Rules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NascenceDungeon1Rules.cs">
       <Link>NascenceDungeon1Rules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon2Rules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NascenceDungeon2Rules.cs">
       <Link>NascenceDungeon2Rules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon3Rules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NascenceDungeon3Rules.cs">
       <Link>NascenceDungeon3Rules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NascenceDungeon4Rules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NascenceDungeon4Rules.cs">
       <Link>NascenceDungeon4Rules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgBindingResolver.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgBindingResolver.cs">
       <Link>MissionAcgBindingResolver.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgRuntimeMaterialization.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgRuntimeMaterialization.cs">
       <Link>MissionAcgRuntimeMaterialization.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgRuntimeStateStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgRuntimeStateStore.cs">
       <Link>MissionAcgRuntimeStateStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgOperationalState.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgOperationalState.cs">
       <Link>MissionAcgOperationalState.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgOperationalStateStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgOperationalStateStore.cs">
       <Link>MissionAcgOperationalStateStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgTokenRewardPolicy.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgTokenRewardPolicy.cs">
       <Link>MissionAcgTokenRewardPolicy.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgIdentityRanges.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgIdentityRanges.cs">
       <Link>MissionAcgIdentityRanges.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgCorpseCreditPolicy.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgCorpseCreditPolicy.cs">
       <Link>MissionAcgCorpseCreditPolicy.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgTokenProgressState.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgTokenProgressState.cs">
       <Link>MissionAcgTokenProgressState.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgTokenProgressStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgTokenProgressStore.cs">
       <Link>MissionAcgTokenProgressStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgCorpsePolicy.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgCorpsePolicy.cs">
       <Link>MissionAcgCorpsePolicy.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgSpatialAuthority.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgSpatialAuthority.cs">
       <Link>MissionAcgSpatialAuthority.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgSpatialStateStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgSpatialStateStore.cs">
       <Link>MissionAcgSpatialStateStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveBinding.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgObjectiveBinding.cs">
       <Link>MissionAcgObjectiveBinding.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveStore.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgObjectiveStore.cs">
       <Link>MissionAcgObjectiveStore.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveContracts.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgObjectiveContracts.cs">
       <Link>MissionAcgObjectiveContracts.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgLayoutCatalog.cs">
       <Link>MissionAcgLayoutCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLayoutSelector.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgLayoutSelector.cs">
       <Link>MissionAcgLayoutSelector.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgLegacyLayoutCatalogFactory.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgLegacyLayoutCatalogFactory.cs">
       <Link>MissionAcgLegacyLayoutCatalogFactory.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionAcgCapturedLayoutCatalog.g.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgCapturedLayoutCatalog.g.cs">
       <Link>MissionAcgCapturedLayoutCatalog.g.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionInstanceDynelCapture.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionInstanceDynelCapture.cs">
       <Link>MissionInstanceDynelCapture.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\MissionInstanceShapeCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\MissionInstanceShapeCatalog.cs">
       <Link>MissionInstanceShapeCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollCaptureTemplate.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRollCaptureTemplate.cs">
       <Link>MissionRollCaptureTemplate.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollCaptureLibrary.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRollCaptureLibrary.cs">
       <Link>MissionRollCaptureLibrary.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionSliderProfile.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionSliderProfile.cs">
       <Link>MissionSliderProfile.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferCompatibility.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferCompatibility.cs">
       <Link>MissionOfferCompatibility.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollEvidenceCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRollEvidenceCatalog.cs">
       <Link>MissionRollEvidenceCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardEvidenceModel.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRewardEvidenceModel.cs">
       <Link>MissionRewardEvidenceModel.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionOfferTextBuilder.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferTextBuilder.cs">
       <Link>MissionOfferTextBuilder.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollService.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRollService.cs">
       <Link>MissionRollService.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRollFeeRules.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRollFeeRules.cs">
       <Link>MissionRollFeeRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionTypeCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionTypeCatalog.cs">
       <Link>MissionTypeCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDiagnostics.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionDiagnostics.cs">
       <Link>MissionDiagnostics.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelTable.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionLevelTable.cs">
       <Link>MissionLevelTable.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelGraph.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionLevelGraph.cs">
       <Link>MissionLevelGraph.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLevelGraphData.g.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionLevelGraphData.g.cs">
       <Link>MissionLevelGraphData.g.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionLocationPool.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionLocationPool.cs">
       <Link>MissionLocationPool.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionNpcDifficultyPolicy.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionNpcDifficultyPolicy.cs">
       <Link>MissionNpcDifficultyPolicy.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRewardCatalog.cs">
       <Link>MissionRewardCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRareLootCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRareLootCatalog.cs">
       <Link>MissionRareLootCatalog.cs</Link>
     </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
@@ -324,29 +324,29 @@
     <Compile Include="PlayfieldLifecycleTraceTests.cs" />
     <Compile Include="PlayfieldObjectLifecycleRuntimeServiceTests.cs" />
     <Compile Include="PlayfieldObjectLifecycleRuntimeServiceTestStubs.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\PlayfieldObjectLifecycleRuntimeService.cs">
       <Link>PlayfieldObjectLifecycleRuntimeService.cs</Link>
     </Compile>
     <Compile Include="PlayfieldHydrationCharacterizationTests.cs" />
     <Compile Include="PlayfieldHydrationIPlayfieldTestStub.cs" />
     <Compile Include="PlayfieldHydrationSeamTests.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldHydrationContracts.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\Hydration\PlayfieldHydrationContracts.cs">
       <Link>PlayfieldHydrationContracts.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldDefinitionCanonicalizer.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\Hydration\PlayfieldDefinitionCanonicalizer.cs">
       <Link>PlayfieldDefinitionCanonicalizer.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldDefinitionValidator.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\Hydration\PlayfieldDefinitionValidator.cs">
       <Link>PlayfieldDefinitionValidator.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\PlayfieldDefinitionComparer.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\Hydration\PlayfieldDefinitionComparer.cs">
       <Link>PlayfieldDefinitionComparer.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Hydration\LegacyPlayfieldInstantiationCoordinator.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\Hydration\LegacyPlayfieldInstantiationCoordinator.cs">
       <Link>LegacyPlayfieldInstantiationCoordinator.cs</Link>
     </Compile>
     <Compile Include="PlayfieldRuntimeOwnershipTests.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\RuntimeOwnershipRegistry.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\RuntimeOwnershipRegistry.cs">
       <Link>RuntimeOwnershipRegistry.cs</Link>
     </Compile>
     <Compile Include="PlayfieldCollisionGeometryTests.cs" />
@@ -390,301 +390,301 @@
     <Compile Include="..\..\..\..\..\..\..\tools-temp\AOSharpLiveCapture\CaptureRuntimeSafety.cs">
       <Link>CaptureRuntimeSafety.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CityControllerInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\CityControllerInteractionRules.cs">
       <Link>CityControllerInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\CorpseInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\CorpseInteractionRules.cs">
       <Link>CorpseInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GenericCmdUseRouteClassifier.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\GenericCmdUseRouteClassifier.cs">
       <Link>GenericCmdUseRouteClassifier.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\DamageCalculation.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\DamageCalculation.cs">
       <Link>DamageCalculation.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GridTerminalInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\GridTerminalInteractionRules.cs">
       <Link>GridTerminalInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\GuestKeyGeneratorInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\GuestKeyGeneratorInteractionRules.cs">
       <Link>GuestKeyGeneratorInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\InventoryContainerInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\InventoryContainerInteractionRules.cs">
       <Link>InventoryContainerInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\RexB18DInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\RexB18DInteractionRules.cs">
       <Link>RexB18DInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\SurgeryClinicInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\SurgeryClinicInteractionRules.cs">
       <Link>SurgeryClinicInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\StaticDynelInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\StaticDynelInteractionRules.cs">
       <Link>StaticDynelInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\StatelInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\StatelInteractionRules.cs">
       <Link>StatelInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayVendorContentProvider.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedSubwayVendorContentProvider.cs">
       <Link>CapturedSubwayVendorContentProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayTailorDialogueContent.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedSubwayTailorDialogueContent.cs">
       <Link>CapturedSubwayTailorDialogueContent.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\MessageHandlers\UseItemOnItemInteractionRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\MessageHandlers\UseItemOnItemInteractionRules.cs">
       <Link>UseItemOnItemInteractionRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\ZoneClientSessionLifecycleCoordinator.cs">
       <Link>ZoneClientSessionLifecycleCoordinator.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\QuestNpcOutboundTransportDiagnostics.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\QuestNpcOutboundTransportDiagnostics.cs">
       <Link>QuestNpcOutboundTransportDiagnostics.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedAreteRobotContentProvider.cs">
       <Link>CapturedAreteRobotContentProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs">
       <Link>CapturedSubwayContentProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs">
       <Link>CapturedSubwayOrdinaryContentProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsContentProvider.cs">
       <Link>CapturedTempleOfThreeWindsContentProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsEncounterRules.cs">
       <Link>CapturedTempleOfThreeWindsEncounterRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DungeonNamedLifecycle.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DungeonNamedLifecycle.cs">
       <Link>DungeonNamedLifecycle.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs">
       <Link>CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs">
       <Link>CapturedTempleOfThreeWindsCombatCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.cs">
       <Link>CapturedEnemyCombatPacketFactory.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.Data.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.Data.cs">
       <Link>CapturedEnemyCombatPacketFactory.Data.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileData.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatProfileData.cs">
       <Link>CapturedEnemyCombatProfileData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileMatching.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatProfileMatching.cs">
       <Link>CapturedEnemyCombatProfileMatching.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCombatSetupGenerator.Data.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\OrdinaryEnemyCombatSetupGenerator.Data.cs">
       <Link>OrdinaryEnemyCombatSetupGenerator.Data.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedEnemyCombatProfileCatalog.cs">
       <Link>CapturedEnemyCombatProfileCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileCatalog.g.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedEnemyCombatProfileCatalog.g.cs">
       <Link>CapturedEnemyCombatProfileCatalog.g.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs">
       <Link>CapturedTempleOfThreeWindsLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSector10LootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedSector10LootDefinitions.cs">
       <Link>CapturedSector10LootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\CapturedSubwayLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedSubwayLootDefinitions.cs">
       <Link>CapturedSubwayLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedInnerSanctumLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedInnerSanctumLootDefinitions.cs">
       <Link>DocumentedInnerSanctumLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedForemansLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedForemansLootDefinitions.cs">
       <Link>DocumentedForemansLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedStepsOfMadnessLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedStepsOfMadnessLootDefinitions.cs">
       <Link>DocumentedStepsOfMadnessLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedSmugglersDenLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedSmugglersDenLootDefinitions.cs">
       <Link>DocumentedSmugglersDenLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedCyborgBarracksLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedCyborgBarracksLootDefinitions.cs">
       <Link>DocumentedCyborgBarracksLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedCryptOfHomeLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedCryptOfHomeLootDefinitions.cs">
       <Link>DocumentedCryptOfHomeLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedCamelotLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedCamelotLootDefinitions.cs">
       <Link>DocumentedCamelotLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedMercenaryCampLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedMercenaryCampLootDefinitions.cs">
       <Link>DocumentedMercenaryCampLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\DocumentedTempleOfThreeWindsLootDefinitions.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\DocumentedTempleOfThreeWindsLootDefinitions.cs">
       <Link>DocumentedTempleOfThreeWindsLootDefinitions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs">
       <Link>OrdinaryEnemyCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyProfile.cs">
       <Link>OrdinaryEnemyProfile.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyLootTableAdapter.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyLootTableAdapter.cs">
       <Link>OrdinaryEnemyLootTableAdapter.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\LootDefinitions.cs"><Link>LootDefinitions.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\LootGenerationService.cs"><Link>LootGenerationService.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\WorldPopulationDefinitions.cs"><Link>WorldPopulationDefinitions.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\WorldRespawnScheduler.cs"><Link>WorldRespawnScheduler.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionModels.cs"><Link>MissionModels.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDefinitionCatalog.cs"><Link>MissionDefinitionCatalog.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\IMissionRepository.cs"><Link>IMissionRepository.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\InMemoryMissionRepository.cs"><Link>InMemoryMissionRepository.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDataMapper.cs"><Link>MissionDataMapper.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionDaoRepositoryAdapter.cs"><Link>MissionDaoRepositoryAdapter.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\LootDefinitions.cs"><Link>LootDefinitions.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\LootGenerationService.cs"><Link>LootGenerationService.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\WorldPopulationDefinitions.cs"><Link>WorldPopulationDefinitions.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\WorldRespawnScheduler.cs"><Link>WorldRespawnScheduler.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionModels.cs"><Link>MissionModels.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionDefinitionCatalog.cs"><Link>MissionDefinitionCatalog.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\IMissionRepository.cs"><Link>IMissionRepository.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\InMemoryMissionRepository.cs"><Link>InMemoryMissionRepository.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionDataMapper.cs"><Link>MissionDataMapper.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionDaoRepositoryAdapter.cs"><Link>MissionDaoRepositoryAdapter.cs</Link></Compile>
     <Compile Include="..\..\..\..\AORebirth.Interfaces\Persistence\Missions\IMissionDao.cs"><Link>IMissionDao.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\PersistentMissionService.cs"><Link>PersistentMissionService.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\RexB18CFeedbackPolicy.cs"><Link>RexB18CFeedbackPolicy.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcContent.cs"><Link>WindcallerKarrecNpcContent.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecNpcRuntimeRegistry.cs"><Link>WindcallerKarrecNpcRuntimeRegistry.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Subway\Quests\WindcallerKarrecInteractionRules.cs"><Link>WindcallerKarrecInteractionRules.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\MissionRewardCoordinator.cs"><Link>MissionRewardCoordinator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Missions\DailyMissionRewardRules.cs"><Link>DailyMissionRewardRules.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\PersistentMissionService.cs"><Link>PersistentMissionService.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Arete\Quests\RexB18CFeedbackPolicy.cs"><Link>RexB18CFeedbackPolicy.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Subway\Quests\WindcallerKarrecNpcContent.cs"><Link>WindcallerKarrecNpcContent.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Subway\Quests\WindcallerKarrecNpcRuntimeRegistry.cs"><Link>WindcallerKarrecNpcRuntimeRegistry.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Subway\Quests\WindcallerKarrecInteractionRules.cs"><Link>WindcallerKarrecInteractionRules.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRewardCoordinator.cs"><Link>MissionRewardCoordinator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\DailyMissionRewardRules.cs"><Link>DailyMissionRewardRules.cs</Link></Compile>
     <Compile Include="..\..\..\..\AORebirth.Stats\SpecialStats\XPTable.cs"><Link>XPTable.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteConditionReferenceValidator.cs"><Link>AreteConditionReferenceValidator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentLoadResult.cs"><Link>AreteContentLoadResult.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentManifest.cs"><Link>AreteContentManifest.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteContentManifestLoader.cs"><Link>AreteContentManifestLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteFrameworkBootstrap.cs"><Link>AreteFrameworkBootstrap.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteJsonContentFileLoader.cs"><Link>AreteJsonContentFileLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\AreteValidationResult.cs"><Link>AreteValidationResult.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueActionReferenceValidator.cs"><Link>DialogueActionReferenceValidator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentPackLoader.cs"><Link>DialogueContentPackLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentPackValidator.cs"><Link>DialogueContentPackValidator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Dialogue\DialogueModels.cs"><Link>DialogueModels.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackLoader.cs"><Link>QuestContentPackLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentPackValidator.cs"><Link>QuestContentPackValidator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestContentRegistry.cs"><Link>QuestContentRegistry.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Arete\Quests\QuestModels.cs"><Link>QuestModels.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayLootPoolRules.cs">
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\AreteConditionReferenceValidator.cs"><Link>AreteConditionReferenceValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentLoadResult.cs"><Link>AreteContentLoadResult.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentManifest.cs"><Link>AreteContentManifest.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentManifestLoader.cs"><Link>AreteContentManifestLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Arete\AreteFrameworkBootstrap.cs"><Link>AreteFrameworkBootstrap.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteJsonContentFileLoader.cs"><Link>AreteJsonContentFileLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteValidationResult.cs"><Link>AreteValidationResult.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueActionReferenceValidator.cs"><Link>DialogueActionReferenceValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueContentPackLoader.cs"><Link>DialogueContentPackLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueContentPackValidator.cs"><Link>DialogueContentPackValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueModels.cs"><Link>DialogueModels.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentPackLoader.cs"><Link>QuestContentPackLoader.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentPackValidator.cs"><Link>QuestContentPackValidator.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentRegistry.cs"><Link>QuestContentRegistry.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestModels.cs"><Link>QuestModels.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\SubwayLootPoolRules.cs">
       <Link>SubwayLootPoolRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NpcCombatAttackRules.cs">
       <Link>NpcCombatAttackRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCombatSpatialPolicy.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NpcCombatSpatialPolicy.cs">
       <Link>NpcCombatSpatialPolicy.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCombatSetupGenerator.cs">
       <Link>OrdinaryEnemyCombatSetupGenerator.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcDamageLineOfSightRuntimeService.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NpcDamageLineOfSightRuntimeService.cs">
       <Link>NpcDamageLineOfSightRuntimeService.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\BoundedGridChaseRoutePlanner.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\BoundedGridChaseRoutePlanner.cs">
       <Link>BoundedGridChaseRoutePlanner.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\ChaseNavigationContracts.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\ChaseNavigationContracts.cs">
       <Link>ChaseNavigationContracts.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcCombatLeashPolicy.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\NpcCombatLeashPolicy.cs">
       <Link>NpcCombatLeashPolicy.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseNavigationRuntimeService.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\NpcChaseNavigationRuntimeService.cs">
       <Link>NpcChaseNavigationRuntimeService.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseRouteFollower.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\NpcChaseRouteFollower.cs">
       <Link>NpcChaseRouteFollower.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\NpcChaseRouteState.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\NpcChaseRouteState.cs">
       <Link>NpcChaseRouteState.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\OfficialDungeonChaseNavigationProvider.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\OfficialDungeonChaseNavigationProvider.cs">
       <Link>OfficialDungeonChaseNavigationProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\OfficialDungeonGeometry.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\OfficialDungeonGeometry.cs">
       <Link>OfficialDungeonGeometry.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Navigation\Pf127ChaseNavigationProvider.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Navigation\Pf127ChaseNavigationProvider.cs">
       <Link>Pf127ChaseNavigationProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcCorpseLifecycleRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NpcCorpseLifecycleRules.cs">
       <Link>NpcCorpseLifecycleRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\NpcPatrolReplayCoordinator.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NpcPatrolReplayCoordinator.cs">
       <Link>NpcPatrolReplayCoordinator.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatHealthRules.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\PlayfieldCharacterHeartbeatHealthRules.cs">
       <Link>PlayfieldCharacterHeartbeatHealthRules.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleTrace.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\PlayfieldLifecycleTrace.cs">
       <Link>PlayfieldLifecycleTrace.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\TempleDoorProximityRuntime.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\TempleDoorProximityRuntime.cs">
       <Link>TempleDoorProximityRuntime.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\PlayfieldCollisionGeometry.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tools\Shared\Playfields\PlayfieldCollisionGeometry.cs">
       <Link>PlayfieldCollisionGeometry.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\Pf127CollisionGeometryLoader.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tools\Shared\Playfields\Pf127CollisionGeometryLoader.cs">
       <Link>Pf127CollisionGeometryLoader.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayVisibilityPacketMeasurement.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\SubwayVisibilityPacketMeasurement.cs">
       <Link>SubwayVisibilityPacketMeasurement.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine\Core\Playfields\SubwayVisibilitySpatialInterestMetrics.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\SubwayVisibilitySpatialInterestMetrics.cs">
       <Link>SubwayVisibilitySpatialInterestMetrics.cs</Link>
     </Compile>
     <Compile Include="TypeMetaBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json">
+    <Content Include="..\..\..\..\..\..\..\Tests\Fixtures\Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json">
       <Link>Content\Official\TempleOfThreeWinds\pf1931-dungeon-geometry.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json">
+    <Content Include="..\..\..\..\..\..\..\Tests\Fixtures\Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json">
       <Link>Content\Captured\Quests\windcaller_karrec_completion_20260721_023942.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
+    <Content Include="..\..\..\..\..\..\..\Tests\Fixtures\Content\Captured\Arete\cleaning_robot_patrol_replay.csv">
       <Link>Content\Captured\Arete\cleaning_robot_patrol_replay.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\manifest.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\rex-larsson\manifest.json">
       <Link>Content\Arete\rex-larsson\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json">
       <Link>Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\rex-larsson\quests\rex-larsson.quests.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\rex-larsson\quests\rex-larsson.quests.json">
       <Link>Content\Arete\rex-larsson\quests\rex-larsson.quests.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\marcus-stone\manifest.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\marcus-stone\manifest.json">
       <Link>Content\Arete\marcus-stone\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
       <Link>Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\manifest.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\windcaller-karrec\manifest.json">
       <Link>Content\Subway\windcaller-karrec\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json">
       <Link>Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json">
       <Link>Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\tailor\manifest.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\tailor\manifest.json">
       <Link>Content\Subway\tailor\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine\Content\Subway\tailor\dialogue\tailor.dialogue.json">
+    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\tailor\dialogue\tailor.dialogue.json">
       <Link>Content\Subway\tailor\dialogue\tailor.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -723,27 +723,27 @@
       <Link>TestData\InfoPacket #6 - 0x57</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionLevels.csv">
+    <None Include="..\..\..\..\..\..\GameData\Missions\Source\MissionLevels.csv">
       <Link>XML Data\MissionLevels.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Clusters.json">
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine_New\XML Data\MissionRewards\ItemDb_Clusters.json">
       <Link>XML Data\MissionRewards\ItemDb_Clusters.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDB_Implants.json">
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine_New\XML Data\MissionRewards\ItemDB_Implants.json">
       <Link>XML Data\MissionRewards\ItemDB_Implants.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Nanos.json">
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine_New\XML Data\MissionRewards\ItemDb_Nanos.json">
       <Link>XML Data\MissionRewards\ItemDb_Nanos.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Refined.json">
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine_New\XML Data\MissionRewards\ItemDb_Refined.json">
       <Link>XML Data\MissionRewards\ItemDb_Refined.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\..\..\..\..\Server\ZoneEngine\XML Data\MissionRewards\ItemDb_Rest.json">
+    <None Include="..\..\..\..\..\..\Server\ZoneEngine_New\XML Data\MissionRewards\ItemDb_Rest.json">
       <Link>XML Data\MissionRewards\ItemDb_Rest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

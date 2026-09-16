@@ -273,7 +273,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string manifestPath = Path.Combine(
                 FindRepositoryRoot(),
-                @"AORebirth\Server\ZoneEngine\Content\Subway\windcaller-karrec\manifest.json");
+                @"AORebirth\Server\ZoneEngine_New\Content\Subway\windcaller-karrec\manifest.json");
             AreteFrameworkRegistries registries =
                 AreteFrameworkBootstrap.LoadManifestSet(new[] { manifestPath });
 

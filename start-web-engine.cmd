@@ -1,6 +1,9 @@
 @echo off
 setlocal EnableExtensions
 
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -WebOnly -ValidateEngineSelectionOnly %*
+if errorlevel 1 exit /b 1
+
 pushd "%~dp0" >nul
 if errorlevel 1 (
     echo [AORebirth Web Start] Failed to switch to repository root.
@@ -78,7 +81,7 @@ if errorlevel 1 (
     exit /b 3
 )
 
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -WebOnly
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start-engines.ps1" -WebOnly %*
 set "START_EXIT=%ERRORLEVEL%"
 popd >nul
 exit /b %START_EXIT%

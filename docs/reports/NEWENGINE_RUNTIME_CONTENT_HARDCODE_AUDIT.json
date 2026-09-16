@@ -1,5 +1,6 @@
 {
   "schemaVersion": 2,
+  "receiptStatus": "Historical content-cleanup audit accepted before Legacy engine retirement; source paths and native assembly below describe that accepted revision. Current relocated source graph is NEWENGINE_CONTENT_ARCHITECTURE_GUARD.json; retirement validation is LEGACY_ENGINE_RETIREMENT.md.",
   "startingSha": "323652db3b07d9640dca5b084a3cfd807baa6b0c",
   "scope": "Conservative static NewEngine project-reference source graph including SDK default files, explicit imported Compile items, linked shared and library sources; tests/tools are not runtime.",
   "classificationMethod": "Contextual syntax scan over the reported source graph with separately recorded domain semantic reviews. Syntax findings are candidates, not a count of distinct hardcoded content files. Unreviewed candidates are reported explicitly.",

@@ -95,14 +95,20 @@ FORMULA_STATIC_INPUTS = (
         "enemy_combat_formula_packet_evidence.json"
     ),
     Path(
-        "AORebirth/Server/ZoneEngine/Core/Playfields/"
+        "Tests/Fixtures/Gameplay/Playfields/"
         "CapturedSubwayOrdinaryContentProvider.cs"
     ),
     Path(
-        "AORebirth/Server/ZoneEngine/Core/Playfields/"
+        "Tests/Fixtures/Gameplay/Playfields/"
         "CapturedTempleOfThreeWindsContentProvider.cs"
     ),
     Path("docs/evidence/TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md"),
+    Path("Tests/Fixtures/Combat/RetiredPopulationCoverage.json"),
+    Path("Tests/Fixtures/Combat/RetiredRealmResourceBindings.json"),
+    Path("AORebirth/GameData/WorldContent.json"),
+    Path("AORebirth/GameData/MobTemplates.json"),
+    Path("AORebirth/GameData/NpcFamilyStatTemplates.json"),
+    Path("AORebirth/GameData/NpcStatTemplateOverlays.json"),
 )
 FORMULA_CAPTURE_SOURCE_NAMES = (
     "capture_info.json",
@@ -110,7 +116,7 @@ FORMULA_CAPTURE_SOURCE_NAMES = (
     "raw-packets.csv",
     "scfu-appearance.csv",
 )
-ACTIVE_RUNTIME_SOURCE_ROOT = Path("AORebirth/Server/ZoneEngine/Core")
+ACTIVE_RUNTIME_SOURCE_ROOT = Path("AORebirth/Server/ZoneEngine_New")
 ARETE_ATTACK_RANGE_ITEM_TEMPLATE_IDS = (
     120910,
     120911,
@@ -131,7 +137,7 @@ ARTIFACT_RELATIVE_PATHS: dict[str, PurePosixPath] = {
         "docs/generated/capture_backed_npc_combat_inventory.json"
     ),
     "catalog": PurePosixPath(
-        "AORebirth/Server/ZoneEngine/Core/Playfields/"
+        "Tests/Fixtures/Gameplay/Playfields/"
         "CapturedEnemyCombatProfileCatalog.g.cs"
     ),
     "fixtures": PurePosixPath(
@@ -2727,7 +2733,12 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
         if set(row) != {"role", "path", "sha256", "byteLength"}:
             raise CohortValidationError(f"artifact descriptor fields are invalid: {role}")
         logical_path = ARTIFACT_RELATIVE_PATHS[role]
-        if row["path"] != logical_path.as_posix():
+        # The accepted pre-retirement cohort keeps its original signed path.
+        # Its catalog bytes were moved unchanged into test evidence ownership;
+        # permit only that exact relocation while checking the original digest.
+        retired_catalog_path = "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.g.cs"
+        relocated_catalog = role == "catalog" and row["path"] == retired_catalog_path
+        if row["path"] != logical_path.as_posix() and not relocated_catalog:
             raise CohortValidationError(f"artifact target is invalid: {role}")
         path = cohort_root / Path(logical_path)
         if role in JSON_ARTIFACT_ROLES:
@@ -2740,7 +2751,7 @@ def validate_cohort(cohort_root: Path, *, verify_toolchain: bool) -> dict[str, A
             parsed_json_artifacts[role] = value
             assert_generated_value_is_path_independent(value, f"{role} artifact")
         else:
-            actual = artifact_descriptor(path, logical_path)
+            actual = artifact_descriptor(path, PurePosixPath(row["path"]) if relocated_catalog else logical_path)
             if any(actual[key] != row[key] for key in actual):
                 raise CohortValidationError(
                     f"artifact is stale or mixed: {logical_path}"

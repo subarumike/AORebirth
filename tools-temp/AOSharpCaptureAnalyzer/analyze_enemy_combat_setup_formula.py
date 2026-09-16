@@ -54,30 +54,15 @@ DEFAULT_OUTPUT = (
 )
 SUBWAY_ORDINARY_CONTENT_PROVIDER = (
     REPOSITORY_ROOT
-    / "AORebirth"
-    / "Server"
-    / "ZoneEngine"
-    / "Core"
-    / "Playfields"
-    / "CapturedSubwayOrdinaryContentProvider.cs"
+    / "Tests" / "Fixtures" / "Gameplay" / "Playfields" / "CapturedSubwayOrdinaryContentProvider.cs"
 )
 TEMPLE_ORDINARY_CONTENT_PROVIDER = (
     REPOSITORY_ROOT
-    / "AORebirth"
-    / "Server"
-    / "ZoneEngine"
-    / "Core"
-    / "Playfields"
-    / "CapturedTempleOfThreeWindsContentProvider.cs"
+    / "Tests" / "Fixtures" / "Gameplay" / "Playfields" / "CapturedTempleOfThreeWindsContentProvider.cs"
 )
 TEMPLE_ORDINARY_COMBAT_LOADOUT_CATALOG = (
     REPOSITORY_ROOT
-    / "AORebirth"
-    / "Server"
-    / "ZoneEngine"
-    / "Core"
-    / "Playfields"
-    / "CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs"
+    / "Tests" / "Fixtures" / "Gameplay" / "Playfields" / "CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs"
 )
 TEMPLE_CULTIST_QUARANTINE_EVIDENCE = (
     REPOSITORY_ROOT

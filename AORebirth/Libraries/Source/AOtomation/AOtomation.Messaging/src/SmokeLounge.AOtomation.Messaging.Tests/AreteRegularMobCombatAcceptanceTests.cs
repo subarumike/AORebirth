@@ -436,53 +436,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreNotEqual(engineerContext.EnemyProfileKey, dockerContext.EnemyProfileKey);
         }
 
-        [TestMethod]
-        public void AreteSpawnersConsumePreparationAndCoordinatorPreservesPreparedRegistryState()
-        {
-            string root = FindRepositoryRoot();
-            string[] spawners =
-            {
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AlexAreaMobRuntime.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\JunkyardCleaningRobotRuntime.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\LoreleiOasisMobRuntime.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteFinishCaptureMobRuntime.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteIccPeacekeeperPatrolRuntime.cs",
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\AreteRoboticGuardDogRuntime.cs"
-            };
 
-            for (int index = 0; index < spawners.Length; index++)
-            {
-                string source = File.ReadAllText(Path.Combine(root, spawners[index]));
-                Assert.IsTrue(source.Contains("PrepareAndRequireCombatReady("), spawners[index]);
-                Assert.IsFalse(source.Contains("CapturedEnemyCombatRuntime.Prepare("), spawners[index]);
-                AssertPreparationIsNotFollowedByAiOverwrite(source, spawners[index]);
-            }
 
-            string coordinator = File.ReadAllText(
-                Path.Combine(root, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
-            Assert.IsTrue(coordinator.Contains("CapturedEnemyCombatRuntimeRegistry.TryGet("));
-            Assert.IsFalse(coordinator.Contains("CapturedEnemyCombatRuntimeRegistry.Remove("));
-            Assert.IsFalse(coordinator.Contains("CapturedEnemyCombatRuntimeRegistry.Clear("));
-            Assert.IsFalse(coordinator.Contains("CapturedEnemyCombatRuntimeRegistry.Register("));
-        }
 
-        [TestMethod]
-        public void RexPlatformCleaningRobotsDoNotDieFromAnUnconditionalLifetimeTimer()
-        {
-            string root = FindRepositoryRoot();
-            string source = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs"));
-
-            Assert.IsTrue(source.Contains("private const double RespawnSeconds = 60.0;"));
-            Assert.IsFalse(source.Contains("LifeUntilBurnSeconds"));
-            Assert.IsFalse(source.Contains("BurnBeforeExplodeSeconds"));
-            Assert.IsFalse(source.Contains("TickBurnAndExplodeLifecycle"));
-            Assert.IsFalse(source.Contains("Captured Arete robot explode"));
-            Assert.IsFalse(source.Contains("candidate.Stats[StatIds.health].Value = 0;"));
-        }
 
         private static ExpectedMob Mob(
             string name,

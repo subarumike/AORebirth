@@ -424,68 +424,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void ZoneClientDoesNotReadZlibCountersBeforeTheFirstTransportWrite()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string zoneClientText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
-            string sendCompressed = ExtractMethodBlock(
-                zoneClientText,
-                "private void SendCompressed(byte[] buffer, bool traceQuestNpcTransport)");
-            string enqueueMessage = ExtractMethodBlock(
-                zoneClientText,
-                "public void SendCompressed(MessageBody messageBody, int sender)");
-            string dispatchMessages = ExtractMethodBlock(zoneClientText, "private void DispatchMessages()");
-            int writeIndex = sendCompressed.IndexOf(
-                "this.zStream.Write(buffer, 0, buffer.Length);",
-                StringComparison.Ordinal);
-            int flushIndex = sendCompressed.IndexOf("this.zStream.Flush();", StringComparison.Ordinal);
-            int terminalEmitIndex = sendCompressed.IndexOf(
-                "QuestNpcOutboundTransportDiagnostics.OnFlushReturned(",
-                StringComparison.Ordinal);
 
-            Assert.IsTrue(writeIndex >= 0, "Expected the compressed socket-write boundary.");
-            Assert.IsTrue(flushIndex > writeIndex, "Flush must follow the compressed transport write.");
-            string beforeWrite = sendCompressed.Substring(0, writeIndex);
-            Assert.IsFalse(
-                beforeWrite.Contains("this.zStream.TotalIn") || beforeWrite.Contains("this.zStream.TotalOut"),
-                "Ionic.Zlib counters are not initialized until the first write and must not be read beforehand.");
-            Assert.IsTrue(
-                sendCompressed.IndexOf("ZlibTotalInOrUnavailable(this.zStream)", StringComparison.Ordinal) > writeIndex
-                && sendCompressed.IndexOf("ZlibTotalOutOrUnavailable(this.zStream)", StringComparison.Ordinal) > writeIndex,
-                "Transport diagnostics may sample guarded zlib counters only after the write returns.");
-            Assert.IsFalse(
-                sendCompressed.Substring(writeIndex, flushIndex - writeIndex)
-                    .Contains("EmitQuestNpcOutboundTransportDiagnostic"),
-                "Diagnostics must not log between ZlibStream.Write and Flush.");
-            Assert.IsTrue(
-                terminalEmitIndex > flushIndex
-                && sendCompressed.IndexOf(
-                    "if (traceQuestNpcTransport && flushReturned)",
-                    StringComparison.Ordinal) < terminalEmitIndex,
-                "The successful terminal diagnostic must emit only after Flush and the transport lock complete.");
-            Assert.IsTrue(
-                zoneClientText.Contains("new QueuedOutboundPacket(buffer, traceQuestNpcTransport)")
-                && zoneClientText.Contains(
-                    "this.SendCompressed(queuedPacket.Buffer, queuedPacket.TraceQuestNpcTransport)"),
-                "Typed diagnostic correlation must travel with the queued byte-array reference even when wire fields are malformed.");
-            AssertTextBefore(
-                enqueueMessage,
-                "this.sendQueue.Enqueue(queuedPacket);",
-                "QuestNpcOutboundTransportDiagnostics.MarkEnqueued(buffer);");
-            Assert.IsFalse(
-                enqueueMessage.Contains("EmitEnqueued("),
-                "Enqueue diagnostics must not perform log I/O while the send queue is locked.");
-            AssertTextBefore(
-                dispatchMessages,
-                "QuestNpcOutboundTransportDiagnostics.EmitEnqueued(",
-                "QuestNpcOutboundTransportDiagnostics.OnDequeued(");
-            AssertTextBefore(
-                dispatchMessages,
-                "QuestNpcOutboundTransportDiagnostics.OnDequeued(",
-                "this.SendCompressed(queuedPacket.Buffer, queuedPacket.TraceQuestNpcTransport);");
-        }
 
         private static void Track(
             SimpleCharFullUpdateMessage message,

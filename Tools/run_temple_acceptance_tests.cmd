@@ -1,87 +1,86 @@
 @echo off
 setlocal
 
+rem Retained Temple packet/evidence/shared-mechanic acceptance.
+rem Current NewEngine gameplay is covered by the mandatory NewEngine test gate.
 set "RUNNER=%~dp0run_aotomation_messaging_tests.cmd"
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~TempleAcceptanceMatrixTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~TempleAcceptanceMatrixTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatActiveCoverageTests.Pf1931CoverageIncludesEveryOrdinaryNamedSuccessorAndOwnedAdd"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatActiveCoverageTests.Pf1931CoverageIncludesEveryOrdinaryNamedSuccessorAndOwnedAdd"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~TempleOfThreeWindsOrdinaryContentTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~TempleOfThreeWindsOrdinaryContentTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~DungeonNamedEncounterCompletionTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~DungeonNamedEncounterCompletionTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~DungeonNamedLifecycleCompletionTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~DungeonNamedLifecycleCompletionTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~TempleDoorStatusRuntimeTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~TempleDoorStatusRuntimeTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatProfileCatalogTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatProfileCatalogTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~OrdinaryEnemyCombatSetupGeneratorTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~OrdinaryEnemyCombatSetupGeneratorTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~PlayfieldCollisionGeometryTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~PlayfieldCollisionGeometryTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~NpcChaseNavigationTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~NpcChaseNavigationTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~OfficialDungeonNavigationTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~OfficialDungeonNavigationTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~N3RecoveredContractTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~N3RecoveredContractTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~PlayfieldRuntimeOwnershipTests"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~PlayfieldRuntimeOwnershipTests"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~PlayfieldLifecycleTraceTests.TempleContentModuleActivatesCapturedNpcSpawnsOnlyForPf1931"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.AzturRoomBossesUseTheSharedFactoryWithCaptureExactBytes"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.AzturRoomBossesUseTheSharedFactoryWithCaptureExactBytes"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.ReanimatedCorpseAnchorProfilesUseTheCapturedSharedPacketSequence"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.ReanimatedCorpseAnchorProfilesUseTheCapturedSharedPacketSequence"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.CultistResolutionRejectsMissingNearestAndCrossEnemyEvidence"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.CultistResolutionRejectsMissingNearestAndCrossEnemyEvidence"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.Level48DeathlessUsesCalculatedDamageWithExactArchetypePacketSemantics"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.Level48DeathlessUsesCalculatedDamageWithExactArchetypePacketSemantics"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.LevelThirtyTwoCultistUsesProductionWeaponValuesWithExactCapturedPacketSequence"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.LevelThirtyTwoCultistUsesProductionWeaponValuesWithExactCapturedPacketSequence"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.TempleOrdinaryCoverageRestoresEveryCompleteContract"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.TempleOrdinaryCoverageRestoresEveryCompleteContract"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.RegistryRejectsDuplicateMissingInvalidAndEvidenceUnsafeDefinitions"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.RegistryRejectsDuplicateMissingInvalidAndEvidenceUnsafeDefinitions"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.GuaranteedIndependentWeightedQualityQuantityAndUniqueGenerationAreDeterministic"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.GuaranteedIndependentWeightedQualityQuantityAndUniqueGenerationAreDeterministic"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ObservedCorpseSnapshotsRejectIndependentProbabilityDefinitions"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ObservedCorpseSnapshotsRejectIndependentProbabilityDefinitions"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.NoAssignmentUnresolvedAndOwnedSummonPathsFailClosed"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.NoAssignmentUnresolvedAndOwnedSummonPathsFailClosed"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.CreditsNoneFixedRangeAndUnresolvedRemainDistinct"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.CreditsNoneFixedRangeAndUnresolvedRemainDistinct"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ObservedCreditSetsRemainUniqueWhileObservedSamplesPreserveMultiplicity"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ObservedCreditSetsRemainUniqueWhileObservedSamplesPreserveMultiplicity"
-if errorlevel 1 exit /b %errorlevel%
-
-call "%RUNNER%" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ArchitectureGuardrailsKeepLootOwnershipOutOfPlayfieldAndEnemyBranches"
+call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.ArchitectureGuardrailsKeepLootOwnershipOutOfPlayfieldAndEnemyBranches"
 if errorlevel 1 exit /b %errorlevel%
 
 exit /b 0

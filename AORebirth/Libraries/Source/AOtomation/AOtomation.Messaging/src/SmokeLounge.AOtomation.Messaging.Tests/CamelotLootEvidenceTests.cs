@@ -96,17 +96,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(table.AllowsDocumentedSupplement);
         }
 
-        [TestMethod]
-        public void GlobalLootLegacySeamUsesCamelotPlayfieldScopedSupplement()
-        {
-            string source = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
-            StringAssert.Contains(source, "hasDocumentedCamelotLoot");
-            StringAssert.Contains(source, "DocumentedCamelotLootDefinitions.ApplyDocumentedLoot");
-            StringAssert.Contains(source, "DocumentedCamelotLootDefinitions.PlayfieldInstance");
-        }
+
 
         [TestMethod]
         public void WikiAuditArtifactMatchesProductionDefinitions()

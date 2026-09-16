@@ -394,9 +394,10 @@ def direct_sql_sites(root: Path) -> list[str]:
 def mission_boundary_files(root: Path) -> list[Path]:
     result = []
     for engine in ("ZoneEngine", "ZoneEngine_New"):
-        mission_root = root / "AORebirth" / "Server" / engine / "Core" / "Missions"
-        result.extend(sorted(path for path in mission_root.rglob("*.cs")
-                             if not set(path.relative_to(mission_root).parts) & EXCLUDED_PARTS))
+        for owner in ("Core", "SharedGameplay"):
+            mission_root = root / "AORebirth" / "Server" / engine / owner / "Missions"
+            result.extend(sorted(path for path in mission_root.rglob("*.cs")
+                                 if not set(path.relative_to(mission_root).parts) & EXCLUDED_PARTS))
     result.extend(
         path
         for path in (
@@ -531,8 +532,9 @@ def self_test() -> None:
             raise RuntimeError("mission provider fixture was not rejected")
 
         (root / "AORebirth/Server/ZoneEngine/Core/Missions/BadMission.cs").unlink()
-        for engine in ("ZoneEngine", "ZoneEngine_New"):
-            nested = root / ("AORebirth/Server/" + engine + "/Core/Missions/Nested/Adapter.cs")
+        for engine, owner in (("ZoneEngine", "Core"), ("ZoneEngine_New", "Core"),
+                              ("ZoneEngine_New", "SharedGameplay")):
+            nested = root / ("AORebirth/Server/" + engine + "/" + owner + "/Missions/Nested/Adapter.cs")
             for bad_source in (
                 "using Provider = MySqlConnector; class Bad {}",
                 "class Bad { IDbTransaction transaction; }",

@@ -95,30 +95,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 builder.ToString());
         }
 
-        [TestMethod]
-        public void SpatialInterestMetricRecordingRemainsPf127OptIn()
-        {
-            string root = FindRepositoryRoot();
-            string snapshotText = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\SubwayVisibilitySnapshotDiagnostics.cs"));
-            string packetText = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
 
-            Assert.IsTrue(
-                snapshotText.Contains("if (!configuration.Enabled")
-                && snapshotText.Contains(
-                    "recipient.Playfield.Identity.Instance != CapturedSubwayContentProvider.SubwayPlayfieldInstance")
-                && snapshotText.Contains("return null;"),
-                "Spatial snapshot diagnostics must remain disabled unless an explicit PF127 session is active.");
-            Assert.IsTrue(
-                packetText.Contains("if (diagnosticSnapshot != null)")
-                && packetText.Contains("diagnosticSnapshot.RecordSpatialInterestSelection("),
-                "Spatial metrics must only record through an active opt-in diagnostic snapshot.");
-        }
 
         private static void ExpectException<TException>(Action action)
             where TException : Exception

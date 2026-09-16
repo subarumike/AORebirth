@@ -31,12 +31,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "capture_backed_npc_combat_inventory.json");
             string generatedPath = Path.Combine(
                 root,
-                "AORebirth",
-                "Server",
-                "ZoneEngine",
-                "Core",
-                "Playfields",
-                "CapturedEnemyCombatProfileCatalog.g.cs");
+                "Tests", "Fixtures", "Gameplay", "Playfields", "CapturedEnemyCombatProfileCatalog.g.cs");
             string inventoryHeader = ReadInventoryHeader(inventoryPath);
             CapturedEnemyCombatProfileDefinition[] profiles =
                 CapturedEnemyCombatProfileCatalog.GetProfilesForTests();
@@ -1393,72 +1388,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void FixedStartSchedulingEmitsSawBeforeDelayedAttackWithoutAReleaseTick()
-        {
-            string coordinator = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    "AORebirth",
-                    "Server",
-                    "ZoneEngine",
-                    "Core",
-                    "Playfields",
-                    "NpcCombatTickCoordinator.cs"));
-            string reset = Slice(
-                coordinator,
-                "internal void ResetCombatTick",
-                "internal void ClearTracking");
-            int sawAtFightStart = reset.IndexOf(
-                "AnnounceCapturedEnemySpecialAttackWeaponContext(",
-                StringComparison.Ordinal);
-            int attackAuthorization = reset.IndexOf(
-                "capturedAttackSource == null",
-                StringComparison.Ordinal);
-            int delayedAttackRegistration = reset.IndexOf(
-                "pendingCapturedAttackStarts[",
-                StringComparison.Ordinal);
-            Assert.IsTrue(attackAuthorization >= 0);
-            Assert.IsTrue(
-                sawAtFightStart > attackAuthorization,
-                "The combat coordinator must resolve an independent range owner before emitting the captured start packets.");
-            Assert.IsTrue(sawAtFightStart >= 0);
-            Assert.IsTrue(delayedAttackRegistration > sawAtFightStart);
-            StringAssert.Contains(
-                coordinator,
-                "return range > 0.0d && !double.IsNaN(range) && !double.IsInfinity(range);");
-            string clearTracking = Slice(
-                coordinator,
-                "internal void ClearTracking",
-                "internal void ClearRuntimeState");
-            Assert.IsFalse(
-                clearTracking.Contains("capturedSpecialAttackWeaponStateCursor.Clear("),
-                "Mutable SAW state is actor state and must survive ordinary fight tracking resets.");
-            string clearRuntimeState = Slice(
-                coordinator,
-                "internal void ClearRuntimeState",
-                "internal void ProcessCombatTick");
-            StringAssert.Contains(
-                clearRuntimeState,
-                "capturedSpecialAttackWeaponStateCursor.ClearAll()");
 
-            string process = Slice(
-                coordinator,
-                "internal void ProcessCombatTick",
-                "private bool TryApplyCapturedWeaponAmmo");
-            int capturedRelease = process.IndexOf(
-                "capturedAttackStartReleased = true;",
-                StringComparison.Ordinal);
-            int pendingRemoval = process.IndexOf(
-                "pendingCapturedAttackStarts.Remove",
-                StringComparison.Ordinal);
-            int conditionalReturn = process.IndexOf(
-                "if (!capturedAttackStartReleased)",
-                StringComparison.Ordinal);
-            Assert.IsTrue(capturedRelease >= 0);
-            Assert.IsTrue(pendingRemoval > capturedRelease);
-            Assert.IsTrue(conditionalReturn > pendingRemoval);
-        }
 
         [TestMethod]
         public void SingleStreamDefinitionsResolveOrRetainAnExactCorpusBackedUnresolvedRecord()
@@ -4745,12 +4675,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string source = LegacyGameplaySource.ReadAllText(
                 Path.Combine(
                     FindRepositoryRoot(),
-                    "AORebirth",
-                    "Server",
-                    "ZoneEngine",
-                    "Core",
-                    "Playfields",
-                    "CapturedEnemyCombatProfileCatalog.cs"));
+                    "Tests", "Fixtures", "Gameplay", "Playfields", "CapturedEnemyCombatProfileCatalog.cs"));
             Assert.IsFalse(source.Contains("Math.Abs(value.Level - level)"));
             Assert.IsFalse(source.Contains("OrderBy(value => value.Level)"));
         }

@@ -63,21 +63,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void GlobalLootLegacySeamUsesCyborgBarracksPlayfieldScopedSupplement()
-        {
-            string source = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
-            StringAssert.Contains(source, "hasDocumentedCyborgBarracksLoot");
-            StringAssert.Contains(
-                source,
-                "DocumentedCyborgBarracksLootDefinitions.ApplyDocumentedLoot");
-            StringAssert.Contains(
-                source,
-                "DocumentedCyborgBarracksLootDefinitions.PlayfieldInstance");
-        }
+
 
         [TestMethod]
         public void WikiAuditArtifactMatchesProductionDefinitions()

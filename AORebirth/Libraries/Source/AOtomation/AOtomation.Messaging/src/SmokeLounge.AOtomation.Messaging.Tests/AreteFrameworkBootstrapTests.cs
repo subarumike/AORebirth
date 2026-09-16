@@ -213,7 +213,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 FindRepositoryRoot(),
                 "AORebirth",
                 "Server",
-                "ZoneEngine");
+                "ZoneEngine_New");
         }
 
         private static string FindRepositoryRoot()

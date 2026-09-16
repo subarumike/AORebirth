@@ -55,123 +55,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         entry.ProfileKey);
                 }
             }
-
-            string subwayCombat = LegacyGameplaySource.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
-            Assert.IsTrue(subwayCombat.Contains("case 155962:"));
-            Assert.IsTrue(subwayCombat.Contains("case 203748:"));
-            Assert.IsTrue(subwayCombat.Contains("case 203726:"));
-            Assert.IsTrue(subwayCombat.Contains("case 203744:"));
-            Assert.IsTrue(subwayCombat.Contains("case 31909:"));
             Assert.AreNotEqual("totw.1931.boss.uklesh-the-frozen", "totw.1931.boss.khalum");
             Assert.AreNotEqual("totw.1931.boss.khalum", "totw.1931.boss.aztur-the-immortal");
         }
 
-        [TestMethod]
-        public void SuccessorAndAddDomainsAreOwnedByTheirEncounterStateMachines()
-        {
-            string root = FindRepositoryRoot();
-            string temple = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs"));
-            string subway = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
-            Assert.IsTrue(temple.Contains("this.RequestNextReanimation(pending.FinishAtUtc);"));
-            Assert.IsTrue(temple.Contains("return this.DetachLivingReanimatedAdds();"));
-            Assert.IsTrue(temple.Contains("CapturedTempleNamedRespawnMode.SuccessorOnly"));
-            Assert.IsTrue(temple.Contains("successorProfileKey = KhalumProfileKey;"));
-            Assert.IsTrue(temple.Contains("delaySeconds = KhalumSpawnAfterUkleshDeathSeconds;"));
-            Assert.IsTrue(temple.Contains("successorProfileKey = AzturProfileKey;"));
-            Assert.IsTrue(temple.Contains("delaySeconds = AzturSpawnAfterKhalumDeathSeconds;"));
-            Assert.IsTrue(subway.Contains("slot.Generation++;"));
-            Assert.IsTrue(subway.Contains("summon.Stats[StatIds.petmaster].Value = 0;"));
-        }
 
-        [TestMethod]
-        public void EncounterRegistryRetirementIsPlayfieldOwnedAndIndependent()
-        {
-            string root = FindRepositoryRoot();
-            string subway = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
-            string temple = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs"));
 
-            Assert.IsTrue(subway.Contains("new RegisteredEncounterDefinition(playfieldInstance, definition)"));
-            Assert.IsTrue(subway.Contains("value.Value.PlayfieldInstance == playfieldInstance"));
-            Assert.IsFalse(subway.Contains("playfieldInstance != CapturedSubwayEncounterRuntimeService.SubwayPlayfieldId"));
-            Assert.IsTrue(temple.Contains("this.playfield.Identity.Instance,"));
-            Assert.IsTrue(temple.Contains("CapturedEncounterRuntimeRegistry.RemoveForPlayfield("));
-        }
 
-        [TestMethod]
-        public void RuntimeDisposalCancelsNamedCombatMovementRespawnAndVisibilityOwnership()
-        {
-            string root = FindRepositoryRoot();
-            string npcRuntime = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string temple = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs"));
-            string subway = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
 
-            Assert.IsTrue(npcRuntime.Contains("character.DoNotDoTimers = true;"));
-            Assert.IsTrue(npcRuntime.Contains("controller.StopFollow();"));
-            Assert.IsTrue(npcRuntime.Contains("this.combatTick.ClearRuntimeState();"));
-            Assert.IsTrue(npcRuntime.Contains("this.corpseLifecycle.ClearRuntimeState();"));
-            Assert.IsTrue(npcRuntime.Contains("this.capturedSubwayEncounters.ClearRuntimeState();"));
-            Assert.IsTrue(npcRuntime.Contains("this.capturedTempleEncounters.ClearRuntimeState();"));
-            Assert.IsTrue(temple.Contains("CapturedEncounterRuntimeRegistry.RemoveForPlayfield("));
-            Assert.IsTrue(temple.Contains("state.ResetAll();"));
-            Assert.IsTrue(temple.Contains("slot.Reset();"));
-            Assert.IsTrue(subway.Contains("CapturedEncounterRuntimeRegistry.RemoveForPlayfield("));
-            Assert.IsTrue(subway.Contains("slot.SpawnDueAtUtc = null;"));
-        }
+
 
         [TestMethod]
         public void FinalDungeonGameplayBacklogUsesExplicitLifecycleOwnershipAndFailsClosed()
         {
             string root = FindRepositoryRoot();
-            string temple = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs"));
-            string subway = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
             string templeOrdinary = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsContentProvider.cs"));
+                    @"Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsContentProvider.cs"));
             string subwayOrdinary = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
-
-            Assert.IsTrue(
-                temple.Contains("CapturedTempleNamedRespawnMode.CapturedAfterNpcDespawn")
-                && temple.Contains("CapturedTempleNamedRespawnMode.TemplePolicyAfterNpcDespawn")
-                && temple.Contains("CapturedTempleNamedRespawnMode.SuccessorOnly")
-                && temple.Contains("CapturedTempleNamedRespawnMode.ChainResetAfterNpcDespawn"));
-            Assert.IsTrue(
-                subway.Contains("CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10)")
-                && subway.Contains("EumenidesObservedRespawnDelay = TimeSpan.FromMinutes(10)")
-                && subway.Contains("slot.SpawnDueAtUtc = null;"));
+                    @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
             Assert.IsTrue(
                 templeOrdinary.Contains("totw.named.murial.300-after-npc-despawn-policy")
                 && templeOrdinary.Contains("WorldRespawnPolicyAssignment.Explicit(MurialRespawn)")
@@ -206,38 +111,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsFalse(
                 subwayOrdinary.Contains("\"Strike Foreman\""),
                 "Strike Foreman is named encounter content and must remain outside ordinary population generation.");
-            Assert.IsTrue(
-                subway.Contains(
-                    "StrikeForemanProfileKey = \"subway.127.named.strike-foreman\"")
-                && subway.Contains("CreateStrikeForemanDefinition()")
-                && subway.Contains("this.ProcessStrikeForemanRespawn(utcNow);")
-                && subway.Contains(
-                    "diedAtUtc.Add(CapturedNamedBossRespawnDelay)")
-                && subway.Contains(
-                    "this.strikeForemanIdentity = Identity.None;"),
-                "Strike Foreman must be active through the shared PF127 named encounter lifecycle.");
         }
 
         [TestMethod]
         public void PostAzturDespawnSchedulesExactlyOneFullChainReset()
         {
-            string temple = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs"));
             DateTime resetAtUtc =
                 new DateTime(2026, 7, 28, 12, 0, 0, DateTimeKind.Utc);
             DateTime resetDueAtUtc;
-
-            Assert.IsTrue(
-                temple.Contains("this.ScheduleMainRoomReset(utcNow);")
-                && temple.Contains("NamedEncounterState uklesh = this.FindNamed(UkleshProfileKey);")
-                && temple.Contains("NamedEncounterState khalum = this.FindNamed(KhalumProfileKey);")
-                && temple.Contains("NamedEncounterState aztur = this.FindNamed(AzturProfileKey);")
-                && temple.Contains("this.namedRespawns.Schedule(")
-                && temple.Contains("UkleshProfileKey,")
-                && temple.Contains("AzturProfileKey,")
-                && temple.Contains("resetDueAtUtc);"));
             Assert.AreEqual(
                 DungeonNamedRespawnClassification.ExplicitlyNoIndependentRespawn,
                 DungeonNamedLifecycleCatalog.Get(
@@ -270,13 +151,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "A dead predecessor corpse must not block the policy-timed chain reset.");
             Assert.IsFalse(
                 CapturedTempleOfThreeWindsEncounterRules.IsLivingMainRoomStage(0, false));
-            Assert.IsTrue(
-                temple.Contains("CapturedTempleOfThreeWindsEncounterRules.IsLivingMainRoomStage("));
-            Assert.IsFalse(
-                temple.Contains("uklesh.Dead = false;")
-                || temple.Contains("khalum.Dead = false;")
-                || temple.Contains("aztur.Dead = false;"),
-                "Scheduling the reset must not revive corpse-owned predecessor state.");
             Assert.AreEqual(
                 resetDueAtUtc,
                 CapturedTempleOfThreeWindsEncounterRules.ResolveNamedRespawnDueAtUtc(
@@ -310,19 +184,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedTempleOfThreeWindsEncounterRules.TryResolveNamedRespawnDelay(
                     CapturedTempleNamedRespawnMode.ChainResetAfterNpcDespawn,
                     out respawnDelaySeconds));
-            Assert.IsTrue(
-                temple.Contains("CapturedEncounterRuntimeRegistry.RemoveForPlayfield(")
-                && temple.Contains("state.ResetAll();"),
-                "Runtime disposal must cancel the pending full-chain reset.");
         }
 
         [TestMethod]
         public void TempleNanoEffectsRemainExactAndOnlyOwnedEffectsReachGameplay()
         {
-            string temple = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsEncounterRuntimeService.cs"));
             int[] packetOnlyNanoIds =
             {
                 205389, 205561, 205600, 205594, 205592,
@@ -371,80 +237,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 CapturedTempleOfThreeWindsEncounterRules.TryGetCapturedNanoEffectOwnership(
                     1,
                     out unknownOwnership));
-            Assert.IsTrue(temple.Contains("this.RequestNextReanimation(pending.FinishAtUtc);"));
-            Assert.IsTrue(
-                temple.Contains("NanoLoader.NanoList.TryGetValue(pending.NanoId, out nano)")
-                && temple.Contains("NanoEventRuntimeService.Default.ExecuteOnUseEvents(actor, nano)"),
-                "The exact instant Gulard self-heal must use the shared nano-data runtime.");
-            Assert.IsTrue(
-                temple.Contains("NanoLandingResult.NotRequired")
-                && temple.Contains("ExecuteCapturedOnUseEvents(")
-                && temple.Contains("NotifyActiveNanoDurationToPlayfield(")
-                && temple.Contains("BuffMessageHandler.Default.SendRemoveNanoBuff(")
-                && temple.Contains("new HealthDamageMessage"),
-                "Gartua must use the explicit shared target path with captured refresh, duration, and heal packets.");
-            Assert.IsFalse(
-                temple.Contains("new[] { DefenderUnscheduledNanoId }")
-                || temple.Contains("new[] { UkleshUnscheduledNanoId }")
-                || temple.Contains("new[] { MurialNanoId }"),
-                "Captured nano identities without a proven schedule must remain unscheduled.");
 
             string root = FindRepositoryRoot();
-            string nanoRuntime = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\NanoEventRuntimeService.cs"));
-            string activeNanoRuntime = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\ActiveNanoRuntimeService.cs"));
-            string modify = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\modify.cs"));
-            string modifyPercentage = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\modifypercentage.cs"));
-            Assert.IsTrue(
-                nanoRuntime.Contains("target.Stats[modifier.StatId].Modifier -= modifier.Delta;")
-                && nanoRuntime.Contains("target.Stats[modifier.StatId].PercentageModifier -= modifier.Delta;")
-                && nanoRuntime.Contains("execution.PreparedTargets.Add(target.Identity.Instance)")
-                && nanoRuntime.Contains("landingResult == NanoLandingResult.Unresolved")
-                && nanoRuntime.Contains("landingResult == NanoLandingResult.Resisted")
-                && nanoRuntime.Contains("FunctionCollection.Instance.GetFunctionByNumber(function.FunctionType) == null")
-                && nanoRuntime.Contains("RemoveModifiersCastBy(")
-                && nanoRuntime.Contains("RemoveAllModifiers("),
-                "Landing must fail closed before partial effects, and modifiers must reverse exact contributions.");
-            Assert.IsTrue(
-                modify.Contains("RecordModifier(")
-                && modifyPercentage.Contains("RecordModifier(")
-                && modifyPercentage.Contains("Character affected = Target as Character;"),
-                "Both modifier functions must record the actual target contribution.");
-            Assert.IsTrue(
-                activeNanoRuntime.Contains("NanoEventRuntimeService.Default.RemoveModifiers(character, nanoId);")
-                && activeNanoRuntime.Contains("ClearAllActiveNanos("),
-                "Expiry, overwrite, reset, and disposal must share modifier cleanup.");
         }
 
-        [TestMethod]
-        public void CapturedNanoLandingResultsMapToExactFinishPacketSemantics()
-        {
-            string nanoRuntime = File.ReadAllText(
-                Path.Combine(
-                    FindRepositoryRoot(),
-                    @"AORebirth\Server\ZoneEngine\Core\NanoEventRuntimeService.cs"));
-            Assert.IsTrue(
-                nanoRuntime.Contains("case NanoLandingResult.NotRequired:")
-                && nanoRuntime.Contains("case NanoLandingResult.Landed:")
-                && nanoRuntime.Contains("parameter = 1;")
-                && nanoRuntime.Contains("case NanoLandingResult.Resisted:")
-                && nanoRuntime.Contains("parameter = 3;")
-                && nanoRuntime.Contains("default:")
-                && nanoRuntime.Contains("parameter = 0;")
-                && nanoRuntime.Contains("return false;"),
-                "Captured finish result 1 must mean landed, 3 resisted, and unresolved must fail closed.");
-        }
+
 
         [TestMethod]
         public void CapturedDungeonLootRemainsAtomicWithUnresolvedSelectionProbabilities()
@@ -453,11 +250,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string templeLoot = File.ReadAllText(
                 Path.Combine(
                     root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs"));
-            string globalLoot = File.ReadAllText(
-                Path.Combine(
-                    root,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+                    @"Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsLootDefinitions.cs"));
 
             Assert.IsTrue(
                 templeLoot.Contains("ObservedCorpseSnapshots = snapshots")
@@ -465,11 +258,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && templeLoot.Contains("Weight = 0")
                 && templeLoot.Contains("DropChanceBasisPoints = 0")
                 && templeLoot.Contains("ProbabilityEvidence = \"unresolved\""));
-            Assert.IsTrue(
-                globalLoot.Contains("ObservedCorpseSnapshots = snapshots")
-                && globalLoot.Contains("SelectionProbabilityEvidence = LootEvidenceConfidence.Unresolved")
-                && globalLoot.Contains("ObservedCorpseSnapshots = new[]")
-                && globalLoot.Contains("ItemPoolUnresolved = true"));
         }
 
         [TestMethod]

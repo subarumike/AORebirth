@@ -31,16 +31,16 @@
     <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
       <Link>RawSimpleCharFullUpdateDecoder.cs</Link>
     </Compile>
-    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacement.cs">
+    <Compile Include="..\..\Tools\Shared\Playfields\OfficialPlayfieldPlacement.cs">
       <Link>OfficialPlayfieldPlacement.cs</Link>
     </Compile>
-    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\OfficialPlacements\OfficialPlayfieldPlacementCatalog.cs">
+    <Compile Include="..\..\Tools\Shared\Playfields\OfficialPlayfieldPlacementCatalog.cs">
       <Link>OfficialPlayfieldPlacementCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCollisionGeometry.cs">
+    <Compile Include="..\..\Tools\Shared\Playfields\PlayfieldCollisionGeometry.cs">
       <Link>PlayfieldCollisionGeometry.cs</Link>
     </Compile>
-    <Compile Include="..\..\AORebirth\Server\ZoneEngine\Core\Playfields\Pf127CollisionGeometryLoader.cs">
+    <Compile Include="..\..\Tools\Shared\Playfields\Pf127CollisionGeometryLoader.cs">
       <Link>Pf127CollisionGeometryLoader.cs</Link>
     </Compile>
     <Compile Include="Pf127LineOfSightPromotionValidator.cs" />

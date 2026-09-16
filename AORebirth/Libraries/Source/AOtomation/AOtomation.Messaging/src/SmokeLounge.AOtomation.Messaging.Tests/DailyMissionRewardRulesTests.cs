@@ -267,13 +267,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 string repositoryPath = Path.Combine(
                     current.FullName,
-                    "AORebirth",
-                    "Server",
-                    "ZoneEngine",
-                    "Content",
-                    "Captured",
-                    "Quests",
-                    "windcaller_karrec_completion_20260721_023942.json");
+                    "Tests", "Fixtures", "Content", "Captured", "Quests", "windcaller_karrec_completion_20260721_023942.json");
                 if (File.Exists(repositoryPath))
                 {
                     return repositoryPath;

@@ -45,33 +45,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(2, MissionAcgInstanceBinding.CurrentFormatVersion);
         }
 
-        [TestMethod]
-        public void BoundMissionContentRegistrationReachesOperationalNpcSpawning()
-        {
-            string module =
-                ReadSource(
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\MissionInstanceContentModule.cs");
-            string npcRuntime =
-                ReadSource(
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
-            string operational =
-                ReadSource(
-                    @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgOperationalRuntime.cs");
 
-            Assert.IsTrue(
-                module.Contains(
-                    "return MissionInstanceService.IsMissionInstancePlayfield(playfieldIdentity.Instance);"));
-            Assert.IsFalse(
-                module.Contains("!MissionAcgBindingRuntime.IsBoundLivePlayfield"));
-            Assert.IsTrue(module.Contains("registration.RegisterCapturedNpcSpawns();"));
-            Assert.IsTrue(
-                npcRuntime.Contains("MissionAcgOperationalRuntime.TrySpawnForPlayfield"));
-            Assert.IsTrue(
-                operational.Contains("MissionInstanceMobCombat.RegisterAggressive(mob.Identity);"));
-            Assert.IsTrue(operational.Contains("npcState.Level"));
-            Assert.IsTrue(
-                operational.Contains("MissionNpcDifficultyPolicy.ResolveLevel"));
-        }
 
         [TestMethod]
         public void LegacyCapturedDifficultyMigratesWithoutLosingMutableState()
@@ -740,111 +714,17 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void GeneratedMissionCorpsePolicyIsWiredWithoutChangingOrdinaryCorpseAccess()
         {
-            string playfield = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
-            string operational = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgOperationalRuntime.cs");
-            string npcRuntime = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
             string lifecycle = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs");
+                @"Tests\Fixtures\Gameplay\Playfields\PlayfieldObjectLifecycleRuntimeService.cs");
             string catalog = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\MissionInstanceShapeCatalog.cs");
-            string completion = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgCompletionJournalService.cs");
-
-            StringAssert.Contains(playfield, "TryAuthorizeGeneratedMissionCorpse");
-            StringAssert.Contains(playfield, "TryResolveCapturedCorpseCredits");
-            StringAssert.Contains(playfield, "CorpseLootRightsPolicy.OwnerOnly");
-            StringAssert.Contains(playfield, "if (operationalMissionNpc)");
-            StringAssert.Contains(playfield, "lootItems.Clear();");
-            StringAssert.Contains(playfield, "generatedLoot.LootUnresolved");
-            StringAssert.Contains(playfield, "if (!corpse.IsGeneratedMissionCorpse)");
-            StringAssert.Contains(playfield, "CorpseLootRightsPolicy.Public");
-            StringAssert.Contains(playfield, "HasExactCorpseLease");
-            StringAssert.Contains(playfield, "ResumeForAccepted");
-            StringAssert.Contains(playfield, "HandleCorpseSpawnFailed");
-            StringAssert.Contains(
-                playfield,
-                "pendingMissionCorpseCompletionResumes");
-            StringAssert.Contains(operational, "TryValidateCorpseAccess");
-            StringAssert.Contains(operational, "concrete.DespawnCorpses");
-            StringAssert.Contains(
-                completion,
-                "ShouldDeferKillCompletionCleanup");
-            StringAssert.Contains(
-                operational,
-                "A generated mission PF2 may never fall through to the ordinary");
-            StringAssert.Contains(npcRuntime, "operationalDeathAlreadyPersisted");
-            StringAssert.Contains(npcRuntime, "action=corpse-and-combat-reward-suppressed");
-            Assert.IsTrue(
-                npcRuntime.IndexOf(
-                    "this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);",
-                    StringComparison.Ordinal)
-                < npcRuntime.IndexOf(
-                    "this.rewards.RunNpcDeathRewardHooks",
-                    StringComparison.Ordinal));
+                @"Tests\Fixtures\Gameplay\Playfields\MissionInstanceShapeCatalog.cs");
             StringAssert.Contains(lifecycle, "if (!registerCorpse(target, corpseId))");
-            Assert.IsFalse(playfield.Contains("Math.Abs(salt)"));
-            Assert.IsFalse(playfield.Contains("credits = 20 +"));
             Assert.IsFalse(catalog.Contains("Math.Abs(salt)"));
         }
 
-        [TestMethod]
-        public void BoundMissionPfRejectsEveryUnregisteredDeathAndGenericCorpseFallback()
-        {
-            string operational = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgOperationalRuntime.cs");
-            string playfield = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs");
 
-            StringAssert.Contains(
-                operational,
-                "A generated mission PF2 may never fall through to the ordinary");
-            StringAssert.Contains(
-                operational,
-                "if (!state.TryGetNpc(target.Identity.Instance, out npc))");
-            StringAssert.Contains(
-                playfield,
-                "MissionAcgBindingRuntime.ClaimsGeneratedLivePlayfield(");
-        }
 
-        [TestMethod]
-        public void PersistedKillDeathReconcilesOnlyExactCompletionWithoutDuplicateCombatRewards()
-        {
-            string npcRuntime = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs");
-            string objective = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionAcgObjectiveInteractionService.cs");
-            string instance = ReadSource(
-                @"AORebirth\Server\ZoneEngine\Core\Missions\MissionInstanceService.cs");
 
-            StringAssert.Contains(
-                npcRuntime,
-                "MissionAcgObjectiveInteractionService");
-            StringAssert.Contains(
-                npcRuntime,
-                "action=corpse-and-combat-reward-suppressed");
-            StringAssert.Contains(
-                objective,
-                "TryResumePersistedTargetDeath");
-            StringAssert.Contains(
-                objective,
-                "IsPersistedKillDeathWitnessEligible");
-            StringAssert.Contains(
-                objective,
-                "\"KillTargetPersistedDeathRecovery\"");
-            StringAssert.Contains(
-                npcRuntime,
-                "persistedDeathWitnessMatchesAttacker");
-            StringAssert.Contains(
-                npcRuntime,
-                "RewardHooksStarted");
-            StringAssert.Contains(
-                instance,
-                "MissionAcgObjectiveInteractionService.TryResumePersistedTargetDeath(");
-            StringAssert.Contains(instance, "ENTRY-RECOVER-KILL");
-        }
 
         [TestMethod]
         public void UnresolvedChestIsExplicitlyEmptyAndCannotRefillOnRestart()

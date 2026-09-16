@@ -40582,223 +40582,93 @@
   "contentInputs": [
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Missions/MissionInstanceMobCombat.cs",
-      "sha256": "c9fbe0098f87fff5674d52f3dc3eeb48825963a5d814cceeca0c1d2fd100d549"
+      "path": "AORebirth/GameData/MobTemplates.json",
+      "sha256": "52056fb5c528a513324db66e86c51a51ef386d0fdc667e40c0cbf0a900844eed"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs",
-      "sha256": "bcc617675d5ad2708ddc15e599f078be2b5eb3a0061b0c1e1717f804c45caae3"
+      "path": "AORebirth/GameData/NpcFamilyStatTemplates.json",
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
-      "sha256": "06b58ef3e037d0268d90002b3f4e6153955dcad34a6396e4f717092d472b8a4c"
+      "path": "AORebirth/GameData/NpcStatTemplateOverlays.json",
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs",
-      "sha256": "96943796af7e0c4711ae158c005bfe904a0ea5f79a18c161800794df8249c792"
+      "path": "AORebirth/GameData/WorldContent.json",
+      "sha256": "b72800318c278094cde506444acc82106ac6a7b8b24fb03055e627cbc06d9791"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteIccPeacekeeperPatrolRuntime.cs",
-      "sha256": "4387cc50654b0b3001620cd042aaa8c2e2f808915b1b49fad0b2dbd3b675df4b"
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs",
+      "sha256": "2f9cbe4c2d07d7d7798d661c7515e4a4ab6ece601d487f1595304519c49e9780"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteLandingSpawn.cs",
-      "sha256": "0e360e8479120f0ec5dabbe37fefa93182b224d34c0160d2cfda22c2dd4ad45c"
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/WorldContentCatalog.cs",
+      "sha256": "085e3f4a600ad27b06e9cd53b9ed1a33a3710c7d433ea4f58190c0727f1c2d44"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteRoboticGuardDogRuntime.cs",
-      "sha256": "9db7bd1d710c955c88fbf92449ef5e445ac68fb0ac495b6e62410214c187ad31"
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/WorldNpcFactory.cs",
+      "sha256": "67f689a803133fe9c46157f402338cd260193ac2a758a594dc94e60aaa2df7f3"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotContentProvider.cs",
-      "sha256": "e3bfe182a231fba7351c57278a2902b4d6fa6d8f9e5b437c321c3e8e3decf58f"
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+      "sha256": "d6d8dfcc9b3d2bd1b1cb2b77682def2db48ddba3bf34b1126b2c149186f15762"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
-      "sha256": "9ea7a2febaf90622b9b6dd3e19ee47bf9a8106171a23e1b5db069a95db3e93b9"
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnContentValidation.cs",
+      "sha256": "c559b8419017b9d702b3fc58b49caa45894f323132c559043e26a17c28d71a06"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "sha256": "9ffe1aa9232100bcb84125514813c094d084351c0327747811a9c399b0d93e3d"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatContract.Data.cs",
       "sha256": "42c7e8c9cb892174c787b73608370f0da90aeab057680cb712c106c5c8757335"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-      "sha256": "7f76cb87d41005ad4b5390e6120880d899db3d8f109db790b572b976280f2b9f"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatData.cs",
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatData.cs",
       "sha256": "dc5267a37982682ee88ab96606257a20e0ee49383677bf25fa5ce8b63d4577c2"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatPacketFactory.Data.cs",
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs",
       "sha256": "0dbb0fcf85f13e50936795a090bc02c5c893841511ea0f82dc07d38f7d05aacb"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
-      "sha256": "dea76b5cc6249e1c0c639a10dcd596b2bfac07614e811b473cb46939b9a30ab1"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileData.cs",
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileData.cs",
       "sha256": "1746f3da33fee95efd635a237eb9a941cb959aa47b45144b162dae2b5f96c242"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileMatching.cs",
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileMatching.cs",
       "sha256": "54699141f7020af8c3ae18b93e8cf47c2b362ab0dfc9a53f1e84fb850fa7ba98"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatSequenceData.cs",
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatSequenceData.cs",
       "sha256": "37e19837960f3d8f85899377ff0a4f20a95569566d7d7d82a19c78e6160eda2d"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayContentProvider.cs",
-      "sha256": "a8d25e19c1663ee154b4a07fd28a45cb29f5009bc27d9ad27cbb37196e478031"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
-      "sha256": "cffba43b7a60e06755b22041745fa58845ae10d2ee8a5e67fbe7d52d8888cfd5"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayOrdinaryContentProvider.cs",
-      "sha256": "5cfa1abec308e1dcbc8643e781015c0a28b730bc735fc9d3be6ab62e49324fe8"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
-      "sha256": "e30bab8606c63f64bfac749b8ad3c6360c12e5d0ae6b3f2efb6c554a63b4714c"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorContentProvider.cs",
-      "sha256": "95f97a6e57fc6c45dc084ad7c6d94dc8eacf059c7c08e55af0fb954f59407ff8"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorRuntimeService.cs",
-      "sha256": "07bd2aa4bf50dd77e0ddbcabcab4e79ced73dec396c2f6bac842ccf5d4416cd4"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
-      "sha256": "5b035e7a4bab0170687f7380287c5f0eed6e7ddb77212c63f74992db87a563ae"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
-      "sha256": "b5fc81c7f51039363e3dd445c765833e1dd4fa03c1474dbd69d0eba42da699e2"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
-      "sha256": "050d90787b4db92f868f4d4ac33c1926eaf5692a4e8bd977f8b82375f1d1203c"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
-      "sha256": "7aff10c983a0c8a7e2f1e17e95def00f40aec1135e581d8ad4b44763a0dee98c"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/Content/NascenceLifeContentModule.cs",
-      "sha256": "346fb6b49f25d8b0ab80d00c19eedb12db0ec4bc494af0208a901648d138d53e"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs",
-      "sha256": "2760fb1a041fdbc2d5b5cb6e1d92f43888804bcaf701eef303fe209e9b51389a"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
-      "sha256": "e3397f35876f01052116fa3e44f3128da9753efa40995d4a8275924459ce6a1e"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
-      "sha256": "a36563288ede4fe4e18752c8aa2005ae79d593b82169d206b20badec9d5f5748"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
-      "sha256": "6f05be714c131064e7738f39daeeb3476c1282e8f9b159e5942341a5c9a430ee"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceShapeCatalog.cs",
-      "sha256": "27c629658013a1f53ec63ce93030d071a4ca51a2fd7871e1044f204bb5ef030c"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MissionInstanceSpawn.cs",
-      "sha256": "fd9b23352c29d053829871c79e58448f978dd309a5722981fff9c230dc31d7b3"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerContentProvider.cs",
-      "sha256": "bb34af96cb4843648a68c45edbca20f0755f6d2f870f09332bd32dacbeac241a"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerSpawnOrchestrator.cs",
-      "sha256": "1213c59ec79f8191ba7b8c44c1f785fa5629d382edc68d5f3d49475253253222"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
-      "sha256": "08cc1415e9ad7af9272ad90a86d82ed52a6e165381efb5903ce3ad71d6b39ca5"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCatalog.cs",
-      "sha256": "c6e5a36886c8720d97ab21e3d6390c2fb7370103b90d267fa85b1776e6def226"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCombatSetupGenerator.Data.cs",
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs",
       "sha256": "119e2e4ea4046f125e1d6fdfe8083327c436751b6b35c8b6576992ed0eeda6f4"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
-      "sha256": "1778a5dff20e5d6dc67388fa8954739724afff9aee8aa3823df452c2085aae1a"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/RomeBlueCitySpawn.cs",
-      "sha256": "08bf217728708c0d64e04a128b7b068c98e981e3bed24b355c08f4e5a92e6ffd"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs",
-      "sha256": "c6c11ca9b3e5b0f6077899f7ac9cf50d402158d13ae472c8d91a147affeaab16"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ThrakOmniGardenSpawn.cs",
-      "sha256": "8617ffccc1553ca9b429cb95079dc0dd83309818532c391630e424e0f1eb4c43"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeySilvertailTransform.cs",
-      "sha256": "a1cf1da66f8703595b2c84369b6a819f1aca37072f48c4944c2c8a299d860d6f"
+      "path": "Tests/Fixtures/Combat/RetiredPopulationCoverage.json",
+      "sha256": "cf20612078047b8dc90146c9b741eecf42f92181b0c59b7f9e54fd6a6f48504e"
     }
   ],
   "corpusSearch": {
@@ -41196,6 +41066,44 @@
       "tools-temp/AOSharpLiveCapture/bin/Debug/captures/20260814-015856"
     ]
   },
+  "currentNewEngineContent": {
+    "authoredNpcDefinitionCount": 23,
+    "authoredPlayfields": [
+      0,
+      127,
+      4676,
+      4677,
+      6553,
+      7010
+    ],
+    "historicalRosterIsCurrentPopulation": false,
+    "inputs": [
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/GameData/WorldContent.json",
+        "sha256": "b72800318c278094cde506444acc82106ac6a7b8b24fb03055e627cbc06d9791"
+      },
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/GameData/MobTemplates.json",
+        "sha256": "52056fb5c528a513324db66e86c51a51ef386d0fdc667e40c0cbf0a900844eed"
+      },
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/GameData/NpcFamilyStatTemplates.json",
+        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+      },
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/GameData/NpcStatTemplateOverlays.json",
+        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+      }
+    ],
+    "privateHashCatalogPopulationEvaluated": false,
+    "runtimeActivationPermissionFromEvidence": false,
+    "runtimeReadinessClaim": "none; parser/registration behavior is covered by NewEngine runtime tests",
+    "scope": "repository editable authored content; private deployment hash catalogs and extracted playfield population are not inferred"
+  },
   "fixedDenominatorExclusions": [
     "53 ICC HQ Social actors",
     "82 Arete Landing Social actors",
@@ -41207,7 +41115,16 @@
     "attack-immune Lolly the Crazed"
   ],
   "generator": "tools-temp/AOSharpCaptureAnalyzer/generate_capture_backed_npc_active_coverage.py",
-  "iccShuttleportEntryGovernance": {
+  "historicalEvidence": {
+    "classificationMeaning": "accepted historical capture evidence; no current spawn or gameplay readiness assertion",
+    "currentPopulation": false,
+    "immutable": true,
+    "path": "Tests/Fixtures/Combat/RetiredPopulationCoverage.json",
+    "runtimeActivationPermission": false,
+    "sha256": "cf20612078047b8dc90146c9b741eecf42f92181b0c59b7f9e54fd6a6f48504e",
+    "sourceCommit": "c5af4ac18a1378dc41c37d31b9ac62ac46c5f8a0"
+  },
+  "historicalIccShuttleportEntryGovernance": {
     "acceptedEntries": 11,
     "activeEvidenceEntries": 24,
     "blockedUnauditedEntries": 0,
@@ -41425,6 +41342,149 @@
     ],
     "playfield": 4582,
     "source": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs"
+  },
+  "historicalResolverAudits": {
+    "pf127OrdinaryProfileResolverAudit": {
+      "automaticAggressionPolicyPromotionAllowed": false,
+      "automaticCombatActivationPromotionAllowed": false,
+      "crossPlayfieldFallbackAllowed": false,
+      "exactRetaliationEligibilitySourceBindingCount": 34,
+      "exactSupportedProfileSelectors": [
+        "subway.supported.17720",
+        "subway.supported.203734"
+      ],
+      "owners": [
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
+          "requiredMarkers": [
+            "internal CapturedEnemyCombatContract WithCaptureProvenRetaliationEligibility("
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
+          "requiredMarkers": [
+            "internal static CapturedEnemyCombatContract ForOrdinary(",
+            "ForOrdinarySelectedAtomicGeneration("
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
+          "requiredMarkers": [
+            "TryResolveProductionOwnedNaturalAttackProfile(",
+            "TryResolveCaptureProvenEquippedWeaponArchetype("
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
+          "requiredMarkers": [
+            "internal static class CapturedSubwayRetaliationEligibilityResolver",
+            "private static readonly Dictionary<int, CapturedSubwayRetaliationBinding> Bindings",
+            "CapturedEnemyCombatProfileCatalog.TryResolve("
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCatalog.cs",
+          "requiredMarkers": [
+            "private static void BuildCapturedOrdinaryRows(",
+            "CapturedSubwayCombatCatalog.ForOrdinary(",
+            "sourceVariantContractResolver"
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
+          "requiredMarkers": [
+            "CapturedEnemyCombatContract combatContract = ResolveCombatContractForSpawn(",
+            "CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(",
+            "CapturedEnemyCombatRuntime.Prepare("
+          ]
+        }
+      ],
+      "profileSelectorPrefix": "subway.ordinary.",
+      "promotedCapability": "combat-contract ownership plus exact source-bound retaliation eligibility for supported selectors",
+      "requiresEveryConcreteRuntimeVariantToResolveFinalCombatReady": true,
+      "requiresEveryConcreteRuntimeVariantToResolveRetaliationEligible": true,
+      "requiresExactConfiguredRuntimeSourceIdentity": true,
+      "resolutionMode": "production-owned-exact-pf127-ordinary-profile-resolver",
+      "retaliationEligibilityPromotionAllowed": true,
+      "runtimePlayfieldOrResource": 127,
+      "surface": "subway-ordinary"
+    },
+    "pf1931CaptureContractResolverAudit": {
+      "automaticAggressionPolicyPromotionAllowed": false,
+      "automaticCombatActivationPromotionAllowed": false,
+      "capturedRuntimeIdentityMappingAllowed": false,
+      "crossPlayfieldFallbackAllowed": false,
+      "namedSurface": "temple-named-encounters",
+      "ordinaryProfileSelector": "totw.ordinary.deathless-legionnaire.42981",
+      "ownedAddSurface": "temple-reanimated-corpse-adds",
+      "owners": [
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
+          "requiredMarkers": [
+            "internal static CapturedEnemyCombatContract ForOrdinary(",
+            "ForOrdinarySelectedAtomicGeneration(",
+            "CapturedEnemyCombatProfileCatalog.TryResolve("
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
+          "requiredMarkers": [
+            "TryResolveCaptureProvenEquippedWeaponArchetype(",
+            "TryResolveProductionOwnedNaturalAttackProfile("
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
+          "requiredMarkers": [
+            "internal static CapturedEnemyCombatContract DefenderOfTheThree()",
+            "internal static CapturedEnemyCombatContract UkleshTheFrozen()",
+            "internal static CapturedEnemyCombatContract AzturTheImmortal()",
+            "internal static CapturedEnemyCombatContract ReanimatedCorpse(int captureSourceIdentity)"
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
+          "requiredMarkers": [
+            "BuildDeathlessLegionnaireSpawns()",
+            "DeathlessLegionnaireProfileKey",
+            "OrdinaryEnemyDamageSource.WeaponRoll"
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
+          "requiredMarkers": [
+            "CapturedTempleOfThreeWindsCombatCatalog.DefenderOfTheThree()",
+            "CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal()",
+            "CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(",
+            "CapturedEnemyCombatRuntime.Prepare("
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
+          "requiredMarkers": [
+            "DefenderProfileKey = \"totw.647.boss.defender-of-the-three\"",
+            "AzturProfileKey = \"totw.1931.boss.aztur-the-immortal\""
+          ]
+        },
+        {
+          "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
+          "requiredMarkers": [
+            "ResolveCombatContractForSpawn(",
+            "CapturedEnemyCombatRuntime.Prepare("
+          ]
+        }
+      ],
+      "resolutionMode": "production-owned-exact-pf1931-capture-contract",
+      "runtimePlayfieldOrResource": 1931
+    }
+  },
+  "iccShuttleportEntryGovernance": {
+    "acceptedEntries": 0,
+    "activeEvidenceEntries": 0,
+    "blockedUnauditedEntries": 0,
+    "entries": [],
+    "playfield": 4582,
+    "scope": "retired evidence allowlist; current spawn activation uses editable content"
   },
   "migrationSummary": {
     "captureCertifiedCorpusProfileCount": 260,
@@ -58359,146 +58419,15 @@
     ],
     "recoverableRuntimeBindingBlockers": []
   },
-  "pf127OrdinaryProfileResolverAudit": {
-    "automaticAggressionPolicyPromotionAllowed": false,
-    "automaticCombatActivationPromotionAllowed": false,
-    "crossPlayfieldFallbackAllowed": false,
-    "exactRetaliationEligibilitySourceBindingCount": 34,
-    "exactSupportedProfileSelectors": [
-      "subway.supported.17720",
-      "subway.supported.203734"
-    ],
-    "owners": [
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.Data.cs",
-        "requiredMarkers": [
-          "internal CapturedEnemyCombatContract WithCaptureProvenRetaliationEligibility("
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-        "requiredMarkers": [
-          "internal static CapturedEnemyCombatContract ForOrdinary(",
-          "ForOrdinarySelectedAtomicGeneration("
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
-        "requiredMarkers": [
-          "TryResolveProductionOwnedNaturalAttackProfile(",
-          "TryResolveCaptureProvenEquippedWeaponArchetype("
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
-        "requiredMarkers": [
-          "internal static class CapturedSubwayRetaliationEligibilityResolver",
-          "private static readonly Dictionary<int, CapturedSubwayRetaliationBinding> Bindings",
-          "CapturedEnemyCombatProfileCatalog.TryResolve("
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyCatalog.cs",
-        "requiredMarkers": [
-          "private static void BuildCapturedOrdinaryRows(",
-          "CapturedSubwayCombatCatalog.ForOrdinary(",
-          "sourceVariantContractResolver"
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
-        "requiredMarkers": [
-          "CapturedEnemyCombatContract combatContract = ResolveCombatContractForSpawn(",
-          "CapturedSubwayRetaliationEligibilityResolver.TryResolveExact(",
-          "CapturedEnemyCombatRuntime.Prepare("
-        ]
-      }
-    ],
-    "profileSelectorPrefix": "subway.ordinary.",
-    "promotedCapability": "combat-contract ownership plus exact source-bound retaliation eligibility for supported selectors",
-    "requiresEveryConcreteRuntimeVariantToResolveFinalCombatReady": true,
-    "requiresEveryConcreteRuntimeVariantToResolveRetaliationEligible": true,
-    "requiresExactConfiguredRuntimeSourceIdentity": true,
-    "resolutionMode": "production-owned-exact-pf127-ordinary-profile-resolver",
-    "retaliationEligibilityPromotionAllowed": true,
-    "runtimePlayfieldOrResource": 127,
-    "surface": "subway-ordinary"
-  },
-  "pf1931CaptureContractResolverAudit": {
-    "automaticAggressionPolicyPromotionAllowed": false,
-    "automaticCombatActivationPromotionAllowed": false,
-    "capturedRuntimeIdentityMappingAllowed": false,
-    "crossPlayfieldFallbackAllowed": false,
-    "namedSurface": "temple-named-encounters",
-    "ordinaryProfileSelector": "totw.ordinary.deathless-legionnaire.42981",
-    "ownedAddSurface": "temple-reanimated-corpse-adds",
-    "owners": [
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatContract.cs",
-        "requiredMarkers": [
-          "internal static CapturedEnemyCombatContract ForOrdinary(",
-          "ForOrdinarySelectedAtomicGeneration(",
-          "CapturedEnemyCombatProfileCatalog.TryResolve("
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedEnemyCombatProfileCatalog.cs",
-        "requiredMarkers": [
-          "TryResolveCaptureProvenEquippedWeaponArchetype(",
-          "TryResolveProductionOwnedNaturalAttackProfile("
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
-        "requiredMarkers": [
-          "internal static CapturedEnemyCombatContract DefenderOfTheThree()",
-          "internal static CapturedEnemyCombatContract UkleshTheFrozen()",
-          "internal static CapturedEnemyCombatContract AzturTheImmortal()",
-          "internal static CapturedEnemyCombatContract ReanimatedCorpse(int captureSourceIdentity)"
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
-        "requiredMarkers": [
-          "BuildDeathlessLegionnaireSpawns()",
-          "DeathlessLegionnaireProfileKey",
-          "OrdinaryEnemyDamageSource.WeaponRoll"
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
-        "requiredMarkers": [
-          "CapturedTempleOfThreeWindsCombatCatalog.DefenderOfTheThree()",
-          "CapturedTempleOfThreeWindsCombatCatalog.AzturTheImmortal()",
-          "CapturedTempleOfThreeWindsCombatCatalog.ReanimatedCorpse(",
-          "CapturedEnemyCombatRuntime.Prepare("
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsLootDefinitions.cs",
-        "requiredMarkers": [
-          "DefenderProfileKey = \"totw.647.boss.defender-of-the-three\"",
-          "AzturProfileKey = \"totw.1931.boss.aztur-the-immortal\""
-        ]
-      },
-      {
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
-        "requiredMarkers": [
-          "ResolveCombatContractForSpawn(",
-          "CapturedEnemyCombatRuntime.Prepare("
-        ]
-      }
-    ],
-    "resolutionMode": "production-owned-exact-pf1931-capture-contract",
-    "runtimePlayfieldOrResource": 1931
-  },
   "populationContract": {
     "actualInitialActorCount": 1565,
     "configuredMaximumActorCount": 1567,
+    "currentRuntimePopulationClaim": false,
     "cursedSilvertail": "a dynamic replacement for one of five Dreaming Silvertails and does not increase the Nascence Life count",
     "dynamicMissionMobs": "excluded from the fixed denominator because their count and identity are mission-instance data",
     "expectedInitialActorCount": 1565,
-    "maximumExplanation": "two Infector slots arm only after Abmouth combat and are not initial actors"
+    "maximumExplanation": "two Infector slots arm only after Abmouth combat and are not initial actors",
+    "scope": "retired Legacy historical roster only"
   },
   "profiles": [
     {
@@ -226043,284 +225972,82 @@
     }
   ],
   "runtimePrepareAudit": {
-    "acceptedCoverageEntryPointCount": 23,
-    "activeEvidenceEntryPointCount": 1,
+    "auditStrength": "source-contract presence and content hashes; not runtime reachability or gameplay acceptance",
     "entries": [
       {
-        "auditKind": "non-denominator-audit",
-        "auditReferences": [
-          "dynamic-mission-mobs"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Missions/MissionInstanceMobCombat.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          26
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs",
+        "sha256": "2f9cbe4c2d07d7d7798d661c7515e4a4ab6ece601d487f1595304519c49e9780"
       },
       {
-        "auditKind": "non-denominator-audit",
-        "auditReferences": [
-          "captured-dialogue-trade-npcs"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          281
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/WorldContentCatalog.cs",
+        "sha256": "085e3f4a600ad27b06e9cd53b9ed1a33a3710c7d433ea4f58190c0727f1c2d44"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-family"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AlexAreaMobRuntime.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          520
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/WorldNpcFactory.cs",
+        "sha256": "67f689a803133fe9c46157f402338cd260193ac2a758a594dc94e60aaa2df7f3"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-additional-captured-actors"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteFinishCaptureMobRuntime.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          154
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+        "sha256": "d6d8dfcc9b3d2bd1b1cb2b77682def2db48ddba3bf34b1126b2c149186f15762"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-additional-captured-actors"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteIccPeacekeeperPatrolRuntime.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          115
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnContentValidation.cs",
+        "sha256": "c559b8419017b9d702b3fc58b49caa45894f323132c559043e26a17c28d71a06"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-additional-captured-actors"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/AreteRoboticGuardDogRuntime.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          132
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+        "sha256": "9ffe1aa9232100bcb84125514813c094d084351c0327747811a9c399b0d93e3d"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-family"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteRobotSpawnOrchestrator.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          185
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatData.cs",
+        "sha256": "dc5267a37982682ee88ab96606257a20e0ee49383677bf25fa5ce8b63d4577c2"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "subway-initial-encounters"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayEncounterRuntimeService.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          983
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatSequenceData.cs",
+        "sha256": "37e19837960f3d8f85899377ff0a4f20a95569566d7d7d82a19c78e6160eda2d"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "subway-merchants"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedSubwayVendorRuntimeService.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          178
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatContract.Data.cs",
+        "sha256": "42c7e8c9cb892174c787b73608370f0da90aeab057680cb712c106c5c8757335"
       },
       {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "temple-named-encounters",
-          "temple-reanimated-corpse-adds"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedTempleOfThreeWindsEncounterRuntimeService.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          1759
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileData.cs",
+        "sha256": "1746f3da33fee95efd635a237eb9a941cb959aa47b45144b162dae2b5f96c242"
       },
       {
-        "auditKind": "non-denominator-audit",
-        "auditReferences": [
-          "elysium-east-captured-population"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ElysiumEastMobRuntime.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          3466
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileMatching.cs",
+        "sha256": "54699141f7020af8c3ae18b93e8cf47c2b362ab0dfc9a53f1e84fb850fa7ba98"
       },
       {
-        "auditKind": "active-evidence",
-        "auditReferences": [
-          "icc-shuttleport-entry-governance"
-        ],
-        "governanceState": "ACTIVE_EVIDENCE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/IccShuttleportSpawn.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          754
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs",
+        "sha256": "0dbb0fcf85f13e50936795a090bc02c5c893841511ea0f82dc07d38f7d05aacb"
       },
       {
-        "auditKind": "non-denominator-audit",
-        "auditReferences": [
-          "cleaning-robots"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/JunkyardCleaningRobotRuntime.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          218
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-family"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/LoreleiOasisMobRuntime.cs",
-        "prepareCallCount": 2,
-        "prepareCallSourceLines": [
-          629,
-          682
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "arete-family"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/MarcusPadAmbientCombat.cs",
-        "prepareCallCount": 2,
-        "prepareCallSourceLines": [
-          268,
-          278
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "nascence-core-hecklers"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceCoreHecklerSpawnOrchestrator.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          247
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "nascence-life"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/NascenceLifeSpawn.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          12296
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "subway-ordinary",
-          "temple-ordinary"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyRuntimeService.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          484
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "rome-blue-city"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/RomeBlueCitySpawn.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          332
-        ]
-      },
-      {
-        "auditKind": "non-denominator-audit",
-        "auditReferences": [
-          "captured-dialogue-trade-npcs"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ScarlettDalquistSpawn.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          146
-        ]
-      },
-      {
-        "auditKind": "fixed-denominator-surfaces",
-        "auditReferences": [
-          "thrak-omni-garden"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Playfields/ThrakOmniGardenSpawn.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          297
-        ]
-      },
-      {
-        "auditKind": "non-denominator-audit",
-        "auditReferences": [
-          "scripted-hostiles"
-        ],
-        "governanceState": "ACCEPTED_COVERAGE",
-        "path": "AORebirth/Server/ZoneEngine/Core/Thrak/Quests/ThrakGardenKeySilvertailTransform.cs",
-        "prepareCallCount": 1,
-        "prepareCallSourceLines": [
-          166
-        ]
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs",
+        "sha256": "119e2e4ea4046f125e1d6fdfe8083327c436751b6b35c8b6576992ed0eeda6f4"
       }
     ],
-    "entryPointCount": 24,
-    "entryPointFileCount": 22,
-    "prepareCallPattern": "\\bCapturedEnemyCombatRuntime\\s*\\.\\s*Prepare\\s*\\(",
-    "productionRoot": "AORebirth/Server/ZoneEngine/Core"
+    "entryPointCount": 6,
+    "entryPointFileCount": 13,
+    "evidenceBasedActivation": false,
+    "legacyRuntimeRetired": true,
+    "productionRoot": "AORebirth/Server/ZoneEngine_New"
   },
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "scope": "historical capture classification plus independent current NewEngine content-consumer audit",
   "surfaces": [
     {
       "actorCount": 322,

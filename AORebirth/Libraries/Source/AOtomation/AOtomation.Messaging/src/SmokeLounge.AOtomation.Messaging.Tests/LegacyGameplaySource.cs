@@ -6,14 +6,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System.Linq;
 
     /// <summary>
-    /// Physical partial extraction does not change a source contract's logical ownership.
-    /// Read every compiled fragment; do not weaken existing packet/evidence assertions.
+    /// Reads retained historical fixtures with their shared compiled fragments.
+    /// Removed Legacy orchestration is deliberately not reconstructed.
     /// </summary>
     internal static class LegacyGameplaySource
     {
         static readonly Dictionary<string, string[]> Fragments = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
-            { "CapturedEnemyCombatContract.cs", new[] { "CapturedEnemyCombatData.cs", "CapturedEnemyCombatSequenceData.cs", "CapturedEnemyCombatContract.Data.cs" } },
             { "CapturedEnemyCombatProfileCatalog.cs", new[] { "CapturedEnemyCombatProfileData.cs", "CapturedEnemyCombatProfileMatching.cs" } },
             { "CapturedEnemyCombatPacketFactory.cs", new[] { "CapturedEnemyCombatPacketFactory.Data.cs" } },
             { "OrdinaryEnemyCombatSetupGenerator.cs", new[] { "OrdinaryEnemyCombatSetupGenerator.Data.cs" } },
@@ -27,7 +26,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             if (Fragments.TryGetValue(Path.GetFileName(path), out fragments))
             {
                 foreach (string fragment in fragments)
-                    source += Environment.NewLine + File.ReadAllText(Path.Combine(Path.GetDirectoryName(path), fragment));
+                    source += Environment.NewLine + File.ReadAllText(ResolveFragment(path, fragment));
             }
             return source;
         }
@@ -38,9 +37,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 string file = Path.GetFileName(path);
                 foreach (KeyValuePair<string, string[]> owner in Fragments)
-                    if (owner.Value.Contains(file)) return Path.Combine(Path.GetDirectoryName(path), owner.Key);
+                    if (owner.Value.Contains(file)) return ResolveFragment(path, owner.Key);
                 return path;
             }).Distinct(StringComparer.Ordinal).ToArray();
+        }
+
+        internal static string ResolveFragment(string ownerPath, string fileName)
+        {
+            string sibling = Path.Combine(Path.GetDirectoryName(ownerPath), fileName);
+            if (File.Exists(sibling)) return sibling;
+            string root = TestRepositoryRootResolver.FindFromCallerFilePath();
+            foreach (string relative in new[]
+            {
+                "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat",
+                "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions",
+                "Tests/Fixtures/Gameplay/Playfields",
+                "Tests/Fixtures/Gameplay/Packets"
+            })
+            {
+                string candidate = Path.Combine(root, relative.Replace('/', Path.DirectorySeparatorChar), fileName);
+                if (File.Exists(candidate)) return candidate;
+            }
+            throw new FileNotFoundException("Retained gameplay fixture fragment is missing", fileName);
         }
     }
 }

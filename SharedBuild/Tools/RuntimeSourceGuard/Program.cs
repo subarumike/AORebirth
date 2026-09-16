@@ -14,7 +14,8 @@ internal static class Program
             if (index < 0 || index + 1 >= args.Length) throw new ArgumentException("Missing repository root");
             string root = Path.GetFullPath(args[index + 1]);
             string launcher = File.ReadAllText(Path.Combine(root, "start-engines.ps1"));
-            Require(launcher.Contains("ZoneEngine_New") && launcher.Contains("LegacyZoneEngine"), "Windows engine selection is missing");
+            Require(launcher.Contains("ZoneEngine_New") && !launcher.Contains("File = \"ZoneEngine.exe\""), "Windows must select only ZoneEngine_New");
+            Require(!File.Exists(Path.Combine(root, "AORebirth/Server/ZoneEngine/ZoneEngine.csproj")), "Retired Legacy engine project must not return");
             foreach (string project in new[] { Project,
                 "AORebirth/Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj",
                 "AORebirth/Libraries/Source/AORebirth.World.Package/AORebirth.World.Package.csproj" })

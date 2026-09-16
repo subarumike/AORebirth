@@ -68,12 +68,6 @@
     {
       "legacyProject": "AORebirth/Server/LoginEngine/LoginEngine.csproj",
       "output": "SharedBuild/source-inventory/LoginEngine.CompileItems.props"
-    },
-    {
-      "legacyProject": "AORebirth/Server/ZoneEngine/ZoneEngine.csproj",
-      "output": "SharedBuild/source-inventory/ZoneEngine.CompileItems.props",
-      "contentOutput": "SharedBuild/source-inventory/ZoneEngine.ContentItems.props",
-      "runtimeCopyOutput": "SharedBuild/source-inventory/ZoneEngine.RuntimeCopyItems.props"
     }
   ]
 }

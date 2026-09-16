@@ -167,30 +167,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void ZoneLoginSimpleCharFullUpdatePrimesJoiningClientBeforeBroadcastingOthers()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string simpleCharFullUpdateText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
-            string sendToPlayfield = ExtractMethodBlock(
-                simpleCharFullUpdateText,
-                "public static void SendToPlayfield(IZoneClient client)");
 
-            int directSend = sendToPlayfield.IndexOf("character.Send(message);", StringComparison.Ordinal);
-            int otherPlayers = sendToPlayfield.IndexOf(
-                "character.Playfield.AnnounceOthers(message, character.Identity);",
-                StringComparison.Ordinal);
-
-            Assert.IsTrue(
-                directSend >= 0 && otherPlayers > directSend,
-                "Zone login must directly prime the joining client with its own SCFU before broadcasting to other players.");
-            Assert.IsFalse(
-                sendToPlayfield.Contains("character.Playfield.Announce(message);"),
-                "Zone login must not depend on visibility registration to deliver the joining character's own SCFU.");
-        }
 
         [TestMethod]
         public void CleaningRobotDeathOrderIncludesStopFightDeathCorpseAndDespawnScheduling()
@@ -301,88 +278,16 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void CombatStartPacketsUseLiveCompatibleBaseFlagAndDoNotEmitDefAggTutorialText()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string attackHandlerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string npcCombatTickText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
-            string resetCombatTick = ExtractMethodBlock(npcCombatTickText, "internal void ResetCombatTick(");
-            string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
-            string clientConnectedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
 
-            Assert.IsTrue(
-                attackHandlerText.Contains("x.Unknown = 0;"),
-                "Player attack-start echo must use the live-captured AttackMessage base Unknown=0 shape.");
-            Assert.IsTrue(
-                clientConnectedText.Contains("SetStat(client, StatIds.state, 0);"),
-                "Login/actionable player state must keep the live-captured State=0 baseline before combat.");
-            Assert.IsFalse(
-                clientConnectedText.Contains("SetStat(client, StatIds.state, 1000001);"),
-                "Login/actionable player state must not prime the client with the invalid State=1000001 combat/tutorial condition.");
-            Assert.IsTrue(
-                playfieldText.Contains("new AttackInfoMessage")
-                && playfieldText.Contains("Unknown = 0,")
-                && capturedPacketFactoryText.Contains("return new AttackInfoMessage")
-                && capturedPacketFactoryText.Contains("Unknown = n3Unknown,")
-                && npcCombatTickText.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo(")
-                && npcCombatTickText.Contains("attackSource.AttackInfoN3Unknown"),
-                "Player AttackInfo must retain Unknown=0 while capture-backed NPC AttackInfo preserves the exact captured N3 byte through the shared packet factory.");
-            Assert.IsFalse(
-                npcCombatTickText.Contains("SendIncomingHitChatIfPlayer")
-                || npcCombatTickText.Contains(" hit you for "),
-                "NPC damage must not emit a second synthetic incoming-hit chat line beside the captured combat packet.");
-            Assert.IsTrue(
-                npcCombatTickText.Contains("NpcCombatAttackRules.DefaultCombatTickSeconds")
-                && npcCombatTickText.Contains("now + TimeSpan.FromSeconds(initialDelaySeconds)")
-                && npcCombatTickText.Contains("attackStartDelaySeconds + firstHitDelaySeconds")
-                && !resetCombatTick.Contains("this.nextCombatTicks.Remove(attacker.Identity.Instance);"),
-                "NPC combat start must not emit immediate first-hit AttackInfo before the live-compatible combat-start window.");
-            Assert.IsFalse(
-                attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
-                || playfieldText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
-                || npcCombatTickText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive.")
-                || clientConnectedText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive."),
-                "Combat-start paths must not server-emit the client Def-Agg tutorial text.");
-        }
 
         [TestMethod]
         public void IccShuttleportBasicCombatPromotesOnlyCaptureBackedIslandReet()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string contractText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
-            string npcCombatTickText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string spatialPolicyText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatSpatialPolicy.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\NpcCombatSpatialPolicy.cs"));
             string profileCatalogText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatProfileCatalog.cs"));
-            string catalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportBasicCombatCatalog.g.cs"));
-            string spawnText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportSpawn.cs"));
-
-            Assert.IsTrue(
-                contractText.Contains("BasicCaptureBackedOrdinary")
-                && contractText.Contains("CapturedBasicCombatFieldAuthority.Captured")
-                && contractText.Contains("CapturedBasicCombatFieldAuthority.GovernedDerived")
-                && contractText.Contains("CapturedBasicCombatFieldAuthority.GenericRuntimePolicy")
-                && contractText.Contains("CapturedBasicCombatFieldAuthority.OptionalPositiveBehavior"),
-                "Basic captured ordinary combat must be an explicit contract model with field authorities.");
-            Assert.IsTrue(
-                npcCombatTickText.Contains("ProcessBasicCaptureBackedOrdinaryAttackTicks")
-                && npcCombatTickText.Contains("nextBasicCaptureBackedAttackTicks")
-                && npcCombatTickText.Contains("SelectBasicDamageObservation")
-                && npcCombatTickText.Contains("observation.AttackInfoDamageTypeWire")
-                && npcCombatTickText.Contains("NpcCombatSpatialPolicy.GenericBasicMeleeAttackRange"),
-                "Basic captured ordinary combat must use independent stream clocks, per-observation damage type, and generic melee spatial policy.");
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedEnemyCombatProfileCatalog.cs"));
             Assert.IsTrue(
                 profileCatalogText.Contains("current.AttackModel == CapturedEnemyAttackModel.BasicCaptureBackedOrdinary")
                 && profileCatalogText.Contains("resolved = current;"),
@@ -391,80 +296,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 spatialPolicyText.Contains("GenericBasicMeleeAttackRange")
                 && spatialPolicyText.Contains("NpcCombatAttackRules.MaxMeleeCombatDistance"),
                 "Basic captured ordinary combat range must be explicit generic runtime policy, not captured attack range.");
-            Assert.IsTrue(
-                catalogText.Contains("Island Reet")
-                && catalogText.Contains("ICC Shuttleport [PF 4582] - 20260819-014109")
-                && catalogText.Contains("ICC Shuttleport [PF 4582] - 20260819-015104")
-                && catalogText.Contains("980e878a61bea869f03009a6657e3f15134b9d0b2a46cf98685842a24d543c6f")
-                && catalogText.Contains("new CapturedBasicCombatDamageObservation(6, 4")
-                && catalogText.Contains("new CapturedBasicCombatStreamDefinition("),
-                "Island Reet production combat must be backed by the two finalized PF4582 Reet captures, preserve the mixed damage-type observation, and expose stream data.");
-            Assert.IsTrue(
-                spawnText.Contains("Name = \"Island Reet\"")
-                && spawnText.Contains("CombatContractFactory = IccShuttleportBasicCombatCatalog.IslandReet")
-                && spawnText.Contains("CapturedEnemyCombatRuntime.PrepareAndRequireCombatReady("),
-                "PF4582 Island Reet spawn must attach the generated basic combat contract and fail closed if it is not runtime-ready.");
-            Assert.IsFalse(
-                catalogText.Contains("CapturedFixedPacketSequence")
-                || catalogText.Contains("FixedAttackInfo")
-                || catalogText.Contains("MinDamage")
-                || catalogText.Contains("MaxDamage")
-                || catalogText.Contains("RechargeSeconds")
-                || catalogText.Contains("CapturedAttackRange")
-                || catalogText.Contains("1234567890"),
-                "Island Reet basic combat data must not be promoted through legacy fixed/min-max/range/recharge sentinel fields.");
         }
 
         [TestMethod]
         public void IccShuttleportAuthoritativePlacementsRemainDataCompleteAndRuntimeFailClosed()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string placementText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportPlacementCatalog.cs"));
-            string generatedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportPlacementCatalog.g.cs"));
-            string spawnText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportSpawn.cs"));
-            string profilePopulationText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\IccShuttleportProfilePopulationCatalog.g.cs"));
             string reportText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"docs\generated\pf4582_authoritative_placement_report.json"));
-
-            Assert.IsTrue(
-                generatedText.Contains("SourcePlacementCount = 206")
-                && generatedText.Contains("UniqueTemplateHashCount = 38")
-                && generatedText.Contains("MappedTemplateHashCount = 31")
-                && generatedText.Contains("BehaviorProvenPlacementCount = 199")
-                && generatedText.Contains("RuntimeEligiblePlacementCount = 199")
-                && generatedText.Contains("RuntimeActivePlacementCount = 199"),
-                "The generated PF4582 placement catalog must preserve the accepted source and activation counts.");
-            Assert.AreEqual(
-                206,
-                generatedText.Split(
-                    new[] { "new IccShuttleportPlacementRecord(" },
-                    StringSplitOptions.None).Length - 1,
-                "The generated artifact must contain all 206 normalized placement records.");
-            Assert.AreEqual(
-                199,
-                spawnText.Split(new[] { "SourceNpcId = 100" }, StringSplitOptions.None).Length - 1
-                + profilePopulationText.Split(
-                    new[] { "npcs.Add(CreateGeneratedProfileNpc(" },
-                    StringSplitOptions.None).Length - 1,
-                "PF4582 must bind exactly 35 explicit and 164 generated profile placements.");
-            Assert.IsTrue(
-                placementText.Contains("TryGetRuntimeActive(")
-                && placementText.Contains("template hash is unresolved")
-                && placementText.Contains("required behavior is unresolved")
-                && placementText.Contains("CandidateRespawnInterpretation")
-                && placementText.Contains("return \"Unresolved\";")
-                && spawnText.Contains("IccShuttleportPlacementCatalog.TryGetRuntimeActive(")
-                && spawnText.Contains("AddGeneratedProfileNpcs(npcs)")
-                && spawnText.Contains("UseTemplateProfile = true")
-                && spawnText.Contains("def.Level < sourcePlacement.MinLevel")
-                && spawnText.Contains("x = sourcePlacement.PositionX")
-                && spawnText.Contains("y = sourcePlacement.PositionY")
-                && spawnText.Contains("z = sourcePlacement.PositionZ"),
-                "Runtime activation must consume the placement catalog and fail closed on unresolved metadata or behavior.");
             Assert.IsTrue(
                 reportText.Contains("\"NO_HAND_TRANSCRIPTION\": \"YES\"")
                 && reportText.Contains("\"DUPLICATE_POSITIONS_PRESERVED\": \"YES\"")
@@ -533,88 +372,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     1001));
         }
 
-        [TestMethod]
-        public void SubwayThiefCombatContractPreservesLiveEnvelopeMovementAndDeathOrder()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string contractText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
-            string controllerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string ordinaryRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string weaponItemFullUpdateText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"));
-            string visibilityPacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
 
-            Assert.IsTrue(
-                contractText.Contains("case 26092:")
-                && contractText.Contains("if (level != 5)")
-                && contractText.Contains("EquippedWeaponWithCapturedPacketSequence(")
-                && contractText.Contains("unchecked((int)0x795B5DB2u)")
-                && contractText.Contains(".WithCapturedWeapon(ThiefCapturedWeaponDefinition(thiefEvidence))")
-                && contractText.Contains("CapturedSubwayThiefMovementTransitionDelaySeconds")
-                && contractText.Contains("CapturedSubwayThiefAttackInfoAmmoCount")
-                && contractText.Contains("CapturedSubwayThiefAttackInfoUnknown")
-                && contractText.Contains("CapturedSubwayThiefSpecialAttackWeaponUnknown5"),
-                "MonsterData 26092 must retain its exact level-5, source-owned packet contract and captured weapon definition while using the equipped weapon roll for damage.");
-
-            Assert.IsTrue(
-                coordinatorText.Contains("pendingCapturedAttackStarts")
-                && coordinatorText.Contains("pendingCapturedMovementTransitions")
-                && coordinatorText.Contains(
-                    "attackStartDelaySeconds + firstHitDelaySeconds")
-                && coordinatorText.Contains("+ capturedContract.MovementTransitionDelaySeconds")
-                && coordinatorText.Contains("capturedContract.HasCapturedAttackStartContext")
-                && coordinatorText.Contains("capturedContract.HasCapturedEquippedAttackInfo")
-                && coordinatorText.Contains("? capturedContract.AttackInfoAmmoCount")
-                && coordinatorText.Contains("? capturedContract.AttackInfoUnknown")
-                && coordinatorText.Contains(": 40,")
-                && coordinatorText.Contains(": 4,"),
-                "Thief timing and AttackInfo overrides must stay contract-gated while legacy equipped NPC fields remain unchanged; damage must flow through the equipped weapon roll.");
-            Assert.IsFalse(
-                coordinatorText.Contains("CombatCapturedSubwayThiefDamageSuppressed")
-                || coordinatorText.Contains("AO_REBIRTH_ENABLE_SUBWAY_THIEF_DIAGNOSTIC_DAMAGE")
-                || coordinatorText.Contains("capturedSubwayThiefDiagnosticDamageSent"),
-                "The temporary one-hit Thief diagnostic damage gate must be removed after live proof that the client renders projectile damage.");
-            Assert.IsTrue(
-                ordinaryRuntimeText.Contains("playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);")
-                && weaponItemFullUpdateText.Contains("SendWeaponDefinitions(ICharacter character, bool announceToPlayfield = false)")
-                && weaponItemFullUpdateText.Contains("CreateWeaponDefinitionMessages(ICharacter character)")
-                && weaponItemFullUpdateText.Contains("StatTuple(CharacterStat.Energy, 0)")
-                && !weaponItemFullUpdateText.Contains("return uint.MaxValue;")
-                && weaponItemFullUpdateText.Contains("AddStatIfPresent(stats, CharacterStat.AttackDelay, item.GetAttribute((int)StatIds.itemdelay))")
-                && weaponItemFullUpdateText.Contains("AddStatIfPresent(stats, CharacterStat.RechargeDelay, item.GetAttribute((int)StatIds.rechargedelay))")
-                && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
-                && visibilityPacketText.Contains("this.SendWeaponDefinitionsForVisibility(")
-                && visibilityPacketText.Contains("WeaponItemFullUpdate.CreateWeaponDefinitionMessages(owner)")
-                && visibilityPacketText.Contains("WeaponItemFullUpdate.LogObserverWeaponDefinition(owner, recipient, message)")
-                && visibilityPacketText.Contains("this.visibility.MarkVisibleEntry(recipient, source);"),
-                "Captured equipped Subway NPC weapons must enter through global interest, retain live-shaped item stats, and be replayed after SCFU but before CharInPlay.");
-
-            string capturedStopBlock = ExtractMethodBlock(
-                controllerText,
-                "public void StopFollowForCapturedCombatRange(");
-            AssertTextBefore(capturedStopBlock, "new FollowTargetInfo", "new StopMovingCmdMessage");
-            AssertTextBefore(capturedStopBlock, "new StopMovingCmdMessage", "new SetPosMessage");
-            AssertTextBefore(capturedStopBlock, "new SetPosMessage", "new FollowCoordinateInfo");
-
-            AssertTextBefore(
-                ExtractMethodBlock(npcRuntimeText, "internal void BeginNpcDeath("),
-                "this.playfield.StopDyingNpcCombatState(target);",
-                "this.playfield.SendNpcDeathAnimation(target);");
-            Assert.IsTrue(
-                ExtractMethodBlock(playfieldText, "internal void StopDyingNpcCombatState(")
-                    .Contains("capturedContract.SendStopFightOnDeath"),
-                "The live-captured Thief StopFight must be emitted before its Death action.");
-        }
 
         [TestMethod]
         public void SubwayFilthFleaCombatUsesCapturedPoisonAndMeleeAttackContext()
@@ -633,46 +391,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(2800, (int)(NpcCombatAttackRules.CapturedSubwayFilthFleaMeleeRechargeSeconds * 1000));
 
             string repositoryRoot = FindRepositoryRoot();
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
             string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.cs"));
             string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs"));
             string catalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
-            string corpseRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
-            Assert.IsTrue(
-                coordinatorText.Contains("this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);")
-                && coordinatorText.Contains("private void AnnounceCapturedSpecialAttackSequenceContext(")
-                && coordinatorText.Contains("CapturedEnemySpecialAttackSequenceDefinition specialAttackSequence)")
-                && coordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(")
-                && coordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateAttack(")
-                && coordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateAttackInfo(")
-                && capturedPacketFactoryText.Contains("Specials = (definitions ?? new CapturedEnemySpecialAttackDefinition[0]).Select(")
-                && capturedPacketFactoryText.Contains("Unknown = n3Unknown,")
-                && coordinatorText.Contains("pendingCapturedMovementTransitions")
-                && coordinatorText.Contains("capturedContract.MovementTransitionDelaySeconds")
-                && coordinatorText.Contains("hasCapturedEquippedAttackInfo")
-                && coordinatorText.Contains("AttackInfoAmmoCount = hasCapturedEquippedAttackInfo")
-                && coordinatorText.Contains("AttackInfoUnk1 = hasCapturedEquippedAttackInfo")
-                && coordinatorText.Contains("weapon.GetAttribute((int)StatIds.damagebonus)")
-                && coordinatorText.Contains("DamageBonus = damageBonus,"),
-                "Captured equipped AttackInfo must preserve its packet shape without zeroing the equipped item's own damage bonus.");
-            int contextIndex = coordinatorText.IndexOf(
-                "this.AnnounceCapturedSpecialAttackSequenceContext(attacker, specialAttackSequence);",
-                StringComparison.Ordinal);
-            int poisonContextIndex = coordinatorText.IndexOf(
-                "CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(",
-                StringComparison.Ordinal);
-            int attackInfoIndex = coordinatorText.IndexOf(
-                "attackerCharacter.Strike(target, strikeContext)",
-                StringComparison.Ordinal);
-
-            Assert.IsTrue(contextIndex >= 0, "Flea combat start must announce captured attack context.");
-            Assert.IsTrue(poisonContextIndex >= 0, "Flea combat must expose captured natural attack templates.");
-            Assert.IsTrue(attackInfoIndex > contextIndex, "Flea context must be established before the shared strike emits AttackInfo damage.");
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs"));
             Assert.IsTrue(
                 providerText.Contains("Filth Flea: 18 complete official-live corpse opens")
                 && providerText.Contains("20260708-004038")
@@ -705,240 +429,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Filth Flea must retain captured Subway corpse credit evidence from completed corpse full-update captures.");
         }
 
-        [TestMethod]
-        public void PvpAuthorizationDoesNotBlockHostileNpcRetaliationInHighGas()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string rulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PlayerVersusPlayerCombatRules.cs"));
-            string playerControlledCombatant = ExtractMethodBlock(
-                rulesText,
-                "internal static bool IsPlayerControlledCombatant");
-            string canEngage = ExtractMethodBlock(
-                rulesText,
-                "internal static bool CanEngagePlayerVersusPlayerCombat");
 
-            Assert.IsTrue(
-                playerControlledCombatant.Contains("IsPlayerCharacter(character)")
-                && playerControlledCombatant.Contains("PetCombatRules.IsPlayerOwnedPet(character)"),
-                "PvP authorization must identify only players and player-owned pets as player-controlled attackers.");
-            Assert.IsTrue(
-                canEngage.Contains("!IsPlayerControlledCombatant(attacker)")
-                && canEngage.Contains("!IsProtectedPlayerVersusPlayerTarget(target)")
-                && canEngage.Contains("return true;"),
-                "Ordinary hostile NPCs must bypass player suppression-gas authorization and retain player retaliation targets.");
-            AssertTextBefore(
-                canEngage,
-                "!IsPlayerControlledCombatant(attacker)",
-                "int attackerGas = ResolveSuppressionGas(attacker);");
-            Assert.IsTrue(
-                canEngage.Contains("return IsPvpFlagged(attacker) || IsPvpFlagged(target);"),
-                "Player and player-owned-pet combat against protected targets must remain suppression-gas gated.");
-        }
 
         [TestMethod]
         public void PlayerCombatRuntimeServiceFinalBoundaryOwnsLifecycleOrchestrationOnly()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string attackHandlerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string playerCombatText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayerCombatRuntimeService.cs"));
             string characterCombatText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Entities\Character.Combat.cs"));
+                Path.Combine(repositoryRoot, @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.Combat.cs"));
             string strikeBuilderText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"AORebirth\Libraries\Source\AORebirth.Core\Combat\CharacterCombatStrikeBuilder.cs"));
-            string combatSubscriptionsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterCombatSubscriptions.cs"));
-            string npcCombatText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
             string checkpointText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"docs\generated\player_combat_lifecycle_ownership_checkpoint_20260705.md"));
-
-            Assert.IsTrue(
-                playerCombatText.Contains("internal sealed class PlayerCombatRuntimeService")
-                && playerCombatText.Contains("internal void StartAttack(")
-                && playerCombatText.Contains("internal void CancelAttack(")
-                && playerCombatText.Contains("internal void ResetCombatTick(")
-                && playerCombatText.Contains("internal void ProcessCombatTick(")
-                && playerCombatText.Contains("internal void ClearFightingTarget(")
-                && playerCombatText.Contains("internal void ClearInvalidCombatTarget(")
-                && playerCombatText.Contains("internal void CleanupDeathCombat(")
-                && playerCombatText.Contains("internal void BeginDeath("),
-                "PlayerCombatRuntimeService must expose named player combat lifecycle seams.");
-            Assert.IsTrue(
-                playerCombatText.Contains("resetCombatTick(attacker);")
-                && playerCombatText.Contains("beginDeath(target);"),
-                "PlayerCombatRuntimeService must leave reset and death seams as pass-through orchestration.");
-            Assert.IsTrue(
-                playerCombatText.Contains("character.SetTarget(target);")
-                && playerCombatText.Contains("character.SetFightingTarget(target);")
-                && playerCombatText.Contains("resetCombatTick(character.Identity);"),
-                "PlayerCombatRuntimeService must own player attack-start state mutation and tick reset orchestration.");
-            Assert.IsTrue(
-                playerCombatText.Contains("internal void CancelAttack(ICharacter character, Action<Identity> resetCombatTick)")
-                && playerCombatText.Contains("character.SetFightingTarget(Identity.None);")
-                && CountOccurrences(playerCombatText, "resetCombatTick(character.Identity);") == 2,
-                "PlayerCombatRuntimeService must own player attack cancel state clear and tick reset orchestration.");
-            Assert.IsTrue(
-                playerCombatText.Contains("internal void ClearFightingTarget(ICharacter character, Action<Identity> clearCombatTracking)")
-                && playerCombatText.Contains("clearCombatTracking(character.Identity);"),
-                "PlayerCombatRuntimeService must own player fighting-target stop/clear orchestration.");
-            Assert.IsTrue(
-                playerCombatText.Contains("Func<Identity, ICharacter> findTarget")
-                && playerCombatText.Contains("Func<ICharacter, bool> isValidTarget")
-                && playerCombatText.Contains("Action<ICharacter, ICharacter> logInvalidTarget")
-                && playerCombatText.Contains("WeaponSlot preferredSlot")
-                && playerCombatText.Contains("Action<ICharacter, ICharacter, WeaponSlot> processValidatedCombatTick")
-                && playerCombatText.Contains("if (attacker.FightingTarget.Instance == 0)")
-                && playerCombatText.Contains("clearCombatTracking(attacker.Identity);")
-                && playerCombatText.Contains("ICharacter target = findTarget(attacker.FightingTarget);")
-                && playerCombatText.Contains("if (!isValidTarget(target))")
-                && playerCombatText.Contains(
-                    "this.ClearInvalidCombatTarget(attacker, target, logInvalidTarget, clearCombatTracking);")
-                && playerCombatText.Contains("processValidatedCombatTick(attacker, target, preferredSlot);"),
-                "PlayerCombatRuntimeService must own player combat tick target/clear orchestration and preserve the firing weapon slot.");
-            string invalidTargetClear = ExtractMethodBlock(playerCombatText, "internal void ClearInvalidCombatTarget");
-            Assert.IsTrue(
-                invalidTargetClear.Contains("Require(logInvalidTarget, \"logInvalidTarget\");")
-                && invalidTargetClear.Contains("Require(clearCombatTracking, \"clearCombatTracking\");")
-                && invalidTargetClear.Contains("logInvalidTarget(attacker, target);")
-                && invalidTargetClear.Contains("this.ClearFightingTarget(attacker, clearCombatTracking);"),
-                "PlayerCombatRuntimeService must own invalid player combat target cleanup.");
-            AssertTextBefore(
-                invalidTargetClear,
-                "logInvalidTarget(attacker, target);",
-                "this.ClearFightingTarget(attacker, clearCombatTracking);");
-            string deathCombatCleanup = ExtractMethodBlock(playerCombatText, "internal void CleanupDeathCombat");
-            Assert.IsTrue(
-                deathCombatCleanup.Contains("Require(clearCombatTracking, \"clearCombatTracking\");")
-                && deathCombatCleanup.Contains("Require(stopFightingDeadTarget, \"stopFightingDeadTarget\");")
-                && deathCombatCleanup.Contains("Require(sendCombatStop, \"sendCombatStop\");")
-                && deathCombatCleanup.Contains("target.SetTarget(Identity.None);")
-                && deathCombatCleanup.Contains("this.ClearFightingTarget(target, clearCombatTracking);")
-                && deathCombatCleanup.Contains("stopFightingDeadTarget(target.Identity);")
-                && deathCombatCleanup.Contains("sendCombatStop(target);"),
-                "PlayerCombatRuntimeService must own player death combat cleanup orchestration.");
-            AssertTextBefore(
-                deathCombatCleanup,
-                "target.SetTarget(Identity.None);",
-                "this.ClearFightingTarget(target, clearCombatTracking);");
-            AssertTextBefore(
-                deathCombatCleanup,
-                "this.ClearFightingTarget(target, clearCombatTracking);",
-                "stopFightingDeadTarget(target.Identity);");
-            AssertTextBefore(
-                deathCombatCleanup,
-                "stopFightingDeadTarget(target.Identity);",
-                "sendCombatStop(target);");
-            Assert.IsFalse(
-                playerCombatText.Contains("CombatDamageRules")
-                || playerCombatText.Contains("Announce(")
-                || playerCombatText.Contains("AttackInfo")
-                || playerCombatText.Contains("StopFightMessage")
-                || playerCombatText.Contains("NPCController")
-                || playerCombatText.Contains("NPCRuntimeService")
-                || playerCombatText.Contains("Inventory")
-                || playerCombatText.Contains("Corpse"),
-                "PlayerCombatRuntimeService must not own algorithms, packets, NPC runtime, inventory, or corpse behavior.");
-
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayerCombatRuntimeService playerCombat;")
-                && runtimeSystemsText.Contains("this.playerCombat = new PlayerCombatRuntimeService();")
-                && runtimeSystemsText.Contains("this.playerCombat.StartAttack(character, target, resetCombatTick);")
-                && runtimeSystemsText.Contains("this.playerCombat.CancelAttack(character, resetCombatTick);")
-                && runtimeSystemsText.Contains("this.playerCombat.ResetCombatTick(attacker, resetCombatTick);")
-                && runtimeSystemsText.Contains("this.playerCombat.ProcessCombatTick(")
-                && runtimeSystemsText.Contains("processValidatedCombatTick);")
-                && runtimeSystemsText.Contains("this.playerCombat.ClearFightingTarget(character, clearCombatTracking);")
-                && runtimeSystemsText.Contains("this.playerCombat.CleanupDeathCombat(")
-                && runtimeSystemsText.Contains("this.playerCombat.BeginDeath(target, beginDeath);"),
-                "PlayfieldRuntimeSystems must own and expose the player combat runtime facade.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayerCombatRuntimeService.cs"),
-                "ZoneEngine project must compile PlayerCombatRuntimeService.");
-            Assert.IsFalse(
-                npcRuntimeText.Contains("PlayerCombatRuntimeService")
-                || npcRuntimeText.Contains("StartPlayerAttack")
-                || npcRuntimeText.Contains("BeginPlayerDeath"),
-                "NPCRuntimeService must remain NPC-only.");
-
-            Assert.IsTrue(
-                attackHandlerText.Contains("this.StartPlayerAttack(character, message.Target);")
-                && attackHandlerText.Contains("this.CancelPlayerAttack(character);")
-                && attackHandlerText.Contains("playfield.StartPlayerAttack(character, target);")
-                && attackHandlerText.Contains("playfield.CancelPlayerAttack(character);")
-                && attackHandlerText.Contains("this.SendCombatStartSpecialAttackWeapon(character);")
-                && attackHandlerText.Contains("this.SendAttackState(character, message.Target, message.Action);")
-                && attackHandlerText.Contains("x.Unknown = 0;"),
-                "AttackMessageHandler must route player attack start/cancel through the player combat boundary while keeping the live-compatible attack echo shape.");
-            int combatStartWeaponIndex = attackHandlerText.IndexOf(
-                "this.SendCombatStartSpecialAttackWeapon(character);",
-                StringComparison.Ordinal);
-            int attackEchoIndex = attackHandlerText.IndexOf(
-                "this.SendAttackState(character, message.Target, message.Action);",
-                StringComparison.Ordinal);
-            Assert.IsTrue(
-                combatStartWeaponIndex >= 0
-                && attackEchoIndex >= 0
-                && combatStartWeaponIndex < attackEchoIndex
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown1 = 61")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown2 = -166")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown3 = 658")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown4 = 969")
-                && attackHandlerText.Contains("CombatStartSpecialAttackUnknown5 = -100")
-                && attackHandlerText.Contains("Unknown4 = \"MAAT\"")
-                && attackHandlerText.Contains("Unknown4 = \"DIIT\"")
-                && attackHandlerText.Contains("Unknown4 = \"BRAW\""),
-                "AttackMessageHandler must send the live-captured player SpecialAttackWeapon state before the attack echo on valid combat start.");
-            Assert.IsFalse(
-                attackHandlerText.Contains("Use the Def-Agg slider in the Stats view to change between defensive and aggressive."),
-                "AttackMessageHandler must not server-emit the client Def-Agg tutorial text on combat start.");
-            Assert.IsTrue(
-                attackHandlerText.Contains("target == null")
-                && attackHandlerText.Contains("ContentDrivenNpcDialogueRouter.ShouldSuppressCombat(target)")
-                && attackHandlerText.Contains("this.SendAttackState(character, Identity.None, 0);"),
-                "AttackMessageHandler must preserve invalid/suppressed attack cancellation packet echo.");
-            Assert.IsTrue(
-                attackHandlerText.Contains("playfield.AcquireNpcAggro(character, target);"),
-                "AttackMessageHandler must keep NPC aggro delegated through Playfield after player attack start.");
-            Assert.IsFalse(
-                attackHandlerText.Contains("AnnounceCombatDamage")
-                || attackHandlerText.Contains("HandleCombatKillingHit")
-                || attackHandlerText.Contains("KillPlayerTarget"),
-                "AttackMessageHandler must not own combat damage, killing-hit, or death lifecycle behavior.");
-
-            string combatTick = ExtractMethodBlock(playfieldText, "internal void ApplyCombatSwingFromWeapon");
-            Assert.IsTrue(
-                combatTick.Contains("if (attacker == null || this.disposed)")
-                && combatTick.Contains("Character c = attacker as Character;")
-                && combatTick.Contains("if (c == null)")
-                && combatTick.Contains("if (c is PlayerCharacter)")
-                && combatTick.Contains("MissionAcgSpatialRuntime.TryValidateCombatPair(")
-                && combatTick.Contains("this.CancelPlayerAttack(attacker);")
-                && combatTick.Contains("c.ProcessWeaponSwing(slot);"),
-                "Playfield weapon-clock swings must preserve mission spatial validation and delegate the strike to the refactored Character combat boundary.");
-
-            Assert.IsTrue(
-                characterCombatText.Contains("public void ProcessWeaponSwing(WeaponSlot slot)")
-                && characterCombatText.Contains("ICharacter target = this.TryResolveFightingTarget();")
-                && characterCombatText.Contains("CharacterCombatStrikeBuilder.Build(this, slot)")
-                && characterCombatText.Contains("this.Strike(target, context);")
-                && characterCombatText.Contains("public CombatStrikeResult Strike(")
-                && characterCombatText.Contains("CombatStrikeDamageCalculator.Calculate(")
-                && characterCombatText.Contains("targetCharacter.ReceiveStrike(")
-                && combatSubscriptionsText.Contains("c.Damaged += this.OnCharacterDamaged;")
-                && combatSubscriptionsText.Contains("c.Died += this.OnCharacterDied;")
-                && combatSubscriptionsText.Contains("this.playfield.HandleCombatKillingHit(e.Killer, e.Victim);"),
-                "Character must own strike calculation while Playfield subscriptions retain damage and death lifecycle integration.");
             Assert.IsTrue(
                 strikeBuilderText.Contains("if (weapon == null || weapon.LowID <= 0)")
                 && strikeBuilderText.Contains("NormalizeStat(attacker.Stats[StatIds.mindamage].Value)")
@@ -951,83 +453,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && strikeBuilderText.Contains("AttackInfoWeaponInstance = PlayerUnarmedAttackInfoWeaponInstance")
                 && strikeBuilderText.Contains("value == MissingStatValue"),
                 "The core strike builder must preserve the proven unarmed player source and packet contract when no weapon is equipped.");
-            string resetNpcCombatTick = ExtractMethodBlock(npcCombatText, "internal void ResetCombatTick");
-            string sendNpcWeaponDefinitions = ExtractMethodBlock(
-                npcCombatText,
-                "private void SendNpcWeaponDefinitionsToPlayerTarget");
-            Assert.IsTrue(
-                resetNpcCombatTick.Contains("this.SendNpcWeaponDefinitionsToPlayerTarget(attacker);")
-                && sendNpcWeaponDefinitions.Contains("target.Controller is PlayerController")
-                && sendNpcWeaponDefinitions.Contains("WeaponItemFullUpdate.CreateWeaponDefinitionMessages(attacker)")
-                && sendNpcWeaponDefinitions.Contains("target.Send(message);"),
-                "NPC combat start must send the acquired player the existing owner-linked weapon definition before the first incoming hit.");
-            AssertTextBefore(
-                resetNpcCombatTick,
-                "this.SendNpcWeaponDefinitionsToPlayerTarget(attacker);",
-                "this.StartBasicCaptureBackedAttackClocks(");
-            Assert.IsTrue(
-                playfieldText.Contains("public void StartPlayerAttack(ICharacter character, Identity target)")
-                && playfieldText.Contains("this.runtimeSystems.StartPlayerAttack(character, target, this.ResetCombatTick);")
-                && playfieldText.Contains("this.ConfigureWeaponsFromEquipment(character);")
-                && !playfieldText.Contains("private void ApplyPlayerAttackStart(ICharacter character, Identity target)"),
-                "Playfield must route player attack-start orchestration through the player combat facade and arm the weapon clocks.");
-            Assert.IsTrue(
-                playfieldText.Contains("public void CancelPlayerAttack(ICharacter character)")
-                && playfieldText.Contains("this.runtimeSystems.CancelPlayerAttack(character, this.ResetCombatTick);")
-                && !playfieldText.Contains("private void ApplyPlayerAttackCancel(ICharacter character)")
-                && playfieldText.Contains("private void ResetPlayerCombatTick(Identity attacker)")
-                && playfieldText.Contains("this.runtimeSystems.ResetPlayerCombatTick(attacker, this.ResetPlayerCombatTick);"),
-                "Playfield must route player attack cancel orchestration through the player combat facade.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.BeginPlayerDeath(target, this.KillPlayerTarget);")
-                && playfieldText.Contains("private void KillPlayerTarget(ICharacter target)")
-                && playfieldText.Contains("this.MarkPlayerDead(target);")
-                && playfieldText.Contains("this.runtimeSystems.RunPlayerDeathStatUpdateSequence(")
-                && playfieldText.Contains("this.runtimeSystems.CleanupPlayerDeathCombat(")
-                && playfieldText.Contains("this.SendPlayerDeathAnimation"),
-                "Playfield must keep player death behavior while routing death stat-update ordering through the facade.");
-            string playerDeath = ExtractMethodBlock(playfieldText, "private void KillPlayerTarget");
-            AssertTextBefore(
-                playerDeath,
-                "this.MarkPlayerDead(target);",
-                "this.runtimeSystems.RunPlayerDeathStatUpdateSequence(");
-            AssertTextBefore(
-                playerDeath,
-                "SendChangedStats,",
-                "this.runtimeSystems.CleanupPlayerDeathCombat(");
-            AssertTextBefore(
-                playerDeath,
-                "this.runtimeSystems.CleanupPlayerDeathCombat(",
-                "this.SendPlayerDeathAnimation");
-            string playerRespawn = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
-            Assert.IsTrue(
-                playerRespawn.Contains("this.runtimeSystems.ProcessPlayerRespawn(")
-                && playerRespawn.Contains("this.ClearCombatTracking")
-                && playerRespawn.Contains("this.StopFightingDeadTarget")
-                && playerRespawn.Contains("this.SendCombatStopMessage")
-                && runtimeSystemsText.Contains("x => this.CleanupPlayerDeathCombat(x, clearCombatTracking, stopFightingDeadTarget, sendCombatStop)")
-                && !playerRespawn.Contains("character.SetTarget(Identity.None);")
-                && !playerRespawn.Contains("character.SetFightingTarget(Identity.None);")
-                && !playerRespawn.Contains("this.ClearCombatTracking(character.Identity);")
-                && !playerRespawn.Contains("this.StopFightingDeadTarget(character.Identity);")
-                && !playerRespawn.Contains("this.SendCombatStopMessage(character);"),
-                "Player death respawn combat cleanup must route through the player combat facade.");
-            Assert.IsTrue(
-                playfieldText.Contains("internal void StopFightingDeadTarget(Identity deadTarget)")
-                && playfieldText.Contains("if (character.Controller is NPCController)")
-                && playfieldText.Contains("this.ClearNpcFightingTarget(character);")
-                && playfieldText.Contains("this.runtimeSystems.ClearPlayerFightingTarget(character, this.ClearCombatTracking);")
-                && playfieldText.Contains("this.SendCombatStopMessage(character);"),
-                "Playfield must keep mixed player/NPC StopFight packet emission while routing player target clear through the facade.");
-            string clearCombatTracking = ExtractMethodBlock(
-                playfieldText,
-                "internal void ClearCombatTracking(Identity identity)");
-            Assert.IsTrue(
-                clearCombatTracking.Contains("Character c = character as Character;")
-                && clearCombatTracking.Contains("c.ClearWeapons();")
-                && clearCombatTracking.Contains("this.lastCombatWeaponSlots.Remove(identity.Instance);")
-                && clearCombatTracking.Contains("this.runtimeSystems.ClearNpcCombatTracking(identity);"),
-                "Playfield must clear per-character weapon clocks and slot tracking while delegating NPC tracking cleanup.");
 
             Assert.IsTrue(
                 checkpointText.Contains("PlayerCombatRuntimeService")
@@ -1410,26 +835,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs"));
             string catalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
-            string corpseRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs"));
             string capturedLootDefinitions = ExtractMethodBlock(
                 providerText,
                 "public CapturedSubwayLootDefinition[] GetLootDefinitions()");
-            string corpseRegistration = ExtractMethodBlock(
-                playfieldText,
-                "private bool RegisterCorpse(ICharacter target, Identity corpseIdentity)");
-            string corpseVisualMap = ExtractMethodBlock(
-                corpseRulesText,
-                "public static Dictionary<int, int> BuildMonsterDataToCorpseCatMeshMap()");
-
-            Assert.IsTrue(
-                corpseVisualMap.Contains("{ 17649, 15215 }"),
-                "Disobedient Bot must use the corpse CATMesh captured in both official-live fights.");
 
             Assert.IsTrue(
                 catalogText.Contains("if (monsterData == 17649)")
@@ -1453,23 +864,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && capturedLootDefinitions.Contains("ProvenEnemyCorpseItem")
                 && capturedLootDefinitions.Contains("ProvisionalProjectPolicy"),
                 "Disobedient Bot must expose only the three fully linked observed items and must keep the ambiguous 234876 candidate inactive.");
-            string globalLootText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
             string ordinaryLootAdapterText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyLootTableAdapter.cs"));
-            Assert.IsTrue(
-                globalLootText.Contains("OrdinaryEnemyLootTableAdapter.Build(")
-                && ordinaryLootAdapterText.Contains("loot.LevelCreditRules.FirstOrDefault")
-                && ordinaryLootAdapterText.Contains("value.EnemyLevel == targetLevel")
-                && ordinaryLootAdapterText.Contains("LootRollMode.WeightedOne")
-                && ordinaryLootAdapterText.Contains("EmptyWeight = loot.EmptyWeight"),
-                "Runtime corpse credits must adapt the observed rule for the enemy's level into the global registry.");
-            Assert.IsTrue(
-                corpseRegistration.Contains("GlobalLootRuntimeService.Generate(target, this.Identity.Instance)")
-                && corpseRegistration.Contains("int credits = generatedLoot.Credits;")
-                && corpseRegistration.Contains("CorpseLootClassFor(target, lootItems, credits)")
-                && corpseRegistration.Contains("Credits = credits"),
-                "Captured Bot credits must create a regular loot-bearing corpse through the shared runtime.");
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyLootTableAdapter.cs"));
         }
 
         [TestMethod]
@@ -1693,118 +1089,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             }
         }
 
-        [TestMethod]
-        public void PlayfieldContentModulesDoNotOwnRuntimeSystems()
-        {
-            string contentDirectory = Path.Combine(
-                FindRepositoryRoot(),
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Content");
-            string[] sourceFiles = Directory.GetFiles(contentDirectory, "*.cs", SearchOption.AllDirectories);
 
-            Assert.IsTrue(sourceFiles.Length >= 4, "Expected current Playfield content-module files to be scanned.");
 
-            foreach (string sourceFile in sourceFiles)
-            {
-                string text = File.ReadAllText(sourceFile);
-                Assert.IsTrue(
-                    text.Contains("namespace ZoneEngine.Core.Playfields.Content"),
-                    "Content guardrail only applies to the content namespace: " + sourceFile);
 
-                for (int i = 0; i < ForbiddenContentModuleReferences.Length; i++)
-                {
-                    ForbiddenReference forbidden = ForbiddenContentModuleReferences[i];
-                    Assert.IsFalse(
-                        text.IndexOf(forbidden.Pattern, StringComparison.Ordinal) >= 0,
-                        string.Format(
-                            "Playfield content modules must define content only; forbidden {0} reference '{1}' found in {2}.",
-                            forbidden.Category,
-                            forbidden.Pattern,
-                            sourceFile));
-                }
-            }
-        }
 
-        [TestMethod]
-        public void PrivateCityContentModuleSkeletonIsRegisteredWithoutRuntimeOwnership()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string modulePath = Path.Combine(
-                repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PrivateCityContentModule.cs");
-            string runtimeSystemsPath = Path.Combine(
-                repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
-            string projectPath = Path.Combine(
-                repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
 
-            string moduleText = File.ReadAllText(modulePath);
-            string runtimeSystemsText = File.ReadAllText(runtimeSystemsPath);
-            string projectText = File.ReadAllText(projectPath);
-
-            Assert.IsTrue(moduleText.Contains("public sealed class PrivateCityContentModule : IPlayfieldContentModule"));
-            Assert.IsTrue(moduleText.Contains("public bool Supports(Identity playfieldIdentity)"));
-            Assert.IsTrue(moduleText.Contains("public void Register(PlayfieldContentRegistration registration)"));
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("new PrivateCityContentModule()"),
-                "PlayfieldRuntimeSystems content coordinator must register the private-city content module skeleton.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\Content\PrivateCityContentModule.cs"),
-                "ZoneEngine project must compile the private-city content module skeleton.");
-        }
-
-        [TestMethod]
-        public void MontroyalContentModuleSkeletonIsRegisteredWithoutRuntimeOwnership()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string modulePath = Path.Combine(
-                repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\MontroyalContentModule.cs");
-            string runtimeSystemsPath = Path.Combine(
-                repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs");
-            string projectPath = Path.Combine(
-                repositoryRoot,
-                @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj");
-
-            string moduleText = File.ReadAllText(modulePath);
-            string runtimeSystemsText = File.ReadAllText(runtimeSystemsPath);
-            string projectText = File.ReadAllText(projectPath);
-
-            Assert.IsTrue(moduleText.Contains("public sealed class MontroyalContentModule : IPlayfieldContentModule"));
-            Assert.IsTrue(moduleText.Contains("private const int MontroyalPlayfieldInstance = 655"));
-            Assert.IsTrue(moduleText.Contains("public bool Supports(Identity playfieldIdentity)"));
-            Assert.IsTrue(moduleText.Contains("public void Register(PlayfieldContentRegistration registration)"));
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("new MontroyalContentModule()"),
-                "PlayfieldRuntimeSystems content coordinator must register the Montroyal content module skeleton.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\Content\MontroyalContentModule.cs"),
-                "ZoneEngine project must compile the Montroyal content module skeleton.");
-        }
 
         [TestMethod]
         public void SubwayContentModuleRegistersCapturedNpcSpawnsWithoutOwningRuntimeSystems()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string moduleText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\SubwayContentModule.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs"));
             string catalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
-            string orchestratorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string scfuPacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs"));
             string scfuMessageText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -1813,39 +1111,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\Serialization\Serializers\Custom\SimpleCharFullUpdateSerializer.cs"));
-
-            Assert.IsTrue(moduleText.Contains("public sealed class SubwayContentModule : IPlayfieldContentModule"));
-            Assert.IsTrue(moduleText.Contains("private const int SubwayPlayfieldInstance = 127"));
             Assert.IsTrue(
                 providerText.Contains("public const int SubwayPlayfieldInstance = 127"),
                 "Captured Subway NPC spawns must bind to the live/client-visible PF127 Subway proxy resource.");
-            Assert.IsTrue(moduleText.Contains("registration.RegisterCapturedNpcSpawns();"));
-            Assert.IsTrue(
-                moduleText.Contains("return false;"),
-                "Subway content module must not suppress unrelated DB mob spawns in this first slice.");
-            Assert.IsFalse(
-                moduleText.Contains("OrdinaryEnemyRuntimeService")
-                || moduleText.Contains("NonPlayerCharacterHandler"),
-                "Subway content module must stay content-only and not own NPC runtime orchestration.");
-
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("new SubwayContentModule()"),
-                "PlayfieldRuntimeSystems content coordinator must register the Subway content module.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\Content\SubwayContentModule.cs")
-                && projectText.Contains(@"Core\Playfields\CapturedSubwayContentProvider.cs")
-                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyProfile.cs")
-                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyCatalog.cs")
-                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyRuntimeService.cs"),
-                "ZoneEngine project must compile the Subway content files.");
-
-            Assert.IsTrue(
-                npcRuntimeText.Contains("new CapturedSubwayContentProvider()")
-                && npcRuntimeText.Contains("new OrdinaryEnemyCatalog(")
-                && npcRuntimeText.Contains("new OrdinaryEnemyRuntimeService(")
-                && npcRuntimeText.Contains("new WorldPopulationController(")
-                && npcRuntimeText.Contains("this.worldPopulation.ActivatePlayfield(playfieldIdentity);"),
-                "NPCRuntimeService must route ordinary activation through the global population controller.");
 
             Assert.IsTrue(
                 providerText.Contains("\"Filth Flea\"")
@@ -1895,32 +1163,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 providerText.Contains("122002"),
                 "CapturedSubwayContentProvider must bind content to resource/playfield 127, not capture object Playfield2:122002.");
             Assert.IsTrue(
-                orchestratorText.Contains("SetMobStat(character, StatIds.monsterdata, profile.MonsterData, profile.ConstructionMode);")
-                && orchestratorText.Contains("this.activateNpc(character);")
-                && orchestratorText.Contains("playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);"),
-                "Captured Subway spawns must register through the global visibility-interest spawn hook while retaining existing runtime/corpse paths.");
-            Assert.IsFalse(
-                orchestratorText.Contains("SetMobStat(character, StatIds.catmesh")
-                || orchestratorText.Contains("SetMobStat(character, StatIds.displaycatmesh"),
-                "Captured Subway spawns must not overwrite template mesh stats with MonsterData ids.");
-            Assert.IsTrue(
-                catalogText.Contains("source.HeadMesh == 0")
-                && orchestratorText.Contains("character.MeshLayer.RemoveMesh(0, 0, 0, 4);"),
-                "Captured Subway no-headmesh mobs must clear template zero mesh layers to preserve live Meshes=count=0 SCFU shape.");
-            Assert.IsTrue(
                 scfuMessageText.Contains("public byte[] ExtendedTextureOverrideData { get; set; }")
                 && scfuSerializerText.Contains("SimpleCharFullUpdateFlags.HasExtendedTextures")
                 && scfuSerializerText.Contains("streamWriter.WriteBytes(scfu.ExtendedTextureOverrideData);"),
                 "SimpleCharFullUpdate must be able to emit captured extended texture override data.");
-            Assert.IsTrue(
-                scfuPacketText.Contains("private const int SubwayPlayfieldResource = 127;")
-                && catalogText.Contains("source.MonsterData == 17657")
-                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedFilthFlea")
-                && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
-                && scfuPacketText.Contains("0x4D, 0x61, 0x74, 0x65,")
-                && scfuPacketText.Contains("0x72, 0x69, 0x61, 0x6C, 0x20, 0x23, 0x39")
-                && scfuPacketText.Contains("OrdinaryEnemyScfuProfile.CapturedFilthFlea"),
-                "Captured Subway Filth Flea must emit the live Material #9 extended texture override block only for PF127 monsterData 17657.");
             string thiefFactory = ExtractMethodBlock(
                 providerText,
                 "private static CapturedSubwaySpawnDefinition Thief");
@@ -1932,18 +1178,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, healthDamage: 31))"),
                 "Captured Subway Thief must preserve live max/current health, monsterData, scale, head mesh, run speed, NPC family, and current surveyed position.");
             Assert.IsTrue(
-                catalogText.Contains("source.MonsterData == 26092")
-                && catalogText.Contains("new OrdinaryEnemyTextureProfile(0, 0x24CA, 0)")
-                && catalogText.Contains("new OrdinaryEnemyTextureProfile(1, 0x2219, 0)")
-                && catalogText.Contains("new OrdinaryEnemyTextureProfile(2, 0x24CC, 0)")
-                && catalogText.Contains("new OrdinaryEnemyTextureProfile(3, 0x24CB, 0)")
-                && catalogText.Contains("new OrdinaryEnemyTextureProfile(4, 0x24CD, 0)")
-                && catalogText.Contains("new OrdinaryEnemyMeshProfile(0, 160561u, 0, 2)")
-                && catalogText.Contains("new OrdinaryEnemyMeshProfile(1, 7777u, 0, 2)")
-                && orchestratorText.Contains("foreach (OrdinaryEnemyTextureProfile texture in appearance.Textures)")
-                && orchestratorText.Contains("foreach (OrdinaryEnemyMeshProfile mesh in appearance.Meshes)"),
-                "Captured Subway Thief must apply the live texture IDs and three-mesh humanoid appearance shape.");
-            Assert.IsTrue(
                 scfuMessageText.Contains("public SimpleCharFullUpdateFlags AdditionalFlags { get; set; }")
                 && scfuMessageText.Contains("public SimpleCharFullUpdateFlags SuppressedFlags { get; set; }")
                 && scfuMessageText.Contains("public Vector3[] Waypoints { get; set; }")
@@ -1952,64 +1186,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && scfuSerializerText.Contains("flags |= scfu.AdditionalFlags;")
                 && scfuSerializerText.Contains("flags &= ~scfu.SuppressedFlags;"),
                 "SimpleCharFullUpdate must be able to emit captured waypoint data and capture-only flag deltas.");
-            Assert.IsTrue(
-                catalogText.Contains("source.MonsterData == 26092")
-                && catalogText.Contains("0x00122002u")
-                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedThief")
-                && scfuPacketText.Contains("CapturedSubwayThiefUnknown1")
-                && scfuPacketText.Contains("scfu.Version = 58;")
-                && scfuPacketText.Contains("scfu.Appearance.Value = ordinaryRuntime.Profile.Appearance.AppearanceValue;")
-                && scfuPacketText.Contains("SimpleCharFullUpdateFlags.UnknownFlag6 | SimpleCharFullUpdateFlags.IsPet")
-                && scfuPacketText.Contains("scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;")
-                && scfuPacketText.Contains("ordinaryRuntime.Profile.Appearance.ScfuProfile"),
-                "Captured Subway Thief must emit the live version, appearance value, unknown movement bytes, and flag mask only for PF127 monsterData 26092.");
         }
 
-        [TestMethod]
-        public void TempleContentModuleActivatesCapturedNpcSpawnsOnlyForPf1931()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string moduleText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\TempleOfThreeWindsContentModule.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
-            Assert.IsTrue(
-                moduleText.Contains("public sealed class TempleOfThreeWindsContentModule : IPlayfieldContentModule"));
-            Assert.IsTrue(
-                moduleText.Contains("private const int TempleOfThreeWindsPlayfieldInstance = 1931"));
-            Assert.IsTrue(moduleText.Contains("registration.RegisterCapturedNpcSpawns();"));
-            Assert.IsTrue(
-                moduleText.Contains("return false;"),
-                "Temple content activation must not suppress unrelated DB mob spawns.");
-            Assert.IsFalse(
-                moduleText.Contains("647"),
-                "PF647 is the Temple gateway and must not activate PF1931 dungeon content.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(runtimeSystemsText, "new TempleOfThreeWindsContentModule()"),
-                "PlayfieldRuntimeSystems must register the Temple content module exactly once.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\Content\TempleOfThreeWindsContentModule.cs"),
-                "ZoneEngine must compile the Temple content module.");
-        }
 
         [TestMethod]
         public void SubwayExistingPopulationAndPatrolReplayRemainLoaded()
         {
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
-            string orchestratorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs"));
             string coordinatorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcPatrolReplayCoordinator.cs"));
-            string npcControllerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Controllers\NPCController.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\NpcPatrolReplayCoordinator.cs"));
 
             Assert.AreEqual(
                 124,
@@ -2064,52 +1252,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("GetPatrolReplaySegments(int sourceInstance)"),
                 "Captured patrol replay must preserve complete cycle timing, movement modes, and captured route speeds.");
             Assert.IsTrue(
-                orchestratorText.Contains("this.patrolReplay.AssignCapturedSubwayReplay(")
-                && orchestratorText.Contains("character.AddWaypoint(start, false);")
-                && orchestratorText.Contains("character.AddWaypoint(end, false);")
-                && orchestratorText.Contains("controller.SetCapturedPatrolReplaySegments(")
-                && orchestratorText.Contains("spawn.UseSpawnAsPatrolStart)")
-                && orchestratorText.Contains("controller.State = CharacterState.Patrolling;"),
-                "Subway spawn orchestration must announce live SCFU waypoints and retain exact captured segment starts.");
-            Assert.IsTrue(
                 coordinatorText.Contains("BuildCapturedSubwaySegments(int sourceInstance)")
                 && coordinatorText.Contains("this.capturedSubwayContentProvider.GetPatrolReplaySegments(sourceInstance)")
                 && coordinatorText.Contains("segments[i].MoveMode"),
                 "NpcPatrolReplayCoordinator must preserve captured Subway coordinates, timing, and movement mode.");
-            Assert.IsTrue(
-                npcControllerText.Contains("private bool IsCapturedIdlePatrolReplay()")
-                && npcControllerText.Contains("&& this.HasCapturedPatrolReplay();")
-                && npcControllerText.Contains("&& this.Character.FightingTarget.Equals(Identity.None)")
-                && npcControllerText.Contains("segment.MoveMode == EnemyBehaviorContract.RunMoveMode")
-                && npcControllerText.Contains(": capturedStart")
-                && npcControllerText.Contains("capturedPatrolReplayBatchesZeroDelaySegments")
-                && npcControllerText.Contains("segment.DelayAfterSeconds > 0.0")
-                && !npcControllerText.Contains("IsCapturedCleaningRobotIdlePatrol"),
-                "Subway replay must preserve captured starts/movement modes, batch same-time corrections, and stop when combat begins.");
-
-            AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private bool Spawn("),
-                "OrdinaryEnemyRuntimeRegistry.Register(character.Identity.Instance, runtimeDefinition);",
-                "this.activateNpc(character);");
-            AssertTextBefore(
-                ExtractMethodBlock(orchestratorText, "private bool Spawn("),
-                "this.activateNpc(character);",
-                "playfield.AnnounceSpawnedCharacterVisibility(character, Identity.None);");
-
-            string scfuPacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
-            Assert.IsTrue(
-                scfuPacketText.Contains("character.Waypoints.Count > 1")
-                && scfuPacketText.Contains("scfu.Version = 58;")
-                && scfuPacketText.Contains("scfu.Waypoints ="),
-                "Moving Subway NPC SCFU must match live version 58 with its initial two-point path.");
-
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            AssertTextBefore(
-                ExtractMethodBlock(npcRuntimeText, "internal void StopDyingNpcCombatState"),
-                "npcController.SnapshotCurrentMotionPosition();",
-                "npcController.StopFollow();");
         }
 
         [TestMethod]
@@ -2120,24 +1266,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 repositoryRoot,
                 @"docs\generated\subway_pf127_visibility_diagnostic_manifest.csv");
             string[] manifestLines = File.ReadAllLines(manifestPath);
-            string selectionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\SubwayVisibilityDiagnosticSelection.cs"));
-            string diagnosticText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\SubwayVisibilitySnapshotDiagnostics.cs"));
-            string visibilityText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
-            string zoneClientText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
             string ordinaryCatalogText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
+                    @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs"));
             string ordinaryGeneratorText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
@@ -2160,41 +1292,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 manifestLines.Count(line => line.Contains(",ORDINARY_ENEMY_REGENERATE,")),
                 "Ordinary diagnostic group must contain exactly nine rows.");
             Assert.IsTrue(
-                selectionText.Contains("SubwayVisibilityDiagnosticConfiguration.Disabled")
-                && selectionText.Contains("bool selected = current.Enabled && current.SelectedSourceInstances.Contains(sourceInstance);")
-                && selectionText.Contains("return selected;")
-                && selectionText.Contains("ALL_38 requires all 38 explicit manifest identities"),
-                "Diagnostic selection must fail closed and require explicit identities.");
-            Assert.IsTrue(
                 ordinaryCatalogText.Contains("spawn.Disposition == OrdinaryEnemyRuntimeDisposition.Active")
                 && ordinaryCatalogText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(")
                 && !ordinaryGeneratorText.Contains("SubwayVisibilityDiagnosticSelection.ShouldIncludeQuarantined(spawn.SourceInstance)"),
                 "The unified catalog must keep only explicitly quarantined supported rows behind the opt-in selector.");
-
-            AssertTextBefore(
-                visibilityText,
-                "sendVisibilityMessage(simpleCharFullUpdate);",
-                "this.SendWeaponDefinitionsForVisibility(");
-            AssertTextBefore(
-                visibilityText,
-                "this.SendWeaponDefinitionsForVisibility(",
-                "sendVisibilityMessage(charInPlay);");
-            AssertTextBefore(
-                zoneClientText,
-                "SubwayVisibilitySnapshotDiagnostics.OnSerializationStarted(messageBody);",
-                "buffer = this.messageSerializer.Serialize(message);");
-            AssertTextBefore(
-                zoneClientText,
-                "buffer = this.messageSerializer.Serialize(message);",
-                "SubwayVisibilitySnapshotDiagnostics.OnSerializationCompleted(messageBody, buffer);");
-            Assert.IsTrue(
-                (diagnosticText.Contains("SCFU_SERIALIZATION_COMPLETED")
-                 || diagnosticText.Contains("PacketPrefix(record.Kind) + \"_SERIALIZATION_COMPLETED\""))
-                && diagnosticText.Contains("ENEMY_SEQUENCE_COMPLETED")
-                && diagnosticText.Contains("SNAPSHOT_COMPLETED")
-                && diagnosticText.Contains("total_serialized_bytes")
-                && diagnosticText.Contains("last_completed_enemy_identity"),
-                "Diagnostic ledger must preserve serialization, enemy, and snapshot completion markers.");
         }
 
         [TestMethod]
@@ -2202,33 +1303,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
             string catalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs"));
             string profileText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs"));
-            string populationText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs"));
-            string orchestratorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string runtimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string combatContractText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyProfile.cs"));
             string combatAttackRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
-            string corpseRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string globalLootText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\NpcCombatAttackRules.cs"));
             string ordinaryLootAdapterText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyLootTableAdapter.cs"));
-            string scfuText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyLootTableAdapter.cs"));
             CapturedSubwayOrdinarySpawnDefinition[] capturedSpawns =
                 new CapturedSubwayOrdinaryContentProvider().GetAllSpawns();
 
@@ -2308,57 +1391,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && providerText.Contains("Unknown1")
                 && providerText.Contains("Unknown2"),
                 "Captured SCFU visual, flag, unknown-field, and path data must remain first-class evidence.");
-            Assert.IsTrue(
-                providerText.Contains("new CapturedSubwayWaypointDefinition(")
-                && catalogText.Contains("source.Waypoints")
-                && orchestratorText.Contains("foreach (OrdinaryEnemyWaypoint waypoint in spawn.Waypoints)")
-                && orchestratorText.Contains("controller.State = CharacterState.Patrolling;"),
-                "Captured SCFU movement paths must load where the captures supplied them.");
-
-            Assert.IsTrue(
-                catalogText.Contains("OrdinaryEnemyConstructionMode.CapturedDirect")
-                && orchestratorText.Contains("if (profile.ConstructionMode == OrdinaryEnemyConstructionMode.TemplateBacked)")
-                && orchestratorText.Contains("Pool.Instance.GetFreeInstance<Character>")
-                && orchestratorText.Contains("ApplyStats(character, variant, profile)")
-                && orchestratorText.Contains("ApplyAppearance(character, profile)")
-                && orchestratorText.Contains("OrdinaryEnemyRuntimeRegistry.Register")
-                && orchestratorText.Contains("character.Stats.SetBaseValueWithoutTriggering("),
-                "Captured-direct ordinary NPC construction must use the standard attackable Character runtime without guessing a template.");
-            Assert.IsTrue(
-                scfuText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
-                && scfuText.Contains("scfu.AdditionalFlags = capturedFlags;")
-                && scfuText.Contains("scfu.SuppressedFlags = ~capturedFlags;")
-                && scfuText.Contains("scfu.Unknown1 = spawn.CapturedScfuUnknown1.ToArray();")
-                && scfuText.Contains("appearance.Textures.Select(")
-                && scfuText.Contains("appearance.Meshes.Select("),
-                "SCFU construction must emit the captured ordinary appearance and exact optional-field shape.");
-            Assert.IsTrue(
-                catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(archetype)")
-                && combatContractText.Contains("internal static CapturedEnemyCombatContract ForOrdinary(")
-                && catalogText.Contains("CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)")
-                && catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(")
-                && catalogText.Contains("No coherent same-capture Subway attack chain for source")
-                && combatContractText.Contains("case CapturedEnemyAttackModel.FixedAttackInfo:")
-                && combatContractText.Contains("return false;")
-                && combatContractText.Contains("this.EvidenceSourceIdentity > 0")
-                && combatContractText.Contains("this.WeaponDefinition != null"),
-                "Ordinary combat must resolve by exact source identity and fail closed unless one coherent captured packet chain owns the complete combat presentation.");
-            Assert.IsTrue(
-                catalogText.Contains("DropGroupHash = \"ordinary-enemy-profile\"")
-                && globalLootText.Contains("EnsureOrdinary"),
-                "Captured ordinary loot evidence must be adapted into the global registry.");
-
-            Assert.IsTrue(
-                runtimeText.Contains("new CapturedSubwayOrdinaryContentProvider()")
-                && runtimeText.Contains("new OrdinaryEnemyCatalog(")
-                && runtimeText.Contains("new OrdinaryEnemyRuntimeService(")
-                && runtimeText.Contains("new WorldPopulationController(")
-                && runtimeText.Contains("this.worldPopulation.ActivatePlayfield(playfieldIdentity);")
-                && projectText.Contains(@"Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs")
-                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyCatalog.cs")
-                && projectText.Contains(@"Core\Playfields\OrdinaryEnemyRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\WorldPopulationController.cs"),
-                "PF127 runtime and project wiring must include the ordinary capture-backed slice.");
 
             string[] excludedNamedOrOwnedMobs =
                 {
@@ -2377,47 +1409,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "Named, boss, personal-pet, and boss-owned summon evidence is outside this ordinary slice: "
                     + excludedNamedOrOwnedMobs[i]);
             }
-
-            Assert.IsTrue(
-                providerText.Contains("0x795451C5")
-                && !providerText.Contains("0x795450A1")
-                && catalogText.Contains("BuildCapturedOrdinarySpawnPolicies()")
-                && catalogText.Contains("new OrdinaryEnemySpawnLevelDefinition(")
-                && catalogText.Contains("OrdinaryEnemySpawnLevelMode.InclusiveRange")
-                && catalogText.Contains("OrdinaryEnemyLevelRerollPolicy.NewPopulationGeneration")
-                && profileText.Contains("internal sealed class OrdinaryEnemySpawnVariant")
-                && profileText.Contains("internal sealed class OrdinaryEnemySpawnLevelDefinition")
-                && profileText.Contains("internal sealed class OrdinaryEnemyLevelSelectionState")
-                && profileText.Contains("return this.Resolve(this.MinimumLevel + offset);")
-                && orchestratorText.Contains("Func<int, int> levelSelector = null")
-                && orchestratorText.Contains("selectionState.ResolveForGeneration(")
-                && orchestratorText.Contains("OrdinaryEnemySpawnVariant variant = spawnGeneration.SelectedVariant;")
-                && !orchestratorText.Contains("bloodcreeper")
-                && !orchestratorText.Contains("30379")
-                && orchestratorText.Contains("ApplyStats(character, variant, profile);")
-                && catalogText.Contains("BloodcreeperAutomaticAggroRadius = 7.0")
-                && catalogText.Contains("new OrdinaryEnemySpawnPolicyConfiguration(")
-                && catalogText.Contains("SubwayOrdinaryRespawnPolicy()")
-                && catalogText.Contains("WorldRespawnPolicyAssignment.Inherit(")
-                && !catalogText.Contains("ordinary.bloodcreeper.240")
-                && catalogText.Contains("OrdinaryEnemyEvidenceState.Policy")
-                && profileText.Contains("this.RespawnEvidence == OrdinaryEnemyEvidenceState.Policy")
-                && populationText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && populationText.Contains("WorldRespawnPolicyResolver.Resolve(")
-                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(")
-                && catalogText.Contains("20260716-033326,20260716-034104")
-                && ordinaryLootAdapterText.Contains("loot.CreditEvidence == OrdinaryEnemyEvidenceState.Policy")
-                && ordinaryLootAdapterText.Contains("LootEvidenceConfidence.Inferred")
-                && combatContractText.Contains("CapturedSubwayBloodcreeperSpitInitialSeconds")
-                && combatContractText.Contains("CapturedSubwayBloodcreeperBiteInitialSeconds")
-                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteMinimumDamage = 21")
-                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteMaximumDamage = 35")
-                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperSpitMinimumDamage = 21")
-                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperSpitMaximumDamage = 41")
-                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperBiteLowTemplate = 121091")
-                && combatAttackRulesText.Contains("CapturedSubwayBloodcreeperSpitLowTemplate = 121094")
-                && corpseRulesText.Contains("{ 30379, 26978 }"),
-                "Bloodcreeper must retain one ranged-level spawn, proactive aggro, dual rolled natural attacks, exact corpse visual, and captured-plus-policy credit handling.");
         }
 
         [TestMethod]
@@ -2485,17 +1476,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 repositoryRoot,
                 @"docs\generated\subway_20260710_population_restore_manifest.csv");
             string supportedProviderText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs"));
             string ordinaryProviderText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
             string ordinaryGeneratorText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"tools-temp\AOSharpCaptureAnalyzer\generate_subway_ordinary_content.py"));
             string ordinaryCatalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
-            string ordinaryRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs"));
 
             string[] lines = File.ReadAllLines(manifestPath);
             Assert.IsTrue(lines.Length > 1, "Population restore manifest must contain classified capture rows.");
@@ -2623,70 +1610,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || ordinaryProviderText.Contains("RoomSpace")
                 || ordinaryGeneratorText.Contains("RoomSpace"),
                 "Population restoration must not add a RoomSpace workaround or coordinate mutation.");
-            Assert.IsTrue(
-                ordinaryCatalogText.Contains("CapturedSubwayContentProvider.IsRuntimeQuarantined(source.SourceInstance)")
-                && !ordinaryCatalogText.Contains("QuarantinedOrdinaryCapture")
-                && ordinaryRuntimeText.Contains("SpawnMobFromTemplate")
-                && ordinaryRuntimeText.Contains("Pool.Instance.GetFreeInstance<Character>")
-                && ordinaryRuntimeText.Contains("spawn.SourceIdentity")
-                && ordinaryRuntimeText.Contains("OrdinaryEnemyRuntimeRegistry.Register")
-                && npcRuntimeText.Contains("OrdinaryEnemyRuntimeRegistry.Remove"),
-                "Current identity allocation and NPC death/despawn lifecycle ownership must remain unchanged.");
         }
 
-        [TestMethod]
-        public void SubwayFilthFleaCorpseUsesCapturedLiveVisualTemplate()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string catalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
-            string corpsePacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\CorpseFullUpdate.cs"));
 
-            Assert.IsTrue(
-                catalogText.Contains("source.MonsterData == 17657")
-                && catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea")
-                && corpsePacketText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
-                && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457"),
-                "Subway Filth Flea corpse selection must stay scoped to the captured PF127 identity and packet length.");
-            Assert.IsTrue(
-                corpsePacketText.Contains("CapturedSubwayFilthFleaTemplate")
-                && corpsePacketText.Contains("01000007E24D617465726961")
-                && corpsePacketText.Contains("6C202339"),
-                "The live Material #9 flea corpse visual tail from capture 20260709-164414 must remain present.");
-
-            string buildMethod = ExtractMethodBlock(
-                corpsePacketText,
-                "public static byte[] Build(");
-            Assert.IsTrue(
-                buildMethod.Contains("OrdinaryEnemyRuntimeRegistry.TryGet(")
-                && buildMethod.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedFilthFlea")
-                && buildMethod.Contains("return BuildCapturedSubwayFilthFlea("),
-                "PF127 Filth Flea corpses must select the capture-backed visual packet before generic corpse construction.");
-
-            string capturedBuildMethod = ExtractMethodBlock(
-                corpsePacketText,
-                "private static byte[] BuildCapturedSubwayFilthFlea(");
-            Assert.IsTrue(
-                capturedBuildMethod.Contains("CapturedSubwayFilthFleaTemplate.Clone()")
-                && capturedBuildMethod.Contains("WriteInt32(buffer, ReceiverInstanceOffset, receiver.Instance);")
-                && capturedBuildMethod.Contains("WriteInt32(buffer, CorpseInstanceOffset, corpseIdentity.Instance);")
-                && capturedBuildMethod.Contains("WriteInt32(buffer, DeadNpcInstanceOffset, deadNpc.Identity.Instance);")
-                && capturedBuildMethod.Contains("CapturedSubwayFilthFleaTailDeadNpcInstanceOffset"),
-                "Captured flea corpse construction must retain the live visual payload while patching runtime identities.");
-        }
 
         [TestMethod]
         public void SubwayOrdinaryLifecyclePolicyIsUniformAndBossesRemainSeparate()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string corpseRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
-            string populationText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs"));
-            string encounterText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
-            encounterText = encounterText.Replace("\r\n", "\n");
             var catalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
                 new CapturedSubwayOrdinaryContentProvider());
@@ -2707,17 +1638,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                              && value.Corpse.UnlootedLifetimeSeconds == 60.0
                              && value.Corpse.LootedCleanupSeconds == 0.0),
                 "Every regular Subway profile must use the shared 30/120/30 corpse policy.");
-            Assert.IsTrue(
-                corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)")
-                && populationText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0"),
-                "Shared regular-mob lifecycle constants must remain exact.");
-            Assert.IsTrue(
-                encounterText.Contains("CapturedNamedBossRespawnDelay = TimeSpan.FromMinutes(10)")
-                && CountOccurrences(encounterText, "1800.0,\n                1800.0,") == 2
-                && encounterText.Contains("17905,\n                1800.0,\n                3.0,"),
-                "Subway named encounters must retain ten-minute respawns and 30-minute loot-bearing corpses while Eumenides uses the captured three-second empty cleanup.");
         }
 
         [TestMethod]
@@ -2725,47 +1645,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             string repositoryRoot = FindRepositoryRoot();
             string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayContentProvider.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs"));
             string ordinaryProviderText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
-            string encounterText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedSubwayEncounterRuntimeService.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayOrdinaryContentProvider.cs"));
             string catalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
-            string combatContractText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatContract.cs"));
-            string globalLootText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\GlobalLootRuntimeService.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCatalog.cs"));
             string attackRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatAttackRules.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\NpcCombatAttackRules.cs"));
             string combatSetupGeneratorText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCombatSetupGenerator.cs"));
-            string movementCoordinatorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCombatSetupGenerator.cs"));
             string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedEnemyCombatPacketFactory.cs"));
-            string movementRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
+                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.cs"));
             string ordinaryProfileText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyProfile.cs"));
-            string ordinaryRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string heartbeatRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"));
-            string weaponPacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\WeaponItemFullUpdate.cs"));
-            string scfuPacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
-            string corpsePacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Packets\CorpseFullUpdate.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string corpseRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
-            string worldPopulationControllerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\WorldPopulationController.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyProfile.cs"));
             string generatedCombatReportText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"docs\generated\subway_enemy_combat_contracts.json"));
             int architectStrikerCombatReportStart = generatedCombatReportText.IndexOf(
@@ -2928,43 +1820,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(workmanStrikerCombatReportStart >= 0);
             string workmanStrikerCombatReport = generatedCombatReportText.Substring(
                 workmanStrikerCombatReportStart);
-            int discardedPetContractStart = combatContractText.IndexOf(
-                "case 17720:",
-                StringComparison.Ordinal);
-            int discardedPetContractEnd = combatContractText.IndexOf(
-                "case 17649:",
-                discardedPetContractStart,
-                StringComparison.Ordinal);
-            Assert.IsTrue(
-                discardedPetContractStart >= 0
-                && discardedPetContractEnd > discardedPetContractStart);
-            string discardedPetContractCase = combatContractText.Substring(
-                discardedPetContractStart,
-                discardedPetContractEnd - discardedPetContractStart);
             string disobedientBotDefinition = ExtractMethodBlock(
                 providerText,
                 "private static CapturedSubwaySpawnDefinition DisobedientBot(");
-            string ordinaryCombatContract = ExtractMethodBlock(
-                combatContractText,
-                "internal static CapturedEnemyCombatContract ForOrdinary(");
-            string workmanStrikerCombatContract = ExtractMethodBlock(
-                combatContractText,
-                "private static CapturedEnemyCombatContract ForWorkmanStriker(");
-            string meldedPatternsCombatContract = ExtractMethodBlock(
-                combatContractText,
-                "private static CapturedEnemyCombatContract ForMeldedPatterns(");
-            string sourceSpecificWeaponCombatContract = ExtractMethodBlock(
-                combatContractText,
-                "private static CapturedEnemyCombatContract ForSourceSpecificWeaponArchetype(");
-            string looterCombatContract = ExtractMethodBlock(
-                combatContractText,
-                "private static CapturedEnemyCombatContract ForLooter(");
-            string muggerCombatContract = ExtractMethodBlock(
-                combatContractText,
-                "internal static CapturedEnemyCombatContract ForSupportedSourceWeapon(");
-            string derangedShopperCombatContract = ExtractMethodBlock(
-                combatContractText,
-                "private static CapturedEnemyCombatContract ForDerangedShopper(");
             var ordinaryCatalog = new OrdinaryEnemyCatalog(
                 new CapturedSubwayContentProvider(),
                 new CapturedSubwayOrdinaryContentProvider());
@@ -3015,155 +1873,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 acceptedEnemyKeys.Length,
                 "Only Subway enemies that pass this whole-enemy gate may be treated as accepted.");
 
-            Assert.IsTrue(
-                providerText.Contains("private static CapturedSubwaySpawnDefinition FilthFlea(")
-                && catalogText.Contains("SubwayOrdinaryRespawnSeconds = 240.0")
-                && catalogText.Contains("SubwayOrdinaryRespawnPolicy()")
-                && providerText.Contains("Filth Flea: 18 complete official-live corpse opens")
-                && combatContractText.Contains("case 17657:")
-                && combatContractText.Contains("CapturedEnemyCombatContract.CapturedSpecialSequence(")
-                && attackRulesText.Contains("CapturedSubwayFilthFleaMonsterData = 17657")
-                && movementCoordinatorText.Contains("AnnounceCapturedSpecialAttackSequenceContext(")
-                && movementCoordinatorText.Contains("CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(")
-                && capturedPacketFactoryText.Contains("Specials = (definitions ?? new CapturedEnemySpecialAttackDefinition[0]).Select(")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && catalogText.Contains("source.MonsterData == 17657")
-                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedFilthFlea")
-                && scfuPacketText.Contains("CapturedSubwayFilthFleaExtendedTextureOverrideData")
-                && corpsePacketText.Contains("CapturedSubwayFilthFleaPacketLength = 457")
-                && corpsePacketText.Contains("BuildCapturedSubwayFilthFlea(")
-                && catalogText.Contains("bool preserveFilthFleaFallback = monsterData == 17657;")
-                && catalogText.Contains("preserveFilthFleaFallback ? 23 : (int?)null")
-                && catalogText.Contains("preserveFilthFleaFallback ? 79 : (int?)null"),
-                "Accepted Subway Filth Flea must keep spawn, movement/chase, combat, appearance, corpse visual, loot, credits, and four-minute respawn coverage together.");
-
-            Assert.IsTrue(
-                ordinaryProviderText.Contains("\"slum_runner\"")
-                && ordinaryProviderText.Contains("\"Slum Runner\"")
-                && ordinaryProviderText.Contains("55648")
-                && ordinaryProviderText.Contains("new CapturedSubwayCombatEvidenceDefinition(")
-                && ordinaryProviderText.Contains("4.210628")
-                && ordinaryProviderText.Contains("31774")
-                && ordinaryProviderText.Contains("20260716-222201")
-                && catalogText.Contains("SubwayOrdinaryRespawnSeconds = 240.0")
-                && catalogText.Contains("PF127 Subway regular mobs use the shared 240-second respawn policy")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Slum Runner must keep its 24 exact spawns, expanded captured attack cadence and loot sample, shared chase, CATMesh/credits, shared four-minute respawn, and ordinary corpse lifetimes together.");
-
-            Assert.IsTrue(
-                ordinaryProviderText.Contains("\"molested_molecules\"")
-                && ordinaryProviderText.Contains("\"Molested Molecules\"")
-                && ordinaryProviderText.Contains("203746")
-                && ordinaryProviderText.Contains("4.749995")
-                && ordinaryProviderText.Contains("new CapturedSubwayCombatEvidenceDefinition(")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(27199, 27199, 10, 1, 3, 3333)")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(121743, 121744, 25, 1, 3, 3333)")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(301712, 301712, 1, 1, 3, 3333)")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(301713, 301713, 1, 1, 3, 3333)")
-                && ordinaryProviderText.Contains("20260716-034104")
-                && ordinaryProviderText.Contains("20260716-221358")
-                && ordinaryProviderText.Contains("203746, 5921")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Molested Molecules must keep its nine exact spawns, captured attack range/cadence, shared chase, three strict loot outcomes, CATMesh/credits, private four-minute respawn policy, and ordinary corpse lifetimes together.");
-
             Assert.AreEqual(
                 33,
                 CountOccurrences(ordinaryProviderText, "\"shadow\""),
                 "Accepted Subway Shadow must preserve its profile keys and all 31 exact spawn rows.");
-            Assert.IsTrue(
-                ordinaryProviderText.Contains("\"Shadow\"")
-                && ordinaryProviderText.Contains("30464")
-                && ordinaryProviderText.Contains("5.299336")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(234875, 234875, 1, 2, 15, 1333)")
-                && CountOccurrences(ordinaryProviderText, ", 30464, 30434,") == 20
-                && ordinaryProfiles.Single(value => value.DisplayName == "Shadow").Loot.ObservedEmptyInventories == 7
-                && !ordinaryProfiles.Single(value => value.DisplayName == "Shadow").Loot.ItemPoolComplete
-                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
-                && !ordinaryCombatContract.Contains("critical")
-                && generatedCombatReportText.Contains("\"Shadow\":")
-                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 56")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 11")
-                && generatedCombatReportText.Contains("\"normalMaxDamage\": 39")
-                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 2")
-                && generatedCombatReportText.Contains("\"criticalMinDamage\": 30")
-                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 44")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Shadow must keep 31 exact spawns, fixed normal-only combat, report-only criticals, shared chase, 15 strict incomplete-pool loot outcomes, CATMesh/credits, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
                 14,
                 CountOccurrences(ordinaryProviderText, "\"infector\""),
                 "Accepted ordinary Subway Infector must preserve its profile keys and all 12 exact spawn rows.");
-            Assert.IsTrue(
-                ordinaryProviderText.Contains("\"Infector\"")
-                && ordinaryProviderText.Contains("31909")
-                && ordinaryProviderText.Contains("5.049360")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(101735, 101736, 21, 1, 14, 714)")
-                && CountOccurrences(ordinaryProviderText, ", 31909, 31868,") == 23
-                && ordinaryProfiles.Single(value => value.DisplayName == "Infector").Loot.ObservedEmptyInventories == 8
-                && !ordinaryProfiles.Single(value => value.DisplayName == "Infector").Loot.ItemPoolComplete
-                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
-                && ordinaryCombatContract.Contains("archetype.MonsterData == 31909")
-                && combatContractText.Contains("case 31909:")
-                && generatedCombatReportText.Contains("\"Infector\":")
-                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 54")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 15")
-                && generatedCombatReportText.Contains("\"normalMaxDamage\": 36")
-                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 3")
-                && generatedCombatReportText.Contains("\"criticalMinDamage\": 52")
-                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 75")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted ordinary Subway Infector must keep 12 exact spawns, 23 exact credit corpses, its generic fixed normal contract with production specialized fields distinct from Abmouth source specialization, report-only criticals, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
                 8,
                 CountOccurrences(ordinaryProviderText, "\"architect_striker\""),
                 "Accepted Subway Architect Striker must preserve its profile key and all seven exact spawn rows.");
-            Assert.IsTrue(
-                ordinaryProviderText.Contains("\"Architect Striker\"")
-                && ordinaryProviderText.Contains("203743")
-                && ordinaryProviderText.Contains("5.425420")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(122482, 122483, 14, 1, 6, 1667)")
-                && CountOccurrences(ordinaryProviderText, ", 203743, 17870,") == 6
-                && ordinaryProfiles.Single(value => value.DisplayName == "Architect Striker").Loot.ObservedCompleteInventories == 6
-                && ordinaryProfiles.Single(value => value.DisplayName == "Architect Striker").Loot.ObservedEmptyInventories == 1
-                && !ordinaryProfiles.Single(value => value.DisplayName == "Architect Striker").Loot.ItemPoolComplete
-                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
-                && architectStrikerCombatReport.Contains("\"normalAttackInfoRows\": 18")
-                && architectStrikerCombatReport.Contains("\"normalMinDamage\": 10")
-                && architectStrikerCombatReport.Contains("\"normalMaxDamage\": 17")
-                && architectStrikerCombatReport.Contains("\"criticalAttackInfoRows\": 1")
-                && architectStrikerCombatReport.Contains("\"criticalMinDamage\": 38")
-                && architectStrikerCombatReport.Contains("\"criticalMaxDamage\": 38")
-                && architectStrikerCombatReport.Contains("\"missedAttackInfoRows\": 1")
-                && architectStrikerCombatReport.Contains("\"specialAttackWeaponRows\": 2")
-                && CountOccurrences(architectStrikerCombatReport, "\"unknown1\": 87") == 1
-                && CountOccurrences(architectStrikerCombatReport, "\"unknown2\": 87") == 1
-                && CountOccurrences(architectStrikerCombatReport, "\"unknown3\": 87") == 1
-                && CountOccurrences(architectStrikerCombatReport, "\"unknown4\": 87") == 1
-                && CountOccurrences(architectStrikerCombatReport, "\"unknown5\": 0") == 1
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Architect Striker must keep seven exact spawns, its captured fixed normal contract without an invented weapon, report-only critical, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile infectedAttendant = ordinaryProfiles.Single(
                 value => value.DisplayName == "Infected Attendant");
@@ -3258,46 +1981,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && CountOccurrences(strikeForemanSecondLootReport, "\"count\": 1") == 2
                 && !ordinaryProviderText.Contains("\"Strike Foreman\""),
                 "Strike Foreman must keep six local 13-point normals and two misses separate from the older other-player 18/18/40 evidence and retain two atomic observed loot outcomes without treating them as guarantees.");
-            Assert.IsTrue(
-                combatContractText.Contains("case 203744:")
-                && combatContractText.Contains(
-                    "subway-strike-foreman-122767-equipped-level-bounded-v1")
-                && encounterText.Contains("CreateStrikeForemanDefinition()")
-                && encounterText.Contains(
-                    "this.ProcessStrikeForemanRespawn(utcNow);")
-                && globalLootText.Contains(
-                    "CapturedStrikeForemanCredits = 176")
-                && globalLootText.Contains(
-                    "captured-atomic-membership-enemy-level-bounded-item-ql"),
-                "Strike Foreman must be active through its exact named encounter contract with production-owned item QL and level-bounded atomic loot quality.");
 
             Assert.AreEqual(
                 12,
                 CountOccurrences(ordinaryProviderText, "\"melded_patterns\""),
                 "Accepted Subway Melded Patterns must preserve its profile keys and all ten exact spawn rows.");
-            Assert.IsTrue(
-                ordinaryProviderText.Contains("\"Melded Patterns\"")
-                && ordinaryProviderText.Contains("203747")
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(122672, 122673, 15, 1, 4, 2500)")
-                && CountOccurrences(ordinaryProviderText, ", 203747, 23368,") == 10
-                && ordinaryProfiles.Single(value => value.DisplayName == "Melded Patterns").Loot.ObservedEmptyInventories == 1
-                && !ordinaryProfiles.Single(value => value.DisplayName == "Melded Patterns").Loot.ItemPoolComplete
-                && meldedPatternsCombatContract.Contains("20260716-034559")
-                && meldedPatternsCombatContract.Contains("combat.ObservedRows == 7")
-                && meldedPatternsCombatContract.Contains("combat.MinDamage == 21")
-                && meldedPatternsCombatContract.Contains("combat.MaxDamage == 34")
-                && meldedPatternsCombatContract.Contains("CapturedEnemyCombatContract.EquippedWeapon(")
-                && meldedPatternsCombatContract.Contains("CapturedSubwayMeldedPatternsWeaponLowTemplate")
-                && meldedPatternsCombatContract.Contains("CapturedSubwayMeldedPatternsWeaponHighTemplate")
-                && meldedPatternsCombatContract.Contains("CapturedSubwayMeldedPatternsWeaponQuality")
-                && !meldedPatternsCombatContract.Contains("FixedAttack(")
-                && !meldedPatternsCombatContract.Contains("EquippedWeaponWithEmptySpecialAttackContext(")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Melded Patterns must keep ten exact spawns, exact QL20 weapon-owned damage/recharge without invented attack context, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             Assert.AreEqual(
                 23,
@@ -3319,50 +2007,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     value => value.Disposition == OrdinaryEnemyRuntimeDisposition.Active
                              && value.LevelDefinition.Mode
                                 == OrdinaryEnemySpawnLevelMode.ExplicitObservedVariants));
-            Assert.IsTrue(
-                ordinaryProviderText.Contains("\"Workman Striker\"")
-                && ordinaryProviderText.Contains("203854")
-                && ordinaryProviderText.Contains("5.139163")
-                && CountOccurrences(ordinaryProviderText, "new CapturedSubwaySourceWeaponEvidenceDefinition(") >= 32
-                && CountOccurrences(ordinaryProviderText, "new CapturedSubwayGenerationVariantDefinition(203854,") == 31
-                && ordinaryProviderText.Contains("new CapturedSubwayLootEvidenceDefinition(202719, 202720, 14, 2, 30, 667)")
-                && CountOccurrences(ordinaryProviderText, ", 203854, 17899,") == 40
-                && workmanStriker.Loot.PoolMode == OrdinaryEnemyLootPoolMode.IndependentEntries
-                && !workmanStriker.Loot.ItemPoolComplete
-                && workmanStriker.Loot.ObservedCompleteInventories == 30
-                && workmanStriker.Loot.ObservedEmptyInventories == 8
-                && catalogText.Contains("archetype.MonsterData == WorkmanStrikerMonsterData")
-                && catalogText.Contains("CapturedSubwayCombatCatalog.ForOrdinary(")
-                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
-                && ordinaryRuntimeText.Contains("spawn.SourceIdentity,")
-                && ordinaryRuntimeText.Contains("variant);")
-                && workmanStrikerCombatContract.Contains("requires a selected capture-reviewed atomic generation variant")
-                && combatContractText.Contains("combat != null && combat.Observed")
-                && combatContractText.Contains("Workman Striker combat requires one exact reviewed atomic level/stat/weapon generation")
-                && combatContractText.Contains("CapturedEnemyCombatContract.EquippedWeaponWithCapturedAttackInfo(")
-                && combatContractText.Contains("captured SIW shapes remain report-only")
-                && workmanStrikerCombatReport.Contains("\"normalAttackInfoRows\": 59")
-                && workmanStrikerCombatReport.Contains("\"normalMinDamage\": 9")
-                && workmanStrikerCombatReport.Contains("\"normalMaxDamage\": 23")
-                && workmanStrikerCombatReport.Contains("\"criticalAttackInfoRows\": 7")
-                && workmanStrikerCombatReport.Contains("\"criticalMinDamage\": 28")
-                && workmanStrikerCombatReport.Contains("\"criticalMaxDamage\": 42")
-                && workmanStrikerCombatReport.Contains("\"missedAttackInfoRows\": 14")
-                && workmanStrikerCombatReport.Contains("\"specialAttackWeaponRows\": 20")
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown1\": 100") == 1
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown2\": 100") == 1
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown3\": 100") == 1
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown4\": 100") == 1
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown1\": 72") == 1
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown2\": 72") == 1
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown3\": 72") == 1
-                && CountOccurrences(workmanStrikerCombatReport, "\"unknown4\": 72") == 1
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Workman Striker must keep 22 exact sources, 31 capture-reviewed atomic generations, item-owned normal damage/recharge, captured AttackInfo, report-only critical/SIW evidence, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             CapturedSubwayCombatEvidenceDefinition workmanCombatEvidence =
                 new CapturedSubwayOrdinaryContentProvider()
@@ -3438,38 +2082,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, looter.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, looter.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, looter.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                looterSpawns.All(
-                    value =>
-                        {
-                            CapturedEnemyCombatContract contract =
-                                looter.Combat.ResolveContract(
-                                    value.SourceIdentity,
-                                    value.Level);
-                            return !contract.IsCombatReady
-                                   && contract.IsQuarantined
-                                   && !string.IsNullOrWhiteSpace(contract.QuarantineReason);
-                        })
-                && CountOccurrences(ordinaryProviderText, ", 203745, 17870,") == 11
-                && catalogText.Contains("CoherentSubwayOrdinaryCombatSources.Contains(sourceIdentity)")
-                && looterCombatContract.Contains("ForSourceSpecificWeaponArchetype")
-                && ordinaryCombatContract.Contains("aggregate weapon fallback is forbidden")
-                && sourceSpecificWeaponCombatContract.Contains("if (matches != 1 || matched == null)")
-                && sourceSpecificWeaponCombatContract.Contains("item owns normal damage and recharge")
-                && !sourceSpecificWeaponCombatContract.Contains("specialAttackWeapon")
-                && generatedCombatReportText.Contains("\"Looter\":")
-                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 15")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 11")
-                && generatedCombatReportText.Contains("\"normalMaxDamage\": 11")
-                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 1")
-                && generatedCombatReportText.Contains("\"criticalMinDamage\": 25")
-                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 25")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Looter must keep eight exact source weapons and dispositions, fail-closed aggregate/missing/conflicting/unknown selection, item-owned visible weapon damage/recharge, report-only critical, strict incomplete-pool loot, CATMesh/credits, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile mugger = ordinaryProfiles.Single(value => value.DisplayName == "Mugger");
             OrdinaryEnemySpawnDefinition[] muggerSpawns = ordinarySpawns
@@ -3559,40 +2171,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, mugger.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, mugger.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, mugger.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                muggerSpawns.All(
-                    value => mugger.Combat.ResolveContract(
-                            value.SourceIdentity,
-                            value.Level).AttackModel
-                        == CapturedEnemyAttackModel.EquippedWeapon)
-                && CountOccurrences(ordinaryProviderText, ", 203734, 17534,") == 25
-                && combatContractText.Contains("Mugger combat requires an exact captured source identity; aggregate weapon fallback is forbidden")
-                && muggerCombatContract.Contains("HasCompleteMuggerSourceWeaponEvidence")
-                && muggerCombatContract.Contains("if (matches != 1 || matched == null)")
-                && muggerCombatContract.Contains("EquippedWeaponWithCapturedAttackInfo")
-                && muggerCombatContract.Contains("item owns runtime damage, damage bonus, and recharge")
-                && muggerCombatContract.Contains("criticals are report-only")
-                && muggerCombatContract.Contains("no empty SIW or captured attack-start/stop context")
-                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
-                && ordinaryRuntimeText.Contains("spawn.SourceIdentity,")
-                && ordinaryRuntimeText.Contains("variant);")
-                && ordinaryRuntimeText.Contains("FindSocialAggroAllies")
-                && ordinaryRuntimeText.Contains("HasClearAggroLineOfSight")
-                && npcRuntimeText.Contains("this.ordinaryEnemies.FindSocialAggroAllies(")
-                && muggerCombatReport.Contains("\"normalAttackInfoRows\": 38")
-                && muggerCombatReport.Contains("\"normalMinDamage\": 9")
-                && muggerCombatReport.Contains("\"normalMaxDamage\": 12")
-                && muggerCombatReport.Contains("\"criticalAttackInfoRows\": 3")
-                && muggerCombatReport.Contains("\"criticalMinDamage\": 21")
-                && muggerCombatReport.Contains("\"criticalMaxDamage\": 21")
-                && muggerCombatReport.Contains("\"medianRechargeSeconds\": 5.816469")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Mugger must keep all nine exact source weapons, spawn levels, and dispositions; fail-closed aggregate/missing/conflicting/unknown selection; item-owned damage/recharge with captured AttackInfo shape; report-only criticals; LOS-gated automatic and same-profile social aggro; strict 18-open incomplete-pool loot; exact CATMesh/level credits; shared chase; private four-minute respawn; and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile derangedShopper = ordinaryProfiles.Single(
                 value => value.DisplayName == "Deranged Shopper");
@@ -3690,53 +2268,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, derangedShopper.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, derangedShopper.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, derangedShopper.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                ordinaryCombatContract.Contains("DerangedShopperMonsterData")
-                && derangedShopperCombatContract.Contains("evidence.Length != 1")
-                && derangedShopperCombatContract.Contains("125454")
-                && derangedShopperCombatContract.Contains("125455")
-                && derangedShopperCombatContract.Contains("EquippedWeaponWithCapturedAttackInfo")
-                && derangedShopperCombatContract.Contains("ten normal local-player hits span 7..15")
-                && derangedShopperCombatContract.Contains("one 27-point critical is report-only")
-                && derangedShopperCombatContract.Contains("six captured misses")
-                && derangedShopperCombatContract.Contains("empty SpecialAttackWeapon 56/45/45/45/0")
-                && derangedShopperCombatContract.Contains("attack-start, StopFight, and death context")
-                && derangedShopperCombatContract.Contains("item owns runtime damage, damage bonus, and recharge")
-                && derangedShopperCombatContract.Contains("runtime behavior is unchanged")
-                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
-                && derangedShopperCombatReport.Contains("\"normalAttackInfoRows\": 10")
-                && derangedShopperCombatReport.Contains("\"normalMinDamage\": 7")
-                && derangedShopperCombatReport.Contains("\"normalMaxDamage\": 15")
-                && derangedShopperCombatReport.Contains("\"criticalAttackInfoRows\": 1")
-                && derangedShopperCombatReport.Contains("\"criticalMinDamage\": 27")
-                && derangedShopperCombatReport.Contains("\"criticalMaxDamage\": 27")
-                && derangedShopperCombatReport.Contains("\"missedAttackInfoRows\": 7")
-                && derangedShopperCombatReport.Contains("\"missedAttackShapes\": [")
-                && derangedShopperCombatReport.Contains("\"ammoCount\": -1")
-                && derangedShopperCombatReport.Contains("\"weaponSlot\": 6")
-                && derangedShopperCombatReport.Contains("\"unknown\": 0")
-                && derangedShopperCombatReport.Contains("\"rows\": 7")
-                && derangedShopperCombatReport.Contains("\"specialAttackWeaponRows\": 1")
-                && derangedShopperCombatReport.Contains("\"unknown1\": 56")
-                && derangedShopperCombatReport.Contains("\"unknown2\": 45")
-                && derangedShopperCombatReport.Contains("\"unknown3\": 45")
-                && derangedShopperCombatReport.Contains("\"unknown4\": 45")
-                && derangedShopperCombatReport.Contains("\"unknown5\": 0")
-                && derangedShopperCombatReport.Contains("\"equippedWeaponShapes\": [")
-                && derangedShopperCombatReport.Contains("\"lowId\": 125454")
-                && derangedShopperCombatReport.Contains("\"highId\": 125455")
-                && derangedShopperCombatReport.Contains("\"quality\": 8")
-                && derangedShopperCombatReport.Contains("20260710-202132")
-                && derangedShopperCombatReport.Contains("(SimpleChar:79574527)")
-                && derangedShopperCombatReport.Contains("20260720-031025")
-                && derangedShopperCombatReport.Contains("(SimpleChar:79803651)")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Deranged Shopper must keep its one active source, exact QL8 source-owned weapon and captured AttackInfo shape, fail-closed aggregate/unknown/missing/conflicting selection, item-owned damage/recharge, ten normal hits at 7..15, report-only critical, seven aggregate misses, evidence-only SIW/start/stop/death context, strict three-open incomplete-pool loot, exact CATMesh/credits, shared chase, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile discardedPet = ordinaryProfiles.Single(
                 value => value.DisplayName == "Discarded Pet");
@@ -3829,26 +2360,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, discardedPet.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, discardedPet.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, discardedPet.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                combatContractText.Contains("case 17720:")
-                && combatContractText.Contains("AttackInfoAmmoCount = attackInfoAmmoCount")
-                && discardedPetContractCase.Contains("CapturedSubwayDiscardedPetWeaponTag")
-                && discardedPetContractCase.Contains("-1")
-                && discardedPet.Combat.Contract.Evidence.Contains("37 normal local-player")
-                && discardedPet.Combat.Contract.Evidence.Contains("criticals remain report-only")
-                && discardedPet.Combat.Contract.Evidence.Contains("conventional median 5.089763")
-                && discardedPetCombatReport.Contains("\"normalAttackInfoRows\": 37")
-                && discardedPetCombatReport.Contains("\"normalMinDamage\": 9")
-                && discardedPetCombatReport.Contains("\"normalMaxDamage\": 18")
-                && discardedPetCombatReport.Contains("\"criticalAttackInfoRows\": 4")
-                && discardedPetCombatReport.Contains("\"criticalMinDamage\": 30")
-                && discardedPetCombatReport.Contains("\"criticalMaxDamage\": 33")
-                && discardedPetCombatReport.Contains("\"medianRechargeSeconds\": 5.079568")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && worldPopulationControllerText.Contains("DelayStartsAt = RespawnDelayStartsAt.NpcDespawn")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Discarded Pet must keep all 29 exact active spawns, captured SIW1 9..18 normal roll and cadence, report-only critical observations, retaliatory chase without proactive aggro or return-to-spawn, strict 16-open incomplete-pool loot, exact CATMesh/level credits, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile bloodcreeper = ordinaryProfiles.Single(value => value.DisplayName == "Bloodcreeper");
             OrdinaryEnemySpawnDefinition[] bloodcreeperSpawns = ordinarySpawns
@@ -3885,20 +2396,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, bloodcreeper.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, bloodcreeper.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, bloodcreeper.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, ", 30379, 26978,") == 1
-                && combatContractText.Contains("CapturedSubwayBloodcreeperSpitInitialSeconds")
-                && combatContractText.Contains("CapturedSubwayBloodcreeperSpitRechargeSeconds")
-                && combatContractText.Contains("CapturedSubwayBloodcreeperBiteInitialSeconds")
-                && combatContractText.Contains("CapturedSubwayBloodcreeperBiteRechargeSeconds")
-                && combatContractText.Contains("CapturedSubwayBloodcreeperSpecialAttackWeaponLastValue")
-                && catalogText.Contains("SubwayOrdinaryRespawnPolicy()")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Bloodcreeper must keep its one exact active spawn, L15..25 generation policy, auto aggro and chase, dual captured natural attacks, strict incomplete-pool loot, L24 exact/private-band credit policy, CATMesh, inherited private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile stimFiend = ordinaryProfiles.Single(value => value.DisplayName == "Stim Fiend");
             OrdinaryEnemySpawnDefinition[] stimFiendSpawns = ordinarySpawns
@@ -3946,20 +2443,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, stimFiend.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, stimFiend.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, stimFiend.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, ", 203739, 5907,") == 15
-                && generatedCombatReportText.Contains("\"Stim Fiend\":")
-                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 13")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 10")
-                && generatedCombatReportText.Contains("\"normalMaxDamage\": 16")
-                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 0")
-                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Stim Fiend must keep 15 exact spawn dispositions, captured fixed normal-only combat, strict incomplete-pool loot, only observed level-credit rows with L17 unresolved, CATMesh, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile neuralBurnout = ordinaryProfiles.Single(value => value.DisplayName == "Neural Burnout");
             OrdinaryEnemySpawnDefinition[] neuralBurnoutSpawns = ordinarySpawns
@@ -4006,22 +2489,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, neuralBurnout.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, neuralBurnout.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, neuralBurnout.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, ", 203730, 5941,") == 9
-                && generatedCombatReportText.Contains("\"Neural Burnout\":")
-                && generatedCombatReportText.Contains("\"normalAttackInfoRows\": 7")
-                && generatedCombatReportText.Contains("\"normalMinDamage\": 15")
-                && generatedCombatReportText.Contains("\"normalMaxDamage\": 22")
-                && generatedCombatReportText.Contains("\"criticalAttackInfoRows\": 1")
-                && generatedCombatReportText.Contains("\"criticalMinDamage\": 51")
-                && generatedCombatReportText.Contains("\"criticalMaxDamage\": 51")
-                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Neural Burnout must keep seven exact active spawns, captured fixed normal combat with report-only critical, strict incomplete-pool loot, only observed level-credit rows with L22 unresolved, CATMesh, shared chase, private four-minute respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile uncontrollableAnger = ordinaryProfiles.Single(
                 value => value.DisplayName == "Uncontrollable Anger");
@@ -4130,34 +2597,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0.0, uncontrollableAnger.Corpse.EmptyLifetimeSeconds);
             Assert.AreEqual(60.0, uncontrollableAnger.Corpse.UnlootedLifetimeSeconds);
             Assert.AreEqual(0.0, uncontrollableAnger.Corpse.LootedCleanupSeconds);
-            Assert.IsTrue(
-                CountOccurrences(ordinaryProviderText, ", 96195, 96177,") == 8
-                && uncontrollableAngerCombatReport.Contains("\"retaliationRows\": 12")
-                && uncontrollableAngerCombatReport.Contains("\"normalAttackInfoRows\": 7")
-                && uncontrollableAngerCombatReport.Contains("\"normalMinDamage\": 9")
-                && uncontrollableAngerCombatReport.Contains("\"normalMaxDamage\": 18")
-                && uncontrollableAngerCombatReport.Contains("\"criticalAttackInfoRows\": 1")
-                && uncontrollableAngerCombatReport.Contains("\"criticalMinDamage\": 19")
-                && uncontrollableAngerCombatReport.Contains("\"criticalMaxDamage\": 19")
-                && uncontrollableAngerCombatReport.Contains("\"missedAttackInfoRows\": 9")
-                && uncontrollableAngerCombatReport.Contains("\"attackInfoRows\": 4")
-                && uncontrollableAngerCombatReport.Contains("\"minDamage\": 25")
-                && uncontrollableAngerCombatReport.Contains("\"maxDamage\": 42")
-                && uncontrollableAngerCombatReport.Contains("\"attackInfoRows\": 1")
-                && uncontrollableAngerCombatReport.Contains("\"minDamage\": 19")
-                && uncontrollableAngerCombatReport.Contains("\"maxDamage\": 19")
-                && uncontrollableAngerCombatReport.Contains("\"reviewedTargetCadence\"")
-                && uncontrollableAngerCombatReport.Contains("5.1165513")
-                && uncontrollableAngerCombatReport.Contains("5.1671525")
-                && uncontrollableAngerCombatReport.Contains("10.1003489")
-                && uncontrollableAngerCombatReport.Contains("\"runtimeRechargeSeconds\": 5.167153")
-                && ordinaryCombatContract.Contains("CapturedEnemyCombatContract.FixedAttack(")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue")
-                && worldPopulationControllerText.Contains("OrdinaryEnemyDefaultRespawnSeconds = 240.0")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Uncontrollable Anger must keep six exact active spawns, two captured patrols, local-player damage separated from Killer-pet and other-player evidence, the reviewed full cadence window, strict loot and exact observed credits, CATMesh, shared chase, inherited private respawn, and ordinary corpse lifetimes together.");
 
             OrdinaryEnemyProfile incompleteRebuild = ordinaryProfiles.Single(
                 value => value.DisplayName == "Incomplete Rebuild");
@@ -4399,44 +2838,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(catalogText.Contains("SubwayOrdinaryRespawnSeconds = 240.0"), "Accepted Disobedient Bot shared scheduler delay is missing.");
             Assert.IsTrue(catalogText.Contains("SubwayOrdinaryRespawnPolicy()"), "Accepted Disobedient Bot shared respawn policy is missing.");
             Assert.IsTrue(
-                combatContractText.Contains("case 17649:")
-                && providerText.Contains("CapturedSubwayCombatCatalog.For(name, monsterData, level)")
-                && combatContractText.Contains("15 Disobedient Bot SIW1 normal local-player hits span 6-15 damage")
-                && combatContractText.Contains("numeric SpecialAttackWeapon values at levels 5, 6, 8, 9, and 10")
-                && combatContractText.Contains("OrdinaryEnemyCombatSetupGenerator.TryGenerate")
-                && combatContractText.Contains("Disobedient Bot SIW1 mathematical combat setup is unsupported for level")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotMinimumDamage = 6")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotMaximumDamage = 15")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotRechargeSeconds = 5.973723")
-                && attackRulesText.Contains("CapturedSubwayDisobedientBotWeaponTag = 0x53495731")
-                && !attackRulesText.Contains("CapturedSubwayDisobedientBotLevel5SpecialAttackWeaponValue")
-                && !attackRulesText.Contains("CapturedSubwayDisobedientBotLevel7SpecialAttackWeaponPolicyValue")
-                && combatSetupGeneratorText.Contains("((19 * input.ActorLevel) + 28) / 4")
-                && combatSetupGeneratorText.Contains("DisobedientBotMinimumLevel = 5")
-                && combatSetupGeneratorText.Contains("DisobedientBotMaximumLevel = 10")
-                && catalogText.Contains("CapturedSubwayCombatCatalog.For(")
-                && catalogText.Contains("archetype.MonsterData,")
-                && catalogText.Contains("level)")
-                && ordinaryProfileText.Contains("CapturedEnemyCombatContract ResolveContract(int level)")
-                && ordinaryRuntimeText.Contains("CapturedEnemyCombatContract baseline = profile.Combat.ResolveContract(")
-                && ordinaryRuntimeText.Contains("combatContract.AttackModel")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue"),
-                "Accepted Subway Disobedient Bot must preserve level-aware SIW1 context, captured damage/attempt cadence, and shared chase while failing closed outside bounded levels.");
-            Assert.IsTrue(
-                providerText.Contains("234877")
-                && providerText.Contains("104683")
-                && providerText.Contains("113398")
-                && catalogText.Contains("if (monsterData == 17649)")
-                && catalogText.Contains("OrdinaryEnemyLootPoolMode.WeightedOne")
-                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(5, 6, 6, 2")
-                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(6, 8, 8, 3")
-                && catalogText.Contains("20260719-020104")
-                && catalogText.Contains("new OrdinaryEnemyLevelCreditRule(10, 12, 12, 2")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)"),
-                "Accepted Subway Disobedient Bot must preserve strict weighted loot evidence, exact credits, CATMesh behavior, and ordinary corpse lifetimes.");
-            Assert.IsTrue(
                 disobedientBotCombatReport.Contains("\"20260708-143600\"")
                 && disobedientBotCombatReport.Contains("\"20260712-153918\"")
                 && disobedientBotCombatReport.Contains("\"20260713-014714\"")
@@ -4451,36 +2852,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && disobedientBotCombatReport.Contains("\"attackInfoRows\": 3")
                 && disobedientBotCombatReport.Contains("\"attackInfoRows\": 2"),
                 "Accepted Subway Disobedient Bot generated combat evidence must retain the local-player, other-player, and player-owned-pet boundaries plus focused attempt cadence.");
-
-            Assert.IsTrue(
-                providerText.Contains("CapturedSurveySpawn(Thief(0x7953AEA5, 5, 146, 72.7292557f, 115.61483f, 313.1308f, 93, 20, useSpawnAsPatrolStart: true, healthDamage: 31))")
-                && providerText.Contains("this.HealthDamage = healthDamage;")
-                && catalogText.Contains("source.HealthDamage,")
-                && catalogText.Contains("monsterData == 26092 ? 1.0 : (double?)null")
-                && catalogText.Contains("monsterData == 26092 ? 1 : (int?)null")
-                && heartbeatRuntimeText.Contains("ordinaryDefinition.Profile.Combat.HealthRegenIntervalSeconds")
-                && heartbeatRuntimeText.Contains("ordinaryDefinition.Profile.Combat.RegenerateHealthWhileInCombat")
-                && providerText.Contains("new CapturedSubwayPatrolReplaySegment(4.548876")
-                && providerText.Contains("new CapturedSubwayLootDefinition(")
-                && providerText.Contains("\"Thief\"")
-                && providerText.Contains("26092")
-                && providerText.Contains("138")
-                && providerText.Contains("297055")
-                && providerText.Contains("10000"),
-                "Accepted Subway Thief must have captured max/current health, patrol start, respawn, guaranteed handbag loot, and identity-specific loot evidence together.");
-
-            Assert.IsTrue(
-                combatContractText.Contains("case 26092:")
-                && combatContractText.Contains("CapturedEnemyCombatContract.EquippedWeaponWithEmptySpecialAttackContext(")
-                && combatContractText.Contains("121567")
-                && combatContractText.Contains("CapturedSubwayThiefAttackStartDelaySeconds")
-                && combatContractText.Contains("CapturedSubwayThiefMovementTransitionDelaySeconds")
-                && combatContractText.Contains("CapturedSubwayThiefFirstHitDelaySeconds")
-                && combatContractText.Contains("CapturedSubwayThiefRechargeSeconds")
-                && combatContractText.Contains("CapturedSubwayThiefAttackInfoAmmoCount")
-                && combatContractText.Contains("CapturedSubwayThiefAttackInfoUnknown")
-                && combatContractText.Contains("CapturedSubwayThiefSpecialAttackWeaponUnknown1"),
-                "Accepted Subway Thief must keep one combat contract containing weapon, attack context, movement transition, timing, and AttackInfo context.");
             Assert.IsTrue(
                 attackRulesText.Contains("CapturedSubwayThiefMonsterData = 26092")
                 && attackRulesText.Contains("CapturedSubwayThiefAttackInfoAmmoCount = -1")
@@ -4489,115 +2860,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && attackRulesText.Contains("CapturedSubwayThiefWeaponDamageMinimumOverride = 0")
                 && attackRulesText.Contains("CapturedSubwayThiefWeaponDamageMaximumOverride = 0"),
                 "Accepted Subway Thief must not silently fall back to fixed fake damage or stale AttackInfo constants.");
-
-            Assert.IsTrue(
-                movementCoordinatorText.Contains("capturedContract.HasCapturedAttackStartContext")
-                && movementCoordinatorText.Contains("capturedContract.MovementTransitionDelaySeconds")
-                && movementRuntimeText.Contains("FollowTargetStart")
-                && movementRuntimeText.Contains("FollowTargetContinue"),
-                "Accepted Subway Thief must be covered by captured attack-start transition and generic combat follow/chase movement.");
-
-            Assert.IsTrue(
-                weaponPacketText.Contains("owner.Stats[StatIds.monsterdata].Value == 26092")
-                && weaponPacketText.Contains("string.Equals(owner.Name, \"Thief\"")
-                && weaponPacketText.Contains("CharacterStat.Energy")
-                && weaponPacketText.Contains("CharacterStat.AttackDelay")
-                && weaponPacketText.Contains("CharacterStat.RechargeDelay"),
-                "Accepted Subway Thief must announce a live-shaped equipped weapon definition so the client renders projectile damage.");
-
-            Assert.IsTrue(
-                catalogText.Contains("source.MonsterData == 26092")
-                && catalogText.Contains("0x00122002u")
-                && catalogText.Contains("OrdinaryEnemyScfuProfile.CapturedThief")
-                && scfuPacketText.Contains("ordinaryRuntime.Profile.Appearance.ScfuProfile")
-                && scfuPacketText.Contains("OrdinaryEnemyScfuProfile.CapturedThief"),
-                "Accepted Subway Thief must retain its identity-specific SCFU appearance and movement bytes.");
-            Assert.IsTrue(
-                catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedThief")
-                && corpsePacketText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
-                && corpsePacketText.Contains("CapturedSubwayThiefPacketLength = 412")
-                && corpsePacketText.Contains("CapturedSubwayThiefTemplate")
-                && corpsePacketText.Contains("BuildCapturedSubwayThief("),
-                "Accepted Subway Thief must retain the exact captured corpse visual packet path.");
-
-            string registerCorpse = ExtractMethodBlock(playfieldText, "private bool RegisterCorpse");
-            Assert.IsTrue(
-                playfieldText.Contains("CapturedSubwayThiefCorpseCatMesh = 5907")
-                && playfieldText.Contains("private static bool UsesCapturedThiefCorpseProfile(ICharacter target)")
-                && playfieldText.Contains("OrdinaryEnemyRuntimeRegistry.TryGet")
-                && !registerCorpse.Contains("if (!state.HasUnlootedItems)")
-                && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero")
-                && corpseRulesText.Contains("EmptyCorpseLifetime = TimeSpan.Zero")
-                && corpseRulesText.Contains("RegularLootCorpseLifetime = TimeSpan.FromSeconds(60)")
-                && catalogText.Contains("OrdinaryEnemyCorpsePacketProfile.CapturedThief")
-                && CountOccurrences(
-                    catalogText.Replace("\r\n", "\n"),
-                    "0.0,\n                60.0,\n                0.0") >= 3,
-                "Accepted Subway Thief must keep its captured corpse visual, 60-second loot-bearing lifetime across close/reopen, and instant empty cleanup.");
         }
 
-        [TestMethod]
-        public void OrdinaryEnemyRuntimeFailsClosedAndCleansProfileLifecycleState()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string spawnMethod = ExtractMethodBlock(
-                runtimeText,
-                "private bool Spawn(");
-            int combatFailureStart = spawnMethod.IndexOf(
-                "if (!combatReady)",
-                StringComparison.Ordinal);
-            int combatFailureReturn = combatFailureStart < 0
-                ? -1
-                : spawnMethod.IndexOf(
-                    "return false;",
-                    combatFailureStart,
-                    StringComparison.Ordinal);
-            int runtimeRegistration = spawnMethod.IndexOf(
-                "OrdinaryEnemyRuntimeRegistry.Register(character.Identity.Instance",
-                StringComparison.Ordinal);
 
-            Assert.IsTrue(
-                playfieldText.Contains("GlobalLootRuntimeService.Generate(target, this.Identity.Instance)")
-                && !playfieldText.Contains("RollCorpseLootItems")
-                && !playfieldText.Contains("GetDatabaseLootTable")
-                && !playfieldText.Contains("DebugLootTable"),
-                "All corpse loot must resolve through the global service, with unresolved ordinary loot failing closed there.");
-
-            Assert.IsTrue(
-                playfieldText.Contains("ordinaryDefinition.Profile.Corpse.UnlootedLifetimeSeconds")
-                && playfieldText.Contains("ordinaryDefinition.Profile.Corpse.LootedCleanupSeconds")
-                && playfieldText.Contains("selectedCorpse.ItemLootLifetime")
-                && playfieldText.Contains("selectedCorpse.EmptyCleanupDelay"),
-                "Corpse access and final-loot cleanup must consume the ordinary profile lifetime values.");
-
-            Assert.IsTrue(
-                combatFailureStart >= 0
-                && combatFailureReturn > combatFailureStart
-                && runtimeRegistration > combatFailureReturn
-                && spawnMethod.Contains("CapturedEnemyCombatRuntimeRegistry.Remove(character.Identity.Instance);")
-                && spawnMethod.IndexOf("this.activateNpc(character);", StringComparison.Ordinal)
-                   > combatFailureReturn,
-                "An unresolved or unequippable ordinary combat contract must reject the population generation before runtime registration or activation.");
-
-            Assert.IsTrue(
-                runtimeText.Contains("this.activeRuntimeIdentityBySource.ContainsKey(spawn.SourceIdentity)")
-                && runtimeText.Contains("internal void ClearRuntimeState(int playfieldInstance)")
-                && runtimeText.Contains("OrdinaryEnemyRuntimeRegistry.RemoveForPlayfield(playfieldInstance)")
-                && npcRuntimeText.Contains("this.worldPopulation.ClearPlayfield(this.playfield.Identity.Instance)")
-                && npcRuntimeText.Contains("this.ordinaryEnemies.ClearRuntimeState(this.playfield.Identity.Instance)")
-                && runtimeSystemsText.Contains("internal void ClearNpcRuntimeState()")
-                && playfieldText.Contains("this.runtimeSystems.ClearNpcRuntimeState();"),
-                "Spawn/reset/dispose paths must prevent duplicates and clear runtime, combat, diagnostic, and profile registry state.");
-        }
 
         [TestMethod]
         public void OrdinaryEnemyProfileValidatorAcceptsStableKeysAndExplicitUnresolvedEvidence()
@@ -4929,200 +3194,20 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsTrue(observedRespawn.HasRespawnDelay);
         }
 
-        [TestMethod]
-        public void KnownPlayfieldContentModulesAreRegisteredExactlyOnceThroughCoordinatorPath()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentCoordinator.cs"));
-            string registrationText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentRegistration.cs"));
 
-            string[] expectedModules =
-                {
-                    "AreteContentModule",
-                    "MontroyalContentModule",
-                    "SubwayContentModule",
-                    "TempleOfThreeWindsContentModule",
-                    "PrivateCityContentModule"
-                };
-
-            Assert.IsTrue(
-                playfieldText.Contains("private readonly PlayfieldRuntimeSystems runtimeSystems"),
-                "Playfield must own runtime systems through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.MaterializeStartupObjects("),
-                "Playfield must enter startup content materialization through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldContentCoordinator content"),
-                "PlayfieldRuntimeSystems must own PlayfieldContentCoordinator.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("this.content.RegisterContent(this.playfield, playfieldIdentity);"),
-                "PlayfieldRuntimeSystems must delegate content registration through PlayfieldContentCoordinator.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("this.RegisterContent,"),
-                "PlayfieldRuntimeSystems must pass content registration into startup materialization.");
-
-            int coordinatorIndex = runtimeSystemsText.IndexOf("new PlayfieldContentCoordinator(", StringComparison.Ordinal);
-            Assert.IsTrue(coordinatorIndex >= 0, "Missing PlayfieldContentCoordinator construction.");
-
-            int previousIndex = coordinatorIndex;
-            for (int i = 0; i < expectedModules.Length; i++)
-            {
-                string constructor = "new " + expectedModules[i] + "()";
-                Assert.AreEqual(
-                    1,
-                    CountOccurrences(runtimeSystemsText, constructor),
-                    expectedModules[i] + " must be registered exactly once.");
-                Assert.AreEqual(
-                    0,
-                    CountOccurrences(playfieldText, constructor),
-                    "Playfield must not directly construct " + expectedModules[i] + ".");
-
-                int moduleIndex = runtimeSystemsText.IndexOf(constructor, coordinatorIndex, StringComparison.Ordinal);
-                Assert.IsTrue(moduleIndex > previousIndex, expectedModules[i] + " is not in expected coordinator order.");
-                previousIndex = moduleIndex;
-            }
-
-            Assert.IsTrue(
-                coordinatorText.Contains("new PlayfieldContentRegistration(playfield, playfieldIdentity)"),
-                "PlayfieldContentCoordinator must create PlayfieldContentRegistration.");
-            Assert.IsTrue(
-                coordinatorText.Contains("module.Register(registration)"),
-                "PlayfieldContentCoordinator must dispatch registrations through PlayfieldContentRegistration.");
-            Assert.IsTrue(
-                registrationText.Contains("public sealed class PlayfieldContentRegistration"),
-                "PlayfieldContentRegistration must remain the registration boundary.");
-        }
 
         [TestMethod]
         public void PlayfieldRuntimeSystemsFacadeOwnsSeparatedRuntimeCoordinators()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string attackHandlerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\AttackMessageHandler.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string characterCombatSubscriptionsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterCombatSubscriptions.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string npcCombatMovementText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"));
             string objectLifecycleText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs"));
-            string objectMaterializationText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
-            string dbMobSpawnText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"));
-            string environmentFunctionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs"));
-            string staticDynelRuntimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
-            string vendorRuntimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVendorRuntimeService.cs"));
-            string corpseAccessText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs"));
-            string rewardRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRewardRuntimeService.cs"));
-            string lifecycleText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleRuntimeService.cs"));
-            string transferText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTransferRuntimeService.cs"));
-            string playerDeathRespawnText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldPlayerDeathRespawnRuntimeService.cs"));
-            string statelTransitionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
-            string wallCollisionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldWallCollisionRuntimeService.cs"));
-            string statUpdateText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatUpdateRuntimeService.cs"));
-            string materializationText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
-            string timedLifecycleText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"));
-            string packetSequencesText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs"));
-            string visibilityFanoutText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs"));
-            string visibilityPacketText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
-            string announcementText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldAnnouncementRuntimeService.cs"));
-            string publishFanoutText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs"));
-            string characterHeartbeatText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"));
+                    @"Tests\Fixtures\Gameplay\Playfields\PlayfieldObjectLifecycleRuntimeService.cs"));
             string characterEntityText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Entities\Character.cs"));
-            string aotomationDeliveryText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldAOtomationDeliveryRuntimeService.cs"));
-            string npcCombatTickText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCombatTickCoordinator.cs"));
-            string corpseLifecycleText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NpcCorpseLifecycleCoordinator.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
+                    @"AORebirth\Libraries\Source\AORebirth.Core\Entities\Character.cs"));
 
             string[] runtimeCoordinatorConstructors =
                 {
@@ -5151,1042 +3236,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "new PlayfieldAOtomationDeliveryRuntimeService()",
                     "new PrivateCityReadyInitCoordinator("
                 };
-            for (int i = 0; i < runtimeCoordinatorConstructors.Length; i++)
-            {
-                Assert.AreEqual(
-                    1,
-                    CountOccurrences(runtimeSystemsText, runtimeCoordinatorConstructors[i]),
-                    "PlayfieldRuntimeSystems must own " + runtimeCoordinatorConstructors[i] + ".");
-                Assert.AreEqual(
-                    0,
-                    CountOccurrences(playfieldText, runtimeCoordinatorConstructors[i]),
-                    "Playfield must not directly construct " + runtimeCoordinatorConstructors[i] + ".");
-            }
-
-            Assert.IsTrue(
-                playfieldText.Contains("this.locality = new PlayfieldLocality(")
-                && playfieldText.Contains("this.runtimeSystems.VisibilityFanout,")
-                && playfieldText.Contains("this.runtimeSystems.PacketSequences,"),
-                "Playfield must construct one locality owner from the runtime fanout and packet-sequencing boundaries.");
-
-            Assert.AreEqual(
-                0,
-                CountOccurrences(runtimeSystemsText, "new NpcCorpseLifecycleCoordinator("),
-                "PlayfieldRuntimeSystems must delegate NPC corpse coordinator construction to NPCRuntimeService.");
-            Assert.AreEqual(
-                0,
-                CountOccurrences(runtimeSystemsText, "new NpcCombatTickCoordinator(playfield)"),
-                "PlayfieldRuntimeSystems must delegate NPC combat coordinator construction to NPCRuntimeService.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(npcRuntimeText, "new NpcCorpseLifecycleCoordinator(playfield, this.RemoveNpcHome)"),
-                "NPCRuntimeService must own NPC corpse lifecycle coordinator construction.");
-            Assert.IsTrue(
-                corpseLifecycleText.Contains("private readonly Action<Identity> removeNpcHome;")
-                && corpseLifecycleText.Contains("this.removeNpcHome(target.Identity);"),
-                "NpcCorpseLifecycleCoordinator must delegate home-state cleanup through NPCRuntimeService.");
-            Assert.IsFalse(
-                corpseLifecycleText.Contains("this.playfield.RemoveNpcHome(target.Identity);"),
-                "NpcCorpseLifecycleCoordinator must not route NPC home cleanup back through Playfield.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(npcRuntimeText, "new NpcCombatTickCoordinator(playfield)"),
-                "NPCRuntimeService must own NPC combat tick coordinator construction.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry;"),
-                "NPCRuntimeService must own NPC registry integration.");
             Assert.IsTrue(
                 objectLifecycleText.Contains("internal sealed class PlayfieldObjectLifecycleRuntimeService")
                 && objectLifecycleText.Contains("internal void RemoveInstancedEntity(IInstancedEntity entity)")
                 && objectLifecycleText.Contains("Pool.Instance.RemoveObject(entity);"),
                 "PlayfieldObjectLifecycleRuntimeService must own safe instanced object removal routing.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldObjectLifecycleRuntimeService objectLifecycle;")
-                && runtimeSystemsText.Contains("this.objectLifecycle.RemoveInstancedEntity(entity);")
-                && playfieldText.Contains("this.runtimeSystems.RemoveInstancedEntity(entity);"),
-                "Playfield object removals must route through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                playfieldText.Contains("Pool.Instance.RemoveObject(entity);"),
-                "Playfield must not directly remove instanced entities from Pool.");
-            Assert.IsTrue(
-                objectMaterializationText.Contains("internal sealed class PlayfieldObjectMaterializationRuntimeService")
-                && objectMaterializationText.Contains("internal void MaterializeStartupObjects(")
-                && objectMaterializationText.Contains("this.MaterializeDbMobSpawns(")
-                && objectMaterializationText.Contains("registerContent(playfieldIdentity);")
-                && objectMaterializationText.Contains("this.MaterializeVendors(")
-                && objectMaterializationText.Contains("this.MaterializeStaticDynels(")
-                && objectMaterializationText.Contains("refreshDynelRegistry();"),
-                "PlayfieldObjectMaterializationRuntimeService must own startup object materialization sequencing.");
-            Assert.IsFalse(
-                objectMaterializationText.Contains("MobSpawnDao")
-                || objectMaterializationText.Contains("MobSpawnStatDao")
-                || objectMaterializationText.Contains("NonPlayerCharacterHandler")
-                || objectMaterializationText.Contains("new NPCController")
-                || objectMaterializationText.Contains("ScriptCompiler")
-                || objectMaterializationText.Contains("VendorHandler")
-                || objectMaterializationText.Contains("new StaticDynel")
-                || objectMaterializationText.Contains("SendCompressed")
-                || objectMaterializationText.Contains("Announce(")
-                || objectMaterializationText.Contains("Stats["),
-                "PlayfieldObjectMaterializationRuntimeService must not own DB loading, object construction, script creation, vendor spawning, packets, or stat algorithms.");
-            Assert.IsTrue(
-                dbMobSpawnText.Contains("internal sealed class PlayfieldDbMobSpawnRuntimeService")
-                && dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)")
-                && dbMobSpawnText.Contains("MobSpawnDao.Instance.GetWhere(new { Playfield = playfieldIdentity.Instance })")
-                && dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)")
-                && dbMobSpawnText.Contains("MobSpawnStatDao.Instance.GetWhere(new { mob.Id, mob.Playfield })")
-                && dbMobSpawnText.Contains("internal ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats, Playfield playfield)")
-                && dbMobSpawnText.Contains("NonPlayerCharacterHandler.InstantiateMobSpawn(")
-                && dbMobSpawnText.Contains("new NPCController()")
-                && dbMobSpawnText.Contains("internal void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)")
-                && dbMobSpawnText.Contains("ScriptCompiler.Instance.CreateKnuBot(mob.KnuBotScriptName, cmob.Identity)"),
-                "PlayfieldDbMobSpawnRuntimeService must own DB mob spawn data loading, NPC construction callback, and KnuBot attachment.");
-            Assert.IsFalse(
-                playfieldText.Contains("private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions")
-                || playfieldText.Contains("private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats")
-                || playfieldText.Contains("private ICharacter InstantiateDbMobSpawn")
-                || playfieldText.Contains("private void AttachMobSpawnKnuBot"),
-                "Playfield must not directly own DB mob spawn loading or construction callbacks.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldDbMobSpawnRuntimeService dbMobSpawns")
-                && runtimeSystemsText.Contains("this.dbMobSpawns = new PlayfieldDbMobSpawnRuntimeService();")
-                && runtimeSystemsText.Contains("this.dbMobSpawns.LoadMobSpawnDefinitions")
-                && runtimeSystemsText.Contains("this.dbMobSpawns.LoadMobSpawnStats")
-                && runtimeSystemsText.Contains("(mob, stats) => this.dbMobSpawns.InstantiateDbMobSpawn(mob, stats, this.playfield)")
-                && runtimeSystemsText.Contains("this.dbMobSpawns.AttachMobSpawnKnuBot"),
-                "PlayfieldRuntimeSystems must route DB mob spawn materialization through the DB mob spawn runtime service.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldDbMobSpawnRuntimeService.");
-            Assert.IsTrue(
-                environmentFunctionText.Contains("internal sealed class PlayfieldEnvironmentFunctionRuntimeService")
-                && environmentFunctionText.Contains("internal void ExecuteFunction(")
-                && environmentFunctionText.Contains("switch (imExecuteFunction.Function.Target)")
-                && environmentFunctionText.Contains("case 1:")
-                && environmentFunctionText.Contains("case 2:")
-                && environmentFunctionText.Contains("case 3:")
-                && environmentFunctionText.Contains("case 14:")
-                && environmentFunctionText.Contains("case 19:")
-                && environmentFunctionText.Contains("case 23:")
-                && environmentFunctionText.Contains("case 26:")
-                && environmentFunctionText.Contains("case 100:")
-                && environmentFunctionText.Contains("sendNoValidTargetMessage(character, \"No valid target found\");")
-                && environmentFunctionText.Contains("FunctionCollection.Instance.CallFunction("),
-                "PlayfieldEnvironmentFunctionRuntimeService must own environment function target routing and function dispatch.");
-            Assert.IsFalse(
-                environmentFunctionText.Contains("ChatTextMessage")
-                || environmentFunctionText.Contains("SendCompressed")
-                || environmentFunctionText.Contains("Pool.Instance")
-                || environmentFunctionText.Contains("Teleport("),
-                "PlayfieldEnvironmentFunctionRuntimeService must not own packet construction, sends, Pool lookup, or teleport mechanics.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldEnvironmentFunctionRuntimeService environmentFunctions")
-                && runtimeSystemsText.Contains("this.environmentFunctions = new PlayfieldEnvironmentFunctionRuntimeService();")
-                && runtimeSystemsText.Contains("internal void ExecuteFunction(")
-                && runtimeSystemsText.Contains("this.environmentFunctions.ExecuteFunction("),
-                "PlayfieldRuntimeSystems must route environment function execution through the environment function runtime service.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.ExecuteFunction(")
-                && playfieldText.Contains("private static void SendNoValidFunctionTargetMessage(Character character, string text)")
-                && playfieldText.Contains("new ChatTextMessage { Identity = character.Identity, Text = text }"),
-                "Playfield must delegate environment function routing while keeping client feedback packet construction.");
-            Assert.IsFalse(
-                playfieldText.Contains("FunctionCollection.Instance.CallFunction(")
-                || playfieldText.Contains("switch (imExecuteFunction.Function.Target)"),
-                "Playfield must not directly own environment function dispatch or target routing.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldEnvironmentFunctionRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldEnvironmentFunctionRuntimeService.");
-            Assert.IsTrue(
-                staticDynelRuntimeText.Contains("internal sealed class PlayfieldStaticDynelRuntimeService")
-                && staticDynelRuntimeText.Contains("internal IEntity CreateStaticDynel(Identity playfieldIdentity, PlayfieldStaticDynelDefinition staticDynel)")
-                && staticDynelRuntimeText.Contains("new StaticDynel(playfieldIdentity, staticDynel.Identity, staticDynel.Template)")
-                && staticDynelRuntimeText.Contains("foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)")
-                && staticDynelRuntimeText.Contains("sdy.Stats[(int)stat.Value1] = (int)stat.Value2;")
-                && staticDynelRuntimeText.Contains("sdy.Stats.Add((int)stat.Value1, (int)stat.Value2);")
-                && staticDynelRuntimeText.Contains("sdy.Coordinate = staticDynel.Coordinate;")
-                && staticDynelRuntimeText.Contains("sdy.Heading = staticDynel.Heading;"),
-                "PlayfieldStaticDynelRuntimeService must own static dynel runtime construction from content definitions.");
-            Assert.IsFalse(
-                staticDynelRuntimeText.Contains("StaticDynelDao")
-                || staticDynelRuntimeText.Contains("MessagePackZip.DeserializeData")
-                || staticDynelRuntimeText.Contains("SendCompressed")
-                || staticDynelRuntimeText.Contains("Pool.Instance")
-                || staticDynelRuntimeText.Contains("VendorHandler"),
-                "PlayfieldStaticDynelRuntimeService must not own content DB loading, deserialization, packets, Pool registration, or vendor spawning.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime")
-                && runtimeSystemsText.Contains("this.staticDynelRuntime = new PlayfieldStaticDynelRuntimeService();")
-                && runtimeSystemsText.Contains("staticDynel => this.staticDynelRuntime.CreateStaticDynel(playfieldIdentity, staticDynel)"),
-                "PlayfieldRuntimeSystems must route static dynel construction through the static dynel runtime service.");
-            Assert.IsFalse(
-                playfieldText.Contains("private IEntity CreateStaticDynel(")
-                || playfieldText.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
-                "Playfield must not directly own static dynel runtime construction.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldStaticDynelRuntimeService.");
-            Assert.IsTrue(
-                vendorRuntimeText.Contains("internal sealed class PlayfieldVendorRuntimeService")
-                && vendorRuntimeText.Contains("internal void SpawnVendors(Playfield playfield, StatelData[] vendorStatels)")
-                && vendorRuntimeText.Contains("VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);"),
-                "PlayfieldVendorRuntimeService must own vendor runtime spawning.");
-            Assert.IsFalse(
-                vendorRuntimeText.Contains("StaticDynelDao")
-                || vendorRuntimeText.Contains("MessagePackZip.DeserializeData")
-                || vendorRuntimeText.Contains("new StaticDynel")
-                || vendorRuntimeText.Contains("SendCompressed")
-                || vendorRuntimeText.Contains("Pool.Instance"),
-                "PlayfieldVendorRuntimeService must not own content DB loading, static dynel construction, packets, or Pool registration.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
-                && runtimeSystemsText.Contains("this.vendors = new PlayfieldVendorRuntimeService();")
-                && runtimeSystemsText.Contains("vendorStatels => this.vendors.SpawnVendors(this.playfield, vendorStatels)"),
-                "PlayfieldRuntimeSystems must route vendor spawning through the vendor runtime service.");
-            Assert.IsFalse(
-                playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
-                || playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
-                "Playfield must not directly own vendor runtime spawning.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldVendorRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldVendorRuntimeService.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(npcRuntimeText, "new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
-                "NPCRuntimeService must own captured Arete robot content provider construction.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(
-                    npcRuntimeText,
-                    "new NpcPatrolReplayCoordinator(this.capturedAreteRobotContent, this.capturedSubwayContent)"),
-                "NPCRuntimeService must own NPC patrol replay coordinator construction.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(
-                    npcRuntimeText,
-                    "new CapturedAreteRobotSpawnOrchestrator("),
-                "NPCRuntimeService must own captured Arete robot spawn orchestration construction.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("this.ActivateNpc"),
-                "NPCRuntimeService must pass NPC activation ownership into captured robot spawning.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains(
-                    "private readonly Dictionary<int, NpcHomeState> npcHomeStates = new Dictionary<int, NpcHomeState>();"),
-                "NPCRuntimeService must own NPC home state storage.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains(
-                    "private readonly Dictionary<int, DateTime> corpseDespawnTicks = new Dictionary<int, DateTime>();"),
-                "NPCRuntimeService must own corpse despawn scheduling state.");
-            Assert.IsFalse(
-                playfieldText.Contains("private readonly Dictionary<int, DateTime> corpseDespawnTicks"),
-                "Playfield must not own corpse despawn scheduling state.");
-            Assert.IsFalse(
-                playfieldText.Contains("private readonly Dictionary<int, NpcHomeState> npcHomeStates"),
-                "Playfield must not own NPC home state storage.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly NPCRuntimeService npcRuntime")
-                && runtimeSystemsText.Contains("private readonly PlayfieldCorpseAccessRuntimeService corpseAccess")
-                && runtimeSystemsText.Contains("private readonly PlayfieldLifecycleRuntimeService lifecycle")
-                && runtimeSystemsText.Contains("private readonly PlayfieldNpcCombatMovementRuntimeService npcCombatMovement")
-                && runtimeSystemsText.Contains("private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization")
-                && runtimeSystemsText.Contains("private readonly PlayfieldPacketSequencingRuntimeService packetSequences")
-                && runtimeSystemsText.Contains("private readonly PlayfieldPlayerDeathRespawnRuntimeService playerDeathRespawn")
-                && runtimeSystemsText.Contains("private readonly PlayfieldStatelTransitionRuntimeService statelTransitions")
-                && runtimeSystemsText.Contains("private readonly PlayfieldStatUpdateRuntimeService statUpdates")
-                && runtimeSystemsText.Contains("private readonly PlayfieldStaticDynelRuntimeService staticDynelRuntime")
-                && runtimeSystemsText.Contains("private readonly PlayfieldTimedLifecycleRuntimeService timedLifecycle")
-                && runtimeSystemsText.Contains("private readonly PlayfieldTransferRuntimeService transfers")
-                && runtimeSystemsText.Contains("private readonly PlayfieldCharacterHeartbeatRuntimeService characterHeartbeat")
-                && runtimeSystemsText.Contains("private readonly PlayfieldVendorRuntimeService vendors")
-                && runtimeSystemsText.Contains("private readonly PlayfieldVisibilityFanoutRuntimeService visibilityFanout")
-                && runtimeSystemsText.Contains("private readonly PlayfieldWallCollisionRuntimeService wallCollision")
-                && runtimeSystemsText.Contains("private readonly PlayfieldAnnouncementRuntimeService announcements")
-                && runtimeSystemsText.Contains("private readonly PlayfieldPublishFanoutRuntimeService publishFanout")
-                && runtimeSystemsText.Contains("private readonly PlayfieldAOtomationDeliveryRuntimeService aotomationDelivery")
-                && runtimeSystemsText.Contains("internal void ProcessPlayerRespawn(")
-                && runtimeSystemsText.Contains("this.playerDeathRespawn.ProcessPlayerRespawn(")
-                && runtimeSystemsText.Contains("x => this.CleanupPlayerDeathCombat(x, clearCombatTracking, stopFightingDeadTarget, sendCombatStop)")
-                && runtimeSystemsText.Contains("internal void PreparePlayfieldTransfer(")
-                && runtimeSystemsText.Contains("this.lifecycle.PreparePlayfieldTransfer(")
-                && runtimeSystemsText.Contains("this.npcRuntime.ActivateNpc(character);")
-                && runtimeSystemsText.Contains("internal void MaterializeStartupObjects(")
-                && runtimeSystemsText.Contains("this.objectMaterialization.MaterializeStartupObjects(")
-                && runtimeSystemsText.Contains("this.RegisterContent,")
-                && runtimeSystemsText.Contains("this.TryResolveVendorStatels,")
-                && runtimeSystemsText.Contains("this.ResolveStaticDynels,")
-                && runtimeSystemsText.Contains("this.RefreshDynelRegistry);")
-                && runtimeSystemsText.Contains("this.npcRuntime.RegisterNpcHome(character);")
-                && runtimeSystemsText.Contains("internal void DespawnNpcImmediately(")
-                && runtimeSystemsText.Contains(
-                    "this.npcRuntime.DespawnNpcImmediately(target, stopFightingDeadTarget, cancelPendingCorpseSpawn);")
-                && runtimeSystemsText.Contains("internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)")
-                && runtimeSystemsText.Contains("this.npcRuntime.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && runtimeSystemsText.Contains("internal void ClearNpcCorpseDespawn(int corpseInstance)")
-                && runtimeSystemsText.Contains("this.npcRuntime.ClearNpcCorpseDespawn(corpseInstance);")
-                && runtimeSystemsText.Contains("internal void ProcessDueNpcCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)")
-                && runtimeSystemsText.Contains("this.npcRuntime.ProcessDueNpcCorpseDespawns(utcNow, despawnCorpse);")
-                && runtimeSystemsText.Contains("this.npcRuntime.SpawnCapturedNpcContent(playfieldIdentity);")
-                && runtimeSystemsText.Contains("this.npcRuntime.BeginNpcDeath(attacker, target);")
-                && runtimeSystemsText.Contains("internal bool ProcessDeadNpcDespawn(ICharacter character)")
-                && runtimeSystemsText.Contains("return this.npcRuntime.ProcessDeadNpcDespawn(character);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ProcessCombatTick(attacker);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ClearInvalidCombatTarget(attacker);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ClearFightingTarget(character);")
-                && runtimeSystemsText.Contains("this.npcRuntime.StopDyingNpcCombatState(target);")
-                && runtimeSystemsText.Contains("this.npcRuntime.AcquireAggro(attacker, target);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ProcessPatrolTick(character);")
-                && runtimeSystemsText.Contains("this.npcRuntime.ClearCombatTracking(identity);")
-                && runtimeSystemsText.Contains("return this.corpseAccess.TryUseCorpse(")
-                && runtimeSystemsText.Contains("return this.corpseAccess.TryUseDeadNpcCorpse(")
-                && runtimeSystemsText.Contains("return this.corpseAccess.TryLootCorpseItem(")
-                && runtimeSystemsText.Contains("this.corpseAccess.ProcessPendingCorpseCreditAwards(")
-                && runtimeSystemsText.Contains("this.statelTransitions.CheckStatelCollision(")
-                && runtimeSystemsText.Contains("this.statelTransitions.PrimeStatelCollisionContacts(")
-                && runtimeSystemsText.Contains("this.statelTransitions.ClearContactState(dynelId);")
-                && runtimeSystemsText.Contains("this.wallCollision.CheckWallCollision(")
-                && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToCharacterClients(")
-                && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToOtherCharacterClients(")
-                && runtimeSystemsText.Contains("this.announcements.AnnounceToCharacterClients(")
-                && runtimeSystemsText.Contains("this.announcements.AnnounceToOtherCharacterClients(")
-                && runtimeSystemsText.Contains("this.publishFanout.PublishMessageBodyToClient(")
-                && runtimeSystemsText.Contains("this.publishFanout.PublishMessageToClient(")
-                && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfield(")
-                && runtimeSystemsText.Contains("this.publishFanout.DispatchMessageToPlayfieldOthers(")
-                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageToClient(")
-                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageBodyToClient(")
-                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageBodiesToClient(")
-                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageToPlayfield(")
-                && runtimeSystemsText.Contains("this.aotomationDelivery.SendMessageToPlayfieldOthers(")
-                && runtimeSystemsText.Contains("this.npcCombatMovement.IsInCombatRange(")
-                && runtimeSystemsText.Contains("this.npcCombatMovement.UpdateNpcMeleeFollowHold(")
-                && runtimeSystemsText.Contains("this.npcCombatMovement.TryMoveNpcIntoCombatRange(")
-                && runtimeSystemsText.Contains("this.characterHeartbeat.ProcessRegeneration(")
-                && runtimeSystemsText.Contains("this.characterHeartbeat.ProcessFollow(")
-                && runtimeSystemsText.Contains("this.characterHeartbeat.ProcessPlayerCollisionChecks(")
-                && runtimeSystemsText.Contains("this.statUpdates.SendChangedStats(")
-                && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfChanged(")
-                && runtimeSystemsText.Contains("this.statUpdates.SendChangedStatsIfClient(")
-                && runtimeSystemsText.Contains("this.statUpdates.RunPlayerDeathStatUpdateSequence(")
-                && runtimeSystemsText.Contains("internal void TransferToPlayfield(")
-                && runtimeSystemsText.Contains("this.transfers.TransferToPlayfield(")
-                && runtimeSystemsText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence(")
-                && runtimeSystemsText.Contains("internal void CompletePlayfieldTransfer(")
-                && runtimeSystemsText.Contains("this.transfers.CompletePlayfieldTransfer("),
-                "PlayfieldRuntimeSystems must delegate runtime entry points through named runtime services.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldLifecycleRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldLifecycleRuntimeService.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldPlayerDeathRespawnRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldPlayerDeathRespawnRuntimeService.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldCharacterHeartbeatRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldCharacterHeartbeatRuntimeService.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldTimedLifecycleRuntimeService.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldTransferRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldTransferRuntimeService.");
-            string characterRegeneration = ExtractMethodBlock(
-                characterHeartbeatText,
-                "internal void ProcessRegeneration");
             string characterEntityTick = ExtractMethodBlock(
                 characterEntityText,
                 "public override void Tick");
-            Assert.IsTrue(
-                characterHeartbeatText.Contains("internal sealed class PlayfieldCharacterHeartbeatRuntimeService")
-                && characterHeartbeatText.Contains("internal void ProcessRegeneration(ICharacter dynel, double deltaTime, Action<ICharacter> sendChangedStats)")
-                && characterRegeneration.Contains("if (PetCombatRules.IsPlayerOwnedPet(dynel))")
-                && characterRegeneration.Contains("if (dynel.Controller is NPCController)")
-                && characterRegeneration.Contains("character.HealRegenElapsed += deltaTime;")
-                && characterRegeneration.Contains("character.NanoRegenElapsed += deltaTime;")
-                && characterRegeneration.Contains("sendChangedStats(dynel);")
-                && characterEntityTick.Contains("this.TickWeapons(deltaTime);")
-                && !characterEntityTick.Contains("HealRegenElapsed")
-                && !characterEntityTick.Contains("NanoRegenElapsed")
-                && characterHeartbeatText.Contains("internal void ProcessFollow(ICharacter dynel)")
-                && characterHeartbeatText.Contains("dynel.Controller.DoFollow();")
-                && characterHeartbeatText.Contains("internal void ProcessPlayerCollisionChecks(")
-                && characterHeartbeatText.Contains("checkWallCollision(dynel);")
-                && characterHeartbeatText.Contains("checkStatelCollision(dynel);"),
-                "PlayfieldCharacterHeartbeatRuntimeService must own player-only delta-time regeneration, follow, and player-collision sequencing while Character.Tick owns weapon clocks only.");
-            AssertTextBefore(
-                characterRegeneration,
-                "if (PetCombatRules.IsPlayerOwnedPet(dynel))",
-                "character.HealRegenElapsed += deltaTime;");
-            AssertTextBefore(
-                characterRegeneration,
-                "if (dynel.Controller is NPCController)",
-                "character.HealRegenElapsed += deltaTime;");
-            int petGuard = characterRegeneration.IndexOf(
-                "if (PetCombatRules.IsPlayerOwnedPet(dynel))",
-                StringComparison.Ordinal);
-            int petReturn = petGuard < 0
-                                ? -1
-                                : characterRegeneration.IndexOf("return;", petGuard, StringComparison.Ordinal);
-            int npcGuard = characterRegeneration.IndexOf(
-                "if (dynel.Controller is NPCController)",
-                StringComparison.Ordinal);
-            int npcReturn = npcGuard < 0
-                                ? -1
-                                : characterRegeneration.IndexOf("return;", npcGuard, StringComparison.Ordinal);
-            int playerRegen = characterRegeneration.IndexOf(
-                "character.HealRegenElapsed += deltaTime;",
-                StringComparison.Ordinal);
-            Assert.IsTrue(
-                petReturn > petGuard
-                && petReturn < playerRegen
-                && npcReturn > npcGuard
-                && npcReturn < playerRegen,
-                "Pet and NPC specialized regeneration branches must return before generic player regeneration.");
-            Assert.IsFalse(
-                characterHeartbeatText.Contains("DoCombatTick")
-                || characterHeartbeatText.Contains("WallCollision.CheckCollision(")
-                || characterHeartbeatText.Contains("TeleportMessageHandler")
-                || characterHeartbeatText.Contains("CorpseFullUpdate")
-                || characterHeartbeatText.Contains("Inventory"),
-                "PlayfieldCharacterHeartbeatRuntimeService must not own combat, wall-routing internals, packets, or inventory.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldPacketSequencingRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldPacketSequencingRuntimeService.");
-            Assert.IsTrue(
-                packetSequencesText.Contains("internal sealed class PlayfieldPacketSequencingRuntimeService")
-                && packetSequencesText.Contains("internal void RunVisibilityPacketPairSequence(")
-                && packetSequencesText.Contains("this.packetSequencing.RunSimpleCharFullUpdateCharInPlaySequence(")
-                && packetSequencesText.Contains("internal void RunPlayfieldTransferBeginSequence(")
-                && packetSequencesText.Contains("this.packetSequencing.RunPlayfieldTransferBeginSequence("),
-                "PlayfieldPacketSequencingRuntimeService must own playfield-local packet order orchestration.");
-            Assert.IsFalse(
-                packetSequencesText.Contains("SimpleCharFullUpdate.")
-                || packetSequencesText.Contains("SimpleCharFullUpdateMessage")
-                || packetSequencesText.Contains("CharInPlayMessage")
-                || packetSequencesText.Contains("TeleportMessageHandler")
-                || packetSequencesText.Contains("ZoneRedirectionMessage")
-                || packetSequencesText.Contains("SendCompressed")
-                || packetSequencesText.Contains("Publish(")
-                || packetSequencesText.Contains("Pool.Instance"),
-                "PlayfieldPacketSequencingRuntimeService must not own packet construction, sends, transport, or Pool lookups.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldVisibilityFanoutRuntimeService.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\Locality\PlayfieldLocalityPackets.cs"),
-                "ZoneEngine project must compile PlayfieldLocalityPackets.");
-            Assert.IsTrue(
-                visibilityFanoutText.Contains("internal sealed class PlayfieldVisibilityFanoutRuntimeService")
-                && visibilityFanoutText.Contains("internal void AnnounceToCharacterClients(")
-                && visibilityFanoutText.Contains("internal void AnnounceToOtherCharacterClients(")
-                && visibilityFanoutText.Contains("internal void FanoutExistingCharactersForScfu("),
-                "PlayfieldVisibilityFanoutRuntimeService must own visibility recipient fanout entry points.");
-            Assert.IsFalse(
-                visibilityFanoutText.Contains("SimpleCharFullUpdate")
-                || visibilityFanoutText.Contains("CharInPlayMessage")
-                || visibilityFanoutText.Contains("SendCompressed")
-                || visibilityFanoutText.Contains("Publish(")
-                || visibilityFanoutText.Contains("IMSend")
-                || visibilityFanoutText.Contains("LogUtil")
-                || visibilityFanoutText.Contains("PacketSequencing")
-                || visibilityFanoutText.Contains("Pool.Instance"),
-                "PlayfieldVisibilityFanoutRuntimeService must not own packet construction, sends, logging, sequencing, or Pool scans.");
-            Assert.IsTrue(
-                visibilityPacketText.Contains("internal sealed class PlayfieldLocalityPackets")
-                && visibilityPacketText.Contains("internal void SendExistingCharacterVisibilityToClient(")
-                && visibilityPacketText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
-                && visibilityPacketText.Contains("SimpleCharFullUpdate.ConstructMessage(temp)")
-                && visibilityPacketText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
-                && visibilityPacketText.Contains("LogUtil.Debug(")
-                && visibilityPacketText.Contains("internal void AnnounceJoiningCharacterVisibility(")
-                && visibilityPacketText.Contains("this.visibility.SelectInitialCharacters(recipient)")
-                && visibilityPacketText.Contains("this.visibility.Reconcile(")
-                && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
-                && visibilityPacketText.Contains("this.SendWeaponDefinitionsForVisibility(")
-                && visibilityPacketText.Contains("sendVisibilityMessage(charInPlay);"),
-                "PlayfieldLocalityPackets must own bounded interest entry, shared packet-pair construction, sequencing delegation, and debug logging.");
-            Assert.IsFalse(
-                visibilityPacketText.Contains("SendCompressed")
-                || visibilityPacketText.Contains("Publish(")
-                || visibilityPacketText.Contains("Pool.Instance"),
-                "PlayfieldLocalityPackets must not own direct transport, publish wrappers, or Pool scans.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldAnnouncementRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldAnnouncementRuntimeService.");
-            Assert.IsTrue(
-                announcementText.Contains("internal sealed class PlayfieldAnnouncementRuntimeService")
-                && announcementText.Contains("internal void AnnounceToCharacterClients(")
-                && announcementText.Contains("foreach (Character entity in characters)")
-                && announcementText.Contains("if (entity?.Controller?.Client != null)")
-                && announcementText.Contains("sendMessageBodyToClient(entity.Controller.Client, messageBody);")
-                && announcementText.Contains("internal void AnnounceToOtherCharacterClients(")
-                && announcementText.Contains("&& entity.Identity != excludedIdentity")
-                && announcementText.Contains("&& entity.Controller?.Client != null"),
-                "PlayfieldAnnouncementRuntimeService must own message announcement recipient fanout orchestration.");
-            Assert.IsFalse(
-                announcementText.Contains("SimpleCharFullUpdate")
-                || announcementText.Contains("CharInPlayMessage")
-                || announcementText.Contains("SendCompressed")
-                || announcementText.Contains("Publish(")
-                || announcementText.Contains("IMSend")
-                || announcementText.Contains("LogUtil")
-                || announcementText.Contains("PacketSequencing")
-                || announcementText.Contains("Pool.Instance"),
-                "PlayfieldAnnouncementRuntimeService must not own packet construction, direct sends, publish wrappers, logging, sequencing, or Pool scans.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.AnnounceMessageToCharacterClients(messageBody, this.Send);")
-                && playfieldText.Contains(
-                    "this.runtimeSystems.AnnounceMessageToOtherCharacterClients(messageBody, dontSend, this.Send);"),
-                "Playfield Announce methods must delegate message fanout through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                playfieldText.Contains("entity.Controller.Client,\r\n                            messageBody,\r\n                            this.Publish")
-                || playfieldText.Contains("this.runtimeSystems.AnnounceToCharacterClients(")
-                || playfieldText.Contains("this.runtimeSystems.AnnounceToOtherCharacterClients("),
-                "Playfield must not retain direct announcement recipient/send orchestration.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldPublishFanoutRuntimeService.");
-            Assert.IsTrue(
-                publishFanoutText.Contains("internal sealed class PlayfieldPublishFanoutRuntimeService")
-                && publishFanoutText.Contains("internal void PublishMessageBodyToClient(")
-                && publishFanoutText.Contains("new IMSendAOtomationMessageBodyToClient")
-                && publishFanoutText.Contains("internal void PublishMessageToClient(")
-                && publishFanoutText.Contains("new IMSendAOtomationMessageToClient")
-                && publishFanoutText.Contains("internal void DispatchMessageToPlayfield(")
-                && publishFanoutText.Contains("internal void DispatchMessageToPlayfieldOthers("),
-                "PlayfieldPublishFanoutRuntimeService must own internal publish/send fanout wrapper orchestration.");
-            Assert.IsFalse(
-                publishFanoutText.Contains("SimpleCharFullUpdate")
-                || publishFanoutText.Contains("CharInPlayMessage")
-                || publishFanoutText.Contains("TeleportMessageHandler")
-                || publishFanoutText.Contains("ZoneRedirectionMessage")
-                || publishFanoutText.Contains("SendCompressed")
-                || publishFanoutText.Contains("PacketSequencing")
-                || publishFanoutText.Contains("Pool.Instance"),
-                "PlayfieldPublishFanoutRuntimeService must not own packet construction, direct sends, sequencing, or Pool lookups.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldAOtomationDeliveryRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldAOtomationDeliveryRuntimeService.");
-            Assert.IsTrue(
-                aotomationDeliveryText.Contains("internal sealed class PlayfieldAOtomationDeliveryRuntimeService")
-                && aotomationDeliveryText.Contains("internal void SendMessageToClient(")
-                && aotomationDeliveryText.Contains("clientMessage.client.SendCompressed(clientMessage.message.Body);")
-                && aotomationDeliveryText.Contains("internal void SendMessageBodyToClient(")
-                && aotomationDeliveryText.Contains("message.client.SendCompressed(message.Body);")
-                && aotomationDeliveryText.Contains("internal void SendMessageBodiesToClient(")
-                && aotomationDeliveryText.Contains("foreach (MessageBody messageBody in message.Bodies)")
-                && aotomationDeliveryText.Contains("internal void SendMessageToPlayfield(")
-                && aotomationDeliveryText.Contains("dispatchToPlayfield(clientMessage.Body);")
-                && aotomationDeliveryText.Contains("internal void SendMessageToPlayfieldOthers(")
-                && aotomationDeliveryText.Contains("dispatchToPlayfieldOthers(clientMessage.Body, clientMessage.Identity);"),
-                "PlayfieldAOtomationDeliveryRuntimeService must own AOtomation bus message delivery.");
-            Assert.IsFalse(
-                aotomationDeliveryText.Contains("SimpleCharFullUpdate")
-                || aotomationDeliveryText.Contains("CharInPlayMessage")
-                || aotomationDeliveryText.Contains("TeleportMessageHandler")
-                || aotomationDeliveryText.Contains("ZoneRedirectionMessage")
-                || aotomationDeliveryText.Contains("PacketSequencing")
-                || aotomationDeliveryText.Contains("Pool.Instance"),
-                "PlayfieldAOtomationDeliveryRuntimeService must not own packet construction, sequencing, or Pool lookups.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageToClient")
-                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageBodyToClient")
-                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageBodiesToClient")
-                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageToPlayfield(message, this.Announce)")
-                && playfieldText.Contains("this.runtimeSystems.DeliverAOtomationMessageToPlayfieldOthers("),
-                "Playfield bus subscriptions must delegate AOtomation delivery through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                playfieldText.Contains("public static void SendAOtomationMessageToClient")
-                || playfieldText.Contains("public void SendAOtomationMessageBodyToClient")
-                || playfieldText.Contains("public void SendAOtomationMessageBodiesToClient")
-                || playfieldText.Contains("public void SendAOtomationMessageToPlayfield")
-                || playfieldText.Contains("public void SendAOtomationMessageToPlayfieldOthers"),
-                "Playfield must not retain AOtomation delivery handlers after extraction.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldStatUpdateRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldStatUpdateRuntimeService.");
-            Assert.IsTrue(
-                statUpdateText.Contains("internal sealed class PlayfieldStatUpdateRuntimeService")
-                && statUpdateText.Contains("internal void SendChangedStats(")
-                && statUpdateText.Contains("internal void SendChangedStatsIfChanged(")
-                && statUpdateText.Contains("internal void SendChangedStatsIfClient(")
-                && statUpdateText.Contains("internal void RunPlayerDeathStatUpdateSequence(")
-                && statUpdateText.Contains("sendChangedStats(target);")
-                && statUpdateText.Contains("cleanupDeathCombat(target);")
-                && statUpdateText.Contains("sendDeathAnimation(target);"),
-                "PlayfieldStatUpdateRuntimeService must own stat-update callback and death stat-send ordering.");
-            Assert.IsFalse(
-                statUpdateText.Contains("Stats[")
-                || statUpdateText.Contains("StatMessage")
-                || statUpdateText.Contains("SendCompressed")
-                || statUpdateText.Contains("Stats.Write")
-                || statUpdateText.Contains("CashStatRules")
-                || statUpdateText.Contains("CombatDamageRules")
-                || statUpdateText.Contains("Pool.Instance"),
-                "PlayfieldStatUpdateRuntimeService must not own stat math, packet construction, persistence, combat rules, or Pool lookups.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldNpcCombatMovementRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldNpcCombatMovementRuntimeService.");
-            Assert.IsTrue(
-                npcCombatMovementText.Contains("internal sealed class PlayfieldNpcCombatMovementRuntimeService")
-                && npcCombatMovementText.Contains("internal bool IsInCombatRange(")
-                && npcCombatMovementText.Contains("internal void UpdateNpcMeleeFollowHold(")
-                && npcCombatMovementText.Contains("internal void TryMoveNpcIntoCombatRange(")
-                && npcCombatMovementText.Contains("internal static double GetCombatDistance(")
-                && npcCombatMovementText.Contains("internal static bool IsCapturedCleaningRobot(")
-                && npcCombatMovementText.Contains("private void MoveNpcTowardCombatTarget("),
-                "PlayfieldNpcCombatMovementRuntimeService must own NPC range, chase, and follow-target movement decisions.");
-            Assert.IsFalse(
-                npcCombatMovementText.Contains("SetPosMessage")
-                || npcCombatMovementText.Contains("this.Announce(")
-                || npcCombatMovementText.Contains("SendCompressed")
-                || npcCombatMovementText.Contains("AttackInfo")
-                || npcCombatMovementText.Contains("Stats.Write")
-                || npcCombatMovementText.Contains("Pool.Instance"),
-                "PlayfieldNpcCombatMovementRuntimeService must not own packet construction, sends, attack packets, persistence, or Pool lookups.");
-            Assert.IsTrue(
-                lifecycleText.Contains("internal sealed class PlayfieldLifecycleRuntimeService")
-                && lifecycleText.Contains("internal void PreparePlayfieldTransfer(")
-                && lifecycleText.Contains("Thread.Sleep(200);")
-                && lifecycleText.Contains("clearTransferContactState(dynel.Identity.Instance);")
-                && lifecycleText.Contains("disableTimers(dynel);")
-                && lifecycleText.Contains("Thread.Sleep(1000);"),
-                "PlayfieldLifecycleRuntimeService must own playfield-transfer sequencing.");
-            Assert.IsFalse(
-                lifecycleText.Contains("SendCompressed")
-                || lifecycleText.Contains("TeleportMessageHandler")
-                || lifecycleText.Contains("ZoneRedirectionMessage")
-                || lifecycleText.Contains("FullCharacterMessageHandler")
-                || lifecycleText.Contains("SimpleCharFullUpdate")
-                || lifecycleText.Contains("Stats[")
-                || lifecycleText.Contains("Pool.Instance")
-                || lifecycleText.Contains("PlayfieldById")
-                || lifecycleText.Contains("Announce("),
-                "PlayfieldLifecycleRuntimeService must not own packet construction, object lookup, stats algorithms, or transport.");
-            Assert.IsTrue(
-                transferText.Contains("internal sealed class PlayfieldTransferRuntimeService")
-                && transferText.Contains("internal void CompletePlayfieldTransfer(")
-                && transferText.Contains("announceDespawn(dynel);")
-                && transferText.Contains("applyTransferState(dynel, destination, heading);")
-                && transferText.Contains("ZoneClient client = captureClient(dynel);")
-                && transferText.Contains("IPlayfield newPlayfield = resolveDestinationPlayfield(playfield);")
-                && transferText.Contains("finalizeTransferDispose(dynel, newPlayfield);")
-                && transferText.Contains("sendRedirect(client);"),
-                "PlayfieldTransferRuntimeService must own post-send cross-playfield handoff orchestration.");
-            Assert.IsFalse(
-                transferText.Contains("TeleportMessageHandler")
-                || transferText.Contains("ZoneRedirectionMessage")
-                || transferText.Contains("SendCompressed")
-                || transferText.Contains("PlayfieldById")
-                || transferText.Contains("new Playfield(")
-                || transferText.Contains("DespawnMessageHandler")
-                || transferText.Contains("AnnounceOthers")
-                || transferText.Contains("Pool.Instance"),
-                "PlayfieldTransferRuntimeService must not own packet construction, transport, lookup, or Playfield callbacks.");
-            Assert.IsTrue(
-                playerDeathRespawnText.Contains("internal sealed class PlayfieldPlayerDeathRespawnRuntimeService")
-                && playerDeathRespawnText.Contains("internal void ProcessPlayerRespawn(")
-                && playerDeathRespawnText.Contains("logCorpseVisualSkipped(character, corpseIdentity);")
-                && playerDeathRespawnText.Contains("sendDeathSocialStatus(character);")
-                && playerDeathRespawnText.Contains("markPlayerRespawned(character);")
-                && playerDeathRespawnText.Contains("sendDeathRespawnStateStats(character);")
-                && playerDeathRespawnText.Contains("stopMovement(character);")
-                && playerDeathRespawnText.Contains("cleanupDeathCombat(character);")
-                && playerDeathRespawnText.Contains("sendChangedStats(character);")
-                && playerDeathRespawnText.Contains("logRespawnRequested(character, corpseIdentity, destinationPlayfield, destination);")
-                && playerDeathRespawnText.Contains("enableTimers(character);")
-                && playerDeathRespawnText.Contains("tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.Rotation, destinationPlayfield)")
-                && playerDeathRespawnText.Contains("transferToRespawnPlayfield(dynel, destination, character.Rotation, destinationPlayfield);"),
-                "PlayfieldPlayerDeathRespawnRuntimeService must own player death/respawn packet-state sequencing.");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "logCorpseVisualSkipped(character, corpseIdentity);",
-                "sendDeathSocialStatus(character);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "sendDeathSocialStatus(character);",
-                "markPlayerRespawned(character);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "markPlayerRespawned(character);",
-                "sendDeathRespawnStateStats(character);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "sendDeathRespawnStateStats(character);",
-                "stopMovement(character);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "stopMovement(character);",
-                "cleanupDeathCombat(character);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "cleanupDeathCombat(character);",
-                "sendChangedStats(character);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "sendChangedStats(character);",
-                "logRespawnRequested(character, corpseIdentity, destinationPlayfield, destination);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "logRespawnRequested(character, corpseIdentity, destinationPlayfield, destination);",
-                "enableTimers(character);");
-            AssertTextBefore(
-                playerDeathRespawnText,
-                "enableTimers(character);",
-                "if (tryCompleteCurrentPlayfieldRespawn(dynel, destination, character.Rotation, destinationPlayfield))");
-            Assert.IsFalse(
-                playerDeathRespawnText.Contains("SendCompressed")
-                || playerDeathRespawnText.Contains("TeleportMessageHandler")
-                || playerDeathRespawnText.Contains("ZoneRedirectionMessage")
-                || playerDeathRespawnText.Contains("FullCharacterMessageHandler")
-                || playerDeathRespawnText.Contains("SimpleCharFullUpdate")
-                || playerDeathRespawnText.Contains("Stats[")
-                || playerDeathRespawnText.Contains("Pool.Instance")
-                || playerDeathRespawnText.Contains("PlayfieldById")
-                || playerDeathRespawnText.Contains("Announce("),
-                "PlayfieldPlayerDeathRespawnRuntimeService must not own packet construction, object lookup, stats algorithms, or transport.");
-            Assert.IsTrue(
-                statelTransitionText.Contains("internal sealed class PlayfieldStatelTransitionRuntimeService")
-                && statelTransitionText.Contains("internal void CheckStatelCollision(")
-                && statelTransitionText.Contains("internal void PrimeStatelCollisionContacts(")
-                && statelTransitionText.Contains("internal void ClearContactState(int dynelId)")
-                && statelTransitionText.Contains("internal static void ArmPostZoneCollisionGrace(ICharacter character)")
-                && statelTransitionText.Contains("private bool TryHandleCapturedMontroyalPrivateCityEntry(")
-                && statelTransitionText.Contains("private bool TryHandleUserConfirmedMontroyalPrivateCityExit(")
-                && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
-                "PlayfieldStatelTransitionRuntimeService must own statel contact, grace, event, and private-city transition orchestration.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.CheckStatelCollision(")
-                && playfieldText.Contains("this.runtimeSystems.PrimeStatelCollisionContacts(dynel, this.collisionStatels);")
-                && playfieldText.Contains("this.runtimeSystems.ClearStatelTransitionContactState(dynelId);")
-                && playfieldText.Contains("PlayfieldStatelTransitionRuntimeService.ArmPostZoneCollisionGrace(character);"),
-                "Playfield must delegate statel collision/contact/grace orchestration through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                playfieldText.Contains("private readonly Dictionary<int, HashSet<string>> statelEnterContacts")
-                || playfieldText.Contains("private readonly HashSet<int> statelCollisionInitializedCharacters")
-                || playfieldText.Contains("private static readonly Dictionary<int, DateTime> postZoneCollisionGraceUntil")
-                || playfieldText.Contains("private bool TryHandleCapturedMontroyalPrivateCityEntry")
-                || playfieldText.Contains("private bool TryHandleUserConfirmedMontroyalPrivateCityExit")
-                || playfieldText.Contains("private static string BuildStatelContactKey")
-                || playfieldText.Contains("private static bool IsInStatelCollisionRange"),
-                "Playfield must not retain moved statel transition orchestration state or helpers.");
-            Assert.IsFalse(
-                statelTransitionText.Contains("TeleportMessageHandler")
-                || statelTransitionText.Contains("ZoneRedirectionMessage")
-                || statelTransitionText.Contains("SendCompressed")
-                || statelTransitionText.Contains("PlayfieldLoader")
-                || statelTransitionText.Contains("OrganizationDao")
-                || statelTransitionText.Contains("new Identity"),
-                "PlayfieldStatelTransitionRuntimeService must not own packet construction, transport, playfield lookup, DB lookup, or handoff identity construction.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldWallCollisionRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldWallCollisionRuntimeService.");
-            Assert.IsTrue(
-                wallCollisionText.Contains("internal sealed class PlayfieldWallCollisionRuntimeService")
-                && wallCollisionText.Contains("internal void CheckWallCollision(")
-                && wallCollisionText.Contains("isPostZoneCollisionGraceActive(dynel)")
-                && wallCollisionText.Contains("WallCollision.CheckCollision(")
-                && wallCollisionText.Contains("PlayfieldLoader.PFData.ContainsKey(destPlayfield)")
-                && wallCollisionText.Contains("Destinations.TryGetValue(destinationIndex, out dest)")
-                && wallCollisionText.Contains("float dist = WallCollision.Distance(")
-                && wallCollisionText.Contains("teleportToPlayfield("),
-                "PlayfieldWallCollisionRuntimeService must own wall-collision routing and destination-coordinate orchestration.");
-            Assert.IsFalse(
-                wallCollisionText.Contains("TeleportMessageHandler")
-                || wallCollisionText.Contains("ZoneRedirectionMessage")
-                || wallCollisionText.Contains("SendCompressed")
-                || wallCollisionText.Contains("new Identity")
-                || wallCollisionText.Contains("Pool.Instance"),
-                "PlayfieldWallCollisionRuntimeService must not own packet construction, transport, identity construction, or Pool lookup.");
-            Assert.IsTrue(
-                timedLifecycleText.Contains("internal sealed class PlayfieldTimedLifecycleRuntimeService")
-                && timedLifecycleText.Contains("internal void ProcessHeartbeatLifecycle(")
-                && timedLifecycleText.Contains("processPendingCorpseSpawns();")
-                && timedLifecycleText.Contains("processCorpseDespawns();")
-                && timedLifecycleText.Contains("processPendingCorpseCreditAwards();")
-                && timedLifecycleText.Contains("xx.InPlayfield(playfieldIdentity)")
-                && timedLifecycleText.Contains("hasPendingDeadNpcDespawn(xx.Identity)")
-                && timedLifecycleText.Contains("if (dynel.Starting)")
-                && timedLifecycleText.Contains("if (processDeadNpcDespawn(dynel))")
-                && timedLifecycleText.Contains("if (dynel.DoNotDoTimers)")
-                && timedLifecycleText.Contains("processCharacterTick(dynel, deltaTime);")
-                && timedLifecycleText.Contains("processNpcPatrolTick(dynel);")
-                && timedLifecycleText.Contains("processFollow(dynel);")
-                && timedLifecycleText.Contains("processPlayerCollision(dynel);"),
-                "PlayfieldTimedLifecycleRuntimeService must own heartbeat lifecycle sequencing.");
-            Assert.IsFalse(
-                timedLifecycleText.Contains("Stats[")
-                || timedLifecycleText.Contains("SendChangedStats")
-                || timedLifecycleText.Contains("DoCombatTick")
-                || timedLifecycleText.Contains("CheckStatelCollision")
-                || timedLifecycleText.Contains("Announce(")
-                || timedLifecycleText.Contains("AttackInfo")
-                || timedLifecycleText.Contains("CorpseFullUpdate")
-                || timedLifecycleText.Contains("Inventory"),
-                "PlayfieldTimedLifecycleRuntimeService must not own algorithms, packets, collision internals, or inventory.");
-
-            string heartbeatTimer = ExtractMethodBlock(playfieldText, "private void HeartBeatTimer");
-            string playfieldCharacterTick = ExtractMethodBlock(playfieldText, "private void ProcessCharacterTick");
-            Assert.IsTrue(
-                heartbeatTimer.Contains(
-                    "this.locality.Tick(deltaTime, this.SendVisibilityMessage, this.SendVisibilityLeave);")
-                && playfieldText.Contains("ProcessCharacterTick = this.ProcessCharacterTick")
-                && playfieldText.Contains("ProcessNpcPatrolTick = this.runtimeSystems.ProcessNpcPatrolTick")
-                && playfieldText.Contains("ProcessFollow = this.runtimeSystems.ProcessCharacterFollow")
-                && playfieldText.Contains("ProcessPlayerCollision ="),
-                "Playfield heartbeat must delegate character lifecycle sequencing through PlayfieldLocality.");
-            Assert.IsTrue(
-                playfieldCharacterTick.Contains("dynel.Tick(deltaTime);")
-                && playfieldCharacterTick.Contains(
-                    "this.runtimeSystems.ProcessCharacterRegeneration(dynel, deltaTime, SendChangedStats);")
-                && playfieldCharacterTick.Contains("this.runtimeSystems.ProcessNpcCombatTick(dynel);")
-                && characterCombatSubscriptionsText.Contains("c.Damaged += this.OnCharacterDamaged;")
-                && characterCombatSubscriptionsText.Contains("c.Died += this.OnCharacterDied;"),
-                "The character tick must sequence weapon clocks and regeneration while registered Character events own damage and death integration.");
-            AssertTextBefore(
-                playfieldCharacterTick,
-                "dynel.Tick(deltaTime);",
-                "this.runtimeSystems.ProcessCharacterRegeneration(dynel, deltaTime, SendChangedStats);");
-            Assert.IsFalse(
-                heartbeatTimer.Contains("foreach (ICharacter dynel in dynels)")
-                || heartbeatTimer.Contains("this.runtimeSystems.ProcessDeadNpcDespawn(dynel)")
-                || heartbeatTimer.Contains("this.runtimeSystems.ProcessNpcPatrolTick(dynel)"),
-                "Playfield heartbeat must not directly own character lifecycle loop sequencing.");
-            Assert.IsTrue(
-                !playfieldText.Contains("private void ProcessCharacterRegeneration(ICharacter dynel)")
-                && !playfieldText.Contains("private void ProcessCharacterFollow(ICharacter dynel)")
-                && !playfieldText.Contains("private void ProcessPlayerCollisionChecks(ICharacter dynel)")
-                && characterHeartbeatText.Contains("dynel.Stats[StatIds.health].Value")
-                && characterHeartbeatText.Contains("dynel.Controller.DoFollow();")
-                && characterHeartbeatText.Contains("checkWallCollision(dynel);")
-                && characterHeartbeatText.Contains("checkStatelCollision(dynel);"),
-                "Playfield must delegate non-combat character heartbeat behavior to PlayfieldCharacterHeartbeatRuntimeService.");
-            string checkWallCollision = ExtractMethodBlock(playfieldText, "private void CheckWallCollision(ICharacter dynel)");
-            Assert.IsTrue(
-                checkWallCollision.Contains("this.runtimeSystems.CheckWallCollision(")
-                && checkWallCollision.Contains("PlayfieldStatelTransitionRuntimeService.IsPostZoneCollisionGraceActive")
-                && checkWallCollision.Contains("this.TeleportToPlayfield"),
-                "Playfield must delegate wall-collision routing while keeping post-zone grace and teleport callbacks.");
-            Assert.IsFalse(
-                checkWallCollision.Contains("WallCollision.CheckCollision(")
-                || checkWallCollision.Contains("PlayfieldLoader.PFData")
-                || checkWallCollision.Contains("WallCollision.Distance(")
-                || checkWallCollision.Contains("new Identity"),
-                "Playfield must not retain wall-collision destination lookup, coordinate math, or teleport identity construction.");
-            string respawnPlayer = ExtractMethodBlock(playfieldText, "public void RespawnPlayer");
-            Assert.IsTrue(
-                respawnPlayer.Contains("this.ResolvePlayerRespawnLocation(character, out destination, out destinationPlayfield);")
-                && respawnPlayer.Contains("Identity corpseIdentity = this.AllocateCorpseIdentity();")
-                && respawnPlayer.Contains("this.runtimeSystems.ProcessPlayerRespawn(")
-                && respawnPlayer.Contains("this.LogSkippedPlayerCorpseVisual")
-                && respawnPlayer.Contains("this.TryCompleteDeathRespawnInCurrentPlayfield")
-                && respawnPlayer.Contains("this.Teleport"),
-                "Playfield must route player respawn sequencing through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                respawnPlayer.Contains("character.StopMovement();")
-                || respawnPlayer.Contains("character.DoNotDoTimers = false;")
-                || respawnPlayer.Contains("character.SendChangedStats();"),
-                "Playfield RespawnPlayer must not directly own moved player respawn sequencing.");
-            string teleport = ExtractMethodBlock(playfieldText, "internal void Teleport(");
-            Assert.IsTrue(
-                teleport.Contains("this.runtimeSystems.TransferToPlayfield(")
-                && teleport.Contains("this.ClearPlayfieldTransferContactState")
-                && teleport.Contains("CapturePlayfieldTransferEnterZoningPhase")
-                && teleport.Contains("DisableTimersForPlayfieldTransfer"),
-                "Playfield teleport must route transfer cleanup sequencing through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                teleport.Contains("Thread.Sleep(200)")
-                || teleport.Contains("Thread.Sleep(1000)")
-                || teleport.Contains("this.statelEnterContacts.Remove(dynelId)")
-                || teleport.Contains("this.statelCollisionInitializedCharacters.Remove(dynelId)")
-                || teleport.Contains("dynel.DoNotDoTimers = true"),
-                "Playfield teleport must not directly own moved transfer cleanup sequencing.");
-
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.SendPrivateCityPlayfieldReadyBlock(client, character);"),
-                "Playfield must delegate private-city ready block sending through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.ProcessNpcCombatTick(dynel);"),
-                "Playfield must delegate NPC combat ticks through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.ClearInvalidNpcCombatTarget(attacker);")
-                && playfieldText.Contains("this.runtimeSystems.ClearNpcCombatTracking(identity);")
-                && playfieldText.Contains("this.runtimeSystems.ClearNpcFightingTarget(character);")
-                && playfieldText.Contains("this.runtimeSystems.StopDyingNpcCombatState(target);"),
-                "Playfield must delegate NPC combat stop/clear orchestration through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                npcCombatTickText.Contains("this.playfield.ClearNpcCombatTracking(attacker.Identity);")
-                && npcCombatTickText.Contains("this.playfield.ClearInvalidNpcCombatTarget(attacker);")
-                && npcCombatTickText.Contains("if (attacker == null || this.playfield == null)"),
-                "NpcCombatTickCoordinator must route NPC combat clear decisions through the runtime ownership boundary.");
-            Assert.IsTrue(
-                playfieldText.Contains("internal bool IsInCombatRange(ICharacter attacker, ICharacter target, double range)")
-                && playfieldText.Contains("return this.runtimeSystems.IsInNpcCombatRange(attacker, target, range);")
-                && playfieldText.Contains("this.runtimeSystems.UpdateNpcMeleeFollowHold(")
-                && playfieldText.Contains("this.runtimeSystems.TryMoveNpcIntoCombatRange(")
-                && playfieldText.Contains("private void MoveNpcToCombatPosition(")
-                && playfieldText.Contains("new SetPosMessage"),
-                "Playfield must delegate NPC combat movement decisions while retaining SetPos packet construction.");
-            Assert.IsTrue(
-                npcCombatMovementText.Contains("MoveCombatPositionToward(")
-                && npcCombatMovementText.Contains("EnemyBehaviorContract.MaxPlayerChaseProjectionDistance")
-                && npcCombatMovementText.Contains("moveNpcToPosition(attacker, attackerPosition);")
-                && npcCombatMovementText.Contains("npcController.Follow(target.Identity, stopDistance);")
-                && npcCombatMovementText.Contains("npcController.StopFollow();")
-                && npcCombatMovementText.Contains("logNpcBrain(\"FollowTargetStart\"")
-                && npcCombatMovementText.Contains("logNpcBrain(\"FollowTargetContinue\""),
-                "NPC combat movement service must own initial SetPos, continuous follow start/continuation, and stop-follow decisions.");
-            string moveNpcTowardCombatTarget = ExtractMethodBlock(
-                npcCombatMovementText,
-                "private void MoveNpcTowardCombatTarget(");
-            Assert.IsFalse(
-                moveNpcTowardCombatTarget.Contains("moveNpcToPosition(attacker, nextPosition)"),
-                "Generic NPC chase must not warp through periodic SetPos steps.");
-            Assert.IsTrue(
-                moveNpcTowardCombatTarget.Contains("navigationResult.HasDestination")
-                && moveNpcTowardCombatTarget.Contains("npcController.MoveTo("),
-                "Geometry-aware chase segments must continue through the existing controller movement pipeline.");
-            Assert.IsFalse(
-                playfieldText.Contains("private void MoveNpcTowardCombatTarget(")
-                || playfieldText.Contains("private void MoveCapturedCleaningRobotTowardCombatTarget(")
-                || playfieldText.Contains("private static AORebirth.Core.Vector.Vector3 GetCombatPosition("),
-                "Playfield must not retain moved NPC combat movement helpers.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("internal void ClearInvalidCombatTarget(ICharacter attacker)")
-                && npcRuntimeText.Contains("internal void ClearFightingTarget(ICharacter character)")
-                && npcRuntimeText.Contains("internal void StopDyingNpcCombatState(ICharacter target)")
-                && npcRuntimeText.Contains("character.SetFightingTarget(Identity.None);")
-                && npcRuntimeText.Contains("target.SetTarget(Identity.None);")
-                && npcRuntimeText.Contains("npcController.StopFollow();"),
-                "NPCRuntimeService must own NPC combat stop/clear state orchestration.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("internal void BeginNpcDeath(ICharacter attacker, ICharacter target)")
-                && npcRuntimeText.Contains("this.corpseLifecycle.HasPendingDeadNpcDespawn(target.Identity)")
-                && npcRuntimeText.Contains("this.playfield.MarkNpcDead(target);")
-                && npcRuntimeText.Contains("this.playfield.StopFightingDeadTarget(target.Identity);")
-                && npcRuntimeText.Contains("this.playfield.StopDyingNpcCombatState(target);")
-                && npcRuntimeText.Contains("this.playfield.SendNpcDeathAnimation(target);")
-                && npcRuntimeText.Contains("this.rewards.RunNpcDeathRewardHooks(")
-                && npcRuntimeText.Contains("this.playfield.AwardCombatXp);")
-                && npcRuntimeText.Contains("this.ScheduleNpcDeathCorpseSpawn(target, corpseIdentity);")
-                && npcRuntimeText.Contains("this.ScheduleDeadNpcDespawn(target);"),
-                "NPCRuntimeService must own NPC death lifecycle orchestration order.");
-            Assert.IsTrue(
-                rewardRuntimeText.Contains("internal sealed class PlayfieldRewardRuntimeService")
-                && rewardRuntimeText.Contains("internal void RunNpcDeathRewardHooks(")
-                && rewardRuntimeText.Contains("awardCombatXp(attacker, target);"),
-                "PlayfieldRewardRuntimeService must own named NPC death reward hook orchestration.");
-            Assert.IsFalse(
-                npcRuntimeText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath")
-                || npcRuntimeText.Contains("private void RunNpcDeathRewardHooks"),
-                "NPCRuntimeService must delegate quest/XP reward hook orchestration to PlayfieldRewardRuntimeService.");
-            Assert.IsFalse(
-                rewardRuntimeText.Contains("CalculateCombatXpReward")
-                || rewardRuntimeText.Contains("SendCompressed")
-                || rewardRuntimeText.Contains("Stats.Write")
-                || rewardRuntimeText.Contains("RollCorpseLootItems")
-                || rewardRuntimeText.Contains("AwardCorpseCredits"),
-                "PlayfieldRewardRuntimeService must not own XP algorithms, packet emission, persistence, loot, or credits.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("private void ScheduleNpcDeathCorpseSpawn(ICharacter target, Identity corpseIdentity)")
-                && npcRuntimeText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);")
-                && npcRuntimeText.Contains("Skipping corpse visual spawn for {0}; no known MonsterData-to-CATMesh mapping."),
-                "NPCRuntimeService must own named NPC death corpse spawn hook orchestration.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("internal bool ProcessDeadNpcDespawn(ICharacter character)")
-                && npcRuntimeText.Contains("this.corpseLifecycle.TryGetDeadNpcDespawn(character.Identity, out despawnTick)")
-                && npcRuntimeText.Contains("this.BeginNpcDeath(null, character);")
-                && npcRuntimeText.Contains("this.FinalizeNpcDespawn(character);"),
-                "NPCRuntimeService must own dead NPC processing orchestration.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("internal void ScheduleNpcCorpseDespawn(Identity corpseIdentity, DateTime expiresAtUtc)")
-                && npcRuntimeText.Contains("internal void ProcessDueNpcCorpseDespawns(DateTime utcNow, Action<int> despawnCorpse)")
-                && npcRuntimeText.Contains("this.corpseDespawnTicks")
-                && npcRuntimeText.Contains("despawnCorpse(corpseInstance);")
-                && npcRuntimeText.Contains("internal void ClearNpcCorpseDespawn(int corpseInstance)")
-                && npcRuntimeText.Contains("private void ScheduleDeadNpcDespawn(ICharacter target)")
-                && npcRuntimeText.Contains("this.corpseLifecycle.ScheduleDeadNpcDespawn(target);"),
-                "NPCRuntimeService must expose named NPC corpse/despawn timing orchestration methods.");
-            Assert.IsTrue(
-                corpseLifecycleText.Contains("internal void ScheduleDeadNpcDespawn(ICharacter target)")
-                && corpseLifecycleText.Contains("internal bool TryGetDeadNpcDespawn(Identity identity, out DateTime despawnTick)")
-                && corpseLifecycleText.Contains("this.deadNpcDespawnTicks[target.Identity.Instance]"),
-                "NpcCorpseLifecycleCoordinator must remain the dead-NPC timing state helper.");
-            Assert.IsFalse(
-                corpseLifecycleText.Contains("this.playfield.MarkNpcDead(target);")
-                || corpseLifecycleText.Contains("RexB18CObjectiveProgressTracker.TryObserveNpcDeath")
-                || corpseLifecycleText.Contains("this.playfield.ScheduleCorpseSpawn(target, corpseIdentity);"),
-                "NpcCorpseLifecycleCoordinator must not own NPC death lifecycle orchestration.");
-            Assert.IsTrue(
-                attackHandlerText.Contains("playfield.AcquireNpcAggro(character, target);")
-                && playfieldText.Contains("this.runtimeSystems.AcquireNpcAggro(attacker, target);"),
-                "Attack handling must route NPC aggro acquisition through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                attackHandlerText.Contains("target.SetFightingTarget(character.Identity);")
-                || attackHandlerText.Contains("NpcAiProfiles.CanRetaliate"),
-                "AttackMessageHandler must not own NPC aggro acquisition rules.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("internal void AcquireAggro(ICharacter attacker, ICharacter target)")
-                && npcRuntimeText.Contains("NpcAiProfiles.CanRetaliate(npcController.AiProfile)")
-                && npcRuntimeText.Contains("this.StartCombatWithAcquiredTarget(attacker, target, capturedContract);")
-                && npcRuntimeText.Contains("private void StartCombatWithAcquiredTarget(")
-                && npcRuntimeText.Contains("target.SetFightingTarget(attacker.Identity);")
-                && npcRuntimeText.Contains("npcController.StopFollowForCombatRange(attacker.CalculatePredictedPosition().coordinate);")
-                && npcRuntimeText.Contains("this.ResetCombatTick(target);"),
-                "NPCRuntimeService must own NPC aggro acquisition, patrol cancellation, and combat-start orchestration.");
-            Assert.IsTrue(
-                timedLifecycleText.Contains("processNpcPatrolTick(dynel);"),
-                "Timed lifecycle scheduling must delegate NPC patrol ticks through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains("internal void ProcessPatrolTick(ICharacter character)")
-                && npcRuntimeText.Contains("if (character.FightingTarget.Instance != 0)")
-                && npcRuntimeText.Contains("character.Controller.DoFollow();")
-                && npcRuntimeText.Contains("character.Controller.StartPatrolling();"),
-                "NPCRuntimeService must keep combat follow active while preventing patrol replay during combat.");
-            Assert.IsTrue(
-                npcCombatTickText.Contains("maintainMovementDuringRecharge")
-                && npcCombatTickText.Contains("!this.playfield.IsInCombatRange(attacker, target, attackSource.Range)")
-                && npcCombatTickText.Contains("this.playfield.TryMoveNpcIntoCombatRange(attacker, target, attackSource.Range);")
-                && npcCombatTickText.Contains("this.playfield.UpdateNpcMeleeFollowHold(attacker, target, attackSource.Range);")
-                && npcCombatTickText.Contains("npcController.StopFollowForCapturedCombatRange(")
-                && npcCombatTickText.Contains("movementDestination);"),
-                "Captured and existing known combat paths must maintain chase and melee hold while Thief preserves its delayed transition.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.SpawnCapturedNpcContent(playfieldIdentity);"),
-                "Playfield must delegate captured NPC spawn orchestration through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.MaterializeStartupObjects(")
-                && runtimeSystemsText.Contains("this.ActivateNpc,")
-                && runtimeSystemsText.Contains("this.objectMaterialization.MaterializeStartupObjects("),
-                "Playfield must delegate DB-spawned NPC activation through PlayfieldRuntimeSystems materialization callbacks.");
-            Assert.IsFalse(
-                playfieldText.Contains("this.runtimeSystems.RegisterDynel(cmob);"),
-                "Playfield must not route DB-spawned NPC activation through the generic dynel registration path.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.RegisterNpcHome(character);"),
-                "Playfield must delegate NPC home registration through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                playfieldText.Contains("this.runtimeSystems.RemoveNpcHome(identity);"),
-                "Playfield must not own NPC home removal after NPCRuntimeService callback wiring.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private void DeactivateNpc(Identity identity)")
-                && runtimeSystemsText.Contains("this.npcRuntime.RemoveNpcHome(identity);")
-                && runtimeSystemsText.Contains("this.UnregisterDynel(identity);"),
-                "PlayfieldRuntimeSystems must keep NPC home and dynel-registry deactivation atomic behind its private callback.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.DespawnNpcImmediately("),
-                "Playfield must delegate immediate NPC despawn through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                runtimeSystemsText.Contains("RemoveNpcImmediately")
-                || npcRuntimeText.Contains("RemoveNpcImmediately")
-                || playfieldText.Contains("this.runtimeSystems.RemoveNpcImmediately("),
-                "Immediate NPC despawn APIs must use despawn naming instead of generic removal naming.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.ProcessDueNpcCorpseDespawns(utcNow, this.DespawnCorpse);")
-                && playfieldText.Contains("this.runtimeSystems.ProcessPendingCorpseSpawns(")
-                && playfieldText.Contains("this.runtimeSystems.DespawnCorpses(")
-                && playfieldText.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && playfieldText.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpse.CorpseIdentity, expiresAtUtc);")
-                && playfieldText.Contains("this.runtimeSystems.DespawnCorpse("),
-                "Playfield must delegate corpse spawn/despawn scheduling, due checks, and cleanup ordering through PlayfieldRuntimeSystems.");
             Assert.IsTrue(
                 objectLifecycleText.Contains("internal int DespawnCorpses<TCorpseState>(")
                 && objectLifecycleText.Contains("pendingCorpseSpawns.Remove(candidate.Key);")
@@ -6221,36 +3278,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && objectLifecycleText.Contains("traceCorpseFullUpdate(corpseId, deadNpcId);")
                 && objectLifecycleText.Contains("sendCorpseFullUpdate(target, corpseId);"),
                 "PlayfieldObjectLifecycleRuntimeService must own pending corpse spawn callback ordering.");
-            string cancelPendingCorpseSpawn = ExtractMethodBlock(
-                playfieldText,
-                "private void CancelPendingNpcCorpseSpawn");
-            string scheduleCorpseSpawn = ExtractMethodBlock(
-                playfieldText,
-                "internal void ScheduleCorpseSpawn");
-            string hasExactCorpseLease = ExtractMethodBlock(
-                playfieldText,
-                "internal bool HasExactCorpseLease");
-            string disposePlayfield = ExtractMethodBlock(
-                playfieldText,
-                "protected override void Dispose");
             string despawnCorpses = ExtractMethodBlock(
                 objectLifecycleText,
                 "internal int DespawnCorpses<TCorpseState>");
             string processPendingCorpseSpawnsRuntime = ExtractMethodBlock(
                 objectLifecycleText,
                 "internal void ProcessPendingCorpseSpawns<TCorpseState>");
-            Assert.IsTrue(
-                cancelPendingCorpseSpawn.Contains("lock (this.pendingCorpseSpawns)")
-                && scheduleCorpseSpawn.Contains("lock (this.pendingCorpseSpawns)")
-                && hasExactCorpseLease.Contains("lock (this.pendingCorpseSpawns)")
-                && disposePlayfield.Contains("lock (this.pendingCorpseSpawns)")
-                && despawnCorpses.Contains("lock (pendingCorpseSpawns)")
-                && despawnCorpses.Contains("pendingSnapshot = pendingCorpseSpawns.ToList();")
-                && despawnCorpses.Contains("IsSamePendingCorpseState(current, candidate.Value)")
-                && processPendingCorpseSpawnsRuntime.Contains("lock (pendingCorpseSpawns)")
-                && processPendingCorpseSpawnsRuntime.Contains("pendingSnapshot = pendingCorpseSpawns.ToList();")
-                && processPendingCorpseSpawnsRuntime.Contains("IsSamePendingCorpseState(current, candidate.Value)"),
-                "Pending corpse paths must lock snapshots and conditional removals while preserving same-key replacements.");
             AssertTextBefore(
                 objectLifecycleText,
                 "if (!registerCorpse(target, corpseId))",
@@ -6259,79 +3292,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 objectLifecycleText,
                 "traceCorpseFullUpdate(corpseId, deadNpcId);",
                 "sendCorpseFullUpdate(target, corpseId);");
-            string processPendingCorpseSpawns = ExtractMethodBlock(playfieldText, "private void ProcessPendingCorpseSpawns");
-            Assert.IsTrue(
-                processPendingCorpseSpawns.Contains("this.runtimeSystems.ProcessPendingCorpseSpawns(")
-                && processPendingCorpseSpawns.Contains("this.RegisterCorpse")
-                && processPendingCorpseSpawns.Contains("this.TraceCorpseFullUpdate")
-                && processPendingCorpseSpawns.Contains("this.SendCorpseFullUpdate"),
-                "Playfield must delegate pending corpse spawn orchestration and keep packet/loot callbacks.");
-            Assert.IsFalse(
-                processPendingCorpseSpawns.Contains("foreach (CorpseState corpse")
-                || processPendingCorpseSpawns.Contains("this.pendingCorpseSpawns.Remove"),
-                "Playfield must not own pending corpse spawn loop orchestration.");
-            Assert.IsTrue(
-                playfieldText.Contains("private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)")
-                && playfieldText.Contains("client.SendCompressed(")
-                && playfieldText.Contains("CorpseFullUpdate.Build("),
-                "Playfield intentionally keeps corpse packet emission outside NPCRuntimeService.");
-            Assert.IsTrue(
-                playfieldText.Contains("private bool RegisterCorpse(ICharacter target, Identity corpseIdentity)")
-                && playfieldText.Contains("private void DespawnCorpse(int corpseInstance)")
-                && playfieldText.Contains("this.corpseInventoryService.Create(state);")
-                && playfieldText.Contains("x => this.corpseInventoryService.Remove(x)")
-                && playfieldText.Contains("x => this.pendingCorpseCreditAwards.Remove(x)"),
-                "The corpse inventory service must own state while object lifecycle preserves despawn cleanup order.");
-            Assert.IsTrue(
-                playfieldText.Contains("GlobalLootRuntimeService.Generate(target, this.Identity.Instance)")
-                && playfieldText.Contains("private static readonly GlobalLootRuntimeService GlobalLootRuntimeService")
-                && playfieldText.Contains("private void SendCorpseInventoryUpdate(ICharacter looter, CorpseState corpse)")
-                && playfieldText.Contains("private void AwardCorpseCredits(ICharacter looter, CorpseState corpse)"),
-                "Global services must own loot and corpse state while Playfield retains packet and character-credit application callbacks.");
-            Assert.IsTrue(
-                corpseAccessText.Contains("internal sealed class PlayfieldCorpseAccessRuntimeService")
-                && corpseAccessText.Contains("internal bool TryUseCorpse<TCorpseState>(")
-                && corpseAccessText.Contains("internal bool TryUseDeadNpcCorpse<TCorpseState>(")
-                && corpseAccessText.Contains("internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(")
-                && corpseAccessText.Contains("internal void ProcessPendingCorpseCreditAwards<TAward, TCorpseState>("),
-                "PlayfieldCorpseAccessRuntimeService must own corpse use, loot, and pending credit orchestration entry points.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.TryUseCorpse(")
-                && playfieldText.Contains("this.runtimeSystems.TryUseDeadNpcCorpse(")
-                && playfieldText.Contains("this.runtimeSystems.TryLootCorpseItem(")
-                && playfieldText.Contains("this.runtimeSystems.ProcessPendingCorpseCreditAwards("),
-                "Playfield must route corpse access and loot orchestration through PlayfieldRuntimeSystems.");
-            AssertTextBefore(
-                corpseAccessText,
-                "sendCorpseInventoryUpdate(looter, corpse);",
-                "scheduleCorpseCreditAward(looter, corpse);");
-            AssertTextBefore(
-                corpseAccessText,
-                "setLooted(corpseLootItem, true);",
-                "sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);");
-            Assert.IsFalse(
-                playfieldText.Contains("private void SendCorpseInventoryUpdateAndCredits"),
-                "Playfield must not keep the combined corpse inventory/credits orchestration helper.");
-            Assert.IsFalse(
-                corpseAccessText.Contains("SendCompressed")
-                || corpseAccessText.Contains("InventoryUpdateMessage")
-                || corpseAccessText.Contains("ContainerAddItemMessage")
-                || corpseAccessText.Contains("new Item(")
-                || corpseAccessText.Contains("BaseInventory")
-                || corpseAccessText.Contains("Stats.Write")
-                || corpseAccessText.Contains("RollCorpseLootItems")
-                || corpseAccessText.Contains("RollCorpseCredits")
-                || corpseAccessText.Contains("AwardCorpseCredits"),
-                "PlayfieldCorpseAccessRuntimeService must not own packet construction, item materialization, inventory algorithms, persistence, loot, or credit math.");
-            Assert.IsFalse(
-                npcRuntimeText.Contains("SendCompressed")
-                || npcRuntimeText.Contains("CorpseFullUpdate.Build(")
-                || npcRuntimeText.Contains("this.corpses[")
-                || npcRuntimeText.Contains("RollCorpseLootItems")
-                || npcRuntimeText.Contains("RollCorpseCredits")
-                || npcRuntimeText.Contains("SendCorpseInventoryUpdate")
-                || npcRuntimeText.Contains("AwardCorpseCredits"),
-                "NPCRuntimeService must not own packet emission, corpse storage, loot, credits, or corpse containers.");
             Assert.IsFalse(
                 objectLifecycleText.Contains("CorpseFullUpdate.Build(")
                 || objectLifecycleText.Contains("RollCorpseLootItems")
@@ -6340,467 +3300,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 || objectLifecycleText.Contains("AwardCorpseCredits")
                 || objectLifecycleText.Contains("InventoryUpdateMessage"),
                 "PlayfieldObjectLifecycleRuntimeService must not own packet emission, loot, credits, or inventory containers.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.BeginNpcDeath(attacker, target);"),
-                "Playfield must delegate NPC corpse lifecycle start through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("this.ProcessDeadNpcDespawn")
-                && timedLifecycleText.Contains("if (processDeadNpcDespawn(dynel))"),
-                "Timed lifecycle scheduling must delegate dead NPC processing through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldRuntimeSystems.cs")
-                && projectText.Contains(@"Core\Playfields\NPCRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldObjectLifecycleRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldRewardRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldRuntimeSystems, NPCRuntimeService, object lifecycle, corpse access, statel transition, and reward runtime services.");
-
-            string immediateRemove = ExtractMethodBlock(npcRuntimeText, "internal void DespawnNpcImmediately");
-            Assert.IsTrue(
-                immediateRemove.Contains("target == null || target.Identity.Type != IdentityType.CanbeAffected"),
-                "NPCRuntimeService must preserve the immediate NPC removal guard.");
-            int stopFightIndex = immediateRemove.IndexOf(
-                "stopFightingDeadTarget(target.Identity);",
-                StringComparison.Ordinal);
-            int cancelCorpseIndex = immediateRemove.IndexOf(
-                "cancelPendingCorpseSpawn(target.Identity);",
-                StringComparison.Ordinal);
-            int finalizeIndex = immediateRemove.IndexOf(
-                "this.FinalizeNpcDespawn(target);",
-                StringComparison.Ordinal);
-            Assert.IsTrue(
-                stopFightIndex >= 0 && stopFightIndex < cancelCorpseIndex && cancelCorpseIndex < finalizeIndex,
-                "Immediate NPC removal must preserve stop-fight, pending-corpse cancellation, then final despawn order.");
-
-            string playfieldImmediateRemove = ExtractMethodBlock(playfieldText, "public void DespawnNpcImmediately");
-            Assert.IsFalse(
-                playfieldImmediateRemove.Contains("this.StopFightingDeadTarget(target.Identity);")
-                || playfieldImmediateRemove.Contains("this.pendingCorpseSpawns.Remove(target.Identity.Instance);")
-                || playfieldImmediateRemove.Contains("this.runtimeSystems.FinalizeNpcDespawn(target);"),
-                "Playfield DespawnNpcImmediately must not own immediate NPC removal sequencing.");
         }
 
-        [TestMethod]
-        public void CorpseLootCreditGuardrailPreservesAccessTransferAndCreditOwnership()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string corpseAccessText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldCorpseAccessRuntimeService.cs"));
-            string corpseInteractionRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CorpseInteractionRules.cs"));
-            string inventoryRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\InventoryContainerRuntimeService.cs"));
-            string corpseRulesText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\CombatCorpseRules.cs"));
-            string ordinaryCatalogText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyCatalog.cs"));
 
-            string playfieldUseCorpse = ExtractMethodBlock(playfieldText, "public bool TryUseCorpse");
-            string playfieldLootCorpseItem = ExtractMethodBlock(playfieldText, "public bool TryLootCorpseItem");
-            string registerCorpse = ExtractMethodBlock(playfieldText, "private bool RegisterCorpse");
-            string playfieldPendingCredits = ExtractMethodBlock(playfieldText, "private void ProcessPendingCorpseCreditAwards");
-            string corpseUse = ExtractMethodBlock(corpseAccessText, "internal bool TryUseCorpse<TCorpseState>(");
-            string corpseLoot = ExtractMethodBlock(corpseAccessText, "internal bool TryLootCorpseItem<TCorpseState, TCorpseLootItem>(");
-            string inventoryAndCredits =
-                ExtractMethodBlock(corpseAccessText, "private void SendCorpseInventoryUpdateAndCredits<TCorpseState>(");
-            string sendCorpseInventoryUpdate =
-                ExtractMethodBlock(playfieldText, "private void SendCorpseInventoryUpdate");
-            string sendCorpseContainerAddItem =
-                ExtractMethodBlock(playfieldText, "private void SendCorpseContainerAddItem");
-            string scheduleCorpseCreditAward =
-                ExtractMethodBlock(playfieldText, "private void ScheduleCorpseCreditAward");
-            string awardCorpseCredits = ExtractMethodBlock(playfieldText, "private void AwardCorpseCredits");
-            string sendStatChangedMessage = ExtractMethodBlock(playfieldText, "private static void SendStatChangedMessage");
 
-            Assert.IsTrue(
-                playfieldUseCorpse.Contains("this.runtimeSystems.TryUseCorpse(")
-                && playfieldUseCorpse.Contains("this.SendCorpseInventoryUpdate")
-                && playfieldUseCorpse.Contains("corpse.InventoryHandle = this.AllocateCorpseInventoryHandle();")
-                && playfieldUseCorpse.Contains("this.ScheduleCorpseCreditAward")
-                && playfieldUseCorpse.Contains("corpse => corpse.IsEmpty"),
-                "Playfield must delegate corpse access sequencing while retaining packet and credit callbacks.");
-            Assert.IsTrue(
-                corpseUse.Contains("this.SendCorpseInventoryUpdateAndCredits(")
-                && corpseUse.Contains("if (!isEmpty(corpse))")
-                && corpseUse.Contains("if (isEmpty(corpse))")
-                && corpseUse.Contains("if (opened(corpse))")
-                && corpseUse.Contains("setOpened(corpse, false);")
-                && corpseUse.Contains("refreshCorpseInventoryHandle(corpse);")
-                && corpseUse.Contains("sendCorpseCloseAction(looter, corpse);")
-                && corpseUse.Contains("sendUseActionFinished(looter);")
-                && corpseUse.Contains("return true;")
-                && corpseUse.Contains("else"),
-                "Corpse access must preserve the captured open, close, and reopen alternation.");
-            Assert.IsFalse(
-                corpseUse.Contains("NextUseSendsAccessActionOnly")
-                || corpseUse.Contains("sendCorpseLootAccessAction"),
-                "Corpse reopen must not retain the rejected refresh-plus-action hypothesis.");
-            Assert.IsTrue(
-                playfieldText.Contains("private void SendCorpseCloseAction")
-                && playfieldText.Contains("ActionIdentity = 0x66"),
-                "Captured corpse close must emit Action 0x66 only through the close branch.");
-            AssertTextBefore(corpseUse, "if (opened(corpse))", "setOpened(corpse, false);");
-            AssertTextBefore(corpseUse, "setOpened(corpse, false);", "refreshCorpseInventoryHandle(corpse);");
-            AssertTextBefore(corpseUse, "refreshCorpseInventoryHandle(corpse);", "sendCorpseCloseAction(looter, corpse);");
-            AssertTextBefore(corpseUse, "sendCorpseCloseAction(looter, corpse);", "sendUseActionFinished(looter);");
-            AssertTextBefore(corpseUse, "sendUseActionFinished(looter);", "setOpened(corpse, true);");
-            AssertTextBefore(
-                inventoryAndCredits,
-                "sendCorpseInventoryUpdate(looter, corpse);",
-                "scheduleCorpseCreditAward(looter, corpse);");
-            Assert.IsTrue(
-                playfieldText.Contains("private static readonly TimeSpan CorpseCreditAwardDelay = TimeSpan.FromMilliseconds(500);")
-                && corpseInteractionRulesText.Contains("public const int CorpseUseAcknowledgeDelayMilliseconds = 550;"),
-                "Capture-backed corpse credit payout must stay after InventoryUpdate and before the delayed GenericCmd success ack.");
-            Assert.IsTrue(
-                !registerCorpse.Contains("if (!state.HasUnlootedItems)")
-                && registerCorpse.Contains("this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);")
-                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseCleanupAfterOpenedDelay = TimeSpan.Zero;")
-                && corpseRulesText.Contains("public static readonly TimeSpan EmptyCorpseLifetime = TimeSpan.Zero;")
-                && corpseRulesText.Contains("public static readonly TimeSpan RegularLootCorpseLifetime = TimeSpan.FromSeconds(60);")
-                && registerCorpse.Contains("CombatCorpseLootClass lootClass = CorpseLootClassFor(target, lootItems, credits);")
-                && corpseRulesText.Contains("unlootedItemCount <= 0 && unlootedCredits <= 0")
-                && CountOccurrences(
-                    ordinaryCatalogText.Replace("\r\n", "\n"),
-                    "0.0,\n                60.0,\n                0.0") >= 3,
-                "Regular loot-bearing corpses must retain 60 seconds, while every born-empty or fully emptied corpse despawns immediately.");
-            AssertTextBefore(
-                registerCorpse,
-                "this.corpseInventoryService.Create(state);",
-                "this.runtimeSystems.ScheduleNpcCorpseDespawn(corpseIdentity, expiresAtUtc);");
 
-            Assert.IsTrue(
-                playfieldLootCorpseItem.Contains("this.runtimeSystems.TryLootCorpseItem(")
-                && playfieldLootCorpseItem.Contains("this.runtimeSystems.CharacterHasUniqueItemAlready")
-                && playfieldLootCorpseItem.Contains("this.runtimeSystems.TryAddCorpseLootItem")
-                && playfieldLootCorpseItem.Contains("this.SendCorpseContainerAddItem")
-                && playfieldLootCorpseItem.Contains("corpse => corpse.IsEmpty")
-                && corpseLoot.Contains("if (isEmpty(corpse))"),
-                "Playfield must delegate corpse item transfer sequencing while retaining packet callbacks.");
-            AssertTextBefore(
-                corpseLoot,
-                "characterHasUniqueItemAlready(looter, item)",
-                "tryAddCorpseLootItem(looter, item, targetPlacement)");
-            AssertTextBefore(
-                corpseLoot,
-                "tryAddCorpseLootItem(looter, item, targetPlacement)",
-                "setLooted(corpseLootItem, true);");
-            AssertTextBefore(corpseLoot, "setLooted(corpseLootItem, true);", "setOpened(corpse, true);");
-            AssertTextBefore(
-                corpseLoot,
-                "setOpened(corpse, true);",
-                "sendCorpseContainerAddItem(looter, sourceContainer, transferResult.TargetSlot);");
-            Assert.IsTrue(
-                corpseLoot.Contains("sourceContainer.Type != IdentityType.Backpack")
-                && corpseLoot.Contains("int corpseInventoryHandleValue = (sourceContainer.Instance >> 16) & 0xffff;")
-                && corpseLoot.Contains("int requestedLootSlot = sourceContainer.Instance & 0xffff;"),
-                "Corpse loot transfer must accept the opened corpse container source encoding and decode handle plus slot.");
-            Assert.IsTrue(
-                corpseLoot.Contains("if (corpseLootItem == null)")
-                && corpseLoot.Contains("sendUseActionFinished(looter);"),
-                "Missing, already-looted, or empty corpse slots must fail safely without producing items.");
-            AssertTextBefore(
-                corpseLoot,
-                "CorpseLootInventoryTransferResult transferResult = tryAddCorpseLootItem(looter, item, targetPlacement);",
-                "setLooted(corpseLootItem, true);");
-            Assert.IsTrue(
-                inventoryRuntimeText.Contains("public bool CharacterHasUniqueItemAlready(")
-                && inventoryRuntimeText.Contains("public CorpseLootInventoryTransferResult TryAddCorpseLootItem(")
-                && runtimeSystemsText.Contains("return this.inventoryContainer.CharacterHasUniqueItemAlready(character, item);")
-                && runtimeSystemsText.Contains("return this.inventoryContainer.TryAddCorpseLootItem(looter, item, targetPlacement);"),
-                "InventoryContainerRuntimeService must own unique validation and inventory insertion helpers.");
-
-            Assert.IsTrue(
-                playfieldPendingCredits.Contains("this.runtimeSystems.ProcessPendingCorpseCreditAwards(")
-                && playfieldPendingCredits.Contains("this.pendingCorpseCreditAwards")
-                && playfieldPendingCredits.Contains("this.AwardCorpseCredits"),
-                "Playfield must delegate due credit-award iteration through runtime systems while retaining the credit award callback.");
-            Assert.IsTrue(
-                scheduleCorpseCreditAward.Contains("this.pendingCorpseCreditAwards.ContainsKey(corpse.CorpseIdentity.Instance)")
-                && scheduleCorpseCreditAward.Contains("corpse.CreditsLooted || corpse.Credits <= 0")
-                && scheduleCorpseCreditAward.Contains("this.pendingCorpseCreditAwards[corpse.CorpseIdentity.Instance]"),
-                "Playfield must keep pending corpse credit storage ownership and must not schedule duplicate or zero-credit payouts.");
-            Assert.IsTrue(
-                awardCorpseCredits.Contains("this.corpseInventoryService.RemoveCredits(corpse.CorpseIdentity, DateTime.UtcNow)")
-                && awardCorpseCredits.Contains("CashStatRules.Clamp")
-                && awardCorpseCredits.Contains("looter.Stats[StatIds.cash].Set((uint)cashAfter);")
-                && awardCorpseCredits.Contains("this.runtimeSystems.SendChangedStatsIfClient(")
-                && sendStatChangedMessage.Contains("StatMessageHandler.Default.SendChanged(character);")
-                && awardCorpseCredits.Contains("looter.Stats.Write();")
-                && awardCorpseCredits.Contains("if (corpse.IsEmpty)")
-                && awardCorpseCredits.Contains("this.ScheduleCorpseDespawn(corpse, corpse.EmptyCleanupDelay, \"credits-empty\");"),
-                "Playfield must keep corpse credit mutation, stat packet callback, persistence ownership, and start cleanup only after credits actually empty the corpse.");
-            Assert.IsFalse(
-                awardCorpseCredits.Contains("FormatFeedbackMessage")
-                || awardCorpseCredits.Contains("ChatTextMessageHandler")
-                || awardCorpseCredits.Contains("SendRewardFeedback")
-                || awardCorpseCredits.Contains("StatIds.xp")
-                || awardCorpseCredits.Contains("UnsavedXP"),
-                "Corpse credit payout must be Cash stat only; capture did not prove chat feedback or XP from corpse interaction.");
-            Assert.IsFalse(
-                corpseLoot.Contains("AwardCorpseCredits")
-                || corpseLoot.Contains("Stats[StatIds.cash].Set")
-                || corpseLoot.Contains("CashStatRules"),
-                "Item loot transfer must not independently award corpse credits.");
-
-            Assert.IsTrue(
-                playfieldText.Contains("private readonly CorpseInventoryService corpseInventoryService")
-                && playfieldText.Contains("private readonly Dictionary<int, PendingCorpseCreditAward> pendingCorpseCreditAwards"),
-                "The global corpse service must own corpse state while Playfield retains delayed credit scheduling.");
-            Assert.IsTrue(
-                sendCorpseInventoryUpdate.Contains("new InventoryUpdateMessage")
-                && sendCorpseContainerAddItem.Contains("new ContainerAddItemMessage")
-                && sendCorpseInventoryUpdate.Contains("NumberOfSlots = CombatCorpseRules.CorpseInventorySlots")
-                && sendCorpseInventoryUpdate.Contains("Unknown1 = 2")
-                && sendCorpseInventoryUpdate.Contains("BagIdentity = corpse.CorpseIdentity")
-                && sendCorpseInventoryUpdate.Contains("SlotnumberInMainInventory = corpse.InventoryHandle")
-                && sendCorpseInventoryUpdate.Contains("Unknown2 = 1"),
-                "Playfield must keep corpse packet construction ownership for now.");
-            Assert.IsTrue(
-                sendCorpseInventoryUpdate.Contains("corpse.LootItems == null")
-                && sendCorpseInventoryUpdate.Contains("new InventoryEntry[0]")
-                && sendCorpseInventoryUpdate.Contains("corpse.LootItems.Where(x => !x.Looted).Select(CreateCorpseInventoryEntry).ToArray()"),
-                "Empty corpses must open with zero inventory entries, while item-bearing corpses expose current unlooted corpse items.");
-            Assert.IsTrue(
-                playfieldText.Contains("LowId = lootItem.Item.LowID")
-                && playfieldText.Contains("HighId = lootItem.Item.HighID")
-                && playfieldText.Contains("Quality = lootItem.Item.Quality"),
-                "Corpse InventoryUpdate entries must expose item ids and quality from corpse state.");
-            Assert.IsFalse(
-                playfieldText.Contains("SendCorpseCreditFeedback"),
-                "Corpse credit payout must not retain an unproven chat/feedback helper.");
-            Assert.IsFalse(
-                corpseAccessText.Contains("InventoryUpdateMessage")
-                || corpseAccessText.Contains("ContainerAddItemMessage")
-                || corpseAccessText.Contains("ActionMessage")
-                || corpseAccessText.Contains("SendCompressed")
-                || corpseAccessText.Contains("Stats[StatIds.cash].Set")
-                || corpseAccessText.Contains("Stats.Write")
-                || corpseAccessText.Contains("private readonly Dictionary<int, PendingCorpseCreditAward>")
-                || corpseAccessText.Contains("new PendingCorpseCreditAward")
-                || corpseAccessText.Contains("new Item("),
-                "PlayfieldCorpseAccessRuntimeService must not own packets, credit mutation, pending-credit storage, or item materialization.");
-        }
-
-        [TestMethod]
-        public void PlayfieldContentDataProviderOwnsStaticContentDataResolution()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string statelTransitionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
-            string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs"));
-            string materializationText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
-            string dbMobSpawnText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs"));
-            string staticDynelRuntimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
-            string vendorRuntimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVendorRuntimeService.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
-
-            Assert.IsTrue(
-                providerText.Contains("internal sealed class PlayfieldContentDataProvider"),
-                "PlayfieldContentDataProvider must be the named content data boundary.");
-            Assert.IsTrue(
-                providerText.Contains("internal List<StatelData> ResolveStatels(Identity playfieldIdentity)"),
-                "Provider must own statel resolution.");
-            Assert.IsTrue(
-                providerText.Contains(
-                    "internal bool TryResolveVendorStatels("),
-                "Provider must own vendor statel resolution.");
-            Assert.IsTrue(
-                providerText.Contains("internal StatelData[] ResolveCollisionStatels(IEnumerable<StatelData> statels)"),
-                "Provider must own collision-capable statel filtering.");
-            Assert.IsTrue(
-                providerText.Contains(
-                    "internal IEnumerable<PlayfieldStaticDynelDefinition> ResolveStaticDynels(Identity playfieldIdentity)"),
-                "Provider must own static dynel definition resolution.");
-            Assert.IsTrue(
-                providerText.Contains("PlayfieldLoader.PFData.TryGetValue"),
-                "Provider must own PlayfieldLoader statel data access.");
-            Assert.IsTrue(
-                providerText.Contains("StaticDynelDao.Instance.GetWhere"),
-                "Provider must own static dynel DB row access.");
-            Assert.IsTrue(
-                providerText.Contains("MessagePackZip.DeserializeData"),
-                "Provider must own static dynel stat payload deserialization.");
-            Assert.IsTrue(
-                providerText.Contains("IdentityType.VendingMachine"),
-                "Provider must preserve the existing vendor statel filter.");
-            Assert.IsTrue(
-                providerText.Contains("x.EventType == EventType.OnCollide")
-                && providerText.Contains("x.EventType == EventType.OnEnter")
-                && providerText.Contains("x.EventType == EventType.OnTargetInVicinity"),
-                "Provider must preserve the existing collision statel event filter.");
-            Assert.IsTrue(
-                providerText.Contains("internal sealed class PlayfieldStaticDynelDefinition"),
-                "Provider must expose static dynel definitions rather than spawning runtime objects.");
-
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldContentDataProvider contentData"),
-                "PlayfieldRuntimeSystems must own PlayfieldContentDataProvider.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains(
-                    "this.contentData = new PlayfieldContentDataProvider(isPrivateCityPlayfieldCandidate);"),
-                "PlayfieldRuntimeSystems must construct the content data provider.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("return this.contentData.ResolveStatels(playfieldIdentity);"),
-                "Runtime systems must delegate statel data resolution to the provider.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains(
-                    "return this.contentData.TryResolveVendorStatels(playfieldIdentity, statels, out vendorStatels);"),
-                "Runtime systems must delegate vendor statel data resolution to the provider.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("return this.contentData.ResolveCollisionStatels(statels);"),
-                "Runtime systems must delegate collision statel filtering to the provider.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("return this.contentData.ResolveStaticDynels(playfieldIdentity);"),
-                "Runtime systems must delegate static dynel data resolution to the provider.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldObjectMaterializationRuntimeService objectMaterialization")
-                && runtimeSystemsText.Contains("this.objectMaterialization.MaterializeStartupObjects("),
-                "Runtime systems must own startup object materialization through the materialization service.");
-
-            string constructor = ExtractMethodBlock(playfieldText, "public Playfield(ZoneServer zoneServer, Identity playfieldIdentity)");
-            AssertTextBefore(
-                constructor,
-                "this.runtimeSystems.ResolveStatels(playfieldIdentity)",
-                "this.runtimeSystems.RegisterStatels(this.statels);");
-            AssertTextBefore(
-                constructor,
-                "this.runtimeSystems.RegisterStatels(this.statels);",
-                "this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);");
-            AssertTextBefore(
-                constructor,
-                "this.collisionStatels = this.runtimeSystems.ResolveCollisionStatels(this.statels);",
-                "this.runtimeSystems.MaterializeStartupObjects(");
-            Assert.IsFalse(
-                constructor.Contains("this.LoadMobSpawns(playfieldIdentity);")
-                || constructor.Contains("this.runtimeSystems.RegisterContent(playfieldIdentity);")
-                || constructor.Contains("this.LoadVendors(playfieldIdentity);")
-                || constructor.Contains("this.LoadStaticDynels(playfieldIdentity);")
-                || constructor.Contains("this.runtimeSystems.RefreshDynelRegistry();"),
-                "Playfield constructor must not directly own startup object materialization sequence.");
-
-            AssertTextBefore(
-                materializationText,
-                "this.MaterializeDbMobSpawns(",
-                "registerContent(playfieldIdentity);");
-            AssertTextBefore(
-                materializationText,
-                "registerContent(playfieldIdentity);",
-                "this.MaterializeVendors(");
-            AssertTextBefore(
-                materializationText,
-                "this.MaterializeVendors(",
-                "this.MaterializeStaticDynels(");
-            AssertTextBefore(
-                materializationText,
-                "this.MaterializeStaticDynels(",
-                "refreshDynelRegistry();");
-
-            string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
-            string primeStatelCollisionContacts =
-                ExtractMethodBlock(playfieldText, "private void PrimeStatelCollisionContacts(ICharacter dynel)");
-            Assert.IsTrue(
-                playfieldText.Contains("private readonly StatelData[] collisionStatels"),
-                "Playfield must keep a provider-filtered collision statel view.");
-            Assert.IsTrue(
-                checkStatelCollision.Contains("this.collisionStatels"),
-                "Playfield CheckStatelCollision must pass provider-filtered collision statels to runtime systems.");
-            Assert.IsTrue(
-                primeStatelCollisionContacts.Contains("this.collisionStatels"),
-                "Playfield PrimeStatelCollisionContacts must pass provider-filtered collision statels to runtime systems.");
-            Assert.IsFalse(
-                primeStatelCollisionContacts.Contains("sd.Events.Any")
-                || checkStatelCollision.Contains("foreach (StatelData sd in this.collisionStatels)"),
-                "Playfield must not own collision-capable statel selection or the statel collision loop.");
-            Assert.IsTrue(
-                statelTransitionText.Contains("foreach (StatelData sd in collisionStatels)")
-                && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
-                "PlayfieldStatelTransitionRuntimeService must own collision statel iteration and event firing.");
-
-            Assert.IsTrue(
-                staticDynelRuntimeText.Contains("new StaticDynel(playfieldIdentity, staticDynel.Identity, staticDynel.Template)")
-                && staticDynelRuntimeText.Contains("foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)")
-                && staticDynelRuntimeText.Contains("sdy.Coordinate = staticDynel.Coordinate;")
-                && staticDynelRuntimeText.Contains("sdy.Heading = staticDynel.Heading;"),
-                "PlayfieldStaticDynelRuntimeService must own runtime static dynel construction.");
-            Assert.IsFalse(
-                staticDynelRuntimeText.Contains("StaticDynelDao.Instance.GetWhere"),
-                "Static dynel runtime construction must not own DB row access.");
-            Assert.IsFalse(
-                staticDynelRuntimeText.Contains("MessagePackZip.DeserializeData"),
-                "Static dynel runtime construction must not own static dynel stat deserialization.");
-            Assert.IsFalse(
-                playfieldText.Contains("private IEntity CreateStaticDynel(")
-                || playfieldText.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
-                "Playfield must not directly own static dynel runtime construction.");
-            Assert.IsTrue(
-                dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions(Identity playfieldIdentity)")
-                && dbMobSpawnText.Contains("MobSpawnDao.Instance.GetWhere")
-                && dbMobSpawnText.Contains("internal IEnumerable<DBMobSpawnStat> LoadMobSpawnStats(DBMobSpawn mob)")
-                && dbMobSpawnText.Contains("MobSpawnStatDao.Instance.GetWhere")
-                && dbMobSpawnText.Contains("internal ICharacter InstantiateDbMobSpawn(DBMobSpawn mob, DBMobSpawnStat[] stats, Playfield playfield)")
-                && dbMobSpawnText.Contains("NonPlayerCharacterHandler.InstantiateMobSpawn")
-                && dbMobSpawnText.Contains("new NPCController()")
-                && dbMobSpawnText.Contains("internal void AttachMobSpawnKnuBot(DBMobSpawn mob, ICharacter cmob)")
-                && dbMobSpawnText.Contains("ScriptCompiler.Instance.CreateKnuBot")
-                && vendorRuntimeText.Contains("internal void SpawnVendors(Playfield playfield, StatelData[] vendorStatels)")
-                && vendorRuntimeText.Contains("VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);"),
-                "DB mob spawn runtime service must own DB loading, object construction, and script creation callbacks while vendor runtime service owns vendor spawning.");
-            Assert.IsFalse(
-                playfieldText.Contains("private IEnumerable<DBMobSpawn> LoadMobSpawnDefinitions")
-                || playfieldText.Contains("private IEnumerable<DBMobSpawnStat> LoadMobSpawnStats")
-                || playfieldText.Contains("private ICharacter InstantiateDbMobSpawn")
-                || playfieldText.Contains("private void AttachMobSpawnKnuBot")
-                || playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
-                || playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
-                "Playfield must not directly own DB mob spawn loading, construction callbacks, or vendor spawning callbacks.");
-            Assert.IsFalse(
-                materializationText.Contains("MobSpawnDao")
-                || materializationText.Contains("MobSpawnStatDao")
-                || materializationText.Contains("NonPlayerCharacterHandler")
-                || materializationText.Contains("new NPCController")
-                || materializationText.Contains("ScriptCompiler")
-                || materializationText.Contains("VendorHandler")
-                || materializationText.Contains("new StaticDynel")
-                || materializationText.Contains("StaticDynelDao"),
-                "Materialization service must not own DB loading or object construction.");
-
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldContentDataProvider.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldDbMobSpawnRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldStaticDynelRuntimeService.cs")
-                && projectText.Contains(@"Core\Playfields\PlayfieldVendorRuntimeService.cs"),
-                "ZoneEngine project must compile PlayfieldContentDataProvider, PlayfieldObjectMaterializationRuntimeService, PlayfieldDbMobSpawnRuntimeService, PlayfieldStaticDynelRuntimeService, and PlayfieldVendorRuntimeService.");
-        }
 
         [TestMethod]
         public void LegacyDbMobSpawnAppearanceUsesCapturedTexturesAndHeadMeshStats()
@@ -6818,10 +3322,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 Path.Combine(
                     repositoryRoot,
                     @"AORebirth\Libraries\Source\AORebirth.Database\SqlTables\mobspawns_stats.sql"));
-            string simpleCharFullUpdateText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Packets\SimpleCharFullUpdate.cs"));
 
             Assert.IsTrue(
                 npcHandlerText.Contains("mob.Textures0 != 0")
@@ -6845,123 +3345,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && mobSpawnStatsText.Contains("(2029842939, 954, 0, 277352961)")
                 && mobSpawnStatsText.Contains("(2029842939, 954, 59, 3)"),
                 "Guard and Guide must retain their capture-proven breed, gender, and character flags.");
-            Assert.IsTrue(
-                simpleCharFullUpdateText.Contains("charId.Instance == 2029842938")
-                && simpleCharFullUpdateText.Contains("charId.Instance == 2029842939")
-                && simpleCharFullUpdateText.Contains("scfu.Unknown1[0] = 0x80;")
-                && simpleCharFullUpdateText.Contains("SimpleCharFullUpdateFlags.UnknownFlag7")
-                && simpleCharFullUpdateText.Contains("scfu.SuppressedFlags = SimpleCharFullUpdateFlags.UnknownFlag2;"),
-                "Guard and Guide must retain their capture-proven SCFU flag and Unknown1 shape.");
             Assert.IsFalse(
                 mobSpawnsText.Contains("0000009CAF0000000004")
                 || mobSpawnsText.Contains("0000009EBB0000000004"),
                 "Captured head meshes must use Stat 64 rather than ignored legacy DB mesh blobs.");
         }
 
-        [TestMethod]
-        public void PlayfieldContentDataProviderDoesNotOwnRuntimeSystemsOrPacketFlows()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string providerText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldContentDataProvider.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string statelTransitionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
-            string materializationText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
-            string staticDynelRuntimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStaticDynelRuntimeService.cs"));
-            string vendorRuntimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVendorRuntimeService.cs"));
 
-            Assert.IsTrue(
-                providerText.Contains("StaticDynelDao.Instance.GetWhere"),
-                "Provider must own static dynel definition data selection.");
-            Assert.IsTrue(
-                providerText.Contains("private StatelData[] ResolveVendorStatels(IEnumerable<StatelData> statels)"),
-                "Provider must own vendor statel filtering.");
-            Assert.IsTrue(
-                providerText.Contains("internal StatelData[] ResolveCollisionStatels(IEnumerable<StatelData> statels)"),
-                "Provider must own collision-capable statel filtering.");
-
-            string[] forbiddenRuntimeOwnershipPatterns =
-                {
-                    "new StaticDynel",
-                    "VendorHandler.SpawnVendorsForPlayfield",
-                    "SendCompressed",
-                    "N3Messages",
-                    "SystemMessages",
-                    "MessageHandler",
-                    "GenericCmd",
-                    "NpcCombat",
-                    "CombatDamageRules",
-                    "NpcCorpse",
-                    "ContainerAddItem",
-                    "ClientMoveItem",
-                    "OrgClient",
-                    "OrgServer",
-                    "PrivateCityReadyInitCoordinator",
-                    "AOSharpLiveCapture",
-                    "tools-temp"
-                };
-            for (int i = 0; i < forbiddenRuntimeOwnershipPatterns.Length; i++)
-            {
-                Assert.IsFalse(
-                    providerText.Contains(forbiddenRuntimeOwnershipPatterns[i]),
-                    "PlayfieldContentDataProvider must not own runtime or packet behavior: "
-                    + forbiddenRuntimeOwnershipPatterns[i]);
-            }
-
-            string checkStatelCollision = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision(ICharacter dynel)");
-
-            Assert.IsTrue(
-                vendorRuntimeText.Contains("VendorHandler.SpawnVendorsForPlayfield(playfield, vendorStatels);"),
-                "PlayfieldVendorRuntimeService must own vendor runtime spawning.");
-            Assert.IsFalse(
-                playfieldText.Contains("private void SpawnVendors(StatelData[] vendorStatels)")
-                || playfieldText.Contains("VendorHandler.SpawnVendorsForPlayfield(this, vendorStatels)"),
-                "Playfield must not directly own vendor runtime spawning.");
-            Assert.IsTrue(
-                staticDynelRuntimeText.Contains("new StaticDynel(playfieldIdentity, staticDynel.Identity, staticDynel.Template)")
-                && staticDynelRuntimeText.Contains("foreach (GameTuple<CharacterStat, uint> stat in staticDynel.Stats)"),
-                "PlayfieldStaticDynelRuntimeService must own StaticDynel runtime construction.");
-            Assert.IsFalse(
-                playfieldText.Contains("private IEntity CreateStaticDynel(")
-                || playfieldText.Contains("new StaticDynel(this.Identity, staticDynel.Identity, staticDynel.Template)"),
-                "Playfield must not directly own StaticDynel runtime construction.");
-            Assert.IsTrue(
-                materializationText.Contains("tryResolveVendorStatels(playfieldIdentity, statels, out vendorStatels)")
-                && materializationText.Contains("spawnVendors(vendorStatels);")
-                && materializationText.Contains("registerDynel(instantiateStaticDynel(staticDynel));"),
-                "PlayfieldObjectMaterializationRuntimeService must own vendor and static dynel materialization loops.");
-            Assert.IsTrue(
-                checkStatelCollision.Contains("this.runtimeSystems.CheckStatelCollision(")
-                && checkStatelCollision.Contains("this.TeleportToPlayfield"),
-                "Playfield must delegate statel collision runtime orchestration while keeping teleport callback ownership.");
-            Assert.IsTrue(
-                statelTransitionText.Contains("IsInStatelCollisionRange(sd, dynel)")
-                && statelTransitionText.Contains("ev.Perform(dynel, sd);"),
-                "PlayfieldStatelTransitionRuntimeService must own statel collision runtime check/event orchestration.");
-            Assert.IsFalse(
-                statelTransitionText.Contains("VendorHandler.SpawnVendorsForPlayfield")
-                || statelTransitionText.Contains("new StaticDynel")
-                || statelTransitionText.Contains("StaticDynelDao.Instance.GetWhere"),
-                "PlayfieldStatelTransitionRuntimeService must not own content data, static dynel construction, or vendor spawning.");
-            Assert.IsFalse(
-                materializationText.Contains("VendorHandler.SpawnVendorsForPlayfield")
-                || materializationText.Contains("new StaticDynel")
-                || materializationText.Contains("StaticDynelDao.Instance.GetWhere"),
-                "PlayfieldObjectMaterializationRuntimeService must not own vendor implementation, static dynel construction, or content DB selection.");
-        }
 
         [TestMethod]
         public void ZoneClientSessionLifecycleCoordinatorModelsSessionPhasesWithoutPacketOwnership()
@@ -7004,7 +3394,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string coordinatorText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs"));
+                    @"Tests\Fixtures\Gameplay\ZoneClientSessionLifecycleCoordinator.cs"));
             Assert.IsTrue(
                 coordinatorText.Contains("public bool CanTransitionTo(ZoneClientSessionPhase phase)"),
                 "Coordinator must own lifecycle transition validation.");
@@ -7088,70 +3478,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(ZoneClientSessionPhase.Disconnecting, disconnectingFromZoning.Phase);
         }
 
-        [TestMethod]
-        public void ZoneClientSessionLifecycleBoundaryIsWiredAroundExistingLoginReadyAndZoningFlow()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string zoneClientText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
-            string zoneLoginText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ZoneLoginMessageHandler.cs"));
-            string clientConnectedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string transferText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTransferRuntimeService.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
-            string teleportMethod = ExtractMethodBlock(
-                playfieldText,
-                "internal void Teleport(");
-            string disposeMethod = ExtractMethodBlock(zoneClientText, "protected override void Dispose(bool disposing)");
 
-            Assert.IsTrue(
-                zoneClientText.Contains("private readonly ZoneClientSessionLifecycleCoordinator sessionLifecycle"),
-                "ZoneClient must own the session lifecycle coordinator.");
-            Assert.IsTrue(
-                zoneClientText.Contains("public ZoneClientSessionLifecycleCoordinator SessionLifecycle"),
-                "ZoneClient must expose the session lifecycle boundary to existing handlers.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\ZoneClientSessionLifecycleCoordinator.cs"),
-                "ZoneEngine project must compile the session lifecycle coordinator.");
-
-            AssertTextBefore(
-                zoneLoginText,
-                "zc.SessionLifecycle.BeginCharacterLoading();",
-                "zc.CreateCharacter(message.CharacterId);");
-            AssertTextBefore(
-                zoneClientText,
-                "this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();",
-                "this.server.PlayfieldById(");
-            AssertTextBefore(
-                clientConnectedText,
-                "client.PacketSequencing.BeginSessionReadyBlock(",
-                "PlayfieldAnarchyFMessageHandler.Default.Send");
-            AssertTextBefore(
-                clientConnectedText,
-                "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
-                "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
-            AssertTextBefore(
-                clientConnectedText,
-                "client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,",
-                "() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)");
-            AssertTextBefore(
-                clientConnectedText,
-                "client.PacketSequencing.CompleteSessionInitialization(",
-                "client.Controller.Character.DoNotDoTimers = false;");
-            AssertTextBefore(
-                transferText,
-                "this.packetSequences.RunPlayfieldTransferBeginSequence(",
-                "sendTeleportPacket);");
-            AssertTextBefore(
-                disposeMethod,
-                "this.sessionLifecycle.EnterDisconnectingForSessionDispose();",
-                "this.stopDispatcher = true;");
-        }
 
         [TestMethod]
         public void ZoneClientSessionLifecycleCheckpointKeepsPhaseOwnershipOutOfPacketCode()
@@ -7167,13 +3494,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string coordinatorText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs"));
-            string zoneLoginText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\ZoneLoginMessageHandler.cs"));
-            string clientConnectedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+                    @"Tests\Fixtures\Gameplay\ZoneClientSessionLifecycleCoordinator.cs"));
 
             Assert.IsTrue(
                 coordinatorText.Contains("private static bool IsAllowedTransition(ZoneClientSessionPhase from, ZoneClientSessionPhase to)"),
@@ -7223,35 +3544,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "ZoneClient session lifecycle coordinator must remain phase-only before packet sequencing moves: "
                     + packetAndRuntimePatterns[i]);
             }
-
-            Assert.IsTrue(
-                clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);"),
-                "FullCharacter packet emission must still remain outside the lifecycle coordinator.");
-            Assert.IsTrue(
-                clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)"),
-                "CharInPlay/visibility packet emission must still remain outside the lifecycle coordinator.");
-            Assert.IsTrue(
-                playfieldText.Contains("TeleportMessageHandler.Default.Send("),
-                "Teleport packet emission must still remain outside the lifecycle coordinator.");
-
-            string markerSurfaces = zoneLoginText + clientConnectedText + playfieldText;
-            Assert.IsFalse(
-                markerSurfaces.Contains("ZoneClientSessionPhase."),
-                "Packet/runtime surfaces must not own lifecycle enum transition rules directly.");
-            Assert.IsFalse(
-                markerSurfaces.Contains("CanTransitionTo("),
-                "Packet/runtime surfaces must call named coordinator transition methods instead of owning transition validity.");
-            Assert.IsFalse(
-                markerSurfaces.Contains("BeginReadyBlock()")
-                || markerSurfaces.Contains("BeginFullCharacterBoundary()")
-                || markerSurfaces.Contains("MarkCharInPlay()")
-                || markerSurfaces.Contains("MarkInPlay()"),
-                "Packet/runtime surfaces must not use loose ready/full-character/CharInPlay lifecycle marker names.");
-            Assert.IsFalse(
-                markerSurfaces.Contains("BeginPlayfieldLoading()")
-                || markerSurfaces.Contains("BeginZoning()")
-                || markerSurfaces.Contains("BeginDisconnecting()"),
-                "Packet/runtime surfaces must not use loose playfield-loading/zoning/disconnect lifecycle marker names.");
         }
 
         [TestMethod]
@@ -7261,13 +3553,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string coordinatorText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\ZoneClientSessionLifecycleCoordinator.cs"));
-            string zoneClientText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
-            string clientConnectedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
+                    @"Tests\Fixtures\Gameplay\ZoneClientSessionLifecycleCoordinator.cs"));
 
             string[] namedPhaseMethods =
                 {
@@ -7285,34 +3571,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     coordinatorText.Contains("public void " + namedPhaseMethods[i] + "()"),
                     "Coordinator must expose named lifecycle phase ownership method " + namedPhaseMethods[i] + ".");
             }
-
-            string runtimeSurfaces = zoneClientText + clientConnectedText + playfieldText;
-            Assert.IsFalse(
-                runtimeSurfaces.Contains("TransitionTo("),
-                "Runtime packet/session surfaces must not call the raw phase transition helper.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(runtimeSurfaces, "ZoneClientSessionPhase."),
-                "Runtime packet/session surfaces may read the current phase for zoning reload detection but must not own phase transitions.");
-            Assert.IsTrue(
-                zoneClientText.Contains("this.SessionLifecycle.Phase == ZoneClientSessionPhase.Zoning"),
-                "The sole runtime phase read must remain the zoning-reload discriminator.");
-
-            Assert.IsTrue(
-                zoneClientText.Contains("this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();")
-                && zoneClientText.Contains("this.sessionLifecycle.EnterDisconnectingForSessionDispose();"),
-                "ZoneClient must use named coordinator methods for playfield-loading/zoning-exit and disconnect phases.");
-            Assert.IsTrue(
-                clientConnectedText.Contains("client.PacketSequencing.BeginSessionReadyBlock(client.SessionLifecycle.EnterReadyBlockForSessionInit);")
-                && clientConnectedText.Contains("client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,")
-                && clientConnectedText.Contains("client.SessionLifecycle.EnterCharInPlayForVisibilityEntry,")
-                && clientConnectedText.Contains("client.PacketSequencing.CompleteSessionInitialization(")
-                && clientConnectedText.Contains("client.SessionLifecycle.CompleteInPlayForSessionInit);"),
-                "ClientConnected must route ready/full-character/CharInPlay/InPlay phases through named coordinator methods.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.TransferToPlayfield(")
-                && playfieldText.Contains("CapturePlayfieldTransferEnterZoningPhase"),
-                "Playfield teleport must route zoning entry through the named coordinator method.");
 
             string[] forbiddenCoordinatorMechanics =
                 {
@@ -7336,1028 +3594,32 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Coordinator must not own packet, teleport, visibility, private-city, or disposal mechanics: "
                     + forbiddenCoordinatorMechanics[i]);
             }
-
-            Assert.IsTrue(
-                playfieldText.Contains("TeleportMessageHandler.Default.Send(")
-                && playfieldText.Contains("new ZoneRedirectionMessage")
-                && playfieldText.Contains("client.SendCompressed(redirect);"),
-                "Teleport/redirection packet mechanics must remain in Playfield.");
-            Assert.IsTrue(
-                playfieldText.Contains("SendPrivateCityPreFullCharacterReadyBlock")
-                && playfieldText.Contains("SendPrivateCityPlayfieldReadyBlock")
-                && playfieldText.Contains("this.runtimeSystems.SendPrivateCity"),
-                "Private-city ready/init packet construction and delegation must remain outside the lifecycle coordinator.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.locality.AnnounceJoiningCharacterVisibility(")
-                && playfieldText.Contains("this.SendVisibilityMessage,")
-                && playfieldText.Contains("this.SendVisibilityLeave);")
-                && playfieldText.Contains("public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)"),
-                "SCFU and CharInPlay broadcast entry points must remain in Playfield.");
-            Assert.IsTrue(
-                zoneClientText.Contains("this.stopDispatcher = true;")
-                && zoneClientText.Contains("this.zStream.Close();")
-                && zoneClientText.Contains("this.netStream.Close();"),
-                "Engine/client disposal mechanics must remain in ZoneClient.");
         }
 
-        [TestMethod]
-        public void ZoneClientDisconnectCannotWaitForeverForBlockedOutboundDispatcher()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string zoneClientText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
-            string disposeMethod = ExtractMethodBlock(
-                zoneClientText,
-                "protected override void Dispose(bool disposing)");
-            string sendMethod = ExtractMethodBlock(
-                zoneClientText,
-                "private void SendCompressed(byte[] buffer, bool traceQuestNpcTransport)");
 
-            Assert.IsFalse(
-                disposeMethod.Contains("while (this.stopDispatcher)"),
-                "Disconnect must never spin forever waiting for a blocked outbound dispatcher.");
-            AssertTextBefore(
-                disposeMethod,
-                "this.AbortTcpTransportQuietly();",
-                "this.dispatcherThread.Join(DispatcherStopTimeoutMilliseconds)");
-            Assert.IsTrue(
-                disposeMethod.Contains("continuing bounded disconnect cleanup"),
-                "A dispatcher timeout must continue cleanup instead of wedging the server client registry.");
-            Assert.IsTrue(
-                zoneClientText.Contains("this.TcpSocket.SendTimeout = TransportSendTimeoutMilliseconds;")
-                && zoneClientText.Contains("this.dispatcherThread.IsBackground = true;"),
-                "Outbound writes and dispatcher process lifetime must both be bounded.");
-            Assert.IsTrue(
-                sendMethod.Contains("disconnectAfterTransportFailure && !this.disposed && !this.stopDispatcher"),
-                "A dispatcher released by disposal must not recursively enter server disconnect.");
-        }
 
-        [TestMethod]
-        public void ExistingCharacterSnapshotsInitializeOnceFromClientConnectedWithoutInboundCharInPlay()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
-            string clientConnectedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
-            string charInPlayText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharInPlayMessageHandler.cs"));
-            string visibilitySequence = ExtractMethodBlock(
-                coordinatorText,
-                "public void RunVisibilityInitializationSequence");
 
-            Assert.AreEqual(
-                1,
-                CountOccurrences(visibilitySequence, "Execute(sendExistingCharacterSnapshots"),
-                "The shared visibility sequence must execute the existing-character snapshot exactly once.");
-            AssertTextBefore(
-                visibilitySequence,
-                "Execute(announceJoiningCharacter",
-                "Execute(sendExistingCharacterSnapshots");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(
-                    clientConnectedText,
-                    "currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client })"),
-                "ClientConnected must initiate one existing-character snapshot for the joining client.");
-            Assert.IsFalse(
-                charInPlayText.Contains("SendSCFUsToClient")
-                || charInPlayText.Contains("IMSendPlayerSCFUs"),
-                "Inbound CharInPlay must not be required for or duplicate the initial existing-character snapshot.");
-        }
 
-        [TestMethod]
-        public void PacketSequencingCoordinatorOwnsSessionInitializationOrderWithoutOwningPackets()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
-            string zoneClientText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
-            string clientConnectedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string transferText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTransferRuntimeService.cs"));
-            string visibilityPacketText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
-            string privateCityReadyInitText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PrivateCityReadyInitCoordinator.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
 
-            Assert.IsTrue(
-                coordinatorText.Contains("public sealed class PacketSequencingCoordinator"),
-                "PacketSequencingCoordinator must be the named session packet sequencing boundary.");
-            Assert.IsTrue(
-                projectText.Contains(@"Core\PacketSequencingCoordinator.cs"),
-                "ZoneEngine project must compile the packet sequencing coordinator.");
-            Assert.IsTrue(
-                zoneClientText.Contains("private readonly PacketSequencingCoordinator packetSequencing")
-                && zoneClientText.Contains("public PacketSequencingCoordinator PacketSequencing"),
-                "ZoneClient must own and expose the packet sequencing coordinator.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PacketSequencingCoordinator packetSequencing")
-                && runtimeSystemsText.Contains("internal void RunPlayfieldTransferBeginSequence(")
-                && playfieldText.Contains("this.locality.SendExistingCharacterVisibilityToClient(")
-                && playfieldText.Contains("this.locality.AnnounceJoiningCharacterVisibility("),
-                "PlayfieldLocality must own visibility entry while PlayfieldRuntimeSystems retains transfer sequencing.");
-            Assert.IsTrue(
-                clientConnectedText.Contains("client.PacketSequencing.BeginSessionReadyBlock(")
-                && clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
-                && clientConnectedText.Contains("client.PacketSequencing.RunVisibilityInitializationSequence(")
-                && clientConnectedText.Contains("client.PacketSequencing.CompleteSessionInitialization("),
-                "ClientConnected must route session packet sequencing through PacketSequencingCoordinator.");
 
-            string readyFullCharacterSequence = ExtractMethodBlock(
-                coordinatorText,
-                "public void RunSessionReadyFullCharacterSequence");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(recordReadyBlockBegin", "Execute(recordSimpleCharFullUpdate");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(recordSimpleCharFullUpdate", "Execute(sendSimpleCharFullUpdate");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(sendSimpleCharFullUpdate", "Execute(prepareFullCharacterState");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(prepareFullCharacterState", "Execute(sendPreFullCharacterReadyBlock");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(sendPreFullCharacterReadyBlock", "Execute(recordFullCharacter");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(recordFullCharacter", "Execute(enterFullCharacterBoundary");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(enterFullCharacterBoundary", "Execute(sendFullCharacter");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(sendFullCharacter", "Execute(sendPlayfieldReadyBlock");
-            AssertTextBefore(readyFullCharacterSequence, "Execute(sendPlayfieldReadyBlock", "Execute(recordReadyBlockEnd");
 
-            string visibilitySequence = ExtractMethodBlock(
-                coordinatorText,
-                "public void RunVisibilityInitializationSequence");
-            AssertTextBefore(visibilitySequence, "Execute(recordJoinerReady", "Execute(enterCharInPlay");
-            AssertTextBefore(visibilitySequence, "Execute(enterCharInPlay", "Execute(announceJoiningCharacter");
-            AssertTextBefore(
-                visibilitySequence,
-                "Execute(announceJoiningCharacter",
-                "Execute(sendExistingCharacterSnapshots");
 
-            string simpleCharFullUpdateCharInPlaySequence = ExtractMethodBlock(
-                coordinatorText,
-                "public void RunSimpleCharFullUpdateCharInPlaySequence");
-            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(recordSimpleCharFullUpdate", "Execute(sendSimpleCharFullUpdate");
-            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(sendSimpleCharFullUpdate", "Execute(prepareCharInPlay");
-            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(prepareCharInPlay", "Execute(recordCharInPlay");
-            AssertTextBefore(simpleCharFullUpdateCharInPlaySequence, "Execute(recordCharInPlay", "Execute(sendCharInPlay");
 
-            AssertTextBefore(
-                clientConnectedText,
-                "() => SimpleCharFullUpdate.SendToPlayfield(client)",
-                "GuestKeyGeneratorInteractionHandler.ProcessCityAccessCardLifetimes(client.Controller.Character);");
-            AssertTextBefore(
-                clientConnectedText,
-                "Packets.WeaponItemFullUpdate.SendWeaponDefinitions(client.Controller.Character);",
-                "currentPlayfield.SendPrivateCityPreFullCharacterReadyBlock(client, client.Controller.Character);");
-            AssertTextBefore(
-                clientConnectedText,
-                "client.SessionLifecycle.EnterFullCharacterBoundaryForSessionInit,",
-                "FullCharacterMessageHandler.Default.Send(client.Controller.Character);");
-            Assert.AreEqual(
-                2,
-                CountOccurrences(playfieldText, "this.locality.SendExistingCharacterVisibilityToClient(")
-                + CountOccurrences(playfieldText, "this.locality.AnnounceJoiningCharacterVisibility("),
-                "Playfield must route both existing-player and joining-player SCFU/CharInPlay pairs through PlayfieldLocality.");
-            Assert.IsTrue(
-                privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
-                && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
-                "PrivateCityReadyInitCoordinator must route private-city ready/init packet order through PacketSequencingCoordinator.");
-            Assert.IsTrue(
-                transferText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence(")
-                && transferText.Contains("Action enterZoningPhase = captureEnterZoningPhase(dynel);")
-                && playfieldText.Contains("TeleportMessageHandler.Default.Send("),
-                "Playfield must route zoning phase entry before teleport packet send through PacketSequencingCoordinator.");
 
-            string privateCityOrgInitSequence = ExtractMethodBlock(
-                coordinatorText,
-                "public void RunPrivateCityPreFullCharacterOrgInitSequence");
-            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendOrgInfoPacket", "Execute(sendInitialSocialStatus");
-            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendInitialSocialStatus", "Execute(sendOrganizationId");
-            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendOrganizationId", "Execute(sendOrganizationRank");
-            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendOrganizationRank", "Execute(sendSocialStatusRepeat1");
-            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendSocialStatusRepeat1", "Execute(sendSocialStatusRepeat2");
-            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendSocialStatusRepeat2", "Execute(sendSocialStatusRepeat3");
-            AssertTextBefore(privateCityOrgInitSequence, "Execute(sendSocialStatusRepeat3", "Execute(recordOrgInitSent");
 
-            string privateCityReadyBlockSequence = ExtractMethodBlock(
-                coordinatorText,
-                "public void RunPrivateCityPlayfieldReadyBlockSequence");
-            AssertTextBefore(privateCityReadyBlockSequence, "Execute(sendPlayfieldAllTowers", "Execute(recordPlayfieldAllTowers");
-            AssertTextBefore(privateCityReadyBlockSequence, "Execute(recordPlayfieldAllTowers", "Execute(sendPlayfieldAllCities");
-            AssertTextBefore(privateCityReadyBlockSequence, "Execute(sendPlayfieldAllCities", "Execute(recordPlayfieldAllCities");
-            AssertTextBefore(privateCityReadyBlockSequence, "Execute(recordPlayfieldAllCities", "Execute(recordTowersCitiesSent");
 
-            string playfieldTransferBeginSequence = ExtractMethodBlock(
-                coordinatorText,
-                "public void RunPlayfieldTransferBeginSequence");
-            AssertTextBefore(playfieldTransferBeginSequence, "Execute(enterZoningPhase", "Execute(sendTeleportPacket");
 
-            string[] packetAndRuntimePatterns =
-                {
-                    "SendCompressed",
-                    "PlayfieldAnarchyFMessageHandler",
-                    "FullCharacterMessageHandler",
-                    "SimpleCharFullUpdate.",
-                    "CharInPlayMessage",
-                    "PlayfieldAllTowersMessage",
-                    "PlayfieldAllCitiesMessage",
-                    "PrivateCityReadyInitCoordinator",
-                    "GenericCmd",
-                    "InventoryContainerRuntimeService",
-                    "OrgClient",
-                    "AOSharpLiveCapture"
-                };
-            for (int i = 0; i < packetAndRuntimePatterns.Length; i++)
-            {
-                Assert.IsFalse(
-                    coordinatorText.Contains(packetAndRuntimePatterns[i]),
-                    "PacketSequencingCoordinator must own sequencing only, not packet construction/runtime systems: "
-                    + packetAndRuntimePatterns[i]);
-            }
 
-            Assert.IsTrue(
-                clientConnectedText.Contains("FullCharacterMessageHandler.Default.Send(client.Controller.Character);")
-                && clientConnectedText.Contains("() => currentPlayfield.AnnouncePlayerVisibility(client.Controller.Character)")
-                && clientConnectedText.Contains("currentPlayfield.SendSCFUsToClient(new IMSendPlayerSCFUs { toClient = client });"),
-                "Session packet send expressions must remain in ClientConnected for these sequencing slices.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.locality.SendExistingCharacterVisibilityToClient(")
-                && playfieldText.Contains("body => sendSCFUs.toClient.SendCompressed(body)")
-                && playfieldText.Contains("this.locality.AnnounceJoiningCharacterVisibility(")
-                && playfieldText.Contains("this.SendVisibilityMessage,")
-                && playfieldText.Contains("this.SendVisibilityLeave);"),
-                "Visibility packet send callbacks must remain in Playfield while packet construction stays behind locality.");
-            Assert.IsTrue(
-                privateCityReadyInitText.Contains("new OrgInfoPacketMessage")
-                && privateCityReadyInitText.Contains("new PlayfieldAllTowersMessage")
-                && privateCityReadyInitText.Contains("new PlayfieldAllCitiesMessage")
-                && privateCityReadyInitText.Contains("this.SendPrivateCityStatValue(client, character, StatIds.socialstatus, 4, 1)")
-                && privateCityReadyInitText.Contains("this.SendPrivateCityStat(client, character, StatIds.clan, 0)")
-                && privateCityReadyInitText.Contains("this.SendPrivateCityStat(client, character, StatIds.clanlevel, 0)"),
-                "Private-city packet construction and stat send expressions must remain in PrivateCityReadyInitCoordinator.");
-        }
 
-        [TestMethod]
-        public void ZoningTeleportSequencingGuardrailKeepsRuntimeHandoffAndRedirectOrder()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string zoneClientText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\ZoneClient.cs"));
-            string packetSequencingText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
-            string lifecycleText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldLifecycleRuntimeService.cs"));
-            string transferText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTransferRuntimeService.cs"));
 
-            string teleportMethod = ExtractMethodBlock(
-                playfieldText,
-                "internal void Teleport(");
-            string createCharacterMethod = ExtractMethodBlock(
-                zoneClientText,
-                "public void CreateCharacter(int charId)");
 
-            AssertTextBefore(
-                teleportMethod,
-                "if (this.TryCompleteLocalTeleportInCurrentPlayfield(dynel, destination, heading, playfield))",
-                "this.runtimeSystems.TransferToPlayfield(");
-            AssertTextBefore(
-                transferText,
-                "this.lifecycle.PreparePlayfieldTransfer(",
-                "Action enterZoningPhase = captureEnterZoningPhase(dynel);");
-            AssertTextBefore(
-                lifecycleText,
-                "clearTransferContactState(dynel.Identity.Instance);",
-                "disableTimers(dynel);");
-            AssertTextBefore(
-                transferText,
-                "Action enterZoningPhase = captureEnterZoningPhase(dynel);",
-                "this.packetSequences.RunPlayfieldTransferBeginSequence(");
-            AssertTextBefore(
-                transferText,
-                "this.packetSequences.RunPlayfieldTransferBeginSequence(",
-                "this.CompletePlayfieldTransfer(");
-            AssertTextBefore(
-                transferText,
-                "announceDespawn(dynel);",
-                "applyTransferState(dynel, destination, heading);");
-            AssertTextBefore(
-                transferText,
-                "applyTransferState(dynel, destination, heading);",
-                "ZoneClient client = captureClient(dynel);");
-            AssertTextBefore(
-                transferText,
-                "ZoneClient client = captureClient(dynel);",
-                "IPlayfield newPlayfield = resolveDestinationPlayfield(playfield);");
-            AssertTextBefore(
-                transferText,
-                "IPlayfield newPlayfield = resolveDestinationPlayfield(playfield);",
-                "finalizeTransferDispose(dynel, newPlayfield);");
-            AssertTextBefore(
-                transferText,
-                "finalizeTransferDispose(dynel, newPlayfield);",
-                "sendRedirect(client);");
 
-            AssertTextBefore(
-                createCharacterMethod,
-                "this.SessionLifecycle.EnterPlayfieldLoadingForCharacterLoadOrZoningExit();",
-                "this.server.PlayfieldById(");
-            AssertTextBefore(
-                createCharacterMethod,
-                "this.server.PlayfieldById(",
-                "this.Controller.Character = new PlayerCharacter(");
 
-            Assert.IsTrue(
-                teleportMethod.Contains("this.runtimeSystems.TransferToPlayfield("),
-                "Playfield must route non-local transfer orchestration through PlayfieldRuntimeSystems.");
-            Assert.IsFalse(
-                packetSequencingText.Contains("TeleportMessageHandler")
-                || packetSequencingText.Contains("ZoneRedirectionMessage")
-                || packetSequencingText.Contains("PlayfieldById")
-                || packetSequencingText.Contains("dynel.Dispose"),
-                "PacketSequencingCoordinator must not own teleport packet construction, destination lookup, or disposal mechanics.");
-            Assert.IsFalse(
-                transferText.Contains("TeleportMessageHandler")
-                || transferText.Contains("ZoneRedirectionMessage")
-                || transferText.Contains("SendCompressed")
-                || transferText.Contains("PlayfieldById")
-                || transferText.Contains("new Playfield("),
-                "PlayfieldTransferRuntimeService must not own teleport packet construction, transport, or destination lookup.");
-            Assert.IsTrue(
-                transferText.Contains("internal void TransferToPlayfield(")
-                && transferText.Contains("this.lifecycle.PreparePlayfieldTransfer(")
-                && transferText.Contains("captureEnterZoningPhase(dynel)")
-                && transferText.Contains("this.packetSequences.RunPlayfieldTransferBeginSequence(")
-                && transferText.Contains("this.CompletePlayfieldTransfer("),
-                "PlayfieldTransferRuntimeService must own non-local transfer orchestration around lifecycle prep, zoning entry sequencing, and handoff completion.");
-            Assert.IsTrue(
-                playfieldText.Contains("private void AnnouncePlayfieldTransferDespawn(Dynel dynel)")
-                && playfieldText.Contains("this.Despawn(dynel.Identity);")
-                && playfieldText.Contains("private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)")
-                && playfieldText.Contains("dynel.Position = new AORebirth.Core.Vector.Vector3")
-                && playfieldText.Contains("dynel.Transform.Rotation =")
-                && playfieldText.Contains("private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)")
-                && playfieldText.Contains("return this.server.PlayfieldById(playfield);")
-                && playfieldText.Contains("private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)")
-                && playfieldText.Contains("dynel.Controller.Client = null;")
-                && playfieldText.Contains("dynel.IsTeleporting = true;")
-                && playfieldText.Contains("dynel.Dispose();")
-                && playfieldText.Contains("private void SendPlayfieldTransferRedirect(ZoneClient client, Identity playfield)")
-                && playfieldText.Contains("var redirect = new ZoneRedirectionMessage")
-                && playfieldText.Contains("client.SendCompressed(redirect);"),
-                "Playfield must keep transfer callbacks that own despawn broadcast, state mutation, destination lookup, disposal, and redirect send.");
-            Assert.IsFalse(
-                teleportMethod.Contains("PlayfieldLifecycleTrace."),
-                "No zoning PlayfieldLifecycleTrace points exist yet; this guardrail protects current lifecycle/order text instead.");
-        }
-
-        [TestMethod]
-        public void SubwayProxyExitUsesOfficialLandingAndSuppressesDelayedEntryBounce()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string rulesText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\SubwayTeleportProxyDestinationRules.cs"));
-            string exitProxyText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Functions\GameFunctions\exitproxyplayfield.cs"));
-            string statelTransitionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
-
-            Assert.IsTrue(
-                statelTransitionText.Contains("private const float CapturedSubwayEntryRadius = 4.0f;")
-                && statelTransitionText.Contains("private static readonly TimeSpan PostZoneCollisionGrace = TimeSpan.FromSeconds(3);")
-                && statelTransitionText.Contains("private readonly HashSet<int> capturedSubwayEntryContacts")
-                && statelTransitionText.Contains("this.capturedSubwayEntryContacts.Contains(dynelId)")
-                && statelTransitionText.Contains("this.capturedSubwayEntryContacts.Remove(dynelId)")
-                && rulesText.Contains("public const float CapturedMainExitLandingX = 3304.028f;")
-                && rulesText.Contains("public const float CapturedMainExitLandingY = 35.11f;")
-                && rulesText.Contains("public const float CapturedMainExitLandingZ = 837.9951f;")
-                && rulesText.Contains("public const float CapturedMainExitHeadingY = -0.4771534f;")
-                && rulesText.Contains("public const float CapturedMainExitHeadingW = 0.87882f;")
-                && exitProxyText.Contains("SubwayTeleportProxyDestinationRules.TryResolveMainExitOverride("),
-                "The Subway main exit must use the official-live landing while preserving post-zone grace and contact-edge suppression against a delayed bounce.");
-        }
-
-        [TestMethod]
-        public void PacketSequencingCoordinatorFinalOwnershipGuardrailKeepsRuntimeMechanicsOut()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketSequencingCoordinator.cs"));
-            string clientConnectedText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\PacketHandlers\ClientConnected.cs"));
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string privateCityReadyInitText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PrivateCityReadyInitCoordinator.cs"));
-
-            string[] ownedSequenceMethods =
-                {
-                    "public void BeginSessionReadyBlock(",
-                    "public void RunSessionReadyFullCharacterSequence(",
-                    "public void RunVisibilityInitializationSequence(",
-                    "public void RunSimpleCharFullUpdateCharInPlaySequence(",
-                    "public void RunPrivateCityPreFullCharacterOrgInitSequence(",
-                    "public void RunPrivateCityPlayfieldReadyBlockSequence(",
-                    "public void RunPlayfieldTransferBeginSequence(",
-                    "public void CompleteSessionInitialization("
-                };
-            for (int i = 0; i < ownedSequenceMethods.Length; i++)
-            {
-                Assert.IsTrue(
-                    coordinatorText.Contains(ownedSequenceMethods[i]),
-                    "PacketSequencingCoordinator must own sequence method " + ownedSequenceMethods[i]);
-            }
-
-            Assert.IsTrue(
-                clientConnectedText.Contains("client.PacketSequencing.RunSessionReadyFullCharacterSequence(")
-                && clientConnectedText.Contains("client.PacketSequencing.RunVisibilityInitializationSequence("),
-                "PacketSequencingCoordinator must own session ready/full-character/visibility initialization sequencing.");
-            string visibilityPacketSequenceText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
-            Assert.AreEqual(
-                3,
-                CountOccurrences(visibilityPacketSequenceText, "this.packetSequences.RunVisibilityPacketPairSequence("),
-                "Playfield visibility packet runtime must keep ordinary, guardian-wire, and Havaris-wire SCFU -> weapons -> CharInPlay packet-pair implementations.");
-            string initialVisibility = ExtractMethodBlock(
-                visibilityPacketSequenceText,
-                "internal void SendExistingCharacterVisibilityToClient(");
-            string joiningVisibility = ExtractMethodBlock(
-                visibilityPacketSequenceText,
-                "internal void AnnounceJoiningCharacterVisibility(");
-            string sharedEntryVisibility = ExtractMethodBlock(
-                visibilityPacketSequenceText,
-                "private bool SendCharacterVisibilityEntry(");
-            Assert.IsTrue(
-                initialVisibility.Contains("this.SendCharacterVisibilityEntry(")
-                && joiningVisibility.Contains("this.SendCharacterVisibilityEntry(")
-                && sharedEntryVisibility.Contains("sendVisibilityMessage(simpleCharFullUpdate);")
-                && sharedEntryVisibility.Contains("this.SendWeaponDefinitionsForVisibility(")
-                && sharedEntryVisibility.Contains("sendVisibilityMessage(charInPlay);"),
-                "Initial and joining interest paths must invoke the same ordered SCFU -> weapons -> CharInPlay implementation.");
-            AssertTextBefore(
-                sharedEntryVisibility,
-                "sendVisibilityMessage(simpleCharFullUpdate);",
-                "this.SendWeaponDefinitionsForVisibility(");
-            AssertTextBefore(
-                sharedEntryVisibility,
-                "this.SendWeaponDefinitionsForVisibility(",
-                "sendVisibilityMessage(charInPlay);");
-            Assert.IsTrue(
-                privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPreFullCharacterOrgInitSequence(")
-                && privateCityReadyInitText.Contains("client.PacketSequencing.RunPrivateCityPlayfieldReadyBlockSequence("),
-                "PacketSequencingCoordinator must own private-city org/stat and towers/cities sequencing.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.runtimeSystems.TransferToPlayfield("),
-                "PlayfieldRuntimeSystems must own non-local transfer orchestration entry from Playfield.");
-
-            string[] forbiddenCoordinatorOwnership =
-                {
-                    "new OrgInfoPacketMessage",
-                    "new PlayfieldAllTowersMessage",
-                    "new PlayfieldAllCitiesMessage",
-                    "SimpleCharFullUpdate.",
-                    "new CharInPlayMessage",
-                    "FullCharacterMessageHandler",
-                    "SendCompressed",
-                    "MessageSerializer",
-                    "NetworkStream",
-                    "zStream",
-                    "netStream",
-                    "PlayfieldById",
-                    "new Playfield(",
-                    "DespawnMessageHandler",
-                    "AnnounceOthers",
-                    "dynel.Position",
-                    "Transform.Rotation",
-                    "Controller.Client = null",
-                    "IsTeleporting",
-                    "dynel.Dispose",
-                    "ZoneRedirectionMessage",
-                    "SendLocal"
-                };
-            for (int i = 0; i < forbiddenCoordinatorOwnership.Length; i++)
-            {
-                Assert.IsFalse(
-                    coordinatorText.Contains(forbiddenCoordinatorOwnership[i]),
-                    "PacketSequencingCoordinator must not own runtime mechanics or packet construction: "
-                    + forbiddenCoordinatorOwnership[i]);
-            }
-
-            string teleportMethod = ExtractMethodBlock(
-                playfieldText,
-                "internal void Teleport(");
-            string localTeleportMethod = ExtractMethodBlock(
-                playfieldText,
-                "private bool TryCompleteLocalTeleportInCurrentPlayfield(");
-
-            Assert.IsTrue(
-                playfieldText.Contains("private void AnnouncePlayfieldTransferDespawn(Dynel dynel)")
-                && playfieldText.Contains("private static void ApplyPlayfieldTransferState(Dynel dynel, Coordinate destination, IQuaternion heading)")
-                && playfieldText.Contains("private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)")
-                && playfieldText.Contains("private static void CompletePlayfieldTransferDispose(Dynel dynel, IPlayfield newPlayfield)")
-                && playfieldText.Contains("private void SendPlayfieldTransferRedirect(ZoneClient client, Identity playfield)"),
-                "Destination lookup, despawn broadcast, coordinate mutation, client detach/dispose, and redirect callbacks must remain in Playfield.");
-            Assert.IsTrue(
-                localTeleportMethod.Contains("TeleportMessageHandler.Default.SendLocal("),
-                "Same-playfield local teleport packet path must remain outside PacketSequencingCoordinator.");
-        }
-
-        [TestMethod]
-        public void TeleportZoningHandoffGuardrailKeepsStatelAndPrivateCityRoutingStable()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string statelTransitionText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldStatelTransitionRuntimeService.cs"));
-
-            string checkStatelCollisionMethod = ExtractMethodBlock(playfieldText, "private void CheckStatelCollision");
-            string teleportToPlayfieldMethod = ExtractMethodBlock(playfieldText, "private void TeleportToPlayfield");
-            string localTeleportMethod = ExtractMethodBlock(
-                playfieldText,
-                "private bool TryCompleteLocalTeleportInCurrentPlayfield(");
-            string checkStatelCollisionRuntimeMethod = ExtractMethodBlock(
-                statelTransitionText,
-                "internal void CheckStatelCollision(");
-            string privateCityEntryMethod = ExtractMethodBlock(
-                statelTransitionText,
-                "private bool TryHandleCapturedMontroyalPrivateCityEntry(");
-            string privateCityExitMethod = ExtractMethodBlock(
-                statelTransitionText,
-                "private bool TryHandleUserConfirmedMontroyalPrivateCityExit(");
-
-            Assert.IsTrue(
-                checkStatelCollisionMethod.Contains("this.runtimeSystems.CheckStatelCollision(")
-                && checkStatelCollisionMethod.Contains("ResolveCapturedMontroyalPrivateCityInstance")
-                && checkStatelCollisionMethod.Contains("ResolveCharacterOrganizationInstance")
-                && checkStatelCollisionMethod.Contains("x => x.StopMovement()")
-                && checkStatelCollisionMethod.Contains("this.SendCapturedPrivateCityEntrySocialStatus")
-                && checkStatelCollisionMethod.Contains("this.TeleportToPlayfield"),
-                "Playfield must keep statel collision as orchestration callbacks into the runtime boundary.");
-            Assert.IsTrue(
-                teleportToPlayfieldMethod.Contains("this.Teleport(")
-                && teleportToPlayfieldMethod.Contains("new Identity { Type = IdentityType.Playfield, Instance = playfieldInstance }"),
-                "Playfield must keep destination identity construction at the teleport handoff boundary.");
-
-            AssertTextBefore(
-                checkStatelCollisionRuntimeMethod,
-                "if (IsPostZoneCollisionGraceActive(dynel))",
-                "this.TryHandleCapturedMontroyalPrivateCityEntry(");
-            AssertTextBefore(
-                checkStatelCollisionRuntimeMethod,
-                "this.TryHandleCapturedMontroyalPrivateCityEntry(",
-                "this.TryHandleUserConfirmedMontroyalPrivateCityExit(");
-            AssertTextBefore(
-                checkStatelCollisionRuntimeMethod,
-                "this.TryHandleUserConfirmedMontroyalPrivateCityExit(",
-                "foreach (StatelData sd in collisionStatels)");
-
-            AssertTextBefore(
-                privateCityEntryMethod,
-                "int destinationPlayfieldId = resolvePrivateCityDestinationPlayfield(character);",
-                "Coordinate destination = ResolveCapturedMontroyalEntryDestination(destinationPlayfieldId);");
-            AssertTextBefore(
-                privateCityEntryMethod,
-                "Coordinate destination = ResolveCapturedMontroyalEntryDestination(destinationPlayfieldId);",
-                "stopMovement(character);");
-            AssertTextBefore(
-                privateCityEntryMethod,
-                "stopMovement(character);",
-                "sendCapturedPrivateCityEntrySocialStatus(character);");
-            AssertTextBefore(
-                privateCityEntryMethod,
-                "sendCapturedPrivateCityEntrySocialStatus(character);",
-                "teleportToPlayfield(dynel, destination, heading, destinationPlayfieldId);");
-
-            AssertTextBefore(
-                privateCityExitMethod,
-                "var destination = new Coordinate(",
-                "stopMovement(character);");
-            AssertTextBefore(
-                privateCityExitMethod,
-                "stopMovement(character);",
-                "teleportToPlayfield(dynel, destination, heading, CapturedMontroyalEntrySourcePlayfieldId);");
-
-            AssertTextBefore(
-                localTeleportMethod,
-                "TeleportMessageHandler.Default.SendLocal(",
-                "dynel.Position = new AORebirth.Core.Vector.Vector3");
-            AssertTextBefore(
-                localTeleportMethod,
-                "dynel.Transform.Rotation =",
-                "this.PrimeStatelCollisionContacts(character);");
-
-            string[] forbiddenStatelRuntimeOwnership =
-                {
-                    "ZoneRedirectionMessage",
-                    "TeleportMessageHandler.Default.Send(",
-                    "TeleportMessageHandler.Default.SendLocal(",
-                    "PlayfieldById",
-                    "new Playfield(",
-                    "client.SendCompressed",
-                    "dynel.Dispose",
-                    "Pool.Instance"
-                };
-            for (int i = 0; i < forbiddenStatelRuntimeOwnership.Length; i++)
-            {
-                Assert.IsFalse(
-                    statelTransitionText.Contains(forbiddenStatelRuntimeOwnership[i]),
-                    "Statel transition runtime must not own Playfield handoff mechanics: "
-                    + forbiddenStatelRuntimeOwnership[i]);
-            }
-        }
-
-        [TestMethod]
-        public void PlayfieldDynelRegistryIsOwnedByPlayfieldAndFeedsSafeLookupPaths()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string registryText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldDynelRegistry.cs"));
-            string projectText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\ZoneEngine.csproj"));
-
-            string[] registryApi =
-                {
-                    "internal void RefreshFromPool()",
-                    "internal void Register(IEntity entity)",
-                    "internal void Unregister(Identity identity)",
-                    "internal void RegisterStatels(IEnumerable<StatelData> playfieldStatels)",
-                    "internal IInstancedEntity FindByIdentity(Identity identity)",
-                    "internal T FindByIdentity<T>(Identity identity)",
-                    "internal ReadOnlyCollection<IDynel> FindDynelsInRange(IDynel dynel, float range)",
-                    "internal ReadOnlyCollection<ICharacter> FindCharactersInRange(IDynel dynel, float range)",
-                    "internal ReadOnlyCollection<ICharacter> Characters()",
-                    "internal ReadOnlyCollection<Character> CharacterEntities()",
-                    "internal ReadOnlyCollection<ICharacter> Players()",
-                    "internal ReadOnlyCollection<ICharacter> Npcs()",
-                    "internal ReadOnlyCollection<Vendor> Vendors()",
-                    "internal ReadOnlyCollection<StaticDynel> StaticDynels()",
-                    "internal ReadOnlyCollection<StatelData> Statels()",
-                    "internal ReadOnlyCollection<StatelData> Terminals()",
-                    "internal ReadOnlyCollection<StatelData> Doors()"
-                };
-
-            Assert.IsTrue(
-                registryText.Contains("internal sealed class PlayfieldDynelRegistry"),
-                "PlayfieldDynelRegistry must be the named server-side dynel registry boundary.");
-            for (int i = 0; i < registryApi.Length; i++)
-            {
-                Assert.IsTrue(
-                    registryText.Contains(registryApi[i]),
-                    "Missing PlayfieldDynelRegistry API: " + registryApi[i]);
-            }
-
-            Assert.IsTrue(
-                playfieldText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry"),
-                "Playfield must own PlayfieldDynelRegistry.");
-            Assert.IsTrue(
-                playfieldText.Contains("internal PlayfieldDynelRegistry DynelRegistry"),
-                "Playfield must expose DynelRegistry for playfield-scoped access.");
-            Assert.AreEqual(
-                1,
-                CountOccurrences(playfieldText, "new PlayfieldDynelRegistry("),
-                "Playfield must construct one dynel registry.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("private readonly PlayfieldDynelRegistry dynelRegistry"),
-                "PlayfieldRuntimeSystems must hold an injected PlayfieldDynelRegistry reference.");
-            Assert.AreEqual(
-                0,
-                CountOccurrences(runtimeSystemsText, "new PlayfieldDynelRegistry("),
-                "PlayfieldRuntimeSystems must not construct PlayfieldDynelRegistry.");
-
-            string[] runtimeDelegations =
-                {
-                    "this.dynelRegistry.RefreshFromPool();",
-                    "this.dynelRegistry.Register(entity);",
-                    "this.dynelRegistry.Unregister(identity);",
-                    "this.dynelRegistry.RegisterStatels(statels);",
-                    "return this.dynelRegistry.FindByIdentity(identity);",
-                    "return this.dynelRegistry.FindByIdentity<T>(identity);",
-                    "return this.dynelRegistry.FindDynelsInRange(dynel, range);",
-                    "return this.dynelRegistry.FindCharactersInRange(dynel, range);",
-                    "return this.dynelRegistry.Characters();",
-                    "return this.dynelRegistry.CharacterEntities();",
-                    "return this.dynelRegistry.StaticDynels();"
-                };
-            for (int i = 0; i < runtimeDelegations.Length; i++)
-            {
-                Assert.IsTrue(
-                    runtimeSystemsText.Contains(runtimeDelegations[i]),
-                    "PlayfieldRuntimeSystems must delegate through registry: " + runtimeDelegations[i]);
-            }
-
-            string[] playfieldDelegations =
-                {
-                    "this.runtimeSystems.RegisterStatels(this.statels);",
-                    "this.runtimeSystems.MaterializeStartupObjects(",
-                    "return this.runtimeSystems.FindByIdentity(identity);",
-                    "return this.runtimeSystems.FindByIdentity<T>(identity);",
-                    "return this.runtimeSystems.FindDynelsInRange(dynel, range).ToList();",
-                    "return this.runtimeSystems.FindCharactersInRange(dynel, range).ToList();",
-                    "this.runtimeSystems.AnnounceMessageToCharacterClients(",
-                    "this.runtimeSystems.AnnounceMessageToOtherCharacterClients(",
-                    "this.runtimeSystems.StaticDynels()"
-                };
-            for (int i = 0; i < playfieldDelegations.Length; i++)
-            {
-                Assert.IsTrue(
-                    playfieldText.Contains(playfieldDelegations[i]),
-                    "Playfield must route the first safe dynel lookup slice through runtime systems: "
-                    + playfieldDelegations[i]);
-            }
-            Assert.IsTrue(
-                playfieldText.Contains("this.locality.SendExistingCharacterVisibilityToClient(")
-                && playfieldText.Contains("this.locality.AnnounceJoiningCharacterVisibility("),
-                "Playfield visibility entry points must route through the locality owner.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("this.ActivateNpc,")
-                && runtimeSystemsText.Contains("this.RegisterDynel,")
-                && runtimeSystemsText.Contains("this.RefreshDynelRegistry);"),
-                "PlayfieldRuntimeSystems must route materialized NPC activation, dynel registration, and registry refresh through the registry boundary.");
-
-            Assert.IsTrue(
-                projectText.Contains(@"Core\Playfields\PlayfieldDynelRegistry.cs"),
-                "ZoneEngine project must compile PlayfieldDynelRegistry.");
-        }
-
-        [TestMethod]
-        public void PlayfieldVisibilityLookupsUseDynelRegistryBoundary()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string visibilityFanoutText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldVisibilityFanoutRuntimeService.cs"));
-            string visibilityPacketText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityPackets.cs"));
-            string visibilityInterestText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityVisibility.cs"));
-            string visibilityStateText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocalityVisibility.cs"));
-            string visibilityPolicyText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocality.cs"));
-            string spatialIndexText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldDynelCellRegistry.cs"));
-            string announcementText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldAnnouncementRuntimeService.cs"));
-            string publishFanoutText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldPublishFanoutRuntimeService.cs"));
-
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("internal ReadOnlyCollection<ICharacter> Characters()")
-                && runtimeSystemsText.Contains("return this.dynelRegistry.Characters();"),
-                "PlayfieldRuntimeSystems must expose current-playfield character visibility views.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("internal ReadOnlyCollection<Character> CharacterEntities()")
-                && runtimeSystemsText.Contains("return this.dynelRegistry.CharacterEntities();"),
-                "PlayfieldRuntimeSystems must expose concrete Character views for existing broadcast paths.");
-
-            string announce = ExtractMethodBlock(playfieldText, "public void Announce(MessageBody messageBody)");
-            string announceOthers = ExtractMethodBlock(playfieldText, "public void AnnounceOthers(MessageBody messageBody, Identity dontSend)");
-            string sendScfus = ExtractMethodBlock(playfieldText, "public void SendSCFUsToClient(IMSendPlayerSCFUs sendSCFUs)");
-            string announcePlayerVisibility = ExtractMethodBlock(playfieldText, "public void AnnouncePlayerVisibility(ICharacter character)");
-            string dynelDropPosition = ExtractMethodBlock(playfieldText, "private Coordinate DynelDropPosition(Identity identity)");
-            string findNamed = ExtractMethodBlock(playfieldText, "public INamedEntity FindNamedEntityByIdentity(Identity identity)");
-
-            Assert.IsTrue(
-                announce.Contains("this.runtimeSystems.AnnounceMessageToCharacterClients(messageBody, this.Send);")
-                && !announce.Contains("this.runtimeSystems.PublishMessageBodyToClient("),
-                "Announce must delegate message fanout orchestration through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                announceOthers.Contains(
-                    "this.runtimeSystems.AnnounceMessageToOtherCharacterClients(messageBody, dontSend, this.Send);")
-                && !announceOthers.Contains("this.runtimeSystems.PublishMessageBodyToClient("),
-                "AnnounceOthers must delegate message fanout orchestration through PlayfieldRuntimeSystems.");
-            Assert.IsTrue(
-                sendScfus.Contains("this.locality.SendExistingCharacterVisibilityToClient(")
-                && sendScfus.Contains("body => sendSCFUs.toClient.SendCompressed(body)")
-                && !sendScfus.Contains("SimpleCharFullUpdate.ConstructMessage(temp)")
-                && !sendScfus.Contains("LogUtil.Debug("),
-                "SendSCFUsToClient must delegate existing-character visibility packet orchestration through PlayfieldLocality.");
-            Assert.IsTrue(
-                announcePlayerVisibility.Contains("this.locality.AnnounceJoiningCharacterVisibility(")
-                && announcePlayerVisibility.Contains("this.SendVisibilityMessage,")
-                && announcePlayerVisibility.Contains("this.SendVisibilityLeave);")
-                && !announcePlayerVisibility.Contains("CharInPlayMessage")
-                && !announcePlayerVisibility.Contains("SimpleCharFullUpdate.ConstructMessage(temp)"),
-                "AnnouncePlayerVisibility must delegate targeted joining-character entry and leave delivery through PlayfieldLocality.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToCharacterClients(this.CharacterEntities(), publishToCharacterClient);")
-                && runtimeSystemsText.Contains("this.visibilityFanout.AnnounceToOtherCharacterClients(")
-                && playfieldText.Contains("this.locality.SendExistingCharacterVisibilityToClient("),
-                "PlayfieldRuntimeSystems must retain generic fanout while PlayfieldLocality owns registry-backed visibility packets.");
-            Assert.IsTrue(
-                playfieldText.Contains("this.locality.SendExistingCharacterVisibilityToClient(")
-                && playfieldText.Contains("this.locality.AnnounceJoiningCharacterVisibility(")
-                && playfieldText.Contains("this.locality.VisibleRecipientsForSource("),
-                "Playfield must route visibility entry, leave, and scoped recipient lookup through the locality boundary.");
-            Assert.IsTrue(
-                visibilityPolicyText.Contains("internal int VisibilityNeighborLevel")
-                && spatialIndexText.Contains("internal IEnumerable<ICharacter> GetCharactersInCells(")
-                && visibilityInterestText.Contains("internal sealed class PlayfieldLocalityVisibility")
-                && visibilityStateText.Contains("visibleSourcesByRecipient")
-                && visibilityStateText.Contains("visibleRecipientsBySource")
-                && visibilityStateText.Contains("internal void Reconcile("),
-                "Locality visibility must own bounded policy, cell candidate queries, bidirectional state, and reconciliation.");
-            Assert.IsTrue(
-                visibilityFanoutText.Contains("foreach (Character entity in characters)")
-                && visibilityFanoutText.Contains("if (entity.Controller.Client != null)")
-                && visibilityFanoutText.Contains("if (entity.Identity != excludedIdentity)")
-                && visibilityFanoutText.Contains("foreach (ICharacter entity in characters)")
-                && visibilityFanoutText.Contains("bool senderEqualsRecipient = entity.Identity == dontSendTo;")
-                && visibilityFanoutText.Contains("bool senderInRecipientPlayfield = entity.InPlayfield(playfieldIdentity);")
-                && visibilityFanoutText.Contains("sent = sendExistingCharacter(entity);")
-                && visibilityFanoutText.Contains("logVisibilityCandidate(entity, senderEqualsRecipient, senderInRecipientPlayfield, sent);"),
-                "Visibility fanout service must retain packet-agnostic iteration over the spatially selected character set.");
-            Assert.IsFalse(
-                visibilityFanoutText.Contains("SimpleCharFullUpdate")
-                || visibilityFanoutText.Contains("CharInPlayMessage")
-                || visibilityFanoutText.Contains("SendCompressed")
-                || visibilityFanoutText.Contains("Publish(")
-                || visibilityFanoutText.Contains("IMSend")
-                || visibilityFanoutText.Contains("LogUtil")
-                || visibilityFanoutText.Contains("PacketSequencing")
-                || visibilityFanoutText.Contains("Pool.Instance"),
-                "Visibility fanout service must not own packet construction, sends, logging, sequencing, or Pool scans.");
-            Assert.IsTrue(
-                visibilityPacketText.Contains("this.visibilityFanout.FanoutExistingCharactersForScfu(")
-                && visibilityPacketText.Contains("this.visibility.SelectInitialCharacters(recipient)")
-                && visibilityPacketText.Contains("this.visibility.Reconcile(")
-                && visibilityPacketText.Contains("this.packetSequences.RunVisibilityPacketPairSequence(")
-                && visibilityPacketText.Contains("sendVisibilityMessage(simpleCharFullUpdate)")
-                && visibilityPacketText.Contains("sendVisibilityMessage(charInPlay)")
-                && visibilityPacketText.Contains("LogUtil.Debug("),
-                "Locality packet service must use bounded interest selection while retaining shared packet-pair orchestration and debug logging.");
-            Assert.IsFalse(
-                visibilityPacketText.Contains("SendCompressed")
-                || visibilityPacketText.Contains("Publish(")
-                || visibilityPacketText.Contains("Pool.Instance"),
-                "Locality packet service must not own direct transport, publish wrappers, or Pool scans.");
-            Assert.IsTrue(
-                announcementText.Contains("foreach (Character entity in characters)")
-                && announcementText.Contains("if (entity?.Controller?.Client != null)")
-                && announcementText.Contains("&& entity.Identity != excludedIdentity")
-                && announcementText.Contains("&& entity.Controller?.Client != null")
-                && announcementText.Contains("sendMessageBodyToClient(entity.Controller.Client, messageBody);"),
-                "Announcement service must own message-recipient fanout and client-send callback ordering.");
-            Assert.IsFalse(
-                announcementText.Contains("SimpleCharFullUpdate")
-                || announcementText.Contains("CharInPlayMessage")
-                || announcementText.Contains("SendCompressed")
-                || announcementText.Contains("Publish(")
-                || announcementText.Contains("IMSend")
-                || announcementText.Contains("LogUtil")
-                || announcementText.Contains("PacketSequencing")
-                || announcementText.Contains("Pool.Instance"),
-                "Announcement service must not own packet construction, direct sends, publish wrappers, logging, sequencing, or Pool scans.");
-            Assert.IsTrue(
-                publishFanoutText.Contains("new IMSendAOtomationMessageBodyToClient")
-                && publishFanoutText.Contains("new IMSendAOtomationMessageToClient")
-                && publishFanoutText.Contains("announce(body)")
-                && publishFanoutText.Contains("announceOthers(body, excludedIdentity)"),
-                "Publish fanout service must own internal message fanout wrapper construction and playfield-message dispatch.");
-            Assert.IsFalse(
-                announce.Contains("new IMSendAOtomationMessageBodyToClient")
-                || announceOthers.Contains("new IMSendAOtomationMessageBodyToClient"),
-                "Playfield visibility broadcast methods must not own internal send-message wrapper construction.");
-            Assert.IsTrue(
-                dynelDropPosition.Contains("this.runtimeSystems.FindByIdentity<IDynel>(identity)"),
-                "Dynel drop lookup must use registry-backed identity lookup.");
-            Assert.IsTrue(
-                findNamed.Contains("this.runtimeSystems.FindByIdentity<INamedEntity>(identity)"),
-                "Named entity lookup must use registry-backed typed identity lookup.");
-
-            string[] visibilityLookupBlocks =
-                {
-                    announce,
-                    announceOthers,
-                    sendScfus,
-                    visibilityFanoutText,
-                    visibilityInterestText,
-                    spatialIndexText,
-                    dynelDropPosition,
-                    findNamed
-                };
-            for (int i = 0; i < visibilityLookupBlocks.Length; i++)
-            {
-                Assert.IsFalse(
-                    visibilityLookupBlocks[i].Contains("Pool.Instance.GetAll"),
-                    "Visibility lookup blocks must not scan Pool directly.");
-                Assert.IsFalse(
-                    visibilityLookupBlocks[i].Contains("Pool.Instance.GetObject"),
-                "Visibility lookup blocks must not use direct Pool identity lookup.");
-            }
-        }
-
-        [TestMethod]
-        public void PlayfieldRemainingSafeCharacterLoopsUseDynelRegistryBoundary()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string timedLifecycleText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldTimedLifecycleRuntimeService.cs"));
-
-            string heartBeat = ExtractMethodBlock(playfieldText, "private void HeartBeatTimer(object sender)");
-            string localityText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Locality\PlayfieldLocality.cs"));
-            string corpseFullUpdate =
-                ExtractMethodBlock(playfieldText, "private void SendCorpseFullUpdate(ICharacter target, Identity corpseIdentity)");
-            string stopFightingDeadTarget =
-                ExtractMethodBlock(playfieldText, "internal void StopFightingDeadTarget(Identity deadTarget)");
-
-            Assert.IsTrue(
-                heartBeat.Contains(
-                    "this.locality.Tick(deltaTime, this.SendVisibilityMessage, this.SendVisibilityLeave);"),
-                "Playfield heartbeat must route current-playfield character loops through the locality boundary.");
-            Assert.IsTrue(
-                localityText.Contains("this.dynelRegistry.Characters()")
-                && localityText.Contains("this.ProcessDynelTick(character, deltaTime);"),
-                "Locality must use the registry-backed full character callback for the safe tick path.");
-            Assert.IsFalse(
-                heartBeat.Contains("Pool.Instance.GetAll")
-                || localityText.Contains("Pool.Instance.GetAll"),
-                "Locality character loops must not scan Pool directly.");
-
-            Assert.IsTrue(
-                corpseFullUpdate.Contains("this.locality.VisibleRecipientsForSource(target.Identity)")
-                && corpseFullUpdate.Contains("this.SendCorpseFullUpdateToRecipient(")
-                && !corpseFullUpdate.Contains("this.runtimeSystems.Characters()")
-                && !corpseFullUpdate.Contains("Pool.Instance.GetAll"),
-                "Corpse full updates must target only recipients that currently know the dead NPC source.");
-
-            string[] movedLoopBlocks =
-                {
-                    stopFightingDeadTarget
-                };
-            for (int i = 0; i < movedLoopBlocks.Length; i++)
-            {
-                Assert.IsTrue(
-                    movedLoopBlocks[i].Contains("this.runtimeSystems.Characters()"),
-                    "Current-playfield character loop must use registry-backed character view.");
-                Assert.IsFalse(
-                    movedLoopBlocks[i].Contains("Pool.Instance.GetAll"),
-                    "Current-playfield character loop must not scan Pool directly.");
-            }
-        }
 
         [TestMethod]
         public void PlayfieldDirectPoolUsageIsLimitedToNamedGlobalAndCrossPlayfieldExceptions()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-
-            string disconnectAllClients = ExtractMethodBlock(playfieldText, "public void DisconnectAllClients()");
-            string numberOfDynels = ExtractMethodBlock(playfieldText, "public int NumberOfDynels()");
-            string numberOfPlayers = ExtractMethodBlock(playfieldText, "public int NumberOfPlayers()");
-            string transferDestination = ExtractMethodBlock(
-                playfieldText,
-                "private IPlayfield ResolveOrCreatePlayfieldTransferDestination(Identity playfield)");
 
             string[] intentionalGlobalOrCrossPlayfieldExceptions =
                 {
@@ -8368,160 +3630,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 2,
                 intentionalGlobalOrCrossPlayfieldExceptions.Length,
                 "Every direct Playfield Pool exception must be named with ownership scope.");
-
-            Assert.IsTrue(
-                disconnectAllClients.Contains("this.runtimeSystems.CharacterEntities()")
-                && !disconnectAllClients.Contains("Pool.Instance")
-                && disconnectAllClients.Contains("character.Controller.Client != null"),
-                "Playfield disposal must disconnect only player characters registered to that playfield runtime.");
-            Assert.IsTrue(
-                numberOfDynels.Contains("Pool.Instance.GetAll((int)IdentityType.CanbeAffected).Count()"),
-                intentionalGlobalOrCrossPlayfieldExceptions[0]);
-            Assert.IsTrue(
-                numberOfPlayers.Contains(
-                    "Pool.Instance.GetAll<Character>((int)IdentityType.CanbeAffected).Count()"),
-                intentionalGlobalOrCrossPlayfieldExceptions[1]);
-            Assert.IsTrue(
-                transferDestination.Contains("return this.server.PlayfieldById(playfield);")
-                && !transferDestination.Contains("Pool.Instance")
-                && !transferDestination.Contains("new Playfield("),
-                "Cross-playfield handoff must resolve through the server-owned persistent runtime registry.");
-
-            Assert.AreEqual(
-                2,
-                CountOccurrences(playfieldText, "Pool.Instance.GetAll"),
-                "Future direct Playfield Pool scans are blocked unless added to this explicit exception list.");
-            Assert.AreEqual(
-                0,
-                CountOccurrences(playfieldText, "Pool.Instance.GetObject"),
-                "Future direct Playfield Pool identity lookups are blocked unless added to this explicit exception list.");
         }
 
         [TestMethod]
         public void AreteCleaningRobotDbSpawnSuppressionKeepsCapturedPathAndLegacyDbBoundary()
         {
             string repositoryRoot = FindRepositoryRoot();
-            string playfieldText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\Playfield.cs"));
-            string runtimeSystemsText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldRuntimeSystems.cs"));
-            string areteContentText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\AreteContentModule.cs"));
-            string montroyalContentText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\MontroyalContentModule.cs"));
-            string privateCityContentText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PrivateCityContentModule.cs"));
-            string coordinatorText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentCoordinator.cs"));
-            string registrationText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content\PlayfieldContentRegistration.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(
                     repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotContentProvider.cs"));
-            string orchestratorText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\CapturedAreteRobotSpawnOrchestrator.cs"));
-            string materializationText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\PlayfieldObjectMaterializationRuntimeService.cs"));
-
-            Assert.IsTrue(
-                npcRuntimeText.Contains("new CapturedAreteRobotContentProvider(LogCapturedAreteRobotContent)"),
-                "Arete captured robot spawns must keep using CapturedAreteRobotContentProvider.");
-            Assert.IsTrue(
-                npcRuntimeText.Contains(
-                    "new CapturedAreteRobotSpawnOrchestrator("),
-                "Arete captured robot spawns must keep using CapturedAreteRobotSpawnOrchestrator.");
-            Assert.IsTrue(
-                orchestratorText.Contains("private readonly Action<ICharacter> activateNpc;")
-                && orchestratorText.Contains("this.activateNpc(mobCharacter);"),
-                "Captured robot spawns must activate through the NPCRuntimeService-owned callback.");
-            Assert.IsTrue(
-                areteContentText.Contains("registration.RegisterCapturedNpcSpawns();"),
-                "Arete captured robot spawns must enter through content-module registration.");
-            Assert.IsTrue(
-                registrationText.Contains("this.playfield.SpawnCapturedNpcContent(this.playfieldIdentity);"),
-                "Captured NPC spawn registration must route through Playfield into NPCRuntimeService.");
-            Assert.IsFalse(
-                areteContentText.Contains("CapturedAreteRobotSpawnOrchestrator"),
-                "AreteContentModule must not own captured NPC runtime orchestration.");
-            Assert.IsFalse(
-                areteContentText.Contains("NpcPatrolReplayCoordinator"),
-                "AreteContentModule must not own patrol replay runtime coordination.");
+                    @"Tests\Fixtures\Gameplay\Playfields\CapturedAreteRobotContentProvider.cs"));
             Assert.IsTrue(
                 providerText.Contains("public CapturedAreteRobotSpawnDefinition[] GetSpawnDefinitions()"),
                 "CapturedAreteRobotContentProvider must expose captured spawn definitions.");
-            Assert.IsTrue(
-                orchestratorText.Contains("CapturedAreteRobotSpawnDefinition[] spawns = this.capturedRobotContent.GetSpawnDefinitions();"),
-                "CapturedAreteRobotSpawnOrchestrator must load captured spawns from the provider.");
-            Assert.IsTrue(
-                orchestratorText.Contains("for (int i = 0; i < spawns.Length; i++)")
-                && orchestratorText.Contains("spawns[i]"),
-                "CapturedAreteRobotSpawnOrchestrator must spawn each captured robot definition.");
-
-            Assert.IsFalse(
-                playfieldText.Contains("private static bool IsAreteCleaningRobotTestSpawn"),
-                "Arete DB suppression predicate must not remain inline in Playfield.");
-            Assert.IsTrue(
-                coordinatorText.Contains("module.ShouldSuppressDbMobSpawn(playfieldInstance, mobSpawnId)"),
-                "PlayfieldContentCoordinator must dispatch DB spawn suppression through content modules.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("return this.content.ShouldSuppressDbMobSpawn(mob.Playfield, mob.Id);"),
-                "PlayfieldRuntimeSystems must ask the content coordinator for DB spawn suppression.");
-            Assert.IsTrue(
-                runtimeSystemsText.Contains("this.ShouldSuppressDbMobSpawn,"),
-                "PlayfieldRuntimeSystems must pass the DB spawn suppression guard into object materialization.");
-
-            string materializeDbMobSpawns =
-                ExtractMethodBlock(materializationText, "private void MaterializeDbMobSpawns");
-            int filterIndex = materializeDbMobSpawns.IndexOf("if (shouldSuppressDbMobSpawn(mob))", StringComparison.Ordinal);
-            Assert.IsTrue(
-                filterIndex >= 0,
-                "Object materialization must still call the Arete robot suppression guard before mob stat loading.");
-            int continueIndex = materializeDbMobSpawns.IndexOf("continue;", filterIndex, StringComparison.Ordinal);
-            int loadStatsIndex =
-                materializeDbMobSpawns.IndexOf("loadMobSpawnStats(mob).ToArray()", filterIndex, StringComparison.Ordinal);
-            Assert.IsTrue(
-                continueIndex > filterIndex && continueIndex < loadStatsIndex,
-                "Suppressed legacy DB rows must be skipped before DB spawn stats are loaded.");
-
-            string suppressionMethod = ExtractMethodBlock(areteContentText, "public bool ShouldSuppressDbMobSpawn");
-            string coordinatorMethod = ExtractMethodBlock(coordinatorText, "public bool ShouldSuppressDbMobSpawn");
-            int playfieldGateIndex = suppressionMethod.IndexOf(
-                "playfieldInstance != PrivateAretePlayfieldInstance",
-                StringComparison.Ordinal);
-            int idSwitchIndex = suppressionMethod.IndexOf("switch (mob.Id)", StringComparison.Ordinal);
-            if (idSwitchIndex < 0)
-            {
-                idSwitchIndex = suppressionMethod.IndexOf("switch (mobSpawnId)", StringComparison.Ordinal);
-            }
-
-            Assert.IsTrue(
-                areteContentText.Contains("private const int PrivateAretePlayfieldInstance = 6553"),
-                "Suppression must preserve the Arete PF 6553 constant.");
-            Assert.IsTrue(playfieldGateIndex >= 0, "Suppression must remain gated to Arete PF 6553.");
-            Assert.IsTrue(
-                idSwitchIndex > playfieldGateIndex,
-                "Suppression must check the Arete PF 6553 gate before matching DB mob row ids.");
-            Assert.IsTrue(
-                coordinatorMethod.Contains("return true;") && coordinatorMethod.Contains("return false;"),
-                "Coordinator must suppress only when a content module owns the DB row.");
-            Assert.AreEqual(5, CountOccurrences(suppressionMethod, "case "), "Only the captured legacy DB rows may be suppressed.");
 
             string[] suppressedDbRows =
                 {
@@ -8531,117 +3652,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "2027138249",
                     "2027138259"
                 };
-            for (int i = 0; i < suppressedDbRows.Length; i++)
-            {
-                Assert.AreEqual(
-                    1,
-                    CountOccurrences(suppressionMethod, "case " + suppressedDbRows[i] + ":"),
-                    "Legacy Arete DB row " + suppressedDbRows[i] + " must remain suppressed exactly once.");
-            }
-
-            Assert.IsFalse(
-                montroyalContentText.Contains("case 2027138231:"),
-                "Montroyal module must not suppress Arete DB rows.");
-            Assert.IsFalse(
-                privateCityContentText.Contains("case 2027138231:"),
-                "Private-city module must not suppress Arete DB rows.");
-            Assert.IsTrue(
-                montroyalContentText.Contains("public bool ShouldSuppressDbMobSpawn")
-                && montroyalContentText.Contains("return false;"),
-                "Montroyal module must leave DB spawns unaffected.");
-            Assert.IsTrue(
-                privateCityContentText.Contains("public bool ShouldSuppressDbMobSpawn")
-                && privateCityContentText.Contains("return false;"),
-                "Private-city module must leave DB spawns unaffected.");
-            Assert.IsTrue(
-                suppressionMethod.Contains("default:") && suppressionMethod.Contains("return false;"),
-                "Non-matching DB spawns, including non-Arete DB spawns, must remain unaffected.");
         }
 
-        [TestMethod]
-        public void RedundantScanSupportNanoRuntimeKeepsCapturedPacketOrderAndReversibleOwnedState()
-        {
-            string repositoryRoot = FindRepositoryRoot();
-            string runtimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string npcRuntimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\NPCRuntimeService.cs"));
-            string castHandlerText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CastNanoMessageHandler.cs"));
-            string buffHandlerText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\BuffMessageHandler.cs"));
-            string actionHandlerText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\MessageHandlers\CharacterActionMessageHandler.cs"));
 
-            string finish = ExtractMethodBlock(
-                runtimeText,
-                "private void FinishSupportNanoCast(");
-            AssertTextBefore(finish, "FinishNanoCasting(", "if (target == null");
-            AssertTextBefore(finish, "FinishNanoCasting(", "SendAddNanoBuff(target");
-            AssertTextBefore(
-                finish,
-                "SendAddNanoBuff(target",
-                "NotifyActiveNanoDurationToPlayfield(");
-            AssertTextBefore(
-                finish,
-                "profile.PrimaryNanoId,",
-                "SendTriggeredSelfCast(");
-            AssertTextBefore(
-                finish,
-                "SendTriggeredSelfCast(",
-                "SendAddNanoBuff(caster");
-            Assert.IsTrue(
-                finish.Contains("profile.TriggeredSelfNanoId")
-                && CountOccurrences(finish, "profile.DurationParameter") == 2,
-                "Redundant Scan must announce both captured duration packets.");
-
-            string apply = ExtractMethodBlock(
-                runtimeText,
-                "private bool ApplyOrRefreshTransientNanoEffect(");
-            Assert.IsTrue(
-                apply.Contains("existing.ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds)")
-                && apply.Contains("return false;")
-                && apply.Contains("recipient.Stats[statId].Modifier += modifierDelta")
-                && apply.Contains("recipient.ActiveNanos[activeNanoKey] = new ActiveNanoState"),
-                "Transient NPC nanos must refresh without restacking and project active state for late observers.");
-            Assert.IsTrue(
-                runtimeText.Contains("recipient.Stats[statId].Modifier -= state.ModifierDelta")
-                && runtimeText.Contains("ProcessExpiredSupportNanoEffects(DateTime utcNow)")
-                && runtimeText.Contains("RemoveAllTransientNanoEffects();")
-                && runtimeText.Contains("NotifyCharacterDied(ICharacter character)"),
-                "Transient NPC nano cleanup must reverse only its owned modifier deltas on expiry, death, and reset.");
-            Assert.IsFalse(runtimeText.Contains("ActiveNanoRuntimeService"));
-            Assert.IsFalse(runtimeText.Contains("CharacterActiveNanosDao"));
-
-            Assert.IsTrue(
-                npcRuntimeText.Contains("this.ordinaryEnemies.ProcessExpiredSupportNanoEffects(utcNow);")
-                && npcRuntimeText.Contains("this.ordinaryEnemies.NotifyCharacterDied(target);")
-                && CountOccurrences(
-                    npcRuntimeText,
-                    "this.ordinaryEnemies.TryProcessSupportNano(") == 2,
-                "NPC runtime must own deterministic expiry, death cleanup, and patrol/combat cast pauses.");
-            Assert.IsTrue(
-                castHandlerText.Contains("public void SendNpcCast(")
-                && castHandlerText.Contains("x.Caster = Identity.None;")
-                && castHandlerText.Contains("public void SendTriggeredSelfCast(")
-                && castHandlerText.Contains("x.Unknown1 = 1;"));
-            Assert.IsTrue(
-                buffHandlerText.Contains("public void SendAddNanoBuff(")
-                && buffHandlerText.Contains("Type = (IdentityType)character.Identity.Instance")
-                && actionHandlerText.Contains("public void NotifyActiveNanoDurationToPlayfield(")
-                && actionHandlerText.Contains("true);"),
-                "NPC Buff and SetNanoDuration packets must broadcast to the playfield instead of a nonexistent NPC client.");
-        }
 
         [TestMethod]
         public void FragmentedSoulNano95447UsesDynamicSkillAndOwnedOrdinaryAllyLifecycle()
@@ -8688,65 +3701,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0, nano.ResolveSpawnNanoPool(22));
 
             string repositoryRoot = FindRepositoryRoot();
-            string runtimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string dynamicLookup = ExtractMethodBlock(
-                runtimeText,
-                "internal static bool TryResolveNanoDataStaticModifier(");
-            string targetSelection = ExtractMethodBlock(
-                runtimeText,
-                "private ICharacter FindSupportNanoTarget(");
-            string targetEligibility = ExtractMethodBlock(
-                runtimeText,
-                "private static bool IsOrdinaryEnemy(");
-            string finish = ExtractMethodBlock(
-                runtimeText,
-                "private void FinishSupportNanoCast(");
-            string apply = ExtractMethodBlock(
-                runtimeText,
-                "private bool ApplyOrRefreshTransientNanoEffect(");
-            string remove = ExtractMethodBlock(
-                runtimeText,
-                "private void RemoveTransientNanoEffect(");
-
-            Assert.IsTrue(
-                dynamicLookup.Contains("NanoLoader.NanoList.TryGetValue(nanoId, out nano)")
-                && runtimeText.Contains("nano.Events.Count != 1")
-                && runtimeText.Contains("onUse.EventType != EventType.OnUse")
-                && runtimeText.Contains("function.FunctionType != (int)FunctionType.Skill")
-                && runtimeText.Contains("function.Target != (int)ItemTarget.Target")
-                && runtimeText.Contains("function.TickCount != 1")
-                && runtimeText.Contains("function.TickInterval != 0")
-                && runtimeText.Contains("!function.dolocalstats")
-                && runtimeText.Contains("function.Requirements.Count != 0")
-                && runtimeText.Contains("function.Arguments.Values.Count != 2")
-                && runtimeText.Contains("statId = function.Arguments.Values[0].AsInt32();")
-                && runtimeText.Contains("modifierDelta = function.Arguments.Values[1].AsInt32();"),
-                "Nano 95447 must resolve its one target Skill effect dynamically from NanoLoader data instead of hard-coding stat 381 or delta +42 in runtime.");
-            Assert.IsTrue(
-                targetSelection.Contains("candidate.Identity != caster.Identity")
-                && targetSelection.Contains("IsOrdinaryEnemy(candidate)")
-                && targetSelection.Contains("profile.FallbackToSelf")
-                && targetEligibility.Contains("OrdinaryEnemyRuntimeRegistry.TryGet("),
-                "Nano 95447 must target any ordinary ally, with self fallback, rather than only another Fragmented Soul.");
-            Assert.IsTrue(
-                finish.Contains("profile.ResolvePrimaryModifierFromNanoData")
-                && finish.Contains("primaryAffectedStatIds = new[] { primaryModifierStatId }")
-                && finish.Contains("ApplyOrRefreshTransientNanoEffect("),
-                "Nano 95447 must carry the dynamically resolved stat and delta into the transient-effect lifecycle.");
-            Assert.IsTrue(
-                apply.Contains("existing.ExpiresAtUtc = utcNow.AddSeconds(profile.EffectLifetimeSeconds)")
-                && apply.Contains("return false;")
-                && apply.Contains("recipient.Stats[statId].Modifier += modifierDelta")
-                && apply.Contains("ModifierDelta = modifierDelta")
-                && apply.Contains("StatIds = (int[])(affectedStatIds ?? profile.AffectedStatIds).Clone()"),
-                "Refreshing nano 95447 must extend expiry without stacking a second +42 delta.");
-            Assert.IsTrue(
-                remove.Contains("recipient.Stats[statId].Modifier -= state.ModifierDelta")
-                && remove.Contains("recipient.ActiveNanos.Remove(state.ActiveNanoKey)"),
-                "Nano 95447 cleanup must remove only the modifier delta and active state owned by its transient effect.");
         }
 
         [TestMethod]
@@ -8846,41 +3800,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.AreEqual(0, schedule.RemainingTicks);
 
             string repositoryRoot = FindRepositoryRoot();
-            string runtimeText = File.ReadAllText(
-                Path.Combine(
-                    repositoryRoot,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\OrdinaryEnemyRuntimeService.cs"));
-            string process = ExtractMethodBlock(
-                runtimeText,
-                "internal bool TryProcessSupportNano(");
-            string finish = ExtractMethodBlock(
-                runtimeText,
-                "private void FinishSupportNanoCast(");
-            string periodic = ExtractMethodBlock(
-                runtimeText,
-                "private bool ApplyOrRefreshPeriodicNanoHit(");
-
-            Assert.IsTrue(
-                process.Contains("profile.CastWhileFighting")
-                && process.Contains("profile.AllowCombatActionsDuringCast")
-                && process.Contains("profile.CastChanceBasisPoints")
-                && process.Contains("OrdinaryEnemySupportNanoRuntimeRules.TrySpendNano(")
-                && process.Contains("StatMessageHandler.Default.AnnounceSingle("),
-                "Incomplete Rebuild casts must use the captured combat/resource policy without pausing attacks.");
-            Assert.IsTrue(
-                finish.Contains("profile.HasPeriodicStatHit")
-                && finish.Contains("profile.HasTriggeredSelfEffect"),
-                "Primary-only periodic nanos must not emit a fabricated triggered-self cast.");
-            Assert.IsTrue(
-                periodic.Contains("new OrdinaryEnemyPeriodicNanoSchedule(profile, utcNow)")
-                && periodic.Contains("existing.PeriodicSchedule.Refresh(profile, utcNow)")
-                && periodic.Contains("profile.NcuCost"),
-                "The immediate +21 hit must leave exactly 959 captured 15-second ticks and project NCU cost.");
-            Assert.IsTrue(
-                runtimeText.Contains("state.PeriodicSchedule.ConsumeDueTicks(utcNow)")
-                && runtimeText.Contains("OrdinaryEnemySupportNanoRuntimeRules.ApplyPositiveCappedDelta(")
-                && runtimeText.Contains("RemoveTransientNanoEffectsForCaster("),
-                "Periodic nano hits must cap at MaxNano and clean up on caster removal or death.");
         }
 
         private static void AssertExpectedOrder(

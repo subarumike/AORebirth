@@ -57,7 +57,7 @@
             return "LoginEngine";
         }
         if (key === "zoneengine") {
-            return "ZoneEngine";
+            throw new Error("Legacy ZoneEngine has been retired; use ZoneEngine_New.");
         }
         if (key === "zoneengine_new") {
             return "ZoneEngine_New";
@@ -121,7 +121,6 @@
             prestartEngine: null,
             requiredEngine: null,
             selfTest: false,
-            legacyZoneEngine: false,
             expectedPids: {}
         };
 
@@ -155,7 +154,7 @@
                 selectMode("core");
             }
             else if (argument === "--legacy-zoneengine" || argument === "-LegacyZoneEngine") {
-                options.legacyZoneEngine = true;
+                throw new Error("Legacy ZoneEngine has been retired; use ZoneEngine_New.");
             }
             else if (argument === "--web-required" || argument === "--web-only") {
                 selectMode("web");
@@ -243,7 +242,7 @@
         };
     }
 
-    function createDefinitions(engineDirectory, ports, legacyZoneEngine) {
+    function createDefinitions(engineDirectory, ports) {
         var root = getFileSystem().GetAbsolutePathName(engineDirectory);
 
         function definition(key, executable, enginePorts, required) {
@@ -260,9 +259,7 @@
         var definitions = [
             definition("ChatEngine", "ChatEngine.exe", [ports.communication, ports.chat], true),
             definition("LoginEngine", "LoginEngine.exe", [ports.login], true),
-            legacyZoneEngine
-                ? definition("ZoneEngine", "ZoneEngine.exe", [ports.zone], true)
-                : definition("ZoneEngine_New", "ZoneEngine_New\\ZoneEngine_New.exe", [ports.zone], true),
+            definition("ZoneEngine_New", "ZoneEngine_New\\ZoneEngine_New.exe", [ports.zone], true),
             definition("WebEngine", "WebEngine.exe", [ports.web], false)
         ];
 
@@ -682,7 +679,7 @@
     function testDefinitions() {
         return createDefinitions(
             "C:\\AORebirth\\AORebirth\\Built\\Debug",
-            { communication: 6996, chat: 7012, login: 7500, zone: 7501, web: 8181 }, true);
+            { communication: 6996, chat: 7012, login: 7500, zone: 7501, web: 8181 });
     }
 
     function healthySnapshot(includeWeb) {
@@ -691,7 +688,7 @@
             processes: [
                 { pid: 101, name: "ChatEngine.exe", path: base + "ChatEngine.exe" },
                 { pid: 201, name: "LoginEngine.exe", path: base + "LoginEngine.exe" },
-                { pid: 301, name: "ZoneEngine.exe", path: base + "ZoneEngine.exe" }
+                { pid: 301, name: "ZoneEngine_New.exe", path: base + "ZoneEngine_New\\ZoneEngine_New.exe" }
             ],
             listeners: [
                 { port: 6996, pid: 101 },
@@ -953,12 +950,12 @@
             "--expect-pid",
             "LoginEngine=201",
             "--expect-pid",
-            "ZoneEngine=301"
+            "ZoneEngine_New=301"
         ]);
         if (parsedRepeatedPids.mode !== "core"
             || parsedRepeatedPids.expectedPids.ChatEngine !== 101
             || parsedRepeatedPids.expectedPids.LoginEngine !== 201
-            || parsedRepeatedPids.expectedPids.ZoneEngine !== 301) {
+            || parsedRepeatedPids.expectedPids.ZoneEngine_New !== 301) {
             throw new Error("Self-test repeated-expected-pid-parsing returned the wrong result.");
         }
         total++;
@@ -1012,14 +1009,35 @@
             throw new Error("Normal backend selection must use ZoneEngine_New.");
         }
         var newSnapshot = healthySnapshot(false);
-        newSnapshot.processes[2].name = "ZoneEngine_New.exe";
-        newSnapshot.processes[2].path = "C:\\AORebirth\\AORebirth\\Built\\Debug\\ZoneEngine_New\\ZoneEngine_New.exe";
         verify("default-new-backend-exact-ownership", true, newSnapshot, defaultTestOptions(), null);
-        verify("legacy-does-not-satisfy-default-backend", false, healthySnapshot(false), defaultTestOptions(), "expected-process-absent");
+        var retiredSnapshot = healthySnapshot(false);
+        retiredSnapshot.processes[2].name = "ZoneEngine.exe";
+        retiredSnapshot.processes[2].path = "C:\\AORebirth\\AORebirth\\Built\\Debug\\ZoneEngine.exe";
+        verify("retired-backend-does-not-satisfy-ownership", false, retiredSnapshot, defaultTestOptions(), "expected-process-absent");
         newSnapshot.processes[2].path = "C:\\Other\\ZoneEngine_New.exe";
         verify("new-backend-wrong-path-rejected", false, newSnapshot, defaultTestOptions(), null);
-        if (!parseArguments(["--legacy-zoneengine"]).legacyZoneEngine) {
-            throw new Error("Explicit rollback selection was not recognized.");
+
+        var retiredArguments = [
+            ["--legacy-zoneengine"],
+            ["-LegacyZoneEngine"],
+            ["--prestart", "ZoneEngine"],
+            ["--engine-required", "ZoneEngine.exe"],
+            ["--expect-pid", "ZoneEngine=301"]
+        ];
+        for (var retiredIndex = 0; retiredIndex < retiredArguments.length; retiredIndex++) {
+            var rejected = false;
+            try {
+                parseArguments(retiredArguments[retiredIndex]);
+            }
+            catch (retiredError) {
+                rejected = String(retiredError.message).indexOf("retired") >= 0;
+            }
+            if (!rejected) {
+                throw new Error("Retired engine selector was not rejected before probing processes.");
+            }
+            total++;
+            passed++;
+            WScript.Echo("[AORebirth Status Test] PASS case=retired-selector-rejected-" + retiredIndex);
         }
 
         WScript.Echo("[AORebirth Status Test] PASS - " + passed + "/" + total + " deterministic cases.");
@@ -1043,9 +1061,7 @@
         }
 
         var ports = loadConfigurationPorts(options.configPath);
-        var legacySelection = options.legacyZoneEngine
-            || options.prestartEngine === "ZoneEngine" || options.requiredEngine === "ZoneEngine";
-        var definitions = createDefinitions(options.engineDirectory, ports, legacySelection);
+        var definitions = createDefinitions(options.engineDirectory, ports);
         var snapshot = captureWindowsSnapshot();
 
         if (options.mode === "prestart") {
