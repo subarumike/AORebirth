@@ -26,15 +26,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
     {
         private readonly InventoryActionService _inventoryActions;
         private readonly TeamService _teams;
-        private readonly NanoService _nanos;
         private readonly GeneratedMissionAcgService _missions;
 
-        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams, NanoService nanos,
+        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams,
             GeneratedMissionAcgService missions)
         {
             _inventoryActions = inventoryActions;
             _teams = teams;
-            _nanos = nanos;
             _missions = missions;
         }
 
@@ -69,12 +67,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     message.Parameter2,
                     player.Identity.Instance));
 
-            if (message.Action == CharacterActionType.InterruptNanoCasting)
-            {
-                _nanos.TryInterrupt(player, session, message);
-                return;
-            }
-
             if (_teams.TryHandle(player, message))
                 return;
 
@@ -83,19 +75,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case CharacterActionType.Die:
                 case CharacterActionType.DeathRespawn:
                     player.RequestRespawn();
-                    break;
-
-                case CharacterActionType.CastNano:
-                    _nanos.TryCast(player, message.Parameter2, message.Target);
-                    break;
-
-                case CharacterActionType.RemoveFriendlyNano:
-                    _nanos.TryRemove(player, message);
-                    break;
-
-                case CharacterActionType.DeleteItem:
-                case CharacterActionType.Split:
-                    _inventoryActions.Handle(player, message);
                     break;
 
                 case CharacterActionType.StandUp:
@@ -111,6 +90,24 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case CharacterActionType.StopSneaking: //TODO: Wire in cooldown on sneak
                     player.Motor.ApplyAction(MovementAction.LeaveSneak);
                     AnnounceAction(player, CharacterActionType.StopSneaking);
+                    break;
+
+                case CharacterActionType.CastNano:
+                    // Client cast request: Parameter2 = nano id, Target = recipient.
+                    NanoRuntime.TryStartCast(player, message.Parameter2, message.Target, DateTime.UtcNow);
+                    break;
+
+                case CharacterActionType.InterruptNanoCasting:
+                    NanoRuntime.InterruptCast(player);
+                    break;
+
+                case CharacterActionType.RemoveFriendlyNano:
+                    CancelNano(player, message);
+                    break;
+
+                case CharacterActionType.DeleteItem:
+                case CharacterActionType.Split:
+                    _inventoryActions.Handle(player, message);
                     break;
 
                 case CharacterActionType.InfoRequest:
@@ -158,6 +155,37 @@ namespace ZoneEngine_New.Core.MessageHandlers
                             player.Identity.Instance));
                     break;
             }
+        }
+
+        /// <summary>
+        /// NCU cancel from the client. Live cancel often arrives as Target=None with the nano id
+        /// in Parameter2; Target.Type=NanoProgram is accepted when present. No single-buff guess.
+        /// </summary>
+        static void CancelNano(Player player, CharacterActionMessage message)
+        {
+            int nanoId = ResolveCancelNanoId(message);
+            if (nanoId <= 0)
+            {
+                player.Logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "RemoveFriendlyNano without a nano id: target={0} p1={1} p2={2} character={3}",
+                        message.Target,
+                        message.Parameter1,
+                        message.Parameter2,
+                        player.Identity.Instance));
+                return;
+            }
+
+            NanoRuntime.TryCancelBuff(player, nanoId);
+        }
+
+        static int ResolveCancelNanoId(CharacterActionMessage message)
+        {
+            if (message.Target.Type == IdentityType.NanoProgram && message.Target.Instance > 0)
+                return message.Target.Instance;
+
+            return message.Parameter2 > 0 ? message.Parameter2 : 0;
         }
 
         static void ApplyStand(Player player)

@@ -139,7 +139,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="../../GameData/NanoMechanics.json;../../GameData/WorldContent.json;../../GameData/ItemBehavior.json">
+    <Content Include="../../GameData/WorldContent.json;../../GameData/ItemBehavior.json">
       <Link>GameData/%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

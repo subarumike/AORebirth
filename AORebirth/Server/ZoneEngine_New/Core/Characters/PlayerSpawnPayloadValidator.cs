@@ -35,14 +35,6 @@ namespace ZoneEngine_New.Core.Characters
             if (!StatCollection.IsUnset(flags) && ((CharacterFlags)flags).HasFlag(CharacterFlags.Tower))
                 errors.Add("player-flags-tower");
 
-            int health = player.Stats.Get(CharacterStat.Health);
-            int maxHealth = player.Stats.Get(CharacterStat.MaxHealth);
-            if (health < 0 || maxHealth <= 0 || health > maxHealth) errors.Add("health-invalid");
-
-            int currentNano = player.Stats.Get(CharacterStat.CurrentNano);
-            int maxNano = player.Stats.Get(CharacterStat.MaxNanoEnergy);
-            if (currentNano < 0 || maxNano <= 0 || currentNano > maxNano) errors.Add("nano-invalid");
-
             if (player.Stats.GetOrZero(CharacterStat.HeadMesh) <= 0) errors.Add("head-mesh-invalid");
             if (player.Playfield == null || player.Playfield.Identity.Instance <= 0) errors.Add("playfield-invalid");
             if (player.Position == null
@@ -80,8 +72,6 @@ namespace ZoneEngine_New.Core.Characters
             if (!spawn.HeadMesh.HasValue || spawn.HeadMesh.Value == 0 || spawn.VisualFlags < 0 || spawn.MonsterScale <= 0
                 || spawn.Appearance == null || (int)spawn.Appearance.Breed < 1 || (int)spawn.Appearance.Breed > 4
                 || spawn.Appearance.Race == 0) errors.Add("appearance-invalid");
-            if (spawn.Health <= 0 || spawn.HealthDamage < 0 || spawn.HealthDamage > spawn.Health)
-                errors.Add("health-invalid");
             if (full.Stats1 == null || full.Stats2 == null || full.Stats3 == null || full.Stats4 == null)
                 errors.Add("full-stat-block-missing");
             else
@@ -98,19 +88,6 @@ namespace ZoneEngine_New.Core.Characters
                 foreach (var row in full.Stats4) Add(row.Value1, row.Value2);
                 foreach (CharacterStat required in CharacterHydrationValidator.RequiredSpawnStats)
                     if (required != CharacterStat.HeadMesh && !values.ContainsKey((int)required)) errors.Add("missing-stat:" + required);
-                if (values.TryGetValue((int)CharacterStat.Health, out long current)
-                    && values.TryGetValue((int)CharacterStat.MaxHealth, out long maximum))
-                {
-                    // Existing SCFU presentation scales maxima above UInt16; durable/FullCharacter values stay exact.
-                    long displayMax = Math.Min(maximum, ushort.MaxValue);
-                    long displayCurrent = maximum > ushort.MaxValue ? current * ushort.MaxValue / maximum : current;
-                    if (maximum <= 0 || current < 0 || current > maximum || spawn.Health != displayMax
-                        || spawn.HealthDamage != displayMax - displayCurrent) errors.Add("full-scfu-health-mismatch");
-                }
-                if (values.TryGetValue((int)CharacterStat.CurrentNano, out long currentNano)
-                    && values.TryGetValue((int)CharacterStat.MaxNanoEnergy, out long maximumNano)
-                    && (maximumNano <= 0 || currentNano < 0 || currentNano > maximumNano))
-                    errors.Add("full-nano-invalid");
                 if (values.TryGetValue((int)CharacterStat.Expansion, out long expansions) && expansions != spawn.Expansions)
                     errors.Add("expansion-mismatch");
                 if (values.TryGetValue((int)CharacterStat.VisualFlags, out long visual) && visual != spawn.VisualFlags)

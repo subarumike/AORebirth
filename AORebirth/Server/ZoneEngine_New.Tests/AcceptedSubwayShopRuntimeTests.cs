@@ -157,7 +157,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
             var items = new StubItemBuilder();
             var minter = new HashItemMinter(data, catalog, items);
             var ids = new Ids();
-            var actions = new InventoryActionService(new NoInventoryMutation(), _flush, ids, new StubLogger(), catalog, items);
+            var actions = new InventoryActionService(new NoInventoryMutation(), _flush, ids, new StubLogger());
             Trade = new TradeService(new StubLogger(), data, catalog, minter, ids, _flush, Persistence);
             Activation = new NpcContentActivationService(playfield, Registry, locality, items, catalog);
             _services = new ServiceCollection().AddSingleton(Registry).AddSingleton(locality).AddSingleton(Activation).AddSingleton(Trade)
@@ -220,7 +220,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
     }
     sealed class Coalesce : ICharacterCoalesceCommit
     {
-        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> nanos) { }
+        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos) { }
     }
     internal sealed class Session : IZoneSession
     {

@@ -25,42 +25,6 @@ namespace ZoneEngine_New.Core.Inventory
         internal static bool TryReadInt(System.Collections.Generic.List<object> arguments, int index, out int value)
             => TryGetInt(arguments, index, out value);
 
-        internal static bool CanExecute(Player player, ItemSpell spell)
-        {
-            // This implementation owns player-directed immediate effects only. Do not apply
-            // selected-target, repeating, or compound requirement semantics to the user by default.
-            if (spell.Target != (int)ItemTarget.User && spell.Target != (int)ItemTarget.Self
-                && spell.Target != (int)ItemTarget.Wearer) return false;
-            if (spell.TickCount > 1 || spell.TickInterval != 0) return false;
-            foreach (ItemRequirement requirement in spell.Requirements)
-            {
-                if (requirement.ChildOperator != 0
-                    || (requirement.Target != (int)ItemTarget.User && requirement.Target != (int)ItemTarget.Self
-                        && requirement.Target != (int)ItemTarget.Wearer)
-                    || !ItemTemplate.EvaluateRequirement(player.Stats.Get((CharacterStat)requirement.StatNumber), requirement))
-                    return false;
-            }
-            switch ((FunctionType)spell.FunctionType)
-            {
-                case FunctionType.OpenBank: return player.Session != null;
-                case FunctionType.SystemText:
-                    return player.Session != null && TryGetString(spell.Arguments, 0, out string text) && text.Length != 0;
-                case FunctionType.UploadNano:
-                    return TryGetInt(spell.Arguments, 0, out int nano) && nano > 0;
-                case FunctionType.Set:
-                    return TryGetInt(spell.Arguments, 0, out _) && TryGetInt(spell.Arguments, 1, out _);
-                case FunctionType.SetFlag:
-                case FunctionType.ClearFlag:
-                    return TryGetInt(spell.Arguments, 0, out _) && TryGetInt(spell.Arguments, 1, out int bit) && bit is >= 0 and <= 31;
-                case FunctionType.Hit:
-                    if (!TryGetInt(spell.Arguments, 0, out _) || !TryGetInt(spell.Arguments, 1, out int amount)) return false;
-                    return amount != int.MinValue && amount != int.MaxValue
-                        && (spell.Arguments.Count < 3 || (TryGetInt(spell.Arguments, 2, out int maximum)
-                            && maximum != int.MinValue && maximum != int.MaxValue));
-                default: return false;
-            }
-        }
-
         public static bool TryExecute(
             int templateId,
             Character target,
@@ -165,7 +129,6 @@ namespace ZoneEngine_New.Core.Inventory
                 return ApplyNanoDelta(target, delta);
 
             target.Stats.Set(stat, target.Stats.GetOrZero(stat, StatDetail.Base) + delta, StatDetail.Base, dirty: true);
-            target.FlushDirtyStats();
             return true;
         }
 
@@ -177,10 +140,12 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
                 target.ApplyDamage(caster, -delta, HitType.Normal);
-                target.FlushDirtyStats();
 
                 int after = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
                 int actual = before - after;
+                // HealthDamage carries post-hit HP; clear dirty Health so Tick's Stat flush
+                // does not also print a second "unknown damage" line.
+                target.Stats.ClearDirty(CharacterStat.Health);
                 if (actual > 0)
                     target.AnnounceHealthDamage(caster, after, -actual, acStat);
 
@@ -195,7 +160,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             int healed = current + applied;
             target.Stats.Set(CharacterStat.Health, healed, StatDetail.Base, dirty: true);
-            target.FlushDirtyStats();
+            target.Stats.ClearDirty(CharacterStat.Health);
             target.AnnounceHealthDamage(caster, healed, applied, damageTypeStat: 0);
             return true;
         }
@@ -212,7 +177,6 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
 
             target.Stats.Set(CharacterStat.CurrentNano, next, StatDetail.Base, dirty: true);
-            target.FlushDirtyStats();
             return true;
         }
 
@@ -222,7 +186,6 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             target.Stats.Set((CharacterStat)statId, value, StatDetail.Base, dirty: true);
-            target.FlushDirtyStats();
             return true;
         }
 
@@ -237,7 +200,6 @@ namespace ZoneEngine_New.Core.Inventory
             var stat = (CharacterStat)statId;
             int current = target.Stats.GetOrZero(stat, StatDetail.Base);
             target.Stats.Set(stat, current | (1 << bitIndex), StatDetail.Base, dirty: true);
-            target.FlushDirtyStats();
             return true;
         }
 
@@ -252,7 +214,6 @@ namespace ZoneEngine_New.Core.Inventory
             var stat = (CharacterStat)statId;
             int current = target.Stats.GetOrZero(stat, StatDetail.Base);
             target.Stats.Set(stat, current & ~(1 << bitIndex), StatDetail.Base, dirty: true);
-            target.FlushDirtyStats();
             return true;
         }
 

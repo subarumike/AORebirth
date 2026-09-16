@@ -143,7 +143,7 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void DeleteRejectsOtherOwnerStaleInstancePermanentKeyAndFailure()
+        public void DeleteRejectsOtherOwnerStaleInstanceAndFailure()
         {
             using var w = new World(); Item item = w.Add(11, 1);
             Player other = TestWorld.CreatePlayer(222); other.Session = new Session();
@@ -153,8 +153,6 @@ namespace ZoneEngine_New.Tests
             Assert.IsFalse(w.Actions.TryDelete(w.Player, Slot(), 11));
             Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
             w.Flush.HardFlush(w.Player);
-            w.Player.Inventory.Inventory.Content[64] = TestWorld.CreateItem(lowId: 226994, instanceId: 99);
-            Assert.IsFalse(w.Actions.TryDelete(w.Player, Slot(), 99));
         }
 
         [TestMethod]
@@ -163,7 +161,7 @@ namespace ZoneEngine_New.Tests
             using var w = new World(); Item bag = w.Add(11, 1);
             bag.Identity = new Identity { Type = IdentityType.Container, Instance = 11 };
             var child = TestWorld.CreateItem(instanceId: 12);
-            w.Persistence.Rows[12] = InventoryActionService.ToRecord(child, bag.Identity, 0, 1);
+            w.Persistence.Rows[12] = child.ToRecord(bag.Identity, 0, 1);
             // No backpack page has been hydrated: the durable transaction must reject it.
             Assert.IsFalse(w.Actions.TryDelete(w.Player, Slot(), 11));
             Assert.AreSame(bag, w.Player.Inventory.Inventory.Content[64]);
@@ -226,7 +224,7 @@ namespace ZoneEngine_New.Tests
             Item stored = TestWorld.CreateItem(instanceId: 22);
             Container bank = w.Player.Inventory.Bank; bank.IsHydrated = true;
             bank.Add(bank.Offset, stored);
-            w.Persistence.Rows[22] = InventoryActionService.ToRecord(stored, bank.Identity, bank.Offset, 1);
+            w.Persistence.Rows[22] = stored.ToRecord(bank.Identity, bank.Offset, 1);
             var moves = new InventoryMoveService(new StubLogger(), w.Flush, w.Actions);
             moves.Handle(w.Player, new ClientContainerAddItemMessage
             {
@@ -277,39 +275,40 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void NanoCrystalConsumesOneAndCommitsProgramTogether()
+        public void ConsumableUseRunsOnUseSpellsThenSpendsOneCharge()
         {
-            using var w = new World(); Item item = w.Add(11, 2);
+            using var w = new World();
+            Item item = w.Add(11, 2);
             item.Definition.Stats[CharacterStat.Can] |= (int)(CanFlags.Consume | CanFlags.Use);
-            item.SpellList[EventType.OnUse] = new List<ItemSpell> { new() { FunctionType = (int)FunctionType.UploadNano, Target = (int)ItemTarget.User, Arguments = new List<object> { 12345 } } };
-            w.Persistence.BeforeCommit = batch =>
+            w.Player.Stats.Set(CharacterStat.Health, 20);
+            w.Player.Stats.Set(CharacterStat.MaxHealth, 100);
+            item.SpellList[EventType.OnUse] = new List<ItemSpell>
             {
-                Assert.AreEqual(2, item.StackCount);
-                CollectionAssert.AreEqual(new[] { 12345 }, batch.UploadedNanoIds.ToArray());
-                Assert.AreEqual(1, batch.Stacks.Single().FinalCount);
-                Assert.AreEqual(0, w.Session.Messages.Count);
+                new() { FunctionType = (int)FunctionType.Hit, Target = (int)ItemTarget.User,
+                    Arguments = new List<object> { (int)CharacterStat.Health, 30 } }
             };
-            Assert.IsTrue(w.Actions.TryUseNanoCrystal(w.Player, Slot(), item));
+            Assert.IsTrue(w.Use(item));
+            Assert.AreEqual(50, w.Player.Stats.GetOrZero(CharacterStat.Health));
             Assert.AreEqual(1, item.StackCount);
-            Assert.AreEqual(3, ((TemplateActionMessage)w.Session.Messages[0]).Unknown2);
-            Assert.IsTrue(w.Session.Messages.OfType<CharacterActionMessage>().Any(m => m.Action == CharacterActionType.UploadNano));
-            w.Persistence.BeforeCommit = null;
-            w.Persistence.Failure = new InvalidOperationException();
-            // Retrying a known nano now rejects before persistence. Use a distinct
-            // program to continue exercising a genuine transaction failure.
-            item.SpellList[EventType.OnUse][0].Arguments[0] = 12346;
-            int messagesBeforeFailure = w.Session.Messages.Count;
-            Assert.IsFalse(w.Actions.TryUseNanoCrystal(w.Player, Slot(), item));
             Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
-            Assert.AreEqual(1, item.StackCount);
-            Assert.AreEqual(2, w.Persistence.Calls);
-            Assert.AreEqual(messagesBeforeFailure, w.Session.Messages.Count);
-            Assert.IsFalse(w.Player.UploadedNanoIds.Contains(12346));
-            w.Flush.HardFlush(w.Player);
         }
 
         [TestMethod]
-        public void UnsupportedCompoundUseIsRejectedBeforeEarlierEffectRuns()
+        public void UnsupportedOnUseAloneDoesNotCountAsExecuted()
+        {
+            using var w = new World(); Item item = w.Add(11, 1);
+            item.SpellList[EventType.OnUse] = new List<ItemSpell>
+            {
+                new() { FunctionType = int.MaxValue, Target = (int)ItemTarget.User }
+            };
+            Assert.IsFalse(item.Definition.ExecuteOnUseSpells(w.Player, new RejectingInventory(), new StubItemBuilder()));
+            Assert.AreEqual(0, w.Session.Messages.Count);
+            Assert.IsTrue(ItemTemplate.EvaluateRequirement(100, new ItemRequirement { Operator = int.MaxValue, Value = 1 }));
+            Assert.IsTrue(ItemTemplate.EvaluateRequirement(528961, new ItemRequirement { StatNumber = 0, Operator = (int)Operator.And, Value = 0 }));
+        }
+
+        [TestMethod]
+        public void SupportedOnUseStillRunsWhenLaterFunctionIsUnhandled()
         {
             using var w = new World(); Item item = w.Add(11, 1);
             item.SpellList[EventType.OnUse] = new List<ItemSpell>
@@ -318,39 +317,8 @@ namespace ZoneEngine_New.Tests
                 new() { FunctionType = int.MaxValue, Target = (int)ItemTarget.User }
             };
             w.Player.Stats.Set(CharacterStat.Cash, 100);
-            Assert.IsFalse(item.Definition.ExecuteOnUseSpells(w.Player, new RejectingInventory(), new StubItemBuilder()));
-            Assert.AreEqual(100, w.Player.Stats.GetOrZero(CharacterStat.Cash));
-            Assert.AreEqual(0, w.Session.Messages.Count);
-            Assert.IsFalse(ItemTemplate.EvaluateRequirement(100, new ItemRequirement { Operator = int.MaxValue, Value = 1 }));
-        }
-
-        [TestMethod]
-        [DataRow(FunctionType.Set)]
-        [DataRow(FunctionType.Hit)]
-        [DataRow(FunctionType.SetFlag)]
-        [DataRow(FunctionType.ClearFlag)]
-        [DataRow(FunctionType.UploadNano)]
-        public void GenericDurableEffectsRejectBeforeAnyEffectOrRepositoryAccess(FunctionType function)
-        {
-            using var w = new World(); Item item = w.Add(11, 2);
-            w.Player.Stats.Set(CharacterStat.Cash, 100);
-            item.SpellList[EventType.OnUse] = new List<ItemSpell>
-            {
-                new() { FunctionType = (int)FunctionType.SystemText, Target = (int)ItemTarget.User,
-                    Arguments = new List<object> { "must not publish before rejecting the durable effect" } },
-                new() { FunctionType = (int)function, Target = (int)ItemTarget.User,
-                    Arguments = new List<object> { (int)CharacterStat.Cash, 1 } },
-                // Bank hydration would throw through this rejecting repository. Even
-                // recognized functions cannot make the earlier mutation safe to publish.
-                new() { FunctionType = (int)FunctionType.OpenBank, Target = (int)ItemTarget.User }
-            };
-            Assert.IsFalse(item.Definition.ExecuteOnUseSpells(w.Player, new RejectingInventory(), new StubItemBuilder()));
-            Assert.AreEqual(100, w.Player.Stats.GetOrZero(CharacterStat.Cash));
-            Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
-            Assert.AreEqual(11, item.InstanceId);
-            Assert.AreEqual(2, item.StackCount);
-            Assert.AreEqual(0, w.Persistence.Calls);
-            Assert.AreEqual(0, w.Session.Messages.Count);
+            Assert.IsTrue(item.Definition.ExecuteOnUseSpells(w.Player, new RejectingInventory(), new StubItemBuilder()));
+            Assert.AreEqual(999, w.Player.Stats.GetOrZero(CharacterStat.Cash));
         }
 
         [TestMethod]
@@ -390,148 +358,6 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(0, w.Session.Messages.Count);
         }
 
-        [TestMethod]
-        public void QuabbitExchangeCommitsBothRowsThenSendsCapturedPacketOrder()
-        {
-            using var w = new World(); Item package = w.Add(11, 1, lowId: 301782);
-            w.Persistence.BeforeCommit = batch =>
-            {
-                Assert.AreSame(package, w.Player.Inventory.Inventory.Content[64]);
-                Assert.AreEqual(0, w.Session.Messages.Count);
-                Assert.AreEqual(301749, batch.Inserts.Single().LowId);
-                Assert.AreEqual((int)IdentityType.Inventory, batch.Inserts.Single().ContainerType);
-                Assert.AreEqual((int)IdentityType.None, batch.Locations.Single().ContainerType);
-            };
-            Assert.IsTrue(w.Actions.TryOpenPackage(w.Player, Slot(), package));
-            Assert.AreEqual(301749, w.Player.Inventory.Inventory.Content.Values.Single().LowId);
-            Assert.AreEqual(4, w.Session.Messages.Count);
-            var grant = (TemplateActionMessage)w.Session.Messages[0];
-            Assert.AreEqual(301749, grant.ItemLowId); Assert.AreEqual(87, grant.Unknown2);
-            Assert.AreEqual(IdentityType.OverflowWindow, grant.Placement.Type);
-            Assert.AreEqual(0x6f, ((ContainerAddItemMessage)w.Session.Messages[1]).TargetPlacement);
-            var consume = (TemplateActionMessage)w.Session.Messages[2];
-            Assert.AreEqual(301782, consume.ItemLowId); Assert.AreEqual(3, consume.Unknown2);
-            Assert.AreEqual(50000, consume.Unknown3); Assert.AreEqual(w.Player.Identity.Instance, consume.Unknown4);
-            Assert.AreEqual(CharacterActionType.DeleteItem, ((CharacterActionMessage)w.Session.Messages[3]).Action);
-            Assert.IsFalse(w.Actions.TryOpenPackage(w.Player, Slot(), package));
-            Assert.AreEqual(1, w.Persistence.Calls);
-        }
-
-        [TestMethod]
-        public void QuabbitFailureOrFullInventoryNeverConsumesOrAcknowledgesPackage()
-        {
-            using var w = new World(); Item package = w.Add(11, 1, lowId: 301782);
-            w.Persistence.Failure = new InvalidOperationException("grant write failure");
-            Assert.IsFalse(w.Actions.TryOpenPackage(w.Player, Slot(), package));
-            Assert.AreSame(package, w.Player.Inventory.Inventory.Content[64]);
-            Assert.AreEqual(0, w.Session.Messages.Count);
-            Assert.AreEqual(1, w.Persistence.Rows.Count);
-            w.Flush.HardFlush(w.Player);
-            TestWorld.FillInventory(w.Player);
-            Assert.IsFalse(w.Actions.TryOpenPackage(w.Player, Slot(), package));
-            Assert.AreEqual(1, w.Persistence.Calls);
-        }
-
-        [TestMethod]
-        public void AlreadyOwnedQuabbitConsumesSealedWithoutDuplicatingOpenedItem()
-        {
-            using var w = new World(); Item package = w.Add(11, 1, lowId: 301782);
-            w.Add(12, 1, 65, 301749);
-            Assert.IsTrue(w.Actions.TryOpenPackage(w.Player, Slot(), package));
-            Assert.AreEqual(1, w.Player.Inventory.Inventory.Content.Count);
-            Assert.AreEqual(2, w.Session.Messages.Count);
-            Assert.AreEqual(301782, ((TemplateActionMessage)w.Session.Messages[0]).ItemLowId);
-        }
-
-        [TestMethod]
-        public void StimCommitsVitalRestoreAndConsumptionBeforePacketsAndEnforcesSkillDeadline()
-        {
-            using var w = new World(); Item stim = w.Add(11, 2, lowId: 291043);
-            var clock = new TestClock(); w.Actions.Clock = clock;
-            SetVitals(w.Player, 20, 100, 10, 80);
-            w.Persistence.BeforeCommit = batch =>
-            {
-                Assert.AreEqual(2, stim.StackCount);
-                Assert.AreEqual(20, w.Player.Stats.GetOrZero(CharacterStat.Health));
-                Assert.AreEqual(0, w.Session.Messages.Count);
-                Assert.AreEqual(1, batch.Stacks.Single().FinalCount);
-                Assert.AreEqual(50, batch.FinalStats.Single(s => s.StatId == (int)CharacterStat.Health).StatValue);
-                Assert.AreEqual(40, batch.FinalStats.Single(s => s.StatId == (int)CharacterStat.CurrentNano).StatValue);
-            };
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.AreEqual(1, stim.StackCount);
-            Assert.AreEqual(50, w.Player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(40, w.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
-            Assert.AreEqual(50, w.Persistence.Stats[(int)CharacterStat.Health]);
-            var locked = w.Session.Messages.OfType<CharacterActionMessage>().Single();
-            Assert.AreEqual(CharacterActionType.SpecialUnavailable, locked.Action);
-            Assert.AreEqual((int)CharacterStat.FirstAid, locked.Parameter1); Assert.AreEqual(40, locked.Parameter2);
-            Assert.IsFalse(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.AreEqual(1, w.Persistence.Calls);
-            clock.Advance(39); w.Actions.Tick(w.Player.Playfield!);
-            Assert.IsFalse(w.Session.Messages.OfType<CharacterActionMessage>().Any(m => m.Action == CharacterActionType.SpecialAvailable));
-            clock.Advance(1); w.Actions.Tick(w.Player.Playfield!);
-            var available = w.Session.Messages.OfType<CharacterActionMessage>().Single(m => m.Action == CharacterActionType.SpecialAvailable);
-            Assert.AreEqual(0, available.Parameter1); Assert.AreEqual((int)CharacterStat.FirstAid, available.Parameter2);
-            w.Persistence.BeforeCommit = null;
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.IsFalse(w.Player.Inventory.Inventory.Content.ContainsKey(64));
-            Assert.AreEqual((int)IdentityType.None, w.Persistence.Rows[11].ContainerType);
-        }
-
-        [TestMethod]
-        public void RechargerUsesDeclaredAmountsAndDurationWithoutConsumingStack()
-        {
-            using var w = new World(); Item recharger = w.Add(11, 50, lowId: 291082);
-            SetVitals(w.Player, 90, 100, 70, 80);
-            recharger.SpellList[EventType.OnUse] = new List<ItemSpell>
-            {
-                new() { FunctionType = (int)FunctionType.Hit, Arguments = new List<object> { (int)CharacterStat.Health, 37 } },
-                new() { FunctionType = (int)FunctionType.Hit, Arguments = new List<object> { (int)CharacterStat.CurrentNano, 43 } },
-                new() { FunctionType = (int)FunctionType.LockSkill, Arguments = new List<object> { (int)CharacterStat.Treatment, 19 } }
-            };
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), recharger));
-            Assert.AreEqual(50, recharger.StackCount);
-            Assert.AreEqual(50, w.Persistence.Rows[11].StackCount);
-            Assert.AreEqual(100, w.Player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(80, w.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
-            Assert.AreEqual(19, w.Session.Messages.OfType<CharacterActionMessage>().Single().Parameter2);
-            Assert.IsFalse(w.Actions.TryUseVitalItem(w.Player, Slot(), recharger));
-        }
-
-        [TestMethod]
-        public void FailedStimPreservesVitalsQuantityAndLockAvailability()
-        {
-            using var w = new World(); Item stim = w.Add(11, 1, lowId: 291043);
-            SetVitals(w.Player, 20, 100, 10, 80);
-            w.Persistence.Failure = new InvalidOperationException("late vital stat failure");
-            Assert.IsFalse(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.AreEqual(1, stim.StackCount);
-            Assert.AreEqual(20, w.Player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(10, w.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
-            Assert.AreEqual(0, w.Persistence.Stats.Count);
-            Assert.AreEqual((int)IdentityType.Inventory, w.Persistence.Rows[11].ContainerType);
-            Assert.AreEqual(0, w.Session.Messages.Count);
-            w.Flush.HardFlush(w.Player);
-            w.Persistence.Failure = null;
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-        }
-
-        static void SetVitals(Player player, int health, int maxHealth, int nano, int maxNano)
-        {
-            player.Stats.Set(CharacterStat.MaxHealth, maxHealth);
-            player.Stats.Set(CharacterStat.Health, health);
-            player.Stats.Set(CharacterStat.MaxNanoEnergy, maxNano);
-            player.Stats.Set(CharacterStat.CurrentNano, nano);
-        }
-
-        sealed class TestClock : TimeProvider
-        {
-            DateTimeOffset _now = DateTimeOffset.UnixEpoch;
-            public override DateTimeOffset GetUtcNow() => _now;
-            public void Advance(int seconds) => _now = _now.AddSeconds(seconds);
-        }
-
         internal sealed class World : IDisposable
         {
             public readonly Player Player = TestWorld.CreatePlayer(111);
@@ -545,22 +371,26 @@ namespace ZoneEngine_New.Tests
             {
                 Player.Session = Session; Session.BindPlayer(Player);
                 Player.Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
-                _services = new ServiceCollection().AddSingleton(new PlayfieldLocality(4582, null)).BuildServiceProvider();
-                typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Player.Playfield, _services);
                 var manager = (PlayfieldManager)RuntimeHelpers.GetUninitializedObject(typeof(PlayfieldManager));
                 typeof(PlayfieldManager).GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Lock());
                 typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Dictionary<int, Player>());
                 Flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => manager), new Coalesce(), new StubLogger());
-                Actions = new InventoryActionService(Persistence, Flush, Ids, new StubLogger(),
-                    new StubCatalog().Add(301749, 1), new StubItemBuilder());
+                _services = new ServiceCollection()
+                    .AddSingleton(new PlayfieldLocality(4582, null))
+                    .AddSingleton(Flush)
+                    .BuildServiceProvider();
+                typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Player.Playfield, _services);
+                Actions = new InventoryActionService(Persistence, Flush, Ids, new StubLogger());
             }
+            public bool Use(Item item, int placement = 64)
+                => item.Use(Player, Slot(placement), new RejectingInventory(), new StubItemBuilder());
             public Item Add(int id, int count, int slot = 64, int lowId = 1000)
             {
                 Item item = TestWorld.CreateItem(instanceId: id, lowId: lowId, highId: lowId);
                 item.StackCount = count;
                 item.Definition.Stats[CharacterStat.Can] = (int)CanFlags.Stackable;
                 Player.Inventory.Inventory.Add(slot, item);
-                Persistence.Rows[id] = InventoryActionService.ToRecord(item, Player.Inventory.Inventory.Identity, slot, count);
+                Persistence.Rows[id] = item.ToRecord(Player.Inventory.Inventory.Identity, slot, count);
                 return item;
             }
             public void Dispose() { Flush.Dispose(); _services.Dispose(); }
@@ -568,7 +398,7 @@ namespace ZoneEngine_New.Tests
         internal sealed class Ids : IItemInstanceIdAllocator { int _next = 100; public int Calls; public int Allocate() { Calls++; return _next++; } }
         sealed class Coalesce : ICharacterCoalesceCommit
         {
-            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds) => throw new InvalidOperationException("No unexpected independent flush.");
+            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos) => throw new InvalidOperationException("No unexpected independent flush.");
         }
         internal sealed class Persistence : IInventoryMutationPersistence
         {

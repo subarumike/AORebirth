@@ -21,7 +21,6 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.Missions;
-    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Dialogue;
     using ZoneEngine_New.Core.WorldSimulation;
     using ZoneEngine.Core.Missions;
@@ -65,7 +64,6 @@ namespace ZoneEngine_New.Core.Playfield
             CharacterSnapshotService characterSnapshot,
             IPlayfieldMetricsRegistry metricsRegistry,
             TeamService teams,
-            NanoService nanos,
             GeneratedMissionAcgService missions,
             AuthoredQuestService authoredQuests,
             DialogueService dialogues,
@@ -99,7 +97,6 @@ namespace ZoneEngine_New.Core.Playfield
             _characterSnapshot = characterSnapshot;
             _metricsRegistry = metricsRegistry;
             Teams = teams ?? throw new ArgumentNullException(nameof(teams));
-            Nanos = nanos ?? throw new ArgumentNullException(nameof(nanos));
             Missions = missions ?? throw new ArgumentNullException(nameof(missions));
             AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
             Dialogues = dialogues ?? throw new ArgumentNullException(nameof(dialogues));
@@ -107,7 +104,6 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         public TeamService Teams { get; }
-        public NanoService Nanos { get; }
         public GeneratedMissionAcgService Missions { get; }
         public AuthoredQuestService AuthoredQuests { get; }
         public DialogueService Dialogues { get; }

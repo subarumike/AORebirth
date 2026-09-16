@@ -178,6 +178,9 @@ namespace ZoneEngine_New.Core.Entities
             return drained;
         }
 
+        /// <summary>Drops a single dirty flag without emitting a StatMessage for it.</summary>
+        public void ClearDirty(CharacterStat stat) => _dirty.Remove(stat);
+
         static int GetDetail(StatValue statValue, StatDetail detail) => detail switch
         {
             StatDetail.Base => statValue.Base,

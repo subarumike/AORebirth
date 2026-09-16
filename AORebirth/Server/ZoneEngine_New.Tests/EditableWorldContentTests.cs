@@ -66,12 +66,23 @@ public sealed class EditableWorldContentTests
     }
 
     [TestMethod]
-    public void MissingHashAndExplicitPlaceholderCannotUseFallback()
+    public void MissingHashUsesAaaaTemplate()
     {
         var catalog = NpcTemplateCatalog.Parse("{\"AAAA\":{\"Templates\":[{\"Name\":\"Marker\",\"Level\":1,\"Stats\":{}}]}}");
-        Assert.IsFalse(catalog.CanResolve("AAAA")); Assert.IsFalse(catalog.TryResolve("AAAA", 1, out _));
-        Assert.IsFalse(catalog.TryResolve("MISSING", 1, out _));
-        Assert.IsFalse(NpcTemplateValidation.CanSpawn(new() { Hash = "AAAA", Name = "Marker" }));
+        Assert.IsTrue(catalog.CanResolve("AAAA"));
+        Assert.IsTrue(catalog.TryResolve("AAAA", 1, out MobTemplate aaaa));
+        Assert.AreEqual("Marker", aaaa.Name);
+        Assert.IsTrue(catalog.TryResolve("MISSING", 1, out MobTemplate fallback));
+        Assert.AreEqual("AAAA", fallback.Hash);
+        Assert.AreEqual("Marker", fallback.Name);
+        Assert.IsTrue(NpcTemplateValidation.CanSpawn(fallback));
+
+        using var fixture = new TempContent();
+        File.WriteAllText(Path.Combine(fixture.Root, "NpcTemplates.json"), "{\"AAAA\":{\"Templates\":[{\"Name\":\"Marker\",\"Level\":1,\"Stats\":{\"54\":1}}]}}");
+        var path = Path.Combine(fixture.Root, "Playfields", "4582"); Directory.CreateDirectory(path);
+        var entry = new PlayfieldSpawnEntry { HashText = "UNRESOLVED", Position = [4, 5, 6], Radius = 0, MinLevel = 1, MaxLevel = 1, RespawnChance = 100, RespawnTime = 30 };
+        File.WriteAllText(Path.Combine(path, "Spawns.json"), JsonSerializer.Serialize(new PlayfieldSpawnsData { SchemaVersion = 1, PlayfieldId = 4582, Spawns = [entry] }));
+        Assert.AreEqual(1, Register(4582, new GameDataStore(new StubLogger(), null, fixture.Root)));
     }
 
     [TestMethod]

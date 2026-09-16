@@ -118,7 +118,8 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// True when <paramref name="actionType"/> is missing, or every requirement on that action passes.
+        /// True when <paramref name="actionType"/> is missing, or the action's requirement
+        /// expression passes (legacy Events fold: leaf compares + And/Or/Not links).
         /// </summary>
         public bool MeetsActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType)
         {
@@ -134,16 +135,73 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
 
-            if (action == null)
+            return action == null || MeetsRequirements(action.Requirements, getStat);
+        }
+
+        /// <summary>
+        /// Legacy requirement expression fold (Events / Criteria):
+        /// <list type="bullet">
+        /// <item><see cref="IsRequirementLinkOperator"/> rows are structural And/Or/Not markers;
+        /// <see cref="Operator.Not"/> inverts the accumulated result.</item>
+        /// <item>Leaf rows are compared via <see cref="EvaluateRequirement"/> and combined with
+        /// <see cref="ItemRequirement.ChildOperator"/> (<see cref="Operator.Or"/> or And).</item>
+        /// </list>
+        /// </summary>
+        public static bool MeetsRequirements(
+            IReadOnlyList<ItemRequirement> requirements,
+            Func<CharacterStat, int> getStat)
+        {
+            ArgumentNullException.ThrowIfNull(requirements);
+            ArgumentNullException.ThrowIfNull(getStat);
+
+            int count = requirements.Count;
+            if (count == 0)
                 return true;
 
-            foreach (ItemRequirement requirement in action.Requirements)
+            bool result = true;
+            bool hasReal = false;
+            for (int i = 0; i < count; i++)
             {
-                if (!EvaluateRequirement(getStat((CharacterStat)requirement.StatNumber), requirement))
-                    return false;
+                ItemRequirement requirement = requirements[i];
+
+                if (IsRequirementLinkOperator(requirement))
+                {
+                    if (hasReal && (Operator)requirement.Operator == Operator.Not)
+                        result = !result;
+                    continue;
+                }
+
+                bool pass = EvaluateRequirement(
+                    getStat((CharacterStat)requirement.StatNumber),
+                    requirement);
+
+                if (!hasReal)
+                {
+                    result = pass;
+                    hasReal = true;
+                    continue;
+                }
+
+                if ((Operator)requirement.ChildOperator == Operator.Or)
+                    result |= pass;
+                else
+                    result &= pass;
             }
 
-            return true;
+            return !hasReal || result;
+        }
+
+        /// <summary>
+        /// Stat=0 And/Or/Not rows are expression-tree link operators, not Flags checks.
+        /// </summary>
+        public static bool IsRequirementLinkOperator(ItemRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+
+            if (requirement.StatNumber != 0)
+                return false;
+
+            return (Operator)requirement.Operator is Operator.And or Operator.Or or Operator.Not;
         }
 
         /// <summary>
@@ -170,19 +228,6 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells) || spells.Count == 0)
                 return false;
-
-            if (target is Player player)
-            {
-                // This generic executor has no aggregate persistence transaction. Durable
-                // effects belong to InventoryActionService or another explicit transactional
-                // owner. A later failure must never leave an earlier stat/upload effect dirty.
-                foreach (ItemSpell spell in spells)
-                    if (((FunctionType)spell.FunctionType is not FunctionType.OpenBank and not FunctionType.SystemText)
-                        || !ItemUseFunctions.CanExecute(player, spell)) return false;
-                foreach (ItemSpell spell in spells)
-                    if (!ExecuteSpell(player, source, spell, inventoryRepository, items, skipPassiveModifiers)) return false;
-                return true;
-            }
 
             bool executed = false;
             foreach (ItemSpell spell in spells)
@@ -253,7 +298,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (function is FunctionType.Modify or FunctionType.ScalingModify)
             {
                 if (skipPassiveModifiers)
-                    return false;
+                    return true;
 
                 StatModifierSpells.Apply([spell], target.Stats);
                 return true;
@@ -302,7 +347,8 @@ namespace ZoneEngine_New.Core.Inventory
                 Operator.Unequal => statValue != required,
                 Operator.True => true,
                 Operator.False => false,
-                _ => false
+                // And/Or/Not and other non-comparison ops are requirement links, not checks.
+                _ => true
             };
         }
     }

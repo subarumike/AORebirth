@@ -422,9 +422,6 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
                 player.Rebase();
-                player.NanoRuntime = _playfieldManager.Nanos;
-                if (!_playfieldManager.Nanos.AttachPlayer(player))
-                    throw new InvalidOperationException("Active nano hydration failed; durable state was not replaced.");
                 PlayerSpawnPayloadValidator.RequireValid(player);
                 PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
                 _playfieldManager.RegisterPlayer(player);
@@ -437,8 +434,6 @@ namespace ZoneEngine_New.Core.Playfield
             }
             catch
             {
-                _playfieldManager.Nanos.DetachPlayer(player);
-                player.NanoRuntime = null;
                 if (registered)
                 {
                     _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
@@ -519,11 +514,10 @@ namespace ZoneEngine_New.Core.Playfield
             _playfieldManager.Teams.AttachPlayer(player);
             _playfieldManager.Teams.RefreshPlayer(player);
 
-            _playfieldManager.Nanos.RefreshPlayer(player);
-            _playfieldManager.Missions.ReplayJournal(player);
-            _playfieldManager.AuthoredQuests.Restore(player);
-
+            // Visibility must activate even when journal/quest restore fails; otherwise nearby
+            // hash-spawns never send SCFU and the client cannot see or tab NPCs.
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+            TryRestorePostSpawnContent(player);
 
             _logger.Info(
                 string.Format(
@@ -598,18 +592,51 @@ namespace ZoneEngine_New.Core.Playfield
             _playfieldManager.Teams.AttachPlayer(player);
             _playfieldManager.Teams.RefreshPlayer(player);
 
-            _playfieldManager.Nanos.RefreshPlayer(player);
-            _playfieldManager.Missions.ReplayJournal(player);
-            _playfieldManager.AuthoredQuests.Restore(player);
-
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+            TryRestorePostSpawnContent(player);
 
-                _logger.Info(
+            _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "ZoneReconnect completed character={0} playfield={1}",
                     characterId,
                     _playfield.Identity.Instance));
+        }
+
+        /// <summary>
+        /// Mission/quest restore must not block locality visibility. A bad frozen offer previously
+        /// aborted spawn completion before <see cref="PlayfieldLocality.ActivatePlayerVisibility"/>,
+        /// so hash-spawned NPCs never sent SCFU to the joining player.
+        /// </summary>
+        void TryRestorePostSpawnContent(Player player)
+        {
+            try
+            {
+                _playfieldManager.Missions.ReplayJournal(player);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(
+                    ex,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Mission journal restore failed character={0}; continuing with world visibility",
+                        player.Identity.Instance));
+            }
+
+            try
+            {
+                _playfieldManager.AuthoredQuests.Restore(player);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(
+                    ex,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Authored quest restore failed character={0}; continuing with world visibility",
+                        player.Identity.Instance));
+            }
         }
 
         private void SendRetailWorldEntryReadyBlock(IZoneSession session, Player player)
@@ -851,8 +878,6 @@ namespace ZoneEngine_New.Core.Playfield
             int characterId = player.Identity.Instance;
             _playfieldManager.Dialogues.Detached(player);
             _playfieldManager.Teams.DetachPlayer(player);
-            _playfieldManager.Nanos.DetachPlayer(player);
-            player.NanoRuntime = null;
 
             if (!player.IsPersistenceQuarantined)
             {

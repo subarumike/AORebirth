@@ -100,13 +100,15 @@ namespace ZoneEngine_New.Tests
         public void Complete_starter_vitals_remain_valid_after_player_rebase()
         {
             Player player = PlayerFrom(ValidHydration());
+            Assert.AreEqual(80, player.Stats.GetOrZero(CharacterStat.PercentRemainingHealth));
+            Assert.AreEqual(68, player.Stats.GetOrZero(CharacterStat.PercentRemainingNano));
 
             player.Rebase();
 
             Assert.AreEqual(34, player.Stats.GetOrZero(CharacterStat.MaxHealth));
-            Assert.AreEqual(25, player.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(27, player.Stats.GetOrZero(CharacterStat.Health));
             Assert.AreEqual(32, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
-            Assert.AreEqual(20, player.Stats.GetOrZero(CharacterStat.CurrentNano));
+            Assert.AreEqual(21, player.Stats.GetOrZero(CharacterStat.CurrentNano));
             PlayerSpawnPayloadValidator.RequireValid(player);
         }
 
@@ -266,10 +268,10 @@ namespace ZoneEngine_New.Tests
         }
 
         [DataTestMethod]
-        [DataRow(34, 2_000_000_000, 20)]
-        [DataRow(39, 65, 126)]
-        [DataRow(49, 2_000_000_000, 36)]
-        public void Production_legacy_snapshots_restore_defaults_and_spawn_without_rewriting_saved_stats(int id, int healthMax, int nanoMax)
+        [DataRow(34, 20)]
+        [DataRow(39, 126)]
+        [DataRow(49, 36)]
+        public void Production_legacy_snapshots_restore_defaults_and_spawn_without_rewriting_saved_stats(int id, int nanoMax)
         {
             var assembly = typeof(CharacterSpawnHydrationTests).Assembly;
             using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames()
@@ -289,17 +291,29 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(0, Stat(hydration, CharacterStat.Side));
             Assert.AreEqual(id == 39 ? 17 : 5, Stat(hydration, CharacterStat.RunSpeed));
             CollectionAssert.AreEqual(before, raw.Stats.Select(row => (row.StatId, row.StatValue)).ToArray());
+            int rawHealth = Stat(raw, CharacterStat.Health);
+            int rawMaxHealth = Stat(raw, CharacterStat.MaxHealth);
+            int rawNano = Stat(raw, CharacterStat.CurrentNano);
+            int rawMaxNano = Stat(raw, CharacterStat.MaxNanoEnergy);
+            int healthPercent = rawMaxHealth <= 0
+                ? 100
+                : (int)Math.Clamp((long)rawHealth * 100 / rawMaxHealth, 0, 100);
+            int nanoPercent = rawMaxNano <= 0
+                ? 100
+                : (int)Math.Clamp((long)rawNano * 100 / rawMaxNano, 0, 100);
             Player player = PlayerFrom(hydration);
             player.Rebase();
-            Assert.AreEqual(healthMax, player.Stats.GetOrZero(CharacterStat.MaxHealth));
-            Assert.AreEqual(nanoMax, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
-            Assert.AreEqual(Stat(raw, CharacterStat.Health), player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(Stat(raw, CharacterStat.CurrentNano), player.Stats.GetOrZero(CharacterStat.CurrentNano));
+            int maxHealth = player.Stats.GetOrZero(CharacterStat.MaxHealth);
+            int maxNano = player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy);
+            Assert.IsTrue(maxHealth > 0);
+            Assert.AreEqual(nanoMax, maxNano);
+            Assert.AreEqual(maxHealth * healthPercent / 100, player.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(maxNano * nanoPercent / 100, player.Stats.GetOrZero(CharacterStat.CurrentNano));
             PlayerSpawnPayloadValidator.RequireValid(player);
             PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
             player.Rebase();
-            Assert.AreEqual(healthMax, player.Stats.GetOrZero(CharacterStat.MaxHealth));
-            Assert.AreEqual(nanoMax, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
+            Assert.AreEqual(maxHealth, player.Stats.GetOrZero(CharacterStat.MaxHealth));
+            Assert.AreEqual(maxNano, player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy));
         }
 
         [TestMethod]
@@ -320,15 +334,24 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void Effective_vital_bounds_still_reject_corruption_before_wire_publication()
+        public void Vital_percent_tracks_current_change_and_applies_on_max_rebase()
         {
-            foreach (var stat in new[] { CharacterStat.Health, CharacterStat.CurrentNano })
-            {
-                Player player = PlayerFrom(With(ValidHydration(), stat, 1000));
-                player.Rebase();
-                Assert.ThrowsException<InvalidOperationException>(() => PlayerSpawnPayloadValidator.RequireValid(player));
-                Assert.ThrowsException<InvalidOperationException>(() => PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage()));
-            }
+            Player player = PlayerFrom(ValidHydration());
+            Assert.AreEqual(80, player.Stats.GetOrZero(CharacterStat.PercentRemainingHealth));
+            Assert.AreEqual(68, player.Stats.GetOrZero(CharacterStat.PercentRemainingNano));
+
+            player.Stats.Set(CharacterStat.Health, 15, StatDetail.Base, dirty: true);
+            Assert.AreEqual(48, player.Stats.GetOrZero(CharacterStat.PercentRemainingHealth));
+
+            player.Rebase();
+            int maxHealth = player.Stats.GetOrZero(CharacterStat.MaxHealth);
+            int maxNano = player.Stats.GetOrZero(CharacterStat.MaxNanoEnergy);
+            Assert.IsTrue(maxHealth > 0);
+            Assert.IsTrue(maxNano > 0);
+            Assert.AreEqual(maxHealth * 48 / 100, player.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(maxNano * 68 / 100, player.Stats.GetOrZero(CharacterStat.CurrentNano));
+            PlayerSpawnPayloadValidator.RequireValid(player);
+            PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
         }
 
         private static CharacterHydrationResult ValidHydration()
@@ -344,8 +367,8 @@ namespace ZoneEngine_New.Tests
                 [CharacterStat.Strength] = 6, [CharacterStat.Agility] = 6, [CharacterStat.Stamina] = 6,
                 [CharacterStat.Intelligence] = 6, [CharacterStat.Sense] = 6, [CharacterStat.Psychic] = 6,
                 [CharacterStat.BodyDevelopment] = 5, [CharacterStat.NanoPool] = 5,
-                [CharacterStat.Health] = 25, [CharacterStat.MaxHealth] = 31,
-                [CharacterStat.CurrentNano] = 20, [CharacterStat.MaxNanoEnergy] = 29,
+                [CharacterStat.MaxHealth] = 31, [CharacterStat.Health] = 25,
+                [CharacterStat.MaxNanoEnergy] = 29, [CharacterStat.CurrentNano] = 20,
                 [CharacterStat.RunSpeed] = 100,
             };
             return Result(values);

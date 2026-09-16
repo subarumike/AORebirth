@@ -39,7 +39,7 @@ static class CharacterPersistenceGameplaySmoke
         ((CatalogRoot)(object)data).Root = Path.Combine(Path.GetDirectoryName(binary)!, "GameData");
         var catalog = new ItemTemplateCatalog(new MySqlItemNameRepository(logger, dao), data, logger);
         var builder = new ItemBuilder(catalog, logger);
-        var loader = new CharacterHydrationService(characters, stats, inventory, nanos, logger);
+        var loader = new CharacterHydrationService(characters, stats, inventory, nanos, new MySqlActiveNanoRepository(dao), logger);
         var snapshot = new CharacterSnapshotService(characters, stats, logger);
         Player player = Load();
         var all = (Dictionary<int, ItemTemplate>)typeof(ItemTemplateCatalog).GetField("_templates", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(catalog)!;
@@ -75,9 +75,9 @@ static class CharacterPersistenceGameplaySmoke
         player.Playfield = world;
         var session = new GameplaySession(); session.BindPlayer(player); player.Session = session;
         manager.RegisterPlayer(player); registry.Register(player);
-        using var flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => manager), new MySqlCharacterCoalesceCommit(inventory, nanos, logger), logger);
+        using var flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => manager), new MySqlCharacterCoalesceCommit(inventory, nanos, new MySqlActiveNanoRepository(dao), logger), logger);
         var allocator = new ItemInstanceIdAllocator(inventory, logger);
-        var actions = new InventoryActionService(new MySqlInventoryMutationPersistence(inventory, nanos), flush, allocator, logger, catalog, builder);
+        var actions = new InventoryActionService(new MySqlInventoryMutationPersistence(inventory, nanos), flush, allocator, logger);
         var moves = new InventoryMoveService(logger, flush, actions);
         player.Rebase();
         int baseline = player.Stats.Get(BonusStat);
@@ -143,7 +143,7 @@ static class CharacterPersistenceGameplaySmoke
             var fault = new PersistenceFault { FailAfterWrite = 3 };
             var failureDao = new MySqlCharacterPersistenceDao(() => new FaultConnection(fixture.Open(), fault));
             var faultInventory = new MySqlInventoryRepository(logger, failureDao);
-            var faultActions = new InventoryActionService(new MySqlInventoryMutationPersistence(faultInventory, nanos), flush, allocator, logger, catalog, builder);
+            var faultActions = new InventoryActionService(new MySqlInventoryMutationPersistence(faultInventory, nanos), flush, allocator, logger);
             var faultMoves = new InventoryMoveService(logger, flush, faultActions);
             string equipped = Fingerprint();
             int equipAcks = session.Messages.OfType<ContainerAddItemMessage>().Count();
@@ -189,7 +189,7 @@ static class CharacterPersistenceGameplaySmoke
             var fault = new PersistenceFault { FailAfterWrite = 1 };
             var failureDao = new MySqlCharacterPersistenceDao(() => new FaultConnection(fixture.Open(), fault));
             var faultInventory = new MySqlInventoryRepository(logger, failureDao);
-            var faultActions = new InventoryActionService(new MySqlInventoryMutationPersistence(faultInventory, nanos), flush, allocator, logger, catalog, builder);
+            var faultActions = new InventoryActionService(new MySqlInventoryMutationPersistence(faultInventory, nanos), flush, allocator, logger);
             var faultMoves = new InventoryMoveService(logger, flush, faultActions);
             var claim = new ClientMoveItemToInventoryMessage { Identity = player.Identity,
                 SourceContainer = new Identity { Type = IdentityType.Backpack, Instance = loot.InventoryHandle << 16 }, TargetPlacement = 68 };

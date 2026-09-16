@@ -47,15 +47,15 @@ public sealed class DelmusMergeIntegrationTests
     }
 
     [TestMethod]
-    public void ActorLocalNanosCannotBypassPlayerDaoOwnership()
+    public void PlayerNanosUseActorLocalRuntimeLikeNewZoneEngine()
     {
         Player player = TestWorld.CreatePlayer(901);
         var spell = TestNanos.Create(1000, durationCentiseconds: 1000);
-        Assert.ThrowsExactly<InvalidOperationException>(() => player.TryApplyBuff(spell, player.Identity, DateTime.UtcNow, out _, out _));
-        Assert.ThrowsExactly<InvalidOperationException>(() => player.TryRestoreBuff(spell, player.Identity, 1, DateTime.UtcNow.AddSeconds(10)));
-        Assert.ThrowsExactly<InvalidOperationException>(() => NanoRuntime.TryStartCast(player, 1000, player.Identity, DateTime.UtcNow));
-        Assert.AreEqual(0, player.Buffs.Count);
-        Assert.IsFalse(player.IsCastingNano);
+        Assert.AreEqual(BuffApplyDecision.Apply, player.TryApplyBuff(spell, player.Identity, DateTime.UtcNow, out Buff? applied, out _));
+        Assert.IsNotNull(applied);
+        Assert.AreEqual(1, player.Buffs.Count);
+        Assert.IsNotNull(player.TryRestoreBuff(TestNanos.Create(1001, durationCentiseconds: 1000), player.Identity, 2, DateTime.UtcNow.AddSeconds(10)));
+        Assert.AreEqual(2, player.Buffs.Count);
     }
 
     [TestMethod]

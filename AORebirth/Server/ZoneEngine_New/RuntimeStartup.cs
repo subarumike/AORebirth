@@ -107,7 +107,6 @@ namespace ZoneEngine_New
             if (skipPlayfieldPackagePin)
                 Console.WriteLine("PLAYFIELD_PACKAGE_PIN_SKIPPED local GameData/Playfields is not checked against the pinned manifest.");
             _ = ZoneEngine_New.Core.GameData.WorldContentCatalog.Load(gameData);
-            _ = ZoneEngine_New.Core.GameData.NanoMechanicCatalog.Load(Path.Combine(gameData, "NanoMechanics.json"));
             using (FileStream items = File.OpenRead(Path.Combine(gameData, "items.dat")))
                 if (items.Length == 0) throw new InvalidDataException("Packaged item catalog is empty.");
         }

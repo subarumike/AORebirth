@@ -78,10 +78,12 @@ namespace ZoneEngine_New.Core.GameData
 
         public bool CanResolve(string hash)
         {
-            if (string.IsNullOrEmpty(hash) || string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal))
+            if (string.IsNullOrEmpty(hash))
                 return false;
+            if (CanResolveCore(hash, new HashSet<string>(StringComparer.Ordinal)))
+                return true;
 
-            return CanResolveCore(hash, new HashSet<string>(StringComparer.Ordinal));
+            return CanUseFallback(hash);
         }
 
         public bool TryGetLeaf(string hash, out NpcLeaf leaf)
@@ -99,14 +101,29 @@ namespace ZoneEngine_New.Core.GameData
         public bool TryResolve(string hash, int? level, out MobTemplate template)
         {
             template = null!;
-            if (string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal)) return false;
+            if (string.IsNullOrEmpty(hash))
+                return false;
             if (TryResolveLeaf(hash, out NpcLeaf leaf))
             {
                 template = Materialize(leaf, level);
                 return true;
             }
 
-            return false;
+            if (!CanUseFallback(hash) || !_leaves.TryGetValue(MobTemplate.FallbackHash, out NpcLeaf fallback))
+                return false;
+
+            template = Materialize(fallback, level);
+            return true;
+        }
+
+        bool CanUseFallback(string hash)
+        {
+            if (string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal))
+                return false;
+            if (_leaves.ContainsKey(hash) || _families.ContainsKey(hash))
+                return false;
+
+            return _leaves.ContainsKey(MobTemplate.FallbackHash);
         }
 
         bool CanResolveCore(string hash, HashSet<string> seen)

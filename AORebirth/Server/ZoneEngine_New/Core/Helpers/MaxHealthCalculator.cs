@@ -35,13 +35,6 @@ namespace ZoneEngine_New.Core.Helpers
                 return false;
             }
 
-            // Retain the existing player GM override from Legacy StatLife.
-            if (stats.GetOrZero(CharacterStat.GmLevel) > 0)
-            {
-                maxHealth = 2_000_000_000;
-                return true;
-            }
-
             maxHealth = Compute(
                 Math.Max(1, stats.GetOrZero(CharacterStat.Breed)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.Profession)),

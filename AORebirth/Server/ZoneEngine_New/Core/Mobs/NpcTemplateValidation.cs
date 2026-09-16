@@ -7,7 +7,6 @@ public static class NpcTemplateValidation
 {
     public static bool CanSpawn(MobTemplate template) => template != null
         && !string.IsNullOrWhiteSpace(template.Hash)
-        && !string.Equals(template.Hash, MobTemplate.FallbackHash, StringComparison.Ordinal)
         && !template.UnresolvedPlaceholder && !string.IsNullOrWhiteSpace(template.Name)
         && template.Stats != null;
 

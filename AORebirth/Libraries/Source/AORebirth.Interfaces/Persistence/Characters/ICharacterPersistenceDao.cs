@@ -26,8 +26,13 @@ namespace AORebirth.Interfaces.Persistence.Characters
         void InsertItem(PersistedItemData item);
         void UpdateItemLocation(ItemLocationData location);
         void SaveItemLocations(IList<PersistedItemData> inserts, IList<ItemLocationData> locations);
+        /// <summary>
+        /// <paramref name="activeNanos"/> null means NCU did not change and must not be touched;
+        /// a non-null list (including an empty one) replaces the character's stored NCU.
+        /// </summary>
         void SaveInventoryAndUploadedNanos(int characterId, IList<PersistedItemData> inserts,
-            IList<ItemLocationData> locations, IList<int> uploadedNanoIds);
+            IList<ItemLocationData> locations, IList<int> uploadedNanoIds,
+            IList<PersistedActiveNanoData>? activeNanos = null);
         void CommitInventoryMutation(CharacterInventoryMutationData mutation);
         // Retains the existing item/credit boundary; this does not implement a new trade feature.
         void CommitItemCredits(ItemCreditMutationData mutation);

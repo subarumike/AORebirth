@@ -40,7 +40,7 @@ public sealed class NpcContentIntegrationTests
         string root = Root();
         using var matrix = JsonDocument.Parse(File.ReadAllText(Path.Combine(root,"docs/reports/SUBWAY_NPC_COMBAT_RECONCILIATION.json")));
         string[] names = matrix.RootElement.GetProperty("npcs").EnumerateArray().Select(r => r.GetProperty("name").GetString()!).ToArray();
-        string[] files = ["Mobs/NpcTemplateValidation.cs", "Playfield/SpawnService.cs", "Nanos/NanoService.cs"];
+        string[] files = ["Mobs/NpcTemplateValidation.cs", "Playfield/SpawnService.cs", "Nanos/NanoRuntime.cs"];
         foreach (string file in files)
         {
             string source = File.ReadAllText(Path.Combine(root,"AORebirth/Server/ZoneEngine_New/Core",file));

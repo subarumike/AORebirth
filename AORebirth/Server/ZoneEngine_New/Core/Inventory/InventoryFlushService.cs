@@ -11,7 +11,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Playfield;
 
     /// <summary>
-    /// Per-character write-behind for dirty item locations and uploaded nanos.
+    /// Per-character write-behind for dirty item locations, uploaded nanos and NCU.
     /// Coalesces bursts, writes on a dedicated thread (off playfield tick), hard-flushes on authority boundaries.
     /// Inventory and nano inserts commit in one transaction.
     /// </summary>
@@ -189,19 +189,20 @@ namespace ZoneEngine_New.Core.Inventory
             if (!player.Inventory.IsHydrated)
                 return;
 
-            if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
+            if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos && !player.HasDirtyActiveNanos)
                 return;
 
             lock (player.PersistenceGate)
             {
                 if (player.IsPersistenceQuarantined)
                     throw new InvalidOperationException("Inventory persistence is quarantined pending database reconciliation.");
-                if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos)
+                if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos && !player.HasDirtyActiveNanos)
                     return;
 
                 PlayerInventory.InventoryDirtyFlush? inventory = player.Inventory.TakeDirty();
                 int[] nanos = player.DrainDirtyUploadedNanos();
-                if (inventory == null && nanos.Length == 0)
+                List<ActiveNanoRecord>? activeNanos = player.TakeDirtyActiveNanos();
+                if (inventory == null && nanos.Length == 0 && activeNanos == null)
                     return;
 
                 try
@@ -210,7 +211,8 @@ namespace ZoneEngine_New.Core.Inventory
                         inventory?.Inserts ?? [],
                         inventory?.Updates ?? [],
                         player.Identity.Instance,
-                        nanos);
+                        nanos,
+                        activeNanos);
                     inventory?.MarkNewlyPersisted();
                 }
                 catch (DatabaseCommitOutcomeUnknownException exception)
@@ -225,6 +227,7 @@ namespace ZoneEngine_New.Core.Inventory
                     if (inventory != null)
                         player.Inventory.RestoreDirty(inventory);
                     player.RestoreDirtyUploadedNanos(nanos);
+                    player.RestoreDirtyActiveNanos(activeNanos);
                     _logger.Error(
                         exception,
                         string.Format(

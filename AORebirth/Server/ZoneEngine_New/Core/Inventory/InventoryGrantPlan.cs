@@ -23,8 +23,8 @@ namespace ZoneEngine_New.Core.Inventory
         InventoryGrantPlan(Player player, Item[] items, int[] slots)
         {
             _player = player; _items = items; _slots = slots;
-            Rows = items.Select((item, i) => InventoryActionService.ToRecord(
-                item, player.Inventory.Inventory.Identity, slots[i], item.StackCount)).ToArray();
+            Rows = items.Select((item, i) => item.ToRecord(
+                player.Inventory.Inventory.Identity, slots[i], item.StackCount)).ToArray();
         }
 
         public IReadOnlyList<ItemInstanceRecord> Rows { get; }

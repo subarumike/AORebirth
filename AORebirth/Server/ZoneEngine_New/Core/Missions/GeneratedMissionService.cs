@@ -109,7 +109,7 @@ public sealed class GeneratedMissionService
             {
                 if (!player.Inventory.Inventory.Content.TryGetValue(consumeSlot.Value, out consumed) || !consumed.IsPersisted || consumed.Locked)
                     return Rejected("Exact objective item is unavailable.");
-                observation.ConsumeItem = ToMissionItem(InventoryActionService.ToRecord(consumed, player.Inventory.Inventory.Identity, consumeSlot.Value, consumed.StackCount));
+                observation.ConsumeItem = ToMissionItem(consumed.ToRecord(player.Inventory.Inventory.Identity, consumeSlot.Value, consumed.StackCount));
             }
             observation.Grants = plan.Rows.Select(ToMissionItem).ToArray();
             observation.ObservedAtUtcTicks = _now();

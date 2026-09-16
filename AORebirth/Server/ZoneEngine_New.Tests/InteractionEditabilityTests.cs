@@ -75,18 +75,6 @@ public sealed class InteractionEditabilityTests
         Assert.AreEqual(root.PromptText,messages.OfType<KnuBotAppendTextMessage>().Single().Text);
     }
     [TestMethod]
-    public void Same_binary_resolves_new_summon_nano_and_template_choice_from_reloaded_content()
-    {
-        var content=WorldContentCatalog.Load(Path.Combine(AppContext.BaseDirectory,"GameData"));
-        var original=content.Summons.Single(); original.NanoId=991234; original.Aliases=[991235];
-        original.Hash="TEST"; original.NpcDefinitionKey=content.Npcs.First(x=>x.PlayfieldId>0).Key;
-        var reloaded=WorldContentCatalog.Parse(JsonSerializer.Serialize(content));
-        var specialty=new SummonNanoSpecialization(reloaded);
-        Assert.IsTrue(specialty.Handles(991234)); Assert.IsFalse(specialty.Handles(300439));
-        Assert.AreEqual(991234,specialty.NormalizeNanoId(991235));
-        Assert.AreEqual(original.NpcDefinitionKey,reloaded.Summons.Single().NpcDefinitionKey);
-    }
-    [TestMethod]
     public void Invalid_content_action_reference_is_rejected_before_runtime_mutation()
     {
         var content=Content(); content.Dialogues[DialogueFixture.Stan].Routes[0].Action="absent-action";

@@ -56,7 +56,6 @@ namespace ZoneEngine_New.Core.Inventory
         public void Tick(Playfield playfield, double deltaTime)
         {
             ArgumentNullException.ThrowIfNull(playfield);
-            _actions.Tick(playfield);
             if (deltaTime <= 0)
                 return;
 
