@@ -2,6 +2,12 @@
 
 Updated: 2026-09-15
 
+An isolated retained-implementation purge is IN PROGRESS on
+`codex/purge-retained-legacy-001`. Its starting master is `4159a00c`.
+Mike authorized unavailable optional gameplay instead of preserving old implementations.
+This branch has not passed release acceptance and must not be deployed. Production is
+unchanged. The earlier retirement acceptance below describes the baseline, not this purge.
+
 The accepted NewEngine content cleanup reached master at
 `c5af4ac18a1378dc41c37d31b9ac62ac46c5f8a0`: editable
 NPC/vendor/quest/dialogue/mission/nano content and no

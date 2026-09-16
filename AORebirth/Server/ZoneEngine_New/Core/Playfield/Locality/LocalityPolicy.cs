@@ -1,115 +1,38 @@
-namespace ZoneEngine_New.Core.Playfield.Locality
+namespace ZoneEngine_New.Core.Playfield.Locality;
+using System;
+using System.IO;
+using Utility.Config;
+using ZoneEngine_New.Core.GameData;
+
+/// <summary>Immutable scheduling settings. Zero XML fields mean unspecified.</summary>
+internal sealed record LocalityPolicy(bool EnableCellHeatScheduling, int VisibilityNeighborLevel,
+    int HotNeighborLevel, int WarmNeighborLevel, int CellSleepTimeSeconds, int SpawnRate)
 {
-    using System;
+    internal static LocalityPolicy FromConfig() => FromConfig(ConfigReadWrite.Instance.CurrentConfig?.Locality);
+    internal static LocalityPolicy FromConfig(LocalitySettings? settings) =>
+        Load(Path.Combine(AppContext.BaseDirectory, "GameData", "Locality.json"), settings);
 
-    using Utility.Config;
-
-    using Config = Utility.Config.ConfigReadWrite;
-
-    internal sealed class LocalityPolicy
+    internal static LocalityPolicy Load(string path, LocalitySettings? overrides = null)
     {
-        private const int DefaultVisibilityNeighborLevel = 2;
-        private const int DefaultHotNeighborLevel = 1;
-        private const int DefaultWarmNeighborLevel = 2;
-        private const int DefaultCellSleepTimeSeconds = 30;
-        private const int DefaultSpawnRate = 1;
+        var data = RuleDocument.Read<LocalitySettings>(path);
+        var defaults = Validate(new(data.EnableCellHeatScheduling, data.VisibilityNeighborLevel,
+            data.HotNeighborLevel, data.WarmNeighborLevel, data.CellSleepTime, data.SpawnRate));
+        if (overrides == null) return defaults;
+        return Validate(new(overrides.EnableCellHeatScheduling,
+            Select(overrides.VisibilityNeighborLevel, defaults.VisibilityNeighborLevel),
+            Select(overrides.HotNeighborLevel, defaults.HotNeighborLevel),
+            Select(overrides.WarmNeighborLevel, defaults.WarmNeighborLevel),
+            Select(overrides.CellSleepTime, defaults.CellSleepTimeSeconds),
+            Select(overrides.SpawnRate, defaults.SpawnRate)));
+    }
 
-        private LocalityPolicy(
-            bool enableCellHeatScheduling,
-            int visibilityNeighborLevel,
-            int hotNeighborLevel,
-            int warmNeighborLevel,
-            int cellSleepTimeSeconds,
-            int spawnRate)
-        {
-            EnableCellHeatScheduling = enableCellHeatScheduling;
-            VisibilityNeighborLevel = visibilityNeighborLevel;
-            HotNeighborLevel = hotNeighborLevel;
-            WarmNeighborLevel = warmNeighborLevel;
-            CellSleepTimeSeconds = cellSleepTimeSeconds;
-            SpawnRate = spawnRate;
-        }
-
-        internal bool EnableCellHeatScheduling { get; }
-
-        internal int VisibilityNeighborLevel { get; }
-
-        internal int HotNeighborLevel { get; }
-
-        internal int WarmNeighborLevel { get; }
-
-        internal int CellSleepTimeSeconds { get; }
-
-        /// <summary>Max hash-spawns per awake cell tick.</summary>
-        internal int SpawnRate { get; }
-
-        internal static LocalityPolicy FromConfig()
-        {
-            LocalitySettings? settings =
-                Config.Instance.CurrentConfig == null ? null : Config.Instance.CurrentConfig.Locality;
-            return FromConfig(settings);
-        }
-
-        internal static LocalityPolicy FromConfig(LocalitySettings? settings)
-        {
-            bool enableCellHeatScheduling = settings != null && settings.EnableCellHeatScheduling;
-            int visibility = DefaultVisibilityNeighborLevel;
-            int hot = DefaultHotNeighborLevel;
-            int warm = DefaultWarmNeighborLevel;
-            int sleep = DefaultCellSleepTimeSeconds;
-            int spawnRate = DefaultSpawnRate;
-
-            if (settings != null)
-            {
-                if (settings.VisibilityNeighborLevel > 0)
-                {
-                    visibility = settings.VisibilityNeighborLevel;
-                }
-
-                if (settings.HotNeighborLevel > 0)
-                {
-                    hot = settings.HotNeighborLevel;
-                }
-
-                if (settings.WarmNeighborLevel > 0)
-                {
-                    warm = settings.WarmNeighborLevel;
-                }
-
-                if (settings.CellSleepTime > 0)
-                {
-                    sleep = settings.CellSleepTime;
-                }
-
-                if (settings.SpawnRate > 0)
-                {
-                    spawnRate = settings.SpawnRate;
-                }
-            }
-
-            if (hot > warm)
-            {
-                hot = DefaultHotNeighborLevel;
-                warm = DefaultWarmNeighborLevel;
-            }
-
-            if (warm > visibility)
-            {
-                warm = Math.Min(warm, visibility);
-                if (hot > warm)
-                {
-                    hot = DefaultHotNeighborLevel;
-                    warm = DefaultWarmNeighborLevel;
-                }
-            }
-
-            return new LocalityPolicy(
-                enableCellHeatScheduling,
-                visibility,
-                hot,
-                warm,
-                sleep,
-                spawnRate);
-        }
+    private static int Select(int configured, int packaged) => configured == 0 ? packaged : configured;
+    private static LocalityPolicy Validate(LocalityPolicy policy)
+    {
+        if (policy.HotNeighborLevel <= 0 || policy.HotNeighborLevel > policy.WarmNeighborLevel
+            || policy.WarmNeighborLevel > policy.VisibilityNeighborLevel
+            || policy.CellSleepTimeSeconds <= 0 || policy.SpawnRate <= 0)
+            throw new InvalidDataException("Locality settings require 0 < hot <= warm <= visibility and positive sleep/spawn values.");
+        return policy;
     }
 }

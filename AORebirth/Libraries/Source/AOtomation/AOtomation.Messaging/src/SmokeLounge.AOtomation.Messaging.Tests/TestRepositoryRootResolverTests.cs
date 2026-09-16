@@ -101,7 +101,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 () => TestRepositoryRootResolver.Resolve(start));
             StringAssert.Contains(failure.Message, Path.GetFullPath(start));
             StringAssert.Contains(failure.Message, "AI_START_HERE.md");
-            StringAssert.Contains(failure.Message, "AORebirth/Server/ZoneEngine");
+            StringAssert.Contains(failure.Message, "AORebirth/Server/ZoneEngine_New");
         }
 
         [TestMethod]
@@ -171,7 +171,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             File.WriteAllText(Path.Combine(repositoryRoot, "AI_START_HERE.md"), "test sentinel");
             File.WriteAllText(Path.Combine(repositoryRoot, "AGENTS.md"), "test sentinel");
             Directory.CreateDirectory(
-                Path.Combine(repositoryRoot, "AORebirth", "Server", "ZoneEngine"));
+                Path.Combine(repositoryRoot, "AORebirth", "Server", "ZoneEngine_New"));
             Directory.CreateDirectory(Path.Combine(repositoryRoot, "docs", "ai"));
             File.WriteAllText(
                 Path.Combine(repositoryRoot, "docs", "ai", "WORKFLOW.md"),

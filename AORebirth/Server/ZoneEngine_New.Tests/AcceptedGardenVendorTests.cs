@@ -9,7 +9,7 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine.Core.Playfields;
 using ZoneEngine_New.Core.Data;
-using ZoneEngine_New.Core.Dialogue;
+using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
@@ -22,18 +22,18 @@ using ZoneEngine_New.Core.Trade;
 public sealed class AcceptedGardenVendorTests
 {
     [TestMethod]
-    public void ComposedCatalogHasTwentyTwoNpcActorsButOnlySixteenImplementedDialogueDomains()
+    public void ComposedActorsDoNotEnableRemovedDialogueOrMutatePlayerState()
     {
         Assert.AreEqual(22, SocialNpcFixture.Definitions.Count);
         Assert.AreEqual(17, SocialNpcFixture.Definitions.Count(value => value.Binding.HasDialogue));
         Assert.AreEqual(3, AreteVendorFixture.StandaloneDefinitions.Count);
-        int enabled = 0;
         foreach (var definition in SocialNpcFixture.Definitions)
         {
             using var state = new AuthoredQuestTests.World(definition.Binding.PlayfieldId);
-            if (new DialogueActionRouter(state.Service).TryOpen(state.Player, definition.Binding.ContentNpcIdentity, false, out _)) enabled++;
+            new KnuBotOpenChatWindowMessageHandler().Handle(new KnuBotOpenChatWindowMessage(), state.Session);
+            Assert.AreEqual(0, state.Dao.Calls);
+            Assert.AreEqual(1, state.Session.Messages.OfType<ChatTextMessage>().Count());
         }
-        Assert.AreEqual(16, enabled, "Lorelei's shop cannot masquerade as her missing quest dialogue, and Zyvania transport is not connected.");
     }
 
     [TestMethod]
@@ -114,15 +114,15 @@ public sealed class AcceptedGardenVendorTests
     }
 
     [TestMethod]
-    public void EveryAcceptedGardenActorOpensExactShopFromBothBusinessAnswerAndGenericUse()
+    public void EveryAcceptedGardenActorRejectsDialogueButOpensExactShopFromGenericUse()
     {
         foreach (var placement in GardenVendorFixture.Placements)
         {
             using (var w = new World(placement))
             {
-                Assert.IsTrue(w.Dialogue.Open(w.State.Session, w.Npc.Identity)); w.Drain();
-                Assert.IsTrue(w.Dialogue.Answer(w.State.Session, w.Npc.Identity, 0));
-                AssertShop(w, placement);
+                new KnuBotOpenChatWindowMessageHandler().Handle(new KnuBotOpenChatWindowMessage(), w.State.Session);
+                Assert.IsFalse(w.Trade.TryGetSession(w.State.Player, out _));
+                Assert.AreEqual(0, w.State.Dao.Calls);
             }
             using (var w = new World(placement))
             {
@@ -135,10 +135,10 @@ public sealed class AcceptedGardenVendorTests
     public void DespawnedOrForeignLifetimeGardenActorCannotOpenShopOrContinueBusinessDialogue()
     {
         var placement = GardenVendorFixture.Placements[0];
-        using var w = new World(placement); Assert.IsTrue(w.Dialogue.Open(w.State.Session, w.Npc.Identity)); w.Drain();
+        using var w = new World(placement);
         var impostor = new NpcCharacter(w.Npc.Identity, new StubItemBuilder()) { Name = w.Npc.Name, Playfield = w.Npc.Playfield };
         w.State.Registry.Register(impostor);
-        Assert.IsFalse(w.Dialogue.Answer(w.State.Session, w.Npc.Identity, 0));
+        new KnuBotAnswerMessageHandler().Handle(new KnuBotAnswerMessage(), w.State.Session);
         Assert.IsFalse(w.Npc.TryUse(w.State.Player)); Assert.IsFalse(w.Trade.TryGetSession(w.State.Player, out _));
         Assert.AreEqual(0, w.State.Session.Messages.OfType<ShopUpdateMessage>().Count());
         Assert.AreEqual(0, w.State.Dao.Calls);
@@ -173,10 +173,8 @@ public sealed class AcceptedGardenVendorTests
     {
         internal readonly AuthoredQuestTests.World State;
         internal readonly NpcCharacter Npc;
-        internal readonly DialogueService Dialogue;
         internal readonly TradeService Trade;
         readonly ServiceProvider _services;
-        long _now;
         internal World(GardenVendorFixture.Placement placement)
         {
             State = new(placement.PlayfieldId); var catalog = Catalog(); var items = new StubItemBuilder();
@@ -190,10 +188,8 @@ public sealed class AcceptedGardenVendorTests
             Npc = (NpcCharacter)actor;
             Assert.IsTrue(State.Npcs.TryGetBinding(Npc, out _)); Assert.IsNotNull(Npc.Shop);
             State.Player.Position = new(Npc.Position.xf, Npc.Position.yf, Npc.Position.zf);
-            Dialogue = new(DialogueCatalog.Load(AppContext.BaseDirectory), new DialogueActionRouter(State.Service), () => _now);
         }
-        internal void Drain() { for (int i = 0; i < 10; i++) { _now += 20; Dialogue.Tick(State.Player.Playfield!); } }
-        public void Dispose() { Dialogue.Shutdown(State.Player.Playfield!); Trade.Cancel(State.Player, "fixture complete"); _services.Dispose(); State.Dispose(); }
+        public void Dispose() { Trade.Cancel(State.Player, "fixture complete"); _services.Dispose(); State.Dispose(); }
     }
     sealed class Ids : IItemInstanceIdAllocator { public int Allocate() => throw new InvalidOperationException("Opening frozen stock must not mint persistent inventory."); }
     sealed class NoMutation : ITradePersistence { public void Persist(TradePersistenceBatch batch) => throw new InvalidOperationException("Opening stock must not persist player inventory."); }

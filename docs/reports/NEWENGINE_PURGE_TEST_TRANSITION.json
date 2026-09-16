@@ -1,0 +1,277 @@
+[
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/AcceptedQuestPropTests.cs",
+    "former_cases": [
+      "BothAcceptedPropsMaterializeExactIdentityTemplatePositionAndEightCapturedStatsOnce",
+      "MissingCatalogOrConflictingExistingIdentityCannotMintAQuestCapability",
+      "StrongboxRequiresExactLiveTargetAndDurableOwnedLockpickThenAcknowledgesAfterCommit",
+      "RangeWrongSourceSlotReplacedTargetAndShutdownCannotProgressStrongbox",
+      "RemainsRejectForeignSessionAndPreserveQuestOnRolledBackItemGrant"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/DialogueTests.cs",
+    "former_cases": [
+      "PackagedDialogueUsesAllExistingManifestDataWithoutMakingDataAnActivationCapability",
+      "AcceptedActorOpensExactContentAndDuplicateOpenCannotResetConversation",
+      "StanAcceptedNodeTriggersExistingQuestTransactionExactlyOnceBeforeNextDialogue",
+      "CloseOptionAndExplicitCloseDiscardTheSessionWithoutInventedOptions",
+      "DisconnectAndTransportReplacementCannotInheritDialogueOwnership",
+      "ZoningAndShutdownRemoveQueuedPacketsAndStagedOwnership",
+      "NpcDespawnAndSameIdentityReplacementDoNotTransferCapabilityOrSession",
+      "ForeignPlayerCannotAnswerOrCloseEvenWhenBothAreNearTheSameAcceptedNpc",
+      "RealTeamJoinLeaveAndRejoinCannotTransferDialogueOrStagedRewardOwnership",
+      "DojaTradePinsStagedItemAndDeclineLeavesInventoryAndMissionUntouched",
+      "DojaTradeCommitPublishesAcceptedOnceAndReplayCannotAwardAgain",
+      "DojaTradeStaleItemAndLateFailureDoNotConsumeOrAcknowledge",
+      "DojaTradeUnknownCommitQuarantinesAndDropsTheSessionWithoutRetryOrAcknowledgement",
+      "StanFactoryTradeUsesFourSlotsAndDurableRewardBeforeAcceptedContinuation",
+      "SarahAcceptedDialogueRecoveryTradeAndVernonHandoffUseOneTransactionPerAction",
+      "SarahTradeRollbackPreservesExactArmorAndHasNoAcceptedFrame",
+      "SarahTradeUnknownCommitKeepsStaleMemoryQuarantinedAndNeverAcknowledgesOrRetries",
+      "ZyvaniaCannotClaimSuccessfulDialogueWithoutItsRequiredTransportAdapter",
+      "MarcoPreservesAcceptedBlankPromptAndTwoChoicesWithoutInventingNanoExplanation",
+      "TailorMeasurementUsesExactAcceptedItemAndExistingAtomicGrantBoundary",
+      "Advance",
+      "Drain",
+      "BeginDoja",
+      "Dispose"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+    "former_cases": [
+      "DirectRewardIsNotCappedAndPlansWholeLevelBeforePublication",
+      "SubFloorLegacyProgressNormalizesAgainstSameAcceptedLevelTable",
+      "ShadowLevelUsesSkConversionAndPreservesXpWatermark",
+      "PlanningDoesNotTreatAnUnownedOldBonusAsARebasedContribution",
+      "PersistedFullBarRewardPreservesDistinctDeathPoolWithoutAwardingIt",
+      "ZeroRewardIsNoOpAndForeignPublicationFailsClosed"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionCorpseInteractionTests.cs",
+    "former_cases": [
+      "OpenCloseReopenPreservesWireOrderSingleClaimAndEachDelayedAcknowledgement",
+      "ReconnectedSessionCannotCloseInheritClaimOrReceiveDelayedAcknowledgements",
+      "KnownClaimFailureCancelsAllQueuedAcknowledgementsWithoutAutomaticRetry",
+      "ClosedInitiatingSessionCannotClaimEvenBeforePlayerReferenceIsUnbound",
+      "CorpseReplyForcesAcceptedTemp4WithoutChangingOrdinaryRepliesOrRequestTargets",
+      "Dispose",
+      "BindPlayer",
+      "UnbindPlayer",
+      "TransferToPlayfield",
+      "Send",
+      "Send",
+      "Send",
+      "Send",
+      "SendInitiateCompression",
+      "Close"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionLoginPlanTests.cs",
+    "former_cases": [
+      "ActiveOwnedMissionPreservesExactSavedPositionAndHydratedInventory",
+      "EndedMissionReturnsToFrozenExteriorWithoutMutatingRepositorySnapshot"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionMaterializationTests.cs",
+    "former_cases": [
+      "AllFiveAcceptedBundlesMaterializeThroughActualNpcFactoryWithExactIdentityAndLife",
+      "RecreatedWorldPreservesDamagedMovedAndDeadNpcStateInsteadOfRespawningDefaults",
+      "EveryAcceptedMissionNpcProducesExactLegacyCorpseBytesFromDurableDeath",
+      "EveryBundleRestoresOnlyUnclaimedUnexpiredExactCorpseWithoutNpcRespawn",
+      "ForeignOrIncompletePersistedObjectSetCannotExposeAPartialWorld"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+    "former_cases": [
+      "CapturedBundleHashesUseDaoCanonicalHexWithoutChangingDigest",
+      "SuppliedDurableAllocatorOwnsEveryGeneratedIdentity",
+      "NewRuntimeCannotFallBackToFileIdentityAllocation",
+      "FrozenSqlProjectionPreservesEveryDestinationRewardAndWireField",
+      "SignedSliderValuesAreStoredWithoutByteWrap"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionServiceTests.cs",
+    "former_cases": [
+      "RewardPreservesUnsnapshottedBaseStatsAndPublishesOnlyAfterCommit",
+      "TokenGrantUsesSealedLevelSideAndCountInTheSameRewardTransaction",
+      "CompletionWithoutSealedTokenPolicyFailsClosedBeforeAnyRewardMutation",
+      "FullInventoryLeavesMissionAndRewardUntouched",
+      "KnownRollbackDoesNotPublishOrQuarantineAndAllowsExplicitRetry",
+      "UnknownCommitQuarantinesWithoutPublishingOrRetrying",
+      "ReplayUsesOriginalBindingAndNeverPublishesAnotherKey",
+      "InactiveExpiredIncompleteAndUnownedMissionsCannotGrant",
+      "ExactMissionKeyAndCleanupSupportEveryLegacyOwnedTopLevelPage",
+      "UnopenedBankUsesExactDurableOwnerWithoutCreatingPartialHydration",
+      "BankCleanupKnownRollbackAndUnknownCommitNeverRemoveLiveItems",
+      "ForeignBankNestedContainerAndStaleLoadedArtifactRemainPending",
+      "AcceptedKeyUsesFrozenOwnedArtifactInsteadOfCurrentContentTemplate",
+      "Dispose",
+      "Persist"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionTokenPolicyTests.cs",
+    "former_cases": [
+      "ProgressUsesExactAmbientPopulationAndNeverTheOlderEightySixPercentThreshold",
+      "FullProgressPreservesEveryOfficialLevelTokenCellAndExactFactionPairs"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionCorpseWireTests.cs",
+    "former_cases": [
+      "SharedMissionCorpseTemplateIsUnchangedFromAcceptedLegacySource",
+      "VariableNamesKeepNullAndTailWithoutPaddingAndCashPatchesOnlyValue"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MissionCorpseInteractionLeaseTests.cs",
+    "former_cases": [
+      "DelayedClaimAndAcknowledgementRequireExactSessionWorldAndLiveOwner"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs",
+    "former_cases": [
+      "WeaponPoolAndNpcStatsChangeWithSameBinary",
+      "ArtifactPoolReloadUsesEditedDataWithSameBinary",
+      "MissionLayoutsLoadWithoutProvenancePermission",
+      "AmbiguousMissionWeaponPoolIsRejected",
+      "WeaponAssignmentDoesNotRequireEvidenceMetadata",
+      "RuntimeCombatAcceptsBlankProvenanceButEvidenceAuditStillRequiresIt",
+      "RuntimeCombatStillRejectsMalformedWeaponPacketDataWithoutProvenance"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/InteractionEditabilityTests.cs",
+    "former_cases": [
+      "Same_binary_uses_changed_quest_item_reward_after_data_reload",
+      "Same_binary_uses_changed_dialogue_action_binding_after_data_reload",
+      "Same_binary_projects_edited_dialogue_text_from_existing_pack_model",
+      "Same_binary_resolves_new_summon_nano_and_template_choice_from_reloaded_content",
+      "Invalid_content_action_reference_is_rejected_before_runtime_mutation",
+      "Blank_provenance_does_not_block_valid_operator_authored_quest_reward"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/InteractionContentFixture.cs",
+    "former_cases": [],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MissionNpcCombatPolicyTests.cs",
+    "former_cases": [
+      "Player_combat_nano_capability_requires_the_actual_accepted_combat_owner",
+      "MeleePreservesExistingMissionDifficultyAndPacketPolicy",
+      "AttachedGunSelectsOnlyApprovedPresentTemplateAndActualClampedQuality",
+      "ExistingGunUnavailablePolicyUsesSiw1ButBodyMeshDoesNotSelectGun",
+      "InvalidMissionLevelDoesNotSilentlySelectAnotherVariant"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedCombatCarrierTests.cs",
+    "former_cases": [
+      "NewLoadsUnchangedGeneratedCatalogThroughSharedCarriers",
+      "SharedWeaponValidationAndProductionCopyNeverMutateCapturedStats",
+      "SharedStreamRetainsEvidenceCopiesAndCompletenessGate",
+      "CaptureRuntimeSafetyStillRequiresSafeEvidenceAndProvenInitialization",
+      "SharedWifuBuilderKeepsTemplateOwnerInstanceSlotAndStatOrderDistinct",
+      "SharedAttackBuildersPreserveEveryExplicitWireField",
+      "SharedSequenceValidationRetainsOneShotAndRepeatingTiming"
+    ],
+    "status": "SUPERSEDED_BY_UNSUPPORTED_BOUNDARY",
+    "replacement": "UnavailableGameplayTests",
+    "scope": "No feature implementation remains. DAO/security suites remain required independently; former successful gameplay coverage is not claimed."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/AuthoredQuestTests.cs",
+    "former_cases": [
+      "PackagedAcceptedAuthoredCatalogPreservesExactObjectives",
+      "LockpickGrantRetirementAndMissionHandoffShareOneCommit",
+      "FailedLockpickCommitPreservesSourceMissionInventoryAndNoAcknowledgement",
+      "UnknownAuthoredCommitQuarantinesWithoutMemoryReplayOrSuccessFrames",
+      "MarcoContentsTipRewardAndLiveStatsCommitTogetherWithoutLosingUnsnapshottedValues",
+      "LateMarcoFailureRollsBackEveryGrantSourceMissionAndRewardStat",
+      "FullInventoryAndStaleRowsCannotConsumeOrAdvanceQuest",
+      "DojaUseAcceptsWithoutConsumingAndReplayDoesNotDuplicateJournal",
+      "DojaTurnInCommitsChipFullLevelTokensAndAccountCooldownBeforePublication",
+      "DojaLateFailureRollsBackChipProgressionBothLedgersAndAccountFlags",
+      "DojaUnknownCommitQuarantinesWithoutPublishingOrRetryingRewards",
+      "DojaAccountCooldownBlocksUseAndRestoreRetainsExactRemainingExpiry",
+      "CommonMissionServiceDoesNotReactivateCompletedDojaAfterCooldown",
+      "CompletedDojaCycleCannotPublishFalseFreshAcceptanceOrConsumeAnotherChip",
+      "StrongboxAndThiefFailureNeverAcknowledgeOrPublishPartialGrant",
+      "CompletedFactoryAndArmorCannotRegenerateUnfinishableQuestItems",
+      "SarahRestoreUsesExistingExactJournalBuildersForOnlyActiveMissions",
+      "StrongboxPreservesLockpickAndFactoryTurnInPublishesOnlyAfterCommit",
+      "Dispose",
+      "Debug",
+      "Info",
+      "Warn",
+      "Error",
+      "Error",
+      "Persist",
+      "BindPlayer",
+      "UnbindPlayer",
+      "TransferToPlayfield",
+      "Send",
+      "Send",
+      "Send",
+      "Send",
+      "SendInitiateCompression",
+      "Close"
+    ],
+    "status": "TEST_FIXTURE_RETAINED_GAMEPLAY_CASES_SUPERSEDED",
+    "replacement": "UnavailableGameplayTests"
+  }
+]

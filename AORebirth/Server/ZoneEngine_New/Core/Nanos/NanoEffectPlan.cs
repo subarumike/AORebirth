@@ -47,15 +47,12 @@ namespace ZoneEngine_New.Core.Nanos
             IReadOnlyDictionary<CharacterStat, int>? previousSameNanoModifiers = null)
         {
             plan = new NanoEffectPlan();
-            // No player NanoResist resolution is proven by the existing generic Legacy path.
+            if (!restoring) return false; // New casts require a separate clean implementation.
+            // Saved hostile effects require their own durable-state contract.
             if (nano.Template.Defend.Count != 0 || !nano.Template.SpellList.TryGetValue(EventType.OnUse, out var spells)
                 || spells.Count == 0) return false;
             try
             {
-                bool previousRemoved = false;
-                if (!restoring)
-                    plan.BaseWrites[caster] = new() { [CharacterStat.CurrentNano] =
-                        checked(caster.Stats.GetOrZero(CharacterStat.CurrentNano, StatDetail.Base) - nano.NanoCost) };
                 foreach (ItemSpell spell in spells)
                 {
                     if (spell.TickCount < 0 || spell.TickCount > 1 || spell.TickInterval != 0) return false;
@@ -76,9 +73,6 @@ namespace ZoneEngine_New.Core.Nanos
                             if (nano.DurationCentiseconds <= 0 || !ReferenceEquals(subject, target)
                                 || stat == CharacterStat.Cash || amount == int.MinValue) return false;
                             plan.Modifiers[stat] = checked(plan.Modifiers.GetValueOrDefault(stat) + amount);
-                            // Legacy RecordModifier reverses this nano's previous contributions on
-                            // the first Modify, after the new delta; subsequent Hits see that state.
-                            previousRemoved = true;
                             break;
                         case FunctionType.Hit:
                             if (stat is not (CharacterStat.Health or CharacterStat.CurrentNano)) return false;
@@ -87,33 +81,7 @@ namespace ZoneEngine_New.Core.Nanos
                                 return false;
                             if (amount < 0 || maximum < 0 || amount == int.MaxValue || maximum == int.MaxValue)
                                 return false; // damaging Hit belongs to the damage/resist authority
-                            // Restore the contribution, never replay an instant heal on login.
-                            if (restoring) break;
-                            if (maximum < amount) (amount, maximum) = (maximum, amount);
-                            int delta = amount == maximum ? amount : next(amount, maximum + 1);
-                            if (delta < amount || delta > maximum) throw new InvalidOperationException("Nano random result outside declared range.");
-                            if (!plan.BaseWrites.TryGetValue(subject, out var writes))
-                                plan.BaseWrites[subject] = writes = new();
-                            int current = writes.GetValueOrDefault(stat, subject.Stats.GetOrZero(stat, StatDetail.Base));
-                            CharacterStat maximumStat = stat == CharacterStat.Health ? CharacterStat.MaxHealth : CharacterStat.MaxNanoEnergy;
-                            int projectedMaximum = subject.Stats.GetOrZero(maximumStat);
-                            int projectedBonus = subject.Stats.GetOrZero(stat, StatDetail.Bonus);
-                            if (ReferenceEquals(subject, target))
-                            {
-                                projectedMaximum = checked(projectedMaximum + plan.Modifiers.GetValueOrDefault(maximumStat)
-                                    - (previousRemoved ? previousSameNanoModifiers?.GetValueOrDefault(maximumStat) ?? 0 : 0));
-                                CharacterStat sourceStat = stat == CharacterStat.Health ? CharacterStat.BodyDevelopment : CharacterStat.NanoPool;
-                                int sourceDelta = checked(plan.Modifiers.GetValueOrDefault(sourceStat)
-                                    - (previousRemoved ? previousSameNanoModifiers?.GetValueOrDefault(sourceStat) ?? 0 : 0));
-                                sourceDelta = checked(sourceDelta + NanoDerivedStats.SkillDelta(subject.Stats, sourceStat,
-                                    plan.Modifiers, previousRemoved ? previousSameNanoModifiers : null));
-                                projectedMaximum = checked(projectedMaximum + (stat == CharacterStat.Health
-                                    ? NanoDerivedStats.HealthDelta(subject, sourceDelta) : NanoDerivedStats.NanoDelta(subject, sourceDelta)));
-                                projectedBonus = checked(projectedBonus + plan.Modifiers.GetValueOrDefault(stat)
-                                    - (previousRemoved ? previousSameNanoModifiers?.GetValueOrDefault(stat) ?? 0 : 0));
-                            }
-                            int cap = checked(projectedMaximum - projectedBonus);
-                            writes[stat] = (int)Math.Min(Math.Max(current, cap), (long)current + delta);
+                            // Saved-state hydration never replays an instantaneous effect.
                             break;
                         default: return false;
                     }

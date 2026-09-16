@@ -3,15 +3,7 @@ setlocal EnableExtensions
 
 call "%~dp0select_python_runtime.cmd"
 if errorlevel 1 exit /b 1
-if not "%AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION%"=="" (
-    %AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --_validate-read-delegation
-    if errorlevel 1 exit /b 1
-    goto :generated_combat_read_lease_acquired
-)
-%AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --run-read-lease --read-lease-command-timeout-seconds 14400 -- "%ComSpec%" /d /c "%~f0" %*
-exit /b %errorlevel%
-
-:generated_combat_read_lease_acquired
+rem Generated Legacy combat C# is no longer a build input.
 
 pushd "%~dp0.." >nul
 if errorlevel 1 (
@@ -70,11 +62,16 @@ call tools\run_dao_architecture_guard.cmd
 if errorlevel 1 goto :stage_fail
 echo [AORebirth Gate] PASS 3/12 DAO architecture guard
 
-set "CURRENT_STAGE=4/12 generated combat runtime contracts"
-echo [AORebirth Gate] START %CURRENT_STAGE%
-call tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatProfileCatalog"
+call tools\run_retained_legacy_guard.cmd
 if errorlevel 1 goto :stage_fail
-echo [AORebirth Gate] PASS 4/12 generated combat runtime contracts
+%AO_REBIRTH_PYTHON% -m unittest discover -s Tools/tests -p test_retained_legacy_guard.py
+if errorlevel 1 goto :stage_fail
+
+set "CURRENT_STAGE=4/12 captured combat packet serialization"
+echo [AORebirth Gate] START %CURRENT_STAGE%
+call tools\run_aotomation_messaging_tests.cmd /Settings:"Tools\required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~CapturedEnemyCombatGeneratedPacketFixtureTests"
+if errorlevel 1 goto :stage_fail
+echo [AORebirth Gate] PASS 4/12 captured combat packet serialization
 
 set "CURRENT_STAGE=5/12 complete AOtomation suite"
 echo [AORebirth Gate] START %CURRENT_STAGE%
@@ -94,13 +91,13 @@ call tools\run_temple_acceptance_tests.cmd
 if errorlevel 1 goto :stage_fail
 echo [AORebirth Gate] PASS 7/12 Temple acceptance
 
-set "CURRENT_STAGE=8/12 mission graph and generated mission reproducibility"
+set "CURRENT_STAGE=8/12 mission data and persistence contracts"
 echo [AORebirth Gate] START %CURRENT_STAGE%
 call tools\generate_mission_level_graph.cmd --check
 if errorlevel 1 goto :stage_fail
 call tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~Mission"
 if errorlevel 1 goto :stage_fail
-echo [AORebirth Gate] PASS 8/12 mission graph and generated mission reproducibility
+echo [AORebirth Gate] PASS 8/12 mission data and persistence contracts
 
 set "CURRENT_STAGE=9/12 Git LFS integrity"
 echo [AORebirth Gate] START %CURRENT_STAGE%

@@ -305,7 +305,7 @@ namespace AORebirth.Database.Domain.Missions
                     || binding.CleanupCheckpoints != 0 || nowUtcTicks >= binding.ExpiresAtUtcTicks || currentCash < 0)
                     return GeneratedResult(GeneratedMissionResultStatus.Rejected, "Mission corpse binding is not accessible.");
                 var corpse = connection.Query<GeneratedMissionObject>("SELECT " + ObjectColumns + " FROM generatedmissionobjects WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance AND RuntimeType=50000 AND RuntimeInstance=@runtimeNpcInstance FOR UPDATE", new { ownerId, questType, questInstance, runtimeNpcInstance }, transaction).SingleOrDefault();
-                if (corpse == null || !corpse.IsDead || corpse.CorpseCredits < 21 || corpse.CorpseCredits > 87 || corpse.CorpseExpiresAtUtcTicks <= nowUtcTicks
+                if (corpse == null || !corpse.IsDead || corpse.CorpseCredits < 0 || corpse.CorpseExpiresAtUtcTicks <= nowUtcTicks
                     || nowUtcTicks < corpse.DiedAtUtcTicks + 600 * System.TimeSpan.TicksPerMillisecond)
                     return GeneratedResult(GeneratedMissionResultStatus.Rejected, "Exact durable mission corpse is unavailable.");
                 if (corpse.CorpseClaimed) return new GeneratedMissionResult { Status = GeneratedMissionResultStatus.AlreadyApplied, Binding = binding };
@@ -401,8 +401,8 @@ namespace AORebirth.Database.Domain.Missions
                 || !Finite(value.X) || !Finite(value.Y) || !Finite(value.Z) || !Finite(value.HeadingX) || !Finite(value.HeadingY) || !Finite(value.HeadingZ) || !Finite(value.HeadingW)
                 || value.Level <= 0 || value.CurrentHealth < 0 || value.MaxHealth <= 0 || (value.CurrentHealth.HasValue != value.MaxHealth.HasValue) || value.CurrentHealth > value.MaxHealth
                 || (value.IsDead && value.CurrentHealth.HasValue && (value.CurrentHealth != 0 || value.DiedAtUtcTicks <= 0
-                    || value.DeathActorId < 0 || value.CorpseCredits < 21 || value.CorpseCredits > 87
-                    || value.CorpseExpiresAtUtcTicks - value.DiedAtUtcTicks != 60600 * System.TimeSpan.TicksPerMillisecond))
+                    || value.DeathActorId < 0 || value.CorpseCredits < 0
+                    || value.CorpseExpiresAtUtcTicks <= value.DiedAtUtcTicks || value.CorpseExpiresAtUtcTicks > DateTime.MaxValue.Ticks))
                 || (!value.IsDead && (value.DiedAtUtcTicks != 0 || value.DeathActorId != 0 || value.CorpseCredits != 0 || value.CorpseClaimed || value.CorpseExpiresAtUtcTicks != 0)))
                 throw new ArgumentException("Invalid typed mission object state.");
         }
@@ -502,7 +502,7 @@ namespace AORebirth.Database.Domain.Missions
                 || (value.TeamType == 0) != (value.TeamInstance == 0) || value.TeamType < 0 || value.TeamInstance < 0 || string.IsNullOrWhiteSpace(value.BundleId) || value.BundleId.Length > 128
                 || value.BundleSha256 == null || value.BundleSha256.Length != 64 || value.BundleSha256.Any(c => !(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f')) || value.BuildingType <= 0 || value.BuildingInstance <= 0 || value.LivePlayfield <= 0
                 || value.ObjectiveType <= 0 || value.ObjectiveInstance <= 0 || value.ObjectiveTemplateId <= 0 || value.ObjectiveInteraction < 1 || value.ObjectiveInteraction > 5 || value.RequiredCount <= 0
-                || value.AcceptedAtUtcTicks <= 0 || value.ExpiresAtUtcTicks - value.AcceptedAtUtcTicks != TimeSpan.TicksPerHour * 48 || value.Artifacts == null || value.Artifacts.Any(item => item == null) || value.Artifacts.Count(item => item.InstanceId == value.KeyInstance) != 1
+                || value.AcceptedAtUtcTicks <= 0 || value.ExpiresAtUtcTicks <= value.AcceptedAtUtcTicks || value.ExpiresAtUtcTicks > DateTime.MaxValue.Ticks || value.Artifacts == null || value.Artifacts.Any(item => item == null) || value.Artifacts.Count(item => item.InstanceId == value.KeyInstance) != 1
                 || value.Objects == null || value.Objects.Count == 0 || !value.Objects.Any(item => item.RuntimeType == value.ObjectiveType && item.RuntimeInstance == value.ObjectiveInstance && item.TemplateId == value.ObjectiveTemplateId))
                 throw new ArgumentException("Incomplete accepted mission/key/ACG/objective binding.");
         }

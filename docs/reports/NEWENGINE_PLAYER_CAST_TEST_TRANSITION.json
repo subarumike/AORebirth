@@ -1,0 +1,344 @@
+[
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/BucketheadNanoTests.cs",
+    "test": "Previously_persisted_crystal_alias_resolves_without_uploading_or_rewriting_rows",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Sparrow_cast_interrupts_cannot_complete_child_against_replaced_session_or_dead_owner",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Casting_is_nonblocking_and_completion_order_is_cast_finish_stat_duration",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Pending_and_recharge_reject_duplicate_requests_without_reapplying_cost",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Ordinary_cast_wire_body_matches_existing_typed_contract_not_triggered_npc_fields",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Cost_and_requirements_are_rechecked_at_completion",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Changed_session_cannot_complete_old_cast_and_stale_close_does_not_cancel_new_one",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Jump_cancellation_is_idempotent_and_old_actor_cannot_mutate_new_owner",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Interrupt_notifies_exact_cast_owner_once_without_completion_or_resource_effects",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Old_cast_interruption_never_notifies_replacement_connection",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Locomotion_start_reaches_cancellation_and_owner_notification",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Turning_and_stop_input_do_not_gain_new_cancellation_behavior",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Captured_self_interrupt_request_reaches_action_handler_and_cannot_cancel_another_owner",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Evidence_selected_notice_matches_captured_retail_body",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Unproven_reason_policy_cancels_server_cast_without_guessing_an_outbound_notice",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Death_or_playfield_change_after_start_cannot_land_a_cast",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Attack_timing_uses_existing_init_softcap_aggdef_and_declared_cap",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Same_playfield_target_cast_commits_both_owners_under_ordered_snapshot_gates",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Cross_playfield_out_of_range_and_target_ownership_change_fail_closed",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Real_catalog_warp_uses_declared_timing_one_caster_commit_and_no_ncu_row",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Selected_cast_uses_nonzero_wire_target_or_current_selection_at_completion",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Pending_cast_cancellation_and_postcommit_recipient_fences_prevent_stale_warps",
+    "reason": "Active cast execution or inherited timing parity is obsolete while player casting is explicitly unsupported.",
+    "replacement": "UnavailableGameplayTests verifies rejection without state or persistence mutations; saved-nano hydration/cancellation checks remain."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Ordered_modifier_then_heal_uses_new_maximum_and_refresh_does_not_double_old_bonus",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Attribute_trickle_downstream_health_nano_and_prospective_xp_match_published_actor",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Persistence_failure_does_not_apply_cost_buff_or_success_packets",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Overview_transaction_failure_never_unlocks_map_in_memory_or_on_wire",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Self_refresh_does_not_duplicate_modifier_and_preserves_unrelated_bonus",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Attribute_then_heal_uses_owned_body_trickle_and_expiry_preserves_equipment_baseline",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Instant_heal_uses_declared_inclusive_range_and_caps_without_duration_row",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Direct_xp_refill_durable_plan_equals_published_real_active_bonus_actor",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Body_development_then_heal_uses_projected_derived_maximum",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Direct_xp_plans_equipment_conditions_at_prospective_level_before_durable_refill",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Overview_map_flag_is_committed_with_ncu_and_clears_only_after_actual_removal",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Mana_heal_is_planned_after_cost_in_the_same_durable_write",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Same_strain_replacement_uses_net_ncu_and_removes_only_old_contribution",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoServiceTests.cs",
+    "test": "Indeterminate_commit_quarantines_closes_and_never_retries_memory_projection",
+    "reason": "Cast execution retired; saved-state tests and explicit refusal cover the current boundary."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/BucketheadNanoTests.cs",
+    "test": "Real_catalog_cast_commits_once_then_publishes_exact_vendor_without_ncu",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/BucketheadNanoTests.cs",
+    "test": "Failed_or_unknown_cost_commit_never_spawns_or_replaces",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/BucketheadNanoTests.cs",
+    "test": "Pending_disconnect_cancels_before_commit_and_does_not_publish",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Real_catalog_commits_cost_heal_and_duration_then_one_point_taunt_not_magnitude_damage",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Area_is_twenty_meters_in_two_dimensions_and_never_grants_template_based_combat",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Failed_or_unknown_commit_has_no_heal_damage_or_taunt",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Pending_cast_cannot_survive_owner_lifecycle_change",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Postcommit_recipient_replacement_is_fenced_and_duplicate_completion_cannot_replay",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Restore_keeps_duration_without_replaying_heal_or_taunt",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Edited_taunt_magnitude_is_content_and_never_converted_to_health_damage",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MongoNanoTests.cs",
+    "test": "Child_requirements_select_actual_recipients_and_unmet_branches_never_taunt",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Same_playfield_observers_keep_despawn_setpos_spawn_appearance_order_and_self_full_refresh",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Cross_rubi_ka_warp_ignores_catalog_one_meter_range_and_uses_existing_transfer_queue",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Team_roster_slots_skip_missing_owners_but_count_resolved_restricted_members",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Commit_failure_has_no_warp_and_indeterminate_cost_quarantines_only_caster",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamWarpNanoTests.cs",
+    "test": "Accepted_transfer_rechecks_caster_authority_after_member_departure",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Real_catalog_morph_commits_declared_lifetime_and_owned_modifiers",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Failed_transaction_does_not_publish_morph_modifiers_or_completion",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Allowed_new_sparrow_cast_returns_to_saved_appearance_on_cancel_and_expiry",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Sparrow_low_ncu_child_finishes_once_without_legacy_ghost_duration",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Sparrow_high_ncu_child_and_parent_commit_together_then_child_expires_without_termination_script",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Sparrow_parent_and_child_rollback_or_uncertain_commit_publish_neither",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Sparrow_detach_and_restore_keep_real_rows_without_replaying_nested_effects",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/MorphNanoTests.cs",
+    "test": "Sparrow_cast_in_sl_retains_morph_and_reacquires_only_proven_flight_after_zone_refresh",
+    "reason": "Optional player-cast execution removed. Saved-nano lifecycle and DAO failure cases remain separately tested."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/AmbientRestorationTests.cs",
+    "test": "ENTIRE_OBSOLETE_FEATURE_FIXTURE",
+    "reason": "Removed optional cast orchestration/formula or unused cast-only helper. Current saved-state hydration, DAO rollback/unknown-outcome and no-mutation rejection are tested separately."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoDelayCalculatorTests.cs",
+    "test": "ENTIRE_OBSOLETE_FEATURE_FIXTURE",
+    "reason": "Removed optional cast orchestration/formula or unused cast-only helper. Current saved-state hydration, DAO rollback/unknown-outcome and no-mutation rejection are tested separately."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoCostCalculatorTests.cs",
+    "test": "ENTIRE_OBSOLETE_FEATURE_FIXTURE",
+    "reason": "Removed optional cast orchestration/formula or unused cast-only helper. Current saved-state hydration, DAO rollback/unknown-outcome and no-mutation rejection are tested separately."
+  },
+  {
+    "path": "AORebirth/Server/ZoneEngine_New.Tests/NanoCastRulesTests.cs",
+    "test": "ENTIRE_OBSOLETE_FEATURE_FIXTURE",
+    "reason": "Removed optional cast orchestration/formula or unused cast-only helper. Current saved-state hydration, DAO rollback/unknown-outcome and no-mutation rejection are tested separately."
+  }
+]

@@ -1,0 +1,54 @@
+{
+  "production_modified": false,
+  "rule": "Implement from explicit generic mechanics, protocol evidence and editable data. Never restore retired source or use Legacy behavior as the sole oracle.",
+  "systems": [
+    {
+      "system": "Player weapon combat and weapon-hit resolution",
+      "status": "UNSUPPORTED",
+      "current_boundary": "Attack requests reject before costs or damage. The old damage calculator and weapon swing callback are removed.",
+      "required_contract": "Independent hit/resist/damage planning, ownership and target validation, equipment and ammo accounting, current packet fixtures, and explicit durable mutation boundaries. NPC visibility, presentation and native AI are not combat parity."
+    },
+    {
+      "system": "Generated missions, authored quests, objectives, rewards and generated mission worlds",
+      "status": "UNSUPPORTED",
+      "current_boundary": "Mission request handlers reject before fee, reward, key, world allocation or DAO mutation. Existing rows remain stored. Owned saved mission interiors recover through the explicit saved exterior converter.",
+      "required_contract": "Validated editable content; clean lifecycle state machine; idempotent DAO transitions and reward/item transactions; ownership checks; objective and expiry evidence. Mission-level CSV loading alone does not enable this system."
+    },
+    {
+      "system": "Dialogue and dialogue-mediated trades",
+      "status": "UNSUPPORTED",
+      "current_boundary": "Dialogue requests receive admitted-owner unavailability feedback only. Native player/vendor inventory transactions remain separate.",
+      "required_contract": "Data-driven dialogue nodes, independently owned sessions, condition evaluation, one-shot turn-ins and transaction-backed grants."
+    },
+    {
+      "system": "Team XP eligibility",
+      "status": "UNSUPPORTED",
+      "current_boundary": "TeamXpShareWindow and its eligibility notices are removed. Team membership/chat continue. Native per-player kill contribution arithmetic is not a replacement for team eligibility.",
+      "required_contract": "Independently specified team eligibility/range/level rules, deterministic share rounding and durable player awards."
+    },
+    {
+      "system": "Non-container item use and item-on-item gameplay",
+      "status": "UNSUPPORTED",
+      "current_boundary": "Use requests reject before consuming stacks, applying stat locks, producing items or running effects. Containers, movement, equipment and their DAO integrity remain supported.",
+      "required_contract": "Validated item event plans, current catalog functions, explicit atomic charge/stack/item/stat writes, no speculative fallback effects."
+    },
+    {
+      "system": "New player and NPC nano casts; periodic team heal, team warp and area taunt execution",
+      "status": "UNSUPPORTED",
+      "current_boundary": "Player casts reject. Old cast timing, pending completion and unused NPC cast runtime are removed. Existing durable nano rows still hydrate, project owned stats, cancel and expire. Retired area effects restore their duration without replaying healing or taunts.",
+      "required_contract": "Independent cast timing/cost and requirement specification; transactional costs/effects; authoritative interruption packets; target/session fences and data-driven specializations. Saved-state compatibility must never schedule a new cast."
+    },
+    {
+      "system": "Locality configuration",
+      "status": "CLEAN_REIMPLEMENTATION_COMPLETE",
+      "current_boundary": "Immutable runtime data from Locality.json with explicit XML overrides. Zero means unspecified; negative or inconsistent values reject rather than invoke copied fallback repair logic.",
+      "required_contract": "Same-binary editability and invalid-configuration rejection are covered by LocalityRuleDataTests."
+    },
+    {
+      "system": "Command token parsing",
+      "status": "CLEAN_REIMPLEMENTATION_COMPLETE",
+      "current_boundary": "Whitespace and NUL framing parser only; existing session/GM checks remain at dispatch.",
+      "required_contract": "Keep parser free of game content, world state and persistence."
+    }
+  ]
+}

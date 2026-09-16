@@ -61,14 +61,14 @@ if errorlevel 1 (
 )
 echo GIT_DIFF_CHECK=PASS
 
-call Tools\generate_capture_backed_npc_combat_inventory.cmd --check
+call Tools\run_retained_legacy_guard.cmd
 if errorlevel 1 (
-    echo GENERATED_COMBAT_INTEGRITY=FAIL
+    echo RETAINED_LEGACY_IMPLEMENTATION_GUARD=FAIL
     echo WINDOWS_ACCEPTANCE=FAIL
     popd
     exit /b 13
 )
-echo GENERATED_COMBAT_INTEGRITY=PASS
+echo RETAINED_LEGACY_IMPLEMENTATION_GUARD=PASS
 
 set "BUILD_RESULT=NOT_RUN"
 if "%RUN_BUILD%"=="1" (
@@ -127,7 +127,7 @@ set "EVIDENCE=build-verify\windows-acceptance-%SHORT_SHA%.env"
 >> "%EVIDENCE%" echo SOURCE_SHA_MATCH=PASS
 >> "%EVIDENCE%" echo TRACKED_SOURCE_CLEAN=PASS
 >> "%EVIDENCE%" echo GIT_DIFF_CHECK=PASS
->> "%EVIDENCE%" echo GENERATED_COMBAT_INTEGRITY=PASS
+>> "%EVIDENCE%" echo RETAINED_LEGACY_IMPLEMENTATION_GUARD=PASS
 >> "%EVIDENCE%" echo WINDOWS_CONTRACTS=PASS
 >> "%EVIDENCE%" echo BUILD=%BUILD_RESULT%
 >> "%EVIDENCE%" echo CONTENT_ARCHITECTURE_GUARD=PASS

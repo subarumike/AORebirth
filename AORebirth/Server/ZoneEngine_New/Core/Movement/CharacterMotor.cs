@@ -268,11 +268,7 @@ namespace ZoneEngine_New.Core.Movement
             float z = message.Coordinates.Z;
 
             Playfield? playfield = _character.Playfield;
-            if (playfield is MissionPlayfield mission
-                && !mission.World.AcceptsMovement(_character, new Vector3(x, y, z))) return;
-            if (playfield is MissionPlayfield && _character is Player missionPlayer
-                && !playfield.GetRequiredService<ZoneEngine_New.Core.Missions.GeneratedMissionAcgService>()
-                    .TryPersistPlayerPosition(missionPlayer, new Vector3(x, y, z))) return;
+
             if (playfield != null)
             {
                 PlayfieldLocality locality = playfield.GetRequiredService<PlayfieldLocality>();
@@ -394,14 +390,6 @@ namespace ZoneEngine_New.Core.Movement
                 start.x + (planar.x * dt),
                 endY,
                 start.z + (planar.z * dt));
-
-            // Governed generated interiors retain the existing no-world altitude behavior;
-            // their captured envelope is an ownership bound, never a fabricated floor/mesh.
-            if (_character.Playfield is MissionPlayfield mission && !mission.World.AcceptsMovement(_character, end))
-            {
-                Halt(); _verticalVelocity = 0;
-                return;
-            }
 
             WorldSimulation.PlayfieldWorldSimulation? world = _character.Playfield?.WorldAccess.Instance;
             if (world != null

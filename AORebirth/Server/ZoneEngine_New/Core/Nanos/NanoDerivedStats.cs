@@ -3,13 +3,12 @@ namespace ZoneEngine_New.Core.Nanos
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using AORebirth.Stats;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Helpers;
 
     /// <summary>
-    /// Exact Legacy attribute-to-skill deltas plus the existing New maximum-resource formulas.
+    /// Projects owned stat differences using the editable character rule data.
     /// Only nano-owned differences enter Bonus; baseline equipment/skill ownership is unchanged.
     /// </summary>
     internal static class NanoDerivedStats
@@ -54,28 +53,13 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         private static int Trickle(IReadOnlyDictionary<CharacterStat, int> stats, CharacterStat skill)
-        {
-            int row = (int)skill - 100;
-            if (row < 0 || row > 67 || SkillTrickleTable.table[row, 0] != (int)skill)
-                throw new InvalidOperationException("Legacy skill trickle table identity changed.");
-            // Preserve StatSkill.Trickle's actual double-addition order and floor, not rounding
-            // each ability independently (which loses fractional contribution boundaries).
-            return checked((int)Math.Floor((SkillTrickleTable.table[row, 1] * stats.GetValueOrDefault(CharacterStat.Strength)
-                + SkillTrickleTable.table[row, 3] * stats.GetValueOrDefault(CharacterStat.Stamina)
-                + SkillTrickleTable.table[row, 5] * stats.GetValueOrDefault(CharacterStat.Sense)
-                + SkillTrickleTable.table[row, 2] * stats.GetValueOrDefault(CharacterStat.Agility)
-                + SkillTrickleTable.table[row, 4] * stats.GetValueOrDefault(CharacterStat.Intelligence)
-                + SkillTrickleTable.table[row, 6] * stats.GetValueOrDefault(CharacterStat.Psychic)) / 4));
-        }
+        => ZoneEngine_New.Core.GameData.CharacterRuleData.Current.SkillContribution(stats, skill);
         private static void Add(Dictionary<CharacterStat, int> values, CharacterStat stat, int amount)
             => values[stat] = checked(values.GetValueOrDefault(stat) + amount);
         private static int MaxHealth(IReadOnlyDictionary<CharacterStat, int> stats)
-            => stats.GetValueOrDefault(CharacterStat.GmLevel) > 0 ? 2_000_000_000
-                : MaxHealthCalculator.Compute(Positive(stats, CharacterStat.Breed), Positive(stats, CharacterStat.Profession),
-                Positive(stats, CharacterStat.TitleLevel), Positive(stats, CharacterStat.Level), Positive(stats, CharacterStat.BodyDevelopment));
+            => ZoneEngine_New.Core.GameData.CharacterRuleData.Current.ComputeVital("health", stats);
         private static int MaxNano(IReadOnlyDictionary<CharacterStat, int> stats)
-            => MaxNanoCalculator.Compute(Positive(stats, CharacterStat.Breed), Positive(stats, CharacterStat.Profession),
-                Positive(stats, CharacterStat.TitleLevel), Positive(stats, CharacterStat.Level), Positive(stats, CharacterStat.NanoPool));
+            => ZoneEngine_New.Core.GameData.CharacterRuleData.Current.ComputeVital("nano", stats);
         private static int Positive(IReadOnlyDictionary<CharacterStat, int> stats, CharacterStat stat)
             => Math.Max(1, stats.GetValueOrDefault(stat));
 
@@ -86,9 +70,9 @@ namespace ZoneEngine_New.Core.Nanos
             if (bodyDevelopmentDelta == 0 || stats.GetOrZero(CharacterStat.NPCFamily) > 0
                 || stats.GetOrZero(CharacterStat.GmLevel) > 0) return 0;
             int body = stats.GetOrZero(CharacterStat.BodyDevelopment);
-            int before = MaxHealthCalculator.Compute(Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
+            int before = ZoneEngine_New.Core.GameData.CharacterRuleData.Current.ComputeVital("health", Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
                 Value(stats, CharacterStat.TitleLevel), Value(stats, CharacterStat.Level), Math.Max(1, body));
-            int after = MaxHealthCalculator.Compute(Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
+            int after = ZoneEngine_New.Core.GameData.CharacterRuleData.Current.ComputeVital("health", Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
                 Value(stats, CharacterStat.TitleLevel), Value(stats, CharacterStat.Level), Math.Max(1, checked(body + bodyDevelopmentDelta)));
             return checked(after - before);
         }
@@ -98,9 +82,9 @@ namespace ZoneEngine_New.Core.Nanos
         {
             if (nanoPoolDelta == 0 || stats.GetOrZero(CharacterStat.NPCFamily) > 0) return 0;
             int pool = stats.GetOrZero(CharacterStat.NanoPool);
-            int before = MaxNanoCalculator.Compute(Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
+            int before = ZoneEngine_New.Core.GameData.CharacterRuleData.Current.ComputeVital("nano", Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
                 Value(stats, CharacterStat.TitleLevel), Value(stats, CharacterStat.Level), Math.Max(1, pool));
-            int after = MaxNanoCalculator.Compute(Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
+            int after = ZoneEngine_New.Core.GameData.CharacterRuleData.Current.ComputeVital("nano", Value(stats, CharacterStat.Breed), Value(stats, CharacterStat.Profession),
                 Value(stats, CharacterStat.TitleLevel), Value(stats, CharacterStat.Level), Math.Max(1, checked(pool + nanoPoolDelta)));
             return checked(after - before);
         }

@@ -13,7 +13,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.Nanos;
-    using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
@@ -27,15 +26,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly InventoryActionService _inventoryActions;
         private readonly TeamService _teams;
         private readonly NanoService _nanos;
-        private readonly GeneratedMissionAcgService _missions;
 
-        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams, NanoService nanos,
-            GeneratedMissionAcgService missions)
+        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams, NanoService nanos)
         {
             _inventoryActions = inventoryActions;
             _teams = teams;
             _nanos = nanos;
-            _missions = missions;
         }
 
         public Type MessageBodyType => typeof(CharacterActionMessage);
@@ -127,7 +123,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         break;
 
                     session.Send(target.BuildInfoPacket());
-                    _missions.TryInfoRequest(player, target.Identity);
                     break;
                 }
 

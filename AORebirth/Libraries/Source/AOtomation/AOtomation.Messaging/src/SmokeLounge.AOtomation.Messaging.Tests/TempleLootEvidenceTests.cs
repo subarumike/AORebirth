@@ -231,7 +231,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string current = AppDomain.CurrentDomain.BaseDirectory;
             while (!string.IsNullOrWhiteSpace(current))
             {
-                if (Directory.Exists(Path.Combine(current, "AORebirth", "Server", "ZoneEngine"))
+                if (Directory.Exists(Path.Combine(current, "AORebirth", "Server", "ZoneEngine_New"))
                     && Directory.Exists(Path.Combine(current, "docs", "generated")))
                 {
                     return current;

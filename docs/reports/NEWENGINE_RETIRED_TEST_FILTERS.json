@@ -1,0 +1,132 @@
+[
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~SubwayAcceptanceMatrixTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatProfileCatalogTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatActiveCoverageTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedSubwayRetaliationEligibilityResolverTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~WorldPopulationFoundationTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~AbmouthEncounterRuntimeServiceTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~DungeonNamedEncounterCompletionTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~DungeonNamedLifecycleCompletionTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~SubwayEnemyLootEvidenceTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~WindcallerKarrec\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_subway_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~QuestRuntimePersistenceTests.Karrec\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~TempleAcceptanceMatrixTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatActiveCoverageTests.Pf1931CoverageIncludesEveryOrdinaryNamedSuccessorAndOwnedAdd\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~TempleOfThreeWindsOrdinaryContentTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~DungeonNamedEncounterCompletionTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~DungeonNamedLifecycleCompletionTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatProfileCatalogTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~OrdinaryEnemyCombatSetupGeneratorTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~OfficialDungeonNavigationTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~PlayfieldRuntimeOwnershipTests\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.AzturRoomBossesUseTheSharedFactoryWithCaptureExactBytes\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.ReanimatedCorpseAnchorProfilesUseTheCapturedSharedPacketSequence\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.CultistResolutionRejectsMissingNearestAndCrossEnemyEvidence\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.Level48DeathlessUsesCalculatedDamageWithExactArchetypePacketSemantics\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.LevelThirtyTwoCultistUsesProductionWeaponValuesWithExactCapturedPacketSequence\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  },
+  {
+    "wrapper": "run_temple_acceptance_tests.cmd",
+    "removed_filter": "call \"%RUNNER%\" /Settings:\"%~dp0required-tests.runsettings\" /TestCaseFilter:\"FullyQualifiedName~CapturedEnemyCombatPacketFactoryTests.TempleOrdinaryCoverageRestoresEveryCompleteContract\"",
+    "reason": "Test class retired with its Legacy gameplay fixture; NewEngine rejection/integrity and captured-byte tests replace the runtime contract."
+  }
+]

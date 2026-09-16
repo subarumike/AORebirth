@@ -14,9 +14,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Logging;
-    using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Data;
-    using ZoneEngine.Core.Missions;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
@@ -25,14 +23,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly ICharacterHydrationService _hydration;
         private readonly PlayfieldManager _playfieldManager;
         private readonly IZoneLogger _logger;
-        private readonly GeneratedMissionAcgService _missions;
         private readonly IZoneAdmissionGate _admission;
 
         public ZoneLoginHandler(
             ICharacterHydrationService hydration,
             PlayfieldManager playfieldManager,
             IZoneLogger logger,
-            GeneratedMissionAcgService missions,
             IZoneAdmissionGate admission)
         {
             ArgumentNullException.ThrowIfNull(hydration);
@@ -42,7 +38,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _hydration = hydration;
             _playfieldManager = playfieldManager;
             _logger = logger;
-            _missions = missions ?? throw new ArgumentNullException(nameof(missions));
             _admission = admission ?? throw new ArgumentNullException(nameof(admission));
         }
 
@@ -121,17 +116,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (hydration == null || session.State != SessionState.Loading)
                 return;
 
-            Playfield playfield;
             int storedPlayfield = hydration.Character.Playfield;
-            if (storedPlayfield >= MissionAcgIdentityRanges.MinimumLivePlayfield2
-                && storedPlayfield <= MissionAcgIdentityRanges.MaximumLivePlayfield2)
+            if (SavedMissionLocation.IsMission(storedPlayfield))
             {
-                var plan = _missions.ResolveLogin(characterId, storedPlayfield);
-                hydration = ApplyMissionLoginPlan(hydration, plan);
-                playfield = plan.World != null ? _playfieldManager.GetOrCreateMission(plan.World)
-                    : _playfieldManager.GetOrCreate(plan.PlayfieldId);
+                FailLogin(session, characterId, "Saved mission location requires recovery; missions are unavailable.");
+                return;
             }
-            else playfield = _playfieldManager.GetOrCreate(storedPlayfield);
+            Playfield playfield = _playfieldManager.GetOrCreate(storedPlayfield);
 
             session.SendInitiateCompression();
             SendChatServerInfo(session, playfield, characterId);
@@ -148,21 +139,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             EnqueueSpawn(session, playfield, hydration);
         }
 
-        internal static CharacterHydrationResult ApplyMissionLoginPlan(CharacterHydrationResult hydration, GeneratedMissionLoginPlan plan)
-        {
-            if (plan.Position == null) return hydration;
-            var source = hydration.Character;
-            return new CharacterHydrationResult
-            {
-                Character = new CharacterRecord
-                {
-                    Id = source.Id, Name = source.Name, FirstName = source.FirstName, LastName = source.LastName,
-                    Playfield = plan.PlayfieldId, X = plan.Position.xf, Y = plan.Position.yf, Z = plan.Position.zf,
-                    HeadingX = source.HeadingX, HeadingY = source.HeadingY, HeadingZ = source.HeadingZ, HeadingW = source.HeadingW
-                },
-                Stats = hydration.Stats, Items = hydration.Items, UploadedNanoIds = hydration.UploadedNanoIds
-            };
-        }
+
 
         private void BeginReconnect(IZoneSession session, Player player, int characterId)
         {

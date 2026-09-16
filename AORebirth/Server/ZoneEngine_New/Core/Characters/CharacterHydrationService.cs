@@ -16,13 +16,15 @@ namespace ZoneEngine_New.Core.Characters
         private readonly IInventoryRepository _inventory;
         private readonly IUploadedNanoRepository _uploadedNanos;
         private readonly IZoneLogger _logger;
+        private readonly AORebirth.Interfaces.Persistence.Missions.IGeneratedMissionDao? _savedMissions;
 
         public CharacterHydrationService(
             ICharacterRepository characters,
             IStatRepository stats,
             IInventoryRepository inventory,
             IUploadedNanoRepository uploadedNanos,
-            IZoneLogger logger)
+            IZoneLogger logger,
+            AORebirth.Interfaces.Persistence.Missions.IGeneratedMissionDao? savedMissions = null)
         {
             ArgumentNullException.ThrowIfNull(characters);
             ArgumentNullException.ThrowIfNull(stats);
@@ -35,6 +37,7 @@ namespace ZoneEngine_New.Core.Characters
             _inventory = inventory;
             _uploadedNanos = uploadedNanos;
             _logger = logger;
+            _savedMissions = savedMissions;
         }
 
         public CharacterHydrationResult? LoadForLogin(int characterId)
@@ -45,6 +48,12 @@ namespace ZoneEngine_New.Core.Characters
             CharacterRecord? character = _characters.GetById(characterId);
             if (character == null || character.Playfield <= 0)
                 return null;
+
+            if (SavedMissionLocation.IsMission(character.Playfield))
+            {
+                character = _savedMissions == null ? null : SavedMissionLocation.RestoreExterior(character, _savedMissions.ReadAccepted(characterId));
+                if (character == null) return null;
+            }
 
             var result = new CharacterHydrationResult
             {

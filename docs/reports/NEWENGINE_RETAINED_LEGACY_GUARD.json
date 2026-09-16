@@ -1,0 +1,7 @@
+{
+  "runtime_files_examined": 602,
+  "known_retained_files": 57,
+  "retired_fingerprints": 122,
+  "violations": [],
+  "limits": "Syntactic guard; historical origin and content-special-case review remain separate required audits."
+}

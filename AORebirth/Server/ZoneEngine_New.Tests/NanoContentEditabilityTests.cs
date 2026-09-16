@@ -44,13 +44,13 @@ public sealed class NanoContentEditabilityTests
             ExcludedPlayfields = [127] };
         file.Write(heal, teleport);
         var first = NanoMechanicCatalog.Load(file.Path);
-        Assert.AreEqual((300495, 10), PeriodicTeamHealNanoSpecialization.ResolveTier(100, first.Get(heal.NanoId, heal.Kind)));
-        Assert.IsFalse(TeamTeleportNanoSpecialization.AllowedPlayfield(127, first.Get(teleport.NanoId, teleport.Kind)));
+        Assert.AreEqual((300495, 10), (first.Get(heal.NanoId, heal.Kind).HealTiers.Single().NanoId, first.Get(heal.NanoId, heal.Kind).HealTiers.Single().Amount));
+        CollectionAssert.AreEqual(new[] { 127 }, first.Get(teleport.NanoId, teleport.Kind).ExcludedPlayfields);
         heal.HealTiers[0].NanoId = 300497; heal.HealTiers[0].Amount = 143; teleport.ExcludedPlayfields = [];
         file.Write(heal, teleport);
         var second = NanoMechanicCatalog.Load(file.Path);
-        Assert.AreEqual((300497, 143), PeriodicTeamHealNanoSpecialization.ResolveTier(100, second.Get(heal.NanoId, heal.Kind)));
-        Assert.IsTrue(TeamTeleportNanoSpecialization.AllowedPlayfield(127, second.Get(teleport.NanoId, teleport.Kind)));
+        Assert.AreEqual((300497, 143), (second.Get(heal.NanoId, heal.Kind).HealTiers.Single().NanoId, second.Get(heal.NanoId, heal.Kind).HealTiers.Single().Amount));
+        Assert.AreEqual(0, second.Get(teleport.NanoId, teleport.Kind).ExcludedPlayfields.Length);
     }
 
     [TestMethod]

@@ -1,0 +1,102 @@
+{
+  "scope": "Current runtime source graph. Roslyn content guard plus origin/method review and the explicit semantic findings below; literal identity scanning alone is not a complete audit.",
+  "files": [
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/MarketSendMessage.cs",
+      "generated": false,
+      "generated_classification": null,
+      "special_cases": [
+        {
+          "line": 62,
+          "source": "return this.ItemLowId != 0 && this.ContainerType != 0;",
+          "classification": "PROTOCOL_REQUIREMENT",
+          "basis": "PROTOCOL_REQUIREMENT: zero is the empty market-entry sentinel."
+        }
+      ]
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Serialization/Serializers/Custom/MarketSendMessageSerializer.cs",
+      "generated": false,
+      "generated_classification": null,
+      "special_cases": [
+        {
+          "line": 73,
+          "source": "if (entry.ItemLowId == 0 && entry.ContainerType == 0 && entry.Placement == 0)",
+          "classification": "PROTOCOL_REQUIREMENT",
+          "basis": "PROTOCOL_REQUIREMENT: all-zero fields encode an empty market-entry slot."
+        }
+      ]
+    },
+    {
+      "path": "AORebirth/Libraries/Source/Cell.Core/Localization/Cell.Core.Designer.cs",
+      "generated": true,
+      "generated_classification": "CODE_GENERATION",
+      "special_cases": []
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+      "generated": false,
+      "generated_classification": null,
+      "special_cases": [
+        {
+          "line": 882,
+          "source": "|| (data.PlayfieldId != 0 && data.PlayfieldId != playfieldId))",
+          "classification": "GENERIC_DATA_VALIDATION",
+          "basis": "GENERIC_DATA_VALIDATION: zero is unspecified metadata identity; any supplied identity must match the loaded playfield."
+        },
+        {
+          "line": 886,
+          "source": "if (data.PlayfieldId == 0)",
+          "classification": "GENERIC_DATA_VALIDATION",
+          "basis": "GENERIC_DATA_VALIDATION: zero is unspecified metadata identity; any supplied identity must match the loaded playfield."
+        }
+      ]
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoService.cs",
+      "generated": false,
+      "generated_classification": null,
+      "special_cases": [
+        {
+          "line": 107,
+          "source": "if (state.NextInstance == int.MaxValue && raw.NanoInstance == 0) return false;",
+          "classification": "SAVED_DATA_COMPATIBILITY",
+          "basis": "SAVED_DATA_COMPATIBILITY: zero persisted nano instance is normalized to an owned distinct identity; it selects no nano content."
+        },
+        {
+          "line": 108,
+          "source": "ActiveNanoRecord record = raw.NanoInstance == 0",
+          "classification": "SAVED_DATA_COMPATIBILITY",
+          "basis": "SAVED_DATA_COMPATIBILITY: zero persisted nano instance is normalized to an owned distinct identity; it selects no nano content."
+        },
+        {
+          "line": 115,
+          "source": "normalize |= raw.NanoInstance == 0;",
+          "classification": "SAVED_DATA_COMPATIBILITY",
+          "basis": "SAVED_DATA_COMPATIBILITY: zero persisted nano instance is normalized to an owned distinct identity; it selects no nano content."
+        }
+      ]
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+      "generated": false,
+      "generated_classification": null,
+      "special_cases": [
+        {
+          "line": 611,
+          "source": "int destPlayfieldId = portal.PlayfieldId == 0 ? playfieldId : portal.PlayfieldId;",
+          "classification": "GENERIC_MECHANIC",
+          "basis": "GENERIC_MECHANIC: a portal destination of zero is relative to its current playfield."
+        }
+      ]
+    }
+  ],
+  "generic_mechanics_review": [
+    "PassiveRegenCalculator: native breed/stat regeneration arithmetic, no named NPC/item/content identity; generic mechanic.",
+    "MartialArtsFistResolver: native skill-to-quality mechanic; weapon identities are read from editable ItemBehavior data.",
+    "KillRewardResolver: native per-player contribution/rounding policy; does not contain the removed team eligibility implementation.",
+    "TriggerVolumeCatalog and CellGrid: generic spatial discretization and trigger geometry, no playfield-specific exceptions.",
+    "Mission DAO expiry and corpse credit bounds: fixed gameplay amounts/lifetimes removed; only structural timestamp/nonnegative-value validation remains."
+  ],
+  "unresolved_candidates": 0
+}

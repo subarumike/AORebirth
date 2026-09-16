@@ -31,7 +31,7 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void NpcTagBackedWeaponsSkipWifuAndUseWireOrdinalsInAttackInfo()
+        public void NpcTagBackedWeaponsSkipWifuAndPreserveSpecialAttackTags()
         {
             NpcCharacter npc = CreateNpc();
             npc.ArmFromItemForTests(WeaponSlot.Npc0, MeleeWeapon(instanceId: 101, lowId: 121567), wireSlot: 0, sawHash: "SIW1");
@@ -47,18 +47,6 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual("SIW1", specials[0].Unknown4);
             Assert.AreEqual("SIW3", specials[2].Unknown4);
 
-            CharacterWeapon armed = npc.Weapons[WeaponSlot.Npc2];
-            Assert.AreEqual(2, AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.Npc2, armed.Item, false));
-            Assert.AreEqual(armed.SawTag, AttackInfoRules.ResolveWeaponInstance(armed, armed.Item, false));
-        }
-
-        [TestMethod]
-        public void NpcAttackInfoSlotUsesWireOrdinal()
-        {
-            var armed = new CharacterWeapon { WireSlot = 5, Item = MeleeWeapon(77) };
-            Assert.AreEqual(
-                5,
-                AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.Npc5, armed.Item, attackerIsPlayer: false));
         }
 
         [TestMethod]

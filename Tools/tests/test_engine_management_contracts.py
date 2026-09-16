@@ -214,9 +214,9 @@ def main():
 
     ordered(
         mandatory_gate,
-        "generated combat runtime contracts",
+        "captured combat packet serialization",
         "run_aotomation_messaging_tests.cmd",
-        "CapturedEnemyCombatProfileCatalog",
+        "CapturedEnemyCombatGeneratedPacketFixtureTests",
     )
 
     explicit_capture_tool = read("tools/generate_capture_backed_npc_combat_inventory.cmd")
@@ -225,9 +225,9 @@ def main():
     require("extract_capture_backed_npc_combat.py --self-test" in explicit_capture_tool,
             "explicit capture analyzer self-test must remain available")
     require(
-        "call Tools\\generate_capture_backed_npc_combat_inventory.cmd --check"
+        "call Tools\\run_retained_legacy_guard.cmd"
         in windows_acceptance,
-        "Windows acceptance must validate raw-independent generated-combat integrity",
+        "Windows acceptance must reject retained Legacy implementations",
     )
     require(
         "validate-current" not in windows_acceptance,

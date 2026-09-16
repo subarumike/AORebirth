@@ -316,18 +316,14 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void LevelWarningsUseSharedTableAndOnlyConfirmationDeliversInvite()
+        public void TeamMembershipDoesNotClaimXpEligibilityOrGrantXp()
         {
             foreach (bool tooHigh in new[] { true, false })
             {
                 var f = new Fixture();
                 Player a = f.Player(1, tooHigh ? 64 : 200), b = f.Player(2, tooHigh ? 200 : 64);
                 f.Invite(a, b);
-                CharacterActionMessage warn = f.Session(a).Bodies.OfType<CharacterActionMessage>().Single();
-                Assert.AreEqual(tooHigh ? CharacterActionType.TeamInviteAck : CharacterActionType.TeamInviteTooLow, warn.Action);
-                Assert.AreEqual(b.Identity, warn.Target);
-                Assert.AreEqual(0, f.Session(b).Bodies.Count);
-                f.Invite(a, b, confirmed: true);
+                Assert.IsFalse(f.Session(a).Bodies.OfType<CharacterActionMessage>().Any(m => m.Action == CharacterActionType.TeamInviteTooLow));
                 f.Accept(b, a);
                 Assert.IsTrue(f.Teams.AreTeammates(a, b));
             }
@@ -438,7 +434,7 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void EveryExistingMemberParticipatesInTheXpRangeWarning()
+        public void LevelChangeDoesNotInvokeRemovedXpEligibilityRules()
         {
             var f = new Fixture();
             Player a = f.Player(1, 60), b = f.Player(2, 60), c = f.Player(3, 60);
@@ -446,9 +442,9 @@ namespace ZoneEngine_New.Tests
             b.Stats.Set(CharacterStat.Level, 200); // Updated only by b's owner-side stat event.
             f.Clear();
             f.Invite(a, c);
-            CharacterActionMessage warning = f.Session(a).Bodies.OfType<CharacterActionMessage>().Single();
-            Assert.AreEqual(CharacterActionType.TeamInviteTooLow, warning.Action);
-            Assert.IsFalse(f.Session(c).Bodies.OfType<CharacterActionMessage>().Any());
+            Assert.IsFalse(f.Session(a).Bodies.OfType<CharacterActionMessage>().Any(m => m.Action == CharacterActionType.TeamInviteTooLow));
+            f.Accept(c, a);
+            Assert.IsTrue(f.Teams.AreTeammates(a, c));
         }
 
         [TestMethod]

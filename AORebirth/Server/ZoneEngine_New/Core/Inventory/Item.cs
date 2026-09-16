@@ -135,28 +135,17 @@ namespace ZoneEngine_New.Core.Inventory
             if (Locked)
                 return false;
 
-            if (player.Playfield.GetRequiredService<Missions.AuthoredQuestService>().IsAuthoredItem(this))
-                return player.Playfield.GetRequiredService<Missions.AuthoredQuestService>().TryUseItem(player, slotIdentity, this);
-
-            if (ItemBehaviorContent.Current.FindPackage(this) != null)
-                return player.Playfield.GetRequiredService<InventoryActionService>().TryOpenPackage(player, slotIdentity, this);
-
-            if (InventoryActionService.IsVitalItem(this))
-                return player.Playfield.GetRequiredService<InventoryActionService>().TryUseVitalItem(player, slotIdentity, this);
-
-            if (Identity.Type == IdentityType.Container && Identity.Instance != 0 && Can(CanFlags.Use))
+            if (Identity.Type != IdentityType.Container)
             {
-                if (TryUseBackpack(player, slotIdentity, inventoryRepository, items))
-                    return true;
+                ZoneEngine_New.Core.MessageHandlers.UnavailableGameplay.Reject(player.Session, "Item use");
+                return false;
             }
 
-            if (!Can(CanFlags.Use))
-                return false;
-            if (!Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))
-                return false;
-            if (Can(CanFlags.Consume) && !InventoryActionService.IsProtectedItem(this))
-                return player.Playfield.GetRequiredService<InventoryActionService>().TryUseNanoCrystal(player, slotIdentity, this);
-            return Definition.ExecuteOnUseSpells(player, inventoryRepository, items);
+            if (Identity.Instance != 0 && Can(CanFlags.Use)
+                && TryUseBackpack(player, slotIdentity, inventoryRepository, items))
+                return true;
+            ZoneEngine_New.Core.MessageHandlers.UnavailableGameplay.Reject(player.Session, "Item use");
+            return false;
         }
 
         /// <summary>

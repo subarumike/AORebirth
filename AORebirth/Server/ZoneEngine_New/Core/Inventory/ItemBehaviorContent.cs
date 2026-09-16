@@ -16,6 +16,7 @@ public sealed class ItemBehaviorContent
     public ItemPackageContent[] Packages { get; set; } = [];
     public VitalItemContent[] VitalItems { get; set; } = [];
     public FistWeaponContent[] FistWeapons { get; set; } = [];
+    public SpecialWeaponContent[] SpecialWeapons { get; set; } = [];
     public string[] Provenance { get; set; } = [];
 
     public static ItemBehaviorContent Load(string? gameDataRoot = null)
@@ -39,12 +40,25 @@ public sealed class ItemBehaviorContent
                 || value.Profession.HasValue && !Enum.IsDefined(value.Profession.Value))
             || result.FistWeapons.Select(value => (value.Profession, value.Tier)).Distinct().Count() != result.FistWeapons.Length)
             throw new InvalidDataException("Invalid or ambiguous unarmed weapon assignment.");
+        if (result.SpecialWeapons.Any(w => !Enum.IsDefined(w.Skill) || w.LowId <= 0 || w.HighId <= 0)
+            || result.SpecialWeapons.Select(w => w.Skill).Distinct().Count() != result.SpecialWeapons.Length)
+            throw new InvalidDataException("Invalid or ambiguous special weapon assignments.");
         return result;
     }
 
     public ItemPackageContent? FindPackage(Item item) => Packages.SingleOrDefault(p => p.SourceIds.Contains(item.LowId) || p.SourceIds.Contains(item.HighId));
     public VitalItemContent? FindVitalItem(Item item) => VitalItems.SingleOrDefault(v => v.TemplateIds.Contains(item.LowId) || v.TemplateIds.Contains(item.HighId));
     public bool IsProtected(Item item) => ProtectedItems.Contains(item.LowId) || ProtectedItems.Contains(item.HighId);
+    public SpecialWeaponContent SpecialWeapon(CharacterStat skill)
+        => SpecialWeapons.SingleOrDefault(w => w.Skill == skill && w.LowId > 0 && w.HighId > 0)
+            ?? throw new InvalidDataException("No configured special weapon for skill.");
+}
+
+public sealed class SpecialWeaponContent
+{
+    public CharacterStat Skill { get; set; }
+    public int LowId { get; set; }
+    public int HighId { get; set; }
 }
 
 public sealed class FistWeaponContent

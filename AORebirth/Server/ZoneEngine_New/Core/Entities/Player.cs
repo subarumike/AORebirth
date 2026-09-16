@@ -238,7 +238,7 @@ namespace ZoneEngine_New.Core.Entities
 
         void RebaseMaxHealth()
         {
-            if (!MaxHealthCalculator.TryCompute(Stats, out int maxHealth))
+            if (!ZoneEngine_New.Core.GameData.CharacterRuleData.Current.TryVital("health", Stats, out int maxHealth))
                 return;
 
             Stats.Set(CharacterStat.MaxHealth, maxHealth, StatDetail.Base, dirty: true);
@@ -246,7 +246,7 @@ namespace ZoneEngine_New.Core.Entities
 
         void RebaseMaxNano()
         {
-            if (!MaxNanoCalculator.TryCompute(Stats, out int maxNano))
+            if (!ZoneEngine_New.Core.GameData.CharacterRuleData.Current.TryVital("nano", Stats, out int maxNano))
                 return;
 
             Stats.Set(CharacterStat.MaxNanoEnergy, maxNano, StatDetail.Base, dirty: true);

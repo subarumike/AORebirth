@@ -10,7 +10,6 @@ using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Nanos;
-using ZoneEngine_New.Core.Missions;
 using AORebirth.Database.Domain.Missions;
 using AORebirth.Interfaces.Persistence.Missions;
 
@@ -269,8 +268,11 @@ static partial class ConnectedAcceptanceSmoke
     static void EnterWorld(ConnectedWireClient client)
     {
         client.Send(new CharInPlayMessage { Identity = Character }, Owner);
-        client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == generated.QuestInstance));
-        client.Wait<QuestFullUpdateMessage>(m => m.Quests.Any(q => q.QuestId.Instance == unchecked((int)0x555BE9F6)));
+        client.Wait<CharInPlayMessage>(m => m.Identity == Character);
+        client.Send(new QuestAlternativeMessage { Identity = Character,
+            MissionTerminalIdentity = new Identity { Type = (IdentityType)0xDAC1, Instance = 12345 }, QuestInfos = [] }, Owner);
+        client.Wait<ChatTextMessage>(m => m.Identity == Character && m.Text.Contains("unavailable"));
+        Require(MissionSnapshot() == missionSnapshot, "unsupported-mission-request-preserves-saved-state");
     }
     static void ValidatePlayerPayload(ConnectedWireClient client, Identity identity)
     {

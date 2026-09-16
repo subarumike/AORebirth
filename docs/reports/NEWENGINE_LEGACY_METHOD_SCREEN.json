@@ -1,0 +1,6 @@
+{
+  "scope": "NewEngine method bodies of at least 90 lexical tokens; candidate screen only, not a proof of independent origin.",
+  "old_methods": 3273,
+  "current_methods": 419,
+  "candidates": []
+}

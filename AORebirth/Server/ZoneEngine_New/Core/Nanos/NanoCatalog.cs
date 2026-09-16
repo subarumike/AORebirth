@@ -29,20 +29,10 @@ namespace ZoneEngine_New.Core.Nanos
         public int NanoCost => Attribute(407);
         public int AttackCapCentiseconds => Attribute(523);
 
-        /// <summary>Legacy Character.CalculateNanoAttackTime, using wide arithmetic before bounds checks.</summary>
-        public bool TryCalculateAttackTime(int aggDef, int nanoInit, out int centiseconds)
-        {
-            centiseconds = 0;
-            if (AttackCentiseconds < 0 || AttackCapCentiseconds < 0 || RechargeCentiseconds < 0
-                || NanoCost < 0 || NcuCost < 0 || DurationCentiseconds < 0) return false;
-            long effectiveInit = nanoInit;
-            if (effectiveInit > 1200) effectiveInit = (effectiveInit - 1200) / 3 + 1200;
-            long delay = Math.Min(Math.Max((long)AttackCentiseconds - ((long)aggDef - 25)
-                - (effectiveInit >> 1), AttackCapCentiseconds), AttackCentiseconds);
-            if (delay < 0 || delay > int.MaxValue) return false;
-            centiseconds = (int)delay;
-            return true;
-        }
+        // Structural validation for persisted nano records; no cast scheduling policy.
+        public bool HasValidPersistentFields => AttackCentiseconds >= 0 && AttackCapCentiseconds >= 0
+            && RechargeCentiseconds >= 0 && NanoCost >= 0 && NcuCost >= 0 && DurationCentiseconds >= 0;
+
     }
 
     /// <summary>

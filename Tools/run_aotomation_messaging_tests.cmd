@@ -1,15 +1,10 @@
 @echo off
 call "%~dp0select_python_runtime.cmd"
 if errorlevel 1 exit /b 1
-if not "%AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION%"=="" (
-    %AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --_validate-read-delegation
-    if errorlevel 1 exit /b 1
-    goto :generated_combat_read_lease_acquired
-)
-%AO_REBIRTH_PYTHON% "%~dp0generated_combat_pipeline.py" --run-read-lease -- "%ComSpec%" /d /c "%~f0" %*
-exit /b %errorlevel%
-
-:generated_combat_read_lease_acquired
+rem The messaging suite no longer compiles generated Legacy combat fixtures.
+rem Validate the replacement implementation boundary before compiling current tests.
+call "%~dp0run_retained_legacy_guard.cmd"
+if errorlevel 1 exit /b 1
 setlocal
 
 set "ROOT=%~dp0.."

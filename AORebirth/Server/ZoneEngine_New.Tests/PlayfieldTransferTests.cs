@@ -19,12 +19,10 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 using ZoneEngine_New.Core.Characters;
 using ZoneEngine_New.Core.Data;
-using ZoneEngine_New.Core.Dialogue;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Mobs;
-using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Movement;
 using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Nanos;
@@ -368,7 +366,6 @@ public sealed class PlayfieldTransferTests
             Set(Manager, "<Teams>k__BackingField", new TeamService(dispatchOnOwner: (player, action) =>
                 player.Playfield?.DispatchPlayerProjection(player, action)));
             Set(Manager, "<Nanos>k__BackingField", new NanoService(new EmptyCatalog(), new EmptyNanos()));
-            Set(Manager, "<Dialogues>k__BackingField", new DialogueService(null!, null!));
             _flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => Manager), Persist, new StubLogger());
             Set(_trades, "_gate", new object()); Set(_trades, "_byPlayer", new Dictionary<int, TradeSession>());
         }
@@ -391,7 +388,6 @@ public sealed class PlayfieldTransferTests
                 .AddSingleton(Manager.Teams).AddSingleton(new WorldSimulationAccess())
                 .AddSingleton(new InventoryMoveService(logger, _flush, Blank<InventoryActionService>()))
                 .AddSingleton(_trades)
-                .AddSingleton(new QuestPropService(world, registry, locality, new StubCatalog(), null!))
                 .AddSingleton(accepted)
                 .AddSingleton(new SummonService(world, registry, locality, accepted, itemBuilder, itemCatalog, contentData, milliseconds))
                 .BuildServiceProvider();

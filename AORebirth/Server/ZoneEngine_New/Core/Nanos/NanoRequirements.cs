@@ -7,27 +7,13 @@ namespace ZoneEngine_New.Core.Nanos
     using ZoneEngine_New.Core.Inventory;
 
     /// <summary>
-    /// The two existing AORebirth.Core evaluators are deliberately different: Actions enforce
-    /// And-linked criteria; Events fold Or links, otherwise And. This is their supported scalar
-    /// subset, not an invented general AO expression grammar. Unknown enforced operations fail.
+    /// Scalar event predicates used to decode saved effects. Unsupported operations reject.
+    /// New player action admission remains unavailable.
     /// </summary>
     internal static class NanoRequirements
     {
-        public static bool Action(Player caster, Player target, IEnumerable<ItemRequirement> requirements)
-        {
-            foreach (ItemRequirement requirement in requirements)
-            {
-                // Zero-link criteria were already enforced by New; retain that stronger boundary.
-                if (requirement.ChildOperator is 0 or (int)Operator.And)
-                {
-                    if (!TryOne(caster, target, requirement, out bool met) || !met) return false;
-                }
-                else if (requirement.ChildOperator is not ((int)Operator.Or or (int)Operator.HasRunningNanoLine
-                    or (int)Operator.Unknown)) return false;
-                // The known non-And links above are ignored by the accepted Legacy Action path.
-            }
-            return true;
-        }
+        // Player cast admission is unavailable until its independent rule contract is implemented.
+        public static bool Action(Player caster, Player target, IEnumerable<ItemRequirement> requirements) => false;
 
         public static bool TryEvent(Character caster, Character target, IReadOnlyList<ItemRequirement> requirements, out bool met)
         {
@@ -72,9 +58,6 @@ namespace ZoneEngine_New.Core.Nanos
                 case Operator.Not: met = actual != expected; break;
                 case Operator.True: met = true; break;
                 case Operator.False: met = false; break;
-                // Exact existing RequirementLambdaCreator behavior. Flight-state admission is
-                // separately fenced by explicit server IsVehicle and current playfield authority.
-                case Operator.FlyingAllowed: met = true; break;
                 default: return false;
             }
             return true;

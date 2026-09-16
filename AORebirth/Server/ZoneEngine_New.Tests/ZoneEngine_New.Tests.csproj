@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../ChatEngine/CoreServer/ChatSessionOwnership.cs" Link="ChatSessionOwnership.cs" />
-    <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedEnemyCombatProfileCatalog.g.cs" Link="Fixtures/CapturedEnemyCombatProfileCatalog.g.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Packets/MorphCaptureWireCatalog.cs" Link="Fixtures/MorphCaptureWireCatalog.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipInteractionRules.cs" Link="Fixtures/DojaChipInteractionRules.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipPacketSender.Data.cs" Link="Fixtures/DojaChipPacketSender.Data.cs" />

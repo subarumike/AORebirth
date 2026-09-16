@@ -45,20 +45,6 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void NpcAttackInfoInstanceMatchesSawTag()
-        {
-            Item item = Weapon(144742, 144743, "SingleBreedMonsterWeapon_001");
-            var armed = new CharacterWeapon { Item = item, WireSlot = 0, SawTag = 0x53495731, SawTagName = "SIW1" };
-
-            Assert.AreEqual(
-                0x53495731,
-                AttackInfoRules.ResolveWeaponInstance(armed, item, attackerIsPlayer: false));
-            Assert.AreEqual(
-                0,
-                AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.Npc0, item, attackerIsPlayer: false));
-        }
-
-        [TestMethod]
         public void NpcTagBackedWeaponsDoNotEmitWifu()
         {
             NpcCharacter npc = CreateNpc();

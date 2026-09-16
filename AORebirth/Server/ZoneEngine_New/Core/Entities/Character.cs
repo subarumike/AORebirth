@@ -53,12 +53,6 @@ namespace ZoneEngine_New.Core.Entities
         const int QuestXpCapPercent = 20;
         const double SoftRangeGraceMeters = 1.5;
         const double HardRangeMultiplier = 3.0;
-        const int MartialArtsSpecialLowId = 211357;
-        const int MartialArtsSpecialHighId = 211358;
-        const int DimachSpecialLowId = 42033;
-        const int DimachSpecialHighId = 42032;
-        const int BrawlSpecialLowId = 211401;
-        const int BrawlSpecialHighId = 211402;
 
         protected Character(Identity identity)
             : base(identity)
@@ -80,7 +74,6 @@ namespace ZoneEngine_New.Core.Entities
         {
             if (reason != TimedActionInterrupt.Movement)
                 Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
-            if (this is not Player) NanoRuntime.InterruptCast(this);
             TimedActionsInterrupted?.Invoke(this, reason);
         }
 
@@ -93,7 +86,6 @@ namespace ZoneEngine_New.Core.Entities
 
         public Dictionary<WeaponSlot, CharacterWeapon> Weapons { get; } = new();
 
-        readonly Dictionary<WeaponSlot, Action> _weaponAttackHandlers = new();
         readonly KillRewardResolver _killRewards = new();
 
         /// <summary>Current auto-attack target; <see cref="Identity.None"/> when not fighting.</summary>
@@ -129,8 +121,8 @@ namespace ZoneEngine_New.Core.Entities
 
             _deathNotified = true;
             InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
+            if (this is not Player) RemoveAllBuffs(BuffRemovalReason.Death);
             SetFightingTarget(Identity.None);
-            if (this is not Player) NanoRuntime.ClearBuffsOnDeath(this);
 
             Cell?.Announce(
                 new CharacterActionMessage
@@ -276,66 +268,13 @@ namespace ZoneEngine_New.Core.Entities
 
         internal static int TitleLevelFor(int level)
         {
-            if (level >= 205)
-                return 7;
-            if (level >= 190)
-                return 6;
-            if (level >= 150)
-                return 5;
-            if (level >= 100)
-                return 4;
-            if (level >= 50)
-                return 3;
-            if (level >= 15)
-                return 2;
-            return 1;
+            return ProgressionData.Current.TitleFor(level);
         }
 
-        /// <summary>Lifetime IP earned at <paramref name="level"/> (legacy <c>StatIp</c> brackets).</summary>
+        /// <summary>Lifetime IP from the editable progression bands.</summary>
         internal static int TotalIpEarnedAtLevel(int level)
         {
-            if (level < 1)
-                return 0;
-
-            int earned = 0;
-            int remaining = level;
-            if (remaining > 204)
-            {
-                earned += (remaining - 204) * 600000;
-                remaining = 204;
-            }
-
-            if (remaining > 189)
-            {
-                earned += (remaining - 189) * 150000;
-                remaining = 189;
-            }
-
-            if (remaining > 149)
-            {
-                earned += (remaining - 149) * 80000;
-                remaining = 149;
-            }
-
-            if (remaining > 99)
-            {
-                earned += (remaining - 99) * 40000;
-                remaining = 99;
-            }
-
-            if (remaining > 49)
-            {
-                earned += (remaining - 49) * 20000;
-                remaining = 49;
-            }
-
-            if (remaining > 14)
-            {
-                earned += (remaining - 14) * 10000;
-                remaining = 14;
-            }
-
-            return earned + 1500 + (remaining - 1) * 4000;
+            return ProgressionData.Current.TotalIp(level);
         }
 
         void AwardKillRewards()
@@ -461,19 +400,8 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public virtual void StartFighting(Identity target, byte action)
         {
-            if (this is Player player && (player.IsPersistenceQuarantined
-                || player.NanoRuntime?.IsFightingRestricted(player) == true))
-                return;
-            SetFightingTarget(target);
-            ResetAllWeaponAttacks();
-            Cell?.Announce(BuildSpecialAttackWeaponMessage());
-            Cell?.Announce(
-                new AttackMessage
-                {
-                    Identity = Identity,
-                    Target = target,
-                    Action = action
-                });
+            if (this is Player player && player.Session is { } session)
+                ZoneEngine_New.Core.MessageHandlers.UnavailableGameplay.Reject(session, "Weapon combat");
         }
 
         public virtual SpecialAttackWeaponMessage BuildSpecialAttackWeaponMessage()
@@ -576,8 +504,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            MartialArtsSpecialLowId,
-                            MartialArtsSpecialHighId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.MartialArts).LowId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.MartialArts).HighId,
                             CharacterStat.MartialArts,
                             "MAAT"));
                     maat = true;
@@ -587,8 +515,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            BrawlSpecialLowId,
-                            BrawlSpecialHighId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Brawl).LowId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Brawl).HighId,
                             CharacterStat.Brawl,
                             "BRAW"));
                     brawl = true;
@@ -598,8 +526,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            DimachSpecialLowId,
-                            DimachSpecialHighId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Dimach).LowId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Dimach).HighId,
                             CharacterStat.Dimach,
                             "DIIT"));
                     dimach = true;
@@ -614,8 +542,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            MartialArtsSpecialLowId,
-                            MartialArtsSpecialHighId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.MartialArts).LowId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.MartialArts).HighId,
                             CharacterStat.MartialArts,
                             "MAAT"));
                 }
@@ -624,8 +552,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            BrawlSpecialLowId,
-                            BrawlSpecialHighId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Brawl).LowId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Brawl).HighId,
                             CharacterStat.Brawl,
                             "BRAW"));
                 }
@@ -634,8 +562,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            DimachSpecialLowId,
-                            DimachSpecialHighId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Dimach).LowId,
+                            ItemBehaviorContent.Current.SpecialWeapon(CharacterStat.Dimach).HighId,
                             CharacterStat.Dimach,
                             "DIIT"));
                 }
@@ -724,20 +652,9 @@ namespace ZoneEngine_New.Core.Entities
             if (slot == WeaponSlot.None || weapon == null)
                 return;
 
-            if (Weapons.TryGetValue(slot, out CharacterWeapon? existing) && existing != null
-                && _weaponAttackHandlers.TryGetValue(slot, out Action? existingHandler))
-            {
-                existing.Attacked -= existingHandler;
-                _weaponAttackHandlers.Remove(slot);
-            }
-
             weapon.Wielder = this;
             weapon.LogicalSlot = slot;
-            CharacterWeapon armed = weapon;
-            Action handler = () => ProcessWeaponSwing(armed);
-            _weaponAttackHandlers[slot] = handler;
             Weapons[slot] = weapon;
-            weapon.Attacked += handler;
             weapon.RefreshEffectiveSpeeds();
         }
 
@@ -748,14 +665,10 @@ namespace ZoneEngine_New.Core.Entities
                 if (pair.Value == null)
                     continue;
 
-                if (_weaponAttackHandlers.TryGetValue(pair.Key, out Action? handler))
-                    pair.Value.Attacked -= handler;
-
                 pair.Value.Wielder = null;
                 pair.Value.Item = null;
             }
 
-            _weaponAttackHandlers.Clear();
             Weapons.Clear();
         }
 
@@ -784,7 +697,6 @@ namespace ZoneEngine_New.Core.Entities
                 TickCombat(deltaTime);
             if (!IsDead && UsesPassiveRegen)
                 TickPassiveRegen(deltaTime);
-            if (this is not Player) NanoRuntime.Tick(this, DateTime.UtcNow);
             base.Tick(deltaTime);
         }
 
@@ -889,66 +801,6 @@ namespace ZoneEngine_New.Core.Entities
                 if (weapon != null && weapon.State == WeaponState.Recharging)
                     weapon.Tick(deltaTime);
             }
-        }
-
-        void ProcessWeaponSwing(CharacterWeapon characterWeapon)
-        {
-            Character? target = TryResolveFightingTarget();
-            if (target == null)
-                return;
-
-            if (!HasLineOfSightTo(target))
-                return;
-
-            Item? weapon = characterWeapon.Item;
-            double attackRange = characterWeapon.GetAttackRange();
-
-            double distance = Distance3D(target);
-            if (distance > attackRange * HardRangeMultiplier)
-            {
-                if (IsPlayer)
-                    SetFightingTarget(Identity.None);
-                return;
-            }
-
-            if (distance > attackRange + SoftRangeGraceMeters)
-                return;
-
-            DamageCalculator.DamageResult result = DamageCalculator.CalculateFromWeapon(this, target, weapon);
-            int attackInfoSlot = AttackInfoRules.ResolveWeaponSlot(
-                characterWeapon,
-                characterWeapon.LogicalSlot,
-                weapon,
-                IsPlayer);
-            if (!result.IsHit)
-            {
-                Cell?.Announce(
-                    new MissedAttackInfoMessage
-                    {
-                        Identity = Identity,
-                        Unknown1 = -1,
-                        Unknown2 = attackInfoSlot,
-                        Unknown3 = Identity,
-                        Unknown4 = target.Identity,
-                        Unknown5 = 0
-                    });
-                return;
-            }
-
-            bool killingHit = target.ApplyDamage(this, result.Damage, result.HitType);
-            Cell?.Announce(
-                new AttackInfoMessage
-                {
-                    Identity = Identity,
-                    Target = target.Identity,
-                    Unknown1 = result.Damage,
-                    Unknown2 = AttackInfoRules.ResolveAmmoCount(characterWeapon, weapon, IsPlayer),
-                    Unknown3 = attackInfoSlot,
-                    Unknown4 = killingHit ? 4 : 0,
-                    Unknown5 = (int)result.HitType,
-                    Unknown6 = AttackInfoRules.ResolveWeaponInstance(characterWeapon, weapon, IsPlayer)
-                });
-            // Weapon/unarmed auto-attacks stay AttackInfo-only. HealthDamage is for Hit/nano/status.
         }
 
         /// <summary>
@@ -1084,7 +936,7 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>
         /// Drops a cast bar in flight. An interrupted cast never charges nano and never starts
         /// a recharge lockout, so spam-cancelling a cast buys nothing. Callers that need the
-        /// client cast bar cleared should go through <see cref="NanoRuntime.InterruptCast"/>.
+        /// client cast scheduling requires a separately implemented runtime.
         /// </summary>
         public void CancelNanoCast() => PendingCast = null;
 

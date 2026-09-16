@@ -7,10 +7,10 @@
     {
       "feature": "login/world entry",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Duplicate/closed sessions and hydration failures reject; credential-to-zone handoff is not proven by this fixture.",
+      "boundary": "Authenticated admission and ownership checks remain. Mission interiors require an unambiguous owned saved exterior. Connected acceptance is recorded separately.",
       "tests": [
         "SessionOwnershipTests.cs",
-        "GeneratedMissionLoginPlanTests.cs"
+        "SavedMissionLocationTests.cs"
       ]
     },
     {
@@ -32,7 +32,7 @@
     {
       "feature": "reconnect",
       "status": "SUPPORTED",
-      "boundary": "Exact actor/transport ownership; connected durable sequence remains unproven.",
+      "boundary": "Exact actor/transport ownership; connected logout/relogin and restart receipt recorded separately.",
       "tests": [
         "SessionOwnershipTests.cs",
         "ExactSpawnVisibilityTests.cs"
@@ -86,28 +86,27 @@
     {
       "feature": "mission persistence",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Supported authored/generated owners only; rejected definitions cannot partly progress.",
+      "boundary": "Existing DAO rows preserved; saved exterior conversion is read-only. Mission orchestration and new mission creation are removed.",
       "tests": [
-        "GeneratedMissionServiceTests.cs",
-        "AuthoredQuestTests.cs"
+        "SavedMissionLocationTests.cs",
+        "UnavailableGameplayTests.cs"
       ]
     },
     {
       "feature": "rewards",
-      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Complete planned grants; capacity/unsupported action rejection before transaction.",
+      "status": "UNSUPPORTED_FAIL_CLOSED",
+      "boundary": "Quest/mission rewards reject before grants or debit. This does not claim all native individual XP arithmetic has been deleted.",
       "tests": [
-        "AuthoredQuestTests.cs",
-        "GeneratedMissionServiceTests.cs",
-        "InventoryActionTests.cs"
+        "UnavailableGameplayTests.cs"
       ]
     },
     {
       "feature": "item use",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Transactional dedicated routes; generic Set/Hit/flags/upload reject before any effect.",
+      "boundary": "Containers remain supported. Non-container and item-on-item gameplay reject before stack, lock, stat or DAO mutation.",
       "tests": [
-        "InventoryActionTests.cs"
+        "InventoryActionTests.cs",
+        "UnavailableGameplayTests.cs"
       ]
     },
     {
@@ -123,72 +122,68 @@
     {
       "feature": "NPC interaction",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Validated editable actors and resolved spawn templates; unresolved or structurally invalid records remain inactive. Interaction ownership and range checks remain required.",
+      "boundary": "Editable NPC activation and native vendor transactions remain. Dialogue and quest interactions reject.",
       "tests": [
         "AcceptedNpcActivationTests.cs",
-        "EditableWorldContentTests.cs"
+        "EditableWorldContentTests.cs",
+        "UnavailableGameplayTests.cs"
       ]
     },
     {
       "feature": "combat",
-      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Configured NPC and mission combat mechanics; structural packet/stat validation remains required. Content provenance is informational; unresolved placeholders cannot enter combat.",
+      "status": "UNSUPPORTED_FAIL_CLOSED",
+      "boundary": "Player attacks reject; weapon-hit callback and damage calculator removed. Native AI visibility/targeting is not combat parity.",
       "tests": [
-        "NpcContentIntegrationTests.cs",
-        "MissionNpcCombatPolicyTests.cs"
+        "UnavailableGameplayTests.cs",
+        "NpcContentIntegrationTests.cs"
       ]
     },
     {
       "feature": "loot",
-      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Owned supported corpse transfers; stale/unauthorized actions reject.",
+      "status": "NOT_RELEVANT_TO_CUTOVER",
+      "boundary": "Generated-mission loot and corpse orchestration removed. Remaining native corpse gameplay is not accepted by this operational cutover; inventory ownership/transactions remain mandatory.",
       "tests": [
-        "GeneratedMissionCorpseInteractionTests.cs",
-        "MissionCorpseInteractionLeaseTests.cs"
+        "InventoryActionTests.cs"
       ]
     },
     {
       "feature": "nanos",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Supported catalog graphs/specializations; rejected graphs spend no resources.",
+      "boundary": "New casts reject. Durable active rows restore, cancel and expire without replaying instant effects; unknown outcomes quarantine.",
       "tests": [
         "NanoServiceTests.cs",
-        "MongoNanoTests.cs",
-        "BucketheadNanoTests.cs"
+        "MorphNanoTests.cs"
       ]
     },
     {
       "feature": "pets",
       "status": "UNSUPPORTED_FAIL_CLOSED",
-      "boundary": "No general pet owner; unsupported shell consumption/summon graphs reject. Buckethead is separate.",
+      "boundary": "Shell/non-container use and new casts reject; no general pet ownership lifecycle is enabled.",
       "tests": [
-        "NanoServiceTests.cs",
         "InventoryActionTests.cs",
-        "BucketheadNanoTests.cs"
+        "NanoServiceTests.cs"
       ]
     },
     {
       "feature": "dialogue",
-      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Connected validated action routes only; 27 absent routes remain tracked.",
+      "status": "UNSUPPORTED_FAIL_CLOSED",
+      "boundary": "No dialogue session/tree/trade orchestration remains; admitted-owner requests reject without mutations.",
       "tests": [
-        "DialogueTests.cs",
-        "AuthoredQuestTests.cs"
+        "UnavailableGameplayTests.cs"
       ]
     },
     {
       "feature": "quests",
-      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Supported authored definitions only; action/capacity failures reject before rewards.",
+      "status": "UNSUPPORTED_FAIL_CLOSED",
+      "boundary": "Quest requests reject before content selection, mutation or reward.",
       "tests": [
-        "AuthoredQuestTests.cs",
-        "AcceptedQuestPropTests.cs"
+        "UnavailableGameplayTests.cs"
       ]
     },
     {
       "feature": "morphs",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Four recognized morphs preserve saved baseline; wider graphs/equipment effects are not enabled.",
+      "boundary": "Saved appearance baseline and existing duration/modifiers are restored, cancelled and expired. New morph casts reject.",
       "tests": [
         "MorphNanoTests.cs",
         "MorphVisualPacketTests.cs"
@@ -197,7 +192,7 @@
     {
       "feature": "teams",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Implemented membership and supported warp contracts.",
+      "boundary": "Membership and chat remain; team warps and old XP eligibility are unavailable.",
       "tests": [
         "TeamServiceTests.cs",
         "TeamWarpNanoTests.cs"
@@ -205,20 +200,19 @@
     },
     {
       "feature": "corpses",
-      "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Exact supported corpse lifecycle and leases.",
+      "status": "NOT_RELEVANT_TO_CUTOVER",
+      "boundary": "Generated-mission corpse lifecycle/leases removed. Native corpse gameplay is not a purge acceptance claim.",
       "tests": [
-        "GeneratedMissionCorpseWireTests.cs",
-        "MissionCorpseInteractionLeaseTests.cs"
+        "InventoryActionTests.cs"
       ]
     },
     {
       "feature": "zoning",
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
-      "boundary": "Supported destination/package routes; failed transfer retains source owner.",
+      "boundary": "Current playfield transfers preserve owner on failure; unsupported mission destinations cannot create a mission world.",
       "tests": [
         "PlayfieldTransferTests.cs",
-        "GeneratedMissionLoginPlanTests.cs"
+        "SavedMissionLocationTests.cs"
       ]
     },
     {
@@ -229,6 +223,14 @@
         "RuntimeStartupTests.cs",
         "SessionOwnershipTests.cs",
         "MorphNanoTests.cs"
+      ]
+    },
+    {
+      "feature": "team XP eligibility",
+      "status": "UNSUPPORTED_FAIL_CLOSED",
+      "boundary": "Retained TeamXpShareWindow removed; no replacement eligibility or team reward contract is claimed.",
+      "tests": [
+        "TeamServiceTests.cs"
       ]
     }
   ]

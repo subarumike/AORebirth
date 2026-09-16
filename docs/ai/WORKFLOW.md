@@ -443,21 +443,22 @@ script invocation.
 
 ### Official Mission-Level Graph
 
-Regenerate the compiled graph from the canonical checked-in CSV with:
+Validate the editable mission-level CSV with:
 
 ```cmd
 cmd /d /c tools\generate_mission_level_graph.cmd
 ```
 
-Verify byte-for-byte reproducibility without writing with:
+The historical command name is retained for operators; it generates no C#.
+Its check mode validates the same CSV without changing it:
 
 ```cmd
 cmd /d /c tools\generate_mission_level_graph.cmd --check
 ```
 
 The upstream ODS is provenance only because its mission cells after level 133
-were precision-coerced. Do not generate the complete graph from that ODS and do
-not make production depend on either spreadsheet file.
+were precision-coerced. NewEngine loads the packaged `Missions/MissionLevels.csv`
+at startup. Edits require reloading the data, without recompiling the executable.
 
 ## Database-Wide Official Playfield Placement Import
 
@@ -1029,8 +1030,8 @@ Add `--mandatory-gate` only when the full mandatory integration gate is required
 for that acceptance event. The wrapper fails closed on a source SHA mismatch,
 tracked-source dirt, `git diff --check`, build failure, or mandatory-gate
 failure. It writes non-secret evidence under ignored `build-verify`.
-The wrapper also validates raw-independent accepted generated-combat integrity
-with `--check`; it must not call the strict historical `--validate-current` gate.
+The wrapper also validates the retained-implementation source guard. Archived
+combat-generation tools are not current NewEngine gameplay acceptance.
 
 Production build, packaging, target-platform acceptance and deployment commands
 are maintained in the private operations repository. They consume the exact

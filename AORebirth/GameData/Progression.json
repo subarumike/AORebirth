@@ -1,0 +1,40 @@
+{
+  "startingIp": 1500,
+  "bands": [
+    {
+      "start": 1,
+      "title": 1,
+      "ipPerLevel": 4000
+    },
+    {
+      "start": 15,
+      "title": 2,
+      "ipPerLevel": 10000
+    },
+    {
+      "start": 50,
+      "title": 3,
+      "ipPerLevel": 20000
+    },
+    {
+      "start": 100,
+      "title": 4,
+      "ipPerLevel": 40000
+    },
+    {
+      "start": 150,
+      "title": 5,
+      "ipPerLevel": 80000
+    },
+    {
+      "start": 190,
+      "title": 6,
+      "ipPerLevel": 150000
+    },
+    {
+      "start": 205,
+      "title": 7,
+      "ipPerLevel": 600000
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "EnableCellHeatScheduling": false,
+  "VisibilityNeighborLevel": 2,
+  "HotNeighborLevel": 1,
+  "WarmNeighborLevel": 2,
+  "CellSleepTime": 30,
+  "SpawnRate": 1
+}

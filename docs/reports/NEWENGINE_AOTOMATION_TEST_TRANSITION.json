@@ -1,0 +1,1598 @@
+[
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/AreteFrameworkBootstrapTests.cs",
+    "test_cases": [
+      "CheckedInBootstrapLoadsAreteAndSubwayDialogueAsOneValidatedSet",
+      "TailorDialoguePreservesCapturedPromptsOptionsAndMeasurementBranches",
+      "RuntimeDefinitionCatalogBuildsCheckedInAreteAndKarrecContracts",
+      "DuplicatePacksAcrossManifestsFailClosed",
+      "MissingCheckedInContentThrowsWithResolvedValidationDetails"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatProfileCatalogTests.cs",
+    "test_cases": [
+      "GeneratedCatalogMatchesTheVersionedInventoryAndFailsClosedOnAmbiguousExactBindings",
+      "InventoryDecodeErrorsAreExplicitAndNeverReusedAsMetadataProvenance",
+      "PacketReadyStreamsRequireExactTimingAndDamageWithoutRangeCertification",
+      "AreteNaturalProfilesResolveGeneratedItemDbRangeWithoutContentAuthority",
+      "NonAreteNaturalSelectorRetainsItsExistingCapturedRangeInput",
+      "ShadowPacketProfilesResolveWithoutInventingNaturalAttackRange",
+      "ShadowUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "UncontrollableAngerUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "EmptyShellUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "InfectorUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "NeuralBurnoutUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "LostThoughtUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "DiscardedPetProfilesResolveTheirOrderedCapturedSawStateTransitions",
+      "DiscardedPetUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "SpecializedMatchingRequiresDistinctStreamsAndRepeatingFirstHitEvidence",
+      "SpecializedMatchingEnrichesNoncontinuousDamageInCapturedOrderAndFailsClosedOnAttackInfoMismatch",
+      "GeneratedRuntimeUnsafeProfilesAreNeverSelected",
+      "SingleStreamDefinitionsResolveOrRetainAnExactCorpusBackedUnresolvedRecord",
+      "CultistWithoutAStableWeaponDiscriminatorFailsClosedWhenTwoVariantsAreCompatible",
+      "LevelThirtyTwoCultistsUseTheirUniqueExactWeaponStreamWithProductionValues",
+      "CultistRuntimeLoadoutsResolveWithoutQuarantine",
+      "Md26137SawInitializationRemainsCaptureBoundAndMissingLevelsFailClosed",
+      "ActiveActorAndCultistQuarantineCountsReconcileByUniqueSpawn",
+      "ReanimatedCorpseAnchorsResolveTheirExactCapturedWeaponProfiles",
+      "EumenidesQ20WeaponSelectorResolvesTheExactGeneratedProfile",
+      "WorkmanStrikerResolvesTheExactCapturedStableWeaponProfile",
+      "WorkmanStrikerQ12ResolvesItsOrderedCapturedSawVariant",
+      "WorkmanStrikerUsesTheSelectedProductionQlWithoutNearestLevelSubstitution",
+      "WorkmanStrikerEveryActiveAtomicGenerationResolvesItsCapturedWeaponArchetype",
+      "ViolentVagabondResultDomainRestoresAllTwentyTwoActors",
+      "FinalOrdinaryDungeonCombatCompletionReconcilesAllTwentyFiveActorsAndAll489Resolve",
+      "FilthFleaProductionOwnedValuesResolveEveryCompatibleExactStream",
+      "FilthFleaGeneratedArchetypeRejectsCrossWeaponSpecialSequence",
+      "MolestedMoleculesUsesItsUniqueExactWeaponStreamWithProductionValues",
+      "PrematurePatternUsesExactNaturalStreamsWithProductionValues",
+      "InfectedAttendantUsesExactNaturalStreamWithProductionValues",
+      "ArchitectStrikerUsesReusableNaturalArchetypeAcrossActiveLevels",
+      "SlumRunnerUsesReusableNaturalArchetypeAcrossAllActiveLevels",
+      "ProductionQlFamiliesResolveOnlyExactCapturedLevelWeaponPacketSemantics",
+      "LooterResolvesTheExactCapturedStableWeaponProfile",
+      "FragmentedSoulMathematicalArchetypeCanonicalizesMutableStateWithoutIdentity",
+      "AllSevenPreviouslyQuarantinedLootersResolveLevelExactPacketSemanticsWithProductionQuality",
+      "EveryActiveMeldedPatternsGenerationResolvesItsOwnerLinkedWeaponThroughTheMathematicalSetup",
+      "MeldedPatternsMathematicalSetupFailsClosedOutsideItsLevelAndWeaponDomains",
+      "IncompleteRebuildResolvesTheExactCapturedStableWeaponProfile",
+      "FragmentedSoulResolvesTheExactCapturedStableWeaponProfile",
+      "RedundantScanResolvesItsExactCapturedActiveWeaponProfiles",
+      "DeathlessArchetypeResolutionIsIndependentOfNearestCapturedLevel",
+      "RealRedundantScanWeaponVariantsDoNotShareAnArchetype",
+      "ActiveSubwayAndTempleSpawnsAreEitherExactSourceCertifiedOrFailClosed",
+      "RemainingSubwayCombatScopeEnumeratesTheExactInScopeActors",
+      "FinalFixedSubwayScopeRestoresFourteenActorsAndEveryAtomicVariant"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgAcceptedProjectionTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "AllFiveAcceptedProjectionsRoundTripExactlyAcrossRestart",
+      "HighBitIssuingTerminalInstanceRemainsConcreteInAcceptedProjection",
+      "RequestSlidersRemainIndependentFromCapturedResponseEnvelope",
+      "FrozenTextRewardsItemsActionsAndQfuContractsSurviveRestart",
+      "TamperedTruncatedPartialAndUnknownVersionRecordsFailClosed",
+      "DuplicateAcceptedIdentityAndOwnerOfferAreRejected",
+      "AtomicTemporaryContentIsNotPublishedAsAcceptedState",
+      "ConcurrentDuplicateOwnerOfferCreationPublishesExactlyOneProjection",
+      "EveryAcceptancePhaseRoundTripsWithoutChangingFrozenOrBoundFields",
+      "StalePhaseReplacementCannotOverwriteTerminalLifecycle",
+      "ExpiredOfferClaimCleanupPersistsAndReleasesItsAllocatorReservation"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgBindingPersistenceTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "NewBindingHasDistinctAcceptedAndOfferIdentities",
+      "SameSelectionInputsChooseSameBundle",
+      "ReloadPreservesBundleBuildingPlayfieldKeyEntranceAndExpiry",
+      "TwoAcceptedMissionsAndTwoOwnersReceiveDistinctLivePlayfields",
+      "SameTypeMissionsRemainExactlyResolvableByAcceptedIdAndKey",
+      "SoloOwnershipRejectsWrongOwnerAndDoesNotInferTeam",
+      "ExteriorMarkerResolutionRejectsAmbiguousSameEntrance",
+      "AllocatedPlayfieldNeverUsesCapturedOrLegacySharedPlayfield",
+      "DuplicateAcceptedQuestRecordsFailClosed",
+      "DuplicateActivePlayfieldRecordsFailClosed",
+      "MissingBundleFailsClosed",
+      "BuildingMismatchFailsClosed",
+      "PayloadHashMismatchFailsClosed",
+      "UnknownVersionFailsClosed",
+      "TruncatedSidecarFailsClosed",
+      "TemporaryAtomicWriteIsNeverVisibleAsRecord",
+      "PersistenceFailureCanRollbackAllUnpersistedReservations",
+      "PlayfieldExhaustionFailsWithoutReturningSharedOrCapturedPf",
+      "RestoredReservationsAreAppliedBeforeNewAllocation",
+      "DuplicateRestoreReservationFails",
+      "ExpiredAndAbandonedBindingsBlockEntry",
+      "PlayfieldReleaseRequiresTerminalCleanupAndAffectsOnlyOwnBinding",
+      "RestartRestoresPendingReleaseHoldBeforePf2Reuse",
+      "OutdoorReturnStampRequiresExactAcceptedQuestAndLivePf2",
+      "SameAcceptedQuestReservationRetryReturnsTheSamePlayfield",
+      "WrongAcceptedQuestCannotReleaseAnotherReservation",
+      "FailedRestoreDoesNotLeavePartialReservations",
+      "ActiveBindingSurvivesShutdownStyleReload",
+      "SidecarsAreIsolatedFromAuthoredQuestPersistence",
+      "CatalogRegressionKeepsFiveSelectableAndIncompleteShapeExcluded"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgExpiryStateStoreTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "CreateFreezesExactBindingIdentityAndDetectsAtBoundary",
+      "CheckpointsAndStatusAdvanceMonotonically",
+      "MissingCheckpointPredecessorFailsClosed",
+      "CompleteRequiresEveryVerifiedReleaseCheckpoint",
+      "ExpiryBoundaryAndCompletionRacePolicyAreDeterministic",
+      "InvalidTimestampFailsClosed",
+      "StoreRoundTripPreservesHashProtectedState",
+      "AtomicReplacementPreservesMonotonicProgress",
+      "ReplacementRejectsCheckpointRegression",
+      "DuplicateAcceptedQuestFailsClosed",
+      "UnknownVersionTruncationAndIntegrityMismatchFailClosed",
+      "OrphanAndBindingIdentityMismatchFailClosed",
+      "ReleaseRequiresJournalAndIndependentRuntimeProof",
+      "AttemptedReleaseCanRecoverOnlyFromVerifiedTotalAbsence"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgLayoutCatalogTests.cs",
+    "test_cases": [
+      "BundleDefensivelyCopiesMutableInputsAndPacketAccessors",
+      "InstanceBindingPreservesAllRuntimeIdentityAndExpiryFields",
+      "CatalogSnapshotsInputsAndKeepsExplicitIncompleteShapeExcluded",
+      "CatalogValidationRejectsEmptyDuplicateAndIncompleteInputs",
+      "CatalogValidationRejectsTruncatedPayloadAndBuildingMismatch",
+      "CatalogLoadFailsClosedWhenNoValidLayoutExists",
+      "SelectorIsStableForSameInputAndIndependentOfPoolOrdering",
+      "SelectorCanVaryAcrossSeedsButRemainsInsideAdmittedPool",
+      "SelectorReturnsSingleEligibleBundleAndFailsClosedOtherwise",
+      "GeneratorPayloadHashIsStableAndSensitiveToExactBytes",
+      "LegacyFactoryKeepsEightStructuralBundlesNonSelectableAndExcludes1441804",
+      "SelectorIgnoresLegacyStructuralBundlesAndUsesGeneratedSelectableBundle",
+      "SelectorFailsClosedForLegacyStructuralOnlyCatalog",
+      "DefaultCatalogLoadsFiveCapturedSelectableBundlesAndEightLegacyAuditBundles",
+      "CatalogValidationRejectsUnsupportedFormatAndIndependentHashMismatch",
+      "CatalogValidationRejectsWireIdentityPlayfieldAndRetargetMismatches",
+      "GeometryRecordsRejectNonFiniteValuesAtConstruction",
+      "RuntimeContractsRejectOutOfDomainEnumValues",
+      "CatalogValidationRejectsConflictingNpcObjectiveIdentityAlias"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgObjectiveCompletionTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "AllFiveContractsBindOneCapturedSlotToOneRuntimeIdentity",
+      "AbandonedExpiredAndCleanedObjectivesCannotResumeCompletion",
+      "CleanupCompletionRequiresBothDurableOwners",
+      "PfReleaseGateRequiresVerifiedTerminalCleanup",
+      "BindingTransitionsRejectStaleStateVersions",
+      "ExactKeyLookupNeverConsumesAnotherAcceptedMissionsKey",
+      "ExactRoutingRejectsWrongOwnerTeamPfRuntimeTemplateNameAndReplay",
+      "SameTemplateTargetsAndSameTypeMissionsRemainIndependent",
+      "FindPersonFindItemReturnAndRepairUseDistinctCapturedContracts",
+      "ReturnAndRepairRequireExactInventoryInstanceAndTerminalOrMachine",
+      "ObjectiveAndCompletionJournalRoundTripPreservesEveryIdentityAndFrozenClaim",
+      "JournalRejectsTruncationUnknownVersionIntegrityMismatchAndIgnoresTemp",
+      "LegacyV1ClaimsMigrateGrantedAndFailClosedForPendingApplication",
+      "ObjectiveStoreCompareAndSwapRejectsAStaleExpectedRecord",
+      "DurableClaimsAndDeliveriesAdvanceMonotonicallyWithFrozenOwnership",
+      "UninitializedClaimsCannotSkipTheFrozenEligibilityBoundary",
+      "DurablePhasesAndGrantStatesCannotRegressOrDuplicate",
+      "EveryDurableCompletionPhaseRoundTripsForRestartRecovery",
+      "StageOneTwoThreeAndAllocationRegressionsRemainExact"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgOperationalRuntimeTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "OperationalFormatIsVersionThreeWithExplicitLegacySupport",
+      "LegacyCapturedDifficultyMigratesWithoutLosingMutableState",
+      "NpcRuntimeIdentityRoundTripsWithoutCapturedPfLeakage",
+      "SameCapturedSlotInTwoPf2InstancesHasDifferentRuntimeIdentity",
+      "DeadNpcAndCorpseOwnershipSurviveRestart",
+      "ExactDeathWitnessAndHookCheckpointSurviveRestart",
+      "LegacyVersionTwoDeadStateMigratesWithoutInventingDeathWitness",
+      "CorpseIdentityIsIsolatedBetweenSimultaneousInstances",
+      "CapturedCorpseCreditRangeIsInclusiveAndNamedAsCurrency",
+      "CapturedCorpseCreditsAreDeterministicAndAlwaysWithinRange",
+      "CapturedCorpseCreditArithmeticRejectsInvalidAndExtremeIdentities",
+      "CapturedCorpseHashingWidensBeforeMultiplication",
+      "CorpseInteractionDistanceFailsClosedForNonFiniteAndExtremeValues",
+      "ExactGeneratedMissionCorpseAccessRequiresFullOwnershipChain",
+      "GeneratedMissionCorpseAccessRejectsStaleLifecycleAndIdentity",
+      "GeneratedMissionCorpseAccessSurvivesRestartWithoutReroll",
+      "PersistedKillDeathRequiresExactWitnessOrDurableVerificationToResume",
+      "ExactLiveKillCorpseLeaseDefersOnlySuccessfulCompletionCleanup",
+      "CompletionStartedCorpseAccessRequiresReservedPf2AndNoCleanup",
+      "OnlyExactObjectiveCorpseRetirementCanResumeCompletion",
+      "GeneratedMissionCorpsePolicyIsWiredWithoutChangingOrdinaryCorpseAccess",
+      "UnresolvedChestIsExplicitlyEmptyAndCannotRefillOnRestart",
+      "AtomicReplacementPreservesOnlyLatestDurableNpcState",
+      "TamperedOperationalSidecarFailsClosed",
+      "TruncatedOperationalSidecarFailsClosed",
+      "UnknownOperationalFormatFailsClosed",
+      "BindingMismatchCannotRedirectOperationalState",
+      "DuplicateNpcRuntimeIdentityIsRejected",
+      "CleanupIsExactAndIdempotentAtTheStateBoundary",
+      "AllSelectableBundlesHaveFiniteCapturedNpcCoordinatesAndAttributes",
+      "SharedAndCapturedPf2ValuesRemainBlockedForLiveAllocation",
+      "IncompleteShape1441804RemainsExcluded"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgRuntimeMaterializationTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "ExactBundleMaterializesPayloadBuildingPfSpawnExitAndAllFiveObjectives",
+      "IdentitiesAreStableReversibleCollisionFreeAndPacketsUseOnlyLivePf",
+      "RegistryRequiresOwnerPfAndRuntimeIdentityAndCleanupIsExact",
+      "DoorChestAndLockStateSurviveAtomicRestartRestoration",
+      "RuntimeStateIgnoresTemporaryWritesAndTruncationFailsClosed",
+      "WrongBundleFailsClosedAndStageOneTwoContractsRemainUnchanged"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgSpatialRuntimeTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "EverySelectableBundleDerivesFiniteSpatialBounds",
+      "RepeatedEnvelopeDerivationIsIdentical",
+      "NonFiniteCapturedCoordinatesFailClosed",
+      "EmptyCoordinateSetIsSpatiallyNonOperational",
+      "InsufficientDistinctCoordinatesFailClosed",
+      "DerivingAnotherLayoutDoesNotMutateExistingBounds",
+      "EnvelopeToleranceIsExactlyTheDocumentedBound",
+      "EntryExitObjectivesAndDynelsAreInsideTheirEnvelope",
+      "OutsideCoordinateIsRejectedByEnvelope",
+      "IncompleteShape1441804RemainsNonSelectableAndNonOperational",
+      "OwnershipAndRangeOnlyOperationDoesNotClaimClearLos",
+      "GeometryRequiredLosIsExplicitlyUnresolved",
+      "InvalidSpatialOwnershipDeniesBeforeLos",
+      "SpatialFormatIsSeparateAndOperationalMigrationRemainsExplicit",
+      "SpatialStateRoundTripPreservesExactMissionAndPosition",
+      "SpatialStateForTwoMissionsKeepsDistinctPf2AndPositions",
+      "TamperedSpatialSidecarFailsIntegrity",
+      "TruncatedSpatialSidecarFailsClosed",
+      "UnknownSpatialVersionFailsClosedAfterValidRehash",
+      "BindingMismatchCannotRedirectPersistedPosition",
+      "AtomicReplacementExposesOnlyLatestValidPosition",
+      "CleanupTransitionsAreExactAndIdempotentAtModelBoundary",
+      "SharedPf1419349CannotBecomeSpatialBindingPf"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgTokenProgressStoreTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "FrozenPercentageFormulaHandlesZeroAndNonzeroTotals",
+      "DeterministicEventIdentityIncludesMissionSlotAndGeneration",
+      "EventPhasesAndAggregateAdvanceExactlyOnce",
+      "TerminalFailureRetainsPreOrPostApplicationTruth",
+      "LifecycleMirrorsMissionTransitionsAndRetainsTerminalReason",
+      "InvalidMigrationAuditRequiresReasonWithoutFabricatedEvent",
+      "AtomicRoundTripPreservesOwnershipProgressAndPendingSend",
+      "DuplicateAcceptedQuestAndReplacementRegressionFailClosed",
+      "DuplicateSidecarUnknownVersionAndTruncationFailClosed",
+      "RehashedFormulaAndEventIdentityTamperingFailClosed",
+      "RehashedSoloActorTamperingFailsClosed",
+      "BindingObjectiveAndTeamOwnershipRemainExact",
+      "GeneratedClaimPolicyUsesExactSealedProgressAndOfficialTable",
+      "GeneratedClaimPolicyDoesNotPromoteLegacyPercentThreshold",
+      "GeneratedClaimPolicyMakesOnlyNeutralExplicitNone"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs",
+    "test_cases": [
+      "ValidCompleteGraphLoadsAndResolvesEveryLevelAndDifficulty",
+      "LevelFourAndCapturedLevelSixtyRowsRemainExact",
+      "MissingLevelFailsClosed",
+      "MissingDifficultyPositionAndMissingCellFailClosed",
+      "DuplicateDifficultyCellFailsClosed",
+      "DuplicateAndConflictingLevelRowsFailClosed",
+      "MalformedNumericTokensFailClosed",
+      "OutOfRangeLevelIndexQualityAndTokenFailClosed",
+      "UnexpectedExtraRowAndColumnsFailClosed",
+      "MalformedHeaderFailsClosed",
+      "TruncatedAndEmptyPayloadsFailClosed",
+      "PayloadAndMetadataHashValidationFailsClosed",
+      "ImpossibleSemanticValuesFailClosed",
+      "CanonicalSerializationAndGenerationAreDeterministic",
+      "CanonicalSourceHashAndDeployedCsvNormalizationRemainStable",
+      "FailedPublicationNeverExposesPartialGraph",
+      "ConcurrentReadersRetainValidSnapshotDuringFailedReload",
+      "MissionRollFailsExplicitlyWithoutAValidGraph"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+    "test_cases": [
+      "MalisRollableNanosAreDistinctFamiliesAtOneLockedQuality",
+      "OfficialFindAndReturnItemIconsMapToCapturedBehavior",
+      "DifficultyWireValuesAreOneBasedAndLevel60EasiestIsQl42",
+      "GeneratedRollUsesTheClampedCharacterLevelConsistently",
+      "ContinuousSliderBytesDecodeAsSignedPercentAndRejectInvalidRange",
+      "GeneratedRollRejectsUnsupportedDifficultyAndSliderWireValues",
+      "UnresolvedSliderCombinationsFallBackCategoricallyToNeutralEvidence",
+      "CapturedLibraryCoversEveryFinalizedMissionTypeWithCompatibleActions",
+      "LeftCapturedSliderProfileReproducesItsObservedTypeCohort",
+      "AllCapturedDifficultyDetentsGenerateForNeutralLeftAndUnresolvedProfiles",
+      "GeneratedRollsAreDeterministicForTheSameSeed",
+      "GeneratedRollsDoNotMutateCapturedBodies",
+      "GeneratedFiveOfferSetsAreIndependentlyCoherent",
+      "ReturnOffersRetargetTheirObjectiveToTheIssuingTerminal",
+      "CompatibilityLayerRejectsTextObjectiveAndRewardContradictions",
+      "FinalizedQl42RewardPairsRemainExactEvidence",
+      "UnchangedCapturedCombinationPreservesExactText",
+      "RollFeeRulesPreserveDeductionAndInsufficientCreditBehavior",
+      "LevelFourNeutralIccRollStaysInTheTerminalPlayfield",
+      "AcgNpcDifficultyReusesStableMissionQualityPolicy"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OrdinaryEnemyCombatSetupGeneratorTests.cs",
+    "test_cases": [
+      "DisobedientBotFormulaReproducesEveryCapturedHeldOutLevelExactly",
+      "DisobedientBotFormulaUsesPopulationLevelWithoutActorIdentity",
+      "DisobedientBotGeneratedLevelsResolveTheCaptureProvenArchetype",
+      "DisobedientBotFormulaFailsClosedOutsideItsCategoricalDomain",
+      "CapturedDisobedientBotSawPacketsRemainExactAndLevelSevenIsDeterministic",
+      "DisobedientBotSharedPathPreservesSawAttackAttackInfoOrder",
+      "StimFiendFormulaReproducesEveryCapturedHeldOutLevelExactly",
+      "StimFiendUsesRuntimeLevelAndRestoresAllSevenStartingActors",
+      "StimFiendTerminalOnlyResultDoesNotBecomeAReusableAttackStream",
+      "StimFiendLevelFourteenUsesProductionCadenceWithoutInventingTiming",
+      "StimFiendFormulaFailsClosedOutsideItsProvenDomain",
+      "CapturedStimFiendSawPacketsRemainExactAndGeneratedLevelSeventeenIsDeterministic",
+      "StimFiendSharedPathPreservesSawAttackAttackInfoOrder",
+      "ViolentVagabondFormulaReproducesEveryObservationAndGeneratesLevelEight",
+      "ViolentVagabondFormulaAndResultDomainFailClosedAcrossCategories",
+      "ViolentVagabondSharedPathPreservesSawAttackAttackInfoOrder",
+      "EternalSentinelFormulaRestoresBothLevelEighteenLoadouts",
+      "MeldedPatternsFormulaReproducesEveryCapturedHeldOutLevelExactly",
+      "EveryCapturedMeldedPatternsSawPacketRemainsByteExactUnderTheFormula",
+      "MeldedPatternsSharedPathPreservesWifuSawAttackAttackInfoOrder",
+      "FragmentedSoulFormulaReproducesEveryCapturedHeldOutLevelExactly",
+      "FinalSubwayEquippedFormulaDomainsReproduceEveryObservationAndFailClosed",
+      "EveryCapturedFragmentedSoulSawPacketRemainsByteExactUnderTheFormula",
+      "FragmentedSoulRestoresAllTenActorsAndNineteenAtomicVariants",
+      "FragmentedSoulFormulaUsesRuntimeLevelAndLoadoutWithoutIdentity",
+      "FragmentedSoulFormulaFailsClosedOutsideItsBoundedCategoricalDomains",
+      "FragmentedSoulLevelNineteenUsesTheSharedCapturedPacketOrder"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PersistentMissionFoundationTests.cs",
+    "test_cases": [
+      "MissionStateDirectoryUsesConfiguredWritableStateDirectory",
+      "MissionStateDirectoryUsesExistingZoneStateDirectoryConfiguration",
+      "MissionStateDirectoryFallsBackToReleaseBaseMissionStateDirectory",
+      "SameQuestProgressIsIsolatedByStableCharacterIdentity",
+      "DurableObservationKeyPreventsDuplicateProgressAcrossRepositoryReconstruction",
+      "ServiceAndRepositoryReconstructionReloadsMissionObjectivesFlagsAndLifecycle",
+      "PrerequisitesAndInvalidTransitionsAreEnforcedPerCharacter",
+      "TerminalMissionDoesNotBecomeImplicitlyRepeatable",
+      "FailedExternalRewardRemainsRetryableAndSuccessfulRetryIsNotDuplicated",
+      "AtomicCharacterStatRewardAndLedgerApplyOnceInOneRepositoryTransaction",
+      "RewardsFailClosedWhenDefinitionEffectOrMissionCompletionIsUnresolved",
+      "AccountAccessFlagRequiresExplicitStableAccountScopeAndIsSharedAcrossCharacters",
+      "CombinedAccountFlagCompletionRollsBackOnConflictingAccountOwnership",
+      "RepositoryTransactionExceptionDoesNotCommitPartialMissionState",
+      "UnresolvedObjectiveAndInvalidStableIdentityFailClosed"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/QuestRuntimePersistenceTests.cs",
+    "test_cases": [
+      "B18CProgressIsIsolatedAcrossCharacters",
+      "B18CFinalDuplicateAfterRestartCompletesAndActivatesB18DOnce",
+      "RexB18ECompletionRewardsXpAndCreditsOnceAndActivatesB18F",
+      "MarcusB18FInventoryFailureRetriesThenGrantsItemAndB194Once",
+      "KarrecProgressRewardsAndAccountAccessAreScopedAndRetrySafe",
+      "KarrecTokenRetryUsesTheAppliedTierInsteadOfTheNewLiveTier",
+      "NeutralKarrecTokenDecisionRemainsZeroAfterSidedRetry",
+      "AtomicHandoffRejectsTerminalNextMissionWithoutCompletingCurrentMission",
+      "B18CPerKillClientFeedbackPolicyCoversOnlyCapturedObjectiveProgress"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/WindcallerKarrecNpcContentTests.cs",
+    "test_cases": [
+      "CaptureDefinesExactlyTheThreeQuestNpcsInPlayfield655",
+      "CapturedAppearancesAndInitialScfuWaypointsRemainExact",
+      "ActiveCapturedPatrolProjectionEmitsCurrentPositionAndDestinationAfterMovementStarts",
+      "AnnoyingDudePatrolPreservesTheCapturedSixteenDestinationCycle",
+      "MaddyCardilePatrolPreservesTheCapturedNineteenDestinationCycle",
+      "EverySpawnDefinitionResolvesToCheckedInDialogueContent",
+      "RuntimeRegistryPreventsDuplicateEntriesAndTearsDownByPlayfield"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Arete/AreteFrameworkBootstrap.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/InMemoryMissionRepository.cs",
+    "test_cases": [
+      "SeedCharacterStat",
+      "SaveMission",
+      "SaveObjective",
+      "SaveFlag",
+      "SaveAccountFlag"
+    ],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgAcceptedProjection.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgAcceptedProjectionStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgAllocationService.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgBindingResolver.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgBindingStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgCapturedLayoutCatalog.g.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgCorpsePolicy.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgExpiryState.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgExpiryStateStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgLayoutCatalog.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgLegacyLayoutCatalogFactory.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgLifecyclePolicy.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgObjectiveContracts.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgObjectiveStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgOperationalState.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgOperationalStateStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgRuntimeMaterialization.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgRuntimeStateStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgSpatialStateStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgTokenProgressState.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgTokenProgressStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionDefinitionCatalog.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionOfferCompatibility.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionOfferStore.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionOfferTextBuilder.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionRewardEvidenceModel.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionRollEvidenceCatalog.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedEnemyCombatProfileCatalog.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedEnemyCombatProfileCatalog.g.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/OrdinaryEnemyCombatSetupGenerator.cs",
+    "test_cases": [],
+    "reason": "Retired mission/dialogue/combat implementation no longer exists; this fixture compiles or executes that implementation.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Current AOtomation message/serializer tests remain. Former feature-success assertions are not claimed."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionOfferStoreTests.cs",
+    "test_cases": [
+      "Initialize",
+      "Cleanup",
+      "CompleteOfferProjectionRoundTripsExactlyAcrossRestart",
+      "ConcurrentOwnersPublishIndependentDurableOfferBatches",
+      "UnpaidPreparedBatchCannotBeAcceptedOrReplaceThePaidRoll",
+      "RestartDiscardsUnpaidPreparationWithoutRegeneratingIt",
+      "DurableFeeClaimSurvivesRestartAndPublishesTheExactBatchOnce",
+      "DuplicateClaimResumesOneDurableClaimAndAcceptedAuditCannotReplay",
+      "StaleClaimCannotOverwriteAcceptedLifecycle",
+      "RestartRecoveryReopensOrExpiresAnUnprojectedClaimExactlyOnce",
+      "ReplacementAndDiscardAreExactOwnerBatchTransitions",
+      "ExpiryTransitionsOnlyTheExactOwnerAndNeverRegenerates",
+      "WrongOwnerCannotClaimAnotherOwnersSameTypeOffer",
+      "ConcurrentDuplicateCallbacksPublishOneClaimRevision",
+      "RestoredTerminalAuditStillBlocksIdentityCollision",
+      "TamperedUnknownTruncatedAndDuplicateLedgersFailClosed",
+      "TemporaryFilesAreIgnoredAndAtomicTransitionsLeaveNoPartialFiles"
+    ],
+    "reason": "Exercises removed filesystem MissionOfferStore, not the current DAO. Current DAO tests and saved-state recovery tests remain required.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.SavedMissionLocationTests",
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "Tools/MissionDaoValidation"
+    ],
+    "protocol_coverage": "Quest packet serialization tests remain; mission creation is explicitly unsupported."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/AreteRegularMobCombatAcceptanceTests.cs",
+    "test_cases": [
+      "SupportedRegularMobContractsResolveCapturedPacketsAndCorpseOrdering",
+      "ExactTwoMetreSpatialPolicyPursuesOutsideHoldsInsideAndRepursuesAfterRetreat",
+      "ResolvedAreteMeleeContractsRequirePursuitBeforePacketEligibilityAndResumeAfterRetreat",
+      "UnsupportedAreteActorsSpawnButRemainExpectedPassiveExclusions",
+      "CapturedSelectorsSupportSharedProfilesAndRejectVariantOrFamilyFallbacks",
+      "CombatIdentityFeedsExactLootRoutingWithoutEngineerDockerFallback"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatActiveCoverageTests.cs",
+    "test_cases": [
+      "EveryHistoricalHostileBindingRetainsItsCaptureClassification",
+      "HistoricalPf127OrdinaryCoverageRetainsExactProfileResolution",
+      "Pf1931CoverageIncludesEveryOrdinaryNamedSuccessorAndOwnedAdd",
+      "Pf127InitialEncountersAndMerchantsAreOutsideTheOrdinaryArchetypeResolver",
+      "HistoricalPf127ProfileResolutionReproducesTheRetainedContractFixture",
+      "NonDenominatorAuditsIncludeEveryDynamicAndScriptedHostileWithoutChangingTheFixedDenominator",
+      "CurrentConsumerAuditSeparatesHistoricalEvidenceFromRuntimeActivation"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatContractTestStub.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs",
+    "test_cases": [
+      "CapturedDamageObservationsAdvanceIndependentlyPerActorAndAttackStream",
+      "KnownGoodSubwayThiefAndCultistUseTheSharedFactoryWithCaptureExactBytes",
+      "AzturRoomBossesUseTheSharedFactoryWithCaptureExactBytes",
+      "WorkmanStrikerStableProfileUsesTheCapturedSharedPacketSequence",
+      "WorkmanStrikerProductionQlChangesOnlyTheCapturedWifuQlField",
+      "AlreadyAuthorizedShadowUsesItsExactCapturedPacketSequenceWithoutARangeField",
+      "DiscardedPetSawStateTransitionsReplayInCapturedOrderPerActor",
+      "DiscardedPetMissingLevelUsesExactNaturalPacketPath",
+      "ReanimatedCorpseAnchorProfilesUseTheCapturedSharedPacketSequence",
+      "EumenidesQ20ProfileUsesTheCapturedSharedPacketSequence",
+      "StrikeForemanUsesExactCapturedWifuAndSharedAttackSuffix",
+      "LooterStableProfileUsesTheCapturedSharedPacketSequence",
+      "LooterProductionQualityChangesOnlyTheCapturedWifuQlField",
+      "MeldedPatternsProductionQualityPreservesTheExactCapturedSharedPacketSequence",
+      "IncompleteRebuildProductionQlChangesOnlyTheCapturedWifuQlField",
+      "FragmentedSoulStableProfileUsesTheCapturedSharedPacketSequence",
+      "RedundantScanStableProfileUsesTheCapturedSharedPacketSequence",
+      "CultistResolutionRejectsMissingNearestAndCrossEnemyEvidence",
+      "CapturedNumericHitWireValueFourIsPreservedWithoutEnumNormalization",
+      "MarcusCapturedZeroEnergyAndAmmoRemainStableWhileAmbiguousSawStateStaysQuarantined",
+      "Level48DeathlessUsesCalculatedDamageWithExactArchetypePacketSemantics",
+      "FilthFleaUsesProductionDamageWithExactCapturedNaturalPacketSemantics",
+      "LevelFiveFilthFleaKeepsNormalArmHitsAndUsesTheCapturedLethalOutcome",
+      "MolestedMoleculesUsesProductionWeaponValuesWithExactCapturedPacketSequence",
+      "LevelThirtyTwoCultistUsesProductionWeaponValuesWithExactCapturedPacketSequence",
+      "PrematurePatternUsesProductionValuesWithExactNaturalPacketPath",
+      "InfectedAttendantUsesProductionValuesWithExactNaturalPacketPath",
+      "ArchitectStrikerMissingLevelUsesExactNaturalPacketPath",
+      "SlumRunnerMissingLevelUsesExactNaturalPacketPath",
+      "ShadowMissingLevelUsesExactNaturalPacketPath",
+      "UncontrollableAngerMissingLevelUsesExactNaturalPacketPath",
+      "EmptyShellMissingLevelUsesExactNaturalPacketPath",
+      "InfectorMissingLevelUsesExactNaturalPacketPath",
+      "NeuralBurnoutMissingLevelUsesExactNaturalPacketPath",
+      "LostThoughtAmbiguousLevelUsesExactNaturalPacketPath",
+      "TempleOrdinaryCoverageRestoresEveryCompleteContract",
+      "ActiveDungeonProfileAuditAllowsOnlySourceOwnedCompleteContracts",
+      "SharedRuntimeOwnsCapturedPacketSemanticsAndSyntheticHitChatIsAbsent"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedSubwayRetaliationEligibilityResolverTests.cs",
+    "test_cases": [
+      "ExactPf127BindingsResolveAllTwentyNineDiscardedPetsAndFiveMuggers",
+      "ExactBindingGuardRejectsCrossPlayfieldWrongMetadataAndUnknownSources"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DungeonNamedEncounterCompletionTests.cs",
+    "test_cases": [
+      "AuthoritativeInventoryEnumeratesEveryNamedStageAndOwnedAddExactlyOnce",
+      "EveryInventoryEntryHasAnExactReadyCombatDomain",
+      "FinalDungeonGameplayBacklogUsesExplicitLifecycleOwnershipAndFailsClosed",
+      "PostAzturDespawnSchedulesExactlyOneFullChainReset",
+      "TempleNanoEffectsRemainExactAndOnlyOwnedEffectsReachGameplay",
+      "CapturedDungeonLootRemainsAtomicWithUnresolvedSelectionProbabilities",
+      "OrdinaryDungeonBaselineRemainsLockedAtFourHundredEightyNine"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DungeonNamedLifecycleCompletionTests.cs",
+    "test_cases": [
+      "AllNineteenDomainsHaveOneExplicitRespawnClassification",
+      "FullUkleshKhalumAzturUkleshLifecycleCompletes",
+      "PostAzturResetCreatesExactlyOneUkleshSchedule",
+      "KhalumAndAzturHaveNoIndependentRespawn",
+      "RuntimeDisposalCancelsSuccessorAndResetSchedules",
+      "OwnedAddsRequireOwnersAndHaveNoIndependentRespawn",
+      "MurialRespawnPolicyCreatesExactlyOneActor",
+      "MurialRespawnStartsExactlyOnePatrolWorker",
+      "Pf127AndPf1931SchedulesRemainIndependent",
+      "StrikeForemanLifecycleContractRemainsExact",
+      "OrdinaryCombatCatalogRemainsFourHundredEightyNine",
+      "NamedCombatDomainsRemainNineteenOfNineteen",
+      "MissionLifecycleOwnershipIsNotUsedByDungeonCatalog"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgTokenProgressRuntimeContractTests.cs",
+    "test_cases": [
+      "DuplicateResolutionPrecedesAnyNewAppliedCount",
+      "TerminalLifecycleRejectsNewEventsWhileRetainingAuditState",
+      "GeneratedProgressPolicyDoesNotGrantQfuSchemaOrTeamDistribution"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+    "test_cases": [
+      "CapturedQuestAlternativeTemplateRoundTripsByteForByte",
+      "EveryCapturedRollBodyRoundTripsAndMatchesItsGoldenHash",
+      "CapturedFixtureAccessorsReturnDefensiveCopies",
+      "GeneratedRollPreservesOneCompleteCapturedServerResponseEnvelope",
+      "GeneratedRollPreservesClientTitleWidthFreshExpiryAndRoundTrips",
+      "MissionRollDeadlineUsesThePrivateServerGameTimeAnchor",
+      "AcceptedMissionExpirySerializesAsFourLosslessWireBytes"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OfficialDungeonNavigationTests.cs",
+    "test_cases": [
+      "Pf1931LoadsOfficialResourceIdentityAndConnectedRoomGraph",
+      "AllTempleOrdinarySpawnsAndMurialPatrolGroundOnOfficialSurfaces",
+      "AllTempleNamedActorsSuccessorsAndAddsGroundOnOfficialSurfaces",
+      "MajorRoomsHaveWalkableAnchorsWhileSolidBoundariesBlockMovementAndLos",
+      "Pf1931FactoryReusesImmutableGeometryAndDisposalClearsRouteState"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PlayfieldLifecycleTraceTests.cs",
+    "test_cases": [
+      "PrivateCityReadyInitKeepsOrgStateBeforeFullCharacterAndReadyBlockAfter",
+      "PrivateCityReadyInitRecorderGuardsPacketMessageOrderAndDetails",
+      "SamePlayfieldVisibilityKeepsCharInPlayAndExistingPlayerSnapshotOrder",
+      "CleaningRobotDeathOrderIncludesStopFightDeathCorpseAndDespawnScheduling",
+      "CleaningRobotNpcAttackOrderKeepsSpecialAttackWeaponBeforeAttackInfo",
+      "IccShuttleportBasicCombatPromotesOnlyCaptureBackedIslandReet",
+      "IccShuttleportAuthoritativePlacementsRemainDataCompleteAndRuntimeFailClosed",
+      "NpcCorpseLifecycleRulesPreserveCapturedCleaningRobotDeathTimings",
+      "NpcCombatAttackRulesPreserveCapturedCleaningRobotContextDecision",
+      "SubwayFilthFleaCombatUsesCapturedPoisonAndMeleeAttackContext",
+      "PlayerCombatRuntimeServiceFinalBoundaryOwnsLifecycleOrchestrationOnly",
+      "AOSharpLiveCaptureIsolatesDecodedExportFailuresAndFailsClosedOnMissingCombatRows",
+      "AOSharpPf127CaptureContainsRuntimeFailuresAndSnapshotsCharacterWrappersOnce",
+      "AOSharpLiveCaptureRoutesEveryRegisteredCallbackThroughOneDurableNoThrowBoundary",
+      "AOSharpPf127NativeCollectionWaitsForMatchingTeleportEnd",
+      "SubwayDisobedientBotCorpseUsesCapturedCreditsAndEvidenceBackedPool",
+      "CapturedAreteRobotContentProviderPreservesSpawnDefinitions",
+      "CapturedAreteRobotContentProviderPreservesCanonicalPatrolReplayPathAndMissingFileFallback",
+      "CapturedAreteRobotContentProviderLoadsCommittedPatrolReplayData",
+      "NpcPatrolReplayCoordinatorAssignsCapturedReplaySegmentsFromProvider",
+      "NpcPatrolReplayCoordinatorAssignsEmptyReplayForMissingProviderData",
+      "CapturedAreteRobotSpawnOrchestrationTraceKeepsSetupReplayAndScfuOrder",
+      "SubwayContentModuleRegistersCapturedNpcSpawnsWithoutOwningRuntimeSystems",
+      "SubwayExistingPopulationAndPatrolReplayRemainLoaded",
+      "SubwayVisibilityIsolationDiagnosticsRemainOptInAndManifestOrdered",
+      "SubwayOrdinaryArchetypesUseCaptureBackedTemplateFreeFramework",
+      "BloodcreeperSingleSpawnRollsInclusiveDocumentedLevelRange",
+      "Subway20260710PopulationRestoreManifestMatchesCaptureAndBoundaries",
+      "SubwayOrdinaryLifecyclePolicyIsUniformAndBossesRemainSeparate",
+      "AcceptedSubwayEnemyGateRequiresWholeEnemyCoverage",
+      "OrdinaryEnemyProfileValidatorAcceptsStableKeysAndExplicitUnresolvedEvidence",
+      "OrdinaryEnemyProfileValidatorRejectsDuplicateAndNondeterministicKeys",
+      "OrdinaryEnemyProfileValidatorRejectsMissingProfilesBossesSummonsAndScriptedBehavior",
+      "OrdinaryEnemyProfileValidatorEnforcesMovementAndRespawnEvidence",
+      "PlayfieldRuntimeSystemsFacadeOwnsSeparatedRuntimeCoordinators",
+      "LegacyDbMobSpawnAppearanceUsesCapturedTexturesAndHeadMeshStats",
+      "ZoneClientSessionLifecycleCoordinatorModelsSessionPhasesWithoutPacketOwnership",
+      "ZoneClientSessionLifecycleCoordinatorRejectsInvalidTransitions",
+      "ZoneClientSessionLifecycleCoordinatorAllowsZoningReturnOptionsAndDisconnects",
+      "ZoneClientSessionLifecycleCheckpointKeepsPhaseOwnershipOutOfPacketCode",
+      "EnterReadyBlockForSessionInit",
+      "EnterFullCharacterBoundaryForSessionInit",
+      "EnterCharInPlayForVisibilityEntry",
+      "CompleteInPlayForSessionInit",
+      "EnterPlayfieldLoadingForCharacterLoadOrZoningExit",
+      "EnterZoningForPlayfieldTransfer",
+      "EnterDisconnectingForSessionDispose",
+      "ZoneClientSessionLifecycleFinalPhaseOwnershipGuardrailKeepsRuntimeMechanicsOut",
+      "PlayfieldDirectPoolUsageIsLimitedToNamedGlobalAndCrossPlayfieldExceptions",
+      "AreteCleaningRobotDbSpawnSuppressionKeepsCapturedPathAndLegacyDbBoundary",
+      "FragmentedSoulNano95447UsesDynamicSkillAndOwnedOrdinaryAllyLifecycle",
+      "IncompleteRebuildNano90405KeepsCapturedPeriodicHitAndCombatPolicy"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PlayfieldRuntimeOwnershipTests.cs",
+    "test_cases": [
+      "FirstEntryInitializesOnceAndReentryReusesPopulationAndCombatBinding",
+      "NearSimultaneousEntriesInitializeOneRuntime",
+      "ReplacementDisposesOldRuntimeBeforeConstructionAndOldScheduledWorkIsInert",
+      "OtherPlayfieldsKeepIndependentPersistentRuntimes",
+      "TemplePopulationContractHasOneHundredSixtySevenOrdinaryAndTwelveInitiallyActiveNamed",
+      "Dispose"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SubwayAcceptanceMatrixTests.cs",
+    "test_cases": [
+      "AllSupportedOrdinaryActorsReconcileThroughProductionOwners",
+      "ProductionOwnersAreCompiledAndReachableFromThePlayfieldLifecycle",
+      "PopulationMovementAggroCombatAndLifecycleHaveFocusedCoverage",
+      "NamedDeathRespawnCorpseAndLootOwnersHaveFocusedCoverage",
+      "VendorDialogueQuestAndGatewayOwnersAreCompiledAndFocused",
+      "PlayfieldGeometryZoningAndTeardownHaveFocusedCoverage"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SubwayEnemyLootEvidenceTests.cs",
+    "test_cases": [
+      "DisobedientBotUsesOnlyStrictlyProvenObservedItems",
+      "SubwayWikiMembershipMapsGeneralSpecificAndLivingCyberDrops",
+      "SubwayWikiSupplementPreservesCapturedLootAndAddsOnlyMissingIds",
+      "SubwayWikiAuditArtifactMatchesDocumentedSourceIds",
+      "RejectedOtherEnemyAndContainerNoiseNeverEntersProfiles",
+      "BloodcreeperUsesFourReviewedOpensAndKeepsItsPoolIncomplete",
+      "ThiefAndFilthFleaPreserveCapturedLootCorpseAndLevelCreditEvidence",
+      "Capture20260712153918PromotesOnlyExactDeathLinkedPositiveCreditCorpses",
+      "AuditedCorpsePromotionKeepsExactCaptureCountsAndIdentityLinkage",
+      "RecoveredLevelCreditRowsKeepSixteenExactDeathCorpseLinks",
+      "StrictDeepCorpseSnapshotsAloneSupplyRuntimeProbabilityDenominators",
+      "WorkmanStrikerUsesThirtyDeduplicatedCompleteCorpseOpens",
+      "LegacyItemSnapshotsStayIdentityLinkedAndCannotBecomeGuessedRuntimeDrops",
+      "ShadowReopenUsesOnlyTheEarliestInventoryTimestampGroupForItsCorpseGeneration",
+      "ReviewedLegacyStrictOpensSupplyFourIncompleteIndependentLootPools",
+      "RecoveredFirstOpenCorpusSuppliesSixteenIncompleteIndependentLootPools",
+      "SlumRunnerPreservesTwentySevenDeathLinkedCorpseVisualAndLevelCreditOutcomes",
+      "OfficialDeathLinkedCorpseEvidenceReachesEveryAuditedOrdinaryProfile",
+      "MuggerUsesIdentityLinkedCreditsAndReviewedStrictLoot",
+      "AdapterPreservesCapturedItemIdentityAndEvidence",
+      "DisobedientBotWeightedRollSelectsEmptyAndEachProvenItem",
+      "RegistryRejectsMissingEvidenceAndInvalidFixedQuality",
+      "RegistryRejectsOverlappingActiveAssignmentOwnership",
+      "AmbiguousOrUnresolvedLinkageCannotBecomeActiveLoot",
+      "InvalidItemIdentityOrMissingEvidenceCannotBecomeActiveLoot"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TempleAcceptanceMatrixTests.cs",
+    "test_cases": [
+      "MatrixPreservesAcceptedTotalsAndExactFailClosedBoundaries",
+      "DeterministicRunnerOwnsEveryTempleAcceptanceSurface",
+      "EarlierTempleReportsDeferCurrentStatusToTheMatrix"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TempleOfThreeWindsOrdinaryContentTests.cs",
+    "test_cases": [
+      "TempleContentIsDedicatedAndCatalogPreservesDungeonBoundaries",
+      "DeathlessLegionnairesUseExactFrontDoorAnchorsAndGeneratedCombat",
+      "AzturRoomBossCombatUsesTheCompleteCapture",
+      "TempleCultistAppearanceMovementAndLifecycleMatchTheCaptureSlice",
+      "TempleCultistCombatAggroLootAndCreditsStayCaptureBounded",
+      "TempleCultistSetupFormulaIsExactBoundedAndWeaponFamilySafe",
+      "DefenderCombatAndLootRemainDedicatedToTheTempleEncounter"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/WorldPopulationFoundationTests.cs",
+    "test_cases": [
+      "DefinitionsValidateAndSortDeterministically",
+      "DuplicateSpawnAndIdentityFailClosed",
+      "MissingProfilePolicyAndInvalidLocationFailClosed",
+      "InvalidRangeSummonsAndScriptedDefinitionsFailClosed",
+      "MissingGroupRespawnPolicyFailsClosed",
+      "SchedulerOrderingIsStableAndBounded",
+      "SchedulerPreventsDuplicatesAndSupportsCancellationScopes",
+      "FixedAndRandomDelaysAreDeterministic",
+      "ArchitectureGuardrailsKeepPacketsLootAndPerSpawnTimersOut",
+      "FixedAndInclusiveLevelDefinitionsAreDeterministicAndValidated",
+      "ExplicitObservedAtomicVariantsRejectDuplicatesNullsAndPartialLoadouts",
+      "LevelSelectionIsStableWithinGenerationAndRerollsOnlyForANewGeneration",
+      "FixedLevelAndDerivedStatsRemainStableAcrossRespawnGenerations",
+      "OrdinaryRespawnPolicyHonorsSpawnGroupDefaultAndNoRespawnPrecedence",
+      "PopulationControllerResolvesConfiguredGroupPoliciesAndRejectsConflictingKeys",
+      "ExcludedClassificationsNeverInheritTheOrdinaryDefault",
+      "UnsupportedAndInvalidRespawnPoliciesFailClosed",
+      "CapturedOrdinaryExceptionsAndPopulationBoundaryRemainStable",
+      "DisobedientBotCorpseEvidenceKeepsEveryIdentityLinkedCreditOutcome",
+      "DeepSubwayOrdinaryCombatUsesLocalPlayerNormalHitEvidence",
+      "MeldedPatternsUsesCapturedWeaponRollAndFailsClosedWithoutExactEvidence",
+      "WorkmanStrikerUsesEveryCapturedAtomicGenerationAndFailsClosedWithoutOne",
+      "SourceAwareCombatResolutionPreservesBaseAndLevelResolverFallbacks",
+      "Capture20260720031025KeepsPatrolsBoundToTheirExactSources",
+      "Capture20260720031855And033749KeepsPatrolsBoundToTheirExactSources",
+      "LooterResolvesEveryCapturedSourceWeaponAndFailsClosedWithoutOneExactTuple",
+      "MuggerUsesExactCurrentSourceWeaponsAndCapturedAttackInfoShapeWithoutFixedDamage",
+      "FragmentedSoulGenerationEvidenceCoversEveryReviewedSourceLocalAtomicVariant",
+      "IncompleteRebuildUsesEveryExactSourceWeaponAndCapturedAttackInfoWithoutFixedDamage",
+      "RedundantScanUsesExactSourceWeaponsAndCapturedAttackInfoShapeWithoutFixedDamage",
+      "RedundantScanKeepsCapturedSupportNanoPairAndConservativeAutomaticAggroPolicy",
+      "DerangedShopperUsesItsOneExactActiveSourceWeaponAndCapturedAttackInfoShape",
+      "DistinctNoRespawnAssignmentsKeepStablePolicyKeysAndProvenance",
+      "SchedulerRejectsInvalidAndDuplicateGenerationWork",
+      "PopulationControllerPreventsDuplicateAndStaleGenerationRespawnRequests",
+      "NewGenerationClearsPriorDeathCorpseFailureAndScheduleState",
+      "VisibilityCombatCorpseAndNavigationOwnersCannotSelectOrAdvanceLevels",
+      "SharedLevelAndRespawnOwnersContainNoEnemySpecificSelectionLogic"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgCorpseCreditPolicy.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Missions/MissionAcgTokenRewardPolicy.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/AreteCombatLootIdentityPolicy.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/AreteRegularMobCombatProfileSelector.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedSubwayContentProvider.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedSubwayRetaliationEligibilityResolver.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedTempleOfThreeWindsCombatCatalog.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedTempleOfThreeWindsContentProvider.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedTempleOfThreeWindsOrdinaryCombatLoadoutCatalog.g.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/MissionInstanceShapeCatalog.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/NpcPatrolReplayCoordinator.cs",
+    "test_cases": [
+      "AssignCapturedAreteRobotReplay"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/OrdinaryEnemyCatalog.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/OrdinaryEnemyLootTableAdapter.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/OrdinaryEnemyProfile.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/WorldPopulationDefinitions.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/AbmouthEncounterRuntimeServiceTests.cs",
+    "test_cases": [
+      "DedicatedEncounterOwnsAbmouthAndOrdinaryPopulationRejectsBossesAndSummons",
+      "AbmouthUsesIndependentXopzAndDenwStreamsWhileSummonsUseDmxf",
+      "EumenidesPreservesAtomicScfuAndDedicatedNamedEnemyLifecyclePolicy",
+      "StrikeForemanUsesCapturedSpawnExactCombatAndSharedNamedLifecycle",
+      "EumenidesUsesCapturedWeaponContextButLeavesDamageAndRechargeItemOwned",
+      "EumenidesCorpseEvidenceReplaysExactCapturedShapeAndTwoAtomicItemLootSnapshots",
+      "FilthFleaReviewedCombatEvidenceAddsOnlyRequested205921Source",
+      "VergilFollowupCombatEvidenceSeparatesLocalPlayerAndKillerPet",
+      "AbmouthFollowupCombatEvidenceSeparatesLocalPlayerAndOwnedPets",
+      "VergilUsesConfirmedRespawnAndCaptureProjectionsRemainAlwaysOn",
+      "LiveAndOfflineCaptureToolsShareTheRawScfuContract",
+      "CaptureToolPreservesEveryRawPacketAcrossIndependentNoThrowSinks",
+      "CaptureToolAccountsEveryScfuStateAndFinalizesWithoutDroppingTheRawTail",
+      "CaptureToolExportsPf127GeometryAndLineOfSightAlwaysOn",
+      "Update",
+      "NotifyPlayfieldChanged",
+      "RequestCombatSample",
+      "CaptureToolFailsClosedWhenPf127GeometryOrLosEvidenceIsIncomplete",
+      "AppendValidation",
+      "ReplacementInfectorScfuMatchesCapturedPacket1896Exactly",
+      "CapturedReplacementInfectorScfuDecodesCompletelyAndRoundTripsExactly",
+      "ScfuTailReadsUnknown4OnlyWhenFlags2RequiresIt"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/CapturedSubwayOrdinaryContentProvider.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/DungeonNamedLifecycle.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "Tests/Fixtures/Gameplay/Playfields/WorldRespawnScheduler.cs",
+    "test_cases": [],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/LegacyGameplaySourceTests.cs",
+    "test_cases": [
+      "HistoricalCatalogIncludesEveryRetainedSharedFragment",
+      "UnrelatedSourceIsUnchangedByLogicalPartialReader"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgExpiryRuntimeContractTests.cs",
+    "test_cases": [
+      "CompletionStartedMayExpireBeforeRewardClaim",
+      "ExpiredObjectiveCannotBeResurrected",
+      "AcceptanceAndReleaseUseExactAllocatorOwner",
+      "OfflineOwnerRetainsReconciliationRequirementDurably"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  },
+  {
+    "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgLegacyFallthroughContractTests.cs",
+    "test_cases": [
+      "LegacyTemplateScansCannotConsumeGeneratedArtifacts",
+      "TrueLegacyAndAuthoredQuestPathsRemainPresent"
+    ],
+    "reason": "Compiles or invokes the retired captured-profile combat or mission implementation; dependency retirement.",
+    "replacement_integrity_coverage": [
+      "ZoneEngine_New.Tests.UnavailableGameplayTests",
+      "ZoneEngine_New.Tests.SavedMissionLocationTests"
+    ],
+    "protocol_coverage": "Captured packet serializer roundtrips retained independently of Legacy gameplay factories."
+  }
+]

@@ -27,7 +27,6 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.MessageHandlers;
     using ZoneEngine_New.Core.Metrics;
-    using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
@@ -177,6 +176,7 @@ namespace ZoneEngine_New
                 return catalog;
             });
             services.AddSingleton<IGameData, GameDataStore>();
+            services.AddSingleton(MissionLevelData.Load(Path.Combine(AppContext.BaseDirectory, "GameData", "Missions", "MissionLevels.csv")));
             services.AddSingleton<HashItemMinter>();
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
@@ -196,27 +196,16 @@ namespace ZoneEngine_New
             }));
             services.AddSingleton<IMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
             services.AddSingleton<IGeneratedMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
-            services.AddSingleton<GeneratedMissionService>();
-            services.AddSingleton(provider => new Lazy<GeneratedMissionAcgService>(provider.GetRequiredService<GeneratedMissionAcgService>));
-            services.AddSingleton<IGeneratedMissionNpcFactory, GeneratedMissionNpcFactory>();
-            services.AddSingleton<GeneratedMissionAcgService>();
-            services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
-            services.AddSingleton<AuthoredQuestService>();
-            services.AddSingleton(_ => ZoneEngine_New.Core.Dialogue.DialogueCatalog.Load(AppContext.BaseDirectory));
-            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueActionRouter>();
-            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueService>();
             services.AddSingleton<INanoCatalog>(provider => NanoCatalog.Load(
                 Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "nanos.dat")));
             services.AddSingleton<IActiveNanoRepository, MySqlActiveNanoRepository>();
             services.AddSingleton(provider => NanoMechanicCatalog.Load(
                 Path.Combine(provider.GetRequiredService<IGameData>().RootPath, "NanoMechanics.json")));
-            services.AddSingleton<INanoSpecialization, PeriodicTeamHealNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, ActiveStatOverlayNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, MorphNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, DurationOnlyNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, TeamTeleportNanoSpecialization>();
+            services.AddSingleton<INanoSpecialization, SavedDurationNanoSpecialization>();
             services.AddSingleton<INanoSpecialization, SummonNanoSpecialization>();
-            services.AddSingleton<INanoSpecialization, AreaTauntNanoSpecialization>();
             services.AddSingleton<NanoService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();

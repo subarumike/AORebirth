@@ -53,7 +53,6 @@ public sealed class DelmusMergeIntegrationTests
         var spell = TestNanos.Create(1000, durationCentiseconds: 1000);
         Assert.ThrowsExactly<InvalidOperationException>(() => player.TryApplyBuff(spell, player.Identity, DateTime.UtcNow, out _, out _));
         Assert.ThrowsExactly<InvalidOperationException>(() => player.TryRestoreBuff(spell, player.Identity, 1, DateTime.UtcNow.AddSeconds(10)));
-        Assert.ThrowsExactly<InvalidOperationException>(() => NanoRuntime.TryStartCast(player, 1000, player.Identity, DateTime.UtcNow));
         Assert.AreEqual(0, player.Buffs.Count);
         Assert.IsFalse(player.IsCastingNano);
     }

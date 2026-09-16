@@ -1,0 +1,14 @@
+{
+  "path": "AORebirth/Server/ZoneEngine_New.Tests/AttackInfoRulesTests.cs",
+  "retired_cases": [
+    "NullWeaponUsesPlayerUnarmedShape",
+    "SyntheticMaFistUsesPlayerUnarmedShapeNotRightHand",
+    "PhysicalInitWeaponUsesPlayerUnarmedShape",
+    "MeleeWeaponUsesMeleeAmmoAndHandSlotWithZeroInstance",
+    "NpcWireSlotUsesNaturalAmmoAndOrdinalSlot",
+    "NpcMaFistFallbackUsesSlotZero",
+    "RangedWeaponUsesRangedAmmoPlaceholder"
+  ],
+  "reason": "These tests solely preserve removed unused AttackInfo fallback selection and placeholder ranged ammunition.",
+  "replacement": "CapturedEnemyCombatGeneratedPacketFixtureTests validates raw wire bodies; UnavailableGameplayTests validates attack rejection before mutation."
+}

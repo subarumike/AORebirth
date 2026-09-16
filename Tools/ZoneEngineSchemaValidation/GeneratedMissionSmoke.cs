@@ -66,7 +66,7 @@ static class GeneratedMissionSmoke
         Console.WriteLine("MISSION_OBJECT_STATE_ATOMIC_ACCEPT=PASS MISSION_OBJECT_STATE_RESTART=PASS MISSION_OBJECT_STATE_STALE_CAS=PASS");
         var restored = new MySqlMissionDao(() => fixture.Open()).ReadAccepted(Owner, QuestType, questId);
         Require(restored != null && restored.LivePlayfield == livePf && restored.KeyInstance == firstItem
-            && restored.ExpiresAtUtcTicks == acceptance.AcceptedAtUtcTicks + TimeSpan.TicksPerHour * 48
+            && restored.ExpiresAtUtcTicks == acceptance.AcceptedAtUtcTicks + TimeSpan.TicksPerHour * 36
             && restored.ExpiresAtUtcTicks > restored.Offer.ExpiresAtUtcTicks
             && restored.BundleId == acceptance.BundleId && restored.BundleSha256 == acceptance.BundleSha256
             && restored.Offer.DestinationType == 0xC9C6 && restored.Offer.DestinationInstance == 6011
@@ -92,7 +92,7 @@ static class GeneratedMissionSmoke
         var death = dao.ReadObjects(Owner, QuestType, questId).Single();
         death.CurrentHealth = 0; death.IsDead = true;
         death.DeathActorId = Owner; death.DiedAtUtcTicks = Now + 2;
-        death.CorpseCredits = 21; death.CorpseExpiresAtUtcTicks = Now + 2 + 60600 * TimeSpan.TicksPerMillisecond;
+        death.CorpseCredits = 17; death.CorpseExpiresAtUtcTicks = Now + 2 + 45000 * TimeSpan.TicksPerMillisecond;
         observation.Objects = [death];
         Require(dao.Observe(observation).Status == GeneratedMissionResultStatus.Applied, "mission-matched-objective-not-applied");
         string afterObjective = FixtureSql.Fingerprint(connection);
@@ -176,7 +176,7 @@ static class GeneratedMissionSmoke
         ExpectRollback(connection, () => dao.ClaimCorpseCredits(Owner, QuestType, questId, 7001, corpseCash, claimTime), 3819, "mission-corpse-late-failure-changed-cash-or-ledger");
         FixtureSql.Execute(connection, "ALTER TABLE generatedmissionobjects DROP CHECK fixture_mission_claim");
         var claimed = dao.ClaimCorpseCredits(Owner, QuestType, questId, 7001, corpseCash, claimTime);
-        Require(claimed.Status == GeneratedMissionResultStatus.Applied && claimed.Cash == corpseCash + 21, "mission-corpse-credits-not-atomic");
+        Require(claimed.Status == GeneratedMissionResultStatus.Applied && claimed.Cash == corpseCash + 17, "mission-corpse-credits-not-atomic");
         string afterCorpse = FixtureSql.Fingerprint(connection);
         Require(dao.ClaimCorpseCredits(Owner, QuestType, questId, 7001, corpseCash, claimTime + 1).Status == GeneratedMissionResultStatus.AlreadyApplied
             && afterCorpse == FixtureSql.Fingerprint(connection), "mission-corpse-replay-duplicated-credits");
@@ -187,8 +187,7 @@ static class GeneratedMissionSmoke
 
     static void ValidateTokenFreeze(DisposableSchemaDatabase fixture, MySqlConnection connection, MySqlMissionDao dao)
     {
-        int count = (int)typeof(ZoneEngine_New.Core.Missions.GeneratedMissionService).Assembly
-            .GetType("ZoneEngine.Core.Missions.MissionLevelTable", true)!.GetMethod("GetTokenReward")!.Invoke(null, [25])!;
+        const int count = 3; // Synthetic transaction amount; reward gameplay is unsupported.
         foreach (bool full in new[] { false, true })
         {
             int offer = dao.ReserveIdentities("offer", 1), quest = dao.ReserveIdentities("quest", 1), pf = dao.ReserveIdentities("playfield", 1);
@@ -212,7 +211,7 @@ static class GeneratedMissionSmoke
             {
                 ambient = dao.ReadObjects(Owner, QuestType, quest).Single(row => row.Kind == 8);
                 ambient.IsDead = true; ambient.CurrentHealth = 0; ambient.DeathActorId = Owner; ambient.DiedAtUtcTicks = Now + 2;
-                ambient.CorpseCredits = 21; ambient.CorpseExpiresAtUtcTicks = ambient.DiedAtUtcTicks + 60600 * TimeSpan.TicksPerMillisecond;
+                ambient.CorpseCredits = 101; ambient.CorpseExpiresAtUtcTicks = ambient.DiedAtUtcTicks + 45000 * TimeSpan.TicksPerMillisecond;
                 Require(dao.UpdateObjects(Owner, QuestType, quest, [ambient], Now + 2).Status == GeneratedMissionResultStatus.Applied, "token-countable-death");
             }
             var observation = new GeneratedMissionObservation
@@ -227,7 +226,7 @@ static class GeneratedMissionSmoke
             {
                 ambient = dao.ReadObjects(Owner, QuestType, quest).Single(row => row.Kind == 8);
                 ambient.IsDead = true; ambient.CurrentHealth = 0; ambient.DeathActorId = Owner; ambient.DiedAtUtcTicks = Now + 4;
-                ambient.CorpseCredits = 21; ambient.CorpseExpiresAtUtcTicks = ambient.DiedAtUtcTicks + 60600 * TimeSpan.TicksPerMillisecond;
+                ambient.CorpseCredits = 101; ambient.CorpseExpiresAtUtcTicks = ambient.DiedAtUtcTicks + 45000 * TimeSpan.TicksPerMillisecond;
                 Require(dao.UpdateObjects(Owner, QuestType, quest, [ambient], Now + 4).Status == GeneratedMissionResultStatus.Applied, "token-later-death");
                 var frozen = dao.ReadAccepted(Owner, QuestType, quest);
                 Require(frozen.TokenProgressPercent == 0 && frozen.TokenDisposition == 0 && frozen.TokenCount == 0 && frozen.TokenClaimLevel == 25 && frozen.TokenClaimSide == 1,
@@ -342,7 +341,7 @@ static class GeneratedMissionSmoke
         KeyInstance = key, BundleId = "disposable-known-bundle", BundleSha256 = new string('a', 64),
         BuildingType = 0xC9C6, BuildingInstance = 6001, LivePlayfield = livePf,
         ObjectiveType = CharacterType, ObjectiveInstance = 7001 + quest % 2, ObjectiveTemplateId = 9001, ObjectiveInteraction = 1, RequiredCount = 1,
-        AcceptedAtUtcTicks = now, ExpiresAtUtcTicks = now + TimeSpan.TicksPerHour * 48, Artifacts = [Item(key, 64)],
+        AcceptedAtUtcTicks = now, ExpiresAtUtcTicks = now + TimeSpan.TicksPerHour * 36, Artifacts = [Item(key, 64)],
         Objects = [new GeneratedMissionObject
         {
             OwnerId = Owner, QuestType = QuestType, QuestInstance = quest, RuntimeType = CharacterType, RuntimeInstance = 7001 + quest % 2,

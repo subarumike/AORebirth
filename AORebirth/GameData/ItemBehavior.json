@@ -1,27 +1,121 @@
 {
-  "ProtectedItems": [226994, 226824],
+  "ProtectedItems": [
+    226994,
+    226824
+  ],
   "Packages": [
-    { "SourceIds": [301782], "ProductLowId": 301749, "ProductHighId": 301749, "Quality": 1, "Unique": true }
+    {
+      "SourceIds": [
+        301782
+      ],
+      "ProductLowId": 301749,
+      "ProductHighId": 301749,
+      "Quality": 1,
+      "Unique": true
+    }
   ],
   "VitalItems": [
-    { "TemplateIds": [291043, 291044], "Consumed": true, "LockStat": "FirstAid", "LockSeconds": 40, "MinimumQuality": 1, "MaximumQuality": 200, "MinimumRestore": 30, "MaximumRestore": 2400 },
-    { "TemplateIds": [291082, 291083], "Consumed": false, "LockStat": "Treatment", "LockSeconds": 15, "MinimumQuality": 1, "MaximumQuality": 100, "MinimumRestore": 200, "MaximumRestore": 5000 }
+    {
+      "TemplateIds": [
+        291043,
+        291044
+      ],
+      "Consumed": true,
+      "LockStat": "FirstAid",
+      "LockSeconds": 40,
+      "MinimumQuality": 1,
+      "MaximumQuality": 200,
+      "MinimumRestore": 30,
+      "MaximumRestore": 2400
+    },
+    {
+      "TemplateIds": [
+        291082,
+        291083
+      ],
+      "Consumed": false,
+      "LockStat": "Treatment",
+      "LockSeconds": 15,
+      "MinimumQuality": 1,
+      "MaximumQuality": 100,
+      "MinimumRestore": 200,
+      "MaximumRestore": 5000
+    }
   ],
   "FistWeapons": [
-    { "Profession": "MartialArtist", "Tier": 1, "LowId": 211352, "HighId": 211366 },
-    { "Profession": "MartialArtist", "Tier": 2, "LowId": 211357, "HighId": 211358 },
-    { "Profession": "MartialArtist", "Tier": 3, "LowId": 211363, "HighId": 211364 },
-    { "Profession": "Shade", "Tier": 1, "LowId": 211349, "HighId": 211351 },
-    { "Profession": "Shade", "Tier": 2, "LowId": 211359, "HighId": 211360 },
-    { "Profession": "Shade", "Tier": 3, "LowId": 211365, "HighId": 211366 },
-    { "Tier": 1, "LowId": 43712, "HighId": 43713 },
-    { "Tier": 2, "LowId": 211355, "HighId": 211356 },
-    { "Tier": 3, "LowId": 211361, "HighId": 211362 }
+    {
+      "Profession": "MartialArtist",
+      "Tier": 1,
+      "LowId": 211352,
+      "HighId": 211366
+    },
+    {
+      "Profession": "MartialArtist",
+      "Tier": 2,
+      "LowId": 211357,
+      "HighId": 211358
+    },
+    {
+      "Profession": "MartialArtist",
+      "Tier": 3,
+      "LowId": 211363,
+      "HighId": 211364
+    },
+    {
+      "Profession": "Shade",
+      "Tier": 1,
+      "LowId": 211349,
+      "HighId": 211351
+    },
+    {
+      "Profession": "Shade",
+      "Tier": 2,
+      "LowId": 211359,
+      "HighId": 211360
+    },
+    {
+      "Profession": "Shade",
+      "Tier": 3,
+      "LowId": 211365,
+      "HighId": 211366
+    },
+    {
+      "Tier": 1,
+      "LowId": 43712,
+      "HighId": 43713
+    },
+    {
+      "Tier": 2,
+      "LowId": 211355,
+      "HighId": 211356
+    },
+    {
+      "Tier": 3,
+      "LowId": 211361,
+      "HighId": 211362
+    }
   ],
   "Provenance": [
     "Permanent passage-item bindings preserved from the former InventoryActionService compiled bridge.",
     "Package content preserved from capture 20260806-rabbit and existing durable transactional grant behavior.",
     "Vital item bindings and restoration curves preserved from the former explicit Legacy specialization; item Hit/LockSkill records remain authoritative when present.",
     "Fist assignment rows preserved from MartialArtsFistResolver; generic skill-tier/QL formula remains runtime mechanics."
+  ],
+  "specialWeapons": [
+    {
+      "skill": "MartialArts",
+      "lowId": 211357,
+      "highId": 211358
+    },
+    {
+      "skill": "Brawl",
+      "lowId": 211401,
+      "highId": 211402
+    },
+    {
+      "skill": "Dimach",
+      "lowId": 42033,
+      "highId": 42032
+    }
   ]
 }

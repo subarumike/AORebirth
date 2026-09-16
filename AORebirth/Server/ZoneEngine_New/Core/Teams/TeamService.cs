@@ -266,25 +266,8 @@ namespace ZoneEngine_New.Core.Teams
             if (_declinedUntil.TryGetValue(target.Identity.Instance, out DateTime until) && _utcNow() < until)
                 return Error(inviter, "That player declined recently. Wait a moment before inviting again.");
             if (!TryLevel(target, out int targetLevel)) return Error(inviter, "Team invite target level is unavailable.");
-            if (!confirmedRange)
-            {
-                bool tooLow = false;
-                foreach (int id in team?.Members ?? [inviter.Identity.Instance])
-                {
-                    if (!TryLevel(_players[id], out int level)) return Error(inviter, "Team member level is unavailable.");
-                    if (ZoneEngine.Core.TeamXpShareWindow.IsTooHighForXpShare(level, targetLevel))
-                    {
-                        Send(inviter, Action(inviter, CharacterActionType.TeamInviteAck, target.Identity));
-                        return true;
-                    }
-                    tooLow |= ZoneEngine.Core.TeamXpShareWindow.IsTooLowForXpShare(level, targetLevel);
-                }
-                if (tooLow)
-                {
-                    Send(inviter, Action(inviter, CharacterActionType.TeamInviteTooLow, target.Identity));
-                    return true;
-                }
-            }
+            // Team XP is unavailable; membership grants no XP rewards.
+
             _invitations[target.Identity.Instance] = new Invitation(inviter, target,
                 inviter.Session!, target.Session!, team?.Id ?? 0);
             // Names/levels come from current actors; no off-map SCFU ghosts or historical capture reads.

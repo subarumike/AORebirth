@@ -444,92 +444,29 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void StimCommitsVitalRestoreAndConsumptionBeforePacketsAndEnforcesSkillDeadline()
+        public void UnsupportedVitalItemsPreserveVitalsRowsStacksAndLocks()
         {
-            using var w = new World(); Item stim = w.Add(11, 2, lowId: 291043);
-            var clock = new TestClock(); w.Actions.Clock = clock;
-            SetVitals(w.Player, 20, 100, 10, 80);
-            w.Persistence.BeforeCommit = batch =>
+            foreach (int template in new[] { 291043, 291082 })
             {
-                Assert.AreEqual(2, stim.StackCount);
+                using var w = new World();
+                Item item = w.Add(11, 2, lowId: template);
+                w.Player.Stats.Set(CharacterStat.Health, 20);
+                w.Player.Stats.Set(CharacterStat.CurrentNano, 10);
+                w.Session.Messages.Clear();
+                Assert.IsTrue(w.Player.Inventory.IsHydrated);
+                for (int attempt = 0; attempt < 2; attempt++)
+                    Assert.IsFalse(item.Use(w.Player, Slot(), new StubInventoryRepository(), new StubItemBuilder()));
+                Assert.AreEqual(2, item.StackCount);
+                Assert.AreEqual(2, w.Persistence.Rows[11].StackCount);
+                Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
                 Assert.AreEqual(20, w.Player.Stats.GetOrZero(CharacterStat.Health));
-                Assert.AreEqual(0, w.Session.Messages.Count);
-                Assert.AreEqual(1, batch.Stacks.Single().FinalCount);
-                Assert.AreEqual(50, batch.FinalStats.Single(s => s.StatId == (int)CharacterStat.Health).StatValue);
-                Assert.AreEqual(40, batch.FinalStats.Single(s => s.StatId == (int)CharacterStat.CurrentNano).StatValue);
-            };
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.AreEqual(1, stim.StackCount);
-            Assert.AreEqual(50, w.Player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(40, w.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
-            Assert.AreEqual(50, w.Persistence.Stats[(int)CharacterStat.Health]);
-            var locked = w.Session.Messages.OfType<CharacterActionMessage>().Single();
-            Assert.AreEqual(CharacterActionType.SpecialUnavailable, locked.Action);
-            Assert.AreEqual((int)CharacterStat.FirstAid, locked.Parameter1); Assert.AreEqual(40, locked.Parameter2);
-            Assert.IsFalse(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.AreEqual(1, w.Persistence.Calls);
-            clock.Advance(39); w.Actions.Tick(w.Player.Playfield!);
-            Assert.IsFalse(w.Session.Messages.OfType<CharacterActionMessage>().Any(m => m.Action == CharacterActionType.SpecialAvailable));
-            clock.Advance(1); w.Actions.Tick(w.Player.Playfield!);
-            var available = w.Session.Messages.OfType<CharacterActionMessage>().Single(m => m.Action == CharacterActionType.SpecialAvailable);
-            Assert.AreEqual(0, available.Parameter1); Assert.AreEqual((int)CharacterStat.FirstAid, available.Parameter2);
-            w.Persistence.BeforeCommit = null;
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.IsFalse(w.Player.Inventory.Inventory.Content.ContainsKey(64));
-            Assert.AreEqual((int)IdentityType.None, w.Persistence.Rows[11].ContainerType);
-        }
-
-        [TestMethod]
-        public void RechargerUsesDeclaredAmountsAndDurationWithoutConsumingStack()
-        {
-            using var w = new World(); Item recharger = w.Add(11, 50, lowId: 291082);
-            SetVitals(w.Player, 90, 100, 70, 80);
-            recharger.SpellList[EventType.OnUse] = new List<ItemSpell>
-            {
-                new() { FunctionType = (int)FunctionType.Hit, Arguments = new List<object> { (int)CharacterStat.Health, 37 } },
-                new() { FunctionType = (int)FunctionType.Hit, Arguments = new List<object> { (int)CharacterStat.CurrentNano, 43 } },
-                new() { FunctionType = (int)FunctionType.LockSkill, Arguments = new List<object> { (int)CharacterStat.Treatment, 19 } }
-            };
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), recharger));
-            Assert.AreEqual(50, recharger.StackCount);
-            Assert.AreEqual(50, w.Persistence.Rows[11].StackCount);
-            Assert.AreEqual(100, w.Player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(80, w.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
-            Assert.AreEqual(19, w.Session.Messages.OfType<CharacterActionMessage>().Single().Parameter2);
-            Assert.IsFalse(w.Actions.TryUseVitalItem(w.Player, Slot(), recharger));
-        }
-
-        [TestMethod]
-        public void FailedStimPreservesVitalsQuantityAndLockAvailability()
-        {
-            using var w = new World(); Item stim = w.Add(11, 1, lowId: 291043);
-            SetVitals(w.Player, 20, 100, 10, 80);
-            w.Persistence.Failure = new InvalidOperationException("late vital stat failure");
-            Assert.IsFalse(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-            Assert.AreEqual(1, stim.StackCount);
-            Assert.AreEqual(20, w.Player.Stats.GetOrZero(CharacterStat.Health));
-            Assert.AreEqual(10, w.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
-            Assert.AreEqual(0, w.Persistence.Stats.Count);
-            Assert.AreEqual((int)IdentityType.Inventory, w.Persistence.Rows[11].ContainerType);
-            Assert.AreEqual(0, w.Session.Messages.Count);
-            w.Flush.HardFlush(w.Player);
-            w.Persistence.Failure = null;
-            Assert.IsTrue(w.Actions.TryUseVitalItem(w.Player, Slot(), stim));
-        }
-
-        static void SetVitals(Player player, int health, int maxHealth, int nano, int maxNano)
-        {
-            player.Stats.Set(CharacterStat.MaxHealth, maxHealth);
-            player.Stats.Set(CharacterStat.Health, health);
-            player.Stats.Set(CharacterStat.MaxNanoEnergy, maxNano);
-            player.Stats.Set(CharacterStat.CurrentNano, nano);
-        }
-
-        sealed class TestClock : TimeProvider
-        {
-            DateTimeOffset _now = DateTimeOffset.UnixEpoch;
-            public override DateTimeOffset GetUtcNow() => _now;
-            public void Advance(int seconds) => _now = _now.AddSeconds(seconds);
+                Assert.AreEqual(10, w.Player.Stats.GetOrZero(CharacterStat.CurrentNano));
+                Assert.AreEqual(0, w.Persistence.Calls);
+                Assert.AreEqual(0, w.Persistence.Stats.Count);
+                Assert.AreEqual(2, w.Session.Messages.Count);
+                Assert.IsTrue(w.Session.Messages.All(m => m is ChatTextMessage));
+                Assert.IsFalse(item.Locked);
+            }
         }
 
         internal sealed class World : IDisposable
