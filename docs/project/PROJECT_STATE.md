@@ -16,8 +16,8 @@ current owners. The dependency inventory has zero Legacy edges. Public source
 `bf7ce16bbbdc6fd7d5baad5cfe31ebfd781ddfdb` passed all 12 mandatory Windows stages,
 including 743 NewEngine and 923 AOtomation tests. Native private-platform package
 acceptance and frozen-binary disposable schema/connected acceptance also passed.
-The validated private tooling candidate is pushed; its shared default promotion
-awaits explicit authorization following an automatic approval-review block.
+The tested private build tooling is now the shared default at `2a9287d4`, following
+Mike's explicit approval; fresh builds and publication use NewEngine only.
 Historical release/database-restore recovery is retained.
 See `docs/reports/LEGACY_ENGINE_RETIREMENT.md`. Production is unchanged; staging
 and official-client acceptance remain required before deployment.

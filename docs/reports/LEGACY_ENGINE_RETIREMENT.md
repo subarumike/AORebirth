@@ -161,9 +161,10 @@ retirement in assembled mode, while retaining patch inspection in the tooling
 checkout. Both modes and the fresh complete native run passed. The failed attempt
 is retained separately and is not an accepted package.
 
-The private operations candidate is committed and pushed. Its shared default
-branch remains at `6d16c8a07cac0bfcb99f85486fe26b786939acce`: automatic approval
-review blocked promotion pending explicit user authorization for that branch.
-The validated candidate is four commits ahead with no divergence. No production
+After Mike explicitly approved updating the private Linux build tools, the private
+operations default was fast-forwarded from `6d16c8a07cac0bfcb99f85486fe26b786939acce`
+to accepted `2a9287d4d72367f86d376b80183b7620d37ef554`. The remote SHA was verified;
+the candidate and default are synchronized. The initial automatic approval block
+and subsequent authorization remain recorded in the local receipt. No production
 operation has been performed; staging/client acceptance and deployment are
 separate from this source retirement.

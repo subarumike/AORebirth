@@ -1,13 +1,9 @@
 # Current Task
 
-Active remaining step: promote the validated private operations candidate
-`2a9287d4` after explicit user authorization. Automatic approval review blocked
-that shared-branch update; the candidate is committed and pushed, and the default
-remains unchanged.
+No active implementation work remains for Legacy engine retirement.
 
-Legacy runtime retirement is implemented on accepted public source `bf7ce16b`.
-Windows exact-source, native private-platform packaging and frozen-binary
-disposable schema/connected acceptance passed. Historical recovery remains.
+Accepted public runtime source: `bf7ce16b`. The approved private build tooling is
+the default at `2a9287d4`. Windows, native packaging and disposable persistence
+acceptance passed. Historical recovery remains; production is unchanged.
+
 See `docs/reports/LEGACY_ENGINE_RETIREMENT.md` for exact source/package identities.
-
-No production operation or production database schema change is part of this task.
