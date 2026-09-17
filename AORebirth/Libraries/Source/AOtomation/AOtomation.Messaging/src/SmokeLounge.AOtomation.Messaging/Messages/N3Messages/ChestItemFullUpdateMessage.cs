@@ -50,34 +50,56 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(1)]
         public int Unknown1 { get; set; }
 
-        [AoMember(2)]
         public Identity Owner { get; set; }
 
+        [AoMember(2)]
+        [AoFlags("chestOwnerType")]
+        public int OwnerType
+        {
+            get { return (int)this.Owner.Type; }
+            set { this.Owner = new Identity { Type = (IdentityType)value, Instance = this.Owner.Instance }; }
+        }
+
         [AoMember(3)]
-        public int PlayfieldId { get; set; }
+        public int OwnerInstance
+        {
+            get { return this.Owner.Instance; }
+            set { this.Owner = new Identity { Type = this.Owner.Type, Instance = value }; }
+        }
 
         [AoMember(4)]
-        public Identity StateMachine { get; set; }
+        [AoUsesFlags("chestOwnerType", typeof(Vector3), FlagsCriteria.HasNone, new[] { int.MaxValue })]
+        public Vector3 Coordinate { get; set; }
 
         [AoMember(5)]
-        public short Unknown5 { get; set; }
+        [AoUsesFlags("chestOwnerType", typeof(Quaternion), FlagsCriteria.HasNone, new[] { int.MaxValue })]
+        public Quaternion Heading { get; set; }
 
-        [AoMember(6, SerializeSize = ArraySizeType.X3F1)]
-        public GameTuple<CharacterStat, uint>[] Stats { get; set; }
+        [AoMember(6)]
+        public int PlayfieldId { get; set; }
 
         [AoMember(7)]
-        public int Unknown6 { get; set; }
+        public Identity StateMachine { get; set; }
 
         [AoMember(8)]
-        public int Unknown7 { get; set; }
+        public short Unknown5 { get; set; }
 
-        [AoMember(9)]
-        public int Unknown8 { get; set; }
+        [AoMember(9, SerializeSize = ArraySizeType.X3F1)]
+        public GameTuple<CharacterStat, uint>[] Stats { get; set; }
 
-        [AoMember(10, SerializeSize = ArraySizeType.X3F1)]
-        public int[] UnknownArray { get; set; }
+        [AoMember(10)]
+        public int Unknown6 { get; set; }
 
         [AoMember(11)]
+        public int Unknown7 { get; set; }
+
+        [AoMember(12)]
+        public int Unknown8 { get; set; }
+
+        [AoMember(13, SerializeSize = ArraySizeType.X3F1)]
+        public int[] UnknownArray { get; set; }
+
+        [AoMember(14)]
         public int Unknown9 { get; set; }
     }
 }

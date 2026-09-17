@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
 
     [TestClass]
@@ -145,6 +146,53 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, player.DrainExpiredBuffs(start.AddSeconds(10)).Count);
             Assert.AreEqual(0, player.DrainExpiredBuffs(start.AddSeconds(20)).Count);
             Assert.AreEqual(0, player.UsedNcu);
+        }
+
+        [TestMethod]
+        public void ConditionalShapeRebasesAndRestoresWithoutPersistingTransformedBase()
+        {
+            Player CreatePlayer()
+            {
+                var player = new Player(Caster, new StubLogger(), new StubItemBuilder());
+                player.Stats.Set(CharacterStat.MaxNCU, 60);
+                player.Stats.Set(CharacterStat.MonsterData, 17);
+                player.Stats.Set((CharacterStat)12, 2);
+                return player;
+            }
+
+            var shape = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.MonsterShape,
+                Arguments = [900],
+                Requirements =
+                [
+                    new() { StatNumber = 12, Operator = (int)Operator.EqualTo, Value = 1 },
+                    new() { StatNumber = 12, Operator = (int)Operator.EqualTo, Value = 2 },
+                    new() { Operator = (int)Operator.Or },
+                ],
+            };
+            NanoSpell spell = TestNanos.Create(1010, modifiers: [shape]);
+            var start = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            Player player = CreatePlayer();
+            Assert.AreEqual(BuffApplyDecision.Apply,
+                player.TryApplyBuff(spell, Caster, start, out Buff? applied, out _));
+            Assert.AreEqual(900, player.Stats.Get(CharacterStat.MonsterData));
+            player.RebaseStats();
+            player.RebaseStats();
+            Assert.AreEqual(900, player.Stats.Get(CharacterStat.MonsterData));
+            Assert.AreEqual(17, player.Stats.Get(CharacterStat.MonsterData, StatDetail.Base));
+            Assert.IsFalse(Array.Exists(player.Stats.DrainDirty(), s => s.Value1 == CharacterStat.MonsterData));
+
+            Player restored = CreatePlayer();
+            restored.TryRestoreBuff(spell, Caster, applied!.NanoInstance, applied.ExpiresAtUtc);
+            Assert.AreEqual(900, restored.Stats.Get(CharacterStat.MonsterData));
+            Assert.AreEqual(applied.ExpiresAtUtc, restored.Buffs[0].ExpiresAtUtc);
+            Assert.AreEqual(BuffRemovalOutcome.Removed,
+                player.TryRemoveBuff(spell.Id, BuffRemovalReason.Cancelled, out _));
+            Assert.AreEqual(17, player.Stats.Get(CharacterStat.MonsterData));
+            Assert.AreEqual(1, restored.DrainExpiredBuffs(applied.ExpiresAtUtc).Count);
+            Assert.AreEqual(17, restored.Stats.Get(CharacterStat.MonsterData));
+            Assert.AreEqual(17, restored.Stats.Get(CharacterStat.MonsterData, StatDetail.Base));
         }
 
         [TestMethod]

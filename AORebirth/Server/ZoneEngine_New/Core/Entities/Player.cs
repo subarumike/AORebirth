@@ -265,6 +265,7 @@ namespace ZoneEngine_New.Core.Entities
 
         public override void RebaseStats()
         {
+            int previousShape = Stats.GetOrZero(CharacterStat.MonsterData);
             // Bonuses first: max health and max nano read the full (base + bonus) ability values,
             // so equipment and buffs have to be in place before those are recomputed. Worn
             // appearance follows the bonus pass because its spells carry stat requirements.
@@ -273,6 +274,19 @@ namespace ZoneEngine_New.Core.Entities
             RebaseWearAppearance();
             RebaseMaxHealth();
             RebaseMaxNano();
+
+            int currentShape = Stats.GetOrZero(CharacterStat.MonsterData);
+            if (currentShape != previousShape && Session?.State == SessionState.InPlay)
+                Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this,
+                    new StatMessage
+                    {
+                        Identity = Identity,
+                        Stats = [new GameTuple<CharacterStat, uint>
+                        {
+                            Value1 = CharacterStat.MonsterData,
+                            Value2 = unchecked((uint)currentShape),
+                        }],
+                    }, includeSelf: true);
 
             if (!_inFullRebase)
                 AnnounceAppearanceIfChanged();

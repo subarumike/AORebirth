@@ -158,6 +158,9 @@ namespace ZoneEngine_New.Core.Inventory
             if (count == 0)
                 return true;
 
+            if (TryEvaluatePostfix(requirements, getStat, out bool expression))
+                return expression;
+
             bool result = true;
             bool hasReal = false;
             for (int i = 0; i < count; i++)
@@ -189,6 +192,57 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             return !hasReal || result;
+        }
+
+        // AODB exports Criteria as postfix leaves and link operators. Older data can instead
+        // carry ChildOperator on leaves; retain that representation's existing fold above.
+        static bool TryEvaluatePostfix(IReadOnlyList<ItemRequirement> requirements,
+            Func<CharacterStat, int> getStat, out bool result)
+        {
+            result = false;
+            bool hasLeaf = false;
+            bool hasLink = false;
+            foreach (ItemRequirement requirement in requirements)
+            {
+                if (IsRequirementLinkOperator(requirement))
+                    hasLink = true;
+                else
+                {
+                    if (requirement.ChildOperator != 0)
+                        return false;
+                    hasLeaf = true;
+                }
+            }
+            // A link-only placeholder and the older leaf fold are not postfix expressions.
+            if (!hasLeaf || !hasLink)
+                return false;
+
+            var values = new Stack<bool>();
+            foreach (ItemRequirement requirement in requirements)
+            {
+                if (!IsRequirementLinkOperator(requirement))
+                {
+                    values.Push(EvaluateRequirement(getStat((CharacterStat)requirement.StatNumber), requirement));
+                    continue;
+                }
+
+                if (values.Count == 0)
+                    return true;
+                bool right = values.Pop();
+                if ((Operator)requirement.Operator == Operator.Not)
+                    values.Push(!right);
+                else
+                {
+                    if (values.Count == 0)
+                        return true;
+                    bool left = values.Pop();
+                    values.Push((Operator)requirement.Operator == Operator.Or ? left || right : left && right);
+                }
+            }
+
+            if (values.Count == 1)
+                result = values.Pop();
+            return true;
         }
 
         /// <summary>
@@ -293,7 +347,8 @@ namespace ZoneEngine_New.Core.Inventory
             if (!spell.MeetsRequirements(target.Stats))
                 return false;
 
-            if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify))
+            if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify)
+                || spell.Is(FunctionType.MonsterShape))
             {
                 if (skipPassiveModifiers)
                     return true;

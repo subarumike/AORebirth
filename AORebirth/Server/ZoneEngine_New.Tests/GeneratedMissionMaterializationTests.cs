@@ -14,6 +14,7 @@ using ZoneEngine.Core.Packets;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Mobs;
+using ZoneEngine_New.Core.Network;
 using Vector3 = AORebirth.Core.Vector.Vector3;
 
 [TestClass]
@@ -58,6 +59,36 @@ public sealed class GeneratedMissionMaterializationTests
             Assert.IsFalse(world.ContainsPosition(new Vector3(float.MaxValue, 0, 0)));
         }
         Assert.IsTrue(passiveObjectives > 0, "The actual FindPerson bundle must exercise the passive target path.");
+    }
+
+    [TestMethod]
+    public void AcceptedWorldChestWireRoundTripsAndOwnedFormOmitsOnlyItsTransform()
+    {
+        var codec = new ZoneMessageCodec();
+        int checkedPackets = 0;
+        foreach (var bundle in MissionAcgCapturedLayoutCatalog.CreateBundles())
+        foreach (var wire in bundle.WireRecords.Where(w => w.Category == MissionAcgWireCategory.Chest))
+        {
+            byte[] original = wire.CopyPacketBytes();
+            var message = codec.Deserialize(original)!;
+            var chest = (ChestItemFullUpdateMessage)message.Body;
+            Assert.AreEqual(Identity.None, chest.Owner);
+            Assert.AreEqual(bundle.SourcePlayfield2, chest.PlayfieldId);
+            CollectionAssert.AreEqual(original, codec.Serialize(message));
+
+            // The existing owned-backpack schema follows Owner directly with PlayfieldId.
+            // Reuse captured fields, removing just the established ownerless transform.
+            byte[] owned = original.Take(41).Concat(original.Skip(69)).ToArray();
+            BinaryPrimitives.WriteUInt16BigEndian(owned.AsSpan(6, 2), (ushort)owned.Length);
+            BinaryPrimitives.WriteInt32BigEndian(owned.AsSpan(33, 4), bundle.CapturedPlayerIdentity.Type);
+            BinaryPrimitives.WriteInt32BigEndian(owned.AsSpan(37, 4), bundle.CapturedPlayerIdentity.Instance);
+            chest.Owner = new Identity { Type = (IdentityType)bundle.CapturedPlayerIdentity.Type,
+                Instance = bundle.CapturedPlayerIdentity.Instance };
+            CollectionAssert.AreEqual(owned, codec.Serialize(message));
+            CollectionAssert.AreEqual(owned, codec.Serialize(codec.Deserialize(owned)!));
+            checkedPackets++;
+        }
+        Assert.IsTrue(checkedPackets > 0);
     }
 
     [TestMethod]

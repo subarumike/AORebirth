@@ -38,6 +38,7 @@ namespace AORebirth.Tools.RDBDataExtractor
             FunctionOperator.Interval,
             FunctionOperator.ApplyOn,
             FunctionOperator.TargetList,
+            FunctionOperator.Criteria,
         };
 
         private static readonly Dictionary<int, string> FunctionSets = LoadFunctionSets();
@@ -204,6 +205,21 @@ namespace AORebirth.Tools.RDBDataExtractor
                 function.TickInterval = interval;
             if (TryGetUInt(keyedArgs, FunctionOperator.ApplyOn, out uint applyOn))
                 function.Target = unchecked((int)applyOn);
+
+            if (keyedArgs.TryGetValue(FunctionOperator.Criteria, out object criteria)
+                && criteria is IEnumerable<RequirementCriterion> requirements)
+            {
+                foreach (RequirementCriterion criterion in requirements)
+                {
+                    function.Requirements.Add(new DatRequirement
+                    {
+                        Statnumber = criterion.Stat,
+                        Value = unchecked((int)criterion.Value),
+                        Operator = (ZeOperator)(int)criterion.Operator,
+                        Target = ZeItemTarget.Self,
+                    });
+                }
+            }
 
             foreach (object value in SelectPositionalArgs(functionType, keyedArgs))
                 function.Arguments.Values.Add(ToMessagePackObject(value));
