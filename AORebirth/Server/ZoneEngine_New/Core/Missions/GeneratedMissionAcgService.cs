@@ -72,8 +72,8 @@ public sealed partial class GeneratedMissionAcgService
                 if (offer == null) return Rejected("No current owned offer with that exact identity.");
                 var state = DecodeFrozenOffer(offer);
                 int seed = Seed(offer);
-                var owner = new MissionAcgIdentityRecord((int)player.Identity.Type, player.Identity.Instance);
-                var bundle = MissionAcgLayoutSelector.Select(_catalog, new MissionAcgSelectionInput(seed, (MissionRollType)offer.MissionType, offer.Quality, owner));
+
+                var bundle = MissionGenerationSettings.Current.Select(_catalog, offer.MissionType, offer.Quality, seed);
                 int quest = _dao.ReserveIdentities("quest", 1);
                 int livePf = ReservePlayfield();
                 int key = _ids.Allocate();
@@ -84,13 +84,13 @@ public sealed partial class GeneratedMissionAcgService
                     QuestType = 0xDAC3, QuestInstance = quest, KeyInstance = key, BundleId = bundle.LayoutId,
                     BundleSha256 = CanonicalBundleHash(bundle), BuildingType = bundle.BuildingIdentity.Type, BuildingInstance = bundle.BuildingIdentity.Instance,
                     LivePlayfield = livePf, State = GeneratedMissionState.Active, AcceptedAtUtcTicks = now,
-                    ExpiresAtUtcTicks = now + TimeSpan.TicksPerHour * 48, UpdatedAtUtcTicks = now, Version = 1, Offer = offer, RequiredCount = 1
+                    ExpiresAtUtcTicks = checked(now + TimeSpan.TicksPerSecond * MissionRollPolicy.Current.AcceptedLifetimeSeconds), UpdatedAtUtcTicks = now, Version = 1, Offer = offer, RequiredCount = 1
                 };
                 var materialized = Materialize(binding);
                 var objectiveSlot = bundle.ObjectiveSlots.Single();
                 var objective = materialized.Objects.Single(value => value.Identity.CapturedIdentity.Equals(objectiveSlot.CapturedIdentity));
                 binding.ObjectiveType = objective.Identity.RuntimeIdentity.Type; binding.ObjectiveInstance = objective.Identity.RuntimeIdentity.Instance;
-                binding.ObjectiveTemplateId = objectiveSlot.TemplateId; binding.ObjectiveInteraction = (int)MissionAcgObjectiveContract.InteractionFor((MissionRollType)offer.MissionType);
+                binding.ObjectiveTemplateId = objectiveSlot.TemplateId; binding.ObjectiveInteraction = MissionRollPolicy.Current.ObjectiveInteraction((MissionRollType)offer.MissionType);
                 var objects = InitialObjects(binding, materialized);
                 var keyContent = MissionArtifactContent.Current.Key;
                 var keyItem = _items.Create(keyContent.LowId, keyContent.HighId, keyContent.Quality, ItemSource.Other, 1, key, new Identity { Type = (IdentityType)0xC76D, Instance = key });
@@ -139,25 +139,10 @@ public sealed partial class GeneratedMissionAcgService
     void ReplayJournal(Player player, GeneratedMissionBinding binding)
     {
         if (player.Session is not IGameTimeSession { GameTimeSynchronizedAtUtc: { } synchronized }) return;
-        var materialized = Materialize(binding);
+        _ = Materialize(binding);
         var state = DecodeFrozenOffer(binding.Offer);
-        var slot = materialized.Bundle.ObjectiveSlots.Single();
-        var objective = new MissionAcgObjectiveBinding(MissionAcgObjectiveBinding.CurrentFormatVersion,
-            materialized.BindingRecord.Binding.AcceptedQuestIdentity, materialized.BindingRecord.Binding.OwnerIdentity,
-            null, true, (MissionRollType)binding.Offer.MissionType, binding.LivePlayfield, binding.BundleId, binding.BundleSha256,
-            materialized.Bundle.BuildingIdentity, slot.Slot, slot.CapturedIdentity,
-            new MissionAcgIdentityRecord(binding.ObjectiveType, binding.ObjectiveInstance), slot.TemplateId, slot.Name,
-            (MissionAcgObjectiveInteraction)binding.ObjectiveInteraction,
-            binding.Offer.MissionType == 4 ? materialized.BindingRecord.Binding.IssuingTerminalIdentity : null,
-            binding.Offer.MissionType == 4 ? slot.TemplateId : 0, 0);
-        var objectiveState = new MissionAcgObjectiveState(MissionAcgObjectiveLifecycle.Exposed, MissionAcgCompletionPhase.None,
-            binding.MissionItem == null ? null : new MissionAcgIdentityRecord(binding.MissionItem.ItemType, binding.MissionItem.InstanceId),
-            0, 0, 0, 0, 0, 0, MissionAcgGrantState.NotStarted, MissionAcgGrantState.NotStarted, MissionAcgGrantState.NotStarted,
-            string.Empty, string.Empty, string.Empty, 0, false, false, false, false, false, DateTime.UtcNow);
-        int expiry = MissionRollService.ResolveClientExpirySeconds(synchronized, DateTime.UtcNow, new DateTime(binding.ExpiresAtUtcTicks, DateTimeKind.Utc));
-        var qfu = MissionAcgAcceptedQfuBuilder.Build(player.Identity, state, materialized.BindingRecord.Binding,
-            new MissionAcgObjectiveRecord(objective, objectiveState, string.Empty), expiry);
-        player.Session.Send(qfu.Message);
+        int expiry = GeneratedMissionWire.ClientExpiry(synchronized, DateTime.UtcNow, new DateTime(binding.ExpiresAtUtcTicks, DateTimeKind.Utc));
+        player.Session.Send(GeneratedMissionJournal.Project(player.Identity, binding, state, expiry));
     }
 
     public bool TryEnter(Player player, Identity entrance, int low, int high)
@@ -229,11 +214,11 @@ public sealed partial class GeneratedMissionAcgService
             if (source.Identity.Kind is MissionAcgRuntimeObjectKind.ObjectiveNpc or MissionAcgRuntimeObjectKind.AmbientNpc)
             {
                 var evidence = new GeneratedMissionNpcEvidence(source, instance.Bundle, binding.Offer.Quality, binding.Offer.MissionType);
-                // Same current Legacy BuildState policy: the accepted deterministic seed and
-                // captured slot/identity choose difficulty once, before the binding transaction.
+                // Freeze generated level and health once: the accepted deterministic seed and
+                // layout slot/identity drive editable scaling before the binding transaction.
                 var rng = new Random(unchecked(Seed(binding.Offer) ^ evidence.CapturedSlot * 397 ^ evidence.CapturedInstance));
-                state.Level = MissionNpcDifficultyPolicy.ResolveLevel(binding.Offer.Quality, rng);
-                state.MaxHealth = MissionNpcDifficultyPolicy.ResolveHealth(state.Level.Value, rng);
+                state.Level = MissionGenerationSettings.Current.Level.Sample(binding.Offer.Quality, rng);
+                state.MaxHealth = MissionGenerationSettings.Current.Health.Sample(state.Level.Value, rng);
                 state.CurrentHealth = state.MaxHealth;
                 var npc = _npcs.Create(evidence, state, _items);
                 if (npc.Stats.GetOrZero(CharacterStat.Health) != state.CurrentHealth || npc.Stats.GetOrZero(CharacterStat.MaxHealth) != state.MaxHealth)
@@ -248,31 +233,22 @@ public sealed partial class GeneratedMissionAcgService
 
     MissionAcgMaterializedInstance Materialize(GeneratedMissionBinding b)
     {
-        var offer = b.Offer;
         var bundle = _catalog.FindByLayoutId(b.BundleId) ?? throw new InvalidOperationException("Accepted bundle is absent.");
-        var binding = new MissionAcgInstanceBinding(MissionAcgInstanceBinding.CurrentFormatVersion,
-            new(b.QuestType, b.QuestInstance), new(b.OfferType, b.OfferInstance), new(50000, b.OwnerId),
-            b.TeamInstance == 0 ? null : new(b.TeamType, b.TeamInstance), (MissionRollType)offer.MissionType, offer.Quality, Seed(offer),
-            new(0xC76D, b.KeyInstance), new(offer.EntranceType, offer.EntranceInstance), offer.EntranceLow, offer.EntranceHigh,
-            offer.DestinationX, offer.DestinationY, offer.DestinationZ, new(offer.IssuingTerminalType, offer.IssuingTerminalInstance),
-            b.BundleId, b.BundleSha256, new(b.BuildingType, b.BuildingInstance), b.LivePlayfield,
-            new DateTime(b.AcceptedAtUtcTicks, DateTimeKind.Utc), new DateTime(b.ExpiresAtUtcTicks, DateTimeKind.Utc), b.TeamInstance == 0);
-        var state = new MissionAcgInstanceState(MissionAcgLifecycleState.Active, MissionAcgCleanupState.None, DateTime.UtcNow, null);
-        if (!MissionAcgRuntimeMaterializer.TryMaterialize(new(binding, state, string.Empty), bundle, null, DateTime.UtcNow, out var instance, out string failure))
+        if (!MissionAcgRuntimeMaterializer.TryMaterialize(b, bundle, null, DateTime.UtcNow, out var instance, out string failure))
             throw new InvalidOperationException(failure);
         return instance;
     }
 
     static QuestInfo DecodeFrozenOffer(GeneratedMissionOffer offer)
     {
-        var roll = MissionRollService.DeserializeBody(offer.FrozenWireBody);
+        var roll = GeneratedMissionWire.Read(offer.FrozenWireBody);
         if (roll.Identity.Instance != offer.OwnerId || offer.OfferIndex < 0 || offer.OfferIndex >= roll.QuestInfos.Length)
             throw new InvalidOperationException("Frozen roll owner/index mismatch.");
         var state = roll.QuestInfos[offer.OfferIndex];
         var action = state.QuestActions.Single();
         var reward = state.ItemRewards?.SingleOrDefault();
         if ((int)state.QuestIdentity.Type != offer.OfferType || state.QuestIdentity.Instance != offer.OfferInstance || state.Quality != offer.Quality
-            || (int)MissionTypeCatalog.TypeFromIcon(state.MissionIconId) != offer.MissionType
+            || (int)MissionRollPolicy.Current.TypeFromIcon(state.MissionIconId) != offer.MissionType
             || (int)action.Playfield.Type != offer.DestinationType || action.Playfield.Instance != offer.DestinationInstance
             || !action.X.Equals(offer.DestinationX) || !action.Y.Equals(offer.DestinationY) || !action.Z.Equals(offer.DestinationZ)
             || action.Unknown18 != offer.EntranceLow || action.Unknown19 != offer.EntranceHigh

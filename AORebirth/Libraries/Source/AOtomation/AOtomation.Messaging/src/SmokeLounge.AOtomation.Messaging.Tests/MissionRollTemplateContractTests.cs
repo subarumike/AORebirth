@@ -18,11 +18,12 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom;
 
     using ZoneEngine.Core.Missions;
+    using ZoneEngine_New.Core.Missions;
 
     #endregion
 
     /// <summary>
-    /// Guards the mission-roll template used by <see cref="MissionRollService"/>. The service decodes a
+    /// Guards the mission-roll template used by <see cref="GeneratedMissionRollService"/>. The service decodes a
     /// captured server->client QuestAlternative response into live objects and re-serializes it back to the
     /// client. If our QuestAlternative/QuestInfo serializer does not reproduce the captured bytes exactly,
     /// the client silently rejects the reply and the mission terminal shows an empty list. This test proves
@@ -51,14 +52,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void CapturedQuestAlternativeTemplateRoundTripsByteForByte()
         {
-            byte[] body = MissionRollService.TemplateBody;
+            byte[] body = GeneratedMissionWire.TemplateBody;
 
-            QuestAlternativeMessage decoded = MissionRollService.DecodeTemplate();
+            QuestAlternativeMessage decoded = GeneratedMissionWire.DecodeTemplate();
 
             Assert.IsNotNull(decoded.QuestInfos, "QuestInfos should not be null after decode.");
             Assert.AreEqual(5, decoded.QuestInfos.Length, "Captured template should decode to 5 offers.");
 
-            byte[] reserialized = MissionRollService.SerializeBody(decoded);
+            byte[] reserialized = GeneratedMissionWire.Write(decoded);
 
             int firstDiff = FirstDifference(body, reserialized);
             Assert.AreEqual(-1, firstDiff, DescribeDifference(body, reserialized, firstDiff));
@@ -67,13 +68,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void EveryCapturedRollBodyRoundTripsAndMatchesItsGoldenHash()
         {
-            Assert.AreEqual(CapturedRollHashes.Length, MissionRollService.CapturedRollCount);
+            Assert.AreEqual(CapturedRollHashes.Length, GeneratedMissionWire.CapturedCount);
             using (SHA256 sha256 = SHA256.Create())
             {
-                for (int i = 0; i < MissionRollService.CapturedRollCount; i++)
+                for (int i = 0; i < GeneratedMissionWire.CapturedCount; i++)
                 {
-                    byte[] body = MissionRollService.CapturedRollBody(i);
-                    QuestAlternativeMessage decoded = MissionRollService.DecodeCapturedRoll(i);
+                    byte[] body = GeneratedMissionWire.CapturedBody(i);
+                    QuestAlternativeMessage decoded = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(i));
 
                     Assert.IsNotNull(decoded.QuestInfos, "roll " + i + " offers");
                     Assert.AreEqual(5, decoded.QuestInfos.Length, "roll " + i + " offer count");
@@ -82,7 +83,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         Hex(sha256.ComputeHash(body)),
                         "roll " + i + " fixture hash");
 
-                    byte[] reserialized = MissionRollService.SerializeBody(decoded);
+                    byte[] reserialized = GeneratedMissionWire.Write(decoded);
                     int firstDiff = FirstDifference(body, reserialized);
                     Assert.AreEqual(
                         -1,
@@ -95,15 +96,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void CapturedFixtureAccessorsReturnDefensiveCopies()
         {
-            byte[] template = MissionRollService.TemplateBody;
+            byte[] template = GeneratedMissionWire.TemplateBody;
             byte originalTemplateByte = template[0];
             template[0] ^= 0xff;
-            Assert.AreEqual(originalTemplateByte, MissionRollService.TemplateBody[0]);
+            Assert.AreEqual(originalTemplateByte, GeneratedMissionWire.TemplateBody[0]);
 
-            byte[] roll = MissionRollService.CapturedRollBody(0);
+            byte[] roll = GeneratedMissionWire.CapturedBody(0);
             byte originalRollByte = roll[0];
             roll[0] ^= 0xff;
-            Assert.AreEqual(originalRollByte, MissionRollService.CapturedRollBody(0)[0]);
+            Assert.AreEqual(originalRollByte, GeneratedMissionWire.CapturedBody(0)[0]);
 
             string[] hexBodies = MissionRollCaptureLibrary.CapturedRollBodiesHex;
             string originalHex = hexBodies[0];
@@ -116,7 +117,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             const int capturedResponseIndex = 7;
             QuestAlternativeMessage captured =
-                MissionRollService.DecodeCapturedRoll(capturedResponseIndex);
+                GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(capturedResponseIndex));
             var request = new QuestAlternativeMessage
                           {
                               Identity = new Identity
@@ -143,8 +144,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                               QuestInfos = new QuestInfo[0]
                           };
 
+            int nextIdentity = 1000;
             QuestAlternativeMessage generated =
-                MissionRollService.BuildRollResponseDeterministic(
+                GeneratedMissionRollService.Generate(
                     request,
                     request.Identity,
                     4,
@@ -152,10 +154,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     0f,
                     0f,
                     MissionLocationSide.Omni,
+                    1201445827,
                     12345,
                     capturedResponseIndex,
-                    unchecked((int)0x55690000),
-                    1201445827);
+                    () => ++nextIdentity);
 
             Assert.AreEqual(captured.VersionId, generated.VersionId);
             Assert.AreEqual(captured.LevelSlider, generated.LevelSlider);
@@ -207,8 +209,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                               QuestInfos = new QuestInfo[0]
                           };
 
+            int nextIdentity = 1000;
             QuestAlternativeMessage generated =
-                MissionRollService.BuildRollResponseDeterministic(
+                GeneratedMissionRollService.Generate(
                     request,
                     request.Identity,
                     4,
@@ -216,10 +219,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     0f,
                     0f,
                     MissionLocationSide.Omni,
+                    1201445827,
                     12345,
                     7,
-                    unchecked((int)0x55690000),
-                    1201445827);
+                    () => ++nextIdentity);
             foreach (QuestInfo offer in generated.QuestInfos)
             {
                 Assert.AreEqual(
@@ -240,7 +243,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     "Every offer must expire exactly 48 client-clock hours after this roll.");
             }
 
-            byte[] body = MissionRollService.SerializeBody(generated);
+            byte[] body = GeneratedMissionWire.Write(generated);
 
             var builder = new SerializerResolverBuilder<MessageBody>();
             SerializerResolver resolver = builder.Build();
@@ -280,23 +283,23 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             Assert.AreEqual(
                 1201445832,
-                MissionRollService.ResolveClientClockNowSeconds(
+                GeneratedMissionWire.ClientClock(
                     synced,
                     synced.AddSeconds(5)));
             Assert.AreEqual(
                 1201445827,
-                MissionRollService.ResolveClientClockNowSeconds(
+                GeneratedMissionWire.ClientClock(
                     synced,
                     synced.AddSeconds(-5)));
             Assert.AreEqual(
                 1201618632,
-                MissionRollService.ResolveClientExpirySeconds(
+                GeneratedMissionWire.ClientExpiry(
                     synced,
                     synced.AddSeconds(5),
                     synced.AddSeconds(172805)));
             Assert.AreEqual(
                 0,
-                MissionRollService.ResolveClientExpirySeconds(
+                GeneratedMissionWire.ClientExpiry(
                     synced,
                     synced.AddSeconds(5),
                     synced.AddSeconds(4)));
@@ -306,7 +309,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void AcceptedMissionExpirySerializesAsFourLosslessWireBytes()
         {
             string expiry =
-                MissionRollService.IntToFixedBinaryString(0x479F3EC3);
+                GeneratedMissionWire.ExpiryField(0x479F3EC3);
             MethodInfo fixedStringBytes =
                 typeof(QuestFullUpdateMessageSerializer).GetMethod(
                     "FixedStringBytes",

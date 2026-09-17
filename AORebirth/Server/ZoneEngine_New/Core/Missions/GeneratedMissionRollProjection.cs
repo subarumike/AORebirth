@@ -1,3 +1,4 @@
+using ZoneEngine_New.Core.Missions;
 namespace ZoneEngine_New.Core.Missions
 {
     using System;
@@ -16,12 +17,12 @@ namespace ZoneEngine_New.Core.Missions
         {
             if (response.QuestInfos == null || response.QuestInfos.Length != 5)
                 throw new InvalidOperationException("The accepted mission generator must supply exactly five offers.");
-            if (!MissionSliderProfile.TryCreate(request, out var sliders, out string error))
+            if (!MissionRollSliders.TryCreate(request, out var sliders, out string error))
                 throw new ArgumentException(error, nameof(request));
-            byte[] wire = MissionRollService.SerializeBody(response);
+            byte[] wire = GeneratedMissionWire.Write(response);
             string wireHash = Convert.ToHexStringLower(SHA256.HashData(wire));
             string batchIdentity = Guid.NewGuid().ToString("N");
-            long expires = issuedUtc.AddHours(48).Ticks;
+            long expires = issuedUtc.AddSeconds(MissionRollPolicy.Current.OfferLifetimeSeconds).Ticks;
             var offers = new List<GeneratedMissionOffer>();
             for (int index = 0; index < response.QuestInfos.Length; index++)
             {

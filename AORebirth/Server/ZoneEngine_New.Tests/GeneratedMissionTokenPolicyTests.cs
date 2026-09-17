@@ -25,7 +25,7 @@ public sealed class GeneratedMissionTokenPolicyTests
     {
         for (int level = 1; level <= 220; level++)
         {
-            Assert.IsTrue(MissionLevelTable.TryGetTokenReward(level, out int expected, out string reason), reason);
+            Assert.IsTrue(MissionLevelRuntime.TryGetTokenReward(level, out int expected, out string reason), reason);
             foreach (Side side in new[] { Side.Clan, Side.Omni })
             {
                 Assert.IsTrue(MissionAcgTokenRewardPolicy.TryResolve(100, level, side, out var data, out reason), reason);

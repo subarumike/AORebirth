@@ -13,8 +13,6 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Logging;
 using ZoneEngine_New.Core.Network;
-using DomainState = ZoneEngine.Core.Missions.MissionLifecycleState;
-using DomainStatus = ZoneEngine.Core.Missions.MissionOperationStatus;
 using DaoState = AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState;
 
 /// <summary>Generic editable authored actions; inventory, rewards and mission transitions commit together.</summary>
@@ -66,7 +64,7 @@ public sealed partial class AuthoredQuestService
         if (Content.TimedTurnIns.FirstOrDefault(x => x.Key == key) is { } timed)
             return item != null && TryTurnInTimedItem(player, slot, item, acknowledge ?? (() => { }), timed);
         if (!Content.Actions.TryGetValue(key, out var action)) return false;
-        return Mutate(player, null, (tx, service) =>
+        return Mutate(player, null, tx =>
         {
             if (!Conditions(player, action, tx)) throw new InvalidOperationException("Interaction conditions are not satisfied.");
             if (action.ItemIds.Length != 0)
@@ -83,9 +81,9 @@ public sealed partial class AuthoredQuestService
             var stats = new List<MissionStatValueData>();
             foreach (var entry in actions)
             {
-                foreach (var completion in entry.Complete) CompleteIfPresent(service, player.Identity.Instance, completion.Quest,
+                foreach (var completion in entry.Complete) CompleteIfPresent(tx, completion.Quest,
                     completion.Objective, completion.Observation, completion.Event);
-                foreach (var quest in entry.Accept) Accept(service, player.Identity.Instance, quest);
+                foreach (var quest in entry.Accept) Accept(tx, quest);
                 if (entry.StatReward is { } reward) stats.AddRange(ApplyStatReward(tx, player, reward.Quest, reward.Key, reward.Xp, reward.Cash,
                     string.IsNullOrWhiteSpace(reward.EffectReference) ? "content-action:" + reward.Quest + ":" + reward.Key : reward.EffectReference, _now().Ticks));
             }
@@ -159,7 +157,7 @@ public sealed partial class AuthoredQuestService
         }
     }
 
-    bool Mutate(Player player, string? account, Func<IMissionDaoTransaction, PersistentMissionService, Action?> operation)
+    bool Mutate(Player player, string? account, Func<IMissionDaoTransaction, Action?> operation)
     {
         bool committed = false, applied = false;
         try
@@ -168,11 +166,7 @@ public sealed partial class AuthoredQuestService
             {
                 if (!IsCurrent(player)) return;
                 _flush.HardFlush(player);
-                Action? publish = _dao.Execute(player.Identity.Instance, account!, tx =>
-                {
-                    var service = new PersistentMissionService(new MissionDaoRepositoryAdapter(new AuthoredMissionTransactionScope(tx)), _catalog.Definitions, () => _now().Ticks);
-                    return operation(tx, service);
-                });
+                Action? publish = _dao.Execute(player.Identity.Instance, account!, operation);
                 committed = true;
                 publish?.Invoke();
                 applied = true;
@@ -220,25 +214,24 @@ public sealed partial class AuthoredQuestService
     { InstanceId = row.InstanceId, ContainerType = row.ContainerType, ContainerInstance = row.ContainerInstance, ContainerPlacement = row.ContainerPlacement,
         ItemType = row.ItemType, LowId = row.LowId, HighId = row.HighId, Quality = row.Quality, StackCount = row.StackCount, Source = (byte)row.Source };
 
-    static void Accept(PersistentMissionService service, int owner, string quest)
+    MissionDefinition Definition(string quest) => _catalog.Definitions.Single(d => string.Equals(d.QuestId, quest, StringComparison.OrdinalIgnoreCase));
+
+    void Accept(IMissionDaoTransaction tx, string quest)
     {
-        RequireSuccess(service.OfferMission(owner, quest));
-        RequireSuccess(service.AcceptMission(owner, quest));
+        var definition = Definition(quest);
+        AuthoredMissionProgression.Offer(tx, definition, _now().Ticks);
+        AuthoredMissionProgression.Accept(tx, definition, _now().Ticks);
     }
 
-    static void CompleteIfPresent(PersistentMissionService service, int owner, string quest, string objective,
+    void CompleteIfPresent(IMissionDaoTransaction tx, string quest, string objective,
         string observationKey = "content-action-complete", string eventType = "ContentAction")
     {
-        var state = service.GetMission(owner, quest);
-        if (state == null || state.State == DomainState.Completed) return;
-        if (state.State == DomainState.Offered) RequireSuccess(service.AcceptMission(owner, quest));
-        RequireSuccess(service.ObserveObjective(new MissionObjectiveObservation { CharacterId = owner, QuestId = quest,
-            ObjectiveId = objective, ObservationKey = observationKey, Amount = 1, EventType = eventType, SourceIdentity = string.Empty, TargetIdentity = string.Empty }));
-        RequireSuccess(service.CompleteMission(owner, quest));
+        var state = tx.GetMission(new(tx.CharacterId, quest));
+        if (state == null || state.State == DaoState.Completed) return;
+        var definition = Definition(quest);
+        if (state.State == DaoState.Offered) AuthoredMissionProgression.Accept(tx, definition, _now().Ticks);
+        AuthoredMissionProgression.Complete(tx, definition, objective, observationKey, eventType, string.Empty, string.Empty, _now().Ticks);
     }
-
-    static void RequireSuccess(MissionOperationResult result)
-    { if (result.Status is not (DomainStatus.Applied or DomainStatus.AlreadyApplied)) throw new InvalidOperationException(result.Message); }
 
     static IList<MissionStatValueData> ApplyStatReward(IMissionDaoTransaction tx, Player player, string quest, string rewardKey, int xp, int cash, string evidence, long now)
     {

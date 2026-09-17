@@ -1,3 +1,4 @@
+using ZoneEngine_New.Core.Missions;
 namespace ZoneEngine.Core.Missions
 {
     using System;
@@ -15,7 +16,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWireValue,
             int missionQuality,
-            MissionSliderProfile sliders,
+            MissionRollSliders sliders,
             Random rng)
         {
             if (sliders == null)
@@ -59,7 +60,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWireValue,
             int missionQuality,
-            MissionSliderProfile sliders)
+            MissionRollSliders sliders)
         {
             for (int i = 0; i < Mixes.Length; i++)
             {
@@ -113,7 +114,7 @@ namespace ZoneEngine.Core.Missions
                 int characterLevel,
                 int difficulty,
                 int missionQuality,
-                MissionSliderProfile sliders)
+                MissionRollSliders sliders)
             {
                 return new EvidenceRank(
                     Math.Abs(MissionQuality - missionQuality),
@@ -132,7 +133,7 @@ namespace ZoneEngine.Core.Missions
                 int characterLevel,
                 int difficulty,
                 int missionQuality,
-                MissionSliderProfile sliders)
+                MissionRollSliders sliders)
             {
                 return CharacterLevel == characterLevel
                        && Difficulty == difficulty
