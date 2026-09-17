@@ -123,6 +123,7 @@ tools-temp/external/aosharp-github/
 tools-temp/external/easyhook/
 
 # Local/generated investigation artifacts that can contain credentials, captures, or copied binaries.
+/artifacts/
 build-verify/
 tools-temp/live-pcaps/
 tools-temp/fusion-logs/

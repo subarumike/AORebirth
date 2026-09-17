@@ -86,14 +86,27 @@ namespace ZoneEngine_New.Core.Ai
             if (target == null)
                 return _nodeState = NodeState.Failure;
 
-            if (_brain.IsInAttackRange(target))
+            if (_brain.CanAttackNow(target))
             {
                 _brain.StopPathing();
                 return _nodeState = NodeState.Success;
             }
 
+            if (_brain.HasUnfinishedPath())
+            {
+                if (_brain.CanPathTo(target))
+                    _brain.PathTo(target.Position);
+                return _nodeState = NodeState.Running;
+            }
+
             if (!_brain.CanPathTo(target))
+            {
+                if (_brain.HasChanceWithGrace(target))
+                    return _nodeState = NodeState.Running;
+
+                _brain.StopFighting();
                 return _nodeState = NodeState.Failure;
+            }
 
             _brain.PathTo(target.Position);
             return _nodeState = NodeState.Running;

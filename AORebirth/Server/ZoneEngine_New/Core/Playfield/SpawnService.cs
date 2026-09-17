@@ -423,6 +423,7 @@ namespace ZoneEngine_New.Core.Playfield
             try
             {
                 _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
+                player.Position = _playfield.SnapFeetToFloor(player.Position);
                 player.Rebase();
                 PlayerSpawnPayloadValidator.RequireValid(player);
                 PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
@@ -765,16 +766,17 @@ namespace ZoneEngine_New.Core.Playfield
             int characterId = player.Identity.Instance;
             int playfieldId = _playfield.Identity.Instance;
 
-            session.SendSamePlayfieldRespawnTeleport(landing);
-            player.Position = landing;
+            Vector3 onFloor = _playfield.SnapFeetToFloor(landing);
+            session.SendSamePlayfieldRespawnTeleport(onFloor);
+            player.Position = onFloor;
 
             session.Send(
                 _playfield.CreatePlayfieldAnarchyFMessage(
                     new SmokeLounge.AOtomation.Messaging.GameData.Vector3
                     {
-                        X = landing.xf,
-                        Y = landing.yf,
-                        Z = landing.zf
+                        X = onFloor.xf,
+                        Y = onFloor.yf,
+                        Z = onFloor.zf
                     }),
                 playfieldId,
                 characterId);

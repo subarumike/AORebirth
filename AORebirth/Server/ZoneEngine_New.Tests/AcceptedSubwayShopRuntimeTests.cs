@@ -153,7 +153,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
             typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(manager, new Dictionary<int, Player>());
             _flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => manager), new Coalesce(), new StubLogger());
-            var data = new StubGameData(HashItemCatalog.Parse("{}", "{}"), allowMissingCatMesh: allowMissingCatMesh);
+            var data = new StubGameData(HashItemCatalog.Parse("{}"), allowMissingCatMesh: allowMissingCatMesh);
             var items = new StubItemBuilder();
             var minter = new HashItemMinter(data, catalog, items);
             var ids = new Ids();

@@ -2,10 +2,10 @@ namespace ZoneEngine_New.Core.GameData
 {
     using System;
 
-    /// <summary>One concrete item family from GameData/HashInstances.json.</summary>
+    /// <summary>One concrete item family from GameData/ItemTemplates.json.</summary>
     public sealed class HashInstance
     {
-        public HashInstance(string hash, int[] templateIds, int minLevel, int maxLevel)
+        public HashInstance(string hash, int[] templateIds)
         {
             ArgumentException.ThrowIfNullOrEmpty(hash);
             ArgumentNullException.ThrowIfNull(templateIds);
@@ -14,16 +14,10 @@ namespace ZoneEngine_New.Core.GameData
 
             Hash = hash;
             TemplateIds = templateIds;
-            MinLevel = minLevel;
-            MaxLevel = maxLevel;
         }
 
         public string Hash { get; }
 
         public int[] TemplateIds { get; }
-
-        public int MinLevel { get; }
-
-        public int MaxLevel { get; }
     }
 }

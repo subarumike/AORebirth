@@ -44,6 +44,29 @@ namespace AORebirth.World.Collision.Tests
         }
 
         [TestMethod]
+        public void TryGetHeight_BilinearSample_MatchesCornerAndMidpoint()
+        {
+            var heights = new float[2, 2];
+            heights[0, 0] = 10f;
+            heights[1, 0] = 20f;
+            heights[0, 1] = 30f;
+            heights[1, 1] = 40f;
+
+            var terrain = new TerrainHeightfield(
+                tileSize: 4f,
+                heightScale: 0.2f,
+                chunkSize: 2,
+                gridWidth: 1,
+                chunks: new[] { new TerrainHeightChunk(heights, originX: 8f, originZ: 12f) });
+
+            Assert.IsTrue(terrain.TryGetHeight(8f, 12f, out float corner));
+            Assert.AreEqual(2f, corner, 0.001f);
+            Assert.IsTrue(terrain.TryGetHeight(10f, 14f, out float mid));
+            Assert.AreEqual(5f, mid, 0.001f);
+            Assert.IsFalse(terrain.TryGetHeight(0f, 0f, out _));
+        }
+
+        [TestMethod]
         public void TryBuild_EmptyChunks_ReturnsNull()
         {
             var terrain = new TerrainHeightfield(1f, 1f, 2, 1, System.Array.Empty<TerrainHeightChunk>());

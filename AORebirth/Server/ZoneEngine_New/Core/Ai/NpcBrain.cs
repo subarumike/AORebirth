@@ -15,6 +15,7 @@ namespace ZoneEngine_New.Core.Ai
     using ZoneEngine_New.Core.Playfield;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
+    using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     public sealed class NpcBrain
     {
@@ -31,6 +32,7 @@ namespace ZoneEngine_New.Core.Ai
         Vector3 _reachCachePos = new(0, 0, 0);
         DateTime _reachCacheUtc;
         bool _reachCacheResult;
+        DateTime _lastChanceUtc;
 
         NpcBrain(NpcCharacter npc, Vector3? home, NpcAiProfile profile)
         {
@@ -91,6 +93,7 @@ namespace ZoneEngine_New.Core.Ai
         {
             Hate.Clear();
             _currentTarget = Identity.None;
+            _lastChanceUtc = default;
         }
 
         public void OnOwnerDied()
@@ -168,9 +171,41 @@ namespace ZoneEngine_New.Core.Ai
         public bool HasChance(Character target)
         {
             ArgumentNullException.ThrowIfNull(target);
-            if (IsInAttackRange(target) && Npc.HasLineOfSightTo(target))
+            if (CanAttackNow(target))
+                return true;
+            // No LOS is fine while the chase path still has travel left.
+            // Give up only with no path, or already on the last point.
+            if (HasUnfinishedPath())
                 return true;
             return CanPathTo(target);
+        }
+
+        public bool HasChanceWithGrace(Character target)
+        {
+            ArgumentNullException.ThrowIfNull(target);
+            if (HasChance(target))
+            {
+                _lastChanceUtc = DateTime.UtcNow;
+                return true;
+            }
+
+            return NpcAiRules.IsWithinNoChanceGrace(_lastChanceUtc, DateTime.UtcNow);
+        }
+
+        public bool HasUnfinishedPath()
+        {
+            if (!Npc.Motor.HasPath)
+                return false;
+
+            MsgVector3[] remaining = Npc.Motor.CopyRemainingWaypoints();
+            if (remaining.Length == 0)
+                return false;
+
+            MsgVector3 last = remaining[remaining.Length - 1];
+            return !PathEndsUnderNpc(
+                new System.Numerics.Vector3((float)Npc.Position.x, (float)Npc.Position.y, (float)Npc.Position.z),
+                last.X,
+                last.Z);
         }
 
         public bool CanPathTo(Character target)
@@ -181,23 +216,31 @@ namespace ZoneEngine_New.Core.Ai
                 return true;
 
             DateTime now = DateTime.UtcNow;
+            Vector3 cachedEnd = HeightfieldOrSelf(target.Position);
             if (_reachCacheId == target.Identity
                 && (now - _reachCacheUtc).TotalSeconds < NpcFollowTarget.RepathIntervalSeconds
-                && Vector3.Abs(target.Position - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters)
+                && Vector3.Abs(cachedEnd - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters)
                 return _reachCacheResult;
 
-            var start = new System.Numerics.Vector3((float)Npc.Position.x, (float)Npc.Position.y, (float)Npc.Position.z);
-            var end = new System.Numerics.Vector3(
-                (float)target.Position.x,
-                (float)target.Position.y,
-                (float)target.Position.z);
+            Vector3 startPos = HeightfieldOrSelf(Npc.Position);
+            Vector3 endPos = cachedEnd;
+            var start = new System.Numerics.Vector3((float)startPos.x, (float)startPos.y, (float)startPos.z);
+            var end = new System.Numerics.Vector3((float)endPos.x, (float)endPos.y, (float)endPos.z);
 
-            // Off-mesh ends or starts stay movable so holes and future off-mesh links are not a wall.
-            bool reachable = !finder.TrySnap(start, out _)
-                || finder.TryFindPath(start, end, _reachPathScratch)
-                || !finder.TrySnap(end, out _);
+            // Off-mesh starts stay movable so holes and future off-mesh links are not a wall.
+            // A complete path that ends under the NPC is not a chase chance once the target
+            // is also out of attack range — they cannot get closer. In-range fight-back is
+            // decided by HasChance before this runs.
+            bool foundPath = finder.TryFindPath(start, end, _reachPathScratch);
+            bool reachable;
+            if (!finder.TrySnap(start, out _))
+                reachable = true;
+            else if (foundPath)
+                reachable = !PathEndsUnderNpc(start, _reachPathScratch);
+            else
+                reachable = !finder.TrySnap(end, out _);
             _reachCacheId = target.Identity;
-            _reachCachePos = new Vector3(target.Position.x, target.Position.y, target.Position.z);
+            _reachCachePos = new Vector3(endPos.x, endPos.y, endPos.z);
             _reachCacheUtc = now;
             _reachCacheResult = reachable;
             return reachable;
@@ -209,8 +252,15 @@ namespace ZoneEngine_New.Core.Ai
             return Npc.Distance3D(target) <= GetAttackRange();
         }
 
+        public bool CanAttackNow(Character target)
+        {
+            ArgumentNullException.ThrowIfNull(target);
+            return IsInAttackRange(target) && Npc.HasLineOfSightTo(target);
+        }
+
         public void PathTo(Vector3 destination)
         {
+            destination = HeightfieldOrSelf(destination);
             DateTime now = DateTime.UtcNow;
             if (Npc.Motor.HasPath || _followAnnounced)
             {
@@ -223,7 +273,19 @@ namespace ZoneEngine_New.Core.Ai
                     return;
             }
 
-            if (!Npc.Motor.TryRetargetFinalWaypoint(destination, 0.25f))
+            if (_reachPathScratch.Count > 0
+                && Vector3.Abs(destination - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters)
+            {
+                _pathScratch.Clear();
+                for (int i = 0; i < _reachPathScratch.Count; i++)
+                {
+                    System.Numerics.Vector3 point = _reachPathScratch[i];
+                    _pathScratch.Add(new Vector3(point.X, point.Y, point.Z));
+                }
+
+                Npc.Motor.SetPath(_pathScratch);
+            }
+            else if (!Npc.Motor.TryRetargetFinalWaypoint(destination, 0.25f))
                 Npc.Motor.NavigateTo(destination);
 
             _pathScratch.Clear();
@@ -284,6 +346,14 @@ namespace ZoneEngine_New.Core.Ai
             return range;
         }
 
+        Vector3 HeightfieldOrSelf(Vector3 position)
+        {
+            Playfield? playfield = Npc.Playfield;
+            if (playfield != null && playfield.TrySnapFeetToFloor(position, out Vector3 floor))
+                return floor;
+            return position;
+        }
+
         Character? Resolve(Identity identity)
         {
             if (identity.Instance == 0 || Npc.Playfield == null)
@@ -304,7 +374,26 @@ namespace ZoneEngine_New.Core.Ai
             Character? target = Resolve(identity);
             return target != null
                 && NpcAiRules.IsNearby(Npc.Position, target.Position, NpcAiRules.NearbyRange)
-                && HasChance(target);
+                && HasChanceWithGrace(target);
+        }
+
+        internal static bool PathEndsUnderNpc(
+            System.Numerics.Vector3 npc,
+            IReadOnlyList<System.Numerics.Vector3> path)
+        {
+            if (path == null || path.Count == 0)
+                return true;
+
+            System.Numerics.Vector3 end = path[path.Count - 1];
+            return PathEndsUnderNpc(npc, end.X, end.Z);
+        }
+
+        static bool PathEndsUnderNpc(System.Numerics.Vector3 npc, float endX, float endZ)
+        {
+            float dx = endX - npc.X;
+            float dz = endZ - npc.Z;
+            float limit = NpcAiRules.PathEndGiveUpMeters;
+            return (dx * dx) + (dz * dz) <= limit * limit;
         }
     }
 }

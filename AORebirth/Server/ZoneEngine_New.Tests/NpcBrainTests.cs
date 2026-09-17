@@ -167,6 +167,99 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(brain.CanPathTo(player));
         }
 
+        [TestMethod]
+        public void HasChanceWithoutLineOfSightUsesPath()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            Player player = TestWorld.CreatePlayer(32);
+            player.Position = new Vector3(1, 0, 0);
+
+            Assert.IsTrue(brain.IsInAttackRange(player));
+            Assert.IsFalse(npc.HasLineOfSightTo(player));
+            Assert.IsFalse(brain.CanAttackNow(player));
+            Assert.IsTrue(brain.CanPathTo(player));
+            Assert.IsTrue(brain.HasChance(player));
+        }
+
+        [TestMethod]
+        public void HasChanceWithGraceStaysTrueAfterChance()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            Player player = TestWorld.CreatePlayer(35);
+            player.Position = new Vector3(8, 0, 0);
+
+            Assert.IsTrue(brain.HasChance(player));
+            Assert.IsTrue(brain.HasChanceWithGrace(player));
+        }
+
+        [TestMethod]
+        public void CanAttackNowRequiresLineOfSight()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            Player player = TestWorld.CreatePlayer(33);
+            player.Position = new Vector3(1, 0, 0);
+
+            Assert.IsTrue(brain.IsInAttackRange(player));
+            Assert.IsFalse(npc.HasLineOfSightTo(player));
+            Assert.IsFalse(brain.CanAttackNow(player));
+        }
+
+        [TestMethod]
+        public void HasUnfinishedPathIsTrueWhileLastWaypointIsAway()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            npc.Motor.SetPath(new[] { new Vector3(0, 0, 0), new Vector3(10, 0, 0) });
+            Player player = TestWorld.CreatePlayer(34);
+            player.Position = new Vector3(10, 0, 0);
+
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.IsTrue(brain.HasUnfinishedPath());
+            Assert.IsFalse(brain.CanAttackNow(player));
+            Assert.IsTrue(brain.HasChance(player));
+        }
+
+        [TestMethod]
+        public void HasUnfinishedPathIsFalseAtFinalPoint()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(10, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            npc.Motor.SetPath(new[] { new Vector3(0, 0, 0), new Vector3(10, 0, 0) });
+
+            Assert.IsFalse(brain.HasUnfinishedPath());
+        }
+
+        [TestMethod]
+        public void PathEndsUnderNpcWhenLastWaypointIsAtFeet()
+        {
+            var path = new System.Collections.Generic.List<System.Numerics.Vector3>
+            {
+                new(0.2f, 0.4f, -0.1f)
+            };
+
+            Assert.IsTrue(NpcBrain.PathEndsUnderNpc(new System.Numerics.Vector3(0f, 0f, 0f), path));
+        }
+
+        [TestMethod]
+        public void PathDoesNotEndUnderNpcWhenLastWaypointTravelsAway()
+        {
+            var path = new System.Collections.Generic.List<System.Numerics.Vector3>
+            {
+                new(4f, 0f, 0f),
+                new(8f, 0f, 2f)
+            };
+
+            Assert.IsFalse(NpcBrain.PathEndsUnderNpc(new System.Numerics.Vector3(0f, 0f, 0f), path));
+        }
+
         static NpcCharacter CreateNpc()
         {
             return new NpcCharacter(

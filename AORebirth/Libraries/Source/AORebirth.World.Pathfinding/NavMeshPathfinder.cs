@@ -18,6 +18,8 @@ namespace AORebirth.World.Pathfinding
     {
         const int MaxPathPolys = 256;
         const int MaxStraightPath = 256;
+        // DotRecast's default node pool grows without bound. Native Detour stops at maxNodes.
+        const int MaxSearchIters = 4096;
         const float StartSkipEpsilon = 0.05f;
         const float PathQueryHorizontal = 8f;
         const float OnMeshHorizontal = 2f;
@@ -112,19 +114,9 @@ namespace AORebirth.World.Pathfinding
                 return false;
 
             Span<long> path = stackalloc long[MaxPathPolys];
-            DtStatus pathStatus = _query.FindPath(
-                ends.StartRef,
-                ends.EndRef,
-                ends.StartPt,
-                ends.EndPt,
-                _filter,
-                path,
-                out int pathCount,
-                path.Length);
-            if (pathStatus.Failed() || pathStatus.IsPartial() || pathCount <= 0)
-                return false;
-
-            return path[pathCount - 1] == ends.EndRef;
+            return TrySearchCorridor(ends, path, out int pathCount)
+                && pathCount > 0
+                && path[pathCount - 1] == ends.EndRef;
         }
 
         public bool TryFindPath(Vector3 start, Vector3 end, List<Vector3> waypoints)
@@ -134,18 +126,11 @@ namespace AORebirth.World.Pathfinding
 
             if (!TryResolveEnds(start, end, out PolyEnds ends))
                 return false;
+            if (!IsOnMesh(end, ends.EndPt))
+                return false;
 
             Span<long> path = stackalloc long[MaxPathPolys];
-            DtStatus pathStatus = _query.FindPath(
-                ends.StartRef,
-                ends.EndRef,
-                ends.StartPt,
-                ends.EndPt,
-                _filter,
-                path,
-                out int pathCount,
-                path.Length);
-            if (pathStatus.Failed() || pathCount <= 0)
+            if (!TrySearchCorridor(ends, path, out int pathCount) || pathCount <= 0)
                 return false;
 
             Span<DtStraightPath> straight = stackalloc DtStraightPath[MaxStraightPath];
@@ -173,6 +158,27 @@ namespace AORebirth.World.Pathfinding
 
         public void Dispose()
         {
+        }
+
+        bool TrySearchCorridor(in PolyEnds ends, Span<long> path, out int pathCount)
+        {
+            pathCount = 0;
+            DtStatus init = _query.InitSlicedFindPath(
+                ends.StartRef,
+                ends.EndRef,
+                ends.StartPt,
+                ends.EndPt,
+                _filter,
+                0);
+            if (init.Failed())
+                return false;
+
+            DtStatus update = _query.UpdateSlicedFindPath(MaxSearchIters, out _);
+            if (update.Failed() || update.InProgress() || update.IsPartial() || !update.Succeeded())
+                return false;
+
+            DtStatus finalized = _query.FinalizeSlicedFindPath(path, out pathCount, path.Length);
+            return !finalized.Failed() && !finalized.IsPartial() && pathCount > 0;
         }
 
         bool TryResolveEnds(Vector3 start, Vector3 end, out PolyEnds ends)

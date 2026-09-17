@@ -1,19 +1,40 @@
 namespace ZoneEngine_New.Core.Movement
 {
-    /// <summary>Lost Eden MovementConfig numeric defaults (no ScriptableObject).</summary>
+    /// <summary>Official-client <c>Vehicle_t</c> defaults from Vehicle.dll.</summary>
     public static class MovementConfig
     {
         public const float Mass = 50f;
-        public const float ForceReachTime = 0.5f;
+        public const float DefaultMaxForce = 2f;
+        public const float DefaultMaxVel = 2f;
         public const float Gravity = -20f;
         public const float GroundStickVelocity = -2f;
         public const float TerminalVelocity = 50f;
+        public const float MaxIntegrationStep = 0.4f;
         public const float SpeedStopEpsilon = 0.05f;
-        public const float WaypointArrivalRadius = 0.5f;
+
+        /// <summary>
+        /// <c>Vehicle_t::Run</c> aborts a functional path when surface alignment
+        /// moves the body more than this from the path sample.
+        /// </summary>
+        public const float PathSampleAbortDistance = 0.5f;
+
+        /// <summary>Body radius used as the hug lift and slide sphere (<c>0.4</c>).</summary>
+        public const float SurfaceHugLift = 0.4f;
+
+        /// <summary>Offset of each <c>EnsureSurfaceAlignment</c> tripod ray.</summary>
+        public const float SurfaceTripodRadius = 0.04f;
+
+        /// <summary><c>FUN_1000b2e5</c> iteration cap when falling is enabled.</summary>
+        public const int SurfaceSlideIterations = 10;
+
+        /// <summary>Normals steeper than this are walls; the rest are walkable floors.</summary>
+        public const float SurfaceSlideFloorY = 0.5f;
+
+        /// <summary>Client flattens the reconstructed normal to up below this Y.</summary>
+        public const float SurfaceUprightMinY = 0.5f;
         public const float WalkBaseVelocity = 1.5f;
         public const float TurnRateRadiansStopped = 3.5f;
         public const float TurnRateRadiansMoving = 1.5f;
-        public const float PathTurnRateDegrees = 500f;
         public const float JumpStatCap = 800f;
         public const float JumpHeightPerStatPool = 200f;
         public const float JumpHeightBase = 1f;

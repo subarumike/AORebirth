@@ -43,6 +43,9 @@ namespace AORebirth.World.Pathfinding.Tests
                         CultureInfo.InvariantCulture,
                         $"No corridor after spawn snap home=({home.X:F2},{home.Y:F2},{home.Z:F2}) near=({near.X:F2},{near.Y:F2},{near.Z:F2})"));
                 Assert.IsTrue(waypoints.Count >= 1);
+                Assert.IsFalse(
+                    pathfinder.TryFindPath(home, new Vector3(home.X, 0f, home.Z), waypoints),
+                    "A point under the mesh must fail before A* floods the playfield.");
             }
         }
 

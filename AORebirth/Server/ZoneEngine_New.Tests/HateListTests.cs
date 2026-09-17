@@ -1,5 +1,7 @@
 namespace ZoneEngine_New.Tests
 {
+    using System;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -97,6 +99,15 @@ namespace ZoneEngine_New.Tests
         {
             Assert.IsFalse(NpcAiRules.IsProximityHostile(0));
             Assert.IsTrue(NpcAiRules.IsProximityHostile(1));
+        }
+
+        [TestMethod]
+        public void NoChanceGraceHoldsUntilTwoSeconds()
+        {
+            DateTime last = new(2026, 9, 17, 12, 0, 0, DateTimeKind.Utc);
+            Assert.IsFalse(NpcAiRules.IsWithinNoChanceGrace(default, last));
+            Assert.IsTrue(NpcAiRules.IsWithinNoChanceGrace(last, last.AddSeconds(1.9)));
+            Assert.IsFalse(NpcAiRules.IsWithinNoChanceGrace(last, last.AddSeconds(2)));
         }
     }
 }

@@ -25,7 +25,7 @@ public sealed class AcceptedVendorRealCatalogTests
         string dataRoot = Path.Combine(AppContext.BaseDirectory, "GameData");
         string path = Path.Combine(dataRoot, "items.dat");
         Assert.IsTrue(File.Exists(path), "The repository GameData/items.dat must be packaged; no synthetic catalog is permitted.");
-        var data = new StubGameData(HashItemCatalog.Parse("{}", "{}")) { RootPath = dataRoot };
+        var data = new StubGameData(HashItemCatalog.Parse("{}")) { RootPath = dataRoot };
         // No SQL/name rows are supplied: the real catalog cannot turn missing templates into name-only stubs.
         var catalog = new ItemTemplateCatalog(new NoNames(), data, new StubLogger());
         var items = new ItemBuilder(catalog, new StubLogger());

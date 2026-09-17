@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
     using AODB.Common.RDBObjects;
 
     using AORebirth.Core.GameData;
+    using AORebirth.World.Collision;
 
     using BepuPhysics;
     using BepuPhysics.Collidables;
@@ -19,6 +20,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
@@ -209,6 +211,26 @@ namespace ZoneEngine_New.Core.WorldSimulation
             return true;
         }
 
+        /// <summary>
+        /// Places feet on the walkable floor at this XZ. Outdoor terrain is the
+        /// heightfield we baked into Bepu; a downward ray that starts under that
+        /// one-sided mesh never hits it, so the heightfield sample is the floor.
+        /// Indoor meshes have no heightfield and still use a torso-height ray.
+        /// </summary>
+        public bool TrySnapToFloor(AoVector3 feet, out AoVector3 floor)
+        {
+            floor = feet;
+            TerrainHeightfield? terrain = _geometry.Collision?.Terrain;
+            if (terrain != null
+                && terrain.TryGetHeight((float)feet.x, (float)feet.z, out float terrainY))
+            {
+                floor = new AoVector3(feet.x, terrainY, feet.z);
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>Casts straight down and reports the surface height under <paramref name="origin"/>.</summary>
         public bool TryRaycastDown(AoVector3 origin, float maxDistance, out AoVector3 hitPosition)
         {
@@ -228,6 +250,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             hitPosition = new AoVector3(origin.x, origin.y - t, origin.z);
             return true;
         }
+
+        public IVehicleSurface CreateVehicleSurface() => new WorldVehicleSurface(Queries);
 
         public void TickSoftTriggers(PlayfieldType playfield, double deltaTime)
         {

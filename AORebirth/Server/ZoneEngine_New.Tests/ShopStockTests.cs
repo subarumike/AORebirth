@@ -15,22 +15,15 @@ namespace ZoneEngine_New.Tests
     [TestClass]
     public sealed class ShopStockTests
     {
-        const string TemplatesJson =
+        const string CatalogJson =
             """
             {
                 "WEAP": {
-                    "PSTL": { "Description": "Pistols", "ParentHash": "WEPN" },
-                    "RIFL": { "Description": "Rifles", "ParentHash": "WEPN" }
-                }
-            }
-            """;
-
-        const string InstancesJson =
-            """
-            {
-                "MOPA": { "TemplateId": [42640], "MinLevel": 1, "MaxLevel": 400 },
-                "PSTL": { "TemplateId": [254633], "MinLevel": 1, "MaxLevel": 300 },
-                "RIFL": { "TemplateId": [257128], "MinLevel": 300, "MaxLevel": 300 }
+                    "Children": [ "PSTL", "RIFL" ]
+                },
+                "MOPA": { "Templates": [42640] },
+                "PSTL": { "Templates": [254633] },
+                "RIFL": { "Templates": [257128] }
             }
             """;
 
@@ -73,7 +66,7 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void QualityIsClampedToTheHashInstanceBand()
+        public void QualityStaysInTheShopEntryBand()
         {
             ShopStock stock = new();
             stock.EnsureFresh(
@@ -82,7 +75,8 @@ namespace ZoneEngine_New.Tests
                 new Random(1));
 
             Assert.AreEqual(1, stock.Slots.Count);
-            Assert.AreEqual(300, stock.Slots[0].Quality);
+            Assert.IsTrue(stock.Slots[0].Quality >= 1);
+            Assert.IsTrue(stock.Slots[0].Quality <= 50);
         }
 
         [TestMethod]
@@ -171,7 +165,7 @@ namespace ZoneEngine_New.Tests
 
         static HashItemMinter Minter()
             => new(
-                new StubGameData(HashItemCatalog.Parse(TemplatesJson, InstancesJson)),
+                new StubGameData(HashItemCatalog.Parse(CatalogJson)),
                 new StubCatalog(),
                 new StubItemBuilder());
     }

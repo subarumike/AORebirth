@@ -107,9 +107,9 @@ public sealed class AcceptedVendorDeathTests
     [TestMethod]
     public void CorpseFixtureMissingCatMeshIsExplicitAndDoesNotWeakenTheDefaultGameDataStub()
     {
-        var ordinary = new StubGameData(HashItemCatalog.Parse("{}", "{}"));
+        var ordinary = new StubGameData(HashItemCatalog.Parse("{}"));
         Assert.ThrowsException<NotSupportedException>(() => ordinary.TryGetCatMesh(208640, out _));
-        var corpse = new StubGameData(HashItemCatalog.Parse("{}", "{}"), allowMissingCatMesh: true);
+        var corpse = new StubGameData(HashItemCatalog.Parse("{}"), allowMissingCatMesh: true);
         Assert.IsFalse(corpse.TryGetCatMesh(208640, out int catMesh)); Assert.AreEqual(0, catMesh);
     }
 

@@ -1,16 +1,18 @@
 {
     "WEAP": {
-        "PSTL": {
-            "Description": "Pistols",
-            "ParentHash": "WEPN"
-        },
-        "RIFL": {
-            "Description": "Rifles",
-            "ParentHash": "WEPN"
-        },
-        "SMGN": {
-            "Description": "Sub Machine Guns",
-            "ParentHash": "WEPN"
-        }
+        "Children": [
+            "PSTL",
+            "RIFL",
+            "SMGN"
+        ]
+    },
+    "PSTL": {
+        "Templates": [254633, 254634, 254635, 254636, 254637, 254638, 254639]
+    },
+    "RIFL": {
+        "Templates": [257128]
+    },
+    "MOPA": {
+        "Templates": [42640, 42641]
     }
 }

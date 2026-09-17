@@ -3,15 +3,15 @@ namespace ZoneEngine_New.Core.GameData
     using System;
     using System.Collections.Generic;
     using System.Text.Json;
-    using System.Text.Json.Serialization;
 
     /// <summary>
-    /// ItemTemplates.json categories plus HashInstances.json families.
+    /// ItemTemplates.json: a hash with Templates is a leaf item family; a hash with Children is a category.
+    /// Parents never have template ids. Leaves never have children.
     /// Lookup is category-first: a hash with children picks a random child Hash, then repeats.
     /// </summary>
     public sealed class HashItemCatalog
     {
-        static readonly JsonSerializerOptions InstanceJsonOptions = new()
+        static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
@@ -36,12 +36,49 @@ namespace ZoneEngine_New.Core.GameData
 
         public int InstanceCount => _instances.Count;
 
-        public static HashItemCatalog Parse(string? templatesJson, string? instancesJson, Random? random = null)
+        public static HashItemCatalog Parse(string? json, Random? random = null)
         {
-            return new HashItemCatalog(
-                ParseCategories(templatesJson),
-                ParseInstances(instancesJson),
-                random);
+            var categories = new Dictionary<string, string[]>(StringComparer.Ordinal);
+            var instances = new Dictionary<string, HashInstance>(StringComparer.Ordinal);
+            if (string.IsNullOrWhiteSpace(json))
+                return new HashItemCatalog(categories, instances, random);
+
+            Dictionary<string, HashItemRow>? records =
+                JsonSerializer.Deserialize<Dictionary<string, HashItemRow>>(json, JsonOptions);
+            if (records == null)
+                return new HashItemCatalog(categories, instances, random);
+
+            foreach (KeyValuePair<string, HashItemRow> pair in records)
+            {
+                string hash = pair.Key;
+                if (string.IsNullOrEmpty(hash) || pair.Value == null)
+                    continue;
+
+                string[]? children = pair.Value.Children;
+                if (children != null && children.Length > 0)
+                {
+                    categories[hash] = children;
+                    continue;
+                }
+
+                int[]? templates = pair.Value.Templates;
+                if (templates == null || templates.Length == 0)
+                    continue;
+
+                List<int> ids = new(templates.Length);
+                foreach (int id in templates)
+                {
+                    if (id > 0)
+                        ids.Add(id);
+                }
+
+                if (ids.Count == 0)
+                    continue;
+
+                instances.TryAdd(hash, new HashInstance(hash, ids.ToArray()));
+            }
+
+            return new HashItemCatalog(categories, instances, random);
         }
 
         public bool TryGetCategory(string hash, out IReadOnlyList<string> childHashes)
@@ -92,7 +129,7 @@ namespace ZoneEngine_New.Core.GameData
         /// <summary>
         /// Appends every leaf <see cref="HashInstance"/> reachable from <paramref name="hash"/> to
         /// <paramref name="into"/>. A hash that is itself a leaf contributes just that instance.
-        /// Category children with no HashInstances entry are skipped, and each hash is visited once
+        /// Category children with no leaf Templates entry are skipped, and each hash is visited once
         /// so a cyclic or diamond-shaped category graph terminates without duplicates.
         /// </summary>
         public void CollectLeafInstances(string hash, List<HashInstance> into)
@@ -127,21 +164,7 @@ namespace ZoneEngine_New.Core.GameData
         public static int ClampQuality(HashInstance instance, int desiredQuality)
         {
             ArgumentNullException.ThrowIfNull(instance);
-
-            int min = instance.MinLevel;
-            int max = instance.MaxLevel;
-            if (max < min)
-            {
-                int swap = min;
-                min = max;
-                max = swap;
-            }
-
-            if (desiredQuality < min)
-                return min;
-            if (desiredQuality > max)
-                return max;
-            return desiredQuality;
+            return desiredQuality < 1 ? 1 : desiredQuality;
         }
 
         public static bool TrySelectIds(
@@ -219,89 +242,6 @@ namespace ZoneEngine_New.Core.GameData
             return true;
         }
 
-        static Dictionary<string, string[]> ParseCategories(string? json)
-        {
-            Dictionary<string, string[]> result = new(StringComparer.Ordinal);
-            if (string.IsNullOrWhiteSpace(json))
-                return result;
-
-            using JsonDocument document = JsonDocument.Parse(json);
-            IndexCategories(document.RootElement, key: null, result);
-            return result;
-        }
-
-        /// <summary>
-        /// A child's hash is its property name, the same key HashInstances.json is indexed by. Scalar
-        /// members (Description, ParentHash) are metadata and are skipped.
-        /// </summary>
-        static void IndexCategories(JsonElement element, string? key, Dictionary<string, string[]> result)
-        {
-            if (element.ValueKind != JsonValueKind.Object)
-                return;
-
-            List<string> children = new();
-            foreach (JsonProperty property in element.EnumerateObject())
-            {
-                if (property.Value.ValueKind != JsonValueKind.Object || property.Name.Length == 0)
-                    continue;
-
-                if (TryReadChildHash(property.Value, out string childHash))
-                    children.Add(childHash);
-                else if (!property.Value.TryGetProperty("Hash", out _) && property.Name.Length != 0)
-                    // Delmus's property-key format coexists with the accepted explicit aliases.
-                    // Malformed/empty explicit Hash values are not silently rewritten.
-                    children.Add(property.Name);
-
-                IndexCategories(property.Value, property.Name, result);
-            }
-
-            if (key != null && children.Count > 0)
-                result.TryAdd(key, children.ToArray());
-        }
-
-        static bool TryReadChildHash(JsonElement obj, out string hash)
-        {
-            hash = string.Empty;
-            if (!obj.TryGetProperty("Hash", out JsonElement value) || value.ValueKind != JsonValueKind.String)
-                return false;
-            hash = value.GetString() ?? string.Empty;
-            return hash.Length > 0;
-        }
-
-        static Dictionary<string, HashInstance> ParseInstances(string? json)
-        {
-            Dictionary<string, HashInstance> result = new(StringComparer.Ordinal);
-            if (string.IsNullOrWhiteSpace(json))
-                return result;
-
-            Dictionary<string, HashInstanceRow>? loaded =
-                JsonSerializer.Deserialize<Dictionary<string, HashInstanceRow>>(json, InstanceJsonOptions);
-            if (loaded == null)
-                return result;
-
-            foreach (KeyValuePair<string, HashInstanceRow> pair in loaded)
-            {
-                if (string.IsNullOrEmpty(pair.Key) || pair.Value?.TemplateId == null)
-                    continue;
-
-                List<int> ids = new(pair.Value.TemplateId.Length);
-                foreach (int id in pair.Value.TemplateId)
-                {
-                    if (id > 0)
-                        ids.Add(id);
-                }
-
-                if (ids.Count == 0)
-                    continue;
-
-                result.TryAdd(
-                    pair.Key,
-                    new HashInstance(pair.Key, ids.ToArray(), pair.Value.MinLevel, pair.Value.MaxLevel));
-            }
-
-            return result;
-        }
-
         readonly struct Band
         {
             public Band(int id, int quality)
@@ -323,14 +263,11 @@ namespace ZoneEngine_New.Core.GameData
                 => x.Quality.CompareTo(y.Quality);
         }
 
-        sealed class HashInstanceRow
+        sealed class HashItemRow
         {
-            [JsonPropertyName("TemplateId")]
-            public int[]? TemplateId { get; set; }
+            public string[]? Children { get; set; }
 
-            public int MinLevel { get; set; }
-
-            public int MaxLevel { get; set; }
+            public int[]? Templates { get; set; }
         }
     }
 }

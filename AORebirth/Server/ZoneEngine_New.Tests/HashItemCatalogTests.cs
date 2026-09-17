@@ -10,23 +10,21 @@ namespace ZoneEngine_New.Tests
     [TestClass]
     public sealed class HashItemCatalogTests
     {
-        const string TemplatesJson =
+        const string CatalogJson =
             """
             {
                 "WEAP": {
-                    "PSTL": { "Description": "Pistols", "ParentHash": "WEPN" },
-                    "RIFL": { "Description": "Rifles", "ParentHash": "WEPN" },
-                    "SMGN": { "Description": "Sub Machine Guns", "ParentHash": "WEPN" }
+                    "Children": [ "PSTL", "RIFL", "SMGN" ]
+                },
+                "PSTL": {
+                    "Templates": [254633, 254634, 254635, 254636, 254637, 254638, 254639]
+                },
+                "RIFL": {
+                    "Templates": [257128]
+                },
+                "MOPA": {
+                    "Templates": [42640, 42641]
                 }
-            }
-            """;
-
-        const string InstancesJson =
-            """
-            {
-                "MOPA": { "TemplateId": [42640, 42641], "MinLevel": 1, "MaxLevel": 400 },
-                "PSTL": { "TemplateId": [254633, 254634, 254635, 254636, 254637, 254638, 254639], "MinLevel": 1, "MaxLevel": 300 },
-                "RIFL": { "TemplateId": [257128], "MinLevel": 300, "MaxLevel": 300 }
             }
             """;
 
@@ -47,7 +45,7 @@ namespace ZoneEngine_New.Tests
         [TestMethod]
         public void CategoryWeapResolvesToHashInstanceChild()
         {
-            HashItemCatalog catalog = HashItemCatalog.Parse(TemplatesJson, InstancesJson, new FixedRandom(0));
+            HashItemCatalog catalog = HashItemCatalog.Parse(CatalogJson, new FixedRandom(0));
 
             Assert.IsTrue(catalog.TryGetCategory("WEAP", out IReadOnlyList<string> children));
             CollectionAssert.AreEqual(new[] { "PSTL", "RIFL", "SMGN" }, new List<string>(children));
@@ -58,7 +56,7 @@ namespace ZoneEngine_New.Tests
         [TestMethod]
         public void DirectHashInstanceSkipsCategorySelection()
         {
-            HashItemCatalog catalog = HashItemCatalog.Parse(TemplatesJson, InstancesJson);
+            HashItemCatalog catalog = HashItemCatalog.Parse(CatalogJson);
 
             Assert.IsFalse(catalog.TryGetCategory("PSTL", out _));
             Assert.IsFalse(catalog.TryGetCategory("MOPA", out _));
@@ -69,60 +67,63 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void PropertyKeyFormatResolvesOnlyRealInstanceLeavesAndSkipsScalarMetadata()
+        public void ParentDescriptionIsIgnoredAndChildrenWinOverTemplates()
         {
             var catalog = HashItemCatalog.Parse("""
-                {"WEAP":{"Description":"Weapons","ParentHash":"ROOT","PSTL":{},"SMGN":{}}}
-                """, InstancesJson, new FixedRandom(0));
+                {"WEAP":{"Description":"Weapons","Children":["PSTL","SMGN"],"Templates":[1]},"PSTL":{"Templates":[254633]}}
+                """, new FixedRandom(0));
             Assert.IsTrue(catalog.TryGetCategory("WEAP", out var children));
             CollectionAssert.AreEqual(new[] { "PSTL", "SMGN" }, new List<string>(children));
             Assert.IsTrue(catalog.TryResolveInstance("WEAP", out var instance));
-            Assert.AreEqual("PSTL", instance.Hash); Assert.IsFalse(catalog.TryResolveInstance("SMGN", out _));
+            Assert.AreEqual("PSTL", instance.Hash);
+            Assert.IsFalse(catalog.TryResolveInstance("SMGN", out _));
         }
 
         [TestMethod]
-        public void ExplicitAliasIsPreservedAndMalformedHashDoesNotAcquireAPropertyFallback()
+        public void EmptyOrInvalidTemplateIdsDoNotBecomeLeaves()
         {
             var catalog = HashItemCatalog.Parse("""
-                {"WEAP":{"SMGN":{"Hash":"MSTA"},"PSTL":{"Hash":17},"RIFL":{"Hash":""}}}
-                """, InstancesJson);
+                {"WEAP":{"Children":["DEAD","ZERO"]},"DEAD":{"Templates":[]},"ZERO":{"Templates":[0,-1]}}
+                """);
             Assert.IsTrue(catalog.TryGetCategory("WEAP", out var children));
-            CollectionAssert.AreEqual(new[] { "MSTA" }, new List<string>(children));
+            CollectionAssert.AreEqual(new[] { "DEAD", "ZERO" }, new List<string>(children));
             Assert.IsFalse(catalog.TryResolveInstance("WEAP", out _));
+            Assert.IsFalse(catalog.TryGetInstance("DEAD", out _));
+            Assert.IsFalse(catalog.TryGetInstance("ZERO", out _));
         }
 
         [TestMethod]
         public void UnknownHashIncludingLegacyLootTableFails()
         {
-            HashItemCatalog catalog = HashItemCatalog.Parse(TemplatesJson, InstancesJson);
+            HashItemCatalog catalog = HashItemCatalog.Parse(CatalogJson);
 
             Assert.IsFalse(catalog.TryResolveInstance("AAAA", out _));
             Assert.IsFalse(catalog.TryResolveInstance("AAAB", out _));
             Assert.IsFalse(catalog.TryResolveInstance("MSTA", out _));
 
-            // A category child with no HashInstances entry is a dead leaf, not a resolvable item.
+            // A category child with no Templates entry is a dead leaf, not a resolvable item.
             Assert.IsFalse(catalog.TryResolveInstance("SMGN", out _));
             Assert.IsFalse(catalog.TryResolveInstance(string.Empty, out _));
         }
 
         [TestMethod]
-        public void ClampQualityUsesInstanceMinMax()
+        public void ClampQualityFloorsBelowOne()
         {
-            HashItemCatalog catalog = HashItemCatalog.Parse(TemplatesJson, InstancesJson);
+            HashItemCatalog catalog = HashItemCatalog.Parse(CatalogJson);
             Assert.IsTrue(catalog.TryGetInstance("PSTL", out HashInstance pistol));
             Assert.AreEqual(1, HashItemCatalog.ClampQuality(pistol, 0));
             Assert.AreEqual(150, HashItemCatalog.ClampQuality(pistol, 150));
-            Assert.AreEqual(300, HashItemCatalog.ClampQuality(pistol, 500));
+            Assert.AreEqual(500, HashItemCatalog.ClampQuality(pistol, 500));
 
             Assert.IsTrue(catalog.TryGetInstance("RIFL", out HashInstance rifle));
-            Assert.AreEqual(300, HashItemCatalog.ClampQuality(rifle, 1));
+            Assert.AreEqual(1, HashItemCatalog.ClampQuality(rifle, 1));
             Assert.AreEqual(300, HashItemCatalog.ClampQuality(rifle, 300));
         }
 
         [TestMethod]
         public void SelectIdsUsesSinglePairAndMultiBand()
         {
-            HashItemCatalog catalog = HashItemCatalog.Parse(TemplatesJson, InstancesJson);
+            HashItemCatalog catalog = HashItemCatalog.Parse(CatalogJson);
             int QualityOf(int id) => SampleQualities[id];
 
             Assert.IsTrue(catalog.TryGetInstance("RIFL", out HashInstance rifle));

@@ -96,7 +96,7 @@ namespace ZoneEngine_New
         public static void ValidatePackage(string baseDirectory, bool skipPlayfieldPackagePin = false)
         {
             string gameData = Path.Combine(baseDirectory, "GameData");
-            foreach (string file in new[] { "NpcTemplates.json", "ItemTemplates.json", "HashInstances.json",
+            foreach (string file in new[] { "NpcTemplates.json", "ItemTemplates.json",
                 "VendingMachines.json", "MonsterData.json", "Xp.json" })
             {
                 using FileStream stream = File.OpenRead(Path.Combine(gameData, file));

@@ -180,7 +180,7 @@ public sealed class AcceptedGardenVendorTests
         internal World(GardenVendorFixture.Placement placement)
         {
             State = new(placement.PlayfieldId); var catalog = Catalog(); var items = new StubItemBuilder();
-            var data = new StubGameData(HashItemCatalog.Parse("{}", "{}"));
+            var data = new StubGameData(HashItemCatalog.Parse("{}"));
             Trade = new(new StubLogger(), data, catalog, new HashItemMinter(data, catalog, items), new Ids(), State.Flush, new NoMutation());
             var playfield = State.Player.Playfield!; var locality = playfield.GetRequiredService<PlayfieldLocality>();
             _services = new ServiceCollection().AddSingleton(State.Registry).AddSingleton(State.Npcs).AddSingleton(locality).AddSingleton(Trade).BuildServiceProvider();

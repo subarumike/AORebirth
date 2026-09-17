@@ -75,7 +75,23 @@ namespace ZoneEngine_New.Core.Ai
 
         public const float ArriveHomeMeters = 1.5f;
 
+        /// <summary>
+        /// A complete nav path whose last point is this close in XZ does not count as a chase
+        /// chance when the target is still out of LOS or attack range.
+        /// </summary>
+        public const float PathEndGiveUpMeters = 1.5f;
+
+        /// <summary>Hold chase this long after the last real chance so a jump over cover does not leash.</summary>
+        public const double NoChanceGraceSeconds = 2;
+
         public const float ProximityHate = 1f;
+
+        public static bool IsWithinNoChanceGrace(DateTime lastChanceUtc, DateTime now)
+        {
+            if (lastChanceUtc == default)
+                return false;
+            return (now - lastChanceUtc).TotalSeconds < NoChanceGraceSeconds;
+        }
 
         public static bool IsProximityHostile(int breedHostility) => breedHostility > 0;
 

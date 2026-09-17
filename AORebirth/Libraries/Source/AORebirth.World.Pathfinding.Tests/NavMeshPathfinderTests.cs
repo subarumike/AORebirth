@@ -81,6 +81,10 @@ namespace AORebirth.World.Pathfinding.Tests
                     Assert.IsFalse(pathfinder.TryCanReach(
                         new Vector3(5f, 0.2f, 5f),
                         new Vector3(5f, 8f, 5f)));
+                    Assert.IsFalse(pathfinder.TryFindPath(
+                        new Vector3(5f, 0.2f, 5f),
+                        new Vector3(15f, -50f, 15f),
+                        waypoints));
 
                     Assert.IsTrue(pathfinder.TrySnap(new Vector3(5f, 1.7f, 5f), out Vector3 snapped));
                     Assert.IsTrue(Vector3.Distance(new Vector3(5f, snapped.Y, 5f), snapped) < 1f);

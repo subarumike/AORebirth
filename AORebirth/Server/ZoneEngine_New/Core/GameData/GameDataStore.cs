@@ -409,44 +409,36 @@ namespace ZoneEngine_New.Core.GameData
 
         private void LoadHashItems()
         {
-            string templatesPath = Path.Combine(RootPath, GameDataPaths.ItemTemplatesFileName);
-            string instancesPath = Path.Combine(RootPath, GameDataPaths.HashInstancesFileName);
-
-            if (!File.Exists(templatesPath))
+            string path = Path.Combine(RootPath, GameDataPaths.ItemTemplatesFileName);
+            if (!File.Exists(path))
             {
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "ItemTemplates.json not found at {0}; hash categories empty",
-                        templatesPath));
-            }
-
-            if (!File.Exists(instancesPath))
-            {
-                _logger.Warn(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "HashInstances.json not found at {0}; hash instances empty",
-                        instancesPath));
+                        "ItemTemplates.json not found at {0}; hash catalog empty",
+                        path));
+                return;
             }
 
             try
             {
-                string? templatesJson = File.Exists(templatesPath) ? File.ReadAllText(templatesPath) : null;
-                string? instancesJson = File.Exists(instancesPath) ? File.ReadAllText(instancesPath) : null;
-                _hashItems = HashItemCatalog.Parse(templatesJson, instancesJson);
+                _hashItems = HashItemCatalog.Parse(File.ReadAllText(path));
                 _logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "GameData hash templates={0} hash instances={1}",
+                        "GameData hash templates={0} hash instances={1} from {2}",
                         _hashItems.CategoryCount,
-                        _hashItems.InstanceCount));
+                        _hashItems.InstanceCount,
+                        path));
             }
             catch (Exception exception)
             {
                 _logger.Error(
                     exception,
-                    "Failed to load ItemTemplates.json / HashInstances.json; hash catalogs empty");
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load ItemTemplates.json from {0}; hash catalog empty",
+                        path));
             }
         }
 

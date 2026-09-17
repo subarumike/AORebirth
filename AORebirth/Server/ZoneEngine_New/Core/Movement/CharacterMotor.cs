@@ -20,7 +20,9 @@ namespace ZoneEngine_New.Core.Movement
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     /// <summary>
-    /// Server locomotion: Lost Eden velocity model + optional path following; Bepu sweep resolve.
+    /// Server locomotion copied from client <c>Vehicle_t::Run</c> /
+    /// <c>WaypointPath_c</c>. Keyed motion uses instant <c>SetVel</c>; NPC paths
+    /// are constant-speed polylines, then surface snap.
     /// </summary>
     public sealed class CharacterMotor
     {
@@ -29,10 +31,10 @@ namespace ZoneEngine_New.Core.Movement
             | MovementFlags.StrafeLeft | MovementFlags.StrafeRight;
 
         readonly Character _character;
+        readonly VehiclePath _vehiclePath = new();
         readonly List<Vector3> _path = new();
         readonly List<Vector3> _navigateScratch = new();
         readonly List<System.Numerics.Vector3> _navMeshScratch = new();
-        int _pathIndex = -1;
 
         MovementFlags _flags;
         MovementState _state = MovementState.Run;
@@ -99,7 +101,7 @@ namespace ZoneEngine_New.Core.Movement
             };
         }
 
-        public bool HasPath => _pathIndex >= 0 && _pathIndex < _path.Count;
+        public bool HasPath => _vehiclePath.IsActive;
 
         /// <summary>
         /// True while translating (keys/path) or still carrying planar speed.
@@ -183,7 +185,11 @@ namespace ZoneEngine_New.Core.Movement
             if (Vector3.Abs(destination - current) < minDeltaMeters)
                 return true;
 
-            _path[_path.Count - 1] = new Vector3(destination.x, destination.y, destination.z);
+            Vector3 start = _character.Position;
+            _path.Clear();
+            _path.Add(new Vector3(start.x, start.y, start.z));
+            _path.Add(new Vector3(destination.x, destination.y, destination.z));
+            _vehiclePath.Set(_path, GetActiveLimits().Forward);
             return true;
         }
 
@@ -195,22 +201,14 @@ namespace ZoneEngine_New.Core.Movement
             if (!HasPath)
                 return [];
 
-            int remaining = _path.Count - _pathIndex;
-            var waypoints = new MsgVector3[remaining];
-            for (int i = 0; i < remaining; i++)
-            {
-                Vector3 point = _path[_pathIndex + i];
-                waypoints[i] = new MsgVector3((float)point.x, (float)point.y, (float)point.z);
-            }
-
-            return waypoints;
+            return _vehiclePath.CopyRemainingWaypoints();
         }
 
         public void ClearPath()
         {
-            bool had = HasPath;
+            bool had = HasPath || _path.Count > 0;
             _path.Clear();
-            _pathIndex = -1;
+            _vehiclePath.Clear();
             if (had)
                 PathCompleted?.Invoke();
         }
@@ -220,20 +218,29 @@ namespace ZoneEngine_New.Core.Movement
             if (waypoints == null || waypoints.Count == 0)
                 return;
 
+            Vector3 start = _character.Position;
+            _path.Add(new Vector3(start.x, start.y, start.z));
+
             // Copy components: callers often pass live Position references that move every tick.
             for (int i = 0; i < waypoints.Count; i++)
             {
                 Vector3 point = waypoints[i];
+                if (i == 0
+                    && Math.Abs(point.x - start.x) < 1e-4
+                    && Math.Abs(point.y - start.y) < 1e-4
+                    && Math.Abs(point.z - start.z) < 1e-4)
+                    continue;
+
                 _path.Add(new Vector3(point.x, point.y, point.z));
             }
 
-            _pathIndex = 0;
+            _vehiclePath.Set(_path, GetActiveLimits().Forward);
         }
 
         void ReplacePath(IReadOnlyList<Vector3> waypoints)
         {
             _path.Clear();
-            _pathIndex = -1;
+            _vehiclePath.Clear();
             CopyWaypoints(waypoints);
         }
 
@@ -245,6 +252,11 @@ namespace ZoneEngine_New.Core.Movement
             {
                 _navMeshScratch.Clear();
                 Vector3 start = _character.Position;
+                Playfield? playfield = _character.Playfield;
+                if (playfield != null && playfield.TrySnapFeetToFloor(start, out Vector3 startFloor))
+                    start = startFloor;
+                if (playfield != null && playfield.TrySnapFeetToFloor(destination, out Vector3 destFloor))
+                    destination = destFloor;
                 if (finder.TryFindPath(
                     new System.Numerics.Vector3((float)start.x, (float)start.y, (float)start.z),
                     new System.Numerics.Vector3((float)destination.x, (float)destination.y, (float)destination.z),
@@ -355,6 +367,12 @@ namespace ZoneEngine_New.Core.Movement
                 }
             }
 
+            var requested = new Vector3(x, y, z);
+            if (playfield != null
+                && playfield.TrySnapFeetToFloor(requested, out Vector3 floor)
+                && y < (float)floor.y)
+                y = (float)floor.y;
+
             _character.Position = new Vector3(x, y, z);
         }
 
@@ -398,32 +416,19 @@ namespace ZoneEngine_New.Core.Movement
                 && _jumpArmed;
             if (idle && TryResolveGroundSupport(out float idleGroundY))
             {
-                // Nothing is driving the character and it has a floor: settle onto it and skip the
-                // rest of the step. An idle character with no floor falls through the normal path.
                 _character.Position = new Vector3(_character.Position.x, idleGroundY, _character.Position.z);
                 return;
             }
 
-            Vector3 desired;
-            float maxVel;
             if (HasPath)
             {
                 TickStallWatch.Stage("motor.path", _character.Identity.Instance);
-                desired = ComputePathDesiredVelocity(dt);
-                maxVel = GetActiveLimits().Forward;
-            }
-            else
-            {
-                desired = ComputeActionDesiredVelocity(dt);
-                maxVel = GetLocomotionMaxSpeed();
+                TickWaypointPath(dt);
+                return;
             }
 
-            bool strafing = !HasPath
-                && (_flags & (MovementFlags.StrafeLeft | MovementFlags.StrafeRight)) != 0;
-            if (strafing)
-                _velocity = desired;
-            else
-                IntegrateVelocity(desired, maxVel, dt);
+            // DummyVehicle_t::CalcSteering is 0; keyed motion is Vehicle_t::SetVel.
+            _velocity = ComputeActionDesiredVelocity(dt);
 
             // Lost Eden grounded / airborne vertical update, then move, then land check.
             float groundY = 0f;
@@ -445,63 +450,30 @@ namespace ZoneEngine_New.Core.Movement
 
             Vector3 planar = _velocity;
             Vector3 start = _character.Position;
-            // Grounded steps must sweep horizontally. Including GroundStickVelocity (-Y) aims the
-            // capsule into the floor, the sweep reports an immediate hit, and planar travel is
-            // cancelled — FollowTarget still animates on the client while the server stays put.
             double endY = grounded ? start.y : start.y + (_verticalVelocity * dt);
             Vector3 end = new(
                 start.x + (planar.x * dt),
                 endY,
                 start.z + (planar.z * dt));
 
-            // Governed generated interiors retain the existing no-world altitude behavior;
-            // their captured envelope is an ownership bound, never a fabricated floor/mesh.
             if (_character.Playfield is MissionPlayfield mission && !mission.World.AcceptsMovement(_character, end))
             {
                 Halt(); _verticalVelocity = 0;
                 return;
             }
 
-            WorldSimulation.PlayfieldWorldSimulation? world = _character.Playfield?.WorldAccess.Instance;
-            if (world != null
-                && world.TryMoveCapsule(
-                    start,
-                    end,
-                    MovementConfig.CapsuleRadius,
-                    MovementConfig.CapsuleHalfHeight,
-                    MovementConfig.CapsuleCenterLift,
-                    MovementConfig.SweepSkin,
-                    out Vector3 resolved,
-                    out Vector3 normal))
+            // Falling-enabled keyed motion: slide then tripod snap (Vehicle_t::Run).
+            EnsureSurfaceAlignment.Result aligned = AlignToSurface(start, end, allowSlide: true);
+            _character.Position = aligned.Position;
+            if (aligned.Normal.y > MovementConfig.SurfaceSlideFloorY && _verticalVelocity <= 0f)
             {
-                _character.Position = resolved;
-
-                // Floor contact while descending sticks; ceiling kills rise. Wall scrapes leave vy alone.
-                if (normal.y > 0.5 && _verticalVelocity <= 0f)
-                    _verticalVelocity = MovementConfig.GroundStickVelocity;
-                else if (normal.y < -0.5 && _verticalVelocity > 0f)
-                    _verticalVelocity = 0f;
+                _verticalVelocity = MovementConfig.GroundStickVelocity;
+                if (!_jumpArmed)
+                    CompleteLanding();
             }
-            else
+            else if (aligned.Normal.y < -MovementConfig.SurfaceSlideFloorY && _verticalVelocity > 0f)
             {
-                _character.Position = end;
-            }
-
-            if (grounded && TryResolveGroundSupport(out float groundedSnapY))
-            {
-                _character.Position = new Vector3(
-                    _character.Position.x,
-                    groundedSnapY,
-                    _character.Position.z);
-            }
-            else if (!_jumpArmed
-                && _verticalVelocity <= 0f
-                && TryResolveGroundSupport(out float landY))
-            {
-                CompleteLanding();
-                _character.Position = new Vector3(_character.Position.x, landY, _character.Position.z);
-                if (_verticalVelocity < 0f)
-                    _verticalVelocity = MovementConfig.GroundStickVelocity;
+                _verticalVelocity = 0f;
             }
         }
 
@@ -718,21 +690,41 @@ namespace ZoneEngine_New.Core.Movement
             return _runLimits;
         }
 
-        /// <summary>
-        /// Max planar speed for the active locomotion direction (Lost Eden).
-        /// Forward/back + strafe keeps forward/back speed and only redirects.
-        /// </summary>
-        float GetLocomotionMaxSpeed()
+        void TickWaypointPath(float dt)
         {
-            if (HasPath)
-                return GetActiveLimits().Forward;
+            Vector3 previous = _character.Position;
+            bool stillOnPath = _vehiclePath.Advance(dt, out Vector3 pathPos, out Vector3 direction);
+            Halt();
+            _verticalVelocity = 0f;
 
-            Vector3 planar = ComputeActionPlanarVelocity();
-            double speed = Vector3.Abs(planar);
-            if (speed > 1e-6)
-                return (float)speed;
+            if (Vector3.Abs(direction) > 1e-6)
+                FacePathDirection(direction);
 
-            return GetActiveLimits().Forward;
+            // DisableFalling: no FUN_1000b2e5 lateral slide. Probe + 0.5 abort only.
+            EnsureSurfaceAlignment.Result aligned = AlignToSurface(previous, pathPos, allowSlide: false);
+            _character.Position = aligned.Position;
+
+            if (Vector3.Abs(_character.Position - pathPos) >= MovementConfig.PathSampleAbortDistance)
+            {
+                _character.Position = previous;
+                ClearPath();
+                return;
+            }
+
+            if (!stillOnPath)
+                ClearPath();
+        }
+
+        EnsureSurfaceAlignment.Result AlignToSurface(Vector3 previous, Vector3 desired, bool allowSlide)
+        {
+            Playfield? playfield = _character.Playfield;
+            if (playfield != null
+                && playfield.TrySnapFeetToFloor(desired, out Vector3 floor)
+                && desired.y < floor.y)
+                desired = new Vector3(desired.x, floor.y, desired.z);
+
+            IVehicleSurface? surface = playfield?.WorldAccess.Instance?.CreateVehicleSurface();
+            return EnsureSurfaceAlignment.Apply(surface, previous, desired, allowSlide);
         }
 
         Vector3 ComputeActionDesiredVelocity(float dt)
@@ -787,83 +779,6 @@ namespace ZoneEngine_New.Core.Movement
             return dir * speed;
         }
 
-        Vector3 ComputePathDesiredVelocity(float dt)
-        {
-            float forwardLimit = GetActiveLimits().Forward;
-            float arrival = MovementConfig.WaypointArrivalRadius;
-            float mass = MovementConfig.Mass;
-
-            while (HasPath)
-            {
-                Vector3 target = _path[_pathIndex];
-                Vector3 to = new(target.x - _character.Position.x, 0, target.z - _character.Position.z);
-                float distance = (float)Vector3.Abs(to);
-                bool isFinal = _pathIndex >= _path.Count - 1;
-
-                if (!isFinal && distance <= arrival)
-                {
-                    _pathIndex++;
-                    continue;
-                }
-
-                if (isFinal)
-                {
-                    float speed = (float)Vector3.Abs(_velocity);
-                    float deceleration = ComputeMaxForce(forwardLimit) / mass;
-                    float stopDistance = (speed * speed) / (2f * Math.Max(deceleration, 0.01f));
-                    bool shouldBrake = distance <= Math.Max(arrival, stopDistance);
-
-                    if (shouldBrake && speed <= MovementConfig.SpeedStopEpsilon && distance <= arrival)
-                    {
-                        ClearPath();
-                        return new Vector3(0, 0, 0);
-                    }
-
-                    if (shouldBrake)
-                    {
-                        if (distance > 1e-4f)
-                            RotateToward(to * (1.0 / distance), dt);
-                        return new Vector3(0, 0, 0);
-                    }
-
-                    Vector3 dir = to * (1.0 / Math.Max(distance, 1e-4f));
-                    RotateToward(dir, dt);
-                    return dir * forwardLimit;
-                }
-
-                Vector3 mid = to * (1.0 / Math.Max(distance, 1e-4f));
-                RotateToward(mid, dt);
-                return mid * forwardLimit;
-            }
-
-            return new Vector3(0, 0, 0);
-        }
-
-        void IntegrateVelocity(Vector3 desired, float maxVel, float dt)
-        {
-            float mass = MovementConfig.Mass;
-            float maxForce = ComputeMaxForce(maxVel);
-            Vector3 steerForce = (desired - _velocity) * maxForce;
-            double steerLen = Vector3.Abs(steerForce);
-            Vector3 force = steerLen > maxForce && steerLen > 1e-8
-                ? steerForce * (maxForce / steerLen)
-                : steerForce;
-            _velocity += force * (dt / mass);
-
-            double speed = Vector3.Abs(_velocity);
-            if (speed > maxVel && speed > 1e-8)
-                _velocity *= maxVel / speed;
-
-            // Only snap to zero when not trying to move — otherwise low max speeds
-            // (walk/strafe/back) never exceed SpeedStopEpsilon on the first frames.
-            if (Vector3.Abs(desired) < 1e-6
-                && Vector3.Abs(_velocity) < MovementConfig.SpeedStopEpsilon)
-                _velocity = new Vector3(0, 0, 0);
-        }
-
-        float ComputeMaxForce(float maxVel) =>
-            MovementConfig.Mass * maxVel / MovementConfig.ForceReachTime;
-
         float GetTurnRateRadians()
         {
             bool moving = ((_flags & TranslationFlags) != 0)
@@ -874,17 +789,13 @@ namespace ZoneEngine_New.Core.Movement
                 : MovementConfig.TurnRateRadiansStopped;
         }
 
-        void RotateToward(Vector3 direction, float dt)
+        /// <summary>
+        /// Client <c>FUN_1000a47a</c>: path ticks copy the segment tangent onto
+        /// body forward immediately. We store heading as yaw around Y.
+        /// </summary>
+        void FacePathDirection(Vector3 direction)
         {
-            if (Vector3.Abs(direction) < 1e-6)
-                return;
-
-            float targetYaw = MathF.Atan2((float)direction.x, (float)direction.z) * (180f / MathF.PI);
-            float currentYaw = GetYawDegrees();
-            float delta = NormalizeAngle(targetYaw - currentYaw);
-            float maxStep = MovementConfig.PathTurnRateDegrees * dt;
-            delta = Math.Clamp(delta, -maxStep, maxStep);
-            RotateYaw(delta);
+            SetYaw(MathF.Atan2((float)direction.x, (float)direction.z) * (180f / MathF.PI));
         }
 
         void RotateYaw(float yawDeltaDegrees)
@@ -926,25 +837,19 @@ namespace ZoneEngine_New.Core.Movement
         }
 
         /// <summary>
-        /// Finds the surface holding the character up. Support has to be tolerant: the client's
-        /// reported Y can sit a little above the baked terrain (props and buildings have no
-        /// collision yet), and a zero-tolerance probe there would make the character fall every
-        /// tick and get snapped back by the next CharDCMove.
+        /// Finds the surface holding the character up. Origin is torso height: spawn and Recast
+        /// poses can sit under the Bepu floor, and a foot-height downward ray then starts below
+        /// the triangle and misses it.
         /// </summary>
         bool TryResolveGroundSupport(out float groundY)
         {
             groundY = (float)_character.Position.y;
-            WorldSimulation.PlayfieldWorldSimulation? world = _character.Playfield?.WorldAccess.Instance;
-            if (world == null)
+            Playfield? playfield = _character.Playfield;
+            if (playfield == null)
                 return true;
 
-            Vector3 from = new(
-                _character.Position.x,
-                _character.Position.y + MovementConfig.GroundProbeLift,
-                _character.Position.z);
-            float depth = MovementConfig.GroundProbeLift + MovementConfig.GroundSnapTolerance;
-            if (!world.TryRaycastDown(from, depth, out Vector3 hit))
-                return false;
+            if (!playfield.TrySnapFeetToFloor(_character.Position, out Vector3 hit))
+                return playfield.WorldAccess.Instance == null;
 
             groundY = (float)hit.y;
             return true;
@@ -952,13 +857,20 @@ namespace ZoneEngine_New.Core.Movement
 
         bool HasGeometryBelow()
         {
-            WorldSimulation.PlayfieldWorldSimulation? world = _character.Playfield?.WorldAccess.Instance;
+            Playfield? playfield = _character.Playfield;
+            if (playfield == null)
+                return false;
+
+            if (playfield.TrySnapFeetToFloor(_character.Position, out _))
+                return true;
+
+            WorldSimulation.PlayfieldWorldSimulation? world = playfield.WorldAccess.Instance;
             if (world == null)
                 return false;
 
             Vector3 from = new(
                 _character.Position.x,
-                _character.Position.y + MovementConfig.GroundProbeLift,
+                _character.Position.y + MovementConfig.CapsuleCenterLift,
                 _character.Position.z);
             return world.TryRaycastDown(from, MovementConfig.VoidProbeDepth, out _);
         }

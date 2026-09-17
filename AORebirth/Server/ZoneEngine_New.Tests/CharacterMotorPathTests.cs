@@ -1,5 +1,7 @@
 namespace ZoneEngine_New.Tests
 {
+    using System;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -27,6 +29,56 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(10f, remaining[0].X);
             Assert.AreEqual(0f, remaining[0].Y);
             Assert.AreEqual(20f, remaining[0].Z);
+        }
+
+        [TestMethod]
+        public void Tick_OnPath_SamplesClientPolylineAtConstantSpeed()
+        {
+            NpcCharacter npc = new(
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 2102 },
+                new StubItemBuilder());
+            npc.Position = new Vector3(0, 0, 0);
+            npc.Motor.NavigateTo(new Vector3(10, 0, 0));
+
+            float speed = 5f;
+            npc.Motor.Tick(1.0);
+
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.AreEqual(speed, (float)npc.Position.x, 0.01f);
+            Assert.AreEqual(0f, (float)npc.Position.z, 0.01f);
+        }
+
+        [TestMethod]
+        public void Tick_OnPath_SnapsFacingToSegmentDirection()
+        {
+            NpcCharacter npc = new(
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 2104 },
+                new StubItemBuilder());
+            npc.Position = new Vector3(0, 0, 0);
+            npc.Motor.NavigateTo(new Vector3(10, 0, 0));
+
+            npc.Motor.Tick(0.05);
+
+            float half = MathF.PI * 0.25f;
+            Assert.AreEqual(0f, npc.Rotation.xf, 0.01f);
+            Assert.AreEqual(MathF.Sin(half), npc.Rotation.yf, 0.01f);
+            Assert.AreEqual(0f, npc.Rotation.zf, 0.01f);
+            Assert.AreEqual(MathF.Cos(half), npc.Rotation.wf, 0.01f);
+        }
+
+        [TestMethod]
+        public void Tick_OnPath_ReachesEndAndClears()
+        {
+            NpcCharacter npc = new(
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 2103 },
+                new StubItemBuilder());
+            npc.Position = new Vector3(0, 0, 0);
+            npc.Motor.NavigateTo(new Vector3(10, 0, 0));
+
+            npc.Motor.Tick(2.0);
+
+            Assert.IsFalse(npc.Motor.HasPath);
+            Assert.AreEqual(10f, (float)npc.Position.x, 0.01f);
         }
     }
 }

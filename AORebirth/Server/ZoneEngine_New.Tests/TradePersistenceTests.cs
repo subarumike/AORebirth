@@ -273,7 +273,7 @@ namespace ZoneEngine_New.Tests
                 typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!
                     .SetValue(manager, new Dictionary<int, Player>());
                 Flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => manager), Coalesce, new StubLogger());
-                var data = new StubGameData(HashItemCatalog.Parse("{}", "{\"ITEM\":{\"TemplateId\":[1000],\"MinLevel\":1,\"MaxLevel\":1}}"));
+                var data = new StubGameData(HashItemCatalog.Parse("{\"ITEM\":{\"Templates\":[1000]}}"));
                 var catalog = new StubCatalog().Add(1000, quality: 1, price: 100);
                 _minter = new HashItemMinter(data, catalog, new StubItemBuilder());
                 _service = new TradeService(new StubLogger(), data, catalog,

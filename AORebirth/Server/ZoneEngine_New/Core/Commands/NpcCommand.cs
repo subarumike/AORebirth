@@ -35,7 +35,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".npc source|template|loot|equipment";
+        public string Usage => ".npc source|template|loot|equipment|position";
 
         public void Execute(GmCommandContext context)
         {
@@ -75,6 +75,12 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
+            if (string.Equals(verb, "position", StringComparison.OrdinalIgnoreCase))
+            {
+                GmCommandFeedback.SendLines(context.Session, context.Player, DumpPosition(context.Player, npc));
+                return;
+            }
+
             GmCommandFeedback.Send(context.Session, context.Player, "Usage: " + Usage);
         }
 
@@ -103,6 +109,42 @@ namespace ZoneEngine_New.Core.Commands
 
             npc = target;
             return true;
+        }
+
+        static List<string> DumpPosition(Character player, NpcCharacter npc)
+        {
+            Vector3 pos = npc.Position;
+            Vector3 you = player.Position;
+            double dx = pos.x - you.x;
+            double dy = pos.y - you.y;
+            double dz = pos.z - you.z;
+            double dist = Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
+            double planar = Math.Sqrt((dx * dx) + (dz * dz));
+            int playfieldId = npc.Playfield?.Identity.Instance ?? 0;
+
+            return new List<string>
+            {
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Server position: {0} id={1} pf={2} ({3:F3},{4:F3},{5:F3})",
+                    npc.Name ?? string.Empty,
+                    npc.Identity.Instance,
+                    playfieldId,
+                    pos.xf,
+                    pos.yf,
+                    pos.zf),
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "You: ({0:F3},{1:F3},{2:F3}) delta=({3:F3},{4:F3},{5:F3}) dist={6:F3} xz={7:F3}",
+                    you.xf,
+                    you.yf,
+                    you.zf,
+                    (float)dx,
+                    (float)dy,
+                    (float)dz,
+                    (float)dist,
+                    (float)planar)
+            };
         }
 
         List<string> DumpSource(NpcCharacter npc)
@@ -413,12 +455,7 @@ namespace ZoneEngine_New.Core.Commands
 
                 if (_gameData.TryGetHashInstance(entry.Hash, out HashInstance instance))
                 {
-                    lines.Add(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "    instance ql={0}-{1}",
-                            instance.MinLevel,
-                            instance.MaxLevel));
+                    lines.Add("    instance");
                     for (int i = 0; i < instance.TemplateIds.Length; i++)
                         lines.Add("    " + FormatItemId(instance.TemplateIds[i]));
                     continue;

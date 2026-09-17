@@ -186,21 +186,49 @@ namespace ZoneEngine_New.Core.Playfield
         public NavMeshPathfinder? Pathfinder { get; private set; }
 
         /// <summary>
-        /// Places an NPC onto the navmesh at spawn. Returns a copy of <paramref name="position"/>
-        /// when no mesh is loaded or no poly is in range. Does not clamp later movement so off-mesh
-        /// links can carry the NPC off the surface.
+        /// Same XZ; Y is the heightfield / Bepu floor. No Recast.
+        /// </summary>
+        public bool TrySnapFeetToFloor(
+            AORebirth.Core.Vector.Vector3 position,
+            out AORebirth.Core.Vector.Vector3 floor)
+        {
+            ArgumentNullException.ThrowIfNull(position);
+            WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
+            if (world != null && world.TrySnapToFloor(position, out floor))
+                return true;
+
+            floor = new AORebirth.Core.Vector.Vector3(position.x, position.y, position.z);
+            return false;
+        }
+
+        /// <summary>
+        /// Same XZ; Y becomes the walkable floor when the world knows one.
+        /// </summary>
+        public AORebirth.Core.Vector.Vector3 SnapFeetToFloor(AORebirth.Core.Vector.Vector3 position)
+        {
+            if (TrySnapFeetToFloor(position, out AORebirth.Core.Vector.Vector3 floor))
+                return floor;
+
+            return new AORebirth.Core.Vector.Vector3(position.x, position.y, position.z);
+        }
+
+        /// <summary>
+        /// Places an NPC on the walkable surface at spawn. Recast is only an XZ hint;
+        /// the authoritative Y is the Bepu floor under a torso-height ray. A Recast Y
+        /// that sits under that triangle made foot-height probes miss and drop the NPC.
         /// </summary>
         public AORebirth.Core.Vector.Vector3 SnapNpcSpawn(AORebirth.Core.Vector.Vector3 position)
         {
             ArgumentNullException.ThrowIfNull(position);
+            var at = new AORebirth.Core.Vector.Vector3(position.x, position.y, position.z);
             if (Pathfinder != null
                 && Pathfinder.TrySnap(
                     new System.Numerics.Vector3((float)position.x, (float)position.y, (float)position.z),
                     NavMeshPathfinder.SpawnSnapExtent,
                     out System.Numerics.Vector3 snapped))
-                return new AORebirth.Core.Vector.Vector3(snapped.X, snapped.Y, snapped.Z);
+                at = new AORebirth.Core.Vector.Vector3(snapped.X, snapped.Y, snapped.Z);
 
-            return new AORebirth.Core.Vector.Vector3(position.x, position.y, position.z);
+            return SnapFeetToFloor(at);
         }
 
         /// <summary>Zoning needs the destination playfield's geometry, not just this one's.</summary>

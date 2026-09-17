@@ -383,7 +383,7 @@ public sealed class PlayfieldTransferTests
             Set(world, "_dynelRegistry", registry); Set(world, "_logger", logger); Set(world, "_playfieldManager", Manager);
             itemCatalog ??= new StubCatalog(); itemBuilder ??= new StubItemBuilder();
             var accepted = new NpcContentActivationService(world, registry, locality, itemBuilder, itemCatalog);
-            var contentData = new StubGameData(HashItemCatalog.Parse("{}", "{}")) { RootPath = Path.Combine(AppContext.BaseDirectory, "GameData") };
+            var contentData = new StubGameData(HashItemCatalog.Parse("{}")) { RootPath = Path.Combine(AppContext.BaseDirectory, "GameData") };
             var services = new ServiceCollection().AddSingleton(spawn).AddSingleton(registry).AddSingleton(locality)
                 .AddSingleton<IGameData>(contentData)
                 .AddSingleton(Manager.Teams).AddSingleton(new WorldSimulationAccess())
