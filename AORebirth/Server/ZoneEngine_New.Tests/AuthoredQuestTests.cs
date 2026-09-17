@@ -19,6 +19,7 @@ using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Playfield.Locality;
@@ -71,6 +72,59 @@ public sealed class AuthoredQuestTests
         Assert.AreEqual(1, w.Dao.Items.Count); Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
         Assert.IsNull(w.Dao.GetMission(new(111, AuthoredQuestFixture.Strongbox))); Assert.AreEqual(0, w.Session.Messages.Count);
         Assert.IsFalse(w.Player.IsPersistenceQuarantined);
+    }
+
+    [DataTestMethod]
+    [DataRow("accepted")]
+    [DataRow("ineligible")]
+    [DataRow("rollback")]
+    [DataRow("unknown")]
+    public void InventoryUsePacketRoutesAuthoredItemsWithoutFallingThroughOnFailure(string outcome)
+    {
+        using var w = new World();
+        w.Activate(AuthoredQuestFixture.BuyLockpick);
+        var item = w.Add(295999);
+        if (outcome == "ineligible") TestWorld.FillInventory(w.Player);
+        item.Definition.Stats[CharacterStat.Can] = (int)(CanFlags.Use | CanFlags.Consume);
+        item.SpellList[EventType.OnUse] = [new ItemSpell
+        {
+            FunctionType = (int)FunctionType.Set, Target = (int)ItemTarget.User,
+            Arguments = [(int)CharacterStat.Cash, 777]
+        }];
+        if (outcome == "rollback") w.Dao.Failure = new InvalidOperationException("late mission write failure");
+        w.Dao.UnknownCommit = outcome == "unknown";
+        w.Dao.BeforeCommit = _ =>
+        {
+            Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
+            Assert.AreEqual(0, w.Session.Messages.Count);
+        };
+        var handler = new GenericCmdMessageHandler(new StubInventoryRepository(), new StubItemBuilder(),
+            (GeneratedMissionAcgService)RuntimeHelpers.GetUninitializedObject(typeof(GeneratedMissionAcgService)), w.Service);
+        handler.Handle(new GenericCmdMessage
+        {
+            Identity = w.Player.Identity, Action = GenericCmdAction.Use, User = w.Player.Identity, Target = [Slot]
+        }, w.Session);
+
+        Assert.AreNotEqual(777, w.Player.Stats.GetOrZero(CharacterStat.Cash));
+        if (outcome == "accepted")
+        {
+            Assert.IsFalse(w.Player.Inventory.Inventory.Content.ContainsKey(64));
+            Assert.AreEqual(95577, w.Player.Inventory.Inventory.Content.Values.Single().LowId);
+            Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
+            Assert.AreEqual(1, w.Session.Messages.OfType<GenericCmdMessage>().Single().Temp1);
+        }
+        else
+        {
+            Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
+            Assert.AreEqual(1, item.StackCount);
+            if (outcome == "unknown")
+            {
+                Assert.IsTrue(w.Player.IsPersistenceQuarantined);
+                Assert.AreEqual(SessionState.Closed, w.Session.State);
+                Assert.AreEqual(0, w.Session.Messages.Count);
+            }
+            else Assert.AreEqual(2, w.Session.Messages.OfType<GenericCmdMessage>().Single().Temp1);
+        }
     }
 
     [TestMethod]
