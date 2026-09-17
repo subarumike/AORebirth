@@ -38,7 +38,7 @@ namespace AORebirth.Database.Domain.Missions
                 var prior = connection.Query<GeneratedBatchCash>("SELECT CashAfter FROM generatedmissionbatches WHERE OwnerId=@OwnerId AND BatchIdentity=@BatchIdentity", batch, transaction).SingleOrDefault();
                 if (prior != null)
                 {
-                    var frozen = connection.Query<GeneratedMissionOffer>("SELECT " + OfferColumns + " FROM generatedmissionoffers WHERE OwnerId=@OwnerId AND BatchIdentity=@BatchIdentity ORDER BY OfferIndex", batch, transaction).ToList();
+                    var frozen = connection.Query<GeneratedMissionOffer>("SELECT " + OfferReadProjection(string.Empty) + " FROM generatedmissionoffers WHERE OwnerId=@OwnerId AND BatchIdentity=@BatchIdentity ORDER BY OfferIndex", batch, transaction).ToList();
                     var original = connection.Query<GeneratedMissionOfferBatch>("SELECT * FROM generatedmissionbatches WHERE OwnerId=@OwnerId AND BatchIdentity=@BatchIdentity", batch, transaction).Single();
                     if (!SameBatch(original, batch) || frozen.Count != batch.Offers.Count || frozen.Where((value, index) => !SameOffer(value, batch.Offers[index])).Any())
                         return GeneratedResult(GeneratedMissionResultStatus.Rejected, "Batch identity belongs to different frozen offers.");
@@ -472,8 +472,10 @@ namespace AORebirth.Database.Domain.Missions
         private static GeneratedMissionResult GeneratedResult(GeneratedMissionResultStatus status, string reason) => new GeneratedMissionResult { Status = status, Reason = reason };
         private static void ValidateBatch(GeneratedMissionOfferBatch batch)
         {
+            // External AO terminal identities retain all 32 wire bits, including the sign bit.
+            // Owner and generated offer identities still use their positive-only contracts.
             if (batch == null || batch.OwnerId <= 0 || batch.OwnerType != 50000 || string.IsNullOrWhiteSpace(batch.BatchIdentity) || batch.BatchIdentity.Length > 64
-                || batch.Fee < 0 || batch.CurrentCash < 0 || batch.TerminalType != 0xDAC1 || batch.TerminalInstance <= 0 || batch.TerminalPlayfield <= 0 || batch.OfferedAtUtcTicks <= 0 || batch.ExpiresAtUtcTicks <= batch.OfferedAtUtcTicks
+                || batch.Fee < 0 || batch.CurrentCash < 0 || batch.TerminalType != 0xDAC1 || batch.TerminalInstance == 0 || batch.TerminalPlayfield <= 0 || batch.OfferedAtUtcTicks <= 0 || batch.ExpiresAtUtcTicks <= batch.OfferedAtUtcTicks
                 || batch.Offers == null || batch.Offers.Count < 1 || batch.Offers.Count > 5)
                 throw new ArgumentException("Invalid frozen mission offer batch.");
             for (int index = 0; index < batch.Offers.Count; index++)
@@ -542,7 +544,12 @@ namespace AORebirth.Database.Domain.Missions
                 || (completion.CurrentLevel == 220 && stats.Count != 0) || (offer.ExperienceReward == 0 && stats.Count != 0))
                 throw new ArgumentException("Final experience and direct XP/SK projection are inconsistent.");
         }
-        private static readonly string OfferReadSql = "SELECT " + string.Join(",", OfferColumns.Split(',').Select(column => "o." + column))
+        // MySQL's text FLOAT result truncates significant digits. DOUBLE projection retains the
+        // stored float exactly before Dapper maps it back to the existing System.Single fields.
+        private static string OfferReadProjection(string prefix) => string.Join(",", OfferColumns.Split(',').Select(column =>
+            column == "DestinationX" || column == "DestinationY" || column == "DestinationZ"
+                ? "CAST(" + prefix + column + " AS DOUBLE) AS " + column : prefix + column));
+        private static readonly string OfferReadSql = "SELECT " + OfferReadProjection("o.")
             + ",b.TerminalType AS IssuingTerminalType,b.TerminalInstance AS IssuingTerminalInstance,b.TerminalPlayfield AS IssuingTerminalPlayfield FROM generatedmissionoffers o JOIN generatedmissionbatches b ON b.OwnerId=o.OwnerId AND b.BatchIdentity=o.BatchIdentity";
         private sealed class GeneratedSequence { public int NextIdentity { get; set; } public int MaximumIdentity { get; set; } }
         private sealed class GeneratedBatchCash { public int CashAfter { get; set; } }

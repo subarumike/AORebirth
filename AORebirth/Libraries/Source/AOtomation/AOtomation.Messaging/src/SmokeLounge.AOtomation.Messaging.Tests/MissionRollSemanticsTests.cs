@@ -12,6 +12,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine.Core.Missions;
+    using ZoneEngine_New.Core.Missions;
 
     [TestClass]
     [DeploymentItem(@".\XML Data\MissionLevels.csv", @"XML Data")]
@@ -53,34 +54,34 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void OfficialFindAndReturnItemIconsMapToCapturedBehavior()
         {
-            Assert.AreEqual(MissionRollType.FindItemReturn, MissionTypeCatalog.TypeFromIcon(11329));
-            Assert.AreEqual(MissionRollType.FindItem, MissionTypeCatalog.TypeFromIcon(11337));
-            Assert.AreEqual(11329, MissionTypeCatalog.IconId(MissionRollType.FindItemReturn, 0));
-            Assert.AreEqual(11337, MissionTypeCatalog.IconId(MissionRollType.FindItem, 0));
-            Assert.AreEqual(MissionRollType.Unknown, MissionTypeCatalog.TypeFromIcon(999999));
+            Assert.AreEqual(MissionRollType.FindItemReturn, MissionRollPolicy.Current.TypeFromIcon(11329));
+            Assert.AreEqual(MissionRollType.FindItem, MissionRollPolicy.Current.TypeFromIcon(11337));
+            Assert.AreEqual(11329, MissionRollPolicy.Current.Icon(MissionRollType.FindItemReturn));
+            Assert.AreEqual(11337, MissionRollPolicy.Current.Icon(MissionRollType.FindItem));
+            Assert.AreEqual(MissionRollType.Unknown, MissionRollPolicy.Current.TypeFromIcon(999999));
         }
 
         [TestMethod]
         public void DifficultyWireValuesAreOneBasedAndLevel60EasiestIsQl42()
         {
             int sliderIndex;
-            Assert.IsTrue(MissionLevelTable.TryDecodeDifficultySlider(1, out sliderIndex));
+            Assert.IsTrue(MissionLevelRuntime.TryDecodeDifficultySlider(1, out sliderIndex));
             Assert.AreEqual(0, sliderIndex);
-            Assert.IsTrue(MissionLevelTable.TryDecodeDifficultySlider(11, out sliderIndex));
+            Assert.IsTrue(MissionLevelRuntime.TryDecodeDifficultySlider(11, out sliderIndex));
             Assert.AreEqual(10, sliderIndex);
-            Assert.IsFalse(MissionLevelTable.TryDecodeDifficultySlider(0, out sliderIndex));
-            Assert.IsFalse(MissionLevelTable.TryDecodeDifficultySlider(12, out sliderIndex));
+            Assert.IsFalse(MissionLevelRuntime.TryDecodeDifficultySlider(0, out sliderIndex));
+            Assert.IsFalse(MissionLevelRuntime.TryDecodeDifficultySlider(12, out sliderIndex));
 
             int missionQuality;
-            Assert.IsTrue(MissionLevelTable.TryGetMissionQuality(60, 1, out missionQuality));
+            Assert.IsTrue(MissionLevelRuntime.TryGetMissionQuality(60, 1, out missionQuality));
             Assert.AreEqual(42, missionQuality);
-            Assert.IsTrue(MissionLevelTable.TryGetMissionQuality(220, 11, out missionQuality));
+            Assert.IsTrue(MissionLevelRuntime.TryGetMissionQuality(220, 11, out missionQuality));
             Assert.AreEqual(250, missionQuality);
-            Assert.IsFalse(MissionLevelTable.TryGetMissionQuality(60, 0, out missionQuality));
-            Assert.IsFalse(MissionLevelTable.TryGetMissionQuality(60, 12, out missionQuality));
+            Assert.IsFalse(MissionLevelRuntime.TryGetMissionQuality(60, 0, out missionQuality));
+            Assert.IsFalse(MissionLevelRuntime.TryGetMissionQuality(60, 12, out missionQuality));
 
-            Assert.AreEqual(1, MissionLevelTable.ClampCharacterLevel(0));
-            Assert.AreEqual(220, MissionLevelTable.ClampCharacterLevel(221));
+            Assert.AreEqual(1, MissionLevelRuntime.ClampCharacterLevel(0));
+            Assert.AreEqual(220, MissionLevelRuntime.ClampCharacterLevel(221));
         }
 
         [TestMethod]
@@ -88,25 +89,24 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             QuestAlternativeMessage request = Request(1, 0, 0, 0, 0, 0, 0);
             CollectionAssert.AreEqual(
-                MissionRollService.SerializeBody(Build(request, 1, 707)),
-                MissionRollService.SerializeBody(Build(request, 0, 707)));
+                GeneratedMissionWire.Write(Build(request, 1, 707)),
+                GeneratedMissionWire.Write(Build(request, 0, 707)));
             CollectionAssert.AreEqual(
-                MissionRollService.SerializeBody(Build(request, 220, 808)),
-                MissionRollService.SerializeBody(Build(request, 221, 808)));
+                GeneratedMissionWire.Write(Build(request, 220, 808)),
+                GeneratedMissionWire.Write(Build(request, 221, 808)));
         }
 
         [TestMethod]
         public void ContinuousSliderBytesDecodeAsSignedPercentAndRejectInvalidRange()
         {
-            int value;
-            Assert.IsTrue(MissionSliderProfile.TryDecodeSignedPercent(156, out value));
-            Assert.AreEqual(-100, value);
-            Assert.IsTrue(MissionSliderProfile.TryDecodeSignedPercent(0, out value));
-            Assert.AreEqual(0, value);
-            Assert.IsTrue(MissionSliderProfile.TryDecodeSignedPercent(100, out value));
-            Assert.AreEqual(100, value);
-            Assert.IsFalse(MissionSliderProfile.TryDecodeSignedPercent(101, out value));
-            Assert.IsFalse(MissionSliderProfile.TryDecodeSignedPercent(155, out value));
+            Assert.IsTrue(MissionRollSliders.TryCreate(Request(1, 156, 0, 0, 0, 0, 0), out var left, out _));
+            Assert.AreEqual(-100, left.GoodBad);
+            Assert.IsTrue(MissionRollSliders.TryCreate(Request(1, 0, 0, 0, 0, 0, 0), out var neutral, out _));
+            Assert.AreEqual(0, neutral.GoodBad);
+            Assert.IsTrue(MissionRollSliders.TryCreate(Request(1, 100, 0, 0, 0, 0, 0), out var right, out _));
+            Assert.AreEqual(100, right.GoodBad);
+            Assert.IsFalse(MissionRollSliders.TryCreate(Request(1, 101, 0, 0, 0, 0, 0), out _, out _));
+            Assert.IsFalse(MissionRollSliders.TryCreate(Request(1, 155, 0, 0, 0, 0, 0), out _, out _));
         }
 
         [TestMethod]
@@ -121,15 +121,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void UnresolvedSliderCombinationsFallBackCategoricallyToNeutralEvidence()
         {
-            MissionSliderProfile neutral = Profile(Request(1, 0, 0, 0, 0, 0, 0));
-            MissionSliderProfile capturedLeft = Profile(Request(1, 156, 156, 0, 0, 0, 156));
-            MissionSliderProfile unresolved = Profile(Request(1, 25, 231, 100, 156, 50, 25));
+            MissionRollSliders neutral = Profile(Request(1, 0, 0, 0, 0, 0, 0));
+            MissionRollSliders capturedLeft = Profile(Request(1, 156, 156, 0, 0, 0, 156));
+            MissionRollSliders unresolved = Profile(Request(1, 25, 231, 100, 156, 50, 25));
 
-            Assert.AreEqual(MissionSliderEvidenceProfile.Neutral, neutral.EvidenceProfile);
+            Assert.AreEqual("Neutral", neutral.EvidenceProfile);
             Assert.AreEqual(
-                MissionSliderEvidenceProfile.CapturedLeftGoodBadOrderChaosCreditsXp,
+                "CapturedLeftGoodBadOrderChaosCreditsXp",
                 capturedLeft.EvidenceProfile);
-            Assert.AreEqual(MissionSliderEvidenceProfile.Unresolved, unresolved.EvidenceProfile);
+            Assert.AreEqual("Unresolved", unresolved.EvidenceProfile);
             Assert.AreEqual(0, unresolved.SemanticDistance(0, 0, 0, 0, 0, 0));
             Assert.AreEqual(1, unresolved.SemanticDistance(-100, -100, 0, 0, 0, -100));
             Assert.AreEqual(0, capturedLeft.SemanticDistance(-100, -100, 0, 0, 0, -100));
@@ -140,9 +140,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void CapturedLibraryCoversEveryFinalizedMissionTypeWithCompatibleActions()
         {
             var types = new HashSet<MissionRollType>();
-            for (int rollIndex = 0; rollIndex < MissionRollService.CapturedRollCount; rollIndex++)
+            for (int rollIndex = 0; rollIndex < GeneratedMissionWire.CapturedCount; rollIndex++)
             {
-                QuestAlternativeMessage roll = MissionRollService.DecodeCapturedRoll(rollIndex);
+                QuestAlternativeMessage roll = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(rollIndex));
                 foreach (QuestInfo offer in roll.QuestInfos)
                 {
                     MissionOfferDescriptor descriptor;
@@ -180,7 +180,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var counts = new Dictionary<MissionRollType, int>();
             foreach (QuestInfo offer in response.QuestInfos)
             {
-                MissionRollType type = MissionTypeCatalog.TypeFromIcon(offer.MissionIconId);
+                MissionRollType type = MissionRollPolicy.Current.TypeFromIcon(offer.MissionIconId);
                 counts[type] = counts.ContainsKey(type) ? counts[type] + 1 : 1;
             }
 
@@ -206,7 +206,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     };
                     int expectedQuality;
                     Assert.IsTrue(
-                        MissionLevelTable.TryGetMissionQuality(
+                        MissionLevelRuntime.TryGetMissionQuality(
                             levels[levelIndex],
                             difficulty,
                             out expectedQuality));
@@ -231,21 +231,21 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void GeneratedRollsAreDeterministicForTheSameSeed()
         {
             QuestAlternativeMessage request = Request(1, 0, 0, 0, 0, 0, 0);
-            byte[] first = MissionRollService.SerializeBody(Build(request, 60, 12345));
-            byte[] second = MissionRollService.SerializeBody(Build(request, 60, 12345));
+            byte[] first = GeneratedMissionWire.Write(Build(request, 60, 12345));
+            byte[] second = GeneratedMissionWire.Write(Build(request, 60, 12345));
             CollectionAssert.AreEqual(first, second);
 
-            byte[] different = MissionRollService.SerializeBody(Build(request, 60, 54321));
+            byte[] different = GeneratedMissionWire.Write(Build(request, 60, 54321));
             Assert.IsFalse(AreEqual(first, different), "Different seeds should be able to select a different valid roll.");
         }
 
         [TestMethod]
         public void GeneratedRollsDoNotMutateCapturedBodies()
         {
-            var before = new byte[MissionRollService.CapturedRollCount][];
+            var before = new byte[GeneratedMissionWire.CapturedCount][];
             for (int i = 0; i < before.Length; i++)
             {
-                before[i] = MissionRollService.CapturedRollBody(i);
+                before[i] = GeneratedMissionWire.CapturedBody(i);
             }
 
             for (int seed = 0; seed < 16; seed++)
@@ -255,7 +255,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             for (int i = 0; i < before.Length; i++)
             {
-                CollectionAssert.AreEqual(before[i], MissionRollService.CapturedRollBody(i), "roll " + i);
+                CollectionAssert.AreEqual(before[i], GeneratedMissionWire.CapturedBody(i), "roll " + i);
             }
         }
 
@@ -268,9 +268,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 QuestAlternativeMessage response = Build(request, 60, seed);
                 Assert.AreEqual(5, response.QuestInfos.Length, "seed " + seed);
 
-                MissionSliderProfile sliders;
+                MissionRollSliders sliders;
                 string sliderError;
-                Assert.IsTrue(MissionSliderProfile.TryCreate(request, out sliders, out sliderError));
+                Assert.IsTrue(MissionRollSliders.TryCreate(request, out sliders, out sliderError));
                 var questIds = new HashSet<int>();
                 foreach (QuestInfo offer in response.QuestInfos)
                 {
@@ -284,7 +284,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "seed " + seed + ": " + compatibilityError);
                     Assert.IsTrue(MissionOfferCompatibility.IsCompatibleWithSliders(descriptor, sliders));
                     Assert.AreEqual(42, offer.Quality);
-                    Assert.AreEqual(MissionTypeCatalog.IconId(descriptor.Type, 0), offer.MissionIconId);
+                    Assert.AreEqual(MissionRollPolicy.Current.Icon(descriptor.Type), offer.MissionIconId);
                     Assert.AreEqual(
                         31,
                         offer.ShortInfo.Length,
@@ -371,7 +371,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 foreach (QuestInfo offer in response.QuestInfos)
                 {
                     Identity objectiveTerminal = offer.QuestActions[0].Unknown1;
-                    if (MissionTypeCatalog.TypeFromIcon(offer.MissionIconId)
+                    if (MissionRollPolicy.Current.TypeFromIcon(offer.MissionIconId)
                         == MissionRollType.FindItemReturn)
                     {
                         Assert.AreEqual(response.MissionTerminalIdentity, objectiveTerminal);
@@ -391,7 +391,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void CompatibilityLayerRejectsTextObjectiveAndRewardContradictions()
         {
             QuestAlternativeMessage request = Request(1, 0, 0, 0, 0, 0, 0);
-            MissionSliderProfile sliders = Profile(request);
+            MissionRollSliders sliders = Profile(request);
             QuestAlternativeMessage response = Build(request, 60, 404);
             QuestInfo offer = response.QuestInfos[0];
 
@@ -453,8 +453,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void FinalizedQl42RewardPairsRemainExactEvidence()
         {
-            MissionSliderProfile neutral = Profile(Request(1, 0, 0, 0, 0, 0, 0));
-            MissionSliderProfile left = Profile(Request(1, 156, 156, 0, 0, 0, 156));
+            MissionRollSliders neutral = Profile(Request(1, 0, 0, 0, 0, 0, 0));
+            MissionRollSliders left = Profile(Request(1, 156, 156, 0, 0, 0, 156));
 
             Assert.IsTrue(MissionRewardEvidenceModel.IsCapturedPair(
                 MissionRollType.FindItemReturn, 60, 1, 42, neutral, 670, 13007, 1808));
@@ -471,7 +471,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void UnchangedCapturedCombinationPreservesExactText()
         {
-            QuestAlternativeMessage roll = MissionRollService.DecodeCapturedRoll(0);
+            QuestAlternativeMessage roll = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(0));
             QuestInfo offer = roll.QuestInfos[0];
             string originalTitle = offer.ShortInfo;
             string originalDescription = offer.Info;
@@ -497,23 +497,18 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void RollFeeRulesPreserveDeductionAndInsufficientCreditBehavior()
         {
-            int fee;
-            int cashAfter;
-            Assert.IsFalse(MissionRollFeeRules.TryCalculateCharge(60, 59, out fee, out cashAfter));
-            Assert.AreEqual(60, fee);
-            Assert.AreEqual(59, cashAfter);
-
-            Assert.IsTrue(MissionRollFeeRules.TryCalculateCharge(60, 60, out fee, out cashAfter));
-            Assert.AreEqual(60, fee);
-            Assert.AreEqual(0, cashAfter);
-            Assert.AreEqual(1, MissionRollFeeRules.FeeForLevel(0));
+            Assert.AreEqual(60, MissionRollPolicy.Current.Fee(60));
+            Assert.AreEqual(1, MissionRollPolicy.Current.Fee(0));
+            // Credit deduction and insufficient-funds preservation are exercised against the actual
+            // DAO by Tools/MissionDaoValidation, not by a duplicate calculator in this test fixture.
         }
 
         [TestMethod]
         public void LevelFourNeutralIccRollStaysInTheTerminalPlayfield()
         {
+            int nextIdentity = 1000;
             QuestAlternativeMessage generated =
-                MissionRollService.BuildRollResponseDeterministic(
+                GeneratedMissionRollService.Generate(
                     Request(1, 0, 0, 0, 0, 0, 0),
                     new Identity
                     {
@@ -525,10 +520,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     3238f,
                     918f,
                     MissionLocationSide.Neutral,
+                    1201445827,
                     12345,
                     0x24681357,
-                    0x55660000,
-                    1201445827);
+                    () => ++nextIdentity);
 
             Assert.AreEqual(5, generated.QuestInfos.Length);
             foreach (QuestInfo offer in generated.QuestInfos)
@@ -546,10 +541,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             var first = new Random(0x12345678);
             var second = new Random(0x12345678);
 
-            int firstLevel = MissionNpcDifficultyPolicy.ResolveLevel(2, first);
-            int firstHealth = MissionNpcDifficultyPolicy.ResolveHealth(firstLevel, first);
-            int secondLevel = MissionNpcDifficultyPolicy.ResolveLevel(2, second);
-            int secondHealth = MissionNpcDifficultyPolicy.ResolveHealth(secondLevel, second);
+            int firstLevel = MissionGenerationSettings.Current.Level.Sample(2, first);
+            int firstHealth = MissionGenerationSettings.Current.Health.Sample(firstLevel, first);
+            int secondLevel = MissionGenerationSettings.Current.Level.Sample(2, second);
+            int secondHealth = MissionGenerationSettings.Current.Health.Sample(secondLevel, second);
 
             Assert.AreEqual(firstLevel, secondLevel);
             Assert.AreEqual(firstHealth, secondHealth);
@@ -564,7 +559,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             int characterLevel,
             int seed)
         {
-            return MissionRollService.BuildRollResponseDeterministic(
+            int nextIdentity = 1000;
+            return GeneratedMissionRollService.Generate(
                 request,
                 new Identity { Type = IdentityType.CanbeAffected, Instance = 0x12345678 },
                 characterLevel,
@@ -572,10 +568,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 300f,
                 300f,
                 MissionLocationSide.Omni,
+                1201445827,
                 seed,
                 0x24681357,
-                0x55660000,
-                1201445827);
+                () => ++nextIdentity);
         }
 
         private static QuestAlternativeMessage Request(
@@ -603,11 +599,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                    };
         }
 
-        private static MissionSliderProfile Profile(QuestAlternativeMessage request)
+        private static MissionRollSliders Profile(QuestAlternativeMessage request)
         {
-            MissionSliderProfile profile;
+            MissionRollSliders profile;
             string error;
-            Assert.IsTrue(MissionSliderProfile.TryCreate(request, out profile, out error), error);
+            Assert.IsTrue(MissionRollSliders.TryCreate(request, out profile, out error), error);
             return profile;
         }
 
@@ -636,7 +632,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 action();
                 Assert.Fail("Expected unsupported mission slider input to fail closed.");
             }
-            catch (ArgumentOutOfRangeException)
+            catch (Exception failure) when (failure is ArgumentException || failure is InvalidOperationException)
             {
             }
         }

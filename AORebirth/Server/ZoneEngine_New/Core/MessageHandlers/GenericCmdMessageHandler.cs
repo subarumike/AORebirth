@@ -24,14 +24,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly IInventoryRepository _inventoryRepository;
         private readonly IItemBuilder _items;
         private readonly GeneratedMissionAcgService _missions;
+        private readonly AuthoredQuestService _quests;
 
-        public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items, GeneratedMissionAcgService missions)
+        public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items, GeneratedMissionAcgService missions,
+            AuthoredQuestService quests)
         {
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
             _inventoryRepository = inventoryRepository;
             _items = items;
             _missions = missions ?? throw new ArgumentNullException(nameof(missions));
+            _quests = quests ?? throw new ArgumentNullException(nameof(quests));
         }
 
         public Type MessageBodyType => typeof(GenericCmdMessage);
@@ -219,6 +222,15 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     item.Can(CanFlags.Use),
                     (ItemClass)item.GetStat(CharacterStat.ItemClass),
                     item.GetStat(CharacterStat.ItemClass)));
+
+            if (_quests.IsAuthoredItem(item))
+            {
+                if (_quests.TryUseItem(player, target, item))
+                    Acknowledge(session, message, target);
+                else if (!player.IsPersistenceQuarantined && session.State == SessionState.InPlay)
+                    Deny(session, message, player, "authored item use was not committed");
+                return;
+            }
 
             if (!item.Use(player, target, _inventoryRepository, _items))
             {

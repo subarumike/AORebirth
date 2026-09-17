@@ -17,8 +17,8 @@ public static class GeneratedMissionCorpseProjection
             || state.RuntimeInstance != evidence.RuntimeInstance || state.RuntimeType != evidence.RuntimeType
             || state.CapturedInstance != evidence.CapturedInstance || state.CapturedType != evidence.CapturedType
             || state.RuntimeType != (int)IdentityType.CanbeAffected || evidence.IsFindPerson
-            || livePlayfield < MissionAcgIdentityRanges.MinimumLivePlayfield2
-            || livePlayfield > MissionAcgIdentityRanges.MaximumLivePlayfield2
+            || livePlayfield < GeneratedMissionIdentitySpace.MinimumLivePlayfield2
+            || livePlayfield > GeneratedMissionIdentitySpace.MaximumLivePlayfield2
             || receiver.Type != IdentityType.CanbeAffected || receiver.Instance <= 0)
             throw new InvalidOperationException("Corpse projection requires the exact durable generated NPC death.");
         var source = evidence.CopySpawnMessage();

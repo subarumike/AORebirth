@@ -30,14 +30,14 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
     readonly ConditionalWeakTable<Player, HashSet<string>> _openHistory = new();
 
     sealed class Conversation(Player player, IZoneSession transport, NpcCharacter npc, Playfield playfield,
-        string contentIdentity, DialogueSession dialogue)
+        string contentIdentity, DialogueCursor dialogue)
     {
         public readonly Player Player = player;
         public readonly IZoneSession Transport = transport;
         public readonly NpcCharacter Npc = npc;
         public readonly Playfield Playfield = playfield;
         public readonly string ContentIdentity = contentIdentity;
-        public DialogueSession Dialogue = dialogue;
+        public DialogueCursor Dialogue = dialogue;
         public readonly Queue<MessageBody> Packets = new();
         public int[] WireOptions = [];
         public long NextPacketAt;
@@ -84,7 +84,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
                 || conversation.Trade != DialogueActionOutcome.Continue || wireAnswer < 0
                 || wireAnswer >= conversation.WireOptions.Length) return false;
             int contentAnswer = conversation.WireOptions[wireAnswer];
-            var next = catalog.Sessions.SelectOption(DialogueCatalog.Copy(conversation.Dialogue), contentAnswer);
+            var next = catalog.Sessions.SelectOption(conversation.Dialogue, contentAnswer);
             if (!SafeResult(next)) return false;
             var effect = actions.ApplyAnswer(conversation.Player, conversation.ContentIdentity,
                 conversation.Dialogue.CurrentNodeId, contentAnswer);
@@ -156,6 +156,8 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
             var item = conversation.StagedItem;
             if (item == null || !conversation.Player.Inventory.Inventory.Content.TryGetValue(conversation.StagedSlot.Instance, out var current)
                 || !ReferenceEquals(item, current)) return false;
+            var next = catalog.Sessions.SelectOption(conversation.Dialogue, 0);
+            if (!SafeResult(next)) return false;
             if (!actions.CompleteTrade(conversation.Player, conversation.TradeRoute!, conversation.StagedSlot, item, () =>
                 {
                     if (!Valid(conversation)) throw new InvalidOperationException("Dialogue owner changed during durable NPC trade completion.");
@@ -166,8 +168,6 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
             conversation.Trade = DialogueActionOutcome.Continue;
             if (!Valid(conversation)) { Remove(conversation); return true; }
             // Only a known committed trade may traverse the content's hidden continuation.
-            var next = catalog.Sessions.SelectOption(DialogueCatalog.Copy(conversation.Dialogue), 0);
-            if (!SafeResult(next)) { Remove(conversation); return true; }
             conversation.Dialogue = next.Session;
             QueueNode(conversation, next);
             Pump(conversation);
@@ -206,7 +206,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
     public bool HasSession(Player player) => _sessions.TryGetValue(player.Identity.Instance, out var session)
         && ReferenceEquals(session.Player, player);
 
-    void QueueNode(Conversation conversation, DialogueSessionResult result)
+    void QueueNode(Conversation conversation, DialogueStep result)
     {
         conversation.Trade = DialogueActionOutcome.Continue;
         if (!result.Session.IsActive)
@@ -240,7 +240,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
         _sessions.TryRemove(new KeyValuePair<int, Conversation>(conversation.Player.Identity.Instance, conversation));
         conversation.Packets.Clear();
         conversation.StagedItem = null;
-        conversation.Dialogue.IsActive = false;
+        conversation.Dialogue = conversation.Dialogue with { IsActive = false };
     }
 
     bool TryConversation(IZoneSession transport, Identity target, out Conversation conversation)
@@ -278,6 +278,5 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
             && binding.HasDialogue && catalog.IsEnabled(binding.ContentNpcIdentity);
     }
 
-    static bool SafeResult(DialogueSessionResult result) => result.IsValid && result.Session != null
-        && result.RecordedActions.All(action => string.Equals(action.ActionType, "EndDialogue", StringComparison.OrdinalIgnoreCase));
+    static bool SafeResult(DialogueStep result) => result.IsValid && result.Session != null;
 }

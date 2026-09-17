@@ -15,12 +15,12 @@ public sealed class DialogueCatalog
     {
         Registry = registry ?? throw new ArgumentNullException(nameof(registry));
         Content = content;
-        Sessions = new DialogueSessionService(registry);
+        Sessions = new DialogueGraph(registry);
     }
 
     public DialogueContentRegistry Registry { get; }
     public InteractionContent? Content { get; }
-    public DialogueSessionService Sessions { get; }
+    public DialogueGraph Sessions { get; }
 
     public static DialogueCatalog Load(string runtimeBaseDirectory)
     {
@@ -31,13 +31,7 @@ public sealed class DialogueCatalog
     public bool TryGet(string contentIdentity, out DialogueNpcEntry npc) => Registry.TryGetNpc(contentIdentity, out npc);
     public bool IsEnabled(string contentIdentity) => Content == null || (Content.Dialogues.TryGetValue(contentIdentity, out var binding) && binding.Enabled);
 
-    public static DialogueSession Copy(DialogueSession session) => new()
-    {
-        SessionId = session.SessionId, NpcIdentity = session.NpcIdentity,
-        CurrentNodeId = session.CurrentNodeId, IsActive = session.IsActive
-    };
-
-    public static DialogueOption[] VisibleOptions(DialogueSessionResult result) => result.AvailableOptions
+    public static DialogueOption[] VisibleOptions(DialogueStep result) => result.AvailableOptions
         .Where(option => option != null && !string.IsNullOrWhiteSpace(option.Text)
             && !option.Hidden)
         .OrderBy(option => option.Index).ToArray();

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using ZoneEngine.Core.Arete.Quests;
 using ZoneEngine.Core.Missions;
+using ZoneEngine_New.Core.Missions.Content;
 
 public sealed class AuthoredQuestCatalog
 {
@@ -16,7 +17,7 @@ public sealed class AuthoredQuestCatalog
     }
     public AuthoredQuestCatalog(IEnumerable<QuestContentPack> packs)
     {
-        var registry = new QuestContentRegistry();
+        var registry = new QuestIndex();
         var validation = registry.Load(packs);
         if (!validation.IsValid) throw new InvalidDataException(string.Join("; ", validation.Errors));
         Content = new InteractionContent { MissionDefinitions = registry.GetQuests().Select(q => new MissionDefinition {

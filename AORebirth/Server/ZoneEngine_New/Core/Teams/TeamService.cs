@@ -47,6 +47,7 @@ namespace ZoneEngine_New.Core.Teams
         private readonly Dictionary<int, Invitation> _invitations = new();
         private readonly Dictionary<int, DateTime> _declinedUntil = new();
         private readonly IChatEngineLink? _chat;
+        private readonly TeamLevelEligibility _eligibility;
         private readonly Func<DateTime> _utcNow;
         private readonly Action<Player, Action>? _dispatchOnOwner;
         private int _nextTeamId = 0x02800000;
@@ -55,6 +56,7 @@ namespace ZoneEngine_New.Core.Teams
         public TeamService(IChatEngineLink? chatLink = null, Func<DateTime>? utcNow = null,
             Action<Player, Action>? dispatchOnOwner = null)
         {
+            _eligibility = TeamLevelEligibility.Current;
             _chat = chatLink;
             _utcNow = utcNow ?? (() => DateTime.UtcNow);
             _dispatchOnOwner = dispatchOnOwner;
@@ -272,12 +274,13 @@ namespace ZoneEngine_New.Core.Teams
                 foreach (int id in team?.Members ?? [inviter.Identity.Instance])
                 {
                     if (!TryLevel(_players[id], out int level)) return Error(inviter, "Team member level is unavailable.");
-                    if (ZoneEngine.Core.TeamXpShareWindow.IsTooHighForXpShare(level, targetLevel))
+                    var range = _eligibility.ForLevel(level);
+                    if (targetLevel > range.Maximum)
                     {
                         Send(inviter, Action(inviter, CharacterActionType.TeamInviteAck, target.Identity));
                         return true;
                     }
-                    tooLow |= ZoneEngine.Core.TeamXpShareWindow.IsTooLowForXpShare(level, targetLevel);
+                    tooLow |= targetLevel < range.Minimum;
                 }
                 if (tooLow)
                 {

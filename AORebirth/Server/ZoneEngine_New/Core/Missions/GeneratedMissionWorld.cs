@@ -63,7 +63,7 @@ public sealed class GeneratedMissionWorld
     readonly GeneratedMissionObject[] _objects;
     readonly IGeneratedMissionNpcFactory _npcs;
     readonly Func<Player, GeneratedMissionObject, bool> _use;
-    readonly MissionAcgSpatialEnvelope _envelope;
+    readonly MissionWorldBounds _envelope;
     readonly float _spawnX, _spawnY, _spawnZ, _exteriorX, _exteriorY, _exteriorZ;
 
     internal GeneratedMissionWorld(GeneratedMissionBinding binding, MissionAcgMaterializedInstance instance,
@@ -76,8 +76,7 @@ public sealed class GeneratedMissionWorld
         _exteriorX = binding.Offer.DestinationX; _exteriorY = binding.Offer.DestinationY; _exteriorZ = binding.Offer.DestinationZ;
         _spawnX = instance.Spawn.X; _spawnY = instance.Spawn.Y; _spawnZ = instance.Spawn.Z;
         _instance = instance; _objects = objects.ToArray(); _npcs = npcs; _use = use;
-        if (!MissionAcgSpatialEnvelope.TryDerive(instance.Bundle, out _envelope, out string spatialFailure))
-            throw new InvalidOperationException(spatialFailure);
+        _envelope = new MissionWorldBounds(instance.Bundle);
         if (_objects.Length != instance.Objects.Count) throw new InvalidOperationException("Durable mission object set differs from its accepted bundle.");
         foreach (var source in instance.Objects)
         {
@@ -100,7 +99,7 @@ public sealed class GeneratedMissionWorld
     public long ExpiresAtUtcTicks { get; }
     public Vector3 Spawn => new(_spawnX, _spawnY, _spawnZ);
     public Vector3 ExteriorPosition => new(_exteriorX, _exteriorY, _exteriorZ);
-    public bool ContainsPosition(Vector3 position) => _envelope.Contains(position.xf, position.yf, position.zf);
+    public bool ContainsPosition(Vector3 position) => _envelope.Contains(position);
     public bool AcceptsMovement(Character character, Vector3 proposed)
         => character.Playfield is MissionPlayfield field && field.World.Matches(this)
             && (!character.IsPlayer || character.Identity.Instance == OwnerId)
@@ -159,7 +158,7 @@ public sealed class GeneratedMissionWorld
             Dynel dynel;
             if (source.Identity.Kind is MissionAcgRuntimeObjectKind.ObjectiveNpc or MissionAcgRuntimeObjectKind.AmbientNpc)
             {
-                dynel = _npcs.Create(new GeneratedMissionNpcEvidence(source, _instance.Bundle, _instance.BindingRecord.Binding.MissionQuality, (int)_instance.BindingRecord.Binding.MissionType), state, items);
+                dynel = _npcs.Create(new GeneratedMissionNpcEvidence(source, _instance.Bundle, _instance.BindingRecord.Offer.Quality, _instance.BindingRecord.Offer.MissionType), state, items);
                 if (dynel.Identity.Type != (IdentityType)state.RuntimeType || dynel.Identity.Instance != state.RuntimeInstance)
                     throw new InvalidOperationException("Mission NPC adapter changed authoritative runtime identity.");
             }
@@ -179,7 +178,7 @@ public sealed class GeneratedMissionWorld
         if (state.OwnerId != OwnerId || state.QuestType != QuestType || state.QuestInstance != QuestInstance || state.RuntimeType != 50000)
             throw new InvalidOperationException("Mission corpse does not belong to this exact world.");
         var source = _instance.Objects.Single(value => value.Identity.RuntimeIdentity.Instance == state.RuntimeInstance && value.Identity.RuntimeIdentity.Type == state.RuntimeType);
-        var evidence = new GeneratedMissionNpcEvidence(source, _instance.Bundle, _instance.BindingRecord.Binding.MissionQuality, (int)_instance.BindingRecord.Binding.MissionType);
+        var evidence = new GeneratedMissionNpcEvidence(source, _instance.Bundle, _instance.BindingRecord.Offer.Quality, _instance.BindingRecord.Offer.MissionType);
         return new GeneratedMissionCorpseDynel(evidence, state, LivePlayfield)
         {
             Playfield = playfield, Position = new Vector3(state.X, state.Y, state.Z),

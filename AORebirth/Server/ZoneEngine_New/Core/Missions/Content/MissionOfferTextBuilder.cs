@@ -1,3 +1,4 @@
+using ZoneEngine_New.Core.Missions;
 namespace ZoneEngine.Core.Missions
 {
     using System;

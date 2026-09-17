@@ -1,3 +1,4 @@
+using ZoneEngine_New.Core.Missions;
 namespace ZoneEngine.Core.Missions
 {
     using System;
@@ -21,7 +22,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWire,
             int missionQl,
-            MissionSliderProfile sliders,
+            MissionRollSliders sliders,
             int playfieldId,
             Random rng)
         {
@@ -47,7 +48,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWire,
             int missionQl,
-            MissionSliderProfile sliders,
+            MissionRollSliders sliders,
             int playfieldId)
         {
             if (sliders == null)
@@ -74,7 +75,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWire,
             int missionQl,
-            MissionSliderProfile sliders)
+            MissionRollSliders sliders)
         {
             if (sliders == null)
             {
@@ -99,7 +100,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWire,
             int missionQl,
-            MissionSliderProfile sliders,
+            MissionRollSliders sliders,
             int playfieldId,
             int cashReward,
             int experienceReward)
@@ -130,7 +131,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWire,
             int missionQl,
-            MissionSliderProfile sliders,
+            MissionRollSliders sliders,
             int cashReward,
             int experienceReward)
         {
@@ -173,7 +174,7 @@ namespace ZoneEngine.Core.Missions
             int characterLevel,
             int difficultyWire,
             int missionQl,
-            MissionSliderProfile sliders,
+            MissionRollSliders sliders,
             int playfieldId,
             Random rng)
         {
@@ -274,7 +275,7 @@ namespace ZoneEngine.Core.Missions
                 int characterLevel,
                 int difficultyWire,
                 int missionQl,
-                MissionSliderProfile sliders,
+                MissionRollSliders sliders,
                 int playfieldId)
             {
                 return new EvidenceRank(
@@ -295,7 +296,7 @@ namespace ZoneEngine.Core.Missions
                 int characterLevel,
                 int difficultyWire,
                 int missionQl,
-                MissionSliderProfile sliders)
+                MissionRollSliders sliders)
             {
                 return CharacterLevel == characterLevel
                        && DifficultyWire == difficultyWire

@@ -36,21 +36,23 @@ namespace ZoneEngine_New.Core.MessageHandlers
             var side = MissionLocationPool.ResolveCharacterSide(player.Stats.Get(CharacterStat.Side));
             if (!MissionLocationPool.CanCharacterRollAtTerminal(side, playfield.Identity.Instance))
             { Feedback(session, player, "This mission terminal is not available to your side. No credits were deducted."); return; }
-            if (!MissionLevelTable.TryGetMissionQuality(level, message.LevelSlider, out _)
-                || !MissionSliderProfile.TryCreate(message, out _, out _))
+            if (!MissionLevelRuntime.TryGetMissionQuality(level, message.LevelSlider, out _)
+                || !MissionRollSliders.TryCreate(message, out _, out _))
             { Feedback(session, player, "The mission terminal rejected unsupported slider settings. No credits were deducted."); return; }
             try
             {
                 DateTime now = DateTime.UtcNow;
                 int first = _dao.ReserveIdentities("offer", 5);
                 int next = first;
-                var response = MissionRollService.BuildRollResponse(message, player.Identity, level,
+                int seed = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
+                int nonce = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
+                var response = GeneratedMissionRollService.Generate(message, player.Identity, level,
                     playfield.Identity.Instance, player.Position.xf, player.Position.zf,
                     side,
-                    MissionRollService.ResolveClientClockNowSeconds(synchronizedUtc, now), out int seed, out int nonce,
+                    GeneratedMissionWire.ClientClock(synchronizedUtc, now), seed, nonce,
                     () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."));
                 var batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,
-                    MissionRollFeeRules.FeeForLevel(level), seed, nonce, now);
+                    MissionRollPolicy.Current.Fee(level), seed, nonce, now);
                 var result = _missions.PublishOffers(player, batch);
                 if (result.Status == GeneratedMissionResultStatus.Applied)
                     session.Send(response);

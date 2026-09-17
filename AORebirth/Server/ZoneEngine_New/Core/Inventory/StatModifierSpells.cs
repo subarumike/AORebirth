@@ -9,7 +9,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Entities;
 
     /// <summary>
-    /// Applies <see cref="FunctionType.Modify"/> spell functions as stat bonuses.
+    /// Applies passive stat and shape functions as stat bonuses.
     /// Shared by worn equipment and active nano buffs: both are declarative bonuses that
     /// a rebase recomputes from scratch, never incremental edits.
     /// </summary>
@@ -23,10 +23,19 @@ namespace ZoneEngine_New.Core.Inventory
             for (int i = 0; i < spells.Count; i++)
             {
                 ItemSpell spell = spells[i];
-                if (!spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify))
+                bool shape = spell.Is(FunctionType.MonsterShape);
+                if (!shape && !spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify))
                     continue;
                 if (!spell.MeetsRequirements(stats))
                     continue;
+                if (shape)
+                {
+                    if (spell.TryReadInt(0, out int monsterData))
+                        stats.Set(CharacterStat.MonsterData,
+                            monsterData - stats.GetOrZero(CharacterStat.MonsterData, StatDetail.Base),
+                            StatDetail.Bonus);
+                    continue;
+                }
                 if (!TryReadModify(spell, out CharacterStat stat, out int delta))
                     continue;
                 if (stat == CharacterStat.Cash)

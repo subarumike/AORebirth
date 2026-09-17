@@ -20,9 +20,8 @@ namespace ZoneEngine_New.Core.Teams
             Player? player = session.Player;
             if (session.State != SessionState.InPlay || player == null || !ReferenceEquals(player.Session, session)
                 || message.Identity != player.Identity || player.IsPersistenceQuarantined) return;
-            string text = ZoneEngine.Core.ChatCommandText.Normalize(message.Command);
-            if (string.IsNullOrWhiteSpace(text)) return;
-            string[] args = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string[] args = CommandInput.Tokenize(message.Command);
+            if (args.Length == 0) return;
             if (args[0].Equals("team", StringComparison.OrdinalIgnoreCase))
                 teams.TryHandleChatCommand(player, args);
             else if (args[0].Equals("invite", StringComparison.OrdinalIgnoreCase) && args.Length == 2)

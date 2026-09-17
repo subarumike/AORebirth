@@ -1,0 +1,12 @@
+{
+  "LevelCount": 220,
+  "MinimumQuality": 1,
+  "MaximumQuality": 250,
+  "MinimumTokens": 1,
+  "MaximumTokens": 9,
+  "NeutralDifficultyIndex": 5,
+  "Provenance": [
+    "Validation constraints already applied at ead34a4a55eb01df47f1afd8c46ca3cfef13254a: AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraph.cs.",
+    "Level and token values remain in the existing accepted MissionLevels.csv; this file contains validation policy only."
+  ]
+}

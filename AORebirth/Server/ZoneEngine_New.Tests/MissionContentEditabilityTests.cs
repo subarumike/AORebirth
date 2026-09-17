@@ -15,6 +15,32 @@ using ZoneEngine_New.Core.Inventory;
 public sealed class MissionContentEditabilityTests
 {
     [TestMethod]
+    public void MissionLevelSourceIsEditableAndInvalidCellsAreRejected()
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            var lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "GameData", "Missions", "Source", "MissionLevels.csv"));
+            File.WriteAllLines(path, lines);
+            var original = MissionLevelData.Load(path);
+            var cells = lines[1].Split(',');
+            cells[11] = "2";
+            lines[1] = string.Join(",", cells);
+            File.WriteAllLines(path, lines);
+            var edited = MissionLevelData.Load(path);
+            Assert.AreEqual(1, original.Quality(1, 11));
+            Assert.AreEqual(2, edited.Quality(1, 11));
+            Assert.AreEqual(original.Tokens(220), edited.Tokens(220));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => edited.Quality(1, 0));
+            cells[11] = "0";
+            lines[1] = string.Join(",", cells);
+            File.WriteAllLines(path, lines);
+            Assert.ThrowsExactly<InvalidDataException>(() => MissionLevelData.Load(path));
+        }
+        finally { File.Delete(path); }
+    }
+
+    [TestMethod]
     public void WeaponPoolAndNpcStatsChangeWithSameBinary()
     {
         string path = Path.Combine(AppContext.BaseDirectory, "GameData", "Missions", "NpcContent.json");
@@ -25,11 +51,9 @@ public sealed class MissionContentEditabilityTests
             """);
         fixture["Stats"]!["RunSpeed"] = 901;
         var second = MissionNpcContent.Parse(fixture.ToJsonString());
-        var old = MissionNpcCombatPolicy.Create(1_000_001, 20, true, new StubItemBuilder(),
-            new StubCatalog().Add(121570, 23), out var oldWeapon, first);
-        var changed = MissionNpcCombatPolicy.Create(1_000_001, 20, true, new StubItemBuilder(),
-            new StubCatalog().Add(87654, 11).Add(87655, 11), out var newWeapon, second);
-        Assert.IsTrue(old.IsRuntimeReady); Assert.IsTrue(changed.IsRuntimeReady);
+        var oldWeapon = NativeWeapon(first, new StubCatalog().AddWeapon(121570, 23));
+        var newWeapon = NativeWeapon(second, new StubCatalog().AddWeapon(87654, 11).AddWeapon(87655, 11));
+        Assert.IsTrue(oldWeapon.IsWieldableCombatWeapon()); Assert.IsTrue(newWeapon.IsWieldableCombatWeapon());
         Assert.AreEqual(121570, oldWeapon!.LowId);
         Assert.AreEqual(87654, newWeapon!.LowId); Assert.AreEqual(87655, newWeapon.HighId); Assert.AreEqual(11, newWeapon.Quality);
         Assert.AreEqual(901, second.Stats[CharacterStat.RunSpeed]);
@@ -106,37 +130,28 @@ public sealed class MissionContentEditabilityTests
     }
 
     [TestMethod]
-    public void RuntimeCombatAcceptsBlankProvenanceButEvidenceAuditStillRequiresIt()
+    public void NativeCombatUsesTemplateStatsWithoutCapturedAttackMetadata()
     {
-        var contract = MissionNpcCombatPolicy.Create(1_000_001, 20, true, new StubItemBuilder(),
-            new StubCatalog().Add(121570, 23), out var item);
-        Assert.IsTrue(contract.IsRuntimeReady); Assert.IsFalse(contract.IsCombatReady);
-        Assert.AreEqual(0, contract.EvidenceSourceIdentity);
-        var weapon = contract.WeaponDefinition;
-        Assert.IsNotNull(weapon); Assert.IsTrue(weapon.IsRuntimeValid); Assert.IsFalse(weapon.IsValid);
-        Assert.AreEqual(string.Empty, weapon.Evidence); Assert.AreEqual(0, weapon.EvidenceSourceIdentity);
-        var actor = new Identity { Type = IdentityType.CanbeAffected, Instance = 345 };
-        var packet = CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(actor, 123, item!.Identity, weapon, requireEvidence: false);
-        Assert.AreEqual(actor, packet.Owner); Assert.AreEqual(123, packet.PlayfieldId);
-        Assert.ThrowsException<InvalidOperationException>(() => CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(actor, 123, item.Identity, weapon));
-        Assert.IsNotNull(CapturedEnemyCombatPacketFactory.CreateAttack(actor, actor, contract, requireEvidence: false));
-        Assert.IsNotNull(CapturedEnemyCombatPacketFactory.CreateSpecialAttackWeapon(actor, contract, requireEvidence: false));
+        var content = MissionNpcContent.Load();
+        content.Provenance = [];
+        content.Ranged.Id = string.Empty;
+        content.Ranged.FirstHitDelay = double.NaN;
+        content.Ranged.HitType = -1;
+        var catalog = new StubCatalog().AddWeapon(121570, 23);
+        catalog.Require(121570).Stats[CharacterStat.AttackDelay] = 137;
+        var item = NativeWeapon(content, catalog);
+        Assert.AreEqual(137, item.GetStat(CharacterStat.AttackDelay));
+        Assert.IsTrue(item.IsWieldableCombatWeapon());
     }
 
     [TestMethod]
-    public void RuntimeCombatStillRejectsMalformedWeaponPacketDataWithoutProvenance()
+    public void NativeCombatRejectsConfiguredNonWeaponTemplate()
     {
-        var contract = MissionNpcCombatPolicy.Create(1_000_001, 20, true, new StubItemBuilder(),
-            new StubCatalog().Add(121570, 23), out _);
-        var weapon = contract.WeaponDefinition;
-        var malformed = new CapturedEnemyWeaponDefinition(string.Empty, 0, weapon.N3Unknown, weapon.Unknown1,
-            weapon.InventorySlot, weapon.StateMachineType, weapon.StateMachineInstance, weapon.Unknown2, weapon.Stats.Skip(1).ToArray(), weapon.Unknown3);
-        Assert.IsFalse(malformed.IsRuntimeValid); contract.WithCapturedWeapon(malformed);
-        Assert.IsFalse(contract.IsRuntimeReady);
-        Assert.ThrowsException<InvalidOperationException>(() => CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(
-            new Identity { Type = IdentityType.CanbeAffected, Instance = 345 }, 123, Identity.None, malformed, requireEvidence: false));
-        var observation = new CapturedBasicCombatDamageObservation(12, 0, string.Empty);
-        Assert.IsTrue(observation.IsRuntimeValid); Assert.IsFalse(observation.IsValid);
-        Assert.IsFalse(new CapturedBasicCombatDamageObservation(-12, 0, string.Empty).IsRuntimeValid);
+        Assert.ThrowsException<InvalidOperationException>(() =>
+            NativeWeapon(MissionNpcContent.Load(), new StubCatalog().Add(121570, 23)));
     }
+
+    static Item NativeWeapon(MissionNpcContent content, StubCatalog catalog)
+        => GeneratedMissionNpcFactory.CreateCombatWeapon(1_000_001, 20, true,
+            new ItemBuilder(catalog, new StubLogger()), catalog, content);
 }

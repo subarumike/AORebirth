@@ -462,19 +462,19 @@
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs">
       <Link>CapturedTempleOfThreeWindsCombatCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatPacketFactory.cs">
       <Link>CapturedEnemyCombatPacketFactory.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.Data.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatPacketFactory.Data.cs">
       <Link>CapturedEnemyCombatPacketFactory.Data.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatProfileData.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatProfileData.cs">
       <Link>CapturedEnemyCombatProfileData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatProfileMatching.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatProfileMatching.cs">
       <Link>CapturedEnemyCombatProfileMatching.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\OrdinaryEnemyCombatSetupGenerator.Data.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\OrdinaryEnemyCombatSetupGenerator.Data.cs">
       <Link>OrdinaryEnemyCombatSetupGenerator.Data.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedEnemyCombatProfileCatalog.cs">
@@ -547,18 +547,15 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRewardCoordinator.cs"><Link>MissionRewardCoordinator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\DailyMissionRewardRules.cs"><Link>DailyMissionRewardRules.cs</Link></Compile>
     <Compile Include="..\..\..\..\AORebirth.Stats\SpecialStats\XPTable.cs"><Link>XPTable.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\AreteConditionReferenceValidator.cs"><Link>AreteConditionReferenceValidator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentLoadResult.cs"><Link>AreteContentLoadResult.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentManifest.cs"><Link>AreteContentManifest.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentManifestLoader.cs"><Link>AreteContentManifestLoader.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Arete\AreteFrameworkBootstrap.cs"><Link>AreteFrameworkBootstrap.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteJsonContentFileLoader.cs"><Link>AreteJsonContentFileLoader.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteValidationResult.cs"><Link>AreteValidationResult.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueActionReferenceValidator.cs"><Link>DialogueActionReferenceValidator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueContentPackLoader.cs"><Link>DialogueContentPackLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueContentPackValidator.cs"><Link>DialogueContentPackValidator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Dialogue\DialogueModels.cs"><Link>DialogueModels.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentDefinitions.cs"><Link>DialogueContentDefinitions.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentValidation.cs"><Link>DialogueContentValidation.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentPackLoader.cs"><Link>QuestContentPackLoader.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentPackValidator.cs"><Link>QuestContentPackValidator.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentRegistry.cs"><Link>QuestContentRegistry.cs</Link></Compile>

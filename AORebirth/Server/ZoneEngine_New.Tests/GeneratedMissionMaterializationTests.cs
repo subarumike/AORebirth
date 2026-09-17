@@ -14,6 +14,7 @@ using ZoneEngine.Core.Packets;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Mobs;
+using ZoneEngine_New.Core.Network;
 using Vector3 = AORebirth.Core.Vector.Vector3;
 
 [TestClass]
@@ -31,7 +32,7 @@ public sealed class GeneratedMissionMaterializationTests
         {
             var (binding, materialized, objects) = Prepare(bundle, index++);
             var world = World(binding, materialized, objects);
-            var dynels = world.CreateDynels(null!, new StubItemBuilder());
+            var dynels = world.CreateDynels(null!, CombatItems());
             Assert.AreEqual(materialized.Objects.Count, dynels.Count, bundle.LayoutId);
             CollectionAssert.AreEquivalent(objects.Select(row => row.RuntimeType + ":" + row.RuntimeInstance).ToArray(),
                 dynels.Select(dynel => (int)dynel.Identity.Type + ":" + dynel.Identity.Instance).ToArray());
@@ -45,8 +46,8 @@ public sealed class GeneratedMissionMaterializationTests
                 var evidence = new GeneratedMissionNpcEvidence(source, bundle, binding.Offer.Quality, binding.Offer.MissionType);
                 Assert.AreEqual(bundle.SourcePlayfield2, evidence.SourcePlayfield2);
                 Assert.AreEqual(source.Identity.CapturedIdentity.Instance, evidence.CapturedInstance);
-                if (evidence.IsFindPerson) { Assert.IsNull(npc.Combat); passiveObjectives++; }
-                else { Assert.IsNotNull(npc.Combat); Assert.IsTrue(npc.Combat.Contract.IsRuntimeReady); }
+                if (evidence.IsFindPerson) { Assert.IsFalse(npc.CombatEnabled); passiveObjectives++; }
+                else { Assert.IsTrue(npc.CombatEnabled); Assert.IsTrue(npc.Weapons.Count > 0); }
             }
             var packet = world.CreateZoneMessage(new() { X = world.Spawn.xf, Y = world.Spawn.yf, Z = world.Spawn.zf });
             Assert.AreEqual(binding.LivePlayfield, packet.PlayfieldId2.Instance);
@@ -61,6 +62,36 @@ public sealed class GeneratedMissionMaterializationTests
     }
 
     [TestMethod]
+    public void AcceptedWorldChestWireRoundTripsAndOwnedFormOmitsOnlyItsTransform()
+    {
+        var codec = new ZoneMessageCodec();
+        int checkedPackets = 0;
+        foreach (var bundle in MissionAcgCapturedLayoutCatalog.CreateBundles())
+        foreach (var wire in bundle.WireRecords.Where(w => w.Category == MissionAcgWireCategory.Chest))
+        {
+            byte[] original = wire.CopyPacketBytes();
+            var message = codec.Deserialize(original)!;
+            var chest = (ChestItemFullUpdateMessage)message.Body;
+            Assert.AreEqual(Identity.None, chest.Owner);
+            Assert.AreEqual(bundle.SourcePlayfield2, chest.PlayfieldId);
+            CollectionAssert.AreEqual(original, codec.Serialize(message));
+
+            // The existing owned-backpack schema follows Owner directly with PlayfieldId.
+            // Reuse captured fields, removing just the established ownerless transform.
+            byte[] owned = original.Take(41).Concat(original.Skip(69)).ToArray();
+            BinaryPrimitives.WriteUInt16BigEndian(owned.AsSpan(6, 2), (ushort)owned.Length);
+            BinaryPrimitives.WriteInt32BigEndian(owned.AsSpan(33, 4), bundle.CapturedPlayerIdentity.Type);
+            BinaryPrimitives.WriteInt32BigEndian(owned.AsSpan(37, 4), bundle.CapturedPlayerIdentity.Instance);
+            chest.Owner = new Identity { Type = (IdentityType)bundle.CapturedPlayerIdentity.Type,
+                Instance = bundle.CapturedPlayerIdentity.Instance };
+            CollectionAssert.AreEqual(owned, codec.Serialize(message));
+            CollectionAssert.AreEqual(owned, codec.Serialize(codec.Deserialize(owned)!));
+            checkedPackets++;
+        }
+        Assert.IsTrue(checkedPackets > 0);
+    }
+
+    [TestMethod]
     public void RecreatedWorldPreservesDamagedMovedAndDeadNpcStateInsteadOfRespawningDefaults()
     {
         foreach (var pair in MissionAcgCapturedLayoutCatalog.CreateBundles().Select((bundle, index) => (bundle, index)))
@@ -70,7 +101,7 @@ public sealed class GeneratedMissionMaterializationTests
             Assert.IsTrue(npcs.Length >= 2, pair.bundle.LayoutId);
             npcs[0].CurrentHealth = 37; npcs[0].X += 0.25f; npcs[0].Version = 9;
             npcs[1].CurrentHealth = 0; npcs[1].IsDead = true; npcs[1].Version = 4;
-            var dynels = World(binding, materialized, objects).CreateDynels(null!, new StubItemBuilder());
+            var dynels = World(binding, materialized, objects).CreateDynels(null!, CombatItems());
             var restored = (NpcCharacter)dynels.Single(value => value.Identity.Instance == npcs[0].RuntimeInstance);
             Assert.AreEqual(37, restored.Stats.GetOrZero(CharacterStat.Health));
             Assert.AreEqual(npcs[0].X, restored.Position.xf);
@@ -132,7 +163,7 @@ public sealed class GeneratedMissionMaterializationTests
             state.CurrentHealth = 0; state.IsDead = true; state.DeathActorId = binding.OwnerId;
             state.DiedAtUtcTicks = DateTime.UtcNow.AddSeconds(-1).Ticks; state.CorpseExpiresAtUtcTicks = state.DiedAtUtcTicks + TimeSpan.TicksPerMillisecond * 60600; state.CorpseCredits = credits;
             var world = World(binding, materialized, objects);
-            var corpse = world.CreateDynels(null!, new StubItemBuilder()).Single(value => value.Identity.Instance == state.RuntimeInstance);
+            var corpse = world.CreateDynels(null!, CombatItems()).Single(value => value.Identity.Instance == state.RuntimeInstance);
             Assert.IsInstanceOfType<GeneratedMissionCorpseDynel>(corpse);
             Assert.AreEqual(IdentityType.Corpse, corpse.Identity.Type);
             byte[] wire = corpse.BuildSpawnPacket(new() { Type = IdentityType.CanbeAffected, Instance = binding.OwnerId })!;
@@ -159,12 +190,21 @@ public sealed class GeneratedMissionMaterializationTests
     }
 
     static GeneratedMissionWorld World(GeneratedMissionBinding binding, MissionAcgMaterializedInstance materialized, IList<GeneratedMissionObject> objects)
-        => new(binding, materialized, objects, new GeneratedMissionNpcFactory(new StubCatalog(),
+        => new(binding, materialized, objects, new GeneratedMissionNpcFactory(CombatCatalog(),
             new Lazy<GeneratedMissionAcgService>(() => throw new AssertFailedException("Materialization must not execute combat or write SQL."))), (_, _) => false);
+
+    static StubCatalog CombatCatalog()
+    {
+        var content = MissionNpcContent.Load();
+        return new StubCatalog().AddWeapon(content.Melee.SpecialLowId, 1).AddWeapon(content.Melee.SpecialHighId, 220);
+    }
+
+    static ZoneEngine_New.Core.Inventory.ItemBuilder CombatItems()
+        => new(CombatCatalog(), new StubLogger());
 
     static (GeneratedMissionBinding, MissionAcgMaterializedInstance, IList<GeneratedMissionObject>) Prepare(MissionAcgLayoutBundle bundle, int index)
     {
-        int pf = MissionAcgIdentityRanges.MinimumLivePlayfield2 + 500 + index;
+        int pf = GeneratedMissionIdentitySpace.MinimumLivePlayfield2 + 500 + index;
         var type = bundle.CompatibleMissionTypes[0];
         var binding = new GeneratedMissionBinding
         {
@@ -172,14 +212,9 @@ public sealed class GeneratedMissionMaterializationTests
             KeyInstance = 10000 + index, BundleId = bundle.LayoutId, BundleSha256 = bundle.GeneratorPayloadSha256,
             BuildingType = bundle.BuildingIdentity.Type, BuildingInstance = bundle.BuildingIdentity.Instance, LivePlayfield = pf,
             AcceptedAtUtcTicks = Accepted.Ticks, ExpiresAtUtcTicks = Accepted.AddHours(48).Ticks, State = GeneratedMissionState.Active,
-            Offer = new GeneratedMissionOffer { MissionType = (int)type, Quality = 25, DestinationPlayfield = 710, DestinationX = 111, DestinationY = 5, DestinationZ = 222 }
+            Offer = new GeneratedMissionOffer { OwnerId = 99, MissionType = (int)type, Quality = 25, DestinationPlayfield = 710, DestinationX = 111, DestinationY = 5, DestinationZ = 222 }
         };
-        var immutable = new MissionAcgInstanceBinding(MissionAcgInstanceBinding.CurrentFormatVersion,
-            new(binding.QuestType, binding.QuestInstance), new(binding.OfferType, binding.OfferInstance), new(50000, 99), null,
-            type, 25, 1234, new(0xC76D, binding.KeyInstance), new(0xC9C6, 710), 123, 124, 111, 5, 222, new(0xDAC1, 100),
-            bundle.LayoutId, bundle.GeneratorPayloadSha256, bundle.BuildingIdentity, pf, Accepted, Accepted.AddHours(48), true);
-        var record = new MissionAcgBindingRecord(immutable, new MissionAcgInstanceState(MissionAcgLifecycleState.Active, MissionAcgCleanupState.None, Accepted, null), string.Empty);
-        Assert.IsTrue(MissionAcgRuntimeMaterializer.TryMaterialize(record, bundle, null, Accepted, out var materialized, out string reason), reason);
+        Assert.IsTrue(MissionAcgRuntimeMaterializer.TryMaterialize(binding, bundle, null, Accepted, out var materialized, out string reason), reason);
         IList<GeneratedMissionObject> objects = materialized.Objects.Select(source => new GeneratedMissionObject
         {
             OwnerId = binding.OwnerId, QuestType = binding.QuestType, QuestInstance = binding.QuestInstance,

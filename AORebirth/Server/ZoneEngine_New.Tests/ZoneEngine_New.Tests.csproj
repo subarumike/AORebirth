@@ -21,6 +21,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../ChatEngine/CoreServer/ChatSessionOwnership.cs" Link="ChatSessionOwnership.cs" />
+    <!-- Existing mission behavior tests now exercise the native implementation directly. -->
+    <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs" Link="Missions/MissionLevelGraphTests.cs" />
+    <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs" Link="Missions/MissionRollSemanticsTests.cs" />
+    <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs" Link="Missions/MissionRollTemplateContractTests.cs" />
+    <!-- Historical combat fixtures compile only into tests, never NewEngine. -->
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Combat/*.cs" Link="Fixtures/Combat/%(Filename)%(Extension)" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedEnemyCombatProfileCatalog.g.cs" Link="Fixtures/CapturedEnemyCombatProfileCatalog.g.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Packets/MorphCaptureWireCatalog.cs" Link="Fixtures/MorphCaptureWireCatalog.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipInteractionRules.cs" Link="Fixtures/DojaChipInteractionRules.cs" />

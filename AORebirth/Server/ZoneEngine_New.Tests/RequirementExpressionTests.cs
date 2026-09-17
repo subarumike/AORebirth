@@ -86,6 +86,21 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void IncompletePostfixCannotFallBackToAnAcceptingLeafFold()
+        {
+            ItemRequirement leaf = new()
+            {
+                StatNumber = (int)CharacterStat.Strength,
+                Operator = (int)Operator.EqualTo,
+                Value = 100,
+            };
+            ItemRequirement orLink = new() { Operator = (int)Operator.Or };
+            Assert.IsFalse(ItemTemplate.MeetsRequirements([leaf, orLink], _ => 100));
+            Assert.IsFalse(ItemTemplate.MeetsRequirements([orLink, leaf], _ => 100));
+            Assert.IsFalse(ItemTemplate.MeetsRequirements([leaf, leaf, orLink, leaf], _ => 100));
+        }
+
+        [TestMethod]
         public void NotLinkInvertsAccumulatedResult()
         {
             var reqs = new List<ItemRequirement>

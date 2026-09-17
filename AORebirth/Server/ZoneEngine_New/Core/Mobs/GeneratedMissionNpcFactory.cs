@@ -1,9 +1,8 @@
 namespace ZoneEngine_New.Core.Mobs;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using AORebirth.Core.Playfields;
+using AORebirth.Enums;
 using AORebirth.Core.Textures;
 using AORebirth.Interfaces.Persistence.Missions;
 using SmokeLounge.AOtomation.Messaging.GameData;
@@ -41,50 +40,90 @@ public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Laz
         foreach (var mesh in source.Meshes ?? []) npc.AddSpawnMesh(mesh);
         if (!evidence.IsFindPerson)
         {
-            var contract = MissionNpcCombatPolicy.Create(state.RuntimeInstance, state.Level.Value,
-                (source.Meshes ?? []).Any(mesh => mesh.Layer == _content.WeaponMeshLayer && mesh.Id > 0), items, catalog, out var weapon, _content);
-            npc.Combat = new MissionNpcCombatRuntime(contract, weapon);
+            var weapon = CreateCombatWeapon(state.RuntimeInstance, state.Level.Value,
+                (source.Meshes ?? []).Any(mesh => mesh.Layer == _content.WeaponMeshLayer && mesh.Id > 0), items, catalog, _content);
+            npc.Equipment.Add(npc.Equipment.Offset, weapon);
+            npc.CombatEnabled = true;
+            npc.RebaseWeapons();
         }
         npc.Motor.RefreshFromStats();
         return npc;
+    }
+
+    internal static Item CreateCombatWeapon(int runtimeIdentity, int level, bool hasGunMesh,
+        IItemBuilder items, IItemTemplateCatalog catalog, MissionNpcContent content)
+    {
+        if (runtimeIdentity < 1_000_000 || level < 1 || level > 220)
+            throw new ArgumentOutOfRangeException(nameof(level));
+        if (hasGunMesh)
+        {
+            for (int offset = 0; offset < content.Weapons.Length; offset++)
+            {
+                var selected = content.Weapons[(int)(Math.Abs((long)runtimeIdentity + offset) % content.Weapons.Length)];
+                if (!catalog.TryGet(selected.LowId, out _) || !catalog.TryGet(selected.HighId, out _)) continue;
+                return BuildWeapon(selected.LowId, selected.HighId, Math.Min(level, selected.MaximumQuality), items, catalog);
+            }
+        }
+
+        return BuildWeapon(content.Melee.SpecialLowId, content.Melee.SpecialHighId, level, items, catalog);
+    }
+
+    static Item BuildWeapon(int lowId, int highId, int quality, IItemBuilder items, IItemTemplateCatalog catalog)
+    {
+        if (!catalog.TryGet(lowId, out _) || !catalog.TryGet(highId, out _))
+            throw new InvalidOperationException("The configured mission weapon templates are unavailable.");
+        var weapon = items.Create(lowId, highId, quality, ItemSource.Other);
+        if (weapon.Quality <= 0 || weapon.LowId != lowId || weapon.HighId != highId || !weapon.IsWieldableCombatWeapon())
+            throw new InvalidOperationException("The configured mission weapon did not resolve to a native combat item.");
+        return weapon;
     }
 }
 
 internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuilder items,
     Lazy<GeneratedMissionAcgService> missions) : NpcCharacter(identity, items)
 {
-    internal MissionNpcCombatRuntime? Combat { get; set; }
+    internal bool CombatEnabled { get; set; }
     internal double AggroRadius { get; set; }
-    public override bool AcceptsPlayerCombatNanos => Combat?.Contract.IsRuntimeReady == true;
+    public override bool AcceptsPlayerCombatNanos => CombatEnabled;
     bool _deathCommitted;
     protected override bool UsesPassiveRegen => false;
     protected override int DeathAnimationKey => 501; // MissionInstanceMobCombat.DeathParameter2.
     protected override int CorpseSpawnDelayMilliseconds => 600; // Accepted NpcCorpseLifecycleRules.
     protected override void SpawnDeathCorpse() => missions.Value.SpawnDeathCorpse(this);
     public override void Rebase() { }
-    public override void RebaseWeapons() { }
-
-    public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
-        => Combat?.Contract.WeaponDefinition is { } definition && Combat.Weapon is { } weapon
-            ? [CapturedEnemyCombatPacketFactory.CreateWeaponDefinition(Identity,
-                Playfield?.Identity.Instance ?? 0, weapon.Identity, definition, requireEvidence: false)] : [];
+    public override void RebaseWeapons()
+    {
+        if (CombatEnabled) base.RebaseWeapons();
+    }
 
     public override void StartFighting(Identity target, byte action)
     {
-        if (Combat != null && !IsDead) Combat.Start(this, target);
+        if (CombatEnabled && !IsDead) base.StartFighting(target, action);
     }
-    protected override void TickCombat(double deltaTime) => Combat?.Tick(this, deltaTime);
+    protected override void TickCombat(double deltaTime)
+    {
+        if (!CombatEnabled) return;
+        var target = TryResolveFightingTarget();
+        if (target == null || target.Playfield != Playfield) return;
+        if (!Weapons.Values.Any(weapon => Distance3D(target) <= weapon.GetAttackRange()))
+        {
+            Motor.NavigateTo(target.Position);
+            return;
+        }
+        Motor.Halt();
+        base.TickCombat(deltaTime);
+    }
 
     public override void Tick(double deltaTime)
     {
         if (IsDead) missions.Value.PollNpcCorpseLifetime(this);
-        if (!IsDead && Combat != null && FightingTarget.Instance == 0 && Playfield != null)
+        if (!IsDead && CombatEnabled && FightingTarget.Instance == 0 && Playfield != null)
         {
             var target = Playfield.GetRequiredService<DynelRegistry>().PlayerEntities()
                 .Where(player => !player.IsDead && !player.IsPersistenceQuarantined && player.Playfield == Playfield
                     && Distance3D(player) <= AggroRadius)
                 .OrderBy(player => Distance3D(player)).ThenBy(player => player.Identity.Instance).FirstOrDefault();
-            if (target != null) Combat.Start(this, target.Identity);
+            if (target != null) StartFighting(target.Identity, 0);
         }
         base.Tick(deltaTime);
     }
@@ -97,8 +136,8 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
             throw new InvalidOperationException("Mission NPC damage could not be durably committed.");
         _deathCommitted = next == 0;
         bool killed = base.ApplyDamage(attacker, damage, hitType);
-        if (!killed && Combat != null && FightingTarget.Instance == 0 && attacker.Playfield == Playfield)
-            Combat.Start(this, attacker.Identity);
+        if (!killed && CombatEnabled && FightingTarget.Instance == 0 && attacker.Playfield == Playfield)
+            StartFighting(attacker.Identity, 0);
         return killed;
     }
 
@@ -109,7 +148,7 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
             throw new InvalidOperationException("Mission NPC death could not be durably committed.");
         _deathCommitted = true;
         base.OnDeath(killer);
-        if (Combat?.Contract.SendStopFightOnDeath == true)
+        if (CombatEnabled)
             Cell?.Announce(new StopFightMessage { Identity = Identity, Unknown1 = 1 });
         missions.Value.OnNpcDeathPublished(this);
     }

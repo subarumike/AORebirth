@@ -19,6 +19,7 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestItemsDatFileName();
             TestItemsDatDynelTypeRoundTrip();
             TestHitFunctionArgOrdering();
+            TestConditionalShapeFunction();
             TestCollisionDatFraming();
             TestSurfacesDatFraming();
             Console.WriteLine("RDBDataExtractor self-test PASS");
@@ -355,6 +356,36 @@ namespace AORebirth.Tools.RDBDataExtractor
                 throw new InvalidOperationException(
                     "Hit function positional args did not match Weak Smiting Missile layout.");
             }
+        }
+
+        private static void TestConditionalShapeFunction()
+        {
+            // The RDB places Criteria before its payload; it is not a positional argument.
+            var keyed = new Dictionary<AODB.Common.Enums.FunctionOperator, object>
+            {
+                { AODB.Common.Enums.FunctionOperator.Criteria,
+                    new List<AODB.Common.Structs.RequirementCriterion>
+                    {
+                        new AODB.Common.Structs.RequirementCriterion
+                        {
+                            Stat = 12, Value = 17534, Operator = (AODB.Common.Enums.Operator)0,
+                        },
+                    } },
+                { AODB.Common.Enums.FunctionOperator.Duration, 1 },
+                { AODB.Common.Enums.FunctionOperator.Interval, 0u },
+                { AODB.Common.Enums.FunctionOperator.ApplyOn, 1u },
+                { AODB.Common.Enums.FunctionOperator.TargetList, 9u },
+                { AODB.Common.Enums.FunctionOperator.Value, 270497u },
+                { AODB.Common.Enums.FunctionOperator.TimedLength, 0u },
+            };
+            var function = ItemRdbMapper.ToFunction((int)AODB.Common.Enums.FunctionType.MonsterShape, keyed);
+            if (function.Arguments.Values.Count != 1
+                || function.Arguments.Values[0].AsInt32() != 270497
+                || function.Requirements.Count != 1
+                || function.Requirements[0].Statnumber != 12
+                || function.Requirements[0].Value != 17534
+                || (int)function.Requirements[0].Operator != 0)
+                throw new InvalidOperationException("Conditional shape lost its payload or requirement.");
         }
 
         private static void TestItemsDatDynelTypeRoundTrip()
