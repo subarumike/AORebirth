@@ -1,0 +1,1107 @@
+{
+  "MinimumLevel": 1,
+  "MaximumLevel": 220,
+  "Source": "9e5021d256ff773dba5384fbd528e61ac249be87:AORebirth/Server/ZoneEngine_New/SharedGameplay/TeamXpShareWindow.cs",
+  "Ranges": [
+    {
+      "Level": 1,
+      "Minimum": 1,
+      "Maximum": 7
+    },
+    {
+      "Level": 2,
+      "Minimum": 1,
+      "Maximum": 8
+    },
+    {
+      "Level": 3,
+      "Minimum": 1,
+      "Maximum": 9
+    },
+    {
+      "Level": 4,
+      "Minimum": 1,
+      "Maximum": 10
+    },
+    {
+      "Level": 5,
+      "Minimum": 1,
+      "Maximum": 11
+    },
+    {
+      "Level": 6,
+      "Minimum": 1,
+      "Maximum": 12
+    },
+    {
+      "Level": 7,
+      "Minimum": 1,
+      "Maximum": 13
+    },
+    {
+      "Level": 8,
+      "Minimum": 2,
+      "Maximum": 14
+    },
+    {
+      "Level": 9,
+      "Minimum": 3,
+      "Maximum": 15
+    },
+    {
+      "Level": 10,
+      "Minimum": 4,
+      "Maximum": 17
+    },
+    {
+      "Level": 11,
+      "Minimum": 5,
+      "Maximum": 18
+    },
+    {
+      "Level": 12,
+      "Minimum": 6,
+      "Maximum": 19
+    },
+    {
+      "Level": 13,
+      "Minimum": 7,
+      "Maximum": 20
+    },
+    {
+      "Level": 14,
+      "Minimum": 8,
+      "Maximum": 21
+    },
+    {
+      "Level": 15,
+      "Minimum": 9,
+      "Maximum": 24
+    },
+    {
+      "Level": 16,
+      "Minimum": 10,
+      "Maximum": 25
+    },
+    {
+      "Level": 17,
+      "Minimum": 10,
+      "Maximum": 26
+    },
+    {
+      "Level": 18,
+      "Minimum": 11,
+      "Maximum": 27
+    },
+    {
+      "Level": 19,
+      "Minimum": 12,
+      "Maximum": 28
+    },
+    {
+      "Level": 20,
+      "Minimum": 13,
+      "Maximum": 29
+    },
+    {
+      "Level": 21,
+      "Minimum": 14,
+      "Maximum": 30
+    },
+    {
+      "Level": 22,
+      "Minimum": 15,
+      "Maximum": 32
+    },
+    {
+      "Level": 23,
+      "Minimum": 15,
+      "Maximum": 33
+    },
+    {
+      "Level": 24,
+      "Minimum": 15,
+      "Maximum": 34
+    },
+    {
+      "Level": 25,
+      "Minimum": 16,
+      "Maximum": 35
+    },
+    {
+      "Level": 26,
+      "Minimum": 17,
+      "Maximum": 38
+    },
+    {
+      "Level": 27,
+      "Minimum": 18,
+      "Maximum": 39
+    },
+    {
+      "Level": 28,
+      "Minimum": 19,
+      "Maximum": 40
+    },
+    {
+      "Level": 29,
+      "Minimum": 20,
+      "Maximum": 41
+    },
+    {
+      "Level": 30,
+      "Minimum": 21,
+      "Maximum": 43
+    },
+    {
+      "Level": 31,
+      "Minimum": 22,
+      "Maximum": 44
+    },
+    {
+      "Level": 32,
+      "Minimum": 22,
+      "Maximum": 45
+    },
+    {
+      "Level": 33,
+      "Minimum": 23,
+      "Maximum": 46
+    },
+    {
+      "Level": 34,
+      "Minimum": 24,
+      "Maximum": 49
+    },
+    {
+      "Level": 35,
+      "Minimum": 25,
+      "Maximum": 50
+    },
+    {
+      "Level": 36,
+      "Minimum": 26,
+      "Maximum": 51
+    },
+    {
+      "Level": 37,
+      "Minimum": 26,
+      "Maximum": 52
+    },
+    {
+      "Level": 38,
+      "Minimum": 26,
+      "Maximum": 54
+    },
+    {
+      "Level": 39,
+      "Minimum": 27,
+      "Maximum": 55
+    },
+    {
+      "Level": 40,
+      "Minimum": 28,
+      "Maximum": 56
+    },
+    {
+      "Level": 41,
+      "Minimum": 29,
+      "Maximum": 57
+    },
+    {
+      "Level": 42,
+      "Minimum": 30,
+      "Maximum": 60
+    },
+    {
+      "Level": 43,
+      "Minimum": 30,
+      "Maximum": 61
+    },
+    {
+      "Level": 44,
+      "Minimum": 31,
+      "Maximum": 62
+    },
+    {
+      "Level": 45,
+      "Minimum": 32,
+      "Maximum": 63
+    },
+    {
+      "Level": 46,
+      "Minimum": 33,
+      "Maximum": 65
+    },
+    {
+      "Level": 47,
+      "Minimum": 34,
+      "Maximum": 66
+    },
+    {
+      "Level": 48,
+      "Minimum": 34,
+      "Maximum": 67
+    },
+    {
+      "Level": 49,
+      "Minimum": 34,
+      "Maximum": 68
+    },
+    {
+      "Level": 50,
+      "Minimum": 35,
+      "Maximum": 71
+    },
+    {
+      "Level": 51,
+      "Minimum": 36,
+      "Maximum": 72
+    },
+    {
+      "Level": 52,
+      "Minimum": 37,
+      "Maximum": 73
+    },
+    {
+      "Level": 53,
+      "Minimum": 38,
+      "Maximum": 74
+    },
+    {
+      "Level": 54,
+      "Minimum": 38,
+      "Maximum": 76
+    },
+    {
+      "Level": 55,
+      "Minimum": 39,
+      "Maximum": 77
+    },
+    {
+      "Level": 56,
+      "Minimum": 40,
+      "Maximum": 78
+    },
+    {
+      "Level": 57,
+      "Minimum": 41,
+      "Maximum": 79
+    },
+    {
+      "Level": 58,
+      "Minimum": 42,
+      "Maximum": 82
+    },
+    {
+      "Level": 59,
+      "Minimum": 42,
+      "Maximum": 83
+    },
+    {
+      "Level": 60,
+      "Minimum": 42,
+      "Maximum": 84
+    },
+    {
+      "Level": 61,
+      "Minimum": 43,
+      "Maximum": 85
+    },
+    {
+      "Level": 62,
+      "Minimum": 44,
+      "Maximum": 87
+    },
+    {
+      "Level": 63,
+      "Minimum": 45,
+      "Maximum": 88
+    },
+    {
+      "Level": 64,
+      "Minimum": 46,
+      "Maximum": 89
+    },
+    {
+      "Level": 65,
+      "Minimum": 46,
+      "Maximum": 90
+    },
+    {
+      "Level": 66,
+      "Minimum": 47,
+      "Maximum": 93
+    },
+    {
+      "Level": 67,
+      "Minimum": 48,
+      "Maximum": 94
+    },
+    {
+      "Level": 68,
+      "Minimum": 49,
+      "Maximum": 95
+    },
+    {
+      "Level": 69,
+      "Minimum": 50,
+      "Maximum": 96
+    },
+    {
+      "Level": 70,
+      "Minimum": 50,
+      "Maximum": 98
+    },
+    {
+      "Level": 71,
+      "Minimum": 50,
+      "Maximum": 99
+    },
+    {
+      "Level": 72,
+      "Minimum": 51,
+      "Maximum": 100
+    },
+    {
+      "Level": 73,
+      "Minimum": 52,
+      "Maximum": 101
+    },
+    {
+      "Level": 74,
+      "Minimum": 53,
+      "Maximum": 104
+    },
+    {
+      "Level": 75,
+      "Minimum": 54,
+      "Maximum": 105
+    },
+    {
+      "Level": 76,
+      "Minimum": 54,
+      "Maximum": 106
+    },
+    {
+      "Level": 77,
+      "Minimum": 55,
+      "Maximum": 107
+    },
+    {
+      "Level": 78,
+      "Minimum": 56,
+      "Maximum": 109
+    },
+    {
+      "Level": 79,
+      "Minimum": 57,
+      "Maximum": 110
+    },
+    {
+      "Level": 80,
+      "Minimum": 58,
+      "Maximum": 111
+    },
+    {
+      "Level": 81,
+      "Minimum": 58,
+      "Maximum": 112
+    },
+    {
+      "Level": 82,
+      "Minimum": 58,
+      "Maximum": 115
+    },
+    {
+      "Level": 83,
+      "Minimum": 59,
+      "Maximum": 116
+    },
+    {
+      "Level": 84,
+      "Minimum": 60,
+      "Maximum": 117
+    },
+    {
+      "Level": 85,
+      "Minimum": 61,
+      "Maximum": 118
+    },
+    {
+      "Level": 86,
+      "Minimum": 62,
+      "Maximum": 120
+    },
+    {
+      "Level": 87,
+      "Minimum": 62,
+      "Maximum": 121
+    },
+    {
+      "Level": 88,
+      "Minimum": 63,
+      "Maximum": 122
+    },
+    {
+      "Level": 89,
+      "Minimum": 64,
+      "Maximum": 123
+    },
+    {
+      "Level": 90,
+      "Minimum": 65,
+      "Maximum": 126
+    },
+    {
+      "Level": 91,
+      "Minimum": 66,
+      "Maximum": 127
+    },
+    {
+      "Level": 92,
+      "Minimum": 66,
+      "Maximum": 128
+    },
+    {
+      "Level": 93,
+      "Minimum": 66,
+      "Maximum": 129
+    },
+    {
+      "Level": 94,
+      "Minimum": 67,
+      "Maximum": 131
+    },
+    {
+      "Level": 95,
+      "Minimum": 68,
+      "Maximum": 132
+    },
+    {
+      "Level": 96,
+      "Minimum": 69,
+      "Maximum": 133
+    },
+    {
+      "Level": 97,
+      "Minimum": 70,
+      "Maximum": 134
+    },
+    {
+      "Level": 98,
+      "Minimum": 70,
+      "Maximum": 137
+    },
+    {
+      "Level": 99,
+      "Minimum": 71,
+      "Maximum": 138
+    },
+    {
+      "Level": 100,
+      "Minimum": 72,
+      "Maximum": 139
+    },
+    {
+      "Level": 101,
+      "Minimum": 73,
+      "Maximum": 140
+    },
+    {
+      "Level": 102,
+      "Minimum": 74,
+      "Maximum": 142
+    },
+    {
+      "Level": 103,
+      "Minimum": 74,
+      "Maximum": 143
+    },
+    {
+      "Level": 104,
+      "Minimum": 74,
+      "Maximum": 144
+    },
+    {
+      "Level": 105,
+      "Minimum": 75,
+      "Maximum": 145
+    },
+    {
+      "Level": 106,
+      "Minimum": 76,
+      "Maximum": 148
+    },
+    {
+      "Level": 107,
+      "Minimum": 77,
+      "Maximum": 149
+    },
+    {
+      "Level": 108,
+      "Minimum": 78,
+      "Maximum": 150
+    },
+    {
+      "Level": 109,
+      "Minimum": 78,
+      "Maximum": 151
+    },
+    {
+      "Level": 110,
+      "Minimum": 79,
+      "Maximum": 153
+    },
+    {
+      "Level": 111,
+      "Minimum": 80,
+      "Maximum": 154
+    },
+    {
+      "Level": 112,
+      "Minimum": 81,
+      "Maximum": 155
+    },
+    {
+      "Level": 113,
+      "Minimum": 82,
+      "Maximum": 156
+    },
+    {
+      "Level": 114,
+      "Minimum": 82,
+      "Maximum": 159
+    },
+    {
+      "Level": 115,
+      "Minimum": 82,
+      "Maximum": 160
+    },
+    {
+      "Level": 116,
+      "Minimum": 83,
+      "Maximum": 161
+    },
+    {
+      "Level": 117,
+      "Minimum": 84,
+      "Maximum": 162
+    },
+    {
+      "Level": 118,
+      "Minimum": 85,
+      "Maximum": 164
+    },
+    {
+      "Level": 119,
+      "Minimum": 86,
+      "Maximum": 165
+    },
+    {
+      "Level": 120,
+      "Minimum": 86,
+      "Maximum": 166
+    },
+    {
+      "Level": 121,
+      "Minimum": 87,
+      "Maximum": 167
+    },
+    {
+      "Level": 122,
+      "Minimum": 88,
+      "Maximum": 170
+    },
+    {
+      "Level": 123,
+      "Minimum": 89,
+      "Maximum": 171
+    },
+    {
+      "Level": 124,
+      "Minimum": 90,
+      "Maximum": 172
+    },
+    {
+      "Level": 125,
+      "Minimum": 90,
+      "Maximum": 173
+    },
+    {
+      "Level": 126,
+      "Minimum": 90,
+      "Maximum": 175
+    },
+    {
+      "Level": 127,
+      "Minimum": 91,
+      "Maximum": 176
+    },
+    {
+      "Level": 128,
+      "Minimum": 92,
+      "Maximum": 177
+    },
+    {
+      "Level": 129,
+      "Minimum": 93,
+      "Maximum": 178
+    },
+    {
+      "Level": 130,
+      "Minimum": 94,
+      "Maximum": 181
+    },
+    {
+      "Level": 131,
+      "Minimum": 94,
+      "Maximum": 182
+    },
+    {
+      "Level": 132,
+      "Minimum": 95,
+      "Maximum": 183
+    },
+    {
+      "Level": 133,
+      "Minimum": 96,
+      "Maximum": 184
+    },
+    {
+      "Level": 134,
+      "Minimum": 97,
+      "Maximum": 186
+    },
+    {
+      "Level": 135,
+      "Minimum": 98,
+      "Maximum": 187
+    },
+    {
+      "Level": 136,
+      "Minimum": 98,
+      "Maximum": 188
+    },
+    {
+      "Level": 137,
+      "Minimum": 98,
+      "Maximum": 189
+    },
+    {
+      "Level": 138,
+      "Minimum": 99,
+      "Maximum": 192
+    },
+    {
+      "Level": 139,
+      "Minimum": 100,
+      "Maximum": 193
+    },
+    {
+      "Level": 140,
+      "Minimum": 101,
+      "Maximum": 194
+    },
+    {
+      "Level": 141,
+      "Minimum": 102,
+      "Maximum": 195
+    },
+    {
+      "Level": 142,
+      "Minimum": 102,
+      "Maximum": 197
+    },
+    {
+      "Level": 143,
+      "Minimum": 103,
+      "Maximum": 198
+    },
+    {
+      "Level": 144,
+      "Minimum": 104,
+      "Maximum": 199
+    },
+    {
+      "Level": 145,
+      "Minimum": 105,
+      "Maximum": 200
+    },
+    {
+      "Level": 146,
+      "Minimum": 106,
+      "Maximum": 203
+    },
+    {
+      "Level": 147,
+      "Minimum": 106,
+      "Maximum": 204
+    },
+    {
+      "Level": 148,
+      "Minimum": 106,
+      "Maximum": 205
+    },
+    {
+      "Level": 149,
+      "Minimum": 107,
+      "Maximum": 206
+    },
+    {
+      "Level": 150,
+      "Minimum": 108,
+      "Maximum": 208
+    },
+    {
+      "Level": 151,
+      "Minimum": 109,
+      "Maximum": 209
+    },
+    {
+      "Level": 152,
+      "Minimum": 110,
+      "Maximum": 210
+    },
+    {
+      "Level": 153,
+      "Minimum": 110,
+      "Maximum": 211
+    },
+    {
+      "Level": 154,
+      "Minimum": 111,
+      "Maximum": 214
+    },
+    {
+      "Level": 155,
+      "Minimum": 112,
+      "Maximum": 215
+    },
+    {
+      "Level": 156,
+      "Minimum": 113,
+      "Maximum": 216
+    },
+    {
+      "Level": 157,
+      "Minimum": 114,
+      "Maximum": 217
+    },
+    {
+      "Level": 158,
+      "Minimum": 114,
+      "Maximum": 219
+    },
+    {
+      "Level": 159,
+      "Minimum": 114,
+      "Maximum": 220
+    },
+    {
+      "Level": 160,
+      "Minimum": 115,
+      "Maximum": 220
+    },
+    {
+      "Level": 161,
+      "Minimum": 116,
+      "Maximum": 220
+    },
+    {
+      "Level": 162,
+      "Minimum": 117,
+      "Maximum": 220
+    },
+    {
+      "Level": 163,
+      "Minimum": 118,
+      "Maximum": 220
+    },
+    {
+      "Level": 164,
+      "Minimum": 118,
+      "Maximum": 220
+    },
+    {
+      "Level": 165,
+      "Minimum": 119,
+      "Maximum": 220
+    },
+    {
+      "Level": 166,
+      "Minimum": 120,
+      "Maximum": 220
+    },
+    {
+      "Level": 167,
+      "Minimum": 121,
+      "Maximum": 220
+    },
+    {
+      "Level": 168,
+      "Minimum": 122,
+      "Maximum": 220
+    },
+    {
+      "Level": 169,
+      "Minimum": 122,
+      "Maximum": 220
+    },
+    {
+      "Level": 170,
+      "Minimum": 122,
+      "Maximum": 220
+    },
+    {
+      "Level": 171,
+      "Minimum": 123,
+      "Maximum": 220
+    },
+    {
+      "Level": 172,
+      "Minimum": 124,
+      "Maximum": 220
+    },
+    {
+      "Level": 173,
+      "Minimum": 125,
+      "Maximum": 220
+    },
+    {
+      "Level": 174,
+      "Minimum": 126,
+      "Maximum": 220
+    },
+    {
+      "Level": 175,
+      "Minimum": 126,
+      "Maximum": 220
+    },
+    {
+      "Level": 176,
+      "Minimum": 127,
+      "Maximum": 220
+    },
+    {
+      "Level": 177,
+      "Minimum": 128,
+      "Maximum": 220
+    },
+    {
+      "Level": 178,
+      "Minimum": 129,
+      "Maximum": 220
+    },
+    {
+      "Level": 179,
+      "Minimum": 130,
+      "Maximum": 220
+    },
+    {
+      "Level": 180,
+      "Minimum": 130,
+      "Maximum": 220
+    },
+    {
+      "Level": 181,
+      "Minimum": 130,
+      "Maximum": 220
+    },
+    {
+      "Level": 182,
+      "Minimum": 131,
+      "Maximum": 220
+    },
+    {
+      "Level": 183,
+      "Minimum": 132,
+      "Maximum": 220
+    },
+    {
+      "Level": 184,
+      "Minimum": 133,
+      "Maximum": 220
+    },
+    {
+      "Level": 185,
+      "Minimum": 134,
+      "Maximum": 220
+    },
+    {
+      "Level": 186,
+      "Minimum": 134,
+      "Maximum": 220
+    },
+    {
+      "Level": 187,
+      "Minimum": 135,
+      "Maximum": 220
+    },
+    {
+      "Level": 188,
+      "Minimum": 136,
+      "Maximum": 220
+    },
+    {
+      "Level": 189,
+      "Minimum": 137,
+      "Maximum": 220
+    },
+    {
+      "Level": 190,
+      "Minimum": 138,
+      "Maximum": 220
+    },
+    {
+      "Level": 191,
+      "Minimum": 138,
+      "Maximum": 220
+    },
+    {
+      "Level": 192,
+      "Minimum": 138,
+      "Maximum": 220
+    },
+    {
+      "Level": 193,
+      "Minimum": 139,
+      "Maximum": 220
+    },
+    {
+      "Level": 194,
+      "Minimum": 140,
+      "Maximum": 220
+    },
+    {
+      "Level": 195,
+      "Minimum": 141,
+      "Maximum": 220
+    },
+    {
+      "Level": 196,
+      "Minimum": 142,
+      "Maximum": 220
+    },
+    {
+      "Level": 197,
+      "Minimum": 142,
+      "Maximum": 220
+    },
+    {
+      "Level": 198,
+      "Minimum": 143,
+      "Maximum": 220
+    },
+    {
+      "Level": 199,
+      "Minimum": 144,
+      "Maximum": 220
+    },
+    {
+      "Level": 200,
+      "Minimum": 145,
+      "Maximum": 220
+    },
+    {
+      "Level": 201,
+      "Minimum": 146,
+      "Maximum": 220
+    },
+    {
+      "Level": 202,
+      "Minimum": 146,
+      "Maximum": 220
+    },
+    {
+      "Level": 203,
+      "Minimum": 146,
+      "Maximum": 220
+    },
+    {
+      "Level": 204,
+      "Minimum": 147,
+      "Maximum": 220
+    },
+    {
+      "Level": 205,
+      "Minimum": 148,
+      "Maximum": 220
+    },
+    {
+      "Level": 206,
+      "Minimum": 149,
+      "Maximum": 220
+    },
+    {
+      "Level": 207,
+      "Minimum": 150,
+      "Maximum": 220
+    },
+    {
+      "Level": 208,
+      "Minimum": 150,
+      "Maximum": 220
+    },
+    {
+      "Level": 209,
+      "Minimum": 151,
+      "Maximum": 220
+    },
+    {
+      "Level": 210,
+      "Minimum": 152,
+      "Maximum": 220
+    },
+    {
+      "Level": 211,
+      "Minimum": 153,
+      "Maximum": 220
+    },
+    {
+      "Level": 212,
+      "Minimum": 154,
+      "Maximum": 220
+    },
+    {
+      "Level": 213,
+      "Minimum": 154,
+      "Maximum": 220
+    },
+    {
+      "Level": 214,
+      "Minimum": 154,
+      "Maximum": 220
+    },
+    {
+      "Level": 215,
+      "Minimum": 155,
+      "Maximum": 220
+    },
+    {
+      "Level": 216,
+      "Minimum": 156,
+      "Maximum": 220
+    },
+    {
+      "Level": 217,
+      "Minimum": 157,
+      "Maximum": 220
+    },
+    {
+      "Level": 218,
+      "Minimum": 158,
+      "Maximum": 220
+    },
+    {
+      "Level": 219,
+      "Minimum": 158,
+      "Maximum": 220
+    },
+    {
+      "Level": 220,
+      "Minimum": 159,
+      "Maximum": 220
+    }
+  ]
+}

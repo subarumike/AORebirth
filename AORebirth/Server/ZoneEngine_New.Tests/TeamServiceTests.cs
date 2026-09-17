@@ -6,6 +6,7 @@ namespace ZoneEngine_New.Tests
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
+    using System.Text.Json.Nodes;
     using AORebirth.Communication.Messages;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -508,6 +509,107 @@ namespace ZoneEngine_New.Tests
             f.Action(b, CharacterActionType.LeaveTeam);
             AssertWire("5E4777700000C350000000010000000020000000000000C3500000000202800001FFFFFFFF0000",
                 f.Session(a).Bodies.OfType<CharacterActionMessage>().First(m => m.Action == CharacterActionType.TeamMemberLeft));
+        }
+
+        [DataTestMethod]
+        [DataRow(null, "")]
+        [DataRow("", "")]
+        [DataRow(" \t\r\n ", "")]
+        [DataRow("\0\0", "")]
+        [DataRow("/command invite  Member2\0", "invite|Member2")]
+        [DataRow("...///TeAm   AcCePt", "TeAm|AcCePt")]
+        [DataRow(".team  invite   Member2", "team|invite|Member2")]
+        [DataRow("/.team accept", ".team|accept")]
+        [DataRow(" /team leave", "/team|leave")]
+        [DataRow("/team\taccept", "team\taccept")]
+        [DataRow("/command\tinvite Member2", "command\tinvite|Member2")]
+        [DataRow("command command invite", "command|invite")]
+        [DataRow("\0 ", "\0")]
+        public void CommandTokenizationPreservesExistingPrefixWhitespaceAndTerminatorOrder(string? input, string expected)
+            => Assert.AreEqual(expected, string.Join("|", CommandInput.Tokenize(input)));
+
+        [TestMethod]
+        public void TeamLevelDataReloadUsesEditedRangesWithoutChangingAnExistingSnapshot()
+        {
+            string path = Path.GetTempFileName();
+            try
+            {
+                string source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "GameData", "Teams", "LevelEligibility.json"));
+                File.WriteAllText(path, source);
+                var original = TeamLevelEligibility.Load(path);
+                var document = JsonNode.Parse(source)!;
+                var row = document["Ranges"]!.AsArray().Single(value => value!["Level"]!.GetValue<int>() == 60)!;
+                row["Minimum"] = 43;
+                row["Maximum"] = 85;
+                File.WriteAllText(path, document.ToJsonString());
+                var edited = TeamLevelEligibility.Load(path);
+                Assert.AreEqual(42, original.ForLevel(60).Minimum);
+                Assert.AreEqual(84, original.ForLevel(60).Maximum);
+                Assert.AreEqual(43, edited.ForLevel(60).Minimum);
+                Assert.AreEqual(85, edited.ForLevel(60).Maximum);
+            }
+            finally { File.Delete(path); }
+        }
+
+        [DataTestMethod]
+        [DataRow("missing")]
+        [DataRow("duplicate")]
+        [DataRow("inverted")]
+        [DataRow("outside")]
+        public void MalformedTeamLevelDataCannotPublishUsableRanges(string corruption)
+        {
+            string path = Path.GetTempFileName();
+            try
+            {
+                var document = JsonNode.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "GameData", "Teams", "LevelEligibility.json")))!;
+                var rows = document["Ranges"]!.AsArray();
+                switch (corruption)
+                {
+                    case "missing": rows.RemoveAt(59); break;
+                    case "duplicate": rows[59]!["Level"] = rows[58]!["Level"]!.GetValue<int>(); break;
+                    case "inverted": rows[59]!["Minimum"] = rows[59]!["Maximum"]!.GetValue<int>() + 1; break;
+                    case "outside": rows[59]!["Maximum"] = document["MaximumLevel"]!.GetValue<int>() + 1; break;
+                }
+                File.WriteAllText(path, document.ToJsonString());
+                Assert.ThrowsExactly<InvalidDataException>(() => TeamLevelEligibility.Load(path));
+            }
+            finally { File.Delete(path); }
+        }
+
+        [TestMethod]
+        public void TeamLevelLookupClampsOutsideLevelsToTheExistingEndpoints()
+        {
+            var ranges = TeamLevelEligibility.Current;
+            Assert.AreEqual(1, ranges.ForLevel(int.MinValue).Level);
+            Assert.AreEqual(ranges.ForLevel(1).Minimum, ranges.ForLevel(0).Minimum);
+            Assert.AreEqual(ranges.ForLevel(1).Maximum, ranges.ForLevel(0).Maximum);
+            Assert.AreEqual(220, ranges.ForLevel(int.MaxValue).Level);
+            Assert.AreEqual(ranges.ForLevel(220).Minimum, ranges.ForLevel(221).Minimum);
+            Assert.AreEqual(ranges.ForLevel(220).Maximum, ranges.ForLevel(221).Maximum);
+        }
+
+        [DataTestMethod]
+        [DataRow(42, true)]
+        [DataRow(84, true)]
+        [DataRow(41, false)]
+        [DataRow(85, false)]
+        public void TeamInviteUsesInclusiveRangeBoundaries(int candidateLevel, bool eligible)
+        {
+            var f = new Fixture();
+            Player inviter = f.Player(1, 60), candidate = f.Player(2, candidateLevel);
+            f.Invite(inviter, candidate);
+            Assert.AreEqual(eligible, f.Session(candidate).Bodies.OfType<CharacterActionMessage>()
+                .Any(message => message.Action == CharacterActionType.TeamRequestInvite));
+            if (eligible)
+            {
+                f.Accept(candidate, inviter);
+                Assert.IsTrue(f.Teams.AreTeammates(inviter, candidate));
+            }
+            else
+            {
+                Assert.IsNull(f.Teams.GetTeam(inviter));
+                Assert.IsNull(f.Teams.GetTeam(candidate));
+            }
         }
 
         private static void AssertWire(string hex, MessageBody body)
