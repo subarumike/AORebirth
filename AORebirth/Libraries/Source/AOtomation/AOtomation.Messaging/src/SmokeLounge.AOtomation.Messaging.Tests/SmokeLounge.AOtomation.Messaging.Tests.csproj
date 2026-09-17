@@ -462,19 +462,19 @@
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedTempleOfThreeWindsCombatCatalog.cs">
       <Link>CapturedTempleOfThreeWindsCombatCatalog.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatPacketFactory.cs">
       <Link>CapturedEnemyCombatPacketFactory.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.Data.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatPacketFactory.Data.cs">
       <Link>CapturedEnemyCombatPacketFactory.Data.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatProfileData.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatProfileData.cs">
       <Link>CapturedEnemyCombatProfileData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatProfileMatching.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatProfileMatching.cs">
       <Link>CapturedEnemyCombatProfileMatching.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Combat\OrdinaryEnemyCombatSetupGenerator.Data.cs">
+    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Combat\OrdinaryEnemyCombatSetupGenerator.Data.cs">
       <Link>OrdinaryEnemyCombatSetupGenerator.Data.cs</Link>
     </Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\CapturedEnemyCombatProfileCatalog.cs">

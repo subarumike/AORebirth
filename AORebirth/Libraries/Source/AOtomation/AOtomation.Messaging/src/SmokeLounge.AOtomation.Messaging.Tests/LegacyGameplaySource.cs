@@ -49,7 +49,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string root = TestRepositoryRootResolver.FindFromCallerFilePath();
             foreach (string relative in new[]
             {
-                "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat",
+                "Tests/Fixtures/Gameplay/Combat",
                 "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions",
                 "Tests/Fixtures/Gameplay/Playfields",
                 "Tests/Fixtures/Gameplay/Packets"
