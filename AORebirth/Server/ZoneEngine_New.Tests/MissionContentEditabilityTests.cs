@@ -15,6 +15,32 @@ using ZoneEngine_New.Core.Inventory;
 public sealed class MissionContentEditabilityTests
 {
     [TestMethod]
+    public void MissionLevelSourceIsEditableAndInvalidCellsAreRejected()
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            var lines = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "GameData", "Missions", "Source", "MissionLevels.csv"));
+            File.WriteAllLines(path, lines);
+            var original = MissionLevelData.Load(path);
+            var cells = lines[1].Split(',');
+            cells[11] = "2";
+            lines[1] = string.Join(",", cells);
+            File.WriteAllLines(path, lines);
+            var edited = MissionLevelData.Load(path);
+            Assert.AreEqual(1, original.Quality(1, 11));
+            Assert.AreEqual(2, edited.Quality(1, 11));
+            Assert.AreEqual(original.Tokens(220), edited.Tokens(220));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => edited.Quality(1, 0));
+            cells[11] = "0";
+            lines[1] = string.Join(",", cells);
+            File.WriteAllLines(path, lines);
+            Assert.ThrowsExactly<InvalidDataException>(() => MissionLevelData.Load(path));
+        }
+        finally { File.Delete(path); }
+    }
+
+    [TestMethod]
     public void WeaponPoolAndNpcStatsChangeWithSameBinary()
     {
         string path = Path.Combine(AppContext.BaseDirectory, "GameData", "Missions", "NpcContent.json");

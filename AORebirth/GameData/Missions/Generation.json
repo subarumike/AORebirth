@@ -1,0 +1,12 @@
+{
+  "LayoutSelection": "seeded-index",
+  "Level": { "Multiplier": 1, "Minimum": 1, "Maximum": 220, "RandomMinimum": -2, "RandomMaximum": 2, "RandomIsPercent": false },
+  "Health": { "Multiplier": 25, "Minimum": 50, "Maximum": 40000, "RandomMinimum": -10, "RandomMaximum": 10, "RandomIsPercent": true },
+  "PositionTolerance": 2.0,
+  "MinimumGeometryPoints": 3,
+  "Provenance": [
+    "Starting commit ead34a4a55eb01df47f1afd8c46ca3cfef13254a: SharedGameplay/Missions/MissionNpcDifficultyPolicy.cs supplied level and health policy; values preserved as editable data.",
+    "Starting commit ead34a4a55eb01df47f1afd8c46ca3cfef13254a: SharedGameplay/Missions/MissionAcgSpatialAuthority.cs supplied spatial tolerance and minimum geometry count.",
+    "Existing Layouts.json contains one selectable layout for each supported mission type. Seeded selection applies only within the validated eligible set."
+  ]
+}

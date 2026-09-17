@@ -160,8 +160,8 @@ namespace ZoneEngine_New.Core.Playfield
 
             // SQL-leased mission instances require their exact accepted binding;
             // an unknown lease must never become an ordinary empty RDB playfield.
-            if (playfieldId >= MissionAcgIdentityRanges.MinimumLivePlayfield2
-                && playfieldId <= MissionAcgIdentityRanges.MaximumLivePlayfield2)
+            if (playfieldId >= GeneratedMissionIdentitySpace.MinimumLivePlayfield2
+                && playfieldId <= GeneratedMissionIdentitySpace.MaximumLivePlayfield2)
                 throw new InvalidOperationException("A generated mission playfield requires its owned accepted world binding.");
 
             lock (_sync)
@@ -276,8 +276,8 @@ namespace ZoneEngine_New.Core.Playfield
         public MissionPlayfield GetOrCreateMission(GeneratedMissionWorld world)
         {
             ArgumentNullException.ThrowIfNull(world);
-            if (world.LivePlayfield < MissionAcgIdentityRanges.MinimumLivePlayfield2
-                || world.LivePlayfield > MissionAcgIdentityRanges.MaximumLivePlayfield2)
+            if (world.LivePlayfield < GeneratedMissionIdentitySpace.MinimumLivePlayfield2
+                || world.LivePlayfield > GeneratedMissionIdentitySpace.MaximumLivePlayfield2)
                 throw new ArgumentOutOfRangeException(nameof(world), "Mission live identity is outside its governed SQL lease namespace.");
             lock (_sync)
             {

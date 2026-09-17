@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.Missions
     #region Usings ...
 
     using System;
+    using AORebirth.Interfaces.Persistence.Missions;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
@@ -311,7 +312,7 @@ namespace ZoneEngine.Core.Missions
     internal sealed class MissionAcgMaterializedInstance
     {
         internal MissionAcgMaterializedInstance(
-            MissionAcgBindingRecord bindingRecord,
+            GeneratedMissionBinding bindingRecord,
             MissionAcgLayoutBundle bundle,
             MissionAcgRuntimeState state,
             IEnumerable<MissionAcgRuntimeObject> objects)
@@ -323,7 +324,7 @@ namespace ZoneEngine.Core.Missions
                 new List<MissionAcgRuntimeObject>(objects).AsReadOnly();
         }
 
-        internal MissionAcgBindingRecord BindingRecord { get; private set; }
+        internal GeneratedMissionBinding BindingRecord { get; private set; }
 
         internal MissionAcgLayoutBundle Bundle { get; private set; }
 
@@ -331,16 +332,16 @@ namespace ZoneEngine.Core.Missions
 
         internal ReadOnlyCollection<MissionAcgRuntimeObject> Objects { get; private set; }
 
-        internal void UpdateBindingRecord(MissionAcgBindingRecord record)
+        internal void UpdateBindingRecord(GeneratedMissionBinding record)
         {
             if (record == null
-                || !record.Binding.AcceptedQuestIdentity.Equals(
-                    this.BindingRecord.Binding.AcceptedQuestIdentity)
-                || record.Binding.AllocatedLivePlayfield2
-                   != this.BindingRecord.Binding.AllocatedLivePlayfield2
+                || !new MissionAcgIdentityRecord(record.QuestType, record.QuestInstance).Equals(
+                    new MissionAcgIdentityRecord(this.BindingRecord.QuestType, this.BindingRecord.QuestInstance))
+                || record.LivePlayfield
+                   != this.BindingRecord.LivePlayfield
                 || !string.Equals(
-                    record.Binding.SelectedBundleId,
-                    this.BindingRecord.Binding.SelectedBundleId,
+                    record.BundleId,
+                    this.BindingRecord.BundleId,
                     StringComparison.Ordinal))
             {
                 throw new InvalidOperationException(
@@ -389,8 +390,8 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            int playfield = instance.BindingRecord.Binding.AllocatedLivePlayfield2;
-            int accepted = instance.BindingRecord.Binding.AcceptedQuestIdentity.Instance;
+            int playfield = instance.BindingRecord.LivePlayfield;
+            int accepted = instance.BindingRecord.QuestInstance;
             if (this.byLivePlayfield.ContainsKey(playfield)
                 || this.byAcceptedQuest.ContainsKey(accepted))
             {
@@ -434,10 +435,8 @@ namespace ZoneEngine.Core.Missions
             if (!this.byLivePlayfield.TryGetValue(
                 allocatedLivePlayfield2,
                 out instance)
-                || instance.BindingRecord.Binding.OwnerIdentity.Instance != ownerInstance
-                || !instance.BindingRecord.State.CanEnter(
-                    nowUtc,
-                    instance.BindingRecord.Binding.ExpiryUtc))
+                || instance.BindingRecord.OwnerId != ownerInstance
+                || (instance.BindingRecord.State != GeneratedMissionState.Active || nowUtc.Ticks >= instance.BindingRecord.ExpiresAtUtcTicks))
             {
                 instance = null;
                 return false;
@@ -504,7 +503,7 @@ namespace ZoneEngine.Core.Missions
         }
 
         internal static bool TryMaterialize(
-            MissionAcgBindingRecord bindingRecord,
+            GeneratedMissionBinding bindingRecord,
             MissionAcgLayoutBundle bundle,
             MissionAcgRuntimeState restoredState,
             DateTime nowUtc,
@@ -526,10 +525,10 @@ namespace ZoneEngine.Core.Missions
             }
 
             List<MissionAcgRuntimeIdentityEntry> identities =
-                CreateIdentityMap(bindingRecord.Binding, seeds);
+                CreateIdentityMap(bindingRecord, seeds);
             if (restoredState != null
                 && !ValidateRestoredState(
-                    bindingRecord.Binding,
+                    bindingRecord,
                     bundle,
                     restoredState,
                     identities,
@@ -540,7 +539,7 @@ namespace ZoneEngine.Core.Missions
 
             MissionAcgRuntimeState state =
                 restoredState
-                ?? CreateInitialState(bindingRecord.Binding, bundle, identities, nowUtc);
+                ?? CreateInitialState(bindingRecord, bundle, identities, nowUtc);
             var byCaptured = new Dictionary<string, MissionAcgRuntimeIdentityEntry>(
                 StringComparer.Ordinal);
             for (int i = 0; i < identities.Count; i++)
@@ -570,7 +569,7 @@ namespace ZoneEngine.Core.Missions
                         ? new byte[0]
                         : RetargetWire(
                             dynel.Wire,
-                            bindingRecord.Binding,
+                            bindingRecord,
                             byCaptured));
             }
 
@@ -593,7 +592,7 @@ namespace ZoneEngine.Core.Missions
                         npc.CapturedIdentity,
                         npc.CapturedPlayfield2,
                         bundle.CapturedPlayerIdentity,
-                        bindingRecord.Binding,
+                        bindingRecord,
                         identity.RuntimeIdentity));
             }
 
@@ -616,7 +615,7 @@ namespace ZoneEngine.Core.Missions
                         objective.CapturedIdentity,
                         objective.CapturedPlayfield2,
                         bundle.CapturedPlayerIdentity,
-                        bindingRecord.Binding,
+                        bindingRecord,
                         identity.RuntimeIdentity));
             }
 
@@ -649,16 +648,16 @@ namespace ZoneEngine.Core.Missions
             }
 
             allocatedLivePlayfield2 =
-                MissionAcgIdentityRanges.MinimumLivePlayfield2
+                GeneratedMissionIdentitySpace.MinimumLivePlayfield2
                 + playfieldOffset;
             return allocatedLivePlayfield2
-                       >= MissionAcgIdentityRanges.MinimumLivePlayfield2
+                       >= GeneratedMissionIdentitySpace.MinimumLivePlayfield2
                    && allocatedLivePlayfield2
-                       <= MissionAcgIdentityRanges.MaximumLivePlayfield2;
+                       <= GeneratedMissionIdentitySpace.MaximumLivePlayfield2;
         }
 
         private static bool ValidateAtomicRelationship(
-            MissionAcgBindingRecord record,
+            GeneratedMissionBinding record,
             MissionAcgLayoutBundle bundle,
             out string failure)
         {
@@ -669,21 +668,27 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            MissionAcgInstanceBinding binding = record.Binding;
-            if (!bundle.IsSelectable
+            GeneratedMissionBinding binding = record;
+            if (binding.OwnerId <= 0 || binding.QuestType != 0xDAC3 || binding.QuestInstance <= 0 || binding.KeyInstance <= 0
+                || binding.Offer == null || binding.Offer.OwnerId != binding.OwnerId || binding.Offer.Quality <= 0
+                || binding.LivePlayfield < GeneratedMissionIdentitySpace.MinimumLivePlayfield2
+                || binding.LivePlayfield > GeneratedMissionIdentitySpace.MaximumLivePlayfield2
+                || binding.AcceptedAtUtcTicks <= 0 || binding.ExpiresAtUtcTicks <= binding.AcceptedAtUtcTicks
+                || !bundle.SupportsMission((ZoneEngine_New.Core.Missions.MissionRollType)binding.Offer.MissionType, binding.Offer.Quality)
+                || !bundle.IsSelectable
                 || !bundle.Completeness.IsSelectionComplete
                 || !string.Equals(
-                    binding.SelectedBundleId,
+                    binding.BundleId,
                     bundle.LayoutId,
                     StringComparison.Ordinal)
                 || !string.Equals(
-                    binding.SelectedBundlePayloadSha256,
+                    binding.BundleSha256,
                     bundle.GeneratorPayloadSha256,
                     StringComparison.OrdinalIgnoreCase)
-                || !binding.AcgBuildingIdentity.Equals(bundle.BuildingIdentity)
-                || binding.AllocatedLivePlayfield2
-                   == MissionAcgIdentityRanges.LegacySharedPlayfield2
-                || binding.AllocatedLivePlayfield2 == bundle.SourcePlayfield2)
+                || !new MissionAcgIdentityRecord(binding.BuildingType, binding.BuildingInstance).Equals(bundle.BuildingIdentity)
+                || binding.LivePlayfield
+                   == GeneratedMissionIdentitySpace.LegacySharedPlayfield2
+                || binding.LivePlayfield == bundle.SourcePlayfield2)
             {
                 failure = "Binding and immutable layout bundle do not form one valid atomic instance.";
                 return false;
@@ -789,12 +794,12 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static List<MissionAcgRuntimeIdentityEntry> CreateIdentityMap(
-            MissionAcgInstanceBinding binding,
+            GeneratedMissionBinding binding,
             IList<IdentitySeed> seeds)
         {
             int playfieldOffset =
-                binding.AllocatedLivePlayfield2
-                - MissionAcgIdentityRanges.MinimumLivePlayfield2;
+                binding.LivePlayfield
+                - GeneratedMissionIdentitySpace.MinimumLivePlayfield2;
             var entries = new List<MissionAcgRuntimeIdentityEntry>(seeds.Count);
             for (int i = 0; i < seeds.Count; i++)
             {
@@ -815,7 +820,7 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static MissionAcgRuntimeState CreateInitialState(
-            MissionAcgInstanceBinding binding,
+            GeneratedMissionBinding binding,
             MissionAcgLayoutBundle bundle,
             IList<MissionAcgRuntimeIdentityEntry> identities,
             DateTime nowUtc)
@@ -845,11 +850,11 @@ namespace ZoneEngine.Core.Missions
 
             return new MissionAcgRuntimeState(
                 MissionAcgRuntimeState.CurrentFormatVersion,
-                binding.AcceptedQuestIdentity,
+                new MissionAcgIdentityRecord(binding.QuestType, binding.QuestInstance),
                 bundle.LayoutId,
                 bundle.GeneratorPayloadSha256,
                 bundle.BuildingIdentity,
-                binding.AllocatedLivePlayfield2,
+                binding.LivePlayfield,
                 identities,
                 doors,
                 chests,
@@ -857,21 +862,21 @@ namespace ZoneEngine.Core.Missions
         }
 
         private static bool ValidateRestoredState(
-            MissionAcgInstanceBinding binding,
+            GeneratedMissionBinding binding,
             MissionAcgLayoutBundle bundle,
             MissionAcgRuntimeState state,
             IList<MissionAcgRuntimeIdentityEntry> expected,
             out string failure)
         {
             failure = string.Empty;
-            if (!state.AcceptedQuestIdentity.Equals(binding.AcceptedQuestIdentity)
+            if (!state.AcceptedQuestIdentity.Equals(new MissionAcgIdentityRecord(binding.QuestType, binding.QuestInstance))
                 || !string.Equals(state.BundleId, bundle.LayoutId, StringComparison.Ordinal)
                 || !string.Equals(
                     state.BundlePayloadSha256,
                     bundle.GeneratorPayloadSha256,
                     StringComparison.OrdinalIgnoreCase)
                 || !state.BuildingIdentity.Equals(bundle.BuildingIdentity)
-                || state.AllocatedLivePlayfield2 != binding.AllocatedLivePlayfield2
+                || state.AllocatedLivePlayfield2 != binding.LivePlayfield
                 || state.IdentityEntries.Count != expected.Count)
             {
                 failure = "Persisted runtime state does not match its binding and bundle.";
@@ -987,7 +992,7 @@ namespace ZoneEngine.Core.Missions
 
         private static byte[] RetargetWire(
             MissionAcgWireRecord wire,
-            MissionAcgInstanceBinding binding,
+            GeneratedMissionBinding binding,
             IDictionary<string, MissionAcgRuntimeIdentityEntry> byCaptured)
         {
             byte[] packet = wire.CopyPacketBytes();
@@ -1007,10 +1012,10 @@ namespace ZoneEngine.Core.Missions
                 switch (slot.Category)
                 {
                     case MissionAcgRetargetCategory.CharacterInstance:
-                        value = binding.OwnerIdentity.Instance;
+                        value = binding.OwnerId;
                         break;
                     case MissionAcgRetargetCategory.Playfield2Instance:
-                        value = binding.AllocatedLivePlayfield2;
+                        value = binding.LivePlayfield;
                         break;
                     case MissionAcgRetargetCategory.DynelIdentityType:
                         value = runtime.RuntimeIdentity.Type;
@@ -1022,19 +1027,19 @@ namespace ZoneEngine.Core.Missions
                         value =
                             wire.CapturedParentIdentity == null
                                 ? slot.CapturedValue
-                                : binding.OwnerIdentity.Type;
+                                : 50000;
                         break;
                     case MissionAcgRetargetCategory.ParentIdentityInstance:
                         value =
                             wire.CapturedParentIdentity == null
                                 ? slot.CapturedValue
-                                : binding.OwnerIdentity.Instance;
+                                : binding.OwnerId;
                         break;
                     case MissionAcgRetargetCategory.BuildingIdentityType:
-                        value = binding.AcgBuildingIdentity.Type;
+                        value = binding.BuildingType;
                         break;
                     case MissionAcgRetargetCategory.BuildingIdentityInstance:
-                        value = binding.AcgBuildingIdentity.Instance;
+                        value = binding.BuildingInstance;
                         break;
                     default:
                         throw new InvalidOperationException(
@@ -1052,7 +1057,7 @@ namespace ZoneEngine.Core.Missions
             MissionAcgIdentityRecord capturedIdentity,
             int? capturedPlayfield2,
             MissionAcgIdentityRecord capturedPlayer,
-            MissionAcgInstanceBinding binding,
+            GeneratedMissionBinding binding,
             MissionAcgIdentityRecord runtimeIdentity)
         {
             if (packet == null || packet.Length == 0)
@@ -1067,7 +1072,7 @@ namespace ZoneEngine.Core.Missions
                 ReplaceInt32(
                     packet,
                     capturedPlayfield2.Value,
-                    binding.AllocatedLivePlayfield2);
+                    binding.LivePlayfield);
             }
 
             if (capturedPlayer != null)
@@ -1075,7 +1080,7 @@ namespace ZoneEngine.Core.Missions
                 ReplaceInt32(
                     packet,
                     capturedPlayer.Instance,
-                    binding.OwnerIdentity.Instance);
+                    binding.OwnerId);
             }
 
             return packet;

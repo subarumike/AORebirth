@@ -77,8 +77,8 @@ public sealed class GeneratedMissionService
             if (!InventoryGrantPlan.TryCreate(player, artifacts, out var plan)) return Rejected("No durable capacity for the complete mission artifact plan.");
             acceptance.Artifacts = plan.Rows.Select(ToMissionItem).ToArray();
             acceptance.AcceptedAtUtcTicks = _now();
-            // Accepted Legacy missions receive a fresh 48h duration, not the roll's remaining window.
-            acceptance.ExpiresAtUtcTicks = checked(acceptance.AcceptedAtUtcTicks + TimeSpan.TicksPerHour * 48);
+            // Acceptance starts the configured lifetime independently of the offer's remaining window.
+            acceptance.ExpiresAtUtcTicks = checked(acceptance.AcceptedAtUtcTicks + TimeSpan.TicksPerSecond * MissionRollPolicy.Current.AcceptedLifetimeSeconds);
             // Accepted artifacts have their own captured SIFU/container/template route.
             return CommitAndPublish(player, () => _dao.Accept(acceptance), _ => plan.PublishAfterCommit(notify: false));
         });

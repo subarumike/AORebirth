@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Script.Serialization;
+using ZoneEngine_New.Core.Missions.Content;
 
 namespace ZoneEngine.Core.Arete.Dialogue
 {
     /// <summary>Reads operator-authored dialogue packs and validates their graph before publication.</summary>
     public sealed class DialogueContentPackLoader
     {
-        public AreteContentLoadResult<DialogueContentPack> LoadFiles(IEnumerable<string> filePaths)
+        public ContentReadResult<DialogueContentPack> LoadFiles(IEnumerable<string> filePaths)
         {
             var packs = new List<DialogueContentPack>();
-            var errors = new AreteValidationResult();
+            var errors = new ContentValidationResult();
             var json = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
             foreach (var entry in (filePaths ?? Enumerable.Empty<string>()).Select((path, index) => new { path, index }))
             {
@@ -34,20 +35,20 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 }
             }
             errors.AddErrors(DialogueContentPackValidator.Validate(packs));
-            return new AreteContentLoadResult<DialogueContentPack>(packs, errors);
+            return new ContentReadResult<DialogueContentPack>(packs, errors);
         }
 
-        public AreteContentLoadResult<DialogueContentPack> LoadFile(string filePath) => LoadFiles(new[] { filePath });
+        public ContentReadResult<DialogueContentPack> LoadFile(string filePath) => LoadFiles(new[] { filePath });
 
-        public AreteContentLoadResult<DialogueContentPack> Load(IEnumerable<DialogueContentPack> packs)
+        public ContentReadResult<DialogueContentPack> Load(IEnumerable<DialogueContentPack> packs)
         {
             var snapshot = (packs ?? Enumerable.Empty<DialogueContentPack>()).ToArray();
-            return new AreteContentLoadResult<DialogueContentPack>(snapshot, DialogueContentPackValidator.Validate(snapshot));
+            return new ContentReadResult<DialogueContentPack>(snapshot, DialogueContentPackValidator.Validate(snapshot));
         }
 
-        public AreteContentLoadResult<DialogueContentPack> LoadEmpty() => Load(Enumerable.Empty<DialogueContentPack>());
+        public ContentReadResult<DialogueContentPack> LoadEmpty() => Load(Enumerable.Empty<DialogueContentPack>());
 
-        public AreteContentLoadResult<DialogueContentPack> LoadDirectory(string directoryPath)
+        public ContentReadResult<DialogueContentPack> LoadDirectory(string directoryPath)
         {
             if (!string.IsNullOrWhiteSpace(directoryPath) && Directory.Exists(directoryPath))
             {
@@ -55,17 +56,20 @@ namespace ZoneEngine.Core.Arete.Dialogue
                 if (paths.Length != 0)
                     return LoadFiles(paths.OrderBy(path => path, StringComparer.OrdinalIgnoreCase));
             }
-            var errors = new AreteValidationResult();
+            var errors = new ContentValidationResult();
             errors.AddError(directoryPath, "A dialogue directory containing JSON content files is required.");
-            return new AreteContentLoadResult<DialogueContentPack>(null, errors);
+            return new ContentReadResult<DialogueContentPack>(null, errors);
         }
 
-        public AreteContentLoadResult<DialogueContentPack> LoadManifest(string manifestPath)
+        public ContentReadResult<DialogueContentPack> LoadManifest(string manifestPath)
         {
-            var manifest = new AreteContentManifestLoader().Load(manifestPath);
-            return manifest.IsValid
-                ? LoadFiles(manifest.DialoguePackFiles)
-                : new AreteContentLoadResult<DialogueContentPack>(null, manifest.Validation);
+            try { return LoadFiles(InteractionManifest.Read(manifestPath).DialoguePacks); }
+            catch (Exception failure)
+            {
+                var errors = new ContentValidationResult();
+                errors.AddError(manifestPath, failure.Message);
+                return new ContentReadResult<DialogueContentPack>(null, errors);
+            }
         }
     }
 
@@ -76,16 +80,16 @@ namespace ZoneEngine.Core.Arete.Dialogue
         public int PackCount { get; private set; }
         public int NpcCount => _npcs.Count;
 
-        public AreteValidationResult Load(IEnumerable<DialogueContentPack> packs)
+        public ContentValidationResult Load(IEnumerable<DialogueContentPack> packs)
             => Publish(new DialogueContentPackLoader().Load(packs));
-        public AreteValidationResult LoadFromFiles(IEnumerable<string> paths)
+        public ContentValidationResult LoadFromFiles(IEnumerable<string> paths)
             => Publish(new DialogueContentPackLoader().LoadFiles(paths));
-        public AreteValidationResult LoadFromDirectory(string path)
+        public ContentValidationResult LoadFromDirectory(string path)
             => Publish(new DialogueContentPackLoader().LoadDirectory(path));
-        public AreteValidationResult LoadFromManifest(string path)
+        public ContentValidationResult LoadFromManifest(string path)
             => Publish(new DialogueContentPackLoader().LoadManifest(path));
 
-        AreteValidationResult Publish(AreteContentLoadResult<DialogueContentPack> candidate)
+        ContentValidationResult Publish(ContentReadResult<DialogueContentPack> candidate)
         {
             if (candidate.IsValid)
             {

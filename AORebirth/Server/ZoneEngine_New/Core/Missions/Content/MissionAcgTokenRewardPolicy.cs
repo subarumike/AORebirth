@@ -22,7 +22,7 @@ namespace ZoneEngine.Core.Missions
             { failure = "Generated token claim side has no configured reward."; return false; }
             int low = token.LowId, high = token.HighId; string name = token.Name;
             int count;
-            if (!MissionLevelTable.TryGetTokenReward(level, out count, out failure)) return false;
+            if (!MissionLevelRuntime.TryGetTokenReward(level, out count, out failure)) return false;
             result = new MissionAcgTokenRewardData(2, low, high, count, name);
             return true;
         }

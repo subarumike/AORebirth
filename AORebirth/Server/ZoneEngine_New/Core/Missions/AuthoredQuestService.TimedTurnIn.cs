@@ -19,7 +19,7 @@ public sealed partial class AuthoredQuestService
         if (!IsCurrent(player) || !TryResolveTimedItem(rule, item, out var chip)) return false;
         string? account = Account(player);
         if (account == null) return false;
-        return Mutate(player, account, (tx, service) =>
+        return Mutate(player, account, tx =>
         {
             RequireSource(player, slot, item);
             if (!LevelEligible(chip, player.Stats.GetOrOne(CharacterStat.Level)))
@@ -28,7 +28,7 @@ public sealed partial class AuthoredQuestService
                 return () => SendChat(player, rule.CooldownText);
             if (!chip.Enabled) return () => SendChat(player, rule.UnavailableText.Replace("{name}", chip.Name));
             if (tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State == MissionLifecycleState.Active) return null;
-            Accept(service, player.Identity.Instance, rule.Quest);
+            Accept(tx, rule.Quest);
             // The shared service returns AlreadyApplied for a completed mission. That
             // preserves history; it does not authorize a fresh daily cycle or journal.
             if (tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State != MissionLifecycleState.Active)
@@ -47,21 +47,21 @@ public sealed partial class AuthoredQuestService
     {
         string? account = Account(player);
         if (account == null) return;
-        Mutate(player, account, (tx, service) =>
+        Mutate(player, account, tx =>
         {
             bool turnIn = tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State == MissionLifecycleState.Active;
             bool active = tx.GetMission(new(player.Identity.Instance, rule.CooldownQuest))?.State == MissionLifecycleState.Active;
             DateTime? until = CharacterCooldown(tx, player.Identity.Instance, rule);
             if (until.HasValue && until.Value <= _now())
             {
-                if (active) CompleteTimed(service, player, rule, rule.CooldownQuest, rule.CooldownObjective, "cooldown-expired-login");
+                if (active) CompleteTimed(tx, player, rule, rule.CooldownQuest, rule.CooldownObjective, "cooldown-expired-login");
                 return () =>
                 {
                     if (turnIn) SendTimedJournal(player, rule.Quest, Content.Journals[rule.Quest].DurationSeconds);
                     if (active) SendTimedDelete(player, rule.CooldownQuest);
                 };
             }
-            if (!active && until.HasValue) Accept(service, player.Identity.Instance, rule.CooldownQuest);
+            if (!active && until.HasValue) Accept(tx, rule.CooldownQuest);
             int remaining = until.HasValue ? Math.Clamp((int)Math.Ceiling((until.Value - _now()).TotalSeconds), 1, rule.CooldownSeconds) : rule.CooldownSeconds;
             return () =>
             {
@@ -113,7 +113,7 @@ public sealed partial class AuthoredQuestService
         ArgumentNullException.ThrowIfNull(publishAcceptedTrade);
         string? account = Account(player);
         if (account == null) return false;
-        return Mutate(player, account, (tx, service) =>
+        return Mutate(player, account, tx =>
         {
             RequireSource(player, slot, chip);
             if (!TryResolveTimedItem(rule, chip, out var definition)
@@ -124,7 +124,7 @@ public sealed partial class AuthoredQuestService
                 throw new InvalidOperationException("Accepted daily reward snapshot is unavailable.");
             var progression = DirectXpRewardPlan.CreatePersistedReward(player, snapshot.XpReward);
             if (progression.LevelAfter != progression.LevelBefore + 1) throw new InvalidOperationException("Timed turn-in full-level reward cannot project exactly one level from this persisted XP state.");
-            CompleteTimed(service, player, rule, rule.Quest, rule.Objective, "complete-quest");
+            CompleteTimed(tx, player, rule, rule.Quest, rule.Objective, "complete-quest");
             long tokens = 0;
             if (snapshot.SideTokenReward > 0)
             {
@@ -138,12 +138,12 @@ public sealed partial class AuthoredQuestService
                 progression.Stats.Select(value => new MissionStatMutationData { StatIdentityType = (int)player.Identity.Type, StatId = (int)value.Key,
                     Kind = AORebirth.Interfaces.Persistence.Missions.MissionStatMutationKind.Set, Value = value.Value, MinimumValue = 0, MaximumValue = int.MaxValue }).ToArray(),
                 ProgressionRewardRules.CreateFullLevelXpEffectReference(snapshot.LevelBefore, snapshot.XpReward), _now().Ticks));
-            Accept(service, player.Identity.Instance, rule.CooldownQuest);
+            Accept(tx, rule.CooldownQuest);
             string until = _now().AddSeconds(rule.CooldownSeconds).ToString("o", CultureInfo.InvariantCulture);
-            RequireSuccess(service.SetFlag(player.Identity.Instance, rule.CooldownQuest, rule.CooldownFlag, until));
-            RequireSuccess(service.SetFlag(player.Identity.Instance, rule.Quest, rule.CooldownFlag, until));
+            AuthoredMissionProgression.SetFlag(tx, Definition(rule.CooldownQuest), rule.CooldownFlag, until, _now().Ticks);
+            AuthoredMissionProgression.SetFlag(tx, Definition(rule.Quest), rule.CooldownFlag, until, _now().Ticks);
             SaveAccountCooldown(tx, account, until, rule);
-            RequireSuccess(service.SetFlag(player.Identity.Instance, rule.CooldownQuest, rule.GrantedFlag, "1"));
+            AuthoredMissionProgression.SetFlag(tx, Definition(rule.CooldownQuest), rule.GrantedFlag, "1", _now().Ticks);
             ApplyRows(tx, Plan(player, []), player, slot, chip);
             return () =>
             {
@@ -179,11 +179,10 @@ public sealed partial class AuthoredQuestService
         tx.SaveAccountFlag(account, flag);
     }
 
-    static void CompleteTimed(PersistentMissionService service, Player player, TimedTurnInDefinition rule, string quest, string objective, string reason)
+    void CompleteTimed(IMissionDaoTransaction tx, Player player, TimedTurnInDefinition rule, string quest, string objective, string reason)
     {
-        RequireSuccess(service.ObserveObjective(new MissionObjectiveObservation { CharacterId = player.Identity.Instance, QuestId = quest, ObjectiveId = objective,
-            ObservationKey = rule.ObservationPrefix + reason + ":" + quest, Amount = 1, EventType = rule.EventType, SourceIdentity = player.Identity.ToString(), TargetIdentity = quest }));
-        RequireSuccess(service.CompleteMission(player.Identity.Instance, quest));
+        AuthoredMissionProgression.Complete(tx, Definition(quest), objective, rule.ObservationPrefix + reason + ":" + quest,
+            rule.EventType, player.Identity.ToString(), quest, _now().Ticks);
     }
 
     static void SendTokens(Player player, int stat, int reward, long finalValue, string text)

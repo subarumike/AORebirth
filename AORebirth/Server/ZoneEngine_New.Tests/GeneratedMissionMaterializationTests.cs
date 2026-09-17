@@ -173,7 +173,7 @@ public sealed class GeneratedMissionMaterializationTests
 
     static (GeneratedMissionBinding, MissionAcgMaterializedInstance, IList<GeneratedMissionObject>) Prepare(MissionAcgLayoutBundle bundle, int index)
     {
-        int pf = MissionAcgIdentityRanges.MinimumLivePlayfield2 + 500 + index;
+        int pf = GeneratedMissionIdentitySpace.MinimumLivePlayfield2 + 500 + index;
         var type = bundle.CompatibleMissionTypes[0];
         var binding = new GeneratedMissionBinding
         {
@@ -181,14 +181,9 @@ public sealed class GeneratedMissionMaterializationTests
             KeyInstance = 10000 + index, BundleId = bundle.LayoutId, BundleSha256 = bundle.GeneratorPayloadSha256,
             BuildingType = bundle.BuildingIdentity.Type, BuildingInstance = bundle.BuildingIdentity.Instance, LivePlayfield = pf,
             AcceptedAtUtcTicks = Accepted.Ticks, ExpiresAtUtcTicks = Accepted.AddHours(48).Ticks, State = GeneratedMissionState.Active,
-            Offer = new GeneratedMissionOffer { MissionType = (int)type, Quality = 25, DestinationPlayfield = 710, DestinationX = 111, DestinationY = 5, DestinationZ = 222 }
+            Offer = new GeneratedMissionOffer { OwnerId = 99, MissionType = (int)type, Quality = 25, DestinationPlayfield = 710, DestinationX = 111, DestinationY = 5, DestinationZ = 222 }
         };
-        var immutable = new MissionAcgInstanceBinding(MissionAcgInstanceBinding.CurrentFormatVersion,
-            new(binding.QuestType, binding.QuestInstance), new(binding.OfferType, binding.OfferInstance), new(50000, 99), null,
-            type, 25, 1234, new(0xC76D, binding.KeyInstance), new(0xC9C6, 710), 123, 124, 111, 5, 222, new(0xDAC1, 100),
-            bundle.LayoutId, bundle.GeneratorPayloadSha256, bundle.BuildingIdentity, pf, Accepted, Accepted.AddHours(48), true);
-        var record = new MissionAcgBindingRecord(immutable, new MissionAcgInstanceState(MissionAcgLifecycleState.Active, MissionAcgCleanupState.None, Accepted, null), string.Empty);
-        Assert.IsTrue(MissionAcgRuntimeMaterializer.TryMaterialize(record, bundle, null, Accepted, out var materialized, out string reason), reason);
+        Assert.IsTrue(MissionAcgRuntimeMaterializer.TryMaterialize(binding, bundle, null, Accepted, out var materialized, out string reason), reason);
         IList<GeneratedMissionObject> objects = materialized.Objects.Select(source => new GeneratedMissionObject
         {
             OwnerId = binding.OwnerId, QuestType = binding.QuestType, QuestInstance = binding.QuestInstance,

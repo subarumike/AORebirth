@@ -3,6 +3,7 @@ namespace ZoneEngine.Core.Missions
     #region Usings ...
 
     using System;
+    using ZoneEngine_New.Core.Missions;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Text;
@@ -189,6 +190,7 @@ namespace ZoneEngine.Core.Missions
             }
 
             var layoutSnapshot = new List<MissionAcgLayoutBundle>(layouts);
+            foreach (var layout in layoutSnapshot) layout?.ValidateShape();
             var exclusionSnapshot =
                 exclusions == null
                     ? new List<MissionAcgLayoutExclusion>()
@@ -815,7 +817,7 @@ namespace ZoneEngine.Core.Missions
             MissionAcgRotationRecord heading,
             byte[] rawPacket,
             string storedRawPacketSha256,
-            IList<MissionAcgProvenanceRecord> provenance,
+            IReadOnlyList<MissionAcgProvenanceRecord> provenance,
             IDictionary<string, StructuredIdentityEvidence> identities,
             ICollection<MissionAcgCatalogValidationIssue> issues)
         {

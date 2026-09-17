@@ -1,3 +1,4 @@
+using ZoneEngine_New.Core.Missions;
 namespace ZoneEngine.Core.Missions
 {
     using System;
@@ -54,14 +55,14 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            MissionRollType type;
-            if (!MissionTypeCatalog.TryTypeFromIcon(offer.MissionIconId, out type))
+            MissionRollType type = MissionRollPolicy.Current.TypeFromIcon(offer.MissionIconId);
+            if (type == MissionRollType.Unknown)
             {
                 error = "Unknown mission icon " + offer.MissionIconId + ".";
                 return false;
             }
 
-            if (MissionTypeCatalog.IconId(type, 0) != offer.MissionIconId)
+            if (MissionRollPolicy.Current.Icon(type) != offer.MissionIconId)
             {
                 error = "Mission icon does not match its canonical type.";
                 return false;
@@ -74,14 +75,14 @@ namespace ZoneEngine.Core.Missions
             }
 
             int actionCode = offer.QuestActions[0].Version;
-            if (actionCode != MissionTypeCatalog.ExpectedActionCode(type))
+            if (actionCode != MissionRollPolicy.Current.Action(type))
             {
                 error = "Mission action code "
                         + actionCode
                         + " does not match "
-                        + MissionTypeCatalog.TypeName(type)
+                        + type.ToString()
                         + " expected "
-                        + MissionTypeCatalog.ExpectedActionCode(type)
+                        + MissionRollPolicy.Current.Action(type)
                         + ".";
                 return false;
             }
@@ -172,7 +173,7 @@ namespace ZoneEngine.Core.Missions
         internal static bool TryValidateGenerated(
             QuestInfo offer,
             MissionOfferDescriptor source,
-            MissionSliderProfile sliders,
+            MissionRollSliders sliders,
             Identity issuingTerminal,
             out MissionOfferDescriptor generated,
             out string error)
@@ -273,7 +274,7 @@ namespace ZoneEngine.Core.Missions
 
         internal static bool IsCompatibleWithSliders(
             MissionOfferDescriptor descriptor,
-            MissionSliderProfile sliders)
+            MissionRollSliders sliders)
         {
             if (descriptor == null || sliders == null)
             {

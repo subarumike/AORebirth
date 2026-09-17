@@ -123,8 +123,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
             Playfield playfield;
             int storedPlayfield = hydration.Character.Playfield;
-            if (storedPlayfield >= MissionAcgIdentityRanges.MinimumLivePlayfield2
-                && storedPlayfield <= MissionAcgIdentityRanges.MaximumLivePlayfield2)
+            if (storedPlayfield >= GeneratedMissionIdentitySpace.MinimumLivePlayfield2
+                && storedPlayfield <= GeneratedMissionIdentitySpace.MaximumLivePlayfield2)
             {
                 var plan = _missions.ResolveLogin(characterId, storedPlayfield);
                 hydration = ApplyMissionLoginPlan(hydration, plan);

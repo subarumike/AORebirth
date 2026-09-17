@@ -9,6 +9,7 @@ using ZoneEngine.Core.Arete;
 using ZoneEngine.Core.Arete.Dialogue;
 using ZoneEngine.Core.Arete.Quests;
 using ZoneEngine.Core.Missions;
+using ZoneEngine_New.Core.Missions.Content;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
 /// <summary>Generic runtime action bindings for the existing validated Content manifest/pack system.</summary>
@@ -36,6 +37,7 @@ public sealed class InteractionContent
     public void Validate()
     {
         if (Version != 1) throw new InvalidDataException("Unsupported interaction content version.");
+        AuthoredMissionProgression.Validate(MissionDefinitions);
         var quests = MissionDefinitions.Select(x => x.QuestId).ToHashSet(StringComparer.Ordinal);
         if (quests.Count != MissionDefinitions.Length) throw new InvalidDataException("Duplicate mission definition.");
         if (Actions.Values.Where(x => x.DirectItemUse).SelectMany(x => x.ItemIds).GroupBy(x => x).Any(x => x.Count() > 1))
@@ -109,14 +111,13 @@ public sealed class InteractionContent
         var dialoguePaths = new List<string>(); var questPaths = new List<string>();
         foreach (var path in paths)
         {
-            var manifest = new AreteContentManifestLoader().Load(path);
-            if (!manifest.IsValid) throw new InvalidDataException(string.Join("; ", manifest.Validation.Errors));
-            dialoguePaths.AddRange(manifest.DialoguePackFiles); questPaths.AddRange(manifest.QuestPackFiles);
+            var manifest = InteractionManifest.Read(path);
+            dialoguePaths.AddRange(manifest.DialoguePacks); questPaths.AddRange(manifest.QuestPacks);
         }
         var dialoguePacks = new DialogueContentPackLoader().LoadFiles(dialoguePaths.Distinct(StringComparer.OrdinalIgnoreCase));
-        var questPacks = new QuestContentPackLoader().LoadFiles(questPaths.Distinct(StringComparer.OrdinalIgnoreCase));
+        var questPacks = QuestIndex.ReadFiles(questPaths.Distinct(StringComparer.OrdinalIgnoreCase));
         if (!dialoguePacks.IsValid || !questPacks.IsValid) throw new InvalidDataException(string.Join("; ", dialoguePacks.Validation.Errors.Concat(questPacks.Validation.Errors)));
-        var dialogues = new DialogueContentRegistry(); var quests = new QuestContentRegistry();
+        var dialogues = new DialogueContentRegistry(); var quests = new QuestIndex();
         var validation = dialogues.Load(dialoguePacks.Packs);
         validation.AddErrors(quests.Load(questPacks.Packs));
         validation.AddErrors(DialogueActionReferenceValidator.Validate(dialoguePacks.Packs, quests));
@@ -133,7 +134,7 @@ public sealed class InteractionContent
         return result;
     }
 }
-public sealed record InteractionRegistries(DialogueContentRegistry DialogueRegistry, QuestContentRegistry QuestRegistry);
+public sealed record InteractionRegistries(DialogueContentRegistry DialogueRegistry, QuestIndex QuestRegistry);
 
 public sealed class InteractionAction
 {

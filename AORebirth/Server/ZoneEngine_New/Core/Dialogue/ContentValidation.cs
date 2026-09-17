@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ZoneEngine.Core.Arete.Quests;
+using ZoneEngine_New.Core.Missions.Content;
 
 namespace ZoneEngine.Core.Arete.Dialogue
 {
     public static class DialogueContentPackValidator
     {
-        public static AreteValidationResult Validate(IEnumerable<DialogueContentPack> packs)
+        public static ContentValidationResult Validate(IEnumerable<DialogueContentPack> packs)
         {
-            var result = new AreteValidationResult();
+            var result = new ContentValidationResult();
             var packNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var npcNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var pack in packs ?? Enumerable.Empty<DialogueContentPack>())
@@ -29,7 +30,7 @@ namespace ZoneEngine.Core.Arete.Dialogue
             return result;
         }
 
-        static void ValidateGraph(DialogueNpcEntry npc, AreteValidationResult errors)
+        static void ValidateGraph(DialogueNpcEntry npc, ContentValidationResult errors)
         {
             var nodes = (npc.Nodes ?? Enumerable.Empty<DialogueNode>()).ToArray();
             var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -71,9 +72,9 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
     public static class DialogueActionReferenceValidator
     {
-        public static AreteValidationResult Validate(IEnumerable<DialogueContentPack> packs, QuestContentRegistry quests)
+        public static ContentValidationResult Validate(IEnumerable<DialogueContentPack> packs, QuestIndex quests)
         {
-            var errors = new AreteValidationResult();
+            var errors = new ContentValidationResult();
             foreach (var pack in packs ?? Enumerable.Empty<DialogueContentPack>())
             {
                 if (pack == null) { errors.AddError("dialogue", "content pack is null"); continue; }
@@ -115,14 +116,14 @@ namespace ZoneEngine.Core.Arete.Dialogue
 
     internal static class ReferenceChecks
     {
-        internal static void Quest(string id, QuestContentRegistry quests, string location, string context, AreteValidationResult errors)
+        internal static void Quest(string id, QuestIndex quests, string location, string context, ContentValidationResult errors)
         {
             if (string.IsNullOrWhiteSpace(id)) errors.AddError(location, "missing mission id for " + context);
             else if (quests == null) errors.AddError(location, "quest registry is missing");
             else if (!quests.TryGetQuest(id, out _)) errors.AddError(location, "mission id '" + id + "' was not found");
         }
 
-        internal static void Condition(string type, string questId, QuestContentRegistry quests, string location, AreteValidationResult errors)
+        internal static void Condition(string type, string questId, QuestIndex quests, string location, ContentValidationResult errors)
         {
             switch (type?.ToLowerInvariant())
             {
@@ -144,10 +145,10 @@ namespace ZoneEngine.Core.Arete
     public static class AreteConditionReferenceValidator
     {
         // Quest definitions are inspected through their existing public contracts; no quest state is changed.
-        public static AreteValidationResult Validate(IEnumerable<DialogueContentPack> dialoguePacks,
-            IEnumerable<QuestContentPack> questPacks, DialogueContentRegistry dialogueRegistry, QuestContentRegistry questRegistry)
+        public static ContentValidationResult Validate(IEnumerable<DialogueContentPack> dialoguePacks,
+            IEnumerable<QuestContentPack> questPacks, DialogueContentRegistry dialogueRegistry, QuestIndex questRegistry)
         {
-            var errors = new AreteValidationResult();
+            var errors = new ContentValidationResult();
             var dialogueNpcs = (dialoguePacks ?? Enumerable.Empty<DialogueContentPack>()).Where(pack => pack != null)
                 .SelectMany(pack => pack.Npcs ?? Enumerable.Empty<DialogueNpcEntry>()).Where(npc => npc != null);
             foreach (var npc in dialogueNpcs)

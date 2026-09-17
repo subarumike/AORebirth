@@ -222,12 +222,10 @@ public sealed class AuthoredQuestTests
         var completed = w.Dao.Missions[key]; completed.State = DaoState.Completed;
         completed.CompletedAtUtcTicks = w.Now.AddDays(-2).Ticks;
         long version = completed.Version, acceptedAt = completed.AcceptedAtUtcTicks, updatedAt = completed.UpdatedAtUtcTicks;
-        var service = new PersistentMissionService(new MissionDaoRepositoryAdapter(w.Dao), w.Catalog.Definitions, () => w.Now.Ticks);
-        var offered = service.OfferMission(111, key.QuestId);
-        var accepted = service.AcceptMission(111, key.QuestId);
-        Assert.AreEqual(MissionOperationStatus.AlreadyApplied, offered.Status);
-        Assert.AreEqual(MissionOperationStatus.AlreadyApplied, accepted.Status);
-        Assert.AreEqual(ZoneEngine.Core.Missions.MissionLifecycleState.Completed, accepted.Mission.State);
+        var definition = w.Catalog.Definitions.Single(value => value.QuestId == key.QuestId);
+        Assert.IsFalse(w.Dao.Execute(111, tx => AuthoredMissionProgression.Offer(tx, definition, w.Now.Ticks)));
+        Assert.IsFalse(w.Dao.Execute(111, tx => AuthoredMissionProgression.Accept(tx, definition, w.Now.Ticks)));
+        Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(key).State);
         var after = w.Dao.GetMission(key);
         Assert.AreEqual(version, after.Version); Assert.AreEqual(acceptedAt, after.AcceptedAtUtcTicks);
         Assert.AreEqual(updatedAt, after.UpdatedAtUtcTicks); Assert.AreEqual(completed.CompletedAtUtcTicks, after.CompletedAtUtcTicks);
@@ -366,8 +364,9 @@ public sealed class AuthoredQuestTests
         }
         internal void Activate(string quest)
         {
-            var service = new PersistentMissionService(new MissionDaoRepositoryAdapter(Dao), Catalog.Definitions);
-            Assert.IsTrue(service.OfferMission(111, quest).Succeeded); Assert.IsTrue(service.AcceptMission(111, quest).Succeeded); Dao.Calls = 0;
+            var definition = Catalog.Definitions.Single(value => value.QuestId == quest);
+            Assert.IsTrue(Dao.Execute(111, tx => AuthoredMissionProgression.Offer(tx, definition, Now.Ticks)));
+            Assert.IsTrue(Dao.Execute(111, tx => AuthoredMissionProgression.Accept(tx, definition, Now.Ticks))); Dao.Calls = 0;
         }
         internal Item Add(int template)
         {

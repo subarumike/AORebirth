@@ -1,0 +1,59 @@
+{
+  "Provenance": {
+    "SourceRevision": "ead34a4a55eb01df47f1afd8c46ca3cfef13254a",
+    "SourcePaths": [
+      "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionRollService.cs",
+      "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionRollFeeRules.cs",
+      "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionRewardCatalog.cs",
+      "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionSliderProfile.cs",
+      "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionTypeCatalog.cs",
+      "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgObjectiveBinding.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+      "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs"
+    ],
+    "Basis": "Existing deployed policies externalized without adding new retail claims. Packet identities/actions and clock are protocol compatibility values; travel bands are existing server policy."
+  },
+  "ClientClockBaseSeconds": 1201445827,
+  "OfferLifetimeSeconds": 172800,
+  "AcceptedLifetimeSeconds": 172800,
+  "MinimumRollFee": 1,
+  "FeePerCharacterLevel": 1,
+  "Types": [
+    { "Type": "KillPerson", "Icon": 11330, "Action": 1, "ObjectiveInteraction": 1, "Title": "Kill person mission" },
+    { "Type": "FindPerson", "Icon": 11335, "Action": 16, "ObjectiveInteraction": 2, "Title": "Find person mission" },
+    { "Type": "FindItem", "Icon": 11337, "Action": 15, "ObjectiveInteraction": 3, "Title": "Find item mission" },
+    { "Type": "RepairMachine", "Icon": 11342, "Action": 8, "ObjectiveInteraction": 5, "Title": "Repair machine mission" },
+    { "Type": "FindItemReturn", "Icon": 11329, "Action": 8, "ObjectiveInteraction": 4, "Title": "Return item mission" }
+  ],
+  "DefaultSliderEvidence": "Neutral",
+  "SliderProfiles": [
+    { "Name": "Neutral", "Values": [0,0,0,0,0,0], "Preference": ["Neutral","CapturedLeftGoodBadOrderChaosCreditsXp"] },
+    { "Name": "CapturedLeftGoodBadOrderChaosCreditsXp", "Values": [-100,-100,0,0,0,-100], "Preference": ["CapturedLeftGoodBadOrderChaosCreditsXp","Neutral"] }
+  ],
+  "Travel": {
+    "DistinctPlayfieldsAboveLevel": 40,
+    "DistinctAttempts": 48,
+    "MinimumDistanceStartsAboveLevel": 40,
+    "MinimumDistancePerLevel": 12.0,
+    "MinimumDistanceOffset": -200.0,
+    "MinimumDistanceFloor": 400.0,
+    "MaximumDistancePerLevel": 35.0,
+    "MaximumDistanceOffset": 900.0,
+    "Bands": [
+      { "MaximumLevel": 40, "Priority": ["same","near","ring","distance","side","all"] },
+      { "MaximumLevel": 80, "Priority": ["local","distance","side","all"] },
+      { "MaximumLevel": 2147483647, "Priority": ["distance","side","all"] }
+    ]
+  },
+  "Rewards": {
+    "NanoQualityTolerance": 10,
+    "ExcludedNameFragments": ["Instruction Disc (Summon Grid Armor", "Instruction Disk (Summon Grid Armor"],
+    "Catalogs": [
+      { "File": "ItemDb_Clusters.json", "FixedQuality": false },
+      { "File": "ItemDB_Implants.json", "FixedQuality": false },
+      { "File": "ItemDb_Nanos.json", "FixedQuality": true },
+      { "File": "ItemDb_Refined.json", "FixedQuality": false },
+      { "File": "ItemDb_Rest.json", "FixedQuality": false }
+    ]
+  }
+}

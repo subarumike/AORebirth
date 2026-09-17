@@ -14,8 +14,8 @@ namespace ZoneEngine.Core.Missions
         {
             credits = 0;
             int encodedPlayfield, ordinal, salt;
-            if (runtimeNpcInstance <= 0 || livePlayfield < MissionAcgIdentityRanges.MinimumLivePlayfield2
-                || livePlayfield > MissionAcgIdentityRanges.MaximumLivePlayfield2
+            if (runtimeNpcInstance <= 0 || livePlayfield < GeneratedMissionIdentitySpace.MinimumLivePlayfield2
+                || livePlayfield > GeneratedMissionIdentitySpace.MaximumLivePlayfield2
                 || !MissionAcgRuntimeMaterializer.TryReverseRuntimeInstance(runtimeNpcInstance, out encodedPlayfield, out ordinal)
                 || encodedPlayfield != livePlayfield || ordinal <= 0
                 || !TryResolveSignedSalt(runtimeNpcInstance, livePlayfield, 131u, out salt)) return false;
