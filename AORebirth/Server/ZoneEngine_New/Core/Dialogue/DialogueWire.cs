@@ -22,7 +22,7 @@ public static class DialogueWire
     public static KnuBotCloseChatWindowMessage Close(Identity player, Identity npc) => new()
     { Identity = player, Target = npc, Unknown = 0, Unknown1 = 2, Seconds = 3, Unknown3 = 0 };
 
-    public static IEnumerable<MessageBody> Node(Identity player, Identity npc, string? playerName, DialogueSessionResult result)
+    public static IEnumerable<MessageBody> Node(Identity player, Identity npc, string? playerName, DialogueStep result)
     {
         var node = result.CurrentNode;
         bool segments = false;

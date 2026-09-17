@@ -70,7 +70,7 @@ public sealed class InteractionEditabilityTests
             Assert.IsTrue(registry.Load(loaded.Packs).IsValid);
         }
         finally { File.Delete(file); }
-        var node=new DialogueSessionService(registry).StartSession(DialogueFixture.Stan);
+        var node=new DialogueGraph(registry).StartSessionAtNode(DialogueFixture.Stan,null);
         var messages=DialogueWire.Node(new(){Type=IdentityType.CanbeAffected,Instance=111},new(){Type=IdentityType.CanbeAffected,Instance=222},"Tester",node).ToArray();
         Assert.AreEqual(root.PromptText,messages.OfType<KnuBotAppendTextMessage>().Single().Text);
     }

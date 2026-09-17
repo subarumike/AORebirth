@@ -225,6 +225,33 @@ public sealed class DialogueTests
         w.Drain(); Assert.AreEqual(1, w.State.Session.Messages.OfType<KnuBotRejectedItemsMessage>().Count());
     }
 
+    [DataTestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void UnsupportedTradeContinuationRejectsBeforeDurableEffects(bool unsupportedAction)
+    {
+        using var w = new World(DialogueFixture.Scarlett, 7010);
+        var chip = w.PrepareDoja(); w.BeginDoja(); Assert.IsTrue(w.Stage());
+        Assert.IsTrue(w.Catalog.TryGet(DialogueFixture.Scarlett, out var npc));
+        foreach (var option in npc.Nodes.SelectMany(node => node.Options))
+            if (unsupportedAction) option.Actions.Add(new() { Type = "GrantItem" });
+            else option.Conditions.Add(new() { Type = "unsupported-condition" });
+        int calls = w.State.Dao.Calls;
+        int credits = w.State.Player.Stats.GetOrZero(CharacterStat.Cash);
+        int xp = w.State.Player.Stats.GetOrZero(CharacterStat.XP);
+        w.State.Session.Messages.Clear();
+        Assert.IsFalse(w.Finish());
+        Assert.AreEqual(calls, w.State.Dao.Calls);
+        Assert.AreSame(chip, w.State.Player.Inventory.Inventory.Content[64]);
+        Assert.AreEqual(1, w.State.Player.Inventory.Inventory.Content.Count);
+        Assert.AreEqual(credits, w.State.Player.Stats.GetOrZero(CharacterStat.Cash));
+        Assert.AreEqual(xp, w.State.Player.Stats.GetOrZero(CharacterStat.XP));
+        Assert.AreEqual(2, w.State.Player.Stats.GetOrOne(CharacterStat.Level));
+        Assert.AreEqual(DaoState.Active, w.State.Dao.GetMission(new(111, DojaChipInteractionRules.QuestTurnIn)).State);
+        Assert.AreEqual(0, w.State.Dao.Rewards.Count);
+        Assert.AreEqual(0, w.State.Session.Messages.Count);
+    }
+
     [TestMethod]
     public void DojaTradeStaleItemAndLateFailureDoNotConsumeOrAcknowledge()
     {
@@ -389,11 +416,13 @@ public sealed class DialogueTests
         public readonly AuthoredQuestTests.World State;
         public readonly NpcCharacter Npc;
         public readonly DialogueService Service;
+        public readonly DialogueCatalog Catalog;
         long _now;
         public World(string content, int playfield, bool accepted = true)
         {
             State = new(playfield); Npc = State.AddNpc(content, accepted);
-            Service = new(DialogueCatalog.Load(AppContext.BaseDirectory), new DialogueActionRouter(State.Service), () => _now);
+            Catalog = DialogueCatalog.Load(AppContext.BaseDirectory);
+            Service = new(Catalog, new DialogueActionRouter(State.Service), () => _now);
         }
         public bool Open() => Service.Open(State.Session, Npc.Identity);
         public bool Answer(int value) => Service.Answer(State.Session, Npc.Identity, value);
