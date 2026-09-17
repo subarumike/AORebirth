@@ -6,6 +6,8 @@ namespace ZoneEngine_New.Core.Ai
     using GroveGames.BehaviourTree.Collections;
     using GroveGames.BehaviourTree.Nodes;
 
+    using AORebirth.World.Pathfinding;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Entities;
@@ -18,14 +20,19 @@ namespace ZoneEngine_New.Core.Ai
     {
         readonly NpcBehaviourTree _tree;
         readonly List<Vector3> _pathScratch = new(2);
+        readonly List<System.Numerics.Vector3> _reachPathScratch = new(8);
         Identity _currentTarget = Identity.None;
         bool _leashing;
         bool _treeResetPending;
         bool _followAnnounced;
         Vector3 _lastAnnouncedEnd = new(0, 0, 0);
         DateTime _lastRepathUtc;
+        Identity _reachCacheId = Identity.None;
+        Vector3 _reachCachePos = new(0, 0, 0);
+        DateTime _reachCacheUtc;
+        bool _reachCacheResult;
 
-        NpcBrain(NpcCharacter npc, Vector3 home, NpcAiProfile profile)
+        NpcBrain(NpcCharacter npc, Vector3? home, NpcAiProfile profile)
         {
             Npc = npc;
             Home = home;
@@ -41,7 +48,9 @@ namespace ZoneEngine_New.Core.Ai
 
         public NpcCharacter Npc { get; }
 
-        public Vector3 Home { get; }
+        public Vector3? Home { get; }
+
+        public bool HasHome => Home is not null;
 
         public HateList Hate { get; }
 
@@ -51,10 +60,9 @@ namespace ZoneEngine_New.Core.Ai
 
         public bool IsBusy => !Hate.IsEmpty || _leashing || Npc.FightingTarget.Instance != 0;
 
-        public static NpcBrain Create(NpcCharacter npc, Vector3 home, NpcAiProfile? profile = null)
+        public static NpcBrain Create(NpcCharacter npc, Vector3? home = null, NpcAiProfile? profile = null)
         {
             ArgumentNullException.ThrowIfNull(npc);
-            ArgumentNullException.ThrowIfNull(home);
             var brain = new NpcBrain(npc, home, profile ?? NpcAiProfiles.Default);
             npc.AttachBrain(brain);
             return brain;
@@ -119,6 +127,8 @@ namespace ZoneEngine_New.Core.Ai
                 return;
             if (!NpcAiRules.IsNearby(Npc.Position, player.Position, NpcAiRules.NearbyRange))
                 return;
+            if (!HasChance(player))
+                return;
 
             Hate.Add(player.Identity, NpcAiRules.ProximityHate);
         }
@@ -126,7 +136,7 @@ namespace ZoneEngine_New.Core.Ai
         public bool ShouldLeash()
         {
             TickStallWatch.Stage("brain.leash", Npc.Identity.Instance);
-            bool leash = NpcAiRules.ShouldLeash(Hate, Home, Npc.Position, IsValidNearby);
+            bool leash = NpcAiRules.ShouldLeash(Hate, Home, Npc.Position, IsEngageable);
             _leashing = leash;
             return leash;
         }
@@ -134,13 +144,13 @@ namespace ZoneEngine_New.Core.Ai
         public bool HasNearbyHate()
         {
             TickStallWatch.Stage("brain.hate", Npc.Identity.Instance);
-            return NpcAiRules.TryHighestNearby(Hate, IsValidNearby, out _, out _);
+            return NpcAiRules.TryHighestNearby(Hate, IsEngageable, out _, out _);
         }
 
         public bool TrySelectHighestThreat()
         {
             TickStallWatch.Stage("brain.select", Npc.Identity.Instance);
-            if (!NpcAiRules.TryHighestNearby(Hate, IsValidNearby, out Identity identity, out _))
+            if (!NpcAiRules.TryHighestNearby(Hate, IsEngageable, out Identity identity, out _))
             {
                 _currentTarget = Identity.None;
                 return false;
@@ -153,7 +163,45 @@ namespace ZoneEngine_New.Core.Ai
         public Character? ResolveCurrentTarget() => Resolve(_currentTarget);
 
         public bool HasArrivedHome()
-            => NpcAiRules.IsNearby(Npc.Position, Home, NpcAiRules.ArriveHomeMeters);
+            => !HasHome || NpcAiRules.IsNearby(Npc.Position, Home, NpcAiRules.ArriveHomeMeters);
+
+        public bool HasChance(Character target)
+        {
+            ArgumentNullException.ThrowIfNull(target);
+            if (IsInAttackRange(target) && Npc.HasLineOfSightTo(target))
+                return true;
+            return CanPathTo(target);
+        }
+
+        public bool CanPathTo(Character target)
+        {
+            ArgumentNullException.ThrowIfNull(target);
+            NavMeshPathfinder? finder = Npc.Playfield?.Pathfinder;
+            if (finder == null)
+                return true;
+
+            DateTime now = DateTime.UtcNow;
+            if (_reachCacheId == target.Identity
+                && (now - _reachCacheUtc).TotalSeconds < NpcFollowTarget.RepathIntervalSeconds
+                && Vector3.Abs(target.Position - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters)
+                return _reachCacheResult;
+
+            var start = new System.Numerics.Vector3((float)Npc.Position.x, (float)Npc.Position.y, (float)Npc.Position.z);
+            var end = new System.Numerics.Vector3(
+                (float)target.Position.x,
+                (float)target.Position.y,
+                (float)target.Position.z);
+
+            // Off-mesh ends or starts stay movable so holes and future off-mesh links are not a wall.
+            bool reachable = !finder.TrySnap(start, out _)
+                || finder.TryFindPath(start, end, _reachPathScratch)
+                || !finder.TrySnap(end, out _);
+            _reachCacheId = target.Identity;
+            _reachCachePos = new Vector3(target.Position.x, target.Position.y, target.Position.z);
+            _reachCacheUtc = now;
+            _reachCacheResult = reachable;
+            return reachable;
+        }
 
         public bool IsInAttackRange(Character target)
         {
@@ -175,18 +223,15 @@ namespace ZoneEngine_New.Core.Ai
                     return;
             }
 
-            // Retarget in place while chasing so SetPath does not ClearPath every repath.
             if (!Npc.Motor.TryRetargetFinalWaypoint(destination, 0.25f))
-            {
-                _pathScratch.Clear();
+                Npc.Motor.NavigateTo(destination);
+
+            _pathScratch.Clear();
+            var remaining = Npc.Motor.CopyRemainingWaypoints();
+            for (int i = 0; i < remaining.Length; i++)
+                _pathScratch.Add(new Vector3(remaining[i].X, remaining[i].Y, remaining[i].Z));
+            if (_pathScratch.Count == 0)
                 _pathScratch.Add(new Vector3(destination.x, destination.y, destination.z));
-                Npc.Motor.SetPath(_pathScratch);
-            }
-            else
-            {
-                _pathScratch.Clear();
-                _pathScratch.Add(new Vector3(destination.x, destination.y, destination.z));
-            }
 
             NpcFollowTarget.AnnounceCoordinatePath(Npc, Npc.Position, _pathScratch);
             _followAnnounced = true;
@@ -214,6 +259,8 @@ namespace ZoneEngine_New.Core.Ai
         {
             TickStallWatch.Stage("brain.reset", Npc.Identity.Instance);
             _leashing = false;
+            _reachCacheId = Identity.None;
+            _reachCacheResult = false;
             ClearHate();
             StopPathing();
             Npc.OnReset();
@@ -252,10 +299,12 @@ namespace ZoneEngine_New.Core.Ai
             return null;
         }
 
-        bool IsValidNearby(Identity identity)
+        bool IsEngageable(Identity identity)
         {
             Character? target = Resolve(identity);
-            return target != null && NpcAiRules.IsNearby(Npc.Position, target.Position, NpcAiRules.NearbyRange);
+            return target != null
+                && NpcAiRules.IsNearby(Npc.Position, target.Position, NpcAiRules.NearbyRange)
+                && HasChance(target);
         }
     }
 }

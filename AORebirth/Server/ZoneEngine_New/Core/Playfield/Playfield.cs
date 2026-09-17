@@ -4,9 +4,12 @@ namespace ZoneEngine_New.Core.Playfield
     using System.Collections.Concurrent;
     using System.Diagnostics;
     using System.Globalization;
+    using System.IO;
     using System.Threading;
 
     using AORebirth.Core.GameData;
+    using AORebirth.World.Collision;
+    using AORebirth.World.Pathfinding;
 
     using Microsoft.Extensions.DependencyInjection;
 
@@ -110,6 +113,7 @@ namespace ZoneEngine_New.Core.Playfield
             _metrics = metricsRegistry.GetOrCreate(playfieldIdentity.Instance);
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
             Geometry = _gameData.GetPlayfieldGeometry(playfieldIdentity.Instance);
+            Pathfinder = TryLoadPathfinder(_gameData.RootPath, playfieldIdentity.Instance, _logger);
 
             _serviceProvider = BuildServices().BuildServiceProvider();
             _dynelRegistry = _serviceProvider.GetRequiredService<DynelRegistry>();
@@ -178,6 +182,27 @@ namespace ZoneEngine_New.Core.Playfield
         /// <summary>Parsed Walls.dat / Dynels.dat / Doors.dat / Collision.dat; members null when files are missing.</summary>
         public PlayfieldGeometryData Geometry { get; }
 
+        /// <summary>Null when the playfield is a style template or GameData has no usable Navmesh.dat.</summary>
+        public NavMeshPathfinder? Pathfinder { get; private set; }
+
+        /// <summary>
+        /// Places an NPC onto the navmesh at spawn. Returns a copy of <paramref name="position"/>
+        /// when no mesh is loaded or no poly is in range. Does not clamp later movement so off-mesh
+        /// links can carry the NPC off the surface.
+        /// </summary>
+        public AORebirth.Core.Vector.Vector3 SnapNpcSpawn(AORebirth.Core.Vector.Vector3 position)
+        {
+            ArgumentNullException.ThrowIfNull(position);
+            if (Pathfinder != null
+                && Pathfinder.TrySnap(
+                    new System.Numerics.Vector3((float)position.x, (float)position.y, (float)position.z),
+                    NavMeshPathfinder.SpawnSnapExtent,
+                    out System.Numerics.Vector3 snapped))
+                return new AORebirth.Core.Vector.Vector3(snapped.X, snapped.Y, snapped.Z);
+
+            return new AORebirth.Core.Vector.Vector3(position.x, position.y, position.z);
+        }
+
         /// <summary>Zoning needs the destination playfield's geometry, not just this one's.</summary>
         protected IGameData GameData => _gameData;
 
@@ -221,8 +246,7 @@ namespace ZoneEngine_New.Core.Playfield
                     Type = IdentityType.Playfield2,
                     Instance = Identity.Instance
                 },
-                // PlayfieldVendorInfo — vendors not wired yet.
-                // GeneratorPayload — ACG generator layouts not wired yet.
+                // GeneratorPayload — ACG generator layouts not wired yet (Identity 0:0 written).
                 PlayfieldX = playfieldX,
                 PlayfieldZ = playfieldZ
             };
@@ -422,6 +446,8 @@ namespace ZoneEngine_New.Core.Playfield
             }
 
             OnDispose();
+            Pathfinder?.Dispose();
+            Pathfinder = null;
             _serviceProvider.Dispose();
         }
 
@@ -504,6 +530,34 @@ namespace ZoneEngine_New.Core.Playfield
             return elapsed * 1000.0 / Stopwatch.Frequency;
         }
 
+        static NavMeshPathfinder? TryLoadPathfinder(string gameDataRoot, int playfieldId, IZoneLogger logger)
+        {
+            if (NavMeshPathfinder.TryLoad(gameDataRoot, playfieldId, out NavMeshPathfinder? pathfinder)
+                && pathfinder != null)
+            {
+                logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Playfield navmesh loaded id={0}",
+                        playfieldId));
+                return pathfinder;
+            }
+
+            string reason = "invalid";
+            if (DungeonPlayfieldKinds.IsStyleTemplate(gameDataRoot, playfieldId))
+                reason = "template";
+            else if (!File.Exists(Path.Combine(gameDataRoot, GameDataPaths.PlayfieldNavMeshRelativePath(playfieldId))))
+                reason = "missing";
+
+            logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield navmesh skipped id={0} reason={1}",
+                    playfieldId,
+                    reason));
+            return null;
+        }
+
         private IServiceCollection BuildServices()
         {
             IServiceCollection services = new ServiceCollection();
@@ -545,7 +599,18 @@ namespace ZoneEngine_New.Core.Playfield
 
             services.AddSingleton<IUploadedNanoRepository, MySqlUploadedNanoRepository>();
             services.AddSingleton<DynelRegistry>();
-            services.AddSingleton<PlayfieldLocality>(_ => new PlayfieldLocality(Identity.Instance, MetaData));
+            services.AddSingleton<PlayfieldLocality>(_ =>
+            {
+                var locality = new PlayfieldLocality(Identity.Instance, MetaData);
+                DungeonWorldLayout? layout = DungeonPlayfieldBinder.TryBuild(
+                    _gameData.RootPath,
+                    Identity.Instance,
+                    generator: null,
+                    _logger);
+                if (layout != null)
+                    locality.ApplyDungeonRooms(layout.Rooms);
+                return locality;
+            });
             services.AddSingleton<SpawnService>();
             services.AddSingleton<NpcContentActivationService>();
             services.AddSingleton<ZoneEngine_New.Core.Missions.QuestPropService>();

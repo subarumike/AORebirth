@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "cellSize": 0.08,
+  "cellHeight": 0.15,
+  "agentRadius": 0.8,
+  "agentHeight": 1.7,
+  "agentMaxClimb": 0.3,
+  "agentMaxSlope": 60,
+  "tileSizeVoxels": 48,
+  "regionMinSize": 8,
+  "regionMergeSize": 20,
+  "edgeMaxLen": 12,
+  "edgeMaxError": 1.3,
+  "vertsPerPoly": 6,
+  "detailSampleDist": 6,
+  "detailSampleMaxError": 1
+}

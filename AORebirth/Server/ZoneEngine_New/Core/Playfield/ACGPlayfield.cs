@@ -14,6 +14,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
@@ -71,9 +72,17 @@ namespace ZoneEngine_New.Core.Playfield
             try
             {
                 MarkBuilt();
+                AORebirth.World.Collision.DungeonWorldLayout? dungeon = DungeonPlayfieldBinder.TryBuild(
+                    GameData.RootPath,
+                    Identity.Instance,
+                    generator: null,
+                    Logger);
+                if (dungeon != null)
+                    GetRequiredService<PlayfieldLocality>().ApplyDungeonRooms(dungeon.Rooms);
+
                 _world = WorldSimulation.PlayfieldWorldSimulation.Create(
                     Identity.Instance,
-                    Geometry,
+                    DungeonPlayfieldBinder.WithDungeonCollision(Identity.Instance, Geometry, dungeon),
                     MetaData,
                     DestinationsCatalog.Instance,
                     GameData,

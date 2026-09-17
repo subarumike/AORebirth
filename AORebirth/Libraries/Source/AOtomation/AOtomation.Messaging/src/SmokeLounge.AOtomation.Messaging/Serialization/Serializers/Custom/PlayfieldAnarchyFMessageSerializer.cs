@@ -8,6 +8,11 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    /// <summary>
+    /// Serializes <see cref="PlayfieldAnarchyFMessage"/> per client
+    /// <c>n3PlayfieldFullUpdateIIR_t::ReadSubClass</c> /
+    /// <c>PlayfieldAnarchyFIIR_t</c> extension (PF world X/Z).
+    /// </summary>
     public class PlayfieldAnarchyFMessageSerializer : ISerializer
     {
         public Type Type
@@ -32,34 +37,50 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                                               X = streamReader.ReadSingle(),
                                               Y = streamReader.ReadSingle(),
                                               Z = streamReader.ReadSingle()
-                                          },
-                                  Unknown2 = streamReader.ReadByte(),
-                                  PlayfieldId1 = streamReader.ReadIdentity(),
-                                  Unknown3 = streamReader.ReadInt32(),
-                                  Unknown4 = streamReader.ReadInt32(),
-                                  PlayfieldId2 = streamReader.ReadIdentity()
+                                          }
                               };
 
-            int remaining = (int)(streamReader.Length - streamReader.Position);
-            if (remaining <= 0)
+            if (message.Version > 1)
             {
-                return message;
+                message.PlayfieldProxyVersion = streamReader.ReadByte();
+                message.PlayfieldId1 = streamReader.ReadIdentity();
+                message.Unknown3 = streamReader.ReadInt32();
+                message.Unknown4 = streamReader.ReadInt32();
+                message.PlayfieldId2 = streamReader.ReadIdentity();
             }
 
-            if (LooksLikeGeneratorPayload(streamReader, remaining))
+            // version > 3: generator DbObject or Identity 0:0, then always PF world X/Z.
+            if (message.Version > 3)
             {
-                message.GeneratorPayload = streamReader.ReadBytes(remaining);
-                return message;
+                int remaining = (int)(streamReader.Length - streamReader.Position);
+                if (remaining >= 16)
+                {
+                    long generatorStart = streamReader.Position;
+                    int generatorType = streamReader.ReadInt32();
+                    int generatorInstance = streamReader.ReadInt32();
+                    if (generatorType != 0 || generatorInstance != 0)
+                    {
+                        int payloadLength = remaining - 8;
+                        streamReader.Position = generatorStart;
+                        message.GeneratorPayload = streamReader.ReadBytes(payloadLength);
+                        AcgBuildingGeneratorData acg;
+                        if (AcgBuildingGeneratorData.TryParse(message.GeneratorPayload, out acg))
+                            message.AcgBuildingGenerator = acg;
+                    }
+                }
+                else if (remaining >= 8)
+                {
+                    // Truncated live shapes still carry world X/Z without a generator slot.
+                }
             }
 
-            message.Unknown5 = streamReader.ReadInt32();
-            message.Unknown6 = streamReader.ReadInt32();
-            message.PlayfieldVendorInfo = (PlayfieldVendorInfo)new PlayfieldVendorInfoSerializer().Deserialize(
-                streamReader,
-                serializationContext,
-                propertyMetaData);
-            message.PlayfieldX = streamReader.ReadInt32();
-            message.PlayfieldZ = streamReader.ReadInt32();
+            int worldRemaining = (int)(streamReader.Length - streamReader.Position);
+            if (worldRemaining >= 8)
+            {
+                message.PlayfieldX = streamReader.ReadInt32();
+                message.PlayfieldZ = streamReader.ReadInt32();
+            }
+
             return message;
         }
 
@@ -91,7 +112,8 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
         {
             var message = (PlayfieldAnarchyFMessage)value;
             if (RequiresGeneratorPayload(message.PlayfieldId1.Type)
-                && (message.GeneratorPayload == null || message.GeneratorPayload.Length == 0))
+                && (message.GeneratorPayload == null || message.GeneratorPayload.Length == 0)
+                && message.AcgBuildingGenerator == null)
             {
                 throw new InvalidOperationException(
                     "Generated playfield identity requires an exact generator payload.");
@@ -104,25 +126,29 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             streamWriter.WriteSingle(message.CharacterCoordinates.X);
             streamWriter.WriteSingle(message.CharacterCoordinates.Y);
             streamWriter.WriteSingle(message.CharacterCoordinates.Z);
-            streamWriter.WriteByte(message.Unknown2);
-            streamWriter.WriteIdentity(message.PlayfieldId1);
-            streamWriter.WriteInt32(message.Unknown3);
-            streamWriter.WriteInt32(message.Unknown4);
-            streamWriter.WriteIdentity(message.PlayfieldId2);
 
-            if (message.GeneratorPayload != null)
+            if (message.Version > 1)
             {
-                streamWriter.WriteBytes(message.GeneratorPayload);
-                return;
+                streamWriter.WriteByte(message.PlayfieldProxyVersion);
+                streamWriter.WriteIdentity(message.PlayfieldId1);
+                streamWriter.WriteInt32(message.Unknown3);
+                streamWriter.WriteInt32(message.Unknown4);
+                streamWriter.WriteIdentity(message.PlayfieldId2);
             }
 
-            streamWriter.WriteInt32(message.Unknown5);
-            streamWriter.WriteInt32(message.Unknown6);
-            new PlayfieldVendorInfoSerializer().Serialize(
-                streamWriter,
-                serializationContext,
-                message.PlayfieldVendorInfo,
-                propertyMetaData);
+            if (message.Version > 3)
+            {
+                if (message.GeneratorPayload != null && message.GeneratorPayload.Length > 0)
+                    streamWriter.WriteBytes(message.GeneratorPayload);
+                else if (message.AcgBuildingGenerator != null)
+                    streamWriter.WriteBytes(message.AcgBuildingGenerator.ToByteArray());
+                else
+                {
+                    streamWriter.WriteInt32(0);
+                    streamWriter.WriteInt32(0);
+                }
+            }
+
             streamWriter.WriteInt32(message.PlayfieldX);
             streamWriter.WriteInt32(message.PlayfieldZ);
         }
@@ -147,29 +173,12 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                     });
         }
 
-        private static bool LooksLikeGeneratorPayload(StreamReader streamReader, int remaining)
-        {
-            if (remaining <= 16)
-            {
-                return false;
-            }
-
-            long position = streamReader.Position;
-            int firstWord = streamReader.ReadInt32();
-            streamReader.Position = position;
-            return firstWord == (int)IdentityType.Door ||
-                   firstWord == (int)IdentityType.Terminal ||
-                   firstWord == (int)IdentityType.VendingMachine ||
-                   firstWord == unchecked((int)0x0000C77D) ||
-                   firstWord == unchecked((int)0x0000C79F) ||
-                   // Capture 20260823-171238 Nascence ACGEntrance (0xC7A1) dungeon generator stamp.
-                   firstWord == unchecked((int)0x0000C7A1);
-        }
-
         private static bool RequiresGeneratorPayload(IdentityType type)
         {
-            int value = (int)type;
-            return value == 0x0000C79E || value == 0x0000C79F || value == 0x0000C7A1;
+            // PlayfieldDoor (0xC79E), ACG building (0xC79F), ACGEntrance (0xC7A1).
+            return type == IdentityType.PlayfieldDoor
+                   || type == IdentityType.AcgBuildingGenerator
+                   || type == IdentityType.AcgEntrance;
         }
     }
 }

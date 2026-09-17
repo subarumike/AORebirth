@@ -15,6 +15,7 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestPlayfieldMetaDataContract();
             TestDistrictAndSpawnContracts();
             TestPlayfieldDatFileNames();
+            TestWaterDatFraming();
             TestItemsDatFileName();
             TestItemsDatDynelTypeRoundTrip();
             TestHitFunctionArgOrdering();
@@ -157,14 +158,43 @@ namespace AORebirth.Tools.RDBDataExtractor
             {
                 throw new InvalidOperationException("Embedded metadata must not yield an outdoor grid.");
             }
+
+            // Indoor / shared tilemaps live under the playfield folder id while metadata
+            // records the distinct RDB tilemap resource (e.g. Playfields/324 → tilemap 310).
+            const int playfieldFolderId = 324;
+            PlayfieldMetaData colocated = new PlayfieldMetaData
+            {
+                SchemaVersion = PlayfieldMetaData.SupportedSchemaVersion,
+                RecordType = 1000009,
+                TilemapResource = 310,
+                Width = 50,
+                Height = 50,
+                TileSize = 2f,
+                HeightScale = 0.2f,
+                TilemapFormat = PlayfieldMetaData.EmbeddedGroundFormat,
+                HeightFormat = "embeddedPng8",
+            };
+
+            if (!colocated.IsValid(out error))
+            {
+                throw new InvalidOperationException(
+                    "Co-located tilemap metadata was rejected: " + error);
+            }
+
+            if (colocated.TilemapResource == playfieldFolderId)
+            {
+                throw new InvalidOperationException(
+                    "Co-located metadata must allow tilemapResource to differ from playfield folder id.");
+            }
         }
 
         private static void TestDistrictAndSpawnContracts()
         {
             if (GameDataPaths.DistrictsFileName != "Districts.json"
+                || GameDataPaths.RoomsFileName != "Rooms.json"
                 || GameDataPaths.SpawnsFileName != "Spawns.json")
             {
-                throw new InvalidOperationException("District/spawn file names were unexpected.");
+                throw new InvalidOperationException("District/room/spawn file names were unexpected.");
             }
 
             PlayfieldDistrictsData districts = new PlayfieldDistrictsData
@@ -217,6 +247,61 @@ namespace AORebirth.Tools.RDBDataExtractor
             {
                 throw new InvalidOperationException("Spawns contract smoke check failed.");
             }
+
+            PlayfieldRoomsData rooms = new PlayfieldRoomsData
+            {
+                SchemaVersion = PlayfieldRoomsData.SupportedSchemaVersion,
+                RecordType = 1000001,
+                RecordId = 127,
+                Rooms = new[]
+                {
+                    new PlayfieldRoomEntry
+                    {
+                        Index = 0,
+                        Flags = 128,
+                        Name = "Ladies' Room",
+                        TileX1 = 145,
+                        TileY1 = 117,
+                        TileX2 = 154,
+                        TileY2 = 122,
+                        Center = new float[] { 4.5f, 0f, 2.5f },
+                        Template = new float[] { 184f, 107.6f, 224f },
+                        DoorConnections = new PlayfieldRoomDoorLink[0],
+                        Lightmap = new byte[0],
+                        CameraAttractors = new PlayfieldRoomAttractor[0],
+                    },
+                },
+            };
+
+            if (rooms.Rooms.Length != 1
+                || rooms.Rooms[0].TileX2 != 154
+                || rooms.Rooms[0].Name != "Ladies' Room")
+            {
+                throw new InvalidOperationException("Rooms contract smoke check failed.");
+            }
+        }
+
+        private static void TestWaterDatFraming()
+        {
+            List<PlayfieldWaterEntry> entries = new List<PlayfieldWaterEntry>
+            {
+                new PlayfieldWaterEntry(-1, 0, new float[] { 1f, 2f, 3f }, new short[] { 0 }),
+                new PlayfieldWaterEntry(42, 1, new float[] { 4f, 5f, 6f, 7f, 8f, 9f }, new short[] { 0, 1, 2 }),
+            };
+
+            int playfieldId;
+            List<PlayfieldWaterEntry> parsed = PlayfieldWaterDat.Parse(
+                PlayfieldWaterDat.Build(127, entries),
+                out playfieldId);
+            if (playfieldId != 127
+                || parsed.Count != 2
+                || parsed[0].RoomIndex != -1
+                || parsed[1].RoomIndex != 42
+                || parsed[1].Vertices.Length != 6
+                || parsed[1].Triangles[2] != 2)
+            {
+                throw new InvalidOperationException("Water.dat round trip failed.");
+            }
         }
 
         private static void TestPlayfieldDatFileNames()
@@ -225,7 +310,8 @@ namespace AORebirth.Tools.RDBDataExtractor
                 || GameDataPaths.DynelsFileName != "Dynels.dat"
                 || GameDataPaths.DoorsFileName != "Doors.dat"
                 || GameDataPaths.CollisionFileName != "Collision.dat"
-                || GameDataPaths.DestinationsFileName != "Destinations.dat")
+                || GameDataPaths.DestinationsFileName != "Destinations.dat"
+                || GameDataPaths.WaterFileName != "Water.dat")
             {
                 throw new InvalidOperationException(
                     "Playfield dat file names were unexpected.");

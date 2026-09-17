@@ -19,6 +19,8 @@ namespace AORebirth.Core.GameData
 
         public const string DistrictsFileName = "Districts.json";
 
+        public const string RoomsFileName = "Rooms.json";
+
         public const string SpawnsFileName = "Spawns.json";
 
         public const string NpcTemplatesFileName = "NpcTemplates.json";
@@ -55,6 +57,10 @@ namespace AORebirth.Core.GameData
         public const string SurfacesFileName = "Surfaces.dat";
 
         public const string DestinationsFileName = "Destinations.dat";
+
+        public const string WaterFileName = "Water.dat";
+
+        public const string NavMeshFileName = "Navmesh.dat";
 
         /// <summary>
         /// Outdoor SurfaceResource RDB instance id for a locality cell:
@@ -98,6 +104,11 @@ namespace AORebirth.Core.GameData
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DistrictsFileName);
         }
 
+        public static string PlayfieldRoomsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), RoomsFileName);
+        }
+
         public static string PlayfieldSpawnsRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), SpawnsFileName);
@@ -131,6 +142,16 @@ namespace AORebirth.Core.GameData
         public static string PlayfieldSurfacesRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), SurfacesFileName);
+        }
+
+        public static string PlayfieldWaterRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), WaterFileName);
+        }
+
+        public static string PlayfieldNavMeshRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), NavMeshFileName);
         }
     }
 }

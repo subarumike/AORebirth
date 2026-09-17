@@ -211,23 +211,28 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void PlayfieldAnarchyFMessageWithVendorTest()
+        public void PlayfieldAnarchyFMessageWithGeneratorPayloadTest()
         {
             var expected = new PlayfieldAnarchyFMessage
                                {
-                                   Identity = Identity.None, 
-                                   CharacterCoordinates = new Vector3(), 
-                                   PlayfieldId1 = Identity.None, 
-                                   PlayfieldId2 = Identity.None, 
-                                   PlayfieldVendorInfo = new PlayfieldVendorInfo(), 
-                                   PlayfieldX = 1, 
-                                   PlayfieldZ = 2
+                                   Identity = Identity.None,
+                                   CharacterCoordinates = new Vector3(),
+                                   PlayfieldId1 = Identity.None,
+                                   PlayfieldId2 = Identity.None,
+                                   GeneratorPayload =
+                                       new byte[]
+                                           {
+                                               0x00, 0x00, 0xC7, 0xA1, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01
+                                           },
+                                   PlayfieldX = -1,
+                                   PlayfieldZ = -1
                                };
 
             var actual = (PlayfieldAnarchyFMessage)this.SerializeDeserialize(expected);
 
             Assert.AreEqual(expected.PlayfieldX, actual.PlayfieldX);
             Assert.AreEqual(expected.PlayfieldZ, actual.PlayfieldZ);
+            CollectionAssert.AreEqual(expected.GeneratorPayload, actual.GeneratorPayload);
         }
 
         [TestMethod]

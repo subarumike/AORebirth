@@ -74,6 +74,12 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         /// <summary>Playfield door / proxy destination identity (TeleportProxy dest type).</summary>
         PlayfieldDoor = 0x0000C79E,
 
+        /// <summary>ACG building generator DbObject (mission interiors).</summary>
+        AcgBuildingGenerator = 0x0000C79F,
+
+        /// <summary>ACGEntrance generator DbObject (Nascence doors / outdoor stamps).</summary>
+        AcgEntrance = 0x0000C7A1,
+
         NanoProgram = 0x0000CF1B, 
 
         GfxEffect = 0x0000CF26,

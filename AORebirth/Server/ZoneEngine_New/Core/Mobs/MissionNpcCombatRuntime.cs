@@ -71,7 +71,7 @@ internal sealed class MissionNpcCombatRuntime
         if (_untilHit > 0) return;
         if (actor.Distance3D(target) > _contract.CapturedAttackRange!.Value)
         {
-            actor.Motor.SetPath([target.Position]);
+            actor.Motor.NavigateTo(target.Position);
             _untilHit = 1.0; // Existing NpcCombatAttackRules.OutOfRangeRetrySeconds.
             return;
         }

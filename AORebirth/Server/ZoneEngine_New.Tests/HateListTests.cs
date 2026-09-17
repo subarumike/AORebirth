@@ -76,6 +76,23 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void ShouldNotLeashOnHomeRangeWhenHomeIsMissing()
+        {
+            var hate = new HateList();
+            Vector3 far = new(NpcAiRules.MaxLeashRange + 1f, 0, 0);
+            Assert.IsFalse(NpcAiRules.ShouldLeash(hate, null, far, _ => false));
+        }
+
+        [TestMethod]
+        public void ShouldLeashWhenHateExistsButNobodyIsEngageable()
+        {
+            var hate = new HateList();
+            hate.Add(PlayerA, 1f);
+            Assert.IsTrue(NpcAiRules.ShouldLeash(hate, Origin, Origin, _ => false));
+            Assert.IsFalse(NpcAiRules.ShouldLeash(hate, Origin, Origin, _ => true));
+        }
+
+        [TestMethod]
         public void ProximityHostileOnlyWhenBreedHostilityIsPositive()
         {
             Assert.IsFalse(NpcAiRules.IsProximityHostile(0));

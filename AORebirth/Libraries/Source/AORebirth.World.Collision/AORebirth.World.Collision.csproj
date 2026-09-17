@@ -11,11 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AODB" Version="1.0.7" />
+    <PackageReference Include="AODB" Version="1.0.8" />
+    <PackageReference Include="StbImageSharp" Version="2.30.15" />
   </ItemGroup>
 
   <!-- Framing / paths / metadata stay in AORebirth.Core (single type identity with ZoneEngine). -->
   <ItemGroup>
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
   </ItemGroup>
 </Project>

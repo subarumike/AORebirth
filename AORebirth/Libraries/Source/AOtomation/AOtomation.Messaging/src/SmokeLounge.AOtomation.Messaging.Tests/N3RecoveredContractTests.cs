@@ -482,13 +482,11 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         Unknown = 0,
                         Version = 4,
                         CharacterCoordinates = new Vector3 { X = 940.0f, Y = 20.0f, Z = 732.0f },
-                        Unknown2 = 0x61,
+                        PlayfieldProxyVersion = 0x61,
                         PlayfieldId1 = new Identity { Type = IdentityType.Playfield1, Instance = 0x11E6 },
                         Unknown3 = 0,
                         Unknown4 = 0,
                         PlayfieldId2 = new Identity { Type = IdentityType.Playfield2, Instance = 0x11E6 },
-                        Unknown5 = 0,
-                        Unknown6 = 0,
                         PlayfieldX = 100000,
                         PlayfieldZ = 100000
                     },
@@ -518,7 +516,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         }
 
         [TestMethod]
-        public void OfficialLivePlayfieldAnarchyFGeneratorPayloadRoundTripsOpaque()
+        public void OfficialLivePlayfieldAnarchyFGeneratorPayloadRoundTripsWithWorldCoords()
         {
             byte[] body = HexToBytes(
                 "5F4B1A3900009C5000074B5000000000044561918542510F5B444453BA610000C79E00001999000000010000000000009C5000074B500000C77D000000010000000100000001000000050000C748000000010000000000000001107CD5190000C73D00000001000000010000000156D9B48B0000C75B00000001000000020000000812D1BF190000C73D000000010000000A0000001056D9B48C0000C748000000010000001A00000001107CD51AFFFFFFFFFFFFFFFF");
@@ -526,8 +524,61 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             PlayfieldAnarchyFMessage decoded = (PlayfieldAnarchyFMessage)Deserialize<PlayfieldAnarchyFMessage>(body);
             Assert.AreEqual((IdentityType)0x0000C79E, decoded.PlayfieldId1.Type);
             Assert.AreEqual(0x1999, decoded.PlayfieldId1.Instance);
-            Assert.AreEqual(128, decoded.GeneratorPayload.Length);
+            Assert.AreEqual(120, decoded.GeneratorPayload.Length);
+            Assert.AreEqual(-1, decoded.PlayfieldX);
+            Assert.AreEqual(-1, decoded.PlayfieldZ);
             CollectionAssert.AreEqual(body, Serialize(decoded));
+        }
+
+        [TestMethod]
+        public void CapturedStaticPlayfieldAnarchyFHasWorldCoordsAndEmptyGenerator()
+        {
+            // 2026-09-16 dungeon/static PF: Playfield1 + world X/Z, generator Identity 0:0.
+            byte[] body = HexToBytes(
+                "5F4B1A3900009C500000021C000000000443C7DF764111BA254398D6B6610000C79C0000021C000000000000000000009C500000021C000000000000000000009AC500009EDE");
+
+            PlayfieldAnarchyFMessage decoded = (PlayfieldAnarchyFMessage)Deserialize<PlayfieldAnarchyFMessage>(body);
+            Assert.AreEqual(IdentityType.Playfield1, decoded.PlayfieldId1.Type);
+            Assert.AreEqual(0x21C, decoded.PlayfieldId1.Instance);
+            Assert.IsNull(decoded.GeneratorPayload);
+            Assert.AreEqual(0x9AC5, decoded.PlayfieldX);
+            Assert.AreEqual(0x9EDE, decoded.PlayfieldZ);
+            CollectionAssert.AreEqual(body, Serialize(decoded));
+        }
+
+        [TestMethod]
+        public void CapturedAcgEntrancePlayfieldAnarchyFSplitsGeneratorAndWorldCoords()
+        {
+            // 2026-09-16 outdoor ACGEntrance: generator DbObject then PFWorld X/Z = -1.
+            byte[] body = HexToBytes(
+                "5F4B1A3900009C500020D30700000000043FE6870040A051EC41C81480610000C7A1C00A021C000000000000000000009C500020D3070000C7A1C00A021C000000010003000A00050040000001446464640000000B002300000200002F00010101001A00050101001300060303000500040302000D00030000000A00020302001500060403002500030401000600060000000A00070101FFFFFFFFFFFFFFFF");
+
+            PlayfieldAnarchyFMessage decoded = (PlayfieldAnarchyFMessage)Deserialize<PlayfieldAnarchyFMessage>(body);
+            Assert.AreEqual((IdentityType)0x0000C7A1, decoded.PlayfieldId1.Type);
+            Assert.AreEqual(unchecked((int)0xC00A021C), decoded.PlayfieldId1.Instance);
+            Assert.AreEqual(97, decoded.GeneratorPayload.Length);
+            Assert.AreEqual(-1, decoded.PlayfieldX);
+            Assert.AreEqual(-1, decoded.PlayfieldZ);
+            Assert.IsNotNull(decoded.AcgBuildingGenerator);
+            Assert.AreEqual(1, decoded.AcgBuildingGenerator.DbObjectVersion);
+            Assert.AreEqual(3, decoded.AcgBuildingGenerator.Version);
+            Assert.AreEqual(10, decoded.AcgBuildingGenerator.Width);
+            Assert.AreEqual(5, decoded.AcgBuildingGenerator.Height);
+            Assert.AreEqual(64, decoded.AcgBuildingGenerator.RoomsPerFloor);
+            Assert.AreEqual(324, decoded.AcgBuildingGenerator.Style);
+            Assert.AreEqual(100, decoded.AcgBuildingGenerator.AmbientRed);
+            Assert.AreEqual(100, decoded.AcgBuildingGenerator.AmbientGreen);
+            Assert.AreEqual(100, decoded.AcgBuildingGenerator.AmbientBlue);
+            Assert.AreEqual(11, decoded.AcgBuildingGenerator.Rooms.Length);
+            Assert.AreEqual(35, decoded.AcgBuildingGenerator.Rooms[0].RoomId);
+            Assert.AreEqual(0, decoded.AcgBuildingGenerator.Rooms[0].Floor);
+            Assert.AreEqual(0, decoded.AcgBuildingGenerator.Rooms[0].GridX);
+            Assert.AreEqual(2, decoded.AcgBuildingGenerator.Rooms[0].GridZ);
+            Assert.AreEqual(0, decoded.AcgBuildingGenerator.Rooms[0].Facing);
+            CollectionAssert.AreEqual(body, Serialize(decoded));
+            CollectionAssert.AreEqual(
+                decoded.GeneratorPayload,
+                decoded.AcgBuildingGenerator.ToByteArray());
         }
 
         [TestMethod]

@@ -68,7 +68,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
     /// chunk <c>i</c> at grid (<c>i % gridWidth</c>, <c>i / gridWidth</c>), samples <c>[x, z]</c>.
     /// </para>
     /// <para>
-    /// Bepu triangles are one-sided: upward-facing terrain winding is origin → +x → +z.
+    /// Bepu triangles are one-sided: upward-facing terrain winding is origin → +z → +x.
     /// </para>
     /// </summary>
     public static class TileCollisionBaker
@@ -168,9 +168,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
                     Vector3 v01 = new(x0, y01, z1);
                     Vector3 v11 = new(x1, y11, z1);
 
-                    // Upward-facing winding: origin → +x → +z.
-                    triangles[t++] = new Triangle(v00, v10, v01);
-                    triangles[t++] = new Triangle(v10, v11, v01);
+                    // Upward-facing winding: origin → +z → +x so (+Z)×(+X)=+Y.
+                    triangles[t++] = new Triangle(v00, v01, v10);
+                    triangles[t++] = new Triangle(v10, v01, v11);
 
                     minHeight = MathF.Min(minHeight, MathF.Min(MathF.Min(y00, y10), MathF.Min(y01, y11)));
                     maxHeight = MathF.Max(maxHeight, MathF.Max(MathF.Max(y00, y10), MathF.Max(y01, y11)));

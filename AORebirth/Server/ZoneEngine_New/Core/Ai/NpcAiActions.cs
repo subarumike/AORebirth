@@ -26,10 +26,10 @@ namespace ZoneEngine_New.Core.Ai
         {
             TickStallWatch.Stage("node.return-to-spawn", _brain.Npc.Identity.Instance);
             _brain.StopFighting();
-            if (_brain.HasArrivedHome())
+            if (!_brain.HasHome || _brain.HasArrivedHome())
                 return _nodeState = NodeState.Success;
 
-            _brain.PathTo(_brain.Home);
+            _brain.PathTo(_brain.Home!);
             return _nodeState = NodeState.Running;
         }
     }
@@ -91,6 +91,9 @@ namespace ZoneEngine_New.Core.Ai
                 _brain.StopPathing();
                 return _nodeState = NodeState.Success;
             }
+
+            if (!_brain.CanPathTo(target))
+                return _nodeState = NodeState.Failure;
 
             _brain.PathTo(target.Position);
             return _nodeState = NodeState.Running;

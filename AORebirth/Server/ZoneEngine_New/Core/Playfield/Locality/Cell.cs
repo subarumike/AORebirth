@@ -44,7 +44,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             if (!_grid.IsOutdoor)
             {
-                SendToOccupants(_occupants, message, exclude);
+                SendToOccupants(_grid.OccupantsInAllCells(), message, exclude);
                 return;
             }
 

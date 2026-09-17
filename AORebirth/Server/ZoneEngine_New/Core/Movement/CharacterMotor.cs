@@ -7,6 +7,8 @@ namespace ZoneEngine_New.Core.Movement
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using AORebirth.World.Pathfinding;
+
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Playfield;
@@ -28,6 +30,8 @@ namespace ZoneEngine_New.Core.Movement
 
         readonly Character _character;
         readonly List<Vector3> _path = new();
+        readonly List<Vector3> _navigateScratch = new();
+        readonly List<System.Numerics.Vector3> _navMeshScratch = new();
         int _pathIndex = -1;
 
         MovementFlags _flags;
@@ -148,24 +152,30 @@ namespace ZoneEngine_New.Core.Movement
         {
             ClearPath();
             StopAllFlags();
-            if (waypoints == null || waypoints.Count == 0)
-                return;
+            CopyWaypoints(waypoints);
+        }
 
-            // Copy components: callers often pass live Position references that move every tick.
-            for (int i = 0; i < waypoints.Count; i++)
-            {
-                Vector3 point = waypoints[i];
-                _path.Add(new Vector3(point.x, point.y, point.z));
-            }
-
-            _pathIndex = 0;
+        /// <summary>
+        /// Plans a corridor through the playfield navmesh when one is loaded; otherwise a single waypoint.
+        /// Replaces an active path without halting residual velocity.
+        /// </summary>
+        public void NavigateTo(Vector3 destination)
+        {
+            PlanIntoScratch(destination);
+            if (HasPath)
+                ReplacePath(_navigateScratch);
+            else
+                SetPath(_navigateScratch);
         }
 
         /// <summary>
         /// Updates the final path point without clearing velocity. False when there is no active path.
+        /// When a navmesh is loaded, returns false so the caller repaths through <see cref="NavigateTo"/>.
         /// </summary>
         public bool TryRetargetFinalWaypoint(Vector3 destination, float minDeltaMeters)
         {
+            if (_character.Playfield?.Pathfinder != null)
+                return false;
             if (!HasPath || _path.Count == 0)
                 return false;
 
@@ -203,6 +213,55 @@ namespace ZoneEngine_New.Core.Movement
             _pathIndex = -1;
             if (had)
                 PathCompleted?.Invoke();
+        }
+
+        void CopyWaypoints(IReadOnlyList<Vector3> waypoints)
+        {
+            if (waypoints == null || waypoints.Count == 0)
+                return;
+
+            // Copy components: callers often pass live Position references that move every tick.
+            for (int i = 0; i < waypoints.Count; i++)
+            {
+                Vector3 point = waypoints[i];
+                _path.Add(new Vector3(point.x, point.y, point.z));
+            }
+
+            _pathIndex = 0;
+        }
+
+        void ReplacePath(IReadOnlyList<Vector3> waypoints)
+        {
+            _path.Clear();
+            _pathIndex = -1;
+            CopyWaypoints(waypoints);
+        }
+
+        void PlanIntoScratch(Vector3 destination)
+        {
+            _navigateScratch.Clear();
+            NavMeshPathfinder? finder = _character.Playfield?.Pathfinder;
+            if (finder != null)
+            {
+                _navMeshScratch.Clear();
+                Vector3 start = _character.Position;
+                if (finder.TryFindPath(
+                    new System.Numerics.Vector3((float)start.x, (float)start.y, (float)start.z),
+                    new System.Numerics.Vector3((float)destination.x, (float)destination.y, (float)destination.z),
+                    _navMeshScratch)
+                    && _navMeshScratch.Count > 0)
+                {
+                    for (int i = 0; i < _navMeshScratch.Count; i++)
+                    {
+                        System.Numerics.Vector3 point = _navMeshScratch[i];
+                        _navigateScratch.Add(new Vector3(point.X, point.Y, point.Z));
+                    }
+
+                    return;
+                }
+            }
+
+            _navigateScratch.Add(new Vector3(destination.x, destination.y, destination.z));
         }
 
         public void Halt()

@@ -29,20 +29,81 @@ namespace ZoneEngine_New.Core.Commands
         /// <summary>Look-at player if selected, otherwise the command issuer.</summary>
         public Player ResolveSubject()
         {
+            if (TryResolveSubject(out Player subject, requirePlayerTarget: false))
+                return subject;
+            return Player;
+        }
+
+        /// <summary>
+        /// Resolves the look-at player when one is selected.
+        /// When <paramref name="requirePlayerTarget"/> is true and a look-at target is set but is
+        /// not a player, sends feedback and returns false (does not fall back to self).
+        /// </summary>
+        public bool TryResolveSubject(out Player subject, bool requirePlayerTarget = true)
+        {
+            subject = Player;
             Identity target = Player.Target;
-            if (target == Identity.None || target.Instance == 0)
-                return Player;
+            if (target == Identity.None || target.Instance == 0 || target == Player.Identity)
+                return true;
 
             Playfield? playfield = Player.Playfield;
             if (playfield == null)
-                return Player;
+            {
+                if (requirePlayerTarget)
+                    GmCommandFeedback.Send(Session, Player, "Not on a playfield.");
+                return !requirePlayerTarget;
+            }
 
-            if (playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel)
-                && dynel is Player subject)
-                return subject;
+            if (TryFindTargetPlayer(playfield, target, out subject))
+                return true;
 
-            return Player;
+            subject = Player;
+            if (!requirePlayerTarget)
+                return true;
+
+            DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
+            Identity canonical = CanbeAffected(target.Instance);
+            if (registry.TryGet(target, out _) || registry.TryGet(canonical, out _))
+            {
+                GmCommandFeedback.Send(Session, Player, "Target is not a player.");
+                return false;
+            }
+
+            GmCommandFeedback.Send(Session, Player, "Unknown target.");
+            return false;
         }
+
+        static bool TryFindTargetPlayer(Playfield playfield, Identity target, out Player subject)
+        {
+            DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
+            if (registry.TryGet(target, out Dynel? dynel) && dynel is Player direct)
+            {
+                subject = direct;
+                return true;
+            }
+
+            // Look-at sometimes carries a mismatched Type; players are CanbeAffected.
+            Identity canonical = CanbeAffected(target.Instance);
+            if (target != canonical
+                && registry.TryGet(canonical, out dynel)
+                && dynel is Player byType)
+            {
+                subject = byType;
+                return true;
+            }
+
+            if (playfield.GetRequiredService<PlayfieldManager>().FindPlayer(target.Instance, out Player found))
+            {
+                subject = found;
+                return true;
+            }
+
+            subject = null!;
+            return false;
+        }
+
+        static Identity CanbeAffected(int instance)
+            => new Identity { Type = IdentityType.CanbeAffected, Instance = instance };
     }
 
     public interface IGmCommand

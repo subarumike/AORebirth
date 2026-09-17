@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AODB" Version="1.0.7" />
+    <PackageReference Include="AODB" Version="1.0.8" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="StbImageWriteSharp" Version="1.16.7" />
@@ -38,6 +38,10 @@
              Link="GameData\PlayfieldMetaData.cs" />
     <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\PlayfieldDistrictsData.cs"
              Link="GameData\PlayfieldDistrictsData.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\PlayfieldRoomsData.cs"
+             Link="GameData\PlayfieldRoomsData.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\PlayfieldWaterDat.cs"
+             Link="GameData\PlayfieldWaterDat.cs" />
     <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\PlayfieldSpawnsData.cs"
              Link="GameData\PlayfieldSpawnsData.cs" />
     <Compile Include="..\..\AORebirth\Server\ZoneEngine_New\Core\Inventory\Dat\DatItemTemplate.cs"

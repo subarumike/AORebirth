@@ -6,6 +6,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
     using AORebirth.Core.GameData;
     using AORebirth.Core.Vector;
+    using AORebirth.World.Collision;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
 
@@ -38,6 +39,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         internal CellGrid Grid => _grid;
 
         internal LocalityPolicy Policy => _policy;
+
+        public void ApplyDungeonRooms(IReadOnlyList<DungeonRoomBounds> rooms)
+            => _grid.ApplyDungeonRooms(rooms);
 
         /// <summary>
         /// Outdoor XZ must lie in the legacy playfield extent (<c>Width|Height * 4</c>).
@@ -180,6 +184,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             if (cellId < 0)
                 return "non-local";
+
+            if (_grid.IsDungeon)
+                return "indoor:" + cellId.ToString(CultureInfo.InvariantCulture);
 
             if (!_grid.IsOutdoor)
                 return "indoor:0";

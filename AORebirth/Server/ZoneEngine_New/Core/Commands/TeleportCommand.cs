@@ -2,10 +2,14 @@ namespace ZoneEngine_New.Core.Commands
 {
     using System;
     using System.Globalization;
+    using System.IO;
+
+    using AORebirth.Core.GameData;
 
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
@@ -18,18 +22,22 @@ namespace ZoneEngine_New.Core.Commands
     public sealed class TeleportCommand : IGmCommand
     {
         private readonly Lazy<PlayfieldManager> _playfieldManager;
+        private readonly IGameData _gameData;
 
-        public TeleportCommand(Lazy<PlayfieldManager> playfieldManager)
+        public TeleportCommand(Lazy<PlayfieldManager> playfieldManager, IGameData gameData)
         {
             ArgumentNullException.ThrowIfNull(playfieldManager);
+            ArgumentNullException.ThrowIfNull(gameData);
             _playfieldManager = playfieldManager;
+            _gameData = gameData;
         }
 
         public string Name => "tp";
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".tp <x> <z> <playfieldId> or .tp <x> <y> <z> <playfieldId>";
+        public string Usage =>
+            ".tp <x> <z> <playfieldId> or .tp <x> <y> <z> <playfieldId> (look-at player if selected)";
 
         public void Execute(GmCommandContext context)
         {
@@ -41,13 +49,32 @@ namespace ZoneEngine_New.Core.Commands
             if (context.Args.Length < 3
                 || !float.TryParse(context.Args[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float x)
                 || !float.TryParse(context.Args[zIndex], NumberStyles.Float, CultureInfo.InvariantCulture, out float z)
-                || !int.TryParse(context.Args[playfieldIndex], NumberStyles.Integer, CultureInfo.InvariantCulture, out int playfieldId))
+                || !int.TryParse(context.Args[playfieldIndex], NumberStyles.Integer, CultureInfo.InvariantCulture, out int playfieldId)
+                || playfieldId <= 0)
             {
                 GmCommandFeedback.Send(context.Session, context.Player, "Usage: " + Usage);
                 return;
             }
 
-            Player subject = context.ResolveSubject();
+            string playfieldDir = Path.Combine(
+                _gameData.RootPath,
+                GameDataPaths.PlayfieldRelativeDirectory(playfieldId));
+            if (!Directory.Exists(playfieldDir))
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Unknown playfield id: {0}",
+                        playfieldId));
+                return;
+            }
+
+            // Look-at player is the subject; do not silently teleport self when target is set.
+            if (!context.TryResolveSubject(out Player subject, requirePlayerTarget: true))
+                return;
+
             Playfield? playfield = subject.Playfield;
             if (playfield == null)
             {

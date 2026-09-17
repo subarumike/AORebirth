@@ -110,13 +110,14 @@ namespace ZoneEngine_New.Core.Playfield
             var resolvedStats = _gameData.ComposeNpcStats(template, level);
             NpcTemplateLevelPolicy.RequireExactLevel(template, level, resolvedStats);
             Identity identity = _registry.AllocateNpcIdentity();
+            Vector3 at = _playfield.SnapNpcSpawn(position);
             NpcCharacter npc = new NpcCharacter(identity, _items)
             {
                 Playfield = _playfield,
                 Name = template.Name,
                 MobTemplate = template,
                 Attackable = template.Attackable,
-                Position = position,
+                Position = at,
                 Rotation = heading ?? new Quaternion(),
                 SpawnSource = spawnSource
             };
@@ -129,7 +130,7 @@ namespace ZoneEngine_New.Core.Playfield
             npc.Rebase();
             TryAttachShop(npc);
             if (npc.Shop == null && npc.Attackable)
-                NpcBrain.Create(npc, position, NpcAiProfiles.Resolve(template.Hash));
+                NpcBrain.Create(npc, new Vector3(at.x, at.y, at.z), NpcAiProfiles.Resolve(template.Hash));
 
             _registry.Register(npc);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(npc);
@@ -729,7 +730,7 @@ namespace ZoneEngine_New.Core.Playfield
                 throw new InvalidOperationException("Player is not on this playfield.");
 
             player.SetFightingTarget(Identity.None);
-            player.Target = Identity.None;
+            player.SetTarget(Identity.None);
 
             player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             _trades.Cancel(player, "left playfield");

@@ -5,6 +5,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
     using AORebirth.Core.GameData;
     using AORebirth.Core.Vector;
+    using AORebirth.World.Collision;
 
     using ZoneEngine_New.Core.Entities;
 
@@ -19,6 +20,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly int _numZonesX;
         private readonly int _numZonesZ;
         private readonly bool _outdoor;
+        private readonly int _visibilityNeighborLevel;
+        private DungeonRoomBounds[] _rooms = [];
 
         internal CellGrid(PlayfieldMetaData? metaData, int visibilityNeighborLevel)
         {
@@ -32,6 +35,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 _cellWorldSize = cellSize;
                 _worldSizeX = worldSizeX;
                 _worldSizeZ = worldSizeZ;
+                _visibilityNeighborLevel = visibilityNeighborLevel;
                 int cellCount = _numZonesX * _numZonesZ;
                 for (int i = 0; i < cellCount; i++)
                     _cells[i] = new Cell(i, this, visibilityNeighborLevel);
@@ -44,11 +48,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 _cellWorldSize = PlayfieldMetaData.CellSize;
                 _worldSizeX = 0f;
                 _worldSizeZ = 0f;
+                _visibilityNeighborLevel = visibilityNeighborLevel;
                 _cells[0] = new Cell(0, this, visibilityNeighborLevel);
             }
         }
 
         internal bool IsOutdoor => _outdoor;
+
+        internal bool IsDungeon => _rooms.Length > 0;
 
         internal int NumZonesX => _numZonesX;
 
@@ -72,12 +79,41 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 && z < _worldSizeZ;
         }
 
+        internal void ApplyDungeonRooms(IReadOnlyList<DungeonRoomBounds> rooms)
+        {
+            ArgumentNullException.ThrowIfNull(rooms);
+            if (_outdoor || rooms.Count == 0)
+                return;
+
+            _rooms = new DungeonRoomBounds[rooms.Count];
+            _cells.Clear();
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                _rooms[i] = rooms[i];
+                int id = rooms[i].Index;
+                if (!_cells.ContainsKey(id))
+                    _cells[id] = new Cell(id, this, _visibilityNeighborLevel);
+            }
+        }
+
         /// <summary>
         /// Resolves the cell for <paramref name="position"/>. Outdoor indices are floored then
         /// clamped into the grid so a registered dynel always has a cell.
         /// </summary>
         internal Cell ResolveCell(Vector3 position)
         {
+            if (_rooms.Length > 0)
+            {
+                int roomId = DungeonRoomCellResolver.Resolve(
+                    _rooms,
+                    new System.Numerics.Vector3(position.xf, position.yf, position.zf));
+                if (_cells.TryGetValue(roomId, out Cell? dungeonCell))
+                    return dungeonCell;
+
+                foreach (KeyValuePair<int, Cell> pair in _cells)
+                    return pair.Value;
+            }
+
             if (!_outdoor)
                 return _cells[0];
 
@@ -96,6 +132,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         internal bool TryGetCellId(Vector3 position, out int cellId, bool clampToGrid)
         {
+            if (_rooms.Length > 0)
+            {
+                cellId = DungeonRoomCellResolver.Resolve(
+                    _rooms,
+                    new System.Numerics.Vector3(position.xf, position.yf, position.zf));
+                return true;
+            }
+
             if (!_outdoor)
             {
                 cellId = 0;
@@ -190,6 +234,15 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
             foreach (Dynel dynel in cell.Occupants)
                 yield return dynel;
+        }
+
+        internal IEnumerable<Dynel> OccupantsInAllCells()
+        {
+            foreach (KeyValuePair<int, Cell> pair in _cells)
+            {
+                foreach (Dynel dynel in pair.Value.Occupants)
+                    yield return dynel;
+            }
         }
     }
 }

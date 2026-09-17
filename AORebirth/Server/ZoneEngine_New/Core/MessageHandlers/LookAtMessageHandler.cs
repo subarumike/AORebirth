@@ -30,7 +30,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (player == null)
                 return;
 
-            player.Target = message.Target;
+            player.SetTarget(message.Target);
 
             // ReturnInfo=1 means InfoRequest will carry the inspect packet.
             if (message.ReturnInfo == 1 || message.Target.Instance == 0)

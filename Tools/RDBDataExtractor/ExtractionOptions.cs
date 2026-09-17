@@ -27,7 +27,9 @@ namespace AORebirth.Tools.RDBDataExtractor
             HelpText = "GameData root for MonsterData.json and items.dat. Defaults to AORebirth/GameData under the repo root.")]
         public string GameDataDirectory { get; set; }
 
-        [Option("tilemap-id", HelpText = "Export one playfield resource id (tilemap and/or district).")]
+        [Option(
+            "tilemap-id",
+            HelpText = "Export one RDBPlayfield id; co-locates its referenced tilemap under that folder.")]
         public int? TilemapId { get; set; }
 
         [Option(

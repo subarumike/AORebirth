@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AODB" Version="1.0.7" />
+    <PackageReference Include="AODB" Version="1.0.8" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="BepuPhysics" Version="2.5.0-beta.25" />
     <PackageReference Include="GroveGames.BehaviourTree" Version="1.1.1" />
@@ -39,6 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="../../Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj" />
     <ProjectReference Include="../../Libraries/Source/AORebirth.World.Collision/AORebirth.World.Collision.csproj" />
+    <ProjectReference Include="../../Libraries/Source/AORebirth.World.Pathfinding/AORebirth.World.Pathfinding.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/Utility.ZoneNew.WinNet10.csproj" />
@@ -76,6 +77,10 @@
     <ItemGroup>
     <Content Include="..\..\Config\Config.xml">
       <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Config\NavAgent.json">
+      <Link>Config\NavAgent.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="../../Datafiles/nanos.dat">

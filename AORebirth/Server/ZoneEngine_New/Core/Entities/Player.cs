@@ -69,6 +69,8 @@ namespace ZoneEngine_New.Core.Entities
             Logger = logger;
             _items = items;
             Inventory = new PlayerInventory();
+            // Requirement folds use Stats.Get; keep this at 0 so Unset never fails NotBitAnd checks.
+            Stats.Set(CharacterStat.SelectedTargetType, 0, StatDetail.Base);
         }
 
         public override bool IsPlayer => true;
@@ -89,8 +91,32 @@ namespace ZoneEngine_New.Core.Entities
         //TODO: Put perks here
 
 
+        /// <summary>
+        /// Bit on <see cref="CharacterStat.SelectedTargetType"/> when the look-at target is an
+        /// <see cref="NpcCharacter"/>. Item ToUse rows such as Health and Nano Stim require
+        /// <c>NotBitAnd</c> this flag.
+        /// </summary>
+        const int SelectedTargetTypeNpcFlag = 16;
+
         /// <summary>Current look-at / selection target from the client.</summary>
-        public Identity Target { get; set; } = Identity.None;
+        public Identity Target { get; private set; } = Identity.None;
+
+        /// <summary>
+        /// Updates look-at selection and mirrors NPC vs non-NPC onto SelectedTargetType bit 16.
+        /// </summary>
+        public void SetTarget(Identity target)
+        {
+            Target = target;
+
+            int flags = Stats.GetOrZero(CharacterStat.SelectedTargetType) & ~SelectedTargetTypeNpcFlag;
+            if (target.Instance != 0
+                && Playfield != null
+                && Playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel)
+                && dynel is NpcCharacter)
+                flags |= SelectedTargetTypeNpcFlag;
+
+            Stats.Set(CharacterStat.SelectedTargetType, flags, StatDetail.Base);
+        }
 
         internal IZoneLogger Logger { get; set; }
 

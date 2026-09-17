@@ -84,14 +84,14 @@ namespace ZoneEngine_New.Core.Ai
 
         public static bool ShouldLeash(
             HateList hate,
-            Vector3 home,
+            Vector3? home,
             Vector3 npcPosition,
-            Func<Identity, bool> isValidNearby)
+            Func<Identity, bool> isEngageable)
         {
             ArgumentNullException.ThrowIfNull(hate);
-            ArgumentNullException.ThrowIfNull(isValidNearby);
+            ArgumentNullException.ThrowIfNull(isEngageable);
 
-            if (Vector3.Abs(npcPosition - home) > MaxLeashRange)
+            if (home is not null && Vector3.Abs(npcPosition - home) > MaxLeashRange)
                 return true;
 
             // Empty list is idle/patrol, not a leash. Leash only after hate exists but nobody is nearby.
@@ -100,7 +100,7 @@ namespace ZoneEngine_New.Core.Ai
 
             foreach (HateEntry entry in hate.Entries)
             {
-                if (isValidNearby(entry.Identity))
+                if (isEngageable(entry.Identity))
                     return false;
             }
 

@@ -11,15 +11,20 @@ namespace AORebirth.World.Collision
         public CollisionTriangleMesh(
             Vector3[] vertices,
             CollisionTriangle[] triangles,
-            int? cellId = null)
+            int? cellId = null,
+            string? source = null)
         {
             Vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
             Triangles = triangles ?? throw new ArgumentNullException(nameof(triangles));
             CellId = cellId;
+            Source = source;
         }
 
         /// <summary>Null for the Collision.dat whole-playfield surface; set for Surfaces.dat cells.</summary>
         public int? CellId { get; }
+
+        /// <summary>Optional dump label (dungeon ground vs room surface).</summary>
+        public string? Source { get; }
 
         public Vector3[] Vertices { get; }
 

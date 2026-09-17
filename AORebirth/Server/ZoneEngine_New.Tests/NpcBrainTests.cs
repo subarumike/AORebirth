@@ -106,6 +106,67 @@ namespace ZoneEngine_New.Tests
             Assert.IsFalse(brain.IsBusy);
         }
 
+        [TestMethod]
+        [Timeout(5000)]
+        public void ResetWithoutHomeHealsInPlace()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(20, 0, 0);
+            npc.Stats.Set(CharacterStat.MaxHealth, 100);
+            npc.Stats.Set(CharacterStat.Health, 20);
+            NpcBrain brain = NpcBrain.Create(npc);
+
+            Assert.IsFalse(brain.HasHome);
+            Assert.IsTrue(brain.HasArrivedHome());
+            brain.AddThreat(new Identity { Type = IdentityType.CanbeAffected, Instance = 4243 }, 10f);
+            Assert.IsTrue(brain.ShouldLeash());
+
+            brain.Tick(0.1);
+
+            Assert.IsTrue(brain.Hate.IsEmpty);
+            Assert.AreEqual(100, npc.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(20, npc.Position.x);
+        }
+
+        [TestMethod]
+        [Timeout(5000)]
+        public void ResetWithHomeWalksThenHeals()
+        {
+            NpcCharacter npc = CreateNpc();
+            Vector3 home = new(0, 0, 0);
+            npc.Position = new Vector3(10, 0, 0);
+            npc.Stats.Set(CharacterStat.MaxHealth, 100);
+            npc.Stats.Set(CharacterStat.Health, 20);
+            NpcBrain brain = NpcBrain.Create(npc, home);
+
+            brain.AddThreat(new Identity { Type = IdentityType.CanbeAffected, Instance = 4244 }, 10f);
+            Assert.IsTrue(brain.ShouldLeash());
+
+            brain.Tick(0.1);
+            Assert.IsFalse(brain.Hate.IsEmpty);
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.AreEqual(20, npc.Stats.GetOrZero(CharacterStat.Health));
+
+            npc.Position = home;
+            brain.Tick(0.1);
+
+            Assert.IsTrue(brain.Hate.IsEmpty);
+            Assert.AreEqual(100, npc.Stats.GetOrZero(CharacterStat.Health));
+        }
+
+        [TestMethod]
+        public void HasChanceWithoutPathfinderStaysTrue()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            Player player = TestWorld.CreatePlayer(31);
+            player.Position = new Vector3(8, 0, 0);
+
+            Assert.IsTrue(brain.HasChance(player));
+            Assert.IsTrue(brain.CanPathTo(player));
+        }
+
         static NpcCharacter CreateNpc()
         {
             return new NpcCharacter(

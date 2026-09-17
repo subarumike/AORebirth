@@ -117,12 +117,30 @@ public sealed class GeneratedMissionWorld
         && ExpiresAtUtcTicks == binding.ExpiresAtUtcTicks && ExteriorPlayfield == binding.Offer.DestinationPlayfield
         && _exteriorX.Equals(binding.Offer.DestinationX) && _exteriorY.Equals(binding.Offer.DestinationY) && _exteriorZ.Equals(binding.Offer.DestinationZ);
 
+    internal bool TryGetGenerator(out AcgBuildingGeneratorData? generator)
+    {
+        if (AcgBuildingGeneratorData.TryParse(
+            StripEmbeddedPlayfieldWorldTrailer(_instance.Bundle.CopyGeneratorPayload()),
+            out AcgBuildingGeneratorData parsed))
+        {
+            generator = parsed;
+            return true;
+        }
+
+        generator = null;
+        return false;
+    }
+
     internal PlayfieldAnarchyFMessage CreateZoneMessage(SmokeLounge.AOtomation.Messaging.GameData.Vector3 position) => new()
     {
         Identity = new() { Type = IdentityType.Playfield2, Instance = LivePlayfield }, CharacterCoordinates = position,
         PlayfieldId1 = new() { Type = (IdentityType)BuildingType, Instance = BuildingInstance },
         PlayfieldId2 = new() { Type = IdentityType.Playfield2, Instance = LivePlayfield },
-        PlayfieldX = 0, PlayfieldZ = 0, Unknown3 = 0, Unknown4 = 0, GeneratorPayload = _instance.Bundle.CopyGeneratorPayload()
+        // Client PlayfieldAnarchyFIIR always appends PFWorld X/Z after the generator DbObject.
+        // Legacy catalog blobs embedded FFFFFFFF trailers; strip those into PlayfieldX/Z = -1.
+        Unknown3 = 0, Unknown4 = 0,
+        GeneratorPayload = StripEmbeddedPlayfieldWorldTrailer(_instance.Bundle.CopyGeneratorPayload()),
+        PlayfieldX = -1, PlayfieldZ = -1
     };
 
     internal IReadOnlyList<Dynel> CreateDynels(MissionPlayfield playfield, IItemBuilder items)
@@ -167,6 +185,27 @@ public sealed class GeneratedMissionWorld
             Playfield = playfield, Position = new Vector3(state.X, state.Y, state.Z),
             Rotation = new Quaternion(state.HeadingX, state.HeadingY, state.HeadingZ, state.HeadingW)
         };
+    }
+
+    /// <summary>
+    /// Legacy ACG catalog blobs appended PFWorld X/Z (-1,-1) to the generator DbObject.
+    /// PlayfieldAnarchyFMessageSerializer now writes those ints separately.
+    /// </summary>
+    static byte[] StripEmbeddedPlayfieldWorldTrailer(byte[] payload)
+    {
+        if (payload == null || payload.Length < 8)
+            return payload ?? Array.Empty<byte>();
+        int last = payload.Length;
+        if (payload[last - 8] == 0xFF && payload[last - 7] == 0xFF && payload[last - 6] == 0xFF
+            && payload[last - 5] == 0xFF && payload[last - 4] == 0xFF && payload[last - 3] == 0xFF
+            && payload[last - 2] == 0xFF && payload[last - 1] == 0xFF)
+        {
+            var trimmed = new byte[last - 8];
+            Buffer.BlockCopy(payload, 0, trimmed, 0, trimmed.Length);
+            return trimmed;
+        }
+
+        return payload;
     }
 
     sealed class MissionStaticDynel : Dynel, IUsableDynel

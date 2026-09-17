@@ -60,6 +60,36 @@ namespace AORebirth.Core.GameData
 
         public int[] TextureIds { get; set; }
 
+        public int PlayfieldId { get; set; }
+
+        public string PlayfieldName { get; set; }
+
+        public int PlayfieldFormatVersion { get; set; }
+
+        public int PlayfieldRecordVersion { get; set; }
+
+        public bool IsIndoor { get; set; }
+
+        public int ZoneSize { get; set; }
+
+        public int ZoneCount { get; set; }
+
+        public int UnknownV9A { get; set; }
+
+        public int UnknownV9B { get; set; }
+
+        public int PlayfieldTypeBits { get; set; }
+
+        public int UnknownV9C { get; set; }
+
+        public int UnknownV9D { get; set; }
+
+        public byte[] ReservedV9 { get; set; }
+
+        public int Unknown3 { get; set; }
+
+        public int Unknown4 { get; set; }
+
         /// <summary>
         /// Checks the invariants the zone runtime depends on. Does not require chunk grid
         /// fields: a document without a usable grid is valid and resolves to an indoor layout.

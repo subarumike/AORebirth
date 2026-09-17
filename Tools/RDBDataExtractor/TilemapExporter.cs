@@ -63,12 +63,14 @@ namespace AORebirth.Tools.RDBDataExtractor
         }
 
         /// <summary>
-        /// Writes metadata.json and tilemap PNG companions. Existing files are skipped unless
+        /// Writes metadata.json and tilemap PNG companions into the playfield folder.
+        /// Loads RDB tilemap <paramref name="tilemapId"/> (may differ from
+        /// <paramref name="playfieldFolderId"/>). Existing files are skipped unless
         /// <paramref name="overwrite"/> is true. Missing indoor sibling PNGs are still written.
         /// </summary>
-        internal ExportFileCounts Export(int tilemapId, bool overwrite)
+        internal ExportFileCounts Export(int tilemapId, int playfieldFolderId, bool overwrite)
         {
-            string folder = GetTilemapFolder(tilemapId);
+            string folder = Path.Combine(this.outputDirectory, playfieldFolderId.ToString());
             string metadataPath = Path.Combine(folder, GameDataPaths.MetadataFileName);
             string gndaPath = Path.Combine(folder, GndaImageName);
             string chgaPath = Path.Combine(folder, ChgaImageName);
@@ -364,11 +366,6 @@ namespace AORebirth.Tools.RDBDataExtractor
 
             File.WriteAllBytes(path, pngBytes);
             return 1;
-        }
-
-        private string GetTilemapFolder(int tilemapId)
-        {
-            return Path.Combine(this.outputDirectory, tilemapId.ToString());
         }
 
         private int[] ReadTextureIds(int tilemapId)

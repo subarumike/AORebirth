@@ -3,7 +3,6 @@ namespace AORebirth.Tools.RDBDataExtractor
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Text;
 
     using AODB;
@@ -114,35 +113,46 @@ namespace AORebirth.Tools.RDBDataExtractor
                     }
                     else
                     {
-                        playfieldIds = tilemaps.EnumerateTilemapIds()
-                            .Union(districts.EnumerateDistrictIds())
-                            .OrderBy(id => id);
+                        playfieldIds = playfieldDats.EnumeratePlayfieldIds();
                     }
 
                     foreach (int playfieldId in playfieldIds)
                     {
-                        bool hasTilemap = tilemaps.TryHasTilemapRecord(playfieldId);
-                        bool hasDistrict = districts.TryHasDistrictRecord(playfieldId);
-                        if (!hasTilemap && !hasDistrict)
+                        if (!playfieldDats.TryHasPlayfieldRecord(playfieldId))
                         {
                             failed++;
                             Console.Error.WriteLine(
                                 "FAIL playfield "
                                 + playfieldId
-                                + " has neither tilemap nor district records.");
+                                + " has no RDBPlayfield (1000001) record.");
                             if (resolved.TilemapId.HasValue)
-                            {
                                 return 1;
-                            }
 
                             continue;
                         }
 
-                        if (hasTilemap)
+                        int tilemapId = playfieldDats.ResolveTilemapId(playfieldId);
+                        bool hasTilemap = tilemaps.TryHasTilemapRecord(tilemapId);
+                        bool hasDistrict = districts.TryHasDistrictRecord(playfieldId);
+
+                        if (tilemapId > 0 && !hasTilemap)
+                        {
+                            failed++;
+                            Console.Error.WriteLine(
+                                "FAIL playfield "
+                                + playfieldId
+                                + " references missing tilemap "
+                                + tilemapId
+                                + ".");
+                            if (resolved.TilemapId.HasValue)
+                                return 1;
+                        }
+                        else if (hasTilemap)
                         {
                             try
                             {
                                 ExportFileCounts counts = tilemaps.Export(
+                                    tilemapId,
                                     playfieldId,
                                     resolved.Overwrite);
                                 tilemapWritten += counts.Written;
@@ -151,6 +161,8 @@ namespace AORebirth.Tools.RDBDataExtractor
                                 {
                                     Console.WriteLine(
                                         "exported tilemap "
+                                        + tilemapId
+                                        + " into playfield "
                                         + playfieldId
                                         + " written="
                                         + counts.Written
@@ -163,15 +175,15 @@ namespace AORebirth.Tools.RDBDataExtractor
                                 failed++;
                                 Console.Error.WriteLine(
                                     "FAIL tilemap "
+                                    + tilemapId
+                                    + " for playfield "
                                     + playfieldId
                                     + " "
                                     + exception.GetType().Name
                                     + ": "
                                     + exception.Message);
                                 if (resolved.TilemapId.HasValue)
-                                {
                                     return 1;
-                                }
                             }
                         }
 
@@ -206,9 +218,7 @@ namespace AORebirth.Tools.RDBDataExtractor
                                     + ": "
                                     + exception.Message);
                                 if (resolved.TilemapId.HasValue)
-                                {
                                     return 1;
-                                }
                             }
                         }
 
@@ -241,9 +251,7 @@ namespace AORebirth.Tools.RDBDataExtractor
                                 + ": "
                                 + exception.Message);
                             if (resolved.TilemapId.HasValue)
-                            {
                                 return 1;
-                            }
                         }
                     }
                 }
