@@ -171,7 +171,7 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void MissingHashRemainsUnresolvedAndAaaaCannotEnableCombat()
+        public void MissingHashFallsBackToAaaa()
         {
             NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(
                 """
@@ -189,12 +189,15 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(catalog.TryResolve("AAAA", 1, out MobTemplate aaaa));
             Assert.AreEqual("AAAA", aaaa.Hash);
             Assert.AreEqual("To Be Determined", aaaa.Name);
-            Assert.IsFalse(aaaa.Attackable);
-            Assert.IsTrue(aaaa.UnresolvedPlaceholder);
-            Assert.IsFalse(NpcTemplateValidation.CanSpawn(aaaa));
+            Assert.IsTrue(aaaa.Attackable);
+            Assert.IsFalse(aaaa.UnresolvedPlaceholder);
 
-            Assert.IsFalse(catalog.CanResolve("ZZZZ"));
-            Assert.IsFalse(catalog.TryResolve("ZZZZ", 1, out _));
+            Assert.IsTrue(catalog.CanResolve("ZZZZ"));
+            Assert.IsTrue(catalog.TryResolve("ZZZZ", 1, out MobTemplate fallback));
+            Assert.AreEqual("AAAA", fallback.Hash);
+            Assert.AreEqual("To Be Determined", fallback.Name);
+            Assert.IsTrue(fallback.Attackable);
+            Assert.IsFalse(fallback.UnresolvedPlaceholder);
 
             Assert.IsFalse(catalog.CanResolve("CYCLE"));
             Assert.IsFalse(catalog.TryResolve("CYCLE", 1, out _));
