@@ -1254,3 +1254,5 @@ INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `des
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1246, 800, 51016, 3222930208, 4530, 51016, 3221492146);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1247, 740, 51016, 3221553892, 4530, 51016, 3221557682);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1248, 540, 51016, 3224109596, 4530, 51016, 3221426610);
+-- ICC Subway entry: use the established Subway entrance/return door.
+INSERT INTO `teleports` (playfield, statelType, statelInstance, destinationPlayfield, destinationType, destinationInstance) SELECT 655, 51016, 3222930063, 127, 51016, 3221618815 WHERE NOT EXISTS (SELECT 1 FROM teleports WHERE playfield = 655 AND statelType = 51016 AND statelInstance = 3222930063);
