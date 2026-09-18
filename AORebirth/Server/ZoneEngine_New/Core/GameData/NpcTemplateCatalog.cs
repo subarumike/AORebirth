@@ -80,7 +80,10 @@ namespace ZoneEngine_New.Core.GameData
         {
             if (string.IsNullOrEmpty(hash))
                 return false;
-            return CanResolveCore(hash, new HashSet<string>(StringComparer.Ordinal));
+            if (CanResolveCore(hash, new HashSet<string>(StringComparer.Ordinal)))
+                return true;
+
+            return CanUseFallback(hash);
         }
 
         public bool TryGetLeaf(string hash, out NpcLeaf leaf)
@@ -106,7 +109,21 @@ namespace ZoneEngine_New.Core.GameData
                 return true;
             }
 
-            return false;
+            if (!CanUseFallback(hash) || !_leaves.TryGetValue(MobTemplate.FallbackHash, out NpcLeaf fallback))
+                return false;
+
+            template = Materialize(fallback, level);
+            return true;
+        }
+
+        bool CanUseFallback(string hash)
+        {
+            if (string.Equals(hash, MobTemplate.FallbackHash, StringComparison.Ordinal))
+                return false;
+            if (_leaves.ContainsKey(hash) || _families.ContainsKey(hash))
+                return false;
+
+            return _leaves.ContainsKey(MobTemplate.FallbackHash);
         }
 
         bool CanResolveCore(string hash, HashSet<string> seen)
@@ -198,7 +215,6 @@ namespace ZoneEngine_New.Core.GameData
             NpcLevelBand nearest = t <= 0.5 ? low : high;
             Dictionary<int, int> stats = InterpolateStats(low, high, t);
             stats[(int)CharacterStat.Level] = level;
-            bool placeholder = string.Equals(leaf.Hash, MobTemplate.FallbackHash, StringComparison.Ordinal);
 
             return new MobTemplate
             {
@@ -207,8 +223,7 @@ namespace ZoneEngine_New.Core.GameData
                 TemplateId = nearest.TemplateId,
                 HasHeadMesh = nearest.HasHeadMesh,
                 Stats = stats,
-                Attackable = !placeholder && nearest.Attackable,
-                UnresolvedPlaceholder = placeholder,
+                Attackable = nearest.Attackable,
                 MinLevel = min,
                 MaxLevel = max,
                 Equipment = CopyPairs(nearest.Equipment),
