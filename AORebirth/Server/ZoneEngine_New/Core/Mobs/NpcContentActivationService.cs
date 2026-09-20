@@ -3,10 +3,14 @@ namespace ZoneEngine_New.Core.Mobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AORebirth.Interfaces.Persistence.Shops;
+using SmokeLounge.AOtomation.Messaging.GameData;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Playfield.Locality;
+using ZoneEngine_New.Core.Trade;
 
 /// <summary>Capabilities belong to a complete loaded content placement, never to an actor name.</summary>
 internal sealed record NpcContentBinding(string PlacementIdentity, string SourceIdentity,
@@ -16,7 +20,8 @@ internal sealed record ShopContentBinding(string PlacementIdentity, string Sourc
 
 /// <summary>One owner per playfield. Runtime identity reuse cannot inherit a placement's capabilities.</summary>
 internal sealed class NpcContentActivationService(Playfield playfield, DynelRegistry registry,
-    PlayfieldLocality locality, IItemBuilder items, IItemTemplateCatalog catalog, ZoneEngine_New.Core.GameData.IGameData? gameData = null)
+    PlayfieldLocality locality, IItemBuilder items, IItemTemplateCatalog catalog, IGameData? gameData = null,
+    IShopDao? shopDao = null)
 {
     readonly ZoneEngine_New.Core.GameData.WorldContentCatalog _content = gameData?.WorldContent ?? ZoneEngine_New.Core.GameData.WorldContentCatalog.Load(System.IO.Path.Combine(AppContext.BaseDirectory, "GameData"));
     readonly Dictionary<NpcCharacter, NpcContentBinding> _bindings = new();
@@ -76,7 +81,143 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
                 throw;
             }
         }
+        ActivateDatabaseShops();
     }
+
+    void ActivateDatabaseShops()
+    {
+        if (shopDao == null || gameData == null) return;
+
+        int playfieldId = playfield.Identity.Instance;
+        Dictionary<int, VendingMachine[]> machinesByVendorId = registry.Dynels()
+            .OfType<VendingMachine>()
+            .Where(machine => machine.SpawnSource == SpawnSource.StaticDynel && machine.OwnerNpc == null)
+            .GroupBy(machine => DatabaseVendorId(playfieldId, machine.PlacementIdentity.Instance))
+            .ToDictionary(group => group.Key, group => group.ToArray());
+
+        foreach (ShopVendorData vendor in shopDao.ListForPlayfield(playfieldId))
+        {
+            string key = "database:" + vendor.VendorId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (!machinesByVendorId.TryGetValue(vendor.VendorId, out VendingMachine[]? candidates)
+                || candidates.Length != 1)
+            {
+                _unavailableVendorEndpoints[key] = candidates == null
+                    ? "No exact static vending-machine identity matched database vendor " + vendor.VendorId + "."
+                    : "Multiple static vending machines matched database vendor " + vendor.VendorId + ".";
+                continue;
+            }
+
+            VendingMachine machine = candidates[0];
+            if (machine.Stock.IsConfiguredSnapshot)
+            {
+                // An exact accepted content binding already owns this runtime endpoint.
+                continue;
+            }
+
+            machine.BindDatabaseDefinition(
+                vendor.VendorId,
+                vendor.VendorTemplateHash,
+                vendor.StockGroupHash,
+                vendor.PricingSkill);
+
+            if (machine.Template.Id != vendor.PlacedTemplateId)
+            {
+                string failure = "Static template " + machine.Template.Id + " does not match database template "
+                    + vendor.PlacedTemplateId + ".";
+                machine.Stock.SetConfigurationUnavailable(failure);
+                _unavailableVendorEndpoints[key] = failure;
+                continue;
+            }
+
+            if (!TryBuildDatabaseStock(vendor, gameData, catalog, out ShopStockRange[] ranges, out string failureReason))
+            {
+                machine.Stock.SetConfigurationUnavailable(failureReason);
+                _unavailableVendorEndpoints[key] = failureReason;
+                continue;
+            }
+
+            machine.Stats.Set(CharacterStat.BuyModifier, (int)(vendor.BuyModifier * 100.0f));
+            machine.Stats.Set(CharacterStat.SellModifier, (int)(vendor.SellModifier * 100.0f));
+            machine.Stock.SetConfiguredRanges(ranges, Random.Shared);
+            _standaloneShops.Add(machine, new ShopContentBinding(
+                key,
+                "database:vendor=" + vendor.VendorId + ";template=" + vendor.VendorTemplateHash
+                    + ";shopInvHash=" + vendor.StockGroupHash,
+                playfieldId));
+        }
+    }
+
+    internal static int DatabaseVendorId(int playfieldId, int vendingMachineInstance)
+        => checked((playfieldId << 16) | ((vendingMachineInstance >> 16) & 0xff));
+
+    internal static bool TryBuildDatabaseStock(
+        ShopVendorData vendor,
+        IGameData gameData,
+        IItemTemplateCatalog catalog,
+        out ShopStockRange[] ranges,
+        out string failure)
+    {
+        ArgumentNullException.ThrowIfNull(vendor);
+        ArgumentNullException.ThrowIfNull(gameData);
+        ArgumentNullException.ThrowIfNull(catalog);
+
+        var built = new List<ShopStockRange>(vendor.Stock.Count);
+        foreach (ShopStockData row in vendor.Stock)
+        {
+            if (!string.Equals(row.StockGroupHash, vendor.StockGroupHash, StringComparison.Ordinal))
+            {
+                ranges = [];
+                failure = "Stock row " + row.StockRowId + " does not retain ShopInvHash " + vendor.StockGroupHash + ".";
+                return false;
+            }
+            if (!gameData.TryGetAssignedItemHash(row.LowId, row.HighId, out string assignedHash)
+                || !gameData.TryGetHashInstance(assignedHash, out HashInstance assigned)
+                || !ExactPair(assigned, row.LowId, row.HighId))
+            {
+                ranges = [];
+                failure = "Stock row " + row.StockRowId + " has no unique exact hash assignment for "
+                    + row.LowId + "/" + row.HighId + ".";
+                return false;
+            }
+            if (!catalog.TryGet(row.LowId, out _) || !catalog.TryGet(row.HighId, out _))
+            {
+                ranges = [];
+                failure = "Stock row " + row.StockRowId + " references unavailable item templates "
+                    + row.LowId + "/" + row.HighId + ".";
+                return false;
+            }
+            if (row.EffectiveMinimumQuality <= 0 || row.EffectiveMaximumQuality < row.EffectiveMinimumQuality)
+            {
+                ranges = [];
+                failure = "Stock row " + row.StockRowId + " has an invalid effective QL range.";
+                return false;
+            }
+
+            built.Add(new ShopStockRange(
+                assignedHash,
+                row.LowId,
+                row.HighId,
+                row.EffectiveMinimumQuality,
+                row.EffectiveMaximumQuality));
+        }
+
+        if (built.Count == 0)
+        {
+            ranges = [];
+            failure = "ShopInvHash " + vendor.StockGroupHash + " has no active stock rows in the vendor QL range.";
+            return false;
+        }
+
+        ranges = built.ToArray();
+        failure = string.Empty;
+        return true;
+    }
+
+    static bool ExactPair(HashInstance instance, int lowId, int highId)
+        => instance.TemplateIds.Length == 1
+            ? instance.TemplateIds[0] == lowId && lowId == highId
+            : instance.TemplateIds.Length == 2
+                && instance.TemplateIds[0] == lowId && instance.TemplateIds[1] == highId;
 
     bool TryCreateStandaloneShop(ZoneEngine_New.Core.GameData.WorldShopDefinition definition,
         out VendingMachine shop, out string failure)

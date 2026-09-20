@@ -156,6 +156,9 @@ namespace ZoneEngine_New
             services.AddSingleton<AORebirth.Interfaces.Persistence.Characters.ICharacterDao>(_ =>
                 new AORebirth.Database.Domain.Characters.MySqlCharacterDao(() =>
                     new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
+            services.AddSingleton<AORebirth.Interfaces.Persistence.Shops.IShopDao>(_ =>
+                new AORebirth.Database.Domain.Shops.MySqlShopDao(() =>
+                    new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
             services.AddSingleton<ICharacterRepository, MySqlCharacterRepository>();
             services.AddSingleton<IStatRepository, MySqlStatRepository>();
             services.AddSingleton<MySqlInventoryRepository>();

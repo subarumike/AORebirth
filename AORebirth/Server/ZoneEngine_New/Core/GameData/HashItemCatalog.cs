@@ -18,6 +18,7 @@ namespace ZoneEngine_New.Core.GameData
 
         readonly Dictionary<string, string[]> _categories;
         readonly Dictionary<string, HashInstance> _instances;
+        readonly Dictionary<(int LowId, int HighId), string?> _assignedHashes;
         readonly Random _random;
 
         public HashItemCatalog(
@@ -29,6 +30,7 @@ namespace ZoneEngine_New.Core.GameData
             ArgumentNullException.ThrowIfNull(instances);
             _categories = categories;
             _instances = instances;
+            _assignedHashes = BuildAssignedHashes(instances);
             _random = random ?? Random.Shared;
         }
 
@@ -103,6 +105,24 @@ namespace ZoneEngine_New.Core.GameData
 
             instance = found;
             return true;
+        }
+
+        /// <summary>
+        /// Resolves only an exact correlation assignment. A one-template leaf represents LowId=HighId;
+        /// a two-template leaf represents that exact ordered pair. Category hashes and multi-band item
+        /// families are not treated as stock-row correlations.
+        /// </summary>
+        public bool TryGetAssignedHash(int lowId, int highId, out string hash)
+        {
+            if (_assignedHashes.TryGetValue((lowId, highId), out string? assigned)
+                && !string.IsNullOrEmpty(assigned))
+            {
+                hash = assigned;
+                return true;
+            }
+
+            hash = string.Empty;
+            return false;
         }
 
         public bool TryResolveInstance(string hash, out HashInstance instance)
@@ -240,6 +260,31 @@ namespace ZoneEngine_New.Core.GameData
             lowId = bands[count - 2].Id;
             highId = bands[count - 1].Id;
             return true;
+        }
+
+        static Dictionary<(int LowId, int HighId), string?> BuildAssignedHashes(
+            Dictionary<string, HashInstance> instances)
+        {
+            var result = new Dictionary<(int LowId, int HighId), string?>();
+            foreach (KeyValuePair<string, HashInstance> pair in instances)
+            {
+                int[] ids = pair.Value.TemplateIds;
+                (int LowId, int HighId) itemPair;
+                if (ids.Length == 1)
+                    itemPair = (ids[0], ids[0]);
+                else if (ids.Length == 2)
+                    itemPair = (ids[0], ids[1]);
+                else
+                    continue;
+
+                if (result.TryGetValue(itemPair, out string? existing)
+                    && !string.Equals(existing, pair.Key, StringComparison.Ordinal))
+                    result[itemPair] = null;
+                else
+                    result[itemPair] = pair.Key;
+            }
+
+            return result;
         }
 
         readonly struct Band

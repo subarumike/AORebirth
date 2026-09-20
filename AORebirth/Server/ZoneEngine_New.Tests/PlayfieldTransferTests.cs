@@ -172,6 +172,99 @@ public sealed class PlayfieldTransferTests
     }
 
     [TestMethod]
+    public void FairTrade_repeated_zone_returns_replay_all_63_vending_machines()
+    {
+        using var f = new Fixture();
+        Playfield fairTrade = f.World(1186);
+        Playfield outside = f.World(655);
+        Player player = f.Player(fairTrade, 1);
+        DynelRegistry registry = fairTrade.GetRequiredService<DynelRegistry>();
+        PlayfieldLocality locality = fairTrade.GetRequiredService<PlayfieldLocality>();
+        var shopInstances = new HashSet<int>();
+
+        for (int index = 0; index < 63; index++)
+        {
+            int instance = unchecked((int)(0xC00004A2u | ((uint)index << 16)));
+            var shop = new VendingMachine(
+                new Identity
+                {
+                    Type = IdentityType.VendingMachine,
+                    Instance = instance
+                },
+                new ItemTemplate { Id = 300000 + index, Name = "Fair Trade shop " + index });
+            shop.Playfield = fairTrade;
+            shop.SpawnSource = SpawnSource.StaticDynel;
+            Assert.IsTrue(registry.TryRegister(shop));
+            locality.RegisterDynel(shop);
+            shopInstances.Add(instance);
+        }
+
+        ZoneSession current = (ZoneSession)player.Session!;
+        locality.ActivatePlayerVisibility(player);
+        Assert.AreEqual(63, CountPackets<VendingMachineFullUpdateMessage>(f.Packets(current)));
+
+        for (int cycle = 0; cycle < 2; cycle++)
+        {
+            current.TransferToPlayfield(outside, new Vector3(8, 0, 0));
+            f.Drain(fairTrade);
+            byte[][] departurePackets = f.Packets(current);
+            Assert.AreEqual(63, departurePackets.Length,
+                "Transfer departure must send one cleanup packet per visible Fair Trade shop.");
+            Assert.IsTrue(ExpectedVendingDespawns(shopInstances, 1186, player.Identity.Instance)
+                    .SetEquals(departurePackets.Select(Convert.ToHexString)),
+                "Every visible Fair Trade shop must be withdrawn before transfer cycle " + cycle + ".");
+
+            f.Drain(outside);
+            f.Packets(current);
+            ZoneSession outsideSession = f.Reconnect(outside, player);
+            f.Packets(outsideSession);
+
+            outsideSession.TransferToPlayfield(fairTrade, new Vector3(175.00107, 5.01, 113.01496));
+            f.Drain(outside);
+            f.Drain(fairTrade);
+            f.Packets(outsideSession);
+
+            current = f.Reconnect(fairTrade, player);
+            byte[][] returnPackets = f.Packets(current);
+            Assert.AreEqual(63, CountPackets<VendingMachineFullUpdateMessage>(returnPackets),
+                "All Fair Trade shops must be visible after return cycle " + cycle + ".");
+            AssertVendingUpdatesPrecedeFullCharacter(returnPackets, cycle);
+        }
+    }
+
+    static int CountPackets<TBody>(byte[][] packets)
+    {
+        var codec = new ZoneMessageCodec();
+        return packets.Count(packet => codec.Deserialize(packet)?.Body is TBody);
+    }
+
+    static void AssertVendingUpdatesPrecedeFullCharacter(byte[][] packets, int cycle)
+    {
+        var codec = new ZoneMessageCodec();
+        var bodies = packets.Select(packet => codec.Deserialize(packet)?.Body).ToArray();
+        int fullCharacterIndex = Array.FindIndex(bodies, body => body is FullCharacterMessage);
+        Assert.IsTrue(fullCharacterIndex >= 0, "Reconnect must include FullCharacter on cycle " + cycle + ".");
+        Assert.AreEqual(63, bodies.Take(fullCharacterIndex).Count(body => body is VendingMachineFullUpdateMessage),
+            "Every Fair Trade shop must be established before FullCharacter on cycle " + cycle + ".");
+        Assert.AreEqual(0, bodies.Skip(fullCharacterIndex + 1).Count(body => body is VendingMachineFullUpdateMessage),
+            "Complete visibility activation must not duplicate shops after FullCharacter on cycle " + cycle + ".");
+    }
+
+    static HashSet<string> ExpectedVendingDespawns(IEnumerable<int> instances, int sender, int receiver)
+    {
+        var codec = new ZoneMessageCodec();
+        return instances.Select(instance => Convert.ToHexString(codec.Serialize(
+                new DespawnMessage
+                {
+                    Identity = new Identity { Type = IdentityType.VendingMachine, Instance = instance },
+                    Unknown = 1
+                },
+                sender,
+                receiver)))
+            .ToHashSet();
+    }
+
+    [TestMethod]
     public void Abandoned_redirect_expires_on_destination_tick_and_releases_ownership_once()
     {
         using var f = new Fixture(); var a = f.World(500); var b = f.World(501);
@@ -417,6 +510,26 @@ public sealed class PlayfieldTransferTests
             var s = new ZoneSession(Guid.NewGuid(), new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp),
                 new ZoneMessageCodec(), Blank<ZoneMessageDispatcher>(), new StubLogger()) { State = SessionState.InPlay };
             _sessions.Add(s); return s;
+        }
+        internal ZoneSession Reconnect(Playfield world, Player player)
+        {
+            ZoneSession session = Session();
+            int characterId = player.Identity.Instance;
+            string account = "fixture-" + characterId.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            ZoneHandoffTicket ticket = _handoffs.Issue(account, _handoffs.BeginLogin(account), characterId);
+            Assert.IsTrue(_handoffs.Claim(characterId, ticket.Cookie1, ticket.Cookie2, _ => account).Accepted);
+            session.BindZoneHandoff(characterId, ticket.Cookie1, ticket.Cookie2, _handoffs);
+            Owner(world, () =>
+            {
+                player.EnterOnline(session);
+                session.State = SessionState.SpawnReady;
+                PlayfieldLocality locality = world.GetRequiredService<PlayfieldLocality>();
+                locality.PrimeVendingMachineVisibility(player);
+                session.Send(player.BuildFullCharacterMessage());
+                session.State = SessionState.InPlay;
+                locality.ActivatePlayerVisibility(player);
+            });
+            return session;
         }
         internal bool Held(Playfield world) => ((Lock)Get(world, "_tickSync")).IsHeldByCurrentThread;
         internal void Owner(Playfield world, Action work) { lock ((Lock)Get(world, "_tickSync")) work(); }

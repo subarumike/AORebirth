@@ -324,7 +324,10 @@ namespace ZoneEngine_New.Core.Playfield
             if (MissionTerminal.IsMissionTerminalType(identity.Type))
                 dynel = new MissionTerminal(identity, template);
             else if (VendingMachine.IsVendingMachineType(identity.Type))
-                dynel = new VendingMachine(identity, template);
+                dynel = new VendingMachine(_registry.AllocateVendingMachineIdentity(), template)
+                {
+                    PlacementIdentity = identity
+                };
             else
                 dynel = new PlayfieldStaticDynel(identity, template);
 
@@ -509,6 +512,9 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(spawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
+            // The client establishes vending dynels at the pre-FullCharacter world-entry
+            // boundary. The complete locality activation below sends every remaining dynel.
+            _playfield.GetRequiredService<PlayfieldLocality>().PrimeVendingMachineVisibility(player);
             SendRetailWorldEntryReadyBlock(session, player);
             session.Send(full);
             SendRetailWorldEntryCompletion(session, player);
@@ -587,6 +593,8 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(reconnectSpawn);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
+            // Reconnect must use the same pre-FullCharacter vending boundary as initial entry.
+            _playfield.GetRequiredService<PlayfieldLocality>().PrimeVendingMachineVisibility(player);
             SendRetailWorldEntryReadyBlock(session, player);
             session.Send(reconnectFull);
             SendRetailWorldEntryCompletion(session, player);
@@ -738,7 +746,9 @@ namespace ZoneEngine_New.Core.Playfield
             _playfieldManager.Dialogues.Detached(player);
             _flush.HardFlush(player);
 
-            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
+            PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
+            locality.DeactivatePlayerVisibility(player);
+            locality.UnregisterDynel(player);
             _registry.Unregister(player.Identity);
             player.Playfield = null;
 

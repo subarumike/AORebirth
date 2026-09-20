@@ -29,6 +29,11 @@ namespace ZoneEngine_New.Core.Entities
         public VendingMachine(Identity identity, ItemTemplate template)
             : base(identity, template)
         {
+            PlacementIdentity = new Identity
+            {
+                Type = identity.Type,
+                Instance = identity.Instance
+            };
         }
 
         public static bool IsVendingMachineType(IdentityType type)
@@ -37,11 +42,34 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Shared stock for every concurrent shopper. Rolled lazily on first open.</summary>
         public ShopStock Stock { get; } = new();
 
+        /// <summary>Database vendor identity retained independently from the runtime dynel identity.</summary>
+        public int DatabaseVendorId { get; private set; }
+
+        public string DatabaseVendorTemplateHash { get; private set; } = string.Empty;
+
+        public string DatabaseStockGroupHash { get; private set; } = string.Empty;
+
+        public int PricingSkill { get; private set; } = (int)CharacterStat.ComputerLiteracy;
+
+        internal void BindDatabaseDefinition(int vendorId, string vendorTemplateHash, string stockGroupHash, int pricingSkill)
+        {
+            if (vendorId <= 0 || string.IsNullOrWhiteSpace(vendorTemplateHash) || string.IsNullOrWhiteSpace(stockGroupHash))
+                throw new ArgumentException("Database shop binding is incomplete.");
+            if (DatabaseVendorId != 0)
+                throw new InvalidOperationException("Vending machine already has a database vendor binding.");
+            DatabaseVendorId = vendorId;
+            DatabaseVendorTemplateHash = vendorTemplateHash;
+            DatabaseStockGroupHash = stockGroupHash;
+            PricingSkill = pricingSkill;
+        }
+
         /// <summary>
         /// Set when this machine is the shop behind an NPC vendor. The NPC owns the transform and is
         /// the identity the player interacts with; the machine itself is never directly usable.
         /// </summary>
         public NpcCharacter? OwnerNpc { get; set; }
+
+        public Identity PlacementIdentity { get; set; }
 
         /// <summary>Credits the machine pays per unit of item value when buying from a player.</summary>
         public int BuyModifier => Stats.GetOrZero(CharacterStat.BuyModifier);

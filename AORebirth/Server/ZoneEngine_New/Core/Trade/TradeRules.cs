@@ -92,8 +92,14 @@ namespace ZoneEngine_New.Core.Trade
         /// <summary>Skill discount steps a shopper earns from Computer Literacy.</summary>
         public static int PricingSkillSteps(Player shopper)
         {
+            return PricingSkillSteps(shopper, (int)CharacterStat.ComputerLiteracy);
+        }
+
+        /// <summary>Skill discount steps a shopper earns from the vendor's configured pricing skill.</summary>
+        public static int PricingSkillSteps(Player shopper, int pricingSkill)
+        {
             ArgumentNullException.ThrowIfNull(shopper);
-            return PricingSkillSteps(shopper.Stats.GetOrZero(CharacterStat.ComputerLiteracy));
+            return PricingSkillSteps(shopper.Stats.GetOrZero((CharacterStat)pricingSkill));
         }
 
         /// <summary>Skill discount steps from a raw Computer Literacy value, clamped to 0-3000.</summary>

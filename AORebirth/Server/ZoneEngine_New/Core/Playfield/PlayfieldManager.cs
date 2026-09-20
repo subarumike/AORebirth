@@ -25,6 +25,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.WorldSimulation;
     using ZoneEngine.Core.Missions;
     using AORebirth.Interfaces.Persistence.Missions;
+    using AORebirth.Interfaces.Persistence.Shops;
 
     public sealed class PlayfieldManager : IDisposable
     {
@@ -47,6 +48,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly TradeService _trades;
         private readonly CharacterSnapshotService _characterSnapshot;
         private readonly IPlayfieldMetricsRegistry _metricsRegistry;
+        private readonly IShopDao _shopDao;
         private bool _disposed;
 
         public PlayfieldManager(
@@ -67,7 +69,8 @@ namespace ZoneEngine_New.Core.Playfield
             GeneratedMissionAcgService missions,
             AuthoredQuestService authoredQuests,
             DialogueService dialogues,
-            IItemTemplateCatalog itemTemplates)
+            IItemTemplateCatalog itemTemplates,
+            IShopDao shopDao)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
@@ -82,6 +85,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(trades);
             ArgumentNullException.ThrowIfNull(characterSnapshot);
             ArgumentNullException.ThrowIfNull(metricsRegistry);
+            ArgumentNullException.ThrowIfNull(shopDao);
 
             _logger = logger;
             _router = router;
@@ -96,6 +100,7 @@ namespace ZoneEngine_New.Core.Playfield
             _trades = trades;
             _characterSnapshot = characterSnapshot;
             _metricsRegistry = metricsRegistry;
+            _shopDao = shopDao;
             Teams = teams ?? throw new ArgumentNullException(nameof(teams));
             Missions = missions ?? throw new ArgumentNullException(nameof(missions));
             AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
@@ -199,7 +204,8 @@ namespace ZoneEngine_New.Core.Playfield
                     _inventoryFlush,
                     _trades,
                     _characterSnapshot,
-                    _metricsRegistry);
+                    _metricsRegistry,
+                    _shopDao);
             }
             else
             {
@@ -218,7 +224,8 @@ namespace ZoneEngine_New.Core.Playfield
                     _inventoryFlush,
                     _trades,
                     _characterSnapshot,
-                    _metricsRegistry);
+                    _metricsRegistry,
+                    _shopDao);
             }
 
             created.Build();
@@ -288,7 +295,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             MissionPlayfield created = new(world, _logger.CreateForPlayfield(world.LivePlayfield), _router,
                 this, _playerHydrator, _gameData, _items, _hashItems, _inventoryRepository, _instanceIds,
-                _inventoryMoves, _inventoryFlush, _trades, _characterSnapshot, _metricsRegistry);
+                _inventoryMoves, _inventoryFlush, _trades, _characterSnapshot, _metricsRegistry, _shopDao);
             try
             {
                 created.Build();

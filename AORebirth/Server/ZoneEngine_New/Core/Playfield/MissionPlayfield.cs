@@ -1,6 +1,9 @@
 namespace ZoneEngine_New.Core.Playfield;
 
 using System;
+
+using AORebirth.Interfaces.Persistence.Shops;
+
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Characters;
@@ -25,9 +28,9 @@ public sealed class MissionPlayfield : Playfield
         PlayfieldManager manager, PlayerHydrator hydrator, IGameData data, IItemBuilder items,
         HashItemMinter hashItems, IInventoryRepository inventory, IItemInstanceIdAllocator ids,
         InventoryMoveService moves, InventoryFlushService flush, TradeService trades,
-        CharacterSnapshotService snapshot, IPlayfieldMetricsRegistry metrics)
+        CharacterSnapshotService snapshot, IPlayfieldMetricsRegistry metrics, IShopDao shopDao)
         : base(new Identity { Type = IdentityType.Playfield, Instance = world.LivePlayfield }, logger, router,
-            manager, hydrator, data, items, hashItems, inventory, ids, moves, flush, trades, snapshot, metrics)
+            manager, hydrator, data, items, hashItems, inventory, ids, moves, flush, trades, snapshot, metrics, shopDao)
     { World = world ?? throw new ArgumentNullException(nameof(world)); _items = items; }
 
     public override void Build()

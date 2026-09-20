@@ -87,6 +87,18 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             _visibility.ActivatePlayerVisibility(player);
         }
 
+        public void PrimeVendingMachineVisibility(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            _visibility.PrimeVendingMachineVisibility(player);
+        }
+
+        public void DeactivatePlayerVisibility(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            _visibility.DeactivatePlayerVisibility(player);
+        }
+
         public void UnregisterDynel(Dynel dynel)
         {
             if (dynel == null)
