@@ -56,6 +56,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<int, XpLevelEntry> _xpLevels = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
         private readonly Dictionary<int, PlayfieldSpawnsData> _playfieldSpawns = new();
+        private readonly Dictionary<int, PlayfieldNpcContentCatalog> _playfieldNpcs = new();
         private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
         private readonly Dictionary<int, uint?> _playfieldCharacterAppearanceOverrides = new();
         private readonly Dictionary<int, int[]?> _exitProxyDoorAllowLists = new();
@@ -259,6 +260,22 @@ namespace ZoneEngine_New.Core.GameData
 
                 PlayfieldSpawnsData loaded = ReadPlayfieldSpawns(playfieldId);
                 _playfieldSpawns[playfieldId] = loaded;
+                return loaded;
+            }
+        }
+
+
+        public PlayfieldNpcContentCatalog GetPlayfieldNpcs(int playfieldId)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playfieldId);
+
+            lock (_playfieldSync)
+            {
+                if (_playfieldNpcs.TryGetValue(playfieldId, out PlayfieldNpcContentCatalog? cached))
+                    return cached;
+
+                PlayfieldNpcContentCatalog loaded = PlayfieldNpcContentCatalog.Load(RootPath, playfieldId);
+                _playfieldNpcs[playfieldId] = loaded;
                 return loaded;
             }
         }

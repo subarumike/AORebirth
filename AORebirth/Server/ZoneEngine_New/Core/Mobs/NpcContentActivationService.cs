@@ -34,7 +34,12 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
     internal void Activate()
     {
         if (_stopped) return;
-        foreach (var definition in _content.Npcs.Where(d => d.PlayfieldId == playfield.Identity.Instance))
+        IEnumerable<WorldNpcDefinition> definitions = _content.Npcs.Where(d => d.PlayfieldId == playfield.Identity.Instance);
+        PlayfieldNpcContentCatalog playfieldContent = gameData?.GetPlayfieldNpcs(playfield.Identity.Instance)
+            ?? PlayfieldNpcContentCatalog.Load(System.IO.Path.Combine(AppContext.BaseDirectory, "GameData"), playfield.Identity.Instance);
+        definitions = definitions.Concat(playfieldContent.Npcs);
+
+        foreach (var definition in definitions)
         {
             if (_activated.Contains(definition.Key)) continue;
             var npc = WorldNpcFactory.Create(definition, items);

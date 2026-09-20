@@ -73,6 +73,10 @@ namespace ZoneEngine_New.Core.GameData
         /// <summary>Missing Spawns.json yields an empty Spawns array (no throw).</summary>
         PlayfieldSpawnsData GetPlayfieldSpawns(int playfieldId);
 
+        /// <summary>Missing Npcs.json yields an empty playfield NPC catalog (no throw).</summary>
+        PlayfieldNpcContentCatalog GetPlayfieldNpcs(int playfieldId)
+            => PlayfieldNpcContentCatalog.Load(RootPath, playfieldId);
+
         /// <summary>
         /// Walls.dat / Dynels.dat / Doors.dat / Collision.dat. Missing files yield null members (no throw).
         /// </summary>
