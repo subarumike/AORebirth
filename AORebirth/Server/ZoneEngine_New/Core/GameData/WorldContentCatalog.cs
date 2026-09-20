@@ -12,7 +12,6 @@ public sealed class WorldContentCatalog
 {
     public static WorldContentCatalog Empty { get; } = new();
     public int SchemaVersion { get; set; } = 1;
-    public WorldNpcDefinition[] Npcs { get; set; } = [];
     public static WorldContentCatalog Load(string root)
     {
         if (string.IsNullOrWhiteSpace(root)) return Empty;
@@ -29,30 +28,8 @@ public sealed class WorldContentCatalog
     }
     public void Validate()
     {
-        if (SchemaVersion != 1 || Npcs == null)
-            throw new InvalidDataException("Unsupported or incomplete world content document.");
-        var keys = new HashSet<string>(StringComparer.Ordinal);
-        var identities = new HashSet<(int, int)>();
-        var shopIdentities = new HashSet<(int, int)>();
-        foreach (var npc in Npcs)
-        {
-            if (npc == null || string.IsNullOrWhiteSpace(npc.Key) || !keys.Add(npc.Key)
-                || npc.PlayfieldId < 0 || npc.InstanceId <= 0 || string.IsNullOrWhiteSpace(npc.Name)
-                || (npc.PlayfieldId > 0 && !identities.Add((npc.PlayfieldId, npc.InstanceId)))
-                || npc.Stats == null || npc.Textures == null || npc.Meshes == null || npc.Presentation == null
-                || (npc.HasDialogue && string.IsNullOrWhiteSpace(npc.ContentNpcIdentity)))
-                throw new InvalidDataException("Invalid or duplicate NPC definition.");
-            RequireTransform(npc.Position, npc.Rotation, npc.Key);
-            if (npc.Textures.Any(t => t == null || t.Place < 0 || t.Id < 0)
-                || npc.Meshes.Any(m => m == null))
-                throw new InvalidDataException("Invalid NPC appearance: " + npc.Key);
-            if (npc.Vendor != null)
-            {
-                RequireVendor(npc.Vendor);
-                if (npc.PlayfieldId > 0 && !shopIdentities.Add((npc.PlayfieldId, npc.Vendor.InstanceId)))
-                    throw new InvalidDataException("Duplicate world shop identity.");
-            }
-        }
+        if (SchemaVersion != 1)
+            throw new InvalidDataException("Unsupported world content document.");
     }
     internal static void RequireTransform(float[] position, float[] rotation, string key)
     {

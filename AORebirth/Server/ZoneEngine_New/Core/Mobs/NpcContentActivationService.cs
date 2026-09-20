@@ -23,7 +23,6 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
     PlayfieldLocality locality, IItemBuilder items, IItemTemplateCatalog catalog, IGameData? gameData = null,
     IShopDao? shopDao = null)
 {
-    readonly ZoneEngine_New.Core.GameData.WorldContentCatalog _content = gameData?.WorldContent ?? ZoneEngine_New.Core.GameData.WorldContentCatalog.Load(System.IO.Path.Combine(AppContext.BaseDirectory, "GameData"));
     readonly Dictionary<NpcCharacter, NpcContentBinding> _bindings = new();
     readonly Dictionary<VendingMachine, ShopContentBinding> _standaloneShops = new();
     readonly HashSet<string> _activated = new(StringComparer.Ordinal);
@@ -34,12 +33,10 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
     internal void Activate()
     {
         if (_stopped) return;
-        IEnumerable<WorldNpcDefinition> definitions = _content.Npcs.Where(d => d.PlayfieldId == playfield.Identity.Instance);
         PlayfieldNpcContentCatalog playfieldContent = gameData?.GetPlayfieldNpcs(playfield.Identity.Instance)
             ?? PlayfieldNpcContentCatalog.Load(System.IO.Path.Combine(AppContext.BaseDirectory, "GameData"), playfield.Identity.Instance);
-        definitions = definitions.Concat(playfieldContent.Npcs);
 
-        foreach (var definition in definitions)
+        foreach (var definition in playfieldContent.Npcs)
         {
             if (_activated.Contains(definition.Key)) continue;
             var npc = WorldNpcFactory.Create(definition, items);

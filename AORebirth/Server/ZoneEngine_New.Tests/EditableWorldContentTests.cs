@@ -23,10 +23,12 @@ public sealed class EditableWorldContentTests
     public void ScarlettPlacementRotationAppearanceAndStatsChangeWithTheSameBinary()
     {
         using var fixture = new TempContent();
-        string original = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "GameData", "WorldContent.json"));
-        File.WriteAllText(Path.Combine(fixture.Root, "WorldContent.json"), original);
+        string original = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "GameData", "Playfields", "7010", "Npcs.json"));
+        string playfieldPath = Path.Combine(fixture.Root, "Playfields", "7010");
+        Directory.CreateDirectory(playfieldPath);
+        File.WriteAllText(Path.Combine(playfieldPath, "Npcs.json"), original);
         Guid binary = typeof(WorldNpcFactory).Assembly.ManifestModule.ModuleVersionId;
-        var a = WorldNpcFactory.Create(WorldContentCatalog.Load(fixture.Root).Npcs.Single(n => n.Name == "Scarlett Dalquist"), new StubItemBuilder());
+        var a = WorldNpcFactory.Create(PlayfieldNpcContentCatalog.Load(fixture.Root, 7010).Npcs.Single(n => n.Name == "Scarlett Dalquist"), new StubItemBuilder());
         var document = JsonNode.Parse(original)!;
         var row = document["Npcs"]!.AsArray().Single(n => n!["Name"]!.GetValue<string>() == "Scarlett Dalquist")!;
         row["Position"] = new JsonArray(31f, 7f, 92f);
@@ -34,8 +36,8 @@ public sealed class EditableWorldContentTests
         row["Stats"]![((int)CharacterStat.Scale).ToString()] = 131;
         row["Textures"]![0]!["Id"] = 1234;
         row["Meshes"]![0]!["Id"] = 5678;
-        File.WriteAllText(Path.Combine(fixture.Root, "WorldContent.json"), document.ToJsonString());
-        var b = WorldNpcFactory.Create(WorldContentCatalog.Load(fixture.Root).Npcs.Single(n => n.Name == "Scarlett Dalquist"), new StubItemBuilder());
+        File.WriteAllText(Path.Combine(playfieldPath, "Npcs.json"), document.ToJsonString());
+        var b = WorldNpcFactory.Create(PlayfieldNpcContentCatalog.Load(fixture.Root, 7010).Npcs.Single(n => n.Name == "Scarlett Dalquist"), new StubItemBuilder());
         Assert.AreEqual(binary, typeof(WorldNpcFactory).Assembly.ManifestModule.ModuleVersionId);
         Assert.AreEqual(104.180695f, a.Position.xf); Assert.AreEqual(31f, b.Position.xf);
         Assert.AreEqual(-0.342263281f, a.Rotation.yf); Assert.AreEqual(1f, b.Rotation.yf);

@@ -31,8 +31,23 @@ internal static class SocialNpcFixture
             Content.PlayfieldId, Content.HasDialogue, Content.Vendor != null);
         internal NpcCharacter Create(IItemBuilder items) => WorldNpcFactory.Create(Content, items);
     }
-    internal static IReadOnlyList<Definition> Definitions { get; } = WorldContentFixtures.Content.Npcs
-        .Where(n => n.PlayfieldId > 0).Select(n => new Definition(n)).ToArray();
+    internal static IReadOnlyList<Definition> Definitions { get; } = LoadDefinitions();
+
+    static IReadOnlyList<Definition> LoadDefinitions()
+    {
+        string root = Path.Combine(AppContext.BaseDirectory, "GameData");
+        string playfields = Path.Combine(root, "Playfields");
+        if (!Directory.Exists(playfields)) return [];
+
+        return Directory.GetDirectories(playfields)
+            .Select(Path.GetFileName)
+            .Where(name => int.TryParse(name, out _))
+            .Select(int.Parse)
+            .SelectMany(playfieldId => PlayfieldNpcContentCatalog.Load(root, playfieldId).Npcs)
+            .Where(n => n.PlayfieldId > 0)
+            .Select(n => new Definition(n))
+            .ToArray();
+    }
 }
 internal static class SubwayMerchantFixture
 {
