@@ -324,7 +324,10 @@ namespace ZoneEngine_New.Core.Playfield
             if (MissionTerminal.IsMissionTerminalType(identity.Type))
                 dynel = new MissionTerminal(identity, template);
             else if (VendingMachine.IsVendingMachineType(identity.Type))
-                dynel = new VendingMachine(identity, template);
+                dynel = new VendingMachine(_registry.AllocateVendingMachineIdentity(), template)
+                {
+                    PlacementIdentity = identity
+                };
             else
                 dynel = new PlayfieldStaticDynel(identity, template);
 

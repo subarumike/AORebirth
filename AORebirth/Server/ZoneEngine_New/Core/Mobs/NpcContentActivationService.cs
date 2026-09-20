@@ -92,7 +92,7 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
         Dictionary<int, VendingMachine[]> machinesByVendorId = registry.Dynels()
             .OfType<VendingMachine>()
             .Where(machine => machine.SpawnSource == SpawnSource.StaticDynel && machine.OwnerNpc == null)
-            .GroupBy(machine => DatabaseVendorId(playfieldId, machine.Identity.Instance))
+            .GroupBy(machine => DatabaseVendorId(playfieldId, machine.PlacementIdentity.Instance))
             .ToDictionary(group => group.Key, group => group.ToArray());
 
         foreach (ShopVendorData vendor in shopDao.ListForPlayfield(playfieldId))

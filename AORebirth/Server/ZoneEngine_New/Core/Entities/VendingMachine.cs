@@ -29,6 +29,11 @@ namespace ZoneEngine_New.Core.Entities
         public VendingMachine(Identity identity, ItemTemplate template)
             : base(identity, template)
         {
+            PlacementIdentity = new Identity
+            {
+                Type = identity.Type,
+                Instance = identity.Instance
+            };
         }
 
         public static bool IsVendingMachineType(IdentityType type)
@@ -63,6 +68,8 @@ namespace ZoneEngine_New.Core.Entities
         /// the identity the player interacts with; the machine itself is never directly usable.
         /// </summary>
         public NpcCharacter? OwnerNpc { get; set; }
+
+        public Identity PlacementIdentity { get; set; }
 
         /// <summary>Credits the machine pays per unit of item value when buying from a player.</summary>
         public int BuyModifier => Stats.GetOrZero(CharacterStat.BuyModifier);
