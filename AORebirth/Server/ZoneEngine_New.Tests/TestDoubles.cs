@@ -118,6 +118,8 @@ namespace ZoneEngine_New.Tests
         public PlayfieldGeometryData GetPlayfieldGeometry(int playfieldId) => throw new NotSupportedException();
 
         public IReadOnlyList<int> GetExitProxyDoorInstances(int playfieldId) => throw new NotSupportedException();
+
+        public IReadOnlyCollection<int>? GetConfiguredExitProxyDoorInstances(int playfieldId) => null;
     }
 
     /// <summary>Only templates added through <see cref="Add"/> resolve; everything else misses.</summary>

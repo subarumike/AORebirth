@@ -76,5 +76,11 @@ namespace ZoneEngine_New.Core.GameData
         /// (static catalog, built once from all playfield Dynels.dat). Empty when none.
         /// </summary>
         IReadOnlyList<int> GetExitProxyDoorInstances(int playfieldId);
+
+        /// <summary>
+        /// Explicit destination door allow-list for reverse ExitProxy surfaces. Null means use
+        /// portal data without an authored allow-list for this playfield.
+        /// </summary>
+        IReadOnlyCollection<int>? GetConfiguredExitProxyDoorInstances(int playfieldId);
     }
 }

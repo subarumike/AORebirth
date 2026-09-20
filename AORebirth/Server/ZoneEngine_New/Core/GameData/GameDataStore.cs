@@ -57,6 +57,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
         private readonly Dictionary<int, PlayfieldSpawnsData> _playfieldSpawns = new();
         private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
+        private readonly Dictionary<int, int[]?> _exitProxyDoorAllowLists = new();
         private readonly Lock _exitProxySync = new();
         private Dictionary<int, int[]>? _exitProxyDoorsByPlayfield;
         private readonly TeleportDestinationCatalog? _teleportDestinations;
@@ -259,6 +260,22 @@ namespace ZoneEngine_New.Core.GameData
                 : [];
         }
 
+        public IReadOnlyCollection<int>? GetConfiguredExitProxyDoorInstances(int playfieldId)
+        {
+            if (playfieldId <= 0)
+                return null;
+
+            lock (_playfieldSync)
+            {
+                if (_exitProxyDoorAllowLists.TryGetValue(playfieldId, out int[]? cached))
+                    return cached;
+
+                int[]? loaded = ReadPlayfieldExitProxyDoorInstances(playfieldId);
+                _exitProxyDoorAllowLists[playfieldId] = loaded;
+                return loaded;
+            }
+        }
+
         private void EnsureExitProxyIndex()
         {
             lock (_exitProxySync)
@@ -285,7 +302,7 @@ namespace ZoneEngine_New.Core.GameData
                         GameDataPaths.PlayfieldDynelsRelativePath(sourcePlayfieldId));
                     PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(dynelsPath);
                     _teleportDestinations?.Apply(sourcePlayfieldId, dynels);
-                    ExitProxyDoorCatalog.CollectFromDynels(dynels, collected, WorldContent.ExitDoorRules);
+                    ExitProxyDoorCatalog.CollectFromDynels(dynels, collected, GetConfiguredExitProxyDoorInstances);
                 }
 
                 Dictionary<int, int[]> index = new(collected.Count);
@@ -733,6 +750,50 @@ namespace ZoneEngine_New.Core.GameData
                 data.PlayfieldId = playfieldId;
 
             return data;
+        }
+
+
+        private int[]? ReadPlayfieldExitProxyDoorInstances(int playfieldId)
+        {
+            string path = Path.Combine(
+                RootPath,
+                GameDataPaths.PlayfieldExitProxyDoorsRelativePath(playfieldId));
+
+            if (!File.Exists(path))
+                return null;
+
+            PlayfieldExitProxyDoorsData? data;
+            try
+            {
+                data = JsonSerializer.Deserialize<PlayfieldExitProxyDoorsData>(
+                    File.ReadAllText(path),
+                    CatalogJsonOptions);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidDataException(
+                    "Playfield exit-proxy doors could not be read: "
+                    + path
+                    + " ("
+                    + exception.GetType().Name
+                    + ": "
+                    + exception.Message
+                    + ")",
+                    exception);
+            }
+
+            if (data == null
+                || data.SchemaVersion != PlayfieldExitProxyDoorsData.SupportedSchemaVersion
+                || data.PlayfieldId != playfieldId
+                || data.DoorInstances == null)
+            {
+                throw new InvalidDataException("Invalid playfield exit-proxy doors: " + path);
+            }
+
+            int[] doors = new int[data.DoorInstances.Length];
+            Array.Copy(data.DoorInstances, doors, data.DoorInstances.Length);
+            Array.Sort(doors);
+            return doors;
         }
 
         private PlayfieldMetaData? ReadPlayfieldMetaData(int playfieldId)

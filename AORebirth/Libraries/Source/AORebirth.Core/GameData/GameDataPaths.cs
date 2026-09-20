@@ -50,6 +50,8 @@ namespace AORebirth.Core.GameData
 
         public const string DoorsFileName = "Doors.dat";
 
+        public const string ExitProxyDoorsFileName = "ExitProxyDoors.json";
+
         public const string CollisionFileName = "Collision.dat";
 
         public const string SurfacesFileName = "Surfaces.dat";
@@ -125,6 +127,11 @@ namespace AORebirth.Core.GameData
         public static string PlayfieldDoorsRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), DoorsFileName);
+        }
+
+        public static string PlayfieldExitProxyDoorsRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), ExitProxyDoorsFileName);
         }
 
         public static string PlayfieldCollisionRelativePath(int playfieldId)
