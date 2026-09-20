@@ -225,8 +225,10 @@ public sealed class PlayfieldTransferTests
             f.Packets(outsideSession);
 
             current = f.Reconnect(fairTrade, player);
-            Assert.AreEqual(63, CountPackets<VendingMachineFullUpdateMessage>(f.Packets(current)),
+            byte[][] returnPackets = f.Packets(current);
+            Assert.AreEqual(63, CountPackets<VendingMachineFullUpdateMessage>(returnPackets),
                 "All Fair Trade shops must be visible after return cycle " + cycle + ".");
+            AssertVendingUpdatesPrecedeFullCharacter(returnPackets, cycle);
         }
     }
 
@@ -234,6 +236,18 @@ public sealed class PlayfieldTransferTests
     {
         var codec = new ZoneMessageCodec();
         return packets.Count(packet => codec.Deserialize(packet)?.Body is TBody);
+    }
+
+    static void AssertVendingUpdatesPrecedeFullCharacter(byte[][] packets, int cycle)
+    {
+        var codec = new ZoneMessageCodec();
+        var bodies = packets.Select(packet => codec.Deserialize(packet)?.Body).ToArray();
+        int fullCharacterIndex = Array.FindIndex(bodies, body => body is FullCharacterMessage);
+        Assert.IsTrue(fullCharacterIndex >= 0, "Reconnect must include FullCharacter on cycle " + cycle + ".");
+        Assert.AreEqual(63, bodies.Take(fullCharacterIndex).Count(body => body is VendingMachineFullUpdateMessage),
+            "Every Fair Trade shop must be established before FullCharacter on cycle " + cycle + ".");
+        Assert.AreEqual(0, bodies.Skip(fullCharacterIndex + 1).Count(body => body is VendingMachineFullUpdateMessage),
+            "Complete visibility activation must not duplicate shops after FullCharacter on cycle " + cycle + ".");
     }
 
     static HashSet<string> ExpectedVendingDespawns(IEnumerable<int> instances, int sender, int receiver)
@@ -508,8 +522,12 @@ public sealed class PlayfieldTransferTests
             Owner(world, () =>
             {
                 player.EnterOnline(session);
+                session.State = SessionState.SpawnReady;
+                PlayfieldLocality locality = world.GetRequiredService<PlayfieldLocality>();
+                locality.PrimeVendingMachineVisibility(player);
+                session.Send(player.BuildFullCharacterMessage());
                 session.State = SessionState.InPlay;
-                world.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+                locality.ActivatePlayerVisibility(player);
             });
             return session;
         }

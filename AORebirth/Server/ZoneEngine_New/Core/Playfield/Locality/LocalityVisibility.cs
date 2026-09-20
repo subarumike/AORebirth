@@ -66,25 +66,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             ArgumentNullException.ThrowIfNull(player);
 
-            ulong recipientKey = player.Identity.Long();
-            IZoneSession? session = player.Session;
-            if (session == null || session.State == SessionState.Closed
-                || !ReferenceEquals(session.Player, player)
-                || !_byIdentity.TryGetValue(recipientKey, out Dynel? current)
-                || !ReferenceEquals(current, player)) return;
-            // Delmus's reconnect repair, fenced to the exact transport. Repeating
-            // activation on the same session must keep successful spawn de-duplication.
-            if (!_recipientSessions.TryGetValue(recipientKey, out var previousSession)
-                || !ReferenceEquals(previousSession, session))
-            {
-                ForgetRecipient(recipientKey);
-                _recipientSessions[recipientKey] = session;
-            }
-            _initializedRecipients.Add(recipientKey);
-            if (!_visibleSourcesByRecipient.ContainsKey(recipientKey))
-            {
-                _visibleSourcesByRecipient[recipientKey] = new HashSet<ulong>();
-            }
+            if (!PrepareRecipient(player)) return;
 
             foreach (Dynel source in CollectCandidates(player))
             {
@@ -92,6 +74,26 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             }
 
             ReconcileSource(player);
+        }
+
+        /// <summary>
+        /// The retail/Legacy world-entry sequence sends vending machine full updates before
+        /// GameTime and FullCharacter. Record those machines in the ordinary visibility set so
+        /// the later complete activation sends the remaining dynels without duplicating shops.
+        /// </summary>
+        internal void PrimeVendingMachineVisibility(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            if (!PrepareRecipient(player)) return;
+
+            foreach (Dynel source in CollectCandidates(player))
+            {
+                if (source is VendingMachine)
+                {
+                    TryEnterVisibility(player, source);
+                }
+            }
         }
 
         /// <summary>
@@ -341,6 +343,33 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
             foreach (MessageBody companion in source.BuildSpawnCompanionMessages())
                 recipient.Session.Send(companion);
+
+            return true;
+        }
+
+        private bool PrepareRecipient(Player player)
+        {
+            ulong recipientKey = player.Identity.Long();
+            IZoneSession? session = player.Session;
+            if (session == null || session.State == SessionState.Closed
+                || !ReferenceEquals(session.Player, player)
+                || !_byIdentity.TryGetValue(recipientKey, out Dynel? current)
+                || !ReferenceEquals(current, player)) return false;
+
+            // Fence visibility to the exact transport. Repeating either priming or complete
+            // activation on the same session preserves successful spawn de-duplication.
+            if (!_recipientSessions.TryGetValue(recipientKey, out IZoneSession? previousSession)
+                || !ReferenceEquals(previousSession, session))
+            {
+                ForgetRecipient(recipientKey);
+                _recipientSessions[recipientKey] = session;
+            }
+
+            _initializedRecipients.Add(recipientKey);
+            if (!_visibleSourcesByRecipient.ContainsKey(recipientKey))
+            {
+                _visibleSourcesByRecipient[recipientKey] = new HashSet<ulong>();
+            }
 
             return true;
         }
