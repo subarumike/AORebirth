@@ -738,7 +738,9 @@ namespace ZoneEngine_New.Core.Playfield
             _playfieldManager.Dialogues.Detached(player);
             _flush.HardFlush(player);
 
-            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
+            PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
+            locality.DeactivatePlayerVisibility(player);
+            locality.UnregisterDynel(player);
             _registry.Unregister(player.Identity);
             player.Playfield = null;
 

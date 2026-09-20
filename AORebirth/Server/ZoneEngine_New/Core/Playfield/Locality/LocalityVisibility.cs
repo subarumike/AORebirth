@@ -94,6 +94,34 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             ReconcileSource(player);
         }
 
+        /// <summary>
+        /// Withdraws every source currently visible to a departing player before forgetting the
+        /// recipient. Zone transfers reuse static dynel identities when the player returns, so the
+        /// old client-side objects must be explicitly removed before those identities are replayed.
+        /// </summary>
+        internal void DeactivatePlayerVisibility(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            ulong recipientKey = player.Identity.Long();
+            if (_visibleSourcesByRecipient.TryGetValue(recipientKey, out HashSet<ulong>? visibleSources))
+            {
+                foreach (ulong sourceKey in new List<ulong>(visibleSources))
+                {
+                    if (_byIdentity.TryGetValue(sourceKey, out Dynel? source))
+                    {
+                        LeaveVisibility(player, source);
+                    }
+                    else
+                    {
+                        RemoveVisibleEntry(recipientKey, sourceKey);
+                    }
+                }
+            }
+
+            ForgetRecipient(recipientKey);
+        }
+
         internal void Reconcile(Dynel changed)
         {
             if (changed == null)
