@@ -80,6 +80,7 @@ namespace ZoneEngine_New.Core.GameData
             EnsureRootExists();
             WorldContent = WorldContentCatalog.Load(RootPath);
             CorpseContent = CorpseContentCatalog.Load(RootPath);
+            RespawnContent = RespawnContentCatalog.Load(RootPath);
             LoadNpcTemplates();
             LoadMonsterWeapons();
             LoadHashItems();
@@ -93,6 +94,8 @@ namespace ZoneEngine_New.Core.GameData
         public WorldContentCatalog WorldContent { get; }
 
         public CorpseContentCatalog CorpseContent { get; }
+
+        public RespawnContentCatalog RespawnContent { get; }
 
         public string PlayfieldsPath { get; }
 

@@ -13,7 +13,6 @@ public sealed class WorldContentCatalog
     public static WorldContentCatalog Empty { get; } = new();
     public int SchemaVersion { get; set; } = 1;
     public WorldNpcDefinition[] Npcs { get; set; } = [];
-    public WorldDestination? Respawn { get; set; }
     public static WorldContentCatalog Load(string root)
     {
         if (string.IsNullOrWhiteSpace(root)) return Empty;
@@ -33,8 +32,6 @@ public sealed class WorldContentCatalog
         if (SchemaVersion != 1 || Npcs == null)
             throw new InvalidDataException("Unsupported or incomplete world content document.");
         var keys = new HashSet<string>(StringComparer.Ordinal);
-        if (Respawn != null && (Respawn.PlayfieldId <= 0 || Respawn.Position is not { Length: 3 }
-            || Respawn.Position.Any(v => !float.IsFinite(v)))) throw new InvalidDataException("Invalid respawn destination.");
         var identities = new HashSet<(int, int)>();
         var shopIdentities = new HashSet<(int, int)>();
         foreach (var npc in Npcs)
@@ -72,7 +69,6 @@ public sealed class WorldContentCatalog
     }
 }
 
-public sealed class WorldDestination { public int PlayfieldId { get; set; } public float[] Position { get; set; } = []; }
 public sealed class WorldNpcDefinition
 {
     public string Key { get; set; } = string.Empty;

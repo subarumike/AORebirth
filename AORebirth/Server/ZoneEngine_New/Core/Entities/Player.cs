@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
@@ -189,8 +190,10 @@ namespace ZoneEngine_New.Core.Entities
             if (playfield == null)
             { Revive(); return; }
 
-            var respawn = playfield.WorldContent.Respawn
-                ?? throw new InvalidOperationException("No respawn destination is configured in world content.");
+            RespawnContentCatalog respawn = playfield.GetRequiredService<IGameData>().RespawnContent;
+            if (respawn.PlayfieldId <= 0 || respawn.Position is not { Length: 3 })
+                throw new InvalidOperationException("No respawn destination is configured.");
+
             Vector3 landing = new Vector3(respawn.Position[0], respawn.Position[1], respawn.Position[2]);
             Revive();
 

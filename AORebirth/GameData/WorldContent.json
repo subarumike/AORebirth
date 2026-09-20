@@ -1,13 +1,5 @@
 {
   "SchemaVersion": 1,
-  "Respawn": {
-    "PlayfieldId": 800,
-    "Position": [
-      665,
-      72.6,
-      570
-    ]
-  },
   "Npcs": [
     {
       "Key": "legacy:ScarlettDalquistSpawn:7010:7A18B924",
