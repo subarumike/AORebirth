@@ -13,7 +13,6 @@ public sealed class WorldContentCatalog
     public static WorldContentCatalog Empty { get; } = new();
     public int SchemaVersion { get; set; } = 1;
     public WorldNpcDefinition[] Npcs { get; set; } = [];
-    public string[] ActiveSpawnEvents { get; set; } = [];
     public WorldDestination? Respawn { get; set; }
     public WorldAppearanceOverride[] CharacterAppearanceOverrides { get; set; } = [];
     public WorldExitDoorRule[] ExitDoorRules { get; set; } = [];
@@ -34,7 +33,7 @@ public sealed class WorldContentCatalog
     }
     public void Validate()
     {
-        if (SchemaVersion != 1 || Npcs == null || ActiveSpawnEvents == null
+        if (SchemaVersion != 1 || Npcs == null
             || CharacterAppearanceOverrides == null || ExitDoorRules == null || CorpseDefaults == null)
             throw new InvalidDataException("Unsupported or incomplete world content document.");
         var keys = new HashSet<string>(StringComparer.Ordinal);

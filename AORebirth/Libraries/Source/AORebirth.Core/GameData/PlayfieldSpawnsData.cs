@@ -101,5 +101,7 @@ namespace AORebirth.Core.GameData
         public int Unknown2 { get; set; }
 
         public string Name { get; set; }
+
+        public bool Active { get; set; }
     }
 }

@@ -275,8 +275,7 @@ namespace ZoneEngine_New.Core.Playfield
                 string? name = events[i]?.Name;
                 if (string.IsNullOrEmpty(name))
                     continue;
-                if (Array.FindIndex(_gameData.WorldContent.ActiveSpawnEvents,
-                    active => string.Equals(active, name, StringComparison.OrdinalIgnoreCase)) < 0)
+                if (!events[i].Active)
                     return true;
             }
 
