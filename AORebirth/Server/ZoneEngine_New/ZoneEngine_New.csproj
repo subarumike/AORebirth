@@ -92,7 +92,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="../../GameData/WorldContent.json;../../GameData/ItemBehavior.json">
+    <Content Include="../../GameData/ItemBehavior.json">
       <Link>GameData/%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -242,3 +242,4 @@
     </Compile>
   </ItemGroup>
 </Project>
+

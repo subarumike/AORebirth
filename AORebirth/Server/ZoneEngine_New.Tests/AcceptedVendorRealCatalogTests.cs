@@ -64,7 +64,7 @@ public sealed class AcceptedVendorRealCatalogTests
         foreach (var definition in definitions)
         {
             var npc = definition.Create(items);
-            bool attached = WorldContentFixtures.Attach(npc, items, catalog, out string failure);
+            bool attached = NpcContentFixtures.Attach(npc, items, catalog, out string failure);
             Assert.IsTrue(attached, definition.Binding.ContentNpcIdentity + ": " + failure);
             AssertTemplatePricing(npc.Shop!, catalog);
         }
@@ -118,3 +118,4 @@ public sealed class AcceptedVendorRealCatalogTests
         public IReadOnlyDictionary<int, string> GetAllNames() => new Dictionary<int, string>();
     }
 }
+

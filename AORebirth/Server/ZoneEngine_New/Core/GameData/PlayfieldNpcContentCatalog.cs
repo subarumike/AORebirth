@@ -52,17 +52,32 @@ public sealed class PlayfieldNpcContentCatalog
                 || (npc.HasDialogue && string.IsNullOrWhiteSpace(npc.ContentNpcIdentity)))
                 throw new InvalidDataException("Invalid or duplicate playfield NPC definition.");
 
-            WorldContentCatalog.RequireTransform(npc.Position, npc.Rotation, npc.Key);
+            RequireTransform(npc.Position, npc.Rotation, npc.Key);
             if (npc.Textures.Any(t => t == null || t.Place < 0 || t.Id < 0)
                 || npc.Meshes.Any(m => m == null))
                 throw new InvalidDataException("Invalid playfield NPC appearance: " + npc.Key);
 
             if (npc.Vendor != null)
             {
-                WorldContentCatalog.RequireVendor(npc.Vendor);
+                RequireVendor(npc.Vendor);
                 if (!shopIdentities.Add(npc.Vendor.InstanceId))
                     throw new InvalidDataException("Duplicate playfield shop identity.");
             }
         }
+    }
+
+    internal static void RequireTransform(float[] position, float[] rotation, string key)
+    {
+        if (position is not { Length: 3 } || position.Any(v => !float.IsFinite(v))
+            || rotation is not { Length: 4 } || rotation.Any(v => !float.IsFinite(v))
+            || rotation.All(v => v == 0)) throw new InvalidDataException("Invalid playfield NPC transform: " + key);
+    }
+
+    internal static void RequireVendor(WorldVendorDefinition vendor)
+    {
+        if (vendor == null || vendor.InstanceId <= 0 || vendor.TemplateId <= 0 || vendor.Stock == null
+            || vendor.Stock.Length == 0 || vendor.Stock.Where((row, index) => row == null || row.Slot != index
+                || row.LowId <= 0 || row.HighId <= 0 || row.Quality <= 0).Any())
+            throw new InvalidDataException("Invalid vendor identity, template or stock.");
     }
 }

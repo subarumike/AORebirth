@@ -291,9 +291,6 @@ namespace ZoneEngine_New.Core.Playfield
             where T : class
             => _serviceProvider.GetRequiredService<T>();
 
-        internal ZoneEngine_New.Core.GameData.WorldContentCatalog WorldContent
-            => _serviceProvider?.GetService<ZoneEngine_New.Core.GameData.IGameData>()?.WorldContent
-                ?? ZoneEngine_New.Core.GameData.WorldContentCatalog.Empty;
 
         /// <summary>Client inventory handle for an opened container (bags, corpses, chests). Range 1..ushort.MaxValue.</summary>
         public int AllocateContainerInventoryHandle()
@@ -653,3 +650,4 @@ namespace ZoneEngine_New.Core.Playfield
         }
     }
 }
+

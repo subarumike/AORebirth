@@ -13,9 +13,8 @@ using ZoneEngine_New.Core.Playfield;
 
 // Baseline test accessors read the same editable files as production. They do not
 // contain actor definitions or participate in runtime construction/authorization.
-internal static class WorldContentFixtures
+internal static class NpcContentFixtures
 {
-    internal static readonly WorldContentCatalog Content = WorldContentCatalog.Load(Path.Combine(AppContext.BaseDirectory, "GameData"));
     internal static bool Attach(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure)
     {
         var content = WorldNpcFactory.DefinitionFor(npc);
@@ -52,7 +51,7 @@ internal static class SocialNpcFixture
 internal static class SubwayMerchantFixture
 {
     internal static IReadOnlyList<SocialNpcFixture.Definition> Definitions { get; } = SocialNpcFixture.Definitions.Where(n => n.Binding.PlayfieldId == 127).ToArray();
-    internal static bool TryAttachShop(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure) => WorldContentFixtures.Attach(npc, items, catalog, out failure);
+    internal static bool TryAttachShop(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure) => NpcContentFixtures.Attach(npc, items, catalog, out failure);
 }
 internal static class AreteQuestNpcFixture
 {
@@ -90,7 +89,7 @@ internal static class AreteVendorFixture
     }
     internal static IReadOnlyList<SocialNpcFixture.Definition> Definitions { get; } = SocialNpcFixture.Definitions.Where(n => n.Binding.PlayfieldId == 6553 && n.Binding.HasVendor).ToArray();
     internal static IReadOnlyList<StandaloneDefinition> StandaloneDefinitions { get; } = CapturedAreteAlexAreaVendorContentProvider.Vendors.Select(n => new StandaloneDefinition(n)).ToArray();
-    internal static bool TryAttachShop(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure) => WorldContentFixtures.Attach(npc, items, catalog, out failure);
+    internal static bool TryAttachShop(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure) => NpcContentFixtures.Attach(npc, items, catalog, out failure);
     internal static bool TryCreateStandaloneShop(StandaloneDefinition definition, Playfield playfield, IItemTemplateCatalog catalog, out VendingMachine shop, out string failure)
     {
         shop = null!; failure = "Incorrect placement playfield.";
@@ -116,5 +115,6 @@ internal static class GardenVendorFixture
     }
     internal static IReadOnlyList<SocialNpcFixture.Definition> Definitions { get; } = SocialNpcFixture.Definitions.Where(n => n.Binding.PlayfieldId is 4676 or 4677).ToArray();
     internal static IReadOnlyList<Placement> Placements { get; } = Definitions.Select(n => new Placement(n.Content)).ToArray();
-    internal static bool TryAttachShop(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure) => WorldContentFixtures.Attach(npc, items, catalog, out failure);
+    internal static bool TryAttachShop(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure) => NpcContentFixtures.Attach(npc, items, catalog, out failure);
 }
+

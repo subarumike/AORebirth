@@ -13,8 +13,6 @@ namespace ZoneEngine_New.Core.GameData
     {
         string RootPath { get; }
 
-        WorldContentCatalog WorldContent => WorldContentCatalog.Load(RootPath);
-
         CorpseContentCatalog CorpseContent => CorpseContentCatalog.Load(RootPath);
 
         RespawnContentCatalog RespawnContent => RespawnContentCatalog.Load(RootPath);
@@ -95,3 +93,4 @@ namespace ZoneEngine_New.Core.GameData
         IReadOnlyCollection<int>? GetConfiguredExitProxyDoorInstances(int playfieldId);
     }
 }
+

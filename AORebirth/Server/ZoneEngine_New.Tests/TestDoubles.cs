@@ -52,9 +52,6 @@ namespace ZoneEngine_New.Tests
 
         public string RootPath { get; init; } = string.Empty;
 
-        public WorldContentCatalog WorldContent => string.IsNullOrEmpty(RootPath)
-            ? WorldContentFixtures.Content : WorldContentCatalog.Load(RootPath);
-
         public CorpseContentCatalog CorpseContent => CorpseContentCatalog.Load(
             string.IsNullOrEmpty(RootPath) ? Path.Combine(AppContext.BaseDirectory, "GameData") : RootPath);
 
@@ -442,5 +439,6 @@ namespace ZoneEngine_New.Tests
         public void Close() => IsClosed = true;
     }
 }
+
 
 

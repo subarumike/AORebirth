@@ -106,7 +106,6 @@ namespace ZoneEngine_New
                 throw new DirectoryNotFoundException("Editable playfield data directory is missing.");
             if (skipPlayfieldPackagePin)
                 Console.WriteLine("PLAYFIELD_PACKAGE_PIN_SKIPPED local GameData/Playfields is not checked against the pinned manifest.");
-            _ = ZoneEngine_New.Core.GameData.WorldContentCatalog.Load(gameData);
             using (FileStream items = File.OpenRead(Path.Combine(gameData, "items.dat")))
                 if (items.Length == 0) throw new InvalidDataException("Packaged item catalog is empty.");
         }
@@ -131,3 +130,4 @@ namespace ZoneEngine_New
         public StartupValidationException(string message) : base(message) { }
     }
 }
+

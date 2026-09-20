@@ -36,7 +36,7 @@ public static class WorldNpcFactory
         out VendingMachine shop, out string failure, Identity? optionalIdentity = null)
     {
         shop = null!; failure = string.Empty;
-        WorldContentCatalog.RequireVendor(definition);
+        PlayfieldNpcContentCatalog.RequireVendor(definition);
         if (!catalog.TryGet(definition.TemplateId, out var template))
         { failure = "Missing vendor template " + definition.TemplateId; return false; }
         foreach (var row in definition.Stock)

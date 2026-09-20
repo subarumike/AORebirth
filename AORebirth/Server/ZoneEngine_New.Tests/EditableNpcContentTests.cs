@@ -17,7 +17,7 @@ using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Playfield.Locality;
 
 [TestClass]
-public sealed class EditableWorldContentTests
+public sealed class EditableNpcContentTests
 {
     [TestMethod]
     public void ScarlettPlacementRotationAppearanceAndStatsChangeWithTheSameBinary()
@@ -118,3 +118,4 @@ public sealed class EditableWorldContentTests
         public void Dispose() => Directory.Delete(Root, true);
     }
 }
+
