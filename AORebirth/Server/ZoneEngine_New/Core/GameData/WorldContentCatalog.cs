@@ -7,13 +7,12 @@ using System.Linq;
 using System.Text.Json;
 using SmokeLounge.AOtomation.Messaging.GameData;
 
-/// <summary>Editable explicit actors and shops in the existing GameData content tree.</summary>
+/// <summary>Editable explicit actors in the existing GameData content tree.</summary>
 public sealed class WorldContentCatalog
 {
     public static WorldContentCatalog Empty { get; } = new();
     public int SchemaVersion { get; set; } = 1;
     public WorldNpcDefinition[] Npcs { get; set; } = [];
-    public WorldShopDefinition[] Shops { get; set; } = [];
     public string[] ActiveSpawnEvents { get; set; } = [];
     public WorldDestination? Respawn { get; set; }
     public WorldAppearanceOverride[] CharacterAppearanceOverrides { get; set; } = [];
@@ -35,7 +34,7 @@ public sealed class WorldContentCatalog
     }
     public void Validate()
     {
-        if (SchemaVersion != 1 || Npcs == null || Shops == null || ActiveSpawnEvents == null
+        if (SchemaVersion != 1 || Npcs == null || ActiveSpawnEvents == null
             || CharacterAppearanceOverrides == null || ExitDoorRules == null || CorpseDefaults == null)
             throw new InvalidDataException("Unsupported or incomplete world content document.");
         var keys = new HashSet<string>(StringComparer.Ordinal);
@@ -68,15 +67,6 @@ public sealed class WorldContentCatalog
                 if (npc.PlayfieldId > 0 && !shopIdentities.Add((npc.PlayfieldId, npc.Vendor.InstanceId)))
                     throw new InvalidDataException("Duplicate world shop identity.");
             }
-        }
-        foreach (var shop in Shops)
-        {
-            if (shop == null || string.IsNullOrWhiteSpace(shop.Key) || !keys.Add(shop.Key) || shop.PlayfieldId <= 0)
-                throw new InvalidDataException("Invalid or duplicate shop definition.");
-            RequireTransform(shop.Position, shop.Rotation, shop.Key);
-            RequireVendor(shop.Vendor);
-            if (!shopIdentities.Add((shop.PlayfieldId, shop.Vendor.InstanceId)))
-                throw new InvalidDataException("Duplicate world shop identity.");
         }
     }
     internal static void RequireTransform(float[] position, float[] rotation, string key)
@@ -150,12 +140,3 @@ public sealed class WorldVendorDefinition
     public JsonElement? CompanionPacket { get; set; }
 }
 public sealed class WorldVendorStock { public int Slot { get; set; } public int LowId { get; set; } public int HighId { get; set; } public int Quality { get; set; } }
-public sealed class WorldShopDefinition
-{
-    public string Key { get; set; } = string.Empty;
-    public string Provenance { get; set; } = string.Empty;
-    public int PlayfieldId { get; set; }
-    public float[] Position { get; set; } = [];
-    public float[] Rotation { get; set; } = [];
-    public WorldVendorDefinition Vendor { get; set; } = new();
-}

@@ -60,27 +60,6 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
                 throw;
             }
         }
-        foreach (var definition in _content.Shops.Where(d => d.PlayfieldId == playfield.Identity.Instance))
-        {
-            if (_activated.Contains(definition.Key)) continue;
-            if (!TryCreateStandaloneShop(definition, out var shop, out string failure))
-            { _unavailableVendorEndpoints[definition.Key] = failure; continue; }
-            bool newlyRegistered = registry.TryRegister(shop);
-            if (!newlyRegistered && !TryAdoptExactStaticShop(shop, out shop))
-                throw new InvalidOperationException("Content standalone vendor identity collision: " + definition.Key);
-            try
-            {
-                _standaloneShops.Add(shop, new(definition.Key, definition.Provenance, definition.PlayfieldId));
-                if (newlyRegistered) locality.RegisterDynel(shop);
-                _activated.Add(definition.Key);
-            }
-            catch
-            {
-                _standaloneShops.Remove(shop);
-                if (newlyRegistered) { locality.UnregisterDynel(shop); registry.UnregisterExact(shop); }
-                throw;
-            }
-        }
         ActivateDatabaseShops();
     }
 
@@ -218,36 +197,6 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
             ? instance.TemplateIds[0] == lowId && lowId == highId
             : instance.TemplateIds.Length == 2
                 && instance.TemplateIds[0] == lowId && instance.TemplateIds[1] == highId;
-
-    bool TryCreateStandaloneShop(ZoneEngine_New.Core.GameData.WorldShopDefinition definition,
-        out VendingMachine shop, out string failure)
-    {
-        if (!WorldNpcFactory.TryCreateShop(definition.Vendor, catalog, out shop, out failure)) return false;
-        shop.Playfield = playfield;
-        shop.Position = new(definition.Position[0], definition.Position[1], definition.Position[2]);
-        shop.Rotation = new(definition.Rotation[0], definition.Rotation[1], definition.Rotation[2], definition.Rotation[3]);
-        return true;
-    }
-
-    // Dynels.dat is loaded before content capability activation. An already-loaded
-    // machine may acquire this exact stock only when every loaded content placement field
-    // matches and its stock has never been opened/generated; it is never replaced.
-    bool TryAdoptExactStaticShop(VendingMachine proposed, out VendingMachine shop)
-    {
-        shop = proposed;
-        if (!registry.TryGet(proposed.Identity, out var dynel) || dynel is not VendingMachine existing
-            || existing.SpawnSource != SpawnSource.StaticDynel || existing.OwnerNpc != null
-            || !ReferenceEquals(existing.Playfield, playfield) || existing.Template.Id != proposed.Template.Id
-            || existing.Stock.IsGenerated || existing.Stock.Slots.Count != 0
-            || existing.Position.x != proposed.Position.x || existing.Position.y != proposed.Position.y || existing.Position.z != proposed.Position.z
-            || existing.Rotation.xf != proposed.Rotation.xf || existing.Rotation.yf != proposed.Rotation.yf
-            || existing.Rotation.zf != proposed.Rotation.zf || existing.Rotation.wf != proposed.Rotation.wf)
-            return false;
-        existing.Stock.SetConfiguredSnapshot(proposed.Stock.Slots);
-        shop = existing;
-        return true;
-    }
-
     // Only loaded content placement construction calls this in production. Packet handlers only query.
     internal void Bind(NpcCharacter npc, NpcContentBinding binding)
     {
