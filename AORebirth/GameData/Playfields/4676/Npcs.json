@@ -1,0 +1,3864 @@
+{
+  "SchemaVersion": 1,
+  "PlayfieldId": 4676,
+  "Npcs": [
+    {
+      "Key": "legacy:garden-vendor:4676:7A2013B7",
+      "Provenance": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs;AOSharpLiveCapture/20260823-205320;sourceVendor:130B7813",
+      "ContentNpcIdentity": "SimpleChar:7A2013B7",
+      "PlayfieldId": 4676,
+      "InstanceId": 2048922551,
+      "Name": "Or-Mada of the Furious Fists",
+      "Position": [
+        401.44077,
+        112.38626,
+        428.45996
+      ],
+      "Rotation": [
+        0,
+        -0.6433794,
+        0,
+        -0.76554775
+      ],
+      "Stats": {
+        "0": 271061505,
+        "1": 32800,
+        "4": 6,
+        "27": 32800,
+        "33": 1,
+        "47": 1,
+        "54": 30,
+        "59": 2,
+        "60": 15,
+        "64": 40694,
+        "89": 1,
+        "156": 103,
+        "359": 236640,
+        "360": 100,
+        "368": 15,
+        "389": 0,
+        "455": 137,
+        "466": 15,
+        "660": 0,
+        "673": 31
+      },
+      "Textures": [],
+      "Meshes": [
+        {
+          "Position": 1,
+          "OverrideTextureId": 0,
+          "Id": 209532,
+          "Layer": 2
+        }
+      ],
+      "HasDialogue": true,
+      "Passive": true,
+      "Attackable": true,
+      "TickLiving": false,
+      "Presentation": {
+        "Meshes": [
+          {
+            "Position": 1,
+            "OverrideTextureId": 0,
+            "Id": 209532,
+            "Layer": 2
+          }
+        ]
+      },
+      "Vendor": {
+        "InstanceId": 319518739,
+        "TemplateId": 99634,
+        "Stock": [
+          {
+            "Slot": 0,
+            "LowId": 152740,
+            "HighId": 152741,
+            "Quality": 69
+          },
+          {
+            "Slot": 1,
+            "LowId": 152740,
+            "HighId": 152741,
+            "Quality": 74
+          },
+          {
+            "Slot": 2,
+            "LowId": 130216,
+            "HighId": 130217,
+            "Quality": 20
+          },
+          {
+            "Slot": 3,
+            "LowId": 130172,
+            "HighId": 130173,
+            "Quality": 22
+          },
+          {
+            "Slot": 4,
+            "LowId": 152734,
+            "HighId": 152735,
+            "Quality": 25
+          },
+          {
+            "Slot": 5,
+            "LowId": 125425,
+            "HighId": 125426,
+            "Quality": 75
+          },
+          {
+            "Slot": 6,
+            "LowId": 130207,
+            "HighId": 130208,
+            "Quality": 53
+          },
+          {
+            "Slot": 7,
+            "LowId": 130207,
+            "HighId": 130208,
+            "Quality": 58
+          },
+          {
+            "Slot": 8,
+            "LowId": 122930,
+            "HighId": 122931,
+            "Quality": 69
+          },
+          {
+            "Slot": 9,
+            "LowId": 152392,
+            "HighId": 152393,
+            "Quality": 47
+          },
+          {
+            "Slot": 10,
+            "LowId": 123368,
+            "HighId": 123369,
+            "Quality": 64
+          },
+          {
+            "Slot": 11,
+            "LowId": 130220,
+            "HighId": 130221,
+            "Quality": 36
+          },
+          {
+            "Slot": 12,
+            "LowId": 122051,
+            "HighId": 122052,
+            "Quality": 71
+          },
+          {
+            "Slot": 13,
+            "LowId": 121766,
+            "HighId": 121767,
+            "Quality": 65
+          },
+          {
+            "Slot": 14,
+            "LowId": 121766,
+            "HighId": 121767,
+            "Quality": 74
+          },
+          {
+            "Slot": 15,
+            "LowId": 121747,
+            "HighId": 121748,
+            "Quality": 72
+          },
+          {
+            "Slot": 16,
+            "LowId": 144086,
+            "HighId": 144087,
+            "Quality": 28
+          },
+          {
+            "Slot": 17,
+            "LowId": 122835,
+            "HighId": 122836,
+            "Quality": 63
+          },
+          {
+            "Slot": 18,
+            "LowId": 122754,
+            "HighId": 122754,
+            "Quality": 61
+          },
+          {
+            "Slot": 19,
+            "LowId": 121709,
+            "HighId": 121710,
+            "Quality": 64
+          },
+          {
+            "Slot": 20,
+            "LowId": 121709,
+            "HighId": 121710,
+            "Quality": 65
+          },
+          {
+            "Slot": 21,
+            "LowId": 129071,
+            "HighId": 129072,
+            "Quality": 41
+          },
+          {
+            "Slot": 22,
+            "LowId": 129071,
+            "HighId": 129072,
+            "Quality": 53
+          },
+          {
+            "Slot": 23,
+            "LowId": 129071,
+            "HighId": 129072,
+            "Quality": 57
+          },
+          {
+            "Slot": 24,
+            "LowId": 231111,
+            "HighId": 231111,
+            "Quality": 59
+          },
+          {
+            "Slot": 25,
+            "LowId": 231112,
+            "HighId": 231112,
+            "Quality": 60
+          },
+          {
+            "Slot": 26,
+            "LowId": 123116,
+            "HighId": 123117,
+            "Quality": 36
+          },
+          {
+            "Slot": 27,
+            "LowId": 122408,
+            "HighId": 122409,
+            "Quality": 24
+          },
+          {
+            "Slot": 28,
+            "LowId": 122351,
+            "HighId": 122352,
+            "Quality": 39
+          },
+          {
+            "Slot": 29,
+            "LowId": 160219,
+            "HighId": 160220,
+            "Quality": 63
+          },
+          {
+            "Slot": 30,
+            "LowId": 160224,
+            "HighId": 160225,
+            "Quality": 22
+          },
+          {
+            "Slot": 31,
+            "LowId": 160224,
+            "HighId": 160225,
+            "Quality": 36
+          },
+          {
+            "Slot": 32,
+            "LowId": 160224,
+            "HighId": 160225,
+            "Quality": 37
+          },
+          {
+            "Slot": 33,
+            "LowId": 129026,
+            "HighId": 129027,
+            "Quality": 5
+          },
+          {
+            "Slot": 34,
+            "LowId": 129026,
+            "HighId": 129027,
+            "Quality": 6
+          },
+          {
+            "Slot": 35,
+            "LowId": 129026,
+            "HighId": 129027,
+            "Quality": 8
+          },
+          {
+            "Slot": 36,
+            "LowId": 152732,
+            "HighId": 152733,
+            "Quality": 2
+          },
+          {
+            "Slot": 37,
+            "LowId": 122924,
+            "HighId": 122925,
+            "Quality": 6
+          },
+          {
+            "Slot": 38,
+            "LowId": 122924,
+            "HighId": 122925,
+            "Quality": 11
+          },
+          {
+            "Slot": 39,
+            "LowId": 122045,
+            "HighId": 122045,
+            "Quality": 1
+          },
+          {
+            "Slot": 40,
+            "LowId": 122045,
+            "HighId": 122046,
+            "Quality": 11
+          },
+          {
+            "Slot": 41,
+            "LowId": 122905,
+            "HighId": 122906,
+            "Quality": 15
+          },
+          {
+            "Slot": 42,
+            "LowId": 122905,
+            "HighId": 122906,
+            "Quality": 18
+          },
+          {
+            "Slot": 43,
+            "LowId": 122807,
+            "HighId": 122808,
+            "Quality": 22
+          },
+          {
+            "Slot": 44,
+            "LowId": 122907,
+            "HighId": 122908,
+            "Quality": 26
+          },
+          {
+            "Slot": 45,
+            "LowId": 122907,
+            "HighId": 122908,
+            "Quality": 31
+          },
+          {
+            "Slot": 46,
+            "LowId": 121705,
+            "HighId": 121705,
+            "Quality": 21
+          },
+          {
+            "Slot": 47,
+            "LowId": 121705,
+            "HighId": 121706,
+            "Quality": 29
+          },
+          {
+            "Slot": 48,
+            "LowId": 121705,
+            "HighId": 121706,
+            "Quality": 37
+          },
+          {
+            "Slot": 49,
+            "LowId": 231252,
+            "HighId": 231253,
+            "Quality": 12
+          },
+          {
+            "Slot": 50,
+            "LowId": 231256,
+            "HighId": 231257,
+            "Quality": 32
+          },
+          {
+            "Slot": 51,
+            "LowId": 142821,
+            "HighId": 142822,
+            "Quality": 42
+          },
+          {
+            "Slot": 52,
+            "LowId": 130064,
+            "HighId": 130065,
+            "Quality": 52
+          },
+          {
+            "Slot": 53,
+            "LowId": 130064,
+            "HighId": 130065,
+            "Quality": 57
+          },
+          {
+            "Slot": 54,
+            "LowId": 231210,
+            "HighId": 231211,
+            "Quality": 53
+          },
+          {
+            "Slot": 55,
+            "LowId": 231210,
+            "HighId": 231211,
+            "Quality": 60
+          },
+          {
+            "Slot": 56,
+            "LowId": 231104,
+            "HighId": 231105,
+            "Quality": 5
+          },
+          {
+            "Slot": 57,
+            "LowId": 231104,
+            "HighId": 231105,
+            "Quality": 14
+          },
+          {
+            "Slot": 58,
+            "LowId": 130224,
+            "HighId": 130225,
+            "Quality": 56
+          },
+          {
+            "Slot": 59,
+            "LowId": 130224,
+            "HighId": 130225,
+            "Quality": 66
+          },
+          {
+            "Slot": 60,
+            "LowId": 130224,
+            "HighId": 130225,
+            "Quality": 69
+          },
+          {
+            "Slot": 61,
+            "LowId": 122695,
+            "HighId": 122696,
+            "Quality": 44
+          },
+          {
+            "Slot": 62,
+            "LowId": 152313,
+            "HighId": 152314,
+            "Quality": 47
+          },
+          {
+            "Slot": 63,
+            "LowId": 122928,
+            "HighId": 122929,
+            "Quality": 45
+          },
+          {
+            "Slot": 64,
+            "LowId": 122928,
+            "HighId": 122929,
+            "Quality": 52
+          },
+          {
+            "Slot": 65,
+            "LowId": 122372,
+            "HighId": 122373,
+            "Quality": 48
+          },
+          {
+            "Slot": 66,
+            "LowId": 121726,
+            "HighId": 121727,
+            "Quality": 47
+          },
+          {
+            "Slot": 67,
+            "LowId": 121726,
+            "HighId": 121727,
+            "Quality": 53
+          },
+          {
+            "Slot": 68,
+            "LowId": 121727,
+            "HighId": 121727,
+            "Quality": 60
+          },
+          {
+            "Slot": 69,
+            "LowId": 130148,
+            "HighId": 130149,
+            "Quality": 45
+          },
+          {
+            "Slot": 70,
+            "LowId": 130148,
+            "HighId": 130149,
+            "Quality": 49
+          },
+          {
+            "Slot": 71,
+            "LowId": 130218,
+            "HighId": 130218,
+            "Quality": 22
+          },
+          {
+            "Slot": 72,
+            "LowId": 130218,
+            "HighId": 130219,
+            "Quality": 29
+          },
+          {
+            "Slot": 73,
+            "LowId": 123385,
+            "HighId": 123386,
+            "Quality": 44
+          },
+          {
+            "Slot": 74,
+            "LowId": 129030,
+            "HighId": 129031,
+            "Quality": 53
+          },
+          {
+            "Slot": 75,
+            "LowId": 144084,
+            "HighId": 144085,
+            "Quality": 15
+          },
+          {
+            "Slot": 76,
+            "LowId": 122833,
+            "HighId": 122834,
+            "Quality": 58
+          },
+          {
+            "Slot": 77,
+            "LowId": 121707,
+            "HighId": 121708,
+            "Quality": 45
+          },
+          {
+            "Slot": 78,
+            "LowId": 121707,
+            "HighId": 121708,
+            "Quality": 49
+          },
+          {
+            "Slot": 79,
+            "LowId": 152311,
+            "HighId": 152312,
+            "Quality": 25
+          },
+          {
+            "Slot": 80,
+            "LowId": 152312,
+            "HighId": 152312,
+            "Quality": 30
+          },
+          {
+            "Slot": 81,
+            "LowId": 144146,
+            "HighId": 144147,
+            "Quality": 5
+          },
+          {
+            "Slot": 82,
+            "LowId": 144146,
+            "HighId": 144147,
+            "Quality": 16
+          },
+          {
+            "Slot": 83,
+            "LowId": 130150,
+            "HighId": 130151,
+            "Quality": 66
+          },
+          {
+            "Slot": 84,
+            "LowId": 130150,
+            "HighId": 130151,
+            "Quality": 69
+          },
+          {
+            "Slot": 85,
+            "LowId": 130150,
+            "HighId": 130151,
+            "Quality": 70
+          },
+          {
+            "Slot": 86,
+            "LowId": 130150,
+            "HighId": 130151,
+            "Quality": 71
+          },
+          {
+            "Slot": 87,
+            "LowId": 142817,
+            "HighId": 142818,
+            "Quality": 3
+          },
+          {
+            "Slot": 88,
+            "LowId": 142817,
+            "HighId": 142818,
+            "Quality": 19
+          },
+          {
+            "Slot": 89,
+            "LowId": 122350,
+            "HighId": 122350,
+            "Quality": 20
+          },
+          {
+            "Slot": 90,
+            "LowId": 131605,
+            "HighId": 131606,
+            "Quality": 26
+          },
+          {
+            "Slot": 91,
+            "LowId": 121591,
+            "HighId": 121592,
+            "Quality": 3
+          },
+          {
+            "Slot": 92,
+            "LowId": 130144,
+            "HighId": 130145,
+            "Quality": 12
+          },
+          {
+            "Slot": 93,
+            "LowId": 130165,
+            "HighId": 130166,
+            "Quality": 44
+          },
+          {
+            "Slot": 94,
+            "LowId": 160242,
+            "HighId": 160243,
+            "Quality": 43
+          },
+          {
+            "Slot": 95,
+            "LowId": 160242,
+            "HighId": 160243,
+            "Quality": 44
+          },
+          {
+            "Slot": 96,
+            "LowId": 160242,
+            "HighId": 160243,
+            "Quality": 55
+          },
+          {
+            "Slot": 97,
+            "LowId": 160239,
+            "HighId": 160240,
+            "Quality": 43
+          },
+          {
+            "Slot": 98,
+            "LowId": 160233,
+            "HighId": 160234,
+            "Quality": 18
+          },
+          {
+            "Slot": 99,
+            "LowId": 231089,
+            "HighId": 231090,
+            "Quality": 37
+          },
+          {
+            "Slot": 100,
+            "LowId": 129069,
+            "HighId": 129070,
+            "Quality": 9
+          },
+          {
+            "Slot": 101,
+            "LowId": 129069,
+            "HighId": 129070,
+            "Quality": 10
+          },
+          {
+            "Slot": 102,
+            "LowId": 129069,
+            "HighId": 129070,
+            "Quality": 14
+          },
+          {
+            "Slot": 103,
+            "LowId": 129069,
+            "HighId": 129070,
+            "Quality": 27
+          },
+          {
+            "Slot": 104,
+            "LowId": 130203,
+            "HighId": 130204,
+            "Quality": 34
+          },
+          {
+            "Slot": 105,
+            "LowId": 144071,
+            "HighId": 144072,
+            "Quality": 53
+          },
+          {
+            "Slot": 106,
+            "LowId": 231125,
+            "HighId": 231126,
+            "Quality": 22
+          },
+          {
+            "Slot": 107,
+            "LowId": 144090,
+            "HighId": 144091,
+            "Quality": 45
+          },
+          {
+            "Slot": 108,
+            "LowId": 144090,
+            "HighId": 144091,
+            "Quality": 65
+          },
+          {
+            "Slot": 109,
+            "LowId": 144090,
+            "HighId": 144091,
+            "Quality": 67
+          },
+          {
+            "Slot": 110,
+            "LowId": 121612,
+            "HighId": 121613,
+            "Quality": 45
+          },
+          {
+            "Slot": 111,
+            "LowId": 122691,
+            "HighId": 122692,
+            "Quality": 5
+          },
+          {
+            "Slot": 112,
+            "LowId": 122691,
+            "HighId": 122692,
+            "Quality": 6
+          },
+          {
+            "Slot": 113,
+            "LowId": 122691,
+            "HighId": 122692,
+            "Quality": 16
+          },
+          {
+            "Slot": 114,
+            "LowId": 130146,
+            "HighId": 130147,
+            "Quality": 24
+          },
+          {
+            "Slot": 115,
+            "LowId": 130146,
+            "HighId": 130147,
+            "Quality": 26
+          },
+          {
+            "Slot": 116,
+            "LowId": 130060,
+            "HighId": 130060,
+            "Quality": 1
+          },
+          {
+            "Slot": 117,
+            "LowId": 130060,
+            "HighId": 130061,
+            "Quality": 6
+          },
+          {
+            "Slot": 118,
+            "LowId": 122943,
+            "HighId": 122944,
+            "Quality": 9
+          },
+          {
+            "Slot": 119,
+            "LowId": 129028,
+            "HighId": 129029,
+            "Quality": 31
+          },
+          {
+            "Slot": 120,
+            "LowId": 129028,
+            "HighId": 129029,
+            "Quality": 38
+          },
+          {
+            "Slot": 121,
+            "LowId": 122829,
+            "HighId": 122830,
+            "Quality": 7
+          },
+          {
+            "Slot": 122,
+            "LowId": 129073,
+            "HighId": 129073,
+            "Quality": 60
+          },
+          {
+            "Slot": 123,
+            "LowId": 129073,
+            "HighId": 129074,
+            "Quality": 62
+          },
+          {
+            "Slot": 124,
+            "LowId": 129073,
+            "HighId": 129074,
+            "Quality": 66
+          },
+          {
+            "Slot": 125,
+            "LowId": 142819,
+            "HighId": 142820,
+            "Quality": 22
+          },
+          {
+            "Slot": 126,
+            "LowId": 142819,
+            "HighId": 142820,
+            "Quality": 25
+          }
+        ]
+      }
+    },
+    {
+      "Key": "legacy:garden-vendor:4676:7A2013B4",
+      "Provenance": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs;AOSharpLiveCapture/20260823-205320;sourceVendor:130B7810",
+      "ContentNpcIdentity": "SimpleChar:7A2013B4",
+      "PlayfieldId": 4676,
+      "InstanceId": 2048922548,
+      "Name": "Or-Mada of Protection",
+      "Position": [
+        404.2271,
+        112.752884,
+        439.98853
+      ],
+      "Rotation": [
+        0,
+        0.99976355,
+        0,
+        0.021746982
+      ],
+      "Stats": {
+        "0": 271061505,
+        "1": 32800,
+        "4": 6,
+        "27": 32800,
+        "33": 1,
+        "47": 1,
+        "54": 30,
+        "59": 2,
+        "60": 15,
+        "64": 40694,
+        "89": 1,
+        "156": 103,
+        "359": 236640,
+        "360": 100,
+        "368": 15,
+        "389": 0,
+        "455": 137,
+        "466": 15,
+        "660": 0,
+        "673": 31
+      },
+      "Textures": [],
+      "Meshes": [
+        {
+          "Position": 1,
+          "OverrideTextureId": 0,
+          "Id": 209541,
+          "Layer": 2
+        }
+      ],
+      "HasDialogue": true,
+      "Passive": true,
+      "Attackable": true,
+      "TickLiving": false,
+      "Presentation": {
+        "Meshes": [
+          {
+            "Position": 1,
+            "OverrideTextureId": 0,
+            "Id": 209541,
+            "Layer": 2
+          }
+        ]
+      },
+      "Vendor": {
+        "InstanceId": 319518736,
+        "TemplateId": 99634,
+        "Stock": [
+          {
+            "Slot": 0,
+            "LowId": 149928,
+            "HighId": 149927,
+            "Quality": 29
+          },
+          {
+            "Slot": 1,
+            "LowId": 149928,
+            "HighId": 149927,
+            "Quality": 37
+          },
+          {
+            "Slot": 2,
+            "LowId": 149916,
+            "HighId": 149915,
+            "Quality": 22
+          },
+          {
+            "Slot": 3,
+            "LowId": 149908,
+            "HighId": 149907,
+            "Quality": 26
+          },
+          {
+            "Slot": 4,
+            "LowId": 85639,
+            "HighId": 22124,
+            "Quality": 33
+          },
+          {
+            "Slot": 5,
+            "LowId": 85513,
+            "HighId": 22313,
+            "Quality": 56
+          },
+          {
+            "Slot": 6,
+            "LowId": 85513,
+            "HighId": 22313,
+            "Quality": 64
+          },
+          {
+            "Slot": 7,
+            "LowId": 149904,
+            "HighId": 149903,
+            "Quality": 32
+          },
+          {
+            "Slot": 8,
+            "LowId": 85746,
+            "HighId": 27391,
+            "Quality": 47
+          },
+          {
+            "Slot": 9,
+            "LowId": 85645,
+            "HighId": 85644,
+            "Quality": 38
+          },
+          {
+            "Slot": 10,
+            "LowId": 85645,
+            "HighId": 85644,
+            "Quality": 48
+          },
+          {
+            "Slot": 11,
+            "LowId": 85645,
+            "HighId": 85644,
+            "Quality": 52
+          },
+          {
+            "Slot": 12,
+            "LowId": 85602,
+            "HighId": 85601,
+            "Quality": 9
+          },
+          {
+            "Slot": 13,
+            "LowId": 85602,
+            "HighId": 85601,
+            "Quality": 40
+          },
+          {
+            "Slot": 14,
+            "LowId": 85562,
+            "HighId": 85561,
+            "Quality": 58
+          },
+          {
+            "Slot": 15,
+            "LowId": 85562,
+            "HighId": 85561,
+            "Quality": 69
+          },
+          {
+            "Slot": 16,
+            "LowId": 85521,
+            "HighId": 85520,
+            "Quality": 39
+          },
+          {
+            "Slot": 17,
+            "LowId": 85750,
+            "HighId": 85749,
+            "Quality": 13
+          },
+          {
+            "Slot": 18,
+            "LowId": 85481,
+            "HighId": 85690,
+            "Quality": 38
+          },
+          {
+            "Slot": 19,
+            "LowId": 85481,
+            "HighId": 85690,
+            "Quality": 42
+          },
+          {
+            "Slot": 20,
+            "LowId": 85481,
+            "HighId": 85690,
+            "Quality": 50
+          },
+          {
+            "Slot": 21,
+            "LowId": 85657,
+            "HighId": 85656,
+            "Quality": 12
+          },
+          {
+            "Slot": 22,
+            "LowId": 85533,
+            "HighId": 85532,
+            "Quality": 70
+          },
+          {
+            "Slot": 23,
+            "LowId": 85761,
+            "HighId": 85760,
+            "Quality": 34
+          },
+          {
+            "Slot": 24,
+            "LowId": 85761,
+            "HighId": 85760,
+            "Quality": 62
+          },
+          {
+            "Slot": 25,
+            "LowId": 85714,
+            "HighId": 85713,
+            "Quality": 14
+          },
+          {
+            "Slot": 26,
+            "LowId": 85714,
+            "HighId": 85713,
+            "Quality": 70
+          },
+          {
+            "Slot": 27,
+            "LowId": 85714,
+            "HighId": 85713,
+            "Quality": 71
+          },
+          {
+            "Slot": 28,
+            "LowId": 70558,
+            "HighId": 85640,
+            "Quality": 28
+          },
+          {
+            "Slot": 29,
+            "LowId": 70562,
+            "HighId": 85597,
+            "Quality": 45
+          },
+          {
+            "Slot": 30,
+            "LowId": 70563,
+            "HighId": 85558,
+            "Quality": 8
+          },
+          {
+            "Slot": 31,
+            "LowId": 70561,
+            "HighId": 85744,
+            "Quality": 36
+          },
+          {
+            "Slot": 32,
+            "LowId": 70561,
+            "HighId": 85744,
+            "Quality": 37
+          },
+          {
+            "Slot": 33,
+            "LowId": 70560,
+            "HighId": 85688,
+            "Quality": 51
+          },
+          {
+            "Slot": 34,
+            "LowId": 70560,
+            "HighId": 85688,
+            "Quality": 75
+          },
+          {
+            "Slot": 35,
+            "LowId": 85593,
+            "HighId": 85592,
+            "Quality": 25
+          },
+          {
+            "Slot": 36,
+            "LowId": 85554,
+            "HighId": 85553,
+            "Quality": 34
+          },
+          {
+            "Slot": 37,
+            "LowId": 85507,
+            "HighId": 85506,
+            "Quality": 32
+          },
+          {
+            "Slot": 38,
+            "LowId": 85507,
+            "HighId": 85506,
+            "Quality": 51
+          },
+          {
+            "Slot": 39,
+            "LowId": 85681,
+            "HighId": 85680,
+            "Quality": 47
+          },
+          {
+            "Slot": 40,
+            "LowId": 149914,
+            "HighId": 149901,
+            "Quality": 33
+          },
+          {
+            "Slot": 41,
+            "LowId": 149910,
+            "HighId": 149909,
+            "Quality": 52
+          },
+          {
+            "Slot": 42,
+            "LowId": 149910,
+            "HighId": 149909,
+            "Quality": 63
+          },
+          {
+            "Slot": 43,
+            "LowId": 149922,
+            "HighId": 149921,
+            "Quality": 59
+          },
+          {
+            "Slot": 44,
+            "LowId": 149930,
+            "HighId": 149929,
+            "Quality": 34
+          },
+          {
+            "Slot": 45,
+            "LowId": 149930,
+            "HighId": 149929,
+            "Quality": 70
+          },
+          {
+            "Slot": 46,
+            "LowId": 85500,
+            "HighId": 85499,
+            "Quality": 8
+          },
+          {
+            "Slot": 47,
+            "LowId": 85500,
+            "HighId": 85499,
+            "Quality": 20
+          },
+          {
+            "Slot": 48,
+            "LowId": 85500,
+            "HighId": 85499,
+            "Quality": 25
+          },
+          {
+            "Slot": 49,
+            "LowId": 85730,
+            "HighId": 85729,
+            "Quality": 18
+          },
+          {
+            "Slot": 50,
+            "LowId": 85730,
+            "HighId": 85729,
+            "Quality": 29
+          },
+          {
+            "Slot": 51,
+            "LowId": 85674,
+            "HighId": 85673,
+            "Quality": 49
+          },
+          {
+            "Slot": 52,
+            "LowId": 85607,
+            "HighId": 22170,
+            "Quality": 36
+          },
+          {
+            "Slot": 53,
+            "LowId": 85567,
+            "HighId": 22223,
+            "Quality": 43
+          },
+          {
+            "Slot": 54,
+            "LowId": 85526,
+            "HighId": 22293,
+            "Quality": 70
+          },
+          {
+            "Slot": 55,
+            "LowId": 85755,
+            "HighId": 21921,
+            "Quality": 45
+          },
+          {
+            "Slot": 56,
+            "LowId": 85755,
+            "HighId": 21921,
+            "Quality": 60
+          },
+          {
+            "Slot": 57,
+            "LowId": 85702,
+            "HighId": 22018,
+            "Quality": 13
+          },
+          {
+            "Slot": 58,
+            "LowId": 85702,
+            "HighId": 22018,
+            "Quality": 71
+          },
+          {
+            "Slot": 59,
+            "LowId": 85501,
+            "HighId": 22343,
+            "Quality": 9
+          },
+          {
+            "Slot": 60,
+            "LowId": 85501,
+            "HighId": 22343,
+            "Quality": 23
+          },
+          {
+            "Slot": 61,
+            "LowId": 85501,
+            "HighId": 22343,
+            "Quality": 58
+          },
+          {
+            "Slot": 62,
+            "LowId": 85501,
+            "HighId": 22343,
+            "Quality": 70
+          },
+          {
+            "Slot": 63,
+            "LowId": 85731,
+            "HighId": 21967,
+            "Quality": 37
+          },
+          {
+            "Slot": 64,
+            "LowId": 85675,
+            "HighId": 22076,
+            "Quality": 44
+          },
+          {
+            "Slot": 65,
+            "LowId": 85641,
+            "HighId": 22116,
+            "Quality": 28
+          },
+          {
+            "Slot": 66,
+            "LowId": 85745,
+            "HighId": 21929,
+            "Quality": 28
+          },
+          {
+            "Slot": 67,
+            "LowId": 85745,
+            "HighId": 21929,
+            "Quality": 36
+          },
+          {
+            "Slot": 68,
+            "LowId": 85745,
+            "HighId": 21929,
+            "Quality": 49
+          },
+          {
+            "Slot": 69,
+            "LowId": 85691,
+            "HighId": 22004,
+            "Quality": 56
+          },
+          {
+            "Slot": 70,
+            "LowId": 85691,
+            "HighId": 22004,
+            "Quality": 62
+          },
+          {
+            "Slot": 71,
+            "LowId": 85740,
+            "HighId": 85739,
+            "Quality": 19
+          },
+          {
+            "Slot": 72,
+            "LowId": 85740,
+            "HighId": 85739,
+            "Quality": 59
+          },
+          {
+            "Slot": 73,
+            "LowId": 85684,
+            "HighId": 85683,
+            "Quality": 59
+          },
+          {
+            "Slot": 74,
+            "LowId": 85655,
+            "HighId": 22104,
+            "Quality": 38
+          },
+          {
+            "Slot": 75,
+            "LowId": 85655,
+            "HighId": 22104,
+            "Quality": 70
+          },
+          {
+            "Slot": 76,
+            "LowId": 85612,
+            "HighId": 22166,
+            "Quality": 54
+          },
+          {
+            "Slot": 77,
+            "LowId": 85612,
+            "HighId": 22166,
+            "Quality": 73
+          },
+          {
+            "Slot": 78,
+            "LowId": 85531,
+            "HighId": 22289,
+            "Quality": 21
+          },
+          {
+            "Slot": 79,
+            "LowId": 85477,
+            "HighId": 21917,
+            "Quality": 70
+          },
+          {
+            "Slot": 80,
+            "LowId": 85712,
+            "HighId": 22010,
+            "Quality": 39
+          },
+          {
+            "Slot": 81,
+            "LowId": 85711,
+            "HighId": 22014,
+            "Quality": 75
+          },
+          {
+            "Slot": 82,
+            "LowId": 85638,
+            "HighId": 85637,
+            "Quality": 7
+          },
+          {
+            "Slot": 83,
+            "LowId": 85638,
+            "HighId": 85637,
+            "Quality": 15
+          },
+          {
+            "Slot": 84,
+            "LowId": 85596,
+            "HighId": 85595,
+            "Quality": 27
+          },
+          {
+            "Slot": 85,
+            "LowId": 85557,
+            "HighId": 85556,
+            "Quality": 41
+          },
+          {
+            "Slot": 86,
+            "LowId": 85512,
+            "HighId": 85511,
+            "Quality": 8
+          },
+          {
+            "Slot": 87,
+            "LowId": 85686,
+            "HighId": 85685,
+            "Quality": 20
+          },
+          {
+            "Slot": 88,
+            "LowId": 85686,
+            "HighId": 85685,
+            "Quality": 37
+          },
+          {
+            "Slot": 89,
+            "LowId": 85541,
+            "HighId": 22262,
+            "Quality": 29
+          },
+          {
+            "Slot": 90,
+            "LowId": 85724,
+            "HighId": 21971,
+            "Quality": 61
+          },
+          {
+            "Slot": 91,
+            "LowId": 85724,
+            "HighId": 21971,
+            "Quality": 72
+          },
+          {
+            "Slot": 92,
+            "LowId": 85668,
+            "HighId": 22080,
+            "Quality": 31
+          },
+          {
+            "Slot": 93,
+            "LowId": 85652,
+            "HighId": 85651,
+            "Quality": 65
+          },
+          {
+            "Slot": 94,
+            "LowId": 85652,
+            "HighId": 85651,
+            "Quality": 68
+          },
+          {
+            "Slot": 95,
+            "LowId": 85569,
+            "HighId": 85568,
+            "Quality": 68
+          },
+          {
+            "Slot": 96,
+            "LowId": 85528,
+            "HighId": 85527,
+            "Quality": 74
+          },
+          {
+            "Slot": 97,
+            "LowId": 85757,
+            "HighId": 85756,
+            "Quality": 38
+          },
+          {
+            "Slot": 98,
+            "LowId": 85706,
+            "HighId": 85705,
+            "Quality": 62
+          },
+          {
+            "Slot": 99,
+            "LowId": 85706,
+            "HighId": 85705,
+            "Quality": 64
+          }
+        ]
+      }
+    },
+    {
+      "Key": "legacy:garden-vendor:4676:7A2013B5",
+      "Provenance": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs;AOSharpLiveCapture/20260823-205320;sourceVendor:130B7811",
+      "ContentNpcIdentity": "SimpleChar:7A2013B5",
+      "PlayfieldId": 4676,
+      "InstanceId": 2048922549,
+      "Name": "Or-Mada of Preservation",
+      "Position": [
+        411.70392,
+        110.80838,
+        438.30316
+      ],
+      "Rotation": [
+        0,
+        -0.9111272,
+        0,
+        0.41212526
+      ],
+      "Stats": {
+        "0": 271061505,
+        "1": 32800,
+        "4": 6,
+        "27": 32800,
+        "33": 1,
+        "47": 1,
+        "54": 30,
+        "59": 2,
+        "60": 15,
+        "64": 40694,
+        "89": 1,
+        "156": 103,
+        "359": 236640,
+        "360": 100,
+        "368": 15,
+        "389": 0,
+        "455": 137,
+        "466": 15,
+        "660": 0,
+        "673": 31
+      },
+      "Textures": [],
+      "Meshes": [
+        {
+          "Position": 1,
+          "OverrideTextureId": 0,
+          "Id": 209532,
+          "Layer": 2
+        }
+      ],
+      "HasDialogue": true,
+      "Passive": true,
+      "Attackable": true,
+      "TickLiving": false,
+      "Presentation": {
+        "Meshes": [
+          {
+            "Position": 1,
+            "OverrideTextureId": 0,
+            "Id": 209532,
+            "Layer": 2
+          }
+        ]
+      },
+      "Vendor": {
+        "InstanceId": 319518737,
+        "TemplateId": 99634,
+        "Stock": [
+          {
+            "Slot": 0,
+            "LowId": 204103,
+            "HighId": 204103,
+            "Quality": 1
+          },
+          {
+            "Slot": 1,
+            "LowId": 204103,
+            "HighId": 204104,
+            "Quality": 10
+          },
+          {
+            "Slot": 2,
+            "LowId": 204103,
+            "HighId": 204104,
+            "Quality": 20
+          },
+          {
+            "Slot": 3,
+            "LowId": 204103,
+            "HighId": 204104,
+            "Quality": 30
+          },
+          {
+            "Slot": 4,
+            "LowId": 204103,
+            "HighId": 204104,
+            "Quality": 40
+          },
+          {
+            "Slot": 5,
+            "LowId": 204104,
+            "HighId": 204104,
+            "Quality": 50
+          },
+          {
+            "Slot": 6,
+            "LowId": 204104,
+            "HighId": 204105,
+            "Quality": 60
+          },
+          {
+            "Slot": 7,
+            "LowId": 204104,
+            "HighId": 204105,
+            "Quality": 70
+          },
+          {
+            "Slot": 8,
+            "LowId": 204104,
+            "HighId": 204105,
+            "Quality": 80
+          },
+          {
+            "Slot": 9,
+            "LowId": 204104,
+            "HighId": 204105,
+            "Quality": 90
+          },
+          {
+            "Slot": 10,
+            "LowId": 291082,
+            "HighId": 291082,
+            "Quality": 1
+          },
+          {
+            "Slot": 11,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 10
+          },
+          {
+            "Slot": 12,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 20
+          },
+          {
+            "Slot": 13,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 30
+          },
+          {
+            "Slot": 14,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 40
+          },
+          {
+            "Slot": 15,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 50
+          },
+          {
+            "Slot": 16,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 60
+          },
+          {
+            "Slot": 17,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 70
+          },
+          {
+            "Slot": 18,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 80
+          },
+          {
+            "Slot": 19,
+            "LowId": 291082,
+            "HighId": 291083,
+            "Quality": 90
+          },
+          {
+            "Slot": 20,
+            "LowId": 291043,
+            "HighId": 291043,
+            "Quality": 1
+          },
+          {
+            "Slot": 21,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 10
+          },
+          {
+            "Slot": 22,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 20
+          },
+          {
+            "Slot": 23,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 30
+          },
+          {
+            "Slot": 24,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 40
+          },
+          {
+            "Slot": 25,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 50
+          },
+          {
+            "Slot": 26,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 60
+          },
+          {
+            "Slot": 27,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 70
+          },
+          {
+            "Slot": 28,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 80
+          },
+          {
+            "Slot": 29,
+            "LowId": 291043,
+            "HighId": 291044,
+            "Quality": 90
+          }
+        ]
+      }
+    },
+    {
+      "Key": "legacy:garden-vendor:4676:7A2013B8",
+      "Provenance": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs;AOSharpLiveCapture/20260823-205320;sourceVendor:130B7814",
+      "ContentNpcIdentity": "SimpleChar:7A2013B8",
+      "PlayfieldId": 4676,
+      "InstanceId": 2048922552,
+      "Name": "Or-Mada of Flaming Barrels",
+      "Position": [
+        414.51218,
+        110.40926,
+        438.45068
+      ],
+      "Rotation": [
+        0,
+        -0.83883405,
+        0,
+        0.5443871
+      ],
+      "Stats": {
+        "0": 271061505,
+        "1": 32800,
+        "4": 6,
+        "27": 32800,
+        "33": 1,
+        "47": 1,
+        "54": 30,
+        "59": 2,
+        "60": 15,
+        "64": 40694,
+        "89": 1,
+        "156": 103,
+        "359": 236640,
+        "360": 100,
+        "368": 15,
+        "389": 0,
+        "455": 137,
+        "466": 15,
+        "660": 0,
+        "673": 31
+      },
+      "Textures": [],
+      "Meshes": [
+        {
+          "Position": 1,
+          "OverrideTextureId": 0,
+          "Id": 209541,
+          "Layer": 2
+        }
+      ],
+      "HasDialogue": true,
+      "Passive": true,
+      "Attackable": true,
+      "TickLiving": false,
+      "Presentation": {
+        "Meshes": [
+          {
+            "Position": 1,
+            "OverrideTextureId": 0,
+            "Id": 209541,
+            "Layer": 2
+          }
+        ]
+      },
+      "Vendor": {
+        "InstanceId": 319518740,
+        "TemplateId": 99634,
+        "Stock": [
+          {
+            "Slot": 0,
+            "LowId": 128734,
+            "HighId": 128735,
+            "Quality": 13
+          },
+          {
+            "Slot": 1,
+            "LowId": 128734,
+            "HighId": 128735,
+            "Quality": 26
+          },
+          {
+            "Slot": 2,
+            "LowId": 128734,
+            "HighId": 128735,
+            "Quality": 36
+          },
+          {
+            "Slot": 3,
+            "LowId": 128834,
+            "HighId": 128834,
+            "Quality": 21
+          },
+          {
+            "Slot": 4,
+            "LowId": 128789,
+            "HighId": 128790,
+            "Quality": 70
+          },
+          {
+            "Slot": 5,
+            "LowId": 122085,
+            "HighId": 122086,
+            "Quality": 23
+          },
+          {
+            "Slot": 6,
+            "LowId": 122465,
+            "HighId": 122466,
+            "Quality": 27
+          },
+          {
+            "Slot": 7,
+            "LowId": 122446,
+            "HighId": 122447,
+            "Quality": 34
+          },
+          {
+            "Slot": 8,
+            "LowId": 123154,
+            "HighId": 123155,
+            "Quality": 53
+          },
+          {
+            "Slot": 9,
+            "LowId": 124770,
+            "HighId": 124771,
+            "Quality": 31
+          },
+          {
+            "Slot": 10,
+            "LowId": 123649,
+            "HighId": 123650,
+            "Quality": 24
+          },
+          {
+            "Slot": 11,
+            "LowId": 122580,
+            "HighId": 122580,
+            "Quality": 40
+          },
+          {
+            "Slot": 12,
+            "LowId": 142855,
+            "HighId": 142856,
+            "Quality": 9
+          },
+          {
+            "Slot": 13,
+            "LowId": 152279,
+            "HighId": 152280,
+            "Quality": 4
+          },
+          {
+            "Slot": 14,
+            "LowId": 152279,
+            "HighId": 152280,
+            "Quality": 14
+          },
+          {
+            "Slot": 15,
+            "LowId": 152280,
+            "HighId": 152280,
+            "Quality": 20
+          },
+          {
+            "Slot": 16,
+            "LowId": 152154,
+            "HighId": 152155,
+            "Quality": 3
+          },
+          {
+            "Slot": 17,
+            "LowId": 128911,
+            "HighId": 128912,
+            "Quality": 45
+          },
+          {
+            "Slot": 18,
+            "LowId": 128911,
+            "HighId": 128912,
+            "Quality": 50
+          },
+          {
+            "Slot": 19,
+            "LowId": 128911,
+            "HighId": 128912,
+            "Quality": 65
+          },
+          {
+            "Slot": 20,
+            "LowId": 123846,
+            "HighId": 123847,
+            "Quality": 22
+          },
+          {
+            "Slot": 21,
+            "LowId": 124219,
+            "HighId": 124220,
+            "Quality": 30
+          },
+          {
+            "Slot": 22,
+            "LowId": 123888,
+            "HighId": 123889,
+            "Quality": 40
+          },
+          {
+            "Slot": 23,
+            "LowId": 124127,
+            "HighId": 124128,
+            "Quality": 66
+          },
+          {
+            "Slot": 24,
+            "LowId": 122083,
+            "HighId": 122084,
+            "Quality": 17
+          },
+          {
+            "Slot": 25,
+            "LowId": 121855,
+            "HighId": 121856,
+            "Quality": 16
+          },
+          {
+            "Slot": 26,
+            "LowId": 122121,
+            "HighId": 122122,
+            "Quality": 6
+          },
+          {
+            "Slot": 27,
+            "LowId": 122235,
+            "HighId": 122236,
+            "Quality": 15
+          },
+          {
+            "Slot": 28,
+            "LowId": 121912,
+            "HighId": 121913,
+            "Quality": 12
+          },
+          {
+            "Slot": 29,
+            "LowId": 123133,
+            "HighId": 123134,
+            "Quality": 19
+          },
+          {
+            "Slot": 30,
+            "LowId": 123419,
+            "HighId": 123420,
+            "Quality": 13
+          },
+          {
+            "Slot": 31,
+            "LowId": 124768,
+            "HighId": 124769,
+            "Quality": 7
+          },
+          {
+            "Slot": 32,
+            "LowId": 124768,
+            "HighId": 124769,
+            "Quality": 18
+          },
+          {
+            "Slot": 33,
+            "LowId": 122539,
+            "HighId": 122540,
+            "Quality": 7
+          },
+          {
+            "Slot": 34,
+            "LowId": 122217,
+            "HighId": 122217,
+            "Quality": 20
+          },
+          {
+            "Slot": 35,
+            "LowId": 128739,
+            "HighId": 128740,
+            "Quality": 6
+          },
+          {
+            "Slot": 36,
+            "LowId": 128811,
+            "HighId": 128812,
+            "Quality": 12
+          },
+          {
+            "Slot": 37,
+            "LowId": 124484,
+            "HighId": 124485,
+            "Quality": 25
+          },
+          {
+            "Slot": 38,
+            "LowId": 124484,
+            "HighId": 124485,
+            "Quality": 41
+          },
+          {
+            "Slot": 39,
+            "LowId": 122463,
+            "HighId": 122464,
+            "Quality": 13
+          },
+          {
+            "Slot": 40,
+            "LowId": 122463,
+            "HighId": 122464,
+            "Quality": 15
+          },
+          {
+            "Slot": 41,
+            "LowId": 123686,
+            "HighId": 123686,
+            "Quality": 20
+          },
+          {
+            "Slot": 42,
+            "LowId": 121836,
+            "HighId": 121837,
+            "Quality": 8
+          },
+          {
+            "Slot": 43,
+            "LowId": 123076,
+            "HighId": 123077,
+            "Quality": 9
+          },
+          {
+            "Slot": 44,
+            "LowId": 122634,
+            "HighId": 122635,
+            "Quality": 4
+          },
+          {
+            "Slot": 45,
+            "LowId": 124315,
+            "HighId": 124316,
+            "Quality": 43
+          },
+          {
+            "Slot": 46,
+            "LowId": 124557,
+            "HighId": 124558,
+            "Quality": 31
+          },
+          {
+            "Slot": 47,
+            "LowId": 124557,
+            "HighId": 124558,
+            "Quality": 66
+          },
+          {
+            "Slot": 48,
+            "LowId": 124557,
+            "HighId": 124558,
+            "Quality": 72
+          },
+          {
+            "Slot": 49,
+            "LowId": 124278,
+            "HighId": 124279,
+            "Quality": 61
+          },
+          {
+            "Slot": 50,
+            "LowId": 152162,
+            "HighId": 152163,
+            "Quality": 52
+          },
+          {
+            "Slot": 51,
+            "LowId": 152162,
+            "HighId": 152163,
+            "Quality": 63
+          },
+          {
+            "Slot": 52,
+            "LowId": 152162,
+            "HighId": 152163,
+            "Quality": 70
+          },
+          {
+            "Slot": 53,
+            "LowId": 152157,
+            "HighId": 152157,
+            "Quality": 20
+          },
+          {
+            "Slot": 54,
+            "LowId": 123723,
+            "HighId": 123724,
+            "Quality": 6
+          },
+          {
+            "Slot": 55,
+            "LowId": 123776,
+            "HighId": 123777,
+            "Quality": 22
+          },
+          {
+            "Slot": 56,
+            "LowId": 152330,
+            "HighId": 152331,
+            "Quality": 66
+          },
+          {
+            "Slot": 57,
+            "LowId": 124411,
+            "HighId": 124412,
+            "Quality": 26
+          },
+          {
+            "Slot": 58,
+            "LowId": 124359,
+            "HighId": 124360,
+            "Quality": 28
+          },
+          {
+            "Slot": 59,
+            "LowId": 128784,
+            "HighId": 128785,
+            "Quality": 53
+          },
+          {
+            "Slot": 60,
+            "LowId": 124101,
+            "HighId": 124102,
+            "Quality": 6
+          },
+          {
+            "Slot": 61,
+            "LowId": 124103,
+            "HighId": 124104,
+            "Quality": 72
+          },
+          {
+            "Slot": 62,
+            "LowId": 123906,
+            "HighId": 123907,
+            "Quality": 67
+          },
+          {
+            "Slot": 63,
+            "LowId": 124505,
+            "HighId": 124506,
+            "Quality": 10
+          },
+          {
+            "Slot": 64,
+            "LowId": 124507,
+            "HighId": 124508,
+            "Quality": 41
+          },
+          {
+            "Slot": 65,
+            "LowId": 124245,
+            "HighId": 124246,
+            "Quality": 68
+          },
+          {
+            "Slot": 66,
+            "LowId": 124265,
+            "HighId": 124266,
+            "Quality": 39
+          },
+          {
+            "Slot": 67,
+            "LowId": 124265,
+            "HighId": 124266,
+            "Quality": 42
+          },
+          {
+            "Slot": 68,
+            "LowId": 124265,
+            "HighId": 124266,
+            "Quality": 75
+          },
+          {
+            "Slot": 69,
+            "LowId": 124153,
+            "HighId": 124154,
+            "Quality": 36
+          },
+          {
+            "Slot": 70,
+            "LowId": 124200,
+            "HighId": 124201,
+            "Quality": 40
+          },
+          {
+            "Slot": 71,
+            "LowId": 123993,
+            "HighId": 123994,
+            "Quality": 40
+          },
+          {
+            "Slot": 72,
+            "LowId": 124217,
+            "HighId": 124218,
+            "Quality": 3
+          },
+          {
+            "Slot": 73,
+            "LowId": 124494,
+            "HighId": 124495,
+            "Quality": 21
+          },
+          {
+            "Slot": 74,
+            "LowId": 124263,
+            "HighId": 124264,
+            "Quality": 27
+          },
+          {
+            "Slot": 75,
+            "LowId": 128909,
+            "HighId": 128910,
+            "Quality": 7
+          },
+          {
+            "Slot": 76,
+            "LowId": 128909,
+            "HighId": 128910,
+            "Quality": 10
+          },
+          {
+            "Slot": 77,
+            "LowId": 128909,
+            "HighId": 128910,
+            "Quality": 13
+          },
+          {
+            "Slot": 78,
+            "LowId": 128909,
+            "HighId": 128910,
+            "Quality": 37
+          },
+          {
+            "Slot": 79,
+            "LowId": 122600,
+            "HighId": 122601,
+            "Quality": 45
+          },
+          {
+            "Slot": 80,
+            "LowId": 121859,
+            "HighId": 121860,
+            "Quality": 53
+          },
+          {
+            "Slot": 81,
+            "LowId": 122125,
+            "HighId": 122126,
+            "Quality": 55
+          },
+          {
+            "Slot": 82,
+            "LowId": 121935,
+            "HighId": 121936,
+            "Quality": 56
+          },
+          {
+            "Slot": 83,
+            "LowId": 123137,
+            "HighId": 123138,
+            "Quality": 57
+          },
+          {
+            "Slot": 84,
+            "LowId": 124933,
+            "HighId": 124934,
+            "Quality": 55
+          },
+          {
+            "Slot": 85,
+            "LowId": 122277,
+            "HighId": 122278,
+            "Quality": 48
+          },
+          {
+            "Slot": 86,
+            "LowId": 122429,
+            "HighId": 122430,
+            "Quality": 56
+          },
+          {
+            "Slot": 87,
+            "LowId": 122429,
+            "HighId": 122430,
+            "Quality": 59
+          },
+          {
+            "Slot": 88,
+            "LowId": 122890,
+            "HighId": 122891,
+            "Quality": 43
+          },
+          {
+            "Slot": 89,
+            "LowId": 124564,
+            "HighId": 124565,
+            "Quality": 55
+          },
+          {
+            "Slot": 90,
+            "LowId": 122296,
+            "HighId": 122297,
+            "Quality": 54
+          },
+          {
+            "Slot": 91,
+            "LowId": 123595,
+            "HighId": 123595,
+            "Quality": 68
+          },
+          {
+            "Slot": 92,
+            "LowId": 121840,
+            "HighId": 121841,
+            "Quality": 46
+          },
+          {
+            "Slot": 93,
+            "LowId": 121840,
+            "HighId": 121841,
+            "Quality": 51
+          },
+          {
+            "Slot": 94,
+            "LowId": 122581,
+            "HighId": 122582,
+            "Quality": 58
+          },
+          {
+            "Slot": 95,
+            "LowId": 122638,
+            "HighId": 122639,
+            "Quality": 42
+          },
+          {
+            "Slot": 96,
+            "LowId": 122030,
+            "HighId": 122031,
+            "Quality": 46
+          },
+          {
+            "Slot": 97,
+            "LowId": 152285,
+            "HighId": 152286,
+            "Quality": 72
+          },
+          {
+            "Slot": 98,
+            "LowId": 124529,
+            "HighId": 124530,
+            "Quality": 29
+          },
+          {
+            "Slot": 99,
+            "LowId": 123704,
+            "HighId": 123705,
+            "Quality": 21
+          },
+          {
+            "Slot": 100,
+            "LowId": 152160,
+            "HighId": 152160,
+            "Quality": 41
+          },
+          {
+            "Slot": 101,
+            "LowId": 124092,
+            "HighId": 124092,
+            "Quality": 1
+          },
+          {
+            "Slot": 102,
+            "LowId": 124313,
+            "HighId": 124314,
+            "Quality": 29
+          },
+          {
+            "Slot": 103,
+            "LowId": 124004,
+            "HighId": 124005,
+            "Quality": 4
+          },
+          {
+            "Slot": 104,
+            "LowId": 124004,
+            "HighId": 124005,
+            "Quality": 28
+          },
+          {
+            "Slot": 105,
+            "LowId": 124004,
+            "HighId": 124005,
+            "Quality": 37
+          },
+          {
+            "Slot": 106,
+            "LowId": 124004,
+            "HighId": 124005,
+            "Quality": 44
+          },
+          {
+            "Slot": 107,
+            "LowId": 123904,
+            "HighId": 123905,
+            "Quality": 27
+          },
+          {
+            "Slot": 108,
+            "LowId": 124504,
+            "HighId": 124504,
+            "Quality": 5
+          },
+          {
+            "Slot": 109,
+            "LowId": 124016,
+            "HighId": 124017,
+            "Quality": 2
+          },
+          {
+            "Slot": 110,
+            "LowId": 124234,
+            "HighId": 124235,
+            "Quality": 62
+          },
+          {
+            "Slot": 111,
+            "LowId": 124550,
+            "HighId": 124551,
+            "Quality": 57
+          },
+          {
+            "Slot": 112,
+            "LowId": 124550,
+            "HighId": 124551,
+            "Quality": 60
+          },
+          {
+            "Slot": 113,
+            "LowId": 122602,
+            "HighId": 122603,
+            "Quality": 73
+          },
+          {
+            "Slot": 114,
+            "LowId": 122450,
+            "HighId": 122451,
+            "Quality": 62
+          },
+          {
+            "Slot": 115,
+            "LowId": 123311,
+            "HighId": 123312,
+            "Quality": 65
+          },
+          {
+            "Slot": 116,
+            "LowId": 123139,
+            "HighId": 123140,
+            "Quality": 70
+          },
+          {
+            "Slot": 117,
+            "LowId": 122987,
+            "HighId": 122987,
+            "Quality": 61
+          },
+          {
+            "Slot": 118,
+            "LowId": 122184,
+            "HighId": 122185,
+            "Quality": 72
+          },
+          {
+            "Slot": 119,
+            "LowId": 123425,
+            "HighId": 123426,
+            "Quality": 68
+          },
+          {
+            "Slot": 120,
+            "LowId": 122298,
+            "HighId": 122299,
+            "Quality": 66
+          },
+          {
+            "Slot": 121,
+            "LowId": 123672,
+            "HighId": 123673,
+            "Quality": 74
+          },
+          {
+            "Slot": 122,
+            "LowId": 122583,
+            "HighId": 122584,
+            "Quality": 62
+          },
+          {
+            "Slot": 123,
+            "LowId": 123196,
+            "HighId": 123197,
+            "Quality": 66
+          },
+          {
+            "Slot": 124,
+            "LowId": 123444,
+            "HighId": 123445,
+            "Quality": 68
+          },
+          {
+            "Slot": 125,
+            "LowId": 152328,
+            "HighId": 152329,
+            "Quality": 38
+          },
+          {
+            "Slot": 126,
+            "LowId": 152158,
+            "HighId": 152158,
+            "Quality": 21
+          },
+          {
+            "Slot": 127,
+            "LowId": 152158,
+            "HighId": 152159,
+            "Quality": 39
+          },
+          {
+            "Slot": 128,
+            "LowId": 124258,
+            "HighId": 124259,
+            "Quality": 43
+          },
+          {
+            "Slot": 129,
+            "LowId": 124400,
+            "HighId": 124401,
+            "Quality": 9
+          },
+          {
+            "Slot": 130,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 6
+          },
+          {
+            "Slot": 131,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 14
+          },
+          {
+            "Slot": 132,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 29
+          },
+          {
+            "Slot": 133,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 32
+          },
+          {
+            "Slot": 134,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 42
+          },
+          {
+            "Slot": 135,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 52
+          },
+          {
+            "Slot": 136,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 59
+          },
+          {
+            "Slot": 137,
+            "LowId": 128916,
+            "HighId": 128917,
+            "Quality": 65
+          },
+          {
+            "Slot": 138,
+            "LowId": 160266,
+            "HighId": 160267,
+            "Quality": 65
+          },
+          {
+            "Slot": 139,
+            "LowId": 160266,
+            "HighId": 160267,
+            "Quality": 67
+          },
+          {
+            "Slot": 140,
+            "LowId": 124198,
+            "HighId": 124199,
+            "Quality": 2
+          },
+          {
+            "Slot": 141,
+            "LowId": 124198,
+            "HighId": 124199,
+            "Quality": 15
+          },
+          {
+            "Slot": 142,
+            "LowId": 124328,
+            "HighId": 124329,
+            "Quality": 8
+          },
+          {
+            "Slot": 143,
+            "LowId": 123839,
+            "HighId": 123840,
+            "Quality": 39
+          }
+        ]
+      }
+    },
+    {
+      "Key": "legacy:garden-vendor:4676:7A2013B6",
+      "Provenance": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs;AOSharpLiveCapture/20260823-205320;sourceVendor:130B7812",
+      "ContentNpcIdentity": "SimpleChar:7A2013B6",
+      "PlayfieldId": 4676,
+      "InstanceId": 2048922550,
+      "Name": "Or-Mada of Protection",
+      "Position": [
+        421.6585,
+        108.36548,
+        429.6127
+      ],
+      "Rotation": [
+        0,
+        -0.519817,
+        0,
+        0.85427785
+      ],
+      "Stats": {
+        "0": 271061505,
+        "1": 32800,
+        "4": 6,
+        "27": 32800,
+        "33": 1,
+        "47": 1,
+        "54": 30,
+        "59": 2,
+        "60": 15,
+        "64": 40694,
+        "89": 1,
+        "156": 103,
+        "359": 236640,
+        "360": 100,
+        "368": 15,
+        "389": 0,
+        "455": 137,
+        "466": 15,
+        "660": 0,
+        "673": 31
+      },
+      "Textures": [],
+      "Meshes": [
+        {
+          "Position": 1,
+          "OverrideTextureId": 0,
+          "Id": 209532,
+          "Layer": 2
+        }
+      ],
+      "HasDialogue": true,
+      "Passive": true,
+      "Attackable": true,
+      "TickLiving": false,
+      "Presentation": {
+        "Meshes": [
+          {
+            "Position": 1,
+            "OverrideTextureId": 0,
+            "Id": 209532,
+            "Layer": 2
+          }
+        ]
+      },
+      "Vendor": {
+        "InstanceId": 319518738,
+        "TemplateId": 99634,
+        "Stock": [
+          {
+            "Slot": 0,
+            "LowId": 149916,
+            "HighId": 149915,
+            "Quality": 69
+          },
+          {
+            "Slot": 1,
+            "LowId": 149912,
+            "HighId": 149911,
+            "Quality": 48
+          },
+          {
+            "Slot": 2,
+            "LowId": 149912,
+            "HighId": 149911,
+            "Quality": 60
+          },
+          {
+            "Slot": 3,
+            "LowId": 85639,
+            "HighId": 22124,
+            "Quality": 24
+          },
+          {
+            "Slot": 4,
+            "LowId": 85513,
+            "HighId": 22313,
+            "Quality": 61
+          },
+          {
+            "Slot": 5,
+            "LowId": 85513,
+            "HighId": 22313,
+            "Quality": 68
+          },
+          {
+            "Slot": 6,
+            "LowId": 85743,
+            "HighId": 21937,
+            "Quality": 53
+          },
+          {
+            "Slot": 7,
+            "LowId": 85743,
+            "HighId": 21937,
+            "Quality": 74
+          },
+          {
+            "Slot": 8,
+            "LowId": 149932,
+            "HighId": 149931,
+            "Quality": 35
+          },
+          {
+            "Slot": 9,
+            "LowId": 149932,
+            "HighId": 149931,
+            "Quality": 74
+          },
+          {
+            "Slot": 10,
+            "LowId": 149904,
+            "HighId": 149903,
+            "Quality": 38
+          },
+          {
+            "Slot": 11,
+            "LowId": 149904,
+            "HighId": 149903,
+            "Quality": 75
+          },
+          {
+            "Slot": 12,
+            "LowId": 85693,
+            "HighId": 27389,
+            "Quality": 26
+          },
+          {
+            "Slot": 13,
+            "LowId": 85693,
+            "HighId": 27389,
+            "Quality": 45
+          },
+          {
+            "Slot": 14,
+            "LowId": 85645,
+            "HighId": 85644,
+            "Quality": 14
+          },
+          {
+            "Slot": 15,
+            "LowId": 85645,
+            "HighId": 85644,
+            "Quality": 46
+          },
+          {
+            "Slot": 16,
+            "LowId": 85645,
+            "HighId": 85644,
+            "Quality": 68
+          },
+          {
+            "Slot": 17,
+            "LowId": 85602,
+            "HighId": 85601,
+            "Quality": 39
+          },
+          {
+            "Slot": 18,
+            "LowId": 85602,
+            "HighId": 85601,
+            "Quality": 59
+          },
+          {
+            "Slot": 19,
+            "LowId": 85562,
+            "HighId": 85561,
+            "Quality": 15
+          },
+          {
+            "Slot": 20,
+            "LowId": 85750,
+            "HighId": 85749,
+            "Quality": 9
+          },
+          {
+            "Slot": 21,
+            "LowId": 85750,
+            "HighId": 85749,
+            "Quality": 24
+          },
+          {
+            "Slot": 22,
+            "LowId": 85750,
+            "HighId": 85749,
+            "Quality": 71
+          },
+          {
+            "Slot": 23,
+            "LowId": 85697,
+            "HighId": 85696,
+            "Quality": 15
+          },
+          {
+            "Slot": 24,
+            "LowId": 85697,
+            "HighId": 85696,
+            "Quality": 20
+          },
+          {
+            "Slot": 25,
+            "LowId": 85697,
+            "HighId": 85696,
+            "Quality": 29
+          },
+          {
+            "Slot": 26,
+            "LowId": 85481,
+            "HighId": 85690,
+            "Quality": 53
+          },
+          {
+            "Slot": 27,
+            "LowId": 85657,
+            "HighId": 85656,
+            "Quality": 19
+          },
+          {
+            "Slot": 28,
+            "LowId": 85533,
+            "HighId": 85532,
+            "Quality": 56
+          },
+          {
+            "Slot": 29,
+            "LowId": 70558,
+            "HighId": 85640,
+            "Quality": 20
+          },
+          {
+            "Slot": 30,
+            "LowId": 70562,
+            "HighId": 85597,
+            "Quality": 12
+          },
+          {
+            "Slot": 31,
+            "LowId": 70564,
+            "HighId": 85515,
+            "Quality": 3
+          },
+          {
+            "Slot": 32,
+            "LowId": 70561,
+            "HighId": 85744,
+            "Quality": 37
+          },
+          {
+            "Slot": 33,
+            "LowId": 70560,
+            "HighId": 85688,
+            "Quality": 10
+          },
+          {
+            "Slot": 34,
+            "LowId": 70560,
+            "HighId": 85688,
+            "Quality": 18
+          },
+          {
+            "Slot": 35,
+            "LowId": 70560,
+            "HighId": 85688,
+            "Quality": 36
+          },
+          {
+            "Slot": 36,
+            "LowId": 85593,
+            "HighId": 85592,
+            "Quality": 33
+          },
+          {
+            "Slot": 37,
+            "LowId": 85593,
+            "HighId": 85592,
+            "Quality": 34
+          },
+          {
+            "Slot": 38,
+            "LowId": 85554,
+            "HighId": 85553,
+            "Quality": 38
+          },
+          {
+            "Slot": 39,
+            "LowId": 85681,
+            "HighId": 85680,
+            "Quality": 60
+          },
+          {
+            "Slot": 40,
+            "LowId": 85681,
+            "HighId": 85680,
+            "Quality": 64
+          },
+          {
+            "Slot": 41,
+            "LowId": 149926,
+            "HighId": 149925,
+            "Quality": 51
+          },
+          {
+            "Slot": 42,
+            "LowId": 149914,
+            "HighId": 149901,
+            "Quality": 41
+          },
+          {
+            "Slot": 43,
+            "LowId": 149906,
+            "HighId": 149905,
+            "Quality": 46
+          },
+          {
+            "Slot": 44,
+            "LowId": 149930,
+            "HighId": 149929,
+            "Quality": 48
+          },
+          {
+            "Slot": 45,
+            "LowId": 149930,
+            "HighId": 149929,
+            "Quality": 64
+          },
+          {
+            "Slot": 46,
+            "LowId": 85586,
+            "HighId": 85585,
+            "Quality": 37
+          },
+          {
+            "Slot": 47,
+            "LowId": 85586,
+            "HighId": 85585,
+            "Quality": 68
+          },
+          {
+            "Slot": 48,
+            "LowId": 85730,
+            "HighId": 85729,
+            "Quality": 27
+          },
+          {
+            "Slot": 49,
+            "LowId": 85730,
+            "HighId": 85729,
+            "Quality": 37
+          },
+          {
+            "Slot": 50,
+            "LowId": 85674,
+            "HighId": 85673,
+            "Quality": 64
+          },
+          {
+            "Slot": 51,
+            "LowId": 85650,
+            "HighId": 22108,
+            "Quality": 10
+          },
+          {
+            "Slot": 52,
+            "LowId": 85650,
+            "HighId": 22108,
+            "Quality": 34
+          },
+          {
+            "Slot": 53,
+            "LowId": 85607,
+            "HighId": 22170,
+            "Quality": 62
+          },
+          {
+            "Slot": 54,
+            "LowId": 85526,
+            "HighId": 22293,
+            "Quality": 55
+          },
+          {
+            "Slot": 55,
+            "LowId": 85755,
+            "HighId": 21921,
+            "Quality": 50
+          },
+          {
+            "Slot": 56,
+            "LowId": 85627,
+            "HighId": 22154,
+            "Quality": 32
+          },
+          {
+            "Slot": 57,
+            "LowId": 85587,
+            "HighId": 22208,
+            "Quality": 54
+          },
+          {
+            "Slot": 58,
+            "LowId": 85548,
+            "HighId": 22258,
+            "Quality": 60
+          },
+          {
+            "Slot": 59,
+            "LowId": 85501,
+            "HighId": 22343,
+            "Quality": 49
+          },
+          {
+            "Slot": 60,
+            "LowId": 85731,
+            "HighId": 21967,
+            "Quality": 20
+          },
+          {
+            "Slot": 61,
+            "LowId": 85731,
+            "HighId": 21967,
+            "Quality": 51
+          },
+          {
+            "Slot": 62,
+            "LowId": 85675,
+            "HighId": 22076,
+            "Quality": 30
+          },
+          {
+            "Slot": 63,
+            "LowId": 85745,
+            "HighId": 21929,
+            "Quality": 41
+          },
+          {
+            "Slot": 64,
+            "LowId": 85745,
+            "HighId": 21929,
+            "Quality": 67
+          },
+          {
+            "Slot": 65,
+            "LowId": 85745,
+            "HighId": 21929,
+            "Quality": 73
+          },
+          {
+            "Slot": 66,
+            "LowId": 85692,
+            "HighId": 22026,
+            "Quality": 75
+          },
+          {
+            "Slot": 67,
+            "LowId": 85636,
+            "HighId": 85635,
+            "Quality": 25
+          },
+          {
+            "Slot": 68,
+            "LowId": 85636,
+            "HighId": 85635,
+            "Quality": 71
+          },
+          {
+            "Slot": 69,
+            "LowId": 85740,
+            "HighId": 85739,
+            "Quality": 3
+          },
+          {
+            "Slot": 70,
+            "LowId": 85740,
+            "HighId": 85739,
+            "Quality": 14
+          },
+          {
+            "Slot": 71,
+            "LowId": 85684,
+            "HighId": 85683,
+            "Quality": 13
+          },
+          {
+            "Slot": 72,
+            "LowId": 85684,
+            "HighId": 85683,
+            "Quality": 21
+          },
+          {
+            "Slot": 73,
+            "LowId": 85684,
+            "HighId": 85683,
+            "Quality": 45
+          },
+          {
+            "Slot": 74,
+            "LowId": 85655,
+            "HighId": 22104,
+            "Quality": 4
+          },
+          {
+            "Slot": 75,
+            "LowId": 85612,
+            "HighId": 22166,
+            "Quality": 29
+          },
+          {
+            "Slot": 76,
+            "LowId": 85612,
+            "HighId": 22166,
+            "Quality": 32
+          },
+          {
+            "Slot": 77,
+            "LowId": 85477,
+            "HighId": 21917,
+            "Quality": 56
+          },
+          {
+            "Slot": 78,
+            "LowId": 85477,
+            "HighId": 21917,
+            "Quality": 58
+          },
+          {
+            "Slot": 79,
+            "LowId": 85712,
+            "HighId": 22010,
+            "Quality": 27
+          },
+          {
+            "Slot": 80,
+            "LowId": 85638,
+            "HighId": 85637,
+            "Quality": 54
+          },
+          {
+            "Slot": 81,
+            "LowId": 85596,
+            "HighId": 85595,
+            "Quality": 66
+          },
+          {
+            "Slot": 82,
+            "LowId": 85512,
+            "HighId": 85511,
+            "Quality": 18
+          },
+          {
+            "Slot": 83,
+            "LowId": 85512,
+            "HighId": 85511,
+            "Quality": 74
+          },
+          {
+            "Slot": 84,
+            "LowId": 85742,
+            "HighId": 85741,
+            "Quality": 51
+          },
+          {
+            "Slot": 85,
+            "LowId": 85742,
+            "HighId": 85741,
+            "Quality": 52
+          },
+          {
+            "Slot": 86,
+            "LowId": 85620,
+            "HighId": 22158,
+            "Quality": 46
+          },
+          {
+            "Slot": 87,
+            "LowId": 85620,
+            "HighId": 22158,
+            "Quality": 54
+          },
+          {
+            "Slot": 88,
+            "LowId": 85541,
+            "HighId": 22262,
+            "Quality": 64
+          },
+          {
+            "Slot": 89,
+            "LowId": 85494,
+            "HighId": 22347,
+            "Quality": 29
+          },
+          {
+            "Slot": 90,
+            "LowId": 85494,
+            "HighId": 22347,
+            "Quality": 65
+          },
+          {
+            "Slot": 91,
+            "LowId": 85724,
+            "HighId": 21971,
+            "Quality": 43
+          },
+          {
+            "Slot": 92,
+            "LowId": 85724,
+            "HighId": 21971,
+            "Quality": 50
+          },
+          {
+            "Slot": 93,
+            "LowId": 85668,
+            "HighId": 22080,
+            "Quality": 37
+          },
+          {
+            "Slot": 94,
+            "LowId": 85652,
+            "HighId": 85651,
+            "Quality": 62
+          },
+          {
+            "Slot": 95,
+            "LowId": 85569,
+            "HighId": 85568,
+            "Quality": 49
+          },
+          {
+            "Slot": 96,
+            "LowId": 85569,
+            "HighId": 85568,
+            "Quality": 50
+          },
+          {
+            "Slot": 97,
+            "LowId": 85528,
+            "HighId": 85527,
+            "Quality": 43
+          },
+          {
+            "Slot": 98,
+            "LowId": 85528,
+            "HighId": 85527,
+            "Quality": 51
+          },
+          {
+            "Slot": 99,
+            "LowId": 85704,
+            "HighId": 85703,
+            "Quality": 63
+          }
+        ]
+      }
+    },
+    {
+      "Key": "legacy:garden-vendor:4676:7A2013B9",
+      "Provenance": "AORebirth/Server/ZoneEngine/Core/Playfields/AbanGardenSpawn.cs;AOSharpLiveCapture/20260823-205320;sourceVendor:130B7815",
+      "ContentNpcIdentity": "SimpleChar:7A2013B9",
+      "PlayfieldId": 4676,
+      "InstanceId": 2048922553,
+      "Name": "Or-Mada of Gear & Ammo",
+      "Position": [
+        422.32648,
+        107.48468,
+        425.36972
+      ],
+      "Rotation": [
+        0,
+        -0.32786134,
+        0,
+        0.9447259
+      ],
+      "Stats": {
+        "0": 271061505,
+        "1": 32800,
+        "4": 6,
+        "27": 32800,
+        "33": 1,
+        "47": 1,
+        "54": 30,
+        "59": 2,
+        "60": 15,
+        "64": 40694,
+        "89": 1,
+        "156": 103,
+        "359": 236640,
+        "360": 100,
+        "368": 15,
+        "389": 0,
+        "455": 137,
+        "466": 15,
+        "660": 0,
+        "673": 31
+      },
+      "Textures": [],
+      "Meshes": [
+        {
+          "Position": 1,
+          "OverrideTextureId": 0,
+          "Id": 209541,
+          "Layer": 2
+        }
+      ],
+      "HasDialogue": true,
+      "Passive": true,
+      "Attackable": true,
+      "TickLiving": false,
+      "Presentation": {
+        "Meshes": [
+          {
+            "Position": 1,
+            "OverrideTextureId": 0,
+            "Id": 209541,
+            "Layer": 2
+          }
+        ]
+      },
+      "Vendor": {
+        "InstanceId": 319518741,
+        "TemplateId": 99634,
+        "Stock": [
+          {
+            "Slot": 0,
+            "LowId": 83920,
+            "HighId": 83920,
+            "Quality": 1
+          },
+          {
+            "Slot": 1,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 5
+          },
+          {
+            "Slot": 2,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 6
+          },
+          {
+            "Slot": 3,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 18
+          },
+          {
+            "Slot": 4,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 19
+          },
+          {
+            "Slot": 5,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 24
+          },
+          {
+            "Slot": 6,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 27
+          },
+          {
+            "Slot": 7,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 37
+          },
+          {
+            "Slot": 8,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 38
+          },
+          {
+            "Slot": 9,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 45
+          },
+          {
+            "Slot": 10,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 46
+          },
+          {
+            "Slot": 11,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 50
+          },
+          {
+            "Slot": 12,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 52
+          },
+          {
+            "Slot": 13,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 65
+          },
+          {
+            "Slot": 14,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 68
+          },
+          {
+            "Slot": 15,
+            "LowId": 83920,
+            "HighId": 83919,
+            "Quality": 74
+          },
+          {
+            "Slot": 16,
+            "LowId": 125219,
+            "HighId": 125219,
+            "Quality": 1
+          },
+          {
+            "Slot": 17,
+            "LowId": 273501,
+            "HighId": 273501,
+            "Quality": 1
+          },
+          {
+            "Slot": 18,
+            "LowId": 273496,
+            "HighId": 273496,
+            "Quality": 1
+          },
+          {
+            "Slot": 19,
+            "LowId": 273502,
+            "HighId": 273502,
+            "Quality": 1
+          },
+          {
+            "Slot": 20,
+            "LowId": 273503,
+            "HighId": 273503,
+            "Quality": 1
+          },
+          {
+            "Slot": 21,
+            "LowId": 273504,
+            "HighId": 273504,
+            "Quality": 1
+          },
+          {
+            "Slot": 22,
+            "LowId": 273500,
+            "HighId": 273500,
+            "Quality": 1
+          },
+          {
+            "Slot": 23,
+            "LowId": 21605,
+            "HighId": 21605,
+            "Quality": 1
+          },
+          {
+            "Slot": 24,
+            "LowId": 21609,
+            "HighId": 21609,
+            "Quality": 1
+          },
+          {
+            "Slot": 25,
+            "LowId": 21601,
+            "HighId": 21601,
+            "Quality": 1
+          },
+          {
+            "Slot": 26,
+            "LowId": 126757,
+            "HighId": 126757,
+            "Quality": 1
+          },
+          {
+            "Slot": 27,
+            "LowId": 21613,
+            "HighId": 21613,
+            "Quality": 1
+          },
+          {
+            "Slot": 28,
+            "LowId": 43145,
+            "HighId": 43146,
+            "Quality": 13
+          },
+          {
+            "Slot": 29,
+            "LowId": 43145,
+            "HighId": 43146,
+            "Quality": 30
+          },
+          {
+            "Slot": 30,
+            "LowId": 43145,
+            "HighId": 43146,
+            "Quality": 33
+          },
+          {
+            "Slot": 31,
+            "LowId": 43145,
+            "HighId": 43146,
+            "Quality": 37
+          },
+          {
+            "Slot": 32,
+            "LowId": 152766,
+            "HighId": 152767,
+            "Quality": 11
+          },
+          {
+            "Slot": 33,
+            "LowId": 70613,
+            "HighId": 70612,
+            "Quality": 57
+          },
+          {
+            "Slot": 34,
+            "LowId": 70611,
+            "HighId": 70617,
+            "Quality": 33
+          },
+          {
+            "Slot": 35,
+            "LowId": 152725,
+            "HighId": 152726,
+            "Quality": 64
+          },
+          {
+            "Slot": 36,
+            "LowId": 84160,
+            "HighId": 84159,
+            "Quality": 45
+          },
+          {
+            "Slot": 37,
+            "LowId": 84160,
+            "HighId": 84159,
+            "Quality": 55
+          },
+          {
+            "Slot": 38,
+            "LowId": 84160,
+            "HighId": 84159,
+            "Quality": 63
+          },
+          {
+            "Slot": 39,
+            "LowId": 158037,
+            "HighId": 158036,
+            "Quality": 31
+          },
+          {
+            "Slot": 40,
+            "LowId": 158045,
+            "HighId": 158046,
+            "Quality": 14
+          },
+          {
+            "Slot": 41,
+            "LowId": 158045,
+            "HighId": 158046,
+            "Quality": 18
+          },
+          {
+            "Slot": 42,
+            "LowId": 158045,
+            "HighId": 158046,
+            "Quality": 36
+          },
+          {
+            "Slot": 43,
+            "LowId": 158045,
+            "HighId": 158046,
+            "Quality": 39
+          },
+          {
+            "Slot": 44,
+            "LowId": 158045,
+            "HighId": 158046,
+            "Quality": 70
+          },
+          {
+            "Slot": 45,
+            "LowId": 70254,
+            "HighId": 70254,
+            "Quality": 20
+          },
+          {
+            "Slot": 46,
+            "LowId": 70254,
+            "HighId": 70251,
+            "Quality": 24
+          },
+          {
+            "Slot": 47,
+            "LowId": 70254,
+            "HighId": 70251,
+            "Quality": 51
+          },
+          {
+            "Slot": 48,
+            "LowId": 70254,
+            "HighId": 70251,
+            "Quality": 72
+          },
+          {
+            "Slot": 49,
+            "LowId": 70253,
+            "HighId": 70252,
+            "Quality": 11
+          },
+          {
+            "Slot": 50,
+            "LowId": 158038,
+            "HighId": 158039,
+            "Quality": 48
+          },
+          {
+            "Slot": 51,
+            "LowId": 158038,
+            "HighId": 158039,
+            "Quality": 64
+          },
+          {
+            "Slot": 52,
+            "LowId": 158038,
+            "HighId": 158039,
+            "Quality": 72
+          },
+          {
+            "Slot": 53,
+            "LowId": 158033,
+            "HighId": 158021,
+            "Quality": 18
+          },
+          {
+            "Slot": 54,
+            "LowId": 158033,
+            "HighId": 158021,
+            "Quality": 40
+          },
+          {
+            "Slot": 55,
+            "LowId": 158033,
+            "HighId": 158021,
+            "Quality": 64
+          },
+          {
+            "Slot": 56,
+            "LowId": 85907,
+            "HighId": 85908,
+            "Quality": 31
+          },
+          {
+            "Slot": 57,
+            "LowId": 85907,
+            "HighId": 85908,
+            "Quality": 32
+          },
+          {
+            "Slot": 58,
+            "LowId": 85907,
+            "HighId": 85908,
+            "Quality": 74
+          },
+          {
+            "Slot": 59,
+            "LowId": 152358,
+            "HighId": 152359,
+            "Quality": 13
+          },
+          {
+            "Slot": 60,
+            "LowId": 152359,
+            "HighId": 152359,
+            "Quality": 50
+          },
+          {
+            "Slot": 61,
+            "LowId": 160279,
+            "HighId": 160280,
+            "Quality": 21
+          },
+          {
+            "Slot": 62,
+            "LowId": 160281,
+            "HighId": 160282,
+            "Quality": 58
+          },
+          {
+            "Slot": 63,
+            "LowId": 150258,
+            "HighId": 150259,
+            "Quality": 51
+          },
+          {
+            "Slot": 64,
+            "LowId": 150259,
+            "HighId": 150259,
+            "Quality": 60
+          },
+          {
+            "Slot": 65,
+            "LowId": 283644,
+            "HighId": 283644,
+            "Quality": 201
+          },
+          {
+            "Slot": 66,
+            "LowId": 283651,
+            "HighId": 283651,
+            "Quality": 201
+          },
+          {
+            "Slot": 67,
+            "LowId": 150255,
+            "HighId": 150255,
+            "Quality": 20
+          },
+          {
+            "Slot": 68,
+            "LowId": 159196,
+            "HighId": 159197,
+            "Quality": 15
+          },
+          {
+            "Slot": 69,
+            "LowId": 159196,
+            "HighId": 159197,
+            "Quality": 23
+          },
+          {
+            "Slot": 70,
+            "LowId": 159196,
+            "HighId": 159197,
+            "Quality": 25
+          },
+          {
+            "Slot": 71,
+            "LowId": 159196,
+            "HighId": 159197,
+            "Quality": 58
+          }
+        ]
+      }
+    }
+  ]
+}
