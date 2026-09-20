@@ -14,7 +14,6 @@ public sealed class WorldContentCatalog
     public int SchemaVersion { get; set; } = 1;
     public WorldNpcDefinition[] Npcs { get; set; } = [];
     public WorldDestination? Respawn { get; set; }
-    public WorldAppearanceOverride[] CharacterAppearanceOverrides { get; set; } = [];
     public WorldCorpseDefaults CorpseDefaults { get; set; } = new();
     public static WorldContentCatalog Load(string root)
     {
@@ -33,14 +32,12 @@ public sealed class WorldContentCatalog
     public void Validate()
     {
         if (SchemaVersion != 1 || Npcs == null
-            || CharacterAppearanceOverrides == null || CorpseDefaults == null)
+            || CorpseDefaults == null)
             throw new InvalidDataException("Unsupported or incomplete world content document.");
         var keys = new HashSet<string>(StringComparer.Ordinal);
         if (Respawn != null && (Respawn.PlayfieldId <= 0 || Respawn.Position is not { Length: 3 }
             || Respawn.Position.Any(v => !float.IsFinite(v)))) throw new InvalidDataException("Invalid respawn destination.");
-        if (CharacterAppearanceOverrides.Any(p => p.PlayfieldId <= 0 || p.MonsterData <= 0)
-            || CharacterAppearanceOverrides.Select(p => p.PlayfieldId).Distinct().Count() != CharacterAppearanceOverrides.Length
-            || CorpseDefaults.AnimationEffects == null || CorpseDefaults.MonsterDataAliases == null
+        if (CorpseDefaults.AnimationEffects == null || CorpseDefaults.MonsterDataAliases == null
             || CorpseDefaults.MonsterDataAliases.Any(p => p.Key <= 0 || p.Value <= 0))
             throw new InvalidDataException("Invalid or duplicate world presentation/corpse defaults.");
         var identities = new HashSet<(int, int)>();
@@ -81,7 +78,6 @@ public sealed class WorldContentCatalog
 }
 
 public sealed class WorldDestination { public int PlayfieldId { get; set; } public float[] Position { get; set; } = []; }
-public sealed class WorldAppearanceOverride { public int PlayfieldId { get; set; } public uint MonsterData { get; set; } }
 public sealed class WorldCorpseDefaults
 {
     public int Flags { get; set; }

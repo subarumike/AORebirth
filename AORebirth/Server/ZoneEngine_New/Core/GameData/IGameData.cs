@@ -60,6 +60,9 @@ namespace ZoneEngine_New.Core.GameData
 
         bool TryGetCatMesh(int monsterData, out int catMesh);
 
+        /// <summary>Playfield-local character MonsterData override for SimpleCharFullUpdate.</summary>
+        bool TryGetPlayfieldCharacterAppearanceOverride(int playfieldId, out uint monsterData);
+
         /// <summary>Null when playfield metadata is missing (indoor fallback).</summary>
         PlayfieldMetaData? GetPlayfieldMetaData(int playfieldId);
 

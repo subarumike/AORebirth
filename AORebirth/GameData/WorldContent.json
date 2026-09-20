@@ -8,16 +8,6 @@
       570
     ]
   },
-  "CharacterAppearanceOverrides": [
-    {
-      "PlayfieldId": 152,
-      "MonsterData": 99902
-    },
-    {
-      "PlayfieldId": 4107,
-      "MonsterData": 99902
-    }
-  ],
   "CorpseDefaults": {
     "Flags": 1579013,
     "MonsterDataAliases": {

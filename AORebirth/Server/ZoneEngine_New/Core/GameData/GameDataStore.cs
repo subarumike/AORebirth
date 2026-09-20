@@ -57,6 +57,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
         private readonly Dictionary<int, PlayfieldSpawnsData> _playfieldSpawns = new();
         private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
+        private readonly Dictionary<int, uint?> _playfieldCharacterAppearanceOverrides = new();
         private readonly Dictionary<int, int[]?> _exitProxyDoorAllowLists = new();
         private readonly Lock _exitProxySync = new();
         private Dictionary<int, int[]>? _exitProxyDoorsByPlayfield;
@@ -202,6 +203,28 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return _catMeshByMonsterData.TryGetValue(monsterData, out catMesh);
+        }
+
+        public bool TryGetPlayfieldCharacterAppearanceOverride(int playfieldId, out uint monsterData)
+        {
+            monsterData = 0;
+            if (playfieldId <= 0)
+                return false;
+
+            lock (_playfieldSync)
+            {
+                if (!_playfieldCharacterAppearanceOverrides.TryGetValue(playfieldId, out uint? cached))
+                {
+                    cached = ReadPlayfieldCharacterAppearanceOverride(playfieldId);
+                    _playfieldCharacterAppearanceOverrides[playfieldId] = cached;
+                }
+
+                if (!cached.HasValue)
+                    return false;
+
+                monsterData = cached.Value;
+                return true;
+            }
         }
 
         public PlayfieldMetaData? GetPlayfieldMetaData(int playfieldId)
@@ -752,6 +775,47 @@ namespace ZoneEngine_New.Core.GameData
             return data;
         }
 
+
+
+        private uint? ReadPlayfieldCharacterAppearanceOverride(int playfieldId)
+        {
+            string path = Path.Combine(
+                RootPath,
+                GameDataPaths.PlayfieldCharacterAppearanceRelativePath(playfieldId));
+
+            if (!File.Exists(path))
+                return null;
+
+            PlayfieldCharacterAppearanceData? data;
+            try
+            {
+                data = JsonSerializer.Deserialize<PlayfieldCharacterAppearanceData>(
+                    File.ReadAllText(path),
+                    CatalogJsonOptions);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidDataException(
+                    "Playfield character appearance could not be read: "
+                    + path
+                    + " ("
+                    + exception.GetType().Name
+                    + ": "
+                    + exception.Message
+                    + ")",
+                    exception);
+            }
+
+            if (data == null
+                || data.SchemaVersion != PlayfieldCharacterAppearanceData.SupportedSchemaVersion
+                || data.PlayfieldId != playfieldId
+                || data.MonsterData == 0)
+            {
+                throw new InvalidDataException("Invalid playfield character appearance: " + path);
+            }
+
+            return data.MonsterData;
+        }
 
         private int[]? ReadPlayfieldExitProxyDoorInstances(int playfieldId)
         {

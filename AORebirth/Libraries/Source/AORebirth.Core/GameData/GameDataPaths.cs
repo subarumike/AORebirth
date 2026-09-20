@@ -52,6 +52,8 @@ namespace AORebirth.Core.GameData
 
         public const string ExitProxyDoorsFileName = "ExitProxyDoors.json";
 
+        public const string CharacterAppearanceFileName = "CharacterAppearance.json";
+
         public const string CollisionFileName = "Collision.dat";
 
         public const string SurfacesFileName = "Surfaces.dat";
@@ -132,6 +134,11 @@ namespace AORebirth.Core.GameData
         public static string PlayfieldExitProxyDoorsRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), ExitProxyDoorsFileName);
+        }
+
+        public static string PlayfieldCharacterAppearanceRelativePath(int playfieldId)
+        {
+            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), CharacterAppearanceFileName);
         }
 
         public static string PlayfieldCollisionRelativePath(int playfieldId)

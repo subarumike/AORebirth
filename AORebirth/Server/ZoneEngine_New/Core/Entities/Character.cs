@@ -2294,11 +2294,10 @@ namespace ZoneEngine_New.Core.Entities
             scfu.Health = displayMaxHealth;
             scfu.HealthDamage = displayMaxHealth - displayCurrentHealth;
 
-            var appearanceOverride = Playfield?.WorldContent.CharacterAppearanceOverrides
-                .FirstOrDefault(value => value.PlayfieldId == playfieldId);
-            if (appearanceOverride != null)
+            if (Playfield?.GetRequiredService<IGameData>()
+                    .TryGetPlayfieldCharacterAppearanceOverride(playfieldId, out uint appearanceMonsterData) == true)
             {
-                scfu.MonsterData = appearanceOverride.MonsterData;
+                scfu.MonsterData = appearanceMonsterData;
             }
             else if (!StatCollection.IsUnset(monsterData) && monsterData != 0)
             {
