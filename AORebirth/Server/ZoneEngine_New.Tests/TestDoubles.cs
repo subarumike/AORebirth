@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
 
     using AORebirth.Core.GameData;
     using AORebirth.Enums;
@@ -54,6 +55,9 @@ namespace ZoneEngine_New.Tests
         public WorldContentCatalog WorldContent => string.IsNullOrEmpty(RootPath)
             ? WorldContentFixtures.Content : WorldContentCatalog.Load(RootPath);
 
+        public CorpseContentCatalog CorpseContent => CorpseContentCatalog.Load(
+            string.IsNullOrEmpty(RootPath) ? Path.Combine(AppContext.BaseDirectory, "GameData") : RootPath);
+
         public int MobTemplateCount => 0;
 
         public int HashTemplateCount => _hashItems.CategoryCount;
@@ -98,6 +102,13 @@ namespace ZoneEngine_New.Tests
             catMesh = 0;
             return false;
         }
+
+        public bool TryGetPlayfieldCharacterAppearanceOverride(int playfieldId, out uint monsterData)
+        {
+            monsterData = 0;
+            return false;
+        }
+
         public bool TryGetMonsterWeapon(string hash, out int[] ids)
         {
             if (string.IsNullOrEmpty(hash) || !_monsterWeapons.TryGetValue(hash, out int[]? found))
@@ -431,3 +442,5 @@ namespace ZoneEngine_New.Tests
         public void Close() => IsClosed = true;
     }
 }
+
+

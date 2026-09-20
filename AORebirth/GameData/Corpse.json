@@ -1,0 +1,26 @@
+{
+  "SchemaVersion": 1,
+  "Flags": 1579013,
+  "MonsterDataAliases": {
+    "26902": 30258
+  },
+  "AnimationEffects": [
+    {
+      "IdentityType": 53031,
+      "NanoId": 972018565,
+      "NanoInstance": 4,
+      "Time1": 0,
+      "Time2": 1,
+      "Unknown2": 0,
+      "Unknown3": 0,
+      "Unknown4": 0,
+      "Unknown5": 0,
+      "Unknown6": 0,
+      "Unknown7": 500,
+      "Unknown8": 1,
+      "Unknown9": 4,
+      "VisualDataId": 30258,
+      "Unknown10": 0
+    }
+  ]
+}

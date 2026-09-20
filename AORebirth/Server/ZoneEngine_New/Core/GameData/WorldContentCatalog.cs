@@ -14,7 +14,6 @@ public sealed class WorldContentCatalog
     public int SchemaVersion { get; set; } = 1;
     public WorldNpcDefinition[] Npcs { get; set; } = [];
     public WorldDestination? Respawn { get; set; }
-    public WorldCorpseDefaults CorpseDefaults { get; set; } = new();
     public static WorldContentCatalog Load(string root)
     {
         if (string.IsNullOrWhiteSpace(root)) return Empty;
@@ -31,15 +30,11 @@ public sealed class WorldContentCatalog
     }
     public void Validate()
     {
-        if (SchemaVersion != 1 || Npcs == null
-            || CorpseDefaults == null)
+        if (SchemaVersion != 1 || Npcs == null)
             throw new InvalidDataException("Unsupported or incomplete world content document.");
         var keys = new HashSet<string>(StringComparer.Ordinal);
         if (Respawn != null && (Respawn.PlayfieldId <= 0 || Respawn.Position is not { Length: 3 }
             || Respawn.Position.Any(v => !float.IsFinite(v)))) throw new InvalidDataException("Invalid respawn destination.");
-        if (CorpseDefaults.AnimationEffects == null || CorpseDefaults.MonsterDataAliases == null
-            || CorpseDefaults.MonsterDataAliases.Any(p => p.Key <= 0 || p.Value <= 0))
-            throw new InvalidDataException("Invalid or duplicate world presentation/corpse defaults.");
         var identities = new HashSet<(int, int)>();
         var shopIdentities = new HashSet<(int, int)>();
         foreach (var npc in Npcs)
@@ -78,13 +73,6 @@ public sealed class WorldContentCatalog
 }
 
 public sealed class WorldDestination { public int PlayfieldId { get; set; } public float[] Position { get; set; } = []; }
-public sealed class WorldCorpseDefaults
-{
-    public int Flags { get; set; }
-    public AnimationEffect[] AnimationEffects { get; set; } = [];
-    public Dictionary<int, int> MonsterDataAliases { get; set; } = new();
-}
-
 public sealed class WorldNpcDefinition
 {
     public string Key { get; set; } = string.Empty;

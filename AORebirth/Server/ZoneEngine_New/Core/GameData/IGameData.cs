@@ -15,6 +15,8 @@ namespace ZoneEngine_New.Core.GameData
 
         WorldContentCatalog WorldContent => WorldContentCatalog.Load(RootPath);
 
+        CorpseContentCatalog CorpseContent => CorpseContentCatalog.Load(RootPath);
+
         int MobTemplateCount { get; }
 
         int HashTemplateCount { get; }

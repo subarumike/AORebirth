@@ -127,7 +127,7 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown5 = 0x32,
                 UnknownArray = [],
                 Unknown6 = 0x03,
-                AnimationEffects = _gameData.WorldContent.CorpseDefaults.AnimationEffects,
+                AnimationEffects = _gameData.CorpseContent.AnimationEffects,
                 // Dead character identity (AOSharp IdentityType.Character == CanbeAffected).
                 UnknownIdentity = Owner,
                 Textures = BuildDefaultTextures(),
@@ -188,7 +188,7 @@ namespace ZoneEngine_New.Core.Entities
             if (!SourceStats.TryGetValue(CharacterStat.MonsterData, out int monsterData))
                 return false;
 
-            if (_gameData.WorldContent.CorpseDefaults.MonsterDataAliases.TryGetValue(monsterData, out int alias))
+            if (_gameData.CorpseContent.MonsterDataAliases.TryGetValue(monsterData, out int alias))
                 monsterData = alias;
 
             return _gameData.TryGetCatMesh(monsterData, out catMesh);
@@ -199,7 +199,7 @@ namespace ZoneEngine_New.Core.Entities
             if (SourceStats.TryGetValue(CharacterStat.Flags, out int flags) && flags != 0)
                 return flags;
 
-            return _gameData.WorldContent.CorpseDefaults.Flags;
+            return _gameData.CorpseContent.Flags;
         }
 
         void CopySourceStats(Character dead)
