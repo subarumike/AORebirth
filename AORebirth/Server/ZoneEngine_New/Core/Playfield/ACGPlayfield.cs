@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Playfield
     using System.Diagnostics;
     using System.Globalization;
 
+    using AORebirth.Interfaces.Persistence.Shops;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Characters;
@@ -39,7 +41,8 @@ namespace ZoneEngine_New.Core.Playfield
             InventoryFlushService inventoryFlush,
             TradeService trades,
             CharacterSnapshotService characterSnapshot,
-            IPlayfieldMetricsRegistry metricsRegistry)
+            IPlayfieldMetricsRegistry metricsRegistry,
+            IShopDao shopDao)
             : base(
                 playfieldIdentity,
                 playfieldLogger,
@@ -55,7 +58,8 @@ namespace ZoneEngine_New.Core.Playfield
                 inventoryFlush,
                 trades,
                 characterSnapshot,
-                metricsRegistry)
+                metricsRegistry,
+                shopDao)
         {
         }
 

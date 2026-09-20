@@ -12,11 +12,12 @@ namespace ZoneEngine_New.Core.Trade
     /// <summary>One purchasable line in a vending machine's generated stock.</summary>
     public readonly struct ShopStockSlot
     {
-        public ShopStockSlot(int lowId, int highId, int quality)
+        public ShopStockSlot(int lowId, int highId, int quality, string itemHash = "")
         {
             LowId = lowId;
             HighId = highId;
             Quality = quality;
+            ItemHash = itemHash ?? string.Empty;
         }
 
         public int LowId { get; }
@@ -24,6 +25,27 @@ namespace ZoneEngine_New.Core.Trade
         public int HighId { get; }
 
         public int Quality { get; }
+
+        /// <summary>The exact item-pair correlation used by DAO-backed stock.</summary>
+        public string ItemHash { get; }
+    }
+
+    internal readonly struct ShopStockRange
+    {
+        public ShopStockRange(string itemHash, int lowId, int highId, int minimumQuality, int maximumQuality)
+        {
+            ItemHash = itemHash;
+            LowId = lowId;
+            HighId = highId;
+            MinimumQuality = minimumQuality;
+            MaximumQuality = maximumQuality;
+        }
+
+        public string ItemHash { get; }
+        public int LowId { get; }
+        public int HighId { get; }
+        public int MinimumQuality { get; }
+        public int MaximumQuality { get; }
     }
 
     /// <summary>
@@ -36,6 +58,7 @@ namespace ZoneEngine_New.Core.Trade
         public const int IdleRefreshMinutes = 10;
 
         readonly List<ShopStockSlot> _slots = new();
+        ShopStockRange[]? _configuredRanges;
         int _openTrades;
         long _idleSinceMs = Environment.TickCount64;
 
@@ -43,6 +66,7 @@ namespace ZoneEngine_New.Core.Trade
 
         public bool IsGenerated { get; private set; }
         internal bool IsConfiguredSnapshot { get; private set; }
+        internal string? ConfigurationUnavailableReason { get; private set; }
 
         /// <summary>An exact accepted vendor adapter installs its entire frozen stock once.</summary>
         internal void SetConfiguredSnapshot(IReadOnlyList<ShopStockSlot> slots)
@@ -58,7 +82,52 @@ namespace ZoneEngine_New.Core.Trade
                 copy.Add(slot);
             }
             _slots.Clear(); _slots.AddRange(copy);
-            IsGenerated = true; IsConfiguredSnapshot = true;
+            IsGenerated = true; IsConfiguredSnapshot = true; ConfigurationUnavailableReason = null;
+        }
+
+        /// <summary>Installs the complete DAO row set and rolls one slot per row.</summary>
+        internal void SetConfiguredRanges(IReadOnlyList<ShopStockRange> ranges, Random random)
+        {
+            ArgumentNullException.ThrowIfNull(ranges);
+            ArgumentNullException.ThrowIfNull(random);
+            if (IsGenerated || _openTrades != 0 || ranges.Count == 0)
+                throw new InvalidOperationException("An accepted shop definition must be nonempty and installed before opening.");
+
+            var copy = new ShopStockRange[ranges.Count];
+            for (int i = 0; i < ranges.Count; i++)
+            {
+                ShopStockRange range = ranges[i];
+                if (string.IsNullOrWhiteSpace(range.ItemHash)
+                    || range.LowId <= 0
+                    || range.HighId <= 0
+                    || range.MinimumQuality <= 0
+                    || range.MaximumQuality < range.MinimumQuality)
+                    throw new InvalidOperationException("An accepted shop definition contains an incomplete stock row.");
+                copy[i] = range;
+            }
+
+            _configuredRanges = copy;
+            IsConfiguredSnapshot = true;
+            ConfigurationUnavailableReason = null;
+            GenerateConfigured(random);
+        }
+
+        internal void SetConfigurationUnavailable(string reason)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(reason);
+            if (IsGenerated || _openTrades != 0)
+                throw new InvalidOperationException("Shop stock availability must be set before opening or generating stock.");
+            _slots.Clear();
+            ConfigurationUnavailableReason = reason;
+        }
+
+        internal void EnsureConfiguredFresh(Random random)
+        {
+            ArgumentNullException.ThrowIfNull(random);
+            if (_configuredRanges == null || (IsGenerated && !IsIdleExpired()))
+                return;
+
+            GenerateConfigured(random);
         }
 
         /// <summary>Shoppers currently holding this machine's trade window open.</summary>
@@ -189,6 +258,20 @@ namespace ZoneEngine_New.Core.Trade
                 }
             }
 
+            IsGenerated = true;
+            _idleSinceMs = Environment.TickCount64;
+        }
+
+        void GenerateConfigured(Random random)
+        {
+            ShopStockRange[] ranges = _configuredRanges
+                ?? throw new InvalidOperationException("Configured shop ranges are unavailable.");
+            _slots.Clear();
+            foreach (ShopStockRange range in ranges)
+            {
+                int quality = random.Next(range.MinimumQuality, range.MaximumQuality + 1);
+                _slots.Add(new ShopStockSlot(range.LowId, range.HighId, quality, range.ItemHash));
+            }
             IsGenerated = true;
             _idleSinceMs = Environment.TickCount64;
         }

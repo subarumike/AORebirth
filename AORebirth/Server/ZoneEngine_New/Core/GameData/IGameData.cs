@@ -46,6 +46,10 @@ namespace ZoneEngine_New.Core.GameData
 
         bool TryGetHashInstance(string hash, out HashInstance instance);
 
+        /// <summary>Returns the unique assigned leaf hash for one exact LowId/HighId pair.</summary>
+        bool TryGetAssignedItemHash(int lowId, int highId, out string hash)
+        { hash = string.Empty; return false; }
+
         bool TryResolveHashInstance(string hash, out HashInstance instance);
 
         /// <summary>Appends every leaf item family reachable from <paramref name="hash"/>.</summary>

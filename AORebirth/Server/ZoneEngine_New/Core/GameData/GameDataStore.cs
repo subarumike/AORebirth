@@ -172,6 +172,9 @@ namespace ZoneEngine_New.Core.GameData
         public bool TryGetHashInstance(string hash, out HashInstance instance)
             => _hashItems.TryGetInstance(hash, out instance);
 
+        public bool TryGetAssignedItemHash(int lowId, int highId, out string hash)
+            => _hashItems.TryGetAssignedHash(lowId, highId, out hash);
+
         public bool TryResolveHashInstance(string hash, out HashInstance instance)
             => _hashItems.TryResolveInstance(hash, out instance);
 

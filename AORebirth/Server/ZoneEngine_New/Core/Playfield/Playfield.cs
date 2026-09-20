@@ -28,6 +28,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.WorldSimulation;
+    using AORebirth.Interfaces.Persistence.Shops;
 
     /// <summary>
     /// Playfield instance: GameData metadata, child DI (DynelRegistry, SpawnService), heartbeat.
@@ -48,6 +49,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly TradeService _trades;
         private readonly CharacterSnapshotService _characterSnapshot;
         private readonly PlayfieldMetrics _metrics;
+        private readonly IShopDao _shopDao;
         private ServiceProvider _serviceProvider;
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
@@ -76,7 +78,8 @@ namespace ZoneEngine_New.Core.Playfield
             InventoryFlushService inventoryFlush,
             TradeService trades,
             CharacterSnapshotService characterSnapshot,
-            IPlayfieldMetricsRegistry metricsRegistry)
+            IPlayfieldMetricsRegistry metricsRegistry,
+            IShopDao shopDao)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(
                 playfieldIdentity.Instance,
@@ -95,6 +98,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(trades);
             ArgumentNullException.ThrowIfNull(characterSnapshot);
             ArgumentNullException.ThrowIfNull(metricsRegistry);
+            ArgumentNullException.ThrowIfNull(shopDao);
 
             Identity = playfieldIdentity;
             _logger = playfieldLogger;
@@ -110,6 +114,7 @@ namespace ZoneEngine_New.Core.Playfield
             _inventoryFlush = inventoryFlush;
             _trades = trades;
             _characterSnapshot = characterSnapshot;
+            _shopDao = shopDao;
             _metrics = metricsRegistry.GetOrCreate(playfieldIdentity.Instance);
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
             Geometry = _gameData.GetPlayfieldGeometry(playfieldIdentity.Instance);
@@ -640,6 +645,7 @@ namespace ZoneEngine_New.Core.Playfield
                 return locality;
             });
             services.AddSingleton<SpawnService>();
+            services.AddSingleton(_shopDao);
             services.AddSingleton<NpcContentActivationService>();
             services.AddSingleton<ZoneEngine_New.Core.Missions.QuestPropService>();
             services.AddSingleton<HashSpawnSystem>();

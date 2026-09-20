@@ -2,6 +2,8 @@ namespace ZoneEngine_New.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using AORebirth.Enums;
+
     using ZoneEngine_New.Core.Trade;
 
     [TestClass]
@@ -62,6 +64,16 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(75, TradeRules.PricingSkillSteps(TradeRules.MaxPricingComputerLiteracy));
             Assert.AreEqual(75, TradeRules.PricingSkillSteps(TradeRules.MaxPricingComputerLiteracy + 1));
             Assert.AreEqual(75, TradeRules.PricingSkillSteps(int.MaxValue));
+        }
+
+        [TestMethod]
+        public void PricingSkillStepsUsesTheVendorConfiguredSkill()
+        {
+            var shopper = TestWorld.CreatePlayer(9010);
+            shopper.Stats.Set(CharacterStat.ComputerLiteracy, 0);
+            shopper.Stats.Set(CharacterStat.Psychology, 800);
+
+            Assert.AreEqual(20, TradeRules.PricingSkillSteps(shopper, (int)CharacterStat.Psychology));
         }
 
         [TestMethod]

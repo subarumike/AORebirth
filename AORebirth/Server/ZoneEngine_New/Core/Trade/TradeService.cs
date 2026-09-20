@@ -101,12 +101,22 @@ namespace ZoneEngine_New.Core.Trade
                 Cancel(player, "opening another trade");
 
             int templateId = machine.Template.Id;
+            if (!string.IsNullOrEmpty(machine.Stock.ConfigurationUnavailableReason))
+            {
+                Tell(player, "This shop has unresolved stock data.");
+                _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                    "Vending machine {0} stock unavailable: {1}",
+                    machine.ShopIdentity.Instance,
+                    machine.Stock.ConfigurationUnavailableReason));
+                return false;
+            }
             if (machine.Stock.IsConfiguredSnapshot)
             {
-                // Frozen stock belongs only to its exact live accepted vendor, never to
+                // Configured stock belongs only to its exact live accepted vendor, never to
                 // a matching template, nearby actor, or stale replacement identity.
                 if (!IsCurrentAcceptedShop(player, machine))
                     return false;
+                machine.Stock.EnsureConfiguredFresh(Random.Shared);
             }
             else
             {
@@ -736,7 +746,7 @@ namespace ZoneEngine_New.Core.Trade
             }
 
             TradeOffer offer = session.InitiatorOffer;
-            int skillSteps = TradeRules.PricingSkillSteps(player);
+            int skillSteps = TradeRules.PricingSkillSteps(player, machine.PricingSkill);
 
             // Price the purchase off the live stock list: a slot may have been re-rolled since the
             // client picked it, and the shopper must pay for what they will actually receive.
