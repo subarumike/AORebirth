@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Tests
 
     using AORebirth.Enums;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine_New.Core.Trade;
 
     [TestClass]
