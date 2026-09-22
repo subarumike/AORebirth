@@ -77,7 +77,7 @@ public sealed partial class GeneratedMissionAcgService
         lock (player.PersistenceGate)
         {
             if (!TryOwnedTarget(player, target, out var binding, out var state, out var dynel)
-                || binding.Offer.MissionType != 1 || state.IsDead || dynel.Distance3D(player) > 8.0) return false;
+                || binding.Offer.MissionType != 1 || state.IsDead || dynel.GetEdgeDistanceTo(player) > 8.0) return false;
             var result = _missions.Observe(player, Observation(binding, 2));
             if (result.Status is GeneratedMissionResultStatus.Applied or GeneratedMissionResultStatus.AlreadyApplied)
                 CompleteVerified(player, result.Binding);
@@ -99,7 +99,7 @@ public sealed partial class GeneratedMissionAcgService
             if (binding.Offer.MissionType == 3)
             {
                 if (!TryOwnedTarget(player, target, out var exact, out var state, out var dynel)
-                    || exact.QuestInstance != binding.QuestInstance || state.ObjectiveConsumed || dynel.Distance3D(player) > 8.0) return false;
+                    || exact.QuestInstance != binding.QuestInstance || state.ObjectiveConsumed || dynel.GetEdgeDistanceTo(player) > 8.0) return false;
                 state.ObjectiveConsumed = true; observation.Objects = [state];
             }
             else

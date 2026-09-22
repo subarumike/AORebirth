@@ -105,7 +105,7 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
         if (!CombatEnabled) return;
         var target = TryResolveFightingTarget();
         if (target == null || target.Playfield != Playfield) return;
-        if (!Weapons.Values.Any(weapon => Distance3D(target) <= weapon.GetAttackRange()))
+        if (!Weapons.Values.Any(weapon => GetEdgeDistanceTo(target) <= weapon.GetAttackRange()))
         {
             Motor.NavigateTo(target.Position);
             return;
@@ -121,8 +121,8 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
         {
             var target = Playfield.GetRequiredService<DynelRegistry>().PlayerEntities()
                 .Where(player => !player.IsDead && !player.IsPersistenceQuarantined && player.Playfield == Playfield
-                    && Distance3D(player) <= AggroRadius)
-                .OrderBy(player => Distance3D(player)).ThenBy(player => player.Identity.Instance).FirstOrDefault();
+                    && GetEdgeDistanceTo(player) <= AggroRadius)
+                .OrderBy(player => GetEdgeDistanceTo(player)).ThenBy(player => player.Identity.Instance).FirstOrDefault();
             if (target != null) StartFighting(target.Identity, 0);
         }
         base.Tick(deltaTime);

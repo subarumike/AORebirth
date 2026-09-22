@@ -37,16 +37,14 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public InfoPacketType Type { get; set; }
 
         [AoMember(1)]
-        [AoUsesFlags("flags", typeof(CharacterInfoPacket), FlagsCriteria.EqualsToAny, 
+        [AoUsesFlags("flags", typeof(TowerInfoPacket), FlagsCriteria.HasAll,
+            (int)InfoPacketFlags.HasPvpInfoHidden, (int)InfoPacketFlags.HasTowers)]
+        [AoUsesFlags("flags", typeof(CharacterInfoPacket), FlagsCriteria.EqualsToAny,
             new[]
                 {
-                    (int)InfoPacketType.Character, (int)InfoPacketType.CharacterOrg, (int)InfoPacketType.CharacterOrgSite, 
-                    (int)InfoPacketType.CharacterOrgSiteTower
+                    (int)InfoPacketType.Character, (int)InfoPacketType.CharacterOrg, (int)InfoPacketType.CharacterOrgSite,
+                    (int)InfoPacketType.CharacterOrgSiteTower, (int)InfoPacketType.Monster
                 })]
-        [AoUsesFlags("flags", typeof(MonsterInfoPacket), FlagsCriteria.EqualsToAny, 
-            new[] { (int)InfoPacketType.Monster, })]
-        [AoUsesFlags("flags", typeof(TowerInfoPacket), FlagsCriteria.EqualsToAny, 
-            new[] { (int)InfoPacketType.Tower, (int)InfoPacketType.ControlTower })]
         public InfoPacket Info { get; set; }
 
         #endregion

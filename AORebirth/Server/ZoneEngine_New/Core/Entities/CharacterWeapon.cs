@@ -103,13 +103,12 @@ namespace ZoneEngine_New.Core.Entities
 
         public bool IsInRange()
         {
-            //TODO: Make a
             Character? wielder = Wielder;
             Character? target = wielder?.TryResolveFightingTarget();
             if (wielder == null || target == null)
                 return false;
 
-            return wielder.Distance3D(target) <= GetAttackRange();
+            return wielder.GetEdgeDistanceTo(target) <= GetAttackRange();
         }
 
         /// <summary>

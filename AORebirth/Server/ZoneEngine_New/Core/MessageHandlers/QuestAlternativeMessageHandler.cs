@@ -28,7 +28,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             if (message.QuestInfos?.Length > 0 || (int)message.MissionTerminalIdentity.Type != MissionTerminal.LiveIdentityType
                 || !playfield.GetRequiredService<DynelRegistry>().TryGet(message.MissionTerminalIdentity, out var dynel)
-                || dynel is not MissionTerminal terminal || terminal.Distance3D(player) > LootableDynel.OpenRange)
+                || dynel is not MissionTerminal terminal || terminal.GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
                 return;
             if (session is not IGameTimeSession { GameTimeSynchronizedAtUtc: { } synchronizedUtc })
             { Feedback(session, player, "The mission clock has not synchronized. No credits were deducted."); return; }

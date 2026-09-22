@@ -127,6 +127,12 @@ namespace ZoneEngine_New.Core.Playfield
 
             ApplyTextures(npc, template);
             npc.FillEquipment(_gameData, _logger);
+            WearCastNano.ApplyContainer(
+                npc,
+                npc.Equipment,
+                includeWield: true,
+                _items,
+                _playfield.GetRequiredService<IInventoryRepository>());
             npc.Rebase();
             TryAttachShop(npc);
             if (npc.Shop == null && npc.Attackable)

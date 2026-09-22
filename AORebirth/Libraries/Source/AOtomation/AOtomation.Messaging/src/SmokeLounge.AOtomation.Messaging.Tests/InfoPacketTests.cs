@@ -44,6 +44,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             Assert.IsNull(infoPacket.TowerFields);
             Assert.IsNull(infoPacket.Towers);
             Assert.AreEqual(0, infoPacket.CityPlayfieldId);
+            Assert.AreEqual(string.Empty, infoPacket.PvpTitle);
         }
 
         [TestMethod]
@@ -208,6 +209,52 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             CollectionAssert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void Serialize0x50OmitsPvpAndOrganization()
+        {
+            var info = new CharacterInfoPacket
+            {
+                Unknown1 = 1,
+                Profession = Profession.Soldier,
+                Level = 1,
+                TitleLevel = 1,
+                VisualProfession = Profession.Soldier,
+                FirstName = string.Empty,
+                LastName = string.Empty,
+                LegacyTitle = string.Empty,
+                PvpTitle = string.Empty,
+                OrganizationId = 99,
+                OrganizationRank = "rank",
+                InvadersKilled = 0,
+                KilledByInvaders = 0,
+                AiLevel = 0,
+                PvpDuelWins = 7,
+                PvpDuelLoses = 0,
+                PvpProfessionDuelLoses = 0,
+                PvpSoloKills = 0,
+                PvpTeamKills = 0,
+                PvpSoloScore = 0,
+                PvpTeamScore = 0,
+                PvpDuelScore = 0
+            };
+
+            var serializer = new MessageSerializer();
+            byte[] characterBytes = this.Serialize(serializer, this.WrapInfoPacket(InfoPacketType.Character, 0, info));
+            byte[] monsterBytes = this.Serialize(serializer, this.WrapInfoPacket(InfoPacketType.Monster, 1, info));
+
+            Assert.AreEqual(characterBytes.Length - 32, monsterBytes.Length);
+
+            var decoded = (InfoPacketMessage)this.Deserialize(serializer, monsterBytes).Body;
+            var packet = (CharacterInfoPacket)decoded.Info;
+            Assert.AreEqual(InfoPacketType.Monster, decoded.Type);
+            Assert.IsNull(packet.OrganizationId);
+            Assert.IsNull(packet.OrganizationRank);
+            Assert.AreEqual(string.Empty, packet.FirstName);
+            Assert.AreEqual(string.Empty, packet.LastName);
+            Assert.AreEqual(string.Empty, packet.PvpTitle);
+            Assert.IsNull(packet.PvpDuelWins);
+        }
+
         #endregion
 
         #region Methods
@@ -251,6 +298,29 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 messageSerializer.Serialize(memoryStream, message);
                 return memoryStream.ToArray();
             }
+        }
+
+        private Message WrapInfoPacket(InfoPacketType type, byte unknown, CharacterInfoPacket info)
+        {
+            var body = new InfoPacketMessage
+            {
+                Identity = new Identity { Type = IdentityType.CanbeAffected, Instance = 18 },
+                Unknown = unknown,
+                Type = type,
+                Info = info
+            };
+            return new Message
+            {
+                Body = body,
+                Header = new Header
+                {
+                    MessageId = 0xDFDF,
+                    PacketType = body.PacketType,
+                    Unknown = 0x0001,
+                    Sender = 954,
+                    Receiver = 18
+                }
+            };
         }
 
         #endregion

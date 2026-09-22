@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Inventory
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
 
     using AORebirth.Enums;
@@ -13,6 +14,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.WorldSimulation;
 
@@ -55,8 +57,15 @@ namespace ZoneEngine_New.Core.Inventory
                     return true;
                 case FunctionType.UploadNano:
                     return target is Player uploadPlayer && UploadNano(uploadPlayer, spell);
+                case FunctionType.CastNano:
+                case FunctionType.AreaCastNano:
+                case FunctionType.TeamCastNano:
+                case FunctionType.PlayfieldNano:
+                    return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository);
                 case FunctionType.TeleportProxy2:
                     return target is Player proxyPlayer && TeleportProxy2(proxyPlayer, spell);
+                case FunctionType.SpawnMonster2:
+                    return SpawnMonster2(target, spell);
                 default:
                     LogUtil.Debug(
                         DebugInfoDetail.Network,
@@ -271,6 +280,52 @@ namespace ZoneEngine_New.Core.Inventory
                 .GetOrCreate(destination.PlayfieldId);
             player.Session.TransferToPlayfield(destPlayfield, landing);
             return true;
+        }
+
+        /// <summary>
+        /// Catalog shape from nano 205606: SpawnMonster2("KHAL", 73, 3600) — hash, level, lifetime.
+        /// Lifetime is stored on the function; one-shot summons do not hash-respawn.
+        /// </summary>
+        static bool SpawnMonster2(Character target, ItemSpell spell)
+        {
+            Playfield? playfield = target.Playfield;
+            if (playfield == null)
+                return false;
+
+            if (!spell.TryReadString(0, out string hash) || hash.Length == 0)
+                return false;
+            if (!spell.TryReadInt(1, out int level) || level <= 0)
+                return false;
+
+            IGameData gameData = playfield.GetRequiredService<IGameData>();
+            if (!gameData.CanResolveMobHash(hash))
+                return false;
+
+            try
+            {
+                playfield.GetRequiredService<SpawnService>().Spawn(
+                    hash,
+                    target.Position,
+                    target.Rotation,
+                    level,
+                    SpawnSource.Summoned);
+                return true;
+            }
+            catch (Exception exception) when (exception is KeyNotFoundException
+                or InvalidOperationException
+                or ArgumentException)
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "SpawnMonster2 failed hash={0} level={1} character={2}: {3}",
+                        hash,
+                        level,
+                        target.Identity.Instance,
+                        exception.Message));
+                return false;
+            }
         }
 
         static bool UploadNano(Player player, ItemSpell spell)

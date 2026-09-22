@@ -29,7 +29,7 @@ namespace ZoneEngine_New.Core.Nanos
     {
         /// <summary>
         /// Decides whether <paramref name="spell"/> can land. Friendly buffs must fit
-        /// <paramref name="maxNcu"/>; hostile nanos never consume the target's NCU.
+        /// <paramref name="maxNcu"/> unless they ignore NCU; hostile nanos never consume it.
         /// </summary>
         public static BuffApplyDecision Evaluate(
             NanoSpell spell,
@@ -50,7 +50,7 @@ namespace ZoneEngine_New.Core.Nanos
             for (int i = 0; i < active.Count; i++)
             {
                 Buff buff = active[i];
-                if (!buff.IsHostile)
+                if (buff.ConsumesNcu)
                     usedNcu += buff.NcuCost;
 
                 // A recast refreshes itself and never loses the stacking comparison.
@@ -71,9 +71,9 @@ namespace ZoneEngine_New.Core.Nanos
 
             replaced = sameNano ?? strainConflict;
 
-            if (!spell.IsHostile)
+            if (spell.ConsumesNcu)
             {
-                int freed = replaced != null && !replaced.IsHostile ? replaced.NcuCost : 0;
+                int freed = replaced != null && replaced.ConsumesNcu ? replaced.NcuCost : 0;
                 if (usedNcu - freed + spell.NcuCost > maxNcu)
                     return BuffApplyDecision.RefusedNotEnoughNcu;
             }

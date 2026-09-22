@@ -35,12 +35,16 @@ namespace ZoneEngine_New.Core.Nanos
             RechargeDelayCapCentiseconds = Math.Max(0, ReadStat(CharacterStat.RechargeDelayCap));
 
             CanFlags can = (CanFlags)(uint)ReadStat(CharacterStat.Can);
-            IsHostile = (can & CanFlags.ApplyOnHostile) != 0
-                && (can & (CanFlags.ApplyOnFriendly | CanFlags.ApplyOnSelf)) == 0;
+            NanoFlags nanoFlags = (NanoFlags)Flags;
+            IsHostile = (nanoFlags & NanoFlags.IsHostile) != 0
+                || ((can & CanFlags.ApplyOnHostile) != 0
+                    && (can & (CanFlags.ApplyOnFriendly | CanFlags.ApplyOnSelf)) == 0);
 
-            // A nano that occupies NCU for a while is a buff; instant nanos just fire and end.
-            IsBuff = template.IsBuff || DurationCentiseconds > 0;
-            CanCancel = template.CanCancel && !IsHostile;
+            IsBuff = (nanoFlags & NanoFlags.IsBuff) != 0 || DurationCentiseconds > 0;
+            CanCancel = template.CanCancel
+                && !IsHostile
+                && (nanoFlags & NanoFlags.NotRemovable) == 0;
+            IgnoresNcu = (nanoFlags & NanoFlags.NoRemoveNoNCUFriendly) != 0;
         }
 
         /// <summary>Nano strain; nanos of one strain never stack. 0 means strainless.</summary>
@@ -65,8 +69,20 @@ namespace ZoneEngine_New.Core.Nanos
 
         public int RechargeDelayCapCentiseconds { get; }
 
+        /// <summary>
+        /// True when the nano occupies NCU. Catalog bit is <see cref="NanoFlags.IsBuff"/>;
+        /// duration covers templates that omit the bit.
+        /// </summary>
+        public bool IsBuff { get; }
+
         /// <summary>True for nanos that only land on enemies (debuffs); these bypass NCU.</summary>
         public bool IsHostile { get; }
+
+        /// <summary>True when <see cref="NanoFlags.NoRemoveNoNCUFriendly"/> skips the NCU gate.</summary>
+        public bool IgnoresNcu { get; }
+
+        /// <summary>Friendly buffs that occupy NCU. Hostile and NoRemoveNoNCUFriendly do not.</summary>
+        public bool ConsumesNcu => !IsHostile && !IgnoresNcu;
 
         public static NanoSpell From(ItemTemplate template)
         {

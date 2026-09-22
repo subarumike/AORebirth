@@ -822,84 +822,40 @@ namespace ZoneEngine_New.Core.Entities
             FullCharacterStats4,
         ];
 
+        /// <summary>Chat labels for <see cref="FullCharacterStatSets"/>, same order.</summary>
+        internal static IReadOnlyList<string> FullCharacterStatSetNames { get; } =
+        [
+            "Account / Flags",
+            "Skills / Core",
+            "Appearance",
+            "Absorb / NCU",
+        ];
+
         public override InfoPacketMessage BuildInfoPacket()
         {
-            // Player inspect is Character (0x40), same as ZoneEngine CharacterInfoPacket.
-            // N3 Unknown=0. Unknown=1 is the monster path and stuck the official client
-            // on "Please wait". Reference Unknowns=1 is CharacterInfoPacket.Unknown1.
+            // Player inspect is Character (0x40). N3 Unknown=0 — Unknown=1 is the
+            // monster path and stuck the official client on "Please wait".
             // Do not copy Name into FirstName — official 0x40 uses the DB first/last
             // strings (often empty). Unique name already arrives in SCFU.Name.
-            int level = Stats.GetOrOne(CharacterStat.Level);
-            int profession = ClampProfession(Stats.GetOrZero(CharacterStat.Profession));
-            int visualProfession = ClampProfession(Stats.GetOrZero(CharacterStat.VisualProfession));
-            int health = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
-            int maxHealth = Math.Max(1, Stats.GetOrZero(CharacterStat.MaxHealth));
-            if (health > maxHealth)
-                health = maxHealth;
-
-            string firstName = FirstName ?? string.Empty;
-            string lastName = LastName ?? string.Empty;
-
+            InfoPacketMessage message = BuildCharacterInfoPacket(
+                0,
+                InfoPacketType.Character,
+                FirstName,
+                LastName);
+            var info = (CharacterInfoPacket)message.Info;
             Logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
                     "InfoPacket player={0} name={1} first='{2}' last='{3}' level={4} prof={5} hp={6}/{7}",
                     Identity.Instance,
                     Name ?? string.Empty,
-                    firstName,
-                    lastName,
-                    level,
-                    profession,
-                    health,
-                    maxHealth));
-
-            return new InfoPacketMessage
-            {
-                Identity = Identity,
-                Unknown = 0,
-                Type = InfoPacketType.Character,
-                Info = new CharacterInfoPacket
-                {
-                    Unknown1 = 0x01,
-                    Profession = (Profession)profession,
-                    Level = ClampToByte(level),
-                    TitleLevel = ClampToByte(Stats.GetOrOne(CharacterStat.TitleLevel)),
-                    VisualProfession = (Profession)visualProfession,
-                    SideXp = 0,
-                    Health = health,
-                    MaxHealth = maxHealth,
-                    BreedHostility = 0,
-                    OrganizationId = null,
-                    FirstName = firstName,
-                    LastName = lastName,
-                    LegacyTitle = string.Empty,
-                    Unknown2 = 0,
-                    OrganizationRank = null,
-                    TowerFields = null,
-                    CityPlayfieldId = 0,
-                    Towers = null,
-                    InvadersKilled = 0,
-                    KilledByInvaders = 0,
-                    AiLevel = Stats.GetOrZero(CharacterStat.AlienLevel),
-                    PvpDuelWins = 0,
-                    PvpDuelLoses = 0,
-                    PvpProfessionDuelLoses = 0,
-                    PvpSoloKills = 0,
-                    PvpTeamKills = 0,
-                    PvpSoloScore = 0,
-                    PvpTeamScore = 0,
-                    PvpDuelScore = 0
-                }
-            };
-        }
-
-        static int ClampProfession(int value)
-        {
-            if (value < 0)
-                return 0;
-            if (value > (int)Profession.Shade)
-                return (int)Profession.Shade;
-            return value;
+                    info.FirstName,
+                    info.LastName,
+                    info.Level,
+                    (int)info.Profession,
+                    info.Health,
+                    info.MaxHealth));
+            return message;
         }
 
         /// <summary>

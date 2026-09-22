@@ -235,6 +235,9 @@
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\MeshLayer.cs">
       <Link>Enums\MeshLayer.cs</Link>
     </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\NanoFlags.cs">
+      <Link>Enums\NanoFlags.cs</Link>
+    </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\CanFlags.cs">
       <Link>Enums\CanFlags.cs</Link>
     </Compile>

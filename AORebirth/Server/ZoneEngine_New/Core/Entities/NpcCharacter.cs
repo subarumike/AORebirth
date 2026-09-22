@@ -87,7 +87,7 @@ namespace ZoneEngine_New.Core.Entities
             if (player.Playfield.Identity.Instance != Playfield.Identity.Instance)
                 return false;
 
-            if (Distance3D(player) > LootableDynel.OpenRange)
+            if (GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
                 return false;
 
             return Playfield.GetRequiredService<TradeService>().TryOpenShop(player, shop);
@@ -158,28 +158,7 @@ namespace ZoneEngine_New.Core.Entities
 
         public override InfoPacketMessage BuildInfoPacket()
         {
-            return new InfoPacketMessage
-            {
-                Identity = Identity,
-                Unknown = 1,
-                Type = InfoPacketType.Monster,
-                Info = new MonsterInfoPacket
-                {
-                    Unknown1 = 1,
-                    Profession = ClampToByte(Stats.GetOrZero(CharacterStat.Profession)),
-                    Level = ClampToByte(Stats.GetOrOne(CharacterStat.Level)),
-                    TitleLevel = ClampToByte(Stats.GetOrOne(CharacterStat.TitleLevel)),
-                    VisualProfession = ClampToByte(Stats.GetOrZero(CharacterStat.VisualProfession)),
-                    Unknown2 = 0,
-                    CurrentHealth = Stats.GetOrZero(CharacterStat.Health),
-                    MaxHealth = Stats.GetOrZero(CharacterStat.MaxHealth),
-                    Unknown3 = 0,
-                    OrganizationId = 0,
-                    Unknown8 = 1234567890,
-                    Unknown9 = 1234567890,
-                    Unknown10 = 1234567890
-                }
-            };
+            return BuildCharacterInfoPacket(1, InfoPacketType.Monster, string.Empty, string.Empty);
         }
 
         public override void Tick(double deltaTime)

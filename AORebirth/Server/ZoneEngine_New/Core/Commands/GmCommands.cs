@@ -35,6 +35,40 @@ namespace ZoneEngine_New.Core.Commands
         }
 
         /// <summary>
+        /// Look-at character (player or NPC) if selected, otherwise the command issuer.
+        /// Sends feedback and returns false when a look-at target is set but is not a character.
+        /// </summary>
+        public bool TryResolveCharacter(out Character subject)
+        {
+            subject = Player;
+            Identity target = Player.Target;
+            if (target == Identity.None || target.Instance == 0 || target == Player.Identity)
+                return true;
+
+            Playfield? playfield = Player.Playfield;
+            if (playfield == null)
+            {
+                GmCommandFeedback.Send(Session, Player, "Not on a playfield.");
+                return false;
+            }
+
+            if (TryFindTargetCharacter(playfield, target, out subject))
+                return true;
+
+            subject = Player;
+            DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
+            Identity canonical = CanbeAffected(target.Instance);
+            if (registry.TryGet(target, out _) || registry.TryGet(canonical, out _))
+            {
+                GmCommandFeedback.Send(Session, Player, "Target is not a character.");
+                return false;
+            }
+
+            GmCommandFeedback.Send(Session, Player, "Unknown target.");
+            return false;
+        }
+
+        /// <summary>
         /// Resolves the look-at player when one is selected.
         /// When <paramref name="requirePlayerTarget"/> is true and a look-at target is set but is
         /// not a player, sends feedback and returns false (does not fall back to self).
@@ -75,18 +109,30 @@ namespace ZoneEngine_New.Core.Commands
 
         static bool TryFindTargetPlayer(Playfield playfield, Identity target, out Player subject)
         {
+            if (TryFindTargetCharacter(playfield, target, out Character character) && character is Player player)
+            {
+                subject = player;
+                return true;
+            }
+
+            subject = null!;
+            return false;
+        }
+
+        static bool TryFindTargetCharacter(Playfield playfield, Identity target, out Character subject)
+        {
             DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
-            if (registry.TryGet(target, out Dynel? dynel) && dynel is Player direct)
+            if (registry.TryGet(target, out Dynel? dynel) && dynel is Character direct)
             {
                 subject = direct;
                 return true;
             }
 
-            // Look-at sometimes carries a mismatched Type; players are CanbeAffected.
+            // Look-at sometimes carries a mismatched Type; characters are CanbeAffected.
             Identity canonical = CanbeAffected(target.Instance);
             if (target != canonical
                 && registry.TryGet(canonical, out dynel)
-                && dynel is Player byType)
+                && dynel is Character byType)
             {
                 subject = byType;
                 return true;

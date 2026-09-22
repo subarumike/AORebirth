@@ -202,7 +202,7 @@ namespace ZoneEngine_New.Core.Entities
             // TODO: properly implement open-range / distance close
             if (!Playfield.GetRequiredService<DynelRegistry>().TryGet(OpenerIdentity, out Dynel? dynel)
                 || dynel is not Player opener
-                || Distance3D(opener) > OpenRange)
+                || GetEdgeDistanceTo(opener) > OpenRange)
             {
                 Close();
             }

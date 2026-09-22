@@ -41,7 +41,6 @@ namespace ZoneEngine_New.Core.Inventory
             SpellList = other.SpellList;
             Actions = other.Actions;
             Relations = other.Relations;
-            IsBuff = other.IsBuff;
             CanCancel = other.CanCancel;
         }
 
@@ -70,12 +69,6 @@ namespace ZoneEngine_New.Core.Inventory
         public List<ItemAction> Actions { get; init; } = new();
 
         public List<int> Relations { get; init; } = new();
-
-        /// <summary>
-        /// True when this definition takes an NCU slot for a while instead of firing once.
-        /// <see cref="ItemFlags"/> already uses all 32 bits, so buff-ness lives here.
-        /// </summary>
-        public bool IsBuff { get; init; }
 
         /// <summary>False when the owner may not dismiss the effect from NCU.</summary>
         public bool CanCancel { get; init; } = true;
@@ -263,7 +256,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// An empty OnUse list is a successful no-op; only present but unhandled functions fail.
         /// </summary>
         /// <param name="skipPassiveModifiers">
-        /// When true, <see cref="FunctionType.Modify"/> and ScalingModify are skipped because NCU
+        /// When true, Modify, ScalingModify, MonsterShape, and SetFlag are skipped because NCU
         /// rebase already applies them from active buffs.
         /// </param>
         /// <param name="source">
@@ -310,32 +303,6 @@ namespace ZoneEngine_New.Core.Inventory
             return executed;
         }
 
-        /// <summary>
-        /// Clears SetFlag bits applied by this template's OnUse handlers when the nano leaves NCU.
-        /// </summary>
-        public void ReverseOnUseSetFlags(Character target)
-        {
-            ArgumentNullException.ThrowIfNull(target);
-
-            if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
-                return;
-
-            for (int i = 0; i < spells.Count; i++)
-            {
-                ItemSpell spell = spells[i];
-                if (!spell.Is(FunctionType.SetFlag)
-                    || !spell.TryReadInt(0, out int statId)
-                    || !spell.TryReadInt(1, out int bitIndex)
-                    || bitIndex < 0
-                    || bitIndex > 31)
-                    continue;
-
-                var stat = (CharacterStat)statId;
-                int current = target.Stats.GetOrZero(stat, StatDetail.Base);
-                target.Stats.Set(stat, current & ~(1 << bitIndex), StatDetail.Base, dirty: true);
-            }
-        }
-
         bool ExecuteSpell(
             Character target,
             Character? source,
@@ -356,6 +323,9 @@ namespace ZoneEngine_New.Core.Inventory
                 StatModifierSpells.Apply([spell], target.Stats);
                 return true;
             }
+
+            if (spell.Is(FunctionType.SetFlag) && skipPassiveModifiers)
+                return true;
 
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items);
         }

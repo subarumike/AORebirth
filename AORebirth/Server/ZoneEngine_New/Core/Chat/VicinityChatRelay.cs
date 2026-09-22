@@ -51,7 +51,7 @@ namespace ZoneEngine_New.Core.Chat
             {
                 if (other.Identity.Instance == senderId)
                     continue;
-                if (speaker.Distance3D(other) > range)
+                if (speaker.GetEdgeDistanceTo(other) > range)
                     continue;
                 recipientIds.Add(other.Identity.Instance);
             }

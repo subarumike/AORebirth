@@ -273,7 +273,7 @@ public sealed class DialogueService(DialogueCatalog catalog, DialogueActionRoute
     {
         binding = null!;
         return npc.Playfield != null && ReferenceEquals(player.Playfield, npc.Playfield) && !npc.IsDead
-            && player.Distance3D(npc) <= LootableDynel.OpenRange
+            && player.GetEdgeDistanceTo(npc) <= LootableDynel.OpenRange
             && npc.Playfield.GetRequiredService<NpcContentActivationService>().TryGetBinding(npc, out binding)
             && binding.HasDialogue && catalog.IsEnabled(binding.ContentNpcIdentity);
     }

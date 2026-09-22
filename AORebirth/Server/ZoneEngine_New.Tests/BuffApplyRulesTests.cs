@@ -158,6 +158,41 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(BuffApplyDecision.Apply, decision);
         }
 
+        [TestMethod]
+        public void NoRemoveNoNcuFriendlySkipsTheNcuCheck()
+        {
+            Buff running = Running(TestNanos.Create(2018, ncuCost: 60));
+
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(
+                TestNanos.Create(
+                    2019,
+                    ncuCost: 40,
+                    flags: NanoFlags.IsBuff | NanoFlags.NoRemoveNoNCUFriendly),
+                [running],
+                maxNcu: 60,
+                out _);
+
+            Assert.AreEqual(BuffApplyDecision.Apply, decision);
+        }
+
+        [TestMethod]
+        public void NoRemoveNoNcuFriendlyDoesNotConsumeNcuForLaterBuffs()
+        {
+            Buff skip = Running(
+                TestNanos.Create(
+                    2020,
+                    ncuCost: 50,
+                    flags: NanoFlags.IsBuff | NanoFlags.NoRemoveNoNCUFriendly));
+
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(
+                TestNanos.Create(2021, ncuCost: 60),
+                [skip],
+                maxNcu: 60,
+                out _);
+
+            Assert.AreEqual(BuffApplyDecision.Apply, decision);
+        }
+
         static Buff Running(NanoSpell spell)
             => Buff.Create(spell, Caster, nanoInstance: 1, DateTime.UtcNow);
     }

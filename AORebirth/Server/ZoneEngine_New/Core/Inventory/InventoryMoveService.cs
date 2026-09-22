@@ -585,6 +585,7 @@ namespace ZoneEngine_New.Core.Inventory
             // TemplateAction Unequip/Equip; Placement=(WearPage:absoluteSlot); cell-announced.
             SendUnequipActions(player, pending);
             player.Rebase();
+            ApplyWearCastNanos(player, pending);
             SendAck(player, pending.AckSource, pending.AckTarget, pending.AckTargetPlacement);
             SendEquipActions(player, pending);
             NotifyEquipmentChanged(player, pending);
@@ -710,6 +711,34 @@ namespace ZoneEngine_New.Core.Inventory
                 return new Identity { Type = (IdentityType)type, Instance = item.InstanceId };
 
             return item.Identity;
+        }
+
+        static void ApplyWearCastNanos(Player player, PendingEquip pending)
+        {
+            Playfield? playfield = player.Playfield;
+            if (playfield == null)
+                return;
+
+            IItemBuilder? items = playfield.GetService<IItemBuilder>();
+            IInventoryRepository? inventory = playfield.GetService<IInventoryRepository>();
+            if (items == null || inventory == null)
+                return;
+
+            if (pending.DestPage.Identity.Type.IsWearPage())
+                WearCastNano.ApplyItem(
+                    player,
+                    pending.Item,
+                    includeWield: pending.DestPage.Identity.Type == IdentityType.WeaponPage,
+                    items,
+                    inventory);
+
+            if (pending.SwappedItem != null && pending.SourcePage.Identity.Type.IsWearPage())
+                WearCastNano.ApplyItem(
+                    player,
+                    pending.SwappedItem,
+                    includeWield: pending.SourcePage.Identity.Type == IdentityType.WeaponPage,
+                    items,
+                    inventory);
         }
 
         static void NotifyEquipmentChanged(Player player, PendingEquip pending)

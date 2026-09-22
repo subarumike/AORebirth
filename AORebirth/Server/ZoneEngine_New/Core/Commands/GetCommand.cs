@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.Commands
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Nanos;
 
     public sealed class GetCommand : IGmCommand
     {
@@ -15,7 +16,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".get stat <statName|statId> | .get stats";
+        public string Usage => ".get stat <statName|statId> | .get stats | .get buffs";
 
         public void Execute(GmCommandContext context)
         {
@@ -37,6 +38,12 @@ namespace ZoneEngine_New.Core.Commands
             if (string.Equals(verb, "stats", StringComparison.OrdinalIgnoreCase))
             {
                 ExecuteStats(context);
+                return;
+            }
+
+            if (string.Equals(verb, "buffs", StringComparison.OrdinalIgnoreCase))
+            {
+                ExecuteBuffs(context);
                 return;
             }
 
@@ -90,7 +97,23 @@ namespace ZoneEngine_New.Core.Commands
             IReadOnlyList<string> lines = GetStatsAomlBuilder.BuildChatLines(
                 subject.Name ?? string.Empty,
                 subject.Stats,
-                Player.FullCharacterStatSets);
+                Player.FullCharacterStatSets,
+                Player.FullCharacterStatSetNames);
+
+            GmCommandFeedback.SendLines(context.Session, context.Player, lines);
+        }
+
+        static void ExecuteBuffs(GmCommandContext context)
+        {
+            if (!context.TryResolveCharacter(out Character subject))
+                return;
+
+            IReadOnlyList<string> lines = GetBuffsAomlBuilder.BuildChatLines(
+                subject.Name ?? string.Empty,
+                subject.Buffs,
+                subject.UsedNcu,
+                subject.MaxNcu,
+                DateTime.UtcNow);
 
             GmCommandFeedback.SendLines(context.Session, context.Player, lines);
         }
@@ -105,10 +128,12 @@ namespace ZoneEngine_New.Core.Commands
             string subjectName,
             StatCollection stats,
             IReadOnlyList<CharacterStat[]> sets,
+            IReadOnlyList<string> setNames,
             int maxBodyLength = DefaultMaxBodyLength)
         {
             ArgumentNullException.ThrowIfNull(stats);
             ArgumentNullException.ThrowIfNull(sets);
+            ArgumentNullException.ThrowIfNull(setNames);
             if (maxBodyLength < 64)
                 throw new ArgumentOutOfRangeException(nameof(maxBodyLength));
 
@@ -123,17 +148,17 @@ namespace ZoneEngine_New.Core.Commands
 
                 IReadOnlyList<string> rows = BuildRows(stats, set);
                 IReadOnlyList<string> chunks = ChunkRows(rows, maxBodyLength);
-                int setNumber = setIndex + 1;
+                string setName = ResolveSetName(setNames, setIndex);
 
                 for (int chunkIndex = 0; chunkIndex < chunks.Count; chunkIndex++)
                 {
                     string label = chunks.Count == 1
-                        ? string.Format(CultureInfo.InvariantCulture, "{0} — Set {1}", title, setNumber)
+                        ? string.Format(CultureInfo.InvariantCulture, "{0} — {1}", title, setName)
                         : string.Format(
                             CultureInfo.InvariantCulture,
-                            "{0} — Set {1} ({2}/{3})",
+                            "{0} — {1} ({2}/{3})",
                             title,
-                            setNumber,
+                            setName,
                             chunkIndex + 1,
                             chunks.Count);
 
@@ -145,6 +170,18 @@ namespace ZoneEngine_New.Core.Commands
                 lines.Add(BuildLink("(no stats)", title));
 
             return lines;
+        }
+
+        static string ResolveSetName(IReadOnlyList<string> setNames, int setIndex)
+        {
+            if (setIndex < setNames.Count)
+            {
+                string name = setNames[setIndex];
+                if (!string.IsNullOrWhiteSpace(name))
+                    return name;
+            }
+
+            return string.Format(CultureInfo.InvariantCulture, "Set {0}", setIndex + 1);
         }
 
         public static string BuildLink(string body, string label)
@@ -229,6 +266,95 @@ namespace ZoneEngine_New.Core.Commands
                 chunks.Add(current.ToString());
 
             return chunks;
+        }
+    }
+
+    /// <summary>Builds AOML <c>text://</c> popup links for a character's active NCU.</summary>
+    internal static class GetBuffsAomlBuilder
+    {
+        public static IReadOnlyList<string> BuildChatLines(
+            string subjectName,
+            IReadOnlyList<Buff> buffs,
+            int usedNcu,
+            int maxNcu,
+            DateTime nowUtc,
+            int maxBodyLength = GetStatsAomlBuilder.DefaultMaxBodyLength)
+        {
+            ArgumentNullException.ThrowIfNull(buffs);
+            if (maxBodyLength < 64)
+                throw new ArgumentOutOfRangeException(nameof(maxBodyLength));
+
+            string who = string.IsNullOrWhiteSpace(subjectName) ? "Target" : subjectName;
+            string title = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} Buffs ({1}, NCU {2}/{3})",
+                who,
+                buffs.Count,
+                usedNcu,
+                maxNcu);
+
+            if (buffs.Count == 0)
+                return [GetStatsAomlBuilder.BuildLink("(no buffs)", title)];
+
+            var rows = new List<string>(buffs.Count);
+            for (int i = 0; i < buffs.Count; i++)
+                rows.Add(FormatRow(buffs[i], nowUtc));
+
+            IReadOnlyList<string> chunks = GetStatsAomlBuilder.ChunkRows(rows, maxBodyLength);
+            var lines = new List<string>(chunks.Count);
+            for (int i = 0; i < chunks.Count; i++)
+            {
+                string label = chunks.Count == 1
+                    ? title
+                    : string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0} ({1}/{2})",
+                        title,
+                        i + 1,
+                        chunks.Count);
+                lines.Add(GetStatsAomlBuilder.BuildLink(chunks[i], label));
+            }
+
+            return lines;
+        }
+
+        public static string FormatRow(Buff buff, DateTime nowUtc)
+        {
+            ArgumentNullException.ThrowIfNull(buff);
+
+            string name = string.IsNullOrWhiteSpace(buff.Name) ? "Nano" : buff.Name;
+            string flags = string.Empty;
+            if (buff.IsHostile)
+                flags += " debuff";
+            if (!buff.CanCancel)
+                flags += " locked";
+
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} ({1}) ncu={2} rem={3} strain={4} inst={5} src={6}{7}",
+                name,
+                buff.Id,
+                buff.NcuCost,
+                FormatRemaining(buff.RemainingCentiseconds(nowUtc)),
+                buff.NanoStrain,
+                buff.NanoInstance,
+                buff.Source.Instance,
+                flags);
+        }
+
+        public static string FormatRemaining(int remainingCentiseconds)
+        {
+            int totalSeconds = remainingCentiseconds / 100;
+            if (totalSeconds < 0)
+                totalSeconds = 0;
+
+            int hours = totalSeconds / 3600;
+            int minutes = (totalSeconds % 3600) / 60;
+            int seconds = totalSeconds % 60;
+            if (hours > 0)
+                return string.Format(CultureInfo.InvariantCulture, "{0}:{1:D2}:{2:D2}", hours, minutes, seconds);
+
+            return string.Format(CultureInfo.InvariantCulture, "{0}:{1:D2}", minutes, seconds);
         }
     }
 }

@@ -81,7 +81,6 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 SpellList = spellList,
                 Actions = template.Actions,
                 Relations = template.Relations,
-                IsBuff = template.IsBuff,
                 CanCancel = template.CanCancel
             };
         }

@@ -44,7 +44,7 @@ internal sealed class GeneratedMissionCorpseDynel : Dynel
     {
         long now = _now();
         if (Playfield == null || player.Session?.State != SessionState.InPlay || player.IsPersistenceQuarantined || player.IsDead || player.Identity.Instance != OwnerId || player.Playfield != Playfield
-            || !double.IsFinite(Distance3D(player)) || Distance3D(player) > 8.0 || now >= _state.CorpseExpiresAtUtcTicks) return false;
+            || !double.IsFinite(GetEdgeDistanceTo(player)) || GetEdgeDistanceTo(player) > 8.0 || now >= _state.CorpseExpiresAtUtcTicks) return false;
         if (_opener != null)
         {
             if (_opener != player || !Authorized(now)) return false;
@@ -119,7 +119,7 @@ internal sealed class GeneratedMissionCorpseDynel : Dynel
     }
 
     bool Authorized(long now) => _opener != null && _opener.Session?.State == SessionState.InPlay && _lease?.Matches(_opener.Session, _opener.Playfield,
-        _opener.Identity.Instance, _opener.IsDead, _opener.IsPersistenceQuarantined, Distance3D(_opener), now) == true;
+        _opener.Identity.Instance, _opener.IsDead, _opener.IsPersistenceQuarantined, GetEdgeDistanceTo(_opener), now) == true;
 
     internal void Remove()
     {

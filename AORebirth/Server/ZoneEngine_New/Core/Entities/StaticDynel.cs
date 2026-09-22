@@ -45,7 +45,7 @@ namespace ZoneEngine_New.Core.Entities
                 || player.Playfield.Identity.Instance != Playfield.Identity.Instance)
                 return false;
 
-            if (Distance3D(player) > LootableDynel.OpenRange)
+            if (GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
                 return false;
 
             if (!Template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))

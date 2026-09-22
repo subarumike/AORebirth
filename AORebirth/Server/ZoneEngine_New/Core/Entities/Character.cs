@@ -51,8 +51,6 @@ namespace ZoneEngine_New.Core.Entities
         const int MaxXpLevel = 220;
         const int KillXpCapPercent = 10;
         const int QuestXpCapPercent = 20;
-        const double SoftRangeGraceMeters = 1.5;
-        const double HardRangeMultiplier = 3.0;
         const int MartialArtsSpecialLowId = 211357;
         const int MartialArtsSpecialHighId = 211358;
         const int DimachSpecialLowId = 42033;
@@ -66,6 +64,14 @@ namespace ZoneEngine_New.Core.Entities
             Motor = new CharacterMotor(this);
             Motor.Jumped += OnJumped;
             Stats.StatChanged += OnStatChanged;
+        }
+
+        public override double GetCollisionRadius()
+        {
+            int scale = Stats.GetOrZero(CharacterStat.Scale);
+            if (scale <= 0)
+                scale = 100;
+            return (scale * CharacterRadius) / 100.0;
         }
 
         //TODO: Put cooldowns here
@@ -953,17 +959,7 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             Item? weapon = characterWeapon.Item;
-            double attackRange = characterWeapon.GetAttackRange();
-
-            double distance = Distance3D(target);
-            if (distance > attackRange * HardRangeMultiplier)
-            {
-                if (IsPlayer)
-                    SetFightingTarget(Identity.None);
-                return;
-            }
-
-            if (distance > attackRange + SoftRangeGraceMeters)
+            if (GetEdgeDistanceTo(target) > characterWeapon.GetAttackRange())
                 return;
 
             DamageCalculator.DamageResult result = DamageCalculator.CalculateFromWeapon(this, target, weapon);
@@ -1171,7 +1167,7 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Active NCU entries, oldest first.</summary>
         public IReadOnlyList<Buff> Buffs => _buffs;
 
-        /// <summary>NCU consumed by friendly buffs; mirrored into CurrentNCU for the client.</summary>
+        /// <summary>NCU consumed by friendly buffs that use NCU; mirrored into CurrentNCU.</summary>
         public int UsedNcu { get; private set; }
 
         /// <summary>NCU capacity from MaxNCU. Always enforced for friendly buffs.</summary>
@@ -1265,7 +1261,9 @@ namespace ZoneEngine_New.Core.Entities
             ArgumentNullException.ThrowIfNull(spell);
 
             applied = null;
-            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, _buffs, MaxNcu, out replaced);
+            // NPC equipment nanos (Uklesh 205608 → 205606) use catalog NCU costs larger than MaxNCU.
+            int ncuCap = this is NpcCharacter ? int.MaxValue : MaxNcu;
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, _buffs, ncuCap, out replaced);
             if (decision != BuffApplyDecision.Apply && decision != BuffApplyDecision.Replace)
                 return decision;
 
@@ -1377,7 +1375,7 @@ namespace ZoneEngine_New.Core.Entities
             int used = 0;
             for (int i = 0; i < _buffs.Count; i++)
             {
-                if (!_buffs[i].IsHostile)
+                if (_buffs[i].ConsumesNcu)
                     used += _buffs[i].NcuCost;
             }
 
@@ -1427,7 +1425,7 @@ namespace ZoneEngine_New.Core.Entities
             lock (_activeNanoDirtyGate)
                 _dirtyActiveNanos = snapshot;
 
-            Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);
+            Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(player);
         }
 
         /// <summary>Takes ownership of the pending NCU snapshot; null when nothing changed.</summary>
@@ -2126,6 +2124,52 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public abstract InfoPacketMessage BuildInfoPacket();
 
+        protected InfoPacketMessage BuildCharacterInfoPacket(byte n3Unknown, InfoPacketType type, string firstName, string lastName)
+        {
+            int level = Stats.GetOrOne(CharacterStat.Level);
+            int profession = ClampProfession(Stats.GetOrZero(CharacterStat.Profession));
+            int visualProfession = ClampProfession(Stats.GetOrZero(CharacterStat.VisualProfession));
+            int health = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
+            int maxHealth = Math.Max(1, Stats.GetOrZero(CharacterStat.MaxHealth));
+            if (health > maxHealth)
+                health = maxHealth;
+
+            return new InfoPacketMessage
+            {
+                Identity = Identity,
+                Unknown = n3Unknown,
+                Type = type,
+                Info = new CharacterInfoPacket
+                {
+                    Unknown1 = 0x01,
+                    Profession = (Profession)profession,
+                    Level = ClampToByte(level),
+                    TitleLevel = ClampToByte(Stats.GetOrOne(CharacterStat.TitleLevel)),
+                    VisualProfession = (Profession)visualProfession,
+                    SideXp = 0,
+                    Health = health,
+                    MaxHealth = maxHealth,
+                    BreedHostility = 0,
+                    FirstName = firstName ?? string.Empty,
+                    LastName = lastName ?? string.Empty,
+                    LegacyTitle = string.Empty,
+                    PvpTitle = string.Empty,
+                    CityPlayfieldId = 0,
+                    InvadersKilled = Stats.GetOrZero(CharacterStat.InvadersKilled),
+                    KilledByInvaders = Stats.GetOrZero(CharacterStat.KilledByInvaders),
+                    AiLevel = Stats.GetOrZero(CharacterStat.AlienLevel),
+                    PvpDuelWins = 0,
+                    PvpDuelLoses = 0,
+                    PvpProfessionDuelLoses = 0,
+                    PvpSoloKills = 0,
+                    PvpTeamKills = 0,
+                    PvpSoloScore = 0,
+                    PvpTeamScore = 0,
+                    PvpDuelScore = 0
+                }
+            };
+        }
+
         /// <summary>
         /// Builds a SimpleCharFullUpdate (SCFU) spawn packet from current character state.
         /// Structure follows ZoneEngine SimpleCharFullUpdate.ConstructMessage without capture/runtime special cases.
@@ -2399,6 +2443,15 @@ namespace ZoneEngine_New.Core.Entities
             if (value > byte.MaxValue)
                 return byte.MaxValue;
             return (byte)value;
+        }
+
+        protected static int ClampProfession(int value)
+        {
+            if (value < 0)
+                return 0;
+            if (value > (int)Profession.Shade)
+                return (int)Profession.Shade;
+            return value;
         }
 
         private static short ClampToShort(int value) =>

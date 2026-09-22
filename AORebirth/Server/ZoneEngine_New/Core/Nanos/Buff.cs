@@ -64,7 +64,7 @@ namespace ZoneEngine_New.Core.Nanos
             }
         }
 
-        /// <summary>Functions to run once when the buff leaves NCU. Not executed yet.</summary>
+        /// <summary>Functions to run once when the buff leaves NCU.</summary>
         public IReadOnlyList<ItemSpell> TerminateSpells
             => SpellList.TryGetValue(EventType.OnTerminate, out List<ItemSpell>? spells) ? spells : [];
 

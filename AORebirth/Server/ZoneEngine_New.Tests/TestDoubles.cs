@@ -33,6 +33,7 @@ namespace ZoneEngine_New.Tests
         readonly Dictionary<int, VendingMachineDefinition> _machines;
         readonly bool _allowMissingCatMesh;
         readonly Dictionary<string, int[]> _monsterWeapons;
+        readonly Dictionary<string, MobTemplate>? _mobs;
         readonly string _rootPath;
 
         public StubGameData(
@@ -40,12 +41,14 @@ namespace ZoneEngine_New.Tests
             Dictionary<int, VendingMachineDefinition>? machines = null,
             bool allowMissingCatMesh = false,
             Dictionary<string, int[]>? monsterWeapons = null,
-            string? rootPath = null)
+            string? rootPath = null,
+            Dictionary<string, MobTemplate>? mobs = null)
         {
             _hashItems = hashItems;
             _machines = machines ?? new Dictionary<int, VendingMachineDefinition>();
             _allowMissingCatMesh = allowMissingCatMesh;
             _monsterWeapons = monsterWeapons ?? new Dictionary<string, int[]>(StringComparer.Ordinal);
+            _mobs = mobs;
             _rootPath = rootPath ?? string.Empty;
             RootPath = _rootPath;
         }
@@ -87,11 +90,18 @@ namespace ZoneEngine_New.Tests
 
         public bool TryGetXpLevel(int level, out XpLevelEntry entry) => throw new NotSupportedException();
 
-        public bool CanResolveMobHash(string hash) => throw new NotSupportedException();
+        public bool CanResolveMobHash(string hash)
+            => _mobs != null ? TryGetMobTemplate(hash, out _) : throw new NotSupportedException();
 
-        public bool TryGetMobTemplate(string hash, out MobTemplate template) => throw new NotSupportedException();
+        public bool TryGetMobTemplate(string hash, out MobTemplate template)
+        {
+            if (_mobs != null)
+                return _mobs.TryGetValue(hash, out template!);
+            throw new NotSupportedException();
+        }
 
-        public bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template) => throw new NotSupportedException();
+        public bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template)
+            => TryGetMobTemplate(hash, out template);
 
         public MobTemplate RequireMobTemplate(string hash) => throw new NotSupportedException();
 
@@ -273,8 +283,10 @@ namespace ZoneEngine_New.Tests
             int rechargeDelay = 0,
             int rechargeDelayCap = 0,
             CanFlags can = CanFlags.ApplyOnFriendly,
+            NanoFlags flags = 0,
             bool canCancel = true,
-            IEnumerable<ItemSpell>? modifiers = null)
+            IEnumerable<ItemSpell>? modifiers = null,
+            IEnumerable<ItemSpell>? terminate = null)
         {
             var stats = new Dictionary<CharacterStat, int>
             {
@@ -293,6 +305,8 @@ namespace ZoneEngine_New.Tests
             var spellList = new Dictionary<EventType, List<ItemSpell>>();
             if (modifiers != null)
                 spellList[EventType.OnUse] = new List<ItemSpell>(modifiers);
+            if (terminate != null)
+                spellList[EventType.OnTerminate] = new List<ItemSpell>(terminate);
 
             return NanoSpell.From(
                 new ItemTemplate
@@ -300,6 +314,7 @@ namespace ZoneEngine_New.Tests
                     Id = nanoId,
                     Name = "Nano " + nanoId,
                     Quality = 1,
+                    Flags = (int)flags,
                     Stats = stats,
                     SpellList = spellList,
                     CanCancel = canCancel
@@ -314,11 +329,38 @@ namespace ZoneEngine_New.Tests
                 Arguments = new List<object> { (int)stat, delta },
                 Requirements = new List<ItemRequirement>()
             };
+
+        /// <summary>A SetFlag function: OR bit <paramref name="bitIndex"/> into <paramref name="stat"/>.</summary>
+        public static ItemSpell SetFlag(CharacterStat stat, int bitIndex)
+            => new()
+            {
+                FunctionType = (int)FunctionType.SetFlag,
+                Arguments = new List<object> { (int)stat, bitIndex },
+                Requirements = new List<ItemRequirement>()
+            };
+
+        /// <summary>Catalog SpawnMonster2: hash, level, lifetime centiseconds.</summary>
+        public static ItemSpell SpawnMonster2(string hash, int level, int lifetimeCentiseconds = 3600)
+            => new()
+            {
+                FunctionType = (int)FunctionType.SpawnMonster2,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = new List<object> { hash, level, lifetimeCentiseconds },
+                Requirements = new List<ItemRequirement>()
+            };
     }
 
     internal sealed class StubItemBuilder : IItemBuilder
     {
         int _nextInstanceId = 90000;
+        readonly Dictionary<int, ItemTemplate> _templates = new();
+
+        public StubItemBuilder Add(ItemTemplate template)
+        {
+            ArgumentNullException.ThrowIfNull(template);
+            _templates[template.Id] = template;
+            return this;
+        }
 
         public Item Create(
             int lowId,
@@ -354,11 +396,13 @@ namespace ZoneEngine_New.Tests
         }
 
         public ItemTemplate CreateTemplate(int lowId, int highId, int quality)
-            => new()
-            {
-                Id = lowId,
-                Quality = quality
-            };
+            => _templates.TryGetValue(lowId, out ItemTemplate? template)
+                ? template
+                : new()
+                {
+                    Id = lowId,
+                    Quality = quality
+                };
 
         public bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item)
             => throw new NotSupportedException();

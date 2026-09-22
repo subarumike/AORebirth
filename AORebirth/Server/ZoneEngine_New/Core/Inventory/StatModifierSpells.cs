@@ -24,7 +24,8 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 ItemSpell spell = spells[i];
                 bool shape = spell.Is(FunctionType.MonsterShape);
-                if (!shape && !spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify))
+                bool setFlag = spell.Is(FunctionType.SetFlag);
+                if (!shape && !setFlag && !spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify))
                     continue;
                 if (!spell.MeetsRequirements(stats))
                     continue;
@@ -36,6 +37,12 @@ namespace ZoneEngine_New.Core.Inventory
                             StatDetail.Bonus);
                     continue;
                 }
+
+                if (setFlag)
+                {
+                    ApplySetFlag(spell, stats);
+                    continue;
+                }
                 if (!TryReadModify(spell, out CharacterStat stat, out int delta))
                     continue;
                 if (stat == CharacterStat.Cash)
@@ -43,6 +50,20 @@ namespace ZoneEngine_New.Core.Inventory
 
                 stats.AddBonus(stat, delta, dirty: true);
             }
+        }
+
+        static void ApplySetFlag(ItemSpell spell, StatCollection stats)
+        {
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int bitIndex)
+                || bitIndex < 0 || bitIndex > 31)
+                return;
+
+            var stat = (CharacterStat)statId;
+            int bit = 1 << bitIndex;
+            int currentFull = stats.GetOrZero(stat);
+            int @base = stats.GetOrZero(stat, StatDetail.Base);
+            int desired = currentFull | bit;
+            stats.Set(stat, desired - @base, StatDetail.Bonus);
         }
 
         static bool TryReadModify(ItemSpell spell, out CharacterStat stat, out int delta)

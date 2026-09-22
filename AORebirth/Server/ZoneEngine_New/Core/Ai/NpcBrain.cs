@@ -128,7 +128,7 @@ namespace ZoneEngine_New.Core.Ai
                 return;
             if (Hate.Contains(player.Identity))
                 return;
-            if (!NpcAiRules.IsNearby(Npc.Position, player.Position, NpcAiRules.NearbyRange))
+            if (Npc.GetEdgeDistanceTo(player) > NpcAiRules.NearbyRange)
                 return;
             if (!HasChance(player))
                 return;
@@ -249,7 +249,7 @@ namespace ZoneEngine_New.Core.Ai
         public bool IsInAttackRange(Character target)
         {
             ArgumentNullException.ThrowIfNull(target);
-            return Npc.Distance3D(target) <= GetAttackRange();
+            return Npc.GetEdgeDistanceTo(target) <= GetAttackRange();
         }
 
         public bool CanAttackNow(Character target)
@@ -373,7 +373,7 @@ namespace ZoneEngine_New.Core.Ai
         {
             Character? target = Resolve(identity);
             return target != null
-                && NpcAiRules.IsNearby(Npc.Position, target.Position, NpcAiRules.NearbyRange)
+                && Npc.GetEdgeDistanceTo(target) <= NpcAiRules.NearbyRange
                 && HasChanceWithGrace(target);
         }
 

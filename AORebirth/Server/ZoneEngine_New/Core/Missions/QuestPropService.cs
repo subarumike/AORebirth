@@ -77,7 +77,7 @@ internal sealed class QuestPropService(Playfield playfield, DynelRegistry regist
             || !player.Inventory.IsHydrated || !_bindings.TryGetValue(target.Instance, out var prop)
             || !ReferenceEquals(prop.Playfield, playfield) || !registry.TryGet(target, out var current) || !ReferenceEquals(current, prop)
             || !registry.TryGet(player.Identity, out var currentPlayer) || !ReferenceEquals(currentPlayer, player)
-            || player.Distance3D(prop) > LootableDynel.OpenRange) return false;
+            || player.GetEdgeDistanceTo(prop) > LootableDynel.OpenRange) return false;
         return Matches(prop, Definitions.Single(definition => definition.Instance == target.Instance));
     }
 

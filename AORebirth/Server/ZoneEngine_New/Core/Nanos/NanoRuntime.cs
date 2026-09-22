@@ -174,6 +174,69 @@ namespace ZoneEngine_New.Core.Nanos
             return true;
         }
 
+        /// <summary>
+        /// Lands a nano immediately: no cast bar, recharge, nano spend, or upload check.
+        /// Buffs occupy NCU; instant nanos just run their OnUse effects.
+        /// </summary>
+        public static bool TryApplyImmediate(
+            Character source,
+            Character target,
+            int nanoId,
+            IItemBuilder items,
+            IInventoryRepository inventory,
+            DateTime nowUtc)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(inventory);
+
+            if (nanoId <= 0 || target.IsDead)
+                return false;
+
+            ItemTemplate template = items.CreateTemplate(nanoId, nanoId, quality: 1);
+            if (template.Id != nanoId)
+                return false;
+
+            return LandImmediate(source, target, NanoSpell.From(template), inventory, items, nowUtc);
+        }
+
+        static bool LandImmediate(
+            Character source,
+            Character target,
+            NanoSpell spell,
+            IInventoryRepository inventory,
+            IItemBuilder items,
+            DateTime nowUtc)
+        {
+            if (!spell.IsBuff)
+            {
+                ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: false, inventory, items);
+                return true;
+            }
+
+            BuffApplyDecision decision = target.TryApplyBuff(
+                spell,
+                source.Identity,
+                nowUtc,
+                out Buff? applied,
+                out Buff? replaced);
+
+            if (applied == null)
+            {
+                if (source is Player)
+                    Refuse(source, DescribeApplyRefusal(decision));
+                return false;
+            }
+
+            if (replaced != null && replaced.Id != spell.Id)
+                AnnounceBuffRemoved(target, replaced);
+
+            SendNanoDuration(source, target, applied);
+            ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: true, inventory, items);
+            return true;
+        }
+
         static void Complete(Character caster, PendingNanoCast cast, DateTime nowUtc)
         {
             NanoSpell spell = cast.Spell;
@@ -301,12 +364,13 @@ namespace ZoneEngine_New.Core.Nanos
             };
 
         /// <summary>
-        /// Start-time NCU preview. Instant and hostile nanos skip it. Land still re-checks via
-        /// <see cref="BuffApplyRules"/>; failure there finishes the cast without applying.
+        /// Start-time NCU preview. Instant, hostile, and NoRemoveNoNCUFriendly nanos skip it.
+        /// Land still re-checks via <see cref="BuffApplyRules"/>; failure there finishes the
+        /// cast without applying.
         /// </summary>
         static bool TargetCanHoldBuff(NanoSpell spell, Character? recipient)
         {
-            if (recipient == null || !spell.IsBuff || spell.IsHostile)
+            if (recipient == null || !spell.IsBuff || !spell.ConsumesNcu)
                 return true;
 
             BuffApplyDecision decision = BuffApplyRules.Evaluate(
@@ -430,14 +494,20 @@ namespace ZoneEngine_New.Core.Nanos
             Character caster,
             Character recipient,
             NanoSpell spell,
-            bool skipPassiveModifiers)
+            bool skipPassiveModifiers,
+            IInventoryRepository? inventory = null,
+            IItemBuilder? items = null)
         {
-            Playfield? playfield = recipient.Playfield ?? caster.Playfield;
-            if (playfield == null)
-                return;
+            if (inventory == null || items == null)
+            {
+                Playfield? playfield = recipient.Playfield ?? caster.Playfield;
+                if (playfield == null)
+                    return;
 
-            IInventoryRepository inventory = playfield.GetRequiredService<IInventoryRepository>();
-            IItemBuilder items = playfield.GetRequiredService<IItemBuilder>();
+                inventory ??= playfield.GetRequiredService<IInventoryRepository>();
+                items ??= playfield.GetRequiredService<IItemBuilder>();
+            }
+
             spell.ExecuteOnUseSpells(
                 recipient,
                 inventory,
@@ -448,9 +518,6 @@ namespace ZoneEngine_New.Core.Nanos
 
         static void ExecuteBuffEnd(Character owner, Buff buff)
         {
-            //Shouldn't this happen as part of the rebase?
-            buff.ReverseOnUseSetFlags(owner);
-
             Playfield? playfield = owner.Playfield;
             if (playfield != null)
             {

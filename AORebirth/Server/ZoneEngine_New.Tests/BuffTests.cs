@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Tests
 {
     using System;
+    using System.Collections.Generic;
 
     using AORebirth.Enums;
 
@@ -25,6 +26,14 @@ namespace ZoneEngine_New.Tests
             Assert.IsFalse(instant.IsBuff);
             Assert.ThrowsExactly<InvalidOperationException>(
                 () => Buff.Create(instant, Caster, nanoInstance: 1, DateTime.UtcNow));
+        }
+
+        [TestMethod]
+        public void NanoWithIsBuffFlagIsABuffEvenWithoutDuration()
+        {
+            NanoSpell buff = TestNanos.Create(1020, durationCentiseconds: 0, flags: NanoFlags.IsBuff);
+
+            Assert.IsTrue(buff.IsBuff);
         }
 
         [TestMethod]
@@ -207,6 +216,88 @@ namespace ZoneEngine_New.Tests
 
             Assert.AreEqual(0, player.Buffs.Count);
             Assert.AreEqual(0, player.UsedNcu);
+        }
+
+        [TestMethod]
+        public void BuffSetFlagOrsTheBitOnRebaseAndClearsItWithoutTouchingBase()
+        {
+            NpcCharacter player = new(new Identity { Type = IdentityType.CanbeAffected, Instance = 504 }, new StubItemBuilder());
+            player.Stats.Set(CharacterStat.MaxNCU, 60);
+            NanoSpell spell = TestNanos.Create(
+                1011,
+                modifiers: [TestNanos.SetFlag(CharacterStat.Flags, 3)]);
+
+            Assert.AreEqual(
+                BuffApplyDecision.Apply,
+                player.TryApplyBuff(spell, Caster, DateTime.UtcNow, out _, out _));
+            Assert.AreEqual(8, player.Stats.GetOrZero(CharacterStat.Flags));
+            Assert.AreEqual(0, player.Stats.GetOrZero(CharacterStat.Flags, StatDetail.Base));
+
+            Assert.AreEqual(
+                BuffRemovalOutcome.Removed,
+                player.TryRemoveBuff(1011, BuffRemovalReason.Cancelled, out _));
+            Assert.AreEqual(0, player.Stats.GetOrZero(CharacterStat.Flags));
+            Assert.AreEqual(0, player.Stats.GetOrZero(CharacterStat.Flags, StatDetail.Base));
+        }
+
+        [TestMethod]
+        public void TwoBuffsSettingTheSameBitStayThatBit()
+        {
+            NpcCharacter player = new(new Identity { Type = IdentityType.CanbeAffected, Instance = 505 }, new StubItemBuilder());
+            player.Stats.Set(CharacterStat.MaxNCU, 60);
+            ItemSpell flag = TestNanos.SetFlag(CharacterStat.Flags, 3);
+
+            Assert.AreEqual(
+                BuffApplyDecision.Apply,
+                player.TryApplyBuff(
+                    TestNanos.Create(1012, strain: 1, modifiers: [flag]),
+                    Caster,
+                    DateTime.UtcNow,
+                    out _,
+                    out _));
+            Assert.AreEqual(
+                BuffApplyDecision.Apply,
+                player.TryApplyBuff(
+                    TestNanos.Create(1013, strain: 2, modifiers: [flag]),
+                    Caster,
+                    DateTime.UtcNow,
+                    out _,
+                    out _));
+            Assert.AreEqual(8, player.Stats.GetOrZero(CharacterStat.Flags));
+            Assert.AreEqual(0, player.Stats.GetOrZero(CharacterStat.Flags, StatDetail.Base));
+
+            Assert.AreEqual(
+                BuffRemovalOutcome.Removed,
+                player.TryRemoveBuff(1012, BuffRemovalReason.Cancelled, out _));
+            Assert.AreEqual(8, player.Stats.GetOrZero(CharacterStat.Flags));
+            Assert.AreEqual(
+                BuffRemovalOutcome.Removed,
+                player.TryRemoveBuff(1013, BuffRemovalReason.Cancelled, out _));
+            Assert.AreEqual(0, player.Stats.GetOrZero(CharacterStat.Flags));
+        }
+
+        [TestMethod]
+        public void InstantSetFlagWritesBase()
+        {
+            NpcCharacter player = new(new Identity { Type = IdentityType.CanbeAffected, Instance = 506 }, new StubItemBuilder());
+            var template = new ItemTemplate
+            {
+                Id = 1014,
+                Name = "Flag item",
+                Quality = 1,
+                SpellList = new Dictionary<EventType, List<ItemSpell>>
+                {
+                    [EventType.OnUse] = [TestNanos.SetFlag(CharacterStat.Flags, 3)]
+                }
+            };
+
+            Assert.IsTrue(template.ExecuteOnUseSpells(
+                player,
+                new StubInventoryRepository(),
+                new StubItemBuilder(),
+                skipPassiveModifiers: false));
+            Assert.AreEqual(8, player.Stats.GetOrZero(CharacterStat.Flags, StatDetail.Base));
+            Assert.AreEqual(8, player.Stats.GetOrZero(CharacterStat.Flags));
         }
     }
 }

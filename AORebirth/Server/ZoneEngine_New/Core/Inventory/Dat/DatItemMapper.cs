@@ -56,7 +56,6 @@ namespace ZoneEngine_New.Core.Inventory.Dat
                 Relations = events.Relations != null
                     ? new List<int>(events.Relations)
                     : new List<int>(template.Relations),
-                IsBuff = template.IsBuff,
                 CanCancel = template.CanCancel
             };
         }

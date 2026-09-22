@@ -14,20 +14,40 @@
 
 namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 {
+    using System;
+
+    [Flags]
+    public enum InfoPacketFlags : byte
+    {
+        HasOrgRank = 0x01,
+
+        HasTowerFields = 0x02,
+
+        HasTowers = 0x04,
+
+        HasGasChangeInfo = 0x08,
+
+        HasPvpInfoHidden = 0x10,
+
+        HasFactionInfo = 0x20,
+
+        HasCharacterInfo = 0x40
+    }
+
     public enum InfoPacketType : byte
     {
-        Character = 0x40, // 0100 0000
+        Character = (byte)InfoPacketFlags.HasCharacterInfo, // 0x40
 
-        CharacterOrg = 0x41, // 0100 0001
+        CharacterOrg = (byte)(InfoPacketFlags.HasCharacterInfo | InfoPacketFlags.HasOrgRank), // 0x41
 
-        CharacterOrgSite = 0x43, // 0100 0011
+        CharacterOrgSite = (byte)(InfoPacketFlags.HasCharacterInfo | InfoPacketFlags.HasOrgRank | InfoPacketFlags.HasTowerFields), // 0x43
 
-        CharacterOrgSiteTower = 0x47, // 0100 0111
+        CharacterOrgSiteTower = (byte)(InfoPacketFlags.HasCharacterInfo | InfoPacketFlags.HasOrgRank | InfoPacketFlags.HasTowerFields | InfoPacketFlags.HasTowers), // 0x47
 
-        Monster = 0x50, // 0101 0000
+        Monster = (byte)(InfoPacketFlags.HasCharacterInfo | InfoPacketFlags.HasPvpInfoHidden), // 0x50
 
-        Tower = 0x54, // 0101 0100
+        Tower = (byte)(InfoPacketFlags.HasCharacterInfo | InfoPacketFlags.HasPvpInfoHidden | InfoPacketFlags.HasTowers), // 0x54
 
-        ControlTower = 0x5C // 0101 1100
+        ControlTower = (byte)(InfoPacketFlags.HasCharacterInfo | InfoPacketFlags.HasPvpInfoHidden | InfoPacketFlags.HasTowers | InfoPacketFlags.HasGasChangeInfo) // 0x5C
     }
 }

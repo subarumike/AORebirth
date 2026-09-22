@@ -91,7 +91,7 @@ namespace ZoneEngine_New.Core.Trade
             // Same range the tick enforces: a crafted Use from across the zone would otherwise open
             // a window that is cancelled again on the next tick.
             Dynel anchor = owner != null ? owner : machine;
-            if (player.Distance3D(anchor) > RangeCancelDistance)
+            if (player.GetEdgeDistanceTo(anchor) > RangeCancelDistance)
             {
                 Tell(player, "You are too far away.");
                 return false;
@@ -169,7 +169,7 @@ namespace ZoneEngine_New.Core.Trade
             if (!partner.Inventory.IsHydrated || !initiator.Inventory.IsHydrated)
                 return false;
 
-            if (initiator.Distance3D(partner) > RangeCancelDistance)
+            if (initiator.GetEdgeDistanceTo(partner) > RangeCancelDistance)
             {
                 Tell(initiator, "You are too far away to trade.");
                 return false;
@@ -278,7 +278,7 @@ namespace ZoneEngine_New.Core.Trade
                 && field != null && !field.IsDisposed && !player.IsDead && !player.IsPersistenceQuarantined && player.Inventory.IsHydrated
                 && (owner == null || (!owner.IsDead && ReferenceEquals(owner.Shop, machine) && ReferenceEquals(owner.Playfield, field)))
                 && ReferenceEquals(machine.Playfield, field)
-                && player.Distance3D(owner != null ? owner : machine) <= RangeCancelDistance
+                && player.GetEdgeDistanceTo(owner != null ? owner : machine) <= RangeCancelDistance
                 && field.GetRequiredService<DynelRegistry>().TryGet(player.Identity, out var currentPlayer)
                 && ReferenceEquals(currentPlayer, player)
                 && field.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>()
@@ -1080,7 +1080,7 @@ namespace ZoneEngine_New.Core.Trade
                     return true;
 
                 Dynel anchor = owner != null ? owner : machine;
-                return initiator.Distance3D(anchor) > RangeCancelDistance;
+                return initiator.GetEdgeDistanceTo(anchor) > RangeCancelDistance;
             }
 
             Player? partner = session.Partner;
@@ -1090,7 +1090,7 @@ namespace ZoneEngine_New.Core.Trade
                 || !ReferenceEquals(partner.Playfield, playfield))
                 return true;
 
-            return initiator.Distance3D(partner) > RangeCancelDistance;
+            return initiator.GetEdgeDistanceTo(partner) > RangeCancelDistance;
         }
 
         #endregion

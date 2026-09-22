@@ -219,6 +219,6 @@ public sealed class GeneratedMissionWorld
             => new ZoneMessageCodec().Deserialize((byte[])_packet.Clone())?.Body
                 ?? throw new InvalidOperationException("Mission static object has no complete accepted wire projection.");
         public bool TryUse(Player player) => player.Identity.Instance == _state.OwnerId && player.Playfield == Playfield
-            && Distance3D(player) <= 8.0 && _use(player, _state);
+            && GetEdgeDistanceTo(player) <= 8.0 && _use(player, _state);
     }
 }

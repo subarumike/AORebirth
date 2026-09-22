@@ -24,7 +24,8 @@ namespace ZoneEngine_New.Core.Entities
         Player = 3,
         Corpse = 4,
         StaticDynel = 5,
-        ContentPlacement = 6
+        ContentPlacement = 6,
+        Summoned = 7
     }
 
     /// <summary>
@@ -68,11 +69,22 @@ namespace ZoneEngine_New.Core.Entities
                 : new Quaternion(value.xf, value.yf, value.zf, value.wf);
         }
 
+        // TODO: determine the actual radius of each dynel.
+        public const float CharacterRadius = 0.5f;
+
         public double Distance3D(Dynel other)
         {
             ArgumentNullException.ThrowIfNull(other);
             Vector3 delta = Position - other.Position;
             return Vector3.Abs(delta);
+        }
+
+        public virtual double GetCollisionRadius() => 0.0;
+
+        public double GetEdgeDistanceTo(Dynel other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+            return Distance3D(other) - GetCollisionRadius() - other.GetCollisionRadius();
         }
 
         /// <summary>
