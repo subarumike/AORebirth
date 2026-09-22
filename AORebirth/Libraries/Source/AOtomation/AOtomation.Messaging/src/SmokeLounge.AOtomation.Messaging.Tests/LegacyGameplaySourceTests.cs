@@ -29,7 +29,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void UnrelatedSourceIsUnchangedByLogicalPartialReader()
         {
             string root = TestRepositoryRootResolver.FindFromCallerFilePath();
-            string path = Path.Combine(root, "AORebirth", "Server", "ZoneEngine_New", "SharedGameplay", "Combat", "NpcAiProfile.cs");
+            string path = Path.Combine(root, "Tests", "Fixtures", "Gameplay", "Combat", "NpcAiProfile.cs");
             Assert.AreEqual(File.ReadAllText(path), LegacyGameplaySource.ReadAllText(path));
         }
     }

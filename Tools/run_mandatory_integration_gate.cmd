@@ -98,7 +98,7 @@ set "CURRENT_STAGE=8/12 mission graph and generated mission reproducibility"
 echo [AORebirth Gate] START %CURRENT_STAGE%
 call tools\generate_mission_level_graph.cmd --check
 if errorlevel 1 goto :stage_fail
-call tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~Mission"
+dotnet test AORebirth\Server\ZoneEngine_New.Tests\ZoneEngine_New.Tests.csproj --configuration Debug --nologo --filter "FullyQualifiedName~Mission"
 if errorlevel 1 goto :stage_fail
 echo [AORebirth Gate] PASS 8/12 mission graph and generated mission reproducibility
 

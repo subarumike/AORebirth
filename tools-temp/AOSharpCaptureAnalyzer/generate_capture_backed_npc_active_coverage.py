@@ -22,8 +22,9 @@ HISTORICAL_COVERAGE_PATH = "Tests/Fixtures/Combat/RetiredPopulationCoverage.json
 HISTORICAL_COVERAGE_SHA256 = "cf20612078047b8dc90146c9b741eecf42f92181b0c59b7f9e54fd6a6f48504e"
 HISTORICAL_SOURCE_COMMIT = "c5af4ac18a1378dc41c37d31b9ac62ac46c5f8a0"
 RUNTIME_SOURCE_ROOT = "AORebirth/Server/ZoneEngine_New"
+CAPTURED_COMBAT_SOURCE_ROOT = "Tests/Fixtures/Gameplay/Combat"
 CAPTURED_COMBAT_SHARED_SOURCE_INPUTS = tuple(
-    RUNTIME_SOURCE_ROOT + "/SharedGameplay/Combat/" + name
+    CAPTURED_COMBAT_SOURCE_ROOT + "/" + name
     for name in (
         "CapturedEnemyCombatData.cs", "CapturedEnemyCombatSequenceData.cs",
         "CapturedEnemyCombatContract.Data.cs", "CapturedEnemyCombatProfileData.cs",
@@ -35,15 +36,15 @@ RUNTIME_CONSUMERS = {
     "Core/Playfield/HashSpawnSystem.cs": ("LoadSpawns(", "SpawnContentValidation.IsValid(", "HashSpawnSystem"),
     "Core/Playfield/SpawnService.cs": ("SpawnService", "NpcContentActivationService"),
     "Core/Mobs/WorldNpcFactory.cs": ("WorldNpcFactory", "WorldNpcDefinition"),
-    "Core/GameData/WorldContentCatalog.cs": ("WorldContentCatalog", "Parse("),
+    "Core/GameData/PlayfieldNpcContentCatalog.cs": ("PlayfieldNpcContentCatalog", "Parse(", "StandaloneShops"),
     "Core/GameData/NpcTemplateCatalog.cs": ("CanResolve(", "TryResolve(", "FallbackHash"),
     "Core/Playfield/SpawnContentValidation.cs": ("IsValid(", "ValidSite(", "float.IsFinite"),
 }
-EDITABLE_CONTENT = (
-    "AORebirth/GameData/WorldContent.json",
-    "AORebirth/GameData/MobTemplates.json",
-    "AORebirth/GameData/NpcFamilyStatTemplates.json",
-    "AORebirth/GameData/NpcStatTemplateOverlays.json",
+EDITABLE_PLAYFIELD_CONTENT_ROOT = "AORebirth/GameData/PlayfieldContent"
+EDITABLE_SUPPORTING_CONTENT = (
+    "docs/accepted/npc/delmus/NpcTemplate.json",
+    "docs/accepted/npc/delmus/NpcFamilyStatTemplates.json",
+    "docs/accepted/npc/delmus/NpcStatTemplateOverlays.json",
 )
 
 class CoverageError(RuntimeError):
@@ -122,26 +123,52 @@ def discover_current_consumers(repo_root: Path) -> list[dict[str, Any]]:
         result.append({"path": relative, "sha256": sha256_utf8_text_lf(repo_path(repo_root, relative)), "hashNormalization": "utf8-sig-text-lf"})
     return result
 
+def editable_playfield_content_paths(repo_root: Path) -> list[str]:
+    root = (repo_root / EDITABLE_PLAYFIELD_CONTENT_ROOT).resolve()
+    if not root.is_relative_to(repo_root.resolve()) or not root.is_dir():
+        raise CoverageError(f"editable playfield content root is missing: {EDITABLE_PLAYFIELD_CONTENT_ROOT}")
+    paths = sorted(root.glob("*/Npcs.json"))
+    if not paths:
+        raise CoverageError(f"editable playfield NPC content is missing: {EDITABLE_PLAYFIELD_CONTENT_ROOT}")
+    return [str(path.relative_to(repo_root)).replace("\\", "/") for path in paths]
+
 def editable_content_inventory(repo_root: Path) -> dict[str, Any]:
     inputs = []
-    for relative in EDITABLE_CONTENT:
+    playfield_content = editable_playfield_content_paths(repo_root)
+    for relative in [*playfield_content, *EDITABLE_SUPPORTING_CONTENT]:
         source = repo_path(repo_root, relative)
         document = load_json(source)
         if not isinstance(document, (dict, list)):
             raise CoverageError(f"editable content root must be an object or array: {relative}")
         inputs.append({"path": relative, "sha256": sha256_utf8_text_lf(source), "hashNormalization": "utf8-sig-text-lf"})
-    world = load_json(repo_path(repo_root, EDITABLE_CONTENT[0]))
-    actors = world.get("Npcs")
-    if not isinstance(actors, list):
-        raise CoverageError("WorldContent.Npcs must be an array")
+    actors = []
+    playfields = []
+    standalone_shop_count = 0
+    for relative in playfield_content:
+        document = load_json(repo_path(repo_root, relative))
+        if not isinstance(document, dict):
+            raise CoverageError(f"playfield NPC content must be an object: {relative}")
+        npcs = document.get("Npcs")
+        shops = document.get("StandaloneShops", [])
+        playfield_id = document.get("PlayfieldId")
+        if not isinstance(npcs, list):
+            raise CoverageError(f"PlayfieldContent.Npcs must be an array: {relative}")
+        if not isinstance(shops, list):
+            raise CoverageError(f"PlayfieldContent.StandaloneShops must be an array: {relative}")
+        if not isinstance(playfield_id, int):
+            raise CoverageError(f"PlayfieldContent.PlayfieldId must be an integer: {relative}")
+        actors.extend(npcs)
+        playfields.append(playfield_id)
+        standalone_shop_count += len(shops)
     keys = [row.get("Key") for row in actors]
     if any(not isinstance(key, str) or not key.strip() for key in keys) or len(set(keys)) != len(keys):
-        raise CoverageError("WorldContent.Npcs keys must be present and unique")
+        raise CoverageError("PlayfieldContent.Npcs keys must be present and unique")
     return {
-        "scope": "repository editable authored content; private deployment hash catalogs and extracted playfield population are not inferred",
+        "scope": "repository editable authored playfield content; private deployment hash catalogs and extracted playfield population are not inferred",
         "inputs": inputs,
         "authoredNpcDefinitionCount": len(actors),
-        "authoredPlayfields": sorted({int(row["PlayfieldId"]) for row in actors}),
+        "authoredStandaloneShopDefinitionCount": standalone_shop_count,
+        "authoredPlayfields": sorted(set(playfields)),
         "runtimeActivationPermissionFromEvidence": False,
         "historicalRosterIsCurrentPopulation": False,
         "privateHashCatalogPopulationEvaluated": False,

@@ -29,6 +29,17 @@ public sealed class WorldNpcDefinition
     public WorldVendorDefinition? Vendor { get; set; }
 }
 
+public sealed class WorldStandaloneShopDefinition
+{
+    public string Key { get; set; } = string.Empty;
+    /// <summary>Informational provenance; never used to grant runtime permission.</summary>
+    public string Provenance { get; set; } = string.Empty;
+    public int PlayfieldId { get; set; }
+    public float[] Position { get; set; } = [];
+    public float[] Rotation { get; set; } = [];
+    public WorldVendorDefinition Vendor { get; set; } = new();
+}
+
 public sealed class WorldTexture
 {
     public int Place { get; set; }

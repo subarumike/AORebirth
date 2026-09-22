@@ -119,7 +119,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 string candidate = Path.Combine(
                     current,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content");
+                    @"AORebirth\Server\ZoneEngine_New");
                 if (Directory.Exists(candidate))
                 {
                     return current;

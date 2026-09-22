@@ -43,4 +43,14 @@ public sealed class ItemBehaviorContentTests
         Assert.AreEqual(100, first.LowId); Assert.AreEqual(200, second.LowId);
         Assert.AreEqual(first.Quality, second.Quality);
     }
+
+    [TestMethod]
+    public void WornMeshOverrideChangesFromContentWithSameBinary()
+    {
+        const string source = """{"WornMeshOverrides":[{"TemplateIds":[3000],"MeshId":4000,"OnlyWhenOverrideTextureId":0,"OverrideTextureId":5000}]}""";
+        var content = ItemBehaviorContent.Parse(source);
+        Assert.IsTrue(content.TryResolveWornMeshOverride(new Item { LowId = 3000, HighId = 3000 }, 4000, 0, out int resolved));
+        Assert.AreEqual(5000, resolved);
+        Assert.IsFalse(content.TryResolveWornMeshOverride(new Item { LowId = 3001, HighId = 3001 }, 4000, 0, out _));
+    }
 }

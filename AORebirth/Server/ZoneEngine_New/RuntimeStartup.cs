@@ -96,8 +96,8 @@ namespace ZoneEngine_New
         public static void ValidatePackage(string baseDirectory, bool skipPlayfieldPackagePin = false)
         {
             string gameData = Path.Combine(baseDirectory, "GameData");
-            foreach (string file in new[] { "NpcTemplates.json", "ItemTemplates.json",
-                "VendingMachines.json", "MonsterData.json", "Xp.json" })
+            // NpcTemplates.json is optional; GameDataStore logs and uses an empty catalog when it is absent.
+            foreach (string file in new[] { "ItemTemplates.json", "VendingMachines.json", "MonsterData.json", "Xp.json" })
             {
                 using FileStream stream = File.OpenRead(Path.Combine(gameData, file));
                 using JsonDocument document = JsonDocument.Parse(stream);
@@ -130,4 +130,3 @@ namespace ZoneEngine_New
         public StartupValidationException(string message) : base(message) { }
     }
 }
-

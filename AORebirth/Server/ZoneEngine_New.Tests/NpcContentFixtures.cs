@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AORebirth.Core.GameData;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
@@ -35,10 +36,10 @@ internal static class SocialNpcFixture
     static IReadOnlyList<Definition> LoadDefinitions()
     {
         string root = Path.Combine(AppContext.BaseDirectory, "GameData");
-        string playfields = Path.Combine(root, "Playfields");
-        if (!Directory.Exists(playfields)) return [];
+        string playfieldContent = Path.Combine(root, GameDataPaths.PlayfieldContentFolderName);
+        if (!Directory.Exists(playfieldContent)) return [];
 
-        return Directory.GetDirectories(playfields)
+        return Directory.GetDirectories(playfieldContent)
             .Select(Path.GetFileName)
             .Where(name => int.TryParse(name, out _))
             .Select(int.Parse)
@@ -61,7 +62,7 @@ internal static class AreteVendorFixture
 {
     internal sealed record StandaloneDefinition(CapturedAreteAlexAreaVendorDefinition Data)
     {
-        internal string PlacementIdentity => "fixture:CapturedAreteAlexAreaVendorContentProvider:6553:" + SourceVendorInstance.ToString("X8");
+        internal string PlacementIdentity => "legacy:CapturedAreteAlexAreaVendorContentProvider:6553:" + SourceVendorInstance.ToString("X8");
         internal string SourceIdentity => "AORebirth/Server/ZoneEngine/Core/Playfields/CapturedAreteAlexAreaVendorContentProvider.cs";
         internal int PlayfieldId => CapturedAreteAlexAreaVendorContentProvider.AreteLandingPlayfieldId;
         internal int SourceVendorInstance => Data.SourceVendorInstance;
@@ -117,4 +118,3 @@ internal static class GardenVendorFixture
     internal static IReadOnlyList<Placement> Placements { get; } = Definitions.Select(n => new Placement(n.Content)).ToArray();
     internal static bool TryAttachShop(NpcCharacter npc, IItemBuilder items, IItemTemplateCatalog catalog, out string failure) => NpcContentFixtures.Attach(npc, items, catalog, out failure);
 }
-

@@ -1616,13 +1616,6 @@ namespace ZoneEngine_New.Core.Entities
         const int ShowSocialVisualFlag = 0x20;
         const int SocialOnlyVisualFlag = 0x40;
 
-        // Capture 20260718-125957: Awakened Burden of Competence wears BackMesh 245106 with
-        // override texture 302715. items.dat stores the mesh alone, so the worn look stays orange
-        // unless the override is supplied here.
-        const int AwakenedBurdenItemId = 302730;
-        const int AwakenedBurdenBackMeshId = 245106;
-        const int AwakenedBurdenOverrideTextureId = 302715;
-
         readonly Dictionary<int, int> _spawnTextures = new();
         readonly Dictionary<int, int> _wearTextures = new();
         readonly List<Mesh> _spawnMeshes = new();
@@ -1820,11 +1813,13 @@ namespace ZoneEngine_New.Core.Entities
             if (!TryResolveMeshPosition(slot, spell, out int position))
                 return false;
 
-            if (overrideTextureId == 0
-                && meshId == AwakenedBurdenBackMeshId
-                && (item.LowId == AwakenedBurdenItemId || item.HighId == AwakenedBurdenItemId))
+            if (ItemBehaviorContent.Current.TryResolveWornMeshOverride(
+                    item,
+                    meshId,
+                    overrideTextureId,
+                    out int resolvedOverrideTextureId))
             {
-                overrideTextureId = AwakenedBurdenOverrideTextureId;
+                overrideTextureId = resolvedOverrideTextureId;
             }
 
             mesh = new Mesh
@@ -2294,8 +2289,8 @@ namespace ZoneEngine_New.Core.Entities
             scfu.Health = displayMaxHealth;
             scfu.HealthDamage = displayMaxHealth - displayCurrentHealth;
 
-            if (Playfield?.GetRequiredService<IGameData>()
-                    .TryGetPlayfieldCharacterAppearanceOverride(playfieldId, out uint appearanceMonsterData) == true)
+            if (Playfield?.GetService<IGameData>()
+                    ?.TryGetPlayfieldCharacterAppearanceOverride(playfieldId, out uint appearanceMonsterData) == true)
             {
                 scfu.MonsterData = appearanceMonsterData;
             }

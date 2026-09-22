@@ -51,14 +51,15 @@ public sealed class PlayfieldTransferTests
             data.GetPlayfieldMetaData(4582), DestinationsCatalog.Instance, data, new StubLogger());
         destination.WorldAccess.Instance = collision;
         var player = f.Player(source, 1);
+        const double landingX = 923.0542;
+        const double landingZ = 859.19006;
+        Assert.IsTrue(collision.TryRaycastDown(new Vector3(landingX, 80, landingZ), 100, out var surface));
         // Start just above the surface so the new horizontal grounded sweep still
         // exercises a real correction, rather than requiring the old downward drift.
-        var landing = new Vector3(100, 0.015625, 100);
+        var landing = new Vector3(landingX, surface.y + 0.015625, landingZ);
         player.Session!.TransferToPlayfield(destination, landing);
         f.Drain(source); f.Drain(destination);
         Assert.AreEqual(landing.y, player.Position.y, "Transfer publishes the requested coordinate before simulation.");
-        Assert.IsTrue(collision.TryRaycastDown(new Vector3(100, MovementConfig.GroundProbeLift, 100),
-            MovementConfig.GroundProbeLift + MovementConfig.GroundSnapTolerance, out var surface));
         f.Owner(destination, () => player.Motor.Tick(dt));
         double authoritativeY = player.Position.y;
         Assert.AreNotEqual(landing.y, authoritativeY, "This route must exercise a real post-arrival adjustment.");
@@ -69,7 +70,7 @@ public sealed class PlayfieldTransferTests
         var saved = f.Snapshots.Writes.Single();
         Assert.AreEqual((float)authoritativeY, saved.Y);
         Assert.AreEqual(authoritativeY, player.Position.y, "Snapshot/logout must not move the player.");
-        Assert.AreEqual(100f, saved.X); Assert.AreEqual(100f, saved.Z);
+        Assert.AreEqual((float)landingX, saved.X); Assert.AreEqual((float)landingZ, saved.Z);
         destination.WorldAccess.Instance = null;
     }
 

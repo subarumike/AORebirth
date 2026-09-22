@@ -24,7 +24,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                         "Explicit AORebirth repository root is invalid. Attempted root: "
                         + explicitCandidate
                         + ". Expected .git (file or directory), AI_START_HERE.md, AGENTS.md, "
-                        + "AORebirth/Server/ZoneEngine, and docs/ai/WORKFLOW.md.");
+                        + "AORebirth/Server/ZoneEngine_New, and docs/ai/WORKFLOW.md.");
                 }
 
                 return explicitCandidate;
@@ -55,7 +55,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "AORebirth repository root was not found. Starting path: "
                 + normalizedStart
                 + ". Expected .git (file or directory), AI_START_HERE.md, AGENTS.md, "
-                + "AORebirth/Server/ZoneEngine, and docs/ai/WORKFLOW.md in one parent directory.");
+                + "AORebirth/Server/ZoneEngine_New, and docs/ai/WORKFLOW.md in one parent directory.");
         }
 
         internal static bool IsRepositoryRoot(string candidate)
@@ -71,7 +71,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 && File.Exists(Path.Combine(normalizedCandidate, "AI_START_HERE.md"))
                 && File.Exists(Path.Combine(normalizedCandidate, "AGENTS.md"))
                 && Directory.Exists(
-                    Path.Combine(normalizedCandidate, "AORebirth", "Server", "ZoneEngine"))
+                    Path.Combine(normalizedCandidate, "AORebirth", "Server", "ZoneEngine_New"))
                 && File.Exists(
                     Path.Combine(normalizedCandidate, "docs", "ai", "WORKFLOW.md"));
         }

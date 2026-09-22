@@ -16,6 +16,7 @@ public sealed class ItemBehaviorContent
     public ItemPackageContent[] Packages { get; set; } = [];
     public VitalItemContent[] VitalItems { get; set; } = [];
     public FistWeaponContent[] FistWeapons { get; set; } = [];
+    public WornMeshOverrideContent[] WornMeshOverrides { get; set; } = [];
     public string[] Provenance { get; set; } = [];
 
     public static ItemBehaviorContent Load(string? gameDataRoot = null)
@@ -39,12 +40,32 @@ public sealed class ItemBehaviorContent
                 || value.Profession.HasValue && !Enum.IsDefined(value.Profession.Value))
             || result.FistWeapons.Select(value => (value.Profession, value.Tier)).Distinct().Count() != result.FistWeapons.Length)
             throw new InvalidDataException("Invalid or ambiguous unarmed weapon assignment.");
+        if (result.WornMeshOverrides.Any(value => value.TemplateIds.Length == 0
+                || value.TemplateIds.Any(id => id <= 0)
+                || value.MeshId <= 0
+                || value.OverrideTextureId <= 0)
+            || result.WornMeshOverrides.SelectMany(value => value.TemplateIds.Select(id => (id, value.MeshId)))
+                .Distinct().Count() != result.WornMeshOverrides.Sum(value => value.TemplateIds.Length))
+            throw new InvalidDataException("Invalid or ambiguous worn mesh override content.");
         return result;
     }
 
     public ItemPackageContent? FindPackage(Item item) => Packages.SingleOrDefault(p => p.SourceIds.Contains(item.LowId) || p.SourceIds.Contains(item.HighId));
     public VitalItemContent? FindVitalItem(Item item) => VitalItems.SingleOrDefault(v => v.TemplateIds.Contains(item.LowId) || v.TemplateIds.Contains(item.HighId));
     public bool IsProtected(Item item) => ProtectedItems.Contains(item.LowId) || ProtectedItems.Contains(item.HighId);
+    public bool TryResolveWornMeshOverride(Item item, int meshId, int overrideTextureId, out int resolvedOverrideTextureId)
+    {
+        resolvedOverrideTextureId = overrideTextureId;
+        WornMeshOverrideContent? found = WornMeshOverrides.SingleOrDefault(
+            value => value.MeshId == meshId
+                && value.OnlyWhenOverrideTextureId == overrideTextureId
+                && (value.TemplateIds.Contains(item.LowId) || value.TemplateIds.Contains(item.HighId)));
+        if (found == null)
+            return false;
+
+        resolvedOverrideTextureId = found.OverrideTextureId;
+        return true;
+    }
 }
 
 public sealed class FistWeaponContent
@@ -80,4 +101,12 @@ public sealed class VitalItemContent
         return MaximumQuality == MinimumQuality ? MinimumRestore
             : checked((int)(MinimumRestore + (long)(MaximumRestore - MinimumRestore) * (quality - MinimumQuality) / (MaximumQuality - MinimumQuality)));
     }
+}
+
+public sealed class WornMeshOverrideContent
+{
+    public int[] TemplateIds { get; set; } = [];
+    public int MeshId { get; set; }
+    public int OnlyWhenOverrideTextureId { get; set; }
+    public int OverrideTextureId { get; set; }
 }

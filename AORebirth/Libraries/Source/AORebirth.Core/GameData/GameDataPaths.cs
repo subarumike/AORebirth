@@ -15,6 +15,8 @@ namespace AORebirth.Core.GameData
 
         public const string PlayfieldsFolderName = "Playfields";
 
+        public const string PlayfieldContentFolderName = "PlayfieldContent";
+
         public const string MetadataFileName = "metadata.json";
 
         public const string DistrictsFileName = "Districts.json";
@@ -102,6 +104,21 @@ namespace AORebirth.Core.GameData
                 playfieldId.ToString(CultureInfo.InvariantCulture));
         }
 
+        public static string PlayfieldContentRelativeDirectory(int playfieldId)
+        {
+            if (playfieldId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "playfieldId",
+                    playfieldId,
+                    "A positive playfield id is required.");
+            }
+
+            return Path.Combine(
+                PlayfieldContentFolderName,
+                playfieldId.ToString(CultureInfo.InvariantCulture));
+        }
+
         public static string PlayfieldMetadataRelativePath(int playfieldId)
         {
             return Path.Combine(PlayfieldRelativeDirectory(playfieldId), MetadataFileName);
@@ -139,17 +156,17 @@ namespace AORebirth.Core.GameData
 
         public static string PlayfieldExitProxyDoorsRelativePath(int playfieldId)
         {
-            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), ExitProxyDoorsFileName);
+            return Path.Combine(PlayfieldContentRelativeDirectory(playfieldId), ExitProxyDoorsFileName);
         }
 
         public static string PlayfieldNpcsRelativePath(int playfieldId)
         {
-            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), PlayfieldNpcsFileName);
+            return Path.Combine(PlayfieldContentRelativeDirectory(playfieldId), PlayfieldNpcsFileName);
         }
 
         public static string PlayfieldCharacterAppearanceRelativePath(int playfieldId)
         {
-            return Path.Combine(PlayfieldRelativeDirectory(playfieldId), CharacterAppearanceFileName);
+            return Path.Combine(PlayfieldContentRelativeDirectory(playfieldId), CharacterAppearanceFileName);
         }
 
         public static string PlayfieldCollisionRelativePath(int playfieldId)

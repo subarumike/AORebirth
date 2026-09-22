@@ -105,11 +105,12 @@ FORMULA_STATIC_INPUTS = (
     Path("docs/evidence/TEMPLE_CULTIST_COMBAT_QUARANTINE_20260726.md"),
     Path("Tests/Fixtures/Combat/RetiredPopulationCoverage.json"),
     Path("Tests/Fixtures/Combat/RetiredRealmResourceBindings.json"),
-    Path("AORebirth/GameData/WorldContent.json"),
-    Path("AORebirth/GameData/MobTemplates.json"),
-    Path("AORebirth/GameData/NpcFamilyStatTemplates.json"),
-    Path("AORebirth/GameData/NpcStatTemplateOverlays.json"),
+    Path("docs/accepted/npc/delmus/NpcTemplate.json"),
+    Path("docs/accepted/npc/delmus/NpcFamilyStatTemplates.json"),
+    Path("docs/accepted/npc/delmus/NpcStatTemplateOverlays.json"),
 )
+PLAYFIELD_CONTENT_ROOT = Path("AORebirth/GameData/PlayfieldContent")
+PLAYFIELD_NPC_CONTENT_FILE_NAME = "Npcs.json"
 FORMULA_CAPTURE_SOURCE_NAMES = (
     "capture_info.json",
     "packets.hex.log",
@@ -117,6 +118,19 @@ FORMULA_CAPTURE_SOURCE_NAMES = (
     "scfu-appearance.csv",
 )
 ACTIVE_RUNTIME_SOURCE_ROOT = Path("AORebirth/Server/ZoneEngine_New")
+CAPTURED_COMBAT_SOURCE_ROOT = Path("Tests/Fixtures/Gameplay/Combat")
+CAPTURED_COMBAT_SHARED_SOURCE_INPUTS = tuple(
+    CAPTURED_COMBAT_SOURCE_ROOT / name
+    for name in (
+        "CapturedEnemyCombatData.cs",
+        "CapturedEnemyCombatSequenceData.cs",
+        "CapturedEnemyCombatContract.Data.cs",
+        "CapturedEnemyCombatProfileData.cs",
+        "CapturedEnemyCombatProfileMatching.cs",
+        "CapturedEnemyCombatPacketFactory.Data.cs",
+        "OrdinaryEnemyCombatSetupGenerator.Data.cs",
+    )
+)
 ARETE_ATTACK_RANGE_ITEM_TEMPLATE_IDS = (
     120910,
     120911,
@@ -1280,6 +1294,22 @@ def auxiliary_input_paths(
     }
     values.add(ITEM_DATABASE.as_posix())
     values.update(path.as_posix() for path in FORMULA_STATIC_INPUTS)
+    values.update(path.as_posix() for path in CAPTURED_COMBAT_SHARED_SOURCE_INPUTS)
+    playfield_content_root = repo_root / PLAYFIELD_CONTENT_ROOT
+    if not playfield_content_root.is_dir():
+        raise PipelineError(
+            "playfield content input root is missing: "
+            f"{PLAYFIELD_CONTENT_ROOT.as_posix()}"
+        )
+    playfield_content_files = tuple(
+        sorted(playfield_content_root.glob(f"*/{PLAYFIELD_NPC_CONTENT_FILE_NAME}"))
+    )
+    if not playfield_content_files:
+        raise PipelineError(
+            "playfield content inputs are missing under: "
+            f"{PLAYFIELD_CONTENT_ROOT.as_posix()}"
+        )
+    values.update(source.relative_to(repo_root).as_posix() for source in playfield_content_files)
     formula_source_texts = [
         (repo_root / FORMULA_GENERATOR).read_text(encoding="utf-8")
     ]
@@ -1287,6 +1317,14 @@ def auxiliary_input_paths(
         path.read_text(encoding="utf-8")
         for relative in FORMULA_STATIC_INPUTS
         if (path := repo_root / relative).is_file()
+    )
+    formula_source_texts.extend(
+        path.read_text(encoding="utf-8")
+        for relative in CAPTURED_COMBAT_SHARED_SOURCE_INPUTS
+        if (path := repo_root / relative).is_file()
+    )
+    formula_source_texts.extend(
+        source.read_text(encoding="utf-8") for source in playfield_content_files
     )
     capture_ids = set(
         re.findall(

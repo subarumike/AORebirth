@@ -52,8 +52,10 @@ namespace ZoneEngine_New.Tests
 
         public string RootPath { get; init; } = string.Empty;
 
+        string DataRoot => string.IsNullOrEmpty(RootPath) ? Path.Combine(AppContext.BaseDirectory, "GameData") : RootPath;
+
         public CorpseContentCatalog CorpseContent => CorpseContentCatalog.Load(
-            string.IsNullOrEmpty(RootPath) ? Path.Combine(AppContext.BaseDirectory, "GameData") : RootPath);
+            DataRoot);
 
         public int MobTemplateCount => 0;
 
@@ -117,6 +119,9 @@ namespace ZoneEngine_New.Tests
             ids = found;
             return ids.Length > 0;
         }
+
+        public PlayfieldNpcContentCatalog GetPlayfieldNpcs(int playfieldId)
+            => PlayfieldNpcContentCatalog.Load(DataRoot, playfieldId);
 
 
         public PlayfieldMetaData? GetPlayfieldMetaData(int playfieldId) => throw new NotSupportedException();
@@ -439,6 +444,5 @@ namespace ZoneEngine_New.Tests
         public void Close() => IsClosed = true;
     }
 }
-
 
 

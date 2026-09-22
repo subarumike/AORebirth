@@ -114,6 +114,31 @@ var contentName = new Regex(@"Scarlett|Buckethead|Accepted(?:Arete|Garden|Social
 var contentField = new Regex(@"(?:Npc|NPC|Nano|Quest|Vendor|Merchant|Template|Playfield|Mesh|Texture|Weapon|Reward|Item)(?:Id|Ids|Hash|Name|Template|Stock|Pool)|(?:Scarlett|Buckethead|Sarah|Stan|Arete)(?:Id|Instance|Position|Rotation|Name)|^(?:SpawnHash|MobHash|LowId|HighId|HeadMesh|CATMesh|MonsterData|NpcFamily)$", RegexOptions.CultureInvariant);
 var findings = new List<Finding>();
 var files = new List<object>();
+bool IsDatabaseSqlLiteral(string file, string leaf, LiteralExpressionSyntax literal)
+{
+    if (!file.Contains("/AORebirth.Database/", StringComparison.Ordinal)
+        || !leaf.EndsWith("Sql", StringComparison.Ordinal))
+        return false;
+    string text = literal.Token.ValueText.TrimStart();
+    return text.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase)
+        || text.StartsWith("INSERT", StringComparison.OrdinalIgnoreCase)
+        || text.StartsWith("UPDATE", StringComparison.OrdinalIgnoreCase)
+        || text.StartsWith("DELETE", StringComparison.OrdinalIgnoreCase);
+}
+bool IsDirectStatsSetLiteral(LiteralExpressionSyntax literal, InvocationExpressionSyntax call)
+{
+    ArgumentSyntax? argument = literal.AncestorsAndSelf().OfType<ArgumentSyntax>().FirstOrDefault();
+    if (argument == null || !call.ArgumentList.Arguments.Contains(argument))
+        return false;
+    ExpressionSyntax expression = argument.Expression;
+    while (expression is ParenthesizedExpressionSyntax parenthesized)
+        expression = parenthesized.Expression;
+    if (expression is CastExpressionSyntax cast)
+        expression = cast.Expression;
+    while (expression is ParenthesizedExpressionSyntax nested)
+        expression = nested.Expression;
+    return ReferenceEquals(expression, literal);
+}
 string Category(string text)
 {
     if (Regex.IsMatch(text, "Dialogue|Conversation", RegexOptions.IgnoreCase)) return "HARDCODED_DIALOGUE_CONTENT";
@@ -162,6 +187,7 @@ foreach (string file in sourceFiles.Where(IsSource))
         bool text = literal.IsKind(SyntaxKind.StringLiteralExpression) && literal.Token.ValueText.Length > 0;
         if (!number && !text) continue;
         bool infrastructureName = leaf.EndsWith("FileName", StringComparison.Ordinal) || leaf.EndsWith("DirectoryName", StringComparison.Ordinal)
+            || IsDatabaseSqlLiteral(file, leaf, literal)
             || (file.Contains("/AORebirth.Database/") && text && literal.Token.ValueText.StartsWith("system.", StringComparison.Ordinal));
         // An argument to a decoder/reader call is an index, not the assigned content value.
         bool directValue = !literal.Ancestors().TakeWhile(n => n != assignment && n != variable && n != property)
@@ -184,6 +210,7 @@ foreach (string file in sourceFiles.Where(IsSource))
             Add(literal, "CONTENT_ID_SWITCH", "Runtime switch selects a specific content identity.");
         if (number && literal.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault() is { } call
             && call.Expression.ToString().EndsWith(".Stats.Set", StringComparison.Ordinal)
+            && IsDirectStatsSetLiteral(literal, call)
             && (literal.Ancestors().OfType<TypeDeclarationSyntax>().Any(t => Regex.IsMatch(t.Identifier.Text, "Npc|NPC|Mob|Spawn|Vendor|Merchant", RegexOptions.CultureInvariant))
                 || literal.Ancestors().OfType<MethodDeclarationSyntax>().Any(m => m.ParameterList.Parameters.Any(p => p.Type?.ToString().Contains("Npc", StringComparison.Ordinal) == true))))
             Add(literal, "COMPILED_NPC_STAT", "Runtime constructor assigns a fixed entity stat.");

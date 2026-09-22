@@ -20,6 +20,29 @@ from Tools import generated_artifact_transaction as transaction
 
 
 class GeneratedCombatPipelineTests(unittest.TestCase):
+    @staticmethod
+    def write_minimal_playfield_content(root: Path) -> str:
+        source = (
+            root
+            / pipeline.PLAYFIELD_CONTENT_ROOT
+            / "127"
+            / pipeline.PLAYFIELD_NPC_CONTENT_FILE_NAME
+        )
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_text(
+            json.dumps(
+                {
+                    "SchemaVersion": 1,
+                    "PlayfieldId": 127,
+                    "Npcs": [],
+                    "StandaloneShops": [],
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        return source.relative_to(root).as_posix()
+
     def test_item_projector_stages_identical_verified_bytes_and_short_output(self):
         with tempfile.TemporaryDirectory(prefix="projector-snapshot-") as temporary:
             root = Path(temporary)
@@ -2117,7 +2140,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             provider = root / pipeline.FORMULA_STATIC_INPUTS[0]
             provider.parent.mkdir(parents=True)
             provider.write_text('CAPTURE = "20260202-020202"\n', encoding="utf-8")
-            expected = []
+            expected = [self.write_minimal_playfield_content(root)]
             for index, logical_root in enumerate(pipeline.SCFU_ANALYZER_SOURCE_ROOTS):
                 source = root / logical_root / f"Fixture{index}.cs"
                 source.parent.mkdir(parents=True, exist_ok=True)
@@ -2178,6 +2201,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             formula = root / pipeline.FORMULA_GENERATOR
             formula.parent.mkdir(parents=True)
             formula.write_text('FORMULA = "no capture reference"\n', encoding="utf-8")
+            self.write_minimal_playfield_content(root)
             for logical_root in pipeline.SCFU_ANALYZER_SOURCE_ROOTS:
                 source = root / logical_root / "Fixture.cs"
                 source.parent.mkdir(parents=True, exist_ok=True)
@@ -2199,6 +2223,7 @@ class GeneratedCombatPipelineTests(unittest.TestCase):
             formula = root / pipeline.FORMULA_GENERATOR
             formula.parent.mkdir(parents=True)
             formula.write_text('FORMULA = "20260101-010101"\n', encoding="utf-8")
+            self.write_minimal_playfield_content(root)
             for logical_root in pipeline.SCFU_ANALYZER_SOURCE_ROOTS:
                 source = root / logical_root / "Fixture.cs"
                 source.parent.mkdir(parents=True, exist_ok=True)

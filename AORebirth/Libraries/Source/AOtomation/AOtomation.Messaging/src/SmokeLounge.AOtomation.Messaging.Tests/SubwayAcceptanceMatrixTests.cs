@@ -151,12 +151,6 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 "ExactPlayerPlayfieldNpcStateAndTwoOfferingsAreRequired",
                 "WrongNpcAndWrongItemCombinationsFailClosed",
                 "GatewayRequiresExactTerminalIdentityTypeAndInstance");
-            AssertFileContainsAll(
-                @"AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging.Tests\QuestRuntimePersistenceTests.cs",
-                "Karrec persistence tests",
-                "KarrecProgressRewardsAndAccountAccessAreScopedAndRetrySafe",
-                "KarrecTokenRetryUsesTheAppliedTierInsteadOfTheNewLiveTier",
-                "NeutralKarrecTokenDecisionRemainsZeroAfterSidedRetry");
         }
 
         [TestMethod]

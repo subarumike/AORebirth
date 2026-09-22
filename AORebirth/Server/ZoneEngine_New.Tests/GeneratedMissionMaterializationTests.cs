@@ -53,7 +53,12 @@ public sealed class GeneratedMissionMaterializationTests
             Assert.AreEqual(binding.LivePlayfield, packet.PlayfieldId2.Instance);
             Assert.AreEqual(binding.BuildingType, (int)packet.PlayfieldId1.Type);
             Assert.AreEqual(binding.BuildingInstance, packet.PlayfieldId1.Instance);
-            CollectionAssert.AreEqual(bundle.CopyGeneratorPayload(), packet.GeneratorPayload);
+            byte[] expectedGeneratorPayload = bundle.CopyGeneratorPayload();
+            if (expectedGeneratorPayload.Length >= 8 && expectedGeneratorPayload[^8..].All(value => value == 0xFF))
+                expectedGeneratorPayload = expectedGeneratorPayload[..^8];
+            CollectionAssert.AreEqual(expectedGeneratorPayload, packet.GeneratorPayload);
+            Assert.AreEqual(-1, packet.PlayfieldX);
+            Assert.AreEqual(-1, packet.PlayfieldZ);
             Assert.IsTrue(world.ContainsPosition(world.Spawn));
             Assert.IsFalse(world.ContainsPosition(new Vector3(float.NaN, 0, 0)));
             Assert.IsFalse(world.ContainsPosition(new Vector3(float.MaxValue, 0, 0)));

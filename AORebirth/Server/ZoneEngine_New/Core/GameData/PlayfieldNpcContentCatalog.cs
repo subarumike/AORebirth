@@ -18,6 +18,8 @@ public sealed class PlayfieldNpcContentCatalog
 
     public WorldNpcDefinition[] Npcs { get; set; } = [];
 
+    public WorldStandaloneShopDefinition[] StandaloneShops { get; set; } = [];
+
     public static PlayfieldNpcContentCatalog Load(string root, int playfieldId)
     {
         if (string.IsNullOrWhiteSpace(root) || playfieldId <= 0) return Empty;
@@ -37,7 +39,7 @@ public sealed class PlayfieldNpcContentCatalog
 
     public void Validate(int expectedPlayfieldId)
     {
-        if (SchemaVersion != 1 || PlayfieldId != expectedPlayfieldId || Npcs == null)
+        if (SchemaVersion != 1 || PlayfieldId != expectedPlayfieldId || Npcs == null || StandaloneShops == null)
             throw new InvalidDataException("Unsupported or incomplete playfield NPC content document.");
 
         var keys = new HashSet<string>(StringComparer.Ordinal);
@@ -63,6 +65,18 @@ public sealed class PlayfieldNpcContentCatalog
                 if (!shopIdentities.Add(npc.Vendor.InstanceId))
                     throw new InvalidDataException("Duplicate playfield shop identity.");
             }
+        }
+
+        foreach (WorldStandaloneShopDefinition shop in StandaloneShops)
+        {
+            if (shop == null || shop.PlayfieldId != PlayfieldId || string.IsNullOrWhiteSpace(shop.Key)
+                || !keys.Add(shop.Key) || string.IsNullOrWhiteSpace(shop.Provenance))
+                throw new InvalidDataException("Invalid or duplicate standalone shop definition.");
+
+            RequireTransform(shop.Position, shop.Rotation, shop.Key);
+            RequireVendor(shop.Vendor);
+            if (!shopIdentities.Add(shop.Vendor.InstanceId))
+                throw new InvalidDataException("Duplicate playfield shop identity.");
         }
     }
 

@@ -215,6 +215,7 @@ namespace ZoneEngine_New.Core.GameData
             NpcLevelBand nearest = t <= 0.5 ? low : high;
             Dictionary<int, int> stats = InterpolateStats(low, high, t);
             stats[(int)CharacterStat.Level] = level;
+            bool isFallback = string.Equals(leaf.Hash, MobTemplate.FallbackHash, StringComparison.Ordinal);
 
             return new MobTemplate
             {
@@ -223,9 +224,10 @@ namespace ZoneEngine_New.Core.GameData
                 TemplateId = nearest.TemplateId,
                 HasHeadMesh = nearest.HasHeadMesh,
                 Stats = stats,
-                Attackable = nearest.Attackable,
+                Attackable = !isFallback && nearest.Attackable,
                 MinLevel = min,
                 MaxLevel = max,
+                UnresolvedPlaceholder = isFallback,
                 Equipment = CopyPairs(nearest.Equipment),
                 KnuBotId = nearest.KnuBotId,
                 ItemTable = CopyLoot(nearest.LootTable)

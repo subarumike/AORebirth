@@ -120,6 +120,7 @@ public sealed class DirectXpRewardPlan
             int refill = checked(equipment.GetOrZero(CharacterStat.MaxHealth) - equipment.GetOrZero(CharacterStat.Health, StatDetail.Bonus));
             if (refill < 0) throw new InvalidOperationException("Prospective health contribution cannot be represented by a nonnegative durable base.");
             values[CharacterStat.Health] = refill;
+            values[CharacterStat.PercentRemainingHealth] = 100;
         }
         if (nanoKnown)
         {
@@ -127,6 +128,7 @@ public sealed class DirectXpRewardPlan
             int refill = checked(equipment.GetOrZero(CharacterStat.MaxNanoEnergy) - equipment.GetOrZero(CharacterStat.CurrentNano, StatDetail.Bonus));
             if (refill < 0) throw new InvalidOperationException("Prospective nano contribution cannot be represented by a nonnegative durable base.");
             values[CharacterStat.CurrentNano] = refill;
+            values[CharacterStat.PercentRemainingNano] = 100;
         }
     }
 

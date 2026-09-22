@@ -62,8 +62,68 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
                 throw;
             }
         }
+        ActivateStandaloneShops(playfieldContent);
         ActivateDatabaseShops();
     }
+
+    void ActivateStandaloneShops(PlayfieldNpcContentCatalog playfieldContent)
+    {
+        foreach (var definition in playfieldContent.StandaloneShops)
+        {
+            if (_activated.Contains(definition.Key)) continue;
+            if (!WorldNpcFactory.TryCreateShop(definition.Vendor, catalog, out var shop, out string failure))
+            {
+                _unavailableVendorEndpoints[definition.Key] = failure;
+                continue;
+            }
+
+            shop.Playfield = playfield;
+            shop.Position = new(definition.Position[0], definition.Position[1], definition.Position[2]);
+            shop.Rotation = new(definition.Rotation[0], definition.Rotation[1], definition.Rotation[2], definition.Rotation[3]);
+
+            bool registered = false;
+            VendingMachine bound = shop;
+            if (registry.TryGet(shop.Identity, out var current))
+            {
+                if (current is not VendingMachine existing || !ReferenceEquals(existing.Playfield, playfield)
+                    || existing.Template.Id != definition.Vendor.TemplateId || existing.OwnerNpc != null)
+                    throw new InvalidOperationException("Standalone shop identity collision: " + definition.Key);
+
+                bound = existing;
+                bound.Position = shop.Position;
+                bound.Rotation = shop.Rotation;
+                if (!bound.Stock.IsConfiguredSnapshot)
+                    bound.Stock.SetConfiguredSnapshot(ToStockSlots(definition.Vendor.Stock));
+            }
+            else
+            {
+                if (!registry.TryRegister(shop))
+                    throw new InvalidOperationException("Standalone shop identity collision: " + definition.Key);
+                registered = true;
+            }
+
+            try
+            {
+                if (registered)
+                    locality.RegisterDynel(bound);
+                _standaloneShops.Add(bound, new ShopContentBinding(definition.Key, definition.Provenance, definition.PlayfieldId));
+                _activated.Add(definition.Key);
+            }
+            catch
+            {
+                _standaloneShops.Remove(bound);
+                if (registered)
+                {
+                    locality.UnregisterDynel(bound);
+                    registry.UnregisterExact(bound);
+                }
+                throw;
+            }
+        }
+    }
+
+    static ShopStockSlot[] ToStockSlots(IEnumerable<WorldVendorStock> stock)
+        => stock.Select(row => new ShopStockSlot(row.LowId, row.HighId, row.Quality)).ToArray();
 
     void ActivateDatabaseShops()
     {

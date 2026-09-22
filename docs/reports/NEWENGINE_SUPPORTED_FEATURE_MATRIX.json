@@ -62,7 +62,7 @@
       "boundary": "Supported owned-slot delayed equip; wider equipment effects remain unsupported.",
       "tests": [
         "InventoryActionTests.cs",
-        "MorphNanoTests.cs"
+        "WearAppearanceRebaseTests.cs"
       ]
     },
     {
@@ -126,7 +126,8 @@
       "boundary": "Validated editable actors and resolved spawn templates; unresolved or structurally invalid records remain inactive. Interaction ownership and range checks remain required.",
       "tests": [
         "AcceptedNpcActivationTests.cs",
-        "EditableWorldContentTests.cs"
+        "EditableNpcContentTests.cs",
+        "InteractionEditabilityTests.cs"
       ]
     },
     {
@@ -152,9 +153,10 @@
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
       "boundary": "Supported catalog graphs/specializations; rejected graphs spend no resources.",
       "tests": [
-        "NanoServiceTests.cs",
-        "MongoNanoTests.cs",
-        "BucketheadNanoTests.cs"
+        "NanoCastRulesTests.cs",
+        "NanoCostCalculatorTests.cs",
+        "BuffTests.cs",
+        "UploadNanoTests.cs"
       ]
     },
     {
@@ -162,9 +164,8 @@
       "status": "UNSUPPORTED_FAIL_CLOSED",
       "boundary": "No general pet owner; unsupported shell consumption/summon graphs reject. Buckethead is separate.",
       "tests": [
-        "NanoServiceTests.cs",
-        "InventoryActionTests.cs",
-        "BucketheadNanoTests.cs"
+        "NanoCastRulesTests.cs",
+        "InventoryActionTests.cs"
       ]
     },
     {
@@ -190,8 +191,8 @@
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
       "boundary": "Four recognized morphs preserve saved baseline; wider graphs/equipment effects are not enabled.",
       "tests": [
-        "MorphNanoTests.cs",
-        "MorphVisualPacketTests.cs"
+        "BuffTests.cs",
+        "WearAppearanceRebaseTests.cs"
       ]
     },
     {
@@ -199,8 +200,7 @@
       "status": "PARTIALLY_SUPPORTED_FAIL_CLOSED",
       "boundary": "Implemented membership and supported warp contracts.",
       "tests": [
-        "TeamServiceTests.cs",
-        "TeamWarpNanoTests.cs"
+        "TeamServiceTests.cs"
       ]
     },
     {
@@ -228,7 +228,7 @@
       "tests": [
         "RuntimeStartupTests.cs",
         "SessionOwnershipTests.cs",
-        "MorphNanoTests.cs"
+        "BuffTests.cs"
       ]
     }
   ]

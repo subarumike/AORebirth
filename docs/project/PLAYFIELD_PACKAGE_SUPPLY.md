@@ -1,9 +1,10 @@
 # Offline Playfields package supply
 
 The pinned `docs/generated/playfields/playfield-package-manifest.json` identifies
-4,710 files / 264,151,897 extracted bytes. The archive contains only the
-`AORebirth/GameData/Playfields` subtree. Existing tracked root GameData catalogs
-and `items.dat` are not regenerated, archived, or replaced by this workflow.
+4,710 files / 264,151,897 extracted bytes. The archive owns only the
+`AORebirth/GameData/Playfields` structural subtree. Existing tracked root GameData
+catalogs, editable `AORebirth/GameData/PlayfieldContent` overlays, and `items.dat`
+are not regenerated, archived, or replaced by this workflow.
 
 This is **structural-only source material, not runtime activation authority**.
 Geometry/placement extraction does not establish an NPC identity, a New-engine

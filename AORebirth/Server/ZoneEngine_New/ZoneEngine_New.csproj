@@ -194,6 +194,7 @@
     <Content Include="..\..\GameData\**\*">
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <!-- Legacy item events overlay (RDB items.dat now carries events; nanos are not in this file). -->
     <Content Include="..\..\Datafiles\items.dat">
@@ -242,4 +243,3 @@
     </Compile>
   </ItemGroup>
 </Project>
-

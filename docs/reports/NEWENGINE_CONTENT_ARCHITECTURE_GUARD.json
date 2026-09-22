@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "scope": "Conservative static NewEngine project-reference source graph including SDK default files, explicit imported Compile items, linked shared and library sources; tests/tools are not runtime.",
   "sourceRevision": null,
-  "runtimeCSharpFilesAudited": 716,
+  "runtimeCSharpFilesAudited": 704,
   "totalRuntimeContentViolations": 0,
   "sourceGraphMethod": "Static project XML expansion, not an evaluated MSBuild compilation manifest. Conditional includes are included conservatively; conditional removals do not hide sources. SDK-generated sources and package binaries are outside this source audit.",
   "sourceGraphLimitations": [
@@ -14,6 +14,8 @@
   "unresolvedProjectInputs": [],
   "projects": [
     "AORebirth/Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj",
+    "AORebirth/Libraries/Source/AORebirth.World.Collision/AORebirth.World.Collision.csproj",
+    "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/AORebirth.World.Pathfinding.csproj",
     "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
     "WindowsBuildNet10/Projects/AORebirth.Communication.ZoneNew.WinNet10.csproj",
     "WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj",
@@ -234,7 +236,16 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
-      "sha256": "b0887896f4fe349df114aceac671eb825cd8da97e8cafbbabb952f2dfeb53232",
+      "sha256": "d361a8da9958a8163cf9bddbe9456f8bb149fe47fdaea324b4cc523762912e98",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldCharacterAppearanceData.cs",
+      "sha256": "c52216aa4e00e24b23e4c6ba5982cd8d0326e4149927e3004888161fd4eb025f",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -251,8 +262,26 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldExitProxyDoorsData.cs",
+      "sha256": "52fbfe3e99edee8c62951cf8a3589597c58dd931ca75456cb9fd2a98b27992e3",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldMetaData.cs",
-      "sha256": "18b177cc5efb7da68d9ff7a99d4a0c007c7cd66ad76de7734d859a3d90030712",
+      "sha256": "36d8057e6157e6d4c9ffbe95fd6b2c811c162a5dc44f53109150f409f04edb9a",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldRoomsData.cs",
+      "sha256": "321088c15ca6338ac964f65516aa3d3f21ac2594a47b4f14bb144ce97f9f03de",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -261,7 +290,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/PlayfieldSpawnsData.cs",
-      "sha256": "0290291d8a4df821b9a5b6d530e214999f72476e49b447e2031177d6dccf01ff",
+      "sha256": "aa7b75404216073d44c34e6ec49db0a249b4a6fecb0fdddc94e84320f69421e9",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -396,7 +425,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Transactions.cs",
-      "sha256": "3b180e2f789b4b832fe4d6ad93a00b326f27adcec03e0f3b0731f3b7e94a6e9b",
+      "sha256": "70dcd3167afbeff3a8bc04d75129bdd7ddb28de46a298795d74432744fc8b7ac",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -414,7 +443,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
-      "sha256": "ce85b99aa90885446a4544116e691e2b61848cc151aff3ce72af138ff570fe21",
+      "sha256": "80993d4e35b6aa32ae6ef217119f6c84514bfe45aad6ec6ec330d0f71ab3bfdf",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -433,6 +462,15 @@
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
       "sha256": "bc897107cbedbb6ea9599b7a9defa037cfb698171f763839ae2869821177e01c",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Shops/MySqlShopDao.cs",
+      "sha256": "dc5ed6767a7854cc0ecb22b9e32dd07071b5b3a24a7642fa1343644e43060bee",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -612,7 +650,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterPersistenceDao.cs",
-      "sha256": "d0187f5699a6029f6a0df1b979fe7ba5f5d97290392e607f42aad4fb4de2e68d",
+      "sha256": "7bbfafae39343f414e9660336e5f1ed4ae1f97532ea68b7482a34664d129dee9",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -665,6 +703,33 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Shops/IShopDao.cs",
+      "sha256": "c17c0f7435403e3c95c9ec13a04a9d1b8a678ec2b29e94f8050043e9445ad36a",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Shops/ShopStockData.cs",
+      "sha256": "a356a420133e00b2d6ac251c472f2cb4680d85d2b2d703cdad0088b96d8fe99a",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Shops/ShopVendorData.cs",
+      "sha256": "efacb9fb7a5c1529e51319ef2de2bb33bae0a8dac54e040fee33548d1e374bec",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Properties/AssemblyInfo.cs",
       "sha256": "b0466d912215d41bca6a4af4e4e98b57c73c55da37ac0a1855f879e6b2a37c07",
       "classification": [
@@ -692,8 +757,278 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/CollisionObjDumper.cs",
+      "sha256": "8b8accd177c23b8dcf14f9907a16c7196000e3f518f8f540899290e56da63c03",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/CollisionTriangle.cs",
+      "sha256": "179bfd50074f7c0c65b3c0ebc2c2fbb9b31d99d6dc87ca5ce16e81bf554d3822",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/CollisionTriangleMesh.cs",
+      "sha256": "419bea21aa70f39b5fc194a2a6ccd45cfe3e604d73490d89c59a649ff350c1a4",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonCollisionBuilder.cs",
+      "sha256": "706f35a48a14716a42ece5571b8e0a82cffb64dffa26d8393315232d0a0facf3",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonGroundMesher.cs",
+      "sha256": "6cbab1c6e7a36698511daf9f7fa01af31d3645ec086246430d628b9799049dd4",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonPlayfieldKinds.cs",
+      "sha256": "9d7b2f837a5a8e367fd9e890459d3c380cbea25de870748e81ddfab2fa8a67e3",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonRoomBounds.cs",
+      "sha256": "62aa42bb6b4c658794cbb7d152ca6b444625041908ee4dfb9916e94cbf72308a",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonRoomCellResolver.cs",
+      "sha256": "eda18e8da345a2c7f401a3bb9d221ca774c9de508d74481b08948b28326daa73",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonRoomPlacer.cs",
+      "sha256": "145e8e16d006e6824d0ee89175c6e0ee38b302ccd19a162b613ff49435045a58",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonRoomSpec.cs",
+      "sha256": "523ff920a9b9ac782b6a79e19b09bc86f6bc9db83bdbb74c6e996150da2b496c",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonStyleCatalog.cs",
+      "sha256": "66e551533bf787e4d46431bd4f56c2758cac978be2a51a7449120e514cc0f94b",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonWorldLayout.cs",
+      "sha256": "133d8c6da13008f514427411c95d386d8ed6d676388e3b02bacaad08e5b462ae",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/PlayfieldCollisionLoader.cs",
+      "sha256": "f98a2f68f54c5539bf02f50f9b48142a487579b1c97002f58eabc71d8ca04473",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/PlayfieldCollisionSet.cs",
+      "sha256": "73da1bd020d22c16f4a92970e7214c47e9a7b85774e48083e54e7894003416a9",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/RdbObjectDeserializer.cs",
+      "sha256": "4c86cb31aed6512fdfb671b2c87a302e990c0bb22a6d5856bff8192d8c90a004",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/StylePlayfieldRoomReader.cs",
+      "sha256": "8b15967722de1ac8ab6851cdf12b7ea5d4a43c1aaa11b69d05e51bb51196eb2a",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/StyleRoomTemplate.cs",
+      "sha256": "080e74de71ff35ecc3c8a6f9c0e208504ad5cf416f62e6c1e4d46a47d0da807b",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/SurfaceResourceNormalizer.cs",
+      "sha256": "15e216d2b34c5d05c052a81c492fc9d99e4dfd6eeef6a42b5c114f8fe7d91512",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/TerrainHeightChunk.cs",
+      "sha256": "dc8b00f41dace54155740e8d8cb902c42cb734c7d249d277a6315490f08ea878",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/TerrainHeightfield.cs",
+      "sha256": "e2b2861a8d6349c79cac70ea6c274cbbf809e35bb6edd23a1daf43f3c03e59b4",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/TerrainHeightfieldMesher.cs",
+      "sha256": "bab05032ec4bedb9f64f04d16b1be0ff154868dc227e7c093098464984927a6f",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/TilemapNormalizer.cs",
+      "sha256": "d43c80bd9f0ac1a3242abfad44dd9aa63c06ba3472a9163d046e6b95300b535a",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/CollisionMeshFlattener.cs",
+      "sha256": "00e5454a4efa9534926d0fe4ad29168d002520cd7a6ae6d1731b6e88a9206804",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/NavMeshBakeResult.cs",
+      "sha256": "284900417be38c60092168c9fab608f146fc36d0192c4f4619a599ed465577e0",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/NavMeshBaker.cs",
+      "sha256": "f882c7a56c083f87c18162234e49f79aa9e9268b8e48437aaea79a29a27bf206",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/NavMeshBuildSettings.cs",
+      "sha256": "9776e463d28ce58285fe3239f90e7eed4c68350b91915d88ddaae162c053005b",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/NavMeshFile.cs",
+      "sha256": "3040c6453324a639e98e4ba61a97642d8a726524f9ebba8008507d28afda0397",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/NavMeshPathfinder.cs",
+      "sha256": "841b5ed4738784473806f29364086b3046251f0e614f32def959322cb2ddcdcf",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding/PlayfieldCollisionResolver.cs",
+      "sha256": "9b698800e13388bf97f16bb50a8becfc093598f91428c6545c3b32ed791dc525",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/CommonAssemblyInfo.cs",
       "sha256": "e118185a5ce3c2978630c578ec43f14f32a12a9d33f4c6a761e0ffb2d49a7344",
+      "classification": [
+        "GENERIC_PROTOCOL_CONSTANT"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/AcgBuildingGeneratorData.cs",
+      "sha256": "d412cf5b7a3a5635f8dc5252454316dd3fa28834528168567c9e8020db3c1b8e",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -936,7 +1271,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/IdentityType.cs",
-      "sha256": "95d25c2fec23fe63d9d57d7734d78a23adc28005eb3c261961e7d0c3b3a7fdb0",
+      "sha256": "63f3f064fda75793f0c5d27692889041144c0dd9d7c783820fb37e13d0d4f3ba",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -1476,7 +1811,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/ChestItemFullUpdateMessage.cs",
-      "sha256": "bf11244cd6c4face348d62d0467fa9214e2e9236d793a26c9ea151038d0ec23e",
+      "sha256": "5babbeaa856d2e68913b017408872e43afe2e6c9cfe4ef840408af6a56134313",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -2016,7 +2351,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/PlayfieldAnarchyFMessage.cs",
-      "sha256": "815ff4313d57b705b7d6c25fd61222df597699b4339d12f310e52a351e6d3c0c",
+      "sha256": "45842280056b9cdabefafc5853b637dd3e713e8e88949afda6bb5618920a8dee",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -2340,7 +2675,16 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/TemplateActionMessage.cs",
-      "sha256": "f7deab4f74522489a188f3b73878c03ee4ef145a1a03046035939b36f830dfed",
+      "sha256": "7d7d21934160c9395089ca7edc8d6554c5a5e3be585ff432fc22055cc9bfb603",
+      "classification": [
+        "GENERIC_PROTOCOL_CONSTANT"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Messages/N3Messages/TemplateActionType.cs",
+      "sha256": "de7ba42d3f70d6045ca2ee8914f0413963db8ee8ebe037c3fc8f4a26f6e4b2b9",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -2934,7 +3278,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/Serialization/Serializers/Custom/PlayfieldAnarchyFMessageSerializer.cs",
-      "sha256": "a832c8219d5c669dff691ffb405d9dba679337242629877b8cfbb01ce5f83ae8",
+      "sha256": "3224e0986f581e86fe933fee4e3428a0216586dc71dca13ac951d73a8e817e57",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -3528,7 +3872,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/HateList.cs",
-      "sha256": "a65d9e8fe78e8fdafeec8f0753b4a4e0fd1ba2e32513d5dac1cd074f6feb03b1",
+      "sha256": "c1ca74fc18c2fbb3f325ee535ab215242058686c4922d248278c37b997f712d0",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3537,7 +3881,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcAiActions.cs",
-      "sha256": "c65ea9a493dd759061f86e60d723a11192d168fb7259fadc421199019c49ffd0",
+      "sha256": "491bb5e591b34526e7ad13c9b3524aae2ead558c4b41a7621ddcdc98722e61d7",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3564,7 +3908,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcBrain.cs",
-      "sha256": "842fd9515474a08c97a8bd44742cb40aecc74345cbcd6f521cc334694e871ead",
+      "sha256": "455e200fdbba463ee89f350895528beddcdee802f3b0b23aa08b8f7374af7107",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3582,7 +3926,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationResult.cs",
-      "sha256": "d7da90a6ea20e7f6ec8fd9fbe4a5009738ec6c63f9119a9f6282fb593c0bb950",
+      "sha256": "352b41bc1466c924b10d8e6d989bc6e3a69e04275c878c1e758becdc87380141",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3591,7 +3935,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationService.cs",
-      "sha256": "75d6755106310d7588931734f96eb7905706f01b268a599353c6761699ad324b",
+      "sha256": "e593ef14bd0169497d3feb65398a49e66e9fab4779e54b5833f5bebeac0077a9",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3600,7 +3944,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterHydrationValidator.cs",
-      "sha256": "ebcf0e0feafec0c3452ffd362d8cd619f9d0fe6e29fef17ecfee448edf09259b",
+      "sha256": "f4a036aceda3c128b1576747ea58a1c1be47d5970ef26870ebd33f1ffbd4e6f2",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3627,7 +3971,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/PlayerHydrator.cs",
-      "sha256": "6c2a53f14e59f551238cbbe310ba6c50548ac6f52bcc71c202811da691d2c269",
+      "sha256": "69480d1130bbd5df8912c31c0de5c0488c8e486dd0d48b5c72b60b107592cfd1",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3636,7 +3980,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/PlayerSpawnPayloadValidator.cs",
-      "sha256": "16759eb2925371dbb983c73fb4dd68d20d58bb4d35662bbc0ce4078bee93a3ab",
+      "sha256": "d47a1ce17caf455718d2cef25ddbd5e8ed5e4dc01ab77e7f79d5e2637d182fa7",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3662,6 +4006,24 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/CharacterStatParser.cs",
+      "sha256": "83f8df39b42f542473140d5e2e955da3d37a25c1f7ff9d6816b81ae851101088",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/GetCommand.cs",
+      "sha256": "248c146e360d36e5685d9917c09d74713209ee20d054aed6b670e9f8371d20f7",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/GiveItemCommand.cs",
       "sha256": "68cf66ef7a00e95bc82f4ee041af8fec927350b33f82f55f0403e8592ea734c2",
       "classification": [
@@ -3672,7 +4034,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/GmCommands.cs",
-      "sha256": "04da8058442b795c59313508990a3160c688f7dd94e8902d1afc6a6448b7f1c9",
+      "sha256": "5bbae952d108dff4b4f7d208c3c08eabe222b505c7552c5b8fe41dd073adf709",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3681,7 +4043,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/NpcCommand.cs",
-      "sha256": "452231a186a3b71c62655a03b955032cfba13219ae295d58d48a63564115d2e1",
+      "sha256": "49cedb3539152ae2ceff35ef7218c9eb28ce63d976ac9fc8a952c322c899e470",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3699,7 +4061,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/SetCommand.cs",
-      "sha256": "31b71b9bf46c192be30acf11294cd9a51b2c869b5995abecb75927b8db955a1b",
+      "sha256": "9a57d45f11862ec15eef13cd59c035375b41d85704012598a81160ce2a914913",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3717,7 +4079,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/TeleportCommand.cs",
-      "sha256": "755d98b33892ebb0ea01fc89539bebf343036f62b52e75693a45c910aae72cb5",
+      "sha256": "5f25fa5017dd29cf4b30fbec08dc815ff2f378d62507ba0c09ffc0b9ea4649d1",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3734,8 +4096,17 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/IActiveNanoRepository.cs",
+      "sha256": "baacbd90e0ecc0a1db63ce911b69f193fdce54a510005819bd9f9cdd72fc79fa",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Data/ICharacterCoalesceCommit.cs",
-      "sha256": "ecd80ca38c24183ec1af045ffedc7c61bc2b7d3815b2ad091272ead4f8057cb2",
+      "sha256": "2a244badba70eca9ed170a2e721f018827373b6976898cfd5f07a851cb960b7a",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3834,7 +4205,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlActiveNanoRepository.cs",
-      "sha256": "4f7453103d041d1785209b040ce53886c6901e7437b6c91a1ce2dbc3ad469a17",
+      "sha256": "c4674db5c042a153939bec6813ebe8b228c699de2580fd5da1b5b7641c1d101f",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3843,7 +4214,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlCharacterCoalesceCommit.cs",
-      "sha256": "cd0a3562ba1801c54edd698c5658f0b613c8e9179365ae66eec420b4f422041a",
+      "sha256": "ef1ecd7dc7e70ebf6ceb06b5c8d41eebd8654c7a9419e9bd074c651872b9fc6c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3941,6 +4312,33 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/ContentDefinitions.cs",
+      "sha256": "b50dfc5fd22664eb14afb59571271cb6c1678efc8beed2621d385a9ba64323e9",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/ContentRegistry.cs",
+      "sha256": "96f31837a55cca315108a95e90640a424311945530b2e56d36e1bc1531e2ddd8",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/ContentValidation.cs",
+      "sha256": "1deca232ea53f89edb3296b23fbb6b09fce617fe4a3f576af6790ebdcce2ed71",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueActionRouter.cs",
       "sha256": "b2926a2b11939cc9426b7de64469f41f3e500db0165c3361f4a1156ebac5ed95",
       "classification": [
@@ -3951,7 +4349,16 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueCatalog.cs",
-      "sha256": "43047a7ccd2d35c967a104aaa2e998cb5022906483dada5b1a8335de7380f0d0",
+      "sha256": "773c51be404a603b3b8c09491e5e3b70de411b531285f26c9edf7400a2e38b7a",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueGraph.cs",
+      "sha256": "2b973859bceaef20efccef822119d9120f1e73cf00abe6805a97122a75925eba",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3960,7 +4367,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueService.cs",
-      "sha256": "7c983e5b4d33bde5c2e6f211a880017664fd741044c85c7b4237e944bd550476",
+      "sha256": "d65047c624a8a80d93d29db1737c37edc811a1b3af8062a19b5b1b7b47cdcd5a",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3969,7 +4376,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Dialogue/DialogueWire.cs",
-      "sha256": "f9327fc2d4e43fb0500a3f1e8b02e1474c7f2f325e6b2c536296718dcf035db7",
+      "sha256": "f54a50efdcdeebdd2a7e3a27e97f393504900db02429e940d49ee12927ab129c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3978,7 +4385,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
-      "sha256": "b9ce5176e2f5de74afb3cfc8bd7b9e270d78747a32e15250e942360af27806ad",
+      "sha256": "351676375898c26ee091ff6ea00d75c3573e628fb561e735c4c668b2b743c967",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -4005,7 +4412,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Corpse.cs",
-      "sha256": "eb523557eb269aba63e56b94eee6298b4cc312a463857e796f0b1d372fc962dc",
+      "sha256": "de34ce886e802be89b5b2c933a579ef4c530c9fedbde1e0bd3701b087f424b00",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4059,7 +4466,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs",
-      "sha256": "45deade212fd46ea29edd783957afc50068ad3f8924a5188f76701fff0d0e3f2",
+      "sha256": "36eabb15f9a8a9cb637c0d8c1eaa9d0402b6e801ef148dd3c69b6b6dccf4dca9",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4068,7 +4475,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs",
-      "sha256": "0f22ca8b7935208f0f3e17d8dce0d93ff8b24d45a9bc7fb9ca86be8e5126f6ba",
+      "sha256": "b52b09f9966347baaad602bb2c285e2e642753c32e2016f8aa0df2c14738cb36",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4086,7 +4493,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/StatCollection.cs",
-      "sha256": "40ea5476c3fa40de71804e380aae72399b0cd87e822f4145b4e6705652a83622",
+      "sha256": "568b2b830887ded20dbb8fdd36d3631725c9a326492cea20fdea0b76b55b04d1",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -4104,7 +4511,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/VendingMachine.cs",
-      "sha256": "2a9dddf6ded376bc61b70b58d7e82312fdb9ae42c62bb1b4dd1921fc63464e32",
+      "sha256": "4a5d6c8af2e24ba3bc2464ec026c2f81a09262cd4b2929b72e9685e5d9c856c1",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4112,8 +4519,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.NpcStats.cs",
-      "sha256": "00dbd9df1781a3fde025b0771bf8a38d6f64ed7305c57f867894d46abbc9b3cc",
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/CorpseContentCatalog.cs",
+      "sha256": "5b73e903e673f2a1d9eeeea5f92232879b2961aa3423cab5fc01786dc07c9bf0",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4122,7 +4529,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
-      "sha256": "effd61ec3802634d596d27a1de6bd8cefbc12a316a4ed6d73e92623ffa0fa1c2",
+      "sha256": "456f7ab7f1ba7e4d2c01a7a7288e4b2d03e88eca33d0504d1f519d6a2227decb",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4131,7 +4538,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/HashInstance.cs",
-      "sha256": "9f643fa46fd634fb967b5140d03b546106e7fee7901a6f7259fe76bda6d82d38",
+      "sha256": "07c2f8ac7ed1804c9a432c177f5dee1bc85c513c98d8d8cf4ce4a5c1bff4ac3c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4140,7 +4547,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/HashItemCatalog.cs",
-      "sha256": "bfda8400b80bb9e4cabccdbb6a22b63d6c8fae46818c0f1c290e737c72d73164",
+      "sha256": "05a80d5b10ef31b1d6d865dee3f1d391070f7eb91b92b56fa74000a5fd6dfc5c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4149,7 +4556,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/IGameData.cs",
-      "sha256": "5dd1d9346346068af60633585abe1bd84e5c2ccb63285e13ed66a793e5e82fd6",
+      "sha256": "b7e27389506f905d48aeb5c16e091ea6432bb2bddef81b045ee9a3655293d881",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4157,17 +4564,17 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NanoMechanicCatalog.cs",
-      "sha256": "a8415b362ba4e8ed53357e5dee8fb1b53623dd3a97bd2519e436be6a4230fc79",
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcContentDefinitions.cs",
+      "sha256": "27e08f841198ebea85701b4fcaf77972c565daf76bcb831bd2851fbb9dba8551",
       "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
+        "GENERIC_RUNTIME_LOGIC"
       ],
       "candidateCount": 0,
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs",
-      "sha256": "2f9cbe4c2d07d7d7798d661c7515e4a4ab6ece601d487f1595304519c49e9780",
+      "sha256": "f0816d73c37e0c1659595cbd18ca9aa59665f74b85b45d9c1089756d97806a06",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4176,7 +4583,25 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/PlayfieldGeometryData.cs",
-      "sha256": "4578925beda16b4f2c5129dea0370bb9dd5a85c2a1a7bb30e2628ab2bae57ed4",
+      "sha256": "a5c752cca0cfb16e03c3468b420e9fa45e61684864f679bae6a4c019ac0c321b",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/PlayfieldNpcContentCatalog.cs",
+      "sha256": "7bf3440a631c476a71e5eea0f148bbd3a3b63480fba38e5c42b668188eff3707",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/RespawnContentCatalog.cs",
+      "sha256": "a3f4925f0c6a9491eedebd591ff567f6a6b6ffa1941affade1fd17427ad42466",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4188,15 +4613,6 @@
       "sha256": "bb63f2907464fad7b9c507a2060a5a740559226b5e4dc1a224bd69f49b743e6e",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/WorldContentCatalog.cs",
-      "sha256": "085e3f4a600ad27b06e9cd53b9ed1a33a3710c7d433ea4f58190c0727f1c2d44",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
       ],
       "candidateCount": 0,
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
@@ -4248,7 +4664,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/MaxHealthCalculator.cs",
-      "sha256": "95b12978031375428143d59b5db3707c6d758c1062b48863586c00c6cd81f83f",
+      "sha256": "edcf93a98698d3bd45504cf868f7e249139297d8a129099e50193f449e3d71ec",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4302,7 +4718,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Container.cs",
-      "sha256": "347d7febfef3aa96f260ce47d6aaf2af22ec549acd1e884c839c32092f12593b",
+      "sha256": "3e979d33c4409e35b03a3f1fa237d7722536937a479bb024178bd1f159401ad9",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -4391,17 +4807,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryActionService.Vitals.cs",
-      "sha256": "ca2db25d9eae383d9c9b3bd96ae759c6635dda4ad7d74d0c447643a02571a7ed",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryActionService.cs",
-      "sha256": "4f876deeb1c3da10c31e3eeae609e9f02ec78648b357b043e7f43b495e489bdf",
+      "sha256": "c59be66db7174797cb1a67a727f614518f992e488740ceef6a53199c2ef3dadd",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4410,7 +4817,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryFlushService.cs",
-      "sha256": "893b5cde35321a0ac63ac910a58cb3ff122a73b4985eac9bd7f29a8914988944",
+      "sha256": "5b99bf2196ce23dbadc95742a87afc8d5cfbd28d0ddd6a1ae0268d4b58d81a1a",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4419,7 +4826,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
-      "sha256": "c97eb6da75c467055977fd20e6ec31a25413a5c2d06152ae8e31bfa549bf7fb6",
+      "sha256": "552241f786f546e2327c25848613acdaa7a8ddc6944346a0bd8fcddbdc5ca754",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4428,7 +4835,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryMoveService.cs",
-      "sha256": "d3908b0e5dd502ae6cb778c7f5b3ad471f2adda73780b383bbcdb417a01d0f70",
+      "sha256": "7d80868f3a35b3435f8150d568df95e314ace6a74879903615fefe65bec126f1",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4437,7 +4844,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Item.cs",
-      "sha256": "484eac0f4ab8fa75038abe2b46773e624a1b0c044065effa70b6e656d64ef7c5",
+      "sha256": "c6b06650abc2e39884f71c41650bec9d28d880f2a7ce1450c566338777670ab3",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4446,7 +4853,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemBehaviorContent.cs",
-      "sha256": "69295657bd50946a34079246d870c66bbe85b17a58d547350cf9803e74bf4660",
+      "sha256": "14d79e739ec808c028bb3e9f5ddeb24ac6b1480da46e97a9ea9a0f9a4bbfecfc",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4464,7 +4871,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemSpells.cs",
-      "sha256": "5c67b3856078ded808f7dfd4999afef1bb921bb721970746fd709e8e1c592f94",
+      "sha256": "89e4eacf49d2eece64b490c74cdd9857beb6be4823b249de4d332a1c4991349b",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4473,7 +4880,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemTemplate.cs",
-      "sha256": "d2b97d186194512187f826879159c998099a181532dc5ea5a7907e7783e10286",
+      "sha256": "bb1a5351be7c965d8b3bb161f539585b12bb8c7acefa42da751a593be7d96881",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4491,7 +4898,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemUseFunctions.cs",
-      "sha256": "cd99a57553a5694fb71ae5534900b348bc843abeb8c68d882f515560ebd9fb74",
+      "sha256": "6f9bdf3b0910f1cf21dcf219d1fef608af26b4d162d94aa09905ea454cb4e126",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4509,7 +4916,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/StatModifierSpells.cs",
-      "sha256": "a64306698a29a38a44caf33d2ba90381c0202bb46e196b7f60c462e597fbda27",
+      "sha256": "b791969e04ffdf0b95d33af2a086caf6453f84d35c5d24ceb62b81bb1d715f19",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4518,7 +4925,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/WearBonusApplier.cs",
-      "sha256": "916e4a7dec93f76d95a102f148a4ff95b251821a1caed3bf6044fb18ef74dd22",
+      "sha256": "ea3386d8bcae69d73fdd63fd3008107c965d945ef2c21ec571f7d28394676524",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4563,7 +4970,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/AttackMessageHandler.cs",
-      "sha256": "147cca24907be452ebfa330aa431edb0a9cb719f422575d47e3175598e964f63",
+      "sha256": "d16eb9ebf4f8f1253895a4183417b38078ac817be47fc3cc3c27a3129862a131",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4599,7 +5006,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs",
-      "sha256": "8dda9ca8ee0e0991ec58e8518a415c5101379021e8a2d94a70ccc36a382fe7a9",
+      "sha256": "a14be5439db8ac2de3d14712645b56a6e13fa5590a4913a677c7571d3a066691",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4644,7 +5051,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/GenericCmdMessageHandler.cs",
-      "sha256": "135c7b7ba8c3e61b31ea858aebc9d146cabdc918b93fdb699318773ca1e6d105",
+      "sha256": "8bb4ab38239fe3abfd2e21b2c66873fcfc8098e2a6368aac728bd84a8aa5dd7c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4662,7 +5069,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/LookAtMessageHandler.cs",
-      "sha256": "f8fe3bc79705e6c147b85bf58e03235822a3de05ffa0c5f662b5d1d6532040b2",
+      "sha256": "b4aa71143a1729ff722569e6928669363756754a5380eaa921acbae7fe348ff8",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4671,7 +5078,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
-      "sha256": "f11e3c094c18fa3fe484c5418b70603afada7d6380b5cc80b712c6b3e452f6b6",
+      "sha256": "bf999e9f61c86aaf2d73a977b356a82d65da567f338be7a3b2386eb103a6eb67",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4725,7 +5132,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
-      "sha256": "87ebbdd2384d0c4cc6dd0f2d8d326770f827c34e7bd4c8127a82400d0badc183",
+      "sha256": "1455ad89742940f2467f73b065bd1078fc93547e29725811d7180355f6f1e970",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4760,8 +5167,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionTransactionScope.cs",
-      "sha256": "1026ad4f1f7880b3aba2629cfbf2905b13d8a7b8fc4055b6643438b087dc6282",
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+      "sha256": "6354e0cef768fb6c9937cffc8bfa66c6f6b568ea9263820de5a40f2d33fc4ecc",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4770,7 +5177,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
-      "sha256": "3969778d11ed0bd8c3f769be8c701caa5a6ed4b238d617ba69eac78e415e63d4",
+      "sha256": "80548c5b9642ed83a32adf32d5c2f7b527d6836cef580d6990f34e3e0d7f3f52",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4788,7 +5195,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
-      "sha256": "e405a925a192133ae927cc7df6e859a696f886b6ce664b196a486c10b281ade3",
+      "sha256": "46328b9b982c5c7285ef8b948372f72652202b170f9982c374521f43767d1813",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4797,7 +5204,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
-      "sha256": "16f9b2f4f438bbbe711cebecf15904ae2770744fd1f4db6e1032406c526fa921",
+      "sha256": "8be440b2677d73f6c53fabed31a204cebec67a295da0e3b2b95fbf25afc4b873",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4814,6 +5221,24 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/InteractionFiles.cs",
+      "sha256": "72bdaada4330b78268b2e9431384bc2600987a3b6a3c6109706320787c77f62b",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/LayoutDefinitions.cs",
+      "sha256": "5ad02a7940b4eda822443f762b6db801f5b81473c7fba0d716b17abb52e71ae5",
+      "classification": [
+        "GENERIC_PROTOCOL_CONSTANT"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgCapturedLayoutCatalog.cs",
       "sha256": "c5b3273ff12645bcab1bd887204f412111dc1518f96a10c9f8df13f8ece21ce1",
       "classification": [
@@ -4824,7 +5249,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgCorpseCreditPolicy.cs",
-      "sha256": "02a123fe64eca4e65fc51e7e5543adcbe9d972b12d4d34b039f56494bc182c2e",
+      "sha256": "503db8b33aa8df031aadacb35c8eddcba9ba470d1ef131a925232c2963758058",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4833,7 +5258,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgLayoutCatalog.cs",
-      "sha256": "8b75340c7c9262728ca6e10d29a1db8717c61253f2253525fd77d334380eb020",
+      "sha256": "ea32247244280695d926069595ea3678fb93b7a08e8f874209c8587301c0820a",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -4841,17 +5266,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgObjectiveContracts.cs",
-      "sha256": "0a86a7a1cb0cdd47ceaa82c7d00ac8b71d4dea442fc202c1a110d043c476a6f5",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgRuntimeMaterialization.cs",
-      "sha256": "27f23a561d2e451b9941a44aa9ffcd097972f3d9c264e99b9f0e32212b7df071",
+      "sha256": "aee273256f46511ce7618a07a26810e9792086ebb0f4f5e77b75b9f66ca1e255",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -4860,7 +5276,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionAcgTokenRewardPolicy.cs",
-      "sha256": "7a55af27fbce55ac45d162451bdf6377b5c830bc7b3b57c618230bae9da7f3a6",
+      "sha256": "0ff4855c192848571ea3b6478e7f25d1611cc5665b7b0ba879419d2fe6b72d01",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4870,6 +5286,15 @@
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionConfigurationContent.cs",
       "sha256": "0d008db8154d0b851c68bc110ce927460814c3c54ea1f6e6e8de266b6689f376",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+      "sha256": "8c4ff64c6af3cea3145db2b836d0ef4a06649e76def4b9f473beaebf46a62ab2",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4887,7 +5312,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
-      "sha256": "d03fca2302b1a17dfa73ddadc3f46f77dafa7c0f85b5eb1b8b1bbe83a45b592c",
+      "sha256": "f41e1c3a791fc7afb3f6c7d8dd9265187150899b31c692741bbd5154f1d85956",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -4896,7 +5321,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferTextBuilder.cs",
-      "sha256": "3899ee9a3627d8abf83c76c854ae2e2553e6ec9e6b36c2b78c2a5d8d27cb11e0",
+      "sha256": "75b42e89287a7dcb93d2bdc4d76829f6e7d757b3e3c830b7adfb6b13c81614f6",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4914,7 +5339,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
-      "sha256": "9fcd8c0e94c337e3f7a1fedc75472366872a677758dca92161af2463931c99de",
+      "sha256": "603d6124571492f98e4cae6a03bb7a271f7cd6ff4d7b20c1293124d8f41b429d",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4941,7 +5366,52 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
-      "sha256": "28303e82fbc91a6d2f70d9cc56ea07bc1445848c2fcd0f8edba2730641431c76",
+      "sha256": "3956870f47a2c4c7cae16e1e4d59b9498e0b984fae88a72bb3d936bcb52daf88",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+      "sha256": "ce68df9edefdf09f16233267e22aab01b7aa8cde890b165dc55d008ae31dde5f",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollPolicy.cs",
+      "sha256": "fcc6935d1fd6b9ba44a1a7ecad1c82128fe13fcba756e80e6369c02b116e3040",
+      "classification": [
+        "GENERIC_PROTOCOL_CONSTANT"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+      "sha256": "d96926849147e236607a45fcb934d7e6885d9328cc751a902c5891ea4ff5ac03",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestDefinitions.cs",
+      "sha256": "d5900f11d576002c2e7caffb922f8fb353aa978a270b27dd94c6fd8b9fc78a05",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestIndex.cs",
+      "sha256": "24d285ae859df28032e76a1b041990ca6a1f30853830f03780297bf8ec417631",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4950,7 +5420,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
-      "sha256": "d25f4b1f9fc6961e03ad5a765761667488d46d86eae9c57e93081a7aab7bad2c",
+      "sha256": "0f5a8de4cc95498c564e971813e48be1c50e1cd7d448567d548d58312557368f",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4986,7 +5456,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionAcgService.cs",
-      "sha256": "ffdce1a9da3020313f70bc01795676ca3b3f13768a5a9dcfd7f9499bc82eb191",
+      "sha256": "1335da575766aa2bd92e4c06b34d070d35e287df1bcea53b459b8d4bc568c80a",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -4995,7 +5465,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionArtifactProjection.cs",
-      "sha256": "a374d8a872717c1c9f920b240b564b9580255a9cf72257dbeb88e1cceb3d45e6",
+      "sha256": "a4c2974b8634d69243d60f43265aac1acb5ab2659a8be3b25b1aeaa140ebb9db",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5013,7 +5483,25 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionCorpseProjection.cs",
-      "sha256": "d5a5a615f51a5b0f7c1155a358be313739c85092f240a327ca2b77d08b6cdff7",
+      "sha256": "3189adf6bf7c1b1cec8f1b0336fc04273378a7b1d0abc0c9b7cdd3f44fd65329",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionIdentitySpace.cs",
+      "sha256": "7d5fe7082750a346fb037f667cef550cd0d70535a4fdf1143c5ccc74f98b3e50",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionJournal.cs",
+      "sha256": "f7b5779b24922e17c8fea6fbe65c7f261eeafba97038bc83c2f32b2fbb6e07bb",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5022,7 +5510,16 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
-      "sha256": "8d81ae1bf8131ba417cd165cfceeed5ef8341fe40410dc196aea705ae99e8dff",
+      "sha256": "347f32e08411f00243708329c69293201ed89a7b0d57a5f054f7010b537db3e5",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+      "sha256": "d7d79442fbffef99df51455a28e337b1fde00f9273e47c3ae3ed6929d1d8a6cc",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5031,7 +5528,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
-      "sha256": "d0d3ba180a05998d0411ae04eadbf277799a5374830b2ab1aeca973ac7d574dc",
+      "sha256": "35d54b7d68694ac881c84dc5fe7e7551b45764c76c0ccaf0ac3c8614ff9b17c9",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5048,8 +5545,17 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWire.cs",
+      "sha256": "ce9d79798a6920cbe3a4d304b83b9226c6439739a7a25dfa91649543c6a089f8",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWorld.cs",
-      "sha256": "e93a79c34b92b6e4b5f4a1466e82dbc70e5b9ba1cf6f47e74f488d6dd9757ab5",
+      "sha256": "cf2073738e58f472f1bd11175475f315e773eec7de9e0c84e99b46f2039328ff",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5058,7 +5564,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
-      "sha256": "3903ade0478c7f92421dcc8731e1e2bb9fef8f4089400c2e2e086497939272fb",
+      "sha256": "13c07c89fe550148c422d75859311bc6c4fc8be8b79f0194f927a91b48cd68ac",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5077,6 +5583,33 @@
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionCorpseInteractionLease.cs",
       "sha256": "26ded584923802c1edb894d93b5916b97d9ab9ccdd53059c616777dc28cb63ef",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionGenerationSettings.cs",
+      "sha256": "06e29d0aadb4a6ca2e2615e87864268aeb4264be35837ed056f6146dab44b10b",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+      "sha256": "01d61a155902fcc6a7feee83f8d08a422d812aa9c6f57cc90f6318f192d26ef3",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionWorldBounds.cs",
+      "sha256": "b380a294a03d5c13ce595cd970c6e806c87c57ab0d5ab34127707fd870f7fadc",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5103,25 +5636,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/GeneratedMissionNpcFactory.cs",
-      "sha256": "54f31441f72124c0a0fd115f5ec1122338c01462e693f45b504a5b25bf9f9928",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatPolicy.cs",
-      "sha256": "6eb638b98df530f6b83ab571768a557f8ccedf08deeaa5adfd684b96c93dd6e4",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MissionNpcCombatRuntime.cs",
-      "sha256": "4b905eb6d89a64c35c3f1e0af804c148201fec167327d5df4662b731bc90be39",
+      "sha256": "e6739a4c0d5022820e7a20307c44dc0a15a91ac5987ce332cc45a27071c38c62",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5138,17 +5653,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobStatResolver.cs",
-      "sha256": "b27cc7a027dde89eefbaf03d3583c61b61b1fe14ebaad751132ff29d004e50c1",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/MobTemplates.cs",
-      "sha256": "b7497d227a7784ef4591ddb1ab0cad92cd967cd0402728de3bf3dc4162de2baf",
+      "sha256": "29869638e39acfa94119c7bd5821c7090a6e0fd7d6898324a13628496636c79f",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5157,25 +5663,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcContentActivationService.cs",
-      "sha256": "47beafd377cd50ecf1dde57c5c6150c85e60681ada88b445772d9fa893ad841d",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcFamilyStatTemplates.cs",
-      "sha256": "7d83647bff9a96f9eb91d9adf5cec36d7efc8fe3c7db647a34e1ef9f281ad705",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcStatTemplates.cs",
-      "sha256": "b82526c4e8216f25d7886d67318f0a7292fc2b7ce245389c7f8b96e46d3766b5",
+      "sha256": "fd84f6b1e0131f5688fec7e97a0f96fdca35092cbcb9dc98cc4ef24d365b28cc",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5193,7 +5681,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcTemplateValidation.cs",
-      "sha256": "2df404595343ef307d3430433065d1cb879dad5d338bd87723e739d1aac11a31",
+      "sha256": "3003c9d805b194648ccab494a6a1ef031ccecff697677252e9f24218ee2d09d6",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5210,17 +5698,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/SummonService.cs",
-      "sha256": "56959302d1cb71aaea26b9736fb5ae9fb42ece8398c6062106c1798938f338ad",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/WorldNpcFactory.cs",
-      "sha256": "67f689a803133fe9c46157f402338cd260193ac2a758a594dc94e60aaa2df7f3",
+      "sha256": "e8624aef336af8c76b92501f32fa4fb6599c5a04d1db71380795273aca7d52c1",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5229,7 +5708,25 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs",
-      "sha256": "320e5db09e6d6ba45bdefddf680257f10915e3f0f06cb63ffbacbbb8f224a57f",
+      "sha256": "f99645c70d81650386ae55b598edab4a631397046dd020b3c6d2dea85b9b4e84",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/EnsureSurfaceAlignment.cs",
+      "sha256": "5b45ca64ec63952741a62c7dc64dde3851a28aa50a3334a382876e7dfcb7d196",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/IVehicleSurface.cs",
+      "sha256": "9aa8d908a47d933d2d4a023eba49dca65fd69900365f2ee704ebe418bbea8823",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5238,7 +5735,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/MovementConfig.cs",
-      "sha256": "7cfe0ad8dc11ab98536eb5e192c42cadb5c2163344f204bf3d175a6528a8847d",
+      "sha256": "f4379669abeffde9803bfacac3c173141453127c465501d9a8712b0f7bd99512",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5255,17 +5752,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/ActiveStatOverlayNanoSpecialization.cs",
-      "sha256": "0a5d2e8a7e372e9d07451d7e586cfd827901fe2148ec15c0df7d861a4107e103",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/AreaTauntNanoSpecialization.cs",
-      "sha256": "843a13c5b404e8778d5960100e9370522a4c80534a46ab1f3e3bbfdb746df603",
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/VehiclePath.cs",
+      "sha256": "cd47aebdc240bafe93389b69685effff2017aaa3af612537b007f4bbacb08c4c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5283,70 +5771,16 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/BuffApplyRules.cs",
-      "sha256": "944a18b5339c953655b31e1ea17523d93cc79a779e01c64c44665db8f6405a06",
+      "sha256": "d0092a9b2d0883bf7cb39fb06d2a5d095f2be3df39e1ea6a1c996db177ca7124",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/DurationOnlyNanoSpecialization.cs",
-      "sha256": "b407115605906e1397b2635e2563bd5855dd4e4967f21fe74843f0db8eeca6ca",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/IActiveNanoProjection.cs",
-      "sha256": "3282c4710db321c793b3d623a6548b2d5f9543f50b75e2b1393674170e448cfa",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/IActiveNanoRepository.cs",
-      "sha256": "76ce3930ab86b911f4f3445207ac4311472f2cf84c07fcc1352e4d06ff42b7e6",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/INanoSpecialization.cs",
-      "sha256": "16521fd7ff62c2950cb0beace85584bc054a3fd776b31d53152b031d0bdfc568",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/MorphNanoSpecialization.cs",
-      "sha256": "3749c678bdc9f774811889b06fe7ee3a59cb65449d496044250787401b81214c",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/MorphVisualPackets.cs",
-      "sha256": "5b1a65962fb48ba04e2e6159ed8eaf3b82309e727be23fd8cf44fbac286722d1",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
       ],
       "candidateCount": 0,
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoCastRules.cs",
-      "sha256": "be5ec73593d89c1ce0a8aeff56d8d204a788e365c065763d518bc8cfbbcd9596",
+      "sha256": "f1e454c4e9f775a2e43dfa4c0063d32f620abaeb94633c0bb219dbb4c9fbec9e",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -5354,53 +5788,8 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoCatalog.cs",
-      "sha256": "0a07332759a7f00c9b2ca697ecda3d5ca1e79c63f0c65eaeea6fd10d6051c1b6",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoDerivedStats.cs",
-      "sha256": "4e38217c9889762ab3123d15c42214ffeebddad430beab5b0861e469a83c47e4",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoEffectPlan.cs",
-      "sha256": "35cd0b1b8d5d4291dee5bde037acc0f233c008781799146edf4e01c4239d5d22",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoRequirements.cs",
-      "sha256": "6a6c7d927ac1f179a51c0ff08775a59be6af2e036bafc007afd621dfcf231cab",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoRuntime.cs",
-      "sha256": "ef951f2a933070d28327dae86c05d1cd9ff14d3fa21a09ab690ff6ace07c9811",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoService.cs",
-      "sha256": "57bb621ebae8169bb717aabe164e975b6fb8dd3c37f5b54a75b18c2cd4864ccb",
+      "sha256": "f3c24be0d49ca319c20fc107d615bca125c2da8dbf2245f31df767e568d5668e",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5419,33 +5808,6 @@
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/PendingNanoCast.cs",
       "sha256": "5050728ec2ac4c097d69cf431dc1ceb550fa3fa8e7a07584904570b193b9a5be",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/PeriodicTeamHealNanoSpecialization.cs",
-      "sha256": "ecf62591f76d0e06490003315a7bb7704000d843d2d53946a043f3749bb373bb",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/SummonNanoSpecialization.cs",
-      "sha256": "5b2eb90ced7eaa48074b730a8fb732d3fd1b81167c5eb9afb582711fff0d2240",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/TeamTeleportNanoSpecialization.cs",
-      "sha256": "641abd42904022abbe48b71c3875255969a67e4323b482bef0f913e31448a323",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5535,7 +5897,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneSession.cs",
-      "sha256": "0ad2fabdb99608179db5a62bfae9744bfe66681d19b05233899351b2709060b8",
+      "sha256": "5115dc5ee31a835e69d9243d55307d175a992b4904b5832607546aef8ae19089",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5544,7 +5906,16 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/ACGPlayfield.cs",
-      "sha256": "b07be65992b5aa711a82f1cf8a080818477b98e2a7a6c24a63cfd3c3eed18497",
+      "sha256": "9f708649c55bb59de71a87e905775b1a3c1163b95bffd99235039b5e9badcc1c",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/DungeonPlayfieldBinder.cs",
+      "sha256": "4255ce39e7d4a7051cea557b15218a44ccb91a7f4a95001a036360612bfda5ae",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5562,7 +5933,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
-      "sha256": "d6d8dfcc9b3d2bd1b1cb2b77682def2db48ddba3bf34b1126b2c149186f15762",
+      "sha256": "4482d11b93888ae975ee399c6304a589e05eb7768cec3c1b2dd3f96e58ce0e4c",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -5580,7 +5951,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/Cell.cs",
-      "sha256": "25f93b72d5ca8769c46b4b9c731f3a7d62304f039517e0760235ca45c0b4edeb",
+      "sha256": "d64d9c54b5674f8c76054d4d7553e8963c7e1b299452cb2f94194241fd6fdea6",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5589,7 +5960,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/CellGrid.cs",
-      "sha256": "d9e218b7179615494715fd5423077c7a48ff5259a44ad3e6209be6cc8b5bbd0e",
+      "sha256": "25ba06a57d2bbf9983fb633260022e5028dc129050e0f3a22e92c789f2cf4f8c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5616,7 +5987,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/LocalityVisibility.cs",
-      "sha256": "491047b1b4979e835d5fda4050a0ac86693ae264868db9c6ffde8e77c34a32c5",
+      "sha256": "8af17338417fd2783f8ed24a12bddf24c133a46e7fcbebee74916779445826a4",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5625,7 +5996,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/PlayfieldLocality.cs",
-      "sha256": "062d60314f58128941d3ea8ae1118c75ecd9411143359fa23eea591fba903bc2",
+      "sha256": "b17f8b9136d508939f6344fc76f80fe211ec585025dcc1ea12ecd72f4f7bf713",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5634,7 +6005,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/MissionPlayfield.cs",
-      "sha256": "d98afc8ff691da0f61c4cc78e0554048c7dd33b50fc67aad504489449d6a8e50",
+      "sha256": "d742abe9f6f68ab677172f1d4f8a5ad1e9e8588257a0214e34d319650ae7da91",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5643,7 +6014,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs",
-      "sha256": "83b313f66ff8696c34e14c59bc73059ccbd111babe6510ecbb665eb65fa854c9",
+      "sha256": "57075e009e7f53af1f275dbcd488466edcbb95177f8f6a96d06b8875f2fe1d0e",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5679,7 +6050,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
-      "sha256": "38a1d320580ca966dacb58f87d6ca5c855038bc922ab1d1ad41f6cbdb2c1529e",
+      "sha256": "715339167ab1963fd05f2de207790ea7006da5bf94450225c7c7079581a2c259",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5706,7 +6077,16 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
-      "sha256": "9ffe1aa9232100bcb84125514813c094d084351c0327747811a9c399b0d93e3d",
+      "sha256": "4bcf42ba0b16dc6a07354de7fa455e75d50f6151ab574f16089d2ee06f8df3e4",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Teams/CommandInput.cs",
+      "sha256": "6fc4a9ae02e0c0c6fd2d80dab65bcebbf86a07aa075bf2f86ebc21c46d181529",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5715,7 +6095,16 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Teams/TeamChatMessageHandler.cs",
-      "sha256": "caca32a10898af197c082eecc2bdc6fd616e96448345fd8c83126703c315689c",
+      "sha256": "d3dde723aa22e8ed9ef649de3bf4db81ef6e14f44a35ba1afa53e79fd56153e9",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Teams/TeamLevelEligibility.cs",
+      "sha256": "c725b36a09be2ff2cf891add0f29ec67caf3e6548aa19b61279a06a17b3f62eb",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5724,7 +6113,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Teams/TeamService.cs",
-      "sha256": "9626a0fff7ef97ac632b7a9f214e534edd3242a1338db47c513120e038c19626",
+      "sha256": "beaa05d14d43381d4eb607eab90af864b0b9e8bd3023ab5f9c0cb433d7a8719c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5733,7 +6122,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Trade/ShopStock.cs",
-      "sha256": "0191e9da445988ef357e2e6e35335a2425b3333cfa8c62a321cbaf31127125e6",
+      "sha256": "564e0dd9182964c4418c02f0e8b0f75e96c01c27bd93ac7df5c29d39903a7db1",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5742,7 +6131,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Trade/TradeRules.cs",
-      "sha256": "c7c8e0b1c5ca6aaca9c02cdd0de249d6812134c0f333c8422b20c9ad69f29fda",
+      "sha256": "61cfdde6098d34795463c7c17d817d5c752b1f67a5b4fc9d54258985115c0520",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5751,7 +6140,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/Trade/TradeService.cs",
-      "sha256": "0e2ab677dbefdd5a185421b218c7610451d675a106464b14edfaa7983db894df",
+      "sha256": "63c8b3c3d60ca905ab4f0e68ec9a67bf4c981d788c406e1259e45d977d3e6a42",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5769,7 +6158,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DestinationsCatalog.cs",
-      "sha256": "3544f3d133b5772efa671fb29c732daa0a6024f9ea97be76726d16f24dcdad97",
+      "sha256": "2989f39d03fe2cc04caef648a6ca321c364a0cbd1234a04855345dd029e1ac20",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5787,7 +6176,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/ExitProxyDoorCatalog.cs",
-      "sha256": "f6f8054b544147914296be60a822dd547d85d783096cf740f2c13deb7a55ae41",
+      "sha256": "a2fb2c60b7cec3ef877f5cbe8c1a93cd6c6ef50f8350171c1ffa45078b70baa4",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5805,7 +6194,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
-      "sha256": "9d882e43c4f64bb02daaf81eb05721378ff272af24105c46763172d9ed3ff9ad",
+      "sha256": "a9678b67a94d91de89dc8c2c3e5e85ff41e1508104521c231c175f060611540c",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5823,7 +6212,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/SurfaceCollisionBaker.cs",
-      "sha256": "4d3ac20c2b951e4576f53e072cda556f4c91e20c120907a7622fad62495fe0c0",
+      "sha256": "41b8197dbdef74d3c2dfee5041eabab2d1f8eb3b8a8c61e4566c3ce4cc556a4d",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5841,7 +6230,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/TileCollisionBaker.cs",
-      "sha256": "a073a511cc33886fd97eb44a2da49082432a342275e517ac3f17059bcaea7b1e",
+      "sha256": "03274a2d04f6c6549722e39509c94f6f8ef60db8bda8d037d3aef6174474c680",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5885,8 +6274,17 @@
       "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
     },
     {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/WorldVehicleSurface.cs",
+      "sha256": "e26febd175805c67919d3f2c1bcafa19c44867de3b83b05aacf738cdcd1dbc05",
+      "classification": [
+        "GENERIC_RUNTIME_LOGIC"
+      ],
+      "candidateCount": 0,
+      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
+    },
+    {
       "path": "AORebirth/Server/ZoneEngine_New/Program.cs",
-      "sha256": "64dca98c20f1ba32e7a4eb1f260a253a81d7fb5708cedd25323ed7a0b9ad3d70",
+      "sha256": "678734a40457483f5d601c37100c92f6010e87d831b028f7719f55a1659f2041",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -5922,376 +6320,7 @@
     },
     {
       "path": "AORebirth/Server/ZoneEngine_New/RuntimeStartup.cs",
-      "sha256": "f4e5c766ea34cb2cd0b1652598a1b1e25cf0cf70e4fb74af09518ce771996d36",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/ChatCommandText.cs",
-      "sha256": "1baa5ca4e9cd130f93f076ab1a5999e5e3255d5f6b4b508934c58b691627c33d",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatContract.Data.cs",
-      "sha256": "42c7e8c9cb892174c787b73608370f0da90aeab057680cb712c106c5c8757335",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatData.cs",
-      "sha256": "dc5267a37982682ee88ab96606257a20e0ee49383677bf25fa5ce8b63d4577c2",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs",
-      "sha256": "0dbb0fcf85f13e50936795a090bc02c5c893841511ea0f82dc07d38f7d05aacb",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.cs",
-      "sha256": "eb42ffaba670c5eeca01ed9006abc69d911811647e8797a5523673b0b0f7a9cb",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileData.cs",
-      "sha256": "1746f3da33fee95efd635a237eb9a941cb959aa47b45144b162dae2b5f96c242",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileMatching.cs",
-      "sha256": "54699141f7020af8c3ae18b93e8cf47c2b362ab0dfc9a53f1e84fb850fa7ba98",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatSequenceData.cs",
-      "sha256": "37e19837960f3d8f85899377ff0a4f20a95569566d7d7d82a19c78e6160eda2d",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/NpcAiProfile.cs",
-      "sha256": "fe09b8676d80440bfbdc6fa8da43496bb1ce7beb45a90dcf2b026f93f7da1be0",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs",
-      "sha256": "119e2e4ea4046f125e1d6fdfe8083327c436751b6b35c8b6576992ed0eeda6f4",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/AreteConditionReferenceValidator.cs",
-      "sha256": "8c97b791add1c72f25fb40b3499b02e24cca58ca9e6fa7904f0d46542a804cd8",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/AreteEnvironmentGate.cs",
-      "sha256": "1496b94ef8ccd44183cfff9daede7a2f194b5fdc7bbca63e3ced97f2428d37c2",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/AreteNoOpActionRecorder.cs",
-      "sha256": "8fe146176ed8c5d63e0040b003f8701f59326c1b763460c5c9282c71f501eb30",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/AreteNoOpConditionEvaluator.cs",
-      "sha256": "1c5ce319808ab9211ef7ce180b16d2b0becdd9e1a7aee297d7cb4abe77c6baed",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/DialogueActionReferenceValidator.cs",
-      "sha256": "31a6889077aba03e062f997137180ba0ac3fd4d704e835cbb720803f589622e5",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/DialogueContentPackLoader.cs",
-      "sha256": "3dac673a330f2ce908f855298d9aecf6d8d0cf03bf57a73b8dabf7a255e7d9a2",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/DialogueContentPackValidator.cs",
-      "sha256": "27279950983a6b4641236769871419d21ed5ca258ea2d184e3bdb298310d6756",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/DialogueContentRegistry.cs",
-      "sha256": "f931d95602fb3be33204e0e1303b7533e092929a5619ff4c08c76ded6ccdb591",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/DialogueModels.cs",
-      "sha256": "744847d91ed4c27516676f7fac1bbb5954de9370683bc7069e69cabd5ad495a1",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/DialogueSessionModels.cs",
-      "sha256": "a7a89fe27f0e283fa6f9117808a90f55f182f77c5ec2687d6c18837d32c1adec",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Dialogue/DialogueSessionService.cs",
-      "sha256": "b5889a0f39c7cbfb839bd73d7fcbb4ddd4109df39521d35b9aa4d7f2ac18a386",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/AreteContentLoadResult.cs",
-      "sha256": "4efc2b4294a6d27b88d173545b7ec2139e90bbbbfcaaf8fab99b6e98507caedd",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/AreteContentManifest.cs",
-      "sha256": "7b4b95920f9aa7d1ce7b07149b2ecab6a211b93a27a15e0ac9c0027dc36f784f",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/AreteContentManifestLoader.cs",
-      "sha256": "45749aa89b145ef6cf77f6a93b488b2a1da45c944e5cc54f88d8abc82c74251c",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/AreteJsonContentFileLoader.cs",
-      "sha256": "7c335bb74460c6163c23fcc94f72faa5540e099741c427186d8a4e9dce6996f8",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/AreteValidationResult.cs",
-      "sha256": "bb3d09d2a50bde49054ce1687846eb816de63d06f2a3ac16a15199c896b2065a",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/IMissionRepository.cs",
-      "sha256": "a83c6bd60e2ca210d560a64f11318f6ed00e8113103ebb439065d0b163919760",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgAcceptedQfuBuilder.cs",
-      "sha256": "5bce33c016cb1260f05ada2ac1294ee7da3c6b0c3ea5f26ec8433379543414a8",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgBindingRecord.cs",
-      "sha256": "8248fe7c4bf9c697dedf53a0a5c9f1a82b34515f53b28dcf5e6435f8a9b80f7c",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgIdentityRanges.cs",
-      "sha256": "ee21d9eb265e482bff5062c5aeb9758078ca28341c53c11692958fb1885fbb8f",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgInstanceBinding.cs",
-      "sha256": "3dd94e1ad88abaae2a11a355a27dabac7f4c99000351dd95a8e117cfc3eafdd0",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgInstanceState.cs",
-      "sha256": "f386bac1d95c913e24f731dd8f93b6a0f7846b8ee6e3cf139ba1dae7c22879d9",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgLayoutBundle.cs",
-      "sha256": "6495732651216a62a54704d40aae16e26a66bd7a4c55752346e6f118039af6b5",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgLayoutRecords.cs",
-      "sha256": "9aeb378e661d4e368d93419e0874e45745b165327dc83dc341017fb3b1e5a372",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgLayoutSelector.cs",
-      "sha256": "02ae80e2d4ba6324b6fa218c5d3c1450d03f03b42c923e4f171f9aececa48a58",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgObjectiveBinding.cs",
-      "sha256": "7fa7df90dc6c6aa654c81fc0a77551ba98a587b7022f310d7bbeb5c6d67bbe11",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionAcgSpatialAuthority.cs",
-      "sha256": "b616a3b7a6631571db92af75578ada0bf730c9405536dfcd89c7ad360fe15ce6",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionDaoRepositoryAdapter.cs",
-      "sha256": "49904637a5b19873908951c68ab524d559b7d36ab14fcaeb4877796f283b036f",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionDataMapper.cs",
-      "sha256": "0b8a883ef0397fdd4c864a1eeddc11f47f807566bab17b9b4c13391e3d4f7517",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionDiagnostics.cs",
-      "sha256": "9281dc135a9ca2a837cf6a0f5a947fee9ff19a7fdc7adf2d2f2592b925d704bc",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraph.cs",
-      "sha256": "e388a21ca06c91848dabc067a67ecd780dff0d4b2bdadb856fb7655ddce08b6a",
+      "sha256": "c8e574dd1a48050ceeb89b0359e7a4aaa826dfd9ec4f4101ae88eecb300dc67f",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -6301,141 +6330,6 @@
     {
       "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
       "sha256": "d2301d075fc2ea997438f97d5f062b1ffdfb0ab229b6cca8a32dc989d17a5c9c",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelTable.cs",
-      "sha256": "76ebb80a35585945d1feed112f11247dbcdcd650d877d5eec06f32865271e2b4",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionModels.cs",
-      "sha256": "89e639639536642d3f9655cd1bea98e565f1c00f44a3f452bc6dd8faad2ee8e4",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionNpcDifficultyPolicy.cs",
-      "sha256": "4022dcccf3846131166ac6c666373770a1b65e0db993edb29d0a24e40b97858a",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionRewardCatalog.cs",
-      "sha256": "c0b273039307dd766ea71d07c5565eec4ee11bd916ad0f51f07fe992fa72812e",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionRewardCoordinator.cs",
-      "sha256": "9db96a2e83e7f4feaefc86c45e94d3060a8eb94d94f23fb2da457300600bfb99",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionRollFeeRules.cs",
-      "sha256": "0e1a924b00d5a1ede5e1923faaf94bd136b1d49907fb9119af69b943731c650f",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionRollService.cs",
-      "sha256": "de0bdfea9b91396606d43ceab57d200615631aa22f8e1f1be2d835bae4e95fba",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionSliderProfile.cs",
-      "sha256": "455f55bfd03e31a91964b4b507ab8d5e2ad11bb3050f8293a6db8427ac7ba847",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionTypeCatalog.cs",
-      "sha256": "33465eb9c55bd38c6dd17bd54b9a05fe29ca7f60a4d816152ee3917e17ec4b71",
-      "classification": [
-        "GENERIC_PROTOCOL_CONSTANT"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/PersistentMissionService.cs",
-      "sha256": "11744e999e1c7c069bdeb73b5413ae97b7f1b840b374206e0078865a4b7b75b2",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/QuestContentPackLoader.cs",
-      "sha256": "224d4a1edc01420a32bafa30a7c44fdee9ec8ad9e6360ae9afd33dda4151f05d",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/QuestContentPackValidator.cs",
-      "sha256": "ff89d4b10f36ecbd5c3f07fe83d4835f42015b17c1981577271b676e1868c71f",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/QuestContentRegistry.cs",
-      "sha256": "8c1b5ead3f5509075372ba3b4e6c8694dc9d0b93ce54df1cbcf9e70ed848139f",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/QuestModels.cs",
-      "sha256": "3c5acd8d151920db0ae8425f4e25f704feb792bad8fa7d2760f30f78e3249857",
-      "classification": [
-        "GENERIC_RUNTIME_LOGIC"
-      ],
-      "candidateCount": 0,
-      "reviewBasis": "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory."
-    },
-    {
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/TeamXpShareWindow.cs",
-      "sha256": "e4ad7c4020ffbd2bacbb2d99924b52097421f5a1364c6cc6fd34446b12074309",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],

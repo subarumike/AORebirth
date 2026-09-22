@@ -55,8 +55,11 @@ class GeneratedCombatActiveCoverageGovernanceTests(unittest.TestCase):
 
     def test_editable_content_audit_does_not_claim_private_or_historical_population(self):
         current = self.generator.editable_content_inventory(REPO_ROOT)
-        world = json.loads((REPO_ROOT / "AORebirth/GameData/WorldContent.json").read_text())
-        self.assertEqual(len(world["Npcs"]), current["authoredNpcDefinitionCount"])
+        npc_count = 0
+        for path in sorted((REPO_ROOT / "AORebirth/GameData/PlayfieldContent").glob("*/Npcs.json")):
+            document = json.loads(path.read_text())
+            npc_count += len(document["Npcs"])
+        self.assertEqual(npc_count, current["authoredNpcDefinitionCount"])
         self.assertFalse(current["runtimeActivationPermissionFromEvidence"])
         self.assertFalse(current["historicalRosterIsCurrentPopulation"])
         self.assertFalse(current["privateHashCatalogPopulationEvaluated"])

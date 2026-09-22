@@ -534,7 +534,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string current = Path.GetDirectoryName(sourcePath);
             while (!string.IsNullOrEmpty(current))
             {
-                if (Directory.Exists(Path.Combine(current, @"AORebirth\Server\ZoneEngine\Core")))
+                if (Directory.Exists(Path.Combine(current, @"AORebirth\Server\ZoneEngine_New")))
                 {
                     return current;
                 }

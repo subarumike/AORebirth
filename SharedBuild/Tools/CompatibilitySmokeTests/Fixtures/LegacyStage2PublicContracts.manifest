@@ -2043,7 +2043,7 @@ type.method|public instance abstract virtual System.Void CommitActiveNanos(Syste
 type.method|public instance abstract virtual System.Void CommitInventoryMutation(AORebirth.Interfaces.Persistence.Characters.CharacterInventoryMutationData mutation)
 type.method|public instance abstract virtual System.Void CommitItemCredits(AORebirth.Interfaces.Persistence.Characters.ItemCreditMutationData mutation)
 type.method|public instance abstract virtual System.Void InsertItem(AORebirth.Interfaces.Persistence.Characters.PersistedItemData item)
-type.method|public instance abstract virtual System.Void SaveInventoryAndUploadedNanos(System.Int32 characterId,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations,System.Collections.Generic.IList<System.Int32> uploadedNanoIds)
+type.method|public instance abstract virtual System.Void SaveInventoryAndUploadedNanos(System.Int32 characterId,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations,System.Collections.Generic.IList<System.Int32> uploadedNanoIds,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedActiveNanoData> activeNanos optional=true;default=null)
 type.method|public instance abstract virtual System.Void SaveItemLocations(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations)
 type.method|public instance abstract virtual System.Void SaveLocation(AORebirth.Interfaces.Persistence.Characters.CharacterStateData character,System.Int32 online)
 type.method|public instance abstract virtual System.Void SaveSnapshot(AORebirth.Interfaces.Persistence.Characters.CharacterStateData character,System.Int32 online,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterStatData> stats)
@@ -3417,6 +3417,73 @@ type.method|public instance special-name System.Void set_State(AORebirth.Interfa
 type.method|public instance special-name System.Void set_UpdatedAtUtcTicks(System.Int64 value)
 type.method|public instance special-name System.Void set_Version(System.Int64 value)
 type.end|AORebirth.Interfaces.Persistence.Missions.MissionStateData
+type.begin|AORebirth.Interfaces.Persistence.Shops.IShopDao
+type.kind|interface
+type.modifiers|abstract
+type.serializable-attribute|not-applicable
+type.base|
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Shops.ShopVendorData> ListForPlayfield(System.Int32 playfieldId)
+type.end|AORebirth.Interfaces.Persistence.Shops.IShopDao
+type.begin|AORebirth.Interfaces.Persistence.Shops.ShopStockData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor(System.Int32 stockRowId,System.String stockGroupHash,System.Int32 lowId,System.Int32 highId,System.Int32 minimumQuality,System.Int32 maximumQuality,System.Int32 effectiveMinimumQuality,System.Int32 effectiveMaximumQuality,System.Int32 multipleCount)
+type.property|public instance System.Int32 EffectiveMaximumQuality {get:public;set:none}
+type.property|public instance System.Int32 EffectiveMinimumQuality {get:public;set:none}
+type.property|public instance System.Int32 HighId {get:public;set:none}
+type.property|public instance System.Int32 LowId {get:public;set:none}
+type.property|public instance System.Int32 MaximumQuality {get:public;set:none}
+type.property|public instance System.Int32 MinimumQuality {get:public;set:none}
+type.property|public instance System.Int32 MultipleCount {get:public;set:none}
+type.property|public instance System.Int32 StockRowId {get:public;set:none}
+type.property|public instance System.String StockGroupHash {get:public;set:none}
+type.method|public instance special-name System.Int32 get_EffectiveMaximumQuality()
+type.method|public instance special-name System.Int32 get_EffectiveMinimumQuality()
+type.method|public instance special-name System.Int32 get_HighId()
+type.method|public instance special-name System.Int32 get_LowId()
+type.method|public instance special-name System.Int32 get_MaximumQuality()
+type.method|public instance special-name System.Int32 get_MinimumQuality()
+type.method|public instance special-name System.Int32 get_MultipleCount()
+type.method|public instance special-name System.Int32 get_StockRowId()
+type.method|public instance special-name System.String get_StockGroupHash()
+type.end|AORebirth.Interfaces.Persistence.Shops.ShopStockData
+type.begin|AORebirth.Interfaces.Persistence.Shops.ShopVendorData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor(System.Int32 vendorId,System.Int32 playfieldId,System.String vendorName,System.Int32 placedTemplateId,System.String vendorTemplateHash,System.Int32 vendorTemplateRowId,System.Int32 vendorItemTemplateId,System.String stockGroupHash,System.Int32 minimumQuality,System.Int32 maximumQuality,System.Single buyModifier,System.Single sellModifier,System.Int32 pricingSkill,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Shops.ShopStockData> stock)
+type.property|public instance System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Shops.ShopStockData> Stock {get:public;set:none}
+type.property|public instance System.Int32 MaximumQuality {get:public;set:none}
+type.property|public instance System.Int32 MinimumQuality {get:public;set:none}
+type.property|public instance System.Int32 PlacedTemplateId {get:public;set:none}
+type.property|public instance System.Int32 PlayfieldId {get:public;set:none}
+type.property|public instance System.Int32 PricingSkill {get:public;set:none}
+type.property|public instance System.Int32 VendorId {get:public;set:none}
+type.property|public instance System.Int32 VendorItemTemplateId {get:public;set:none}
+type.property|public instance System.Int32 VendorTemplateRowId {get:public;set:none}
+type.property|public instance System.Single BuyModifier {get:public;set:none}
+type.property|public instance System.Single SellModifier {get:public;set:none}
+type.property|public instance System.String StockGroupHash {get:public;set:none}
+type.property|public instance System.String VendorName {get:public;set:none}
+type.property|public instance System.String VendorTemplateHash {get:public;set:none}
+type.method|public instance special-name System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Shops.ShopStockData> get_Stock()
+type.method|public instance special-name System.Int32 get_MaximumQuality()
+type.method|public instance special-name System.Int32 get_MinimumQuality()
+type.method|public instance special-name System.Int32 get_PlacedTemplateId()
+type.method|public instance special-name System.Int32 get_PlayfieldId()
+type.method|public instance special-name System.Int32 get_PricingSkill()
+type.method|public instance special-name System.Int32 get_VendorId()
+type.method|public instance special-name System.Int32 get_VendorItemTemplateId()
+type.method|public instance special-name System.Int32 get_VendorTemplateRowId()
+type.method|public instance special-name System.Single get_BuyModifier()
+type.method|public instance special-name System.Single get_SellModifier()
+type.method|public instance special-name System.String get_StockGroupHash()
+type.method|public instance special-name System.String get_VendorName()
+type.method|public instance special-name System.String get_VendorTemplateHash()
+type.end|AORebirth.Interfaces.Persistence.Shops.ShopVendorData
 assembly.end|AORebirth.Interfaces
 assembly.begin|AORebirth.ObjectManager
 assembly.name|AORebirth.ObjectManager

@@ -40582,43 +40582,48 @@
   "contentInputs": [
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/GameData/MobTemplates.json",
-      "sha256": "52056fb5c528a513324db66e86c51a51ef386d0fdc667e40c0cbf0a900844eed"
+      "path": "AORebirth/GameData/PlayfieldContent/127/Npcs.json",
+      "sha256": "b77403d1784f13363eb45cb6026df5a94f872f22f50aa982dbda1fd37f4f1dd1"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/GameData/NpcFamilyStatTemplates.json",
-      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+      "path": "AORebirth/GameData/PlayfieldContent/4676/Npcs.json",
+      "sha256": "aa8aeab963325555854c0b0ed67355bdb848848814f0aae0319eec6a91192955"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/GameData/NpcStatTemplateOverlays.json",
-      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+      "path": "AORebirth/GameData/PlayfieldContent/4677/Npcs.json",
+      "sha256": "a753629226c489877f6faab37cd0573ef89d755bd3747617a1c673496a195ea7"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/GameData/WorldContent.json",
-      "sha256": "b72800318c278094cde506444acc82106ac6a7b8b24fb03055e627cbc06d9791"
+      "path": "AORebirth/GameData/PlayfieldContent/6553/Npcs.json",
+      "sha256": "ada84c16a5cc448008ffb0dfc436d8fb9d09af5aabb038f57fd3b6fd444307f1"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "AORebirth/GameData/PlayfieldContent/7010/Npcs.json",
+      "sha256": "b5de70ca37732306810ee98e8ac58841640910c184d8f130b4c19a17e10f78d8"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs",
-      "sha256": "2f9cbe4c2d07d7d7798d661c7515e4a4ab6ece601d487f1595304519c49e9780"
+      "sha256": "f0816d73c37e0c1659595cbd18ca9aa59665f74b85b45d9c1089756d97806a06"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/WorldContentCatalog.cs",
-      "sha256": "085e3f4a600ad27b06e9cd53b9ed1a33a3710c7d433ea4f58190c0727f1c2d44"
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/PlayfieldNpcContentCatalog.cs",
+      "sha256": "7bf3440a631c476a71e5eea0f148bbd3a3b63480fba38e5c42b668188eff3707"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/WorldNpcFactory.cs",
-      "sha256": "67f689a803133fe9c46157f402338cd260193ac2a758a594dc94e60aaa2df7f3"
+      "sha256": "e8624aef336af8c76b92501f32fa4fb6599c5a04d1db71380795273aca7d52c1"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
-      "sha256": "d6d8dfcc9b3d2bd1b1cb2b77682def2db48ddba3bf34b1126b2c149186f15762"
+      "sha256": "4482d11b93888ae975ee399c6304a589e05eb7768cec3c1b2dd3f96e58ce0e4c"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
@@ -40628,47 +40633,62 @@
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
-      "sha256": "9ffe1aa9232100bcb84125514813c094d084351c0327747811a9c399b0d93e3d"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatContract.Data.cs",
-      "sha256": "42c7e8c9cb892174c787b73608370f0da90aeab057680cb712c106c5c8757335"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatData.cs",
-      "sha256": "dc5267a37982682ee88ab96606257a20e0ee49383677bf25fa5ce8b63d4577c2"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs",
-      "sha256": "0dbb0fcf85f13e50936795a090bc02c5c893841511ea0f82dc07d38f7d05aacb"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileData.cs",
-      "sha256": "1746f3da33fee95efd635a237eb9a941cb959aa47b45144b162dae2b5f96c242"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileMatching.cs",
-      "sha256": "54699141f7020af8c3ae18b93e8cf47c2b362ab0dfc9a53f1e84fb850fa7ba98"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatSequenceData.cs",
-      "sha256": "37e19837960f3d8f85899377ff0a4f20a95569566d7d7d82a19c78e6160eda2d"
-    },
-    {
-      "hashNormalization": "utf8-sig-text-lf",
-      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs",
-      "sha256": "119e2e4ea4046f125e1d6fdfe8083327c436751b6b35c8b6576992ed0eeda6f4"
+      "sha256": "4bcf42ba0b16dc6a07354de7fa455e75d50f6151ab574f16089d2ee06f8df3e4"
     },
     {
       "hashNormalization": "utf8-sig-text-lf",
       "path": "Tests/Fixtures/Combat/RetiredPopulationCoverage.json",
       "sha256": "cf20612078047b8dc90146c9b741eecf42f92181b0c59b7f9e54fd6a6f48504e"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatContract.Data.cs",
+      "sha256": "42c7e8c9cb892174c787b73608370f0da90aeab057680cb712c106c5c8757335"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatData.cs",
+      "sha256": "dc5267a37982682ee88ab96606257a20e0ee49383677bf25fa5ce8b63d4577c2"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs",
+      "sha256": "0dbb0fcf85f13e50936795a090bc02c5c893841511ea0f82dc07d38f7d05aacb"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatProfileData.cs",
+      "sha256": "1746f3da33fee95efd635a237eb9a941cb959aa47b45144b162dae2b5f96c242"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatProfileMatching.cs",
+      "sha256": "54699141f7020af8c3ae18b93e8cf47c2b362ab0dfc9a53f1e84fb850fa7ba98"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatSequenceData.cs",
+      "sha256": "37e19837960f3d8f85899377ff0a4f20a95569566d7d7d82a19c78e6160eda2d"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "Tests/Fixtures/Gameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs",
+      "sha256": "119e2e4ea4046f125e1d6fdfe8083327c436751b6b35c8b6576992ed0eeda6f4"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "docs/accepted/npc/delmus/NpcFamilyStatTemplates.json",
+      "sha256": "af351b522cfe19eab2b065d18e480e46aa48e582c832611e3e84bba10e6cb21d"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "docs/accepted/npc/delmus/NpcStatTemplateOverlays.json",
+      "sha256": "7fa35a1ed167f3d82a8dbf408102967b4ffaff72252fadc14753955d32609b29"
+    },
+    {
+      "hashNormalization": "utf8-sig-text-lf",
+      "path": "docs/accepted/npc/delmus/NpcTemplate.json",
+      "sha256": "0fc8b2f5bb96b5fe310e64420d041efd15aed2f6b5c5684fd0f6f810b335c692"
     }
   ],
   "corpusSearch": {
@@ -41067,42 +41087,62 @@
     ]
   },
   "currentNewEngineContent": {
-    "authoredNpcDefinitionCount": 23,
+    "authoredNpcDefinitionCount": 22,
     "authoredPlayfields": [
-      0,
       127,
       4676,
       4677,
       6553,
       7010
     ],
+    "authoredStandaloneShopDefinitionCount": 3,
     "historicalRosterIsCurrentPopulation": false,
     "inputs": [
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/GameData/WorldContent.json",
-        "sha256": "b72800318c278094cde506444acc82106ac6a7b8b24fb03055e627cbc06d9791"
+        "path": "AORebirth/GameData/PlayfieldContent/127/Npcs.json",
+        "sha256": "b77403d1784f13363eb45cb6026df5a94f872f22f50aa982dbda1fd37f4f1dd1"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/GameData/MobTemplates.json",
-        "sha256": "52056fb5c528a513324db66e86c51a51ef386d0fdc667e40c0cbf0a900844eed"
+        "path": "AORebirth/GameData/PlayfieldContent/4676/Npcs.json",
+        "sha256": "aa8aeab963325555854c0b0ed67355bdb848848814f0aae0319eec6a91192955"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/GameData/NpcFamilyStatTemplates.json",
-        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+        "path": "AORebirth/GameData/PlayfieldContent/4677/Npcs.json",
+        "sha256": "a753629226c489877f6faab37cd0573ef89d755bd3747617a1c673496a195ea7"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/GameData/NpcStatTemplateOverlays.json",
-        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+        "path": "AORebirth/GameData/PlayfieldContent/6553/Npcs.json",
+        "sha256": "ada84c16a5cc448008ffb0dfc436d8fb9d09af5aabb038f57fd3b6fd444307f1"
+      },
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "AORebirth/GameData/PlayfieldContent/7010/Npcs.json",
+        "sha256": "b5de70ca37732306810ee98e8ac58841640910c184d8f130b4c19a17e10f78d8"
+      },
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "docs/accepted/npc/delmus/NpcTemplate.json",
+        "sha256": "0fc8b2f5bb96b5fe310e64420d041efd15aed2f6b5c5684fd0f6f810b335c692"
+      },
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "docs/accepted/npc/delmus/NpcFamilyStatTemplates.json",
+        "sha256": "af351b522cfe19eab2b065d18e480e46aa48e582c832611e3e84bba10e6cb21d"
+      },
+      {
+        "hashNormalization": "utf8-sig-text-lf",
+        "path": "docs/accepted/npc/delmus/NpcStatTemplateOverlays.json",
+        "sha256": "7fa35a1ed167f3d82a8dbf408102967b4ffaff72252fadc14753955d32609b29"
       }
     ],
     "privateHashCatalogPopulationEvaluated": false,
     "runtimeActivationPermissionFromEvidence": false,
     "runtimeReadinessClaim": "none; parser/registration behavior is covered by NewEngine runtime tests",
-    "scope": "repository editable authored content; private deployment hash catalogs and extracted playfield population are not inferred"
+    "scope": "repository editable authored playfield content; private deployment hash catalogs and extracted playfield population are not inferred"
   },
   "fixedDenominatorExclusions": [
     "53 ICC HQ Social actors",
@@ -225977,22 +226017,22 @@
       {
         "hashNormalization": "utf8-sig-text-lf",
         "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs",
-        "sha256": "2f9cbe4c2d07d7d7798d661c7515e4a4ab6ece601d487f1595304519c49e9780"
+        "sha256": "f0816d73c37e0c1659595cbd18ca9aa59665f74b85b45d9c1089756d97806a06"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/WorldContentCatalog.cs",
-        "sha256": "085e3f4a600ad27b06e9cd53b9ed1a33a3710c7d433ea4f58190c0727f1c2d44"
+        "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/PlayfieldNpcContentCatalog.cs",
+        "sha256": "7bf3440a631c476a71e5eea0f148bbd3a3b63480fba38e5c42b668188eff3707"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
         "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/WorldNpcFactory.cs",
-        "sha256": "67f689a803133fe9c46157f402338cd260193ac2a758a594dc94e60aaa2df7f3"
+        "sha256": "e8624aef336af8c76b92501f32fa4fb6599c5a04d1db71380795273aca7d52c1"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
         "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
-        "sha256": "d6d8dfcc9b3d2bd1b1cb2b77682def2db48ddba3bf34b1126b2c149186f15762"
+        "sha256": "4482d11b93888ae975ee399c6304a589e05eb7768cec3c1b2dd3f96e58ce0e4c"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
@@ -226002,41 +226042,41 @@
       {
         "hashNormalization": "utf8-sig-text-lf",
         "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
-        "sha256": "9ffe1aa9232100bcb84125514813c094d084351c0327747811a9c399b0d93e3d"
+        "sha256": "4bcf42ba0b16dc6a07354de7fa455e75d50f6151ab574f16089d2ee06f8df3e4"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatData.cs",
+        "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatData.cs",
         "sha256": "dc5267a37982682ee88ab96606257a20e0ee49383677bf25fa5ce8b63d4577c2"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatSequenceData.cs",
+        "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatSequenceData.cs",
         "sha256": "37e19837960f3d8f85899377ff0a4f20a95569566d7d7d82a19c78e6160eda2d"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatContract.Data.cs",
+        "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatContract.Data.cs",
         "sha256": "42c7e8c9cb892174c787b73608370f0da90aeab057680cb712c106c5c8757335"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileData.cs",
+        "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatProfileData.cs",
         "sha256": "1746f3da33fee95efd635a237eb9a941cb959aa47b45144b162dae2b5f96c242"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatProfileMatching.cs",
+        "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatProfileMatching.cs",
         "sha256": "54699141f7020af8c3ae18b93e8cf47c2b362ab0dfc9a53f1e84fb850fa7ba98"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs",
+        "path": "Tests/Fixtures/Gameplay/Combat/CapturedEnemyCombatPacketFactory.Data.cs",
         "sha256": "0dbb0fcf85f13e50936795a090bc02c5c893841511ea0f82dc07d38f7d05aacb"
       },
       {
         "hashNormalization": "utf8-sig-text-lf",
-        "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs",
+        "path": "Tests/Fixtures/Gameplay/Combat/OrdinaryEnemyCombatSetupGenerator.Data.cs",
         "sha256": "119e2e4ea4046f125e1d6fdfe8083327c436751b6b35c8b6576992ed0eeda6f4"
       }
     ],

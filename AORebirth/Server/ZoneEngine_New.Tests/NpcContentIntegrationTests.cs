@@ -58,7 +58,7 @@ public sealed class NpcContentIntegrationTests
     static string Root()
     {
         for (DirectoryInfo? directory = new(AppContext.BaseDirectory); directory != null; directory = directory.Parent)
-            if (File.Exists(Path.Combine(directory.FullName,"AORebirth/GameData/NpcTemplates.json"))) return directory.FullName;
+            if (File.Exists(Path.Combine(directory.FullName,"AORebirth/GameData/ItemTemplates.json"))) return directory.FullName;
         throw new DirectoryNotFoundException("Repository content root unavailable.");
     }
 }

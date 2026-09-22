@@ -76,7 +76,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             while (!string.IsNullOrEmpty(current))
             {
                 if (File.Exists(Path.Combine(current, "AGENTS.md"))
-                    && Directory.Exists(Path.Combine(current, @"AORebirth\Server\ZoneEngine")))
+                    && Directory.Exists(Path.Combine(current, @"AORebirth\Server\ZoneEngine_New")))
                 {
                     return current;
                 }

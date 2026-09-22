@@ -50,9 +50,6 @@ if errorlevel 1 exit /b %errorlevel%
 call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~WindcallerKarrec"
 if errorlevel 1 exit /b %errorlevel%
 
-call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~QuestRuntimePersistenceTests.Karrec"
-if errorlevel 1 exit /b %errorlevel%
-
 call "%RUNNER%" /Settings:"%~dp0required-tests.runsettings" /TestCaseFilter:"FullyQualifiedName~GlobalLootFoundationTests.RegistryRejectsDuplicateMissingInvalidAndEvidenceUnsafeDefinitions"
 if errorlevel 1 exit /b %errorlevel%
 

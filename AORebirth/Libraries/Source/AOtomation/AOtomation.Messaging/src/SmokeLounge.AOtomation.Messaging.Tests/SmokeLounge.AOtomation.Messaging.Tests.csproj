@@ -9,6 +9,7 @@
     <RootNamespace>SmokeLounge.AOtomation.Messaging.Tests</RootNamespace>
     <AssemblyName>SmokeLounge.AOtomation.Messaging.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <BaseOutputPath>$(SolutionDir)\..\bin\test</BaseOutputPath>
     <BaseIntermediateOutputPath>$(SolutionDir)\..\obj\test</BaseIntermediateOutputPath>
@@ -112,79 +113,11 @@
     </Compile>
     <Compile Include="CaptureRuntimeSafetyTests.cs" />
     <Compile Include="NewCharacterStartAreaSelectionContractTests.cs" />
-    <Compile Include="MissionDaoArchitectureTests.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
     <Compile Include="LoginSessionHydrationSafetyContractTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="InspectMessageContractTests.cs" />
     <Compile Include="N3RecoveredContractTests.cs" />
-    <Compile Include="MissionAcgLayoutCatalogTests.cs" />
-    <Compile Include="MissionAcgBindingPersistenceTests.cs" />
-    <Compile Include="MissionAcgAcceptedProjectionTests.cs" />
-    <Compile Include="MissionAcgAcceptanceIdempotencyContractTests.cs" />
-    <Compile Include="MissionOfferIdentityStoreTests.cs" />
-    <Compile Include="MissionOfferStoreTests.cs" />
-    <Compile Include="MissionAcgRuntimeMaterializationTests.cs" />
-    <Compile Include="MissionAcgObjectiveCompletionTests.cs" />
-    <Compile Include="MissionAcgOperationalRuntimeTests.cs" />
-    <Compile Include="MissionAcgSpatialRuntimeTests.cs" />
-    <Compile Include="MissionAcgExpiryStateStoreTests.cs" />
-    <Compile Include="MissionAcgExpiryRuntimeContractTests.cs" />
-    <Compile Include="MissionAcgTokenProgressStoreTests.cs" />
-    <Compile Include="MissionAcgTokenProgressRuntimeContractTests.cs" />
-    <Compile Include="MissionAcgLegacyFallthroughContractTests.cs" />
-    <Compile Include="MissionAcgLegacyCatalogTestStubs.cs" />
-    <Compile Include="MissionLevelGraphTests.cs" />
-    <Compile Include="MissionRollTemplateContractTests.cs" />
-    <Compile Include="MissionRollSemanticsTests.cs" />
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgLayoutRecords.cs">
-      <Link>MissionAcgLayoutRecords.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgLayoutBundle.cs">
-      <Link>MissionAcgLayoutBundle.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgInstanceBinding.cs">
-      <Link>MissionAcgInstanceBinding.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgInstanceState.cs">
-      <Link>MissionAcgInstanceState.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgLifecyclePolicy.cs">
-      <Link>MissionAcgLifecyclePolicy.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionKeyStore.cs">
-      <Link>MissionKeyStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgBindingRecord.cs">
-      <Link>MissionAcgBindingRecord.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgBindingStore.cs">
-      <Link>MissionAcgBindingStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgAcceptedProjection.cs">
-      <Link>MissionAcgAcceptedProjection.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgAcceptedProjectionStore.cs">
-      <Link>MissionAcgAcceptedProjectionStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferIdentityStore.cs">
-      <Link>MissionOfferIdentityStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionStateDirectory.cs">
-      <Link>MissionStateDirectory.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferStore.cs">
-      <Link>MissionOfferStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgExpiryState.cs">
-      <Link>MissionAcgExpiryState.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgExpiryStateStore.cs">
-      <Link>MissionAcgExpiryStateStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgAllocationService.cs">
-      <Link>MissionAcgAllocationService.cs</Link>
-    </Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NascenceDungeon1Rules.cs">
       <Link>NascenceDungeon1Rules.cs</Link>
     </Compile>
@@ -196,126 +129,6 @@
     </Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\NascenceDungeon4Rules.cs">
       <Link>NascenceDungeon4Rules.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgBindingResolver.cs">
-      <Link>MissionAcgBindingResolver.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgRuntimeMaterialization.cs">
-      <Link>MissionAcgRuntimeMaterialization.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgRuntimeStateStore.cs">
-      <Link>MissionAcgRuntimeStateStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgOperationalState.cs">
-      <Link>MissionAcgOperationalState.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgOperationalStateStore.cs">
-      <Link>MissionAcgOperationalStateStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgTokenRewardPolicy.cs">
-      <Link>MissionAcgTokenRewardPolicy.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgIdentityRanges.cs">
-      <Link>MissionAcgIdentityRanges.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgCorpseCreditPolicy.cs">
-      <Link>MissionAcgCorpseCreditPolicy.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgTokenProgressState.cs">
-      <Link>MissionAcgTokenProgressState.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgTokenProgressStore.cs">
-      <Link>MissionAcgTokenProgressStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgCorpsePolicy.cs">
-      <Link>MissionAcgCorpsePolicy.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgSpatialAuthority.cs">
-      <Link>MissionAcgSpatialAuthority.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgSpatialStateStore.cs">
-      <Link>MissionAcgSpatialStateStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgObjectiveBinding.cs">
-      <Link>MissionAcgObjectiveBinding.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgObjectiveStore.cs">
-      <Link>MissionAcgObjectiveStore.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgObjectiveContracts.cs">
-      <Link>MissionAcgObjectiveContracts.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgLayoutCatalog.cs">
-      <Link>MissionAcgLayoutCatalog.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionAcgLayoutSelector.cs">
-      <Link>MissionAcgLayoutSelector.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgLegacyLayoutCatalogFactory.cs">
-      <Link>MissionAcgLegacyLayoutCatalogFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionAcgCapturedLayoutCatalog.g.cs">
-      <Link>MissionAcgCapturedLayoutCatalog.g.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionInstanceDynelCapture.cs">
-      <Link>MissionInstanceDynelCapture.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\MissionInstanceShapeCatalog.cs">
-      <Link>MissionInstanceShapeCatalog.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRollCaptureTemplate.cs">
-      <Link>MissionRollCaptureTemplate.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRollCaptureLibrary.cs">
-      <Link>MissionRollCaptureLibrary.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionSliderProfile.cs">
-      <Link>MissionSliderProfile.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferCompatibility.cs">
-      <Link>MissionOfferCompatibility.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRollEvidenceCatalog.cs">
-      <Link>MissionRollEvidenceCatalog.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRewardEvidenceModel.cs">
-      <Link>MissionRewardEvidenceModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionOfferTextBuilder.cs">
-      <Link>MissionOfferTextBuilder.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRollService.cs">
-      <Link>MissionRollService.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRollFeeRules.cs">
-      <Link>MissionRollFeeRules.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionTypeCatalog.cs">
-      <Link>MissionTypeCatalog.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionDiagnostics.cs">
-      <Link>MissionDiagnostics.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionLevelTable.cs">
-      <Link>MissionLevelTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionLevelGraph.cs">
-      <Link>MissionLevelGraph.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionLevelGraphData.g.cs">
-      <Link>MissionLevelGraphData.g.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionLocationPool.cs">
-      <Link>MissionLocationPool.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionNpcDifficultyPolicy.cs">
-      <Link>MissionNpcDifficultyPolicy.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRewardCatalog.cs">
-      <Link>MissionRewardCatalog.cs</Link>
-    </Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionRareLootCatalog.cs">
-      <Link>MissionRareLootCatalog.cs</Link>
     </Compile>
     <Compile Include="NpcChaseNavigationTests.cs" />
     <Compile Include="OfficialDungeonNavigationTests.cs" />
@@ -360,13 +173,8 @@
     <Compile Include="TempleAcceptanceMatrixTests.cs" />
     <Compile Include="DungeonNamedEncounterCompletionTests.cs" />
     <Compile Include="DungeonNamedLifecycleCompletionTests.cs" />
-    <Compile Include="PersistentMissionFoundationTests.cs" />
-    <Compile Include="QuestRuntimePersistenceTests.cs" />
-    <Compile Include="AreteFrameworkBootstrapTests.cs" />
     <Compile Include="SubwayAcceptanceMatrixTests.cs" />
-    <Compile Include="WindcallerKarrecNpcContentTests.cs" />
     <Compile Include="WindcallerKarrecInteractionRulesTests.cs" />
-    <Compile Include="DailyMissionRewardRulesTests.cs" />
     <Compile Include="SubwayLootPoolRulesTests.cs" />
     <Compile Include="SubwayEnemyLootEvidenceTests.cs" />
     <Compile Include="InnerSanctumLootEvidenceTests.cs" />
@@ -532,34 +340,18 @@
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\LootGenerationService.cs"><Link>LootGenerationService.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\WorldPopulationDefinitions.cs"><Link>WorldPopulationDefinitions.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\WorldRespawnScheduler.cs"><Link>WorldRespawnScheduler.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionModels.cs"><Link>MissionModels.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\MissionDefinitionCatalog.cs"><Link>MissionDefinitionCatalog.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\IMissionRepository.cs"><Link>IMissionRepository.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\InMemoryMissionRepository.cs"><Link>InMemoryMissionRepository.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionDataMapper.cs"><Link>MissionDataMapper.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionDaoRepositoryAdapter.cs"><Link>MissionDaoRepositoryAdapter.cs</Link></Compile>
     <Compile Include="..\..\..\..\AORebirth.Interfaces\Persistence\Missions\IMissionDao.cs"><Link>IMissionDao.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\PersistentMissionService.cs"><Link>PersistentMissionService.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Arete\Quests\RexB18CFeedbackPolicy.cs"><Link>RexB18CFeedbackPolicy.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Subway\Quests\WindcallerKarrecNpcContent.cs"><Link>WindcallerKarrecNpcContent.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Subway\Quests\WindcallerKarrecNpcRuntimeRegistry.cs"><Link>WindcallerKarrecNpcRuntimeRegistry.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Subway\Quests\WindcallerKarrecInteractionRules.cs"><Link>WindcallerKarrecInteractionRules.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\MissionRewardCoordinator.cs"><Link>MissionRewardCoordinator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Missions\DailyMissionRewardRules.cs"><Link>DailyMissionRewardRules.cs</Link></Compile>
     <Compile Include="..\..\..\..\AORebirth.Stats\SpecialStats\XPTable.cs"><Link>XPTable.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentLoadResult.cs"><Link>AreteContentLoadResult.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentManifest.cs"><Link>AreteContentManifest.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteContentManifestLoader.cs"><Link>AreteContentManifestLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Arete\AreteFrameworkBootstrap.cs"><Link>AreteFrameworkBootstrap.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteJsonContentFileLoader.cs"><Link>AreteJsonContentFileLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\AreteValidationResult.cs"><Link>AreteValidationResult.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Missions\Content\InteractionFiles.cs"><Link>MissionContentInteractionFiles.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Missions\Content\QuestDefinitions.cs"><Link>QuestDefinitions.cs</Link></Compile>
+    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Missions\Content\QuestIndex.cs"><Link>QuestIndex.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentDefinitions.cs"><Link>DialogueContentDefinitions.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentValidation.cs"><Link>DialogueContentValidation.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentPackLoader.cs"><Link>QuestContentPackLoader.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentPackValidator.cs"><Link>QuestContentPackValidator.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestContentRegistry.cs"><Link>QuestContentRegistry.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\SharedGameplay\Missions\QuestModels.cs"><Link>QuestModels.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\SubwayLootPoolRules.cs">
       <Link>SubwayLootPoolRules.cs</Link>
     </Compile>

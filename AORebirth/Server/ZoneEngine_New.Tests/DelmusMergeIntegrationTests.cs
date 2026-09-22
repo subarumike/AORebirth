@@ -50,6 +50,7 @@ public sealed class DelmusMergeIntegrationTests
     public void PlayerNanosUseActorLocalRuntimeLikeNewZoneEngine()
     {
         Player player = TestWorld.CreatePlayer(901);
+        player.Stats.Set(CharacterStat.MaxNCU, 60);
         var spell = TestNanos.Create(1000, durationCentiseconds: 1000);
         Assert.AreEqual(BuffApplyDecision.Apply, player.TryApplyBuff(spell, player.Identity, DateTime.UtcNow, out Buff? applied, out _));
         Assert.IsNotNull(applied);

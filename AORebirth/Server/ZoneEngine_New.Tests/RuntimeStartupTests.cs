@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Utility.Network;
@@ -56,6 +57,32 @@ namespace ZoneEngine_New.Tests
             Assert.ThrowsException<StartupValidationException>(() => RuntimeStartup.ValidateDatabaseTarget("wrong", "approved", true));
             Assert.ThrowsException<StartupValidationException>(() => RuntimeStartup.ValidateDatabaseTarget("approved", null, true));
             Assert.ThrowsException<StartupValidationException>(() => RuntimeStartup.ValidateDatabaseTarget("Approved", "approved", false));
+        }
+
+        [TestMethod]
+        public void PackageValidationTreatsNpcTemplatesAsOptionalEditableContent()
+        {
+            string root = Path.Combine(Path.GetTempPath(), "AORebirthPackageValidation_" + Guid.NewGuid().ToString("N"));
+            string gameData = Path.Combine(root, "GameData");
+            Directory.CreateDirectory(Path.Combine(gameData, "Playfields"));
+            try
+            {
+                File.WriteAllText(Path.Combine(gameData, "ItemTemplates.json"), "{}");
+                File.WriteAllText(Path.Combine(gameData, "VendingMachines.json"), "{}");
+                File.WriteAllText(Path.Combine(gameData, "MonsterData.json"), "{}");
+                File.WriteAllText(Path.Combine(gameData, "Xp.json"), "{}");
+                File.WriteAllBytes(Path.Combine(gameData, "items.dat"), [1]);
+
+                RuntimeStartup.ValidatePackage(root, skipPlayfieldPackagePin: true);
+
+                File.Delete(Path.Combine(gameData, "ItemTemplates.json"));
+                Assert.ThrowsException<FileNotFoundException>(() => RuntimeStartup.ValidatePackage(root, skipPlayfieldPackagePin: true));
+            }
+            finally
+            {
+                if (Directory.Exists(root))
+                    Directory.Delete(root, recursive: true);
+            }
         }
 
         [TestMethod]

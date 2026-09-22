@@ -76,7 +76,7 @@ namespace ZoneEngine.Core.Navigation
 
                     string sourceCandidate = Path.Combine(
                         cursor.FullName,
-                        @"AORebirth\Server\ZoneEngine",
+                        @"Tests\Fixtures",
                         RelativePath);
                     if (File.Exists(sourceCandidate))
                     {

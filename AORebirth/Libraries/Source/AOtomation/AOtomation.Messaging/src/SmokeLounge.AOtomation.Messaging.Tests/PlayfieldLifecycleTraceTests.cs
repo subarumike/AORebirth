@@ -392,7 +392,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             string repositoryRoot = FindRepositoryRoot();
             string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatPacketFactory.cs"));
             string providerText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\CapturedSubwayContentProvider.cs"));
             string catalogText = File.ReadAllText(
@@ -1655,7 +1655,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             string combatSetupGeneratorText = LegacyGameplaySource.ReadAllText(
                 Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyCombatSetupGenerator.cs"));
             string capturedPacketFactoryText = LegacyGameplaySource.ReadAllText(
-                Path.Combine(repositoryRoot, @"AORebirth\Server\ZoneEngine_New\SharedGameplay\Combat\CapturedEnemyCombatPacketFactory.cs"));
+                Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Combat\CapturedEnemyCombatPacketFactory.cs"));
             string ordinaryProfileText = File.ReadAllText(
                 Path.Combine(repositoryRoot, @"Tests\Fixtures\Gameplay\Playfields\OrdinaryEnemyProfile.cs"));
             string generatedCombatReportText = File.ReadAllText(
@@ -3996,7 +3996,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
             {
                 string candidate = Path.Combine(
                     current,
-                    @"AORebirth\Server\ZoneEngine\Core\Playfields\Content");
+                    @"AORebirth\Server\ZoneEngine_New");
                 if (Directory.Exists(candidate))
                 {
                     return current;

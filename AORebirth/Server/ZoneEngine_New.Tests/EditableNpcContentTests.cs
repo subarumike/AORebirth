@@ -23,8 +23,8 @@ public sealed class EditableNpcContentTests
     public void ScarlettPlacementRotationAppearanceAndStatsChangeWithTheSameBinary()
     {
         using var fixture = new TempContent();
-        string original = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "GameData", "Playfields", "7010", "Npcs.json"));
-        string playfieldPath = Path.Combine(fixture.Root, "Playfields", "7010");
+        string original = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, GameDataPaths.RootFolderName, GameDataPaths.PlayfieldContentFolderName, "7010", "Npcs.json"));
+        string playfieldPath = Path.Combine(fixture.Root, GameDataPaths.PlayfieldContentFolderName, "7010");
         Directory.CreateDirectory(playfieldPath);
         File.WriteAllText(Path.Combine(playfieldPath, "Npcs.json"), original);
         Guid binary = typeof(WorldNpcFactory).Assembly.ManifestModule.ModuleVersionId;
@@ -77,8 +77,10 @@ public sealed class EditableNpcContentTests
         Assert.IsFalse(aaaa.Attackable);
         Assert.IsTrue(aaaa.UnresolvedPlaceholder);
         Assert.IsFalse(NpcTemplateValidation.CanSpawn(aaaa));
-        Assert.IsFalse(catalog.CanResolve("MISSING"));
-        Assert.IsFalse(catalog.TryResolve("MISSING", 1, out _));
+        Assert.IsTrue(catalog.CanResolve("MISSING"));
+        Assert.IsTrue(catalog.TryResolve("MISSING", 1, out MobTemplate fallback));
+        Assert.AreEqual(MobTemplate.FallbackHash, fallback.Hash);
+        Assert.IsFalse(NpcTemplateValidation.CanSpawn(fallback));
 
         using var fixture = new TempContent();
         File.WriteAllText(Path.Combine(fixture.Root, "NpcTemplates.json"), "{\"AAAA\":{\"Templates\":[{\"Name\":\"Marker\",\"Level\":1,\"Stats\":{\"54\":1}}]}}");
@@ -118,4 +120,3 @@ public sealed class EditableNpcContentTests
         public void Dispose() => Directory.Delete(Root, true);
     }
 }
-
