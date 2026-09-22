@@ -786,7 +786,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         TrainSkillCost = 0x00000199, 
 
-        IsFightingMe = 0x0000019A, 
+        NumberOfFightingOpponents = 0x0000019A, 
 
         MultipleCount = 0x0000019C, 
 

@@ -1669,7 +1669,7 @@ namespace AORebirth.Enums
 
         /// <summary>
         /// </summary>
-        isfightingme = 410,
+        numberoffightingopponents = 410,
 
         /// <summary>
         /// </summary>

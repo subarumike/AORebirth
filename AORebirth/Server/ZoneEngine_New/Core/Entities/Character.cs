@@ -64,6 +64,9 @@ namespace ZoneEngine_New.Core.Entities
             Motor = new CharacterMotor(this);
             Motor.Jumped += OnJumped;
             Stats.StatChanged += OnStatChanged;
+            // Requirement folds use Stats.Get. Unset is not 0, so a missing opponent count
+            // reads as "in combat".
+            Stats.Set(CharacterStat.NumberOfFightingOpponents, 0, StatDetail.Base);
         }
 
         public override double GetCollisionRadius()
@@ -104,6 +107,14 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>Current auto-attack target; <see cref="Identity.None"/> when not fighting.</summary>
         public Identity FightingTarget { get; private set; } = Identity.None;
+
+        /// <summary>Resolved character for <see cref="FightingTarget"/>, when they were on this playfield.</summary>
+        Character? _opponent;
+
+        /// <summary>Characters that currently have this character as <see cref="FightingTarget"/>.</summary>
+        readonly HashSet<Character> _attackers = new();
+
+        bool _publishingOpponentCount;
 
         /// <summary>Raised once when the corpse swap completes (after <see cref="CorpseSwapDelayMilliseconds"/>).</summary>
         public event Action<Character>? Died;
@@ -517,9 +528,94 @@ namespace ZoneEngine_New.Core.Entities
 
         public void SetFightingTarget(Identity identity)
         {
-            FightingTarget = identity;
+            if (FightingTarget != identity)
+            {
+                if (_opponent != null)
+                {
+                    Character previous = _opponent;
+                    _opponent = null;
+                    previous.RemoveAttacker(this);
+                }
+
+                FightingTarget = identity;
+
+                if (identity.Instance != 0)
+                {
+                    Character? next = ResolveFightingOpponent(identity);
+                    if (next != null && !ReferenceEquals(next, this))
+                    {
+                        _opponent = next;
+                        next.AddAttacker(this);
+                    }
+                }
+            }
+
             if (identity.Instance == 0)
                 ResetAllWeaponAttacks();
+        }
+
+        /// <summary>
+        /// Drops this character's fight links. Attackers are told to stop, including ones
+        /// that are not ticking, so the opponent count cannot outlive the fight.
+        /// </summary>
+        public void LeaveCombat()
+        {
+            SetFightingTarget(Identity.None);
+            if (_attackers.Count == 0)
+                return;
+
+            Character[] attackers = new Character[_attackers.Count];
+            _attackers.CopyTo(attackers);
+            foreach (Character attacker in attackers)
+            {
+                if (attacker.FightingTarget == Identity)
+                    attacker.SetFightingTarget(Identity.None);
+                else
+                    RemoveAttacker(attacker);
+            }
+        }
+
+        Character? ResolveFightingOpponent(Identity identity)
+        {
+            Playfield? playfield = Playfield;
+            if (playfield == null || identity.Instance == 0)
+                return null;
+
+            if (!playfield.GetRequiredService<DynelRegistry>().TryGet(identity, out Dynel? dynel))
+                return null;
+
+            return dynel as Character;
+        }
+
+        void AddAttacker(Character attacker)
+        {
+            if (!_attackers.Add(attacker))
+                return;
+
+            PublishOpponentCount();
+        }
+
+        void RemoveAttacker(Character attacker)
+        {
+            if (!_attackers.Remove(attacker))
+                return;
+
+            PublishOpponentCount();
+        }
+
+        void PublishOpponentCount()
+        {
+            _publishingOpponentCount = true;
+            try
+            {
+                int count = _attackers.Count;
+                Stats.Set(CharacterStat.NumberOfFightingOpponents, 0, StatDetail.Bonus);
+                Stats.Set(CharacterStat.NumberOfFightingOpponents, count, StatDetail.Base, dirty: true);
+            }
+            finally
+            {
+                _publishingOpponentCount = false;
+            }
         }
 
         protected virtual void SpawnDeathCorpse()
@@ -1100,6 +1196,13 @@ namespace ZoneEngine_New.Core.Entities
         void OnStatChanged(CharacterStat stat, int previous, int next, bool isInitialSet)
         {
             Motor.OnStatChanged(stat, previous, next, isInitialSet);
+
+            if (stat == CharacterStat.NumberOfFightingOpponents)
+            {
+                if (!_publishingOpponentCount && next != _attackers.Count)
+                    PublishOpponentCount();
+                return;
+            }
 
             if (!_applyingVitalFromPercent)
             {

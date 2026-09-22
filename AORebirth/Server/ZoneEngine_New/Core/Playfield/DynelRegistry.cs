@@ -1,5 +1,6 @@
 namespace ZoneEngine_New.Core.Playfield
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -85,17 +86,23 @@ namespace ZoneEngine_New.Core.Playfield
 
         public bool UnregisterExact(Dynel dynel)
         {
+            ArgumentNullException.ThrowIfNull(dynel);
+            ulong key = dynel.Identity.Long();
+            Character? leaving = CombatantIfRegistered(key, dynel);
+            leaving?.LeaveCombat();
             lock (_sync)
-                return _dynels.TryGetValue(dynel.Identity.Long(), out var current)
-                    && ReferenceEquals(current, dynel) && _dynels.Remove(dynel.Identity.Long());
+                return _dynels.TryGetValue(key, out Dynel? current)
+                    && ReferenceEquals(current, dynel)
+                    && _dynels.Remove(key);
         }
 
         public void Unregister(Identity identity)
         {
+            ulong key = identity.Long();
+            Character? leaving = CombatantIfRegistered(key, expected: null);
+            leaving?.LeaveCombat();
             lock (_sync)
-            {
-                _dynels.Remove(identity.Long());
-            }
+                _dynels.Remove(key);
         }
 
         public bool TryGet(Identity identity, out Dynel? dynel)
@@ -132,9 +139,31 @@ namespace ZoneEngine_New.Core.Playfield
 
         public void Clear()
         {
+            Character[] leaving;
+            lock (_sync)
+                leaving = _dynels.Values.OfType<Character>().ToArray();
+
+            foreach (Character character in leaving)
+                character.LeaveCombat();
+
+            lock (_sync)
+                _dynels.Clear();
+        }
+
+        /// <summary>
+        /// The registered character for <paramref name="key"/>, when it is a
+        /// <see cref="Character"/> and, if <paramref name="expected"/> is set, that same instance.
+        /// Read outside the lock that removes it so <see cref="Character.LeaveCombat"/> can run first.
+        /// </summary>
+        Character? CombatantIfRegistered(ulong key, Dynel? expected)
+        {
             lock (_sync)
             {
-                _dynels.Clear();
+                if (!_dynels.TryGetValue(key, out Dynel? current))
+                    return null;
+                if (expected != null && !ReferenceEquals(current, expected))
+                    return null;
+                return current as Character;
             }
         }
     }

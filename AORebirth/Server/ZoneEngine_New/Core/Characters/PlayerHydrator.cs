@@ -46,6 +46,10 @@ namespace ZoneEngine_New.Core.Characters
 
             foreach (StatRecord stat in hydration.Stats)
             {
+                // Opponent count is runtime fight bookkeeping, not a saved character row.
+                if (stat.StatId == (int)CharacterStat.NumberOfFightingOpponents)
+                    continue;
+
                 player.Stats.Set((CharacterStat)stat.StatId, stat.StatValue, StatDetail.Base);
             }
 

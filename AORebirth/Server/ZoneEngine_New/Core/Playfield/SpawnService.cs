@@ -857,6 +857,7 @@ namespace ZoneEngine_New.Core.Playfield
             _playfieldManager.Dialogues?.Detached(npc);
             _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>().Detached(npc);
 
+            npc.SetFightingTarget(Identity.None);
             npc.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             Identity identity = npc.Identity;
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(npc);
@@ -897,6 +898,7 @@ namespace ZoneEngine_New.Core.Playfield
         private void DespawnPlayer(Player player)
         {
             int characterId = player.Identity.Instance;
+            player.SetFightingTarget(Identity.None);
             _playfieldManager.Dialogues.Detached(player);
             _playfieldManager.Teams.DetachPlayer(player);
 

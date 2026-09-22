@@ -5,6 +5,8 @@ namespace ZoneEngine_New.Core.Characters
     using System.Globalization;
     using AORebirth.Database.Dao;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Logging;
@@ -106,6 +108,9 @@ namespace ZoneEngine_New.Core.Characters
             List<StatRecord> stats = [];
             foreach (var entry in player.Stats.GetEntries())
             {
+                if (entry.Stat == CharacterStat.NumberOfFightingOpponents)
+                    continue;
+
                 if (StatCollection.IsUnset(entry.Base))
                     continue;
 

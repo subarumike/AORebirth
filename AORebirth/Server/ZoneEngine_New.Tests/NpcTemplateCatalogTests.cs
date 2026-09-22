@@ -250,6 +250,49 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(15, stats.GetOrZero(CharacterStat.Strength));
         }
 
+        [TestMethod]
+        public void WearBonusesSkipHealthModify()
+        {
+            var stats = new StatCollection();
+            stats.Set(CharacterStat.Health, 100);
+
+            var page = new Container(IdentityType.ArmorPage, 0, 50);
+            Item item = new()
+            {
+                LowId = 1,
+                HighId = 1,
+                Quality = 10,
+                Definition = new ItemTemplate
+                {
+                    Id = 1,
+                    Quality = 10,
+                    SpellList = new Dictionary<EventType, List<ItemSpell>>
+                    {
+                        [EventType.OnWear] =
+                        [
+                            new ItemSpell
+                            {
+                                FunctionType = (int)FunctionType.Modify,
+                                Arguments = [(int)CharacterStat.Health, 40]
+                            },
+                            new ItemSpell
+                            {
+                                FunctionType = (int)FunctionType.Modify,
+                                Arguments = [(int)CharacterStat.MaxHealth, 25]
+                            }
+                        ]
+                    }
+                }
+            };
+            Assert.IsTrue(page.Add(0, item));
+
+            stats.ClearBonuses(dirty: true);
+            WearBonusApplier.ApplyContainer(page, includeWield: false, stats);
+            Assert.AreEqual(0, stats.GetOrZero(CharacterStat.Health, StatDetail.Bonus));
+            Assert.AreEqual(100, stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(25, stats.GetOrZero(CharacterStat.MaxHealth, StatDetail.Bonus));
+        }
+
         sealed class FixedRandom : Random
         {
             readonly int _value;

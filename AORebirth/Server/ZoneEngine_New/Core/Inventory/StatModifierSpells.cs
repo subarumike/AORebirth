@@ -45,7 +45,9 @@ namespace ZoneEngine_New.Core.Inventory
                 }
                 if (!TryReadModify(spell, out CharacterStat stat, out int delta))
                     continue;
-                if (stat == CharacterStat.Cash)
+                // Health is current hit points. Folding a worn Modify into the bonus
+                // layer makes a hit write that bonus back as base, and the client adds it again.
+                if (stat == CharacterStat.Cash || stat == CharacterStat.Health)
                     continue;
 
                 stats.AddBonus(stat, delta, dirty: true);

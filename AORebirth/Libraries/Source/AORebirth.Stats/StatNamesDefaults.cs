@@ -478,7 +478,7 @@ namespace AORebirth.Stats
             NameList.Add(407, "NanoPoints");
             NameList.Add(408, "TrainSkill");
             NameList.Add(409, "TrainSkillCost");
-            NameList.Add(410, "IsFightingMe");
+            NameList.Add(410, "NumberOfFightingOpponents");
             NameList.Add(411, "NextFormula");
             NameList.Add(412, "MultipleCount");
             NameList.Add(413, "EffectType");
