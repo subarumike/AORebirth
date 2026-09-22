@@ -27,10 +27,12 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            Player player = context.Player;
-            if (stat == CharacterStat.Level)
+            if (!context.TryResolveCharacter(out Character subject))
+                return;
+
+            if (stat == CharacterStat.Level && subject.IsPlayer)
             {
-                if (!player.TrySetLevel(value))
+                if (!subject.TrySetLevel(value))
                 {
                     GmCommandFeedback.Send(
                         context.Session,
@@ -41,8 +43,8 @@ namespace ZoneEngine_New.Core.Commands
             }
             else
             {
-                player.Stats.Set(stat, value, StatDetail.Base, dirty: true);
-                player.FlushDirtyStats();
+                subject.Stats.Set(stat, value, StatDetail.Base, dirty: true);
+                subject.FlushDirtyStats();
             }
 
             GmCommandFeedback.Send(
@@ -50,10 +52,11 @@ namespace ZoneEngine_New.Core.Commands
                 context.Player,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Set {0} ({1}) = {2}",
+                    "Set {0} ({1}) = {2} [{3}]",
                     stat,
                     (int)stat,
-                    value));
+                    value,
+                    subject.Name ?? string.Empty));
         }
     }
 }

@@ -89,6 +89,32 @@ public sealed class ExactSpawnVisibilityTests
     }
 
     [TestMethod]
+    public void PlayerSpawnIncludesCharInPlayForObservers()
+    {
+        var (observer, observerSession, locality) = Create();
+        var other = new VisiblePlayer(701);
+        var otherSession = new Session();
+        other.EnterOnline(otherSession);
+        locality.RegisterDynel(other);
+
+        locality.ActivatePlayerVisibility(observer);
+        AssertCharInPlayFollowsSpawn(observerSession, other.Identity.Instance);
+
+        locality.ActivatePlayerVisibility(other);
+        AssertCharInPlayFollowsSpawn(otherSession, observer.Identity.Instance);
+    }
+
+    static void AssertCharInPlayFollowsSpawn(Session session, int playerInstance)
+    {
+        int spawnIndex = session.Bodies.FindIndex(
+            body => body is SimpleCharFullUpdateMessage spawn && spawn.Identity.Instance == playerInstance);
+        int inPlayIndex = session.Bodies.FindIndex(
+            body => body is CharInPlayMessage inPlay && inPlay.Identity.Instance == playerInstance);
+        Assert.IsTrue(spawnIndex >= 0, "Observer did not receive the player spawn.");
+        Assert.IsTrue(inPlayIndex > spawnIndex, "CharInPlay must follow that player's spawn.");
+    }
+
+    [TestMethod]
     public void ClosedOrUnboundTransportCannotConsumeARecipientSnapshot()
     {
         var (player, first, locality) = Create();
@@ -112,6 +138,22 @@ public sealed class ExactSpawnVisibilityTests
     {
         internal MessageBody Body = new DespawnMessage();
         public override MessageBody BuildSpawnMessage() => Body;
+    }
+
+    sealed class VisiblePlayer : Player
+    {
+        public VisiblePlayer(int instance)
+            : base(
+                new Identity { Type = IdentityType.CanbeAffected, Instance = instance },
+                new StubLogger(),
+                new StubItemBuilder())
+        {
+        }
+
+        public override SimpleCharFullUpdateMessage BuildSpawnMessage()
+            => new() { Identity = Identity };
+
+        public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages() => [];
     }
     sealed class Session : IZoneSession
     {

@@ -328,6 +328,14 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                         ScfuSendLog.Write(scfu);
                     recipient.Session!.Send(spawn);
                 }
+
+                // Observers render a player only after CharInPlay for that identity.
+                if (source is Player)
+                    recipient.Session!.Send(new CharInPlayMessage
+                    {
+                        Identity = source.Identity,
+                        Unknown = 0x00
+                    });
             }
             catch
             {

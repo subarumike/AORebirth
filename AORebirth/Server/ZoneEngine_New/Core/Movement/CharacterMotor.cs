@@ -318,21 +318,27 @@ namespace ZoneEngine_New.Core.Movement
             }
         }
 
-        public void Consume(CharDCMoveMessage message)
+        /// <summary>
+        /// Applies an inbound move. Returns false when the position is rejected;
+        /// rejected moves do not change path, action, heading, or position.
+        /// </summary>
+        public bool Consume(CharDCMoveMessage message)
         {
             ArgumentNullException.ThrowIfNull(message);
+            if (!TryAcceptClientPosition(message))
+                return false;
 
             ClearPath();
             ApplyAction((MovementAction)message.MoveType);
             ApplyClientHeading(message);
-            SnapToClientPosition(message);
+            return true;
         }
 
-        void SnapToClientPosition(CharDCMoveMessage message)
+        bool TryAcceptClientPosition(CharDCMoveMessage message)
         {
             // EXPLOIT: client XYZ is applied unclamped vs speed/last update. Playfield XZ is gated below.
             if (message.Coordinates == null)
-                return;
+                return true;
 
             float x = message.Coordinates.X;
             float y = message.Coordinates.Y;
@@ -340,10 +346,12 @@ namespace ZoneEngine_New.Core.Movement
 
             Playfield? playfield = _character.Playfield;
             if (playfield is MissionPlayfield mission
-                && !mission.World.AcceptsMovement(_character, new Vector3(x, y, z))) return;
+                && !mission.World.AcceptsMovement(_character, new Vector3(x, y, z)))
+                return false;
             if (playfield is MissionPlayfield && _character is Player missionPlayer
                 && !playfield.GetRequiredService<ZoneEngine_New.Core.Missions.GeneratedMissionAcgService>()
-                    .TryPersistPlayerPosition(missionPlayer, new Vector3(x, y, z))) return;
+                    .TryPersistPlayerPosition(missionPlayer, new Vector3(x, y, z)))
+                return false;
             if (playfield != null)
             {
                 PlayfieldLocality locality = playfield.GetRequiredService<PlayfieldLocality>();
@@ -363,7 +371,7 @@ namespace ZoneEngine_New.Core.Movement
                                 locality.WorldSizeZ));
                     }
 
-                    return;
+                    return false;
                 }
             }
 
@@ -371,9 +379,13 @@ namespace ZoneEngine_New.Core.Movement
             if (playfield != null
                 && playfield.TrySnapFeetToFloor(requested, out Vector3 floor)
                 && y < (float)floor.y)
+            {
                 y = (float)floor.y;
+                message.Coordinates.Y = y;
+            }
 
             _character.Position = new Vector3(x, y, z);
+            return true;
         }
 
         /// <summary>
