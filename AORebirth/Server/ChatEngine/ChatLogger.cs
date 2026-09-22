@@ -219,6 +219,14 @@ namespace ChatEngine
 
         private static string GetLogDirectory()
         {
+#if AOREBIRTH_LINUX
+            string configuredDirectory = Environment.GetEnvironmentVariable(
+                "AO_REBIRTH_CHAT_LOG_DIRECTORY");
+            if (!string.IsNullOrWhiteSpace(configuredDirectory))
+            {
+                return configuredDirectory;
+            }
+#endif
 
             return "Logs";
         }

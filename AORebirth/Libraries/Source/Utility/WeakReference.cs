@@ -86,10 +86,12 @@ namespace Utility
         /// </param>
         /// <param name="context">
         /// </param>
+#if !AOREBIRTH_LINUX
         protected WeakReference(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
 
         /// <summary> 
         /// Gets or sets the object (the target) referenced by the current WeakReference{T} 

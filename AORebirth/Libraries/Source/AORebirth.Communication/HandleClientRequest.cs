@@ -84,10 +84,16 @@ namespace AORebirth.Communication
 
         /// <summary>
         /// </summary>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void ConnectHandler(object sender, EventArgs e);
 
         /// <summary>
         /// </summary>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void DisconnectHandler(object sender, EventArgs e);
 
         /// <summary>
@@ -96,6 +102,9 @@ namespace AORebirth.Communication
         /// </param>
         /// <param name="e">
         /// </param>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void MessageReceivedHandler(object sender, OnMessageArgs e);
 
         #endregion

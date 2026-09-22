@@ -323,14 +323,23 @@ namespace Utility
                 MessagePackSerializer<Dictionary<T, TU>> messagePackSerializer =
                     MessagePackSerializer.Create<Dictionary<T, TU>>();
 
+#if AOREBIRTH_LINUX
+                binaryReader.ReadInt32();
+                binaryReader.ReadInt32();
+#else
                 var buffer = new byte[4];
                 inputStream.Read(buffer, 0, 4);
                 inputStream.Read(buffer, 0, 4);
+#endif
 
                 return messagePackSerializer.Unpack(inputStream);
             }
             finally
             {
+#if AOREBIRTH_LINUX
+                inputStream.Dispose();
+                fileStream.Dispose();
+#endif
             }
         }
 

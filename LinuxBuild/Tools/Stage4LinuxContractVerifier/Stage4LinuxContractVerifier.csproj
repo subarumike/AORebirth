@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../Stage2ContractFingerprint.cs" Link="Stage2ContractFingerprint.cs" />
+    <Compile Include="../Stage4ContractFingerprint.cs" Link="Stage4ContractFingerprint.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Projects/AORebirth.Communication.Linux.csproj" />
+    <ProjectReference Include="../../Projects/Cell.Core.Linux.csproj" />
+    <ProjectReference Include="../../Projects/MemBus.Linux.csproj" />
+    <ProjectReference Include="../../Projects/MsgPack.Mono.Linux.csproj" />
+    <ProjectReference Include="../../Projects/SmokeLounge.AOtomation.Messaging.Linux.csproj" />
+  </ItemGroup>
+</Project>

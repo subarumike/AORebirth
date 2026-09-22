@@ -1,6 +1,14 @@
 # AORebirth Project State
 
-Updated: 2026-09-15
+Updated: 2026-09-22
+
+Linux source governance now requires literal equality between public GitHub
+master, linux-private/master, Linux build HEAD and live Login/Zone source SHAs.
+Linux portability and build/deployment tools live in public source under
+`LinuxBuild`; private patch assembly is retired. Windows and Linux exact-SHA
+acceptance remain mandatory before production promotion. Source integration
+alone does not claim deployment or client acceptance. See
+`LinuxBuild/README.md` and `docs/project/DEVELOPMENT_AUTHORITY.md`.
 
 The accepted NewEngine content cleanup reached master at
 `c5af4ac18a1378dc41c37d31b9ac62ac46c5f8a0`: editable
@@ -26,10 +34,10 @@ Windows is the authoritative development and acceptance platform. NewEngine is
 the default server engine; shared gameplay, DAO persistence, login admission and
 zoning behavior remain unchanged by the build separation.
 
-Production build/deployment tooling is maintained privately. Windows-required
+Production build/deployment tooling is maintained in public master. Windows-required
 source inventories, compatibility adapters and contract fixtures live under
-SharedBuild. Windows and private-platform acceptance pass for the separated
-source. Public branch history has been cleaned; hosted-history follow-up and
+SharedBuild. Earlier Windows and private-platform acceptance passed for the
+separated source. Public branch history has been cleaned; hosted-history follow-up and
 developer checkout resynchronization remain active.
 
 The complete earlier source history, production receipts and operational details

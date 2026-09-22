@@ -1,0 +1,36 @@
+[Unit]
+Description=AORebirth BotService
+Wants=network-online.target
+After=network-online.target ao-rebirth-chatengine.service
+
+[Service]
+Type=simple
+User=aorebirth
+Group=aorebirth
+WorkingDirectory=/opt/ao-rebirth/botservice/current
+EnvironmentFile=/etc/ao-rebirth/botservice/botservice.env
+ExecStartPre=/opt/ao-rebirth/botservice/current/AORebirth.BotService.Host --validate-startup
+ExecStart=/opt/ao-rebirth/botservice/current/AORebirth.BotService.Host
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=30s
+TimeoutStopSec=45s
+KillSignal=SIGTERM
+SuccessExitStatus=0
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

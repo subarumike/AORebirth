@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Project>
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Translations/locales.Designer.cs">
+      <DependentUpon>locales.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Translations/Properties/AssemblyInfo.cs" />
+    <EmbeddedResource Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Translations/locales.de.resx" />
+    <EmbeddedResource Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Translations/locales.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>locales.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

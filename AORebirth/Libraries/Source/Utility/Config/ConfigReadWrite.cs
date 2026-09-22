@@ -97,7 +97,7 @@ namespace Utility.Config
         {
             get
             {
-#if AOREBIRTH_WIN_NET10
+#if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
                 if (this._config == null)
                 {
                     this._config = LoadConfig();
@@ -152,9 +152,16 @@ namespace Utility.Config
             try
             {
                 XmlSerializer ser = new XmlSerializer(typeof(Config));
+#if AOREBIRTH_LINUX
+                using (FileStream stream = File.Create(GetConfigPath()))
+                {
+                    ser.Serialize(stream, this._config);
+                }
+#else
                 MemoryStream ms = new MemoryStream();
                 ser.Serialize(ms, this._config);
                 File.WriteAllText(GetConfigPath(), Encoding.UTF8.GetString(ms.GetBuffer()));
+#endif
             }
             catch
             {
@@ -192,7 +199,7 @@ namespace Utility.Config
                     new XmlSerializer(typeof(Config)).Deserialize(
                         new MemoryStream(File.ReadAllBytes(GetConfigPath())));
 
-#if AOREBIRTH_WIN_NET10
+#if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
             string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
             if (string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal)
                 && !string.IsNullOrWhiteSpace(config.MysqlConnection)

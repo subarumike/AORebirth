@@ -41,6 +41,10 @@ namespace ChatEngine
     using System.Threading;
     using System.Threading.Tasks;
 
+    #if AOREBIRTH_LINUX
+    using System.Net.Sockets;
+    using System.Runtime.InteropServices;
+    #endif
 
     using AORebirth.Database;
     using AORebirth.Communication.ISComV2Server;
@@ -52,13 +56,16 @@ namespace ChatEngine
 
     using locales;
 
+    #if !AOREBIRTH_LINUX
     using NBug;
     using NBug.Properties;
+    #endif
 
     using NLog;
 
     using Utility;
 
+    // #if !AOREBIRTH_LINUX
     // using ZoneEngine.Core.Playfields; // unused while CacheAllPlayfieldData is commented out
     // #endif
 
@@ -85,7 +92,9 @@ namespace ChatEngine
 
         /// <summary>
         /// </summary>
+        #if !AOREBIRTH_LINUX
         private static ConsoleText ct;
+        #endif
 
         /// <summary>
         /// </summary>
@@ -109,6 +118,11 @@ namespace ChatEngine
 
         private static TextWriter originalOutputWriter;
 
+        #if AOREBIRTH_LINUX
+        private static PosixSignalRegistration sigIntRegistration;
+
+        private static PosixSignalRegistration sigTermRegistration;
+        #endif
 
         #endregion
 
@@ -305,10 +319,14 @@ namespace ChatEngine
                             if (File.Exists(shutdownFile))
                             {
                                 ConsumeShutdownFile(shutdownFile);
+                                #if AOREBIRTH_LINUX
+                                RequestShutdown("shutdown file");
+                                #else
                                 Console.WriteLine("Shutdown file requested.");
                                 ShutDownServer(null);
                                 FlushHeadlessConsoleLogging();
                                 Environment.Exit(0);
+                                #endif
                             }
 
                             Thread.Sleep(1000);
@@ -343,6 +361,9 @@ namespace ChatEngine
                 return false;
             }
 
+            #if AOREBIRTH_LINUX
+            NotifySystemd("READY=1\nSTATUS=ChatEngine listeners are ready");
+            #endif
 
             string shutdownFile = GetEitherArgumentValue(args, "/shutdown-file", "--shutdown-file");
             while (!exited)
@@ -392,6 +413,22 @@ namespace ChatEngine
         {
             Console.CancelKeyPress += ConsoleCancelKeyPress;
 
+            #if AOREBIRTH_LINUX
+            sigIntRegistration = PosixSignalRegistration.Create(
+                PosixSignal.SIGINT,
+                context =>
+                    {
+                        context.Cancel = true;
+                        RequestShutdown("SIGINT");
+                    });
+            sigTermRegistration = PosixSignalRegistration.Create(
+                PosixSignal.SIGTERM,
+                context =>
+                    {
+                        context.Cancel = true;
+                        RequestShutdown("SIGTERM");
+                    });
+            #endif
         }
 
         private static void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -404,8 +441,49 @@ namespace ChatEngine
         {
             Console.CancelKeyPress -= ConsoleCancelKeyPress;
 
+            #if AOREBIRTH_LINUX
+            if (sigIntRegistration != null)
+            {
+                sigIntRegistration.Dispose();
+                sigIntRegistration = null;
+            }
+
+            if (sigTermRegistration != null)
+            {
+                sigTermRegistration.Dispose();
+                sigTermRegistration = null;
+            }
+            #endif
         }
 
+        #if AOREBIRTH_LINUX
+        private static void NotifySystemd(string state)
+        {
+            string notifySocket = Environment.GetEnvironmentVariable("NOTIFY_SOCKET");
+            if (string.IsNullOrWhiteSpace(notifySocket))
+            {
+                return;
+            }
+
+            if (notifySocket[0] == '@')
+            {
+                notifySocket = "\0" + notifySocket.Substring(1);
+            }
+
+            try
+            {
+                byte[] payload = System.Text.Encoding.UTF8.GetBytes(state);
+                using (var socket = new Socket(AddressFamily.Unix, SocketType.Dgram, ProtocolType.Unspecified))
+                {
+                    socket.SendTo(payload, new UnixDomainSocketEndPoint(notifySocket));
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine("systemd notification failed: " + e.Message);
+            }
+        }
+        #endif
 
         /// <summary>
         /// </summary>
@@ -495,6 +573,9 @@ namespace ChatEngine
                 return;
             }
 
+            #if AOREBIRTH_LINUX
+            NotifySystemd("STOPPING=1\nSTATUS=ChatEngine is stopping");
+            #endif
             ShutDownServer(null);
             try
             {
@@ -533,6 +614,10 @@ namespace ChatEngine
                 chatServer = null;
             }
 
+            #if AOREBIRTH_LINUX
+            AppDomain.CurrentDomain.UnhandledException -= LinuxUnhandledException;
+            TaskScheduler.UnobservedTaskException -= LinuxUnobservedTaskException;
+            #endif
 
             try
             {
@@ -605,9 +690,11 @@ namespace ChatEngine
                     return false;
                 }
 
+                #if !AOREBIRTH_LINUX
                 // Temporary: ChatEngine does not consume PFData; skip so startup
                 // does not require playfields.dat beside ChatEngine.exe.
                 // PlayfieldLoader.CacheAllPlayfieldData();
+                #endif
             }
             catch (Exception e)
             {
@@ -710,6 +797,7 @@ namespace ChatEngine
                 // Setup and enable NLog logging.
                 LogUtil.SetupConsoleLogging(LogLevel.Debug);
                 LogUtil.ApplyConfiguredDebugDetails();
+                #if !AOREBIRTH_LINUX
                 LogUtil.SetupFileLogging("${basedir}/ChatEngineLog.txt", LogLevel.Trace);
 
                 // NBug initialization
@@ -717,6 +805,10 @@ namespace ChatEngine
                 Settings.WriteLogToDisk = true;
                 AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
                 TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+                #else
+                AppDomain.CurrentDomain.UnhandledException += LinuxUnhandledException;
+                TaskScheduler.UnobservedTaskException += LinuxUnobservedTaskException;
+                #endif
             }
             catch (Exception e)
             {
@@ -730,6 +822,32 @@ namespace ChatEngine
             return true;
         }
 
+        #if AOREBIRTH_LINUX
+        private static void LinuxUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception exception = e.ExceptionObject as Exception;
+            Logger logger = LogManager.GetCurrentClassLogger();
+            if (exception != null)
+            {
+                logger.Fatal(exception, "Unhandled ChatEngine exception");
+                Console.Error.WriteLine(exception);
+            }
+            else
+            {
+                logger.Fatal("Unhandled ChatEngine exception: {0}", e.ExceptionObject);
+                Console.Error.WriteLine(e.ExceptionObject);
+            }
+
+            LogManager.Flush();
+        }
+
+        private static void LinuxUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            LogManager.GetCurrentClassLogger().Error(e.Exception, "Unobserved ChatEngine task exception");
+            Console.Error.WriteLine(e.Exception);
+            LogManager.Flush();
+        }
+        #endif
 
         /// <summary>
         /// </summary>
@@ -758,6 +876,13 @@ namespace ChatEngine
 
         private static string GetConfiguredConfigPath()
         {
+            #if AOREBIRTH_LINUX
+            string configuredPath = Environment.GetEnvironmentVariable("AO_REBIRTH_CONFIG_PATH");
+            if (!string.IsNullOrWhiteSpace(configuredPath))
+            {
+                return configuredPath;
+            }
+            #endif
 
             return "Config.xml";
         }
@@ -833,12 +958,39 @@ namespace ChatEngine
 
             string requiredSqlType = Environment.GetEnvironmentVariable("AO_REBIRTH_REQUIRED_SQL_TYPE");
 
+            #if AOREBIRTH_LINUX
+            if (configuration.LogChat)
+            {
+                throw new InvalidDataException(
+                    "LogChat must remain disabled for the first Linux deployment milestone.");
+            }
+
+            if (!string.Equals(configuration.SQLType, "MySql", StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "The first Linux deployment milestone supports only the MySql provider.");
+            }
+
+            if (!string.Equals(requiredSqlType, "MySql", StringComparison.Ordinal))
+            {
+                throw new InvalidDataException(
+                    "AO_REBIRTH_REQUIRED_SQL_TYPE must be MySql for the Linux deployment profile.");
+            }
+            #endif
 
             string connectionString;
             if (configuration.SQLType == "MySql")
             {
                 string environmentConnection = Environment.GetEnvironmentVariable(
                     "AO_REBIRTH_MYSQL_CONNECTION");
+                #if AOREBIRTH_LINUX
+                if (string.IsNullOrWhiteSpace(environmentConnection))
+                {
+                    throw new InvalidDataException(
+                        "AO_REBIRTH_MYSQL_CONNECTION is required by the Linux MySQL deployment profile.");
+                }
+
+                #endif
 
                 connectionString = string.IsNullOrWhiteSpace(environmentConnection)
                     ? configuration.MysqlConnection
@@ -909,6 +1061,18 @@ namespace ChatEngine
         private static IPAddress GetISComListenAddress(Utility.Config.Config configuration)
         {
             string listenIP = configuration.ListenIP;
+            #if AOREBIRTH_LINUX
+            listenIP = Environment.GetEnvironmentVariable("AO_REBIRTH_ISCOM_LISTEN_IP");
+            if (string.IsNullOrWhiteSpace(listenIP))
+            {
+                listenIP = configuration.ISCommLocalIP;
+            }
+
+            if (string.IsNullOrWhiteSpace(listenIP))
+            {
+                listenIP = "127.0.0.1";
+            }
+            #endif
 
             IPAddress address;
             if (!IPAddress.TryParse(listenIP, out address))
@@ -916,6 +1080,13 @@ namespace ChatEngine
                 throw new InvalidDataException("The ISCom listen address is invalid.");
             }
 
+            #if AOREBIRTH_LINUX
+            if (!IPAddress.IsLoopback(address))
+            {
+                throw new InvalidDataException(
+                    "The first Linux deployment requires a loopback-only ISCom listen address.");
+            }
+            #endif
 
             return address;
         }
@@ -923,6 +1094,13 @@ namespace ChatEngine
         private static IPAddress GetChatListenAddress(Utility.Config.Config configuration)
         {
             string listenIP = configuration.ListenIP;
+            #if AOREBIRTH_LINUX
+            listenIP = Environment.GetEnvironmentVariable("AO_REBIRTH_CHAT_LISTEN_IP");
+            if (string.IsNullOrWhiteSpace(listenIP))
+            {
+                listenIP = "127.0.0.1";
+            }
+            #endif
 
             IPAddress address;
             if (!IPAddress.TryParse(listenIP, out address))
@@ -1189,6 +1367,13 @@ namespace ChatEngine
             }
 
             bool headless = HasEitherArgument(args, "/headless", "--headless");
+            #if AOREBIRTH_LINUX
+            if (!headless)
+            {
+                Console.Error.WriteLine("ChatEngine Linux service mode requires --headless.");
+                return 2;
+            }
+            #endif
 
             try
             {
@@ -1198,8 +1383,13 @@ namespace ChatEngine
                     RegisterShutdownSignals();
                 }
 
+                #if AOREBIRTH_LINUX
+                LoadStrictConfiguration();
+                #endif
 
+                #if !AOREBIRTH_LINUX
                 ct = new ConsoleText();
+                #endif
 
                 OnScreenBanner.PrintAORebirthBanner(ConsoleColor.Yellow);
 

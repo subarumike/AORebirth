@@ -1,7 +1,9 @@
 using System;
 using System.Net;
 using System.Runtime.Serialization;
+#if !AOREBIRTH_LINUX
 using System.Security.Permissions;
+#endif
 
 namespace Cell.Core.Exceptions
 {
@@ -29,6 +31,7 @@ namespace Cell.Core.Exceptions
 			}
 		}
 
+#if !AOREBIRTH_LINUX
         [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
@@ -37,5 +40,6 @@ namespace Cell.Core.Exceptions
 
             base.GetObjectData(info, context);
         }
+#endif
 	}
 }

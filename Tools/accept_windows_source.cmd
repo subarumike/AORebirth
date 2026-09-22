@@ -70,6 +70,15 @@ if errorlevel 1 (
 )
 echo GENERATED_COMBAT_INTEGRITY=PASS
 
+call Tools\test_linux_source_identity.cmd
+if errorlevel 1 (
+    echo CROSS_PLATFORM_SOURCE_IDENTITY_TESTS=FAIL
+    echo WINDOWS_ACCEPTANCE=FAIL
+    popd
+    exit /b 14
+)
+echo CROSS_PLATFORM_SOURCE_IDENTITY_TESTS=PASS
+
 set "BUILD_RESULT=NOT_RUN"
 if "%RUN_BUILD%"=="1" (
     call Tools\build_aorebirth_debug.cmd
@@ -128,6 +137,7 @@ set "EVIDENCE=build-verify\windows-acceptance-%SHORT_SHA%.env"
 >> "%EVIDENCE%" echo TRACKED_SOURCE_CLEAN=PASS
 >> "%EVIDENCE%" echo GIT_DIFF_CHECK=PASS
 >> "%EVIDENCE%" echo GENERATED_COMBAT_INTEGRITY=PASS
+>> "%EVIDENCE%" echo CROSS_PLATFORM_SOURCE_IDENTITY_TESTS=PASS
 >> "%EVIDENCE%" echo WINDOWS_CONTRACTS=PASS
 >> "%EVIDENCE%" echo BUILD=%BUILD_RESULT%
 >> "%EVIDENCE%" echo CONTENT_ARCHITECTURE_GUARD=PASS

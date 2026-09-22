@@ -92,12 +92,18 @@ namespace ChatEngine.Channels
         /// </param>
         /// <param name="text">
         /// </param>
+        #if AOREBIRTH_LINUX
+        [System.Serializable]
+        #endif
         public delegate void ChannelMessageEvent(object sender, ChannelMessageEventArgs e);
 
         /// <summary>
         /// </summary>
         /// <param name="playerName">
         /// </param>
+        #if AOREBIRTH_LINUX
+        [System.Serializable]
+        #endif
         public delegate void ClientJoinEvent(object sender, ClientJoinEventArgs e);
 
         #endregion

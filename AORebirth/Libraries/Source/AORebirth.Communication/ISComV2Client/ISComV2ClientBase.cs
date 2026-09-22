@@ -127,10 +127,16 @@ namespace AORebirth.Communication.ISComV2Client
         /// </summary>
         /// <param name="dataBytes">
         /// </param>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnDataReceived(object sender, OnDataReceivedArgs e);
 
         /// <summary>
         /// </summary>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void OnDisconnect(object sender, EventArgs e);
 
         #endregion
@@ -307,7 +313,7 @@ namespace AORebirth.Communication.ISComV2Client
             this._tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             this._tcpSock.NoDelay = true;
             this._tcpSock.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-#if AOREBIRTH_WIN_NET10
+#if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
             try
             {
                 this._tcpSock.SetSocketOption(

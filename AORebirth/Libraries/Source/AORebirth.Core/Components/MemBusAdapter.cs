@@ -66,6 +66,23 @@ namespace AORebirth.Core.Components
         private readonly ConditionalWeakTable<object, SenderDispatchQueue> senderDispatchQueues =
             new ConditionalWeakTable<object, SenderDispatchQueue>();
 
+#if AOREBIRTH_LINUX
+        /// <summary>
+        /// </summary>
+        private readonly object dispatchSync = new object();
+
+        /// <summary>
+        /// </summary>
+        private readonly ManualResetEventSlim dispatchIdle = new ManualResetEventSlim(true);
+
+        /// <summary>
+        /// </summary>
+        private bool acceptingMessages = true;
+
+        /// <summary>
+        /// </summary>
+        private int pendingMessages;
+#endif
 
         /// <summary>
         /// </summary>
@@ -118,6 +135,12 @@ namespace AORebirth.Core.Components
                 return;
             }
 
+#if AOREBIRTH_LINUX
+            if (!this.TryRegisterDispatch())
+            {
+                throw new InvalidOperationException("LoginEngine message dispatch is stopping.");
+            }
+#endif
 
             SenderDispatchQueue dispatchQueue = receivedEvent.Sender == null
                                                      ? this.nullSenderDispatchQueue
@@ -127,6 +150,9 @@ namespace AORebirth.Core.Components
             if (!receivedEvent.TrySetDispatchCompletion(
                 () => this.CompleteOrderedDispatch(dispatchQueue, receivedEvent)))
             {
+#if AOREBIRTH_LINUX
+                this.CompleteTrackedDispatch();
+#endif
                 throw new InvalidOperationException("LoginEngine message dispatch was already registered.");
             }
 
@@ -176,6 +202,9 @@ namespace AORebirth.Core.Components
                 }
             }
 
+#if AOREBIRTH_LINUX
+            this.CompleteTrackedDispatch();
+#endif
 
             if (nextEvent != null)
             {
@@ -213,6 +242,70 @@ namespace AORebirth.Core.Components
             return this.memBus.Subscribe(action);
         }
 
+#if AOREBIRTH_LINUX
+        /// <summary>
+        /// </summary>
+        internal void StopAcceptingMessages()
+        {
+            lock (this.dispatchSync)
+            {
+                this.acceptingMessages = false;
+                if (this.pendingMessages == 0)
+                {
+                    this.dispatchIdle.Set();
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="timeout">
+        /// </param>
+        /// <returns>
+        /// </returns>
+        internal bool WaitForIdle(TimeSpan timeout)
+        {
+            return this.dispatchIdle.Wait(timeout);
+        }
+
+        /// <summary>
+        /// </summary>
+        private void CompleteTrackedDispatch()
+        {
+            lock (this.dispatchSync)
+            {
+                if (this.pendingMessages <= 0)
+                {
+                    return;
+                }
+
+                this.pendingMessages--;
+                if (this.pendingMessages == 0)
+                {
+                    this.dispatchIdle.Set();
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        private bool TryRegisterDispatch()
+        {
+            lock (this.dispatchSync)
+            {
+                if (!this.acceptingMessages)
+                {
+                    return false;
+                }
+
+                this.pendingMessages++;
+                this.dispatchIdle.Reset();
+                return true;
+            }
+        }
+#endif
 
         #endregion
     }

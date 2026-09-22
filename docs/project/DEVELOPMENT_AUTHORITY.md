@@ -5,9 +5,9 @@ Status: Permanent project policy.
 ## Authority
 
 AORebirth has one authoritative gameplay source tree and one authoritative codebase.
-Production build and deployment tooling is maintained in a separate private
-operations repository. A private build consumes an exact accepted gameplay
-commit; it is not a second gameplay implementation.
+Application source, portability fixes, build definitions and reusable deployment
+tooling are maintained in public GitHub master. The Linux-private master ref is
+an exact mirror of that commit, not an additional source or patch layer.
 Windows is the authoritative development platform and source of truth. Linux is
 the production deployment platform.
 
@@ -141,6 +141,13 @@ The invariant for any cross-platform acceptance event is:
 ```text
 WINDOWS_ACCEPTED_SHA == LINUX_BUILD_SHA == LINUX_DEPLOY_ARTIFACT_SHA
 ```
+
+For a release, public `origin/master`, `linux-private/master`, build HEAD and
+the running LoginEngine/ZoneEngine_New source receipts must literally identify
+that same commit. A private child commit, even with an identical tree, fails this
+requirement. Preserve the previous live source under an archive ref before
+moving the Linux mirror. Keep server secrets and active host configuration
+external; cross-platform source repairs go through public master first.
 
 Linux acceptance workspaces may perform destructive checkout cleanup only when
 they are explicitly controlled build workspaces. Normal Windows developer

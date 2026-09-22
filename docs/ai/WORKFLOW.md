@@ -1033,10 +1033,12 @@ The wrapper also validates raw-independent accepted generated-combat integrity
 with `--check`; it must not call the strict historical `--validate-current` gate.
 
 Production build, packaging, target-platform acceptance and deployment commands
-are maintained in the private operations repository. They consume the exact
-Windows-accepted source SHA and verify the packaged editable-content inventory.
+are maintained in `LinuxBuild`. Follow `LinuxBuild/README.md`; they consume the
+exact Windows-accepted public-master SHA and verify packaged editable content.
+`linux-private/master` must mirror that exact SHA. Private child commits and
+source patches are forbidden. Server-specific configuration remains external.
 NewEngine content architecture validation replaces the historical official
 placement allowlist; Legacy/offline evidence validation remains separate.
 Public Windows acceptance verifies Windows metadata contracts and runtime tests;
-it does not claim private production-platform acceptance. See
+it does not claim Linux production-platform acceptance. See
 `docs/project/BUILD_ACCEPTANCE_BOUNDARY.md`.

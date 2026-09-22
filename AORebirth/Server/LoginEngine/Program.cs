@@ -29,6 +29,7 @@
 
 #endregion
 
+#if !AOREBIRTH_LINUX
 namespace LoginEngine
 {
     #region Usings ...
@@ -896,3 +897,4 @@ namespace LoginEngine
         #endregion
     }
 }
+#endif

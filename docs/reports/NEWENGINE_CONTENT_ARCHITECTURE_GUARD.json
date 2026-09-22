@@ -29,7 +29,7 @@
   "files": [
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/HandleClientRequest.cs",
-      "sha256": "41943044b8c3d3443da02f689bf52b80b88019633f70cb2efd38514fef0cef01",
+      "sha256": "f60627d763dcceb1898936a3c266193321fcab9645d59227bf47675ae2e9d761",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -38,7 +38,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ISComV2Client/ISComV2Client.cs",
-      "sha256": "abe9972e7f8ace37f60d1584a6e1d9c55666841aed697c698163de586c0f2fa4",
+      "sha256": "76c39ee882cfea9fd500511d61b80aff2a6cd3f1e5c60ea1559f83565830f87a",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -47,7 +47,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ISComV2Client/ISComV2ClientBase.cs",
-      "sha256": "e0d84510f6e9c75240db406c5b2be201cb9ba56ba3765ce5debce981533f546b",
+      "sha256": "a7cb936bd4593115686f5fd5e9b0b35c997609b25e6c9ce8e70dfdeaeb6f555f",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -56,7 +56,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ISComV2Server/ISComV2ClientHandler.cs",
-      "sha256": "29045b6b13969e7e5e98c93c9e915a63141bbf199c4e2f5cd9762a8dbb00c229",
+      "sha256": "d206d0b8665b57b00f5238eb97571a9e3ffe82ed0f001a2719fde0e2e77abb39",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -65,7 +65,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ISComV2Server/ISComV2Server.cs",
-      "sha256": "6a00ae1002fcab7c7ed42635d4edf7dff6f68071b5a1259d6172f613026e3989",
+      "sha256": "02925703844254d3ff0e62754ce917de24b35c43cc6ec087ef495a21754720ed",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -209,7 +209,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ZoneCom.cs",
-      "sha256": "b230c3688de1f87a2b2940500763978f0f52a2c9ebd80a922b2017ea5720de9f",
+      "sha256": "923c38a7e6ade2602e54d1fc01de08c617736d22080045fb21ae21e8b2a6b6f0",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -218,7 +218,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ZoneComClient.cs",
-      "sha256": "f9d4c8ab100d57b0306ea57521ffa7e4726a971cb1dd621f1d536265905d60c9",
+      "sha256": "da9cc9cbdd1a0c07f0907c7788f28a3fd5a20df6429dbe2f76fa8470d3f56753",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -227,7 +227,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Communication/ZoneComServer.cs",
-      "sha256": "c63a84fbe95786b080355f7a567a716c364a286bb8c55c21762651a64d4b0e3d",
+      "sha256": "bd720152df91546ea2ed7609a49c522d49edb9c0e18d7fa44b7177799cbf524b",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -308,7 +308,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/AORebirth.Core/Properties/AssemblyInfo.cs",
-      "sha256": "6e8b78e7ff8a11cc7b157d8cca2eadfd72cf4555807a5df6b083c288acdce284",
+      "sha256": "14cee00cb0cab7dc20fe7d19bdfed8127ac9402aa312b6ba3d7cf90681583227",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3539,7 +3539,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/Cell.Core/Exceptions/InvalidEndpointException.cs",
-      "sha256": "236abf4fe40df00a5a00aa4aee0401f38a635a274e996a5704caab9d8cf7a007",
+      "sha256": "db1d7ece412c73b97628a088dd3507af334dc2bcb7b4575fdd91de58a05063ad",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -3629,7 +3629,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/Cell.Core/ServerBase.cs",
-      "sha256": "d03404a03bd96fdaee968c54d63e37c8468540aa38051a807200b4629e687600",
+      "sha256": "ade6fd92c0a7d836e304614777e84d823dbcee4034f22136cdde28901164676f",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],
@@ -3809,7 +3809,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/Utility/Config/ConfigReadWrite.cs",
-      "sha256": "3bf9a25e1b1272abde54fb0c08165bbeb46387bf2440a40b768ed28de0078099",
+      "sha256": "4e7621859aef09b62035b181a591ef5647324a064ec7c5d402003c5024dc7d1d",
       "classification": [
         "GENERIC_RUNTIME_LOGIC"
       ],
@@ -3836,7 +3836,7 @@
     },
     {
       "path": "AORebirth/Libraries/Source/Utility/LogUtil.cs",
-      "sha256": "a81f1307c26489d483bfb702b301bc5dc58334118a61285f539b3a46433f3928",
+      "sha256": "da9d9214c9b690e636130d76b5b7a984a177f22b5833869dd2de63a95fdd6541",
       "classification": [
         "GENERIC_PROTOCOL_CONSTANT"
       ],

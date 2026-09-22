@@ -89,6 +89,9 @@ namespace AORebirth.Communication.ISComV2Server
         /// </param>
         /// <param name="messageObject">
         /// </param>
+#if AOREBIRTH_LINUX
+        [System.Serializable]
+#endif
         public delegate void DataReceivedHandler(object sender, DynamicMessage e);
 
         #endregion

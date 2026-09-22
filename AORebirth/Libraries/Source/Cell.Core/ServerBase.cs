@@ -248,7 +248,11 @@ namespace Cell.Core
             }
             catch (Exception e)
             {
+#if AOREBIRTH_LINUX
+                LogManager.GetLogger(CellDef.CORE_LOG_FNAME).Error(e, "Could not disconnect client");
+#else
                 LogManager.GetLogger(CellDef.CORE_LOG_FNAME).ErrorException("Could not disconnect client", e);
+#endif
             }
         }
 
@@ -582,11 +586,19 @@ namespace Cell.Core
             }
             catch (SocketException e)
             {
+#if AOREBIRTH_LINUX
+                LogManager.GetLogger(CellDef.CORE_LOG_FNAME).Warn(e, Resources.SocketExceptionAsyncAccept);
+#else
                 LogManager.GetLogger(CellDef.CORE_LOG_FNAME).WarnException(Resources.SocketExceptionAsyncAccept, e);
+#endif
             }
             catch (Exception e)
             {
+#if AOREBIRTH_LINUX
+                LogManager.GetLogger(CellDef.CORE_LOG_FNAME).Fatal(e, Resources.FatalAsyncAccept);
+#else
                 LogManager.GetLogger(CellDef.CORE_LOG_FNAME).FatalException(Resources.FatalAsyncAccept, e);
+#endif
             }
         }
 
@@ -610,11 +622,19 @@ namespace Cell.Core
             }
             catch (SocketException e)
             {
+#if AOREBIRTH_LINUX
+                LogManager.GetLogger(CellDef.CORE_LOG_FNAME).Warn(e, Resources.SocketExceptionAsyncAccept);
+#else
                 LogManager.GetLogger(CellDef.CORE_LOG_FNAME).WarnException(Resources.SocketExceptionAsyncAccept, e);
+#endif
             }
             catch (Exception e)
             {
+#if AOREBIRTH_LINUX
+                LogManager.GetLogger(CellDef.CORE_LOG_FNAME).Fatal(e, Resources.FatalAsyncAccept);
+#else
                 LogManager.GetLogger(CellDef.CORE_LOG_FNAME).FatalException(Resources.FatalAsyncAccept, e);
+#endif
             }
         }
 
