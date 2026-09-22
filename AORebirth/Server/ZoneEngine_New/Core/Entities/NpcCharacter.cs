@@ -16,6 +16,7 @@ namespace ZoneEngine_New.Core.Entities
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Trade;
 
     /// <summary>
@@ -113,6 +114,14 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             base.OnDeath(killer);
+        }
+
+        protected override void RemoveFromWorldAfterDeath()
+        {
+            if (Playfield == null)
+                return;
+
+            Playfield.GetRequiredService<SpawnService>().DespawnNpc(this);
         }
 
         /// <summary>

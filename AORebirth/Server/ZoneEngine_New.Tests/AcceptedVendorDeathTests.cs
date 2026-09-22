@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Playfield.Locality;
@@ -53,7 +54,65 @@ public sealed class AcceptedVendorDeathTests
         Assert.AreSame(corpse, w.Registry.Dynels().OfType<Corpse>().Single());
         Assert.AreEqual(1, deaths);
         Assert.AreEqual(0, w.Persistence.Calls); Assert.AreEqual(0, w.Snapshots.Writes.Count);
-        // This proves lifecycle only. Generic Corpse still has Biofreak-specific visual constants.
+    }
+
+    [TestMethod]
+    public void CommandSpawnedNpcDespawnsAndCorpseCopiesSourceSexBreedWithoutForeignAnims()
+    {
+        using var w = new AcceptedSubwayShopRuntimeTests.World(allowMissingCatMesh: true);
+        var playfield = w.Player.Playfield!;
+        var locality = playfield.GetRequiredService<PlayfieldLocality>();
+        var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 1_000_004 }, new StubItemBuilder())
+        {
+            Name = "Biodome 2 Warden",
+            Playfield = playfield,
+            Position = w.Player.Position
+        };
+        npc.Stats.Set(CharacterStat.Sex, 2);
+        npc.Stats.Set(CharacterStat.Breed, 3);
+        npc.Stats.Set(CharacterStat.MonsterData, 252172);
+        w.Registry.Register(npc);
+        locality.RegisterDynel(npc);
+        locality.RegisterDynel(w.Player);
+        locality.ActivatePlayerVisibility(w.Player);
+        w.Session.Messages.Clear();
+
+        npc.OnDeath();
+        npc.Tick(2.5);
+
+        Assert.IsNull(npc.Playfield);
+        Assert.IsFalse(w.Registry.TryGet(npc.Identity, out _));
+        Assert.IsTrue(w.Session.Messages.OfType<DespawnMessage>().Any(message => message.Identity == npc.Identity));
+        var corpse = w.Registry.Dynels().OfType<Corpse>().Single(item => item.Owner == npc.Identity);
+        var cfu = w.Session.Messages.OfType<CorpseFullUpdateMessage>().Single(message => message.UnknownIdentity == npc.Identity);
+        Assert.AreEqual(2u, cfu.Stats.Single(stat => stat.Value1 == CharacterStat.Sex).Value2);
+        Assert.AreEqual(3u, cfu.Stats.Single(stat => stat.Value1 == CharacterStat.Breed).Value2);
+        Assert.IsFalse(cfu.Stats.Any(stat => stat.Value1 == CharacterStat.CATMesh && stat.Value2 == 30258));
+        Assert.AreSame(playfield, corpse.Playfield);
+    }
+
+    [TestMethod]
+    public void CorpseItemAnimEffectMatchesRetailFifteenIntBlob()
+    {
+        var orders = typeof(AnimationEffect).GetProperties()
+            .Select(property => property.GetCustomAttribute<AoMemberAttribute>())
+            .Where(member => member != null)
+            .Select(member => member!.Order)
+            .OrderBy(order => order)
+            .ToArray();
+        CollectionAssert.AreEqual(Enumerable.Range(0, 15).ToArray(), orders);
+
+        var effect = Corpse.BuildAnimationEffects(30258).Single();
+        Assert.AreEqual(53031, effect.TypeId);
+        Assert.AreEqual(0, effect.HeaderB);
+        Assert.AreEqual(4, effect.HeaderC);
+        Assert.AreEqual(0, effect.Duration);
+        Assert.AreEqual(1, effect.Interval);
+        Assert.AreEqual(500, effect.Unknown7);
+        Assert.AreEqual(1, effect.Unknown8);
+        Assert.AreEqual(4, effect.Unknown9);
+        Assert.AreEqual(30258, effect.MonsterData);
+        Assert.AreEqual(0, effect.Unknown10);
     }
 
     [DataTestMethod]

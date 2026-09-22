@@ -503,6 +503,16 @@ namespace ZoneEngine_New.Core.Entities
             SpawnDeathCorpse();
             ClearKillRewards();
             Died?.Invoke(this);
+            RemoveFromWorldAfterDeath();
+        }
+
+        /// <summary>
+        /// Hash-spawn and content NPCs despawn from <see cref="Died"/> listeners.
+        /// Command-spawned and other listener-less NPCs still have to leave the world here.
+        /// Mission NPCs override this so the dead body can linger for the accepted visual window.
+        /// </summary>
+        protected virtual void RemoveFromWorldAfterDeath()
+        {
         }
 
         public void SetFightingTarget(Identity identity)

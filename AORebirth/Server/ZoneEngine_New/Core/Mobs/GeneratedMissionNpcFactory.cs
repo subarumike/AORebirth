@@ -90,6 +90,9 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
     protected override int DeathAnimationKey => 501; // MissionInstanceMobCombat.DeathParameter2.
     protected override int CorpseSpawnDelayMilliseconds => 600; // Accepted NpcCorpseLifecycleRules.
     protected override void SpawnDeathCorpse() => missions.Value.SpawnDeathCorpse(this);
+    protected override void RemoveFromWorldAfterDeath()
+    {
+    }
     public override void Rebase() { }
     public override void RebaseWeapons()
     {

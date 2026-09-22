@@ -79,7 +79,6 @@ namespace ZoneEngine_New.Core.GameData
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
 
             EnsureRootExists();
-            CorpseContent = CorpseContentCatalog.Load(RootPath);
             RespawnContent = RespawnContentCatalog.Load(RootPath);
             LoadNpcTemplates();
             LoadMonsterWeapons();
@@ -90,8 +89,6 @@ namespace ZoneEngine_New.Core.GameData
         }
 
         public string RootPath { get; }
-
-        public CorpseContentCatalog CorpseContent { get; }
 
         public RespawnContentCatalog RespawnContent { get; }
 

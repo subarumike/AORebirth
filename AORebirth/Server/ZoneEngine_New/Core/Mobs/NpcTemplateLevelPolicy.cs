@@ -7,9 +7,26 @@ namespace ZoneEngine_New.Core.Mobs
     /// <summary>
     /// A resolved template must contain stats for the selected level. Generic
     /// family/overlay interpolation runs in the data loader before this check.
+    /// Requested levels outside the template min/max clamp to that range.
     /// </summary>
     internal static class NpcTemplateLevelPolicy
     {
+        internal static int? ClampRequestedLevel(MobTemplate template, int? requestedLevel)
+        {
+            ArgumentNullException.ThrowIfNull(template);
+            if (!requestedLevel.HasValue)
+                return null;
+            if (requestedLevel.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(requestedLevel));
+
+            int min = template.MinLevel;
+            int max = template.MaxLevel;
+            if (min <= 0 || max < min)
+                return requestedLevel;
+
+            return Math.Clamp(requestedLevel.Value, min, max);
+        }
+
         internal static void RequireExactLevel(MobTemplate template, int? requestedLevel,
             IReadOnlyDictionary<int, int>? resolvedStats = null)
         {

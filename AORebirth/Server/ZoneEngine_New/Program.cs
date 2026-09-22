@@ -228,7 +228,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, TeleportCommand>();
             services.AddSingleton<IGmCommand, SetCommand>();
             services.AddSingleton<IGmCommand, GetCommand>();
-            services.AddSingleton<IGmCommand, GiveItemCommand>();
+            services.AddSingleton<IGmCommand, GiveCommand>();
             services.AddSingleton<IGmCommand, NpcCommand>();
             services.AddSingleton<IGmCommand, ServerStatsCommand>();
             services.AddSingleton<GmCommandDispatcher>();

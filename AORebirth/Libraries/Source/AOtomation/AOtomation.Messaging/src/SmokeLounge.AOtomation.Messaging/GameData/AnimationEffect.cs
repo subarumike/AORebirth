@@ -8,7 +8,8 @@
 //   http://www.wtfpl.net/ for more details.
 // </copyright>
 // <summary>
-//   Defines the AnimationEffect type (AOSharp CFU spell/anim row: 15 ints).
+//   Retail CorpseFullUpdate ItemAnimEffect blob is 15 int32s. The 14th int
+//   is MonsterData. CATMesh is a corpse stat, not this row.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -21,19 +22,19 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         #region AoMember Properties
 
         [AoMember(0)]
-        public int IdentityType { get; set; }
+        public int TypeId { get; set; }
 
         [AoMember(1)]
-        public int NanoId { get; set; }
+        public int HeaderB { get; set; }
 
         [AoMember(2)]
-        public int NanoInstance { get; set; }
+        public int HeaderC { get; set; }
 
         [AoMember(3)]
-        public int Time1 { get; set; }
+        public int Duration { get; set; }
 
         [AoMember(4)]
-        public int Time2 { get; set; }
+        public int Interval { get; set; }
 
         [AoMember(5)]
         public int Unknown2 { get; set; }
@@ -60,7 +61,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         public int Unknown9 { get; set; }
 
         [AoMember(13)]
-        public int VisualDataId { get; set; }
+        public int MonsterData { get; set; }
 
         [AoMember(14)]
         public int Unknown10 { get; set; }

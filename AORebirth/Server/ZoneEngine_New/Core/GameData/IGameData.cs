@@ -13,8 +13,6 @@ namespace ZoneEngine_New.Core.GameData
     {
         string RootPath { get; }
 
-        CorpseContentCatalog CorpseContent => CorpseContentCatalog.Load(RootPath);
-
         RespawnContentCatalog RespawnContent => RespawnContentCatalog.Load(RootPath);
 
         int MobTemplateCount { get; }

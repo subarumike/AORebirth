@@ -9,6 +9,35 @@ namespace ZoneEngine_New.Tests
     public sealed class NpcTemplateLevelPolicyTests
     {
         [TestMethod]
+        public void RequestBelowMinClampsToMin()
+        {
+            MobTemplate template = new()
+            {
+                Hash = "ql200-only",
+                MinLevel = 200,
+                MaxLevel = 200,
+                Stats = { [(int)CharacterStat.Level] = 200, [(int)CharacterStat.MaxHealth] = 500 }
+            };
+
+            int? clamped = NpcTemplateLevelPolicy.ClampRequestedLevel(template, 2);
+            Assert.AreEqual(200, clamped);
+            NpcTemplateLevelPolicy.RequireExactLevel(template, clamped);
+        }
+
+        [TestMethod]
+        public void RequestAboveMaxClampsToMax()
+        {
+            Assert.AreEqual(20, NpcTemplateLevelPolicy.ClampRequestedLevel(Template(), 50));
+        }
+
+        [TestMethod]
+        public void InRangeRequestIsUnchanged()
+        {
+            Assert.AreEqual(7, NpcTemplateLevelPolicy.ClampRequestedLevel(Template(), 7));
+            Assert.IsNull(NpcTemplateLevelPolicy.ClampRequestedLevel(Template(), null));
+        }
+
+        [TestMethod]
         public void ExactLevelPreservesAllTemplateStats()
         {
             MobTemplate template = Template();

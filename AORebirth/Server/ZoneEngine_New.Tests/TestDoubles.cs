@@ -57,9 +57,6 @@ namespace ZoneEngine_New.Tests
 
         string DataRoot => string.IsNullOrEmpty(RootPath) ? Path.Combine(AppContext.BaseDirectory, "GameData") : RootPath;
 
-        public CorpseContentCatalog CorpseContent => CorpseContentCatalog.Load(
-            DataRoot);
-
         public int MobTemplateCount => 0;
 
         public int HashTemplateCount => _hashItems.CategoryCount;

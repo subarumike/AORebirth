@@ -107,8 +107,9 @@ namespace ZoneEngine_New.Core.Playfield
             }
 
             NpcTemplateValidation.RequireSpawnable(template);
-            var resolvedStats = _gameData.ComposeNpcStats(template, level);
-            NpcTemplateLevelPolicy.RequireExactLevel(template, level, resolvedStats);
+            int? spawnLevel = NpcTemplateLevelPolicy.ClampRequestedLevel(template, level);
+            var resolvedStats = _gameData.ComposeNpcStats(template, spawnLevel);
+            NpcTemplateLevelPolicy.RequireExactLevel(template, spawnLevel, resolvedStats);
             Identity identity = _registry.AllocateNpcIdentity();
             Vector3 at = _playfield.SnapNpcSpawn(position);
             NpcCharacter npc = new NpcCharacter(identity, _items)
@@ -853,7 +854,7 @@ namespace ZoneEngine_New.Core.Playfield
         {
             ArgumentNullException.ThrowIfNull(npc);
 
-            _playfieldManager.Dialogues.Detached(npc);
+            _playfieldManager.Dialogues?.Detached(npc);
             _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>().Detached(npc);
 
             npc.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);

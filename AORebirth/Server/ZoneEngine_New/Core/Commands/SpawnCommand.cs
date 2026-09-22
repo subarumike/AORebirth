@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Core.Commands
     using System;
     using System.Globalization;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Playfield;
@@ -73,7 +75,7 @@ namespace ZoneEngine_New.Core.Commands
                     "Spawned {0} id={1} level={2}",
                     npc.Name,
                     npc.Identity.Instance,
-                    level));
+                    npc.Stats.GetOrZero(CharacterStat.Level)));
         }
     }
 }

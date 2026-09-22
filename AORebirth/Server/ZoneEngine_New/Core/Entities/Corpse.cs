@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Core.Entities
     using System;
     using System.Collections.Generic;
 
+    using AORebirth.Enums;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -23,6 +25,9 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Lifetime in centiseconds (1/100 s). 18000 = 3 minutes.</summary>
         private const int DefaultTimeExist = 18000;
         private const int DefaultDeadTimer = 60;
+
+        /// <summary>Retail corpse Flags on CorpseFullUpdate.</summary>
+        private const int DefaultFlags = 1579013;
         public const int LootReserveSeconds = 60;
 
         private readonly IGameData _gameData;
@@ -105,7 +110,10 @@ namespace ZoneEngine_New.Core.Entities
             MsgVector3 position = Position;
             MsgQuaternion heading = Rotation;
 
-            // Wire constants from live CFU / AOSharp CorpseFullUpdate body writer.
+            TryResolveCatMesh(out int catMesh);
+            SourceStats.TryGetValue(CharacterStat.MonsterData, out int monsterData);
+
+            // Wire constants from live retail CorpseFullUpdate.
             return new CorpseFullUpdateMessage
             {
                 Identity = Identity,
@@ -118,8 +126,7 @@ namespace ZoneEngine_New.Core.Entities
                 PlayfieldId = playfieldId,
                 StateMachine = Identity.None,
                 Unknown3 = 0x6F,
-                Stats = BuildStats(),
-                // AOSharp: WriteInt32(Name.Length + 1); WriteString(Name); WriteByte(0);
+                Stats = BuildStats(catMesh),
                 NameLength = Name.Length + 1,
                 Name = Name,
                 NameTerminator = 0,
@@ -127,7 +134,7 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown5 = 0x32,
                 UnknownArray = [],
                 Unknown6 = 0x03,
-                AnimationEffects = _gameData.CorpseContent.AnimationEffects,
+                AnimationEffects = BuildAnimationEffects(monsterData),
                 // Dead character identity (AOSharp IdentityType.Character == CanbeAffected).
                 UnknownIdentity = Owner,
                 Textures = BuildDefaultTextures(),
@@ -151,35 +158,55 @@ namespace ZoneEngine_New.Core.Entities
             return textures;
         }
 
-        GameTuple<CharacterStat, uint>[] BuildStats()
+        GameTuple<CharacterStat, uint>[] BuildStats(int catMesh)
         {
             // Live Remains CFU: CATMesh present, MonsterData absent; include zeroed companion stats.
             List<GameTuple<CharacterStat, uint>> stats =
             [
-                Tuple(CharacterStat.Flags, ResolveFlags()),
+                Tuple(CharacterStat.Flags, DefaultFlags),
                 Tuple(CharacterStat.StaticInstance, 0),
                 Tuple(CharacterStat.ACGItemLevel, 0),
                 Tuple(CharacterStat.ACGItemTemplateID, 0),
                 Tuple(CharacterStat.ACGItemTemplateID2, 0),
                 Tuple(CharacterStat.MultipleCount, 1),
-                Tuple(CharacterStat.CanChangeClothes, 0),
-                Tuple(CharacterStat.TimeExist, TimeExist),
-                Tuple(CharacterStat.DeadTimer, DefaultDeadTimer),
-                Tuple(CharacterStat.CorpseType, (int)Owner.Type),
-                Tuple(CharacterStat.CorpseInstance, Owner.Instance),
-                // TEMP: live Biofreak Remains Sex/Breed until source copy is proven
-                Tuple(CharacterStat.Sex, 2),
-                Tuple(CharacterStat.Breed, 7),
             ];
 
-            if (TryResolveCatMesh(out int catMesh))
+            AddCopied(stats, CharacterStat.Scale);
+            stats.Add(Tuple(CharacterStat.CanChangeClothes, 0));
+            AddCopied(stats, CharacterStat.Sex);
+            AddCopied(stats, CharacterStat.Breed);
+            AddCopied(stats, CharacterStat.Race);
+            stats.Add(Tuple(CharacterStat.CorpseType, (int)Owner.Type));
+            stats.Add(Tuple(CharacterStat.CorpseInstance, Owner.Instance));
+
+            if (catMesh != 0)
                 stats.Add(Tuple(CharacterStat.CATMesh, catMesh));
 
-            AddCopied(stats, CharacterStat.Race);
-            AddCopied(stats, CharacterStat.Scale);
             AddCopied(stats, CharacterStat.Cash);
+            AddCopied(stats, CharacterStat.HeadMesh);
+            stats.Add(Tuple(CharacterStat.TimeExist, TimeExist));
+            stats.Add(Tuple(CharacterStat.DeadTimer, DefaultDeadTimer));
 
             return stats.ToArray();
+        }
+
+        internal static AnimationEffect[] BuildAnimationEffects(int monsterData)
+        {
+            return
+            [
+                new AnimationEffect
+                {
+                    TypeId = (int)FunctionType.ItemAnimEffect,
+                    HeaderB = 0,
+                    HeaderC = 4,
+                    Duration = 0,
+                    Interval = 1,
+                    Unknown7 = 500,
+                    Unknown8 = 1,
+                    Unknown9 = 4,
+                    MonsterData = monsterData
+                }
+            ];
         }
 
         bool TryResolveCatMesh(out int catMesh)
@@ -188,18 +215,7 @@ namespace ZoneEngine_New.Core.Entities
             if (!SourceStats.TryGetValue(CharacterStat.MonsterData, out int monsterData))
                 return false;
 
-            if (_gameData.CorpseContent.MonsterDataAliases.TryGetValue(monsterData, out int alias))
-                monsterData = alias;
-
-            return _gameData.TryGetCatMesh(monsterData, out catMesh);
-        }
-
-        int ResolveFlags()
-        {
-            if (SourceStats.TryGetValue(CharacterStat.Flags, out int flags) && flags != 0)
-                return flags;
-
-            return _gameData.CorpseContent.Flags;
+            return _gameData.TryGetCatMesh(monsterData, out catMesh) && catMesh != 0;
         }
 
         void CopySourceStats(Character dead)
@@ -207,10 +223,12 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat[] copy =
             [
                 CharacterStat.Cash,
+                CharacterStat.Sex,
+                CharacterStat.Breed,
                 CharacterStat.Race,
                 CharacterStat.Scale,
-                CharacterStat.Flags,
-                CharacterStat.MonsterData
+                CharacterStat.MonsterData,
+                CharacterStat.HeadMesh
             ];
 
             foreach (CharacterStat stat in copy)
