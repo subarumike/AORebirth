@@ -8,7 +8,8 @@ namespace ZoneEngine_New.Core.Helpers
 
     /// <summary>
     /// Player MaxNanoEnergy. Same <c>beforeModifiers</c> table as the official nano formula.
-    /// NPCs (<c>NPCFamily</c> &gt; 0) keep stored max nano. Result is the full max, not trickle.
+    /// Players only; NPCs keep their stored max nano. Nano Pool is read as its full value,
+    /// so skill trickle must already be in the bonus layer.
     /// Profession 14+ is shifted down one column (legacy Shade gap).
     /// </summary>
     public static class MaxNanoCalculator
@@ -30,18 +31,12 @@ namespace ZoneEngine_New.Core.Helpers
 
         public static bool TryCompute(StatCollection stats, out int maxNano)
         {
-            if (stats.GetOrZero(CharacterStat.NPCFamily) > 0)
-            {
-                maxNano = 0;
-                return false;
-            }
-
             maxNano = Compute(
                 Math.Max(1, stats.GetOrZero(CharacterStat.Breed)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.Profession)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.TitleLevel)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.Level)),
-                VitalSkillTrickle.Effective(stats, CharacterStat.NanoPool));
+                Math.Max(1, stats.GetOrZero(CharacterStat.NanoPool)));
             return maxNano > 0;
         }
 

@@ -8,7 +8,8 @@ namespace ZoneEngine_New.Core.Helpers
 
     /// <summary>
     /// Player Life / MaxHealth. Same <c>beforeModifiers</c> table as the official Life formula.
-    /// NPCs (<c>NPCFamily</c> &gt; 0) keep stored Life. Result is the full max, not trickle.
+    /// Players only; NPCs keep their stored Life. Body Development is read as its full value,
+    /// so skill trickle must already be in the bonus layer.
     /// </summary>
     public static class MaxHealthCalculator
     {
@@ -29,18 +30,12 @@ namespace ZoneEngine_New.Core.Helpers
 
         public static bool TryCompute(StatCollection stats, out int maxHealth)
         {
-            if (stats.GetOrZero(CharacterStat.NPCFamily) > 0)
-            {
-                maxHealth = 0;
-                return false;
-            }
-
             maxHealth = Compute(
                 Math.Max(1, stats.GetOrZero(CharacterStat.Breed)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.Profession)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.TitleLevel)),
                 Math.Max(1, stats.GetOrZero(CharacterStat.Level)),
-                VitalSkillTrickle.Effective(stats, CharacterStat.BodyDevelopment));
+                Math.Max(1, stats.GetOrZero(CharacterStat.BodyDevelopment)));
             return maxHealth > 0;
         }
 

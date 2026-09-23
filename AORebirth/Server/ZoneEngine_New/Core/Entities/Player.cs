@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
@@ -34,6 +35,11 @@ namespace ZoneEngine_New.Core.Entities
         public object PersistenceGate { get; } = new();
 
         public bool IsPersistenceQuarantined => _persistenceQuarantined;
+
+        public CharacterSaveState SaveState { get; } = new();
+
+        /// <summary>Skill trickle and training costs used by rebase and the trainer.</summary>
+        public SkillCatalog SkillCatalog { get; init; } = SkillCatalog.Default;
 
         /// <summary>An indeterminate commit must be reloaded from storage, never overwritten from memory.</summary>
         public void QuarantinePersistence()
@@ -72,7 +78,15 @@ namespace ZoneEngine_New.Core.Entities
             Inventory = new PlayerInventory();
             // Requirement folds use Stats.Get; keep this at 0 so Unset never fails NotBitAnd checks.
             Stats.Set(CharacterStat.SelectedTargetType, 0, StatDetail.Base);
+            Stats.BaseChanged += stat =>
+            {
+                if (!CharacterSaveState.IsCheckpointOnly(stat))
+                    SaveState.MarkDirty();
+            };
         }
+
+        /// <summary>Between death and respawn the live position is not a valid place to resume.</summary>
+        public bool IsRespawnPending => _respawnPending;
 
         public override bool IsPlayer => true;
 
@@ -177,6 +191,7 @@ namespace ZoneEngine_New.Core.Entities
             try
             {
                 Respawn();
+                SaveState.MarkDirty();
             }
             catch (Exception exception)
             {
@@ -269,11 +284,13 @@ namespace ZoneEngine_New.Core.Entities
         public override void RebaseStats()
         {
             int previousShape = Stats.GetOrZero(CharacterStat.MonsterData);
-            // Bonuses first: max health and max nano read the full (base + bonus) ability values,
-            // so equipment and buffs have to be in place before those are recomputed. Worn
-            // appearance follows the bonus pass because its spells carry stat requirements.
+            // Bonuses first: skill trickle, max health and max nano read the full (base + bonus)
+            // ability values, so equipment and buffs have to be in place before those are
+            // recomputed. Worn appearance follows the bonus pass because its spells carry stat
+            // requirements.
             RebaseEquipBonuses();
             ApplyBuffBonuses();
+            SkillCatalog.ApplyTrickle(Stats);
             RebaseWearAppearance();
             RebaseMaxHealth();
             RebaseMaxNano();
@@ -363,7 +380,9 @@ namespace ZoneEngine_New.Core.Entities
                 CharacterStat.Health,
                 CharacterStat.MaxHealth);
             Stats.Set(CharacterStat.MaxHealth, maxHealth, StatDetail.Base, dirty: true);
-            ApplyVitalFromPercent(CharacterStat.Health, maxHealth, percent);
+            // Regen, heals and revive cap at the full max; scaling against the base alone would
+            // drop a full character below it on every rebase and restart regen.
+            ApplyVitalFromPercent(CharacterStat.Health, Stats.GetOrZero(CharacterStat.MaxHealth), percent);
         }
 
         void RebaseMaxNano()
@@ -376,7 +395,7 @@ namespace ZoneEngine_New.Core.Entities
                 CharacterStat.CurrentNano,
                 CharacterStat.MaxNanoEnergy);
             Stats.Set(CharacterStat.MaxNanoEnergy, maxNano, StatDetail.Base, dirty: true);
-            ApplyVitalFromPercent(CharacterStat.CurrentNano, maxNano, percent);
+            ApplyVitalFromPercent(CharacterStat.CurrentNano, Stats.GetOrZero(CharacterStat.MaxNanoEnergy), percent);
         }
 
         void RebaseEquipBonuses()

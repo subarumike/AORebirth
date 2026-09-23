@@ -433,6 +433,7 @@ namespace ZoneEngine_New.Core.Playfield
             try
             {
                 _services.GetRequiredService<PlayerHydrator>().Apply(player, hydration);
+                player.SaveState.SeedPersisted(character, hydration.Stats);
                 player.Position = _playfield.SnapFeetToFloor(player.Position);
                 player.Rebase();
                 PlayerSpawnPayloadValidator.RequireValid(player);
@@ -477,6 +478,12 @@ namespace ZoneEngine_New.Core.Playfield
             return player;
         }
 
+        static void SendSpawnMovement(IZoneSession session, Player player)
+        {
+            foreach (CharDCMoveMessage move in player.Motor.BuildSpawnMoves())
+                session.Send(move);
+        }
+
         /// <summary>Called from <see cref="Playfield.Tick"/> via inbound drain only.</summary>
         public void CompletePendingSpawn(IZoneSession session, PendingSpawnInboundItem command)
         {
@@ -517,6 +524,7 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerSpawnPayloadValidator.RequireValidMessages(spawn, full);
             ScfuSendLog.Write(spawn);
             session.Send(spawn);
+            SendSpawnMovement(session, player);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
             // The client establishes vending dynels at the pre-FullCharacter world-entry
@@ -598,6 +606,7 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerSpawnPayloadValidator.RequireValidMessages(reconnectSpawn, reconnectFull);
             ScfuSendLog.Write(reconnectSpawn);
             session.Send(reconnectSpawn);
+            SendSpawnMovement(session, player);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
             // Reconnect must use the same pre-FullCharacter vending boundary as initial entry.
@@ -801,6 +810,7 @@ namespace ZoneEngine_New.Core.Playfield
             SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
             ScfuSendLog.Write(spawn);
             session.Send(spawn);
+            SendSpawnMovement(session, player);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
             session.Send(player.BuildFullCharacterMessage());
@@ -837,6 +847,7 @@ namespace ZoneEngine_New.Core.Playfield
             player.Logger = _logger;
             _registry.Register(player);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+            player.SaveState.MarkDirty();
 
             _logger.Info(
                 string.Format(

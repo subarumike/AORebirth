@@ -196,6 +196,7 @@ namespace ZoneEngine_New.Tests
             public void SetOffline(int characterId) { Online = 0; OfflineWrites++; }
             public void SaveLocation(CharacterRecord character, int online) => throw new InvalidOperationException("Non-atomic snapshot.");
             public void SaveSnapshot(CharacterRecord character, int online, IReadOnlyList<StatRecord> stats) => SnapshotWrites++;
+            public bool SaveOnlineCheckpoint(int characterId, CharacterRecord? location, IReadOnlyList<StatRecord> stats) => throw new InvalidOperationException("Unexpected checkpoint.");
         }
 
         private sealed class RejectingStatRepository : IStatRepository

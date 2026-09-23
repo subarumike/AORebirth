@@ -64,6 +64,14 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
             }
         }
 
+        public long Remaining
+        {
+            get
+            {
+                return Math.Max(0, this.stream.Length - this.stream.Position);
+            }
+        }
+
         #endregion
 
         #region Public Methods and Operators
@@ -84,9 +92,28 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
             return this.reader.ReadSByte();
         }
 
+        /// <summary>
+        /// Reads up to <paramref name="count"/> bytes. The buffer is sized by what the message holds,
+        /// not by a length the sender declared.
+        /// </summary>
         public byte[] ReadBytes(int count)
         {
-            return this.reader.ReadBytes(count);
+            return this.reader.ReadBytes((int)Math.Min(count, this.Remaining));
+        }
+
+        /// <summary>
+        /// A sender-declared element count, rejected before anything is allocated when it is negative or
+        /// larger than the bytes left, since every element takes at least one byte.
+        /// </summary>
+        public int CheckElementCount(int count)
+        {
+            if (count < 0 || count > this.Remaining)
+            {
+                throw new InvalidDataException(
+                    "Declared element count " + count + " exceeds the " + this.Remaining + " bytes left in the message.");
+            }
+
+            return count;
         }
 
         public short ReadInt16()
@@ -113,7 +140,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization
 
         public string ReadString(int length)
         {
-            var bytes = this.reader.ReadBytes(length);
+            var bytes = this.ReadBytes(length);
             return Encoding.ASCII.GetString(bytes).TrimEnd(char.MinValue);
         }
 

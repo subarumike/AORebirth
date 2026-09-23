@@ -552,7 +552,12 @@ namespace ZoneEngine_New.Core.Playfield
                 DrainRebases();
                 _playfieldManager.Dialogues.Tick(this);
                 foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
-                    if (ReferenceEquals(player.Playfield, this)) _playfieldManager.Missions.PollLifecycle(player);
+                {
+                    if (!ReferenceEquals(player.Playfield, this))
+                        continue;
+                    _playfieldManager.Missions.PollLifecycle(player);
+                    _characterSnapshot.CheckpointIfDue(player);
+                }
             }
 
             _metrics.TickExecution.Record(ElapsedMilliseconds(tickStart));

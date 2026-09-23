@@ -20,5 +20,11 @@ namespace ZoneEngine_New.Core.Data
 
         /// <summary>Atomically persists location, online state, and base stats.</summary>
         void SaveSnapshot(CharacterRecord character, int online, IReadOnlyList<StatRecord> stats);
+
+        /// <summary>
+        /// Atomically persists an online checkpoint: optional location plus base stats, never the online flag.
+        /// Returns false, writing nothing, once the row is no longer marked online.
+        /// </summary>
+        bool SaveOnlineCheckpoint(int characterId, CharacterRecord? location, IReadOnlyList<StatRecord> stats);
     }
 }

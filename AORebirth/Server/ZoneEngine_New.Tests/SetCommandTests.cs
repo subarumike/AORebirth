@@ -13,6 +13,7 @@ namespace ZoneEngine_New.Tests
 
     using ZoneEngine_New.Core.Commands;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
 
@@ -30,6 +31,46 @@ namespace ZoneEngine_New.Tests
 
             Assert.AreEqual(80, gm.Stats.Get(CharacterStat.Health));
             Assert.IsTrue(LastText(session).Contains("[Gm]", StringComparison.Ordinal));
+        }
+
+        [TestMethod]
+        public void Set_MaxHealth_OnPlayer_IsReplacedByCalculatedMax()
+        {
+            Player gm = TestWorld.CreatePlayer(1, "Gm");
+            gm.Stats.Set(CharacterStat.Breed, (int)Breed.Solitus);
+            gm.Stats.Set(CharacterStat.Profession, (int)Profession.Soldier);
+            gm.Stats.Set(CharacterStat.Level, 10);
+            gm.Stats.Set(CharacterStat.TitleLevel, 1);
+            gm.Stats.Set(CharacterStat.BodyDevelopment, 40);
+            int expected = MaxHealthCalculator.Compute((int)Breed.Solitus, (int)Profession.Soldier, 1, 10, 40);
+
+            new SetCommand().Execute(new GmCommandContext(new RecordingZoneSession(), gm, ["1", "1840"]));
+
+            Assert.AreEqual(expected, gm.Stats.Get(CharacterStat.MaxHealth));
+
+            gm.Stats.Set(CharacterStat.NPCFamily, 5);
+            new SetCommand().Execute(new GmCommandContext(new RecordingZoneSession(), gm, ["1", "999999"]));
+
+            Assert.AreEqual(expected, gm.Stats.Get(CharacterStat.MaxHealth, StatDetail.Base));
+        }
+
+        [TestMethod]
+        public void Set_Health_And_Nano_AboveMax_AreCappedAtMax()
+        {
+            Player gm = TestWorld.CreatePlayer(1, "Gm");
+            gm.Stats.Set(CharacterStat.MaxHealth, 500);
+            gm.Stats.Set(CharacterStat.MaxNanoEnergy, 300);
+            gm.Stats.Set(CharacterStat.Health, 400);
+            gm.Stats.Set(CharacterStat.CurrentNano, 200);
+
+            new SetCommand().Execute(new GmCommandContext(new RecordingZoneSession(), gm, ["health", "9999"]));
+            new SetCommand().Execute(new GmCommandContext(new RecordingZoneSession(), gm, ["currentnano", "9999"]));
+
+            Assert.AreEqual(500, gm.Stats.Get(CharacterStat.Health));
+            Assert.AreEqual(300, gm.Stats.Get(CharacterStat.CurrentNano));
+
+            new SetCommand().Execute(new GmCommandContext(new RecordingZoneSession(), gm, ["health", "120"]));
+            Assert.AreEqual(120, gm.Stats.Get(CharacterStat.Health));
         }
 
         [TestMethod]

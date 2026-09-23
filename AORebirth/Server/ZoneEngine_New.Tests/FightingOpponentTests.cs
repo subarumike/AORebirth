@@ -179,6 +179,12 @@ namespace ZoneEngine_New.Tests
             public void SaveSnapshot(CharacterRecord character, int online, IReadOnlyList<StatRecord> stats)
                 => Stats.AddRange(stats);
 
+            public bool SaveOnlineCheckpoint(int characterId, CharacterRecord? location, IReadOnlyList<StatRecord> stats)
+            {
+                Stats.AddRange(stats);
+                return true;
+            }
+
             public IReadOnlyList<StatRecord> GetForCharacter(int id) => [];
 
             public void UpsertForCharacter(int id, IReadOnlyList<StatRecord> stats)

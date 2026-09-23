@@ -1,5 +1,7 @@
 namespace ZoneEngine_New.Tests
 {
+    using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -88,6 +90,29 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1d, mover.Position.x, 0.001);
             Assert.AreEqual(3d, mover.Position.z, 0.001);
             Assert.IsFalse(observerSession.Sent.Exists(body => body is CharDCMoveMessage));
+        }
+
+        [TestMethod]
+        public void SpawnMovesMatchHeldMovement()
+        {
+            Player player = TestWorld.CreatePlayer(21, "Walker");
+            player.Position = new AORebirth.Core.Vector.Vector3(4, 5, 6);
+            player.Rotation = new AORebirth.Core.Vector.Quaternion(0, 1, 0, 0);
+
+            Assert.AreEqual(0, player.Motor.BuildSpawnMoves().Count);
+
+            player.Motor.ApplyAction(MovementAction.SwitchToSit);
+            Assert.AreEqual(0, player.Motor.BuildSpawnMoves().Count);
+
+            player.Motor.ApplyAction(MovementAction.LeaveSit);
+            player.Motor.ApplyAction(MovementAction.StrafeRightStart);
+            List<CharDCMoveMessage> strafing = player.Motor.BuildSpawnMoves();
+            Assert.AreEqual(1, strafing.Count);
+            Assert.AreEqual((byte)MovementAction.StrafeRightStart, strafing[0].MoveType);
+            Assert.AreEqual(0, strafing[0].Unknown);
+            Assert.AreEqual(player.Identity.Instance, strafing[0].Identity.Instance);
+            Assert.AreEqual(4f, strafing[0].Coordinates.X);
+            Assert.AreEqual(6f, strafing[0].Coordinates.Z);
         }
     }
 }

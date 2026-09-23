@@ -576,6 +576,8 @@ public sealed class PlayfieldTransferTests
         public void SaveLocation(CharacterRecord character, int online) => throw new NotSupportedException();
         public void SaveSnapshot(CharacterRecord character, int online, IReadOnlyList<StatRecord> stats)
         { if (Fail) throw new InvalidOperationException("fixture snapshot failure"); Writes.Add(character); }
+        public bool SaveOnlineCheckpoint(int characterId, CharacterRecord? location, IReadOnlyList<StatRecord> stats)
+        { if (Fail) throw new InvalidOperationException("fixture checkpoint failure"); if (location != null) Writes.Add(location); return true; }
         public IReadOnlyList<StatRecord> GetForCharacter(int id) => [];
         public void UpsertForCharacter(int id, IReadOnlyList<StatRecord> stats) => throw new NotSupportedException();
     }

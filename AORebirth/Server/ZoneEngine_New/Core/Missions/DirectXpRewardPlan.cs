@@ -110,6 +110,7 @@ public sealed class DirectXpRewardPlan
         foreach (var entry in player.Stats.GetEntries()) equipment.Set(entry.Stat, entry.Base);
         foreach (var pair in values) equipment.Set(pair.Key, pair.Value);
         if (player.Inventory.IsHydrated) player.Inventory.ApplyWearBonuses(equipment);
+        player.SkillCatalog.ApplyTrickle(equipment);
         bool healthKnown = MaxHealthCalculator.TryCompute(equipment, out int health);
         bool nanoKnown = MaxNanoCalculator.TryCompute(equipment, out int nano);
         if (healthKnown) equipment.Set(CharacterStat.MaxHealth, health);

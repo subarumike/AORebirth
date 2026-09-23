@@ -23,6 +23,12 @@ namespace AORebirth.Interfaces.Persistence.Characters
         void SaveLocation(CharacterStateData character, int online);
         void SaveSnapshot(CharacterStateData character, int online, IList<CharacterStatData> stats);
         void SaveStats(int characterId, IList<CharacterStatData> stats);
+        /// <summary>
+        /// Online write-behind checkpoint. Locks the character row and writes only while it is still
+        /// marked online, so a checkpoint can never land after the logout snapshot; returns false when
+        /// skipped. A null <paramref name="location"/> leaves the stored location untouched. Never writes Online.
+        /// </summary>
+        bool SaveOnlineCheckpoint(int characterId, CharacterStateData location, IList<CharacterStatData> stats);
         void InsertItem(PersistedItemData item);
         void UpdateItemLocation(ItemLocationData location);
         void SaveItemLocations(IList<PersistedItemData> inserts, IList<ItemLocationData> locations);

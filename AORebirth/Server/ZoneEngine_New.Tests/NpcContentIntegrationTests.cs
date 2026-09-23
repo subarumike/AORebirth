@@ -16,7 +16,10 @@ public sealed class NpcContentIntegrationTests
         var npc = new MobTemplate { Hash = "TEST", Name = "Fixture", UnresolvedPlaceholder = true };
         Assert.IsFalse(NpcTemplateValidation.CanSpawn(npc));
         Assert.ThrowsExactly<InvalidOperationException>(() => NpcTemplateValidation.RequireSpawnable(npc));
+        npc.Attackable = false;
+        Assert.IsTrue(NpcTemplateValidation.CanSpawn(npc));
         npc.UnresolvedPlaceholder = false;
+        npc.Attackable = true;
         Assert.IsTrue(NpcTemplateValidation.CanSpawn(npc));
     }
 

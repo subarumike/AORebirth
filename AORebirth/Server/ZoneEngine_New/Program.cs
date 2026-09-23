@@ -46,18 +46,18 @@ namespace ZoneEngine_New
         private static PlayfieldManager? playfieldManager;
         private static IChatEngineLink? chatEngineLink;
         private static int shutdownStarted;
-        private static bool shutdownFailed;
+        private static volatile bool shutdownFailed;
+        private static readonly ManualResetEventSlim shutdownCompleted = new(false);
 
         private static int Main(string[] args)
         {
             // AODB playfield RDB parsers read strings with Windows-1252.
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            using PosixSignalRegistration? termination = OperatingSystem.IsWindows() ? null :
-                PosixSignalRegistration.Create(PosixSignal.SIGTERM, context =>
-                {
-                    context.Cancel = true;
-                    exited = true;
-                });
+            // Windows maps console close to SIGHUP and logoff/shutdown to SIGTERM, then ends the
+            // process as soon as the handler returns, so the save must finish inside the handler.
+            using PosixSignalRegistration termination = PosixSignalRegistration.Create(PosixSignal.SIGTERM, TerminationRequested);
+            using PosixSignalRegistration hangup = PosixSignalRegistration.Create(PosixSignal.SIGHUP, TerminationRequested);
+            AppDomain.CurrentDomain.ProcessExit += ProcessExiting;
             Console.CancelKeyPress += ConsoleCancelKeyPress;
             try
             {
@@ -124,7 +124,23 @@ namespace ZoneEngine_New
                 exited = true;
                 Shutdown();
                 Console.CancelKeyPress -= ConsoleCancelKeyPress;
+                AppDomain.CurrentDomain.ProcessExit -= ProcessExiting;
             }
+        }
+
+        private static void TerminationRequested(PosixSignalContext context)
+        {
+            context.Cancel = true;
+            exited = true;
+            try { Console.WriteLine("ZoneEngine_New termination requested signal=" + context.Signal + "; saving players."); }
+            catch (Exception) { }
+            Shutdown();
+        }
+
+        private static void ProcessExiting(object? sender, EventArgs e)
+        {
+            exited = true;
+            Shutdown();
         }
 
         private static int CheckDatabase()
@@ -257,6 +273,7 @@ namespace ZoneEngine_New
             AddMessageHandler<CreateQuestMessageHandler>(services);
             AddMessageHandler<QuestMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
+            AddMessageHandler<SkillMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();
             services.AddSingleton<ZoneNetworkHost>();
@@ -274,8 +291,25 @@ namespace ZoneEngine_New
         {
             if (Interlocked.Exchange(ref shutdownStarted, 1) != 0)
             {
+                // Returning early would let Main or a console event end the process mid-save.
+                shutdownCompleted.Wait();
                 return !shutdownFailed;
             }
+
+            try
+            {
+                ShutdownCore();
+            }
+            finally
+            {
+                shutdownCompleted.Set();
+            }
+
+            return !shutdownFailed;
+        }
+
+        private static void ShutdownCore()
+        {
             // Read-only validators must never send a service stop notification.
             if (rootServices != null)
             {
@@ -302,7 +336,6 @@ namespace ZoneEngine_New
             Cleanup(() => rootServices?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             rootServices = null;
             Cleanup(LogManager.Shutdown);
-            return !shutdownFailed;
         }
 
         private static bool InitializeLogging()

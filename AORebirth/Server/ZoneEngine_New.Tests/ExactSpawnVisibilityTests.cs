@@ -7,9 +7,13 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.Movement;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Playfield.Locality;
+
+using Quaternion = AORebirth.Core.Vector.Quaternion;
+using Vector3 = AORebirth.Core.Vector.Vector3;
 
 [TestClass]
 public sealed class ExactSpawnVisibilityTests
@@ -95,10 +99,15 @@ public sealed class ExactSpawnVisibilityTests
         var other = new VisiblePlayer(701);
         var otherSession = new Session();
         other.EnterOnline(otherSession);
+        other.Position = new Vector3(12, 3, 40);
+        other.Rotation = new Quaternion(0, 0.6, 0, 0.8);
+        other.Motor.ApplyAction(MovementAction.SwitchToWalk);
+        other.Motor.ApplyAction(MovementAction.ForwardStart);
         locality.RegisterDynel(other);
 
         locality.ActivatePlayerVisibility(observer);
         AssertCharInPlayFollowsSpawn(observerSession, other.Identity.Instance);
+        AssertSpawnMoveFollowsCharInPlay(observerSession, other);
 
         locality.ActivatePlayerVisibility(other);
         AssertCharInPlayFollowsSpawn(otherSession, observer.Identity.Instance);
@@ -112,6 +121,32 @@ public sealed class ExactSpawnVisibilityTests
             body => body is CharInPlayMessage inPlay && inPlay.Identity.Instance == playerInstance);
         Assert.IsTrue(spawnIndex >= 0, "Observer did not receive the player spawn.");
         Assert.IsTrue(inPlayIndex > spawnIndex, "CharInPlay must follow that player's spawn.");
+    }
+
+    static void AssertSpawnMoveFollowsCharInPlay(Session session, Player player)
+    {
+        int inPlayIndex = session.Bodies.FindIndex(
+            body => body is CharInPlayMessage inPlay && inPlay.Identity.Instance == player.Identity.Instance);
+        var moves = new List<CharDCMoveMessage>();
+        for (int i = inPlayIndex + 1; i < session.Bodies.Count; i++)
+        {
+            if (session.Bodies[i] is not CharDCMoveMessage move
+                || move.Identity.Instance != player.Identity.Instance)
+                break;
+            moves.Add(move);
+        }
+
+        Assert.AreEqual(1, moves.Count, "Player spawn must send the current direction.");
+        Assert.AreEqual((byte)MovementAction.ForwardStart, moves[0].MoveType);
+        foreach (CharDCMoveMessage move in moves)
+        {
+            Assert.AreEqual(0, move.Unknown);
+            Assert.AreEqual(12f, move.Coordinates.X);
+            Assert.AreEqual(3f, move.Coordinates.Y);
+            Assert.AreEqual(40f, move.Coordinates.Z);
+            Assert.AreEqual(0.6f, move.Heading.Y);
+            Assert.AreEqual(0.8f, move.Heading.W);
+        }
     }
 
     [TestMethod]

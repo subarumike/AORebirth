@@ -3,6 +3,8 @@ namespace AORebirth.Database.Domain.Characters
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Globalization;
+    using System.Text;
     using AORebirth.Interfaces.Persistence.Characters;
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -187,12 +189,64 @@ namespace AORebirth.Database.Domain.Characters
             Transaction((c, t) => { WriteStats(c, t, characterId, stats); return 0; });
         }
 
+        public bool SaveOnlineCheckpoint(int characterId, CharacterStateData location, IList<CharacterStatData> stats)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (stats == null) throw new ArgumentNullException(nameof(stats));
+            if (location != null)
+            {
+                ValidateCharacter(location);
+                if (location.Id != characterId) throw new ArgumentException("Checkpoint location belongs to another character.", nameof(location));
+            }
+            if (location == null && stats.Count == 0) return true;
+
+            return Transaction((c, t) =>
+            {
+                object online;
+                using (var command = Command(c, t, "SELECT Online FROM characters WHERE Id=@Id FOR UPDATE", "@Id", characterId))
+                    online = command.ExecuteScalar();
+                if (online == null) throw new InvalidOperationException("Character row is missing during checkpoint persistence.");
+                if (online == DBNull.Value || Convert.ToInt32(online, CultureInfo.InvariantCulture) == 0) return false;
+
+                if (location != null)
+                    Execute(c, t, "UPDATE characters SET Playfield=@Playfield,X=@X,Y=@Y,Z=@Z,"
+                        + "HeadingW=@W,HeadingX=@HX,HeadingY=@HY,HeadingZ=@HZ WHERE Id=@Id",
+                        "@Playfield", location.Playfield, "@X", location.X, "@Y", location.Y, "@Z", location.Z,
+                        "@W", location.HeadingW, "@HX", location.HeadingX, "@HY", location.HeadingY, "@HZ", location.HeadingZ,
+                        "@Id", characterId);
+                WriteStats(c, t, characterId, stats);
+                return true;
+            });
+        }
+
+        // Well under MySQL's 65535 placeholder limit while keeping each statement a single round trip.
+        private const int StatRowsPerStatement = 256;
+
         private static void WriteStats(IDbConnection c, IDbTransaction t, int characterId, IList<CharacterStatData> stats)
         {
-            foreach (var stat in stats)
-                Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Instance,@StatId,@Value) "
-                    + "ON DUPLICATE KEY UPDATE StatValue=@Value", "@Type", (int)IdentityType.CanbeAffected,
-                    "@Instance", characterId, "@StatId", stat.StatId, "@Value", stat.StatValue);
+            for (int start = 0; start < stats.Count; start += StatRowsPerStatement)
+            {
+                int count = Math.Min(StatRowsPerStatement, stats.Count - start);
+                var sql = new StringBuilder("INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES ");
+                var parameters = new object[4 + count * 4];
+                parameters[0] = "@Type";
+                parameters[1] = (int)IdentityType.CanbeAffected;
+                parameters[2] = "@Instance";
+                parameters[3] = characterId;
+                for (int i = 0; i < count; i++)
+                {
+                    CharacterStatData stat = stats[start + i];
+                    string index = i.ToString(CultureInfo.InvariantCulture);
+                    if (i > 0) sql.Append(',');
+                    sql.Append("(@Type,@Instance,@S").Append(index).Append(",@V").Append(index).Append(')');
+                    parameters[4 + i * 4] = "@S" + index;
+                    parameters[5 + i * 4] = stat.StatId;
+                    parameters[6 + i * 4] = "@V" + index;
+                    parameters[7 + i * 4] = stat.StatValue;
+                }
+                sql.Append(" AS incoming ON DUPLICATE KEY UPDATE StatValue=incoming.StatValue");
+                Execute(c, t, sql.ToString(), parameters);
+            }
         }
 
         private static void LockCharacter(IDbConnection c, IDbTransaction t, int characterId)

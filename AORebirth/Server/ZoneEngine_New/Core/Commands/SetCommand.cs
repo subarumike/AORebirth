@@ -44,6 +44,10 @@ namespace ZoneEngine_New.Core.Commands
             else
             {
                 subject.Stats.Set(stat, value, StatDetail.Base, dirty: true);
+                // Derived stats (max health, max nano, trickle) are recomputed from their inputs, so a
+                // manual value for one of them does not survive; current vitals are left as set.
+                if (subject is Player player && stat is not (CharacterStat.Health or CharacterStat.CurrentNano))
+                    player.RebaseStats();
                 subject.FlushDirtyStats();
             }
 

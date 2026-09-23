@@ -54,7 +54,6 @@
     <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/ZoneHandoffStore.cs" Link="Shared/ZoneHandoffStore.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Dao/TeleportRoutingDao.cs" Link="Shared/TeleportRoutingDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Stats/SpecialStats/XPTable.cs" Link="SharedGameplay/Progression/XPTable.cs" />
-    <Compile Include="../../Libraries/Source/AORebirth.Stats/SkillTrickleTable.cs" Link="SharedGameplay/Nanos/SkillTrickleTable.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs" Link="SharedGameplay/Missions/MySqlMissionDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs" Link="Shared/Characters/MySqlCharacterDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Shops/MySqlShopDao.cs" Link="Shared/Shops/MySqlShopDao.cs" />

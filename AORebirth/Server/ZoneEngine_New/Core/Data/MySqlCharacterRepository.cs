@@ -26,6 +26,8 @@ namespace ZoneEngine_New.Core.Data
         public void SaveLocation(CharacterRecord character, int online) => Run(() => _persistence.SaveLocation(Map(character), online), _logger);
         public void SaveSnapshot(CharacterRecord character, int online, IReadOnlyList<StatRecord> stats)
             => Run(() => _persistence.SaveSnapshot(Map(character), online, stats.Select(Map).ToArray()), _logger);
+        public bool SaveOnlineCheckpoint(int characterId, CharacterRecord? location, IReadOnlyList<StatRecord> stats)
+            => Run(() => _persistence.SaveOnlineCheckpoint(characterId, location == null ? null! : Map(location), stats.Select(Map).ToArray()), _logger);
         public void SetOnline(int characterId) => SetOnlineState(characterId, 1);
         public void SetOffline(int characterId) => SetOnlineState(characterId, 0);
         private void SetOnlineState(int characterId, int online)

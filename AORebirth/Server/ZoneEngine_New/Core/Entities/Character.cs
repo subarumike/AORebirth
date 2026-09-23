@@ -1195,6 +1195,10 @@ namespace ZoneEngine_New.Core.Entities
 
         void OnStatChanged(CharacterStat stat, int previous, int next, bool isInitialSet)
         {
+            // Hydration loads stats in no fixed order, so only live writes are capped.
+            if (!isInitialSet && next > previous && TryCapVital(stat, next))
+                return;
+
             Motor.OnStatChanged(stat, previous, next, isInitialSet);
 
             if (stat == CharacterStat.NumberOfFightingOpponents)
@@ -1217,6 +1221,26 @@ namespace ZoneEngine_New.Core.Entities
 
             foreach (CharacterWeapon weapon in Weapons.Values)
                 weapon?.RefreshEffectiveSpeeds();
+        }
+
+        /// <summary>Rewrites a current vital raised above its full max down to the max; true when it did.</summary>
+        bool TryCapVital(CharacterStat stat, int next)
+        {
+            CharacterStat maxStat = stat switch
+            {
+                CharacterStat.Health => CharacterStat.MaxHealth,
+                CharacterStat.CurrentNano => CharacterStat.MaxNanoEnergy,
+                _ => CharacterStat.Unset
+            };
+            if (maxStat == CharacterStat.Unset)
+                return false;
+
+            int max = Stats.GetOrZero(maxStat);
+            if (max <= 0 || next <= max)
+                return false;
+
+            Stats.Set(stat, Stats.GetOrZero(stat, StatDetail.Base) - (next - max), StatDetail.Base, dirty: true);
+            return true;
         }
 
         /// <summary>0–100 remaining fraction of <paramref name="maxStat"/> after a current-vital change.</summary>

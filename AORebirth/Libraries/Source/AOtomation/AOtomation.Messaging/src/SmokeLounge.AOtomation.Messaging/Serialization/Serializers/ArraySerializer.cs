@@ -85,7 +85,8 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers
                 if (propertyMetaData.Options.SerializeSize != ArraySizeType.NoSerialization)
                 {
                     var arraySizeSerializer = new ArraySizeSerializer(propertyMetaData.Options.SerializeSize);
-                    arrayLength = (int)arraySizeSerializer.Deserialize(streamReader, serializationContext, propertyMetaData);
+                    arrayLength = streamReader.CheckElementCount(
+                        (int)arraySizeSerializer.Deserialize(streamReader, serializationContext, propertyMetaData));
                 }
                 else
                 {
@@ -176,9 +177,15 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers
             {
                 if (propertyMetaData.Options.SerializeSize != ArraySizeType.NoSerialization)
                 {
-                    setArrayLength =
+                    setArrayLength = Expression.Block(
                         new ArraySizeSerializer(propertyMetaData.Options.SerializeSize).DeserializerExpression(
-                            streamReaderExpression, serializationContextExpression, arrayLength, propertyMetaData);
+                            streamReaderExpression, serializationContextExpression, arrayLength, propertyMetaData),
+                        Expression.Assign(
+                            arrayLength,
+                            Expression.Call(
+                                streamReaderExpression,
+                                ReflectionHelper.GetMethodInfo<StreamReader, Func<int, int>>(o => o.CheckElementCount),
+                                arrayLength)));
                 }
                 else
                 {

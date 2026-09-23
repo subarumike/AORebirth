@@ -17,6 +17,7 @@ namespace ZoneEngine_New.Core.Movement
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
+    using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     /// <summary>
@@ -98,6 +99,73 @@ namespace ZoneEngine_New.Core.Movement
                 TurnDir = (byte)(turnLeft && !turnRight ? 3 : turnRight && !turnLeft ? 4 : 0),
                 JumpState = (byte)(jumping ? 3 : 1),
                 LastSpeedMode = (byte)lastSpeed
+            };
+        }
+
+        /// <summary>
+        /// Directional CharDCMove packets for a client that just spawned this character.
+        /// Posture and speed-mode switches are omitted. Unknown is 0 so the client applies
+        /// each move to this identity. Empty when the character is not moving directionally.
+        /// </summary>
+        public List<CharDCMoveMessage> BuildSpawnMoves()
+        {
+            var actions = new List<MovementAction>(4);
+            bool forward = HasPath || (_flags & MovementFlags.Forward) != 0;
+            bool backward = !HasPath && (_flags & MovementFlags.Backward) != 0;
+            if (forward)
+                actions.Add(MovementAction.ForwardStart);
+            if (backward)
+                actions.Add(MovementAction.BackwardStart);
+            if ((_flags & MovementFlags.StrafeLeft) != 0)
+                actions.Add(MovementAction.StrafeLeftStart);
+            if ((_flags & MovementFlags.StrafeRight) != 0)
+                actions.Add(MovementAction.StrafeRightStart);
+            if ((_flags & MovementFlags.TurnLeft) != 0)
+                actions.Add((_flags & MovementFlags.MouseTurn) != 0
+                    ? MovementAction.TurnLeftMouse
+                    : MovementAction.TurnLeftStart);
+            if ((_flags & MovementFlags.TurnRight) != 0)
+                actions.Add((_flags & MovementFlags.MouseTurn) != 0
+                    ? MovementAction.TurnRightMouse
+                    : MovementAction.TurnRightStart);
+            if ((_flags & MovementFlags.ElevateUp) != 0)
+                actions.Add(MovementAction.ElevateUpStart);
+            if ((_flags & MovementFlags.ElevateDown) != 0)
+                actions.Add(MovementAction.ElevateDownStart);
+            if (!_jumpArmed || (_flags & MovementFlags.Jump) != 0)
+                actions.Add(MovementAction.JumpStart);
+
+            var messages = new List<CharDCMoveMessage>(actions.Count);
+            foreach (MovementAction action in actions)
+                messages.Add(CreateMove(action));
+            return messages;
+        }
+
+        CharDCMoveMessage CreateMove(MovementAction action)
+        {
+            Quaternion rotation = _character.Rotation;
+            Vector3 position = _character.Position;
+            return new CharDCMoveMessage
+            {
+                Identity = _character.Identity,
+                Unknown = 0,
+                MoveType = (byte)action,
+                Heading = new MsgQuaternion
+                {
+                    X = rotation.xf,
+                    Y = rotation.yf,
+                    Z = rotation.zf,
+                    W = rotation.wf
+                },
+                Coordinates = new MsgVector3
+                {
+                    X = position.xf,
+                    Y = position.yf,
+                    Z = position.zf
+                },
+                Unknown1 = 0,
+                AuxA = 0,
+                AuxB = 0
             };
         }
 
