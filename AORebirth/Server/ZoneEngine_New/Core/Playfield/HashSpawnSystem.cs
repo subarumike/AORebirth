@@ -51,7 +51,8 @@ namespace ZoneEngine_New.Core.Playfield
             int minLevel,
             int maxLevel,
             int cellId,
-            PlayfieldSpawnEntry source)
+            PlayfieldSpawnEntry source,
+            bool isStatic)
         {
             ArgumentNullException.ThrowIfNull(sites);
             ArgumentNullException.ThrowIfNull(source);
@@ -66,6 +67,7 @@ namespace ZoneEngine_New.Core.Playfield
             MaxLevel = maxLevel;
             CellId = cellId;
             Source = source;
+            IsStatic = isStatic;
             State = HashSpawnState.Dead;
             NextSpawnTime = DateTime.UtcNow;
         }
@@ -87,11 +89,14 @@ namespace ZoneEngine_New.Core.Playfield
 
         internal int CellId { get; }
 
+        /// <summary>Hash resolved to an item template, not an NPC template; spawns a static dynel.</summary>
+        internal bool IsStatic { get; }
+
         internal HashSpawnState State { get; set; }
 
         internal DateTime NextSpawnTime { get; set; }
 
-        internal NpcCharacter? Spawned { get; set; }
+        internal Dynel? Spawned { get; set; }
     }
 
     /// <summary>
@@ -108,7 +113,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly IZoneLogger _logger;
         private readonly Dictionary<int, List<HashSpawnPoint>> _pointsByCell = new();
         private readonly List<HashSpawnPoint> _allPoints = new();
-        private readonly Dictionary<NpcCharacter, HashSpawnPoint> _pointBySpawned = new();
+        private readonly Dictionary<Dynel, HashSpawnPoint> _pointBySpawned = new();
         private int _spawnRate = 1;
         private bool _initialized;
 
@@ -190,9 +195,12 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
-                if (!_gameData.CanResolveMobHash(spawnHash)
-                    || !_gameData.TryResolveMobTemplate(spawnHash, entry.MinLevel, out var spawnTemplate)
-                    || !NpcTemplateValidation.CanSpawn(spawnTemplate))
+                bool isMobHash = _gameData.CanResolveMobHash(spawnHash);
+                bool isMob = isMobHash
+                    && _gameData.TryResolveMobTemplate(spawnHash, entry.MinLevel, out var spawnTemplate)
+                    && NpcTemplateValidation.CanSpawn(spawnTemplate);
+                bool isStatic = !isMobHash && _spawnService.CanSpawnStatic(spawnHash);
+                if (!isMob && !isStatic)
                 {
                     _logger.Warn(
                         string.Format(
@@ -241,7 +249,8 @@ namespace ZoneEngine_New.Core.Playfield
                     entry.MinLevel,
                     entry.MaxLevel,
                     cell.Id,
-                    entry);
+                    entry,
+                    isStatic);
 
                 if (!_pointsByCell.TryGetValue(cell.Id, out List<HashSpawnPoint>? list))
                 {
@@ -379,6 +388,21 @@ namespace ZoneEngine_New.Core.Playfield
             try
             {
                 PickSpawnTransform(point, out Vector3 position, out Quaternion heading);
+                if (point.IsStatic)
+                {
+                    StaticDynel dynel = _spawnService.SpawnStatic(
+                        point.HashText,
+                        position,
+                        heading,
+                        RollLevel(point),
+                        SpawnSource.HashSpawn);
+                    point.Spawned = dynel;
+                    point.State = HashSpawnState.Alive;
+                    _pointBySpawned[dynel] = point;
+                    LogSpawn("spawn", point, dynel.Identity.Instance, dynel.Template.Name, position);
+                    return true;
+                }
+
                 NpcCharacter character = _spawnService.Spawn(
                     point.HashText,
                     position,
@@ -495,19 +519,31 @@ namespace ZoneEngine_New.Core.Playfield
 
         private void DespawnForSleep(HashSpawnPoint point)
         {
-            NpcCharacter? character = point.Spawned;
-            if (character == null)
+            Dynel? spawned = point.Spawned;
+            if (spawned == null)
                 return;
 
-            character.Died -= OnSpawnedDied;
-            _pointBySpawned.Remove(character);
+            _pointBySpawned.Remove(spawned);
             point.Spawned = null;
             // Stay Alive — sleep-despawned; respawn on next awake tick.
             point.State = HashSpawnState.Alive;
-            int instance = character.Identity.Instance;
-            string? name = character.Name;
-            Vector3 position = character.Position;
-            _spawnService.DespawnNpc(character);
+            int instance = spawned.Identity.Instance;
+            string? name = spawned switch
+            {
+                NpcCharacter npc => npc.Name,
+                StaticDynel staticDynel => staticDynel.Template.Name,
+                _ => null
+            };
+            Vector3 position = spawned.Position;
+            if (spawned is NpcCharacter character)
+            {
+                character.Died -= OnSpawnedDied;
+                _spawnService.DespawnNpc(character);
+            }
+            else if (spawned is StaticDynel dynel)
+            {
+                _spawnService.DespawnStatic(dynel);
+            }
             LogSpawn("sleep-despawn", point, instance, name, position);
         }
 
@@ -538,12 +574,13 @@ namespace ZoneEngine_New.Core.Playfield
         /// </summary>
         private void RecoverOrphanedSpawn(HashSpawnPoint point)
         {
-            NpcCharacter? character = point.Spawned;
-            if (character == null || character.Playfield != null)
+            Dynel? spawned = point.Spawned;
+            if (spawned == null || spawned.Playfield != null)
                 return;
 
-            character.Died -= OnSpawnedDied;
-            _pointBySpawned.Remove(character);
+            if (spawned is NpcCharacter character)
+                character.Died -= OnSpawnedDied;
+            _pointBySpawned.Remove(spawned);
             point.Spawned = null;
             point.State = HashSpawnState.Dead;
             point.NextSpawnTime = DateTime.UtcNow.AddSeconds(point.RespawnTimeSeconds);

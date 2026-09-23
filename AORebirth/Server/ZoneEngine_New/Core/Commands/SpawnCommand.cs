@@ -43,15 +43,6 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            if (!_gameData.CanResolveMobHash(hash))
-            {
-                GmCommandFeedback.Send(
-                    context.Session,
-                    context.Player,
-                    string.Format(CultureInfo.InvariantCulture, "Unknown mob hash: {0}", hash));
-                return;
-            }
-
             Playfield? playfield = context.Player.Playfield;
             if (playfield == null)
             {
@@ -60,6 +51,12 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             SpawnService spawn = playfield.GetRequiredService<SpawnService>();
+            if (!_gameData.CanResolveMobHash(hash))
+            {
+                SpawnStatic(context, spawn, hash, level);
+                return;
+            }
+
             NpcCharacter npc = spawn.Spawn(
                 hash,
                 context.Player.Position,
@@ -76,6 +73,36 @@ namespace ZoneEngine_New.Core.Commands
                     npc.Name,
                     npc.Identity.Instance,
                     npc.Stats.GetOrZero(CharacterStat.Level)));
+        }
+
+        static void SpawnStatic(GmCommandContext context, SpawnService spawn, string hash, int level)
+        {
+            if (!spawn.CanSpawnStatic(hash))
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(CultureInfo.InvariantCulture, "Unknown mob or item hash: {0}", hash));
+                return;
+            }
+
+            StaticDynel dynel = spawn.SpawnStatic(
+                hash,
+                context.Player.Position,
+                context.Player.Rotation,
+                level,
+                SpawnSource.Command);
+
+            GmCommandFeedback.Send(
+                context.Session,
+                context.Player,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Spawned static {0} id={1} template={2} ql={3}",
+                    dynel.Template.Name,
+                    dynel.Identity.Instance,
+                    dynel.Template.Id,
+                    dynel.Template.Quality));
         }
     }
 }

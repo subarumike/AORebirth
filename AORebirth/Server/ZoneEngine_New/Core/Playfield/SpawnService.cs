@@ -157,6 +157,82 @@ namespace ZoneEngine_New.Core.Playfield
             return npc;
         }
 
+        /// <summary>True when <paramref name="hash"/> resolves to an item family from ItemTemplates.json.</summary>
+        public bool CanSpawnStatic(string hash)
+            => !string.IsNullOrEmpty(hash) && _gameData.TryResolveHashInstance(hash, out _);
+
+        /// <summary>
+        /// Spawns an item template hash as a static world dynel. <paramref name="level"/> is the
+        /// requested item quality.
+        /// </summary>
+        public StaticDynel SpawnStatic(
+            string hash,
+            Vector3 position,
+            Quaternion? heading = null,
+            int? level = null,
+            SpawnSource spawnSource = SpawnSource.None)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(hash);
+            ArgumentNullException.ThrowIfNull(position);
+
+            if (!_gameData.TryResolveHashInstance(hash, out HashInstance instance)
+                || !_hashItems.TryRollIdsFor(instance, level ?? 1, out int lowId, out int highId, out int quality))
+            {
+                throw new KeyNotFoundException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Item template hash '{0}' not found",
+                        hash));
+            }
+
+            ItemTemplate template = _items.CreateTemplate(lowId, highId, quality);
+            Identity identity = _registry.AllocateStaticDynelIdentity();
+            var dynel = new PlayfieldStaticDynel(identity, template)
+            {
+                Playfield = _playfield,
+                Position = position,
+                Rotation = heading ?? new Quaternion(),
+                SpawnSource = spawnSource
+            };
+
+            _registry.Register(dynel);
+            _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(dynel);
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Spawned static hash={0} name={1} id={2} template={3}/{4} ql={5} at ({6},{7},{8})",
+                    hash,
+                    template.Name,
+                    identity.Instance,
+                    lowId,
+                    highId,
+                    quality,
+                    position.xf,
+                    position.yf,
+                    position.zf));
+
+            return dynel;
+        }
+
+        /// <summary>Removes a hash-spawned static dynel from the playfield (visibility + registry).</summary>
+        public void DespawnStatic(StaticDynel dynel)
+        {
+            ArgumentNullException.ThrowIfNull(dynel);
+
+            Identity identity = dynel.Identity;
+            _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(dynel);
+            _registry.Unregister(identity);
+            dynel.Playfield = null;
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Despawned static id={0} playfield={1}",
+                    identity.Instance,
+                    _playfield.Identity.Instance));
+        }
+
         static void ApplyTextures(NpcCharacter npc, MobTemplate template)
         {
             Dictionary<int, int>? textures = template.Textures;

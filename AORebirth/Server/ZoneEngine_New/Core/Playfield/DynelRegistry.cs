@@ -15,6 +15,7 @@ namespace ZoneEngine_New.Core.Playfield
         private const int FirstCorpseInstance = 2_000_000;
         private const int FirstVendingMachineInstance = 3_000_000;
         private const int FirstTempBagInstance = 4_000_000;
+        private const int FirstStaticDynelInstance = 5_000_000;
 
         private readonly Lock _sync = new();
         private readonly Dictionary<ulong, Dynel> _dynels = new();
@@ -22,6 +23,7 @@ namespace ZoneEngine_New.Core.Playfield
         private int _nextCorpseInstance = FirstCorpseInstance - 1;
         private int _nextVendingMachineInstance = FirstVendingMachineInstance - 1;
         private int _nextTempBagInstance = FirstTempBagInstance - 1;
+        private int _nextStaticDynelInstance = FirstStaticDynelInstance - 1;
 
         public Identity AllocateNpcIdentity()
         {
@@ -50,6 +52,17 @@ namespace ZoneEngine_New.Core.Playfield
             return new Identity
             {
                 Type = IdentityType.VendingMachine,
+                Instance = instance
+            };
+        }
+
+        /// <summary>Identity for a static item dynel spawned from a hash rather than placed by Dynels.dat.</summary>
+        public Identity AllocateStaticDynelIdentity()
+        {
+            int instance = Interlocked.Increment(ref _nextStaticDynelInstance);
+            return new Identity
+            {
+                Type = IdentityType.Terminal,
                 Instance = instance
             };
         }
