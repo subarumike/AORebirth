@@ -121,6 +121,9 @@ namespace ZoneEngine_New.Core.GameData
         public bool CanResolveMobHash(string hash)
             => _npcTemplates.CanResolve(hash);
 
+        public bool HasMobTemplate(string hash)
+            => _npcTemplates.HasTemplate(hash);
+
         public bool TryGetMobTemplate(string hash, out MobTemplate template)
         {
             template = null!;

@@ -157,10 +157,6 @@ namespace ZoneEngine_New.Core.Playfield
             return npc;
         }
 
-        /// <summary>True when <paramref name="hash"/> resolves to an item family from ItemTemplates.json.</summary>
-        public bool CanSpawnStatic(string hash)
-            => !string.IsNullOrEmpty(hash) && _gameData.TryResolveHashInstance(hash, out _);
-
         /// <summary>
         /// Spawns an item template hash as a static world dynel. <paramref name="level"/> is the
         /// requested item quality.

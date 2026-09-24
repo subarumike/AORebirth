@@ -51,9 +51,18 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             SpawnService spawn = playfield.GetRequiredService<SpawnService>();
-            if (!_gameData.CanResolveMobHash(hash))
+            if (_gameData.IsStaticSpawnHash(hash))
             {
                 SpawnStatic(context, spawn, hash, level);
+                return;
+            }
+
+            if (!_gameData.CanResolveMobHash(hash))
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(CultureInfo.InvariantCulture, "Unknown mob or item hash: {0}", hash));
                 return;
             }
 
@@ -77,15 +86,6 @@ namespace ZoneEngine_New.Core.Commands
 
         static void SpawnStatic(GmCommandContext context, SpawnService spawn, string hash, int level)
         {
-            if (!spawn.CanSpawnStatic(hash))
-            {
-                GmCommandFeedback.Send(
-                    context.Session,
-                    context.Player,
-                    string.Format(CultureInfo.InvariantCulture, "Unknown mob or item hash: {0}", hash));
-                return;
-            }
-
             StaticDynel dynel = spawn.SpawnStatic(
                 hash,
                 context.Player.Position,

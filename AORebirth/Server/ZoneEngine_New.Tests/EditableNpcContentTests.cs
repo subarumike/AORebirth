@@ -95,6 +95,21 @@ public sealed class EditableNpcContentTests
     }
 
     [TestMethod]
+    public void ItemTemplateHashSpawnsAsStaticInsteadOfPlaceholder()
+    {
+        using var fixture = new TempContent();
+        File.WriteAllText(Path.Combine(fixture.Root, "NpcTemplates.json"), "{\"AAAA\":{\"Templates\":[{\"Name\":\"Marker\",\"Level\":1,\"Stats\":{\"54\":1}}]}}");
+        File.WriteAllText(Path.Combine(fixture.Root, "ItemTemplates.json"), "{\"AR0000546100005461\":{\"Templates\":[21601,21601]}}");
+        var data = new GameDataStore(new StubLogger(), null, fixture.Root);
+
+        Assert.IsTrue(data.CanResolveMobHash("AR0000546100005461"));
+        Assert.IsFalse(data.HasMobTemplate("AR0000546100005461"));
+        Assert.IsTrue(((IGameData)data).IsStaticSpawnHash("AR0000546100005461"));
+        Assert.IsFalse(((IGameData)data).IsStaticSpawnHash("MISSING"));
+        Assert.IsFalse(((IGameData)data).IsStaticSpawnHash(MobTemplate.FallbackHash));
+    }
+
+    [TestMethod]
     public void InvalidPlacementIsRejectedByStructureWithoutReviewMetadata()
     {
         var entry = new PlayfieldSpawnEntry { HashText = "TEST", Position = [1, 2, 3], MinLevel = 1, MaxLevel = 2, RespawnChance = 100 };

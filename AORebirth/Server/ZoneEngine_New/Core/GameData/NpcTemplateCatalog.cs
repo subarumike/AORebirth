@@ -86,6 +86,10 @@ namespace ZoneEngine_New.Core.GameData
             return CanUseFallback(hash);
         }
 
+        /// <summary>True when <paramref name="hash"/> resolves to an authored template, ignoring the placeholder fallback.</summary>
+        public bool HasTemplate(string hash)
+            => !string.IsNullOrEmpty(hash) && CanResolveCore(hash, new HashSet<string>(StringComparer.Ordinal));
+
         public bool TryGetLeaf(string hash, out NpcLeaf leaf)
         {
             if (string.IsNullOrEmpty(hash) || !_leaves.TryGetValue(hash, out NpcLeaf? found))

@@ -195,11 +195,11 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
-                bool isMobHash = _gameData.CanResolveMobHash(spawnHash);
-                bool isMob = isMobHash
+                bool isStatic = _gameData.IsStaticSpawnHash(spawnHash);
+                bool isMob = !isStatic
+                    && _gameData.CanResolveMobHash(spawnHash)
                     && _gameData.TryResolveMobTemplate(spawnHash, entry.MinLevel, out var spawnTemplate)
                     && NpcTemplateValidation.CanSpawn(spawnTemplate);
-                bool isStatic = !isMobHash && _spawnService.CanSpawnStatic(spawnHash);
                 if (!isMob && !isStatic)
                 {
                     _logger.Warn(

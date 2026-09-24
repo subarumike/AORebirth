@@ -29,6 +29,16 @@ namespace ZoneEngine_New.Core.GameData
 
         bool CanResolveMobHash(string hash) => TryGetMobTemplate(hash, out _);
 
+        /// <summary>Like <see cref="CanResolveMobHash"/> but false when only the placeholder fallback would match.</summary>
+        bool HasMobTemplate(string hash) => CanResolveMobHash(hash);
+
+        /// <summary>
+        /// True when <paramref name="hash"/> has no authored NPC template but is in ItemTemplates.json, so it
+        /// spawns as a static dynel instead of the placeholder NPC.
+        /// </summary>
+        bool IsStaticSpawnHash(string hash)
+            => !string.IsNullOrEmpty(hash) && !HasMobTemplate(hash) && TryResolveHashInstance(hash, out _);
+
         bool TryGetMobTemplate(string hash, out MobTemplate template);
 
         bool TryResolveMobTemplate(string hash, int? level, out MobTemplate template)
