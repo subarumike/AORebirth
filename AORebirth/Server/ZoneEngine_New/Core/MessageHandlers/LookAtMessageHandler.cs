@@ -6,6 +6,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
@@ -40,8 +41,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (playfield == null)
                 return;
 
-            if (!playfield.GetRequiredService<DynelRegistry>().TryGet(message.Target, out Dynel? dynel)
-                || dynel is not Character target)
+            if (!playfield.GetRequiredService<DynelRegistry>().TryGet(message.Target, out Dynel? dynel))
+                return;
+
+            // Targetting a Grid enter terminal clears combat so the client's isfightingme
+            // criteria can pass on the following Use.
+            if (dynel is StaticDynel staticDynel && GridEnterTerminal.IsGridEnter(staticDynel.Template))
+            {
+                GridEnterTerminal.ClearCombatForEntry(player);
+                return;
+            }
+
+            if (dynel is not Character target)
                 return;
 
             session.Send(target.BuildInfoPacket());

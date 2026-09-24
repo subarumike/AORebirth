@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Ai
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Playfield;
 
@@ -125,6 +126,10 @@ namespace ZoneEngine_New.Core.Ai
             if (!Npc.Attackable)
                 return;
             if (!NpcAiRules.IsProximityHostile(Npc.Stats.GetOrZero(NpcAiRules.BreedHostilityStat)))
+                return;
+            // Grid enter: client blocks Use while isfightingme; do not re-arm combat while
+            // the player has a TeleportProxy2 terminal selected.
+            if (player is Player enteringGrid && GridEnterTerminal.IsPlayerTargetingGridEnter(enteringGrid))
                 return;
             if (Hate.Contains(player.Identity))
                 return;

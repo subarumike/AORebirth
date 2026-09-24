@@ -212,17 +212,36 @@ namespace ZoneEngine_New.Core.WorldSimulation
         }
 
         /// <summary>
-        /// Places feet on the walkable floor at this XZ. Outdoor terrain is the
-        /// heightfield we baked into Bepu; a downward ray that starts under that
-        /// one-sided mesh never hits it, so the heightfield sample is the floor.
-        /// Indoor meshes have no heightfield and still use a torso-height ray.
+        /// Places feet on the walkable floor at this XZ.
+        /// Outdoor playfields bake both a heightfield (sea/ground) and raised surface meshes
+        /// (platforms, decks). A heightfield-only snap puts Jobe Platform / Nero-style decks
+        /// into the water at Y=0. Probe from above the higher of feet/terrain so Bepu hits the
+        /// real floor; fall back to the heightfield when no mesh is above it.
         /// </summary>
         public bool TrySnapToFloor(AoVector3 feet, out AoVector3 floor)
         {
             floor = feet;
             TerrainHeightfield? terrain = _geometry.Collision?.Terrain;
-            if (terrain != null
-                && terrain.TryGetHeight((float)feet.x, (float)feet.z, out float terrainY))
+            float terrainY = 0f;
+            bool hasTerrain = terrain != null
+                && terrain.TryGetHeight((float)feet.x, (float)feet.z, out terrainY);
+
+            float probeY = (float)feet.y;
+            if (hasTerrain)
+                probeY = MathF.Max(probeY, terrainY);
+            probeY += MovementConfig.GroundProbeLift;
+
+            float maxDistance = MovementConfig.VoidProbeDepth;
+            if (hasTerrain)
+                maxDistance = MathF.Max(maxDistance, probeY - terrainY + 1f);
+
+            if (TryRaycastDown(new AoVector3(feet.x, probeY, feet.z), maxDistance, out AoVector3 hit))
+            {
+                floor = new AoVector3(feet.x, hit.y, feet.z);
+                return true;
+            }
+
+            if (hasTerrain)
             {
                 floor = new AoVector3(feet.x, terrainY, feet.z);
                 return true;

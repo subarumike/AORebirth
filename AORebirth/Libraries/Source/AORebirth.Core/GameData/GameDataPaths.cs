@@ -35,6 +35,8 @@ namespace AORebirth.Core.GameData
 
         public const string VendingMachinesFileName = "VendingMachines.json";
 
+        public const string GridTerminalRoutesFileName = "GridTerminalRoutes.json";
+
         public const string MonsterDataFileName = "MonsterData.json";
 
         public const string RespawnFileName = "Respawn.json";

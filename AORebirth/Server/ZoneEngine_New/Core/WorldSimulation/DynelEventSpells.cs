@@ -9,6 +9,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
     using AORebirth.Enums;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine_New.Core.Inventory;
 
     using AodbEventType = AODB.Common.Enums.EventType;
@@ -42,8 +44,14 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 for (int i = 0; i < sets.Count; i++)
                 {
                     ItemSpell? spell = TryMapSpell((int)pair.Key, sets[i]);
-                    if (spell != null)
-                        spells.Add(spell);
+                    if (spell == null)
+                        continue;
+
+                    // Grid / one-way proxies: drop isfightingme so combat cannot block entry.
+                    if (pair.Key == AodbFunctionType.TeleportProxy2)
+                        StripIsFightingMe(spell);
+
+                    spells.Add(spell);
                 }
             }
 
@@ -149,6 +157,19 @@ namespace ZoneEngine_New.Core.WorldSimulation
             }
 
             return result;
+        }
+
+        static void StripIsFightingMe(ItemSpell spell)
+        {
+            if (spell.Requirements == null || spell.Requirements.Count == 0)
+                return;
+
+            int isFightingMe = (int)CharacterStat.IsFightingMe;
+            for (int i = spell.Requirements.Count - 1; i >= 0; i--)
+            {
+                if (spell.Requirements[i].StatNumber == isFightingMe)
+                    spell.Requirements.RemoveAt(i);
+            }
         }
 
         static object? Get(Dictionary<AodbFunctionOperator, object> arguments, AodbFunctionOperator key)

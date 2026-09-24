@@ -10,10 +10,16 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
+    using Quaternion = AORebirth.Core.Vector.Quaternion;
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     /// <summary>
     /// Playfield-placed world object backed by a reference-only interpolated item template.
@@ -48,7 +54,18 @@ namespace ZoneEngine_New.Core.Entities
             if (GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
                 return false;
 
-            if (!Template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))
+            // TeleportProxy2 terminals (Grid enter): combat must not block.
+            // Clear fight for client isfightingme; skip ToUse criteria that include it.
+            bool gridEnter = GridEnterTerminal.IsGridEnter(Template);
+            if (gridEnter)
+            {
+                GridEnterTerminal.ClearCombatForEntry(player);
+                return OnUse(player);
+            }
+
+            if (!Template.MeetsActionRequirements(
+                    stat => player.Stats.GetOrZero(stat),
+                    ActionType.ToUse))
                 return false;
 
             return OnUse(player);
@@ -58,6 +75,35 @@ namespace ZoneEngine_New.Core.Entities
         {
             if (Playfield == null || player.Session == null)
                 return false;
+
+            IGameData gameData = Playfield.GetRequiredService<IGameData>();
+            if (gameData.TryGetCapturedGridEnter(
+                    Playfield.Identity.Instance,
+                    Identity.Instance,
+                    out CapturedGridEnterLanding landing))
+            {
+                Vector3 position = landing.PositionFallback;
+                Quaternion heading = landing.HeadingFallback;
+                if (landing.ExitTerminalInstance != 0
+                    && PortalDoorLandingResolver.TryResolveProxyLanding(
+                        gameData.GetPlayfieldGeometry(landing.PlayfieldId),
+                        landing.ExitTerminalInstance,
+                        PortalDoorLandingResolver.Proxy2EntryDoorClearance,
+                        out Vector3 resolved,
+                        out Quaternion resolvedHeading))
+                {
+                    position = resolved;
+                    heading = resolvedHeading;
+                }
+
+                player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+                player.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+                player.Rotation = heading;
+                Playfield dest = Playfield.GetRequiredService<PlayfieldManager>()
+                    .GetOrCreate(landing.PlayfieldId);
+                player.Session.TransferToPlayfield(dest, position, heading);
+                return true;
+            }
 
             return Template.ExecuteOnUseSpells(
                 player,
@@ -70,13 +116,16 @@ namespace ZoneEngine_New.Core.Entities
             MsgVector3 coordinate = Position;
             MsgQuaternion heading = Rotation;
 
+            // World-placed statics: Identitytype/Instance are the *owner* slot, not the dynel id.
+            // Legacy leaves them at 0. Non-zero Identitytype (e.g. Terminal=51005) makes the
+            // AoFlags gate omit Coordinate/Heading, so the client never places the mesh.
             var message = new SimpleItemFullUpdateMessage
             {
                 Identity = Identity,
                 Unknown = 0,
                 MsgVersion = SimpleItemFullUpdateMsgVersion,
-                Identitytype = (int)Identity.Type,
-                Instance = Identity.Instance,
+                Identitytype = 0,
+                Instance = 0,
                 Coordinate = coordinate,
                 Heading = heading,
                 Playfield = Playfield != null ? Playfield.Identity.Instance : 0,
@@ -88,7 +137,7 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown2 = 0,
                 Unknown3 = SimpleItemFullUpdateUnknown3,
                 Stats = BuildStats(),
-                Name = Template.Name ?? string.Empty
+                Name = string.Empty
             };
             message.Owner = Identity.None;
             return message;

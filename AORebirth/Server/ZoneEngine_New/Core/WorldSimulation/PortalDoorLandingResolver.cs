@@ -103,8 +103,14 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// <summary>Sideways offset LineTeleport leaves from its destination line.</summary>
         public const float LineLandingOffset = 4.0f;
 
-        /// <summary>Events raised when a character walks into a door rather than using it.</summary>
-        static readonly AodbEventType[] WalkInEvents = [AodbEventType.OnEnter, AodbEventType.OnCollide];
+        /// <summary>Events raised when a character walks into a door/pad rather than using it.</summary>
+        static readonly AodbEventType[] WalkInEvents =
+        [
+            AodbEventType.OnEnter,
+            AodbEventType.OnCollide,
+            // Grid exit pads use OnTargetInVicinity + LineTeleport, not OnUse.
+            AodbEventType.OnTargetInVicinity
+        ];
 
         static readonly (AodbFunctionType Function, float Clearance, bool RecordsReturn)[] ProxyFunctions =
         [
