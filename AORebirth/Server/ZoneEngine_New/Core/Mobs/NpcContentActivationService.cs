@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Mobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AORebirth.Core.GameData;
 using AORebirth.Interfaces.Persistence.Shops;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using ZoneEngine_New.Core.Entities;
@@ -34,7 +35,7 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
     {
         if (_stopped) return;
         PlayfieldNpcContentCatalog playfieldContent = gameData?.GetPlayfieldNpcs(playfield.Identity.Instance)
-            ?? PlayfieldNpcContentCatalog.Load(System.IO.Path.Combine(AppContext.BaseDirectory, "GameData"), playfield.Identity.Instance);
+            ?? PlayfieldNpcContentCatalog.Load(GameDataPaths.ResolveRuntimeRoot(), playfield.Identity.Instance);
 
         foreach (var definition in playfieldContent.Npcs)
         {

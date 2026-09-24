@@ -19,7 +19,8 @@ namespace ZoneEngine_New.Core.GameData
     using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
-    /// Loads and caches the GameData tree from {BaseDirectory}\GameData.
+    /// Loads and caches the GameData tree from the runtime GameData root.
+    /// <see cref="GameDataPaths.EnvironmentVariableName"/> overrides the directory beside the process.
     /// There is no path search. Missing root files log and degrade gracefully.
     /// </summary>
     public sealed class GameDataStore : IGameData
@@ -65,7 +66,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly TeleportDestinationCatalog? _teleportDestinations;
 
         public GameDataStore(IZoneLogger logger, TeleportDestinationCatalog? teleportDestinations = null)
-            : this(logger, teleportDestinations, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, GameDataPaths.RootFolderName))
+            : this(logger, teleportDestinations, GameDataPaths.ResolveRuntimeRoot())
         {
         }
 

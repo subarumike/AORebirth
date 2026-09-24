@@ -8,6 +8,7 @@ namespace ZoneEngine_New
     using System.Text;
     using System.Text.Json;
     using MySqlConnector;
+    using AORebirth.Core.GameData;
     using Utility.Config;
     using Utility.Network;
     using ZoneEngine_New.Core.Data;
@@ -95,7 +96,7 @@ namespace ZoneEngine_New
 
         public static void ValidatePackage(string baseDirectory, bool skipPlayfieldPackagePin = false)
         {
-            string gameData = Path.Combine(baseDirectory, "GameData");
+            string gameData = GameDataPaths.Resolve(baseDirectory);
             // NpcTemplates.json is optional; GameDataStore logs and uses an empty catalog when it is absent.
             foreach (string file in new[] { "ItemTemplates.json", "VendingMachines.json", "MonsterData.json", "Xp.json" })
             {

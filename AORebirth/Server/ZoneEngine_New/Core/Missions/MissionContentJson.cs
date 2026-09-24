@@ -7,13 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using AORebirth.Core.GameData;
 
 /// <summary>Editable GameData adapter for the existing immutable mission records.
 /// Construction still executes each record's structural validators. No content type
 /// names, source hashes or reconstruction approval decisions come from the file.</summary>
 internal static class MissionContentJson
 {
-    internal static string RootPath => Path.Combine(AppContext.BaseDirectory, "GameData", "Missions");
+    internal static string RootPath => Path.Combine(GameDataPaths.ResolveRuntimeRoot(), "Missions");
     internal static T Read<T>(string filename) => Read<T>(RootPath, filename);
     internal static T Read<T>(string root, string filename)
     {

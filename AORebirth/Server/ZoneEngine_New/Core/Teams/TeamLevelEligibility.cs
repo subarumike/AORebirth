@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using AORebirth.Core.GameData;
 
 /// <summary>Validated editable eligibility windows; invitation policy remains in TeamService.</summary>
 internal sealed class TeamLevelEligibility
@@ -12,7 +13,7 @@ internal sealed class TeamLevelEligibility
     sealed record Content(int MinimumLevel, int MaximumLevel, LevelRange[] Ranges);
 
     internal static TeamLevelEligibility Current { get; } = Load(
-        Path.Combine(AppContext.BaseDirectory, "GameData", "Teams", "LevelEligibility.json"));
+        Path.Combine(GameDataPaths.ResolveRuntimeRoot(), "Teams", "LevelEligibility.json"));
 
     readonly LevelRange[] ranges;
     TeamLevelEligibility(LevelRange[] values) => ranges = values;

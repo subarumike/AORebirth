@@ -26,7 +26,7 @@ namespace ZoneEngine_New.Core.GameData
         static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         static readonly Lazy<SkillCatalog> DefaultCatalog = new(() =>
-            LoadOrEmpty(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, GameDataPaths.RootFolderName)));
+            LoadOrEmpty(GameDataPaths.ResolveRuntimeRoot()));
 
         readonly CharacterStat[] _trickleAbilities;
         readonly Dictionary<CharacterStat, int[]> _tricklePercents;

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AORebirth.Core.GameData;
 using SmokeLounge.AOtomation.Messaging.GameData;
 
 /// <summary>Editable item mechanic bindings. Identity/loot/curve values are content;
@@ -20,7 +21,7 @@ public sealed class ItemBehaviorContent
     public string[] Provenance { get; set; } = [];
 
     public static ItemBehaviorContent Load(string? gameDataRoot = null)
-        => Parse(File.ReadAllText(Path.Combine(gameDataRoot ?? Path.Combine(AppContext.BaseDirectory, "GameData"), "ItemBehavior.json")));
+        => Parse(File.ReadAllText(Path.Combine(gameDataRoot ?? GameDataPaths.ResolveRuntimeRoot(), "ItemBehavior.json")));
 
     public static ItemBehaviorContent Parse(string json)
     {

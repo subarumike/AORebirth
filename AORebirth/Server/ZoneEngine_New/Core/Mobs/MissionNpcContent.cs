@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AORebirth.Core.GameData;
 using SmokeLounge.AOtomation.Messaging.GameData;
 
 /// <summary>Generated mission NPC content, using the same editable GameData root as world templates.</summary>
@@ -21,7 +22,7 @@ public sealed class MissionNpcContent
 
     public static MissionNpcContent Load(string? gameDataRoot = null)
     {
-        var path = Path.Combine(gameDataRoot ?? Path.Combine(AppContext.BaseDirectory, "GameData"), "Missions", "NpcContent.json");
+        var path = Path.Combine(gameDataRoot ?? GameDataPaths.ResolveRuntimeRoot(), "Missions", "NpcContent.json");
         return Parse(File.ReadAllText(path));
     }
 

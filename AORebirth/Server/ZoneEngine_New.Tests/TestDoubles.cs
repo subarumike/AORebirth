@@ -55,7 +55,7 @@ namespace ZoneEngine_New.Tests
 
         public string RootPath { get; init; } = string.Empty;
 
-        string DataRoot => string.IsNullOrEmpty(RootPath) ? Path.Combine(AppContext.BaseDirectory, "GameData") : RootPath;
+        string DataRoot => string.IsNullOrEmpty(RootPath) ? GameDataPaths.ResolveRuntimeRoot() : RootPath;
 
         public int MobTemplateCount => 0;
 

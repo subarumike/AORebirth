@@ -6,11 +6,13 @@ namespace AORebirth.Core.GameData
 
     /// <summary>
     /// Path conventions for the checked-in GameData tree.
-    /// Relative segments only: the extractor resolves them against its output root and
-    /// the server resolves them against its runtime base directory.
+    /// Relative segments are resolved by the extractor against its output root.
+    /// The server resolves them with <see cref="ResolveRuntimeRoot"/>.
     /// </summary>
     public static class GameDataPaths
     {
+        public const string EnvironmentVariableName = "AO_REBIRTH_GAMEDATA_PATH";
+
         public const string RootFolderName = "GameData";
 
         public const string PlayfieldsFolderName = "Playfields";
@@ -91,6 +93,46 @@ namespace AORebirth.Core.GameData
             }
 
             return (playfieldId << 16) | (cellId & 0xFFFF);
+        }
+
+        /// <summary>
+        /// GameData directory for this process.
+        /// <see cref="EnvironmentVariableName"/> replaces the tree beside the runtime base directory.
+        /// </summary>
+        public static string ResolveRuntimeRoot()
+        {
+            return Resolve(AppContext.BaseDirectory);
+        }
+
+        /// <summary>
+        /// GameData directory for <paramref name="baseDirectory"/>.
+        /// The environment override applies only when that directory is this process's runtime base.
+        /// </summary>
+        public static string Resolve(string baseDirectory)
+        {
+            if (IsProcessBaseDirectory(baseDirectory))
+            {
+                string configured = Environment.GetEnvironmentVariable(EnvironmentVariableName);
+                if (!string.IsNullOrWhiteSpace(configured))
+                    return Path.GetFullPath(configured.Trim());
+            }
+
+            return Path.Combine(baseDirectory, RootFolderName);
+        }
+
+        private static bool IsProcessBaseDirectory(string baseDirectory)
+        {
+            if (string.IsNullOrWhiteSpace(baseDirectory))
+                return false;
+
+            string normalized = NormalizeDirectory(baseDirectory);
+            return string.Equals(normalized, NormalizeDirectory(AppContext.BaseDirectory), StringComparison.OrdinalIgnoreCase)
+                || string.Equals(normalized, NormalizeDirectory(AppDomain.CurrentDomain.BaseDirectory), StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string NormalizeDirectory(string path)
+        {
+            return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         public static string PlayfieldRelativeDirectory(int playfieldId)
