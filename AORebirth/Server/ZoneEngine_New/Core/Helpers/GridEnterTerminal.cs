@@ -62,7 +62,7 @@ namespace ZoneEngine_New.Core.Helpers
         internal static Func<CharacterStat, int> RequirementStats(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
-            return stat => stat == CharacterStat.IsFightingMe
+            return stat => stat == CharacterStat.NumberOfFightingOpponents
                 ? 0
                 : player.Stats.GetOrZero(stat);
         }

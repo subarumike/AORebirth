@@ -164,7 +164,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (spell.Requirements == null || spell.Requirements.Count == 0)
                 return;
 
-            int isFightingMe = (int)CharacterStat.IsFightingMe;
+            int isFightingMe = (int)CharacterStat.NumberOfFightingOpponents;
             for (int i = spell.Requirements.Count - 1; i >= 0; i--)
             {
                 if (spell.Requirements[i].StatNumber == isFightingMe)
