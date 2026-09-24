@@ -803,6 +803,11 @@ namespace ZoneEngine_New.Core.Movement
                 && desired.y < floor.y)
                 desired = new Vector3(desired.x, floor.y, desired.z);
 
+            // Indoor Grid: vehicle tripod linecasts hit baked GNDA at ~Y=0 and pull authored
+            // pad landings into the floor (arrive Y=4.2 → snapshot Y=0).
+            if (playfield?.MetaData?.IsIndoor == true)
+                return EnsureSurfaceAlignment.Apply(null, previous, desired, allowSlide);
+
             IVehicleSurface? surface = playfield?.WorldAccess.Instance?.CreateVehicleSurface();
             return EnsureSurfaceAlignment.Apply(surface, previous, desired, allowSlide);
         }
@@ -940,6 +945,11 @@ namespace ZoneEngine_New.Core.Movement
             Playfield? playfield = _character.Playfield;
             if (playfield == null)
                 return false;
+
+            // Indoor (Grid): only mesh snaps count. A raw downward ray hits baked GNDA at ~Y=0
+            // and would falsely enable gravity, pulling pad landings into the floor.
+            if (playfield.MetaData?.IsIndoor == true)
+                return playfield.TrySnapFeetToFloor(_character.Position, out _);
 
             if (playfield.TrySnapFeetToFloor(_character.Position, out _))
                 return true;

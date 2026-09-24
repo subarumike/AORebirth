@@ -51,6 +51,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
         readonly Dictionary<int, LosCacheEntry> _losCache = new();
         readonly HashSet<int> _exitProxyDoors = new();
         readonly int _playfieldId;
+        readonly bool _isIndoor;
         int _nextTriggerId = 1;
         bool _disposed;
 
@@ -61,7 +62,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             PlayfieldGeometryData geometry,
             DestinationsCatalog destinations,
             IGameData gameData,
-            IZoneLogger logger)
+            IZoneLogger logger,
+            bool isIndoor)
         {
             _playfieldId = playfieldId;
             _pool = pool;
@@ -70,6 +72,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             _destinations = destinations;
             _gameData = gameData;
             _logger = logger;
+            _isIndoor = isIndoor;
             Queries = new WorldQueries(simulation, pool);
         }
 
@@ -95,7 +98,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             ArgumentNullException.ThrowIfNull(destinations);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
-            _ = meta;
+            bool isIndoor = meta?.IsIndoor == true;
 
             var pool = new BufferPool();
             var simulation = Simulation.Create(
@@ -111,7 +114,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 geometry,
                 destinations,
                 gameData,
-                logger);
+                logger,
+                isIndoor);
             int surfaceStatics = SurfaceCollisionBaker.BakeAll(geometry.Collision, pool, simulation);
             int tileStatics = TileCollisionBaker.BakeAll(
                 geometry.Collision?.Terrain,
@@ -217,13 +221,16 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// (platforms, decks). A heightfield-only snap puts Jobe Platform / Nero-style decks
         /// into the water at Y=0. Probe from above the higher of feet/terrain so Bepu hits the
         /// real floor; fall back to the heightfield when no mesh is above it.
+        /// Indoor (Grid): GNDA/heightfield tiles sit at ~Y=0 under elevated pads. Never pull
+        /// authored pad Y down onto that void floor — only accept nearby mesh hits.
         /// </summary>
         public bool TrySnapToFloor(AoVector3 feet, out AoVector3 floor)
         {
             floor = feet;
             TerrainHeightfield? terrain = _geometry.Collision?.Terrain;
             float terrainY = 0f;
-            bool hasTerrain = terrain != null
+            bool hasTerrain = !_isIndoor
+                && terrain != null
                 && terrain.TryGetHeight((float)feet.x, (float)feet.z, out terrainY);
 
             float probeY = (float)feet.y;
@@ -237,6 +244,12 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
             if (TryRaycastDown(new AoVector3(feet.x, probeY, feet.z), maxDistance, out AoVector3 hit))
             {
+                // Grid pads float above baked GNDA (~Y=0). A hit far below feet is the void
+                // heightfield, not a walkable indoor floor — keep authored Y (GridFloorSnapTests).
+                const float indoorVoidPullMeters = 2f;
+                if (_isIndoor && hit.y < (float)feet.y - indoorVoidPullMeters)
+                    return false;
+
                 floor = new AoVector3(feet.x, hit.y, feet.z);
                 return true;
             }
