@@ -70,6 +70,27 @@ namespace ZoneEngine_New.Core.Inventory
             return HashItemCatalog.TrySelectIds(instance, quality, CatalogQuality, out lowId, out highId);
         }
 
+        /// <summary>
+        /// Mints every item one loot roll or world spawn of <paramref name="hash"/> should create.
+        /// Appends to <paramref name="into"/>. A SpawnAll parent mints every branch; any other hash mints one.
+        /// </summary>
+        public void MintSpawns(string hash, int desiredQuality, ItemSource source, List<Item> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            if (string.IsNullOrEmpty(hash))
+                return;
+
+            var instances = new List<HashInstance>();
+            _gameData.CollectHashSpawns(hash, instances);
+            for (int i = 0; i < instances.Count; i++)
+            {
+                if (!TryRollIdsFor(instances[i], desiredQuality, out int lowId, out int highId, out int quality))
+                    continue;
+
+                into.Add(_items.CreateWithNewInstance(lowId, highId, quality, source));
+            }
+        }
+
         /// <summary>Every leaf item family reachable from <paramref name="hash"/>.</summary>
         public void CollectLeafInstances(string hash, List<HashInstance> into)
             => _gameData.CollectHashLeafInstances(hash, into);

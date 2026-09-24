@@ -5,7 +5,10 @@ namespace ZoneEngine_New.Tests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using AORebirth.Enums;
+
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
 
     [TestClass]
     public sealed class HashItemCatalogTests
@@ -104,6 +107,71 @@ namespace ZoneEngine_New.Tests
             // A category child with no Templates entry is a dead leaf, not a resolvable item.
             Assert.IsFalse(catalog.TryResolveInstance("SMGN", out _));
             Assert.IsFalse(catalog.TryResolveInstance(string.Empty, out _));
+        }
+
+        [TestMethod]
+        public void SpawnAllParentResolvesEveryBranch()
+        {
+            HashItemCatalog catalog = HashItemCatalog.Parse(
+                """
+                {
+                    "ALL": { "SpawnAll": true, "Children": ["PSTL", "RIFL", "NEST"] },
+                    "NEST": { "Children": ["MOPA", "GONE"] },
+                    "ONE": { "Children": ["RIFL", "PSTL"] },
+                    "OFF": { "SpawnAll": false, "Children": ["PSTL", "RIFL"] },
+                    "PSTL": { "Templates": [1] },
+                    "RIFL": { "Templates": [2] },
+                    "MOPA": { "Templates": [3] },
+                    "LOOP": { "SpawnAll": true, "Children": ["LOOP", "PSTL"] }
+                }
+                """,
+                new FixedRandom(0));
+
+            var all = new List<HashInstance>();
+            catalog.CollectSpawns("ALL", all);
+            CollectionAssert.AreEqual(new[] { "PSTL", "RIFL", "MOPA" }, all.ConvertAll(item => item.Hash));
+
+            var one = new List<HashInstance>();
+            catalog.CollectSpawns("ONE", one);
+            Assert.AreEqual(1, one.Count);
+            Assert.AreEqual("RIFL", one[0].Hash);
+
+            var off = new List<HashInstance>();
+            catalog.CollectSpawns("OFF", off);
+            Assert.AreEqual(1, off.Count);
+            Assert.AreEqual("PSTL", off[0].Hash);
+
+            var loop = new List<HashInstance>();
+            catalog.CollectSpawns("LOOP", loop);
+            Assert.AreEqual(1, loop.Count);
+            Assert.AreEqual("PSTL", loop[0].Hash);
+
+            Assert.IsTrue(catalog.TryResolveInstance("ALL", out HashInstance single));
+            Assert.AreEqual("PSTL", single.Hash);
+            Assert.IsTrue(catalog.CanResolveItem("ALL"));
+            Assert.IsFalse(catalog.CanResolveItem("GONE"));
+        }
+
+        [TestMethod]
+        public void SpawnAllLootMintsEveryBranch()
+        {
+            HashItemCatalog catalog = HashItemCatalog.Parse(
+                """
+                {
+                    "ALL": { "SpawnAll": true, "Children": ["PSTL", "RIFL"] },
+                    "PSTL": { "Templates": [1] },
+                    "RIFL": { "Templates": [2] }
+                }
+                """,
+                new FixedRandom(0));
+            var minter = new HashItemMinter(new StubGameData(catalog), new StubCatalog(), new StubItemBuilder());
+            var items = new List<Item>();
+
+            minter.MintSpawns("ALL", 10, ItemSource.Loot, items);
+
+            Assert.AreEqual(2, items.Count);
+            Assert.AreEqual(1, items[0].LowId);
+            Assert.AreEqual(2, items[1].LowId);
         }
 
         [TestMethod]

@@ -37,7 +37,7 @@ namespace ZoneEngine_New.Core.GameData
         /// spawns as a static dynel instead of the placeholder NPC.
         /// </summary>
         bool IsStaticSpawnHash(string hash)
-            => !string.IsNullOrEmpty(hash) && !HasMobTemplate(hash) && TryResolveHashInstance(hash, out _);
+            => !string.IsNullOrEmpty(hash) && !HasMobTemplate(hash) && CanResolveItemHash(hash);
 
         bool TryGetMobTemplate(string hash, out MobTemplate template);
 
@@ -61,6 +61,21 @@ namespace ZoneEngine_New.Core.GameData
         { hash = string.Empty; return false; }
 
         bool TryResolveHashInstance(string hash, out HashInstance instance);
+
+        /// <summary>True when some leaf item family is reachable from <paramref name="hash"/>.</summary>
+        bool CanResolveItemHash(string hash);
+
+        /// <summary>
+        /// Item families one loot roll or world-item spawn should create.
+        /// A parent with optional SpawnAll contributes every child branch; other parents contribute one random child.
+        /// </summary>
+        void CollectHashSpawns(string hash, List<HashInstance> into);
+
+        /// <summary>
+        /// NPCs one spawn of <paramref name="hash"/> should create.
+        /// A parent with optional SpawnAll contributes every child branch; other parents contribute one random child.
+        /// </summary>
+        void CollectMobSpawns(string hash, int? level, List<MobTemplate> into);
 
         /// <summary>Appends every leaf item family reachable from <paramref name="hash"/>.</summary>
         void CollectHashLeafInstances(string hash, List<HashInstance> into);

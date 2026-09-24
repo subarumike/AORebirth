@@ -86,7 +86,7 @@ namespace ZoneEngine_New.Core.Playfield
             _snapshot = snapshot;
         }
 
-        /// <summary>Spawns an NPC from a mob template hash and registers it on this playfield.</summary>
+        /// <summary>Spawns one randomly resolved NPC from a mob template hash and registers it on this playfield.</summary>
         public NpcCharacter Spawn(
             string hash,
             Vector3 position,
@@ -105,6 +105,48 @@ namespace ZoneEngine_New.Core.Playfield
                         "Mob template hash '{0}' not found",
                         hash));
             }
+
+            return SpawnMob(template, position, heading, level, spawnSource);
+        }
+
+        /// <summary>
+        /// Spawns every branch of <paramref name="hash"/>. A parent with SpawnAll creates one NPC per branch;
+        /// any other hash creates the single resolved NPC.
+        /// </summary>
+        public IReadOnlyList<NpcCharacter> SpawnBranches(
+            string hash,
+            Vector3 position,
+            Quaternion? heading = null,
+            int? level = null,
+            SpawnSource spawnSource = SpawnSource.None)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(hash);
+            ArgumentNullException.ThrowIfNull(position);
+
+            var templates = new List<MobTemplate>();
+            _gameData.CollectMobSpawns(hash, level, templates);
+            var spawned = new List<NpcCharacter>(templates.Count);
+            for (int i = 0; i < templates.Count; i++)
+            {
+                if (!NpcTemplateValidation.CanSpawn(templates[i]))
+                    continue;
+
+                spawned.Add(SpawnMob(templates[i], position, heading, level, spawnSource));
+            }
+
+            return spawned;
+        }
+
+        /// <summary>Spawns one already-resolved NPC template and registers it on this playfield.</summary>
+        public NpcCharacter SpawnMob(
+            MobTemplate template,
+            Vector3 position,
+            Quaternion? heading = null,
+            int? level = null,
+            SpawnSource spawnSource = SpawnSource.None)
+        {
+            ArgumentNullException.ThrowIfNull(template);
+            ArgumentNullException.ThrowIfNull(position);
 
             NpcTemplateValidation.RequireSpawnable(template);
             int? spawnLevel = NpcTemplateLevelPolicy.ClampRequestedLevel(template, level);
@@ -158,7 +200,7 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         /// <summary>
-        /// Spawns an item template hash as a static world dynel. <paramref name="level"/> is the
+        /// Spawns one randomly resolved item template hash as a static world dynel. <paramref name="level"/> is the
         /// requested item quality.
         /// </summary>
         public StaticDynel SpawnStatic(
@@ -171,8 +213,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentException.ThrowIfNullOrEmpty(hash);
             ArgumentNullException.ThrowIfNull(position);
 
-            if (!_gameData.TryResolveHashInstance(hash, out HashInstance instance)
-                || !_hashItems.TryRollIdsFor(instance, level ?? 1, out int lowId, out int highId, out int quality))
+            if (!_gameData.TryResolveHashInstance(hash, out HashInstance instance))
             {
                 throw new KeyNotFoundException(
                     string.Format(
@@ -181,9 +222,73 @@ namespace ZoneEngine_New.Core.Playfield
                         hash));
             }
 
+            StaticDynel? dynel = SpawnStaticInstance(instance, position, heading, level, spawnSource, hash);
+            if (dynel == null)
+            {
+                throw new KeyNotFoundException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Item template hash '{0}' not found",
+                        hash));
+            }
+
+            return dynel;
+        }
+
+        /// <summary>
+        /// Spawns every branch of <paramref name="hash"/> as a world item.
+        /// A parent with SpawnAll creates one dynel per branch; any other hash creates one dynel.
+        /// </summary>
+        public IReadOnlyList<StaticDynel> SpawnStaticBranches(
+            string hash,
+            Vector3 position,
+            Quaternion? heading = null,
+            int? level = null,
+            SpawnSource spawnSource = SpawnSource.None)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(hash);
+            ArgumentNullException.ThrowIfNull(position);
+
+            var instances = new List<HashInstance>();
+            _gameData.CollectHashSpawns(hash, instances);
+            var spawned = new List<StaticDynel>(instances.Count);
+            for (int i = 0; i < instances.Count; i++)
+            {
+                StaticDynel? dynel = SpawnStaticInstance(
+                    instances[i],
+                    position,
+                    heading,
+                    level,
+                    spawnSource,
+                    instances[i].Hash);
+                if (dynel != null)
+                    spawned.Add(dynel);
+            }
+
+            return spawned;
+        }
+
+        /// <summary>
+        /// Spawns one resolved item family as a world dynel. Returns null when the quality band cannot be selected.
+        /// </summary>
+        public StaticDynel? SpawnStaticInstance(
+            HashInstance instance,
+            Vector3 position,
+            Quaternion? heading = null,
+            int? level = null,
+            SpawnSource spawnSource = SpawnSource.None,
+            string? logHash = null)
+        {
+            ArgumentNullException.ThrowIfNull(instance);
+            ArgumentNullException.ThrowIfNull(position);
+
+            if (!_hashItems.TryRollIdsFor(instance, level ?? 1, out int lowId, out int highId, out int quality))
+                return null;
+
             ItemTemplate template = _items.CreateTemplate(lowId, highId, quality);
+            string hash = string.IsNullOrEmpty(logHash) ? instance.Hash : logHash;
             Identity identity = _registry.AllocateStaticDynelIdentity();
-            var dynel = new PlayfieldStaticDynel(identity, template)
+            var dynel = new WorldItem(identity, template, lowId, highId, quality)
             {
                 Playfield = _playfield,
                 Position = position,

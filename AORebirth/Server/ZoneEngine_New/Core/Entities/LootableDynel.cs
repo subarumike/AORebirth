@@ -80,6 +80,7 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             int nextSlot = 0;
+            var minted = new List<Item>();
             foreach (MobItemTableEntry entry in ItemTable)
             {
                 if (entry == null || string.IsNullOrEmpty(entry.Hash) || entry.Repeats <= 0)
@@ -94,13 +95,18 @@ namespace ZoneEngine_New.Core.Entities
                         continue;
 
                     int quality = RollQuality(LootLevel, entry.LevelMod);
-                    if (!minter.TryMint(entry.Hash, quality, ItemSource.Loot, out Item item))
-                        continue;
+                    minted.Clear();
+                    minter.MintSpawns(entry.Hash, quality, ItemSource.Loot, minted);
+                    for (int i = 0; i < minted.Count; i++)
+                    {
+                        if (nextSlot >= Loot.Capacity)
+                            return;
 
-                    if (!Loot.Add(nextSlot, item))
-                        return;
+                        if (!Loot.Add(nextSlot, minted[i]))
+                            return;
 
-                    nextSlot++;
+                        nextSlot++;
+                    }
                 }
             }
         }

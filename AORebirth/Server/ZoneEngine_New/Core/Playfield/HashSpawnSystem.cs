@@ -39,7 +39,8 @@ namespace ZoneEngine_New.Core.Playfield
     }
 
     /// <summary>
-    /// Runtime HashSpawnPoint: district spawn entry plus Alive/Dead state and NpcCharacter link.
+    /// Runtime HashSpawnPoint: district spawn entry plus Alive/Dead state and the dynels it owns.
+    /// A SpawnAll parent owns one dynel per branch.
     /// </summary>
     internal sealed class HashSpawnPoint
     {
@@ -70,7 +71,10 @@ namespace ZoneEngine_New.Core.Playfield
             IsStatic = isStatic;
             State = HashSpawnState.Dead;
             NextSpawnTime = DateTime.UtcNow;
+            _members = new List<Dynel>();
         }
+
+        readonly List<Dynel> _members;
 
         internal string HashText { get; }
 
@@ -96,7 +100,19 @@ namespace ZoneEngine_New.Core.Playfield
 
         internal DateTime NextSpawnTime { get; set; }
 
-        internal Dynel? Spawned { get; set; }
+        internal int MemberCount => _members.Count;
+
+        internal void AddMember(Dynel member)
+        {
+            ArgumentNullException.ThrowIfNull(member);
+            _members.Add(member);
+        }
+
+        internal bool RemoveMember(Dynel member)
+            => _members.Remove(member);
+
+        internal Dynel[] MembersSnapshot()
+            => _members.ToArray();
     }
 
     /// <summary>
@@ -196,10 +212,7 @@ namespace ZoneEngine_New.Core.Playfield
                 }
 
                 bool isStatic = _gameData.IsStaticSpawnHash(spawnHash);
-                bool isMob = !isStatic
-                    && _gameData.CanResolveMobHash(spawnHash)
-                    && _gameData.TryResolveMobTemplate(spawnHash, entry.MinLevel, out var spawnTemplate)
-                    && NpcTemplateValidation.CanSpawn(spawnTemplate);
+                bool isMob = !isStatic && HasSpawnableMob(spawnHash, entry.MinLevel);
                 if (!isMob && !isStatic)
                 {
                     _logger.Warn(
@@ -369,7 +382,7 @@ namespace ZoneEngine_New.Core.Playfield
         {
             RecoverOrphanedSpawn(point);
 
-            if (point.Spawned != null)
+            if (point.MemberCount > 0)
                 return false;
 
             if (point.State == HashSpawnState.Alive)
@@ -387,38 +400,14 @@ namespace ZoneEngine_New.Core.Playfield
 
             try
             {
-                PickSpawnTransform(point, out Vector3 position, out Quaternion heading);
-                if (point.IsStatic)
-                {
-                    StaticDynel dynel = _spawnService.SpawnStatic(
-                        point.HashText,
-                        position,
-                        heading,
-                        RollLevel(point),
-                        SpawnSource.HashSpawn);
-                    point.Spawned = dynel;
-                    point.State = HashSpawnState.Alive;
-                    _pointBySpawned[dynel] = point;
-                    LogSpawn("spawn", point, dynel.Identity.Instance, dynel.Template.Name, position);
-                    return true;
-                }
+                int? level = RollLevel(point);
+                int spawned = point.IsStatic
+                    ? SpawnStaticBranches(point, level)
+                    : SpawnMobBranches(point, level);
+                if (spawned == 0)
+                    return false;
 
-                NpcCharacter character = _spawnService.Spawn(
-                    point.HashText,
-                    position,
-                    heading,
-                    RollLevel(point),
-                    SpawnSource.HashSpawn);
-                point.Spawned = character;
                 point.State = HashSpawnState.Alive;
-                _pointBySpawned[character] = point;
-                character.Died += OnSpawnedDied;
-                LogSpawn(
-                    "spawn",
-                    point,
-                    character.Identity.Instance,
-                    character.Name,
-                    position);
                 return true;
             }
             catch (Exception exception)
@@ -517,34 +506,109 @@ namespace ZoneEngine_New.Core.Playfield
                 site.Centre.zf + (float)(Math.Sin(angle) * distance));
         }
 
+        private int SpawnMobBranches(HashSpawnPoint point, int? level)
+        {
+            var templates = new List<MobTemplate>();
+            _gameData.CollectMobSpawns(point.HashText, level, templates);
+            int spawned = 0;
+            for (int i = 0; i < templates.Count; i++)
+            {
+                if (!NpcTemplateValidation.CanSpawn(templates[i]))
+                    continue;
+
+                PickSpawnTransform(point, out Vector3 position, out Quaternion heading);
+                NpcCharacter character = _spawnService.SpawnMob(
+                    templates[i],
+                    position,
+                    heading,
+                    level,
+                    SpawnSource.HashSpawn);
+                point.AddMember(character);
+                _pointBySpawned[character] = point;
+                character.Died += OnSpawnedDied;
+                LogSpawn("spawn", point, character.Identity.Instance, character.Name, position);
+                spawned++;
+            }
+
+            return spawned;
+        }
+
+        private int SpawnStaticBranches(HashSpawnPoint point, int? level)
+        {
+            var instances = new List<HashInstance>();
+            _gameData.CollectHashSpawns(point.HashText, instances);
+            int spawned = 0;
+            for (int i = 0; i < instances.Count; i++)
+            {
+                PickSpawnTransform(point, out Vector3 position, out Quaternion heading);
+                StaticDynel? dynel = _spawnService.SpawnStaticInstance(
+                    instances[i],
+                    position,
+                    heading,
+                    level,
+                    SpawnSource.HashSpawn,
+                    instances[i].Hash);
+                if (dynel == null)
+                    continue;
+
+                point.AddMember(dynel);
+                _pointBySpawned[dynel] = point;
+                LogSpawn("spawn", point, dynel.Identity.Instance, dynel.Template.Name, position);
+                spawned++;
+            }
+
+            return spawned;
+        }
+
+        private bool HasSpawnableMob(string hash, int level)
+        {
+            if (!_gameData.CanResolveMobHash(hash))
+                return false;
+
+            var templates = new List<MobTemplate>();
+            _gameData.CollectMobSpawns(hash, level, templates);
+            for (int i = 0; i < templates.Count; i++)
+            {
+                if (NpcTemplateValidation.CanSpawn(templates[i]))
+                    return true;
+            }
+
+            return false;
+        }
+
         private void DespawnForSleep(HashSpawnPoint point)
         {
-            Dynel? spawned = point.Spawned;
-            if (spawned == null)
+            Dynel[] members = point.MembersSnapshot();
+            if (members.Length == 0)
                 return;
 
-            _pointBySpawned.Remove(spawned);
-            point.Spawned = null;
             // Stay Alive — sleep-despawned; respawn on next awake tick.
             point.State = HashSpawnState.Alive;
-            int instance = spawned.Identity.Instance;
-            string? name = spawned switch
+            for (int i = 0; i < members.Length; i++)
             {
-                NpcCharacter npc => npc.Name,
-                StaticDynel staticDynel => staticDynel.Template.Name,
-                _ => null
-            };
-            Vector3 position = spawned.Position;
-            if (spawned is NpcCharacter character)
-            {
-                character.Died -= OnSpawnedDied;
-                _spawnService.DespawnNpc(character);
+                Dynel spawned = members[i];
+                _pointBySpawned.Remove(spawned);
+                point.RemoveMember(spawned);
+                int instance = spawned.Identity.Instance;
+                string? name = spawned switch
+                {
+                    NpcCharacter npc => npc.Name,
+                    StaticDynel staticDynel => staticDynel.Template.Name,
+                    _ => null
+                };
+                Vector3 position = spawned.Position;
+                if (spawned is NpcCharacter character)
+                {
+                    character.Died -= OnSpawnedDied;
+                    _spawnService.DespawnNpc(character);
+                }
+                else if (spawned is StaticDynel dynel)
+                {
+                    _spawnService.DespawnStatic(dynel);
+                }
+
+                LogSpawn("sleep-despawn", point, instance, name, position);
             }
-            else if (spawned is StaticDynel dynel)
-            {
-                _spawnService.DespawnStatic(dynel);
-            }
-            LogSpawn("sleep-despawn", point, instance, name, position);
         }
 
         private void OnSpawnedDied(Character character)
@@ -556,9 +620,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             npc.Died -= OnSpawnedDied;
             _pointBySpawned.Remove(npc);
-            point.Spawned = null;
-            point.State = HashSpawnState.Dead;
-            point.NextSpawnTime = DateTime.UtcNow.AddSeconds(point.RespawnTimeSeconds);
+            point.RemoveMember(npc);
             int instance = npc.Identity.Instance;
             string? name = npc.Name;
 
@@ -566,22 +628,41 @@ namespace ZoneEngine_New.Core.Playfield
             if (npc.Playfield != null)
                 _spawnService.DespawnNpc(npc);
 
+            if (point.MemberCount > 0)
+                return;
+
+            point.State = HashSpawnState.Dead;
+            point.NextSpawnTime = DateTime.UtcNow.AddSeconds(point.RespawnTimeSeconds);
             LogSpawnDeath(point, instance, name);
         }
 
         /// <summary>
-        /// Clears ownership when an NPC was removed without raising <see cref="Character.Died"/>.
+        /// Clears ownership when a member was removed without raising <see cref="Character.Died"/>.
+        /// The point respawns only after every member is gone.
         /// </summary>
         private void RecoverOrphanedSpawn(HashSpawnPoint point)
         {
-            Dynel? spawned = point.Spawned;
-            if (spawned == null || spawned.Playfield != null)
+            if (point.MemberCount == 0)
                 return;
 
-            if (spawned is NpcCharacter character)
-                character.Died -= OnSpawnedDied;
-            _pointBySpawned.Remove(spawned);
-            point.Spawned = null;
+            Dynel[] members = point.MembersSnapshot();
+            bool removed = false;
+            for (int i = 0; i < members.Length; i++)
+            {
+                Dynel spawned = members[i];
+                if (spawned.Playfield != null)
+                    continue;
+
+                if (spawned is NpcCharacter character)
+                    character.Died -= OnSpawnedDied;
+                _pointBySpawned.Remove(spawned);
+                point.RemoveMember(spawned);
+                removed = true;
+            }
+
+            if (!removed || point.MemberCount > 0)
+                return;
+
             point.State = HashSpawnState.Dead;
             point.NextSpawnTime = DateTime.UtcNow.AddSeconds(point.RespawnTimeSeconds);
         }

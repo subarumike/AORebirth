@@ -114,6 +114,50 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void SpawnAllFamilyResolvesEveryBranch()
+        {
+            NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(
+                """
+                {
+                    "LEAF": {
+                        "Templates": [ { "Name": "Leaf", "Level": 1, "Stats": { "54": 1 } } ]
+                    },
+                    "OTHER": {
+                        "Templates": [ { "Name": "Other", "Level": 1, "Stats": { "54": 1 } } ]
+                    },
+                    "PACK": { "SpawnAll": true, "Children": ["LEAF", "NEST", "MISSING"] },
+                    "NEST": { "Children": ["OTHER", "LEAF"] },
+                    "ONE": { "Children": ["OTHER", "LEAF"] },
+                    "INNER": { "SpawnAll": true, "Children": ["OTHER"] },
+                    "OUTER": { "SpawnAll": true, "Children": ["INNER", "LEAF"] },
+                    "LOOP": { "SpawnAll": true, "Children": ["LOOP", "LEAF"] }
+                }
+                """,
+                new FixedRandom(0));
+
+            var pack = new List<MobTemplate>();
+            catalog.CollectSpawns("PACK", 1, pack);
+            CollectionAssert.AreEqual(new[] { "LEAF", "OTHER" }, pack.ConvertAll(template => template.Hash));
+
+            var one = new List<MobTemplate>();
+            catalog.CollectSpawns("ONE", 1, one);
+            Assert.AreEqual(1, one.Count);
+            Assert.AreEqual("OTHER", one[0].Hash);
+
+            var outer = new List<MobTemplate>();
+            catalog.CollectSpawns("OUTER", 1, outer);
+            CollectionAssert.AreEqual(new[] { "OTHER", "LEAF" }, outer.ConvertAll(template => template.Hash));
+
+            var loop = new List<MobTemplate>();
+            catalog.CollectSpawns("LOOP", 1, loop);
+            Assert.AreEqual(1, loop.Count);
+            Assert.AreEqual("LEAF", loop[0].Hash);
+
+            Assert.IsTrue(catalog.TryResolve("PACK", 1, out MobTemplate single));
+            Assert.AreEqual("LEAF", single.Hash);
+        }
+
+        [TestMethod]
         public void UnknownAndCyclicFamiliesFail()
         {
             NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(SampleJson);

@@ -303,13 +303,13 @@ namespace ZoneEngine_New.Core.Inventory
 
             try
             {
-                playfield.GetRequiredService<SpawnService>().Spawn(
+                IReadOnlyList<NpcCharacter> spawned = playfield.GetRequiredService<SpawnService>().SpawnBranches(
                     hash,
                     target.Position,
                     target.Rotation,
                     level,
                     SpawnSource.Summoned);
-                return true;
+                return spawned.Count > 0;
             }
             catch (Exception exception) when (exception is KeyNotFoundException
                 or InvalidOperationException

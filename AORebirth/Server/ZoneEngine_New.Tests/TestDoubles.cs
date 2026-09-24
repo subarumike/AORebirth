@@ -79,6 +79,19 @@ namespace ZoneEngine_New.Tests
         public bool TryResolveHashInstance(string hash, out HashInstance instance)
             => _hashItems.TryResolveInstance(hash, out instance);
 
+        public bool CanResolveItemHash(string hash)
+            => _hashItems.CanResolveItem(hash);
+
+        public void CollectHashSpawns(string hash, List<HashInstance> into)
+            => _hashItems.CollectSpawns(hash, into);
+
+        public void CollectMobSpawns(string hash, int? level, List<MobTemplate> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            if (TryResolveMobTemplate(hash, level, out MobTemplate template))
+                into.Add(template);
+        }
+
         public void CollectHashLeafInstances(string hash, List<HashInstance> into)
             => _hashItems.CollectLeafInstances(hash, into);
 

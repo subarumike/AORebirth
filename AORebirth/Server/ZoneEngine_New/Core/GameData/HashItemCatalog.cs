@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.GameData
     /// ItemTemplates.json: a hash with Templates is a leaf item family; a hash with Children is a category.
     /// Parents never have template ids. Leaves never have children.
     /// Lookup is category-first: a hash with children picks a random child Hash, then repeats.
+    /// Optional <c>SpawnAll</c> on a parent takes every child branch instead of one random child.
     /// </summary>
     public sealed class HashItemCatalog
     {
@@ -19,18 +20,21 @@ namespace ZoneEngine_New.Core.GameData
         readonly Dictionary<string, string[]> _categories;
         readonly Dictionary<string, HashInstance> _instances;
         readonly Dictionary<(int LowId, int HighId), string?> _assignedHashes;
+        readonly HashSet<string> _spawnAll;
         readonly Random _random;
 
         public HashItemCatalog(
             Dictionary<string, string[]> categories,
             Dictionary<string, HashInstance> instances,
-            Random? random = null)
+            Random? random = null,
+            HashSet<string>? spawnAll = null)
         {
             ArgumentNullException.ThrowIfNull(categories);
             ArgumentNullException.ThrowIfNull(instances);
             _categories = categories;
             _instances = instances;
             _assignedHashes = BuildAssignedHashes(instances);
+            _spawnAll = spawnAll ?? new HashSet<string>(StringComparer.Ordinal);
             _random = random ?? Random.Shared;
         }
 
@@ -42,13 +46,14 @@ namespace ZoneEngine_New.Core.GameData
         {
             var categories = new Dictionary<string, string[]>(StringComparer.Ordinal);
             var instances = new Dictionary<string, HashInstance>(StringComparer.Ordinal);
+            var spawnAll = new HashSet<string>(StringComparer.Ordinal);
             if (string.IsNullOrWhiteSpace(json))
-                return new HashItemCatalog(categories, instances, random);
+                return new HashItemCatalog(categories, instances, random, spawnAll);
 
             Dictionary<string, HashItemRow>? records =
                 JsonSerializer.Deserialize<Dictionary<string, HashItemRow>>(json, JsonOptions);
             if (records == null)
-                return new HashItemCatalog(categories, instances, random);
+                return new HashItemCatalog(categories, instances, random, spawnAll);
 
             foreach (KeyValuePair<string, HashItemRow> pair in records)
             {
@@ -60,6 +65,8 @@ namespace ZoneEngine_New.Core.GameData
                 if (children != null && children.Length > 0)
                 {
                     categories[hash] = children;
+                    if (pair.Value.SpawnAll)
+                        spawnAll.Add(hash);
                     continue;
                 }
 
@@ -80,7 +87,7 @@ namespace ZoneEngine_New.Core.GameData
                 instances.TryAdd(hash, new HashInstance(hash, ids.ToArray()));
             }
 
-            return new HashItemCatalog(categories, instances, random);
+            return new HashItemCatalog(categories, instances, random, spawnAll);
         }
 
         public bool TryGetCategory(string hash, out IReadOnlyList<string> childHashes)
@@ -147,6 +154,22 @@ namespace ZoneEngine_New.Core.GameData
         }
 
         /// <summary>
+        /// True when a leaf item family is reachable from <paramref name="hash"/>, ignoring random selection.
+        /// </summary>
+        public bool CanResolveItem(string hash)
+            => CanResolveItem(hash, new HashSet<string>(StringComparer.Ordinal));
+
+        /// <summary>
+        /// Appends the families one loot roll or world-item spawn should create.
+        /// A parent with <c>SpawnAll</c> contributes every child branch. Any other parent contributes one random child.
+        /// </summary>
+        public void CollectSpawns(string hash, List<HashInstance> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            CollectSpawns(hash, into, new HashSet<string>(StringComparer.Ordinal));
+        }
+
+        /// <summary>
         /// Appends every leaf <see cref="HashInstance"/> reachable from <paramref name="hash"/> to
         /// <paramref name="into"/>. A hash that is itself a leaf contributes just that instance.
         /// Category children with no leaf Templates entry are skipped, and each hash is visited once
@@ -178,6 +201,55 @@ namespace ZoneEngine_New.Core.GameData
 
                 if (_instances.TryGetValue(current, out HashInstance? instance))
                     into.Add(instance);
+            }
+        }
+
+        bool CanResolveItem(string hash, HashSet<string> seen)
+        {
+            if (string.IsNullOrEmpty(hash) || !seen.Add(hash))
+                return false;
+            if (_instances.ContainsKey(hash))
+                return true;
+            if (!_categories.TryGetValue(hash, out string[]? children) || children.Length == 0)
+                return false;
+
+            for (int i = 0; i < children.Length; i++)
+            {
+                if (CanResolveItem(children[i], seen))
+                    return true;
+            }
+
+            return false;
+        }
+
+        void CollectSpawns(string hash, List<HashInstance> into, HashSet<string> trail)
+        {
+            if (string.IsNullOrEmpty(hash) || !trail.Add(hash))
+                return;
+
+            try
+            {
+                if (_categories.TryGetValue(hash, out string[]? children) && children.Length > 0)
+                {
+                    if (_spawnAll.Contains(hash))
+                    {
+                        for (int i = 0; i < children.Length; i++)
+                            CollectSpawns(children[i], into, trail);
+                        return;
+                    }
+
+                    string child = children[_random.Next(children.Length)];
+                    if (!string.IsNullOrEmpty(child))
+                        CollectSpawns(child, into, trail);
+                    return;
+                }
+
+                if (_instances.TryGetValue(hash, out HashInstance? instance))
+                    into.Add(instance);
+            }
+            finally
+            {
+                trail.Remove(hash);
             }
         }
 
@@ -313,6 +385,8 @@ namespace ZoneEngine_New.Core.GameData
             public string[]? Children { get; set; }
 
             public int[]? Templates { get; set; }
+
+            public bool SpawnAll { get; set; }
         }
     }
 }

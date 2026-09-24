@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.GameData
     /// <summary>
     /// NpcTemplates.json: a hash with Templates is a leaf NPC; a hash with Children is a family.
     /// Parents never have stats. Leaves never have children.
+    /// Optional <c>SpawnAll</c> on a parent spawns every child branch instead of one random child.
     /// </summary>
     public sealed class NpcTemplateCatalog
     {
@@ -22,17 +23,20 @@ namespace ZoneEngine_New.Core.GameData
 
         readonly Dictionary<string, string[]> _families;
         readonly Dictionary<string, NpcLeaf> _leaves;
+        readonly HashSet<string> _spawnAll;
         readonly Random _random;
 
         public NpcTemplateCatalog(
             Dictionary<string, string[]> families,
             Dictionary<string, NpcLeaf> leaves,
-            Random? random = null)
+            Random? random = null,
+            HashSet<string>? spawnAll = null)
         {
             ArgumentNullException.ThrowIfNull(families);
             ArgumentNullException.ThrowIfNull(leaves);
             _families = families;
             _leaves = leaves;
+            _spawnAll = spawnAll ?? new HashSet<string>(StringComparer.Ordinal);
             _random = random ?? Random.Shared;
         }
 
@@ -44,13 +48,14 @@ namespace ZoneEngine_New.Core.GameData
         {
             var families = new Dictionary<string, string[]>(StringComparer.Ordinal);
             var leaves = new Dictionary<string, NpcLeaf>(StringComparer.Ordinal);
+            var spawnAll = new HashSet<string>(StringComparer.Ordinal);
             if (string.IsNullOrWhiteSpace(json))
-                return new NpcTemplateCatalog(families, leaves, random);
+                return new NpcTemplateCatalog(families, leaves, random, spawnAll);
 
             Dictionary<string, NpcHashDto>? records =
                 JsonSerializer.Deserialize<Dictionary<string, NpcHashDto>>(json, JsonOptions);
             if (records == null)
-                return new NpcTemplateCatalog(families, leaves, random);
+                return new NpcTemplateCatalog(families, leaves, random, spawnAll);
 
             foreach (KeyValuePair<string, NpcHashDto> pair in records)
             {
@@ -62,6 +67,8 @@ namespace ZoneEngine_New.Core.GameData
                 if (children != null && children.Length > 0)
                 {
                     families[hash] = children;
+                    if (pair.Value.SpawnAll)
+                        spawnAll.Add(hash);
                     continue;
                 }
 
@@ -73,7 +80,7 @@ namespace ZoneEngine_New.Core.GameData
                 leaves[hash] = new NpcLeaf(hash, bands);
             }
 
-            return new NpcTemplateCatalog(families, leaves, random);
+            return new NpcTemplateCatalog(families, leaves, random, spawnAll);
         }
 
         public bool CanResolve(string hash)
@@ -172,6 +179,57 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return _leaves.TryGetValue(current, out leaf!);
+        }
+
+        /// <summary>
+        /// Appends the NPCs one spawn of <paramref name="hash"/> should create.
+        /// A parent with <c>SpawnAll</c> contributes every child branch. Any other parent contributes one random child.
+        /// An unknown hash contributes the placeholder fallback when that leaf exists.
+        /// </summary>
+        public void CollectSpawns(string hash, int? level, List<MobTemplate> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            if (string.IsNullOrEmpty(hash))
+                return;
+
+            int start = into.Count;
+            CollectSpawns(hash, level, into, new HashSet<string>(StringComparer.Ordinal));
+            if (into.Count != start)
+                return;
+
+            if (CanUseFallback(hash) && _leaves.TryGetValue(MobTemplate.FallbackHash, out NpcLeaf fallback))
+                into.Add(Materialize(fallback, level));
+        }
+
+        void CollectSpawns(string hash, int? level, List<MobTemplate> into, HashSet<string> trail)
+        {
+            if (string.IsNullOrEmpty(hash) || !trail.Add(hash))
+                return;
+
+            try
+            {
+                if (_families.TryGetValue(hash, out string[]? children) && children.Length > 0)
+                {
+                    if (_spawnAll.Contains(hash))
+                    {
+                        for (int i = 0; i < children.Length; i++)
+                            CollectSpawns(children[i], level, into, trail);
+                        return;
+                    }
+
+                    string? pick = PickChild(children);
+                    if (!string.IsNullOrEmpty(pick))
+                        CollectSpawns(pick, level, into, trail);
+                    return;
+                }
+
+                if (_leaves.TryGetValue(hash, out NpcLeaf? leaf))
+                    into.Add(Materialize(leaf, level));
+            }
+            finally
+            {
+                trail.Remove(hash);
+            }
         }
 
         string? PickChild(string[] children)
@@ -367,6 +425,8 @@ namespace ZoneEngine_New.Core.GameData
             public string[]? Children { get; set; }
 
             public NpcLevelBand[]? Templates { get; set; }
+
+            public bool SpawnAll { get; set; }
         }
     }
 

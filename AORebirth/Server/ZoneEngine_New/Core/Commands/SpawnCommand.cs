@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Commands
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -66,43 +67,87 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            NpcCharacter npc = spawn.Spawn(
+            IReadOnlyList<NpcCharacter> npcs = spawn.SpawnBranches(
                 hash,
                 context.Player.Position,
                 context.Player.Rotation,
                 level,
                 SpawnSource.Command);
+            if (npcs.Count == 0)
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(CultureInfo.InvariantCulture, "Spawn failed for hash: {0}", hash));
+                return;
+            }
+
+            if (npcs.Count == 1)
+            {
+                NpcCharacter npc = npcs[0];
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Spawned {0} id={1} level={2}",
+                        npc.Name,
+                        npc.Identity.Instance,
+                        npc.Stats.GetOrZero(CharacterStat.Level)));
+                return;
+            }
 
             GmCommandFeedback.Send(
                 context.Session,
                 context.Player,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Spawned {0} id={1} level={2}",
-                    npc.Name,
-                    npc.Identity.Instance,
-                    npc.Stats.GetOrZero(CharacterStat.Level)));
+                    "Spawned {0} from {1}",
+                    npcs.Count,
+                    hash));
         }
 
         static void SpawnStatic(GmCommandContext context, SpawnService spawn, string hash, int level)
         {
-            StaticDynel dynel = spawn.SpawnStatic(
+            IReadOnlyList<StaticDynel> dynels = spawn.SpawnStaticBranches(
                 hash,
                 context.Player.Position,
                 context.Player.Rotation,
                 level,
                 SpawnSource.Command);
+            if (dynels.Count == 0)
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(CultureInfo.InvariantCulture, "Spawn failed for hash: {0}", hash));
+                return;
+            }
+
+            if (dynels.Count == 1)
+            {
+                StaticDynel dynel = dynels[0];
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Spawned static {0} id={1} template={2} ql={3}",
+                        dynel.Template.Name,
+                        dynel.Identity.Instance,
+                        dynel.Template.Id,
+                        dynel.Template.Quality));
+                return;
+            }
 
             GmCommandFeedback.Send(
                 context.Session,
                 context.Player,
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Spawned static {0} id={1} template={2} ql={3}",
-                    dynel.Template.Name,
-                    dynel.Identity.Instance,
-                    dynel.Template.Id,
-                    dynel.Template.Quality));
+                    "Spawned {0} statics from {1}",
+                    dynels.Count,
+                    hash));
         }
     }
 }
