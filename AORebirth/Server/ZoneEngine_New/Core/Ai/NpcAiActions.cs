@@ -82,9 +82,15 @@ namespace ZoneEngine_New.Core.Ai
         public override NodeState Evaluate(float deltaTime)
         {
             TickStallWatch.Stage("node.move-toward-target", _brain.Npc.Identity.Instance);
+            // The combat sequence stays on this node while chasing, so re-select here.
+            // A new or stolen target has to enter combat on this tick, before arrival.
+            _brain.TrySelectHighestThreat();
             Character? target = _brain.ResolveCurrentTarget();
             if (target == null)
                 return _nodeState = NodeState.Failure;
+
+            if (_brain.Npc.FightingTarget != target.Identity)
+                _brain.Npc.StartFighting(target.Identity, 0);
 
             if (_brain.CanAttackNow(target))
             {

@@ -1,11 +1,17 @@
 namespace ZoneEngine_New.Tests
 {
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
+
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -211,6 +217,57 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void AggroStartsCombatBeforeTheNpcIsInAttackRange()
+        {
+            using ServiceProvider services = CombatServices();
+            Playfield playfield = Playfield(services);
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            npc.SetWeapon(WeaponSlot.MainHand, new CharacterWeapon());
+            Player player = TestWorld.CreatePlayer(41);
+            player.Position = new Vector3(15, 0, 0);
+            Place(playfield, services, npc, player);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            brain.AddThreat(player.Identity, 5f);
+
+            Assert.IsFalse(brain.IsInAttackRange(player));
+            npc.Tick(1.1);
+
+            Assert.AreEqual(player.Identity, npc.FightingTarget);
+            Assert.IsTrue(npc.Weapons[WeaponSlot.MainHand].IsFullyCharged);
+
+            npc.Tick(0.05);
+            Assert.AreEqual(player.Identity, npc.FightingTarget);
+            Assert.IsTrue(npc.Weapons[WeaponSlot.MainHand].IsFullyCharged);
+        }
+
+        [TestMethod]
+        public void HigherThreatSwitchesCombatTargetWhileStillChasing()
+        {
+            using ServiceProvider services = CombatServices();
+            Playfield playfield = Playfield(services);
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            Player first = TestWorld.CreatePlayer(42);
+            first.Position = new Vector3(12, 0, 0);
+            Player second = TestWorld.CreatePlayer(43);
+            second.Position = new Vector3(14, 0, 0);
+            Place(playfield, services, npc, first, second);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            brain.AddThreat(first.Identity, 5f);
+
+            npc.Tick(0.1);
+            Assert.AreEqual(first.Identity, npc.FightingTarget);
+            Assert.IsFalse(brain.IsInAttackRange(first));
+
+            brain.AddThreat(second.Identity, 20f);
+            npc.Tick(0.1);
+
+            Assert.AreEqual(second.Identity, npc.FightingTarget);
+            Assert.IsFalse(brain.IsInAttackRange(second));
+        }
+
+        [TestMethod]
         public void HasUnfinishedPathIsTrueWhileLastWaypointIsAway()
         {
             NpcCharacter npc = CreateNpc();
@@ -265,6 +322,32 @@ namespace ZoneEngine_New.Tests
             return new NpcCharacter(
                 new Identity { Type = IdentityType.CanbeAffected, Instance = 1001 },
                 new StubItemBuilder());
+        }
+
+        static ServiceProvider CombatServices()
+            => new ServiceCollection()
+                .AddSingleton(new DynelRegistry())
+                .AddSingleton(new WorldSimulationAccess())
+                .BuildServiceProvider();
+
+        static void Place(Playfield playfield, ServiceProvider services, params Character[] characters)
+        {
+            DynelRegistry registry = services.GetRequiredService<DynelRegistry>();
+            foreach (Character character in characters)
+            {
+                character.Playfield = playfield;
+                registry.Register(character);
+            }
+        }
+
+        static Playfield Playfield(ServiceProvider services)
+        {
+            var playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
+            typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(playfield, new Identity { Type = IdentityType.Playfield2, Instance = 800 });
+            typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(playfield, services);
+            return playfield;
         }
     }
 }
