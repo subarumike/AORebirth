@@ -123,6 +123,39 @@ namespace AORebirth.World.Collision.Tests
             Assert.AreEqual(40f, ground.Vertices[0].Z, 0.001f);
         }
 
+        [TestMethod]
+        public void Mesher_IndoorRamp_TakesCornerHeightFromPreviousTile()
+        {
+            var gnda = new byte[9];
+            var dcga = new byte[9];
+            gnda[0] = 10;
+            gnda[1] = 20;
+            gnda[3] = 40;
+            gnda[4] = 80;
+            dcga[4] = 1;
+            var room = new StyleRoomTemplate(0, 1, 1, 2, 2, Vector3.Zero);
+
+            CollisionTriangleMesh? mesh = DungeonGroundMesher.TryBuild(
+                gnda,
+                dcga,
+                mapWidth: 3,
+                mapHeight: 3,
+                room,
+                placed: Vector3.Zero,
+                facing: 0,
+                tileSize: 2f,
+                heightScale: 0.2f,
+                yOffset: 0f,
+                roomIndex: 0);
+
+            Assert.IsNotNull(mesh);
+            Assert.AreEqual(2f, mesh.Vertices[0].Y, 0.001f);
+            Assert.AreEqual(4f, mesh.Vertices[1].Y, 0.001f);
+            Assert.AreEqual(16f, mesh.Vertices[2].Y, 0.001f);
+            Assert.AreEqual(8f, mesh.Vertices[3].Y, 0.001f);
+            Assert.IsTrue(mesh.Triangles.All(tri => TriangleNormalY(mesh.Vertices, tri) > 0f));
+        }
+
         static float TriangleNormalY(Vector3[] vertices, CollisionTriangle tri)
         {
             Vector3 ab = vertices[tri.B] - vertices[tri.A];
