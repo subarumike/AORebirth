@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- Vendored Lost-Eden sources are not nullable-annotated. -->
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+    <RootNamespace>LostEden.Vehicles</RootNamespace>
+    <AssemblyName>AORebirth.World.Vehicle</AssemblyName>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- PlayfieldCellSurface.AttachEmptyGrid takes the AODB Tilemap. -->
+    <PackageReference Include="AODB" Version="1.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The vendored tests were written against the sources directly and reach internals. -->
+    <InternalsVisibleTo Include="AORebirth.World.Vehicle.Tests" />
+  </ItemGroup>
+</Project>

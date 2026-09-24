@@ -21,18 +21,61 @@ namespace ZoneEngine_New.Core.Playfield
         Dead = 1
     }
 
-    /// <summary>One candidate centre/heading/radius for a hash spawn point.</summary>
+    /// <summary>
+    /// Rotation spawn shorts are degrees. The client stores
+    /// rotationMid = angle * 2 * pi / 360 and rotationWidth = width * 2 * pi / 360.
+    /// </summary>
+    internal static class SpawnHeading
+    {
+        internal static float ToRadians(int degrees)
+        {
+            return degrees * (MathF.PI * 2f / 360f);
+        }
+
+        /// <summary>Cone centre. Yaw around Y, matching the heading <c>CharacterMotor</c> writes.</summary>
+        internal static Quaternion FromFacingDegrees(int angleDegrees)
+        {
+            return FromYawRadians(ToRadians(angleDegrees));
+        }
+
+        /// <summary>
+        /// Uniform sample inside the facing cone. <paramref name="unitRandom"/> is [0, 1]:
+        /// 0 is mid - width/2, 1 is mid + width/2.
+        /// </summary>
+        internal static Quaternion Sample(int angleDegrees, int widthDegrees, double unitRandom)
+        {
+            float mid = ToRadians(angleDegrees);
+            float width = ToRadians(widthDegrees);
+            float yaw = mid + (((float)unitRandom - 0.5f) * width);
+            return FromYawRadians(yaw);
+        }
+
+        static Quaternion FromYawRadians(float yawRadians)
+        {
+            float half = yawRadians * 0.5f;
+            return new Quaternion(0, MathF.Sin(half), 0, MathF.Cos(half));
+        }
+    }
+
+    /// <summary>One candidate centre, facing cone, and radius for a hash spawn point.</summary>
     internal readonly struct SpawnSite
     {
-        internal SpawnSite(Vector3 centre, Quaternion heading, float radius)
+        internal SpawnSite(Vector3 centre, int facingDegrees, int widthDegrees, float radius)
         {
             Centre = centre;
-            Heading = heading;
+            FacingDegrees = facingDegrees;
+            WidthDegrees = widthDegrees;
+            Heading = SpawnHeading.FromFacingDegrees(facingDegrees);
             Radius = Math.Max(0f, radius);
         }
 
         internal Vector3 Centre { get; }
 
+        internal int FacingDegrees { get; }
+
+        internal int WidthDegrees { get; }
+
+        /// <summary>Cone centre. A live spawn samples uniformly inside the width.</summary>
         internal Quaternion Heading { get; }
 
         internal float Radius { get; }
@@ -310,7 +353,8 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 new SpawnSite(
                     primaryPosition,
-                    HeadingFromAngles(entry.Angle, entry.AngleW),
+                    entry.Angle,
+                    entry.AngleW,
                     entry.Radius)
             };
 
@@ -326,7 +370,8 @@ namespace ZoneEngine_New.Core.Playfield
                 sites.Add(
                     new SpawnSite(
                         new Vector3(extra.Position[0], extra.Position[1], extra.Position[2]),
-                        HeadingFromAngles(extra.Angle, extra.AngleW),
+                        extra.Angle,
+                        extra.AngleW,
                         extra.Radius));
             }
 
@@ -492,7 +537,10 @@ namespace ZoneEngine_New.Core.Playfield
             out Quaternion heading)
         {
             SpawnSite site = point.Sites[Random.Shared.Next(point.Sites.Length)];
-            heading = site.Heading;
+            heading = SpawnHeading.Sample(
+                site.FacingDegrees,
+                site.WidthDegrees,
+                Random.Shared.NextDouble());
             position = site.Centre;
             if (site.Radius <= 0f)
                 return;
@@ -713,21 +761,5 @@ namespace ZoneEngine_New.Core.Playfield
                     point.RespawnTimeSeconds));
         }
 
-        /// <summary>
-        /// AO yaw-only headings commonly store quaternion Y/W in Angle/AngleW.
-        /// </summary>
-        private static Quaternion HeadingFromAngles(int angle, int angleW)
-        {
-            if (angle == 0 && angleW == 0)
-                return new Quaternion(0, 0, 0, 1);
-
-            double y = angle;
-            double w = angleW;
-            double length = Math.Sqrt((y * y) + (w * w));
-            if (length <= 0.0)
-                return new Quaternion(0, 0, 0, 1);
-
-            return new Quaternion(0, y / length, 0, w / length);
-        }
     }
 }

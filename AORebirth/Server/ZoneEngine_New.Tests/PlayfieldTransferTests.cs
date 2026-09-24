@@ -63,8 +63,8 @@ public sealed class PlayfieldTransferTests
         f.Owner(destination, () => player.Motor.Tick(dt));
         double authoritativeY = player.Position.y;
         Assert.AreNotEqual(landing.y, authoritativeY, "This route must exercise a real post-arrival adjustment.");
-        Assert.AreEqual((double)(float)surface.y,
-            authoritativeY, "The grounded sweep snaps to the surface; DAO persistence must preserve that exact result.");
+        Assert.AreEqual(surface.y + LostEden.Vehicles.VehicleSim.StepHeight,
+            authoritativeY, 1e-4, "The vehicle lands a step height above the surface; DAO persistence must preserve that exact result.");
         var snapshot = new CharacterSnapshotService(f.Snapshots, f.Snapshots, new StubLogger());
         snapshot.Commit(player);
         var saved = f.Snapshots.Writes.Single();

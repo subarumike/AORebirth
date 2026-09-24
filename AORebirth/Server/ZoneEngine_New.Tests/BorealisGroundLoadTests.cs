@@ -1,21 +1,15 @@
-namespace ZoneEngine_New.Tests
+﻿namespace ZoneEngine_New.Tests
 {
     using System;
     using System.Globalization;
 
     using AORebirth.World.Collision;
 
-    using BepuPhysics;
-    using BepuPhysics.Collidables;
-    using BepuPhysics.CollisionDetection;
-    using BepuPhysics.Constraints;
-    using BepuUtilities;
-    using BepuUtilities.Memory;
+    using LostEden.Vehicles;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using ZoneEngine_New.Core.GameData;
-    using ZoneEngine_New.Core.WorldSimulation;
 
     [TestClass]
     public sealed class BorealisGroundLoadTests
@@ -26,7 +20,7 @@ namespace ZoneEngine_New.Tests
         const float SpawnZ = 518.6351f;
 
         [TestMethod]
-        public void Borealis_TerrainIsPresentForBepuAndNavmeshSource()
+        public void Borealis_TerrainIsPresentForVehicleSurfaceAndNavmeshSource()
         {
             var data = new GameDataStore(new StubLogger());
             PlayfieldGeometryData geometry = data.GetPlayfieldGeometry(PlayfieldId);
@@ -35,7 +29,7 @@ namespace ZoneEngine_New.Tests
             TerrainHeightfield? terrain = geometry.Collision.Terrain;
             Assert.IsNotNull(
                 terrain,
-                "TerrainHeightfield is null. Bepu TileCollisionBaker and navmesh flatten share this field.");
+                "TerrainHeightfield is null. The vehicle surface and navmesh flatten share this field.");
             Assert.IsTrue(
                 terrain.Chunks.Count > 0,
                 "TerrainHeightfield has no chunks.");
@@ -59,16 +53,13 @@ namespace ZoneEngine_New.Tests
                 "Navmesh terrain source is too small to be the outdoor ground. triangles="
                 + navSource.Triangles.Length.ToString(CultureInfo.InvariantCulture));
 
-            var pool = new BufferPool();
-            Simulation simulation = Simulation.Create(
-                pool,
-                new EmptyNarrowPhase(),
-                new EmptyPoseIntegrator(),
-                new SolveDescription(1, 1));
-            int baked = TileCollisionBaker.BakeAll(terrain, pool, simulation, out TileBakeReport tiles);
+            PlayfieldSurface? surface = PlayfieldSurfaceFactory.Build(geometry.Collision);
+            Assert.IsNotNull(surface?.Terrain, "The vehicle surface has no terrain for playfield 800.");
+            float surfaceY = surface.Terrain.GroundHeightAt(new Vec3(SpawnX, SpawnY, SpawnZ), out _);
             Assert.IsTrue(
-                baked > 0 && tiles.Complete && tiles.Triangles > 1000,
-                "Bepu terrain bake missed the ground. " + tiles);
+                terrain.TryGetHeight(SpawnX, SpawnZ, out float heightfieldY),
+                "The heightfield has no height at the spawn.");
+            Assert.AreEqual(heightfieldY, surfaceY, 0.05f, "The vehicle terrain disagrees with the heightfield.");
         }
 
         static bool TrySampleHeight(TerrainHeightfield terrain, float x, float z, out float y)
@@ -94,79 +85,6 @@ namespace ZoneEngine_New.Tests
             }
 
             return false;
-        }
-
-        struct EmptyNarrowPhase : INarrowPhaseCallbacks
-        {
-            public void Initialize(Simulation simulation)
-            {
-            }
-
-            public bool AllowContactGeneration(
-                int workerIndex,
-                CollidableReference a,
-                CollidableReference b,
-                ref float speculativeMargin)
-                => false;
-
-            public bool AllowContactGeneration(
-                int workerIndex,
-                CollidablePair pair,
-                int childIndexA,
-                int childIndexB)
-                => false;
-
-            public bool ConfigureContactManifold<TManifold>(
-                int workerIndex,
-                CollidablePair pair,
-                ref TManifold manifold,
-                out PairMaterialProperties pairMaterial)
-                where TManifold : unmanaged, IContactManifold<TManifold>
-            {
-                pairMaterial = default;
-                return false;
-            }
-
-            public bool ConfigureContactManifold(
-                int workerIndex,
-                CollidablePair pair,
-                int childIndexA,
-                int childIndexB,
-                ref ConvexContactManifold manifold)
-                => false;
-
-            public void Dispose()
-            {
-            }
-        }
-
-        struct EmptyPoseIntegrator : IPoseIntegratorCallbacks
-        {
-            public AngularIntegrationMode AngularIntegrationMode => AngularIntegrationMode.Nonconserving;
-
-            public bool AllowSubstepsForUnconstrainedBodies => false;
-
-            public bool IntegrateVelocityForKinematics => false;
-
-            public void Initialize(Simulation simulation)
-            {
-            }
-
-            public void PrepareForIntegration(float dt)
-            {
-            }
-
-            public void IntegrateVelocity(
-                System.Numerics.Vector<int> bodyIndices,
-                Vector3Wide position,
-                QuaternionWide orientation,
-                BodyInertiaWide localInertia,
-                System.Numerics.Vector<int> integrationMask,
-                int workerIndex,
-                System.Numerics.Vector<float> dt,
-                ref BodyVelocityWide velocity)
-            {
-            }
         }
     }
 }

@@ -66,7 +66,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public float Factor { get; }
     }
 
-    /// <summary>XZ spatial hash of soft zoning triggers (not Bepu hard).</summary>
+    /// <summary>XZ spatial hash of soft zoning triggers (not hard collision).</summary>
     public sealed class TriggerVolumeCatalog
     {
         public const float BinSize = 32f;

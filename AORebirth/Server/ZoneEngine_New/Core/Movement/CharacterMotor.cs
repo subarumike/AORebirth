@@ -9,6 +9,9 @@ namespace ZoneEngine_New.Core.Movement
 
     using AORebirth.World.Pathfinding;
 
+    using LostEden.Vehicles;
+    using LostEden.Vehicles.Surfaces;
+
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Playfield;
@@ -21,9 +24,11 @@ namespace ZoneEngine_New.Core.Movement
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     /// <summary>
-    /// Server locomotion copied from client <c>Vehicle_t::Run</c> /
-    /// <c>WaypointPath_c</c>. Keyed motion uses instant <c>SetVel</c>; NPC paths
-    /// are constant-speed polylines, then surface snap.
+    /// Server locomotion on the client's own vehicle: a <see cref="CharVehicleSim"/>
+    /// (<c>PlayerVehicle_t</c>) for players and an <see cref="NpcVehicleSim"/> (<c>NPCVehicle_t</c>)
+    /// for NPCs, colliding against the playfield's <see cref="ISurface"/>. The flag-to-axis glue is
+    /// Lost-Eden's <c>N3CharVehicle</c>; the client-position gates, mission hooks, flight authority and
+    /// navmesh planning are the server's.
     /// </summary>
     public sealed class CharacterMotor
     {
@@ -31,8 +36,11 @@ namespace ZoneEngine_New.Core.Movement
             MovementFlags.Forward | MovementFlags.Backward
             | MovementFlags.StrafeLeft | MovementFlags.StrafeRight;
 
+        const MovementFlags TurnFlags = MovementFlags.TurnLeft | MovementFlags.TurnRight;
+
         readonly Character _character;
-        readonly VehiclePath _vehiclePath = new();
+        readonly CharVehicleSim _sim;
+        readonly NpcVehicleSim? _npc;
         readonly List<Vector3> _path = new();
         readonly List<Vector3> _navigateScratch = new();
         readonly List<System.Numerics.Vector3> _navMeshScratch = new();
@@ -41,23 +49,39 @@ namespace ZoneEngine_New.Core.Movement
         MovementState _state = MovementState.Run;
         MovementState _lastSpeedMode = MovementState.Run;
 
-        Vector3 _velocity = new(0, 0, 0);
-        float _verticalVelocity;
+        Quaternion? _syncedRotation;
+        int _playerPathIndex = -1;
         int _jumpStrength;
         int _jumpAgility;
         int _jumpGmLevel;
-        bool _jumpArmed = true;
         bool _voidWarned;
-        VelocityLimits _runLimits = new(5f, 3f, 2.5f);
 
         public CharacterMotor(Character character)
         {
             _character = character ?? throw new ArgumentNullException(nameof(character));
+            _npc = character.IsPlayer ? null : new NpcVehicleSim();
+            _sim = _npc ?? new CharVehicleSim();
+            _sim.Mass = MovementConfig.Mass;
+            _sim.MaxForce = MovementConfig.InitialMaxForce;
+            _sim.MaxVel = MovementConfig.InitialMaxVel;
+            _sim.NearProbeOffset = MovementConfig.BodyRadius;
+            _sim.SlowingDistance = MovementConfig.InitialSlowingDistance;
+            _sim.MovementState = (int)_state;
+            _sim.OwnerIsNpc = _npc != null;
+            _sim.JumpLanded += OnJumpLanded;
+            _sim.DisableSurfaceHug();
+            _sim.UseSurfaceNormal();
+            _sim.UpdateMotionConstraints();
         }
 
         public MovementFlags MovementFlags => _flags;
 
         public MovementState State => _state;
+
+        /// <summary>The vehicle itself.</summary>
+        public CharVehicleSim Vehicle => _sim;
+
+        bool Jumping => _sim.JumpHeight != 0f;
 
         public CharMovementStatus BuildMovementStatus()
         {
@@ -70,7 +94,7 @@ namespace ZoneEngine_New.Core.Movement
             bool turnRight = (_flags & MovementFlags.TurnRight) != 0;
             bool elevateUp = (_flags & MovementFlags.ElevateUp) != 0;
             bool elevateDown = (_flags & MovementFlags.ElevateDown) != 0;
-            bool jumping = !_jumpArmed || (_flags & MovementFlags.Jump) != 0;
+            bool jumping = Jumping || (_flags & MovementFlags.Jump) != 0;
 
             if (_state == MovementState.Sit)
             {
@@ -132,7 +156,7 @@ namespace ZoneEngine_New.Core.Movement
                 actions.Add(MovementAction.ElevateUpStart);
             if ((_flags & MovementFlags.ElevateDown) != 0)
                 actions.Add(MovementAction.ElevateDownStart);
-            if (!_jumpArmed || (_flags & MovementFlags.Jump) != 0)
+            if (Jumping || (_flags & MovementFlags.Jump) != 0)
                 actions.Add(MovementAction.JumpStart);
 
             var messages = new List<CharDCMoveMessage>(actions.Count);
@@ -169,7 +193,9 @@ namespace ZoneEngine_New.Core.Movement
             };
         }
 
-        public bool HasPath => _vehiclePath.IsActive;
+        public bool HasPath => _npc != null
+            ? !_npc.Path.Empty
+            : _playerPathIndex >= 0 && _playerPathIndex < _path.Count;
 
         /// <summary>
         /// True while translating (keys/path) or still carrying planar speed.
@@ -178,19 +204,22 @@ namespace ZoneEngine_New.Core.Movement
         public bool IsMoving =>
             (_flags & TranslationFlags) != 0
             || HasPath
-            || Vector3.Abs(_velocity) > MovementConfig.SpeedStopEpsilon;
+            || _sim.Speed > MovementConfig.SpeedStopEpsilon;
 
         public event Action? PathCompleted;
 
         /// <summary>Raised when a jump actually starts (not a failed sit/unarmed attempt).</summary>
         public event Action? Jumped;
 
+        /// <summary>
+        /// The run-speed stat drives the vehicle's whole speed curve (<c>FUN_1006f2fc</c>). The old
+        /// health penalty is gone: Lost-Eden found no stock evidence for it.
+        /// </summary>
         public void RefreshFromStats()
         {
-            int runSpeed = _character.Stats.GetOrZero(CharacterStat.RunSpeed);
-            int health = _character.Stats.GetOrZero(CharacterStat.Health);
-            int maxHealth = _character.Stats.GetOrZero(CharacterStat.MaxHealth);
-            _runLimits = ComputeRunLimits(runSpeed, health, maxHealth);
+            _sim.RunSpeedStat = _character.Stats.GetOrZero(CharacterStat.RunSpeed);
+            _sim.UpdateMotionConstraints();
+            ApplyFlagsToAxes();
             RefreshJumpStats();
         }
 
@@ -206,8 +235,6 @@ namespace ZoneEngine_New.Core.Movement
             switch (stat)
             {
                 case CharacterStat.RunSpeed:
-                case CharacterStat.Health:
-                case CharacterStat.MaxHealth:
                     RefreshFromStats();
                     break;
                 case CharacterStat.Strength:
@@ -253,34 +280,63 @@ namespace ZoneEngine_New.Core.Movement
             if (Vector3.Abs(destination - current) < minDeltaMeters)
                 return true;
 
-            Vector3 start = _character.Position;
-            _path.Clear();
-            _path.Add(new Vector3(start.x, start.y, start.z));
-            _path.Add(new Vector3(destination.x, destination.y, destination.z));
-            _vehiclePath.Set(_path, GetActiveLimits().Forward);
+            _navigateScratch.Clear();
+            _navigateScratch.Add(new Vector3(destination.x, destination.y, destination.z));
+            ReplacePath(_navigateScratch);
             return true;
         }
 
         /// <summary>
-        /// Remaining path points for SCFU. Empty when idle so HasWaypoints stays clear.
+        /// Remaining path points for SCFU. Empty when idle so HasWaypoints stays clear. For an NPC these
+        /// are the waypoints its guide has not yet passed, i.e. what the vehicle is still steering along.
         /// </summary>
         public MsgVector3[] CopyRemainingWaypoints()
         {
             if (!HasPath)
                 return [];
 
-            return _vehiclePath.CopyRemainingWaypoints();
+            int first = _npc != null ? FirstWaypointAheadOfGuide() : _playerPathIndex;
+            if (first >= _path.Count)
+                first = _path.Count - 1;
+
+            var remaining = new MsgVector3[_path.Count - first];
+            for (int i = first; i < _path.Count; i++)
+                remaining[i - first] = new MsgVector3 { X = _path[i].xf, Y = _path[i].yf, Z = _path[i].zf };
+            return remaining;
+        }
+
+        /// <summary>The first kept waypoint the guide has not reached, measured along the flat path.</summary>
+        int FirstWaypointAheadOfGuide()
+        {
+            float consumed = _npc!.Guide.Time * _npc.Guide.MaxSpeed;
+            float along = 0f;
+            for (int i = 1; i < _path.Count; i++)
+            {
+                along += FlatDistance(_path[i - 1], _path[i]);
+                if (along > consumed)
+                    return i;
+            }
+
+            return _path.Count - 1;
         }
 
         public void ClearPath()
         {
             bool had = HasPath || _path.Count > 0;
             _path.Clear();
-            _vehiclePath.Clear();
-            if (had)
-                PathCompleted?.Invoke();
+            _playerPathIndex = -1;
+            _npc?.Path.Clear();
+            if (!had)
+                return;
+
+            ApplyFlagsToAxes();
+            PathCompleted?.Invoke();
         }
 
+        /// <summary>
+        /// Keeps the full waypoint list (with Y) for SCFU and fills the vehicle's path. An NPC gets
+        /// stock's <c>Path_t</c> + guide; a player body keeps Lost-Eden's point-and-drive follower.
+        /// </summary>
         void CopyWaypoints(IReadOnlyList<Vector3> waypoints)
         {
             if (waypoints == null || waypoints.Count == 0)
@@ -302,13 +358,23 @@ namespace ZoneEngine_New.Core.Movement
                 _path.Add(new Vector3(point.x, point.y, point.z));
             }
 
-            _vehiclePath.Set(_path, GetActiveLimits().Forward);
+            if (_npc != null)
+            {
+                _npc.Path.Clear();
+                for (int i = 0; i < _path.Count; i++)
+                    _npc.Path.AddWaypoint(ToVec3(_path[i]));
+                _npc.RestartPath();
+                return;
+            }
+
+            _playerPathIndex = 1;
         }
 
         void ReplacePath(IReadOnlyList<Vector3> waypoints)
         {
             _path.Clear();
-            _vehiclePath.Clear();
+            _playerPathIndex = -1;
+            _npc?.Path.Clear();
             CopyWaypoints(waypoints);
         }
 
@@ -344,10 +410,7 @@ namespace ZoneEngine_New.Core.Movement
             _navigateScratch.Add(new Vector3(destination.x, destination.y, destination.z));
         }
 
-        public void Halt()
-        {
-            _velocity = new Vector3(0, 0, 0);
-        }
+        public void Halt() => _sim.Halt();
 
         public void ResetForPlayfieldTransfer(Vector3 position)
         {
@@ -358,32 +421,27 @@ namespace ZoneEngine_New.Core.Movement
             Warp(position);
         }
 
+        /// <summary>
+        /// Places the vehicle without steering. A rotation goes through <c>SetRelRot</c>, so a warp
+        /// that keeps its velocity carries it into the new facing.
+        /// </summary>
         public void Warp(Vector3 position, Quaternion? rotation = null, bool resetVelocity = true)
         {
-            float previousYaw = GetYawDegrees();
             _character.Position = position;
+            _sim.Position = ToVec3(position);
             if (rotation != null)
+            {
                 _character.Rotation = rotation;
+                ApplyHeadingToSim(rotation);
+            }
 
-            if (resetVelocity)
-            {
-                Halt();
-                _verticalVelocity = MovementConfig.GroundStickVelocity;
-                _jumpArmed = true;
-            }
-            else if (rotation != null)
-            {
-                float yawDelta = NormalizeAngle(GetYawDegrees() - previousYaw);
-                if (Math.Abs(yawDelta) >= 1e-6f)
-                {
-                    float rad = yawDelta * (MathF.PI / 180f);
-                    float c = MathF.Cos(rad);
-                    float s = MathF.Sin(rad);
-                    float vx = (float)_velocity.x;
-                    float vz = (float)_velocity.z;
-                    _velocity = new Vector3((vx * c) + (vz * s), 0, (-vx * s) + (vz * c));
-                }
-            }
+            if (!resetVelocity)
+                return;
+
+            _sim.Halt();
+            _sim.LandNow(_sim.Position.Y);
+            if (_sim.FallingEnabled)
+                _sim.BeginFalling();
         }
 
         /// <summary>
@@ -453,32 +511,31 @@ namespace ZoneEngine_New.Core.Movement
             }
 
             _character.Position = new Vector3(x, y, z);
+            _sim.Position = new Vec3(x, y, z);
             return true;
         }
 
-        /// <summary>
-        /// Applies client heading and rotates residual planar velocity by the yaw delta
-        /// (Lost Eden <c>Warp(..., resetVelocity: false)</c>).
-        /// </summary>
+        /// <summary>Client heading through <c>SetRelRot</c>, which re-aims residual velocity along it.</summary>
         void ApplyClientHeading(CharDCMoveMessage message)
         {
-            float previousYaw = GetYawDegrees();
-            _character.Rotation = new Quaternion(
+            var heading = new Quaternion(
                 message.Heading.X,
                 message.Heading.Y,
                 message.Heading.Z,
                 message.Heading.W);
+            _character.Rotation = heading;
+            ApplyHeadingToSim(heading);
+        }
 
-            float yawDelta = NormalizeAngle(GetYawDegrees() - previousYaw);
-            if (Math.Abs(yawDelta) < 1e-6f)
+        void ApplyHeadingToSim(Quaternion heading)
+        {
+            _syncedRotation = heading;
+            Vec3 forward = ToQuat(heading) * Vec3.ReferenceForward;
+            forward.Y = 0f;
+            if (forward.LengthSquared < 1e-8f)
                 return;
 
-            float rad = yawDelta * (MathF.PI / 180f);
-            float c = MathF.Cos(rad);
-            float s = MathF.Sin(rad);
-            float vx = (float)_velocity.x;
-            float vz = (float)_velocity.z;
-            _velocity = new Vector3((vx * c) + (vz * s), 0, (-vx * s) + (vz * c));
+            _sim.SetRelRot(Quat.LookRotation(forward / forward.Length, _sim.SurfaceNormal));
         }
 
         public void Tick(double deltaTime)
@@ -488,103 +545,162 @@ namespace ZoneEngine_New.Core.Movement
             if (dt <= 0f)
                 return;
 
+            BindSurface();
+            _sim.Position = ToVec3(_character.Position);
+            if (_character.Rotation != null && !ReferenceEquals(_character.Rotation, _syncedRotation))
+                ApplyHeadingToSim(_character.Rotation);
+
             bool idle = !HasPath
-                && (_flags & TranslationFlags) == 0
-                && Math.Abs(_verticalVelocity) < MovementConfig.SpeedStopEpsilon
-                && Vector3.Abs(_velocity) < MovementConfig.SpeedStopEpsilon
-                && _state != MovementState.Sit
-                && _jumpArmed;
-            if (idle && TryResolveGroundSupport(out float idleGroundY))
-            {
-                _character.Position = new Vector3(_character.Position.x, idleGroundY, _character.Position.z);
+                && (_flags & (TranslationFlags | TurnFlags)) == 0
+                && !_sim.Airborne
+                && _sim.Speed <= VehicleSim.MovingSpeedEpsilon
+                && _sim.VerticalVelocity == 0f;
+            if (idle)
                 return;
-            }
 
             if (HasPath)
             {
                 TickStallWatch.Stage("motor.path", _character.Identity.Instance);
-                TickWaypointPath(dt);
+                if (_npc != null)
+                    _npc.AdvanceGuide(dt);
+                else
+                    SteerAlongPlayerPath();
+            }
+
+            HoldAltitudeOverVoid();
+
+            Vec3 previous = _sim.Position;
+            _sim.Run(dt);
+
+            if (_character.Playfield is MissionPlayfield mission
+                && !mission.World.AcceptsMovement(_character, ToVector3(_sim.Position)))
+            {
+                _sim.Position = previous;
+                _sim.Halt();
+                _sim.VerticalVelocity = 0f;
                 return;
             }
 
-            // DummyVehicle_t::CalcSteering is 0; keyed motion is Vehicle_t::SetVel.
-            _velocity = ComputeActionDesiredVelocity(dt);
+            _character.Position = ToVector3(_sim.Position);
+            PullHeading();
 
-            // Lost Eden grounded / airborne vertical update, then move, then land check.
-            float groundY = 0f;
-            bool grounded = _verticalVelocity <= 0f && TryResolveGroundSupport(out groundY);
-            if (grounded)
+            if (_npc != null && HasPath && NpcPathFinished())
+                ClearPath();
+        }
+
+        /// <summary>
+        /// The guide has consumed the whole path and the body has arrived, or has stopped trying
+        /// (<c>SteeringDirArrive</c> halts once it passes the target, and a wall halts it too).
+        /// </summary>
+        bool NpcPathFinished()
+        {
+            if (_npc!.Guide.Time * _npc.Guide.MaxSpeed < _npc.Path.TotalLength)
+                return false;
+
+            Vec3 last = _npc.Path.GetWaypoint(_npc.Path.Size - 1);
+            float dx = last.X - _sim.Position.X;
+            float dz = last.Z - _sim.Position.Z;
+            return (dx * dx) + (dz * dz) <= MovementConfig.PathArrivalRadius * MovementConfig.PathArrivalRadius
+                || _sim.Speed <= VehicleSim.MovingSpeedEpsilon;
+        }
+
+        /// <summary>
+        /// Unported Lost-Eden glue (<c>N3CharVehicle.SteerAlongPath</c>): point a player body at the next
+        /// waypoint and drive forward. Stock's follow-target branch is not recovered.
+        /// </summary>
+        void SteerAlongPlayerPath()
+        {
+            while (HasPath)
             {
-                if (!_jumpArmed && _verticalVelocity <= 0f)
-                    CompleteLanding();
+                Vector3 target = _path[_playerPathIndex];
+                float dx = (float)target.x - _sim.Position.X;
+                float dz = (float)target.z - _sim.Position.Z;
+                float distance = MathF.Sqrt((dx * dx) + (dz * dz));
+                if (distance <= MovementConfig.WaypointArrivalRadius)
+                {
+                    _playerPathIndex++;
+                    if (HasPath)
+                        continue;
 
-                if (_verticalVelocity < 0f)
-                    _verticalVelocity = MovementConfig.GroundStickVelocity;
+                    _sim.SetForwardDrive(0f);
+                    _sim.SetTurnRate(0f);
+                    _sim.Halt();
+                    ClearPath();
+                    return;
+                }
 
-                _character.Position = new Vector3(_character.Position.x, groundY, _character.Position.z);
-            }
-            else
-            {
-                ApplyGravity(dt);
-            }
-
-            Vector3 planar = _velocity;
-            Vector3 start = _character.Position;
-            double endY = grounded ? start.y : start.y + (_verticalVelocity * dt);
-            Vector3 end = new(
-                start.x + (planar.x * dt),
-                endY,
-                start.z + (planar.z * dt));
-
-            if (_character.Playfield is MissionPlayfield mission && !mission.World.AcceptsMovement(_character, end))
-            {
-                Halt(); _verticalVelocity = 0;
+                var toward = new Vec3(dx / distance, 0f, dz / distance);
+                _sim.SetRelRot(Quat.LookRotation(toward, Vec3.ReferenceUp));
+                _sim.SetForwardDrive(1f);
                 return;
-            }
-
-            // Falling-enabled keyed motion: slide then tripod snap (Vehicle_t::Run).
-            EnsureSurfaceAlignment.Result aligned = AlignToSurface(start, end, allowSlide: true);
-            _character.Position = aligned.Position;
-            if (aligned.Normal.y > MovementConfig.SurfaceSlideFloorY && _verticalVelocity <= 0f)
-            {
-                _verticalVelocity = MovementConfig.GroundStickVelocity;
-                if (!_jumpArmed)
-                    CompleteLanding();
-            }
-            else if (aligned.Normal.y < -MovementConfig.SurfaceSlideFloorY && _verticalVelocity > 0f)
-            {
-                _verticalVelocity = 0f;
             }
         }
 
-        void ApplyGravity(float dt)
+        /// <summary>
+        /// Binds the playfield's surface. With none the vehicle cannot find the ground, so falling is off
+        /// and it holds its altitude; Fly (vehicle state 7) turns falling off by itself.
+        /// </summary>
+        void BindSurface()
         {
-            // Falling with nothing at all underneath means the playfield is missing collision, not
-            // that the character walked off the world. Hold position and say so once.
-            if (!HasGeometryBelow())
-            {
-                _verticalVelocity = 0f;
-                if (!_voidWarned && _character is Player voidPlayer)
-                {
-                    _voidWarned = true;
-                    voidPlayer.Logger.Warn(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            "No collision geometry below character={0} at ({1:F3},{2:F3},{3:F3}); holding altitude",
-                            _character.Identity.Instance,
-                            _character.Position.x,
-                            _character.Position.y,
-                            _character.Position.z));
-                }
-
+            ISurface? surface = _character.Playfield?.WorldAccess.Instance?.Surface;
+            _sim.Surface = surface;
+            bool falling = surface != null && _state != MovementState.Fly;
+            if (falling == _sim.FallingEnabled)
                 return;
-            }
 
-            _verticalVelocity += MovementConfig.Gravity * dt;
-            _verticalVelocity = Math.Clamp(
-                _verticalVelocity,
-                -MovementConfig.TerminalVelocity,
-                MovementConfig.TerminalVelocity);
+            if (falling)
+                _sim.EnableFalling();
+            else
+                _sim.DisableFalling();
+        }
+
+        /// <summary>
+        /// Falling with nothing at all underneath means the playfield is missing collision, not that the
+        /// character walked off the world. Hold position and say so once.
+        /// </summary>
+        void HoldAltitudeOverVoid()
+        {
+            if (!_sim.FallingEnabled || !_sim.Airborne || HasGeometryBelow())
+                return;
+
+            _sim.DisableFalling();
+            if (_voidWarned || _character is not Player voidPlayer)
+                return;
+
+            _voidWarned = true;
+            voidPlayer.Logger.Warn(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "No collision geometry below character={0} at ({1:F3},{2:F3},{3:F3}); holding altitude",
+                    _character.Identity.Instance,
+                    _character.Position.x,
+                    _character.Position.y,
+                    _character.Position.z));
+        }
+
+        /// <summary>
+        /// The dynel keeps the heading only; the body's surface tilt stays inside the vehicle
+        /// (<c>N3CharVehicle.PullSimToTransform</c>). A moving body faces along its velocity, flipped when
+        /// backing up, which is what orientation mode 1 does whenever the surface is bound.
+        /// </summary>
+        void PullHeading()
+        {
+            Vec3 forward = _sim.GetBodyForward();
+            float vx = _sim.Velocity.X;
+            float vz = _sim.Velocity.Z;
+            if ((vx * vx) + (vz * vz) > 1e-8f)
+                forward = new Vec3(vx * _sim.Direction, 0f, vz * _sim.Direction);
+
+            if (Math.Abs(forward.X) < 1e-5f && Math.Abs(forward.Z) < 1e-5f)
+                return;
+
+            float yaw = MathF.Atan2(forward.X, forward.Z);
+            if (Math.Abs(NormalizeRadians(yaw - GetYawRadians())) < 1e-5f)
+                return;
+
+            float half = yaw * 0.5f;
+            _character.Rotation = new Quaternion(0, MathF.Sin(half), 0, MathF.Cos(half));
+            _syncedRotation = _character.Rotation;
         }
 
         public void ApplyAction(MovementAction action)
@@ -640,7 +756,7 @@ namespace ZoneEngine_New.Core.Movement
                     break;
                 case MovementAction.JumpStart:
                     SetFlags(_flags | MovementFlags.Jump);
-                    TryStartJump(requireGrounded: false);
+                    TryStartJump();
                     break;
                 case MovementAction.JumpStop:
                     SetFlags(_flags & ~MovementFlags.Jump);
@@ -724,12 +840,75 @@ namespace ZoneEngine_New.Core.Movement
         void SetFlags(MovementFlags flags)
         {
             _flags = flags;
-            // Lost Eden: clearing all translation input hard-stops planar speed.
-            if ((_flags & TranslationFlags) == 0)
-                Halt();
+            ApplyFlagsToAxes();
         }
 
         void StopAllFlags() => SetFlags(MovementFlags.None);
+
+        /// <summary>
+        /// <c>N3CharVehicle.ApplyFlagsToAxes</c>: input flags into the four axes. An NPC body has none
+        /// (<c>NPCVehicle_t</c>'s lateral and turn channels are empty and its longitudinal reads the
+        /// path), and the release branch's halt would fight the guide, so NPC flags stay flags.
+        /// </summary>
+        void ApplyFlagsToAxes()
+        {
+            if (_npc != null)
+                return;
+
+            float drive = 0f;
+            if ((_flags & MovementFlags.Forward) != 0)
+                drive += 1f;
+            if ((_flags & MovementFlags.Backward) != 0)
+                drive -= 1f;
+
+            int curve = drive < 0f ? 2 : 1;
+            if (_sim.CurveDirection != curve)
+            {
+                _sim.CurveDirection = curve;
+                _sim.UpdateMotionConstraints();
+            }
+
+            // forward 1006ef8d, backward 1006f122, release 1006f23a; the halt and the direction are
+            // both required (N3CharVehicle).
+            if (drive != _sim.ForwardDrive)
+            {
+                if (drive > 0f)
+                {
+                    _sim.SetDirection(1);
+                    _sim.SetForwardDrive(drive);
+                }
+                else if (drive < 0f)
+                {
+                    _sim.SetForwardDrive(drive);
+                    _sim.SetDirection(-1);
+                }
+                else
+                {
+                    _sim.SetForwardDrive(0f);
+                    _sim.Halt();
+                    _sim.SetDirection(1);
+                }
+            }
+
+            float strafe = 0f;
+            if ((_flags & MovementFlags.StrafeRight) != 0)
+                strafe += 1f;
+            if ((_flags & MovementFlags.StrafeLeft) != 0)
+                strafe -= 1f;
+            _sim.SetStrafe(strafe);
+
+            float turn = 0f;
+            if ((_flags & MovementFlags.TurnRight) != 0)
+                turn += 1f;
+            if ((_flags & MovementFlags.TurnLeft) != 0)
+                turn -= 1f;
+            _sim.SetTurnRate(turn * GetTurnRateRadians());
+        }
+
+        /// <summary>Unported Lost-Eden glue: these two rates are not stock.</summary>
+        float GetTurnRateRadians() => IsMoving
+            ? MovementConfig.TurnRateRadiansMoving
+            : MovementConfig.TurnRateRadiansStopped;
 
         void EnterMovementState(MovementState state)
         {
@@ -740,199 +919,22 @@ namespace ZoneEngine_New.Core.Movement
                 StopAllFlags();
 
             _state = state;
+            _sim.MovementState = (int)state;
+            _sim.UpdateMotionConstraints();
+            ApplyFlagsToAxes();
             SyncMovementModeStat();
         }
 
         void LeaveMovementState()
         {
-            _state = _lastSpeedMode is MovementState.Walk or MovementState.Run
+            EnterMovementState(_lastSpeedMode is MovementState.Walk or MovementState.Run
                 ? _lastSpeedMode
-                : MovementState.Run;
-            SyncMovementModeStat();
+                : MovementState.Run);
         }
 
         void SyncMovementModeStat()
         {
             _character.Stats.Set(CharacterStat.CurrentMovementMode, (int)_state, StatDetail.Base, dirty: true);
-        }
-
-        VelocityLimits GetActiveLimits()
-        {
-            if (_state == MovementState.Walk)
-            {
-                float cap = MovementConfig.WalkBaseVelocity;
-                return new VelocityLimits(
-                    Math.Min(_runLimits.Forward, cap),
-                    Math.Min(_runLimits.Backward, cap),
-                    Math.Min(_runLimits.Strafe, cap));
-            }
-
-            return _runLimits;
-        }
-
-        void TickWaypointPath(float dt)
-        {
-            Vector3 previous = _character.Position;
-            bool stillOnPath = _vehiclePath.Advance(dt, out Vector3 pathPos, out Vector3 direction);
-            Halt();
-            _verticalVelocity = 0f;
-
-            if (Vector3.Abs(direction) > 1e-6)
-                FacePathDirection(direction);
-
-            // DisableFalling: no FUN_1000b2e5 lateral slide. Probe + 0.5 abort only.
-            EnsureSurfaceAlignment.Result aligned = AlignToSurface(previous, pathPos, allowSlide: false);
-            _character.Position = aligned.Position;
-
-            if (Vector3.Abs(_character.Position - pathPos) >= MovementConfig.PathSampleAbortDistance)
-            {
-                _character.Position = previous;
-                ClearPath();
-                return;
-            }
-
-            if (!stillOnPath)
-                ClearPath();
-        }
-
-        EnsureSurfaceAlignment.Result AlignToSurface(Vector3 previous, Vector3 desired, bool allowSlide)
-        {
-            Playfield? playfield = _character.Playfield;
-            if (playfield != null
-                && playfield.TrySnapFeetToFloor(desired, out Vector3 floor)
-                && desired.y < floor.y)
-                desired = new Vector3(desired.x, floor.y, desired.z);
-
-            IVehicleSurface? surface = playfield?.WorldAccess.Instance?.CreateVehicleSurface();
-            return EnsureSurfaceAlignment.Apply(surface, previous, desired, allowSlide);
-        }
-
-        Vector3 ComputeActionDesiredVelocity(float dt)
-        {
-            if (_state == MovementState.Sit)
-                return new Vector3(0, 0, 0);
-
-            float turn = 0f;
-            if ((_flags & MovementFlags.TurnLeft) != 0)
-                turn -= 1f;
-            if ((_flags & MovementFlags.TurnRight) != 0)
-                turn += 1f;
-            if (turn != 0f)
-                RotateYaw(turn * GetTurnRateRadians() * (180f / MathF.PI) * dt);
-
-            return ComputeActionPlanarVelocity();
-        }
-
-        /// <summary>
-        /// Planar intent from movement flags. Combined axes share one speed
-        /// (forward &gt; backward &gt; strafe) and only change direction.
-        /// </summary>
-        Vector3 ComputeActionPlanarVelocity()
-        {
-            Vector3 forward = GetForward();
-            Vector3 right = new(forward.z, 0, -forward.x);
-            Vector3 dir = new(0, 0, 0);
-            VelocityLimits limits = GetActiveLimits();
-
-            if ((_flags & MovementFlags.Forward) != 0)
-                dir += forward;
-            if ((_flags & MovementFlags.Backward) != 0)
-                dir -= forward;
-            if ((_flags & MovementFlags.StrafeRight) != 0)
-                dir += right;
-            if ((_flags & MovementFlags.StrafeLeft) != 0)
-                dir -= right;
-
-            double len = Vector3.Abs(dir);
-            if (len < 1e-6)
-                return new Vector3(0, 0, 0);
-
-            float speed;
-            if ((_flags & MovementFlags.Forward) != 0)
-                speed = limits.Forward;
-            else if ((_flags & MovementFlags.Backward) != 0)
-                speed = limits.Backward;
-            else
-                speed = limits.Strafe;
-
-            dir = dir * (1.0 / len);
-            return dir * speed;
-        }
-
-        float GetTurnRateRadians()
-        {
-            bool moving = ((_flags & TranslationFlags) != 0)
-                || HasPath
-                || Vector3.Abs(_velocity) > MovementConfig.SpeedStopEpsilon;
-            return moving
-                ? MovementConfig.TurnRateRadiansMoving
-                : MovementConfig.TurnRateRadiansStopped;
-        }
-
-        /// <summary>
-        /// Client <c>FUN_1000a47a</c>: path ticks copy the segment tangent onto
-        /// body forward immediately. We store heading as yaw around Y.
-        /// </summary>
-        void FacePathDirection(Vector3 direction)
-        {
-            SetYaw(MathF.Atan2((float)direction.x, (float)direction.z) * (180f / MathF.PI));
-        }
-
-        void RotateYaw(float yawDeltaDegrees)
-        {
-            if (Math.Abs(yawDeltaDegrees) < 1e-6f)
-                return;
-
-            float yaw = GetYawDegrees() + yawDeltaDegrees;
-            SetYaw(yaw);
-            float rad = yawDeltaDegrees * (MathF.PI / 180f);
-            float c = MathF.Cos(rad);
-            float s = MathF.Sin(rad);
-            float vx = (float)_velocity.x;
-            float vz = (float)_velocity.z;
-            _velocity = new Vector3((vx * c) + (vz * s), 0, (-vx * s) + (vz * c));
-        }
-
-        void SetYaw(float yawDegrees)
-        {
-            float rad = yawDegrees * (MathF.PI / 180f);
-            // Yaw around Y: quaternion (0, sin(y/2), 0, cos(y/2))
-            float half = rad * 0.5f;
-            _character.Rotation = new Quaternion(0, MathF.Sin(half), 0, MathF.Cos(half));
-        }
-
-        float GetYawDegrees()
-        {
-            Quaternion q = _character.Rotation ?? new Quaternion();
-            // yaw from quaternion
-            float siny = 2f * ((float)(q.wf * q.yf + q.xf * q.zf));
-            float cosy = 1f - (2f * ((float)(q.yf * q.yf + q.zf * q.zf)));
-            return MathF.Atan2(siny, cosy) * (180f / MathF.PI);
-        }
-
-        Vector3 GetForward()
-        {
-            float yaw = GetYawDegrees() * (MathF.PI / 180f);
-            return new Vector3(MathF.Sin(yaw), 0, MathF.Cos(yaw));
-        }
-
-        /// <summary>
-        /// Finds the surface holding the character up. Origin is torso height: spawn and Recast
-        /// poses can sit under the Bepu floor, and a foot-height downward ray then starts below
-        /// the triangle and misses it.
-        /// </summary>
-        bool TryResolveGroundSupport(out float groundY)
-        {
-            groundY = (float)_character.Position.y;
-            Playfield? playfield = _character.Playfield;
-            if (playfield == null)
-                return true;
-
-            if (!playfield.TrySnapFeetToFloor(_character.Position, out Vector3 hit))
-                return playfield.WorldAccess.Instance == null;
-
-            groundY = (float)hit.y;
-            return true;
         }
 
         bool HasGeometryBelow()
@@ -950,107 +952,65 @@ namespace ZoneEngine_New.Core.Movement
 
             Vector3 from = new(
                 _character.Position.x,
-                _character.Position.y + MovementConfig.CapsuleCenterLift,
+                _character.Position.y + MovementConfig.VoidProbeLift,
                 _character.Position.z);
             return world.TryRaycastDown(from, MovementConfig.VoidProbeDepth, out _);
         }
 
-        bool TryStartJump(bool requireGrounded)
+        /// <summary>
+        /// <c>JumpStartTransitionAction_t</c>: the owner's jump height into <see cref="CharVehicleSim.Jump"/>.
+        /// With no surface bound there is no ground to leave, so only the event is raised.
+        /// </summary>
+        bool TryStartJump()
         {
-            if (!_jumpArmed || _state == MovementState.Sit)
-                return false;
-            if (requireGrounded && !TryResolveGroundSupport(out _))
+            if (_state == MovementState.Sit || Jumping)
                 return false;
 
-            _verticalVelocity = ComputeJumpVerticalVelocity(_jumpStrength, _jumpAgility, _jumpGmLevel);
-            _jumpArmed = false;
+            if (_sim.Surface != null
+                && !_sim.Jump(CharVehicleSim.JumpHeightFromStats(_jumpStrength, _jumpAgility, _jumpGmLevel)))
+                return false;
+
             Jumped?.Invoke();
             return true;
         }
 
-        void CompleteLanding()
-        {
-            if (_jumpArmed)
-                return;
+        void OnJumpLanded() => _flags &= ~MovementFlags.Jump;
 
-            _jumpArmed = true;
-            _flags &= ~MovementFlags.Jump;
+        float GetYawRadians()
+        {
+            Quaternion q = _character.Rotation ?? new Quaternion();
+            float siny = 2f * ((float)(q.wf * q.yf + q.xf * q.zf));
+            float cosy = 1f - (2f * ((float)(q.yf * q.yf + q.zf * q.zf)));
+            return MathF.Atan2(siny, cosy);
         }
 
-        static float ComputeJumpVerticalVelocity(int strength, int agility, int gmLevel)
+        static float NormalizeRadians(float radians)
         {
-            float str = strength;
-            float agi = agility;
-            if (str + agi > MovementConfig.JumpStatCap && gmLevel == 0)
-            {
-                str = MovementConfig.JumpStatCap;
-                agi = 0f;
-            }
-
-            float height = ((str + agi) / MovementConfig.JumpHeightPerStatPool) + MovementConfig.JumpHeightBase;
-            if (height < MovementConfig.JumpHeightFloor)
-                height = MovementConfig.JumpHeightFloor;
-
-            return MathF.Sqrt(2f * height * MathF.Abs(MovementConfig.Gravity));
+            while (radians > MathF.PI)
+                radians -= 2f * MathF.PI;
+            while (radians < -MathF.PI)
+                radians += 2f * MathF.PI;
+            return radians;
         }
 
-        static VelocityLimits ComputeRunLimits(int runSpeed, int curHp, int maxHp)
+        static float FlatDistance(Vector3 a, Vector3 b)
         {
-            float statFactor = ComputeStatFactor(runSpeed, curHp, maxHp);
-            float fwd = Math.Clamp(
-                (statFactor * MovementConfig.RunForwardSlope) + MovementConfig.RunForwardBase,
-                MovementConfig.RunForwardMin,
-                MovementConfig.RunForwardMax);
-            float back = Math.Clamp(
-                (statFactor * MovementConfig.RunBackSlope) + MovementConfig.RunBackBase,
-                MovementConfig.RunBackMin,
-                MovementConfig.RunBackMax);
-            float strafe = Math.Clamp(
-                MovementConfig.RunStrafeBase + (statFactor * MovementConfig.RunStrafeSlope),
-                MovementConfig.RunStrafeMin,
-                MovementConfig.RunStrafeMax);
-            return new VelocityLimits(fwd, back, strafe);
+            float dx = (float)(b.x - a.x);
+            float dz = (float)(b.z - a.z);
+            return MathF.Sqrt((dx * dx) + (dz * dz));
         }
 
-        /// <summary>
-        /// Below <see cref="MovementConfig.HealthPenalty"/> of maximum health, run speed is scaled
-        /// down toward the minimum. Applying that needs both health pools; without them there is no
-        /// penalty to apply, and guessing one would cripple the character.
-        /// </summary>
-        static float ComputeStatFactor(int runSpeed, int curHp, int maxHp)
+        static Vec3 ToVec3(Vector3 v) => new((float)v.x, (float)v.y, (float)v.z);
+
+        static Vector3 ToVector3(Vec3 v) => new(v.X, v.Y, v.Z);
+
+        static Quat ToQuat(Quaternion? q)
         {
-            if (curHp <= 0 || maxHp <= 0)
-                return runSpeed;
+            if (q == null)
+                return Quat.Identity;
 
-            float ratio = curHp / (maxHp * MovementConfig.HealthPenalty);
-            if (ratio < 1f)
-                return (ratio * (runSpeed + MovementConfig.StatOffset)) - MovementConfig.StatOffset;
-            return runSpeed;
-        }
-
-        static float NormalizeAngle(float degrees)
-        {
-            while (degrees > 180f)
-                degrees -= 360f;
-            while (degrees < -180f)
-                degrees += 360f;
-            return degrees;
-        }
-
-        readonly struct VelocityLimits
-        {
-            public VelocityLimits(float forward, float backward, float strafe)
-            {
-                Forward = forward;
-                Backward = backward;
-                Strafe = strafe;
-            }
-
-            public float Forward { get; }
-
-            public float Backward { get; }
-
-            public float Strafe { get; }
+            var quat = new Quat(q.xf, q.yf, q.zf, q.wf);
+            return quat.Length < 1e-6f ? Quat.Identity : quat.Normalized;
         }
     }
 }

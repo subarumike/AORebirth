@@ -32,7 +32,7 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void Tick_OnPath_SamplesClientPolylineAtConstantSpeed()
+        public void Tick_OnPath_SteersBehindTheGuideAtRunSpeed()
         {
             NpcCharacter npc = new(
                 new Identity { Type = IdentityType.CanbeAffected, Instance = 2102 },
@@ -40,11 +40,12 @@ namespace ZoneEngine_New.Tests
             npc.Position = new Vector3(0, 0, 0);
             npc.Motor.NavigateTo(new Vector3(10, 0, 0));
 
-            float speed = 5f;
-            npc.Motor.Tick(1.0);
+            for (int i = 0; i < 20; i++)
+                npc.Motor.Tick(0.05);
 
             Assert.IsTrue(npc.Motor.HasPath);
-            Assert.AreEqual(speed, (float)npc.Position.x, 0.01f);
+            Assert.AreEqual(5f, npc.Motor.Vehicle.MaxVel, 1e-4f, "State 3 with RunSpeed 0 is the 5 m/s base.");
+            Assert.IsTrue(npc.Position.x > 2.0 && npc.Position.x < 5.0, "x=" + npc.Position.x);
             Assert.AreEqual(0f, (float)npc.Position.z, 0.01f);
         }
 
@@ -75,10 +76,15 @@ namespace ZoneEngine_New.Tests
             npc.Position = new Vector3(0, 0, 0);
             npc.Motor.NavigateTo(new Vector3(10, 0, 0));
 
-            npc.Motor.Tick(2.0);
+            bool completed = false;
+            npc.Motor.PathCompleted += () => completed = true;
+            for (int i = 0; i < 120 && npc.Motor.HasPath; i++)
+                npc.Motor.Tick(0.05);
 
+            Assert.IsTrue(completed);
             Assert.IsFalse(npc.Motor.HasPath);
-            Assert.AreEqual(10f, (float)npc.Position.x, 0.01f);
+            Assert.AreEqual(10f, (float)npc.Position.x, 0.3f);
+            Assert.AreEqual(0, npc.Motor.CopyRemainingWaypoints().Length);
         }
     }
 }

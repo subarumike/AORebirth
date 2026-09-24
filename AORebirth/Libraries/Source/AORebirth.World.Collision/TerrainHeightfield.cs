@@ -35,8 +35,8 @@ namespace AORebirth.World.Collision
         public IReadOnlyList<TerrainHeightChunk> Chunks { get; }
 
         /// <summary>
-        /// Bilinear sample of the same heightfield baked into Bepu. A downward
-        /// ray that starts under that one-sided mesh cannot hit it; this is the
+        /// Bilinear sample of the same heightfield the vehicle's tilemap surface reads. A downward
+        /// ray that starts under that one-sided surface cannot hit it; this is the
         /// height to stand above before casting.
         /// </summary>
         public bool TryGetHeight(float x, float z, out float y)

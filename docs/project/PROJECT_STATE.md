@@ -30,6 +30,10 @@ Historical release/database-restore recovery is retained.
 See `docs/reports/LEGACY_ENGINE_RETIREMENT.md`. Production is unchanged; staging
 and official-client acceptance remain required before deployment.
 
+ZoneEngine_New collision and movement run on the vendored Lost-Eden Vehicle port
+(`AORebirth.World.Vehicle`); BepuPhysics is removed and the Recast navmesh remains for
+NPC route planning. Live engine validation of the port is still pending.
+
 Windows is the authoritative development and acceptance platform. NewEngine is
 the default server engine; shared gameplay, DAO persistence, login admission and
 zoning behavior remain unchanged by the build separation.

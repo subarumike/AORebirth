@@ -185,6 +185,16 @@ Alternatives considered: Keep iterating in live playtest loops.
 
 Consequences: Next movement work needs a replay contract and local packet comparison.
 
+## Server Locomotion Uses the Vendored Lost-Eden Vehicle Port
+
+Decision: ZoneEngine_New movement and collision use Lost-Eden's reverse-engineered `Vehicle_t` port, vendored unchanged (except a thread-static `DeltaTimeNow`) into `AORebirth.World.Vehicle` at the commit recorded in its `VENDORED.md`. Players drive a `CharVehicleSim` through Lost-Eden's `N3CharVehicle` flag-to-axis glue; NPCs follow an `NpcVehicleSim` `Path_t` + `PathGuide_t`. Line of sight, floor snap and raycasts query the same `ISurface`. BepuPhysics is removed. DotRecast navmesh planning is kept for NPC routes until `GraphPathFinder_t` is recovered.
+
+Reason: The client simulates characters with this vehicle; running the same code on the server keeps server positions, speeds and NPC paths in step with what clients predict.
+
+Alternatives considered: Keep Bepu for queries beside the vehicle, or reference Lost-Eden's source directly.
+
+Consequences: Server-only behaviour (client position gates, mission movement hooks, flight authority, void hold, movement-mode stat) stays in `CharacterMotor`. Refresh the vendored copy per `VENDORED.md` rather than editing it. Surfaces are one-sided, so line of sight tests both directions.
+
 ## Hostile NPC Chase Navigation Is Global and Provider-Gated
 
 Decision: Geometry-aware hostile-NPC pursuit is owned by `ZoneEngine.Core.Navigation` and consumed through the shared NPC combat/movement boundary. Playfields opt in only by supplying authoritative, versioned navigation input through `IPlayfieldChaseNavigationProvider`. PF127/resource `127` is the first provider and Vergil is the first representative end-to-end case; unsupported playfields preserve legacy direct chase.

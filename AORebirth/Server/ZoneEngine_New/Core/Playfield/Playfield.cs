@@ -191,7 +191,7 @@ namespace ZoneEngine_New.Core.Playfield
         public NavMeshPathfinder? Pathfinder { get; private set; }
 
         /// <summary>
-        /// Same XZ; Y is the heightfield / Bepu floor. No Recast.
+        /// Same XZ; Y is the heightfield / surface-mesh floor. No Recast.
         /// </summary>
         public bool TrySnapFeetToFloor(
             AORebirth.Core.Vector.Vector3 position,
@@ -219,7 +219,7 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>
         /// Places an NPC on the walkable surface at spawn. Recast is only an XZ hint;
-        /// the authoritative Y is the Bepu floor under a torso-height ray. A Recast Y
+        /// the authoritative Y is the collision floor under a torso-height ray. A Recast Y
         /// that sits under that triangle made foot-height probes miss and drop the NPC.
         /// </summary>
         public AORebirth.Core.Vector.Vector3 SnapNpcSpawn(AORebirth.Core.Vector.Vector3 position)

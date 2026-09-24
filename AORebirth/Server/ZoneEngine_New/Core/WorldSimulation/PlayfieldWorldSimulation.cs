@@ -1,21 +1,16 @@
-namespace ZoneEngine_New.Core.WorldSimulation
+﻿namespace ZoneEngine_New.Core.WorldSimulation
 {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Numerics;
 
     using AODB.Common.RDBObjects;
 
     using AORebirth.Core.GameData;
     using AORebirth.World.Collision;
 
-    using BepuPhysics;
-    using BepuPhysics.Collidables;
-    using BepuPhysics.CollisionDetection;
-    using BepuPhysics.Constraints;
-    using BepuUtilities;
-    using BepuUtilities.Memory;
+    using LostEden.Vehicles;
+    using LostEden.Vehicles.Surfaces;
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
@@ -35,12 +30,10 @@ namespace ZoneEngine_New.Core.WorldSimulation
         AoQuaternion? Heading = null);
 
     /// <summary>
-    /// Per-playfield static collision + soft zoning triggers (query-only Bepu world).
+    /// Per-playfield static collision (the client's <c>Surface_i</c> world) + soft zoning triggers.
     /// </summary>
     public sealed class PlayfieldWorldSimulation : IDisposable
     {
-        readonly BufferPool _pool;
-        readonly Simulation _simulation;
         readonly TriggerVolumeCatalog _triggers = new();
         readonly DestinationsCatalog _destinations;
         readonly PlayfieldGeometryData _geometry;
@@ -56,26 +49,29 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         PlayfieldWorldSimulation(
             int playfieldId,
-            BufferPool pool,
-            Simulation simulation,
+            PlayfieldSurface? surface,
             PlayfieldGeometryData geometry,
             DestinationsCatalog destinations,
             IGameData gameData,
             IZoneLogger logger)
         {
             _playfieldId = playfieldId;
-            _pool = pool;
-            _simulation = simulation;
+            SurfaceData = surface;
             _geometry = geometry;
             _destinations = destinations;
             _gameData = gameData;
             _logger = logger;
-            Queries = new WorldQueries(simulation, pool);
         }
 
-        public WorldQueries Queries { get; }
+        /// <summary>The terrain and static meshes as built for the vehicles; null with no geometry.</summary>
+        public PlayfieldSurface? SurfaceData { get; }
 
-        public int HardStaticCount { get; private set; }
+        /// <summary>What every <see cref="CharVehicleSim"/> in this playfield collides against.</summary>
+        public ISurface? Surface => SurfaceData?.Root;
+
+        /// <summary>Collision cells holding static geometry, plus the terrain when there is one.</summary>
+        public int HardStaticCount =>
+            (SurfaceData?.PopulatedCellCount ?? 0) + (SurfaceData?.Terrain != null ? 1 : 0);
 
         public int WallTriggerCount => _triggers.WallTriggerCount;
 
@@ -97,44 +93,32 @@ namespace ZoneEngine_New.Core.WorldSimulation
             ArgumentNullException.ThrowIfNull(logger);
             _ = meta;
 
-            var pool = new BufferPool();
-            var simulation = Simulation.Create(
-                pool,
-                new NarrowPhaseCallbacks(),
-                new PoseIntegratorCallbacks(),
-                new SolveDescription(1, 1));
-
+            PlayfieldSurface? surface = PlayfieldSurfaceFactory.Build(geometry.Collision);
             var world = new PlayfieldWorldSimulation(
                 playfieldId,
-                pool,
-                simulation,
+                surface,
                 geometry,
                 destinations,
                 gameData,
                 logger);
-            int surfaceStatics = SurfaceCollisionBaker.BakeAll(geometry.Collision, pool, simulation);
-            int tileStatics = TileCollisionBaker.BakeAll(
-                geometry.Collision?.Terrain,
-                pool,
-                simulation,
-                out TileBakeReport tiles);
-            world.HardStaticCount = surfaceStatics + tileStatics;
             world.BakeWallTriggers(geometry.Walls);
             world.BakePortalTriggers(geometry.Dynels, playfieldId);
             world.BakeExitProxyTriggers(gameData.GetExitProxyDoorInstances(playfieldId));
 
+            int terrainChunks = surface?.Terrain != null ? geometry.Collision!.Terrain!.Chunks.Count : 0;
             logger.Info(
-                $"World bake playfield={playfieldId} terrain[{tiles}] surfaceStatics={surfaceStatics}"
+                $"World bake playfield={playfieldId} terrainChunks={terrainChunks}"
+                + $" surfaceCells={surface?.PopulatedCellCount ?? 0} surfaceTriangles={surface?.TriangleCount ?? 0}"
                 + $" wallTriggers={world.WallTriggerCount} portalTriggers={world.PortalTriggerCount}"
                 + $" exitTriggers={world.ExitTriggerCount}");
-            if (geometry.Collision?.Terrain != null && !tiles.Complete)
+            if (surface != null && surface.OutsideTriangleCount > 0)
             {
                 logger.Warn(
-                    $"World bake playfield={playfieldId} baked only {tiles.ChunksBaked}/{tiles.ChunksExpected}"
-                    + " terrain chunks; expect holes in the ground.");
+                    $"World bake playfield={playfieldId} dropped {surface.OutsideTriangleCount}"
+                    + " surface triangles outside the collision cell grid.");
             }
 
-            if (surfaceStatics == 0)
+            if ((surface?.PopulatedCellCount ?? 0) == 0)
             {
                 logger.Warn(
                     $"World bake playfield={playfieldId} has no surface geometry;"
@@ -148,7 +132,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public bool HasLineOfSight(AoVector3 from, AoVector3 to)
         {
             long nowMs = Environment.TickCount64;
-            // Quantize to ~0.25u. Include all axes — the prior 8-bit to.xz key collided often.
+            // Quantize to ~0.25u. Include all axes â€” the prior 8-bit to.xz key collided often.
             int key = HashCode.Combine(
                 (int)(from.x * 4f),
                 (int)(from.y * 4f),
@@ -160,9 +144,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (_losCache.TryGetValue(key, out LosCacheEntry entry) && nowMs < entry.ExpireMs)
                 return entry.Clear;
 
-            bool clear = Queries.HasLineOfSight(
-                new Vector3((float)from.x, (float)from.y, (float)from.z),
-                new Vector3((float)to.x, (float)to.y, (float)to.z));
+            bool clear = IsSegmentClear(ToVec3(from), ToVec3(to));
             _losCache[key] = new LosCacheEntry
             {
                 Clear = clear,
@@ -176,53 +158,33 @@ namespace ZoneEngine_New.Core.WorldSimulation
         }
 
         /// <summary>
-        /// Moves a character capsule from <paramref name="start"/> toward <paramref name="end"/>,
-        /// both given at foot level, and reports how far it can legally travel.
-        /// <paramref name="resolved"/> is always a position the capsule can occupy.
-        /// </summary>
-        public bool TryMoveCapsule(
-            AoVector3 start,
-            AoVector3 end,
-            float radius,
-            float halfHeight,
-            float centerLift,
-            float skin,
-            out AoVector3 resolved,
-            out AoVector3 normal)
-        {
-            resolved = end;
-            normal = default;
-
-            var from = new Vector3((float)start.x, (float)(start.y + centerLift), (float)start.z);
-            var to = new Vector3((float)end.x, (float)(end.y + centerLift), (float)end.z);
-            Vector3 delta = to - from;
-            float length = delta.Length();
-            if (length < 1e-6f)
-                return false;
-
-            if (!Queries.CapsuleSweep(from, to, radius, halfHeight, out float distance, out Vector3 hitNormal))
-                return false;
-
-            float travel = MathF.Max(0f, distance - skin);
-            Vector3 direction = delta / length;
-            Vector3 stopped = from + (direction * travel);
-            resolved = new AoVector3(stopped.X, stopped.Y - centerLift, stopped.Z);
-            normal = new AoVector3(hitNormal.X, hitNormal.Y, hitNormal.Z);
-            return true;
-        }
-
-        /// <summary>
-        /// Places feet on the walkable floor at this XZ. Outdoor terrain is the
-        /// heightfield we baked into Bepu; a downward ray that starts under that
-        /// one-sided mesh never hits it, so the heightfield sample is the floor.
-        /// Indoor meshes have no heightfield and still use a torso-height ray.
+        /// Places feet on the walkable surface under this position. The nearest upward-facing
+        /// surface (floor, platform, building or terrain) from <see cref="MovementConfig.GroundProbeLift"/>
+        /// above the feet down to <see cref="MovementConfig.GroundSnapTolerance"/> below wins.
+        /// Feet buried under the terrain are lifted onto it: surfaces are one-sided, so a
+        /// downward ray that starts under the ground never hits it.
         /// </summary>
         public bool TrySnapToFloor(AoVector3 feet, out AoVector3 floor)
         {
             floor = feet;
+            float feetY = (float)feet.y;
+            bool hasTerrain = false;
+            float terrainY = 0f;
             TerrainHeightfield? terrain = _geometry.Collision?.Terrain;
             if (terrain != null
-                && terrain.TryGetHeight((float)feet.x, (float)feet.z, out float terrainY))
+                && terrain.TryGetHeight((float)feet.x, (float)feet.z, out terrainY))
+                hasTerrain = true;
+
+            float originY = feetY + MovementConfig.GroundProbeLift;
+            var origin = new Vec3((float)feet.x, originY, (float)feet.z);
+            var end = new Vec3((float)feet.x, feetY - MovementConfig.GroundSnapTolerance, (float)feet.z);
+            if (Surface != null && Surface.GetLineIntersection(origin, end, out Vec3 hit, out _, false, null))
+            {
+                floor = new AoVector3(feet.x, hit.Y, feet.z);
+                return true;
+            }
+
+            if (hasTerrain && feetY <= terrainY + MovementConfig.GroundSnapTolerance)
             {
                 floor = new AoVector3(feet.x, terrainY, feet.z);
                 return true;
@@ -238,20 +200,34 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (maxDistance <= 0f)
                 return false;
 
-            bool didHit = Queries.Raycast(
-                new Vector3((float)origin.x, (float)origin.y, (float)origin.z),
-                new Vector3(0f, -1f, 0f),
-                maxDistance,
-                out float t,
-                out _);
-            if (!didHit)
+            if (Surface == null)
                 return false;
 
-            hitPosition = new AoVector3(origin.x, origin.y - t, origin.z);
+            Vec3 start = ToVec3(origin);
+            var end = new Vec3(start.X, start.Y - maxDistance, start.Z);
+            if (!Surface.GetLineIntersection(start, end, out Vec3 hit, out _, false, null))
+                return false;
+
+            hitPosition = new AoVector3(origin.x, hit.Y, origin.z);
             return true;
         }
 
-        public IVehicleSurface CreateVehicleSurface() => new WorldVehicleSurface(Queries);
+        /// <summary>
+        /// Surfaces are one-sided, so the segment is tested both ways: a wall blocks sight
+        /// from whichever side it is seen.
+        /// </summary>
+        bool IsSegmentClear(Vec3 from, Vec3 to)
+        {
+            if (Surface == null)
+                return true;
+            if ((to - from).LengthSquared < 1e-8f)
+                return true;
+
+            return !Surface.GetLineIntersection(from, to, out _, out _, false, null)
+                && !Surface.GetLineIntersection(to, from, out _, out _, false, null);
+        }
+
+        static Vec3 ToVec3(AoVector3 v) => new((float)v.x, (float)v.y, (float)v.z);
 
         public void TickSoftTriggers(PlayfieldType playfield, double deltaTime)
         {
@@ -671,8 +647,6 @@ namespace ZoneEngine_New.Core.WorldSimulation
             _losCache.Clear();
             _playerTriggerState.Clear();
             _zoneGraceUntil.Clear();
-            _simulation.Dispose();
-            _pool.Clear();
         }
 
         sealed class PlayerTriggerState
@@ -690,79 +664,6 @@ namespace ZoneEngine_New.Core.WorldSimulation
         {
             public bool Clear;
             public long ExpireMs;
-        }
-
-        struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
-        {
-            public void Initialize(Simulation simulation)
-            {
-            }
-
-            public bool AllowContactGeneration(
-                int workerIndex,
-                CollidableReference a,
-                CollidableReference b,
-                ref float speculativeMargin)
-                => false;
-
-            public bool AllowContactGeneration(
-                int workerIndex,
-                CollidablePair pair,
-                int childIndexA,
-                int childIndexB)
-                => false;
-
-            public bool ConfigureContactManifold<TManifold>(
-                int workerIndex,
-                CollidablePair pair,
-                ref TManifold manifold,
-                out PairMaterialProperties pairMaterial)
-                where TManifold : unmanaged, IContactManifold<TManifold>
-            {
-                pairMaterial = default;
-                return false;
-            }
-
-            public bool ConfigureContactManifold(
-                int workerIndex,
-                CollidablePair pair,
-                int childIndexA,
-                int childIndexB,
-                ref ConvexContactManifold manifold)
-                => false;
-
-            public void Dispose()
-            {
-            }
-        }
-
-        struct PoseIntegratorCallbacks : IPoseIntegratorCallbacks
-        {
-            public AngularIntegrationMode AngularIntegrationMode => AngularIntegrationMode.Nonconserving;
-
-            public bool AllowSubstepsForUnconstrainedBodies => false;
-
-            public bool IntegrateVelocityForKinematics => false;
-
-            public void Initialize(Simulation simulation)
-            {
-            }
-
-            public void PrepareForIntegration(float dt)
-            {
-            }
-
-            public void IntegrateVelocity(
-                System.Numerics.Vector<int> bodyIndices,
-                Vector3Wide position,
-                QuaternionWide orientation,
-                BodyInertiaWide localInertia,
-                System.Numerics.Vector<int> integrationMask,
-                int workerIndex,
-                System.Numerics.Vector<float> dt,
-                ref BodyVelocityWide velocity)
-            {
-            }
         }
     }
 }

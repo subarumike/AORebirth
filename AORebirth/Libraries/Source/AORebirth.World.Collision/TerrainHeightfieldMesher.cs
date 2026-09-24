@@ -6,7 +6,7 @@ namespace AORebirth.World.Collision
 
     /// <summary>
     /// Tessellates a <see cref="TerrainHeightfield"/> into world-space triangles.
-    /// Winding is origin → +z → +x so (+Z)×(+X)=+Y. Matches <c>TileCollisionBaker</c>.
+    /// Winding is origin → +z → +x so (+Z)×(+X)=+Y. Matches the vehicle's upward-facing floors.
     /// </summary>
     public static class TerrainHeightfieldMesher
     {

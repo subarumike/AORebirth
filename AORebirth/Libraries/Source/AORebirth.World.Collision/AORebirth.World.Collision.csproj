@@ -17,6 +17,7 @@
 
   <!-- Framing / paths / metadata stay in AORebirth.Core (single type identity with ZoneEngine). -->
   <ItemGroup>
+    <ProjectReference Include="../AORebirth.World.Vehicle/AORebirth.World.Vehicle.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
   </ItemGroup>
