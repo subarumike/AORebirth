@@ -75,6 +75,7 @@ INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `des
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(619, 655, 51016, 3222143631, 0, 0, 0);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(620, 655, 51016, 3222078095, 0, 0, 0);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1249, 655, 51016, 3223388815, 1186, 51016, 3221488802);
+INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1250, 655, 51016, 3222930063, 127, 51016, 3221618815);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(633, 665, 51016, 3226600089, 2073, 51016, 3221293081);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(637, 665, 51016, 3229024921, 4805, 51016, 3223392965);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(638, 670, 51016, 3222995614, 1503, 51016, 3221226975);

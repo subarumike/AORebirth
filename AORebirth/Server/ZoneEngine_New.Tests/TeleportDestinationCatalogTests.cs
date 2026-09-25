@@ -95,6 +95,37 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void Andromeda_subway_proxy_names_the_city_exit_door()
+        {
+            // teleports.sql 1250. Raw Dynels.dat names subway door 0; the route names door 6.
+            var row = new TeleportRoute
+            {
+                Playfield = 655,
+                StatelType = 51016,
+                StatelInstance = 0xC01A028Fu,
+                DestinationPlayfield = 127,
+                DestinationType = 51016,
+                DestinationInstance = 0xC006007Fu
+            };
+            var data = new GameDataStore(new StubLogger(), new TeleportDestinationCatalog(new[] { row }));
+            var door = data.GetPlayfieldGeometry(655).Dynels!.Dynels.Single(d =>
+                d.IdentityType == 51016 && unchecked((uint)d.IdentityInstance) == row.StatelInstance);
+            Assert.IsTrue(PortalDoorLandingResolver.TryReadPortal(door, out var portal));
+            Assert.AreEqual(PortalLandingKind.DoorDynel, portal.Kind);
+            Assert.AreEqual(127, portal.PlayfieldId);
+            Assert.AreEqual(unchecked((int)0xC006007Fu), portal.DoorInstance);
+            Assert.IsTrue(portal.RecordsReturn);
+            var exit = data.GetPlayfieldGeometry(127).Dynels!.Dynels.Single(d =>
+                d.IdentityType == 51016 && d.IdentityInstance == portal.DoorInstance);
+            Assert.IsTrue(PortalDoorLandingResolver.TryResolveDoorLanding(
+                data.GetPlayfieldGeometry(127), portal.DoorInstance, portal.DoorClearance, out var landing, out _));
+            Assert.AreEqual(64.0083f, exit.Position.X, 0.01f);
+            Assert.AreEqual(318.9879f, exit.Position.Z, 0.01f);
+            Assert.AreEqual(exit.Position.X, (float)landing.x, 5.1f);
+            Assert.AreEqual(exit.Position.Z, (float)landing.z, 5.1f);
+        }
+
+        [TestMethod]
         public void Conflicting_routes_are_rejected_instead_of_using_row_order()
         {
             Assert.ThrowsExactly<InvalidDataException>(() => new TeleportDestinationCatalog(new[]
