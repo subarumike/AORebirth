@@ -99,7 +99,7 @@ namespace ZoneEngine_New.Tests
             NpcCharacter player = new(new Identity { Type = IdentityType.CanbeAffected, Instance = 602 }, new StubItemBuilder());
 
             player.StartNanoRecharge(
-                NanoDelayCalculator.RechargeTimeCentiseconds(0, 0, aggDef: 50, nanoInitiative: 0),
+                NanoDelayCalculator.RechargeTimeCentiseconds(0),
                 start);
 
             Assert.IsFalse(player.IsInNanoRecharge(start));

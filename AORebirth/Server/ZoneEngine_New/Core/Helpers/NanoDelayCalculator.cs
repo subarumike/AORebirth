@@ -3,11 +3,12 @@ namespace ZoneEngine_New.Core.Helpers
     using System;
 
     /// <summary>
-    /// Cast time and post-cast recharge for a nano, in centiseconds.
-    /// Half of nano initiative, and AggDef clamped to <see cref="AggDefMin"/>..<see cref="AggDefMax"/>,
-    /// come off the template delay. Initiative above <see cref="InitiativeSoftCap"/> adds only one
+    /// Nano cast time and post-cast recharge, in centiseconds.
+    /// Cast time takes half of nano initiative, and AggDef clamped to <see cref="AggDefMin"/>..<see cref="AggDefMax"/>,
+    /// off the template delay. Initiative above <see cref="InitiativeSoftCap"/> adds only one
     /// sixth of the extra. A defensive slider can run longer than the template. The result floors
     /// at 0, then at the template cap when that cap is set.
+    /// Recharge is the template delay alone.
     /// </summary>
     public static class NanoDelayCalculator
     {
@@ -25,12 +26,9 @@ namespace ZoneEngine_New.Core.Helpers
             int nanoInitiative)
             => Reduce(attackDelayCentiseconds, attackDelayCapCentiseconds, aggDef, nanoInitiative);
 
-        public static int RechargeTimeCentiseconds(
-            int rechargeDelayCentiseconds,
-            int rechargeDelayCapCentiseconds,
-            int aggDef,
-            int nanoInitiative)
-            => Reduce(rechargeDelayCentiseconds, rechargeDelayCapCentiseconds, aggDef, nanoInitiative);
+        /// <summary>Template recharge delay, in centiseconds. The client waits this value as-is.</summary>
+        public static int RechargeTimeCentiseconds(int rechargeDelayCentiseconds)
+            => Math.Max(0, rechargeDelayCentiseconds);
 
         static int Reduce(int delay, int cap, int aggDef, int nanoInitiative)
         {

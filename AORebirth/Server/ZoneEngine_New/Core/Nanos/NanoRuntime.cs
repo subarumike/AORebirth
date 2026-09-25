@@ -101,6 +101,9 @@ namespace ZoneEngine_New.Core.Nanos
             if (refusal == NanoCastRefusal.None && !TargetCanHoldBuff(spell, recipient))
                 refusal = NanoCastRefusal.NotEnoughNcu;
 
+            if (refusal == NanoCastRefusal.None && spell.IsHostile && !IsHostileNanoTarget(caster, recipient))
+                refusal = NanoCastRefusal.InvalidTarget;
+
             if (refusal != NanoCastRefusal.None)
             {
                 LogCastRefused(caster, nanoId, target, refusal, phase: "start", attempt: attempt, spell: spell);
@@ -127,6 +130,63 @@ namespace ZoneEngine_New.Core.Nanos
             }
 
             return NanoCastRefusal.None;
+        }
+
+        /// <summary>
+        /// Spell removal of one nano id. Absent ids are a successful no-op.
+        /// Uncancellable and hostile buffs are removed.
+        /// </summary>
+        public static bool TryStripNano(Character owner, int nanoId)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+            if (nanoId <= 0)
+                return false;
+
+            if (owner.TryRemoveBuff(nanoId, BuffRemovalReason.Stripped, out Buff? removed)
+                == BuffRemovalOutcome.Removed
+                && removed != null)
+                AnnounceBuffRemoved(owner, removed);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Spell removal of every buff whose strain matches. Strain 0 is refused so a
+        /// strainless buff is not wiped by an empty argument.
+        /// </summary>
+        public static bool TryStripStrain(Character owner, int strain)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+            if (strain <= 0)
+                return false;
+
+            var matching = new List<int>();
+            foreach (Buff buff in owner.Buffs)
+            {
+                if (buff.NanoStrain == strain)
+                    matching.Add(buff.Id);
+            }
+
+            for (int i = 0; i < matching.Count; i++)
+            {
+                if (owner.TryRemoveBuff(matching[i], BuffRemovalReason.Stripped, out Buff? removed)
+                    == BuffRemovalOutcome.Removed
+                    && removed != null)
+                    AnnounceBuffRemoved(owner, removed);
+            }
+
+            return true;
+        }
+
+        /// <summary>Spell removal of every NCU entry, including uncancellable buffs.</summary>
+        public static bool StripAllBuffs(Character owner)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+
+            List<Buff> removed = owner.RemoveAllBuffs(BuffRemovalReason.Stripped);
+            for (int i = 0; i < removed.Count; i++)
+                AnnounceBuffRemoved(owner, removed[i]);
+            return true;
         }
 
         /// <summary>
@@ -209,6 +269,9 @@ namespace ZoneEngine_New.Core.Nanos
             IItemBuilder items,
             DateTime nowUtc)
         {
+            if (spell.IsHostile && !IsHostileNanoTarget(source, target))
+                return false;
+
             if (!spell.IsBuff)
             {
                 ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: false, inventory, items);
@@ -261,6 +324,13 @@ namespace ZoneEngine_New.Core.Nanos
                 return;
             }
 
+            if (spell.IsHostile && !IsHostileNanoTarget(caster, recipient))
+            {
+                AnnounceCastInterrupted(caster, spell.Id);
+                Refuse(caster, NanoCastRules.Describe(NanoCastRefusal.InvalidTarget));
+                return;
+            }
+
             // Duplicate instant-cast packets can both reach Complete before the land window closes.
             if (!caster.TryClaimNanoLand(spell.Id, cast.Target, nowUtc))
             {
@@ -278,13 +348,11 @@ namespace ZoneEngine_New.Core.Nanos
             SpendNano(caster, cast.NanoCost);
             AnnounceCastFinished(caster, spell.Id);
 
-            caster.StartNanoRecharge(
-                NanoDelayCalculator.RechargeTimeCentiseconds(
-                    spell.RechargeDelayCentiseconds,
-                    spell.RechargeDelayCapCentiseconds,
-                    caster.Stats.GetOrZero(CharacterStat.AggDef),
-                    caster.Stats.GetOrZero(CharacterStat.NanoCInit)),
-                nowUtc);
+            // NoTimerNotify nanos finish with no lockout. Everyone else waits the raw template delay.
+            int recharge = (spell.Flags & (int)NanoFlags.NoTimerNotify) != 0
+                ? 0
+                : NanoDelayCalculator.RechargeTimeCentiseconds(spell.RechargeDelayCentiseconds);
+            caster.StartNanoRecharge(recharge, nowUtc);
 
             if (!spell.IsBuff)
             {
@@ -338,7 +406,7 @@ namespace ZoneEngine_New.Core.Nanos
                     recipient.UsedNcu,
                     recipient.MaxNcu,
                     applied.DurationCentiseconds,
-                    spell.RechargeDelayCentiseconds));
+                    recharge));
         }
 
         static NanoCastAttempt BuildAttempt(
@@ -411,6 +479,12 @@ namespace ZoneEngine_New.Core.Nanos
             int remaining = Math.Max(0, caster.Stats.GetOrZero(CharacterStat.CurrentNano) - cost);
             caster.Stats.Set(CharacterStat.CurrentNano, remaining, StatDetail.Base, dirty: true);
         }
+
+        /// <summary>
+        /// Hostile nanos may land on the caster. Other targets still have to be legal to attack.
+        /// </summary>
+        static bool IsHostileNanoTarget(Character caster, Character? target)
+            => target != null && (ReferenceEquals(caster, target) || CombatRules.CanAttack(caster, target));
 
         /// <summary>Self, or a character in the same playfield. Null means the target is gone.</summary>
         static Character? ResolveTarget(Character caster, Identity target)

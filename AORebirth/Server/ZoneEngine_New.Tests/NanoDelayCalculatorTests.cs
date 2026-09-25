@@ -40,32 +40,34 @@ namespace ZoneEngine_New.Tests
         public void InitiativeAboveTheSoftCapContributesAtASixth()
         {
             // (1500 - 1200) / 6 + 600 = 650 initiative, so 350 remains of a 1000 delay.
-            int recharge = NanoDelayCalculator.RechargeTimeCentiseconds(
-                rechargeDelayCentiseconds: 1000,
-                rechargeDelayCapCentiseconds: 100,
+            int attack = NanoDelayCalculator.AttackTimeCentiseconds(
+                attackDelayCentiseconds: 1000,
+                attackDelayCapCentiseconds: 100,
                 aggDef: 0,
                 nanoInitiative: 1500);
 
-            Assert.AreEqual(350, recharge);
+            Assert.AreEqual(350, attack);
         }
 
         [TestMethod]
         public void AggDefIsClampedAndDefensiveStanceLengthensTheDelay()
         {
             // 500 - (-100) = 600.
-            Assert.AreEqual(600, NanoDelayCalculator.RechargeTimeCentiseconds(500, 100, aggDef: -100, nanoInitiative: 0));
+            Assert.AreEqual(600, NanoDelayCalculator.AttackTimeCentiseconds(500, 100, aggDef: -100, nanoInitiative: 0));
 
             // -250 clamps to -100.
-            Assert.AreEqual(600, NanoDelayCalculator.RechargeTimeCentiseconds(500, 100, aggDef: -250, nanoInitiative: 0));
+            Assert.AreEqual(600, NanoDelayCalculator.AttackTimeCentiseconds(500, 100, aggDef: -250, nanoInitiative: 0));
 
             // 150 clamps to 100: 500 - 100 = 400.
-            Assert.AreEqual(400, NanoDelayCalculator.RechargeTimeCentiseconds(500, 100, aggDef: 150, nanoInitiative: 0));
+            Assert.AreEqual(400, NanoDelayCalculator.AttackTimeCentiseconds(500, 100, aggDef: 150, nanoInitiative: 0));
         }
 
         [TestMethod]
-        public void TemplatesWithoutARechargeDelayNeverLockOut()
+        public void RechargeKeepsTheTemplateDelay()
         {
-            Assert.AreEqual(0, NanoDelayCalculator.RechargeTimeCentiseconds(0, 0, aggDef: 50, nanoInitiative: 100));
+            Assert.AreEqual(800, NanoDelayCalculator.RechargeTimeCentiseconds(800));
+            Assert.AreEqual(0, NanoDelayCalculator.RechargeTimeCentiseconds(0));
+            Assert.AreEqual(0, NanoDelayCalculator.RechargeTimeCentiseconds(-10));
         }
 
         [TestMethod]
