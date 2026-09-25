@@ -8,6 +8,9 @@ if "%~1"=="" (
 )
 
 set "AO_PATH=%~1"
+rem A trailing backslash before the closing quote is treated as an escaped quote
+rem by the .NET argument parser when AO_PATH is quoted again below.
+if "%AO_PATH:~-1%"=="\" set "AO_PATH=%AO_PATH:~0,-1%"
 shift
 
 pushd "%ROOT%"

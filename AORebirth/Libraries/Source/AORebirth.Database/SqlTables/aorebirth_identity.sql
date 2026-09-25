@@ -11,8 +11,8 @@ CREATE TABLE `account_identities` (
   `IdentityPublicId` char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `CanonicalUsername` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `NormalizedUsername` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `CanonicalEmail` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
-  `NormalizedEmail` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `CanonicalEmail` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `NormalizedEmail` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `EmailVerifiedAt` datetime(6) NULL,
   `IdentityStatus` enum('Reserved','Active','Suspended','Disabled') CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'Reserved',
   `CreatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
@@ -28,7 +28,7 @@ CREATE TABLE `account_identities` (
   CONSTRAINT `CK_account_identities_email_pair` CHECK ((`CanonicalEmail` IS NULL AND `NormalizedEmail` IS NULL) OR (`CanonicalEmail` IS NOT NULL AND `NormalizedEmail` IS NOT NULL)),
   CONSTRAINT `CK_account_identities_email_normalization` CHECK (`NormalizedEmail` IS NULL OR `NormalizedEmail` = LOWER(TRIM(`CanonicalEmail`))),
   CONSTRAINT `CK_account_identities_email_verified_requires_email` CHECK (`EmailVerifiedAt` IS NULL OR `NormalizedEmail` IS NOT NULL)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `account_game_mappings` (
   `IdentityId` bigint unsigned NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE `account_game_mappings` (
   CONSTRAINT `FK_account_game_mappings_identity` FOREIGN KEY (`IdentityId`) REFERENCES `account_identities` (`IdentityId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `CK_account_game_mappings_positive_game_account` CHECK (`GameAccountId` > 0),
   CONSTRAINT `CK_account_game_mappings_linked_at` CHECK ((`MappingState` = 'Linked' AND `LinkedAt` IS NOT NULL) OR (`MappingState` <> 'Linked'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `account_external_mappings` (
   `ExternalMappingId` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -60,7 +60,7 @@ CREATE TABLE `account_external_mappings` (
   CONSTRAINT `CK_account_external_mappings_provider` CHECK (`Provider` REGEXP '^[a-z0-9_:-]{2,32}$'),
   CONSTRAINT `CK_account_external_mappings_external_id` CHECK (CHAR_LENGTH(`ExternalAccountId`) BETWEEN 1 AND 64),
   CONSTRAINT `CK_account_external_mappings_linked_at` CHECK ((`MappingState` = 'Linked' AND `LinkedAt` IS NOT NULL) OR (`MappingState` <> 'Linked'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `account_email_verification_tokens` (
   `EmailVerificationTokenId` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -76,7 +76,7 @@ CREATE TABLE `account_email_verification_tokens` (
   CONSTRAINT `FK_account_email_verification_tokens_identity` FOREIGN KEY (`IdentityId`) REFERENCES `account_identities` (`IdentityId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `CK_account_email_verification_tokens_expires` CHECK (`ExpiresAt` > `CreatedAt`),
   CONSTRAINT `CK_account_email_verification_tokens_used_at` CHECK ((`TokenState` = 'Used' AND `UsedAt` IS NOT NULL) OR (`TokenState` <> 'Used' AND `UsedAt` IS NULL))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `account_password_reset_tokens` (
   `PasswordResetTokenId` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -94,14 +94,14 @@ CREATE TABLE `account_password_reset_tokens` (
   CONSTRAINT `FK_account_password_reset_tokens_identity` FOREIGN KEY (`IdentityId`) REFERENCES `account_identities` (`IdentityId`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `CK_account_password_reset_tokens_expires` CHECK (`ExpiresAt` > `CreatedAt`),
   CONSTRAINT `CK_account_password_reset_tokens_used_at` CHECK ((`TokenState` = 'Used' AND `UsedAt` IS NOT NULL) OR (`TokenState` <> 'Used' AND `UsedAt` IS NULL))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `account_provisioning_jobs` (
   `ProvisioningJobId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `IdempotencyKeyHash` binary(32) NOT NULL,
   `IdentityId` bigint unsigned NULL,
   `RequestedNormalizedUsername` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `RequestedNormalizedEmail` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `RequestedNormalizedEmail` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `RequestedGameAccountId` int NULL,
   `RequestedExternalProvider` varchar(32) CHARACTER SET ascii COLLATE ascii_bin NULL,
   `RequestedExternalAccountId` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
@@ -109,7 +109,7 @@ CREATE TABLE `account_provisioning_jobs` (
   `ProvisioningStep` tinyint unsigned NOT NULL DEFAULT 10,
   `AttemptCount` int unsigned NOT NULL DEFAULT 0,
   `LastFailureCode` varchar(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
-  `LastFailureDetail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `LastFailureDetail` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
   `CreatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `UpdatedAt` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`ProvisioningJobId`),
@@ -132,4 +132,4 @@ CREATE TABLE `account_provisioning_jobs` (
     (`ProvisioningState` = 'Active' AND `ProvisioningStep` = 60) OR
     (`ProvisioningState` = 'ManualReview' AND `ProvisioningStep` = 90)
   )
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
