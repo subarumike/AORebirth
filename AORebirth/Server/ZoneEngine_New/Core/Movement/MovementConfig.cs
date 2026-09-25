@@ -29,6 +29,13 @@ namespace ZoneEngine_New.Core.Movement
 
         public const float SpeedStopEpsilon = 0.05f;
 
+        /// <summary>
+        /// When false, NPC bodies take their steering velocity at once instead of accelerating toward it.
+        /// Observers move NPCs along FollowTarget paths at full speed, so server-side acceleration only
+        /// puts the server position behind the client's.
+        /// </summary>
+        public const bool NpcAccelerationEnabled = false;
+
         /// <summary>Server floor snap: probes start this far above the feet so a small rise still reads as floor.</summary>
         public const float GroundProbeLift = 0.5f;
 

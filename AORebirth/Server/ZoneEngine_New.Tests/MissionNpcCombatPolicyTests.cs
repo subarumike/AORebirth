@@ -63,7 +63,7 @@ public sealed class MissionNpcCombatPolicyTests
         }
         Character attacker = npcAttacks ? npc : world.Player;
         Character target = npcAttacks ? world.Player : npc;
-        if (npcAttacks) npc.Equipment.Add(npc.Equipment.Offset, item);
+        if (npcAttacks) npc.EquipCombatWeapon(item);
         else world.Player.Inventory.Equipment.Add((int)WeaponSlots.Righthand, item);
         attacker.RebaseWeapons();
         var weapon = attacker.Weapons.Values.Single();

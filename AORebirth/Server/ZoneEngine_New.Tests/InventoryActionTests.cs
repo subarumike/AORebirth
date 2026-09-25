@@ -410,7 +410,7 @@ namespace ZoneEngine_New.Tests
         internal sealed class Ids : IItemInstanceIdAllocator { int _next = 100; public int Calls; public int Allocate() { Calls++; return _next++; } }
         sealed class Coalesce : ICharacterCoalesceCommit
         {
-            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos) => throw new InvalidOperationException("No unexpected independent flush.");
+            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks) => throw new InvalidOperationException("No unexpected independent flush.");
         }
         internal sealed class Persistence : IInventoryMutationPersistence
         {

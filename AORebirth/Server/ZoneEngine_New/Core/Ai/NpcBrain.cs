@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Ai
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Metrics;
+    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Playfield;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -21,14 +22,18 @@ namespace ZoneEngine_New.Core.Ai
     {
         readonly NpcBehaviourTree _tree;
         readonly List<Vector3> _pathScratch = new(2);
+        readonly List<Vector3> _routeScratch = new(8);
         readonly List<System.Numerics.Vector3> _reachPathScratch = new(8);
+        readonly List<System.Numerics.Vector3> _planScratch = new(8);
         Identity _currentTarget = Identity.None;
         bool _leashing;
         bool _treeResetPending;
         bool _followAnnounced;
-        Vector3 _lastAnnouncedEnd = new(0, 0, 0);
-        DateTime _lastRepathUtc;
+        Vector3 _segmentDestination = new(0, 0, 0);
+        bool _segmentReachesDestination;
+        Vector3 _progressAnchor = new(0, 0, 0);
         Identity _reachCacheId = Identity.None;
+        Vector3 _reachCacheStart = new(0, 0, 0);
         Vector3 _reachCachePos = new(0, 0, 0);
         DateTime _reachCacheUtc;
         bool _reachCacheResult;
@@ -59,6 +64,9 @@ namespace ZoneEngine_New.Core.Ai
         public bool PatrolEnabled { get; set; }
 
         public IReadOnlyList<Vector3> PatrolWaypoints { get; set; }
+
+        /// <summary>When the pathing NPC last made <see cref="NpcFollowTarget.PathStuckProgressMeters"/> of progress.</summary>
+        internal DateTime ProgressSinceUtc { get; set; }
 
         public bool IsBusy => !Hate.IsEmpty || _leashing || Npc.FightingTarget.Instance != 0;
 
@@ -218,7 +226,7 @@ namespace ZoneEngine_New.Core.Ai
             DateTime now = DateTime.UtcNow;
             Vector3 cachedEnd = HeightfieldOrSelf(target.Position);
             if (_reachCacheId == target.Identity
-                && (now - _reachCacheUtc).TotalSeconds < NpcFollowTarget.RepathIntervalSeconds
+                && (now - _reachCacheUtc).TotalSeconds < NpcFollowTarget.PathReplanSeconds
                 && Vector3.Abs(cachedEnd - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters)
                 return _reachCacheResult;
 
@@ -240,6 +248,7 @@ namespace ZoneEngine_New.Core.Ai
             else
                 reachable = !finder.TrySnap(end, out _);
             _reachCacheId = target.Identity;
+            _reachCacheStart = new Vector3(startPos.x, startPos.y, startPos.z);
             _reachCachePos = new Vector3(endPos.x, endPos.y, endPos.z);
             _reachCacheUtc = now;
             _reachCacheResult = reachable;
@@ -258,47 +267,53 @@ namespace ZoneEngine_New.Core.Ai
             return IsInAttackRange(target) && Npc.HasLineOfSightTo(target);
         }
 
+        /// <summary>
+        /// Keeps a segment of <see cref="NpcFollowTarget.PathLookaheadSeconds"/> of travel ahead of the NPC
+        /// along the route to <paramref name="destination"/>. A running segment is replaced once
+        /// <see cref="NpcFollowTarget.PathReplanSeconds"/> of it has been travelled, so its end is never reached
+        /// mid-route. The last segment, which ends at the destination, is only replaced when the destination
+        /// moves. An NPC that stops making progress for <see cref="NpcFollowTarget.PathStuckWarpSeconds"/> is
+        /// warped one replan interval along its path.
+        /// </summary>
         public void PathTo(Vector3 destination)
         {
             destination = HeightfieldOrSelf(destination);
             DateTime now = DateTime.UtcNow;
-            if (Npc.Motor.HasPath || _followAnnounced)
+            bool active = Npc.Motor.HasPath;
+            if (active)
             {
-                double elapsed = (now - _lastRepathUtc).TotalSeconds;
-                if (elapsed < NpcFollowTarget.RepathIntervalSeconds)
-                    return;
-
-                float delta = (float)Vector3.Abs(destination - _lastAnnouncedEnd);
-                if (delta < NpcFollowTarget.MinAnnounceDeltaMeters)
-                    return;
-            }
-
-            if (_reachPathScratch.Count > 0
-                && Vector3.Abs(destination - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters)
-            {
-                _pathScratch.Clear();
-                for (int i = 0; i < _reachPathScratch.Count; i++)
+                if (IsStuck(now))
                 {
-                    System.Numerics.Vector3 point = _reachPathScratch[i];
-                    _pathScratch.Add(new Vector3(point.X, point.Y, point.Z));
+                    WarpAlongPath(now);
+                    active = false;
                 }
-
-                Npc.Motor.SetPath(_pathScratch);
+                else if (!ShouldReplan(destination))
+                    return;
             }
-            else if (!Npc.Motor.TryRetargetFinalWaypoint(destination, 0.25f))
-                Npc.Motor.NavigateTo(destination);
 
-            _pathScratch.Clear();
-            var remaining = Npc.Motor.CopyRemainingWaypoints();
-            for (int i = 0; i < remaining.Length; i++)
-                _pathScratch.Add(new Vector3(remaining[i].X, remaining[i].Y, remaining[i].Z));
-            if (_pathScratch.Count == 0)
-                _pathScratch.Add(new Vector3(destination.x, destination.y, destination.z));
+            PlanRoute(destination);
+            Vector3 start = Npc.Position;
+            if (PathEndsUnderNpc(
+                new System.Numerics.Vector3((float)start.x, (float)start.y, (float)start.z),
+                (float)_routeScratch[_routeScratch.Count - 1].x,
+                (float)_routeScratch[_routeScratch.Count - 1].z))
+                return;
 
-            NpcFollowTarget.AnnounceCoordinatePath(Npc, Npc.Position, _pathScratch);
+            float lookaheadMeters = (float)(Npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathLookaheadSeconds);
+            bool truncated = TruncateByDistance(_routeScratch, lookaheadMeters, _pathScratch);
+            if (active)
+                Npc.Motor.ReplacePath(_pathScratch);
+            else
+                Npc.Motor.SetPath(_pathScratch);
+            if (!Npc.Motor.HasPath)
+                return;
+
+            if (!active)
+                ResetProgress(now);
+            _segmentDestination = new Vector3(destination.x, destination.y, destination.z);
+            _segmentReachesDestination = !truncated;
+            NpcFollowTarget.AnnounceCoordinatePath(Npc, start, _pathScratch);
             _followAnnounced = true;
-            _lastAnnouncedEnd = new Vector3(destination.x, destination.y, destination.z);
-            _lastRepathUtc = now;
         }
 
         /// <summary>Clears motor path and settles observers with a FollowTarget stop.</summary>
@@ -311,8 +326,136 @@ namespace ZoneEngine_New.Core.Ai
 
             NpcFollowTarget.AnnounceStop(Npc, Npc.Position);
             _followAnnounced = false;
-            _lastAnnouncedEnd = new Vector3(0, 0, 0);
-            _lastRepathUtc = default;
+            ProgressSinceUtc = default;
+        }
+
+        /// <summary>
+        /// Copies the leading <paramref name="meters"/> of <paramref name="path"/> (flat XZ distance) into
+        /// <paramref name="into"/>, cutting the crossing leg with an interpolated point. A path shorter
+        /// than that, or a non-positive limit, is copied whole. Returns true when the path was cut short.
+        /// </summary>
+        internal static bool TruncateByDistance(IReadOnlyList<Vector3> path, float meters, List<Vector3> into)
+        {
+            into.Clear();
+            if (path == null || path.Count == 0)
+                return false;
+
+            into.Add(new Vector3(path[0].x, path[0].y, path[0].z));
+            float along = 0f;
+            for (int i = 1; i < path.Count; i++)
+            {
+                Vector3 from = path[i - 1];
+                Vector3 to = path[i];
+                double dx = to.x - from.x;
+                double dz = to.z - from.z;
+                float leg = (float)Math.Sqrt((dx * dx) + (dz * dz));
+                if (meters <= 0f || along + leg <= meters)
+                {
+                    into.Add(new Vector3(to.x, to.y, to.z));
+                    along += leg;
+                    continue;
+                }
+
+                double t = leg > 0f ? (meters - along) / leg : 0.0;
+                into.Add(new Vector3(
+                    from.x + ((to.x - from.x) * t),
+                    from.y + ((to.y - from.y) * t),
+                    from.z + ((to.z - from.z) * t)));
+                return true;
+            }
+
+            return false;
+        }
+
+        bool ShouldReplan(Vector3 destination)
+        {
+            if (_segmentReachesDestination)
+                return Vector3.Abs(destination - _segmentDestination) >= NpcFollowTarget.MinAnnounceDeltaMeters;
+
+            double leftSeconds = NpcFollowTarget.PathLookaheadSeconds - NpcFollowTarget.PathReplanSeconds;
+            return Npc.Motor.RemainingPathMeters() <= Npc.Motor.Vehicle.MaxVel * leftSeconds;
+        }
+
+        bool IsStuck(DateTime now)
+        {
+            if (Vector3.Abs(Npc.Position - _progressAnchor) >= NpcFollowTarget.PathStuckProgressMeters)
+            {
+                ResetProgress(now);
+                return false;
+            }
+
+            return (now - ProgressSinceUtc).TotalSeconds >= NpcFollowTarget.PathStuckWarpSeconds;
+        }
+
+        void ResetProgress(DateTime now)
+        {
+            Vector3 position = Npc.Position;
+            _progressAnchor = new Vector3(position.x, position.y, position.z);
+            ProgressSinceUtc = now;
+        }
+
+        /// <summary>
+        /// Stuck: place the NPC one replan interval along its current path and settle observers there.
+        /// </summary>
+        void WarpAlongPath(DateTime now)
+        {
+            Vector3 position = Npc.Position;
+            _routeScratch.Clear();
+            _routeScratch.Add(new Vector3(position.x, position.y, position.z));
+            MsgVector3[] remaining = Npc.Motor.CopyRemainingWaypoints();
+            for (int i = 0; i < remaining.Length; i++)
+                _routeScratch.Add(new Vector3(remaining[i].X, remaining[i].Y, remaining[i].Z));
+
+            float meters = (float)(Npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathReplanSeconds);
+            TruncateByDistance(_routeScratch, meters, _pathScratch);
+            Vector3 last = _pathScratch[_pathScratch.Count - 1];
+            var target = new Vector3(last.x, last.y, last.z);
+
+            Npc.Motor.ClearPath();
+            Npc.Motor.Warp(target);
+            NpcFollowTarget.AnnounceStop(Npc, target);
+            ResetProgress(now);
+        }
+
+        /// <summary>
+        /// Full route from the NPC's position to <paramref name="destination"/> into <see cref="_routeScratch"/>,
+        /// starting with the current position.
+        /// Reuses the <see cref="CanPathTo"/> path when it was planned from here to the same place; with no
+        /// navmesh, or no path found, the route is a straight line.
+        /// </summary>
+        void PlanRoute(Vector3 destination)
+        {
+            _routeScratch.Clear();
+            Vector3 feet = Npc.Position;
+            _routeScratch.Add(new Vector3(feet.x, feet.y, feet.z));
+            Vector3 startPos = HeightfieldOrSelf(feet);
+            if (_reachPathScratch.Count > 0
+                && Vector3.Abs(destination - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters
+                && Vector3.Abs(startPos - _reachCacheStart) < MovementConfig.PathArrivalRadius)
+            {
+                AppendRoute(_reachPathScratch);
+                return;
+            }
+
+            NavMeshPathfinder? finder = Npc.Playfield?.Pathfinder;
+            if (finder != null)
+            {
+                var start = new System.Numerics.Vector3((float)startPos.x, (float)startPos.y, (float)startPos.z);
+                var end = new System.Numerics.Vector3((float)destination.x, (float)destination.y, (float)destination.z);
+                if (finder.TryFindPath(start, end, _planScratch) && _planScratch.Count > 0)
+                {
+                    AppendRoute(_planScratch);
+                    return;
+                }
+            }
+
+            _routeScratch.Add(new Vector3(destination.x, destination.y, destination.z));
+        }
+
+        void AppendRoute(List<System.Numerics.Vector3> points)
+        {
+            for (int i = 0; i < points.Count; i++)
+                _routeScratch.Add(new Vector3(points[i].X, points[i].Y, points[i].Z));
         }
 
         public void StopFighting() => NpcAiCombat.AnnounceStopFight(Npc);

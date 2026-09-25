@@ -91,6 +91,12 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public long ExpiresAtUtcTicks { get; set; }
     }
 
+    public sealed class PersistedSkillLockData
+    {
+        public int StatId { get; set; }
+        public long ExpiresAtUtcTicks { get; set; }
+    }
+
     public sealed class CharacterActiveNanoData
     {
         public int CharacterId { get; set; }

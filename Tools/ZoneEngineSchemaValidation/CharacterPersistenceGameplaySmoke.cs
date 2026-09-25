@@ -39,7 +39,7 @@ static class CharacterPersistenceGameplaySmoke
         ((CatalogRoot)(object)data).Root = Path.Combine(Path.GetDirectoryName(binary)!, "GameData");
         var catalog = new ItemTemplateCatalog(new MySqlItemNameRepository(logger, dao), data, logger);
         var builder = new ItemBuilder(catalog, logger);
-        var loader = new CharacterHydrationService(characters, stats, inventory, nanos, new MySqlActiveNanoRepository(dao), logger);
+        var loader = new CharacterHydrationService(characters, stats, inventory, nanos, new MySqlActiveNanoRepository(dao), new MySqlSkillLockRepository(dao), logger);
         var snapshot = new CharacterSnapshotService(characters, stats, logger);
         Player player = Load();
         var all = (Dictionary<int, ItemTemplate>)typeof(ItemTemplateCatalog).GetField("_templates", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(catalog)!;

@@ -13,7 +13,6 @@ namespace ZoneEngine_New.Core.Movement
         StrafeLeft = 1 << 4,
         StrafeRight = 1 << 5,
         Jump = 1 << 6,
-        MouseTurn = 1 << 7,
         ElevateUp = 1 << 8,
         ElevateDown = 1 << 9,
     }

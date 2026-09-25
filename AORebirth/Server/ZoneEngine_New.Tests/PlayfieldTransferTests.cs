@@ -563,7 +563,7 @@ public sealed class PlayfieldTransferTests
     internal sealed class PersistStore : ICharacterCoalesceCommit
     {
         public int Count; public bool Fail; public Action? Before;
-        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos)
+        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks)
         { Before?.Invoke(); if (Fail) throw new InvalidOperationException("fixture flush failure"); Interlocked.Increment(ref Count); }
     }
     internal sealed class SnapshotStore : ICharacterRepository, IStatRepository

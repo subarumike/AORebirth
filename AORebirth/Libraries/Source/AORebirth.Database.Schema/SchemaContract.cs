@@ -26,7 +26,8 @@ public static class SchemaContract
         "20260904_item_instances_from_legacy.sql",
         "20260905_item_instance_id_sequence.sql",
         "20260906_item_instances_source.sql",
-        "20260908_generated_mission_state.sql"
+        "20260908_generated_mission_state.sql",
+        "20260925_character_skill_locks.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -44,7 +45,8 @@ public static class SchemaContract
     {
         "item_instances", "item_instance_id_sequence", "schema_migrations",
         "generatedmissionsequences", "generatedmissionbatches", "generatedmissionoffers",
-        "generatedmissionbindings", "generatedmissionobservations", "generatedmissionartifacts", "generatedmissionobjects"
+        "generatedmissionbindings", "generatedmissionobservations", "generatedmissionartifacts", "generatedmissionobjects",
+        "characterskilllocks"
     });
 
     public static readonly IReadOnlyList<(string Table, string Columns)> UniqueKeys = Array.AsReadOnly(new[]
@@ -61,7 +63,7 @@ public static class SchemaContract
         ("generatedmissionbindings", "ActivePlayfield"), ("generatedmissionbindings", "KeyInstance"),
         ("generatedmissionobservations", "OwnerId,QuestType,QuestInstance,ObservationIdentity"),
         ("generatedmissionartifacts", "InstanceId"), ("generatedmissionobjects", "QuestType,QuestInstance,RuntimeType,RuntimeInstance"),
-        ("generatedmissionobjects", "RuntimeType,RuntimeInstance")
+        ("generatedmissionobjects", "RuntimeType,RuntimeInstance"), ("characterskilllocks", "CharacterId,StatId")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()
@@ -134,6 +136,8 @@ public static class SchemaContract
         Add("generatedmissionobjects", "int", "DeathActorId CorpseCredits", false);
         Add("generatedmissionobjects", "tinyint", "IsDead IsOpen IsLocked LootResolved ObjectiveConsumed CorpseClaimed", false);
         Add("generatedmissionobjects", "bigint", "Version UpdatedAtUtcTicks DiedAtUtcTicks CorpseExpiresAtUtcTicks", false);
+        Add("characterskilllocks", "int", "CharacterId StatId", false);
+        Add("characterskilllocks", "bigint", "ExpiresAtUtcTicks", false);
         return result.AsReadOnly();
     }
 }

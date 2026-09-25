@@ -298,12 +298,55 @@ namespace ZoneEngine_New.Core.Inventory
             if (!SpellList.TryGetValue(eventType, out List<ItemSpell>? spells) || spells.Count == 0)
                 return eventType == EventType.OnUse;
 
+            if (eventType is EventType.OnUse or EventType.OnUseItemOn
+                && TryFindActiveSkillLock(eventType, target, source, DateTime.UtcNow, out int lockedStat, out TimeSpan remaining))
+            {
+                (source ?? target).SendSkillLocked(lockedStat, remaining);
+                return false;
+            }
+
             criteria ??= new SpellCriteria();
             bool executed = false;
             foreach (ItemSpell spell in spells)
                 executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria);
 
             return executed;
+        }
+
+        /// <summary>
+        /// A LockSkill in <paramref name="eventType"/> whose stat is still locked on the character it
+        /// would lock. Such a use is refused outright: none of its functions run.
+        /// </summary>
+        public bool TryFindActiveSkillLock(
+            EventType eventType,
+            Character target,
+            Character? source,
+            DateTime nowUtc,
+            out int statId,
+            out TimeSpan remaining)
+        {
+            ArgumentNullException.ThrowIfNull(target);
+
+            statId = 0;
+            remaining = TimeSpan.Zero;
+            if (!SpellList.TryGetValue(eventType, out List<ItemSpell>? spells))
+                return false;
+
+            foreach (ItemSpell spell in spells)
+            {
+                if (!spell.Is(FunctionType.LockSkill) || !ItemUseFunctions.TryReadSkillLock(spell, out int stat, out _))
+                    continue;
+
+                TimeSpan left = ItemUseFunctions.ResolveApplyOn(target, source, spell).SkillLocks.Remaining(stat, nowUtc);
+                if (left <= TimeSpan.Zero)
+                    continue;
+
+                statId = stat;
+                remaining = left;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>Runs OnTerminate functions when a timed nano leaves NCU.</summary>

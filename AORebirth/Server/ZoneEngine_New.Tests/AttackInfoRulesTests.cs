@@ -69,36 +69,48 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void NpcWireSlotUsesNaturalAmmoAndOrdinalSlot()
+        public void NpcMonsterWeaponWithoutVisualUsesSlotZeroAndSawTag()
         {
-            Item club = Weapon(
+            Item claw = Weapon(
                 initiativeType: (int)CharacterStat.MeleeInit,
                 instanceId: 77);
-            var armed = new CharacterWeapon { Item = club, WireSlot = 3, SawTag = 0x53495731, SawTagName = "SIW1" };
+            var armed = new CharacterWeapon { Item = claw, WireSlot = 3, SawTag = 0x53495731, SawTagName = "SIW1" };
 
-            Assert.AreEqual(3, AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.MainHand, club, attackerIsPlayer: false));
+            Assert.AreEqual(0, AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.Npc3, claw, attackerIsPlayer: false));
             Assert.AreEqual(
-                AttackInfoRules.NaturalMeleeAmmoCount,
-                AttackInfoRules.ResolveAmmoCount(armed, club, attackerIsPlayer: false));
+                AttackInfoRules.PlayerMeleeAmmoCount,
+                AttackInfoRules.ResolveAmmoCount(armed, claw, attackerIsPlayer: false));
             Assert.AreEqual(
                 0x53495731,
-                AttackInfoRules.ResolveWeaponInstance(armed, club, attackerIsPlayer: false));
+                AttackInfoRules.ResolveWeaponInstance(armed, claw, attackerIsPlayer: false));
         }
 
         [TestMethod]
-        public void NpcMaFistFallbackUsesSlotZero()
+        public void NpcVisualOverrideUsesRightHandOverrideStyleAndNoTag()
         {
-            Item fist = Weapon(
+            Item claw = Weapon(
                 initiativeType: (int)CharacterStat.MeleeInit,
-                instanceId: 0);
-            var armed = new CharacterWeapon { Item = fist, WireSlot = -1 };
+                instanceId: 77);
+            Item pistol = Weapon(
+                initiativeType: (int)CharacterStat.RangedInit,
+                instanceId: 88);
+            var armed = new CharacterWeapon
+            {
+                Item = claw,
+                DamageOverride = pistol,
+                WireSlot = 0,
+                SawTag = 0x53495731,
+                SawTagName = "SIW1"
+            };
 
             Assert.AreEqual(
-                0,
-                AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.MainHand, fist, attackerIsPlayer: false));
+                (int)WeaponSlots.Righthand,
+                AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.Npc0, claw, attackerIsPlayer: false));
             Assert.AreEqual(
-                AttackInfoRules.NaturalMeleeAmmoCount,
-                AttackInfoRules.ResolveAmmoCount(armed, fist, attackerIsPlayer: false));
+                AttackInfoRules.NpcRangedAmmoCount,
+                AttackInfoRules.ResolveAmmoCount(armed, claw, attackerIsPlayer: false));
+            Assert.AreEqual(0, AttackInfoRules.ResolveWeaponInstance(armed, claw, attackerIsPlayer: false));
+            Assert.IsTrue(armed.IsRanged());
         }
 
         [TestMethod]

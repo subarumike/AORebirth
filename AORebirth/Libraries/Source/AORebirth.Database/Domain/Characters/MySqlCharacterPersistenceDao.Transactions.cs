@@ -11,10 +11,15 @@ namespace AORebirth.Database.Domain.Characters
     {
         public void SaveInventoryAndUploadedNanos(int characterId, IList<PersistedItemData> inserts,
             IList<ItemLocationData> locations, IList<int> uploadedNanoIds,
-            IList<PersistedActiveNanoData>? activeNanos = null)
+            IList<PersistedActiveNanoData>? activeNanos = null,
+            IList<PersistedSkillLockData>? skillLocks = null)
         {
             if (inserts == null || locations == null || uploadedNanoIds == null) throw new ArgumentNullException("batch");
-            if (inserts.Count == 0 && locations.Count == 0 && uploadedNanoIds.Count == 0 && activeNanos == null) return;
+            if (inserts.Count == 0 && locations.Count == 0 && uploadedNanoIds.Count == 0 && activeNanos == null && skillLocks == null) return;
+            if (skillLocks != null
+                && (skillLocks.Any(l => l.StatId < 0 || l.ExpiresAtUtcTicks <= 0)
+                    || skillLocks.Select(l => l.StatId).Distinct().Count() != skillLocks.Count))
+                throw new ArgumentException("Invalid or duplicate skill lock.", nameof(skillLocks));
             if (activeNanos != null
                 && (activeNanos.Any(n => n.NanoId <= 0 || n.NanoInstance <= 0 || n.DurationCentiseconds < 0 || n.ExpiresAtUtcTicks < 0)
                     || activeNanos.Select(n => n.Strain).Distinct().Count() != activeNanos.Count
@@ -33,8 +38,22 @@ namespace AORebirth.Database.Domain.Characters
                             "@Nano", nano.NanoId, "@Strain", nano.Strain, "@Instance", nano.NanoInstance,
                             "@Duration", nano.DurationCentiseconds, "@Expiry", nano.ExpiresAtUtcTicks);
                 }
+                if (skillLocks != null)
+                {
+                    Execute(c, t, "DELETE FROM characterskilllocks WHERE CharacterId=@Id", "@Id", characterId);
+                    foreach (var skillLock in skillLocks)
+                        Execute(c, t, "INSERT INTO characterskilllocks (CharacterId,StatId,ExpiresAtUtcTicks) VALUES (@Id,@Stat,@Expiry)",
+                            "@Id", characterId, "@Stat", skillLock.StatId, "@Expiry", skillLock.ExpiresAtUtcTicks);
+                }
                 return 0;
             });
+        }
+
+        public IList<PersistedSkillLockData> LoadSkillLocks(int characterId)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            return Query("SELECT StatId,ExpiresAtUtcTicks FROM characterskilllocks WHERE CharacterId=@Id ORDER BY StatId",
+                r => new PersistedSkillLockData { StatId = r.GetInt32(0), ExpiresAtUtcTicks = r.GetInt64(1) }, "@Id", characterId);
         }
 
         public void CommitInventoryMutation(CharacterInventoryMutationData mutation)

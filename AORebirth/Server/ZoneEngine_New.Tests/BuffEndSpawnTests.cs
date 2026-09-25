@@ -323,7 +323,8 @@ namespace ZoneEngine_New.Tests
                 IReadOnlyList<ItemLocationUpdate> updates,
                 int characterId,
                 IReadOnlyList<int> nanos,
-                IReadOnlyList<ActiveNanoRecord>? activeNanos)
+                IReadOnlyList<ActiveNanoRecord>? activeNanos,
+                IReadOnlyList<SkillLockRecord>? skillLocks)
             {
             }
         }

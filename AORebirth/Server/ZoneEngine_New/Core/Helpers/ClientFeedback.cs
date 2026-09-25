@@ -16,10 +16,13 @@ namespace ZoneEngine_New.Core.Helpers
 
         public const int CategoryId = 110;
 
+        /// <summary>"You're unable to perform this action; please check the requirements of the item." Key name unknown.</summary>
+        public const int CheckItemRequirements = 141178878;
+
         public static void Send(Character character, string key)
             => Send(character, unchecked((int)ElfHash(key)));
 
-        static void Send(Character character, int messageId)
+        public static void Send(Character character, int messageId)
         {
             if (character is not Player player || player.Session == null)
                 return;

@@ -58,10 +58,16 @@ namespace ZoneEngine_New.Core.Entities
         public int WireSlot { get; set; } = -1;
 
         /// <summary>
-        /// WeaponPage slot for a visible hand (right, then left). Negative when this weapon has no WeaponMesh.
-        /// AttackInfo keeps <see cref="WireSlot"/>.
+        /// NPC visual right-hand weapon. When set it supplies the damage roll, damage type and
+        /// melee/ranged style, while <see cref="Item"/> keeps timing and OnHit procs.
         /// </summary>
-        public int VisibleHandSlot { get; set; } = -1;
+        public Item? DamageOverride { get; set; }
+
+        /// <summary>Item whose AttackRange this weapon uses. Falls back to <see cref="Item"/>.</summary>
+        public Item? RangeSource { get; set; }
+
+        /// <summary>Item that rolls damage for this weapon's swings.</summary>
+        public Item? DamageItem => DamageOverride ?? Item;
 
         /// <summary>
         /// NPC SAW / AttackInfo weapon tag (4-char packed int). Zero for player hands / fists.
@@ -100,10 +106,11 @@ namespace ZoneEngine_New.Core.Entities
 
         public double GetAttackRange()
         {
-            if (Item == null)
+            Item? source = RangeSource ?? Item;
+            if (source == null)
                 return DefaultMeleeAttackRange;
 
-            double range = Math.Max(0, StatCollection.Normalize(Item.GetStat(CharacterStat.AttackRange)));
+            double range = Math.Max(0, StatCollection.Normalize(source.GetStat(CharacterStat.AttackRange)));
             return range > 0.0 ? range : DefaultMeleeAttackRange;
         }
 
@@ -157,13 +164,14 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public bool IsRanged()
         {
-            if (Item == null)
+            Item? style = DamageItem;
+            if (style == null)
                 return false;
 
-            if ((Item.GetWeaponFlags() & WeaponFlags.Ranged) != 0)
+            if ((style.GetWeaponFlags() & WeaponFlags.Ranged) != 0)
                 return true;
 
-            return Item.IsWieldableCombatWeapon() && !AttackInfoRules.UsesMeleeAmmo(Item);
+            return style.IsWieldableCombatWeapon() && !AttackInfoRules.UsesMeleeAmmo(style);
         }
 
         public void ResetAttack()

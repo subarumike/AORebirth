@@ -42,7 +42,7 @@ public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Laz
         {
             var weapon = CreateCombatWeapon(state.RuntimeInstance, state.Level.Value,
                 (source.Meshes ?? []).Any(mesh => mesh.Layer == _content.WeaponMeshLayer && mesh.Id > 0), items, catalog, _content);
-            npc.Equipment.Add(npc.Equipment.Offset, weapon);
+            npc.EquipCombatWeapon(weapon);
             npc.CombatEnabled = true;
             npc.RebaseWeapons();
         }

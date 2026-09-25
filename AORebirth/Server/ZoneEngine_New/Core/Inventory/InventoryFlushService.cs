@@ -189,20 +189,21 @@ namespace ZoneEngine_New.Core.Inventory
             if (!player.Inventory.IsHydrated)
                 return;
 
-            if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos && !player.HasDirtyActiveNanos)
+            if (!HasDirtyState(player))
                 return;
 
             lock (player.PersistenceGate)
             {
                 if (player.IsPersistenceQuarantined)
                     throw new InvalidOperationException("Inventory persistence is quarantined pending database reconciliation.");
-                if (!player.Inventory.HasDirtyEntries && !player.HasDirtyUploadedNanos && !player.HasDirtyActiveNanos)
+                if (!HasDirtyState(player))
                     return;
 
                 PlayerInventory.InventoryDirtyFlush? inventory = player.Inventory.TakeDirty();
                 int[] nanos = player.DrainDirtyUploadedNanos();
                 List<ActiveNanoRecord>? activeNanos = player.TakeDirtyActiveNanos();
-                if (inventory == null && nanos.Length == 0 && activeNanos == null)
+                List<SkillLockRecord>? skillLocks = player.SkillLocks.TakeDirty(DateTime.UtcNow);
+                if (inventory == null && nanos.Length == 0 && activeNanos == null && skillLocks == null)
                     return;
 
                 try
@@ -212,7 +213,8 @@ namespace ZoneEngine_New.Core.Inventory
                         inventory?.Updates ?? [],
                         player.Identity.Instance,
                         nanos,
-                        activeNanos);
+                        activeNanos,
+                        skillLocks);
                     inventory?.MarkNewlyPersisted();
                 }
                 catch (DatabaseCommitOutcomeUnknownException exception)
@@ -228,6 +230,7 @@ namespace ZoneEngine_New.Core.Inventory
                         player.Inventory.RestoreDirty(inventory);
                     player.RestoreDirtyUploadedNanos(nanos);
                     player.RestoreDirtyActiveNanos(activeNanos);
+                    player.SkillLocks.RestoreDirty(skillLocks);
                     _logger.Error(
                         exception,
                         string.Format(
@@ -238,6 +241,10 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
         }
+
+        static bool HasDirtyState(Player player)
+            => player.Inventory.HasDirtyEntries || player.HasDirtyUploadedNanos || player.HasDirtyActiveNanos
+                || player.SkillLocks.IsDirty;
 
         public void Dispose()
         {

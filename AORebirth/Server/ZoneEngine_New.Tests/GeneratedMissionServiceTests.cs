@@ -282,7 +282,7 @@ public sealed class GeneratedMissionServiceTests
     }
     sealed class Coalesce : ICharacterCoalesceCommit
     {
-        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos)
+        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks)
             => throw new AssertFailedException("A clean mission grant unexpectedly used an independent inventory commit.");
     }
     sealed class Dao : IGeneratedMissionDao

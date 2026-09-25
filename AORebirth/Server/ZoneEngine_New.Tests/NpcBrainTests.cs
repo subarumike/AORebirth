@@ -317,6 +317,140 @@ namespace ZoneEngine_New.Tests
             Assert.IsFalse(NpcBrain.PathEndsUnderNpc(new System.Numerics.Vector3(0f, 0f, 0f), path));
         }
 
+        [TestMethod]
+        public void TruncateByDistanceCutsAStraightPathMidLeg()
+        {
+            var into = new System.Collections.Generic.List<Vector3>();
+
+            Assert.IsTrue(NpcBrain.TruncateByDistance(new[] { new Vector3(0, 0, 0), new Vector3(10, 2, 0) }, 3f, into));
+
+            Assert.AreEqual(2, into.Count);
+            Assert.AreEqual(3, into[1].x, 1e-4);
+            Assert.AreEqual(0.6, into[1].y, 1e-4);
+        }
+
+        [TestMethod]
+        public void TruncateByDistanceKeepsCornersInsideTheLimit()
+        {
+            var into = new System.Collections.Generic.List<Vector3>();
+
+            NpcBrain.TruncateByDistance(
+                new[] { new Vector3(0, 0, 0), new Vector3(2, 0, 0), new Vector3(2, 0, 4) },
+                3f,
+                into);
+
+            Assert.AreEqual(3, into.Count);
+            Assert.AreEqual(2, into[1].x, 1e-4);
+            Assert.AreEqual(2, into[2].x, 1e-4);
+            Assert.AreEqual(1, into[2].z, 1e-4);
+        }
+
+        [TestMethod]
+        public void TruncateByDistanceCopiesAShortPathWhole()
+        {
+            var into = new System.Collections.Generic.List<Vector3>();
+
+            Assert.IsFalse(NpcBrain.TruncateByDistance(new[] { new Vector3(0, 0, 0), new Vector3(1, 0, 1) }, 5f, into));
+
+            Assert.AreEqual(2, into.Count);
+            Assert.AreEqual(1, into[1].x, 1e-4);
+            Assert.AreEqual(1, into[1].z, 1e-4);
+        }
+
+        [TestMethod]
+        public void PathToPlansALookaheadSegmentAndIgnoresRetargetsBeforeTheReplanPoint()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            double lookahead = npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathLookaheadSeconds;
+
+            brain.PathTo(new Vector3(20, 0, 0));
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.AreEqual(lookahead, SegmentEnd(npc).X, 1e-3);
+
+            brain.PathTo(new Vector3(0, 0, 20));
+            Assert.AreEqual(lookahead, SegmentEnd(npc).X, 1e-3);
+            Assert.AreEqual(0, SegmentEnd(npc).Z, 1e-3);
+        }
+
+        [TestMethod]
+        public void PathToReplacesTheSegmentBeforeItsEndOnceTheReplanIntervalIsTravelled()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            double lookahead = npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathLookaheadSeconds;
+
+            brain.PathTo(new Vector3(20, 0, 0));
+            for (int i = 0; i < 22; i++)
+                npc.Motor.Tick(0.05);
+            Assert.IsTrue(npc.Motor.HasPath);
+
+            brain.PathTo(new Vector3(20, 0, 0));
+
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.AreEqual(npc.Position.x + lookahead, SegmentEnd(npc).X, 1e-3);
+            Assert.IsTrue(SegmentEnd(npc).X > lookahead);
+        }
+
+        [TestMethod]
+        public void PathToPlansTheNextSegmentWhenThePathHasEnded()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            double lookahead = npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathLookaheadSeconds;
+
+            brain.PathTo(new Vector3(20, 0, 0));
+            npc.Position = new Vector3(lookahead, 0, 0);
+            npc.Motor.ClearPath();
+
+            brain.PathTo(new Vector3(20, 0, 0));
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.AreEqual(lookahead * 2, SegmentEnd(npc).X, 1e-3);
+        }
+
+        [TestMethod]
+        public void PathToWarpsOneReplanIntervalAlongThePathWhenStuck()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            double replan = npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathReplanSeconds;
+            double lookahead = npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathLookaheadSeconds;
+
+            brain.PathTo(new Vector3(20, 0, 0));
+            brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds + 1));
+            brain.PathTo(new Vector3(20, 0, 0));
+
+            Assert.AreEqual(replan, npc.Position.x, 1e-3);
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.AreEqual(replan + lookahead, SegmentEnd(npc).X, 1e-3);
+        }
+
+        [TestMethod]
+        public void PathToLeavesASlowNpcAloneBeforeTheStuckLimit()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            double lookahead = npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathLookaheadSeconds;
+
+            brain.PathTo(new Vector3(20, 0, 0));
+            brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds - 1));
+            brain.PathTo(new Vector3(20, 0, 0));
+
+            Assert.AreEqual(0, npc.Position.x, 1e-3);
+            Assert.AreEqual(lookahead, SegmentEnd(npc).X, 1e-3);
+        }
+
+        static SmokeLounge.AOtomation.Messaging.GameData.Vector3 SegmentEnd(NpcCharacter npc)
+        {
+            SmokeLounge.AOtomation.Messaging.GameData.Vector3[] remaining = npc.Motor.CopyRemainingWaypoints();
+            return remaining[remaining.Length - 1];
+        }
+
         static NpcCharacter CreateNpc()
         {
             return new NpcCharacter(

@@ -16,6 +16,7 @@ namespace ZoneEngine_New.Core.Characters
         private readonly IInventoryRepository _inventory;
         private readonly IUploadedNanoRepository _uploadedNanos;
         private readonly IActiveNanoRepository _activeNanos;
+        private readonly ISkillLockRepository _skillLocks;
         private readonly IZoneLogger _logger;
 
         public CharacterHydrationService(
@@ -24,8 +25,10 @@ namespace ZoneEngine_New.Core.Characters
             IInventoryRepository inventory,
             IUploadedNanoRepository uploadedNanos,
             IActiveNanoRepository activeNanos,
+            ISkillLockRepository skillLocks,
             IZoneLogger logger)
         {
+            ArgumentNullException.ThrowIfNull(skillLocks);
             ArgumentNullException.ThrowIfNull(characters);
             ArgumentNullException.ThrowIfNull(stats);
             ArgumentNullException.ThrowIfNull(inventory);
@@ -38,6 +41,7 @@ namespace ZoneEngine_New.Core.Characters
             _inventory = inventory;
             _uploadedNanos = uploadedNanos;
             _activeNanos = activeNanos;
+            _skillLocks = skillLocks;
             _logger = logger;
         }
 
@@ -56,7 +60,8 @@ namespace ZoneEngine_New.Core.Characters
                 Stats = RestoreLegacyDefaults(_stats.GetForCharacter(characterId)),
                 Items = _inventory.GetCarriedItems(characterId),
                 UploadedNanoIds = _uploadedNanos.GetForCharacter(characterId),
-                ActiveNanos = _activeNanos.GetForCharacter(characterId)
+                ActiveNanos = _activeNanos.GetForCharacter(characterId),
+                SkillLocks = _skillLocks.GetForCharacter(characterId)
             };
 
             CharacterHydrationValidationResult validation = CharacterHydrationValidator.Validate(result);

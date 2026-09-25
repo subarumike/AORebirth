@@ -73,93 +73,184 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void WeaponMeshFillsRightHandThenLeftHand()
+        public void OnlyFirstVisualWeaponIsShown()
         {
             var catalog = new StubCatalog()
-                .AddWeapon(10, 1)
-                .AddWeapon(11, 1)
-                .AddWeapon(12, 1)
-                .AddWeapon(13, 1);
-            catalog.Require(10).Stats[CharacterStat.WeaponMesh] = 0;
-            catalog.Require(11).Stats[CharacterStat.WeaponMesh] = 501;
-            catalog.Require(12).Stats[CharacterStat.WeaponMesh] = 502;
-            catalog.Require(13).Stats[CharacterStat.WeaponMesh] = 503;
+                .AddWeapon(9, 1)
+                .AddMeleeWeapon(10, mesh: 501)
+                .AddMeleeWeapon(11, mesh: 502)
+                .AddMeleeWeapon(12, mesh: 503);
 
-            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 2 }, new CatalogItemBuilder(catalog))
-            {
-                MobTemplate = new MobTemplate
-                {
-                    Name = "Armed",
-                    Equipment = [[10, 10], [11, 11], [12, 12], [13, 13]]
-                }
-            };
-            npc.Stats.Set(CharacterStat.Level, 1);
+            NpcCharacter npc = CreateNpc(catalog, 2, [[9, 9], [10, 10], [11, 11], [12, 12]]);
             npc.FillEquipment(new StubGameData(HashItemCatalog.Parse("{}")));
             npc.RebaseWeapons();
 
-            int right = 0;
-            int left = 0;
-            int extra = 0;
-            foreach (Mesh mesh in npc.Meshes)
-            {
-                if (mesh.Position == 1)
-                    right = (int)mesh.Id;
-                else if (mesh.Position == 2)
-                    left = (int)mesh.Id;
-                if (mesh.Id == 503)
-                    extra++;
-            }
-
-            Assert.AreEqual(501, right);
-            Assert.AreEqual(502, left);
-            Assert.AreEqual(0, extra);
+            Assert.AreEqual(10, npc.VisualRightHand!.LowId);
+            Assert.AreEqual(501, HandMesh(npc, 1));
+            Assert.AreEqual(0, HandMesh(npc, 2));
+            Assert.AreEqual(1, npc.BuildWeaponInstanceMessages().Count);
         }
 
         [TestMethod]
-        public void VisibleWeaponMeshSendsRightThenLeftWeaponInstance()
+        public void MonsterWeaponsAttackWhileFirstVisualWeaponSendsRightHandInstance()
         {
             var catalog = new StubCatalog()
-                .AddWeapon(10, 1)
+                .AddMeleeWeapon(30, mesh: 501)
+                .AddMeleeWeapon(31, mesh: 502)
+                .AddNpcEquipper(20, "SIW1")
+                .AddNpcEquipper(21, "SIW2")
                 .AddWeapon(11, 1)
                 .AddWeapon(12, 1);
-            catalog.Require(10).Stats[CharacterStat.WeaponMesh] = 0;
-            catalog.Require(11).Stats[CharacterStat.WeaponMesh] = 501;
-            catalog.Require(12).Stats[CharacterStat.WeaponMesh] = 502;
-            AddEquipMonsterWeapon(catalog.Require(11), "SIW1");
-            AddEquipMonsterWeapon(catalog.Require(12), "SIW2");
+            catalog.Require(30).Stats[CharacterStat.AttackRange] = 25;
+            var gameData = new StubGameData(
+                HashItemCatalog.Parse("{}"),
+                monsterWeapons: new Dictionary<string, int[]> { ["SIW1"] = [11, 11], ["SIW2"] = [12, 12] });
 
-            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 3 }, new CatalogItemBuilder(catalog))
+            NpcCharacter npc = CreateNpc(catalog, 3, [[30, 30], [20, 20], [31, 31], [21, 21]]);
+            npc.FillEquipment(gameData);
+            npc.RebaseWeapons();
+
+            List<WeaponItemFullUpdateMessage> instances = npc.BuildWeaponInstanceMessages();
+            Assert.AreEqual(1, instances.Count);
+            Assert.AreEqual((short)(0x0100 | (int)WeaponSlots.Righthand), instances[0].Unknown2);
+            Assert.AreEqual(0, HandMesh(npc, 2));
+
+            Assert.AreEqual(2, npc.Weapons.Count);
+            CharacterWeapon first = npc.Weapons[WeaponSlot.Npc0];
+            CharacterWeapon second = npc.Weapons[WeaponSlot.Npc1];
+            Assert.AreEqual(11, first.Item!.LowId);
+            Assert.AreEqual(12, second.Item!.LowId);
+            Assert.AreSame(npc.VisualRightHand, first.DamageOverride);
+            Assert.AreSame(npc.VisualRightHand, second.DamageOverride);
+            Assert.AreEqual(25.0, first.GetAttackRange());
+            Assert.AreEqual(0, first.WireSlot);
+            Assert.AreEqual(1, second.WireSlot);
+        }
+
+        [TestMethod]
+        public void VisualWeaponWithoutMonsterWeaponDoesNotAttack()
+        {
+            var catalog = new StubCatalog().AddMeleeWeapon(10, mesh: 501);
+
+            NpcCharacter npc = CreateNpc(catalog, 4, [[10, 10]]);
+            npc.FillEquipment(new StubGameData(HashItemCatalog.Parse("{}")));
+            npc.RebaseWeapons();
+
+            Assert.AreEqual(501, HandMesh(npc, 1));
+            Assert.AreEqual(0, npc.Weapons.Count);
+            Assert.AreEqual(1, npc.BuildWeaponInstanceMessages().Count);
+        }
+
+        [TestMethod]
+        public void RepeatedRebaseDoesNotAccumulateMonsterWeaponsOrKeepStaleHands()
+        {
+            var catalog = new StubCatalog()
+                .AddMeleeWeapon(10, mesh: 501)
+                .AddNpcEquipper(20, "SIW1")
+                .AddWeapon(11, 1);
+            var gameData = new StubGameData(
+                HashItemCatalog.Parse("{}"),
+                monsterWeapons: new Dictionary<string, int[]> { ["SIW1"] = [11, 11] });
+
+            NpcCharacter npc = CreateNpc(catalog, 6, [[10, 10], [20, 20]]);
+            npc.FillEquipment(gameData);
+            npc.Rebase();
+            npc.Rebase();
+            Assert.AreEqual(1, npc.Weapons.Count);
+
+            npc.Equipment.Remove(0);
+            npc.Rebase();
+            Assert.IsNull(npc.VisualRightHand);
+            Assert.AreEqual(0, HandMesh(npc, 1));
+            Assert.IsNull(npc.Weapons[WeaponSlot.Npc0].DamageOverride);
+        }
+
+        [TestMethod]
+        public void EquipmentDoesNotModifyNpcStats()
+        {
+            var catalog = new StubCatalog().AddWeapon(10, 1);
+            catalog.Require(10).SpellList[EventType.OnWear] =
+            [
+                new ItemSpell
+                {
+                    FunctionType = (int)FunctionType.Modify,
+                    Arguments = [(int)CharacterStat.Strength, 5]
+                }
+            ];
+
+            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 5 }, new CatalogItemBuilder(catalog))
+            {
+                MobTemplate = new MobTemplate
+                {
+                    Name = "Buffed Gear",
+                    Equipment = [[10, 10]]
+                }
+            };
+            npc.Stats.Set(CharacterStat.Level, 1);
+            npc.Stats.Set(CharacterStat.Strength, 10);
+            npc.FillEquipment(new StubGameData(HashItemCatalog.Parse("{}")));
+            npc.RebaseStats();
+
+            Assert.AreEqual(10, npc.Stats.GetOrZero(CharacterStat.Strength));
+            Assert.AreEqual(0, npc.Stats.GetOrZero(CharacterStat.Strength, StatDetail.Bonus));
+        }
+
+        [TestMethod]
+        public void LootgiverItemRunsItsOnWearModifiers()
+        {
+            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 7 }, new CatalogItemBuilder(new StubCatalog()));
+            npc.Stats.Set(CharacterStat.Strength, 10);
+            npc.Equipment.Add(0, new Item
+            {
+                LowId = 1,
+                HighId = 1,
+                Quality = 1,
+                Definition = new ItemTemplate
+                {
+                    Id = 1,
+                    Name = "NPC Lootgiver 10",
+                    SpellList = new Dictionary<EventType, List<ItemSpell>>
+                    {
+                        [EventType.OnWear] =
+                        [
+                            new ItemSpell
+                            {
+                                FunctionType = (int)FunctionType.Modify,
+                                Arguments = [(int)CharacterStat.Strength, 5]
+                            }
+                        ]
+                    }
+                }
+            });
+
+            npc.RebaseStats();
+
+            Assert.AreEqual(15, npc.Stats.GetOrZero(CharacterStat.Strength));
+        }
+
+        static NpcCharacter CreateNpc(StubCatalog catalog, int instance, List<List<int>> equipment)
+        {
+            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = instance }, new CatalogItemBuilder(catalog))
             {
                 MobTemplate = new MobTemplate
                 {
                     Name = "Armed",
-                    Equipment = [[10, 10], [11, 11], [12, 12]]
+                    Equipment = equipment
                 }
             };
             npc.Stats.Set(CharacterStat.Level, 1);
-            npc.FillEquipment(new StubGameData(HashItemCatalog.Parse("{}")));
-            npc.RebaseWeapons();
-
-            List<WeaponItemFullUpdateMessage> instances = npc.BuildWeaponInstanceMessages();
-            Assert.AreEqual(2, instances.Count);
-            Assert.AreEqual((short)(0x0100 | (int)WeaponSlots.Righthand), instances[0].Unknown2);
-            Assert.AreEqual((short)(0x0100 | (int)WeaponSlots.LeftHand), instances[1].Unknown2);
-            Assert.AreEqual((int)WeaponSlots.Righthand, npc.Weapons[WeaponSlot.Npc1].VisibleHandSlot);
-            Assert.AreEqual((int)WeaponSlots.LeftHand, npc.Weapons[WeaponSlot.Npc2].VisibleHandSlot);
-            Assert.AreEqual(0, npc.Weapons[WeaponSlot.Npc0].WireSlot);
-            Assert.AreEqual(1, npc.Weapons[WeaponSlot.Npc1].WireSlot);
+            return npc;
         }
 
-        static void AddEquipMonsterWeapon(ItemTemplate template, string hash)
+        static int HandMesh(NpcCharacter npc, int position)
         {
-            template.SpellList[EventType.OnWear] =
-            [
-                new ItemSpell
-                {
-                    FunctionType = (int)FunctionType.EquipMonsterWeapon,
-                    Arguments = [hash]
-                }
-            ];
+            foreach (Mesh mesh in npc.Meshes)
+            {
+                if (mesh.Position == position)
+                    return (int)mesh.Id;
+            }
+
+            return 0;
         }
 
         static bool TryFindEquipMonsterWeaponHash(ItemTemplate template, out string hash)
@@ -348,6 +439,15 @@ namespace ZoneEngine_New.Tests
         {
             catalog.Add(id, quality);
             catalog.Require(id).Stats[CharacterStat.ItemClass] = (int)ItemClass.Weapon;
+            return catalog;
+        }
+
+        public static StubCatalog AddMeleeWeapon(this StubCatalog catalog, int id, int mesh)
+        {
+            catalog.AddWeapon(id, 1);
+            ItemTemplate template = catalog.Require(id);
+            template.Stats[CharacterStat.InitiativeType] = (int)CharacterStat.MeleeInit;
+            template.Stats[CharacterStat.WeaponMesh] = mesh;
             return catalog;
         }
     }

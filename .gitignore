@@ -113,6 +113,7 @@ UpgradeLog*.XML
 /AORebirth/Built
 AORebirth/GameData/Playfields/
 AORebirth/GameData/items.dat
+AORebirth/GameData/Text.json
 AORebirth/_dotMemory.AORebirth/
 AORebirth/AORebirth.sln.DotSettings
 

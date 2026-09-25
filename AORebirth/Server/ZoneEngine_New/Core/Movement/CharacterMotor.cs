@@ -39,7 +39,7 @@ namespace ZoneEngine_New.Core.Movement
 
         readonly Character _character;
         readonly CharVehicleSim _sim;
-        readonly NpcVehicleSim? _npc;
+        readonly ServerNpcVehicleSim? _npc;
         readonly List<Vector3> _path = new();
         readonly List<Vector3> _navigateScratch = new();
         readonly List<System.Numerics.Vector3> _navMeshScratch = new();
@@ -58,7 +58,9 @@ namespace ZoneEngine_New.Core.Movement
         public CharacterMotor(Character character)
         {
             _character = character ?? throw new ArgumentNullException(nameof(character));
-            _npc = character.IsPlayer ? null : new NpcVehicleSim();
+            _npc = character.IsPlayer
+                ? null
+                : new ServerNpcVehicleSim { InstantAcceleration = !MovementConfig.NpcAccelerationEnabled };
             _sim = _npc ?? new CharVehicleSim();
             _sim.Mass = MovementConfig.Mass;
             _sim.MaxForce = MovementConfig.InitialMaxForce;
@@ -143,13 +145,9 @@ namespace ZoneEngine_New.Core.Movement
             if ((_flags & MovementFlags.StrafeRight) != 0)
                 actions.Add(MovementAction.StrafeRightStart);
             if ((_flags & MovementFlags.TurnLeft) != 0)
-                actions.Add((_flags & MovementFlags.MouseTurn) != 0
-                    ? MovementAction.TurnLeftMouse
-                    : MovementAction.TurnLeftStart);
+                actions.Add(MovementAction.TurnLeftStart);
             if ((_flags & MovementFlags.TurnRight) != 0)
-                actions.Add((_flags & MovementFlags.MouseTurn) != 0
-                    ? MovementAction.TurnRightMouse
-                    : MovementAction.TurnRightStart);
+                actions.Add(MovementAction.TurnRightStart);
             if ((_flags & MovementFlags.ElevateUp) != 0)
                 actions.Add(MovementAction.ElevateUpStart);
             if ((_flags & MovementFlags.ElevateDown) != 0)
@@ -241,11 +239,15 @@ namespace ZoneEngine_New.Core.Movement
             }
         }
 
+        /// <summary>
+        /// Starts a new path. Without NPC acceleration the guide starts one slowing distance in, so the
+        /// body is at full speed from the first tick, as observers show it.
+        /// </summary>
         public void SetPath(IReadOnlyList<Vector3> waypoints)
         {
             ClearPath();
             StopAllFlags();
-            CopyWaypoints(waypoints);
+            CopyWaypoints(waypoints, _npc != null && _npc.InstantAcceleration ? _sim.SlowingDistance : 0f);
         }
 
         /// <summary>
@@ -301,6 +303,21 @@ namespace ZoneEngine_New.Core.Movement
             return remaining;
         }
 
+        /// <summary>Flat meters of path still ahead: of the NPC guide, or of a player body. Zero when idle.</summary>
+        public float RemainingPathMeters()
+        {
+            if (!HasPath)
+                return 0f;
+
+            if (_npc != null)
+                return Math.Max(0f, _npc.Path.TotalLength - (_npc.Guide.Time * _npc.Guide.MaxSpeed));
+
+            float remaining = FlatDistance(_character.Position, _path[_playerPathIndex]);
+            for (int i = _playerPathIndex + 1; i < _path.Count; i++)
+                remaining += FlatDistance(_path[i - 1], _path[i]);
+            return remaining;
+        }
+
         /// <summary>The first kept waypoint the guide has not reached, measured along the flat path.</summary>
         int FirstWaypointAheadOfGuide()
         {
@@ -333,7 +350,7 @@ namespace ZoneEngine_New.Core.Movement
         /// Keeps the full waypoint list (with Y) for SCFU and fills the vehicle's path. An NPC gets
         /// stock's <c>Path_t</c> + guide; a player body keeps Lost-Eden's point-and-drive follower.
         /// </summary>
-        void CopyWaypoints(IReadOnlyList<Vector3> waypoints)
+        void CopyWaypoints(IReadOnlyList<Vector3> waypoints, float guideLeadMeters = 0f)
         {
             if (waypoints == null || waypoints.Count == 0)
                 return;
@@ -360,18 +377,39 @@ namespace ZoneEngine_New.Core.Movement
                 for (int i = 0; i < _path.Count; i++)
                     _npc.Path.AddWaypoint(ToVec3(_path[i]));
                 _npc.RestartPath();
+                if (guideLeadMeters > 0f && _npc.MaxVel > 0f)
+                    _npc.Guide.RestartGuide(_npc.Path, _npc.MaxVel, guideLeadMeters / _npc.MaxVel);
                 return;
             }
 
             _playerPathIndex = 1;
         }
 
-        void ReplacePath(IReadOnlyList<Vector3> waypoints)
+        /// <summary>
+        /// Swaps the active path without clearing velocity or raising <see cref="PathCompleted"/>. An NPC's
+        /// guide keeps its lead over the body: the arrive steering runs about one slowing distance behind
+        /// the guide at full speed, so restarting the guide at the body would brake it on every swap.
+        /// </summary>
+        public void ReplacePath(IReadOnlyList<Vector3> waypoints)
         {
+            float lead = CurrentGuideLead();
             _path.Clear();
             _playerPathIndex = -1;
             _npc?.Path.Clear();
-            CopyWaypoints(waypoints);
+            CopyWaypoints(waypoints, lead);
+        }
+
+        /// <summary>Flat distance from the body to the NPC guide, capped at the steady-state slowing distance.</summary>
+        float CurrentGuideLead()
+        {
+            if (_npc == null || !HasPath)
+                return 0f;
+
+            Vec3 guide = _npc.Guide.GuidePos;
+            float dx = guide.X - (float)_character.Position.x;
+            float dz = guide.Z - (float)_character.Position.z;
+            float lead = MathF.Sqrt((dx * dx) + (dz * dz));
+            return Math.Min(lead, _sim.SlowingDistance);
         }
 
         void PlanIntoScratch(Vector3 destination)
@@ -736,19 +774,17 @@ namespace ZoneEngine_New.Core.Movement
                     SetFlags((_flags | MovementFlags.TurnLeft) & ~MovementFlags.TurnRight);
                     break;
                 case MovementAction.TurnLeftMouse:
-                    SetFlags((_flags | MovementFlags.TurnLeft | MovementFlags.MouseTurn) & ~MovementFlags.TurnRight);
+                case MovementAction.TurnRightMouse:
+                    // Heading only: the packet's quaternion is authoritative, so no turn rate is simulated.
                     break;
                 case MovementAction.TurnLeftStop:
-                    SetFlags(_flags & ~(MovementFlags.TurnLeft | MovementFlags.MouseTurn));
+                    SetFlags(_flags & ~MovementFlags.TurnLeft);
                     break;
                 case MovementAction.TurnRightStart:
                     SetFlags((_flags | MovementFlags.TurnRight) & ~MovementFlags.TurnLeft);
                     break;
-                case MovementAction.TurnRightMouse:
-                    SetFlags((_flags | MovementFlags.TurnRight | MovementFlags.MouseTurn) & ~MovementFlags.TurnLeft);
-                    break;
                 case MovementAction.TurnRightStop:
-                    SetFlags(_flags & ~(MovementFlags.TurnRight | MovementFlags.MouseTurn));
+                    SetFlags(_flags & ~MovementFlags.TurnRight);
                     break;
                 case MovementAction.JumpStart:
                     SetFlags(_flags | MovementFlags.Jump);
@@ -1109,6 +1145,31 @@ namespace ZoneEngine_New.Core.Movement
                 if (v < Floor)
                     v = Floor;
                 return v;
+            }
+        }
+
+        /// <summary>
+        /// N3Lite's NPC vehicle with an optional instant-acceleration mode: the body takes the arrive
+        /// behaviour's desired velocity at once instead of accelerating toward it through the
+        /// MaxForce-limited integrator.
+        /// </summary>
+        sealed class ServerNpcVehicleSim : NpcVehicleSim
+        {
+            public bool InstantAcceleration { get; init; }
+
+            /// <summary>
+            /// Arrive steers with <c>(desired - Velocity) * Mass * 4</c>, so the desired velocity is recovered
+            /// from the force and set directly; the zeroed force then leaves it unchanged.
+            /// </summary>
+            protected override SteeringResult CalcSteering(out Vec3 force)
+            {
+                SteeringResult result = base.CalcSteering(out force);
+                if (!InstantAcceleration || result != SteeringResult.Force)
+                    return result;
+
+                Velocity += force / (Mass * 4f);
+                force = Vec3.Zero;
+                return result;
             }
         }
     }

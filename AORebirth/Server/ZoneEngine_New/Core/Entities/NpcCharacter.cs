@@ -28,6 +28,7 @@ namespace ZoneEngine_New.Core.Entities
 
         readonly IItemBuilder _items;
         readonly Dictionary<int, string> _equipmentSawHashes = new();
+        readonly HashSet<int> _combatWeaponSlots = new();
 
         public NpcCharacter(Identity identity, IItemBuilder items)
             : base(identity)
@@ -146,31 +147,21 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
-        /// Announces a WeaponInstance after SCFU only for a visible weapon (non-zero WeaponMesh).
-        /// The first visible weapon is the right hand. The next is the left.
+        /// Announces a WeaponInstance after SCFU for the visual right-hand weapon when it has a
+        /// non-zero WeaponMesh. Monster weapons are never announced; SAW and AttackInfo carry them.
         /// </summary>
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
         {
             var messages = new List<WeaponItemFullUpdateMessage>();
-            for (int ordinal = 0; ordinal < MaxNpcCombatWeapons; ordinal++)
-            {
-                WeaponSlot slot = (WeaponSlot)((int)WeaponSlot.Npc0 + ordinal);
-                if (!Weapons.TryGetValue(slot, out CharacterWeapon? armed) || armed?.Item == null)
-                    continue;
-                if (armed.VisibleHandSlot < 0)
-                    continue;
+            if (VisualRightHand == null)
+                return messages;
 
-                WeaponItemFullUpdateMessage? visible = TryBuildWeaponItemFullUpdate(
-                    armed.Item,
-                    armed.VisibleHandSlot,
-                    armed,
-                    visibleHand: true);
-                if (visible == null)
-                    continue;
-
+            WeaponItemFullUpdateMessage? visible = TryBuildWeaponItemFullUpdate(
+                VisualRightHand,
+                (int)WeaponSlots.Righthand,
+                visibleHand: true);
+            if (visible != null)
                 messages.Add(visible);
-            }
-
             return messages;
         }
 
@@ -221,6 +212,7 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             _equipmentSawHashes.Clear();
+            _combatWeaponSlots.Clear();
             int quality = Stats.GetOrOne(CharacterStat.Level);
             List<List<int>> pairs = template.Equipment;
             for (int i = 0; i < pairs.Count; i++)
@@ -264,10 +256,21 @@ namespace ZoneEngine_New.Core.Entities
             TryAddEquipment(
                 _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other),
                 logger,
+                combatWeapon: true,
                 sawHash: weaponHash);
         }
 
-        bool TryAddEquipment(Item item, IZoneLogger? logger, string? sawHash = null)
+        /// <summary>
+        /// Adds a server-assigned combat weapon for NPCs that have no monster weapon equipper
+        /// (generated mission actors). Call <see cref="RebaseWeapons"/> afterwards.
+        /// </summary>
+        internal bool EquipCombatWeapon(Item weapon, IZoneLogger? logger = null)
+        {
+            ArgumentNullException.ThrowIfNull(weapon);
+            return TryAddEquipment(weapon, logger, combatWeapon: true);
+        }
+
+        bool TryAddEquipment(Item item, IZoneLogger? logger, bool combatWeapon = false, string? sawHash = null)
         {
             int slot = Equipment.FindFreeSlot();
             if (slot < 0)
@@ -284,6 +287,8 @@ namespace ZoneEngine_New.Core.Entities
             if (!Equipment.Add(slot, item))
                 return false;
 
+            if (combatWeapon)
+                _combatWeaponSlots.Add(slot);
             if (!string.IsNullOrEmpty(sawHash))
                 _equipmentSawHashes[slot] = sawHash;
 
@@ -360,10 +365,19 @@ namespace ZoneEngine_New.Core.Entities
             RebaseWeapons();
         }
 
+        /// <summary>
+        /// NPC stats come from the mob template, buffs, and "lootgiver" items only; ordinary
+        /// equipment never modifies them.
+        /// </summary>
         public override void RebaseStats()
         {
             Stats.ClearBonuses(dirty: true);
-            WearBonusApplier.ApplyContainer(Equipment, includeWield: true, Stats);
+            foreach (KeyValuePair<int, Item> slot in Equipment.EnumerateSlots())
+            {
+                if (slot.Value.Definition?.Name?.Contains("lootgiver", StringComparison.OrdinalIgnoreCase) == true)
+                    WearBonusApplier.ApplyItem(slot.Value, includeWield: false, Stats);
+            }
+
             ApplyBuffBonuses();
             RebaseWearAppearance();
         }
@@ -374,121 +388,68 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         protected override IEnumerable<Container> AppearanceWearPages => [Equipment];
 
+        /// <summary>
+        /// First melee/ranged equipment item; later ones are ignored. Drawn in the right hand and
+        /// overrides monster weapon damage.
+        /// </summary>
+        public Item? VisualRightHand { get; private set; }
+
+        /// <summary>
+        /// Visual weapons fill the hands; monster weapons (equipper-expanded or assigned through
+        /// <see cref="EquipCombatWeapon"/>) are the only attack cycles. No monster weapon means
+        /// no auto-attack.
+        /// </summary>
         public override void RebaseWeapons()
         {
             ClearWeapons();
-            ClearHandMesh(RightHandMeshPosition);
-            ClearHandMesh(LeftHandMeshPosition);
-
-            int quality = Stats.GetOrOne(CharacterStat.Level);
-            int armed = 0;
-            bool maCombined = false;
-            int meshHands = 0;
-
-            if (!TryArmFromEquipmentContainer(ref armed, ref maCombined, ref meshHands))
-                TryArmNpcEquipment(MobTemplate?.Equipment, quality, ref armed, ref maCombined, ref meshHands);
-
-            if (armed == 0)
-            {
-                FinishWeaponRebase(_items, armedMain: false, armedOff: false, maCombined: false);
-                return;
-            }
-
-            if (maCombined)
-                ArmMartialArtsFist(_items, WeaponSlot.CombinedMA);
-
+            AssignVisualHands();
+            ArmMonsterWeapons();
             ResetAllWeaponAttacks();
         }
 
-        bool TryArmFromEquipmentContainer(ref int armed, ref bool maCombined, ref int meshHands)
+        void AssignVisualHands()
         {
-            if (Equipment.Content.Count == 0)
-                return false;
+            VisualRightHand = null;
+            ClearHandMesh(RightHandMeshPosition);
+            ClearHandMesh(LeftHandMeshPosition);
 
-            bool armedAny = false;
-            int last = Equipment.Offset + Equipment.Capacity;
-            for (int slot = Equipment.Offset; slot < last && armed < MaxNpcCombatWeapons; slot++)
+            foreach (KeyValuePair<int, Item> slot in Equipment.EnumerateSlots())
             {
-                if (!Equipment.Content.TryGetValue(slot, out Item? item) || item == null)
-                    continue;
-                if (!item.IsWieldableCombatWeapon())
+                if (_combatWeaponSlots.Contains(slot.Key) || !IsVisualWeapon(slot.Value))
                     continue;
 
-                if (!_equipmentSawHashes.TryGetValue(slot, out string? sawHash)
-                    || string.IsNullOrEmpty(sawHash))
-                    TryFindEquipMonsterWeaponHash(item, out sawHash);
-
-                WeaponSlot hand = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
-                ArmFromItem(hand, item, wireSlot: armed, sawHash: sawHash);
-                ApplyWeaponMesh(hand, item, ref meshHands);
-                armed++;
-                armedAny = true;
-                if (item.IsMaCombinedWeapon())
-                    maCombined = true;
+                VisualRightHand = slot.Value;
+                int meshId = StatCollection.Normalize(slot.Value.GetStat(CharacterStat.WeaponMesh));
+                if (meshId > 0)
+                    SetHandMesh(RightHandMeshPosition, meshId, overrideTextureId: 0);
+                return;
             }
-
-            return armedAny;
         }
 
-        bool TryArmNpcEquipment(
-            List<List<int>>? source,
-            int quality,
-            ref int armed,
-            ref bool maCombined,
-            ref int meshHands)
+        void ArmMonsterWeapons()
         {
-            if (source == null || source.Count == 0)
-                return false;
-
-            bool armedAny = false;
-            for (int i = 0; i < source.Count && armed < MaxNpcCombatWeapons; i++)
+            int armed = 0;
+            Item? rangeSource = VisualRightHand;
+            foreach (KeyValuePair<int, Item> slot in Equipment.EnumerateSlots())
             {
-                List<int> pair = source[i];
-                if (pair == null || pair.Count < 1)
+                if (armed >= MaxNpcCombatWeapons)
+                    return;
+                if (!_combatWeaponSlots.Contains(slot.Key))
                     continue;
 
-                int lowId = pair[0];
-                int highId = pair.Count >= 2 ? pair[1] : lowId;
-                if (lowId <= 0)
-                    continue;
-
-                Item item = _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other);
-                if (!item.IsWieldableCombatWeapon())
-                    continue;
-
-                WeaponSlot slot = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
-                ArmFromItem(slot, item, wireSlot: armed);
-                ApplyWeaponMesh(slot, item, ref meshHands);
+                _equipmentSawHashes.TryGetValue(slot.Key, out string? sawHash);
+                WeaponSlot logical = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
+                ArmFromItem(logical, slot.Value, wireSlot: armed, sawHash: sawHash);
+                rangeSource ??= slot.Value;
+                CharacterWeapon weapon = Weapons[logical];
+                weapon.DamageOverride = VisualRightHand;
+                weapon.RangeSource = rangeSource;
                 armed++;
-                armedAny = true;
-                if (item.IsMaCombinedWeapon())
-                    maCombined = true;
             }
-
-            return armedAny;
         }
 
-        /// <summary>
-        /// The first non-zero WeaponMesh fills the right hand. The next fills the left.
-        /// The same order is stored for the weapon-instance slot.
-        /// </summary>
-        void ApplyWeaponMesh(WeaponSlot logicalSlot, Item item, ref int meshHands)
-        {
-            if (meshHands >= 2)
-                return;
-
-            int meshId = StatCollection.Normalize(item.GetStat(CharacterStat.WeaponMesh));
-            if (meshId <= 0)
-                return;
-
-            bool rightHand = meshHands == 0;
-            int position = rightHand ? RightHandMeshPosition : LeftHandMeshPosition;
-            int equipmentSlot = rightHand ? (int)WeaponSlots.Righthand : (int)WeaponSlots.LeftHand;
-            SetHandMesh(position, meshId, overrideTextureId: 0);
-            if (Weapons.TryGetValue(logicalSlot, out CharacterWeapon? armed) && armed != null)
-                armed.VisibleHandSlot = equipmentSlot;
-            meshHands++;
-        }
+        static bool IsVisualWeapon(Item item)
+            => (item.GetWeaponFlags() & (WeaponFlags.Melee | WeaponFlags.Ranged)) != 0;
 
         const int RightHandMeshPosition = 1;
         const int LeftHandMeshPosition = 2;

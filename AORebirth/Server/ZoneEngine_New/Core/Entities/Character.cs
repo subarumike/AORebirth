@@ -77,7 +77,72 @@ namespace ZoneEngine_New.Core.Entities
             return (scale * CharacterRadius) / 100.0;
         }
 
-        //TODO: Put cooldowns here
+        /// <summary>LockSkill cooldowns by stat id. Only players persist them.</summary>
+        public SkillLocks SkillLocks { get; } = new();
+
+        public void LockSkill(int statId, int durationSeconds, DateTime nowUtc)
+        {
+            SkillLocks.Lock(statId, ScaleSkillLock(statId, durationSeconds), nowUtc);
+            if (this is Player player)
+                Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(player);
+        }
+
+        /// <summary>
+        /// SkillLockModifier is a percent of the lock duration. The client floors it at -50.
+        /// Special-attack locks stay at the scripted duration.
+        /// </summary>
+        int ScaleSkillLock(int statId, int durationSeconds)
+        {
+            if (durationSeconds <= 0 || IgnoresSkillLockModifier(statId))
+                return durationSeconds;
+
+            int modifier = Stats.GetOrZero(CharacterStat.SkillLockModifier);
+            if (modifier < -50)
+                modifier = -50;
+
+            return (int)((durationSeconds * (100L + modifier) + 50) / 100);
+        }
+
+        static bool IgnoresSkillLockModifier(int statId)
+        {
+            switch ((CharacterStat)statId)
+            {
+                case CharacterStat.Brawl:
+                case CharacterStat.Dimach:
+                case CharacterStat.SneakAttack:
+                case CharacterStat.FastAttack:
+                case CharacterStat.Burst:
+                case CharacterStat.FlingShot:
+                case CharacterStat.AimedShot:
+                case CharacterStat.FullAuto:
+                case CharacterStat.ShadowBreedTemplate:
+                case CharacterStat.VisualFlags:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>Client text 1000/222040796.</summary>
+        public void SendSkillLocked(int statId, TimeSpan remaining)
+        {
+            if (this is not Player player || player.Session == null)
+                return;
+
+            int totalSeconds = (int)Math.Ceiling(remaining.TotalSeconds);
+            player.Session.Send(
+                new ChatTextMessage
+                {
+                    Identity = Identity,
+                    Text = string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Unable to perform action, {0} skill is locked, able in {1:00}:{2:00}:{3:00}",
+                        (CharacterStat)statId,
+                        totalSeconds / 3600,
+                        totalSeconds / 60 % 60,
+                        totalSeconds % 60)
+                });
+        }
 
         /// <summary>
         /// Subscribe for delayed actions. Honor <see cref="TimedActionInterrupt.LeavePlayfield"/>
@@ -715,6 +780,10 @@ namespace ZoneEngine_New.Core.Entities
                         armed.SawTag));
             }
 
+            // NPC SAW lists only monster weapons.
+            if (!IsPlayer)
+                return specials.ToArray();
+
             foreach (KeyValuePair<WeaponSlot, CharacterWeapon> pair in Weapons)
             {
                 Item? item = pair.Value?.Item;
@@ -1085,7 +1154,10 @@ namespace ZoneEngine_New.Core.Entities
             if (GetEdgeDistanceTo(target) > characterWeapon.GetAttackRange())
                 return;
 
-            DamageCalculator.DamageResult result = DamageCalculator.CalculateFromWeapon(this, target, weapon);
+            DamageCalculator.DamageResult result = DamageCalculator.CalculateFromWeapon(
+                this,
+                target,
+                characterWeapon.DamageItem);
             int attackInfoSlot = AttackInfoRules.ResolveWeaponSlot(
                 characterWeapon,
                 characterWeapon.LogicalSlot,

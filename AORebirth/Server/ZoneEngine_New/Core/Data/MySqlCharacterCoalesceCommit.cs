@@ -29,7 +29,8 @@ namespace ZoneEngine_New.Core.Data
             IReadOnlyList<ItemLocationUpdate> updates,
             int characterId,
             IReadOnlyList<int> uploadedNanoIds,
-            IReadOnlyList<ActiveNanoRecord>? activeNanos)
+            IReadOnlyList<ActiveNanoRecord>? activeNanos,
+            IReadOnlyList<SkillLockRecord>? skillLocks)
             => Run(() => _persistence.SaveInventoryAndUploadedNanos(
                 characterId,
                 inserts.Select(Map).ToArray(),
@@ -41,6 +42,11 @@ namespace ZoneEngine_New.Core.Data
                     Strain = v.Strain,
                     NanoInstance = v.NanoInstance,
                     DurationCentiseconds = v.DurationCentiseconds,
+                    ExpiresAtUtcTicks = v.ExpiresAtUtcTicks
+                }).ToArray(),
+                skillLocks?.Select(v => new PersistedSkillLockData
+                {
+                    StatId = v.StatId,
                     ExpiresAtUtcTicks = v.ExpiresAtUtcTicks
                 }).ToArray()), _logger);
     }

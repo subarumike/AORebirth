@@ -220,7 +220,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
     }
     sealed class Coalesce : ICharacterCoalesceCommit
     {
-        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos) { }
+        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks) { }
     }
     internal sealed class Session : IZoneSession
     {

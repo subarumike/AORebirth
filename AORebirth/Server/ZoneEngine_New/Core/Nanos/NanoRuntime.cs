@@ -506,6 +506,12 @@ namespace ZoneEngine_New.Core.Nanos
         {
             switch (refusal)
             {
+                case NanoCastRefusal.CasterDead:
+                    ClientFeedback.Send(caster, "Feedback_TargetIsAlreadyDead");
+                    return;
+                case NanoCastRefusal.RequirementsNotMet:
+                    ClientFeedback.Send(caster, ClientFeedback.CheckItemRequirements);
+                    return;
                 case NanoCastRefusal.AlreadyCasting:
                     ClientFeedback.Send(caster, "Feedback_WaitForCurrentNanoprogram");
                     return;

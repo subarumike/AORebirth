@@ -17,8 +17,8 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>Player equipped melee / player unarmed ammo (0xFFFFFFFF).</summary>
         public const int PlayerMeleeAmmoCount = -1;
 
-        /// <summary>NPC natural / tag-backed melee ammo used by live private-server swing rows.</summary>
-        public const int NaturalMeleeAmmoCount = 0;
+        /// <summary>NPC ranged swing ammo (AOEmu PlayfieldEngine).</summary>
+        public const int NpcRangedAmmoCount = 1;
 
         /// <summary>Legacy/private-server equipped ranged placeholder ammo.</summary>
         public const int RangedAmmoCount = 40;
@@ -59,9 +59,9 @@ namespace ZoneEngine_New.Core.Helpers
 
         public static int ResolveAmmoCount(CharacterWeapon? armed, Item? weapon, bool attackerIsPlayer)
         {
-            // NPC template / natural melee uses ammo 0.
-            if (!attackerIsPlayer || (armed != null && armed.WireSlot >= 0))
-                return NaturalMeleeAmmoCount;
+            // NPC: melee style of the visual override, else the monster weapon.
+            if (!attackerIsPlayer)
+                return UsesMeleeAmmo(armed?.DamageItem ?? weapon) ? PlayerMeleeAmmoCount : NpcRangedAmmoCount;
 
             // Player unarmed and player melee both use -1 (private-server / AOEmu melee rows).
             if (IsUnarmedPresentation(armed, weapon) || UsesMeleeAmmo(weapon))
@@ -79,11 +79,12 @@ namespace ZoneEngine_New.Core.Helpers
             Item? weapon,
             bool attackerIsPlayer = true)
         {
-            if (armed != null && armed.WireSlot >= 0)
-                return armed.WireSlot;
+            // NPC: right hand when a visual weapon overrides the monster weapon, else 0.
+            if (!attackerIsPlayer)
+                return armed?.DamageOverride != null ? (int)WeaponSlots.Righthand : 0;
 
-            // Player synthetic fist / PhysicalInit and NPC MA-fist fallback: slot 0.
-            if (!attackerIsPlayer || IsUnarmedPresentation(armed, weapon))
+            // Player synthetic fist / PhysicalInit: slot 0.
+            if (IsUnarmedPresentation(armed, weapon))
                 return 0;
 
             return logicalSlot switch
@@ -98,8 +99,9 @@ namespace ZoneEngine_New.Core.Helpers
 
         public static int ResolveWeaponInstance(CharacterWeapon? armed, Item? weapon, bool attackerIsPlayer)
         {
-            // NPC natural weapons: AttackInfo Unknown6 must equal SAW SpecialAttack.Unknown3.
-            if (armed != null && armed.SawTag != 0)
+            // NPC monster weapons: AttackInfo Unknown6 must equal SAW SpecialAttack.Unknown3,
+            // unless a visual weapon overrides the swing.
+            if (armed != null && armed.SawTag != 0 && armed.DamageOverride == null)
                 return armed.SawTag;
 
             // Private-server player unarmed rows use instance 0 (not AOEmu's 100).

@@ -459,7 +459,7 @@ public sealed class AuthoredQuestTests
         public ItemTemplate Require(int id) => new() { Id = id, Quality = 1 };
     }
     sealed class NoIndependentFlush : ICharacterCoalesceCommit
-    { public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int owner, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos) => throw new InvalidOperationException("No independent item transaction expected."); }
+    { public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int owner, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks) => throw new InvalidOperationException("No independent item transaction expected."); }
     internal sealed class Session : IZoneSession
     {
         internal readonly List<object> Messages = [];

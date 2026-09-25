@@ -17,6 +17,9 @@ namespace ZoneEngine_New.Core.Characters
         /// <summary>Stored NCU. Entries whose deadline already passed are dropped on apply.</summary>
         public IReadOnlyList<ActiveNanoRecord> ActiveNanos { get; init; } = [];
 
+        /// <summary>Stored LockSkill cooldowns. Expired entries are dropped on apply.</summary>
+        public IReadOnlyList<SkillLockRecord> SkillLocks { get; init; } = [];
+
         public bool IsSpawnReady => CharacterHydrationValidator.Validate(this).IsValid;
     }
 }

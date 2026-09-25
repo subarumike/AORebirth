@@ -19,6 +19,7 @@ namespace AORebirth.Interfaces.Persistence.Characters
         IDictionary<int, string> LoadItemNames();
         IList<int> LoadUploadedNanos(int characterId);
         IList<PersistedActiveNanoData> LoadActiveNanos(int characterId);
+        IList<PersistedSkillLockData> LoadSkillLocks(int characterId);
         int LeaseItemInstanceIds(int count);
         void SaveLocation(CharacterStateData character, int online);
         void SaveSnapshot(CharacterStateData character, int online, IList<CharacterStatData> stats);
@@ -35,10 +36,12 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// <summary>
         /// <paramref name="activeNanos"/> null means NCU did not change and must not be touched;
         /// a non-null list (including an empty one) replaces the character's stored NCU.
+        /// <paramref name="skillLocks"/> follows the same rule for the character's skill locks.
         /// </summary>
         void SaveInventoryAndUploadedNanos(int characterId, IList<PersistedItemData> inserts,
             IList<ItemLocationData> locations, IList<int> uploadedNanoIds,
-            IList<PersistedActiveNanoData>? activeNanos = null);
+            IList<PersistedActiveNanoData>? activeNanos = null,
+            IList<PersistedSkillLockData>? skillLocks = null);
         void CommitInventoryMutation(CharacterInventoryMutationData mutation);
         // Retains the existing item/credit boundary; this does not implement a new trade feature.
         void CommitItemCredits(ItemCreditMutationData mutation);

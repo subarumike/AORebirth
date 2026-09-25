@@ -62,6 +62,10 @@ namespace ZoneEngine_New.Core.Characters
                 player.TryAddUploadedNano(nanoId);
 
             RestoreActiveNanos(player, hydration);
+
+            DateTime nowUtc = DateTime.UtcNow;
+            foreach (SkillLockRecord record in hydration.SkillLocks)
+                player.SkillLocks.Restore(record.StatId, new DateTime(record.ExpiresAtUtcTicks, DateTimeKind.Utc), nowUtc);
         }
 
         /// <summary>

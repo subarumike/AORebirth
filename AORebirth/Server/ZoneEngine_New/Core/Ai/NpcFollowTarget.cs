@@ -23,8 +23,19 @@ namespace ZoneEngine_New.Core.Ai
         public const byte RunMoveMode = 25;
         public const byte CrawlMoveMode = 27;
 
-        /// <summary>Minimum seconds between destination retarget + FollowTarget re-announce.</summary>
-        public const double RepathIntervalSeconds = 1;
+        /// <summary>Seconds of travel covered by each planned segment.</summary>
+        public const double PathLookaheadSeconds = 1.5;
+
+        /// <summary>
+        /// Seconds of travel before the next segment replaces the current one. Shorter than the lookahead so
+        /// the segment end stays ahead of the NPC and neither server nor client brakes between segments.
+        /// </summary>
+        public const double PathReplanSeconds = 1;
+
+        /// <summary>A pathing NPC that has not moved <see cref="PathStuckProgressMeters"/> in this long is warped ahead.</summary>
+        public const double PathStuckWarpSeconds = 3;
+
+        public const float PathStuckProgressMeters = 1f;
 
         public const float MinAnnounceDeltaMeters = 2.0f;
 

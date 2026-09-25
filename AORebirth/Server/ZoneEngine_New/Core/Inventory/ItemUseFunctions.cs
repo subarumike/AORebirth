@@ -63,6 +63,8 @@ namespace ZoneEngine_New.Core.Inventory
                     return target is Player textPlayer && SystemText(textPlayer, spell);
                 case FunctionType.SaveChar:
                     return true;
+                case FunctionType.LockSkill:
+                    return LockSkill(target, source, spell);
                 case FunctionType.UploadNano:
                     return target is Player uploadPlayer && UploadNano(uploadPlayer, spell);
                 case FunctionType.CastNano:
@@ -210,7 +212,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
 
             Character caster = source ?? target;
-            Character recipient = ResolveCastChanceRecipient(target, source, spell);
+            Character recipient = ResolveApplyOn(target, source, spell);
             return NanoRuntime.TryApplyImmediate(
                 caster,
                 recipient,
@@ -220,7 +222,11 @@ namespace ZoneEngine_New.Core.Inventory
                 DateTime.UtcNow);
         }
 
-        static Character ResolveCastChanceRecipient(Character eventTarget, Character? source, ItemSpell spell)
+        /// <summary>
+        /// Character a function's ApplyOn names: User / Wearer / Self is whoever used the item or cast
+        /// the nano, Target is the event target.
+        /// </summary>
+        internal static Character ResolveApplyOn(Character eventTarget, Character? source, ItemSpell spell)
         {
             switch ((ItemTarget)spell.Target)
             {
@@ -281,6 +287,22 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
 
             target.Stats.Set(CharacterStat.CurrentNano, next, StatDetail.Base, dirty: true);
+            return true;
+        }
+
+        /// <summary>LockSkill args: Stat, Value (seconds). The leading Action word is not stored in items.dat.</summary>
+        internal static bool TryReadSkillLock(ItemSpell spell, out int statId, out int durationSeconds)
+        {
+            durationSeconds = 0;
+            return spell.TryReadInt(0, out statId) && spell.TryReadInt(1, out durationSeconds);
+        }
+
+        static bool LockSkill(Character target, Character? source, ItemSpell spell)
+        {
+            if (!TryReadSkillLock(spell, out int statId, out int durationSeconds))
+                return false;
+
+            ResolveApplyOn(target, source, spell).LockSkill(statId, durationSeconds, DateTime.UtcNow);
             return true;
         }
 

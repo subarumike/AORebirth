@@ -74,7 +74,7 @@ static class CutoverDurableReloadSmoke
         var stats = new MySqlStatRepository(log);
         var inventory = new MySqlInventoryRepository(log);
         var nanos = new MySqlUploadedNanoRepository(log);
-        var loaded = new CharacterHydrationService(characters, stats, inventory, nanos, new MySqlActiveNanoRepository(), log).LoadForLogin(CharacterId);
+        var loaded = new CharacterHydrationService(characters, stats, inventory, nanos, new MySqlActiveNanoRepository(), new MySqlSkillLockRepository(), log).LoadForLogin(CharacterId);
         Require(loaded != null && loaded.Character.Id == CharacterId && loaded.Character.X == 101
             && loaded.Character.Y == 21 && loaded.Character.Z == 102 && loaded.Character.Playfield == 4582
             && loaded.Character.Name == "CutoverFixture" && loaded.Character.FirstName == "" && loaded.Character.LastName == ""
