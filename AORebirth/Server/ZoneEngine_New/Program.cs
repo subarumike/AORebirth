@@ -234,6 +234,7 @@ namespace ZoneEngine_New
 
             //Chat
             services.AddSingleton<IChatEngineLink, IsComChatEngineLink>();
+            services.AddSingleton(provider => new Lazy<TeamService>(provider.GetRequiredService<TeamService>));
             services.AddSingleton(provider => new TeamService(
                 provider.GetRequiredService<IChatEngineLink>(), dispatchOnOwner: (player, action) =>
                     player.Playfield?.DispatchPlayerProjection(player, action)));

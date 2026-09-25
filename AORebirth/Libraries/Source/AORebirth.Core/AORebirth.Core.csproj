@@ -249,6 +249,7 @@
     <Compile Include="Vector\Transform.cs" />
     <Compile Include="Vector\Vector3.cs" />
     <Compile Include="VendorHandler\VendorHandler.cs" />
+    <Compile Include="Teams\JsonTeamLevelEligibilityDao.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="InstancedEntities\" />

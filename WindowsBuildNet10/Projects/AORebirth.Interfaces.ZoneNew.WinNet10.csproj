@@ -23,5 +23,6 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IGeneratedMissionDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionInventoryMutationTransaction.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Teams/ITeamLevelEligibilityDao.cs" />
   </ItemGroup>
 </Project>

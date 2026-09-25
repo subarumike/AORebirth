@@ -10,6 +10,7 @@ namespace ZoneEngine_New.Core.Chat
     using Utility.Config;
 
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Teams;
 
     using ConfigReadWrite = Utility.Config.ConfigReadWrite;
 
@@ -21,20 +22,23 @@ namespace ZoneEngine_New.Core.Chat
     }
 
     /// <summary>
-    /// Zone→ChatEngine ISCom link for vicinity (and later system chat) traffic.
+    /// Zone↔ChatEngine ISCom link: Zone→Chat sends; Chat→Zone delivers LFT seed commands.
     /// </summary>
     public sealed class IsComChatEngineLink : IChatEngineLink
     {
         private readonly IZoneLogger _logger;
+        private readonly Lazy<TeamService> _teams;
         private readonly ISComV2Client _client = new ISComV2Client();
         private bool _started;
         private bool _disposed;
 
-        public IsComChatEngineLink(IZoneLogger logger)
+        public IsComChatEngineLink(IZoneLogger logger, Lazy<TeamService> teams)
         {
             ArgumentNullException.ThrowIfNull(logger);
+            ArgumentNullException.ThrowIfNull(teams);
             _logger = logger;
-            _client.OnReceiveData += (_, _) => { };
+            _teams = teams;
+            _client.OnReceiveData += OnReceiveData;
         }
 
         public void Start()
@@ -87,12 +91,35 @@ namespace ZoneEngine_New.Core.Chat
             }
         }
 
+        void OnReceiveData(object sender, DynamicMessage message)
+        {
+            if (message?.DataObject is not ChatCommand command
+                || string.IsNullOrWhiteSpace(command.ChatCommandString))
+                return;
+
+            try
+            {
+                _teams.Value.TryHandleInboundChatCommand(
+                    command.CharacterId,
+                    command.ChatCommandString);
+            }
+            catch (Exception exception)
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "ISCom inbound ChatCommand failed: {0}",
+                        exception.Message));
+            }
+        }
+
         public void Dispose()
         {
             if (_disposed)
                 return;
 
             _disposed = true;
+            _client.OnReceiveData -= OnReceiveData;
             _client.ShutDown();
             _client.Dispose();
         }

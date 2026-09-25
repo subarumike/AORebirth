@@ -17,8 +17,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (session.State != SessionState.InPlay || session.Player is not { } player
                 || !ReferenceEquals(player.Session, session) || player.IsPersistenceQuarantined)
                 return;
-            // Existing accepted RaidCmd capture proves only command 1.
-            if (message.Command == 1) _teams.ConvertToRaid(player);
+            // Capture 20260902-073932: Command=1 convert.
+            // Capture 20260924-213512: Command=4 move member (TargetCharacterId + DestinationTeamIndex).
+            _teams.TryHandleRaidCmd(player, message);
         }
     }
 }
