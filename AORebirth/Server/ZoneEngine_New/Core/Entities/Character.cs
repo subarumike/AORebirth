@@ -1760,6 +1760,7 @@ namespace ZoneEngine_New.Core.Entities
         readonly Dictionary<int, Mesh> _handMeshes = new();
         readonly List<AOTextures> _textures = new();
         readonly List<Mesh> _meshes = new();
+        byte[]? _extendedTextureOverrideData;
         bool _appearanceViewStale = true;
 
         /// <summary>
@@ -1807,6 +1808,18 @@ namespace ZoneEngine_New.Core.Entities
 
             _spawnTextures[place] = textureId;
             _appearanceViewStale = true;
+        }
+
+        /// <summary>Template-authored SCFU extended texture override data.</summary>
+        public void SetExtendedTextureOverrideData(byte[]? data)
+        {
+            if (data == null || data.Length == 0)
+            {
+                _extendedTextureOverrideData = null;
+                return;
+            }
+
+            _extendedTextureOverrideData = (byte[])data.Clone();
         }
 
         /// <summary>Template or authored-content mesh.</summary>
@@ -2392,6 +2405,7 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown2 = 0,
                 ActiveNanos = BuildActiveNanos(),
                 Waypoints = Motor.CopyRemainingWaypoints(),
+                ExtendedTextureOverrideData = CopyExtendedTextureOverrideData(),
                 Textures = BuildTextures(isNpc),
                 Meshes = BuildMeshes(headMesh)
             };
@@ -2503,6 +2517,11 @@ namespace ZoneEngine_New.Core.Entities
 
             return scfu;
         }
+
+        internal byte[]? CopyExtendedTextureOverrideData()
+            => _extendedTextureOverrideData == null || _extendedTextureOverrideData.Length == 0
+                ? null
+                : (byte[])_extendedTextureOverrideData.Clone();
 
         /// <summary>Texture places as they appear on this character's own spawn packet.</summary>
         internal Texture[] BuildWireTextures() => BuildTextures(!IsPlayer);
