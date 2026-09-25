@@ -4,15 +4,18 @@ namespace ZoneEngine_New.Core.Helpers
 
     /// <summary>
     /// Cast time and post-cast recharge for a nano, in centiseconds.
-    /// Both use the same reduction: aggressiveness above the defensive midpoint and half of
-    /// nano initiative come off the template delay, floored at the template's cap.
+    /// Half of nano initiative, and AggDef clamped to <see cref="AggDefMin"/>..<see cref="AggDefMax"/>,
+    /// come off the template delay. Initiative above <see cref="InitiativeSoftCap"/> adds only one
+    /// sixth of the extra. A defensive slider can run longer than the template. The result floors
+    /// at 0, then at the template cap when that cap is set.
     /// </summary>
     public static class NanoDelayCalculator
     {
-        /// <summary>AggDef midpoint; full defensive (0) adds delay, full aggressive (100) removes it.</summary>
-        public const int AggDefNeutral = 25;
+        public const int AggDefMin = -100;
 
-        /// <summary>Initiative above this contributes at a third of its value.</summary>
+        public const int AggDefMax = 100;
+
+        /// <summary>Initiative above this contributes at one sixth of the extra amount.</summary>
         public const int InitiativeSoftCap = 1200;
 
         public static int AttackTimeCentiseconds(
@@ -35,14 +38,17 @@ namespace ZoneEngine_New.Core.Helpers
                 return 0;
 
             int initiative = Math.Max(0, nanoInitiative);
-            if (initiative > InitiativeSoftCap)
-                initiative = ((initiative - InitiativeSoftCap) / 3) + InitiativeSoftCap;
+            int initFactor = initiative <= InitiativeSoftCap
+                ? initiative / 2
+                : (initiative - InitiativeSoftCap) / 6 + (InitiativeSoftCap / 2);
 
-            int reduction = (aggDef - AggDefNeutral) + (initiative / 2);
-            int floor = cap > 0 ? Math.Min(cap, delay) : 0;
+            int result = delay - initFactor - Math.Clamp(aggDef, AggDefMin, AggDefMax);
+            if (result < 0)
+                result = 0;
+            if (cap > 0 && result < cap)
+                result = cap;
 
-            // Reduction can be negative (defensive stance), so clamp to the template delay too.
-            return Math.Clamp(delay - reduction, floor, delay);
+            return result;
         }
     }
 }
