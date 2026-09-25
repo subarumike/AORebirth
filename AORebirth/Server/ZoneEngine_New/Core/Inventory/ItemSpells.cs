@@ -5,6 +5,8 @@ namespace ZoneEngine_New.Core.Inventory
 
     using AORebirth.Enums;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine_New.Core.Entities;
 
     public sealed class ItemRequirement
@@ -54,7 +56,14 @@ namespace ZoneEngine_New.Core.Inventory
         {
             ArgumentNullException.ThrowIfNull(stats);
 
-            return ItemTemplate.MeetsRequirements(Requirements, stat => stats.Get(stat));
+            return MeetsRequirements(stat => stats.Get(stat));
+        }
+
+        public bool MeetsRequirements(Func<CharacterStat, int> getStat)
+        {
+            ArgumentNullException.ThrowIfNull(getStat);
+
+            return ItemTemplate.MeetsRequirements(Requirements, getStat);
         }
 
         public bool TryReadInt(int index, out int value)
@@ -137,6 +146,56 @@ namespace ZoneEngine_New.Core.Inventory
                 copy.Requirements.Add(requirement.Copy());
 
             return copy;
+        }
+    }
+
+    /// <summary>
+    /// Stats that exist only while one event runs. <see cref="CharacterStat.Rnd"/> rolls 1–100
+    /// and that value stays available as <see cref="CharacterStat.LastRnd"/> for later functions
+    /// in the same event. <see cref="CharacterStat.SecondaryItemTemplate"/> is the low id of the
+    /// item used on the target.
+    /// </summary>
+    public sealed class SpellCriteria
+    {
+        public const int RollMin = 1;
+        public const int RollMaxInclusive = 100;
+
+        public int SecondaryItemTemplate { get; init; }
+
+        /// <summary>
+        /// Door the character walked into. Vicinity <see cref="FunctionType.TeleportProxy"/> records
+        /// this as the way back when the spell itself does not name a source door.
+        /// </summary>
+        public int SourceDoorInstance { get; init; }
+
+        /// <summary>Item the event may destroy (the one used on the target, or the item being used).</summary>
+        public Item? Subject { get; init; }
+
+        public Identity SubjectSlot { get; init; }
+
+        /// <summary>Test hook. Production rolls <see cref="RollMin"/> through <see cref="RollMaxInclusive"/>.</summary>
+        public Func<int>? NextRoll { get; init; }
+
+        int _lastRnd;
+
+        public int Resolve(CharacterStat stat, Func<CharacterStat, int> characterStat)
+        {
+            ArgumentNullException.ThrowIfNull(characterStat);
+
+            switch (stat)
+            {
+                case CharacterStat.SecondaryItemTemplate:
+                    return SecondaryItemTemplate;
+                case CharacterStat.Rnd:
+                    _lastRnd = NextRoll != null
+                        ? NextRoll()
+                        : Random.Shared.Next(RollMin, RollMaxInclusive + 1);
+                    return _lastRnd;
+                case CharacterStat.LastRnd:
+                    return _lastRnd;
+                default:
+                    return characterStat(stat);
+            }
         }
     }
 

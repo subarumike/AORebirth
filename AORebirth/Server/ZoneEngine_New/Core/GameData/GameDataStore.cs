@@ -313,6 +313,30 @@ namespace ZoneEngine_New.Core.GameData
                 : [];
         }
 
+        public bool TryGetTeleportRoute(
+            int playfield,
+            int statelType,
+            uint statelInstance,
+            out int destinationPlayfield,
+            out int destinationType,
+            out uint destinationInstance)
+        {
+            if (_teleportDestinations != null
+                && _teleportDestinations.TryGet(
+                    playfield,
+                    statelType,
+                    statelInstance,
+                    out destinationPlayfield,
+                    out destinationType,
+                    out destinationInstance))
+                return true;
+
+            destinationPlayfield = 0;
+            destinationType = 0;
+            destinationInstance = 0;
+            return false;
+        }
+
         public IReadOnlyCollection<int>? GetConfiguredExitProxyDoorInstances(int playfieldId)
         {
             if (playfieldId <= 0)
@@ -350,11 +374,7 @@ namespace ZoneEngine_New.Core.GameData
                         || sourcePlayfieldId <= 0)
                         continue;
 
-                    string dynelsPath = Path.Combine(
-                        RootPath,
-                        GameDataPaths.PlayfieldDynelsRelativePath(sourcePlayfieldId));
-                    PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(dynelsPath);
-                    _teleportDestinations?.Apply(sourcePlayfieldId, dynels);
+                    PlayfieldDynels? dynels = ReadPlayfieldDynels(sourcePlayfieldId);
                     ExitProxyDoorCatalog.CollectFromDynels(dynels, collected, GetConfiguredExitProxyDoorInstances);
                 }
 
@@ -947,9 +967,7 @@ namespace ZoneEngine_New.Core.GameData
         {
             PlayfieldWalls? walls = TryDeserializeRdbObject<PlayfieldWalls>(
                 Path.Combine(RootPath, GameDataPaths.PlayfieldWallsRelativePath(playfieldId)));
-            PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(
-                Path.Combine(RootPath, GameDataPaths.PlayfieldDynelsRelativePath(playfieldId)));
-            _teleportDestinations?.Apply(playfieldId, dynels);
+            PlayfieldDynels? dynels = ReadPlayfieldDynels(playfieldId);
             PlayfieldDoors? doors = TryDeserializeRdbObject<PlayfieldDoors>(
                 Path.Combine(RootPath, GameDataPaths.PlayfieldDoorsRelativePath(playfieldId)));
 
@@ -962,6 +980,14 @@ namespace ZoneEngine_New.Core.GameData
                 Doors = doors,
                 Collision = collision.HasCollision ? collision : null
             };
+        }
+
+        private PlayfieldDynels? ReadPlayfieldDynels(int playfieldId)
+        {
+            PlayfieldDynels? dynels = TryDeserializeRdbObject<PlayfieldDynels>(
+                Path.Combine(RootPath, GameDataPaths.PlayfieldDynelsRelativePath(playfieldId)));
+            _teleportDestinations?.Apply(playfieldId, dynels);
+            return dynels;
         }
 
         private static T? TryDeserializeRdbObject<T>(string path)

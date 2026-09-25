@@ -33,33 +33,6 @@ namespace ZoneEngine_New.Core.Inventory.Dat
             };
         }
 
-        /// <summary>
-        /// Rebuilds <paramref name="template"/> with event and action data from the companion
-        /// file. Everything the RDB export owns is carried across unchanged.
-        /// </summary>
-        public static ItemTemplate WithEvents(ItemTemplate template, ItemEventsDatTemplate events)
-        {
-            return new ItemTemplate
-            {
-                Id = template.Id,
-                Name = template.Name,
-                Quality = template.Quality,
-                Flags = template.Flags,
-                ItemType = template.ItemType,
-                DynelType = template.DynelType,
-                MultipleCount = template.MultipleCount,
-                Stats = template.Stats,
-                Attack = template.Attack,
-                Defend = template.Defend,
-                SpellList = ToSpellList(events.Events),
-                Actions = ToActions(events.Actions),
-                Relations = events.Relations != null
-                    ? new List<int>(events.Relations)
-                    : new List<int>(template.Relations),
-                CanCancel = template.CanCancel
-            };
-        }
-
         private static Dictionary<EventType, List<ItemSpell>> ToSpellList(List<DatEvent>? events)
         {
             var spellList = new Dictionary<EventType, List<ItemSpell>>();
@@ -166,6 +139,15 @@ namespace ZoneEngine_New.Core.Inventory.Dat
 
         private static object ToClr(MessagePackObject value)
         {
+            if (value.IsArray)
+            {
+                IList<MessagePackObject> items = value.AsList();
+                var list = new List<object>(items.Count);
+                for (int i = 0; i < items.Count; i++)
+                    list.Add(ToClr(items[i]));
+                return list;
+            }
+
             if (value.IsTypeOf<int>() == true)
                 return value.AsInt32();
             if (value.IsTypeOf<float>() == true)

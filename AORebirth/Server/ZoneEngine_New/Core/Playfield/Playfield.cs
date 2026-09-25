@@ -239,6 +239,9 @@ namespace ZoneEngine_New.Core.Playfield
         /// <summary>Zoning needs the destination playfield's geometry, not just this one's.</summary>
         protected IGameData GameData => _gameData;
 
+        /// <summary>Item definitions, including vicinity spells that live on the template rather than the placement.</summary>
+        protected IItemTemplateCatalog ItemTemplates => _playfieldManager.ItemTemplates;
+
         /// <summary>Optional world simulation assigned by <see cref="ACGPlayfield.Build"/>.</summary>
         public WorldSimulationAccess WorldAccess =>
             _serviceProvider.GetRequiredService<WorldSimulationAccess>();

@@ -134,7 +134,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// <summary>
         /// Legacy requirement expression fold (Events / Criteria):
         /// <list type="bullet">
-        /// <item><see cref="IsRequirementLinkOperator"/> rows are structural And/Or/Not markers;
+        /// <item><see cref="IsRequirementLinkOperator"/> rows (And/Or/Not) are structural markers;
         /// <see cref="Operator.Not"/> inverts the accumulated result.</item>
         /// <item>Leaf rows are compared via <see cref="EvaluateRequirement"/> and combined with
         /// <see cref="ItemRequirement.ChildOperator"/> (<see cref="Operator.Or"/> or And).</item>
@@ -239,14 +239,13 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// Stat=0 And/Or/Not rows are expression-tree link operators, not Flags checks.
+        /// And/Or/Not rows are expression-tree link operators, not stat checks.
+        /// Authored criteria sometimes leave a compared stat on the link (item 222955's
+        /// OnUseItemOn Or nodes carry stat 273); the operator is what makes it a link.
         /// </summary>
         public static bool IsRequirementLinkOperator(ItemRequirement requirement)
         {
             ArgumentNullException.ThrowIfNull(requirement);
-
-            if (requirement.StatNumber != 0)
-                return false;
 
             return (Operator)requirement.Operator is Operator.And or Operator.Or or Operator.Not;
         }
@@ -267,18 +266,42 @@ namespace ZoneEngine_New.Core.Inventory
             IInventoryRepository inventoryRepository,
             IItemBuilder items,
             bool skipPassiveModifiers = false,
+            Character? source = null,
+            SpellCriteria? criteria = null)
+            => ExecuteSpells(
+                EventType.OnUse,
+                target,
+                inventoryRepository,
+                items,
+                criteria,
+                skipPassiveModifiers,
+                source);
+
+        /// <summary>
+        /// Runs every function on <paramref name="eventType"/>. An empty OnUse list is a successful
+        /// no-op; any other empty list does nothing. Criteria see <paramref name="criteria"/>
+        /// (random roll, item used on the target) and otherwise the character's stats.
+        /// </summary>
+        public bool ExecuteSpells(
+            EventType eventType,
+            Character target,
+            IInventoryRepository inventoryRepository,
+            IItemBuilder items,
+            SpellCriteria? criteria = null,
+            bool skipPassiveModifiers = false,
             Character? source = null)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
 
-            if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells) || spells.Count == 0)
-                return true;
+            if (!SpellList.TryGetValue(eventType, out List<ItemSpell>? spells) || spells.Count == 0)
+                return eventType == EventType.OnUse;
 
+            criteria ??= new SpellCriteria();
             bool executed = false;
             foreach (ItemSpell spell in spells)
-                executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers);
+                executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria);
 
             return executed;
         }
@@ -293,14 +316,11 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
 
-            if (!SpellList.TryGetValue(EventType.OnTerminate, out List<ItemSpell>? spells) || spells.Count == 0)
-                return false;
-
-            bool executed = false;
-            foreach (ItemSpell spell in spells)
-                executed |= ExecuteSpell(target, source: null, spell, inventoryRepository, items, skipPassiveModifiers: false);
-
-            return executed;
+            return ExecuteSpells(
+                EventType.OnTerminate,
+                target,
+                inventoryRepository,
+                items);
         }
 
         bool ExecuteSpell(
@@ -309,9 +329,10 @@ namespace ZoneEngine_New.Core.Inventory
             ItemSpell spell,
             IInventoryRepository inventoryRepository,
             IItemBuilder items,
-            bool skipPassiveModifiers)
+            bool skipPassiveModifiers,
+            SpellCriteria criteria)
         {
-            if (!spell.MeetsRequirements(target.Stats))
+            if (!spell.MeetsRequirements(stat => criteria.Resolve(stat, id => target.Stats.Get(id))))
                 return false;
 
             if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify)
@@ -327,7 +348,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (spell.Is(FunctionType.SetFlag) && skipPassiveModifiers)
                 return true;
 
-            return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items);
+            return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria);
         }
 
         public static bool EvaluateRequirement(int statValue, ItemRequirement requirement)

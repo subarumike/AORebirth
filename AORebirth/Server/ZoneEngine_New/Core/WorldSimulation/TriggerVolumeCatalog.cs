@@ -17,7 +17,13 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// of its own — the landing comes from the return stats saved when they walked in — and it
         /// is not in Dynels.dat at all, so it is registered on arrival rather than baked.
         /// </summary>
-        ExitProxy = 3
+        ExitProxy = 3,
+
+        /// <summary>
+        /// A dynel whose OnTargetInVicinity spells run when a character steps into its radius.
+        /// Grid line-teleport pads use this instead of a walk-in door portal.
+        /// </summary>
+        TargetVicinity = 4
     }
 
     public sealed class ZoneTriggerVolume
@@ -51,6 +57,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public float CenterY;
         public float CenterZ;
         public float Radius = TriggerVolumeCatalog.PortalRadius;
+
+        /// <summary>OnTargetInVicinity spells for a <see cref="ZoneTriggerKind.TargetVicinity"/> pad.</summary>
+        public Inventory.ItemTemplate? VicinityEvents;
     }
 
     public readonly struct ZoneTriggerHit
@@ -89,6 +98,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// </summary>
         public const float PortalHalfHeight = 3f;
 
+        /// <summary>
+        /// Radius of an OnTargetInVicinity pad when the placement has no VicinityRange.
+        /// </summary>
+        public const float TargetVicinityRadius = 1f;
+
         readonly List<ZoneTriggerVolume> _all = new();
         readonly Dictionary<long, List<ZoneTriggerVolume>> _bins = new();
 
@@ -98,7 +112,21 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         public int ExitTriggerCount { get; private set; }
 
+        public int VicinityTriggerCount { get; private set; }
+
         public int Count => _all.Count;
+
+        public bool HasDynel(ZoneTriggerKind kind, int dynelInstance)
+        {
+            for (int i = 0; i < _all.Count; i++)
+            {
+                ZoneTriggerVolume volume = _all[i];
+                if (volume.Kind == kind && volume.DynelInstance == dynelInstance)
+                    return true;
+            }
+
+            return false;
+        }
 
         public void Add(ZoneTriggerVolume volume)
         {
@@ -110,6 +138,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 PortalTriggerCount++;
             else if (volume.Kind == ZoneTriggerKind.ExitProxy)
                 ExitTriggerCount++;
+            else if (volume.Kind == ZoneTriggerKind.TargetVicinity)
+                VicinityTriggerCount++;
 
             int minBinX = (int)MathF.Floor(volume.MinX / BinSize);
             int maxBinX = (int)MathF.Floor(volume.MaxX / BinSize);
@@ -156,6 +186,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             int maxBinX = (int)MathF.Floor(maxX / BinSize);
             int minBinZ = (int)MathF.Floor(minZ / BinSize);
             int maxBinZ = (int)MathF.Floor(maxZ / BinSize);
+            ZoneTriggerHit vicinity = default;
+            bool sawVicinity = false;
 
             for (int bz = minBinZ; bz <= maxBinZ; bz++)
             {
@@ -167,13 +199,33 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
                     for (int i = 0; i < list.Count; i++)
                     {
-                        if (TryHit(list[i], fromX, fromZ, x, y, z, overlappingIds, out hit))
-                            return true;
+                        if (!TryHit(list[i], fromX, fromZ, x, y, z, overlappingIds, out ZoneTriggerHit candidate))
+                            continue;
+
+                        // A beam the character is standing in must not swallow a door or border
+                        // crossed on the same step.
+                        if (candidate.Volume.Kind == ZoneTriggerKind.TargetVicinity)
+                        {
+                            if (!sawVicinity)
+                            {
+                                vicinity = candidate;
+                                sawVicinity = true;
+                            }
+
+                            continue;
+                        }
+
+                        hit = candidate;
+                        return true;
                     }
                 }
             }
 
-            return false;
+            if (!sawVicinity)
+                return false;
+
+            hit = vicinity;
+            return true;
         }
 
         static bool TryHit(
@@ -211,12 +263,12 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 return true;
             }
 
-            if (v.Kind is ZoneTriggerKind.PortalDynel or ZoneTriggerKind.ExitProxy)
+            if (v.Kind is ZoneTriggerKind.PortalDynel or ZoneTriggerKind.ExitProxy or ZoneTriggerKind.TargetVicinity)
             {
-                if (MathF.Abs(y - v.CenterY) > PortalHalfHeight)
+                if (MathF.Abs(y - v.CenterY) > HalfHeight(v))
                     return false;
 
-                // Sweep the movement against the portal disc so a fast run cannot skip through it.
+                // Sweep the movement against the disc so a fast run cannot skip through it.
                 float dist = DistanceToSegment(fromX, fromZ, x, z, v.CenterX, v.CenterZ);
                 if (dist > v.Radius)
                     return false;
@@ -342,8 +394,15 @@ namespace ZoneEngine_New.Core.WorldSimulation
             float dx = x - v.CenterX;
             float dz = z - v.CenterZ;
             return (dx * dx) + (dz * dz) <= v.Radius * v.Radius
-                && MathF.Abs(y - v.CenterY) <= PortalHalfHeight;
+                && MathF.Abs(y - v.CenterY) <= HalfHeight(v);
         }
+
+        /// <summary>
+        /// Vertical reach of a disc trigger. A vicinity pad reaches at least as far as a door:
+        /// Jobe Platform's exit doors sit 1.9 above the landing in front of them.
+        /// </summary>
+        public static float HalfHeight(ZoneTriggerVolume v)
+            => v.Kind == ZoneTriggerKind.TargetVicinity ? MathF.Max(v.Radius, PortalHalfHeight) : PortalHalfHeight;
 
         ZoneTriggerVolume? FindById(int id)
         {

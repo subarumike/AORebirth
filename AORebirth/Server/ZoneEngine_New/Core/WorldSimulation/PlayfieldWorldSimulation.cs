@@ -12,13 +12,16 @@
     using LostEden.Vehicles;
     using LostEden.Vehicles.Surfaces;
 
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
+    using EventType = AORebirth.Enums.EventType;
     using AoVector3 = AORebirth.Core.Vector.Vector3;
     using AoQuaternion = AORebirth.Core.Vector.Quaternion;
     using CharacterStat = SmokeLounge.AOtomation.Messaging.GameData.CharacterStat;
@@ -79,13 +82,16 @@
 
         public int ExitTriggerCount => _triggers.ExitTriggerCount;
 
+        public int VicinityTriggerCount => _triggers.VicinityTriggerCount;
+
         public static PlayfieldWorldSimulation Create(
             int playfieldId,
             PlayfieldGeometryData geometry,
             PlayfieldMetaData? meta,
             DestinationsCatalog destinations,
             IGameData gameData,
-            IZoneLogger logger)
+            IZoneLogger logger,
+            IItemTemplateCatalog? itemTemplates = null)
         {
             ArgumentNullException.ThrowIfNull(geometry);
             ArgumentNullException.ThrowIfNull(destinations);
@@ -103,6 +109,7 @@
                 logger);
             world.BakeWallTriggers(geometry.Walls);
             world.BakePortalTriggers(geometry.Dynels, playfieldId);
+            world.BakeVicinityTriggers(geometry.Dynels, itemTemplates);
             world.BakeExitProxyTriggers(gameData.GetExitProxyDoorInstances(playfieldId));
 
             int terrainChunks = surface?.Terrain != null ? geometry.Collision!.Terrain!.Chunks.Count : 0;
@@ -110,7 +117,7 @@
                 $"World bake playfield={playfieldId} terrainChunks={terrainChunks}"
                 + $" surfaceCells={surface?.PopulatedCellCount ?? 0} surfaceTriangles={surface?.TriangleCount ?? 0}"
                 + $" wallTriggers={world.WallTriggerCount} portalTriggers={world.PortalTriggerCount}"
-                + $" exitTriggers={world.ExitTriggerCount}");
+                + $" vicinityTriggers={world.VicinityTriggerCount} exitTriggers={world.ExitTriggerCount}");
             if (surface != null && surface.OutsideTriangleCount > 0)
             {
                 logger.Warn(
@@ -272,7 +279,10 @@
                         ReadProxyReturn(player),
                         out ZoneCrossing crossing))
                 {
-                    TryTransfer(playfield, player, crossing, now);
+                    if (crossing.Trigger.Kind == ZoneTriggerKind.TargetVicinity)
+                        FireTargetVicinity(playfield, player, crossing.Trigger);
+                    else
+                        TryTransfer(playfield, player, crossing, now);
                 }
             }
         }
@@ -325,6 +335,12 @@
                     + hit.Volume.DestIndex
                     + "; Destinations.dat for that playfield is missing or short.");
                 return false;
+            }
+
+            if (hit.Volume.Kind == ZoneTriggerKind.TargetVicinity)
+            {
+                crossing = new ZoneCrossing(0, position, hit.Volume);
+                return true;
             }
 
             if (hit.Volume.Kind == ZoneTriggerKind.PortalDynel)
@@ -407,6 +423,7 @@
         public void RegisterExitProxyDoor(int doorInstance)
         {
             if (doorInstance == 0
+                || _triggers.HasDynel(ZoneTriggerKind.TargetVicinity, doorInstance)
                 || !ExitProxyDoorCatalog.ShouldRegister(doorInstance, _gameData.GetConfiguredExitProxyDoorInstances(_playfieldId))
                 || !_exitProxyDoors.Add(doorInstance))
                 return;
@@ -469,6 +486,15 @@
             if (portal.LandingKind == PortalLandingKind.DestinationLine)
             {
                 return PortalDoorLandingResolver.TryResolveLineLanding(
+                    _destinations,
+                    portal.DestPlayfieldId,
+                    portal.DestIndex,
+                    out landing, out heading);
+            }
+
+            if (portal.LandingKind == PortalLandingKind.DestinationMidpoint)
+            {
+                return PortalDoorLandingResolver.TryResolveMidpointLanding(
                     _destinations,
                     portal.DestPlayfieldId,
                     portal.DestIndex,
@@ -590,6 +616,91 @@
                             DestIndex = b.DestinationIndex
                         });
                 }
+            }
+        }
+
+        /// <summary>
+        /// Drops a character's trigger memory and ignores further triggers briefly. A line teleport
+        /// calls this so the landing pad does not immediately fire, and so the source pad cannot
+        /// fire again while a playfield transfer is still in flight.
+        /// </summary>
+        public void ForgetCharacterTriggers(int characterId)
+        {
+            DropCharacterTriggerMemory(characterId);
+            _zoneGraceUntil[characterId] = (Environment.TickCount64 / 1000.0) + 3.0;
+        }
+
+        /// <summary>
+        /// Forgets where the character last stood on this playfield. A transfer must sample from
+        /// the landing alone: a segment drawn from the spot they occupied before they left will
+        /// cross the ring they just used and send them straight back.
+        /// </summary>
+        public void DropCharacterTriggerMemory(int characterId)
+        {
+            _playerTriggerState.Remove(characterId);
+        }
+
+        void FireTargetVicinity(PlayfieldType playfield, Player player, ZoneTriggerVolume pad)
+        {
+            ItemTemplate? events = pad.VicinityEvents;
+            if (events == null || player.Session == null)
+                return;
+
+            events.ExecuteSpells(
+                EventType.OnTargetInVicinity,
+                player,
+                playfield.GetRequiredService<IInventoryRepository>(),
+                playfield.GetRequiredService<IItemBuilder>(),
+                new SpellCriteria { SourceDoorInstance = pad.DynelInstance });
+        }
+
+        void BakeVicinityTriggers(PlayfieldDynels? dynels, IItemTemplateCatalog? itemTemplates)
+        {
+            if (dynels?.Dynels == null)
+                return;
+
+            for (int i = 0; i < dynels.Dynels.Count; i++)
+            {
+                PlayfieldDynel d = dynels.Dynels[i];
+                // Placement spells win. Jobe teleporting rings leave the placement empty and keep
+                // OnTargetInVicinity Teleport on the item template.
+                ItemTemplate events = DynelEventSpells.WithOnUseFromDynel(
+                    new ItemTemplate { Id = d.TemplateId },
+                    d);
+                if (!events.SpellList.ContainsKey(EventType.OnTargetInVicinity)
+                    && itemTemplates != null
+                    && itemTemplates.TryGet(d.TemplateId, out ItemTemplate? fromTemplate)
+                    && fromTemplate.SpellList.ContainsKey(EventType.OnTargetInVicinity))
+                    events = fromTemplate;
+
+                if (!events.SpellList.ContainsKey(EventType.OnTargetInVicinity))
+                    continue;
+
+                float x = d.Position.X;
+                float y = d.Position.Y;
+                float z = d.Position.Z;
+                float r = TriggerVolumeCatalog.TargetVicinityRadius;
+                if (events.Stats.TryGetValue(CharacterStat.VicinityRange, out int vicinityRange) && vicinityRange > 0)
+                    r = vicinityRange;
+                var pad = new ZoneTriggerVolume
+                {
+                    Kind = ZoneTriggerKind.TargetVicinity,
+                    Id = _nextTriggerId++,
+                    MinX = x - r,
+                    MaxX = x + r,
+                    MinZ = z - r,
+                    MaxZ = z + r,
+                    CenterX = x,
+                    CenterY = y,
+                    CenterZ = z,
+                    Radius = r,
+                    DynelInstance = d.IdentityInstance,
+                    VicinityEvents = events
+                };
+                float h = TriggerVolumeCatalog.HalfHeight(pad);
+                pad.MinY = y - h;
+                pad.MaxY = y + h;
+                _triggers.Add(pad);
             }
         }
 

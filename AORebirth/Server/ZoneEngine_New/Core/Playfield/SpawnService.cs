@@ -1025,6 +1025,9 @@ namespace ZoneEngine_New.Core.Playfield
             _registry.Register(player);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
             player.SaveState.MarkDirty();
+            // The next trigger sample has to start at this landing. Keeping the position from
+            // the last visit draws a segment through the pad they left by, which zones them back.
+            _playfield.GetService<WorldSimulationAccess>()?.Instance?.DropCharacterTriggerMemory(player.Identity.Instance);
 
             _logger.Info(
                 string.Format(

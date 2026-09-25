@@ -17,54 +17,30 @@ namespace ZoneEngine_New.Core.WorldSimulation
     using AodbOperator = AODB.Common.Enums.Operator;
 
     /// <summary>
-    /// Copies OnUse functions from a Dynels.dat placement onto an item template. RDB item records
-    /// for terminals are often empty shells; the Use behaviour lives on the playfield dynel.
+    /// Copies dynel events onto an item template. RDB item records for terminals are often empty
+    /// shells; Use and vicinity behaviour lives on the playfield dynel.
     /// </summary>
     public static class DynelEventSpells
     {
+        /// <summary>
+        /// Copies <see cref="EventType.OnUse"/> and <see cref="EventType.OnTargetInVicinity"/> from
+        /// the dynel. Grid teleporters keep <see cref="FunctionType.LineTeleport"/> on vicinity,
+        /// not on use.
+        /// </summary>
         public static ItemTemplate WithOnUseFromDynel(ItemTemplate template, PlayfieldDynel? dynel)
         {
             ArgumentNullException.ThrowIfNull(template);
-            if (dynel?.Modifiers == null
-                || !dynel.Modifiers.TryGetValue(AodbEventType.OnUse, out Modifier? modifier)
-                || modifier?.Modifiers == null
-                || modifier.Modifiers.Count == 0)
+            if (dynel?.Modifiers == null)
                 return template;
 
-            var spells = new List<ItemSpell>();
-            foreach (KeyValuePair<AodbFunctionType, List<Dictionary<AodbFunctionOperator, object>>> pair
-                     in modifier.Modifiers)
-            {
-                List<Dictionary<AodbFunctionOperator, object>>? sets = pair.Value;
-                if (sets == null)
-                    continue;
-
-                for (int i = 0; i < sets.Count; i++)
-                {
-                    ItemSpell? spell = TryMapSpell((int)pair.Key, sets[i]);
-                    if (spell != null)
-                        spells.Add(spell);
-                }
-            }
-
-            if (spells.Count == 0)
-                return template;
-
-            var spellList = new Dictionary<EventType, List<ItemSpell>>(template.SpellList.Count + 1);
+            var spellList = new Dictionary<EventType, List<ItemSpell>>(template.SpellList.Count + 2);
             foreach (KeyValuePair<EventType, List<ItemSpell>> existing in template.SpellList)
                 spellList[existing.Key] = existing.Value;
 
-            if (spellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? onUse))
-            {
-                var merged = new List<ItemSpell>(onUse.Count + spells.Count);
-                merged.AddRange(onUse);
-                merged.AddRange(spells);
-                spellList[EventType.OnUse] = merged;
-            }
-            else
-            {
-                spellList[EventType.OnUse] = spells;
-            }
+            bool added = CopyEvent(dynel, spellList, AodbEventType.OnUse, EventType.OnUse);
+            added |= CopyEvent(dynel, spellList, AodbEventType.OnTargetInVicinity, EventType.OnTargetInVicinity);
+            if (!added)
+                return template;
 
             return new ItemTemplate
             {
@@ -83,6 +59,51 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 Relations = template.Relations,
                 CanCancel = template.CanCancel
             };
+        }
+
+        static bool CopyEvent(
+            PlayfieldDynel dynel,
+            Dictionary<EventType, List<ItemSpell>> spellList,
+            AodbEventType source,
+            EventType destination)
+        {
+            if (!dynel.Modifiers.TryGetValue(source, out Modifier? modifier)
+                || modifier?.Modifiers == null
+                || modifier.Modifiers.Count == 0)
+                return false;
+
+            var spells = new List<ItemSpell>();
+            foreach (KeyValuePair<AodbFunctionType, List<Dictionary<AodbFunctionOperator, object>>> pair
+                     in modifier.Modifiers)
+            {
+                List<Dictionary<AodbFunctionOperator, object>>? sets = pair.Value;
+                if (sets == null)
+                    continue;
+
+                for (int i = 0; i < sets.Count; i++)
+                {
+                    ItemSpell? spell = TryMapSpell((int)pair.Key, sets[i]);
+                    if (spell != null)
+                        spells.Add(spell);
+                }
+            }
+
+            if (spells.Count == 0)
+                return false;
+
+            if (spellList.TryGetValue(destination, out List<ItemSpell>? existing))
+            {
+                var merged = new List<ItemSpell>(existing.Count + spells.Count);
+                merged.AddRange(existing);
+                merged.AddRange(spells);
+                spellList[destination] = merged;
+            }
+            else
+            {
+                spellList[destination] = spells;
+            }
+
+            return true;
         }
 
         static ItemSpell? TryMapSpell(int functionType, Dictionary<AodbFunctionOperator, object>? arguments)

@@ -90,7 +90,8 @@ namespace ZoneEngine_New.Core.Playfield
                     MetaData,
                     DestinationsCatalog.Instance,
                     GameData,
-                    Logger);
+                    Logger,
+                    ItemTemplates);
 
                 statics = _world.HardStaticCount;
                 wallTriggers = _world.WallTriggerCount;

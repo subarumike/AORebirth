@@ -114,6 +114,23 @@ namespace ZoneEngine_New.Core.GameData
         /// portal data without an authored allow-list for this playfield.
         /// </summary>
         IReadOnlyCollection<int>? GetConfiguredExitProxyDoorInstances(int playfieldId);
+
+        /// <summary>
+        /// DAO override for a placed door. False when this statel has no route.
+        /// </summary>
+        bool TryGetTeleportRoute(
+            int playfield,
+            int statelType,
+            uint statelInstance,
+            out int destinationPlayfield,
+            out int destinationType,
+            out uint destinationInstance)
+        {
+            destinationPlayfield = 0;
+            destinationType = 0;
+            destinationInstance = 0;
+            return false;
+        }
     }
 }
 

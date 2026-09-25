@@ -31,6 +31,28 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         public int Count => _routes.Count;
 
+        public bool TryGet(
+            int playfield,
+            int statelType,
+            uint statelInstance,
+            out int destinationPlayfield,
+            out int destinationType,
+            out uint destinationInstance)
+        {
+            if (_routes.TryGetValue((playfield, statelType, statelInstance), out var target))
+            {
+                destinationPlayfield = target.Playfield;
+                destinationType = target.Type;
+                destinationInstance = target.Instance;
+                return true;
+            }
+
+            destinationPlayfield = 0;
+            destinationType = 0;
+            destinationInstance = 0;
+            return false;
+        }
+
         public void Apply(int sourcePlayfieldId, PlayfieldDynels? dynels)
         {
             if (dynels?.Dynels == null) return;
@@ -49,6 +71,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
                             if (!arguments.TryGetValue(FunctionOperator.Arg1, out object? raw)
                                 || raw is not IList values || values.Count < 3
                                 || Convert.ToInt32(values[0]) != (int)IdentityType.PlayfieldDoor) continue;
+                            // The route names a door, so drop any TeleportProxy2 destination line.
+                            while (!values.IsFixedSize && values.Count > 4) values.RemoveAt(values.Count - 1);
                             if (target.Type != (int)IdentityType.Door || target.Playfield <= 0 || target.Playfield > 0xFFFF
                                 || (target.Instance & 0xFF000000u) != 0xC0000000u
                                 || (target.Instance & 0xFFFFu) != (uint)target.Playfield)

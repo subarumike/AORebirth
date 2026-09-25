@@ -52,7 +52,8 @@ public sealed class MissionPlayfield : Playfield
                 MetaData,
                 DestinationsCatalog.Instance,
                 GameData,
-                Logger);
+                Logger,
+                ItemTemplates);
             RegisterWorldServices(_simulation);
         }
 

@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AODB" Version="1.0.8" />
+    <PackageReference Include="AODB" Version="1.0.10" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="GroveGames.BehaviourTree" Version="1.1.1" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
@@ -195,11 +195,6 @@
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <!-- Legacy item events overlay (RDB items.dat now carries events; nanos are not in this file). -->
-    <Content Include="..\..\Datafiles\items.dat">
-      <Link>GameData\ItemEvents.dat</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

@@ -23,7 +23,10 @@ namespace ZoneEngine_New.Core.WorldSimulation
         DoorDynel,
 
         /// <summary>Stand beside a numbered line in Destinations.dat. Used by LineTeleport.</summary>
-        DestinationLine
+        DestinationLine,
+
+        /// <summary>Stand on the middle of a numbered line in Destinations.dat. Used by TeleportProxy2.</summary>
+        DestinationMidpoint
     }
 
     /// <summary>
@@ -75,7 +78,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
     /// target is the dynel <c>0xC0000000 | destPlayfieldId | (destDoorIndex &lt;&lt; 16)</c> in the
     /// destination playfield, and the character is placed
     /// <see cref="ProxyEntryDoorClearance"/> (or <see cref="Proxy2EntryDoorClearance"/>) units in
-    /// front of it along its heading — landing on the door itself puts you inside its frame.</item>
+    /// front of it along its heading — landing on the door itself puts you inside its frame. A
+    /// TeleportProxy2 whose full argument list names a destination line lands on that line's
+    /// midpoint instead.</item>
     /// <item><b>LineTeleport</b> names a <em>destination line</em>, not a door:
     /// <c>{IdentityType.Playfield3, packed, destPlayfieldId}</c>, where the Destinations.dat key is
     /// <c>packed &gt;&gt; 16</c> and a <c>destPlayfieldId</c> of 0 means the door's own playfield.
@@ -139,7 +144,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         /// <summary>
         /// Reads a TeleportProxy / TeleportProxy2 argument list of the form
-        /// <c>{PlayfieldDoor, destPlayfieldId, destDoorIndex, ...}</c>.
+        /// <c>{PlayfieldDoor, destPlayfieldId, destDoorIndex, ...}</c>. A list that continues
+        /// <c>{..., Playfield3, (destinationIndex &lt;&lt; 16) | destPlayfieldId, ...}</c> names a
+        /// Destinations.dat line in the destination playfield, which is where the character lands
+        /// instead of the door. A line landing has no door to walk back out of, so it never
+        /// records a return.
         /// </summary>
         public static bool TryParseProxyDestination(
             IList? arguments,
@@ -158,14 +167,31 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (!IsAddressable(playfieldId, doorIndex) || playfieldId <= 0)
                 return false;
 
+            bool namesLine = TryReadProxyDestinationLine(arguments, playfieldId, out byte lineIndex);
             destination = new PortalDestination
             {
                 PlayfieldId = playfieldId,
-                Kind = PortalLandingKind.DoorDynel,
+                Kind = namesLine ? PortalLandingKind.DestinationMidpoint : PortalLandingKind.DoorDynel,
                 DoorInstance = ToDoorInstance(playfieldId, doorIndex),
+                DestinationIndex = lineIndex,
                 DoorClearance = clearance,
-                RecordsReturn = recordsReturn
+                RecordsReturn = recordsReturn && !namesLine
             };
+            return true;
+        }
+
+        static bool TryReadProxyDestinationLine(IList arguments, int playfieldId, out byte lineIndex)
+        {
+            lineIndex = 0;
+            if (arguments.Count < 6 || ToInt(arguments[4]) != (int)IdentityType.Playfield3)
+                return false;
+
+            uint packed = unchecked((uint)ToInt(arguments[5]));
+            uint index = packed >> 16;
+            if ((packed & 0xFFFFu) != (uint)playfieldId || index < 1 || index > byte.MaxValue)
+                return false;
+
+            lineIndex = (byte)index;
             return true;
         }
 
@@ -284,6 +310,27 @@ namespace ZoneEngine_New.Core.WorldSimulation
             byte destinationIndex,
             out Vector3 landing,
             out Quaternion heading)
+            => TryResolveLine(destinations, playfieldId, destinationIndex, LineLandingOffset, out landing, out heading);
+
+        /// <summary>
+        /// Resolves a TeleportProxy2 destination line landing: the line's midpoint, facing the same
+        /// way a LineTeleport arrival would.
+        /// </summary>
+        public static bool TryResolveMidpointLanding(
+            DestinationsCatalog destinations,
+            int playfieldId,
+            byte destinationIndex,
+            out Vector3 landing,
+            out Quaternion heading)
+            => TryResolveLine(destinations, playfieldId, destinationIndex, 0f, out landing, out heading);
+
+        static bool TryResolveLine(
+            DestinationsCatalog destinations,
+            int playfieldId,
+            byte destinationIndex,
+            float offset,
+            out Vector3 landing,
+            out Quaternion heading)
         {
             ArgumentNullException.ThrowIfNull(destinations);
             landing = default!;
@@ -301,8 +348,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (length <= 1e-4f)
                 return false;
 
-            newX -= spanZ / length * LineLandingOffset;
-            newZ += spanX / length * LineLandingOffset;
+            newX -= spanZ / length * offset;
+            newZ += spanX / length * offset;
 
             landing = new Vector3(newX, line.EndY, newZ);
             // Match CharacterMotor's yaw convention: local +Z faces the destination-line normal.
@@ -333,6 +380,33 @@ namespace ZoneEngine_New.Core.WorldSimulation
             return false;
         }
 
+        /// <summary>
+        /// Reads a LineTeleport argument list of the form
+        /// <c>{Playfield3, packed, destPlayfieldId}</c>. A playfield of 0 means the dynel's own
+        /// playfield. The destination line index is <c>packed &gt;&gt; 16</c>.
+        /// </summary>
+        public static bool TryParseLineDestination(IList? arguments, out PortalDestination destination)
+        {
+            destination = default;
+            if (arguments == null
+                || arguments.Count < 3
+                || ToInt(arguments[0]) != (int)IdentityType.Playfield3)
+                return false;
+
+            uint packed = unchecked((uint)ToInt(arguments[1]));
+            int playfieldId = ToInt(arguments[2]);
+            if (playfieldId < 0)
+                return false;
+
+            destination = new PortalDestination
+            {
+                PlayfieldId = playfieldId,
+                Kind = PortalLandingKind.DestinationLine,
+                DestinationIndex = (byte)(packed >> 16)
+            };
+            return true;
+        }
+
         static bool TryReadLinePortal(Modifier modifier, out PortalDestination destination)
         {
             destination = default;
@@ -344,21 +418,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
             for (int s = 0; s < sets!.Count; s++)
             {
-                if (!TryGetArgumentList(sets[s], out IList? values)
-                    || values!.Count < 3
-                    || ToInt(values[0]) != (int)IdentityType.Playfield3)
+                if (!TryGetArgumentList(sets[s], out IList? values))
                     continue;
 
-                // The destination line index sits above the packed playfield id, and a playfield of
-                // 0 means "stay here" rather than "no destination".
-                uint packed = unchecked((uint)ToInt(values[1]));
-                destination = new PortalDestination
-                {
-                    PlayfieldId = ToInt(values[2]),
-                    Kind = PortalLandingKind.DestinationLine,
-                    DestinationIndex = (byte)(packed >> 16)
-                };
-                return true;
+                if (TryParseLineDestination(values, out destination))
+                    return true;
             }
 
             return false;

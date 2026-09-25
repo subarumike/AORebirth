@@ -3,7 +3,9 @@ namespace ZoneEngine_New.Core.Inventory
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
 
+    using AORebirth.Core.GameData;
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -14,10 +16,14 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.WorldSimulation;
 
+    using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
+    using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -30,7 +36,8 @@ namespace ZoneEngine_New.Core.Inventory
             Character? source,
             ItemSpell spell,
             IInventoryRepository inventoryRepository,
-            IItemBuilder items)
+            IItemBuilder items,
+            SpellCriteria? criteria = null)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
@@ -62,6 +69,12 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.TeamCastNano:
                 case FunctionType.PlayfieldNano:
                     return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository);
+                case FunctionType.Teleport:
+                    return target is Player teleportPlayer && Teleport(teleportPlayer, spell);
+                case FunctionType.LineTeleport:
+                    return target is Player linePlayer && LineTeleport(linePlayer, spell);
+                case FunctionType.TeleportProxy:
+                    return target is Player proxyDoorPlayer && TeleportProxy(proxyDoorPlayer, spell, criteria);
                 case FunctionType.TeleportProxy2:
                     return target is Player proxyPlayer && TeleportProxy2(proxyPlayer, spell);
                 case FunctionType.SpawnMonster2:
@@ -241,9 +254,242 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// One-way proxy teleport used by Grid enter terminals and similar OnUse machines.
-        /// Destination is packed as PlayfieldDoor (playfield + door index); the landing dynel may
-        /// be a Door or a Terminal with that packed instance.
+        /// Absolute OnUse teleport. Positional args are RelX, RelY, RelZ, destination playfield.
+        /// One-way: it clears any stored proxy return door.
+        /// </summary>
+        static bool Teleport(Player player, ItemSpell spell)
+        {
+            if (player.Session == null || player.Playfield == null)
+                return false;
+
+            if (!spell.TryReadInt(0, out int x)
+                || !spell.TryReadInt(1, out int y)
+                || !spell.TryReadInt(2, out int z)
+                || !spell.TryReadInt(3, out int playfieldId)
+                || playfieldId <= 0
+                || playfieldId >= ZoneEngine.Core.Missions.GeneratedMissionIdentitySpace.MinimumLivePlayfield2)
+                return false;
+
+            Playfield source = player.Playfield;
+            IGameData gameData = source.GetRequiredService<IGameData>();
+            string playfieldDir = Path.Combine(
+                gameData.RootPath,
+                GameDataPaths.PlayfieldRelativeDirectory(playfieldId));
+            if (!Directory.Exists(playfieldDir))
+                return false;
+
+            bool samePlayfield = playfieldId == source.Identity.Instance;
+            Playfield destination = samePlayfield
+                ? source
+                : source.GetRequiredService<PlayfieldManager>().GetOrCreate(playfieldId);
+            Vector3 landing = destination.SnapFeetToFloor(new Vector3(x, y, z));
+
+            ClearProxyReturn(player);
+            source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
+
+            if (samePlayfield)
+            {
+                FinishSamePlayfieldMove(player, source, landing, heading: null);
+                return true;
+            }
+
+            player.Session.TransferToPlayfield(destination, landing);
+            return true;
+        }
+
+        /// <summary>
+        /// LineTeleport names a Destinations.dat line: <c>{Playfield3, packed, destPlayfield}</c>.
+        /// A destination playfield of 0 stays on the character's current playfield. One-way.
+        /// </summary>
+        static bool LineTeleport(Player player, ItemSpell spell)
+        {
+            if (player.Session == null || player.Playfield == null)
+                return false;
+
+            if (!PortalDoorLandingResolver.TryParseLineDestination(spell.Arguments, out PortalDestination destination))
+                return false;
+
+            Playfield source = player.Playfield;
+            int playfieldId = destination.PlayfieldId == 0
+                ? source.Identity.Instance
+                : destination.PlayfieldId;
+            if (playfieldId <= 0
+                || playfieldId >= ZoneEngine.Core.Missions.GeneratedMissionIdentitySpace.MinimumLivePlayfield2)
+                return false;
+
+            IGameData gameData = source.GetRequiredService<IGameData>();
+            if (playfieldId != source.Identity.Instance)
+            {
+                string playfieldDir = Path.Combine(
+                    gameData.RootPath,
+                    GameDataPaths.PlayfieldRelativeDirectory(playfieldId));
+                if (!Directory.Exists(playfieldDir))
+                    return false;
+            }
+
+            if (!PortalDoorLandingResolver.TryResolveLineLanding(
+                    DestinationsCatalog.Instance,
+                    playfieldId,
+                    destination.DestinationIndex,
+                    out Vector3 landing,
+                    out Quaternion heading))
+                return false;
+
+            ClearProxyReturn(player);
+            source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
+
+            if (playfieldId == source.Identity.Instance)
+            {
+                FinishSamePlayfieldMove(player, source, landing, heading);
+                return true;
+            }
+
+            player.Rotation = heading;
+            Playfield destPlayfield = source.GetRequiredService<PlayfieldManager>().GetOrCreate(playfieldId);
+            player.Session.TransferToPlayfield(destPlayfield, landing, heading);
+            return true;
+        }
+
+        static void ClearProxyReturn(Player player)
+        {
+            player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+            player.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+        }
+
+        static void FinishSamePlayfieldMove(Player player, Playfield source, Vector3 landing, Quaternion? heading)
+        {
+            if (heading != null)
+                player.Motor.Warp(landing, heading);
+            else
+                player.Motor.Warp(landing);
+
+            player.Session!.SendSamePlayfieldRespawnTeleport(landing);
+            PlayfieldLocality? locality = source.GetService<PlayfieldLocality>();
+            if (locality == null)
+                return;
+
+            locality.Announce(
+                player,
+                new CharDCMoveMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 0x00,
+                    MoveType = (byte)MovementAction.FullStop,
+                    Heading = new MsgQuaternion
+                    {
+                        X = player.Rotation.xf,
+                        Y = player.Rotation.yf,
+                        Z = player.Rotation.zf,
+                        W = player.Rotation.wf
+                    },
+                    Coordinates = new MsgVector3
+                    {
+                        X = landing.xf,
+                        Y = landing.yf,
+                        Z = landing.zf
+                    },
+                    Unknown1 = 0,
+                    AuxA = 0,
+                    AuxB = 0
+                },
+                includeSelf: false);
+        }
+
+        /// <summary>
+        /// Walk-in proxy. Args are <c>{PlayfieldDoor, destPlayfield, doorIndex, sourceDoor, ...}</c>.
+        /// A source door of 0 uses <see cref="SpellCriteria.SourceDoorInstance"/>. The destination
+        /// door becomes the way back, unless that door already has its own vicinity teleport.
+        /// Jobe Platform's return rings instead name a destination line and land on its midpoint.
+        /// </summary>
+        static bool TeleportProxy(Player player, ItemSpell spell, SpellCriteria? criteria)
+        {
+            if (player.Session == null || player.Playfield == null)
+                return false;
+
+            if (!PortalDoorLandingResolver.TryParseProxyDestination(
+                    spell.Arguments,
+                    PortalDoorLandingResolver.ProxyEntryDoorClearance,
+                    recordsReturn: true,
+                    out PortalDestination destination))
+                return false;
+
+            Playfield source = player.Playfield;
+            IGameData gameData = source.GetRequiredService<IGameData>();
+            int sourceDoor = criteria?.SourceDoorInstance ?? 0;
+            if (spell.TryReadInt(3, out int namedDoor) && namedDoor != 0)
+                sourceDoor = namedDoor;
+
+            int destPlayfield = destination.PlayfieldId;
+            int destDoor = destination.DoorInstance;
+            bool landsOnLine = destination.Kind == PortalLandingKind.DestinationMidpoint;
+            if (sourceDoor != 0
+                && gameData.TryGetTeleportRoute(
+                    source.Identity.Instance,
+                    (int)IdentityType.Door,
+                    unchecked((uint)sourceDoor),
+                    out int routedPlayfield,
+                    out int routedType,
+                    out uint routedInstance))
+            {
+                // A route replaces the raw door. Door 0 on Jobe Platform is a teleporting ring,
+                // which is where every unrouted proxy was landing.
+                if (routedType != (int)IdentityType.Door
+                    || routedPlayfield <= 0
+                    || routedPlayfield > 0xFFFF
+                    || (routedInstance & 0xFF000000u) != 0xC0000000u
+                    || (routedInstance & 0xFFFFu) != (uint)routedPlayfield)
+                    return false;
+
+                destPlayfield = routedPlayfield;
+                destDoor = unchecked((int)routedInstance);
+                landsOnLine = false;
+            }
+
+            if (destPlayfield == source.Identity.Instance)
+                return false;
+
+            Vector3 landing;
+            Quaternion heading;
+            if (landsOnLine)
+            {
+                if (!PortalDoorLandingResolver.TryResolveMidpointLanding(
+                        DestinationsCatalog.Instance,
+                        destPlayfield,
+                        destination.DestinationIndex,
+                        out landing,
+                        out heading))
+                    return false;
+                ClearProxyReturn(player);
+            }
+            else
+            {
+                if (!PortalDoorLandingResolver.TryResolveDoorLanding(
+                        gameData.GetPlayfieldGeometry(destPlayfield),
+                        destDoor,
+                        destination.DoorClearance,
+                        out landing,
+                        out heading))
+                    return false;
+                player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, source.Identity.Instance, StatDetail.Base, dirty: true);
+                player.Stats.Set(CharacterStat.ExternalDoorInstance, sourceDoor, StatDetail.Base, dirty: true);
+            }
+
+            player.Rotation = heading;
+
+            Playfield arrival = source.GetRequiredService<PlayfieldManager>().GetOrCreate(destPlayfield);
+            if (!landsOnLine && arrival is ACGPlayfield acg)
+                acg.World?.RegisterExitProxyDoor(destDoor);
+
+            source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
+            player.Session.TransferToPlayfield(arrival, landing, heading);
+            return true;
+        }
+
+        /// <summary>
+        /// One-way proxy teleport used by Grid enter terminals and similar OnUse machines. A full
+        /// argument list names a Destinations.dat line and lands on its midpoint; otherwise the
+        /// destination is packed as PlayfieldDoor (playfield + door index) and the landing dynel
+        /// may be a Door or a Terminal with that packed instance.
         /// </summary>
         static bool TeleportProxy2(Player player, ItemSpell spell)
         {
@@ -261,13 +507,24 @@ namespace ZoneEngine_New.Core.Inventory
             if (destination.PlayfieldId == source.Identity.Instance)
                 return false;
 
-            IGameData gameData = source.GetRequiredService<IGameData>();
-            if (!PortalDoorLandingResolver.TryResolveProxyLanding(
-                    gameData.GetPlayfieldGeometry(destination.PlayfieldId),
+            Vector3 landing;
+            Quaternion heading;
+            if (destination.Kind == PortalLandingKind.DestinationMidpoint)
+            {
+                if (!PortalDoorLandingResolver.TryResolveMidpointLanding(
+                        DestinationsCatalog.Instance,
+                        destination.PlayfieldId,
+                        destination.DestinationIndex,
+                        out landing,
+                        out heading))
+                    return false;
+            }
+            else if (!PortalDoorLandingResolver.TryResolveProxyLanding(
+                    source.GetRequiredService<IGameData>().GetPlayfieldGeometry(destination.PlayfieldId),
                     destination.DoorInstance,
                     destination.DoorClearance,
-                    out Vector3 landing,
-                    out Quaternion heading))
+                    out landing,
+                    out heading))
                 return false;
 
             // TeleportProxy2 is one-way: clear any stale return door so exit proxies cannot pull
@@ -278,7 +535,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             Playfield destPlayfield = source.GetRequiredService<PlayfieldManager>()
                 .GetOrCreate(destination.PlayfieldId);
-            player.Session.TransferToPlayfield(destPlayfield, landing);
+            player.Session.TransferToPlayfield(destPlayfield, landing, heading);
             return true;
         }
 
