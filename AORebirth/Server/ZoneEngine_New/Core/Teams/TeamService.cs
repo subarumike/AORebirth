@@ -27,7 +27,7 @@ namespace ZoneEngine_New.Core.Teams
             public List<int> Members { get; } = [leader];
             public bool IsRaid;
             public bool ExplicitLeadershipTransfer;
-            /// <summary>Per-member raid sub-team index; missing / default = -1 (capture 20260924-213512).</summary>
+            /// <summary>Per-member raid sub-team index; Team 1 = 0, Team 2 = 1 (capture 20260924-213512).</summary>
             public Dictionary<int, int> RaidTeamIndex { get; } = new();
         }
 
@@ -115,6 +115,10 @@ namespace ZoneEngine_New.Core.Teams
                 // Zoning clears Player.Session before transport closure. Superseded transport callbacks
                 // must also be ignored; neither is the accepted Legacy leave-game transition.
                 if (!Owns(player) || !ReferenceEquals(player.Session, disconnectedSession)) return;
+                // Cross-PF transfer keeps the session bound in Loading until Arrive/Unbind. The old
+                // socket often closes in that window; treating it as leave dissolves the team and
+                // the next reconnect RefreshPlayer then stacks TeamMember rows on a broken UI.
+                if (disconnectedSession.State == SessionState.Loading) return;
                 CancelInvitations(player.Identity.Instance);
                 Remove(player, notifyLeaving: false);
             }
@@ -238,33 +242,40 @@ namespace ZoneEngine_New.Core.Teams
             }
         }
 
+        /// <summary>ISCom inbound ChatCommand: resolve online owner by character id, then reuse /team|/invite parsing.</summary>
+        public bool TryHandleInboundChatCommand(int characterId, string chatCommandString)
+        {
+            Player? player;
+            lock (_sync)
+            {
+                if (!_players.TryGetValue(characterId, out player) || !IsActive(player))
+                    return false;
+            }
+
+            string[] args = CommandInput.Tokenize(chatCommandString);
+            if (args.Length == 0) return false;
+            if (args[0].Equals("team", StringComparison.OrdinalIgnoreCase))
+                return TryHandleChatCommand(player, args);
+            if (args[0].Equals("invite", StringComparison.OrdinalIgnoreCase) && args.Length == 2)
+                return TryHandleChatCommand(player, ["team", "invite", args[1]]);
+            return false;
+        }
+
         public bool ConvertToRaid(Player leader)
         {
             lock (_sync)
             {
                 if (!IsActive(leader)) return false;
-                if (!_membership.TryGetValue(leader.Identity.Instance, out Team? team))
-                    return Error(leader, "You are not in a team.");
-                if (team.Leader != leader.Identity.Instance)
-                    return Error(leader, "Only the team leader can convert to raid.");
-                if (team.IsRaid)
-                    return Error(leader, "Your team is already a raid.");
-                if (team.Members.Count < 2)
-                    return Error(leader, "You need at least one other team member to convert to raid.");
-
+                if (!_membership.TryGetValue(leader.Identity.Instance, out Team? team)
+                    || team.Leader != leader.Identity.Instance || team.Members.Count < 2)
+                    return Error(leader, "Only the leader of a team can convert to raid.");
+                if (team.IsRaid) return Error(leader, "Your team is already a raid.");
                 team.IsRaid = true;
+                // Raid Team 1 is index 0; capture move used DestinationTeamIndex=1 for Team 2.
                 foreach (int id in team.Members)
-                {
-                    Player member = _players[id];
-                    Send(member, new RaidMessage { Identity = member.Identity, Unknown = 0, Unknown1 = 0 });
-                    ChatCommand(id, "#aorebirth-raid-convert " + team.Id);
-                }
-
-                Send(leader, new ChatTextMessage
-                {
-                    Identity = leader.Identity,
-                    Text = "Your team has been converted to a raid."
-                });
+                    team.RaidTeamIndex[id] = 0;
+                foreach (int id in team.Members)
+                    SendRoster(_players[id], team);
                 return true;
             }
         }
@@ -285,9 +296,8 @@ namespace ZoneEngine_New.Core.Teams
         }
 
         /// <summary>
-        /// Capture 20260924-213512: OUT RaidCmd Command=4 Target=Zizion DestTeam=1 →
-        /// IN TeamMemberInfo, SocialStatus, TeamMemberLeft(param2=0), TeamMember(Unknown4=1),
-        /// TeamMemberInfo, SocialStatus for each raid viewer.
+        /// Capture 20260924-213512: OUT RaidCmd Command=4 → IN TeamMemberInfo, SocialStatus,
+        /// TeamMemberLeft(param2=0), TeamMember(Unknown4=dest), TeamMemberInfo, SocialStatus.
         /// </summary>
         public bool MoveRaidMember(Player leader, int targetCharacterId, int destinationTeamIndex)
         {
@@ -306,8 +316,10 @@ namespace ZoneEngine_New.Core.Teams
                     return Error(leader, "That player is not in your raid.");
 
                 team.RaidTeamIndex[targetCharacterId] = destinationTeamIndex;
+                // Full roster to every viewer: TeamMemberLeft(self) for the moved member alone
+                // clears other raid bars on that client (Team 2 then cannot see Team 1).
                 foreach (int viewerId in team.Members)
-                    PublishRaidMemberMove(_players[viewerId], target, team);
+                    SendRoster(_players[viewerId], team);
                 return true;
             }
         }
@@ -326,167 +338,34 @@ namespace ZoneEngine_New.Core.Teams
             if (!TryLevel(target, out int targetLevel)) return Error(inviter, "Team invite target level is unavailable.");
             if (!confirmedRange)
             {
-                if (TryFindLevelConflict(
-                        inviter,
-                        team,
-                        targetLevel,
-                        out Player? conflictMember,
-                        out bool tooHigh))
+                bool tooLow = false;
+                foreach (int id in team?.Members ?? [inviter.Identity.Instance])
                 {
-                    string conflictName = conflictMember != null && !string.IsNullOrEmpty(conflictMember.Name)
-                        ? conflictMember.Name
-                        : "the team";
-                    if (tooHigh)
+                    if (!TryLevel(_players[id], out int level)) return Error(inviter, "Team member level is unavailable.");
+                    var range = _eligibility.ForLevel(level);
+                    if (targetLevel > range.Maximum)
                     {
                         Send(inviter, Action(inviter, CharacterActionType.TeamInviteAck, target.Identity));
-                        Send(inviter, new ChatTextMessage
-                        {
-                            Identity = inviter.Identity,
-                            Text = target.Name + " is too high for " + conflictName + "."
-                        });
+                        return true;
                     }
-                    else
-                    {
-                        Send(inviter, Action(inviter, CharacterActionType.TeamInviteTooLow, target.Identity));
-                        Send(inviter, new ChatTextMessage
-                        {
-                            Identity = inviter.Identity,
-                            Text = target.Name + " is too low for " + conflictName + "."
-                        });
-                    }
-
+                    tooLow |= targetLevel < range.Minimum;
+                }
+                if (tooLow)
+                {
+                    Send(inviter, Action(inviter, CharacterActionType.TeamInviteTooLow, target.Identity));
                     return true;
                 }
             }
-
             _invitations[target.Identity.Instance] = new Invitation(inviter, target,
                 inviter.Session!, target.Session!, team?.Id ?? 0);
-            // Real name+level for Recruit/LFT — never invent levels (avoids fake too high/low).
-            WireInvitePresence(inviter, target, targetLevel);
+            // Names/levels come from current actors; no off-map SCFU ghosts or historical capture reads.
+            Send(inviter, target.BuildInfoPacket());
+            Send(inviter, new StatMessage { Identity = target.Identity, Stats =
+                [new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.Level, Value2 = (uint)targetLevel }] });
             if (!ReferenceEquals(inviter.Playfield, target.Playfield))
                 Send(target, new TeamInviteMessage { Identity = target.Identity, Unknown = 1,
                     Inviter = inviter.Identity, Name = _data[inviter.Identity.Instance].Name });
             Send(target, Action(target, CharacterActionType.TeamRequestInvite, inviter.Identity));
-            return true;
-        }
-
-        /// <summary>
-        /// Invitee must be in XP range of every current team member (solo = inviter).
-        /// TooHigh uses the lowest conflicting member; TooLow uses the highest.
-        /// </summary>
-        bool TryFindLevelConflict(
-            Player inviter,
-            Team? team,
-            int inviteeLevel,
-            out Player? conflictMember,
-            out bool tooHigh)
-        {
-            conflictMember = null;
-            tooHigh = false;
-
-            Player? tooHighMember = null;
-            int tooHighMemberLevel = int.MaxValue;
-            Player? tooLowMember = null;
-            int tooLowMemberLevel = int.MinValue;
-
-            foreach (int id in team?.Members ?? [inviter.Identity.Instance])
-            {
-                if (!_players.TryGetValue(id, out Player? member) || !IsActive(member))
-                    continue;
-                if (!TryLevel(member, out int memberLevel))
-                    continue;
-
-                if (_eligibility.IsTooHighForMember(memberLevel, inviteeLevel))
-                {
-                    if (memberLevel < tooHighMemberLevel)
-                    {
-                        tooHighMember = member;
-                        tooHighMemberLevel = memberLevel;
-                    }
-                }
-                else if (_eligibility.IsTooLowForMember(memberLevel, inviteeLevel))
-                {
-                    if (memberLevel > tooLowMemberLevel)
-                    {
-                        tooLowMember = member;
-                        tooLowMemberLevel = memberLevel;
-                    }
-                }
-            }
-
-            if (tooHighMember != null)
-            {
-                conflictMember = tooHighMember;
-                tooHigh = true;
-                return true;
-            }
-
-            if (tooLowMember != null)
-            {
-                conflictMember = tooLowMember;
-                tooHigh = false;
-                return true;
-            }
-
-            return false;
-        }
-
-        void WireInvitePresence(Player viewer, Player subject, int subjectLevel)
-        {
-            Send(viewer, subject.BuildInfoPacket());
-            Send(viewer, new StatMessage
-            {
-                Identity = subject.Identity,
-                Stats =
-                [
-                    new GameTuple<CharacterStat, uint>
-                    {
-                        Value1 = CharacterStat.Level,
-                        Value2 = (uint)Math.Clamp(subjectLevel, 1, 220)
-                    }
-                ]
-            });
-        }
-
-        /// <summary>
-        /// ChatEngine LFT search → seed real name+level for matches (anti "NoName is too high").
-        /// No off-map SCFU ghosts — InfoPacket + Level StatMessage only.
-        /// </summary>
-        public bool TryHandleInboundChatCommand(int characterId, string command)
-        {
-            if (string.IsNullOrWhiteSpace(command))
-                return false;
-
-            string text = command.Trim();
-            if (text.Equals("#aorebirth-lft-remove", StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            const string seedPrefix = "#aorebirth-lft-seed";
-            if (!text.StartsWith(seedPrefix, StringComparison.Ordinal))
-                return false;
-
-            lock (_sync)
-            {
-                if (_stopped || !_players.TryGetValue(characterId, out Player? searcher) || !IsActive(searcher))
-                    return true;
-
-                string[] tokens = text.Split([' '], StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 1; i < tokens.Length; i++)
-                {
-                    string token = tokens[i];
-                    int colon = token.IndexOf(':');
-                    string idPart = colon >= 0 ? token[..colon] : token;
-                    if (!int.TryParse(idPart, out int candidateId) || candidateId == 0
-                        || candidateId == characterId)
-                        continue;
-                    if (!_players.TryGetValue(candidateId, out Player? candidate) || !IsActive(candidate))
-                        continue;
-                    if (!TryLevel(candidate, out int level))
-                        continue;
-                    WireInvitePresence(searcher, candidate, level);
-                }
-            }
-
             return true;
         }
 
@@ -591,13 +470,24 @@ namespace ZoneEngine_New.Core.Teams
             }
             else if (team.Members.Count > 1)
             {
-                if (team.Leader == player.Identity.Instance) team.Leader = team.Members[0];
-                team.ExplicitLeadershipTransfer = false;
+                // Legacy Leave: TeamMemberLeft only, then if leaver was leader NotifyLeadershipStats
+                // (AcceptTeamRequest to the new leader only). Never rebroadcast roster or RaidMessage —
+                // that crashes remaining RaidView clients.
+                if (team.Leader == player.Identity.Instance)
+                {
+                    team.Leader = team.Members[0];
+                    team.ExplicitLeadershipTransfer = true;
+                }
+                else
+                    team.ExplicitLeadershipTransfer = false;
                 foreach (int id in team.Members)
                 {
                     Player member = _players[id];
-                    ApplyStats(member, team, id == team.Leader ? 7 : 5, send: true);
-                    if (id == team.Leader)
+                    int social = id == team.Leader
+                        ? (team.ExplicitLeadershipTransfer ? 15 : 7)
+                        : (team.ExplicitLeadershipTransfer ? 13 : 5);
+                    ApplyStats(member, team, social, send: true);
+                    if (id == team.Leader && team.ExplicitLeadershipTransfer)
                     {
                         Send(member, Action(member, CharacterActionType.TeamRequestReply, Identity.None, 0, 17));
                         Send(member, Action(member, CharacterActionType.AcceptTeamRequest, member.Identity,
@@ -620,6 +510,13 @@ namespace ZoneEngine_New.Core.Teams
             SetStat(viewer, CharacterStat.SocialStatus, social, true);
             SetStat(viewer, CharacterStat.TeamSide, 2, true);
             SetStat(viewer, CharacterStat.SocialStatus, social, true);
+            // Re-publish after zoning/reconnect must clear prior TeamMember rows first.
+            // Capture 20260924-213512 uses TeamMemberLeft Parameter2=0 for reassignment (not leave -1).
+            foreach (int id in team.Members)
+            {
+                if (!_players.TryGetValue(id, out Player? seated)) continue;
+                Send(viewer, Action(viewer, CharacterActionType.TeamMemberLeft, seated.Identity, team.Id, 0));
+            }
             if (viewer.Identity.Instance == team.Leader)
             {
                 Send(viewer, Action(viewer, CharacterActionType.TeamRequestReply, Identity.None, 0, 17));
@@ -658,32 +555,12 @@ namespace ZoneEngine_New.Core.Teams
         {
             if (!TryLevel(member, out int level)) return;
             MemberData data = _data[member.Identity.Instance];
-            int raidTeamIndex = team.RaidTeamIndex.GetValueOrDefault(member.Identity.Instance, -1);
+            int raidTeamIndex = team.IsRaid
+                ? team.RaidTeamIndex.GetValueOrDefault(member.Identity.Instance, 0)
+                : -1;
             Send(viewer, new TeamMemberMessage { Identity = viewer.Identity, Unknown = 0, Member = member.Identity,
                 Team = new Identity { Type = IdentityType.TeamWindow, Instance = team.Id }, Unknown4 = raidTeamIndex,
                 Level = level, Unknown5 = (short)data.Profession, Name = data.Name });
-        }
-
-        private void PublishRaidMemberMove(Player viewer, Player target, Team team)
-        {
-            if (!IsActive(viewer)) return;
-            int social = viewer.Identity.Instance == team.Leader
-                ? (team.ExplicitLeadershipTransfer ? 15 : 7)
-                : (team.ExplicitLeadershipTransfer ? 13 : 5);
-            MemberData data = _data[target.Identity.Instance];
-            if (data.HasVitals)
-                Send(viewer, new TeamMemberInfoMessage { Identity = viewer.Identity, Unknown = 0, Member = target.Identity,
-                    Unknown3 = data.MaxHealth, Unknown4 = data.MaxHealth,
-                    Unknown5 = data.MaxNano, Unknown6 = data.MaxNano });
-            SetStat(viewer, CharacterStat.SocialStatus, social, true);
-            // Capture 20260924-213512: TeamMemberLeft Parameter2=0 (reassign), not leave (-1).
-            Send(viewer, Action(viewer, CharacterActionType.TeamMemberLeft, target.Identity, team.Id, 0));
-            Announce(viewer, target, team);
-            if (data.HasVitals)
-                Send(viewer, new TeamMemberInfoMessage { Identity = viewer.Identity, Unknown = 0, Member = target.Identity,
-                    Unknown3 = data.MaxHealth, Unknown4 = data.MaxHealth,
-                    Unknown5 = data.MaxNano, Unknown6 = data.MaxNano });
-            SetStat(viewer, CharacterStat.SocialStatus, social, true);
         }
 
         private void ApplyStats(Player player, Team? team, int social, bool send)

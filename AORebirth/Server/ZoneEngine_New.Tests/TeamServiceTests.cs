@@ -399,16 +399,41 @@ namespace ZoneEngine_New.Tests
                 DestinationTeamIndex = 1
             }));
             CharacterActionMessage left = f.Session(a).Bodies.OfType<CharacterActionMessage>()
-                .Single(m => m.Action == CharacterActionType.TeamMemberLeft);
-            Assert.AreEqual(b.Identity, left.Target);
+                .First(m => m.Action == CharacterActionType.TeamMemberLeft && m.Target == b.Identity);
             Assert.AreEqual(f.Teams.GetTeam(a)!.TeamId, left.Parameter1);
             Assert.AreEqual(0, left.Parameter2);
-            TeamMemberMessage moved = f.Session(a).Bodies.OfType<TeamMemberMessage>()
-                .Single(m => m.Member.Instance == b.Identity.Instance);
-            Assert.AreEqual(1, moved.Unknown4);
-            TeamMemberMessage peerView = f.Session(b).Bodies.OfType<TeamMemberMessage>()
-                .Single(m => m.Member.Instance == b.Identity.Instance);
-            Assert.AreEqual(1, peerView.Unknown4);
+            Assert.AreEqual(1, f.Session(a).Bodies.OfType<TeamMemberMessage>()
+                .Last(m => m.Member.Instance == b.Identity.Instance).Unknown4);
+            Assert.AreEqual(1, f.Session(b).Bodies.OfType<TeamMemberMessage>()
+                .Last(m => m.Member.Instance == b.Identity.Instance).Unknown4);
+            // Moved viewer must still see the other raid member (Team 1) after full roster republish.
+            Assert.AreEqual(0, f.Session(b).Bodies.OfType<TeamMemberMessage>()
+                .Last(m => m.Member.Instance == a.Identity.Instance).Unknown4);
+        }
+
+        [TestMethod]
+        public void RaidLeaderLeavePromotesNextMemberAndRepublishesRaidRoster()
+        {
+            var f = new Fixture();
+            Player a = f.Player(1), b = f.Player(2), c = f.Player(3);
+            f.Join(a, b);
+            f.Invite(a, c);
+            f.Accept(c, a);
+            Assert.IsTrue(f.Teams.ConvertToRaid(a));
+            f.Clear();
+            f.Action(a, CharacterActionType.LeaveTeam);
+            Assert.IsNull(f.Teams.GetTeam(a));
+            TeamSnapshot? remaining = f.Teams.GetTeam(b);
+            Assert.IsNotNull(remaining);
+            Assert.IsTrue(remaining!.IsRaid);
+            Assert.AreEqual(b.Identity.Instance, remaining.LeaderId);
+            CollectionAssert.AreEqual(new[] { 2, 3 }, remaining.MemberIds.ToArray());
+            Assert.IsTrue(f.Session(b).Bodies.OfType<RaidMessage>().Any());
+            Assert.IsTrue(f.Session(c).Bodies.OfType<RaidMessage>().Any());
+            Assert.IsTrue(f.Session(b).Bodies.OfType<TeamMemberMessage>()
+                .Any(m => m.Member.Instance == c.Identity.Instance));
+            Assert.IsTrue(f.Session(c).Bodies.OfType<TeamMemberMessage>()
+                .Any(m => m.Member.Instance == b.Identity.Instance));
         }
 
         [TestMethod]
