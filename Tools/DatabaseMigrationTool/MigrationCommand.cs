@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using AORebirth.Database.Schema;
 using MySqlConnector;
 
@@ -14,7 +15,7 @@ public static class MigrationCommand
     {
         if (!TryParse(args, out string operation, out string? expectedDatabase))
         {
-            output.WriteLine("USAGE: DatabaseMigrationTool status|validate|plan OR migrate --expected-database NAME --acknowledge-backup --acknowledge-engines-stopped. Connection comes only from AO_REBIRTH_MIGRATION_CONNECTION.");
+            output.WriteLine("USAGE: DatabaseMigrationTool init|status|validate|plan OR migrate --expected-database NAME --acknowledge-backup --acknowledge-engines-stopped. Connection comes only from AO_REBIRTH_MIGRATION_CONNECTION.");
             return 64;
         }
         try
@@ -24,6 +25,21 @@ public static class MigrationCommand
             var builder = new MySqlConnectionStringBuilder(raw) { AllowLoadLocalInfile = false, AllowUserVariables = true, ConnectionTimeout = 5, DefaultCommandTimeout = 120 };
             if (string.IsNullOrWhiteSpace(builder.Database) || (operation == "migrate" && builder.Database != expectedDatabase))
             { output.WriteLine("REFUSED: exact database acknowledgement does not match the selected database."); return 64; }
+             if (operation == "init")
+             {
+                 using var initConnection = new MySqlConnection(builder.ConnectionString);
+                 initConnection.Open();
+                 using var initAcquire = new MySqlCommand("SELECT GET_LOCK(CONCAT(DATABASE(),':aorebirth-schema'),0)", initConnection);
+                 if (Convert.ToInt32(initAcquire.ExecuteScalar(), CultureInfo.InvariantCulture) != 1)
+                 { output.WriteLine("REFUSED: another schema operator holds the database migration lock."); return 2; }
+                 try { Initialize(initConnection, output); }
+                 finally
+                 {
+                     using var initRelease = new MySqlCommand("SELECT RELEASE_LOCK(CONCAT(DATABASE(),':aorebirth-schema'))", initConnection);
+                     initRelease.ExecuteScalar();
+                 }
+                 return 0;
+             }
             var before = DatabaseSchemaReadiness.Check(builder.ConnectionString);
             WriteStatus(output, before);
             if (operation is "status" or "validate") return before.IsCurrent ? 0 : 2;
@@ -71,7 +87,7 @@ public static class MigrationCommand
     {
         operation = args.Length == 0 ? string.Empty : args[0];
         expectedDatabase = null;
-        if (args.Length == 1 && operation is "status" or "validate" or "plan") return true;
+        if (args.Length == 1 && operation is "status" or "validate" or "plan" or "init") return true;
         if (args.Length == 5 && operation == "migrate" && args[1] == "--expected-database" && IsIdentifier(args[2]) && args[3] == "--acknowledge-backup" && args[4] == "--acknowledge-engines-stopped")
         { expectedDatabase = args[2]; return true; }
         return false;
@@ -86,6 +102,80 @@ public static class MigrationCommand
         // Normalize checkout line endings so the plan hash is identical on Windows and Linux.
         return reader.ReadToEnd().Replace("\r\n", "\n", StringComparison.Ordinal);
     }
+
+    private static IReadOnlyList<string> InitScriptNames()
+    {
+        return typeof(MigrationCommand).Assembly.GetManifestResourceNames()
+            .Where(resource => resource.Contains("SqlTables", StringComparison.OrdinalIgnoreCase))
+            .Select(resource => Regex.Match(resource, @"(?<name>[A-Za-z0-9_]+\.sql)$"))
+            .Where(match => match.Success)
+            .Select(match => match.Groups["name"].Value)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static string ReadInitScript(string name)
+    {
+        Assembly assembly = typeof(MigrationCommand).Assembly;
+        string resource = assembly.GetManifestResourceNames().Single(candidate => candidate.EndsWith("." + name, StringComparison.Ordinal));
+        using var reader = new StreamReader(assembly.GetManifestResourceStream(resource)!);
+        return reader.ReadToEnd().Replace("\r\n", "\n", StringComparison.Ordinal);
+    }
+
+    private static void Initialize(MySqlConnection connection, TextWriter output)
+    {
+        var scripts = InitScriptNames().Select(name => new InitScript(name, ReadInitScript(name))).ToArray();
+        var tableOwners = scripts
+            .SelectMany(script => TablesDeclaredByCreate(script.Sql).Select(table => (table, script.Name)))
+            .ToDictionary(item => item.table, item => item.Name, StringComparer.OrdinalIgnoreCase);
+        var pending = scripts.ToDictionary(script => script.Name, StringComparer.Ordinal);
+        var completed = new HashSet<string>(StringComparer.Ordinal);
+        var orderedScripts = new List<InitScript>(scripts.Length);
+
+        while (pending.Count != 0)
+        {
+            InitScript? next = pending.Values
+                .OrderBy(script => script.Name, StringComparer.Ordinal)
+                .FirstOrDefault(script => ReferencedTables(script.Sql)
+                    .Select(table => tableOwners.TryGetValue(table, out string? owner) ? owner : null)
+                    .Where(owner => owner is not null)
+                    .All(owner => owner == script.Name || completed.Contains(owner!)));
+            if (next is null)
+                throw new MigrationRefusedException("SQL table dependencies contain a cycle or an unresolved creation order.");
+
+            pending.Remove(next.Name);
+            completed.Add(next.Name);
+            orderedScripts.Add(next);
+        }
+
+        foreach (InitScript script in orderedScripts.AsEnumerable().Reverse())
+            foreach (string table in TablesDeclaredByCreate(script.Sql))
+                Execute(connection, "DROP TABLE IF EXISTS " + QuoteIdentifier(table));
+
+        foreach (InitScript next in orderedScripts)
+        {
+            string sql = next.Sql;
+            Execute(connection, sql);
+            output.WriteLine("INITIALIZED=" + next.Name);
+        }
+        Execute(connection, "CREATE TABLE IF NOT EXISTS schema_migrations (MigrationName VARCHAR(255) NOT NULL, AppliedAtUtc DATETIME(6) NOT NULL, PRIMARY KEY (MigrationName)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+
+    private static IEnumerable<string> TablesDeclaredByCreate(string sql)
+    {
+        const string pattern = @"(?im)^\s*CREATE\s+TABLE(?:\s+IF\s+NOT\s+EXISTS)?\s+`?(?<table>[A-Za-z0-9_]+)`?";
+        return Regex.Matches(sql, pattern).Select(match => match.Groups["table"].Value).Distinct(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static IEnumerable<string> ReferencedTables(string sql)
+    {
+        const string pattern = @"(?i)\bREFERENCES\s+`?(?<table>[A-Za-z0-9_]+)`?";
+        return Regex.Matches(sql, pattern).Select(match => match.Groups["table"].Value).Distinct(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static string QuoteIdentifier(string identifier) => "`" + identifier.Replace("`", "``", StringComparison.Ordinal) + "`";
+
+    private sealed record InitScript(string Name, string Sql);
 
     private static void Apply(MySqlConnection connection, TextWriter output)
     {
@@ -134,7 +224,7 @@ public static class MigrationCommand
     }
 
     private static bool Equal(string left, string right) => string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
-    private static bool IsIdentifier(string value) => value.Length is > 0 and <= 64 && value.All(c => char.IsAsciiLetterOrDigit(c) || c == '_');
+    private static bool IsIdentifier(string value) => value.Length is > 0 and <= 64 && value.All(c => char.IsAsciiLetterOrDigit(c) || c is '_' or '-');
     private static void WriteStatus(TextWriter output, SchemaCheckResult result) => output.WriteLine(result.State + ": " + result.Message);
     private static long Scalar(MySqlConnection connection, string sql)
     { using var command = new MySqlCommand(sql, connection); return Convert.ToInt64(command.ExecuteScalar(), CultureInfo.InvariantCulture); }
