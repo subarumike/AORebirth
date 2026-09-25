@@ -52,6 +52,7 @@ namespace ZoneEngine_New.Core.Entities
             TimeExist = DefaultTimeExist;
             ExpiresAtUtc = DateTime.UtcNow.AddMilliseconds(TimeExist * 10);
             CopySourceStats(dead);
+            OwnerTextures = dead.BuildWireTextures();
         }
 
         public Identity LootWinner { get; set; } = Identity.None;
@@ -104,6 +105,9 @@ namespace ZoneEngine_New.Core.Entities
 
         Dictionary<CharacterStat, int> SourceStats { get; } = new();
 
+        /// <summary>Owner's textures captured at death.</summary>
+        Texture[] OwnerTextures { get; }
+
         public override MessageBody BuildSpawnMessage()
         {
             int playfieldId = Playfield != null ? Playfield.Identity.Instance : 0;
@@ -137,7 +141,7 @@ namespace ZoneEngine_New.Core.Entities
                 AnimationEffects = BuildAnimationEffects(monsterData),
                 // Dead character identity (AOSharp IdentityType.Character == CanbeAffected).
                 UnknownIdentity = Owner,
-                Textures = BuildDefaultTextures(),
+                Textures = OwnerTextures.Length > 0 ? OwnerTextures : BuildDefaultTextures(),
                 Unknown7 = 0
             };
         }

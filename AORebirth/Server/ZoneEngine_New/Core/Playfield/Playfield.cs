@@ -539,6 +539,7 @@ namespace ZoneEngine_New.Core.Playfield
                 GetRequiredService<NpcContentActivationService>().Tick();
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inventory.moves");
                 _inventoryMoves.Tick(this, deltaTime);
+                GetRequiredService<ItemUseService>().Tick(deltaTime);
                 _trades.Tick(this, deltaTime);
 
                 WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
@@ -574,7 +575,7 @@ namespace ZoneEngine_New.Core.Playfield
 
         static NavMeshPathfinder? TryLoadPathfinder(string gameDataRoot, int playfieldId, IZoneLogger logger)
         {
-            if (NavMeshPathfinder.TryLoad(gameDataRoot, playfieldId, out NavMeshPathfinder? pathfinder)
+            if (NavMeshPathfinder.TryLoad(gameDataRoot, playfieldId, out NavMeshPathfinder? pathfinder, out string? failure)
                 && pathfinder != null)
             {
                 logger.Info(
@@ -590,6 +591,17 @@ namespace ZoneEngine_New.Core.Playfield
                 reason = "template";
             else if (!File.Exists(Path.Combine(gameDataRoot, GameDataPaths.PlayfieldNavMeshRelativePath(playfieldId))))
                 reason = "missing";
+
+            if (failure != null)
+            {
+                logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Playfield navmesh skipped id={0} reason=invalid detail={1}",
+                        playfieldId,
+                        failure));
+                return null;
+            }
 
             logger.Info(
                 string.Format(
@@ -658,6 +670,7 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton<NpcContentActivationService>();
             services.AddSingleton<ZoneEngine_New.Core.Missions.QuestPropService>();
             services.AddSingleton<HashSpawnSystem>();
+            services.AddSingleton<ItemUseService>();
             return services;
         }
     }

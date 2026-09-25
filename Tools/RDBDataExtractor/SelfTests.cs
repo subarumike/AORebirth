@@ -20,6 +20,8 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestItemsDatDynelTypeRoundTrip();
             TestHitFunctionArgOrdering();
             TestConditionalShapeFunction();
+            TestSpellOrderAndExpression();
+            TestTextSpellStrings();
             TestCollisionDatFraming();
             TestSurfacesDatFraming();
             Console.WriteLine("RDBDataExtractor self-test PASS");
@@ -386,6 +388,99 @@ namespace AORebirth.Tools.RDBDataExtractor
                 || function.Requirements[0].Value != 17534
                 || (int)function.Requirements[0].Operator != 0)
                 throw new InvalidOperationException("Conditional shape lost its payload or requirement.");
+        }
+
+        private static void TestSpellOrderAndExpression()
+        {
+            var hit = new Dictionary<AODB.Common.Enums.FunctionOperator, object>
+            {
+                { AODB.Common.Enums.FunctionOperator.Stat, 27u },
+                { AODB.Common.Enums.FunctionOperator.Min, -1 },
+                { AODB.Common.Enums.FunctionOperator.Max, -2 },
+                { AODB.Common.Enums.FunctionOperator.DamageType, 90u },
+            };
+            var teleport = new Dictionary<AODB.Common.Enums.FunctionOperator, object>
+            {
+                { AODB.Common.Enums.FunctionOperator.RelXPos, 1 },
+                { AODB.Common.Enums.FunctionOperator.RelYPos, 2 },
+                { AODB.Common.Enums.FunctionOperator.RelZPos, 3 },
+                { AODB.Common.Enums.FunctionOperator.TeleportDest, 595 },
+            };
+            var expression = new AODB.Common.Structs.BinaryExpression
+            {
+                Tag = 3,
+                Operator = 1,
+                Left = new AODB.Common.Structs.StatExpression { Stat = 16, Flag = false },
+                Right = new AODB.Common.Structs.ConstantExpression { Value = 4f },
+            };
+            var expressionArgs = new Dictionary<AODB.Common.Enums.FunctionOperator, object>
+            {
+                { AODB.Common.Enums.FunctionOperator.Stat, 16 },
+                { AODB.Common.Enums.FunctionOperator.TargetExpression, 1 },
+                { AODB.Common.Enums.FunctionOperator.ToClient, 0 },
+                { AODB.Common.Enums.FunctionOperator.Expression, expression },
+            };
+
+            var modifier = new Modifier();
+            modifier.AddModifier(AODB.Common.Enums.FunctionType.Hit, hit);
+            modifier.AddModifier(AODB.Common.Enums.FunctionType.Teleport, teleport);
+            modifier.AddModifier(AODB.Common.Enums.FunctionType.Expression, expressionArgs);
+            modifier.AddModifier(AODB.Common.Enums.FunctionType.Hit, hit);
+
+            ZoneEngine_New.Core.Inventory.Dat.DatItemTemplate template = ItemRdbMapper.Map(
+                1,
+                0,
+                null,
+                null,
+                new Dictionary<AODB.Common.Enums.EventType, Modifier>
+                {
+                    { AODB.Common.Enums.EventType.OnUse, modifier },
+                },
+                null);
+
+            if (template.Events.Count != 1 || template.Events[0].Functions.Count != 4)
+                throw new InvalidOperationException("Spell events were dropped or reordered.");
+
+            int[] expected =
+            {
+                (int)AODB.Common.Enums.FunctionType.Hit,
+                (int)AODB.Common.Enums.FunctionType.Teleport,
+                (int)AODB.Common.Enums.FunctionType.Expression,
+                (int)AODB.Common.Enums.FunctionType.Hit,
+            };
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if (template.Events[0].Functions[i].FunctionType != expected[i])
+                    throw new InvalidOperationException("Spell event order did not match the client list.");
+            }
+
+            ZoneEngine_New.Core.Inventory.Dat.DatFunction packed = template.Events[0].Functions[2];
+            if (packed.Arguments.Values.Count != 4
+                || packed.Arguments.Values[0].AsInt32() != 16
+                || packed.Arguments.Values[1].AsInt32() != 1
+                || packed.Arguments.Values[2].AsInt32() != 0
+                || !packed.Arguments.Values[3].IsArray)
+            {
+                throw new InvalidOperationException("Expression spell did not keep its tree.");
+            }
+        }
+
+        private static void TestTextSpellStrings()
+        {
+            var keyed = new Dictionary<AODB.Common.Enums.FunctionOperator, object>
+            {
+                { AODB.Common.Enums.FunctionOperator.Text, new string[] { "Hello", "There" } },
+                { AODB.Common.Enums.FunctionOperator.Value, 7 },
+            };
+
+            ZoneEngine_New.Core.Inventory.Dat.DatFunction function =
+                ItemRdbMapper.ToFunction((int)AODB.Common.Enums.FunctionType.Text, keyed);
+            if (function.Arguments.Values.Count < 2
+                || function.Arguments.Values[0].AsString() != "Hello"
+                || function.Arguments.Values[1].AsString() != "There")
+            {
+                throw new InvalidOperationException("Text spell dropped a string.");
+            }
         }
 
         private static void TestItemsDatDynelTypeRoundTrip()

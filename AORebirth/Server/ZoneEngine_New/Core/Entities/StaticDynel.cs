@@ -88,10 +88,20 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown2 = 0,
                 Unknown3 = SimpleItemFullUpdateUnknown3,
                 Stats = BuildStats(),
-                Name = Template.Name ?? string.Empty
+                // Client displays this as a C string. The length must include the trailing NUL,
+                // matching mission-key SimpleItemFullUpdate. Empty stays length 0.
+                Name = TerminateClientName(Template.Name)
             };
             message.Owner = Identity.None;
             return message;
+        }
+
+        static string TerminateClientName(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return string.Empty;
+
+            return name[^1] == '\0' ? name : name + '\0';
         }
 
         void ApplyTemplateStats()

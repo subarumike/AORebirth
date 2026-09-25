@@ -239,6 +239,11 @@ namespace Utility.Config
         public LocalitySettings Locality { get; set; }
 
         /// <summary>
+        /// Localhost debug MCP server. Omitted or Enabled false leaves it off.
+        /// </summary>
+        public DebugMcpSettings DebugMcp { get; set; }
+
+        /// <summary>
         /// Comma-separated DebugInfoDetail flags (e.g. Engine,Error,Network,Combat,Locality). Defaults to Engine,Error when omitted.
         /// </summary>
         public string DebugInfoDetail { get; set; }

@@ -11,7 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AODB" Version="1.0.8" />
+    <ProjectReference Include="..\..\..\aodb\AODB\AODB.csproj" />
+    <ProjectReference Include="..\..\..\aodb\AODB.Common\AODB.Common.csproj" />
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="StbImageWriteSharp" Version="1.16.7" />

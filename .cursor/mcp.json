@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "zoneengine-debug": {
+      "type": "http",
+      "url": "http://127.0.0.1:7590/mcp"
+    }
+  }
+}

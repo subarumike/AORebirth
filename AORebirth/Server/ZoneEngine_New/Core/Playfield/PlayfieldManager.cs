@@ -343,6 +343,14 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
+        public IReadOnlyList<Playfield> SnapshotPlayfields()
+        {
+            lock (_sync)
+            {
+                return _playfields.Values.ToList();
+            }
+        }
+
         public void RegisterPlayer(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);

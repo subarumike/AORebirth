@@ -249,7 +249,8 @@ namespace ZoneEngine_New.Core.Inventory
             Item? destOccupant,
             LootableDynel? lootSource)
         {
-            if (HasPending(player.Identity.Instance))
+            if (HasPending(player.Identity.Instance)
+                || player.Playfield?.GetService<ItemUseService>()?.HasPending(player.Identity.Instance) == true)
                 return;
 
             bool destIsWear = destPage.Identity.Type.IsWearPage();

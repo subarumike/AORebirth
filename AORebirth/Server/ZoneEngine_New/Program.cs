@@ -34,6 +34,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
+    using ZoneEngine_New.Core.DebugMcp;
     using ZoneEngine_New.Core.Teams;
 
     using ConfigReadWrite = Utility.Config.ConfigReadWrite;
@@ -43,6 +44,7 @@ namespace ZoneEngine_New
         private static volatile bool exited;
         private static ServiceProvider? rootServices;
         private static ZoneNetworkHost? networkHost;
+        private static DebugMcpHost? debugMcp;
         private static PlayfieldManager? playfieldManager;
         private static IChatEngineLink? chatEngineLink;
         private static int shutdownStarted;
@@ -102,6 +104,15 @@ namespace ZoneEngine_New
                 _ = rootServices.GetRequiredService<InventoryFlushService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
+                try
+                {
+                    debugMcp = DebugMcpHost.Start(rootServices, logger);
+                }
+                catch (Exception)
+                {
+                    Shutdown();
+                    throw;
+                }
                 RuntimeStartup.NotifyService("READY=1\nSTATUS=ZoneEngine_New ready");
                 Console.WriteLine("ZONEENGINE_NEW_READY");
                 logger.Info("ZoneEngine_New root container started.");
@@ -326,6 +337,8 @@ namespace ZoneEngine_New
                     Console.Error.WriteLine("ZONEENGINE_NEW_SHUTDOWN_FAILED type=" + exception.GetType().Name);
                 }
             }
+            Cleanup(() => debugMcp?.DisposeAsync().AsTask().GetAwaiter().GetResult());
+            debugMcp = null;
             Cleanup(() => networkHost?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             networkHost = null;
             Cleanup(() => playfieldManager?.Dispose());
@@ -346,6 +359,7 @@ namespace ZoneEngine_New
                 ApplyGreenConsoleLogColors();
                 LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngine_NewLog.txt", LogLevel.Trace);
+                DebugMcpLogBuffer.Shared.Install();
                 LogActiveConfiguration();
             }
             catch (Exception)

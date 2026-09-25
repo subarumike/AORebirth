@@ -48,7 +48,18 @@ namespace AORebirth.World.Pathfinding
 
         public static bool TryLoad(string gameDataRoot, int playfieldId, out NavMeshPathfinder? pathfinder)
         {
+            return TryLoad(gameDataRoot, playfieldId, out pathfinder, out _);
+        }
+
+        /// <param name="failure">Why a present mesh was rejected; null when it loaded or there is none.</param>
+        public static bool TryLoad(
+            string gameDataRoot,
+            int playfieldId,
+            out NavMeshPathfinder? pathfinder,
+            out string? failure)
+        {
             pathfinder = null;
+            failure = null;
             if (string.IsNullOrWhiteSpace(gameDataRoot) || playfieldId <= 0)
                 return false;
             if (DungeonPlayfieldKinds.IsStyleTemplate(gameDataRoot, playfieldId))
@@ -61,10 +72,11 @@ namespace AORebirth.World.Pathfinding
             NavMeshBuildSettings settings;
             try
             {
-                settings = NavMeshBuildSettings.Load(NavMeshBuildSettings.DefaultPathBesideGameData(gameDataRoot));
+                settings = NavMeshBuildSettings.Load(NavMeshBuildSettings.ResolvePath(gameDataRoot));
             }
-            catch
+            catch (Exception exception)
             {
+                failure = "settings: " + exception.Message;
                 return false;
             }
 
@@ -73,8 +85,9 @@ namespace AORebirth.World.Pathfinding
             {
                 mesh = NavMeshFile.Read(meshPath, out _);
             }
-            catch
+            catch (Exception exception)
             {
+                failure = "mesh: " + exception.Message;
                 return false;
             }
 

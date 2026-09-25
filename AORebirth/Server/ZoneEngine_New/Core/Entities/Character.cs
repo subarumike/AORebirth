@@ -89,6 +89,8 @@ namespace ZoneEngine_New.Core.Entities
         {
             if (reason != TimedActionInterrupt.Movement)
                 Playfield?.GetRequiredService<InventoryMoveService>().CancelPending(Identity.Instance);
+            if (reason == TimedActionInterrupt.LeavePlayfield)
+                Playfield?.GetService<ItemUseService>()?.CancelPending(Identity.Instance);
             NanoRuntime.InterruptCast(this);
             TimedActionsInterrupted?.Invoke(this, reason);
         }
@@ -2501,6 +2503,9 @@ namespace ZoneEngine_New.Core.Entities
 
             return scfu;
         }
+
+        /// <summary>Texture places as they appear on this character's own spawn packet.</summary>
+        internal Texture[] BuildWireTextures() => BuildTextures(!IsPlayer);
 
         private Texture[] BuildTextures(bool isNpc)
         {

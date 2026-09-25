@@ -60,6 +60,20 @@ namespace AORebirth.World.Pathfinding
             return Path.Combine(parent, "Config", ConfigFileName);
         }
 
+        /// <summary>
+        /// Config beside <paramref name="gameDataRoot"/>, else beside the process. An overridden GameData
+        /// tree (for example a scripts checkout) usually has no Config folder of its own.
+        /// </summary>
+        public static string ResolvePath(string gameDataRoot)
+        {
+            string besideGameData = DefaultPathBesideGameData(gameDataRoot);
+            if (File.Exists(besideGameData))
+                return besideGameData;
+
+            string besideProcess = Path.Combine(AppContext.BaseDirectory, "Config", ConfigFileName);
+            return File.Exists(besideProcess) ? besideProcess : besideGameData;
+        }
+
         public static NavMeshBuildSettings Load(string path)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(path);

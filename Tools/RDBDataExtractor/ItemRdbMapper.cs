@@ -116,33 +116,60 @@ namespace AORebirth.Tools.RDBDataExtractor
 
             foreach (KeyValuePair<AoEventType, Modifier> eventPair in modifiers)
             {
-                if (eventPair.Value?.Modifiers == null || eventPair.Value.Modifiers.Count == 0)
+                List<DatFunction> functions = ToEventFunctions(eventPair.Value);
+                if (functions.Count == 0)
                     continue;
 
-                var datEvent = new DatEvent
+                template.Events.Add(new DatEvent
                 {
                     EventType = (ZeEventType)(int)eventPair.Key,
-                    Functions = new List<DatFunction>(),
-                };
+                    Functions = functions,
+                });
+            }
+        }
 
-                foreach (KeyValuePair<AoFunctionType, List<Dictionary<FunctionOperator, object>>> functionPair
-                         in eventPair.Value.Modifiers)
+        /// <summary>
+        /// Every spell on the event, in client order. <see cref="Modifier.Functions"/> is the
+        /// source; the function-type dictionary is only a fallback.
+        /// </summary>
+        static List<DatFunction> ToEventFunctions(Modifier modifier)
+        {
+            var functions = new List<DatFunction>();
+            if (modifier == null)
+                return functions;
+
+            if (modifier.Functions != null && modifier.Functions.Count > 0)
+            {
+                foreach (SpellFunction spell in modifier.Functions)
                 {
-                    if (functionPair.Value == null)
+                    if (spell?.Operations == null)
                         continue;
 
-                    foreach (Dictionary<FunctionOperator, object> keyedArgs in functionPair.Value)
-                    {
-                        if (keyedArgs == null)
-                            continue;
-
-                        datEvent.Functions.Add(ToFunction((int)functionPair.Key, keyedArgs));
-                    }
+                    functions.Add(ToFunction((int)spell.Function, spell.Operations));
                 }
 
-                if (datEvent.Functions.Count > 0)
-                    template.Events.Add(datEvent);
+                return functions;
             }
+
+            if (modifier.Modifiers == null)
+                return functions;
+
+            foreach (KeyValuePair<AoFunctionType, List<Dictionary<FunctionOperator, object>>> functionPair
+                     in modifier.Modifiers)
+            {
+                if (functionPair.Value == null)
+                    continue;
+
+                foreach (Dictionary<FunctionOperator, object> keyedArgs in functionPair.Value)
+                {
+                    if (keyedArgs == null)
+                        continue;
+
+                    functions.Add(ToFunction((int)functionPair.Key, keyedArgs));
+                }
+            }
+
+            return functions;
         }
 
         static void MapRequirements(
@@ -231,55 +258,68 @@ namespace AORebirth.Tools.RDBDataExtractor
         /// AODB stores function args keyed by <see cref="FunctionOperator"/>. Legacy
         /// FunctionSets.cfg describes the positional consumer layout: typed tokens consume
         /// keys in insertion order (after meta), and <c>x</c> tokens skip that many bytes
-        /// of keys (4 bytes per skipped int key).
+        /// of keys (4 bytes per skipped int key). Arguments the format does not name are
+        /// still appended, so Criteria, Expression, and any spell missing from the cfg
+        /// keep their payload.
         /// </summary>
         internal static List<object> SelectPositionalArgs(
             int functionType,
             Dictionary<FunctionOperator, object> keyedArgs)
         {
             var result = new List<object>();
-            if (!FunctionSets.TryGetValue(functionType, out string format) || string.IsNullOrWhiteSpace(format))
-                return result;
-
             var queue = new Queue<KeyValuePair<FunctionOperator, object>>();
             foreach (KeyValuePair<FunctionOperator, object> pair in keyedArgs)
             {
                 if (MetaOperators.Contains(pair.Key))
                     continue;
+
+                if (pair.Value is string[] texts)
+                {
+                    for (int t = 0; t < texts.Length; t++)
+                        queue.Enqueue(new KeyValuePair<FunctionOperator, object>(FunctionOperator.Text, texts[t]));
+                    continue;
+                }
+
                 queue.Enqueue(pair);
             }
 
-            string[] tokens = format.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < tokens.Length; i++)
+            if (FunctionSets.TryGetValue(functionType, out string format) && !string.IsNullOrWhiteSpace(format))
             {
-                string token = tokens[i].Trim().ToLowerInvariant();
-                if (token.Length < 2)
-                    continue;
-
-                char kind = token[token.Length - 1];
-                if (!int.TryParse(token.Substring(0, token.Length - 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int count)
-                    || count < 0)
-                    continue;
-
-                if (kind == 'x')
+                string[] tokens = format.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < tokens.Length; i++)
                 {
-                    int skipKeys = count / 4;
-                    for (int skipped = 0; skipped < skipKeys && queue.Count > 0; skipped++)
-                        queue.Dequeue();
-                    continue;
-                }
+                    string token = tokens[i].Trim().ToLowerInvariant();
+                    if (token.Length < 2)
+                        continue;
 
-                for (int taken = 0; taken < count; taken++)
-                {
-                    if (queue.Count == 0)
-                        break;
+                    char kind = token[token.Length - 1];
+                    if (!int.TryParse(token.Substring(0, token.Length - 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int count)
+                        || count < 0)
+                        continue;
 
-                    object value = queue.Dequeue().Value;
-                    if (kind == 's' && value is string text)
-                        value = text.TrimEnd('\0');
-                    result.Add(value);
+                    if (kind == 'x')
+                    {
+                        int skipKeys = count / 4;
+                        for (int skipped = 0; skipped < skipKeys && queue.Count > 0; skipped++)
+                            queue.Dequeue();
+                        continue;
+                    }
+
+                    for (int taken = 0; taken < count; taken++)
+                    {
+                        if (queue.Count == 0)
+                            break;
+
+                        object value = queue.Dequeue().Value;
+                        if (kind == 's' && value is string text)
+                            value = text.TrimEnd('\0');
+                        result.Add(value);
+                    }
                 }
             }
+
+            while (queue.Count > 0)
+                result.Add(queue.Dequeue().Value);
 
             return result;
         }
@@ -351,11 +391,88 @@ namespace AORebirth.Tools.RDBDataExtractor
                     return (int)b;
                 case bool flag:
                     return flag ? 1 : 0;
+                case float f:
+                    return f;
+                case double d:
+                    return (float)d;
+                case string[] texts:
+                    return PackArray(PackStrings(texts));
+                case SpellExpression expression:
+                    return PackExpression(expression);
+                case IEnumerable<RequirementCriterion> criteria:
+                    return PackCriteria(criteria);
                 default:
                     if (value is Enum)
                         return Convert.ToInt32(value, CultureInfo.InvariantCulture);
                     return Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
             }
+        }
+
+        static MessagePackObject PackExpression(SpellExpression expression)
+        {
+            if (expression == null)
+                return MessagePackObject.Nil;
+
+            switch (expression)
+            {
+                case ConstantExpression constant:
+                    return PackArray(new MessagePackObject(1), new MessagePackObject(constant.Value));
+                case StatExpression stat:
+                    return PackArray(
+                        new MessagePackObject(2),
+                        new MessagePackObject(stat.Stat),
+                        new MessagePackObject(stat.Flag ? 1 : 0));
+                case BinaryExpression binary:
+                    return PackArray(
+                        new MessagePackObject(binary.Tag),
+                        new MessagePackObject(binary.Operator),
+                        PackExpression(binary.Left),
+                        PackExpression(binary.Right));
+                default:
+                    return MessagePackObject.Nil;
+            }
+        }
+
+        static MessagePackObject PackCriteria(IEnumerable<RequirementCriterion> criteria)
+        {
+            var packed = new List<MessagePackObject>();
+            if (criteria != null)
+            {
+                foreach (RequirementCriterion criterion in criteria)
+                {
+                    packed.Add(PackArray(
+                        new MessagePackObject(criterion.Stat),
+                        new MessagePackObject(unchecked((int)criterion.Value)),
+                        new MessagePackObject((int)criterion.Operator)));
+                }
+            }
+
+            return PackArray(packed);
+        }
+
+        static MessagePackObject[] PackStrings(string[] texts)
+        {
+            var packed = new MessagePackObject[texts == null ? 0 : texts.Length];
+            if (texts == null)
+                return packed;
+
+            for (int i = 0; i < texts.Length; i++)
+                packed[i] = texts[i] ?? string.Empty;
+
+            return packed;
+        }
+
+        static MessagePackObject PackArray(params MessagePackObject[] values)
+        {
+            return new MessagePackObject(values ?? new MessagePackObject[0]);
+        }
+
+        static MessagePackObject PackArray(List<MessagePackObject> values)
+        {
+            if (values == null || values.Count == 0)
+                return new MessagePackObject(new MessagePackObject[0]);
+
+            return new MessagePackObject(values.ToArray());
         }
 
         static Dictionary<int, string> LoadFunctionSets()

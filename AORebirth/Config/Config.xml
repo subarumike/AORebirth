@@ -22,6 +22,12 @@
     <!-- Max hash-spawns per awake cell tick (default 1). -->
     <SpawnRate>1</SpawnRate>
   </Locality>
+  <!-- Localhost debug MCP for live game-state inspection. false leaves the listener off. -->
+  <DebugMcp>
+    <Enabled>false</Enabled>
+    <ListenIP>127.0.0.1</ListenIP>
+    <Port>7590</Port>
+  </DebugMcp>
   <!-- Debug console categories: comma-separated DebugInfoDetail names (default Engine,Error) -->
   <!-- Locality: player cell changes + cell heat (Hot/Warm/Cold/Asleep) + hash-spawns in ZoneEngine_NewLog -->
   <!-- Network: ZoneEngine_New inbound/outbound message type names -->

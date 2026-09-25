@@ -125,6 +125,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     else if (message.Target is { Length: >= 2 }
                         && _missions.TryUseItemOnTarget(player, message.Target[0], message.Target[1]))
                         Acknowledge(session, message, message.Target[1]);
+                    else if (message.Target is { Length: >= 2 }
+                        && TryUseItemOnItem(player, playfield, message.Target[0], message.Target[1]))
+                        Acknowledge(session, message, message.Target[1]);
                     else Deny(session, message, player, "no accepted item-on-target interaction");
                     break;
 
@@ -163,7 +166,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case IdentityType.Inventory:
                 case IdentityType.ArmorPage:
                 case IdentityType.SocialPage:
-                    HandleUseInventoryItem(message, session, player, target);
+                    HandleUseInventoryItem(message, session, player, playfield, target);
                     break;
 
                 default:
@@ -181,6 +184,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             GenericCmdMessage message,
             IZoneSession session,
             Player player,
+            Playfield playfield,
             Identity target)
         {
             if (!player.Inventory.IsHydrated)
@@ -232,21 +236,26 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (!item.Use(player, target, _inventoryRepository, _items))
+            ItemUseService uses = playfield.GetRequiredService<ItemUseService>();
+            ItemUseStart start = uses.TryBegin(player, target, item);
+            if (start == ItemUseStart.Rejected)
             {
-                Deny(session, message, player, DescribeInventoryUseFailure(player, item));
+                Deny(session, message, player, uses.HasPending(player.Identity.Instance)
+                    ? "Use failed: another item use is pending"
+                    : DescribeInventoryUseFailure(player, item));
                 return;
             }
 
             player.Logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "GenericCmd Use inventory item succeeded char={0} name={1} itemIdentity={2} slot={3}:{4}",
+                    "GenericCmd Use inventory item {5} char={0} name={1} itemIdentity={2} slot={3}:{4}",
                     player.Identity.Instance,
                     item.Name,
                     item.Identity,
                     target.Type,
-                    target.Instance));
+                    target.Instance,
+                    start == ItemUseStart.Started ? "delayed" : "succeeded"));
             Acknowledge(session, message, target);
         }
 
@@ -314,6 +323,53 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             Acknowledge(session, message, dynel.Identity);
+        }
+
+        /// <summary>
+        /// Target's OnUseItemOn functions. Criteria stat 273 is the used item's low id, so a
+        /// statue can teleport for the right key and reject everything else.
+        /// </summary>
+        bool TryUseItemOnItem(Player player, Playfield playfield, Identity sourceSlot, Identity target)
+        {
+            if (!player.Inventory.IsHydrated || sourceSlot.Type != IdentityType.Inventory)
+                return false;
+            if (!player.Inventory.TryGetItem(sourceSlot.Type, sourceSlot.Instance, out Item source) || source.Locked)
+                return false;
+
+            ItemTemplate? template = null;
+            if (playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel) && dynel is StaticDynel staticDynel)
+            {
+                if (staticDynel.Playfield == null
+                    || player.Playfield == null
+                    || staticDynel.Playfield.Identity.Instance != player.Playfield.Identity.Instance
+                    || staticDynel.GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
+                    return false;
+
+                template = staticDynel.Template;
+            }
+            else if (player.Inventory.TryGetItem(target.Type, target.Instance, out Item targetItem))
+            {
+                template = targetItem.Definition;
+            }
+
+            if (template == null)
+                return false;
+            if (!template.SpellList.ContainsKey(EventType.OnUseItemOn))
+                return false;
+            if (!template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.UseItemOnItem))
+                return false;
+
+            return template.ExecuteSpells(
+                EventType.OnUseItemOn,
+                player,
+                _inventoryRepository,
+                _items,
+                new SpellCriteria
+                {
+                    SecondaryItemTemplate = source.LowId,
+                    Subject = source,
+                    SubjectSlot = sourceSlot
+                });
         }
 
         static string FormatTargets(GenericCmdMessage message)

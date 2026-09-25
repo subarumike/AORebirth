@@ -32,6 +32,61 @@ namespace AORebirth.World.Pathfinding.Tests
         }
 
         [TestMethod]
+        public void TryLoad_CorruptMesh_ReportsMeshFailure()
+        {
+            string gameDataRoot = CreateTempGameData(copyConfig: true);
+            try
+            {
+                string meshPath = Path.Combine(gameDataRoot, GameDataPaths.PlayfieldNavMeshRelativePath(900012));
+                Directory.CreateDirectory(Path.GetDirectoryName(meshPath)!);
+                File.WriteAllBytes(meshPath, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+
+                Assert.IsFalse(NavMeshPathfinder.TryLoad(gameDataRoot, 900012, out NavMeshPathfinder? pathfinder, out string? failure));
+                Assert.IsNull(pathfinder);
+                Assert.IsNotNull(failure);
+                StringAssert.StartsWith(failure, "mesh:");
+            }
+            finally
+            {
+                DeleteTree(Directory.GetParent(gameDataRoot)?.FullName);
+            }
+        }
+
+        [TestMethod]
+        public void ResolvePath_PrefersConfigBesideGameData()
+        {
+            string gameDataRoot = CreateTempGameData(copyConfig: true);
+            try
+            {
+                Assert.AreEqual(
+                    NavMeshBuildSettings.DefaultPathBesideGameData(gameDataRoot),
+                    NavMeshBuildSettings.ResolvePath(gameDataRoot));
+            }
+            finally
+            {
+                DeleteTree(Directory.GetParent(gameDataRoot)?.FullName);
+            }
+        }
+
+        [TestMethod]
+        public void ResolvePath_NoConfigBesideGameData_FallsBackToProcessConfig()
+        {
+            string processConfig = Path.Combine(AppContext.BaseDirectory, "Config", NavMeshBuildSettings.ConfigFileName);
+            if (!File.Exists(processConfig))
+                Assert.Inconclusive("Test output has no Config/NavAgent.json.");
+
+            string gameDataRoot = CreateTempGameData(copyConfig: false);
+            try
+            {
+                Assert.AreEqual(processConfig, NavMeshBuildSettings.ResolvePath(gameDataRoot));
+            }
+            finally
+            {
+                DeleteTree(Directory.GetParent(gameDataRoot)?.FullName);
+            }
+        }
+
+        [TestMethod]
         public void TryLoad_TemplatePlayfield_ReturnsFalse()
         {
             string gameDataRoot = FindGameDataRoot();

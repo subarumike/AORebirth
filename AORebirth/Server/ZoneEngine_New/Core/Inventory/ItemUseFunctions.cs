@@ -79,6 +79,8 @@ namespace ZoneEngine_New.Core.Inventory
                     return target is Player proxyPlayer && TeleportProxy2(proxyPlayer, spell);
                 case FunctionType.SpawnMonster2:
                     return SpawnMonster2(target, spell);
+                case FunctionType.DestroyItem:
+                    return DestroySubject(target, criteria);
                 default:
                     LogUtil.Debug(
                         DebugInfoDetail.Network,
@@ -583,6 +585,18 @@ namespace ZoneEngine_New.Core.Inventory
                         exception.Message));
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Removes the item this event was aimed at: the item used on a target, or the item
+        /// whose own OnUse is running. Criteria on the function decide when it fires.
+        /// </summary>
+        static bool DestroySubject(Character target, SpellCriteria? criteria)
+        {
+            if (target is not Player player || criteria?.Subject == null)
+                return false;
+
+            return criteria.Subject.DestroyOne(player, criteria.SubjectSlot);
         }
 
         static bool UploadNano(Player player, ItemSpell spell)

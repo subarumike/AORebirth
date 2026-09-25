@@ -69,7 +69,7 @@ namespace ZoneEngine_New.Core.Inventory
         public ItemSource Source { get; init; } = ItemSource.Other;
 
         /// <summary>
-        /// True while this instance is mid-move (delayed equip/unequip). Locked items cannot be
+        /// True while this instance is mid-move (delayed equip/unequip) or mid-use (delayed use). Locked items cannot be
         /// removed or relocated by other packets (trade, delete, a second inventory move).
         /// </summary>
         public bool Locked { get; set; }
@@ -150,17 +150,49 @@ namespace ZoneEngine_New.Core.Inventory
             if (Locked)
                 return false;
 
-            if (Identity.Type == IdentityType.Container && Identity.Instance != 0 && Can(CanFlags.Use))
+            if (IsBackpackUse)
             {
                 if (TryUseBackpack(player, slotIdentity, inventoryRepository, items))
                     return true;
             }
 
-            if (!Can(CanFlags.Use))
+            if (!CanBeginUse(player))
                 return false;
-            if (!Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))
+            return ExecuteUse(player, slotIdentity, inventoryRepository, items);
+        }
+
+        /// <summary>Bag open/close toggle; never delayed.</summary>
+        public bool IsBackpackUse
+            => Identity.Type == IdentityType.Container && Identity.Instance != 0 && Can(CanFlags.Use);
+
+        /// <summary>Gates checked when a use starts and again when a delayed use completes.</summary>
+        public bool CanBeginUse(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            if (player.Session == null || player.Playfield == null || !player.Inventory.IsHydrated)
                 return false;
-            if (!Definition.ExecuteOnUseSpells(player, inventoryRepository, items))
+            if (Locked || !Can(CanFlags.Use))
+                return false;
+            return Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse);
+        }
+
+        /// <summary>Runs OnUse spells and spends a consumable charge. Callers gate with <see cref="CanBeginUse"/>.</summary>
+        public bool ExecuteUse(
+            Player player,
+            Identity slotIdentity,
+            IInventoryRepository inventoryRepository,
+            IItemBuilder items)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ArgumentNullException.ThrowIfNull(items);
+
+            if (!Definition.ExecuteOnUseSpells(
+                    player,
+                    inventoryRepository,
+                    items,
+                    criteria: new SpellCriteria { Subject = this, SubjectSlot = slotIdentity }))
                 return false;
             if (Can(CanFlags.Consume))
                 ConsumeCharge(player, slotIdentity);
@@ -177,14 +209,28 @@ namespace ZoneEngine_New.Core.Inventory
             if (!Can(CanFlags.Consume) || InstanceId <= 0)
                 return;
 
+            DestroyOne(player, slotIdentity);
+        }
+
+        /// <summary>
+        /// Removes one charge from <paramref name="slotIdentity"/>. The last charge leaves inventory,
+        /// is retired so a relog cannot bring it back, and the client is told to drop the slot.
+        /// </summary>
+        internal bool DestroyOne(Player player, Identity slotIdentity)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
             PlayerInventory inventory = player.Inventory;
             int placement = slotIdentity.Instance;
             if (!inventory.TryResolvePageByPlacement(placement, out Container page, out bool isWearPage)
                 || isWearPage)
-                return;
+                return false;
 
             if (!page.Content.TryGetValue(placement, out Item? occupant) || !ReferenceEquals(occupant, this))
-                return;
+                return false;
+
+            if (Locked)
+                return false;
 
             if (StackCount > 1)
             {
@@ -193,9 +239,8 @@ namespace ZoneEngine_New.Core.Inventory
             }
             else
             {
-                // A locked item is mid-move; leave the charge alone rather than half-destroy it.
                 if (page.Remove(placement) == null)
-                    return;
+                    return false;
 
                 StackCount = 0;
                 inventory.Discard(this, ConsumedGraveyard(player));
@@ -203,6 +248,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             player.Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);
+            return true;
         }
 
         /// <summary>
@@ -214,7 +260,10 @@ namespace ZoneEngine_New.Core.Inventory
 
         static void SendDeleteItem(Player player, IdentityType pageType, int placement)
         {
-            player.Session!.Send(
+            if (player.Session == null)
+                return;
+
+            player.Session.Send(
                 new CharacterActionMessage
                 {
                     Identity = player.Identity,
