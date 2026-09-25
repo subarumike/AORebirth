@@ -14,7 +14,7 @@
   <LinkDeadTimeoutSeconds>60</LinkDeadTimeoutSeconds>
   <Locality>
     <!-- Safety default: locality visibility remains active while character ticks stay full-rate. -->
-    <EnableCellHeatScheduling>false</EnableCellHeatScheduling>
+    <EnableCellHeatScheduling>true</EnableCellHeatScheduling>
     <VisibilityNeighborLevel>2</VisibilityNeighborLevel>
     <HotNeighborLevel>1</HotNeighborLevel>
     <WarmNeighborLevel>2</WarmNeighborLevel>
