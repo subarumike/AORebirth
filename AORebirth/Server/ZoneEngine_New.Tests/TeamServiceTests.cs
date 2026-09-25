@@ -327,6 +327,12 @@ namespace ZoneEngine_New.Tests
                 CharacterActionMessage warn = f.Session(a).Bodies.OfType<CharacterActionMessage>().Single();
                 Assert.AreEqual(tooHigh ? CharacterActionType.TeamInviteAck : CharacterActionType.TeamInviteTooLow, warn.Action);
                 Assert.AreEqual(b.Identity, warn.Target);
+                ChatTextMessage text = f.Session(a).Bodies.OfType<ChatTextMessage>().Single();
+                Assert.AreEqual(
+                    tooHigh
+                        ? "Member2 is too high for Member1."
+                        : "Member2 is too low for Member1.",
+                    text.Text);
                 Assert.AreEqual(0, f.Session(b).Bodies.Count);
                 f.Invite(a, b, confirmed: true);
                 f.Accept(b, a);
@@ -348,13 +354,61 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, invite.Unknown);
             f.Accept(b, a);
             Assert.IsFalse(f.Teams.ConvertToRaid(b));
+            Assert.AreEqual(
+                "Only the team leader can convert to raid.",
+                f.Session(b).Bodies.OfType<ChatTextMessage>().Single().Text);
             f.Clear();
             Assert.IsTrue(f.Teams.ConvertToRaid(a));
             Assert.IsTrue(f.Teams.GetTeam(b)!.IsRaid);
             Assert.AreEqual(2, f.AllBodies.OfType<RaidMessage>().Count());
+            Assert.AreEqual(
+                "Your team has been converted to a raid.",
+                f.Session(a).Bodies.OfType<ChatTextMessage>().Single().Text);
             Assert.IsTrue(f.Chat.Commands.Any(c => c.CharacterId == 1 && c.ChatCommandString.StartsWith("#aorebirth-raid-convert ", StringComparison.Ordinal)));
             Assert.IsTrue(f.Chat.Commands.Any(c => c.CharacterId == 2 && c.ChatCommandString.StartsWith("#aorebirth-raid-convert ", StringComparison.Ordinal)));
             Assert.IsFalse(f.Teams.ConvertToRaid(a));
+            Assert.AreEqual(
+                "Your team is already a raid.",
+                f.Session(a).Bodies.OfType<ChatTextMessage>().Last().Text);
+        }
+
+        [TestMethod]
+        public void RaidLeaderMoveMemberPublishesTeamMemberLeftThenTeamMemberWithRaidIndex()
+        {
+            // Capture 20260924-213512: RaidCmd Command=4 Target=Zizion Dest=1 →
+            // TeamMemberInfo, SocialStatus, TeamMemberLeft(param2=0), TeamMember(Unknown4=1), ...
+            var f = new Fixture();
+            Player a = f.Player(1), b = f.Player(2);
+            f.Join(a, b);
+            Assert.IsTrue(f.Teams.ConvertToRaid(a));
+            f.Clear();
+            Assert.IsFalse(f.Teams.TryHandleRaidCmd(b, new RaidCmdMessage
+            {
+                Command = 4,
+                TargetCharacterId = a.Identity.Instance,
+                DestinationTeamIndex = 1
+            }));
+            Assert.AreEqual(
+                "Only the raid leader can move members between teams.",
+                f.Session(b).Bodies.OfType<ChatTextMessage>().Single().Text);
+            f.Clear();
+            Assert.IsTrue(f.Teams.TryHandleRaidCmd(a, new RaidCmdMessage
+            {
+                Command = 4,
+                TargetCharacterId = b.Identity.Instance,
+                DestinationTeamIndex = 1
+            }));
+            CharacterActionMessage left = f.Session(a).Bodies.OfType<CharacterActionMessage>()
+                .Single(m => m.Action == CharacterActionType.TeamMemberLeft);
+            Assert.AreEqual(b.Identity, left.Target);
+            Assert.AreEqual(f.Teams.GetTeam(a)!.TeamId, left.Parameter1);
+            Assert.AreEqual(0, left.Parameter2);
+            TeamMemberMessage moved = f.Session(a).Bodies.OfType<TeamMemberMessage>()
+                .Single(m => m.Member.Instance == b.Identity.Instance);
+            Assert.AreEqual(1, moved.Unknown4);
+            TeamMemberMessage peerView = f.Session(b).Bodies.OfType<TeamMemberMessage>()
+                .Single(m => m.Member.Instance == b.Identity.Instance);
+            Assert.AreEqual(1, peerView.Unknown4);
         }
 
         [TestMethod]

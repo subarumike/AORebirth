@@ -37,7 +37,11 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(1)]
         public Identity Team { get; set; }
 
-        /// <summary>Capture constant -1.</summary>
+        /// <summary>
+        /// Raid sub-team index. Ordinary team / pre-move raid uses -1
+        /// (captures 20260727-071217, 20260924-213512). After RaidCmd Command=4
+        /// this equals DestinationTeamIndex (capture 20260924-213512: 1).
+        /// </summary>
         [AoMember(2)]
         public int Unknown4 { get; set; }
 
