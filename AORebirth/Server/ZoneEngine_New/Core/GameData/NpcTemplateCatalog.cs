@@ -276,6 +276,9 @@ namespace ZoneEngine_New.Core.GameData
             SelectBands(bands, level, out NpcLevelBand low, out NpcLevelBand high, out double t);
             NpcLevelBand nearest = t <= 0.5 ? low : high;
             Dictionary<int, int> stats = InterpolateStats(low, high, t);
+            if (nearest.CharacterFlags.HasValue)
+                stats[(int)CharacterStat.Flags] = nearest.CharacterFlags.Value;
+
             stats[(int)CharacterStat.Level] = level;
             bool isFallback = string.Equals(leaf.Hash, MobTemplate.FallbackHash, StringComparison.Ordinal);
 
@@ -291,6 +294,8 @@ namespace ZoneEngine_New.Core.GameData
                 MaxLevel = max,
                 UnresolvedPlaceholder = isFallback,
                 Equipment = CopyPairs(nearest.Equipment),
+                ExtendedTextureOverrideData = CopyBytes(nearest.ExtendedTextureOverrideData),
+                CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(nearest.CorpseFullUpdateTemplate),
                 KnuBotId = nearest.KnuBotId,
                 ItemTable = CopyLoot(nearest.LootTable)
             };
@@ -420,6 +425,42 @@ namespace ZoneEngine_New.Core.GameData
             return copy;
         }
 
+        static byte[] CopyBytes(byte[]? source)
+        {
+            if (source == null || source.Length == 0)
+                return [];
+
+            var copy = new byte[source.Length];
+            Buffer.BlockCopy(source, 0, copy, 0, source.Length);
+            return copy;
+        }
+
+        static MobCorpseFullUpdateTemplate? CopyCorpseFullUpdateTemplate(MobCorpseFullUpdateTemplate? source)
+        {
+            if (source == null || source.PacketTemplate.Length == 0)
+                return null;
+
+            return new MobCorpseFullUpdateTemplate
+            {
+                PacketTemplate = CopyBytes(source.PacketTemplate),
+                MessageId = source.MessageId,
+                MessageIdOffset = source.MessageIdOffset,
+                PacketLengthOffset = source.PacketLengthOffset,
+                SenderInstanceOffset = source.SenderInstanceOffset,
+                ReceiverInstanceOffset = source.ReceiverInstanceOffset,
+                CorpseInstanceOffset = source.CorpseInstanceOffset,
+                PositionXOffset = source.PositionXOffset,
+                PositionYOffset = source.PositionYOffset,
+                PositionZOffset = source.PositionZOffset,
+                PlayfieldIdOffset = source.PlayfieldIdOffset,
+                DeadNpcInstanceOffset = source.DeadNpcInstanceOffset,
+                CatMeshOffset = source.CatMeshOffset,
+                CashOffset = source.CashOffset,
+                MonsterDataOffset = source.MonsterDataOffset,
+                TailDeadNpcInstanceOffset = source.TailDeadNpcInstanceOffset
+            };
+        }
+
         sealed class NpcHashDto
         {
             public string[]? Children { get; set; }
@@ -436,6 +477,8 @@ namespace ZoneEngine_New.Core.GameData
 
         public Dictionary<int, int> Stats { get; set; } = new();
 
+        public int? CharacterFlags { get; set; }
+
         public int Level { get; set; }
 
         public int TemplateId { get; set; }
@@ -447,6 +490,10 @@ namespace ZoneEngine_New.Core.GameData
         public int KnuBotId { get; set; }
 
         public List<List<int>> Equipment { get; set; } = new();
+
+        public byte[] ExtendedTextureOverrideData { get; set; } = [];
+
+        public MobCorpseFullUpdateTemplate? CorpseFullUpdateTemplate { get; set; }
 
         [JsonPropertyName("LootTable")]
         public List<MobItemTableEntry> LootTable { get; set; } = new();

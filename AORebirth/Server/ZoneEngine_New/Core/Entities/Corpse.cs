@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Entities
 {
     using System;
+    using System.Buffers.Binary;
     using System.Collections.Generic;
 
     using AORebirth.Enums;
@@ -48,7 +49,12 @@ namespace ZoneEngine_New.Core.Entities
             Rotation = dead.Rotation;
             Playfield = dead.Playfield;
             LootLevel = dead.Stats.GetOrOne(CharacterStat.Level);
-            ItemTable = dead is NpcCharacter npc ? npc.MobTemplate?.ItemTable : null;
+            if (dead is NpcCharacter npc)
+            {
+                ItemTable = npc.MobTemplate?.ItemTable;
+                CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(npc.MobTemplate?.CorpseFullUpdateTemplate);
+            }
+
             TimeExist = DefaultTimeExist;
             ExpiresAtUtc = DateTime.UtcNow.AddMilliseconds(TimeExist * 10);
             CopySourceStats(dead);
@@ -107,6 +113,106 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>Owner's textures captured at death.</summary>
         Texture[] OwnerTextures { get; }
+
+        MobCorpseFullUpdateTemplate? CorpseFullUpdateTemplate { get; }
+
+        public override byte[]? BuildSpawnPacket(Identity receiver)
+        {
+            if (CorpseFullUpdateTemplate == null || CorpseFullUpdateTemplate.PacketTemplate.Length == 0)
+                return null;
+
+            byte[] packet = CopyBytes(CorpseFullUpdateTemplate.PacketTemplate);
+            int sender = Playfield?.Identity.Instance ?? 0;
+            int playfieldId = Playfield?.Identity.Instance ?? 0;
+            SourceStats.TryGetValue(CharacterStat.Cash, out int cash);
+            SourceStats.TryGetValue(CharacterStat.MonsterData, out int monsterData);
+            TryResolveCatMesh(out int catMesh);
+
+            WriteUInt16(packet, CorpseFullUpdateTemplate.MessageIdOffset, CorpseFullUpdateTemplate.MessageId, nameof(CorpseFullUpdateTemplate.MessageId));
+            WriteUInt16(packet, CorpseFullUpdateTemplate.PacketLengthOffset, packet.Length, nameof(CorpseFullUpdateTemplate.PacketLengthOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.SenderInstanceOffset, sender, nameof(CorpseFullUpdateTemplate.SenderInstanceOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.ReceiverInstanceOffset, receiver.Instance, nameof(CorpseFullUpdateTemplate.ReceiverInstanceOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.CorpseInstanceOffset, Identity.Instance, nameof(CorpseFullUpdateTemplate.CorpseInstanceOffset));
+            WriteSingle(packet, CorpseFullUpdateTemplate.PositionXOffset, (float)Position.x, nameof(CorpseFullUpdateTemplate.PositionXOffset));
+            WriteSingle(packet, CorpseFullUpdateTemplate.PositionYOffset, (float)Position.y, nameof(CorpseFullUpdateTemplate.PositionYOffset));
+            WriteSingle(packet, CorpseFullUpdateTemplate.PositionZOffset, (float)Position.z, nameof(CorpseFullUpdateTemplate.PositionZOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.PlayfieldIdOffset, playfieldId, nameof(CorpseFullUpdateTemplate.PlayfieldIdOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.DeadNpcInstanceOffset, Owner.Instance, nameof(CorpseFullUpdateTemplate.DeadNpcInstanceOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.CatMeshOffset, catMesh, nameof(CorpseFullUpdateTemplate.CatMeshOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.CashOffset, Math.Max(0, cash), nameof(CorpseFullUpdateTemplate.CashOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.MonsterDataOffset, monsterData, nameof(CorpseFullUpdateTemplate.MonsterDataOffset));
+            WriteInt32(packet, CorpseFullUpdateTemplate.TailDeadNpcInstanceOffset, Owner.Instance, nameof(CorpseFullUpdateTemplate.TailDeadNpcInstanceOffset));
+            return packet;
+        }
+
+        static byte[] CopyBytes(byte[] source)
+        {
+            var copy = new byte[source.Length];
+            Buffer.BlockCopy(source, 0, copy, 0, source.Length);
+            return copy;
+        }
+
+        static MobCorpseFullUpdateTemplate? CopyCorpseFullUpdateTemplate(MobCorpseFullUpdateTemplate? source)
+        {
+            if (source == null || source.PacketTemplate.Length == 0)
+                return null;
+
+            return new MobCorpseFullUpdateTemplate
+            {
+                PacketTemplate = CopyBytes(source.PacketTemplate),
+                MessageId = source.MessageId,
+                MessageIdOffset = source.MessageIdOffset,
+                PacketLengthOffset = source.PacketLengthOffset,
+                SenderInstanceOffset = source.SenderInstanceOffset,
+                ReceiverInstanceOffset = source.ReceiverInstanceOffset,
+                CorpseInstanceOffset = source.CorpseInstanceOffset,
+                PositionXOffset = source.PositionXOffset,
+                PositionYOffset = source.PositionYOffset,
+                PositionZOffset = source.PositionZOffset,
+                PlayfieldIdOffset = source.PlayfieldIdOffset,
+                DeadNpcInstanceOffset = source.DeadNpcInstanceOffset,
+                CatMeshOffset = source.CatMeshOffset,
+                CashOffset = source.CashOffset,
+                MonsterDataOffset = source.MonsterDataOffset,
+                TailDeadNpcInstanceOffset = source.TailDeadNpcInstanceOffset
+            };
+        }
+
+        static void WriteUInt16(byte[] packet, int offset, int value, string name)
+        {
+            if (offset < 0)
+                return;
+
+            if (value < ushort.MinValue || value > ushort.MaxValue)
+                throw new InvalidOperationException($"{name} value {value} is outside UInt16 range.");
+
+            RequireRange(packet, offset, sizeof(ushort), name);
+            BinaryPrimitives.WriteUInt16BigEndian(packet.AsSpan(offset, sizeof(ushort)), (ushort)value);
+        }
+
+        static void WriteInt32(byte[] packet, int offset, int value, string name)
+        {
+            if (offset < 0)
+                return;
+
+            RequireRange(packet, offset, sizeof(int), name);
+            BinaryPrimitives.WriteInt32BigEndian(packet.AsSpan(offset, sizeof(int)), value);
+        }
+
+        static void WriteSingle(byte[] packet, int offset, float value, string name)
+        {
+            if (offset < 0)
+                return;
+
+            RequireRange(packet, offset, sizeof(float), name);
+            BinaryPrimitives.WriteSingleBigEndian(packet.AsSpan(offset, sizeof(float)), value);
+        }
+
+        static void RequireRange(byte[] packet, int offset, int count, string name)
+        {
+            if (offset > packet.Length - count)
+                throw new InvalidOperationException($"{name} offset {offset} is outside the corpse packet template.");
+        }
 
         public override MessageBody BuildSpawnMessage()
         {

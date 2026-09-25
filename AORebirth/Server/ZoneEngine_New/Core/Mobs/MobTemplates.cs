@@ -56,6 +56,12 @@ namespace ZoneEngine_New.Core.Mobs
         /// <summary>SCFU texture overrides keyed by place. Empty omits the texture block.</summary>
         public Dictionary<int, int> Textures { get; set; } = new();
 
+        /// <summary>Opaque SCFU extended texture override payload copied from template data.</summary>
+        public byte[] ExtendedTextureOverrideData { get; set; } = [];
+
+        /// <summary>Optional raw CorpseFullUpdate template for NPCs whose corpse visuals are not codec-representable.</summary>
+        public MobCorpseFullUpdateTemplate? CorpseFullUpdateTemplate { get; set; }
+
         public int KnuBotId { get; set; }
 
         public string RawFeatures { get; set; } = string.Empty;
@@ -67,5 +73,40 @@ namespace ZoneEngine_New.Core.Mobs
         public string BinaryListData { get; set; } = string.Empty;
 
         public JsonElement? BinaryList { get; set; }
+    }
+
+    public sealed class MobCorpseFullUpdateTemplate
+    {
+        public byte[] PacketTemplate { get; set; } = [];
+
+        public int MessageId { get; set; }
+
+        public int MessageIdOffset { get; set; } = -1;
+
+        public int PacketLengthOffset { get; set; } = -1;
+
+        public int SenderInstanceOffset { get; set; } = -1;
+
+        public int ReceiverInstanceOffset { get; set; } = -1;
+
+        public int CorpseInstanceOffset { get; set; } = -1;
+
+        public int PositionXOffset { get; set; } = -1;
+
+        public int PositionYOffset { get; set; } = -1;
+
+        public int PositionZOffset { get; set; } = -1;
+
+        public int PlayfieldIdOffset { get; set; } = -1;
+
+        public int DeadNpcInstanceOffset { get; set; } = -1;
+
+        public int CatMeshOffset { get; set; } = -1;
+
+        public int CashOffset { get; set; } = -1;
+
+        public int MonsterDataOffset { get; set; } = -1;
+
+        public int TailDeadNpcInstanceOffset { get; set; } = -1;
     }
 }
