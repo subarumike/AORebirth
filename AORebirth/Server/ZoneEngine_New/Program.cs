@@ -285,6 +285,7 @@ namespace ZoneEngine_New
             AddMessageHandler<QuestMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             AddMessageHandler<SkillMessageHandler>(services);
+            AddMessageHandler<SetStatMessageHandler>(services);
             services.AddSingleton<IMessageRouter, MessageRouter>();
             services.AddSingleton<ZoneMessageDispatcher>();
             services.AddSingleton<ZoneNetworkHost>();
