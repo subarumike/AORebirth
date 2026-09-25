@@ -630,6 +630,12 @@ namespace ZoneEngine_New.Core.Entities
         {
             if (this is Player player && player.IsPersistenceQuarantined)
                 return;
+            if (Playfield != null
+                && Playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel)
+                && dynel is Character resolved
+                && !CombatRules.CanAttack(this, resolved))
+                return;
+
             SetFightingTarget(target);
             ResetAllWeaponAttacks();
             Cell?.Announce(BuildSpecialAttackWeaponMessage());
@@ -966,7 +972,10 @@ namespace ZoneEngine_New.Core.Entities
             TickOneRegen(
                 ref _healRegenElapsed,
                 deltaTime,
-                PassiveRegenCalculator.ComputeHealthDelta(breed, bodyDevelopment),
+                PassiveRegenCalculator.ComputeHealthDelta(
+                    breed,
+                    bodyDevelopment,
+                    Stats.GetOrZero(CharacterStat.HealDelta)),
                 PassiveRegenCalculator.ComputeHealthIntervalSeconds(
                     Stats.GetOrZero(CharacterStat.Stamina),
                     sitting),
@@ -976,7 +985,10 @@ namespace ZoneEngine_New.Core.Entities
             TickOneRegen(
                 ref _nanoRegenElapsed,
                 deltaTime,
-                PassiveRegenCalculator.ComputeNanoDelta(breed, bodyDevelopment),
+                PassiveRegenCalculator.ComputeNanoDelta(
+                    breed,
+                    Stats.GetOrZero(CharacterStat.NanoPool),
+                    Stats.GetOrZero(CharacterStat.NanoDelta)),
                 PassiveRegenCalculator.ComputeNanoIntervalSeconds(
                     Stats.GetOrZero(CharacterStat.Psychic),
                     sitting),
@@ -1063,6 +1075,9 @@ namespace ZoneEngine_New.Core.Entities
             if (target == null)
                 return;
 
+            if (!CombatRules.CanAttack(this, target))
+                return;
+
             if (!HasLineOfSightTo(target))
                 return;
 
@@ -1091,7 +1106,11 @@ namespace ZoneEngine_New.Core.Entities
                 return;
             }
 
-            bool killingHit = target.ApplyDamage(this, result.Damage, result.HitType);
+            target.ApplyDamage(this, result.Damage, result.HitType);
+            if (weapon != null)
+                ApplyOnHitProcs(target, weapon);
+
+            bool killingHit = target.IsDead;
             Cell?.Announce(
                 new AttackInfoMessage
                 {
@@ -1108,11 +1127,41 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
+        /// Runs the weapon's OnHit functions after a connecting swing. Item 205012's
+        /// OnHit is CastChance: a percent chance to land a nano on the recipient.
+        /// </summary>
+        void ApplyOnHitProcs(Character target, Item weapon)
+        {
+            if (!weapon.SpellList.ContainsKey(EventType.OnHit))
+                return;
+
+            Playfield? playfield = Playfield;
+            if (playfield == null)
+                return;
+
+            IItemBuilder? items = playfield.GetService<IItemBuilder>();
+            IInventoryRepository? inventory = playfield.GetService<IInventoryRepository>();
+            if (items == null || inventory == null)
+                return;
+
+            weapon.Definition.ExecuteSpells(
+                EventType.OnHit,
+                target,
+                inventory,
+                items,
+                source: this);
+        }
+
+        /// <summary>
         /// Applies hit-point damage. Returns true when this hit killed the character.
         /// </summary>
         public virtual bool ApplyDamage(Character attacker, int damage, HitType hitType)
         {
             if (_deathNotified || damage <= 0)
+                return false;
+
+            // Same-character hits are item and status effects. Cross-character damage is an attack.
+            if (!ReferenceEquals(attacker, this) && !CombatRules.CanAttack(attacker, this))
                 return false;
 
             int previousHealth = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
@@ -2178,15 +2227,21 @@ namespace ZoneEngine_New.Core.Entities
             => new();
 
         /// <summary>
-        /// Builds one WIFU for an equipped hand-slot item, or null when the item should not be announced.
-        /// Fists and NPC tag-backed natural weapons are omitted — AttackInfo/SAW carry those hits.
+        /// Builds one WeaponInstance for an equipped hand-slot item, or null when it should not be announced.
+        /// Only a visible weapon (non-zero weapon mesh on that hand) is sent.
+        /// Fists and invisible NPC tag weapons are omitted — AttackInfo/SAW carry those hits.
         /// </summary>
         protected WeaponItemFullUpdateMessage? TryBuildWeaponItemFullUpdate(
             Item item,
             int equipmentSlot,
-            CharacterWeapon? armed = null)
+            CharacterWeapon? armed = null,
+            bool visibleHand = false)
         {
-            if (!AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(item, armed))
+            if (!AttackInfoRules.HasVisibleWeaponMesh(item, equipmentSlot))
+                return null;
+            if (visibleHand && !item.IsWieldableCombatWeapon())
+                return null;
+            if (!visibleHand && !AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(item, armed))
                 return null;
 
             int weaponInstanceId = Playfield != null

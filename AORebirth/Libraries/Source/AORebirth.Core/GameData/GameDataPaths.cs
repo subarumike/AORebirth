@@ -41,6 +41,8 @@ namespace AORebirth.Core.GameData
 
         public const string MonsterDataFileName = "MonsterData.json";
 
+        public const string TextFileName = "Text.json";
+
         public const string RespawnFileName = "Respawn.json";
 
         public const string XpFileName = "Xp.json";

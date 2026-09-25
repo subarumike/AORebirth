@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Trade
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
@@ -93,7 +94,7 @@ namespace ZoneEngine_New.Core.Trade
             Dynel anchor = owner != null ? owner : machine;
             if (player.GetEdgeDistanceTo(anchor) > RangeCancelDistance)
             {
-                Tell(player, "You are too far away.");
+                ClientFeedback.Send(player, "Feedback_TooFarAway");
                 return false;
             }
 
@@ -171,7 +172,7 @@ namespace ZoneEngine_New.Core.Trade
 
             if (initiator.GetEdgeDistanceTo(partner) > RangeCancelDistance)
             {
-                Tell(initiator, "You are too far away to trade.");
+                ClientFeedback.Send(initiator, "Feedback_TargetOutsideRangeForTrade");
                 return false;
             }
 
@@ -188,7 +189,7 @@ namespace ZoneEngine_New.Core.Trade
 
             if (HasSession(partner))
             {
-                Tell(initiator, partner.Name + " is already trading.");
+                ClientFeedback.Send(initiator, "Feedback_TargetIsAlreadyInATrade");
                 return false;
             }
 
@@ -311,7 +312,7 @@ namespace ZoneEngine_New.Core.Trade
 
             if (session.AddShopPick(stockIndex) < 0)
             {
-                Tell(player, "Trade window is full.");
+                ClientFeedback.Send(player, "Feedback_CantTradeMoreItems");
                 return;
             }
 
@@ -342,13 +343,13 @@ namespace ZoneEngine_New.Core.Trade
             if (InventoryMoveService.IsBagItem(item))
             {
                 // Bag interiors would need handle invalidation and recursive ownership transfer.
-                Tell(player, "Containers cannot be traded.");
+                ClientFeedback.Send(player, "Feedback_ItemCantBeTraded");
                 return;
             }
 
             if (TradeRules.IsNoDrop(item))
             {
-                Tell(player, item.Name + " cannot be traded.");
+                ClientFeedback.Send(player, "Feedback_NoDropItemCantBeTraded");
                 return;
             }
 
@@ -360,7 +361,7 @@ namespace ZoneEngine_New.Core.Trade
             if (tradeSlot < 0)
             {
                 page.Add(source.Instance, item);
-                Tell(player, "Trade window is full.");
+                ClientFeedback.Send(player, "Feedback_CantTradeMoreItems");
                 return;
             }
 
@@ -401,7 +402,7 @@ namespace ZoneEngine_New.Core.Trade
             if (!player.Inventory.TryPlace(item, out Container page, out int slot))
             {
                 offer.TryRestore(tradeSlot, item);
-                Tell(player, "Inventory is full.");
+                ClientFeedback.Send(player, "Feedback_InventoryFull");
                 return;
             }
 
@@ -468,8 +469,8 @@ namespace ZoneEngine_New.Core.Trade
                 if (failure != null)
                 {
                     session.ClearAcceptances();
-                    Tell(session.Initiator, "Trade failed: " + failure);
-                    Tell(session.Partner!, "Trade failed: " + failure);
+                    TellTradeFailure(session.Initiator, failure);
+                    TellTradeFailure(session.Partner!, failure);
                     return;
                 }
 
@@ -554,8 +555,8 @@ namespace ZoneEngine_New.Core.Trade
             if (failure != null)
             {
                 session.ClearAcceptances();
-                Tell(initiator, "Trade failed: " + failure);
-                Tell(partner, "Trade failed: " + failure);
+                TellTradeFailure(initiator, failure);
+                TellTradeFailure(partner, failure);
                 return;
             }
 
@@ -770,7 +771,7 @@ namespace ZoneEngine_New.Core.Trade
             {
                 if (TradeRules.IsNoDrop(item))
                 {
-                    Tell(player, "Trade failed: " + item.Name + " cannot be sold.");
+                    ClientFeedback.Send(player, "Feedback_NoDropItemCantBeTraded");
                     return;
                 }
 
@@ -783,7 +784,7 @@ namespace ZoneEngine_New.Core.Trade
             long finalCash = (long)player.Stats.GetOrZero(CharacterStat.Cash) - buyTotal + sellTotal;
             if (finalCash < 0)
             {
-                Tell(player, "Trade failed: you cannot afford that.");
+                ClientFeedback.Send(player, "Feedback_NotEnoughCredits");
                 return;
             }
 
@@ -797,7 +798,7 @@ namespace ZoneEngine_New.Core.Trade
             // lose the paid-for item on restart. Require real inventory before allocating ids.
             if (!player.Inventory.HasFreeInventorySlots(purchases.Count))
             {
-                Tell(player, "Trade failed: not enough free inventory slots.");
+                ClientFeedback.Send(player, "Feedback_NoRoomInInventory");
                 return;
             }
 
@@ -814,7 +815,7 @@ namespace ZoneEngine_New.Core.Trade
                     && (TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId)
                         || ContainsTemplate(minted, item)))
                 {
-                    Tell(player, "Trade failed: you already have " + item.Name + ".");
+                    ClientFeedback.Send(player, "Feedback_AlreadyGotUniqueItem");
                     return;
                 }
 
@@ -1012,7 +1013,7 @@ namespace ZoneEngine_New.Core.Trade
                         "Trade return failed instance={0} owner={1}; no free slot",
                         item.InstanceId,
                         owner.Identity.Instance));
-                Tell(owner, "Could not return " + item.Name + " to your inventory.");
+                ClientFeedback.Send(owner, "Feedback_NoRoomInInventory");
             }
 
             offer.Credits = 0;
@@ -1345,6 +1346,18 @@ namespace ZoneEngine_New.Core.Trade
                 StatDetail.Base,
                 dirty: true);
             player.FlushDirtyStats();
+        }
+
+        static void TellTradeFailure(Player player, string failure)
+        {
+            if (failure.EndsWith("cannot be traded.", StringComparison.Ordinal))
+                ClientFeedback.Send(player, "Feedback_NoDropItemCantBeTraded");
+            else if (failure.EndsWith("does not have enough free inventory slots.", StringComparison.Ordinal))
+                ClientFeedback.Send(player, "Feedback_NoRoomInInventory");
+            else if (failure.Contains(" already has ", StringComparison.Ordinal))
+                ClientFeedback.Send(player, "Feedback_AlreadyGotUniqueItem");
+            else
+                Tell(player, "Trade failed: " + failure);
         }
 
         static void Tell(Player player, string text)

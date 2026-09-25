@@ -39,7 +39,6 @@ namespace AORebirth.Tools.RDBDataExtractor
                     return 2;
                 }
 
-                Directory.CreateDirectory(resolved.OutputDirectory);
                 Directory.CreateDirectory(resolved.GameDataDirectory);
 
                 int tilemapWritten = 0;
@@ -52,10 +51,43 @@ namespace AORebirth.Tools.RDBDataExtractor
                 int monsterDataSkipped = 0;
                 int itemsDatWritten = 0;
                 int itemsDatSkipped = 0;
+                int textWritten = 0;
+                int textSkipped = 0;
                 int failed = 0;
 
-                using (var controller = new RdbController(resolved.AoClientPath))
+                if (!resolved.SkipText)
                 {
+                    try
+                    {
+                        var text = new TextExporter(
+                            resolved.AoClientPath,
+                            resolved.GameDataDirectory);
+                        ExportFileCounts textCounts = text.Export(resolved.Overwrite);
+                        textWritten += textCounts.Written;
+                        textSkipped += textCounts.Skipped;
+                    }
+                    catch (Exception exception)
+                    {
+                        failed++;
+                        Console.Error.WriteLine(
+                            "FAIL Text.json "
+                            + exception.GetType().Name
+                            + ": "
+                            + exception.Message);
+                    }
+                }
+
+                bool exportPlayfields = !resolved.SkipPlayfields;
+                bool needRdb = !resolved.SkipMonsterData
+                    || !resolved.SkipItemsDat
+                    || exportPlayfields;
+                if (needRdb)
+                {
+                    if (exportPlayfields)
+                        Directory.CreateDirectory(resolved.OutputDirectory);
+
+                    using (var controller = new RdbController(resolved.AoClientPath))
+                    {
                     if (!resolved.SkipMonsterData)
                     {
                         try
@@ -100,13 +132,15 @@ namespace AORebirth.Tools.RDBDataExtractor
                         }
                     }
 
-                    var tilemaps = new TilemapExporter(controller, resolved.OutputDirectory);
-                    var districts = new DistrictExporter(controller, resolved.OutputDirectory);
-                    var playfieldDats = new PlayfieldDatExporter(
-                        controller,
-                        resolved.OutputDirectory);
+                    if (exportPlayfields)
+                    {
+                        var tilemaps = new TilemapExporter(controller, resolved.OutputDirectory);
+                        var districts = new DistrictExporter(controller, resolved.OutputDirectory);
+                        var playfieldDats = new PlayfieldDatExporter(
+                            controller,
+                            resolved.OutputDirectory);
 
-                    IEnumerable<int> playfieldIds;
+                        IEnumerable<int> playfieldIds;
                     if (resolved.TilemapId.HasValue)
                     {
                         playfieldIds = new[] { resolved.TilemapId.Value };
@@ -253,6 +287,8 @@ namespace AORebirth.Tools.RDBDataExtractor
                             if (resolved.TilemapId.HasValue)
                                 return 1;
                         }
+                        }
+                    }
                     }
                 }
 
@@ -277,6 +313,10 @@ namespace AORebirth.Tools.RDBDataExtractor
                     + itemsDatWritten
                     + " itemsDatSkipped="
                     + itemsDatSkipped
+                    + " textWritten="
+                    + textWritten
+                    + " textSkipped="
+                    + textSkipped
                     + " failed="
                     + failed);
                 return failed > 0 ? 1 : 0;

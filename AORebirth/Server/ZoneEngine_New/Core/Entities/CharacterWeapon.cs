@@ -52,10 +52,16 @@ namespace ZoneEngine_New.Core.Entities
         public Item? Item { get; set; }
 
         /// <summary>
-        /// Value written to AttackInfo / WIFU slot fields. Negative means derive from
-        /// <see cref="LogicalSlot"/> (players). NPCs set 0..7 for template weapon ordinals.
+        /// Value written to AttackInfo slot fields.
+        /// Negative means derive from <see cref="LogicalSlot"/> (players). NPCs set 0..7 for template weapon ordinals.
         /// </summary>
         public int WireSlot { get; set; } = -1;
+
+        /// <summary>
+        /// WeaponPage slot for a visible hand (right, then left). Negative when this weapon has no WeaponMesh.
+        /// AttackInfo keeps <see cref="WireSlot"/>.
+        /// </summary>
+        public int VisibleHandSlot { get; set; } = -1;
 
         /// <summary>
         /// NPC SAW / AttackInfo weapon tag (4-char packed int). Zero for player hands / fists.

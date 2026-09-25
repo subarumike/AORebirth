@@ -38,6 +38,9 @@ namespace ZoneEngine_New.Core.Entities
 
         public CharacterSaveState SaveState { get; } = new();
 
+        /// <summary>Rebuilt from active <see cref="FunctionType.ChangeActionRestriction"/> buffs.</summary>
+        public ActionRestrictionFlags ActionRestrictionFlags { get; internal set; }
+
         /// <summary>Skill trickle and training costs used by rebase and the trainer.</summary>
         public SkillCatalog SkillCatalog { get; init; } = SkillCatalog.Default;
 
@@ -290,6 +293,7 @@ namespace ZoneEngine_New.Core.Entities
             // requirements.
             RebaseEquipBonuses();
             ApplyBuffBonuses();
+            ActionRestrictionFlags = CombatRules.CollectActionRestrictions(Buffs, Stats);
             SkillCatalog.ApplyTrickle(Stats);
             RebaseWearAppearance();
             RebaseMaxHealth();
@@ -427,7 +431,7 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Called after a Weapons / Armor / Implant / Social slot changes.
-        /// Hand weapons announce WIFU.
+        /// A visible hand weapon announces its WeaponInstance.
         /// </summary>
         public void OnEquipmentChanged(EquipSlot slot)
         {

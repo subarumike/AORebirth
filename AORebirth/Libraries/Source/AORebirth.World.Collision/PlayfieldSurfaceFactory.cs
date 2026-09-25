@@ -4,8 +4,8 @@ namespace AORebirth.World.Collision
     using System.Collections.Generic;
     using System.Numerics;
 
-    using LostEden.Vehicles;
-    using LostEden.Vehicles.Surfaces;
+    using N3Lite;
+    using N3Lite.Surfaces;
 
     /// <summary>
     /// A playfield's client-style collision world: the terrain as an <c>n3TilemapSurface_t</c> with a
@@ -177,10 +177,7 @@ namespace AORebirth.World.Collision
                 for (int i = 0; i < indices.Length; i++)
                     indices[i] = i;
 
-                TriangleMeshSurface? surface = PlayfieldCellSurface.BuildCell(verts, indices);
-                if (surface == null)
-                    continue;
-
+                var surface = new TriangleMeshSurface(verts, indices);
                 cells.SetSurfaceForCell(cell, surface);
                 populated++;
             }

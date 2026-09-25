@@ -14,6 +14,7 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
     using SmokeLounge.AOtomation.Messaging.Serialization;
     using ZoneEngine_New.Core.Chat;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
@@ -354,16 +355,12 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, invite.Unknown);
             f.Accept(b, a);
             Assert.IsFalse(f.Teams.ConvertToRaid(b));
-            Assert.AreEqual(
-                "Only the team leader can convert to raid.",
-                f.Session(b).Bodies.OfType<ChatTextMessage>().Single().Text);
+            AssertFeedback(f.Session(b).Bodies.OfType<FeedbackMessage>().Single(), "Feedback_NeedToBeTeamLeader");
             f.Clear();
             Assert.IsTrue(f.Teams.ConvertToRaid(a));
             Assert.IsTrue(f.Teams.GetTeam(b)!.IsRaid);
             Assert.AreEqual(2, f.AllBodies.OfType<RaidMessage>().Count());
-            Assert.AreEqual(
-                "Your team has been converted to a raid.",
-                f.Session(a).Bodies.OfType<ChatTextMessage>().Single().Text);
+            AssertFeedback(f.Session(a).Bodies.OfType<FeedbackMessage>().Single(), "Feedback_RaidCreated");
             Assert.IsTrue(f.Chat.Commands.Any(c => c.CharacterId == 1 && c.ChatCommandString.StartsWith("#aorebirth-raid-convert ", StringComparison.Ordinal)));
             Assert.IsTrue(f.Chat.Commands.Any(c => c.CharacterId == 2 && c.ChatCommandString.StartsWith("#aorebirth-raid-convert ", StringComparison.Ordinal)));
             Assert.IsFalse(f.Teams.ConvertToRaid(a));
@@ -388,9 +385,7 @@ namespace ZoneEngine_New.Tests
                 TargetCharacterId = a.Identity.Instance,
                 DestinationTeamIndex = 1
             }));
-            Assert.AreEqual(
-                "Only the raid leader can move members between teams.",
-                f.Session(b).Bodies.OfType<ChatTextMessage>().Single().Text);
+            AssertFeedback(f.Session(b).Bodies.OfType<FeedbackMessage>().Single(), "Feedback_NeedToBeTeamLeader");
             f.Clear();
             Assert.IsTrue(f.Teams.TryHandleRaidCmd(a, new RaidCmdMessage
             {
@@ -678,6 +673,13 @@ namespace ZoneEngine_New.Tests
             using var reader = new SmokeLounge.AOtomation.Messaging.Serialization.StreamReader(input);
             MessageBody decoded = (MessageBody)serializer.Deserialize(reader, new SerializationContext(resolver));
             Assert.AreEqual(body.GetType(), decoded.GetType());
+        }
+
+        private static void AssertFeedback(FeedbackMessage message, string key)
+        {
+            Assert.AreEqual(ClientFeedback.Channel, message.Unknown1);
+            Assert.AreEqual(ClientFeedback.CategoryId, message.CategoryId);
+            Assert.AreEqual(unchecked((int)ClientFeedback.ElfHash(key)), message.MessageId);
         }
 
         private static string Describe(MessageBody body) => body switch

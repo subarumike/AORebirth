@@ -88,7 +88,7 @@ namespace ZoneEngine_New.Core.Nanos
                     NanoCastRefusal.NotUploaded,
                     phase: "start",
                     detail: "spell resolve failed");
-                Refuse(caster, NanoCastRules.Describe(NanoCastRefusal.NotUploaded));
+                Refuse(caster, NanoCastRefusal.NotUploaded);
                 return NanoCastRefusal.NotUploaded;
             }
 
@@ -107,7 +107,7 @@ namespace ZoneEngine_New.Core.Nanos
             if (refusal != NanoCastRefusal.None)
             {
                 LogCastRefused(caster, nanoId, target, refusal, phase: "start", attempt: attempt, spell: spell);
-                Refuse(caster, NanoCastRules.Describe(refusal));
+                Refuse(caster, refusal);
                 return refusal;
             }
 
@@ -288,7 +288,7 @@ namespace ZoneEngine_New.Core.Nanos
             if (applied == null)
             {
                 if (source is Player)
-                    Refuse(source, DescribeApplyRefusal(decision));
+                    Refuse(source, decision);
                 return false;
             }
 
@@ -320,14 +320,14 @@ namespace ZoneEngine_New.Core.Nanos
                     attempt: attempt,
                     spell: spell);
                 AnnounceCastInterrupted(caster, spell.Id);
-                Refuse(caster, NanoCastRules.Describe(refusal));
+                Refuse(caster, refusal);
                 return;
             }
 
             if (spell.IsHostile && !IsHostileNanoTarget(caster, recipient))
             {
                 AnnounceCastInterrupted(caster, spell.Id);
-                Refuse(caster, NanoCastRules.Describe(NanoCastRefusal.InvalidTarget));
+                Refuse(caster, NanoCastRefusal.InvalidTarget);
                 return;
             }
 
@@ -384,7 +384,7 @@ namespace ZoneEngine_New.Core.Nanos
                         spell.NanoStrain,
                         spell.StackingOrder,
                         spell.NcuCost));
-                Refuse(caster, DescribeApplyRefusal(decision));
+                Refuse(caster, decision);
                 return;
             }
 
@@ -502,12 +502,49 @@ namespace ZoneEngine_New.Core.Nanos
                 : null;
         }
 
-        static string DescribeApplyRefusal(BuffApplyDecision decision) => decision switch
+        static void Refuse(Character caster, NanoCastRefusal refusal)
         {
-            BuffApplyDecision.RefusedNotEnoughNcu => "Not enough NCU.",
-            BuffApplyDecision.RefusedStrainStronger => "A stronger nano program of that type is already running.",
-            _ => "That nano program had no effect.",
-        };
+            switch (refusal)
+            {
+                case NanoCastRefusal.AlreadyCasting:
+                    ClientFeedback.Send(caster, "Feedback_WaitForCurrentNanoprogram");
+                    return;
+                case NanoCastRefusal.Recharging:
+                    ClientFeedback.Send(caster, "Feedback_NanobotsAreRecharging");
+                    return;
+                case NanoCastRefusal.NotEnoughNano:
+                    ClientFeedback.Send(caster, "Feedback_NanoprogramDidNotActivateNotEnoughNanoenergy");
+                    return;
+                case NanoCastRefusal.NotEnoughNcu:
+                    ClientFeedback.Send(caster, "Feedback_NCUErrorNanoprogramCantReplaceOther");
+                    return;
+                case NanoCastRefusal.InvalidTarget:
+                    ClientFeedback.Send(caster, "Feedback_UnableToExecuteOnThisTarget");
+                    return;
+                case NanoCastRefusal.TargetDead:
+                    ClientFeedback.Send(caster, "Feedback_TargetIsAlreadyDead");
+                    return;
+                default:
+                    Refuse(caster, NanoCastRules.Describe(refusal));
+                    return;
+            }
+        }
+
+        static void Refuse(Character caster, BuffApplyDecision decision)
+        {
+            switch (decision)
+            {
+                case BuffApplyDecision.RefusedNotEnoughNcu:
+                    ClientFeedback.Send(caster, "Feedback_NCUErrorNanoprogramCantReplaceOther");
+                    return;
+                case BuffApplyDecision.RefusedStrainStronger:
+                    ClientFeedback.Send(caster, "Feedback_NCUErrorBetterProgramRunning");
+                    return;
+                default:
+                    Refuse(caster, "That nano program had no effect.");
+                    return;
+            }
+        }
 
         static void AnnounceCastStarted(Character caster, int nanoId, Identity target)
             => Announce(
@@ -608,20 +645,26 @@ namespace ZoneEngine_New.Core.Nanos
         {
             ExecuteBuffEnd(owner, buff);
 
-            SessionOf(owner)?.Send(
-                new BuffMessage
+            var message = new BuffMessage
+            {
+                Identity = owner.Identity,
+                Action = 0,
+                NanoProgram = new Identity
                 {
-                    Identity = owner.Identity,
-                    Action = 0,
-                    NanoProgram = new Identity
-                    {
-                        Type = IdentityType.NanoProgram,
-                        Instance = buff.Id
-                    }
-                });
+                    Type = IdentityType.NanoProgram,
+                    Instance = buff.Id
+                }
+            };
+
+            SessionOf(owner)?.Send(message);
+            // Owner already has the direct copy. Everyone else who can see them needs the clear.
+            owner.Cell?.Announce(message, exclude: owner);
         }
 
-        /// <summary>Duration drives the NCU countdown; both caster and target need it.</summary>
+        /// <summary>
+        /// Duration is the buff landing. Caster and owner get a direct copy for NCU.
+        /// The owner's cell gets the same packet so other players see the buff.
+        /// </summary>
         static void SendNanoDuration(Character caster, Character owner, Buff buff)
         {
             var message = new CharacterActionMessage
@@ -643,6 +686,11 @@ namespace ZoneEngine_New.Core.Nanos
             SessionOf(caster)?.Send(message);
             if (!ReferenceEquals(caster, owner))
                 SessionOf(owner)?.Send(message);
+
+            owner.Cell?.Announce(
+                message,
+                exclude: owner,
+                alsoExclude: ReferenceEquals(caster, owner) ? null : caster);
         }
 
         static void LogCastRefused(

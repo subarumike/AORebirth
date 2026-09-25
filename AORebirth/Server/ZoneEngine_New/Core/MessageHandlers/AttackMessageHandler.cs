@@ -7,6 +7,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
 
@@ -36,36 +37,41 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (playfield == null)
                 return;
 
-            Character? target = null;
-            if (message.Target.Instance != 0
-                && playfield.GetRequiredService<DynelRegistry>().TryGet(message.Target, out Dynel? dynel)
-                && dynel is Character character
-                && !character.IsDead
-                && character.Identity.Instance != player.Identity.Instance
-                && IsAttackable(character))
+            if (message.Target.Instance == 0)
             {
-                target = character;
-            }
-
-            if (target == null)
-            {
-                player.SetFightingTarget(Identity.None);
-                player.Cell?.Announce(
-                    new AttackMessage
-                    {
-                        Identity = player.Identity,
-                        Target = Identity.None,
-                        Action = 0
-                    });
+                ClearAttack(player);
                 return;
             }
 
-            player.StartFighting(target.Identity, message.Action);
+            Character? target = null;
+            if (playfield.GetRequiredService<DynelRegistry>().TryGet(message.Target, out Dynel? dynel)
+                && dynel is Character character)
+                target = character;
+
+            if (target != null && CombatRules.CanAttack(player, target))
+            {
+                player.StartFighting(target.Identity, message.Action);
+                return;
+            }
+
+            if (target != null && CombatRules.IsPvpAttackBlocked(player, target))
+                ClientFeedback.Send(player, "Feedback_PvpNotAllowedSinceYouAreNeutral");
+            else
+                ClientFeedback.Send(player, "Feedback_StartingAttackFailed");
+
+            ClearAttack(player);
         }
 
-        static bool IsAttackable(Character character)
+        static void ClearAttack(Player player)
         {
-            return character is not NpcCharacter npc || npc.Attackable;
+            player.SetFightingTarget(Identity.None);
+            player.Cell?.Announce(
+                new AttackMessage
+                {
+                    Identity = player.Identity,
+                    Target = Identity.None,
+                    Action = 0
+                });
         }
     }
 }

@@ -13,6 +13,7 @@ namespace ZoneEngine_New.Core.Inventory
 
     using Utility;
 
+    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
@@ -81,6 +82,33 @@ namespace ZoneEngine_New.Core.Inventory
                     return SpawnMonster2(target, spell);
                 case FunctionType.DestroyItem:
                     return DestroySubject(target, criteria);
+                case FunctionType.ToggleFlag:
+                    return ToggleFlag(target, spell);
+                case FunctionType.CastNanoIfPossible:
+                case FunctionType.NpcCastNanoIfPossible:
+                case FunctionType.CastNanoIfPossibleOnFightTarget:
+                case FunctionType.NpcCastNanoIfPossibleOnFightTarget:
+                    return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository);
+                case FunctionType.CastChance:
+                    return CastChance(target, source, spell, items, inventoryRepository, criteria);
+                case FunctionType.RemoveNano:
+                    return RemoveNano(target, spell);
+                case FunctionType.RemoveNanoStrain:
+                    return RemoveNanoStrain(target, spell);
+                case FunctionType.RemoveBuffs:
+                    return NanoRuntime.StripAllBuffs(target);
+                case FunctionType.SpawnItem:
+                    return SpawnItem(target, spell);
+                case FunctionType.NpcSocialAnim:
+                    return NpcSocialAnim(target, spell);
+                case FunctionType.NpcWipeHateList:
+                    return NpcWipeHateList(target);
+                case FunctionType.NpcStopMoving:
+                    return NpcStopMoving(target);
+                case FunctionType.NpcTeleportToSpawnPoint:
+                    return NpcTeleportToSpawnPoint(target);
+                case FunctionType.NpcFightSelected:
+                    return NpcFightSelected(target, source);
                 default:
                     LogUtil.Debug(
                         DebugInfoDetail.Network,
@@ -151,6 +179,61 @@ namespace ZoneEngine_New.Core.Inventory
 
             target.Stats.Set(stat, target.Stats.GetOrZero(stat, StatDetail.Base) + delta, StatDetail.Base, dirty: true);
             return true;
+        }
+
+        /// <summary>
+        /// Weapon OnHit proc (item 205012): nano id, then chance percent. A roll of 1–100
+        /// lands the nano when it is less than or equal to the chance. ApplyOn selects
+        /// the recipient; <see cref="ItemTarget.Target"/> is the character who was hit.
+        /// </summary>
+        static bool CastChance(
+            Character target,
+            Character? source,
+            ItemSpell spell,
+            IItemBuilder items,
+            IInventoryRepository inventory,
+            SpellCriteria? criteria)
+        {
+            if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
+                return false;
+            if (!spell.TryReadInt(1, out int chance))
+                return false;
+            if (chance <= 0)
+                return true;
+
+            if (chance > SpellCriteria.RollMaxInclusive)
+                chance = SpellCriteria.RollMaxInclusive;
+
+            criteria ??= new SpellCriteria();
+            int roll = criteria.Resolve(CharacterStat.Rnd, static _ => 0);
+            if (roll > chance)
+                return true;
+
+            Character caster = source ?? target;
+            Character recipient = ResolveCastChanceRecipient(target, source, spell);
+            return NanoRuntime.TryApplyImmediate(
+                caster,
+                recipient,
+                nanoId,
+                items,
+                inventory,
+                DateTime.UtcNow);
+        }
+
+        static Character ResolveCastChanceRecipient(Character eventTarget, Character? source, ItemSpell spell)
+        {
+            switch ((ItemTarget)spell.Target)
+            {
+                case ItemTarget.User:
+                case ItemTarget.Wearer:
+                case ItemTarget.Self:
+                    return source ?? eventTarget;
+                case ItemTarget.Fightingtarget:
+                    Character? fighting = source?.TryResolveFightingTarget();
+                    return fighting ?? eventTarget;
+                default:
+                    return eventTarget;
+            }
         }
 
         static bool ApplyHealthDelta(Character target, Character? source, int delta, int acStat)
@@ -235,6 +318,144 @@ namespace ZoneEngine_New.Core.Inventory
             var stat = (CharacterStat)statId;
             int current = target.Stats.GetOrZero(stat, StatDetail.Base);
             target.Stats.Set(stat, current & ~(1 << bitIndex), StatDetail.Base, dirty: true);
+            return true;
+        }
+
+        static bool ToggleFlag(Character target, ItemSpell spell)
+        {
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int bitIndex))
+                return false;
+
+            if (bitIndex < 0 || bitIndex > 31)
+                return false;
+
+            var stat = (CharacterStat)statId;
+            int current = target.Stats.GetOrZero(stat, StatDetail.Base);
+            target.Stats.Set(stat, current ^ (1 << bitIndex), StatDetail.Base, dirty: true);
+            return true;
+        }
+
+        static bool RemoveNano(Character target, ItemSpell spell)
+        {
+            if (!spell.TryReadInt(0, out int nanoId))
+                return false;
+
+            return NanoRuntime.TryStripNano(target, nanoId);
+        }
+
+        static bool RemoveNanoStrain(Character target, ItemSpell spell)
+        {
+            if (!spell.TryReadInt(0, out int strain))
+                return false;
+
+            return NanoRuntime.TryStripStrain(target, strain);
+        }
+
+        /// <summary>
+        /// Catalog shape: hash, quality, and a 0/1 third integer. Both third values grant one item
+        /// into inventory. Any other third value is refused.
+        /// </summary>
+        static bool SpawnItem(Character target, ItemSpell spell)
+        {
+            if (target is not Player player || player.Playfield == null || player.Session == null)
+                return false;
+            if (!spell.TryReadString(0, out string hash) || hash.Length == 0)
+                return false;
+            if (!spell.TryReadInt(1, out int quality) || quality <= 0)
+                return false;
+            if (spell.TryReadInt(2, out int mode) && mode is not 0 and not 1)
+                return false;
+
+            if (!player.Playfield.GetRequiredService<HashItemMinter>().TryMint(hash, quality, ItemSource.Other, out Item item))
+                return false;
+            if (!player.Inventory.TryPlace(item, out Container page, out int slot))
+                return false;
+
+            player.Inventory.MarkDirty(item, page, slot);
+            player.Playfield.GetService<InventoryFlushService>()?.NotifyDirty(player);
+            player.Session.Send(
+                new AddTemplateMessage
+                {
+                    Identity = player.Identity,
+                    HighId = item.HighId,
+                    LowId = item.LowId,
+                    Quality = item.Quality,
+                    Count = item.StackCount
+                });
+            return true;
+        }
+
+        /// <summary>
+        /// Catalog shape is one animation id. <see cref="CharacterActionType.NpcSocialAnim"/>
+        /// carries that id in <c>Target.Instance</c>.
+        /// </summary>
+        static bool NpcSocialAnim(Character target, ItemSpell spell)
+        {
+            if (!spell.TryReadInt(0, out int animId) || animId <= 0)
+                return false;
+
+            var message = new CharacterActionMessage
+            {
+                Identity = target.Identity,
+                Unknown = 0,
+                Action = CharacterActionType.NpcSocialAnim,
+                Target = new Identity { Type = IdentityType.None, Instance = animId }
+            };
+
+            if (target.Cell != null)
+                target.Cell.Announce(message);
+            else if (target is Player player)
+                player.Session?.Send(message);
+
+            return true;
+        }
+
+        static bool NpcWipeHateList(Character target)
+        {
+            if (target is not NpcCharacter npc || npc.Brain == null)
+                return false;
+
+            npc.Brain.StopFighting();
+            npc.Brain.ClearHate();
+            return true;
+        }
+
+        static bool NpcStopMoving(Character target)
+        {
+            if (target is not NpcCharacter npc)
+                return false;
+
+            if (npc.Brain != null)
+                npc.Brain.StopPathing();
+            else
+                npc.Motor.ClearPath();
+            return true;
+        }
+
+        static bool NpcTeleportToSpawnPoint(Character target)
+        {
+            if (target is not NpcCharacter npc || npc.Brain is not NpcBrain brain || brain.Home is not Vector3 home)
+                return false;
+
+            brain.StopPathing();
+            npc.Motor.Warp(home);
+            return true;
+        }
+
+        static bool NpcFightSelected(Character target, Character? source)
+        {
+            NpcCharacter? npc = target as NpcCharacter ?? source as NpcCharacter;
+            if (npc?.Brain == null)
+                return false;
+
+            Character? opponent = ReferenceEquals(npc, target) ? source : target;
+            if (opponent == null || ReferenceEquals(opponent, npc) || opponent.IsDead)
+                return false;
+            if (!ReferenceEquals(opponent.Playfield, npc.Playfield))
+                return false;
+
+            npc.Brain.AddThreat(opponent.Identity, NpcAiRules.ProximityHate);
+            npc.StartFighting(opponent.Identity, 0);
             return true;
         }
 

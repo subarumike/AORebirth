@@ -69,6 +69,10 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool IsCastFunction(ItemSpell spell)
             => spell.Is(FunctionType.CastNano)
+                || spell.Is(FunctionType.CastNanoIfPossible)
+                || spell.Is(FunctionType.NpcCastNanoIfPossible)
+                || spell.Is(FunctionType.CastNanoIfPossibleOnFightTarget)
+                || spell.Is(FunctionType.NpcCastNanoIfPossibleOnFightTarget)
                 || spell.Is(FunctionType.AreaCastNano)
                 || spell.Is(FunctionType.TeamCastNano)
                 || spell.Is(FunctionType.PlayfieldNano);

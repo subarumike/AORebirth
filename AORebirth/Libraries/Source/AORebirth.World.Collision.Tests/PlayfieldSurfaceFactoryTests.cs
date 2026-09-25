@@ -2,7 +2,7 @@ namespace AORebirth.World.Collision.Tests
 {
     using System.Numerics;
 
-    using LostEden.Vehicles;
+    using N3Lite;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

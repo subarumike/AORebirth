@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Nanos
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Teams;
@@ -46,7 +47,11 @@ namespace ZoneEngine_New.Core.Nanos
                 return ((FunctionType)spell.FunctionType) switch
                 {
                     FunctionType.CastNano => CastNano(caster, target, spell, items, inventory, nowUtc),
-                    FunctionType.AreaCastNano => AreaCastNano(caster, spell, items, inventory, nowUtc),
+                    FunctionType.CastNanoIfPossible => CastNanoIfPossible(caster, target, spell, items, inventory, nowUtc),
+                    FunctionType.NpcCastNanoIfPossible => CastNanoIfPossible(caster, target, spell, items, inventory, nowUtc),
+                    FunctionType.CastNanoIfPossibleOnFightTarget => CastNanoOnFightTarget(caster, spell, items, inventory, nowUtc),
+                    FunctionType.NpcCastNanoIfPossibleOnFightTarget => CastNanoOnFightTarget(caster, spell, items, inventory, nowUtc),
+                    FunctionType.AreaCastNano => AreaCastNano(caster, target, spell, items, inventory, nowUtc),
                     FunctionType.TeamCastNano => TeamCastNano(caster, spell, items, inventory, nowUtc),
                     FunctionType.PlayfieldNano => PlayfieldNano(caster, spell, items, inventory, nowUtc),
                     _ => false
@@ -72,8 +77,48 @@ namespace ZoneEngine_New.Core.Nanos
             return NanoRuntime.TryApplyImmediate(caster, target, nanoId, items, inventory, nowUtc);
         }
 
+        /// <summary>
+        /// Same nano id as <see cref="FunctionType.CastNano"/>. A child that cannot land
+        /// does not fail the parent event.
+        /// </summary>
+        static bool CastNanoIfPossible(
+            Character caster,
+            Character target,
+            ItemSpell spell,
+            IItemBuilder items,
+            IInventoryRepository inventory,
+            DateTime nowUtc)
+        {
+            if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
+                return false;
+
+            NanoRuntime.TryApplyImmediate(caster, target, nanoId, items, inventory, nowUtc);
+            return true;
+        }
+
+        /// <summary>
+        /// Same nano id as <see cref="FunctionType.CastNano"/>, aimed at the caster's fighting target.
+        /// No current target is a successful no-op.
+        /// </summary>
+        static bool CastNanoOnFightTarget(
+            Character caster,
+            ItemSpell spell,
+            IItemBuilder items,
+            IInventoryRepository inventory,
+            DateTime nowUtc)
+        {
+            if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
+                return false;
+
+            Character? fightTarget = caster.TryResolveFightingTarget();
+            if (fightTarget != null)
+                NanoRuntime.TryApplyImmediate(caster, fightTarget, nanoId, items, inventory, nowUtc);
+            return true;
+        }
+
         static bool AreaCastNano(
             Character caster,
+            Character target,
             ItemSpell spell,
             IItemBuilder items,
             IInventoryRepository inventory,
@@ -86,12 +131,15 @@ namespace ZoneEngine_New.Core.Nanos
             if (!TryResolveChild(items, nanoId, out NanoSpell? child) || child == null)
                 return false;
 
-            Playfield? playfield = caster.Playfield;
+            // ItemTarget.Target (nukes such as 28638) is centered on the cast recipient.
+            // User and Wearer stay centered on the caster.
+            Character center = spell.Target == (int)ItemTarget.Target ? target : caster;
+            Playfield? playfield = center.Playfield ?? caster.Playfield;
             DynelRegistry? registry = playfield?.GetService<DynelRegistry>();
             if (registry == null)
             {
-                if (AcceptsRecipient(caster, caster, child) && caster.Distance3D(caster) <= radius)
-                    NanoRuntime.TryApplyImmediate(caster, caster, nanoId, items, inventory, nowUtc);
+                if (AcceptsRecipient(caster, center, child))
+                    NanoRuntime.TryApplyImmediate(caster, center, nanoId, items, inventory, nowUtc);
                 return true;
             }
 
@@ -101,7 +149,7 @@ namespace ZoneEngine_New.Core.Nanos
                     continue;
                 if (!ReferenceEquals(candidate.Playfield, playfield))
                     continue;
-                if (caster.Distance3D(candidate) > radius)
+                if (center.Distance3D(candidate) > radius)
                     continue;
                 if (!AcceptsRecipient(caster, candidate, child))
                     continue;
@@ -206,26 +254,34 @@ namespace ZoneEngine_New.Core.Nanos
             CanFlags can = ReadCan(child);
             bool self = ReferenceEquals(source, candidate);
             if ((can & (CanFlags.ApplyOnSelf | CanFlags.ApplyOnFriendly | CanFlags.ApplyOnHostile)) == 0)
+            {
+                // Area nukes such as Volcanic Eruption store Can as 0 and IsHostile on the child.
+                if (child.IsHostile)
+                    return CombatRules.CanAttack(source, candidate);
+
                 return self;
+            }
 
+            bool accepted;
             if (self)
-                return (can & CanFlags.ApplyOnSelf) != 0;
+                accepted = (can & CanFlags.ApplyOnSelf) != 0;
+            else if (candidate.IsPlayer)
+                accepted = (can & CanFlags.ApplyOnFriendly) != 0;
+            else
+                accepted = candidate is NpcCharacter npc
+                    && npc.Attackable
+                    && (can & CanFlags.ApplyOnHostile) != 0;
 
-            if (candidate.IsPlayer)
-                return (can & CanFlags.ApplyOnFriendly) != 0;
-
-            return candidate is NpcCharacter npc
-                && npc.Attackable
-                && (can & CanFlags.ApplyOnHostile) != 0;
+            return !child.IsHostile || (accepted && CombatRules.CanAttack(source, candidate));
         }
 
         static CanFlags ReadCan(NanoSpell child)
         {
-            if (!child.Stats.TryGetValue(CharacterStat.Can, out int value))
+            if (!child.Stats.TryGetValue(CharacterStat.Can, out int value) || StatCollection.IsUnset(value))
                 return 0;
 
-            value = StatCollection.Normalize(value);
-            return value <= 0 ? 0 : (CanFlags)(uint)value;
+            // Bit 31 (ApplyOnFightingTarget) is negative as a signed int. Keep the flag word.
+            return (CanFlags)(uint)value;
         }
     }
 }

@@ -140,8 +140,9 @@ namespace AORebirth.Enums
         CastNanoIfPossibleOnFightTarget = 53212,
 
         /// <summary>
+        /// On-hit proc. Arguments are the nano template id and the chance percent (1–100).
         /// </summary>
-        CastStunNano = 53089,
+        CastChance = 53089,
 
         /// <summary>
         /// </summary>

@@ -53,6 +53,22 @@ namespace ZoneEngine_New.Core.Helpers
         }
 
         /// <summary>
+        /// True when the only reason <see cref="CanAttack"/> fails is that the target player is not PvP-flagged.
+        /// </summary>
+        public static bool IsPvpAttackBlocked(Character attacker, Character target)
+        {
+            ArgumentNullException.ThrowIfNull(attacker);
+            ArgumentNullException.ThrowIfNull(target);
+
+            if (!attacker.IsPlayer || attacker.IsDead || target.IsDead || ReferenceEquals(attacker, target))
+                return false;
+            if (IsInRestrictedGas(target))
+                return false;
+
+            return target is Player player && (player.ActionRestrictionFlags & PlayerAttackable) == 0;
+        }
+
+        /// <summary>
         /// Restricted gas refuses fighting. Volumes are not wired yet, so no target is in gas.
         /// </summary>
         public static bool IsInRestrictedGas(Character target)

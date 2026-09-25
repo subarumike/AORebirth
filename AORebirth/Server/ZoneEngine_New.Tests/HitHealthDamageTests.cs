@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
 
     [TestClass]
@@ -20,6 +21,7 @@ namespace ZoneEngine_New.Tests
         public void OffensiveHitSendsSignedHealthDamageWithAcDamageType()
         {
             Player target = CreatePlayer(1, out RecordingZoneSession targetSession, health: 200, maxHealth: 200);
+            target.ActionRestrictionFlags = ActionRestrictionFlags.PvPEnabled;
             Player caster = CreatePlayer(2, out RecordingZoneSession casterSession, health: 100, maxHealth: 100);
 
             Assert.IsTrue(

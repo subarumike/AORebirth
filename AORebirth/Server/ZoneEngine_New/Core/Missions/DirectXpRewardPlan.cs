@@ -155,7 +155,7 @@ public sealed class DirectXpRewardPlan
             SendStat(player, CharacterStat.LastSaveXP, checked((int)XpFloor(LevelAfter)), 1);
             SendStat(player, CharacterStat.SocialStatus, 0, 1);
             SendStat(player, CharacterStat.XP, ExperienceAfter, 0);
-            player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = 0,
+            player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel,
                 CategoryId = 110, MessageId = 249817907 });
         }
         else if (RequestedReward > 0 && !IsShadowKnowledge) SendStat(player, CharacterStat.XP, ExperienceAfter, 0);

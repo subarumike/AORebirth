@@ -15,6 +15,9 @@ namespace ZoneEngine_New.Core.Nanos
         Expired,
         Cancelled,
         Death,
+
+        /// <summary>A spell removed the buff. Ignores <see cref="ItemTemplate.CanCancel"/>.</summary>
+        Stripped,
     }
 
     /// <summary>Result of asking a character to drop one buff.</summary>

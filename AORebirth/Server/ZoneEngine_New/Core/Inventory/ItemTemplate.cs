@@ -345,7 +345,8 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
             }
 
-            if (spell.Is(FunctionType.SetFlag) && skipPassiveModifiers)
+            if ((spell.Is(FunctionType.SetFlag) || spell.Is(FunctionType.ChangeActionRestriction))
+                && skipPassiveModifiers)
                 return true;
 
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria);

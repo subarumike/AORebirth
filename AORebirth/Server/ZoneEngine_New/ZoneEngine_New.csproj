@@ -33,6 +33,7 @@
     <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.2.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="N3Lite" Version="0.1.3" />
     <PackageReference Include="NLog" Version="6.1.4" />
   </ItemGroup>
 
@@ -40,7 +41,6 @@
     <ProjectReference Include="../../Libraries/Source/AORebirth.Database.Schema/AORebirth.Database.Schema.csproj" />
     <ProjectReference Include="../../Libraries/Source/AORebirth.World.Collision/AORebirth.World.Collision.csproj" />
     <ProjectReference Include="../../Libraries/Source/AORebirth.World.Pathfinding/AORebirth.World.Pathfinding.csproj" />
-    <ProjectReference Include="../../Libraries/Source/AORebirth.World.Vehicle/AORebirth.World.Vehicle.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/AORebirth.Core.ZoneNew.WinNet10.csproj" />
     <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/Utility.ZoneNew.WinNet10.csproj" />

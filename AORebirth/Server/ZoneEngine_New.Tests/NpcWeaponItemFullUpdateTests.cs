@@ -20,7 +20,10 @@ namespace ZoneEngine_New.Tests
         [TestMethod]
         public void EquippedMeleeWeaponIsAnnouncedAndFistIsNot()
         {
-            Assert.IsTrue(AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(MeleeWeapon(instanceId: 55)));
+            Assert.IsFalse(AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(MeleeWeapon(instanceId: 55)));
+            Item visible = MeleeWeapon(instanceId: 55);
+            visible.Definition.Stats[CharacterStat.WeaponMesh] = 10;
+            Assert.IsTrue(AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(visible));
             Assert.IsFalse(AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(Fist(instanceId: 0)));
             Assert.IsFalse(
                 AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(
@@ -59,6 +62,15 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(
                 5,
                 AttackInfoRules.ResolveWeaponSlot(armed, WeaponSlot.Npc5, armed.Item, attackerIsPlayer: false));
+        }
+
+        [TestMethod]
+        public void NpcBuildWeaponInstanceMessagesSkipsWeaponsWithoutMesh()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.ArmFromItemForTests(WeaponSlot.Npc0, MeleeWeapon(instanceId: 55), wireSlot: 0);
+
+            Assert.AreEqual(0, npc.BuildWeaponInstanceMessages().Count);
         }
 
         [TestMethod]

@@ -8,6 +8,7 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Playfield.Locality;
@@ -211,7 +212,7 @@ public sealed partial class GeneratedMissionAcgService
         try
         {
             var quest = new Identity { Type = (IdentityType)binding.QuestType, Instance = binding.QuestInstance };
-            player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = 0, CategoryId = 110, MessageId = 108871108 });
+            player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel, CategoryId = 110, MessageId = 108871108 });
             player.Session?.Send(new CharacterActionMessage { Identity = player.Identity, Unknown = 0, Action = (CharacterActionType)59,
                 Target = quest, Parameter1 = 0xDAC3, Parameter2 = quest.Instance, Unknown1 = 0, Unknown2 = 0 });
             player.Session?.Send(new QuestMessage { Identity = player.Identity, Unknown = 0, Action = QuestAction.Delete, Mission = quest, Unknown1 = 0, Unknown2 = 0, Unknown3 = 0 });

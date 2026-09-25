@@ -9,8 +9,8 @@
     using AORebirth.Core.GameData;
     using AORebirth.World.Collision;
 
-    using LostEden.Vehicles;
-    using LostEden.Vehicles.Surfaces;
+    using N3Lite;
+    using N3Lite.Surfaces;
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;

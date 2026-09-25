@@ -9,8 +9,8 @@ namespace ZoneEngine_New.Core.Movement
 
     using AORebirth.World.Pathfinding;
 
-    using LostEden.Vehicles;
-    using LostEden.Vehicles.Surfaces;
+    using N3Lite;
+    using N3Lite.Surfaces;
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Metrics;
@@ -24,11 +24,10 @@ namespace ZoneEngine_New.Core.Movement
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
 
     /// <summary>
-    /// Server locomotion on the client's own vehicle: a <see cref="CharVehicleSim"/>
-    /// (<c>PlayerVehicle_t</c>) for players and an <see cref="NpcVehicleSim"/> (<c>NPCVehicle_t</c>)
-    /// for NPCs, colliding against the playfield's <see cref="ISurface"/>. The flag-to-axis glue is
-    /// Lost-Eden's <c>N3CharVehicle</c>; the client-position gates, mission hooks, flight authority and
-    /// navmesh planning are the server's.
+    /// Server locomotion on N3Lite's vehicle: a <see cref="CharVehicleSim"/> for players and an
+    /// <see cref="NpcVehicleSim"/> for NPCs, colliding against the playfield's <see cref="ISurface"/>.
+    /// The client-position gates, movement-mode speed curves, flight authority and navmesh planning
+    /// stay here; the integrator and the surfaces are the package.
     /// </summary>
     public sealed class CharacterMotor
     {
@@ -66,12 +65,11 @@ namespace ZoneEngine_New.Core.Movement
             _sim.MaxVel = MovementConfig.InitialMaxVel;
             _sim.NearProbeOffset = MovementConfig.BodyRadius;
             _sim.SlowingDistance = MovementConfig.InitialSlowingDistance;
-            _sim.MovementState = (int)_state;
-            _sim.OwnerIsNpc = _npc != null;
+            _sim.BodyHeight = 2f;
             _sim.JumpLanded += OnJumpLanded;
             _sim.DisableSurfaceHug();
             _sim.UseSurfaceNormal();
-            _sim.UpdateMotionConstraints();
+            ApplyMotionConstraints();
         }
 
         public MovementFlags MovementFlags => _flags;
@@ -212,13 +210,11 @@ namespace ZoneEngine_New.Core.Movement
         public event Action? Jumped;
 
         /// <summary>
-        /// The run-speed stat drives the vehicle's whole speed curve (<c>FUN_1006f2fc</c>). The old
-        /// health penalty is gone: Lost-Eden found no stock evidence for it.
+        /// The run-speed stat drives the whole speed curve. N3Lite takes the resulting max speed;
+        /// the stance curves stay here.
         /// </summary>
         public void RefreshFromStats()
         {
-            _sim.RunSpeedStat = _character.Stats.GetOrZero(CharacterStat.RunSpeed);
-            _sim.UpdateMotionConstraints();
             ApplyFlagsToAxes();
             RefreshJumpStats();
         }
@@ -846,12 +842,13 @@ namespace ZoneEngine_New.Core.Movement
         void StopAllFlags() => SetFlags(MovementFlags.None);
 
         /// <summary>
-        /// <c>N3CharVehicle.ApplyFlagsToAxes</c>: input flags into the four axes. An NPC body has none
-        /// (<c>NPCVehicle_t</c>'s lateral and turn channels are empty and its longitudinal reads the
-        /// path), and the release branch's halt would fight the guide, so NPC flags stay flags.
+        /// Input flags into the four axes. An NPC body has none, and the release branch's halt
+        /// would fight the path guide, so NPC flags stay flags. Speeds are applied either way:
+        /// a rooted NPC still has to brake.
         /// </summary>
         void ApplyFlagsToAxes()
         {
+            ApplyMotionConstraints();
             if (_npc != null)
                 return;
 
@@ -861,15 +858,9 @@ namespace ZoneEngine_New.Core.Movement
             if ((_flags & MovementFlags.Backward) != 0)
                 drive -= 1f;
 
-            int curve = drive < 0f ? 2 : 1;
-            if (_sim.CurveDirection != curve)
-            {
-                _sim.CurveDirection = curve;
-                _sim.UpdateMotionConstraints();
-            }
-
-            // forward 1006ef8d, backward 1006f122, release 1006f23a; the halt and the direction are
-            // both required (N3CharVehicle).
+            // forward SetDirection(1) then drive, backward drive then SetDirection(-1),
+            // release drive 0, halt, then SetDirection(1). Both the halt and the direction
+            // are required.
             if (drive != _sim.ForwardDrive)
             {
                 if (drive > 0f)
@@ -919,8 +910,8 @@ namespace ZoneEngine_New.Core.Movement
                 StopAllFlags();
 
             _state = state;
-            _sim.MovementState = (int)state;
-            _sim.UpdateMotionConstraints();
+            if (state == MovementState.Fly)
+                _sim.DisableFalling();
             ApplyFlagsToAxes();
             SyncMovementModeStat();
         }
@@ -967,7 +958,7 @@ namespace ZoneEngine_New.Core.Movement
                 return false;
 
             if (_sim.Surface != null
-                && !_sim.Jump(CharVehicleSim.JumpHeightFromStats(_jumpStrength, _jumpAgility, _jumpGmLevel)))
+                && !_sim.Jump(JumpHeightFromStats(_jumpStrength, _jumpAgility, _jumpGmLevel)))
                 return false;
 
             Jumped?.Invoke();
@@ -1011,6 +1002,114 @@ namespace ZoneEngine_New.Core.Movement
 
             var quat = new Quat(q.xf, q.yf, q.zf, q.wf);
             return quat.Length < 1e-6f ? Quat.Identity : quat.Normalized;
+        }
+
+        /// <summary>
+        /// Writes N3Lite's max speed, strafe speed and drive lock from the current stance.
+        /// Backing up selects the reverse curve. Rooted, sit and rooted-can-sit refuse a player's
+        /// drive; only rooted brakes an NPC, which is how <c>NpcVehicleSim</c> treats a locked drive.
+        /// </summary>
+        void ApplyMotionConstraints()
+        {
+            float drive = 0f;
+            if ((_flags & MovementFlags.Forward) != 0)
+                drive += 1f;
+            if ((_flags & MovementFlags.Backward) != 0)
+                drive -= 1f;
+
+            int state = (int)_state;
+            SpeedCurve curve = SpeedCurve.For(state, drive < 0f ? 2 : 1);
+            float runSpeed = _character.Stats.GetOrZero(CharacterStat.RunSpeed);
+            _sim.UpdateMotionConstraints(curve.MaxSpeed(runSpeed));
+            _sim.StrafeSpeed = curve.Strafe(state, runSpeed);
+            _sim.DriveLocked = _npc != null
+                ? _state == MovementState.Rooted
+                : _state is MovementState.Rooted or MovementState.Sit or MovementState.RootedCanSit;
+        }
+
+        /// <summary>
+        /// Jump height from Strength, Agility and GmLevel: <c>(str + agi) / 200 + 1</c>, at least 0.5.
+        /// Past 800 in total a non-GM counts as exactly 800.
+        /// </summary>
+        static float JumpHeightFromStats(int strength, int agility, int gmLevel)
+        {
+            float str = strength;
+            float agi = agility;
+            if (800f < agi + str && gmLevel == 0)
+            {
+                str = 800f;
+                agi = 0f;
+            }
+
+            float height = (float)((agi + str) / 200.0 + 1.0);
+            if (height < 0.5f)
+                height = 0.5f;
+            return height;
+        }
+
+        struct SpeedCurve
+        {
+            public float Divisor;
+            public float Base;
+            public float Max;
+            public float Min;
+            public bool Constant;
+
+            public static SpeedCurve For(int state, int direction)
+            {
+                switch (state)
+                {
+                    case 3:
+                        return direction == 2
+                            ? new SpeedCurve { Divisor = 275f / 0.7f, Base = 3f, Max = 9.099999f, Min = 1.05f }
+                            : new SpeedCurve { Divisor = 275f, Base = 5f, Max = 13f, Min = 1.5f };
+                    case 4:
+                        return new SpeedCurve { Divisor = 275f / 0.625f, Base = 3f, Max = 8f, Min = 1.5f };
+                    case 7:
+                        return new SpeedCurve { Divisor = 275f, Base = 7f, Max = 15f, Min = 1.5f };
+                    case 5:
+                        return new SpeedCurve { Base = 1f, Constant = true };
+                    default:
+                        return new SpeedCurve { Base = 1.5f, Constant = true };
+                }
+            }
+
+            public float MaxSpeed(float runSpeedStat)
+            {
+                if (Constant)
+                {
+                    float v = Base;
+                    if (v < 0.01f)
+                        v = 0.1f;
+                    return v;
+                }
+
+                float speed = runSpeedStat / Divisor + Base;
+                if (speed > Max)
+                    speed = Max;
+                if (speed < Min)
+                    speed = Min;
+                return speed;
+            }
+
+            public float Strafe(int state, float runSpeedStat)
+            {
+                const float Scale = 0.5f;
+                const float Floor = 0.75f;
+                if (state == 2)
+                    return Math.Max(Floor, 1.5f);
+
+                if (Constant)
+                    return Math.Max(Floor, Base);
+
+                float v = Scale * runSpeedStat / Divisor + Scale * Base;
+                float max = Scale * Max;
+                if (v > max)
+                    v = max;
+                if (v < Floor)
+                    v = Floor;
+                return v;
+            }
         }
     }
 }

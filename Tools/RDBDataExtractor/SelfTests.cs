@@ -3,6 +3,8 @@ namespace AORebirth.Tools.RDBDataExtractor
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Text.Json;
+    using AODB;
     using AORebirth.Core.GameData;
     using StbImageWriteSharp;
 
@@ -17,6 +19,7 @@ namespace AORebirth.Tools.RDBDataExtractor
             TestPlayfieldDatFileNames();
             TestWaterDatFraming();
             TestItemsDatFileName();
+            TestTextExport();
             TestItemsDatDynelTypeRoundTrip();
             TestHitFunctionArgOrdering();
             TestConditionalShapeFunction();
@@ -327,6 +330,119 @@ namespace AORebirth.Tools.RDBDataExtractor
             {
                 throw new InvalidOperationException(
                     "items.dat file name was unexpected.");
+            }
+        }
+
+        private static void TestTextExport()
+        {
+            if (GameDataPaths.TextFileName != "Text.json")
+            {
+                throw new InvalidOperationException(
+                    "Text.json file name was unexpected.");
+            }
+
+            string directory = Path.Combine(Path.GetTempPath(), "rdbdataextractor-text-selftest");
+            Directory.CreateDirectory(directory);
+            string path = Path.Combine(directory, GameDataPaths.TextFileName);
+            try
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+
+                var exporter = new TextExporter("unused", directory);
+                var database = new TextDatabase();
+                database.Ldb[7] = new Dictionary<int, string>
+                {
+                    { 1, "from-ldb" },
+                    { 2, "ldb-only" },
+                    { 3, "a\"b\nc" },
+                    { 4, "can't" },
+                };
+                database.Mdb[7] = new Dictionary<int, string>
+                {
+                    { 1, "from-mdb" },
+                };
+                database.Mdb[9] = new Dictionary<int, string>
+                {
+                    { 0, "other" },
+                };
+
+                ExportFileCounts written = exporter.Write(database, false);
+                if (written.Written != 1 || written.Skipped != 0)
+                {
+                    throw new InvalidOperationException(
+                        "Text.json write counts were unexpected.");
+                }
+
+                ExportFileCounts skipped = exporter.Write(database, false);
+                if (skipped.Written != 0 || skipped.Skipped != 1)
+                {
+                    throw new InvalidOperationException(
+                        "Existing Text.json was not skipped.");
+                }
+
+                using (JsonDocument document = JsonDocument.Parse(File.ReadAllText(path)))
+                {
+                    JsonElement entries = document.RootElement;
+                    if (entries.GetArrayLength() != 5)
+                    {
+                        throw new InvalidOperationException(
+                            "Text.json entry count was " + entries.GetArrayLength() + ".");
+                    }
+
+                    ExpectTextEntry(entries[0], 7, 1, "from-mdb");
+                    ExpectTextEntry(entries[1], 7, 2, "ldb-only");
+                    ExpectTextEntry(entries[2], 7, 3, "a\"b\nc");
+                    ExpectTextEntry(entries[3], 7, 4, "can't");
+                    ExpectTextEntry(entries[4], 9, 0, "other");
+                }
+
+                string raw = File.ReadAllText(path);
+                if (!raw.Contains("can't") || raw.Contains("\\u0027"))
+                {
+                    throw new InvalidOperationException(
+                        "Text.json escaped an apostrophe.");
+                }
+
+                bool rejectedEmpty = false;
+                try
+                {
+                    exporter.Write(new TextDatabase(), true);
+                }
+                catch (InvalidOperationException)
+                {
+                    rejectedEmpty = true;
+                }
+
+                if (!rejectedEmpty)
+                {
+                    throw new InvalidOperationException(
+                        "Empty text database was accepted.");
+                }
+            }
+            finally
+            {
+                if (Directory.Exists(directory))
+                    Directory.Delete(directory, true);
+            }
+        }
+
+        private static void ExpectTextEntry(
+            JsonElement entry,
+            int category,
+            int id,
+            string text)
+        {
+            if (entry.GetProperty("category").GetInt32() != category
+                || entry.GetProperty("id").GetInt32() != id
+                || entry.GetProperty("text").GetString() != text)
+            {
+                throw new InvalidOperationException(
+                    "Text.json entry "
+                    + category
+                    + ":"
+                    + id
+                    + " was unexpected.");
             }
         }
 

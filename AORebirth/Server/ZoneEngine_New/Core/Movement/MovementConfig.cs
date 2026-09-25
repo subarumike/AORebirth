@@ -2,7 +2,7 @@ namespace ZoneEngine_New.Core.Movement
 {
     /// <summary>
     /// Server-side movement values. The vehicle's own constants (gravity, speed curves, step height,
-    /// probe sizes) live in <c>LostEden.Vehicles</c>; these cover what only the server does.
+    /// probe sizes) live in <c>N3Lite</c>; these cover what only the server does.
     /// </summary>
     public static class MovementConfig
     {

@@ -39,12 +39,13 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         /// <summary>
         /// Sends <paramref name="message"/> to connected players who can see this cell
         /// (this cell plus visibility-neighbor cells). Indoor playfields use the single cell.
+        /// <paramref name="exclude"/> and <paramref name="alsoExclude"/> already received a direct copy.
         /// </summary>
-        public void Announce(MessageBody message, Dynel? exclude = null)
+        public void Announce(MessageBody message, Dynel? exclude = null, Dynel? alsoExclude = null)
         {
             if (!_grid.IsOutdoor)
             {
-                SendToOccupants(_grid.OccupantsInAllCells(), message, exclude);
+                SendToOccupants(_grid.OccupantsInAllCells(), message, exclude, alsoExclude);
                 return;
             }
 
@@ -53,7 +54,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             {
                 foreach (Dynel dynel in _grid.OccupantsInCell(cellId))
                 {
-                    if (ReferenceEquals(dynel, exclude))
+                    if (IsExcluded(dynel, exclude, alsoExclude))
                         continue;
 
                     if (dynel is Player player && player.Session != null)
@@ -65,16 +66,20 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         static void SendToOccupants(
             IEnumerable<Dynel> occupants,
             MessageBody message,
-            Dynel? exclude)
+            Dynel? exclude,
+            Dynel? alsoExclude)
         {
             foreach (Dynel dynel in occupants)
             {
-                if (ReferenceEquals(dynel, exclude))
+                if (IsExcluded(dynel, exclude, alsoExclude))
                     continue;
 
                 if (dynel is Player player && player.Session != null)
                     player.Session.Send(message);
             }
         }
+
+        static bool IsExcluded(Dynel dynel, Dynel? exclude, Dynel? alsoExclude)
+            => ReferenceEquals(dynel, exclude) || ReferenceEquals(dynel, alsoExclude);
     }
 }

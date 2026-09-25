@@ -123,6 +123,46 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void HostileAreaCastWithNoCanFlagsHitsAroundTheTargetNotTheCaster()
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId,
+                can: 0,
+                flags: NanoFlags.IsHostile));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 6, 0, 0);
+            NpcCharacter center = world.Npc(2, 0, 0, 0, attackable: true);
+            NpcCharacter nearCenter = world.Npc(3, 3, 0, 0, attackable: true);
+            NpcCharacter nearSafe = world.Npc(4, 2, 0, 0, attackable: false);
+            NpcCharacter outside = world.Npc(5, 16, 0, 0, attackable: true);
+            Player bystander = world.Player(6, 4, 0, 0);
+
+            Assert.IsTrue(UseAreaOn(caster, center, items, HostileId, radius: 10));
+            Assert.AreEqual(0, caster.Buffs.Count);
+            Assert.AreEqual(1, center.Buffs.Count);
+            Assert.AreEqual(1, nearCenter.Buffs.Count);
+            Assert.AreEqual(0, nearSafe.Buffs.Count);
+            Assert.AreEqual(0, outside.Buffs.Count);
+            Assert.AreEqual(0, bystander.Buffs.Count);
+        }
+
+        [TestMethod]
+        public void HostileAreaCastOnSelfHitsNearbyAttackableNotTheCaster()
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId,
+                can: 0,
+                flags: NanoFlags.IsHostile));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter near = world.Npc(2, 4, 0, 0, attackable: true);
+
+            Assert.IsTrue(UseAreaOn(caster, caster, items, HostileId, radius: 10));
+            Assert.AreEqual(0, caster.Buffs.Count);
+            Assert.AreEqual(1, near.Buffs.Count);
+        }
+
+        [TestMethod]
         public void TeamCastNanoLandsOnTeammatesAndSoloSelf()
         {
             var items = new StubItemBuilder().Add(Timed(BuffId));
@@ -235,6 +275,27 @@ namespace ZoneEngine_New.Tests
                 }
             };
             return template.ExecuteOnUseSpells(player, new SilentInventory(), items);
+        }
+
+        static bool UseAreaOn(Player caster, Character center, StubItemBuilder items, int nanoId, int radius)
+        {
+            var template = new ItemTemplate
+            {
+                Id = 9001,
+                SpellList = new Dictionary<EventType, List<ItemSpell>>
+                {
+                    [EventType.OnUse] =
+                    [
+                        new ItemSpell
+                        {
+                            FunctionType = (int)FunctionType.AreaCastNano,
+                            Target = (int)ItemTarget.Target,
+                            Arguments = [nanoId, radius]
+                        }
+                    ]
+                }
+            };
+            return template.ExecuteOnUseSpells(center, new SilentInventory(), items, source: caster);
         }
 
         static Player ReadyPlayer(int id)

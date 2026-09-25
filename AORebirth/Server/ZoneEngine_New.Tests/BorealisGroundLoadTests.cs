@@ -5,7 +5,7 @@
 
     using AORebirth.World.Collision;
 
-    using LostEden.Vehicles;
+    using N3Lite;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

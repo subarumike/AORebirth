@@ -9,7 +9,7 @@ namespace AORebirth.Tools.RDBDataExtractor
     [Verb(
         "extract",
         isDefault: true,
-        HelpText = "Export RDB playfield tilemaps/districts, MonsterData→CatMesh pairings, and items.dat.")]
+        HelpText = "Export RDB playfield tilemaps/districts, MonsterData→CatMesh pairings, items.dat, and client text.")]
     internal sealed class ExtractionOptions
     {
         [Option(
@@ -49,6 +49,16 @@ namespace AORebirth.Tools.RDBDataExtractor
             "skip-items-dat",
             HelpText = "Skip GameData/items.dat export.")]
         public bool SkipItemsDat { get; set; }
+
+        [Option(
+            "skip-text",
+            HelpText = "Skip GameData/Text.json export.")]
+        public bool SkipText { get; set; }
+
+        [Option(
+            "skip-playfields",
+            HelpText = "Skip playfield tilemap, district, and dat export.")]
+        public bool SkipPlayfields { get; set; }
 
         internal static ExtractionOptions Resolve(ExtractionOptions options)
         {
@@ -96,6 +106,8 @@ namespace AORebirth.Tools.RDBDataExtractor
                 SelfTest = false,
                 SkipMonsterData = options.SkipMonsterData,
                 SkipItemsDat = options.SkipItemsDat,
+                SkipText = options.SkipText,
+                SkipPlayfields = options.SkipPlayfields,
             };
         }
     }

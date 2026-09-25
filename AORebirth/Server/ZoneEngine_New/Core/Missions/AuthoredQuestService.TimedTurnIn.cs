@@ -8,6 +8,7 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Network;
 using MissionLifecycleState = AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState;
@@ -191,8 +192,8 @@ public sealed partial class AuthoredQuestService
         for (int pulse = 1; pulse <= reward / 2; pulse++)
             player.Session?.Send(new StatMessage { Identity = player.Identity,
                 Stats = [new() { Value1 = (CharacterStat)stat, Value2 = (uint)(previous + pulse * 2) }] });
-        player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1, FormattedMessage = text.Replace("{value}", finalValue.ToString(CultureInfo.InvariantCulture)) });
-        player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, CategoryId = 110, MessageId = 108871108 });
+        player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel, FormattedMessage = text.Replace("{value}", finalValue.ToString(CultureInfo.InvariantCulture)) });
+        player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel, CategoryId = 110, MessageId = 108871108 });
     }
 
     static bool TryResolveTimedItem(TimedTurnInDefinition rule, Item item, out TimedItem definition)

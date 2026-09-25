@@ -27,6 +27,22 @@ namespace ZoneEngine_New.Tests
 
             Grant(target, ActionRestrictionFlags.PvPEnabled);
             Assert.IsTrue(CombatRules.CanAttack(attacker, target));
+            Assert.IsFalse(CombatRules.IsPvpAttackBlocked(attacker, target));
+        }
+
+        [TestMethod]
+        public void UnflaggedPlayerTargetIsAPvpBlock()
+        {
+            Player attacker = TestWorld.CreatePlayer(1);
+            Player target = TestWorld.CreatePlayer(2);
+            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 3 }, new StubItemBuilder())
+            {
+                Attackable = false
+            };
+
+            Assert.IsTrue(CombatRules.IsPvpAttackBlocked(attacker, target));
+            Assert.IsFalse(CombatRules.IsPvpAttackBlocked(attacker, npc));
+            Assert.IsFalse(CombatRules.IsPvpAttackBlocked(npc, target));
         }
 
         [TestMethod]

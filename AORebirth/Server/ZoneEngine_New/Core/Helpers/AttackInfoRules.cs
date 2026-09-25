@@ -113,11 +113,14 @@ namespace ZoneEngine_New.Core.Helpers
 
         /// <summary>
         /// True when observers should receive WeaponItemFullUpdate for this hand item.
+        /// Only a visible weapon (non-zero weapon mesh) gets an instance.
         /// Fists/unarmed and NPC tag-driven natural weapons stay AttackInfo/SAW-only.
         /// </summary>
         public static bool ShouldAnnounceWeaponItemFullUpdate(Item? item, CharacterWeapon? armed = null)
         {
             if (item == null || item.InstanceId <= 0 || !item.IsWieldableCombatWeapon())
+                return false;
+            if (!HasVisibleWeaponMesh(item))
                 return false;
 
             // Tag-backed NPC weapons use SAW + AttackInfo instance=tag, not WIFU.
@@ -131,6 +134,43 @@ namespace ZoneEngine_New.Core.Helpers
                 return false;
 
             return true;
+        }
+
+        /// <summary>True when the item carries a non-zero weapon mesh on either hand or the shared stat.</summary>
+        public static bool HasVisibleWeaponMesh(Item? item)
+        {
+            if (item == null)
+                return false;
+
+            return VisualMesh(item, CharacterStat.WeaponMesh) > 0
+                || VisualMesh(item, WeaponMeshRightStat) > 0
+                || VisualMesh(item, WeaponMeshLeftStat) > 0;
+        }
+
+        /// <summary>
+        /// True when this equipment slot would draw a weapon mesh.
+        /// Shared <see cref="CharacterStat.WeaponMesh"/> fills either hand. Hand stats fill only their hand.
+        /// </summary>
+        public static bool HasVisibleWeaponMesh(Item? item, int equipmentSlot)
+        {
+            if (item == null)
+                return false;
+            if (VisualMesh(item, CharacterStat.WeaponMesh) > 0)
+                return true;
+            if (equipmentSlot == (int)WeaponSlots.Righthand)
+                return VisualMesh(item, WeaponMeshRightStat) > 0;
+            if (equipmentSlot == (int)WeaponSlots.LeftHand)
+                return VisualMesh(item, WeaponMeshLeftStat) > 0;
+            return false;
+        }
+
+        const CharacterStat WeaponMeshRightStat = (CharacterStat)1006;
+        const CharacterStat WeaponMeshLeftStat = (CharacterStat)1007;
+
+        static int VisualMesh(Item item, CharacterStat stat)
+        {
+            int value = StatCollection.Normalize(item.GetStat(stat));
+            return value <= 0 ? 0 : value;
         }
     }
 }

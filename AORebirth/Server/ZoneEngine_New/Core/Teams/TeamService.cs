@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.Teams
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
     using ZoneEngine_New.Core.Chat;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Network;
 
@@ -244,9 +245,9 @@ namespace ZoneEngine_New.Core.Teams
             {
                 if (!IsActive(leader)) return false;
                 if (!_membership.TryGetValue(leader.Identity.Instance, out Team? team))
-                    return Error(leader, "You are not in a team.");
+                    return Feedback(leader, "Feedback_YouAreNotMemberOfTeam");
                 if (team.Leader != leader.Identity.Instance)
-                    return Error(leader, "Only the team leader can convert to raid.");
+                    return Feedback(leader, "Feedback_NeedToBeTeamLeader");
                 if (team.IsRaid)
                     return Error(leader, "Your team is already a raid.");
                 if (team.Members.Count < 2)
@@ -260,11 +261,7 @@ namespace ZoneEngine_New.Core.Teams
                     ChatCommand(id, "#aorebirth-raid-convert " + team.Id);
                 }
 
-                Send(leader, new ChatTextMessage
-                {
-                    Identity = leader.Identity,
-                    Text = "Your team has been converted to a raid."
-                });
+                Send(leader, ClientFeedback.Create(leader.Identity, "Feedback_RaidCreated"));
                 return true;
             }
         }
@@ -295,11 +292,11 @@ namespace ZoneEngine_New.Core.Teams
             {
                 if (!IsActive(leader)) return false;
                 if (!_membership.TryGetValue(leader.Identity.Instance, out Team? team))
-                    return Error(leader, "You are not in a team.");
+                    return Feedback(leader, "Feedback_YouAreNotMemberOfTeam");
                 if (!team.IsRaid)
                     return Error(leader, "Your team is not a raid.");
                 if (team.Leader != leader.Identity.Instance)
-                    return Error(leader, "Only the raid leader can move members between teams.");
+                    return Feedback(leader, "Feedback_NeedToBeTeamLeader");
                 if (!_players.TryGetValue(targetCharacterId, out Player? target) || !IsActive(target)
                     || !_membership.TryGetValue(targetCharacterId, out Team? targetTeam)
                     || !ReferenceEquals(targetTeam, team))
@@ -317,7 +314,7 @@ namespace ZoneEngine_New.Core.Teams
             if (targetIdentity.Type != IdentityType.CanbeAffected || targetIdentity.Instance <= 0
                 || !_players.TryGetValue(targetIdentity.Instance, out Player? target) || !IsActive(target)
                 || ReferenceEquals(target, inviter)) return Error(inviter, "Team invite target is not available.");
-            if (_membership.ContainsKey(target.Identity.Instance)) return Error(inviter, "That player is already in a team.");
+            if (_membership.ContainsKey(target.Identity.Instance)) return Feedback(inviter, "Feedback_AlreadyTeamMember");
             _membership.TryGetValue(inviter.Identity.Instance, out Team? team);
             if (_invitations.ContainsKey(target.Identity.Instance))
                 return Error(inviter, "Team invite already pending for " + target.Name + ".");
@@ -539,7 +536,7 @@ namespace ZoneEngine_New.Core.Teams
             if (target.Type != IdentityType.CanbeAffected || target == leader.Identity
                 || !_membership.TryGetValue(leader.Identity.Instance, out Team? team)
                 || team.Leader != leader.Identity.Instance || !team.Members.Contains(target.Instance))
-                return Error(leader, "Only the team leader can kick another member of this team.");
+                return Feedback(leader, "Feedback_NeedToBeTeamLeader");
             CancelInvitations(target.Instance);
             return Remove(_players[target.Instance], true);
         }
@@ -776,6 +773,12 @@ namespace ZoneEngine_New.Core.Teams
         private bool Error(Player player, string text)
         {
             Send(player, new ChatTextMessage { Identity = player.Identity, Text = text });
+            return false;
+        }
+
+        private bool Feedback(Player player, string key)
+        {
+            Send(player, ClientFeedback.Create(player.Identity, key));
             return false;
         }
     }

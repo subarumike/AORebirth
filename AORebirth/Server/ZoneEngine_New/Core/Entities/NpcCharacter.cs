@@ -146,20 +146,29 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
-        /// Announces equipped combat weapons after SCFU only when they need owner-linked WIFU.
-        /// Tag-backed NPC natural weapons stay SAW/AttackInfo-only (no fist/WIFU).
+        /// Announces a WeaponInstance after SCFU only for a visible weapon (non-zero WeaponMesh).
+        /// The first visible weapon is the right hand. The next is the left.
         /// </summary>
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
         {
             var messages = new List<WeaponItemFullUpdateMessage>();
-            foreach (CharacterWeapon? armed in Weapons.Values)
+            for (int ordinal = 0; ordinal < MaxNpcCombatWeapons; ordinal++)
             {
-                if (armed?.Item == null || armed.WireSlot < 0)
+                WeaponSlot slot = (WeaponSlot)((int)WeaponSlot.Npc0 + ordinal);
+                if (!Weapons.TryGetValue(slot, out CharacterWeapon? armed) || armed?.Item == null)
+                    continue;
+                if (armed.VisibleHandSlot < 0)
                     continue;
 
-                WeaponItemFullUpdateMessage? message = TryBuildWeaponItemFullUpdate(armed.Item, armed.WireSlot, armed);
-                if (message != null)
-                    messages.Add(message);
+                WeaponItemFullUpdateMessage? visible = TryBuildWeaponItemFullUpdate(
+                    armed.Item,
+                    armed.VisibleHandSlot,
+                    armed,
+                    visibleHand: true);
+                if (visible == null)
+                    continue;
+
+                messages.Add(visible);
             }
 
             return messages;
@@ -368,13 +377,16 @@ namespace ZoneEngine_New.Core.Entities
         public override void RebaseWeapons()
         {
             ClearWeapons();
+            ClearHandMesh(RightHandMeshPosition);
+            ClearHandMesh(LeftHandMeshPosition);
 
             int quality = Stats.GetOrOne(CharacterStat.Level);
             int armed = 0;
             bool maCombined = false;
+            int meshHands = 0;
 
-            if (!TryArmFromEquipmentContainer(ref armed, ref maCombined))
-                TryArmNpcEquipment(MobTemplate?.Equipment, quality, ref armed, ref maCombined);
+            if (!TryArmFromEquipmentContainer(ref armed, ref maCombined, ref meshHands))
+                TryArmNpcEquipment(MobTemplate?.Equipment, quality, ref armed, ref maCombined, ref meshHands);
 
             if (armed == 0)
             {
@@ -388,7 +400,7 @@ namespace ZoneEngine_New.Core.Entities
             ResetAllWeaponAttacks();
         }
 
-        bool TryArmFromEquipmentContainer(ref int armed, ref bool maCombined)
+        bool TryArmFromEquipmentContainer(ref int armed, ref bool maCombined, ref int meshHands)
         {
             if (Equipment.Content.Count == 0)
                 return false;
@@ -408,6 +420,7 @@ namespace ZoneEngine_New.Core.Entities
 
                 WeaponSlot hand = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
                 ArmFromItem(hand, item, wireSlot: armed, sawHash: sawHash);
+                ApplyWeaponMesh(hand, item, ref meshHands);
                 armed++;
                 armedAny = true;
                 if (item.IsMaCombinedWeapon())
@@ -421,7 +434,8 @@ namespace ZoneEngine_New.Core.Entities
             List<List<int>>? source,
             int quality,
             ref int armed,
-            ref bool maCombined)
+            ref bool maCombined,
+            ref int meshHands)
         {
             if (source == null || source.Count == 0)
                 return false;
@@ -444,6 +458,7 @@ namespace ZoneEngine_New.Core.Entities
 
                 WeaponSlot slot = (WeaponSlot)((int)WeaponSlot.Npc0 + armed);
                 ArmFromItem(slot, item, wireSlot: armed);
+                ApplyWeaponMesh(slot, item, ref meshHands);
                 armed++;
                 armedAny = true;
                 if (item.IsMaCombinedWeapon())
@@ -453,6 +468,30 @@ namespace ZoneEngine_New.Core.Entities
             return armedAny;
         }
 
+        /// <summary>
+        /// The first non-zero WeaponMesh fills the right hand. The next fills the left.
+        /// The same order is stored for the weapon-instance slot.
+        /// </summary>
+        void ApplyWeaponMesh(WeaponSlot logicalSlot, Item item, ref int meshHands)
+        {
+            if (meshHands >= 2)
+                return;
+
+            int meshId = StatCollection.Normalize(item.GetStat(CharacterStat.WeaponMesh));
+            if (meshId <= 0)
+                return;
+
+            bool rightHand = meshHands == 0;
+            int position = rightHand ? RightHandMeshPosition : LeftHandMeshPosition;
+            int equipmentSlot = rightHand ? (int)WeaponSlots.Righthand : (int)WeaponSlots.LeftHand;
+            SetHandMesh(position, meshId, overrideTextureId: 0);
+            if (Weapons.TryGetValue(logicalSlot, out CharacterWeapon? armed) && armed != null)
+                armed.VisibleHandSlot = equipmentSlot;
+            meshHands++;
+        }
+
+        const int RightHandMeshPosition = 1;
+        const int LeftHandMeshPosition = 2;
         const int MaxNpcCombatWeapons = 8;
     }
 }
