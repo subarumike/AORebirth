@@ -438,7 +438,8 @@ namespace ZoneEngine_New.Core.Commands
                 rows.Add(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Chance {0}% x{1} levelMod={2}",
+                        "{0} Chance {1}% x{2} levelMod={3}",
+                        entry.Hash.Replace('"', '\''),
                         entry.Chance,
                         entry.Repeats,
                         entry.LevelMod));
