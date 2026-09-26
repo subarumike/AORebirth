@@ -294,7 +294,28 @@ namespace ZoneEngine_New.Core.Entities
             if (!string.IsNullOrEmpty(sawHash))
                 _equipmentSawHashes[slot] = sawHash;
 
+            UploadNanoCrystal(item);
             return true;
+        }
+
+        /// <summary>
+        /// Equipped nano crystals count as uploaded: every UploadNano function on the item adds its
+        /// nano to this NPC's list. The crystal stays in equipment.
+        /// </summary>
+        void UploadNanoCrystal(Item item)
+        {
+            foreach (KeyValuePair<EventType, List<ItemSpell>> pair in item.SpellList)
+            {
+                List<ItemSpell>? spells = pair.Value;
+                if (spells == null)
+                    continue;
+
+                for (int i = 0; i < spells.Count; i++)
+                {
+                    if (spells[i].Is(FunctionType.UploadNano) && spells[i].TryReadInt(0, out int nanoId))
+                        TryAddUploadedNano(nanoId);
+                }
+            }
         }
 
         internal static bool TryFindEquipMonsterWeaponHash(Item item, out string hash)

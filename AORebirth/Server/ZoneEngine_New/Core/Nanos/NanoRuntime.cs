@@ -455,7 +455,7 @@ namespace ZoneEngine_New.Core.Nanos
                 CasterIsDead = caster.IsDead,
                 CasterIsCasting = caster.IsCastingNano,
                 CasterIsRecharging = caster.IsInNanoRecharge(nowUtc),
-                // NPC casts are not upload gated; only players own a nano program list.
+                // NPC casts are not upload gated; an NPC's list only holds its equipped crystals.
                 IsUploaded = !caster.IsPlayer || caster.UploadedNanoIds.Contains(spell.Id),
                 RequirementsMet = spell.MeetsActionRequirements(
                     stat => caster.Stats.Get(stat),
