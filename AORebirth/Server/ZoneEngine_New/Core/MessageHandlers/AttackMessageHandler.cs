@@ -55,7 +55,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             if (target != null && CombatRules.IsPvpAttackBlocked(player, target))
-                ClientFeedback.Send(player, "Feedback_PvpNotAllowedSinceYouAreNeutral");
+                ClientFeedback.Send(player, "Feedback_PvpNotAllowedInThisDistrict");
             else
                 ClientFeedback.Send(player, "Feedback_StartingAttackFailed");
 
