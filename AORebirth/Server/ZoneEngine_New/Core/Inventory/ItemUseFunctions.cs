@@ -500,6 +500,8 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// Absolute OnUse teleport. Positional args are RelX, RelY, RelZ, destination playfield.
+        /// A destination playfield of 0 is a soft in-place teleport on the current playfield
+        /// (e.g. 258912 Entrance to Hangar), like LineTeleport's intrazone lift.
         /// One-way: it clears any stored proxy return door.
         /// </summary>
         static bool Teleport(Player player, ItemSpell spell)
@@ -510,20 +512,25 @@ namespace ZoneEngine_New.Core.Inventory
             if (!spell.TryReadInt(0, out int x)
                 || !spell.TryReadInt(1, out int y)
                 || !spell.TryReadInt(2, out int z)
-                || !spell.TryReadInt(3, out int playfieldId)
-                || playfieldId <= 0
-                || playfieldId >= ZoneEngine.Core.Missions.GeneratedMissionIdentitySpace.MinimumLivePlayfield2)
+                || !spell.TryReadInt(3, out int playfieldId))
                 return false;
 
             Playfield source = player.Playfield;
-            IGameData gameData = source.GetRequiredService<IGameData>();
-            string playfieldDir = Path.Combine(
-                gameData.RootPath,
-                GameDataPaths.PlayfieldRelativeDirectory(playfieldId));
-            if (!Directory.Exists(playfieldDir))
-                return false;
+            bool samePlayfield = playfieldId == 0 || playfieldId == source.Identity.Instance;
+            if (!samePlayfield)
+            {
+                if (playfieldId < 0
+                    || playfieldId >= ZoneEngine.Core.Missions.GeneratedMissionIdentitySpace.MinimumLivePlayfield2)
+                    return false;
 
-            bool samePlayfield = playfieldId == source.Identity.Instance;
+                IGameData gameData = source.GetRequiredService<IGameData>();
+                string playfieldDir = Path.Combine(
+                    gameData.RootPath,
+                    GameDataPaths.PlayfieldRelativeDirectory(playfieldId));
+                if (!Directory.Exists(playfieldDir))
+                    return false;
+            }
+
             Playfield destination = samePlayfield
                 ? source
                 : source.GetRequiredService<PlayfieldManager>().GetOrCreate(playfieldId);
@@ -531,6 +538,12 @@ namespace ZoneEngine_New.Core.Inventory
 
             ClearProxyReturn(player);
             source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
+
+            if (playfieldId == 0)
+            {
+                FinishIntrazoneLineTeleport(player, source, landing, source.Identity.Instance);
+                return true;
+            }
 
             if (samePlayfield)
             {
@@ -621,7 +634,7 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// Same-playfield lift (LineTeleport with destination playfield 0). The client snaps in place
+        /// Same-playfield lift (LineTeleport or Teleport with destination playfield 0). The client snaps in place
         /// from a soft N3Teleport and keeps its heading; no zone transfer and no redirect.
         /// </summary>
         static void FinishIntrazoneLineTeleport(Player player, Playfield source, Vector3 landing, int destinationKey)
