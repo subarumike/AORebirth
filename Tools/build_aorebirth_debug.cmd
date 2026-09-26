@@ -51,6 +51,15 @@ if errorlevel 1 (
     exit /b !RESTORE_EXIT!
 )
 
+echo [ACTIVE_CHECKOUT_WINS] Stopping positively identified AORebirth core engines before build...
+call "%~dp0..\stop-engines.cmd" -CoreOnly
+if errorlevel 1 (
+    set ENGINE_CLEANUP_EXIT=!ERRORLEVEL!
+    echo [AORebirth Build] Engine cleanup failed with exit code !ENGINE_CLEANUP_EXIT!; build was not started.
+    popd
+    exit /b !ENGINE_CLEANUP_EXIT!
+)
+
 echo [AORebirth Build] Building AORebirth.Core...
 "%MSBUILD%" "AORebirth\Libraries\Source\AORebirth.Core\AORebirth.Core.csproj" /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 set CORE_EXIT=%ERRORLEVEL%

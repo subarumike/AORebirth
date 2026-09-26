@@ -219,12 +219,34 @@ or Git Bash workflows only. Use the read-only root wrapper below for status:
 cmd /d /c status-engines.cmd
 ```
 
+### Cross-checkout engine ownership (`ACTIVE_CHECKOUT_WINS`)
+
+Before a governed core-engine build, start, or restart, the lifecycle workflow
+enumerates LoginEngine, ChatEngine, and ZoneEngine_New processes, records each
+accessible executable path and owning checkout, and stops every positively
+identified AORebirth instance. Another AORebirth checkout is stale development
+state for this operation and does not require separate permission from Mike.
+
+Identification requires the exact process name and complete canonical suffix
+under `AORebirth\Built\Debug`; a port number or process name alone is never
+sufficient. Shutdown first signals the identified process through its owning
+checkout, then tries its window-close path, and force-stops only that confirmed
+PID after the existing bounded timeout. The workflow waits for exit and for all
+governed ports to be released. An unknown, inaccessible, or unverified port
+owner is never killed and blocks the build/start with its ownership failure.
+
+Read-only identification without stopping a process is available through:
+
+```cmd
+cmd /d /c stop-engines.cmd -CoreOnly -IdentifyOnly
+```
+
 The status wrapper reads configured ports, resolves listener PIDs through
 Windows CIM, and correlates each listener with the exact canonical executable
 under `AORebirth\Built\Debug`. It fails closed on missing processes or ports,
 wrong owners, multiple listener PIDs, split multi-port ownership, duplicate
 engine instances, or unavailable executable ownership. Verified mappings are
-ChatEngine `6996` and `7012`, LoginEngine `7500`, ZoneEngine `7501`, and optional
+ChatEngine `6996` and `7012`, LoginEngine `7500`, ZoneEngine_New `7501`, and optional
 WebEngine `8181`. An absent WebEngine with a closed port is healthy; any partial
 or conflicting optional-Web state fails.
 
@@ -248,27 +270,30 @@ through the production MySQL configuration/connector path, requires
 if any `characters.Online` value is nonzero. It performs no writes, migrations,
 resets, or schema repair.
 
-After a successful rebuild, restart engines with:
+For a governed rebuild and restart, use:
 
 ```cmd
 cmd /d /c restart-engines.cmd
 ```
 
-`start-engines.cmd` and `restart-engines.cmd` run preflight before launch;
-restart runs it before stopping any healthy engine. Startup verifies exact
-launched-PID ownership and rolls back only processes launched by that
-invocation. Managed shutdown trusts only PID metadata whose executable path and
-start time match and never falls back to killing processes by name.
+`restart-engines.cmd` validates database/schema readiness, stops all positively
+identified AORebirth core engines and verifies released ports, builds the active
+checkout, then starts only those fresh outputs. `start-engines.cmd` removes
+positively identified stale-checkout engines before its normal exact-owner
+prestart checks. Startup verifies exact launched-PID ownership and rolls back
+only processes launched by that invocation. Managed shutdown trusts either
+validated active-checkout PID metadata or exact canonical AORebirth engine
+identity; it never kills by process name or port alone.
 
 Normal build/acceptance also builds and tests `ZoneEngine_New`, the only zone
-backend. Build it alone with:
+backend. Build the three core engines without starting them with:
 
 ```cmd
 cmd /d /c NewZoneEngineBuild\build.cmd
 ```
 
-Then start ChatEngine, LoginEngine, and `ZoneEngine_New` in the governed order
-with:
+To stop, rebuild, and start ChatEngine, LoginEngine, and `ZoneEngine_New` in the
+governed order, use:
 
 ```cmd
 cmd /d /c restart-engines.cmd

@@ -37,6 +37,15 @@ if not "%STOP_EXIT%"=="0" (
     exit /b %STOP_EXIT%
 )
 
+echo [AORebirth Restart] Building freshly stopped active checkout engines...
+call "%~dp0NewZoneEngineBuild\build.cmd"
+set BUILD_EXIT=%ERRORLEVEL%
+if not "%BUILD_EXIT%"=="0" (
+    echo [AORebirth Restart] Build failed with exit code %BUILD_EXIT%; no engine was started.
+    popd >nul
+    exit /b %BUILD_EXIT%
+)
+
 echo [AORebirth Restart] Starting engines...
 call "%~dp0start-engines.cmd" %*
 set START_EXIT=%ERRORLEVEL%

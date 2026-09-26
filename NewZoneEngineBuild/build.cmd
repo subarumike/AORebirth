@@ -58,6 +58,13 @@ if errorlevel 1 (
     exit /b 1
 )
 
+echo [ACTIVE_CHECKOUT_WINS] Stopping positively identified AORebirth core engines before build...
+call "%REPO%\stop-engines.cmd" -CoreOnly
+if errorlevel 1 (
+    echo [NewZoneEngineBuild] Engine cleanup failed; build was not started.
+    exit /b 1
+)
+
 echo.
 echo [3/4] Building ChatEngine, LoginEngine, ZoneEngine_New (%CONFIG%)...
 "%MSBUILD%" "%CHAT_PROJ%" /t:Build /p:Configuration=%CONFIG% /m:1 /nr:false /v:minimal

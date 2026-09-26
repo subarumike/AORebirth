@@ -166,10 +166,11 @@ def main():
     require(stop_ps.count("foreach ($engine in $engines)") == 2,
             "port release checks must run after all selected engines stop")
     ordered(stop_ps, "Stop-EngineProcess -Process $metadataProcess",
-            "# Stop every selected managed process", "--prestart ZoneEngine_New")
+            "# Stop every selected managed process",
+            'Wait-EnginePrestartState -EngineName "ZoneEngine_New"')
     require('$configPath = Join-Path $root "AORebirth\\Config\\Config.xml"' in stop_ps,
             "shutdown status probes must use the repository configuration")
-    require("$statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name" in stop_ps,
+    require("$statusProbe --config $configPath --engine-dir $engineDir --prestart $EngineName" in stop_ps,
             "shutdown release probes must receive configuration and engine-directory arguments")
     require(not re.search(r"(?m)^\s*-and\b", stop_ps),
             "PowerShell continuation operators must remain on the preceding condition line")

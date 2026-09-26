@@ -1,6 +1,12 @@
 param(
     [ValidateSet("ChatEngine", "LoginEngine", "ZoneEngine_New", "WebEngine")]
-    [string[]]$EngineName
+    [string[]]$EngineName,
+
+    [switch]$CoreOnly,
+
+    [switch]$StaleCheckoutsOnly,
+
+    [switch]$IdentifyOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -15,6 +21,11 @@ if ([string]::IsNullOrWhiteSpace($configPath)) {
 $statusProbe = Join-Path $root "Tools\engine_status_probe.js"
 $cscript = Join-Path $env:SystemRoot "System32\cscript.exe"
 $failed = $false
+$coreEngineNames = @("ChatEngine", "LoginEngine", "ZoneEngine_New")
+
+if ($CoreOnly -and $EngineName -and $EngineName.Count -gt 0) {
+    throw "CoreOnly cannot be combined with EngineName."
+}
 
 $engineDefinitions = @(
     @{ Name = "ZoneEngine_New"; File = "ZoneEngine_New\ZoneEngine_New.exe" },
@@ -23,7 +34,10 @@ $engineDefinitions = @(
     @{ Name = "ChatEngine"; File = "ChatEngine.exe" }
 )
 
-$engines = if ($EngineName -and $EngineName.Count -gt 0) {
+$engines = if ($CoreOnly) {
+    @($engineDefinitions | Where-Object { $coreEngineNames -contains $_.Name })
+}
+elseif ($EngineName -and $EngineName.Count -gt 0) {
     @($engineDefinitions | Where-Object { $EngineName -contains $_.Name })
 }
 else {
@@ -93,6 +107,9 @@ function Stop-EngineProcess {
     if (Get-Process -Id $Process.Id -ErrorAction SilentlyContinue) {
         Write-Warning "$EngineName did not exit cleanly; forcing process stop."
         Stop-Process -Id $Process.Id -Force
+        if (-not (Wait-ProcessExit -ProcessId $Process.Id -TimeoutSeconds 5)) {
+            throw "$EngineName pid=$($Process.Id) remained running after confirmed force termination."
+        }
     }
 }
 
@@ -115,6 +132,132 @@ function Get-ProcessesByExecutablePath {
             }
         }
     )
+}
+
+function Get-AORebirthEngineProcesses {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Engine
+    )
+
+    if ($coreEngineNames -notcontains $Engine.Name) {
+        return @()
+    }
+
+    $relativeEnginePath = Join-Path "AORebirth\Built\Debug" ([string]$Engine.File)
+    $pathSuffix = [System.IO.Path]::DirectorySeparatorChar + $relativeEnginePath
+
+    @(
+        foreach ($candidate in @(Get-Process -ErrorAction SilentlyContinue)) {
+            try {
+                $candidatePath = [System.IO.Path]::GetFullPath($candidate.Path)
+                if ($candidate.ProcessName -ine $Engine.Name) {
+                    continue
+                }
+                if ([System.IO.Path]::GetFileNameWithoutExtension($candidatePath) -ine $Engine.Name) {
+                    continue
+                }
+                if (-not $candidatePath.EndsWith($pathSuffix, [System.StringComparison]::OrdinalIgnoreCase)) {
+                    continue
+                }
+
+                $checkoutRootText = $candidatePath.Substring(0, $candidatePath.Length - $pathSuffix.Length)
+                if ([string]::IsNullOrWhiteSpace($checkoutRootText)) {
+                    continue
+                }
+
+                $checkoutRoot = [System.IO.Path]::GetFullPath($checkoutRootText)
+                [pscustomobject]@{
+                    Process = $candidate
+                    Path = $candidatePath
+                    CheckoutRoot = $checkoutRoot
+                    ShutdownFile = Join-Path $checkoutRoot "logs\engines\$($Engine.Name).shutdown"
+                    IsCurrentCheckout = $checkoutRoot -ieq [System.IO.Path]::GetFullPath($root)
+                }
+            }
+            catch {
+            }
+        }
+    )
+}
+
+function Wait-EnginePrestartState {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$EngineName,
+
+        [switch]$AllowCurrentCheckoutOwner,
+
+        [int]$TimeoutSeconds = 10
+    )
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $probeOutput = @()
+    $probeExit = 1
+    do {
+        $probeOutput = @(& $cscript //nologo $statusProbe --config $configPath --engine-dir $engineDir --prestart $EngineName 2>&1)
+        $probeExit = $LASTEXITCODE
+        if ($probeExit -eq 0 -or ($AllowCurrentCheckoutOwner -and $probeExit -eq 3)) {
+            $probeOutput | ForEach-Object { Write-Host $_ }
+            return $probeExit
+        }
+
+        Start-Sleep -Milliseconds 500
+    } while ((Get-Date) -lt $deadline)
+
+    $probeOutput | ForEach-Object { Write-Host $_ }
+    return $probeExit
+}
+
+foreach ($engine in @($engines | Where-Object { $coreEngineNames -contains $_.Name })) {
+    foreach ($identified in @(Get-AORebirthEngineProcesses -Engine $engine)) {
+        Write-Host ("[ACTIVE_CHECKOUT_WINS] identified engine={0} pid={1} checkout={2} path={3}" -f `
+            $engine.Name, $identified.Process.Id, $identified.CheckoutRoot, $identified.Path)
+
+        if ($IdentifyOnly) {
+            continue
+        }
+        if ($StaleCheckoutsOnly -and $identified.IsCurrentCheckout) {
+            continue
+        }
+
+        try {
+            Stop-EngineProcess `
+                -Process $identified.Process `
+                -EngineName $engine.Name `
+                -ShutdownFile $identified.ShutdownFile
+            if (Test-Path -LiteralPath $identified.ShutdownFile) {
+                Remove-Item -LiteralPath $identified.ShutdownFile -Force
+            }
+        }
+        catch {
+            Write-Warning ("Could not stop positively identified AORebirth {0} pid={1} from checkout {2}." -f `
+                $engine.Name, $identified.Process.Id, $identified.CheckoutRoot)
+            $failed = $true
+        }
+    }
+}
+
+if ($IdentifyOnly) {
+    Write-Host "ACTIVE_CHECKOUT_WINS identification complete; no process was stopped."
+    return
+}
+
+if ($StaleCheckoutsOnly) {
+    foreach ($engine in @($engines | Where-Object { $coreEngineNames -contains $_.Name })) {
+        $prestartExit = Wait-EnginePrestartState -EngineName $engine.Name -AllowCurrentCheckoutOwner
+        if ($prestartExit -ne 0 -and $prestartExit -ne 3) {
+            Write-Warning "$($engine.Name) pre-start state remains unsafe; an unknown or unverified owner was not killed."
+            $failed = $true
+        }
+    }
+
+    if ($failed) {
+        Write-Error "AO Rebirth stale-checkout cleanup did not reach a verified safe state."
+    }
+
+    Write-Host "AO Rebirth stale-checkout cleanup complete."
+    return
 }
 
 foreach ($engine in $engines) {
@@ -202,17 +345,16 @@ foreach ($engine in $engines) {
         else {
             Write-Host "ZoneEngine_New process is not running."
         }
-        & $cscript //nologo $statusProbe --config $configPath --engine-dir $engineDir --prestart ZoneEngine_New
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "ZoneEngine_New zone port is not fully released; no unmanaged process was killed."
+        $releaseExit = Wait-EnginePrestartState -EngineName "ZoneEngine_New"
+        if ($releaseExit -ne 0) {
+            Write-Warning "ZoneEngine_New zone port is not fully released; an unknown or unverified owner was not killed."
             $failed = $true
         }
     }
     else {
-        & $cscript //nologo $statusProbe --config $configPath --engine-dir $engineDir --prestart $engine.Name
-        $releaseExit = $LASTEXITCODE
+        $releaseExit = Wait-EnginePrestartState -EngineName $engine.Name
         if ($releaseExit -ne 0) {
-            Write-Warning "$($engine.Name) is not fully stopped with its ports released; no unmanaged process was killed."
+            Write-Warning "$($engine.Name) is not fully stopped with its ports released; an unknown or unverified owner was not killed."
             $failed = $true
         }
     }

@@ -117,6 +117,21 @@ individual content definitions belong in the appropriate editable data source.
 - For Windows/cmd searches, prefer shell-safe `rg` forms with repeated `-e` patterns over complex quoted regex strings, especially when paths contain spaces.
 - Protect the context window: avoid command spam, large logs, repeated searches, and noisy transcripts.
 - Never launch the AO game/client unless Mike explicitly instructs it in the current task.
+- If this task starts or restarts ZoneEngine_New, LoginEngine, ChatEngine, or
+  WebEngine, run `cmd /d /c stop-engines.cmd` before the final reply unless Mike
+  explicitly asks to leave the engines running.
+- `ACTIVE_CHECKOUT_WINS`: before building, starting, or restarting the governed
+  LoginEngine, ChatEngine, or ZoneEngine_New set, automatically identify and
+  stop positively identified AORebirth backend engines from every local
+  AORebirth checkout. Do not ask Mike merely because an identified engine came
+  from another checkout. Positive identification requires the exact engine name
+  and its canonical `AORebirth\Built\Debug` executable suffix, from which the
+  owning checkout is derived. Request graceful shutdown through that checkout
+  first; force only that confirmed PID after the bounded shutdown timeout, then
+  wait for process exit and port release. Never kill by process name or port
+  alone. If an expected port owner cannot be positively identified as one of
+  these AORebirth engines, stop the workflow and report it. Never leave backend
+  engines from two AORebirth checkouts running simultaneously.
 - For AOSharp live capture startup, use only the approved `cmd.exe` wrapper documented in `docs/ai/WORKFLOW.md`.
 - For mission-terminal / mission-lifecycle capture **analyze and implement**,
   use the repository-relative analyzer build/run commands documented in

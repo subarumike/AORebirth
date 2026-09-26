@@ -293,6 +293,9 @@ if ($ValidateSchemaOnly) {
     return
 }
 
+Write-Host "[ACTIVE_CHECKOUT_WINS] Removing positively identified AORebirth core engines from stale checkouts before startup..."
+& (Join-Path $root "stop-engines.ps1") -CoreOnly -StaleCheckoutsOnly
+
 $windowStyle = if ($Visible) { "Normal" } else { "Hidden" }
 
 if ($WithWeb) {
