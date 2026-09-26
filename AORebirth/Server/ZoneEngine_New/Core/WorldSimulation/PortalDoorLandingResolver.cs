@@ -56,6 +56,12 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// <summary>Destinations.dat key when <see cref="Kind"/> is DestinationLine.</summary>
         public byte DestinationIndex { get; init; }
 
+        /// <summary>
+        /// LineTeleport's packed Destinations.dat key, <c>(index &lt;&lt; 16) | playfieldId</c>, as it
+        /// appears in the function arguments. The intrazone N3Teleport echoes it in Playfield2.
+        /// </summary>
+        public int DestinationKey { get; init; }
+
         /// <summary>How far in front of the target door to place the character.</summary>
         public float DoorClearance { get; init; }
 
@@ -402,7 +408,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             {
                 PlayfieldId = playfieldId,
                 Kind = PortalLandingKind.DestinationLine,
-                DestinationIndex = (byte)(packed >> 16)
+                DestinationIndex = (byte)(packed >> 16),
+                DestinationKey = unchecked((int)packed)
             };
             return true;
         }

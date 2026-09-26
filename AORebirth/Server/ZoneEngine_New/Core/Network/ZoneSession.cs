@@ -318,6 +318,65 @@ namespace ZoneEngine_New.Core.Network
                 player.Identity.Instance);
         }
 
+        public void SendIntrazoneTeleport(Vector3 landing, AORebirth.Core.Vector.Quaternion heading, int destinationKey)
+        {
+            ArgumentNullException.ThrowIfNull(landing);
+            ArgumentNullException.ThrowIfNull(heading);
+
+            Player? player = Player;
+            if (player == null)
+                throw new InvalidOperationException("Session has no bound player.");
+
+            Playfield? playfield = player.Playfield;
+            if (playfield == null)
+                throw new InvalidOperationException("Player is not on a playfield.");
+
+            Send(
+                BuildIntrazoneTeleport(player, landing, heading, destinationKey),
+                playfield.Identity.Instance,
+                player.Identity.Instance);
+        }
+
+        /// <summary>
+        /// N3.dll n3TeleportIIR_t::Activate branches on ChangePlayfield.Instance: 0 applies
+        /// UpdateLastAllowedPosition + SetRelPosRot in place; anything else runs StartTeleport and
+        /// unloads the zone. ReadSubClass rejects a playfield-proxy version other than 'a' and caps
+        /// the trailing blob at 1000 bytes; the soft branch never reads the blob.
+        /// </summary>
+        internal static N3TeleportMessage BuildIntrazoneTeleport(Player player, Vector3 landing,
+            AORebirth.Core.Vector.Quaternion heading, int destinationKey)
+        {
+            const IdentityType intrazonePlayfieldProxyType = (IdentityType)51104;
+
+            return new N3TeleportMessage
+            {
+                Identity = player.Identity,
+                Unknown = 0,
+                Destination = new MsgVector3
+                {
+                    X = landing.xf,
+                    Y = landing.yf,
+                    Z = landing.zf
+                },
+                Heading = new MsgQuaternion
+                {
+                    X = heading.xf,
+                    Y = heading.yf,
+                    Z = heading.zf,
+                    W = heading.wf
+                },
+                Unknown1 = 0x61,
+                Playfield = new Identity { Type = intrazonePlayfieldProxyType, Instance = 0 },
+                GameServerId = 0,
+                SgId = 0,
+                ChangePlayfield = Identity.None,
+                Unknown4 = 0,
+                Unknown5 = 0,
+                Playfield2 = new Identity { Type = IdentityType.Playfield3, Instance = destinationKey },
+                Payload = new byte[8]
+            };
+        }
+
         private static N3TeleportMessage BuildNormalTeleport(Player player, Vector3 landing, int destPlayfieldId,
             AORebirth.Core.Vector.Quaternion heading)
         {

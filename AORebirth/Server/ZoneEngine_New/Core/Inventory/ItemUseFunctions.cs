@@ -581,7 +581,15 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             ClearProxyReturn(player);
+            // Drops the pad overlap and holds triggers off briefly; afterwards the landing's
+            // overlaps are adopted, so a return beam beside the landing only fires once walked off.
             source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
+
+            if (destination.PlayfieldId == 0)
+            {
+                FinishIntrazoneLineTeleport(player, source, landing, destination.DestinationKey);
+                return true;
+            }
 
             if (playfieldId == source.Identity.Instance)
             {
@@ -609,6 +617,23 @@ namespace ZoneEngine_New.Core.Inventory
                 player.Motor.Warp(landing);
 
             player.Session!.SendSamePlayfieldRespawnTeleport(landing);
+            AnnounceArrival(player, source, landing);
+        }
+
+        /// <summary>
+        /// Same-playfield lift (LineTeleport with destination playfield 0). The client snaps in place
+        /// from a soft N3Teleport and keeps its heading; no zone transfer and no redirect.
+        /// </summary>
+        static void FinishIntrazoneLineTeleport(Player player, Playfield source, Vector3 landing, int destinationKey)
+        {
+            player.Motor.Warp(landing);
+            player.Session!.SendIntrazoneTeleport(landing, player.Rotation, destinationKey);
+            AnnounceArrival(player, source, landing);
+        }
+
+        /// <summary>Other clients only see the N3Teleport's effect through a normal move.</summary>
+        static void AnnounceArrival(Player player, Playfield source, Vector3 landing)
+        {
             PlayfieldLocality? locality = source.GetService<PlayfieldLocality>();
             if (locality == null)
                 return;

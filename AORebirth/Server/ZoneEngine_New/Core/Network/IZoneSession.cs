@@ -31,6 +31,13 @@ namespace ZoneEngine_New.Core.Network
         void SendSamePlayfieldRespawnTeleport(Vector3 landing)
             => throw new System.NotSupportedException("This session does not support a same-playfield respawn.");
 
+        /// <summary>
+        /// Intrazone LineTeleport: N3Teleport with ChangePlayfield instance 0, which the client
+        /// applies as SetRelPosRot without unloading the playfield. Sent to the moving client only.
+        /// </summary>
+        void SendIntrazoneTeleport(Vector3 landing, AORebirth.Core.Vector.Quaternion heading, int destinationKey)
+            => throw new System.NotSupportedException("This session does not support an intrazone teleport.");
+
         void Send(byte[] packet);
 
         void Send(Message message);

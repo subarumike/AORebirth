@@ -149,7 +149,92 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(5f, player.Position.zf, 0.001f);
             Assert.AreEqual(0, player.Stats.GetOrZero(CharacterStat.ExternalPlayfieldInstance));
             Assert.AreEqual(0, player.Stats.GetOrZero(CharacterStat.ExternalDoorInstance));
-            Assert.IsTrue(session.SamePlayfield);
+            Assert.AreEqual(line << 16, session.IntrazoneKey);
+            Assert.IsFalse(session.SamePlayfield, "Intrazone lifts must not send the zone-reloading teleport.");
+            Assert.AreEqual(0, session.Transfers);
+        }
+
+        [TestMethod]
+        public void IntrazoneLineTeleportKeepsTheCharactersHeading()
+        {
+            const int playfieldId = 101;
+            const byte line = 3;
+            DestinationsCatalog.Instance.Register(
+                playfieldId,
+                new Dictionary<byte, PlayfieldDestination>
+                {
+                    [line] = new PlayfieldDestination
+                    {
+                        DestinationId = (line << 16) | playfieldId,
+                        StartX = 0, StartY = 5, StartZ = 0,
+                        EndX = 10, EndY = 5, EndZ = 0
+                    }
+                });
+
+            var session = new RecordingSession();
+            Player player = TestWorld.CreatePlayer(1);
+            player.Session = session;
+            session.BindPlayer(player);
+            player.Playfield = BlankPlayfield(playfieldId);
+            var facing = new Quaternion(0, 0.6, 0, 0.8);
+            player.Rotation = facing;
+
+            var template = new ItemTemplate
+            {
+                SpellList =
+                {
+                    [EventType.OnTargetInVicinity] =
+                    [
+                        new ItemSpell
+                        {
+                            FunctionType = (int)FunctionType.LineTeleport,
+                            Arguments = new List<object> { (int)IdentityType.Playfield3, (line << 16) | playfieldId, 0 }
+                        }
+                    ]
+                }
+            };
+
+            Assert.IsTrue(template.ExecuteSpells(
+                EventType.OnTargetInVicinity,
+                player,
+                new StubInventoryRepository(),
+                new StubItemBuilder()));
+            Assert.AreEqual((line << 16) | playfieldId, session.IntrazoneKey);
+            Assert.AreEqual(facing.yf, session.IntrazoneHeading!.yf, 0.0001f);
+            Assert.AreEqual(facing.wf, player.Rotation.wf, 0.0001f);
+            // Midpoint (5,5,0) shoved 4m to the left of +X is +Z.
+            Assert.AreEqual(5f, player.Position.xf, 0.001f);
+            Assert.AreEqual(4f, player.Position.zf, 0.001f);
+        }
+
+        [TestMethod]
+        public void IntrazoneTeleportPacketIsTheSoftClientForm()
+        {
+            Player player = TestWorld.CreatePlayer(7);
+            const int key = (23 << 16) | GridPlayfieldId;
+            N3TeleportMessage message = ZoneSession.BuildIntrazoneTeleport(
+                player, new Vector3(238.5, 37.3, 267.9), new Quaternion(0, 0, 0, 1), key);
+
+            Assert.AreEqual((byte)0x61, message.Unknown1);
+            Assert.AreEqual(Identity.None, message.ChangePlayfield);
+            Assert.AreEqual((IdentityType)51104, message.Playfield.Type);
+            Assert.AreEqual(0, message.Playfield.Instance);
+            Assert.AreEqual(IdentityType.Playfield3, message.Playfield2.Type);
+            Assert.AreEqual(key, message.Playfield2.Instance);
+            Assert.AreEqual(8, message.Payload.Length);
+        }
+
+        [TestMethod]
+        public void GridUpPadLineLandsOnTheUpperFloor()
+        {
+            var data = new GameDataStore(new StubLogger());
+            DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
+
+            Assert.IsTrue(PortalDoorLandingResolver.TryResolveLineLanding(
+                DestinationsCatalog.Instance, GridPlayfieldId, 23, out Vector3 landing));
+            Assert.AreEqual(238.5f, landing.xf, 0.2f);
+            Assert.AreEqual(37.3f, landing.yf, 0.2f);
+            Assert.AreEqual(267.9f, landing.zf, 0.2f);
         }
 
         [TestMethod]
@@ -182,7 +267,8 @@ namespace ZoneEngine_New.Tests
             player.Position = new Vector3(pad.Position.X, pad.Position.Y, pad.Position.Z);
             world.TickSoftTriggers(playfield, 0.1);
 
-            Assert.IsTrue(session.SamePlayfield);
+            Assert.IsNotNull(session.IntrazoneKey);
+            Assert.IsFalse(session.SamePlayfield);
             Assert.AreNotEqual(pad.Position.X, player.Position.xf, 0.5);
         }
 
@@ -564,6 +650,17 @@ namespace ZoneEngine_New.Tests
                 => TransferToPlayfield(destination, landing);
 
             public void SendSamePlayfieldRespawnTeleport(Vector3 landing) => SamePlayfield = true;
+
+            public int? IntrazoneKey { get; private set; }
+
+            public Quaternion? IntrazoneHeading { get; private set; }
+
+            public void SendIntrazoneTeleport(Vector3 landing, Quaternion heading, int destinationKey)
+            {
+                IntrazoneKey = destinationKey;
+                IntrazoneHeading = heading;
+                Landing = landing;
+            }
 
             public void Send(byte[] packet)
             {
