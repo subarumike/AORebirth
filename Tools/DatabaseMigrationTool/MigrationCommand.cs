@@ -76,9 +76,9 @@ public static class MigrationCommand
             output.WriteLine("MIGRATION_FAILED: MySQL error " + exception.Number.ToString(CultureInfo.InvariantCulture) + "; stop and inspect status. The migration ledger records completed steps only. No automatic retry or reverse migration was attempted.");
             return 3;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
-            output.WriteLine("MIGRATION_FAILED: invalid configuration or governed migration asset. No credentials are logged; inspect the approved release and run status.");
+            output.WriteLine("MIGRATION_FAILED: " + exception);
             return 3;
         }
     }
