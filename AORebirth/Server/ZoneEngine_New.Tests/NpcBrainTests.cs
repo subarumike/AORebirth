@@ -43,7 +43,7 @@ namespace ZoneEngine_New.Tests
             Player near = TestWorld.CreatePlayer(12);
             near.Position = new Vector3(4, 0, 0);
             Player far = TestWorld.CreatePlayer(13);
-            far.Position = new Vector3(NpcAiRules.NearbyRange + 5f, 0, 0);
+            far.Position = new Vector3(NpcAiRules.ProximityAggroRange + 5f, 0, 0);
 
             brain.TryProximityAggro(near);
             Assert.IsTrue(brain.Hate.IsEmpty);

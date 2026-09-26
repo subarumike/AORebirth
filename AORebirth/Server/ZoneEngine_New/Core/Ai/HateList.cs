@@ -71,6 +71,12 @@ namespace ZoneEngine_New.Core.Ai
 
         public const float NearbyRange = 30f;
 
+        /// <summary>
+        /// BreedHostility proximity aggro radius. Separate from <see cref="NearbyRange"/>, which is how far a
+        /// new attacker can be for the NPC to fight back: shrinking that would leash an NPC nuked from range.
+        /// </summary>
+        public const float ProximityAggroRange = 15f;
+
         public const float MaxLeashRange = 70f;
 
         public const float ArriveHomeMeters = 1.5f;

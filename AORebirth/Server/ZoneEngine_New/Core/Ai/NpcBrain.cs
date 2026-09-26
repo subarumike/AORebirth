@@ -151,7 +151,7 @@ namespace ZoneEngine_New.Core.Ai
                 return;
             if (Hate.Contains(player.Identity))
                 return;
-            if (Npc.GetEdgeDistanceTo(player) > NpcAiRules.NearbyRange)
+            if (Npc.GetEdgeDistanceTo(player) > NpcAiRules.ProximityAggroRange)
                 return;
             if (!HasChance(player))
                 return;
