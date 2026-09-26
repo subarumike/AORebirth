@@ -318,6 +318,81 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void GuideWaitsAtTheCornerUntilTheBodyArrives()
+        {
+            Assert.AreEqual(5.61f, NpcBrain.ClampGuideDistance(12f, 2f, 5.61f), 0.01f);
+            Assert.AreEqual(5.61f, NpcBrain.ClampGuideDistance(12f, 5f, 5.61f), 0.01f);
+            Assert.AreEqual(12f, NpcBrain.ClampGuideDistance(12f, 5.5f, 5.61f), 0.01f, "Within the release distance the body is never going to pass the parked guide.");
+            Assert.AreEqual(1f, NpcBrain.ClampGuideDistance(12f, 0f, 1f), 0.01f);
+            Assert.AreEqual(12f, NpcBrain.ClampGuideDistance(12f, 5.61f, 5.61f), 0.01f);
+            Assert.AreEqual(12f, NpcBrain.ClampGuideDistance(12f, 2f, float.PositiveInfinity), 0.01f);
+        }
+
+        [TestMethod]
+        public void DistanceAlongPathStaysOnTheNearLegWhenTheRouteFoldsBack()
+        {
+            Vector3[] path =
+            {
+                new(0, 0, 0),
+                new(0, 0, 10),
+                new(2, 0, 10),
+                new(2, 0, 0)
+            };
+
+            // The guide is held at the first corner, so the fold-back leg is past it.
+            Assert.AreEqual(3f, NpcBrain.DistanceAlongPath(path, 1.2, 3, 10f), 0.05f);
+        }
+
+        [TestMethod]
+        public void DistanceAlongPathIgnoresAShortLegBehindTheBody()
+        {
+            // The live PF127 stall: stale stubs at the segment start sit within 2 m of a body already
+            // 2 m along. Taking the first nearby leg pinned the guide behind the body.
+            Vector3[] path =
+            {
+                new(204.89, 73.01, 129.53),
+                new(205.01, 73.01, 129.53),
+                new(205.01, 73.01, 129.58),
+                new(204.76, 73.01, 129.97),
+                new(203.98, 73.01, 130.49),
+                new(199.94, 73.01, 130.49)
+            };
+
+            float body = NpcBrain.DistanceAlongPath(path, 203.29, 130.49, 6f);
+
+            Assert.AreEqual(2.26f, body, 0.05f);
+        }
+
+        [TestMethod]
+        public void DistanceUntilTurnStopsAtTheFirstSharpCorner()
+        {
+            // The live corridor: north, then a 28 degree turn the guide was cutting through the wall.
+            float meters = NpcBrain.DistanceUntilTurn(
+                new[]
+                {
+                    new Vector3(205.59, 73.01, 124.00),
+                    new Vector3(205.01, 73.01, 129.58),
+                    new Vector3(204.76, 73.01, 129.97),
+                    new Vector3(199.94, 73.01, 130.49)
+                },
+                NpcFollowTarget.PathCornerTurnDegrees);
+
+            Assert.AreEqual(5.61, meters, 0.05);
+        }
+
+        [TestMethod]
+        public void DistanceUntilTurnIgnoresAStraightAndAShallowBend()
+        {
+            Assert.IsTrue(float.IsPositiveInfinity(NpcBrain.DistanceUntilTurn(
+                new[] { new Vector3(0, 0, 0), new Vector3(0, 0, 10), new Vector3(0, 0, 20) },
+                NpcFollowTarget.PathCornerTurnDegrees)));
+
+            Assert.IsTrue(float.IsPositiveInfinity(NpcBrain.DistanceUntilTurn(
+                new[] { new Vector3(0, 0, 0), new Vector3(10, 0, 0), new Vector3(20, 0, 1.76) },
+                NpcFollowTarget.PathCornerTurnDegrees)));
+        }
+
+        [TestMethod]
         public void TruncateByDistanceCutsAStraightPathMidLeg()
         {
             var into = new System.Collections.Generic.List<Vector3>();

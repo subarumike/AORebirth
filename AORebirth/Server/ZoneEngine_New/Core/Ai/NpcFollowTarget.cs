@@ -27,6 +27,15 @@ namespace ZoneEngine_New.Core.Ai
         public const double PathLookaheadSeconds = 1.5;
 
         /// <summary>
+        /// The steer point waits at a turn sharper than this until the body reaches it.
+        /// Running the steer point past the turn pulls the body back through the wall.
+        /// </summary>
+        public const float PathCornerTurnDegrees = 25f;
+
+        /// <summary>The steer point held at a turn is released once the body is this close to it.</summary>
+        public const float PathCornerReleaseMeters = 0.5f;
+
+        /// <summary>
         /// Seconds of travel before the next segment replaces the current one. Shorter than the lookahead so
         /// the segment end stays ahead of the NPC and neither server nor client brakes between segments.
         /// </summary>

@@ -258,7 +258,20 @@ namespace ZoneEngine_New.Core.Ai
         public bool IsInAttackRange(Character target)
         {
             ArgumentNullException.ThrowIfNull(target);
-            return Npc.GetEdgeDistanceTo(target) <= GetAttackRange();
+            // Match the swing check: a weapon only swings inside its own range, so stopping the
+            // chase inside a longer range leaves a short-reach NPC standing out of reach.
+            double edge = Npc.GetEdgeDistanceTo(target);
+            bool armed = false;
+            foreach (CharacterWeapon? weapon in Npc.Weapons.Values)
+            {
+                if (weapon == null)
+                    continue;
+                armed = true;
+                if (edge <= weapon.GetAttackRange())
+                    return true;
+            }
+
+            return !armed && edge <= CharacterWeapon.DefaultMeleeAttackRange;
         }
 
         public bool CanAttackNow(Character target)
@@ -272,8 +285,8 @@ namespace ZoneEngine_New.Core.Ai
         /// along the route to <paramref name="destination"/>. A running segment is replaced once
         /// <see cref="NpcFollowTarget.PathReplanSeconds"/> of it has been travelled, so its end is never reached
         /// mid-route. The last segment, which ends at the destination, is only replaced when the destination
-        /// moves. An NPC that stops making progress for <see cref="NpcFollowTarget.PathStuckWarpSeconds"/> is
-        /// warped one replan interval along its path.
+        /// moves. An NPC that stops making progress for
+        /// <see cref="NpcFollowTarget.PathStuckWarpSeconds"/> is warped one replan interval along its path.
         /// </summary>
         public void PathTo(Vector3 destination)
         {
@@ -365,6 +378,98 @@ namespace ZoneEngine_New.Core.Ai
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Flat XZ distance from <paramref name="path"/>[0] to the first vertex where the route
+        /// turns more than <paramref name="maxTurnDegrees"/> past <paramref name="afterDistance"/>.
+        /// Positive infinity when no such turn remains.
+        /// </summary>
+        internal static float DistanceUntilTurn(IReadOnlyList<Vector3> path, float maxTurnDegrees, float afterDistance = 0f)
+        {
+            if (path == null || path.Count < 3)
+                return float.PositiveInfinity;
+
+            double cosLimit = Math.Cos(maxTurnDegrees * (Math.PI / 180.0));
+            float along = 0f;
+            for (int i = 1; i < path.Count - 1; i++)
+            {
+                double ax = path[i].x - path[i - 1].x;
+                double az = path[i].z - path[i - 1].z;
+                double aLen = Math.Sqrt((ax * ax) + (az * az));
+                along += (float)aLen;
+                double bx = path[i + 1].x - path[i].x;
+                double bz = path[i + 1].z - path[i].z;
+                double bLen = Math.Sqrt((bx * bx) + (bz * bz));
+                if (aLen < 1e-4 || bLen < 1e-4)
+                    continue;
+
+                double dot = ((ax * bx) + (az * bz)) / (aLen * bLen);
+                if (dot < cosLimit && along > afterDistance)
+                    return along;
+            }
+
+            return float.PositiveInfinity;
+        }
+
+        /// <summary>
+        /// Flat XZ distance from <paramref name="path"/>[0] to the point nearest (<paramref name="x"/>, <paramref name="z"/>)
+        /// within the first <paramref name="maxAlong"/> meters of the route. The body is behind the guide, so a later
+        /// leg that folds back closer, on the far side of a wall, is never used. Nor is a short leg behind the body
+        /// that happens to lie within a couple of meters of it.
+        /// </summary>
+        internal static float DistanceAlongPath(IReadOnlyList<Vector3> path, double x, double z, float maxAlong)
+        {
+            if (path == null || path.Count < 2)
+                return 0f;
+
+            float along = 0f;
+            float best = 0f;
+            double bestMiss = double.PositiveInfinity;
+            for (int i = 1; i < path.Count && along <= maxAlong; i++)
+            {
+                double ax = path[i - 1].x;
+                double az = path[i - 1].z;
+                double dx = path[i].x - ax;
+                double dz = path[i].z - az;
+                double len2 = (dx * dx) + (dz * dz);
+                float leg = (float)Math.Sqrt(len2);
+                double t = 0.0;
+                if (len2 > 1e-8)
+                {
+                    t = (((x - ax) * dx) + ((z - az) * dz)) / len2;
+                    double tMax = leg > 0f ? Math.Min(1.0, (maxAlong - along) / leg) : 0.0;
+                    t = Math.Clamp(t, 0.0, Math.Max(0.0, tMax));
+                }
+
+                double ex = x - (ax + (dx * t));
+                double ez = z - (az + (dz * t));
+                double miss = (ex * ex) + (ez * ez);
+                if (miss < bestMiss)
+                {
+                    bestMiss = miss;
+                    best = along + (float)(leg * t);
+                }
+
+                along += leg;
+            }
+
+            return best;
+        }
+
+        /// <summary>
+        /// Holds <paramref name="guideDistance"/> at a sharp turn until the body is within
+        /// <see cref="NpcFollowTarget.PathCornerReleaseMeters"/> of it.
+        /// Releasing early lets the steer point run around the wall and pull the body back.
+        /// Waiting for the body to pass it never ends: arrive steering slows the body as it nears the parked guide.
+        /// </summary>
+        internal static float ClampGuideDistance(float guideDistance, float bodyDistance, float cornerDistance)
+        {
+            if (float.IsInfinity(cornerDistance))
+                return guideDistance;
+            if (bodyDistance >= cornerDistance - NpcFollowTarget.PathCornerReleaseMeters)
+                return guideDistance;
+            return guideDistance > cornerDistance ? cornerDistance : guideDistance;
         }
 
         bool ShouldReplan(Vector3 destination)
@@ -460,6 +565,42 @@ namespace ZoneEngine_New.Core.Ai
 
         public void StopFighting() => NpcAiCombat.AnnounceStopFight(Npc);
 
+        /// <summary>
+        /// Leash because someone nearby has no route and is out of attack range.
+        /// Places the NPC on its home spot. The following reset heals and clears hate.
+        /// </summary>
+        public bool WarpHomeIfTargetUnreachable()
+        {
+            if (!HasHome || !HasNearbyUnreachableTarget())
+                return false;
+
+            Vector3 home = Home!;
+            Npc.Motor.ClearPath();
+            Npc.Motor.Warp(home);
+            NpcFollowTarget.AnnounceStop(Npc, home);
+            _followAnnounced = false;
+            ProgressSinceUtc = default;
+            return true;
+        }
+
+        bool HasNearbyUnreachableTarget()
+        {
+            foreach (HateEntry entry in Hate.Entries)
+            {
+                Character? target = Resolve(entry.Identity);
+                if (target == null)
+                    continue;
+                if (Npc.GetEdgeDistanceTo(target) > NpcAiRules.NearbyRange)
+                    continue;
+                // A leftover path must not count. CanAttackNow still means they can fight from here.
+                if (CanAttackNow(target) || CanPathTo(target))
+                    continue;
+                return true;
+            }
+
+            return false;
+        }
+
         public void ResetOutOfCombat()
         {
             TickStallWatch.Stage("brain.reset", Npc.Identity.Instance);
@@ -474,19 +615,6 @@ namespace ZoneEngine_New.Core.Ai
             // the sequence re-enters this node for the rest of the tick. Clear state before the
             // next tick instead.
             _treeResetPending = true;
-        }
-
-        double GetAttackRange()
-        {
-            double range = CharacterWeapon.DefaultMeleeAttackRange;
-            foreach (CharacterWeapon? weapon in Npc.Weapons.Values)
-            {
-                if (weapon == null)
-                    continue;
-                range = Math.Max(range, weapon.GetAttackRange());
-            }
-
-            return range;
         }
 
         Vector3 HeightfieldOrSelf(Vector3 position)
@@ -516,7 +644,7 @@ namespace ZoneEngine_New.Core.Ai
         {
             Character? target = Resolve(identity);
             return target != null
-                && Npc.GetEdgeDistanceTo(target) <= NpcAiRules.NearbyRange
+                && Npc.GetEdgeDistanceTo(target) <= NpcAiRules.EngageRange(identity == _currentTarget)
                 && HasChanceWithGrace(target);
         }
 
