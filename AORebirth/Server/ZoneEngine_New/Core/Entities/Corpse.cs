@@ -337,8 +337,7 @@ namespace ZoneEngine_New.Core.Entities
                 CharacterStat.Breed,
                 CharacterStat.Race,
                 CharacterStat.Scale,
-                CharacterStat.MonsterData,
-                CharacterStat.HeadMesh
+                CharacterStat.MonsterData
             ];
 
             foreach (CharacterStat stat in copy)
@@ -347,6 +346,11 @@ namespace ZoneEngine_New.Core.Entities
                 if (!StatCollection.IsUnset(value))
                     SourceStats[stat] = value;
             }
+
+            // The corpse carries one head mesh: the one the character showed, helmet or template head included.
+            int headMesh = dead.ResolveShownHeadMesh();
+            if (headMesh != 0)
+                SourceStats[CharacterStat.HeadMesh] = headMesh;
         }
 
         void AddCopied(List<GameTuple<CharacterStat, uint>> stats, CharacterStat stat)

@@ -2739,6 +2739,22 @@ namespace ZoneEngine_New.Core.Entities
             return meshes.ToArray();
         }
 
+        /// <summary>
+        /// The head the character shows: a worn or template head-slot mesh, else the HeadMesh stat. 0 when none.
+        /// </summary>
+        internal int ResolveShownHeadMesh()
+        {
+            IReadOnlyList<Mesh> meshes = Meshes;
+            for (int i = 0; i < meshes.Count; i++)
+            {
+                if (meshes[i].Position == 0 && meshes[i].Layer == (byte)MeshLayer.Equipment && meshes[i].Id != 0)
+                    return unchecked((int)meshes[i].Id);
+            }
+
+            int headMesh = Stats.Get(CharacterStat.HeadMesh);
+            return StatCollection.IsUnset(headMesh) ? 0 : headMesh;
+        }
+
         static bool HasHeadSlotMesh(List<Mesh> meshes)
         {
             for (int i = 0; i < meshes.Count; i++)
