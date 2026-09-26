@@ -34,7 +34,26 @@ namespace ZoneEngine_New.Core.Entities
 
         public ItemTemplate Template { get; }
 
+        /// <summary>
+        /// Template OnUse runs after the template's AttackDelay, like an inventory use, through the
+        /// playfield's <see cref="ItemUseService"/>. <see cref="DelaysUse"/> false runs at once.
+        /// </summary>
         public bool TryUse(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            ItemUseService? uses = DelaysUse ? Playfield?.GetService<ItemUseService>() : null;
+            if (uses != null)
+                return uses.TryBegin(player, this) != ItemUseStart.Rejected;
+
+            return CanBeginUse(player) && ExecuteUse(player);
+        }
+
+        /// <summary>False for uses that open a UI rather than run template spells.</summary>
+        protected virtual bool DelaysUse => true;
+
+        /// <summary>Gates checked when a use starts and again when a delayed use completes.</summary>
+        public bool CanBeginUse(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
 
@@ -48,11 +67,11 @@ namespace ZoneEngine_New.Core.Entities
             if (GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
                 return false;
 
-            if (!Template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse))
-                return false;
-
-            return OnUse(player);
+            return Template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse);
         }
+
+        /// <summary>Runs the use. Callers gate with <see cref="CanBeginUse"/>.</summary>
+        public bool ExecuteUse(Player player) => OnUse(player);
 
         protected virtual bool OnUse(Player player)
         {

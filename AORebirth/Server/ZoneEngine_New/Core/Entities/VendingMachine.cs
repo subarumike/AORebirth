@@ -84,6 +84,9 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public Identity ShopIdentity => Identity;
 
+        /// <summary>Opening the shop pane is immediate.</summary>
+        protected override bool DelaysUse => false;
+
         /// <summary>
         /// An NPC-owned machine is opened through the NPC, never by targeting the machine directly.
         /// Returning false here keeps a crafted GenericCmd Use on the hidden machine from opening a

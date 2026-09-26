@@ -58,9 +58,17 @@ namespace ZoneEngine_New.Core.Inventory
         public static int ResolveDelayCentiseconds(Item item)
         {
             ArgumentNullException.ThrowIfNull(item);
-            int delay = StatCollection.Normalize(item.GetStat(CharacterStat.AttackDelay));
-            return Math.Clamp(delay, 0, MaxDelayCentiseconds);
+            return ClampDelay(item.GetStat(CharacterStat.AttackDelay));
         }
+
+        public static int ResolveDelayCentiseconds(StaticDynel dynel)
+        {
+            ArgumentNullException.ThrowIfNull(dynel);
+            return ClampDelay(dynel.Stats.GetOrZero(CharacterStat.AttackDelay));
+        }
+
+        static int ClampDelay(int attackDelay)
+            => Math.Clamp(StatCollection.Normalize(attackDelay), 0, MaxDelayCentiseconds);
 
         public bool HasPending(int characterId)
         {
@@ -84,19 +92,57 @@ namespace ZoneEngine_New.Core.Inventory
             if (!item.CanBeginUse(player))
                 return ItemUseStart.Rejected;
 
-            int delay = ResolveDelayCentiseconds(item);
-            if (delay <= 0)
-                return item.ExecuteUse(player, slot, _inventoryRepository, _items) ? ItemUseStart.Executed : ItemUseStart.Rejected;
+            int instanceId = item.InstanceId;
+            var pending = new PendingItemUse(
+                player,
+                string.Format(CultureInfo.InvariantCulture, "slot={0}:{1} low={2} instanceId={3}",
+                    slot.Type, slot.Instance, item.LowId, instanceId),
+                () => RevalidateInventory(player, slot, item, instanceId),
+                () => item.ExecuteUse(player, slot, _inventoryRepository, _items),
+                lockTarget: locked => item.Locked = locked);
+            return Begin(pending, ResolveDelayCentiseconds(item));
+        }
 
-            var pending = new PendingItemUse(player, slot, item, delay * 0.01);
-            item.Locked = true;
+        /// <summary>
+        /// World item / static dynel Use. The template's AttackDelay runs like an inventory use; range,
+        /// playfield and use requirements are checked again before OnUse runs.
+        /// </summary>
+        public ItemUseStart TryBegin(Player player, StaticDynel dynel)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(dynel);
+
+            if (!ReferenceEquals(player.Playfield, _playfield)
+                || HasPending(player.Identity.Instance)
+                || _moves.HasPending(player.Identity.Instance))
+                return ItemUseStart.Rejected;
+
+            if (!dynel.CanBeginUse(player))
+                return ItemUseStart.Rejected;
+
+            var pending = new PendingItemUse(
+                player,
+                string.Format(CultureInfo.InvariantCulture, "dynel={0} template={1}", dynel.Identity, dynel.Template.Id),
+                () => RevalidateDynel(player, dynel),
+                () => dynel.ExecuteUse(player),
+                lockTarget: null);
+            return Begin(pending, ResolveDelayCentiseconds(dynel));
+        }
+
+        ItemUseStart Begin(PendingItemUse pending, int delayCentiseconds)
+        {
+            if (delayCentiseconds <= 0)
+                return pending.Execute() ? ItemUseStart.Executed : ItemUseStart.Rejected;
+
+            pending.RemainingSeconds = delayCentiseconds * 0.01;
+            pending.SetLocked(true);
             lock (_gate)
             {
-                if (_pending.TryAdd(player.Identity.Instance, pending))
+                if (_pending.TryAdd(pending.Player.Identity.Instance, pending))
                     return ItemUseStart.Started;
             }
 
-            item.Locked = false;
+            pending.SetLocked(false);
             return ItemUseStart.Rejected;
         }
 
@@ -109,7 +155,7 @@ namespace ZoneEngine_New.Core.Inventory
                     return;
             }
 
-            pending.Item.Locked = false;
+            pending.SetLocked(false);
         }
 
         public void Tick(double deltaTime)
@@ -148,7 +194,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             foreach (PendingItemUse pending in stale)
-                pending.Item.Locked = false;
+                pending.SetLocked(false);
 
             foreach (PendingItemUse pending in due)
                 Complete(pending);
@@ -157,28 +203,24 @@ namespace ZoneEngine_New.Core.Inventory
         void Complete(PendingItemUse pending)
         {
             // DestroyOne/ConsumeCharge refuse locked items.
-            pending.Item.Locked = false;
+            pending.SetLocked(false);
 
             Player player = pending.Player;
-            string? failure = Revalidate(player, pending);
-            if (failure == null
-                && pending.Item.ExecuteUse(player, pending.Slot, _inventoryRepository, _items))
+            string? failure = RevalidatePlayer(player) ?? pending.Revalidate();
+            if (failure == null && pending.Execute())
                 return;
 
             _logger.Warn(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Delayed item use aborted char={0} slot={1}:{2} low={3} instanceId={4}: {5}",
+                    "Delayed item use aborted char={0} {1}: {2}",
                     player.Identity.Instance,
-                    pending.Slot.Type,
-                    pending.Slot.Instance,
-                    pending.Item.LowId,
-                    pending.InstanceId,
+                    pending.Description,
                     failure ?? "OnUse spells returned false"));
             Tell(player, FailedText);
         }
 
-        string? Revalidate(Player player, PendingItemUse pending)
+        string? RevalidatePlayer(Player player)
         {
             if (player.Session == null || player.Session.State != SessionState.InPlay)
                 return "session not InPlay";
@@ -186,13 +228,28 @@ namespace ZoneEngine_New.Core.Inventory
                 return "player dead or quarantined";
             if (!ReferenceEquals(player.Playfield, _playfield))
                 return "playfield changed";
+            return null;
+        }
+
+        static string? RevalidateInventory(Player player, Identity slot, Item item, int instanceId)
+        {
             if (!player.Inventory.IsHydrated)
                 return "inventory not hydrated";
-            if (!player.Inventory.TryGetItem(pending.Slot.Type, pending.Slot.Instance, out Item current)
-                || !ReferenceEquals(current, pending.Item)
-                || current.InstanceId != pending.InstanceId)
+            if (!player.Inventory.TryGetItem(slot.Type, slot.Instance, out Item current)
+                || !ReferenceEquals(current, item)
+                || current.InstanceId != instanceId)
                 return "slot changed";
             if (!current.CanBeginUse(player))
+                return "use gates failed";
+            return null;
+        }
+
+        string? RevalidateDynel(Player player, StaticDynel dynel)
+        {
+            if (!_playfield.GetRequiredService<DynelRegistry>().TryGet(dynel.Identity, out Dynel? current)
+                || !ReferenceEquals(current, dynel))
+                return "dynel gone";
+            if (!dynel.CanBeginUse(player))
                 return "use gates failed";
             return null;
         }
@@ -210,26 +267,28 @@ namespace ZoneEngine_New.Core.Inventory
                 });
         }
 
-        sealed class PendingItemUse
+        /// <summary>
+        /// One delayed use. <see cref="Revalidate"/> re-checks the used thing's own gates (null = still valid);
+        /// the player gates are shared. Only inventory items lock while the delay runs.
+        /// </summary>
+        sealed class PendingItemUse(
+            Player player,
+            string description,
+            Func<string?> revalidate,
+            Func<bool> execute,
+            Action<bool>? lockTarget)
         {
-            public PendingItemUse(Player player, Identity slot, Item item, double remainingSeconds)
-            {
-                Player = player;
-                Slot = slot;
-                Item = item;
-                InstanceId = item.InstanceId;
-                RemainingSeconds = remainingSeconds;
-            }
+            public Player Player { get; } = player;
 
-            public Player Player { get; }
-
-            public Identity Slot { get; }
-
-            public Item Item { get; }
-
-            public int InstanceId { get; }
+            public string Description { get; } = description;
 
             public double RemainingSeconds { get; set; }
+
+            public string? Revalidate() => revalidate();
+
+            public bool Execute() => execute();
+
+            public void SetLocked(bool locked) => lockTarget?.Invoke(locked);
         }
     }
 }
