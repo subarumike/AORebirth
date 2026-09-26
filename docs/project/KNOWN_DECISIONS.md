@@ -230,3 +230,19 @@ Required workflow:
 Alternatives considered: Keep growing `Playfield.cs`; only use separate VS projects for every system.
 
 Consequences: Agents extract systems into `Core/<System>/` when touching them. Wire models stay in AOtomation.Messaging.
+
+## Mail Terminal Live Rules (NewEngine)
+
+Decision: Mail send/return rules follow live capture `Andromeda [PF 655] - 20260926-061753` and are content-backed in `GameData/MailRules.json` (see `.cursor/rules/mail-terminal-live-rules.mdc`).
+
+- Send rejects **NoDrop** and **backpack/container** items.
+- Return only for **COD** or **unique item already owned**; never if already `Returned:`.
+- Player mail flags base **0x28** (open `0x29`, Take All `0x2B`).
+- Retention **14d** normal / **2d** COD.
+- Successful Return → `SendAccepted` EchoAction=7.
+- Returned COD mail stores **Credits = 0** (original sender Take All is free).
+- ZoneEngine_New startup applies `SqlTables/character_mail.sql` (`CREATE TABLE IF NOT EXISTS`) via `IMailDao.EnsureSchema()`.
+
+Reason: Earlier Market receive used `0x7C`; player Return eligibility is not “any attachment”.
+
+Consequences: Do not reintroduce `FlagsBase=0x7C` for player mail or unrestricted Return.

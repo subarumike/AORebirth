@@ -1,0 +1,22 @@
+{
+  "StandardPostageCredits": 2000,
+  "ExpressPostageCredits": 200000,
+  "ComputerLiteracyLockSeconds": 30,
+  "MailRetentionDays": 14,
+  "CodMailRetentionDays": 2,
+  "MailboxListLimit": 30,
+  "FlagsBase": 40,
+  "FailureNoDrop": "You can not send nodrop items through the mail system.",
+  "FailureNoChests": "You can not send container items through the mail system.",
+  "FailureReturnNotEligible": "To return the mail, it must either be cash on delivery, or you must already have the unique item. In addition, the mail must not have been returned before.",
+  "SystemSenderNames": [
+    "Omni-Trade",
+    "Market",
+    "GMI",
+    "System",
+    "Mail Terminal"
+  ],
+  "DefaultSystemSenderName": "Omni-Trade",
+  "CodPaymentSenderName": "Mail Terminal",
+  "CodPaymentSubject": "COD payment"
+}

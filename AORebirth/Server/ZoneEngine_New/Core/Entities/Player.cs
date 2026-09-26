@@ -613,7 +613,7 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.PVPSoloScore,
             CharacterStat.PVPTeamScore,
             CharacterStat.PVPDuelScore,
-            //CharacterStat.UnreadMailCount,
+            CharacterStat.UnreadMailCount,
             //CharacterStat.LastMailCheckTime,
             CharacterStat.SavedXP,
             CharacterStat.Flags,
@@ -950,7 +950,7 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<byte, byte>
                 {
                     Value1 = (byte)id,
-                    Value2 = checked((byte)RequireWireStat(stats, id))
+                    Value2 = (byte)Math.Clamp(RequireWireStat(stats, id), byte.MinValue, byte.MaxValue)
                 };
             }
 
@@ -964,10 +964,13 @@ namespace ZoneEngine_New.Core.Entities
             for (int i = 0; i < ids.Length; i++)
             {
                 CharacterStat id = ids[i];
+                // Stats4 wire is Int16. Large bases (e.g. InsuranceTime unix timestamps) must not
+                // throw OverflowException and block login — same clamp as Character appearance shorts.
+                int raw = RequireWireStat(stats, id);
                 tuples[i] = new GameTuple<byte, short>
                 {
                     Value1 = (byte)id,
-                    Value2 = checked((short)RequireWireStat(stats, id))
+                    Value2 = (short)Math.Clamp(raw, short.MinValue, short.MaxValue)
                 };
             }
 

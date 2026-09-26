@@ -98,6 +98,8 @@ namespace ZoneEngine_New.Tests
         public bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition)
             => _machines.TryGetValue(templateId, out definition!);
 
+        public MailRulesCatalog MailRules => MailRulesCatalog.Empty;
+
         public bool TryGetXpLevel(int level, out XpLevelEntry entry) => throw new NotSupportedException();
 
         public bool CanResolveMobHash(string hash)

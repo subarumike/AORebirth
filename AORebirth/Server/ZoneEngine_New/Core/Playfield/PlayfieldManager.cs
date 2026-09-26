@@ -49,6 +49,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly CharacterSnapshotService _characterSnapshot;
         private readonly IPlayfieldMetricsRegistry _metricsRegistry;
         private readonly IShopDao _shopDao;
+        private readonly AORebirth.Interfaces.Persistence.Mail.IMailDao _mailDao;
         private bool _disposed;
 
         public PlayfieldManager(
@@ -70,7 +71,8 @@ namespace ZoneEngine_New.Core.Playfield
             AuthoredQuestService authoredQuests,
             DialogueService dialogues,
             IItemTemplateCatalog itemTemplates,
-            IShopDao shopDao)
+            IShopDao shopDao,
+            AORebirth.Interfaces.Persistence.Mail.IMailDao mailDao)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
@@ -86,6 +88,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(characterSnapshot);
             ArgumentNullException.ThrowIfNull(metricsRegistry);
             ArgumentNullException.ThrowIfNull(shopDao);
+            ArgumentNullException.ThrowIfNull(mailDao);
 
             _logger = logger;
             _router = router;
@@ -101,6 +104,7 @@ namespace ZoneEngine_New.Core.Playfield
             _characterSnapshot = characterSnapshot;
             _metricsRegistry = metricsRegistry;
             _shopDao = shopDao;
+            _mailDao = mailDao;
             Teams = teams ?? throw new ArgumentNullException(nameof(teams));
             Missions = missions ?? throw new ArgumentNullException(nameof(missions));
             AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
@@ -113,6 +117,9 @@ namespace ZoneEngine_New.Core.Playfield
         public AuthoredQuestService AuthoredQuests { get; }
         public DialogueService Dialogues { get; }
         public IItemTemplateCatalog ItemTemplates { get; }
+
+        /// <summary>Shared mail inbox DAO for playfield-scoped spawn / envelope sync.</summary>
+        public AORebirth.Interfaces.Persistence.Mail.IMailDao MailDao => _mailDao;
 
         /// <summary>Releases only the exact ended, empty mission lease; never an ordinary playfield.</summary>
         public bool TryReleaseMission(GeneratedMissionBinding binding)
@@ -333,6 +340,29 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 return _playersByCharacterId.TryGetValue(characterId, out player!);
             }
+        }
+
+        /// <summary>Case-insensitive name lookup across live players. Selection among duplicates is unspecified.</summary>
+        public bool FindPlayerByName(string name, out Player? player)
+        {
+            player = null;
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            lock (_sync)
+            {
+                foreach (Player candidate in _playersByCharacterId.Values)
+                {
+                    if (candidate != null
+                        && string.Equals(candidate.Name, name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        player = candidate;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public IReadOnlyList<Player> SnapshotPlayers()

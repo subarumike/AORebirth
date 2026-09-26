@@ -83,6 +83,22 @@ namespace ZoneEngine_New.Core.GameData
         /// <summary>Shop stock table for a vending machine template id.</summary>
         bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition);
 
+        /// <summary>
+        /// Capture-backed Enter The Grid landing for a source terminal, when authored in
+        /// <c>GridTerminalRoutes.json</c>.
+        /// </summary>
+        bool TryGetCapturedGridEnter(
+            int sourcePlayfieldId,
+            int sourceTerminalInstance,
+            out CapturedGridEnterLanding landing)
+        {
+            landing = default;
+            return false;
+        }
+
+        /// <summary>Mail Terminal tunables from <c>MailRules.json</c>.</summary>
+        MailRulesCatalog MailRules { get; }
+
         bool TryGetCatMesh(int monsterData, out int catMesh);
 
         /// <summary>Playfield-local character MonsterData override for SimpleCharFullUpdate.</summary>

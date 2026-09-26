@@ -1,0 +1,45 @@
+---
+description: Live AO Mail Terminal rules (send/return) — capture-backed
+globs: "**/Mail/**/*.cs,**/MailRules.json,**/MailRulesCatalog.cs,**/MailMessage*.cs"
+alwaysApply: false
+---
+
+# Mail Terminal — live rules
+
+Authority: live capture `Andromeda [PF 655] - 20260926-061753` (+ earlier Market receive captures).
+
+## Send reject (server + client)
+
+- **NoDrop** items cannot be mailed (`FailureNoDrop`).
+- **Backpack / Container / bag** items cannot be mailed (`FailureNoChests` / `IsBagItem`).
+
+## Return to Sender
+
+Return is allowed only when **all** of:
+
+1. Mail was **not** already returned (`Subject` must not start with `Returned:`), and
+2. Either:
+   - **COD** (`Credits < 0`), or
+   - Attached item is **Unique** and the recipient **already holds** that unique template in inventory.
+
+Otherwise reject with live text in `MailRules.json` → `FailureReturnNotEligible`.
+
+Plain text, credit gifts, and normal (non-unique / non-COD) item gifts are **not** returnable.
+
+On successful Return of COD mail, the inserted “Returned: …” row must have **Credits = 0** (item only). The original sender must **not** pay COD again to Take All.
+
+## Wire flags (player mail)
+
+- Base `FlagsBase` = **0x28** (not Market’s older 0x7C observation).
+- Open/read → `0x29` (bit0).
+- Take All / empty attachments → `0x2B` (bit0|bit1).
+- bit1 = attachments cleared (Delete enabled; Return disabled).
+
+## Retention
+
+- Normal mail: **14** days (`MailRetentionDays`).
+- COD mail: **2** days (`CodMailRetentionDays`).
+
+## Successful Return wire
+
+Live responds with `MailAction.SendAccepted` and `EchoAction = ReturnToSender (7)` — not only a mailbox list refresh.

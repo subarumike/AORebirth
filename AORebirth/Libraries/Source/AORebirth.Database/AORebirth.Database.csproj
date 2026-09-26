@@ -120,6 +120,7 @@
     <Compile Include="Domain\Missions\MySqlMissionDao.Inventory.cs" />
     <Compile Include="Domain\Missions\MySqlMissionDao.Legacy.cs" />
     <Compile Include="Domain\Shops\MySqlShopDao.cs" />
+    <Compile Include="Domain\Mail\MySqlMailDao.cs" />
     <Compile Include="Dao\CharacterOnlineOwnershipGuard.cs" />
     <Compile Include="Dao\ZoneHandoffStore.cs" />
     <Compile Include="Dao\CharacterDao.cs" />
@@ -211,6 +212,9 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="SqlTables\characters.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlTables\character_mail.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqlTables\charactersactivenanos.sql">

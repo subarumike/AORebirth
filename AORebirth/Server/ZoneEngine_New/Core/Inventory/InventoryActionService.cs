@@ -12,7 +12,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Network;
 
     /// <summary>Plan first, commit all durable rows, then publish one inventory mutation.</summary>
-    public sealed class InventoryActionService
+    public sealed partial class InventoryActionService
     {
         readonly IInventoryMutationPersistence _persistence;
         readonly InventoryFlushService _flush;
@@ -51,6 +51,17 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         public bool TryDelete(Player player, Identity slot, int expectedInstanceId)
+            => TryRetireItem(player, slot, expectedInstanceId, finalStats: null);
+
+        /// <summary>
+        /// Retires one owned inventory item (mail attach / discard). Optional <paramref name="finalStats"/>
+        /// commits in the same inventory mutation (e.g. postage debit).
+        /// </summary>
+        public bool TryRetireItem(
+            Player player,
+            Identity slot,
+            int expectedInstanceId,
+            IReadOnlyList<StatRecord>? finalStats)
         {
             if (!TryResolveOwnedSlot(player, slot, out Container page, out Item item)
                 || item.InstanceId != expectedInstanceId) return false;
@@ -61,13 +72,41 @@ namespace ZoneEngine_New.Core.Inventory
             bool result = TryCommit(player,
                 [new InventoryRowChange(item, graveyard, item.InstanceId, item.StackCount, Retired: true)],
                 () => IsCurrent(page, slot.Instance, item, expectedInstanceId),
-                () => page.Content.Remove(slot.Instance));
+                () =>
+                {
+                    page.Content.Remove(slot.Instance);
+                    if (finalStats != null)
+                    {
+                        foreach (StatRecord stat in finalStats)
+                            player.Stats.Set((CharacterStat)stat.StatId, stat.StatValue, StatDetail.Base, dirty: true);
+                        player.FlushDirtyStats();
+                    }
+                },
+                finalStats: finalStats);
             if (result && page.Identity.Type.IsWearPage())
             {
                 player.Rebase();
                 player.OnEquipmentChanged(new EquipSlot(page.Identity.Type, slot.Instance));
             }
             return result;
+        }
+
+        /// <summary>Persists only character stats through the inventory mutation boundary (cash postage, COD).</summary>
+        public bool TryApplyStats(Player player, IReadOnlyList<StatRecord> finalStats)
+        {
+            if (player.Session?.State != SessionState.InPlay || player.IsPersistenceQuarantined || player.IsDead
+                || finalStats == null || finalStats.Count == 0)
+                return false;
+
+            return TryCommit(player, [],
+                () => true,
+                () =>
+                {
+                    foreach (StatRecord stat in finalStats)
+                        player.Stats.Set((CharacterStat)stat.StatId, stat.StatValue, StatDetail.Base, dirty: true);
+                    player.FlushDirtyStats();
+                },
+                finalStats: finalStats);
         }
 
         public bool TrySplit(Player player, Identity slot, int expectedInstanceId, int amount)

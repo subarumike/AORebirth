@@ -53,6 +53,8 @@ namespace ZoneEngine_New.Core.GameData
             new Dictionary<string, string[]>(StringComparer.Ordinal),
             new Dictionary<string, HashInstance>(StringComparer.Ordinal));
         private readonly Dictionary<int, VendingMachineDefinition> _vendingMachines = new();
+        private GridTerminalRouteCatalog _gridTerminalRoutes = GridTerminalRouteCatalog.Empty;
+        private MailRulesCatalog _mailRules = MailRulesCatalog.Empty;
         private readonly Dictionary<int, int> _catMeshByMonsterData = new();
         private readonly Dictionary<int, XpLevelEntry> _xpLevels = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
@@ -85,6 +87,8 @@ namespace ZoneEngine_New.Core.GameData
             LoadMonsterWeapons();
             LoadHashItems();
             LoadVendingMachines();
+            LoadGridTerminalRoutes();
+            LoadMailRules();
             LoadMonsterData();
             LoadXpLevels();
         }
@@ -206,6 +210,82 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return _vendingMachines.TryGetValue(templateId, out definition!);
+        }
+
+        public bool TryGetCapturedGridEnter(
+            int sourcePlayfieldId,
+            int sourceTerminalInstance,
+            out CapturedGridEnterLanding landing)
+            => _gridTerminalRoutes.TryGet(sourcePlayfieldId, sourceTerminalInstance, out landing);
+
+        public MailRulesCatalog MailRules => _mailRules;
+
+        private void LoadMailRules()
+        {
+            try
+            {
+                _mailRules = MailRulesCatalog.Load(RootPath);
+                if (_mailRules.FailureNoDrop.Length == 0)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "MailRules.json missing or empty under {0}; mail send will refuse until present",
+                            RootPath));
+                    return;
+                }
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData mail rules postage={0}/{1} retentionDays={2}",
+                        _mailRules.StandardPostageCredits,
+                        _mailRules.ExpressPostageCredits,
+                        _mailRules.MailRetentionDays));
+            }
+            catch (Exception exception)
+            {
+                _mailRules = MailRulesCatalog.Empty;
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load MailRules.json from {0}",
+                        RootPath));
+            }
+        }
+
+        private void LoadGridTerminalRoutes()
+        {
+            try
+            {
+                _gridTerminalRoutes = GridTerminalRouteCatalog.Load(RootPath);
+                if (_gridTerminalRoutes.Count == 0)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "GridTerminalRoutes.json missing or empty under {0}; grid enters use raw TeleportProxy2",
+                            RootPath));
+                    return;
+                }
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData grid terminal routes={0}",
+                        _gridTerminalRoutes.Count));
+            }
+            catch (Exception exception)
+            {
+                _gridTerminalRoutes = GridTerminalRouteCatalog.Empty;
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load GridTerminalRoutes.json from {0}",
+                        RootPath));
+            }
         }
 
         public bool TryGetCatMesh(int monsterData, out int catMesh)

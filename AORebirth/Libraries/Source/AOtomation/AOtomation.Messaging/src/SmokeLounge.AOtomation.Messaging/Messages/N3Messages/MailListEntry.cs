@@ -46,7 +46,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public int CodField { get; set; }
 
         /// <summary>
-        /// Live Market mail used 0x7C in this capture. bit0 = read icon.
+        /// Player mail base 0x28 (capture 20260926-061753). bit0 = read → 0x29;
+        /// bit1 = attachments cleared → 0x2B after Take All. Older Market receive used 0x7C.
         /// </summary>
         public int FlagsField { get; set; }
 

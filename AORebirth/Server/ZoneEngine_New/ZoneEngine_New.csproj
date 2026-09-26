@@ -58,6 +58,7 @@
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs" Link="SharedGameplay/Missions/MySqlMissionDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterDao.cs" Link="Shared/Characters/MySqlCharacterDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Shops/MySqlShopDao.cs" Link="Shared/Shops/MySqlShopDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Mail/MySqlMailDao.cs" Link="Shared/Mail/MySqlMailDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Inventory.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Inventory.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Transactions.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Transactions.cs" />
@@ -70,6 +71,8 @@
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Shops/IShopDao.cs" Link="Shared/Shops/IShopDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Shops/ShopStockData.cs" Link="Shared/Shops/ShopStockData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Shops/ShopVendorData.cs" Link="Shared/Shops/ShopVendorData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Mail/IMailDao.cs" Link="Shared/Mail/IMailDao.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Mail/MailRowData.cs" Link="Shared/Mail/MailRowData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Generated.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Inventory.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/SharedBuild/Compatibility/JavaScriptSerializer.Portable.cs" Link="Compatibility/JavaScriptSerializer.cs" />

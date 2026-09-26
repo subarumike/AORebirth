@@ -27,8 +27,9 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         TakeAll = 3,
 
         /// <summary>
-        /// Server → client: update cached mail flags (capture 20260715-Recive-mail-datetime-stamp).
-        /// Wire: mailId (int64) + FlagsField (int32). Live: open→0x7D (read), TakeAll empty→0x7F.
+        /// Server → client: update cached mail flags.
+        /// Player mail (20260926-061753): open→0x29, TakeAll empty→0x2B. Base FlagsBase=0x28.
+        /// Older Market receive used 0x7C/0x7D/0x7F.
         /// </summary>
         UpdateMailFlags = 4,
 

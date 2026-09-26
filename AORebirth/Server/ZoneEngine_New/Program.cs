@@ -77,6 +77,7 @@ namespace ZoneEngine_New
                 }
                 if (CheckDatabase() != 0)
                     return 2;
+                EnsureCharacterMailTable();
                 RuntimeStartup.ValidatePackage(AppContext.BaseDirectory, skipPlayfieldPackagePin);
 
                 if (!InitializeLogging())
@@ -152,6 +153,18 @@ namespace ZoneEngine_New
             return result.IsCurrent ? 0 : 2;
         }
 
+        /// <summary>
+        /// Mail Terminal table is content SQL (not the inventory schema ledger). Apply
+        /// <c>SqlTables/character_mail.sql</c> on every start via CREATE TABLE IF NOT EXISTS.
+        /// </summary>
+        private static void EnsureCharacterMailTable()
+        {
+            var mailDao = new AORebirth.Database.Domain.Mail.MySqlMailDao(() =>
+                new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString()));
+            mailDao.EnsureSchema();
+            Console.WriteLine("MAIL_SCHEMA_OK: character_mail ensured from SqlTables/character_mail.sql");
+        }
+
         private static void RedirectConsoleLog(string[] args, string first, string second, bool error)
         {
             string? path = GetEitherArgumentValue(args, first, second);
@@ -174,6 +187,9 @@ namespace ZoneEngine_New
                     new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
             services.AddSingleton<AORebirth.Interfaces.Persistence.Shops.IShopDao>(_ =>
                 new AORebirth.Database.Domain.Shops.MySqlShopDao(() =>
+                    new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
+            services.AddSingleton<AORebirth.Interfaces.Persistence.Mail.IMailDao>(_ =>
+                new AORebirth.Database.Domain.Mail.MySqlMailDao(() =>
                     new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString())));
             services.AddSingleton<ICharacterRepository, MySqlCharacterRepository>();
             services.AddSingleton<IStatRepository, MySqlStatRepository>();
@@ -230,6 +246,7 @@ namespace ZoneEngine_New
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
             services.AddSingleton<TradeService>();
+            services.AddSingleton<ZoneEngine_New.Core.Mail.MailService>();
             services.AddSingleton<ZoneMessageCodec>();
 
             //Chat
@@ -263,6 +280,7 @@ namespace ZoneEngine_New
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<ClientContainerAddItemMessageHandler>(services);
             AddMessageHandler<TradeMessageHandler>(services);
+            AddMessageHandler<MailMessageHandler>(services);
             AddMessageHandler<KnuBotOpenChatWindowMessageHandler>(services);
             AddMessageHandler<KnuBotAnswerMessageHandler>(services);
             AddMessageHandler<KnuBotCloseChatWindowMessageHandler>(services);

@@ -47,6 +47,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly InventoryFlushService _flush;
         private readonly TradeService _trades;
         private readonly CharacterSnapshotService _snapshot;
+        private readonly AORebirth.Interfaces.Persistence.Mail.IMailDao _mailDao;
 
         public SpawnService(
             IServiceProvider services,
@@ -59,7 +60,8 @@ namespace ZoneEngine_New.Core.Playfield
             HashItemMinter hashItems,
             InventoryFlushService flush,
             TradeService trades,
-            CharacterSnapshotService snapshot)
+            CharacterSnapshotService snapshot,
+            AORebirth.Interfaces.Persistence.Mail.IMailDao mailDao)
         {
             ArgumentNullException.ThrowIfNull(services);
             ArgumentNullException.ThrowIfNull(registry);
@@ -72,6 +74,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(flush);
             ArgumentNullException.ThrowIfNull(trades);
             ArgumentNullException.ThrowIfNull(snapshot);
+            ArgumentNullException.ThrowIfNull(mailDao);
 
             _services = services;
             _registry = registry;
@@ -84,6 +87,7 @@ namespace ZoneEngine_New.Core.Playfield
             _flush = flush;
             _trades = trades;
             _snapshot = snapshot;
+            _mailDao = mailDao;
         }
 
         /// <summary>Spawns one randomly resolved NPC from a mob template hash and registers it on this playfield.</summary>
@@ -696,6 +700,7 @@ namespace ZoneEngine_New.Core.Playfield
             // InitiateCompression + ChatServerInfo + PlayfieldAnarchyF + GameTime are sent from ZoneLoginHandler.
 
             _playfieldManager.Teams.AttachPlayer(player);
+            ApplyUnreadMailCount(player);
             SimpleCharFullUpdateMessage spawn = player.BuildSpawnMessage();
             FullCharacterMessage full = player.BuildFullCharacterMessage();
             PlayerSpawnPayloadValidator.RequireValidMessages(spawn, full);
@@ -769,6 +774,7 @@ namespace ZoneEngine_New.Core.Playfield
             }
 
             // Reject a damaged retained aggregate before stealing or publishing session ownership.
+            ApplyUnreadMailCount(player);
             PlayerSpawnPayloadValidator.RequireValid(player);
             PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
             StealSessionIfNeeded(player, session);
@@ -1125,6 +1131,29 @@ namespace ZoneEngine_New.Core.Playfield
                     "Despawned LinkDead player {0} playfield={1}",
                     characterId,
                     _playfield.Identity.Instance));
+        }
+
+        /// <summary>
+        /// Authoritative unread count for FullCharacter. Missing mail table degrades to 0 so login still works.
+        /// </summary>
+        void ApplyUnreadMailCount(Player player)
+        {
+            int unread = 0;
+            try
+            {
+                unread = Math.Max(0, _mailDao.CountUnread(player.Identity.Instance));
+            }
+            catch (Exception exception)
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Mail unread count unavailable for character {0}: {1}",
+                        player.Identity.Instance,
+                        exception.Message));
+            }
+
+            player.Stats.Set(CharacterStat.UnreadMailCount, unread, StatDetail.Base, dirty: false);
         }
     }
 }

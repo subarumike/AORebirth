@@ -1172,6 +1172,10 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         DistanceToSpawnpoint = 0x00000281, 
 
+        UnreadMailCount = 0x00000289,
+
+        LastMailCheckTime = 0x0000028A,
+
         AdvantageHash1 = 0x0000028B, 
 
         AdvantageHash2 = 0x0000028C, 

@@ -9,23 +9,25 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Mail;
     using ZoneEngine_New.Core.Network;
 
-    public sealed class CharInPlayMessageHandler : IMessageHandler<CharInPlayMessage>
+    /// <summary>
+    /// Routes Mail Terminal traffic to <see cref="MailService"/>. Runs on the playfield tick
+    /// thread via the inbound queue.
+    /// </summary>
+    public sealed class MailMessageHandler : IMessageHandler<MailMessage>
     {
         readonly MailService _mail;
 
-        public CharInPlayMessageHandler(MailService mail)
+        public MailMessageHandler(MailService mail)
         {
             _mail = mail ?? throw new ArgumentNullException(nameof(mail));
         }
 
-        public Type MessageBodyType => typeof(CharInPlayMessage);
+        public Type MessageBodyType => typeof(MailMessage);
 
         public void Handle(MessageBody body, IZoneSession session)
-        {
-            Handle((CharInPlayMessage)body, session);
-        }
+            => Handle((MailMessage)body, session);
 
-        public void Handle(CharInPlayMessage message, IZoneSession session)
+        public void Handle(MailMessage message, IZoneSession session)
         {
             ArgumentNullException.ThrowIfNull(message);
             ArgumentNullException.ThrowIfNull(session);
@@ -34,18 +36,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
 
             Player? player = session.Player;
-            if (player?.Cell == null)
+            if (player?.Playfield == null || player.IsDead || player.IsPersistenceQuarantined)
                 return;
 
-            player.Cell.Announce(
-                new CharInPlayMessage
-                {
-                    Identity = player.Identity,
-                    Unknown = 0x00
-                });
-
-            // Backup path — FullCharacter already carries unread from spawn; re-sync if CharInPlay arrives.
-            _mail.SyncUnreadMailEnvelope(player);
+            _mail.Handle(player, message);
         }
     }
 }

@@ -77,6 +77,8 @@
     <Compile Include="Persistence\Shops\IShopDao.cs" />
     <Compile Include="Persistence\Shops\ShopStockData.cs" />
     <Compile Include="Persistence\Shops\ShopVendorData.cs" />
+    <Compile Include="Persistence\Mail\IMailDao.cs" />
+    <Compile Include="Persistence\Mail\MailRowData.cs" />
     <Compile Include="Persistence\Teams\ITeamLevelEligibilityDao.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

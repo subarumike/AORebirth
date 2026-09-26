@@ -35,6 +35,10 @@ namespace AORebirth.Core.GameData
 
         public const string VendingMachinesFileName = "VendingMachines.json";
 
+        public const string GridTerminalRoutesFileName = "GridTerminalRoutes.json";
+
+        public const string MailRulesFileName = "MailRules.json";
+
         public const string TeamsFolderName = "Teams";
 
         public const string LevelEligibilityFileName = "LevelEligibility.json";
