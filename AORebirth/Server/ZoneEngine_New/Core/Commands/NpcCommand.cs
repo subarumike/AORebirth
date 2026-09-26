@@ -410,62 +410,83 @@ namespace ZoneEngine_New.Core.Commands
             return lines;
         }
 
-        List<string> DumpLoot(NpcCharacter npc)
+        /// <summary>
+        /// Popup link(s) listing every item each loot table entry can drop, by name.
+        /// Categories are expanded to all reachable leaf instances.
+        /// </summary>
+        IReadOnlyList<string> DumpLoot(NpcCharacter npc)
         {
-            List<string> lines = new();
             MobTemplate? template = npc.MobTemplate;
             if (template == null)
-            {
-                lines.Add("No mob template on target.");
-                return lines;
-            }
+                return ["No mob template on target."];
 
-            lines.Add(
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "Loot: {0} hash={1}",
-                    template.Name,
-                    template.Hash));
-
+            string title = string.IsNullOrWhiteSpace(template.Name) ? "Loot" : template.Name + " Loot";
             List<MobItemTableEntry> itemTable = template.ItemTable;
             if (itemTable == null || itemTable.Count == 0)
-            {
-                lines.Add("  (no item table)");
-                return lines;
-            }
+                return [GetStatsAomlBuilder.BuildLink("(no item table)", title)];
 
+            var rows = new List<string>();
+            var instances = new List<HashInstance>();
+            int itemCount = 0;
             foreach (MobItemTableEntry entry in itemTable)
             {
                 if (entry == null || string.IsNullOrEmpty(entry.Hash))
                     continue;
 
-                lines.Add(
+                if (rows.Count > 0)
+                    rows.Add(string.Empty);
+                rows.Add(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "  table {0} repeats={1} chance={2} levelMod={3}",
-                        entry.Hash,
-                        entry.Repeats,
+                        "Chance {0}% x{1} levelMod={2}",
                         entry.Chance,
+                        entry.Repeats,
                         entry.LevelMod));
 
-                bool isCategory = _gameData.TryGetHashTemplate(entry.Hash, out IReadOnlyList<string> children)
-                    && children.Count > 0;
-                if (isCategory)
-                    lines.Add("    category " + string.Join(", ", children));
+                instances.Clear();
+                _gameData.CollectHashLeafInstances(entry.Hash, instances);
+                var names = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < instances.Count; i++)
+                    names.Add(LootItemName(instances[i]));
 
-                if (_gameData.TryGetHashInstance(entry.Hash, out HashInstance instance))
+                if (names.Count == 0)
                 {
-                    lines.Add("    instance");
-                    for (int i = 0; i < instance.TemplateIds.Length; i++)
-                        lines.Add("    " + FormatItemId(instance.TemplateIds[i]));
+                    rows.Add("  (nothing resolvable)");
                     continue;
                 }
 
-                if (!isCategory)
-                    lines.Add("    (not found)");
+                foreach (string name in names)
+                    rows.Add("  " + name);
+                itemCount += names.Count;
+            }
+
+            title = string.Format(CultureInfo.InvariantCulture, "{0} ({1} items)", title, itemCount);
+            IReadOnlyList<string> chunks = GetStatsAomlBuilder.ChunkRows(rows, GetStatsAomlBuilder.DefaultMaxBodyLength);
+            var lines = new List<string>(chunks.Count);
+            for (int i = 0; i < chunks.Count; i++)
+            {
+                string label = chunks.Count == 1
+                    ? title
+                    : string.Format(CultureInfo.InvariantCulture, "{0} ({1}/{2})", title, i + 1, chunks.Count);
+                lines.Add(GetStatsAomlBuilder.BuildLink(chunks[i], label));
             }
 
             return lines;
+        }
+
+        string LootItemName(HashInstance instance)
+        {
+            int[] ids = instance.TemplateIds;
+            string name = ids.Length > 0 ? ItemName(ids[0]) : "(none)";
+            if (ids.Length > 1)
+            {
+                string highName = ItemName(ids[^1]);
+                if (!string.Equals(name, highName, StringComparison.Ordinal))
+                    name = name + " / " + highName;
+            }
+
+            // A double quote would terminate the text:// href.
+            return name.Replace('"', '\'');
         }
 
         void AppendIdLists(List<string> lines, string label, List<List<int>> lists)
