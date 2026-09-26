@@ -40,9 +40,58 @@ namespace ZoneEngine_New.Core.Nanos
                 Complete(character, cast, nowUtc);
             }
 
+            TickPeriodicEffects(character, nowUtc);
+
             List<Buff> expired = character.DrainExpiredBuffs(nowUtc);
             for (int i = 0; i < expired.Count; i++)
                 AnnounceBuffRemoved(character, expired[i]);
+        }
+
+        /// <summary>
+        /// Heal/damage over time ticks due on this character's buffs. Ticks are collected first: a
+        /// killing tick empties NCU, so no buff list is walked while effects run.
+        /// </summary>
+        static void TickPeriodicEffects(Character character, DateTime nowUtc)
+        {
+            IReadOnlyList<Buff> buffs = character.Buffs;
+            if (buffs.Count == 0 || character.IsDead)
+                return;
+
+            List<(Buff Buff, ItemSpell Spell)>? due = null;
+            var spells = new List<ItemSpell>();
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                spells.Clear();
+                buffs[i].CollectDueTicks(nowUtc, spells);
+                for (int s = 0; s < spells.Count; s++)
+                    (due ??= new()).Add((buffs[i], spells[s]));
+            }
+
+            if (due == null)
+                return;
+
+            Playfield? playfield = character.Playfield;
+            if (playfield == null)
+                return;
+
+            IInventoryRepository inventory = playfield.GetRequiredService<IInventoryRepository>();
+            IItemBuilder items = playfield.GetRequiredService<IItemBuilder>();
+            DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
+            for (int i = 0; i < due.Count; i++)
+            {
+                if (character.IsDead)
+                    return;
+
+                (Buff buff, ItemSpell spell) = due[i];
+                // Attributed to the caster while it is still here; otherwise the owner takes it.
+                Character? source = registry.TryGet(buff.Source, out Dynel? dynel) && dynel is Character caster
+                    ? caster
+                    : null;
+                if (!spell.MeetsRequirements(stat => character.Stats.Get(stat)))
+                    continue;
+
+                ItemUseFunctions.TryExecute(buff.Id, character, source, spell, inventory, items);
+            }
         }
 
         /// <summary>Death empties NCU and drops a cast in flight, ignoring CanCancel.</summary>

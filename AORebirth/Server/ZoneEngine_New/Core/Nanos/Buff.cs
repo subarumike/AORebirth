@@ -37,12 +37,64 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>Legacy duration ceiling (100 hours in centiseconds).</summary>
         public const int MaxDurationCentiseconds = 36000000;
 
+        readonly List<PeriodicEffect> _periodic = new();
+
         Buff(NanoSpell spell, Identity source, int nanoInstance, DateTime expiresAtUtc)
             : base(spell)
         {
             Source = source;
             NanoInstance = nanoInstance;
             ExpiresAtUtc = expiresAtUtc;
+        }
+
+        /// <summary>
+        /// Heal/damage over time: an OnUse Hit with TickCount &gt; 1 and a TickInterval (centiseconds).
+        /// The land runs it once; the rest run every interval while the buff is up, up to TickCount in all.
+        /// </summary>
+        void SchedulePeriodic(DateTime nowUtc, int hitsAlreadyDone)
+        {
+            _periodic.Clear();
+            if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                return;
+
+            for (int i = 0; i < spells.Count; i++)
+            {
+                ItemSpell spell = spells[i];
+                if (!spell.Is(FunctionType.Hit) || spell.TickCount <= 1 || spell.TickInterval == 0)
+                    continue;
+
+                int remaining = spell.TickCount - hitsAlreadyDone;
+                if (remaining > 0)
+                    _periodic.Add(new PeriodicEffect(spell, remaining, nowUtc.AddMilliseconds(spell.TickInterval * 10.0)));
+            }
+        }
+
+        /// <summary>
+        /// Periodic functions due by <paramref name="nowUtc"/>. A tick that would land at or after expiry
+        /// is dropped. Each returned entry is one tick.
+        /// </summary>
+        public void CollectDueTicks(DateTime nowUtc, List<ItemSpell> due)
+        {
+            ArgumentNullException.ThrowIfNull(due);
+            for (int i = 0; i < _periodic.Count; i++)
+            {
+                PeriodicEffect effect = _periodic[i];
+                while (effect.Remaining > 0 && effect.NextUtc <= nowUtc && effect.NextUtc < ExpiresAtUtc)
+                {
+                    due.Add(effect.Spell);
+                    effect.Remaining--;
+                    effect.NextUtc = effect.NextUtc.AddMilliseconds(effect.Spell.TickInterval * 10.0);
+                }
+            }
+        }
+
+        sealed class PeriodicEffect(ItemSpell spell, int remaining, DateTime nextUtc)
+        {
+            public ItemSpell Spell { get; } = spell;
+
+            public int Remaining { get; set; } = remaining;
+
+            public DateTime NextUtc { get; set; } = nextUtc;
         }
 
         /// <summary>Caster identity. Kept so buffs can be attributed and audited.</summary>
@@ -82,7 +134,10 @@ namespace ZoneEngine_New.Core.Nanos
             }
 
             int duration = Math.Clamp(spell.DurationCentiseconds, 1, MaxDurationCentiseconds);
-            return new Buff(spell, source, nanoInstance, nowUtc.AddMilliseconds(duration * 10L));
+            var buff = new Buff(spell, source, nanoInstance, nowUtc.AddMilliseconds(duration * 10L));
+            // The land runs the initial hit.
+            buff.SchedulePeriodic(nowUtc, hitsAlreadyDone: 1);
+            return buff;
         }
 
         /// <summary>
@@ -92,7 +147,10 @@ namespace ZoneEngine_New.Core.Nanos
         public static Buff Restore(NanoSpell spell, Identity source, int nanoInstance, DateTime expiresAtUtc)
         {
             ArgumentNullException.ThrowIfNull(spell);
-            return new Buff(spell, source, nanoInstance, expiresAtUtc);
+            var buff = new Buff(spell, source, nanoInstance, expiresAtUtc);
+            // Ticks restart from now; the expiry cut in CollectDueTicks keeps them inside what is left.
+            buff.SchedulePeriodic(DateTime.UtcNow, hitsAlreadyDone: 1);
+            return buff;
         }
 
         public bool IsExpired(DateTime nowUtc) => nowUtc >= ExpiresAtUtc;
