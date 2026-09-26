@@ -158,6 +158,52 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void FamilyPicksOnlyChildrenCoveringRequestedLevel()
+        {
+            const string json =
+                """
+                {
+                    "LEET": {
+                        "Templates": [
+                            { "Name": "Leet", "Level": 1, "Stats": { "54": 1 } },
+                            { "Name": "Leet", "Level": 5, "Stats": { "54": 5 } }
+                        ]
+                    },
+                    "PHEAR": {
+                        "Templates": [ { "Name": "Phear Leet", "Level": 17, "Stats": { "54": 17 } } ]
+                    },
+                    "BIG": {
+                        "Templates": [ { "Name": "Big Leet", "Level": 30, "Stats": { "54": 30 } } ]
+                    },
+                    "NEST": { "Children": ["BIG"] },
+                    "FAM": { "Children": ["PHEAR", "NEST", "LEET"] }
+                }
+                """;
+
+            for (int roll = 0; roll < 3; roll++)
+            {
+                NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(json, new FixedRandom(roll));
+
+                var low = new List<MobTemplate>();
+                catalog.CollectSpawns("FAM", 1, low);
+                Assert.AreEqual(1, low.Count);
+                Assert.AreEqual("LEET", low[0].Hash);
+                Assert.AreEqual(1, low[0].Stats[(int)CharacterStat.Level]);
+
+                Assert.IsTrue(catalog.TryResolve("FAM", 17, out MobTemplate mid));
+                Assert.AreEqual("PHEAR", mid.Hash);
+
+                // No child covers 10: nearest range wins (LEET max 5 is 5 away, PHEAR 17 is 7 away).
+                Assert.IsTrue(catalog.TryResolve("FAM", 10, out MobTemplate gap));
+                Assert.AreEqual("LEET", gap.Hash);
+                Assert.AreEqual(5, gap.Stats[(int)CharacterStat.Level]);
+
+                Assert.IsTrue(catalog.TryResolve("FAM", 200, out MobTemplate high));
+                Assert.AreEqual("BIG", high.Hash);
+            }
+        }
+
+        [TestMethod]
         public void UnknownAndCyclicFamiliesFail()
         {
             NpcTemplateCatalog catalog = NpcTemplateCatalog.Parse(SampleJson);
@@ -347,7 +393,7 @@ namespace ZoneEngine_New.Tests
             }
 
             public override int Next(int maxValue)
-                => _value;
+                => Math.Min(_value, maxValue - 1);
         }
     }
 }

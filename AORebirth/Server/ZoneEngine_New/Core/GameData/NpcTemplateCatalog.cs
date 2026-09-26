@@ -114,7 +114,7 @@ namespace ZoneEngine_New.Core.GameData
             template = null!;
             if (string.IsNullOrEmpty(hash))
                 return false;
-            if (TryResolveLeaf(hash, out NpcLeaf leaf))
+            if (TryResolveLeaf(hash, level, out NpcLeaf leaf))
             {
                 template = Materialize(leaf, level);
                 return true;
@@ -158,7 +158,7 @@ namespace ZoneEngine_New.Core.GameData
             return false;
         }
 
-        bool TryResolveLeaf(string hash, out NpcLeaf leaf)
+        bool TryResolveLeaf(string hash, int? level, out NpcLeaf leaf)
         {
             leaf = null!;
             if (string.IsNullOrEmpty(hash))
@@ -171,7 +171,7 @@ namespace ZoneEngine_New.Core.GameData
                 if (!seen.Add(current))
                     return false;
 
-                string? pick = PickChild(children);
+                string? pick = PickChild(children, level);
                 if (string.IsNullOrEmpty(pick))
                     return false;
 
@@ -217,7 +217,7 @@ namespace ZoneEngine_New.Core.GameData
                         return;
                     }
 
-                    string? pick = PickChild(children);
+                    string? pick = PickChild(children, level);
                     if (!string.IsNullOrEmpty(pick))
                         CollectSpawns(pick, level, into, trail);
                     return;
@@ -232,7 +232,46 @@ namespace ZoneEngine_New.Core.GameData
             }
         }
 
-        string? PickChild(string[] children)
+        /// <summary>
+        /// Random child. With a requested level, only children whose template range covers it are
+        /// eligible; when none do, the children whose range lies closest to the level are used instead.
+        /// </summary>
+        string? PickChild(string[] children, int? level)
+        {
+            if (level is not > 0)
+                return PickAny(children);
+
+            var eligible = new List<string>(children.Length);
+            int bestDistance = int.MaxValue;
+            for (int i = 0; i < children.Length; i++)
+            {
+                string child = children[i];
+                if (string.IsNullOrEmpty(child))
+                    continue;
+                if (!TryGetLevelRange(child, new HashSet<string>(StringComparer.Ordinal), out int min, out int max))
+                    continue;
+
+                int distance = level.Value < min ? min - level.Value
+                    : level.Value > max ? level.Value - max
+                    : 0;
+                if (distance > bestDistance)
+                    continue;
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    eligible.Clear();
+                }
+
+                eligible.Add(child);
+            }
+
+            if (eligible.Count == 0)
+                return PickAny(children);
+
+            return eligible[_random.Next(eligible.Count)];
+        }
+
+        string? PickAny(string[] children)
         {
             int viable = 0;
             for (int i = 0; i < children.Length; i++)
@@ -255,6 +294,43 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return null;
+        }
+
+        /// <summary>Union of the template level ranges of every leaf reachable from <paramref name="hash"/>.</summary>
+        bool TryGetLevelRange(string hash, HashSet<string> seen, out int min, out int max)
+        {
+            min = int.MaxValue;
+            max = int.MinValue;
+            if (string.IsNullOrEmpty(hash) || !seen.Add(hash))
+                return false;
+
+            if (_leaves.TryGetValue(hash, out NpcLeaf? leaf))
+            {
+                seen.Remove(hash);
+                min = Math.Min(leaf.MinLevel, leaf.MaxLevel);
+                max = Math.Max(leaf.MinLevel, leaf.MaxLevel);
+                return true;
+            }
+
+            if (!_families.TryGetValue(hash, out string[]? children))
+            {
+                seen.Remove(hash);
+                return false;
+            }
+
+            bool found = false;
+            for (int i = 0; i < children.Length; i++)
+            {
+                if (!TryGetLevelRange(children[i], seen, out int childMin, out int childMax))
+                    continue;
+
+                min = Math.Min(min, childMin);
+                max = Math.Max(max, childMax);
+                found = true;
+            }
+
+            seen.Remove(hash);
+            return found;
         }
 
         public static MobTemplate Materialize(NpcLeaf leaf, int? desiredLevel)
