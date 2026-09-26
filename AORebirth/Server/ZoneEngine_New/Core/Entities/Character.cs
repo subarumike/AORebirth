@@ -1384,7 +1384,7 @@ namespace ZoneEngine_New.Core.Entities
                     SyncVitalPercent(next, CharacterStat.MaxNanoEnergy, CharacterStat.PercentRemainingNano);
             }
 
-            if (stat != CharacterStat.AggDef)
+            if (stat != CharacterStat.AggDef && !CharacterWeapon.IsInitiativeStat(stat))
                 return;
 
             foreach (CharacterWeapon weapon in Weapons.Values)
@@ -1913,7 +1913,10 @@ namespace ZoneEngine_New.Core.Entities
             Item fist = items.Create(lowId, highId, quality, ItemSource.Other);
             ArmFromItem(slot, fist);
             if (Weapons.TryGetValue(slot, out CharacterWeapon? armed) && armed != null)
+            {
                 armed.IsSyntheticFist = true;
+                armed.RefreshEffectiveSpeeds();
+            }
         }
 
         /// <summary>

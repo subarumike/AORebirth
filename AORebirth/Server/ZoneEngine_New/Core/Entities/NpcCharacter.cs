@@ -446,6 +446,7 @@ namespace ZoneEngine_New.Core.Entities
                 CharacterWeapon weapon = Weapons[logical];
                 weapon.DamageOverride = VisualRightHand;
                 weapon.RangeSource = rangeSource;
+                weapon.RefreshEffectiveSpeeds();
                 armed++;
             }
         }

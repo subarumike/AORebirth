@@ -90,10 +90,10 @@ namespace ZoneEngine_New.Core.Entities
 
         public double BaseRechargeSpeed { get; private set; } = DefaultRechargeSpeedSeconds;
 
-        /// <summary>Effective attack phase length after AggDef (and later initiative).</summary>
+        /// <summary>Effective attack phase length after initiative and AggDef.</summary>
         public double AttackSpeed { get; private set; } = DefaultAttackSpeedSeconds;
 
-        /// <summary>Effective recharge phase length after AggDef (and later initiative).</summary>
+        /// <summary>Effective recharge phase length after initiative and AggDef.</summary>
         public double RechargeSpeed { get; private set; } = DefaultRechargeSpeedSeconds;
 
         public WeaponState State { get; set; } = WeaponState.Attacking;
@@ -192,11 +192,13 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
-        /// Recompute effective cycle from base delays and the wielder's current AggDef.
+        /// Recompute effective cycle from base delays, the wielder's initiative skill and AggDef:
+        /// attack = Base - Init/600 - skew, recharge = Base - Init/300 - skew, each floored at 1s.
         /// </summary>
         public void RefreshEffectiveSpeeds()
         {
             double skewSeconds = 0.0;
+            int initiative = 0;
             if (Wielder != null)
             {
                 int aggDef = Wielder.Stats.Get(CharacterStat.AggDef);
@@ -205,14 +207,34 @@ namespace ZoneEngine_New.Core.Entities
                     aggDef = Math.Clamp(aggDef, -100, 100);
                     skewSeconds = (aggDef - 75) / 100.0;
                 }
+
+                // Full value: base + modifiers + attribute trickle.
+                initiative = Math.Max(0, Wielder.Stats.GetOrZero(InitiativeSkill()));
             }
 
-            // TODO: Initiative reduction — AdjustedAttack = Base - Init/600 - AggDefSkew;
-            // AdjustedRecharge = Base - Init/300 - AggDefSkew; then floor at weapon/1s cap.
-            // Apply live from the weapon's initiative skill (Melee/Ranged/Physical) like AggDef.
-
-            AttackSpeed = Math.Max(MinCycleSeconds, BaseAttackSpeed - skewSeconds);
-            RechargeSpeed = Math.Max(MinCycleSeconds, BaseRechargeSpeed - skewSeconds);
+            AttackSpeed = Math.Max(MinCycleSeconds, BaseAttackSpeed - (initiative / 600.0) - skewSeconds);
+            RechargeSpeed = Math.Max(MinCycleSeconds, BaseRechargeSpeed - (initiative / 300.0) - skewSeconds);
         }
+
+        /// <summary>
+        /// The weapon's InitiativeType (440) names the skill: Melee Init, Ranged Init or Physical Init.
+        /// Without one, ranged weapons use Ranged Init, fists Physical Init, anything else Melee Init.
+        /// </summary>
+        public CharacterStat InitiativeSkill()
+        {
+            WeaponFlags flags = DamageItem?.GetWeaponFlags() ?? WeaponFlags.None;
+            if ((flags & WeaponFlags.Ranged) != 0)
+                return CharacterStat.RangedInit;
+            if ((flags & WeaponFlags.Unarmed) != 0)
+                return CharacterStat.PhysicalInit;
+            if ((flags & WeaponFlags.Melee) != 0)
+                return CharacterStat.MeleeInit;
+            if (IsRanged())
+                return CharacterStat.RangedInit;
+            return IsSyntheticFist || DamageItem == null ? CharacterStat.PhysicalInit : CharacterStat.MeleeInit;
+        }
+
+        public static bool IsInitiativeStat(CharacterStat stat)
+            => stat is CharacterStat.MeleeInit or CharacterStat.RangedInit or CharacterStat.PhysicalInit;
     }
 }
