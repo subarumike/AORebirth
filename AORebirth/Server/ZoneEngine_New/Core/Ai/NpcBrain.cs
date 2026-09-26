@@ -30,6 +30,8 @@ namespace ZoneEngine_New.Core.Ai
         bool _treeResetPending;
         bool _followAnnounced;
         Vector3 _segmentDestination = new(0, 0, 0);
+        Vector3 _segmentEnd = new(0, 0, 0);
+        DateTime _segmentPlannedUtc;
         bool _segmentReachesDestination;
         Vector3 _progressAnchor = new(0, 0, 0);
         Identity _reachCacheId = Identity.None;
@@ -328,7 +330,10 @@ namespace ZoneEngine_New.Core.Ai
             destination = HeightfieldOrSelf(destination);
             DateTime now = DateTime.UtcNow;
             bool active = Npc.Motor.HasPath;
-            if (active)
+            // The motor drops a segment the body stopped on (wall, arrive-halt) short of its end. Replanning
+            // that from scratch every tick re-announces it every tick and never lets the stuck clock run.
+            bool continuing = active || (_followAnnounced && !HasReachedSegmentEnd());
+            if (continuing)
             {
                 if (IsStuck(now))
                 {
@@ -354,7 +359,9 @@ namespace ZoneEngine_New.Core.Ai
                     _stuckWarps++;
                     active = false;
                 }
-                else if (!ShouldReplan(destination))
+                else if (active && !ShouldReplan(destination))
+                    return;
+                else if (!active && (now - _segmentPlannedUtc).TotalSeconds < NpcFollowTarget.PathReplanSeconds)
                     return;
             }
 
@@ -375,8 +382,11 @@ namespace ZoneEngine_New.Core.Ai
             if (!Npc.Motor.HasPath)
                 return;
 
-            if (!active)
+            if (!continuing)
                 ResetProgress(now);
+            Vector3 segmentEnd = _pathScratch[_pathScratch.Count - 1];
+            _segmentEnd = new Vector3(segmentEnd.x, segmentEnd.y, segmentEnd.z);
+            _segmentPlannedUtc = now;
             _segmentDestination = new Vector3(destination.x, destination.y, destination.z);
             _segmentReachesDestination = !truncated;
             NpcFollowTarget.AnnounceCoordinatePath(Npc, start, _pathScratch);
@@ -525,6 +535,11 @@ namespace ZoneEngine_New.Core.Ai
                 return guideDistance;
             return guideDistance > cornerDistance ? cornerDistance : guideDistance;
         }
+
+        bool HasReachedSegmentEnd()
+            => PathEndsUnderNpc(
+                new System.Numerics.Vector3((float)Npc.Position.x, (float)Npc.Position.y, (float)Npc.Position.z),
+                new System.Numerics.Vector3((float)_segmentEnd.x, (float)_segmentEnd.y, (float)_segmentEnd.z));
 
         bool ShouldReplan(Vector3 destination)
         {
