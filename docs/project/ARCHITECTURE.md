@@ -10,7 +10,7 @@ AO Rebirth is split into console engines plus shared libraries:
 flowchart LR
     Client["AO Client"] --> Login["LoginEngine"]
     Client --> Chat["ChatEngine"]
-    Client --> Zone["ZoneEngine"]
+    Client --> Zone["ZoneEngine_New"]
     Web["WebEngine"] --> DB["cellao_codex_clean MySQL"]
     Assets["Pinned local WebCore htdocs"] --> Web
     PHP["Validated local php-cgi"] --> Web
@@ -42,7 +42,7 @@ sequenceDiagram
     participant C as AO Client
     participant L as LoginEngine
     participant Ch as ChatEngine
-    participant Z as ZoneEngine
+    participant Z as ZoneEngine_New
     participant DB as MySQL
     C->>L: login credentials / character selection
     L->>DB: account and character lookup
@@ -58,7 +58,7 @@ Typical combat/loot flow:
 ```mermaid
 sequenceDiagram
     participant C as AO Client
-    participant Z as ZoneEngine
+    participant Z as ZoneEngine_New
     participant PF as Playfield
     C->>Z: Attack / actions / movement
     Z->>PF: update combat state
@@ -77,19 +77,19 @@ Important files and directories:
 - `AORebirth/Libraries/Source/AORebirth.Core/Entities/Dynel.cs`: base dynamic entity.
 - `AORebirth/Libraries/Source/AORebirth.Core/Entities/Character.cs`: character model.
 - `AORebirth/Libraries/Source/AORebirth.Core/Inventory`: inventory pages and item movement models.
-- `AORebirth/Server/ZoneEngine/Core/Controllers/PlayerController.cs`: player runtime controller.
-- `AORebirth/Server/ZoneEngine/Core/Controllers/NPCController.cs`: NPC runtime controller and movement/combat behavior.
-- `AORebirth/Server/ZoneEngine/Core/Navigation/`: global hostile-NPC chase capability, bounded route planning/following, route lifecycle state, and playfield navigation-provider contract. PF127 is the first provider; see `docs/project/NPC_CHASE_NAVIGATION.md`.
-- `AORebirth/Server/ZoneEngine/Core/Playfields/OrdinaryEnemyProfile.cs`, `OrdinaryEnemyCatalog.cs`, and `OrdinaryEnemyRuntimeService.cs`: validated ordinary-enemy type/spawn data and the single shared runtime path. See `docs/project/ORDINARY_ENEMY_RUNTIME.md`.
-- `docs/reference/pf4582/PlayfieldDistrictInfo.json`, `Tools/generate_pf4582_placements.py`, and `IccShuttleportPlacementCatalog*.cs`: PF4582's accepted 206-record runtime-governance layer, deterministic normalization, explicit source-key/runtime evidence mapping, and fail-closed activation. `NpcId` is the stable AORebirth placement key, not a proven native Funcom field. `template-hash-evidence.json` and `Tools/audit_pf4582_template_hashes.py` provide the separate pinned 38-key identity-resolution ledger; the legacy `TemplateHash` name does not imply a terminal mob identity.
-- `docs/reference/pf4582/official/`, `Tools/reconcile_pf4582_official_source.py`, and `IccShuttleportOfficialPlacementCatalog*.cs`: byte-pinned official EP1 structural evidence, deterministic 206-to-207 reconciliation, and a 207-record evidence overlay. The official `HashSpawnPoint_t` parser and packed four-byte `ACGHash_t` scalar/tag are proven; terminal identity remains unresolved. The overlay is not runtime-consumed, `NCNN` has null `SourceNpcId`, and current activation remains 25 active / 181 blocked.
-- `Tools/import_official_playfield_placements.py`, `docs/reference/playfields/official-placement-source-manifest.json`, and `docs/generated/playfields/`: the database-wide normalized official type-`1000014` static placement evidence layer. It retains 630 resource instances and 32,805 independent placement records from the official `18.8.62_EP1` old-graphics-client database extraction, including explicit parser-limited resources and duplicate records. `OfficialPlayfieldPlacementCatalog` loads the one exact-cased packaged corpus relative to the built ZoneEngine and provides shared per-playfield evidence APIs plus deterministic manifest/provenance validation on Windows and Linux; no normal startup owner or runtime spawn path consumes it. `docs/reference/playfields/aorebirth-playfield-representation-manifest.json` declares the bounded AORebirth-side offline adapters, and `Tools/aorebirth_playfield_reconciliation.py` renders `docs/generated/playfields/official-playfield-reconciliation.json`; non-enumerable dynamic or external counts remain null rather than being guessed as zero. PF4582 specialized reconciliation is downstream compatibility/history, while `IccShuttleportPlacementCatalog` remains the separate runtime-governance authority.
-- `AORebirth/Server/ZoneEngine/Core/Playfields/Playfield.cs`: playfield entity registry, combat, death, corpse, loot, despawn, and broad gameplay flow — **do not add new system ecosystems here**; extract to `Core/<System>/` (see `docs/project/SUBSYSTEMS.md`).
-- `AORebirth/Server/ZoneEngine/Core/Mail/`: Mail Terminal runtime + handler subsystem.
-- `AORebirth/Server/ZoneEngine/Core/Arete/`: Arete dialogue/quest subsystem.
-- `AORebirth/Server/ZoneEngine/Core/MessageHandlers`: N3 message handlers for zone gameplay (handlers may also live inside a subsystem folder).
-- `AORebirth/Server/ZoneEngine/Core/Packets`: custom packet builders.
-- `AORebirth/Server/ZoneEngine/ChatCommands`: GM/debug command surface.
+- `AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs`: player runtime entity and state.
+- `AORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs`: NPC runtime entity.
+- `AORebirth/Server/ZoneEngine_New/Core/Ai/NpcBrain.cs`: reusable NPC behavior.
+- `AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs`: server movement authority and vehicle-simulation integration.
+- `AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs` and `PlayfieldNpcContentCatalog.cs`: validated editable NPC and playfield content loading.
+- `AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcContentActivationService.cs` and `WorldNpcFactory.cs`: NPC content activation and runtime construction.
+- Historical retired-ZoneEngine provenance: `docs/reference/pf4582/PlayfieldDistrictInfo.json`, `Tools/generate_pf4582_placements.py`, and the retired `IccShuttleportPlacementCatalog*.cs` targets record PF4582's 206-placement evidence, deterministic normalization, and source-key mapping. Those generated-C# targets are not `ZoneEngine_New` inputs. `NpcId` is the stable AORebirth placement key, not a proven native Funcom field. `template-hash-evidence.json` and `Tools/audit_pf4582_template_hashes.py` provide the separate pinned 38-key identity-resolution ledger; the legacy `TemplateHash` name does not imply a terminal mob identity.
+- Historical retired-ZoneEngine provenance: `docs/reference/pf4582/official/`, `Tools/reconcile_pf4582_official_source.py`, and the retired `IccShuttleportOfficialPlacementCatalog*.cs` targets retain byte-pinned official EP1 structural evidence and 206-to-207 reconciliation. Those generated-C# targets are not `ZoneEngine_New` inputs. The official `HashSpawnPoint_t` parser and packed four-byte `ACGHash_t` scalar/tag are proven; terminal identity remains unresolved. The retired baseline was 25 active / 181 blocked, and `NCNN` had null `SourceNpcId`.
+- `Tools/import_official_playfield_placements.py`, `docs/reference/playfields/official-placement-source-manifest.json`, and `docs/generated/playfields/`: normalized official placement evidence for tooling and tests. `OfficialPlayfieldPlacementCatalog` validates that evidence but is not compiled into or consumed by `ZoneEngine_New`.
+- `AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs`: world and playfield orchestration — **do not add new system ecosystems here**; extract reusable mechanics to `Core/<System>/` (see `docs/project/SUBSYSTEMS.md`).
+- `AORebirth/Server/ZoneEngine_New/Core/Dialogue/`, `Missions/`, and `Inventory/`: current gameplay-system owners.
+- `AORebirth/Server/ZoneEngine_New/Core/Network/` and `MessageHandlers/`: zone networking and thin message dispatch.
+- `AORebirth/Server/ZoneEngine_New/Core/Commands/`: command surface.
 - `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging`: message models and serializer contracts.
 
 ## Networking Architecture
@@ -146,7 +146,7 @@ Primary build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-The standard validation wrapper verifies required package folders before MSBuild, runs explicit MSBuild solution restore only when package folders are missing, then builds `AORebirth.Core`, `ZoneEngine`, the read-only `DatabasePreflight`, and `WebEngine` with single-node MSBuild (`/m:1`) and node reuse disabled (`/nr:false`). Legacy build-time NuGet restore through `.nuget\NuGet.targets` has been removed from project files. PowerShell and `.ps1` wrappers are implementation details behind approved CMD lifecycle entrypoints and are not invoked directly by Codex. The solution includes server engines, shared libraries, AOtomation, msgpack-cli, and utility projects. Some tools under `tools-temp` are separate projects and are not necessarily part of the main solution.
+The standard validation wrapper verifies required package folders before MSBuild, runs explicit MSBuild solution restore only when package folders are missing, then builds `AORebirth.Core`, `ZoneEngine_New`, the read-only `DatabasePreflight`, and `WebEngine` with single-node MSBuild (`/m:1`) and node reuse disabled (`/nr:false`). Legacy build-time NuGet restore through `.nuget\NuGet.targets` has been removed from project files. PowerShell and `.ps1` wrappers are implementation details behind approved CMD lifecycle entrypoints and are not invoked directly by Codex. The solution includes server engines, shared libraries, AOtomation, msgpack-cli, and utility projects. Some tools under `tools-temp` are separate projects and are not necessarily part of the main solution.
 
 ## Dependency Graph
 
@@ -154,9 +154,9 @@ High-level dependency direction:
 
 ```mermaid
 flowchart TB
-    ZoneEngine --> AORebirthCore["AORebirth.Core"]
-    ZoneEngine --> AORebirthDatabase["AORebirth.Database"]
-    ZoneEngine --> AOtomation["AOtomation.Messaging"]
+    ZoneEngine_New --> AORebirthCore["AORebirth.Core"]
+    ZoneEngine_New --> AORebirthDatabase["AORebirth.Database"]
+    ZoneEngine_New --> AOtomation["AOtomation.Messaging"]
     LoginEngine --> AORebirthDatabase
     ChatEngine --> AORebirthDatabase
     WebEngine --> AORebirthDatabase
@@ -180,8 +180,14 @@ flowchart TB
   and all PHP syntax are validated; live database semantics, HTTPS transport,
   and upstream redistribution rights remain unproven.
 
-## Hostile NPC Chase Navigation
+## Historical: Retired ZoneEngine Hostile NPC Chase Navigation
 
-The global navigation boundary is `ZoneEngine.Core.Navigation`, not an enemy or playfield content profile. Existing combat policy requests pursuit through `PlayfieldNpcCombatMovementRuntimeService`; `NpcChaseNavigationRuntimeService` chooses direct movement, a cached provider route, or a fail-closed hold. `IPlayfieldChaseNavigationProvider` supplies authoritative segment checks and route generation without exposing PF127 details to combat code. Valid destinations continue through `NPCController.MoveTo`, preserving server movement cadence and client synchronization.
+This section is retained as historical design evidence and does not describe
+the active `ZoneEngine_New` runtime. Current movement and navigation ownership
+is in `ZoneEngine_New.Core.Ai.NpcBrain`,
+`ZoneEngine_New.Core.Movement.CharacterMotor`, and
+`AORebirth.World.Pathfinding`.
+
+Historically, the global navigation boundary was `ZoneEngine.Core.Navigation`, not an enemy or playfield content profile. The combat policy requested pursuit through `PlayfieldNpcCombatMovementRuntimeService`; `NpcChaseNavigationRuntimeService` chose direct movement, a cached provider route, or a fail-closed hold. `IPlayfieldChaseNavigationProvider` supplied authoritative segment checks and route generation without exposing PF127 details to combat code. Valid destinations continued through `NPCController.MoveTo`, preserving server movement cadence and client synchronization.
 
 PF127/resource `127` is currently the only supported provider. It derives a bounded same-elevation grid from the promoted collision geometry and validates every segment against that geometry. Other playfields explicitly remain unsupported and preserve legacy direct chase. See `docs/project/NPC_CHASE_NAVIGATION.md` for exact limits, failure behavior, lifecycle cleanup, validation, and the provider-adoption process.

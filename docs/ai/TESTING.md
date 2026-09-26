@@ -1,5 +1,12 @@
 # Testing
 
+This document is conditional guidance. Run fixture, unit, regression, smoke, or
+acceptance suites only when Mike explicitly requests them. Reading this file,
+editing source, or encountering a validation failure does not independently
+authorize automated tests or production-code changes. Normal development is:
+inspect, make the smallest targeted change, compile/build as needed, and leave
+live AO client verification to Mike.
+
 Generated: 2026-06-02
 
 ## Build Verification

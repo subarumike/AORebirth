@@ -11,9 +11,6 @@ For mission analyze **and** mission implement work, ALWAYS use this tool:
 cmd /d /c tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe "<capture-folder>"
 ```
 
-Absolute path:
-`C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe`
-
 Rules:
 
 - When Mike provides a mission / mission-terminal / mission-lifecycle capture, run this exe **first**.

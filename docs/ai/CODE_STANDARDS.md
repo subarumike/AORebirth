@@ -12,10 +12,9 @@ Generated: 2026-06-02
 ## Folder Structure Rules
 
 - Server runtime code belongs under the matching engine directory.
-- Zone gameplay handlers belong under `AORebirth/Server/ZoneEngine/Core/MessageHandlers`.
-- Custom packet builders belong under `AORebirth/Server/ZoneEngine/Core/Packets`.
+- Zone gameplay handlers belong under `AORebirth/Server/ZoneEngine_New/Core/MessageHandlers`.
 - Core entity/inventory/item logic belongs under `AORebirth/Libraries/Source/AORebirth.Core`.
-- Packet models belong under AOtomation unless a custom ZoneEngine packet builder is intentionally used.
+- Packet models belong under AOtomation unless a custom ZoneEngine_New packet implementation is intentionally used.
 - Temporary capture/test tooling belongs under `tools-temp`.
 - Active AI workflow documentation belongs under `docs/ai`.
 - Active project documentation belongs under `docs/project`.
@@ -30,6 +29,27 @@ Generated: 2026-06-02
 - Prefer existing AO Rebirth patterns over new abstractions.
 - Add abstractions only when they reduce real complexity or protect a verified contract.
 - Avoid adding broad gameplay heuristics in packet-sensitive paths.
+- Follow the root `AGENTS.md` existing-mechanism-first order before introducing
+  abstractions, configuration systems, build mechanisms, or compatibility
+  layers.
+- A failing test or generated guard is diagnostic evidence; it is not by itself
+  authority to change runtime behavior.
+
+## Control-Flow Brace Style
+
+- Omit braces when an `if` body contains exactly one bare `return`, `continue`,
+  `break`, or `throw` statement.
+- Keep braces when the body has more than one statement or its single statement
+  is not a bare control-flow exit.
+
+## Data-Driven Content Rules
+
+- Keep NPC-specific definitions, stats, appearances, IDs, dialogue, quests,
+  rewards, vendor stock, spawn bindings, and similar gameplay content in the
+  appropriate editable data source.
+- Runtime C# should contain reusable mechanics, services, loaders, and
+  validation rather than individual content definitions.
+- Do not move private GameData into tracked public paths.
 - For high-risk systems, separate evidence/model/test work from runtime behavior changes.
 
 ## File Naming Rules

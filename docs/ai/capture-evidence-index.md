@@ -3,11 +3,12 @@
 Status date: 2026-08-16
 
 ## Source of Evidence
-Historical retained capture artifacts are in:
-C:\Users\Mike\Documents\AORebirth\tools-temp\AOSharpLiveCapture\bin\Debug\captures
+Historical raw capture artifacts referenced by this index are external to this
+fresh checkout; this index does not prove that their raw folders are locally
+available. Tracked derived fixtures are under `docs\reference\captures`.
 
-New captures created by the approved launcher are stored in:
-C:\Users\Mike\Documents\AORebirth\Captures
+New captures created by the approved launcher are stored under the
+repository-relative `Captures` directory.
 
 New session folder names use `<area> [PF <resource id>] - <capture id>` so a person can identify the location immediately while analyzers retain the compact timestamp capture ID.
 

@@ -1,5 +1,105 @@
 # Agent Rules
 
+## Authority and instruction precedence
+
+`AGENTS.md` is the repository-wide authority for agent behavior. A nested
+`AGENTS.md`, if present, must also be followed for files within its subtree; it
+may add narrower requirements but may not weaken higher-precedence rules.
+
+Instruction precedence, highest to lowest:
+
+1. external system and user instructions;
+2. this root `AGENTS.md`, supplemented by applicable nested `AGENTS.md` files;
+3. `docs/project/DEVELOPMENT_AUTHORITY.md`;
+4. `docs/project/PROJECT_STATE.md`;
+5. `docs/ai/CURRENT_TASK.md`, for the active task only;
+6. `docs/project/KNOWN_DECISIONS.md`;
+7. architecture and subsystem documentation;
+8. workflow and code-standard documentation;
+9. task-specific evidence documents;
+10. historical documentation.
+
+Current authoritative documents override stale historical descriptions.
+Historical reports never redefine current architecture. `AI_START_HERE.md` is
+the single startup index.
+
+## Existing architecture and scope
+
+Before introducing an abstraction, replacement system, build or configuration
+mechanism, staging mechanism, service, wrapper, compatibility layer, or
+architecture change:
+
+- inspect the existing implementation;
+- identify the existing configuration, runtime, and build mechanisms;
+- prove those mechanisms cannot satisfy the requested requirement;
+- report that evidence before redesigning anything.
+
+Use this order of preference:
+
+`existing mechanism > configuration > smallest targeted fix > new architecture`
+
+A configuration problem is not authorization for an architecture change. A
+failing validation or test is not authorization to modify production code.
+
+Perform only the requested task. Do not perform unrelated cleanup,
+refactoring, modernization, architecture redesign, documentation expansion,
+test repair, or build-system redesign. Do not turn a narrow task into a
+generalized framework.
+
+## AORebirth validation and live acceptance
+
+Do not automatically run fixture, unit, or regression test suites. Run them
+only when Mike explicitly requests them.
+
+For normal AORebirth development:
+
+`inspect -> smallest targeted change -> compile/build -> live AO client verification`
+
+Compilation and build validation remain appropriate when needed to produce a
+runnable build. Mike performs live AO client verification. Never launch or
+control the AO client unless Mike explicitly requests it in the current task.
+
+Do not modify production behavior merely to satisfy stale fixtures, snapshots,
+stored hashes, generated inventories, generated reports, or unit-test
+expectations. Treat those failures as diagnostic information unless the task
+explicitly establishes the test or fixture as an authoritative contract.
+
+## Gameplay content boundary
+
+Gameplay and content data must remain data-driven. NPC-specific data, stats,
+appearances, IDs, dialogue, quests, rewards, vendor stock, spawn bindings, and
+similar game content must not be hard-coded into reusable runtime C# merely to
+make behavior work.
+
+Runtime C# implements reusable mechanics, services, loaders, and validation;
+individual content definitions belong in the appropriate editable data source.
+
+## Development authority
+
+- Public GitHub `master` is the authoritative source.
+- Windows/public master is developed and accepted first.
+- Linux is a derived build of the same accepted source.
+- Linux-specific changes are limited to actual Linux operating-system, build,
+  and deployment requirements.
+- Do not make Linux-only gameplay/runtime changes or introduce gameplay/runtime
+  changes directly on the Linux deployment.
+- `ZoneEngine_New` is the active zone runtime. Legacy `ZoneEngine` is retired;
+  historical references do not make it active.
+
+## GameData authority
+
+- `D:\AORebirth-fresh\GameData` is Mike's private full GameData dataset.
+- `AORebirth\GameData` is the public GitHub distributable/placeholder dataset.
+- Differences between private and public catalogs are intentional and are not
+  automatically drift.
+- Existing runtime configuration `AO_REBIRTH_GAMEDATA_PATH` selects
+  external/private GameData.
+- Do not redesign GameData staging or selection when that existing mechanism
+  satisfies the requirement.
+- Never commit private GameData to public GitHub.
+- `AO-Content-Dump-main` is extraction, reference, and upstream material; it is
+  not the runtime GameData root.
+
 - This agent works only on AORebirth. Never work on AO Rebuild or AO stripdown, and never switch to either workspace.
 - Read `AI_START_HERE.md` first.
 - Ground work in repository files.
@@ -18,7 +118,13 @@
 - Protect the context window: avoid command spam, large logs, repeated searches, and noisy transcripts.
 - Never launch the AO game/client unless Mike explicitly instructs it in the current task.
 - For AOSharp live capture startup, use only the approved `cmd.exe` wrapper documented in `docs/ai/WORKFLOW.md`.
-- For mission-terminal / mission-lifecycle capture **analyze and implement**, ALWAYS run `C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe "<capture-folder>"` first (see `docs/ai/WORKFLOW.md`). Ground implementation in its `mission-flow.replay.log`. Do not start with ad-hoc log greps or other analyzers.
+- For mission-terminal / mission-lifecycle capture **analyze and implement**,
+  use the repository-relative analyzer build/run commands documented in
+  `docs/ai/WORKFLOW.md`. From the repository root, the analyzer command is
+  `cmd /d /c tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe "<capture-folder>"`.
+  If the executable is absent, use the documented repository-relative MSBuild
+  command first. Ground implementation in `mission-flow.replay.log`. Do not use
+  a user-profile absolute path or start with ad-hoc log searches.
 - Report files inspected.
 - Report files changed.
 - Report validation performed.
@@ -38,12 +144,16 @@ For capture-backed tasks:
 
 - When Mike provides an AOSharpLiveCapture capture directory or path, treat that as confirmation that the capture is complete and closed. Analyze it immediately; do not ask whether it is closed or finalized unless Mike explicitly says the capture is still running.
 - When a workflow document explicitly identifies the approved command, wrapper, launcher, or script, use that command directly. Do not perform any repository search to verify, locate, confirm, inspect, or rediscover it.
-- Launch the approved AOSharp capture workflow immediately.
-- Reproduce the gameplay action.
-- Stop the capture.
-- Analyze the capture.
-- The first operational command should normally be the approved capture launcher.
-- If the task explicitly says "perform a capture", "start capture", "run capture", or references a known capture workflow, the approved capture launcher should be the first task-related command executed.
+- When Mike explicitly requests a new capture, launch the approved AOSharp
+  capture workflow immediately. Mike performs the live gameplay action unless
+  he explicitly instructs the agent otherwise in the current task. Stop and
+  analyze that capture through the approved workflow.
+- When Mike provides a completed capture path, analyze it immediately; do not
+  launch or stop another capture.
+- For an explicit new-capture task, the first operational command should
+  normally be the approved capture launcher.
+- If the task explicitly says "perform a capture", "start capture", or "run capture",
+  the approved capture launcher should be the first task-related command executed.
 
 Do not spend command budget on these unless the approved workflow has already failed:
 
@@ -61,18 +171,9 @@ Do not spend command budget on these unless the approved workflow has already fa
 
 Active task discipline:
 
-- Stay on the active gameplay task.
-- Current active priority is Mike's authorized Legacy engine retirement after the NewEngine content cleanup reached master. Preserve shared mechanics, editable content and durable DAO state while removing the obsolete engine and its build/launch paths. Leave the developer branch/worktree untouched and perform no production operation. See `docs/ai/CURRENT_TASK.md`.
-- Prefer visible gameplay improvements over architectural refactoring.
-- Use live AO captures as the authoritative source for Subway behavior and content.
-- Do not resume Playfield decomposition unless Mike explicitly requests it.
-- Do not make speculative Subway fixes; require capture-backed evidence.
-- Do not switch to repo cleanup.
-- Do not switch to architecture reviews.
-- Do not switch to modernization work.
-- Do not switch to documentation cleanup.
-- Do not classify unrelated dirty files.
-- Do not propose unrelated future work.
+- The active task is defined only in `docs/ai/CURRENT_TASK.md`.
+- Stay within that task and the user's current request.
+- Do not classify, alter, or propose work on unrelated dirty files.
 
 Failure exception:
 

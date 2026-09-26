@@ -89,12 +89,11 @@ addressable; parser-limited resources remain explicit without synthetic rows;
 unknown runtime state remains nullable; and no imported record may spawn until
 a separate governed mapping and behavior-readiness gate authorizes it.
 
-The one checked-in corpus is packaged unchanged by the authoritative Windows
-project and the derived Linux content inventory. Both built ZoneEngines must
-load and validate it through the same catalog implementation and produce the
-same canonical placement-manifest digest for the same source SHA. Packaged
-availability is not runtime activation; the gameplay spawn path remains under
-its existing separately governed catalogs.
+The checked-in corpus is retained as offline tooling and test evidence. It is
+not compiled into or loaded by `ZoneEngine_New`, and the current derived Linux
+inventory rejects the obsolete runtime corpus. Evidence availability is not
+runtime activation; the gameplay spawn path remains under its separately
+governed current content sources.
 
 ## Database Safety
 
@@ -195,9 +194,13 @@ Alternatives considered: Keep Bepu for queries beside the vehicle, or reference 
 
 Consequences: Server-only behaviour (client position gates, mission movement hooks, flight authority, void hold, movement-mode stat) stays in `CharacterMotor`. Refresh the vendored copy per `VENDORED.md` rather than editing it. Surfaces are one-sided, so line of sight tests both directions.
 
-## Hostile NPC Chase Navigation Is Global and Provider-Gated
+## Historical: Retired ZoneEngine Hostile NPC Chase Navigation
 
-Decision: Geometry-aware hostile-NPC pursuit is owned by `ZoneEngine.Core.Navigation` and consumed through the shared NPC combat/movement boundary. Playfields opt in only by supplying authoritative, versioned navigation input through `IPlayfieldChaseNavigationProvider`. PF127/resource `127` is the first provider and Vergil is the first representative end-to-end case; unsupported playfields preserve legacy direct chase.
+Status: retained as historical design evidence. This section does not describe
+the active `ZoneEngine_New` runtime. The preceding `ZoneEngine_New` movement
+decision is the current authority.
+
+Historical decision: Geometry-aware hostile-NPC pursuit was owned by `ZoneEngine.Core.Navigation` and consumed through the shared NPC combat/movement boundary. Playfields opted in only by supplying authoritative, versioned navigation input through `IPlayfieldChaseNavigationProvider`. PF127/resource `127` was the first provider and Vergil was the first representative end-to-end case; unsupported playfields preserved legacy direct chase.
 
 Reason: Damage LOS proved the PF127 obstruction but left Vergil stationary. A shared bounded planner and route follower fixes that ownership gap without copying path state into individual enemies or pretending that unproven playfields are navigation-ready.
 
@@ -217,7 +220,10 @@ Consequences: Trace root cause first, then patch the confirmed emitter.
 
 ## Gameplay Systems Own A Subsystem Folder
 
-Decision: New and active gameplay systems (Mail, Pets, Insurance, Bank, etc.) live under `AORebirth/Server/ZoneEngine/Core/<System>/`, not inside `Playfields/Playfield.cs`. See `docs/project/SUBSYSTEMS.md`.
+Decision: New and active gameplay systems live under
+`AORebirth/Server/ZoneEngine_New/Core/<System>/`, not inside
+`AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs`. See
+`docs/project/SUBSYSTEMS.md`.
 
 Reason: Playfield monolith merges and git rebase pulls repeatedly wiped or collided with in-progress systems (Mail). Folder ownership makes commits, reviews, and merges survivable.
 

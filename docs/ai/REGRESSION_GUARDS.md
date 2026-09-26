@@ -1,5 +1,12 @@
 # Regression Guards
 
+These constraints apply when a requested change enters a protected area. They
+do not independently authorize fixture, unit, regression, smoke, or acceptance
+test execution; Mike must explicitly request those suites. A stale fixture,
+snapshot, hash, inventory, report, or test expectation is diagnostic evidence,
+not authority to change production behavior, unless the task establishes it as
+an authoritative contract.
+
 Do not regress these verified or repeatedly repaired behaviors:
 
 - `FullCharacter` message version stays `26`.

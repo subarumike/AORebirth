@@ -1,31 +1,34 @@
-# ZoneEngine Subsystems
+# ZoneEngine_New Subsystems
 
-Gameplay systems live in their own folder under `AORebirth/Server/ZoneEngine/Core/<System>/`.
-Do not grow new mail/pets/bank/quest logic inside `Playfields/Playfield.cs`.
+Gameplay systems live in their own folder under
+`AORebirth/Server/ZoneEngine_New/Core/<System>/`. Do not grow new system
+orchestration inside `Core/Playfield/Playfield.cs`.
 
 ## Layout (Zone runtime)
 
 ```
-ZoneEngine/Core/
-  Navigation/    - Global NPC chase planning/following and playfield providers
-  Mail/          ← Mail Terminal ecosystem (active)
-  GMI/           ← Global Market vault (MarketSend deposit; web UI separate)
-  Perks/         ← TrainPerk / UsePerk / AddPerkAction (session-trained; capture-backed)
-  Arete/         ← Arete dialogue/quests (existing pattern)
-  Playfields/    ← World space / visibility / population only
-  MessageHandlers/  ← Thin handlers OR move handler into the subsystem folder
-  Pets/          ← Next extraction target (still scattered as Pet*.cs today)
+ZoneEngine_New/Core/
+  Ai/               - Reusable NPC behavior
+  Dialogue/         - Dialogue mechanics and routing
+  Inventory/        - Zone inventory mechanics
+  Missions/         - Mission mechanics and lifecycle
+  Mobs/             - NPC activation and construction
+  Movement/         - Character movement authority
+  Playfield/        - World space, visibility and population orchestration
+  Trade/            - Player trade mechanics
+  MessageHandlers/  - Thin zone message dispatch
 ```
 
 ## What belongs in a subsystem
 
 | Keep in subsystem | Leave elsewhere |
 | --- | --- |
-| Runtime service (`MailRuntimeService`) | Shared inventory/stats helpers (`InventoryItemRules` mail flags OK) |
-| System message handler (`MailMessageHandler`) | Wire models/serializers in `AOtomation.Messaging` |
-| System-specific rules/constants | Playfield spawn/visibility |
+| System runtime service | Shared inventory/stat primitives |
+| Thin system handler or dispatcher | Wire models/serializers in `AOtomation.Messaging` |
+| System-specific reusable rules | Playfield world/visibility orchestration |
 
-Messaging contracts (`MailMessage`, serializer) stay in `AOtomation.Messaging` — they are the shared protocol layer, not Zone gameplay.
+Messaging contracts and serializers stay in `AOtomation.Messaging`; they are
+the shared protocol layer, not Zone gameplay.
 
 ## Workflow so pulls do not wipe work
 
@@ -37,9 +40,11 @@ Messaging contracts (`MailMessage`, serializer) stay in `AOtomation.Messaging` �
 
 ## Extraction rule for agents
 
-When starting or continuing work on Mail, Pets, Insurance, Bank, Trade, etc.:
+When starting or continuing a gameplay subsystem:
 
 1. Put new code under `Core/<System>/`.
 2. Do not add more gameplay orchestration into `Playfield.cs`.
-3. Update `ZoneEngine.csproj` Compile includes for the new paths.
+3. Local C# files under the project directory are included automatically;
+   update `ZoneEngine_New.csproj` only when an external linked source or other
+   project metadata actually requires it.
 4. Document the move in `docs/ai/CURRENT_TASK.md`.

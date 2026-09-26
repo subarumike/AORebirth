@@ -1,5 +1,12 @@
 # AORebirth Ubuntu service packages
 
+**Historical staged bring-up record. Do not use this file for current build or
+deployment instructions.** The current authority is
+[LinuxBuild/README.md](../README.md), and the current governed deployment
+workflow is [production-release/README.md](production-release/README.md), which
+deploys LoginEngine and ZoneEngine_New from one accepted public-master SHA.
+Statements below describe earlier stages and are retained only as history.
+
 The Linux deployment lane now packages ChatEngine and a separate LoginEngine
 slice. ZoneEngine remains on a later porting stage. Both installed test services
 stay disabled and loopback-only.

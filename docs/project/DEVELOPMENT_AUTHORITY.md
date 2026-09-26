@@ -58,7 +58,7 @@ behavior.
 Behavior belongs to source. Reachability belongs to explicit deployment
 configuration.
 
-LoginEngine and ZoneEngine use the governed `AO_REBIRTH_BIND_MODE`
+LoginEngine and ZoneEngine_New use the governed `AO_REBIRTH_BIND_MODE`
 configuration owner for client listener exposure. Accepted values are
 `Loopback` and `Public`. An absent setting selects `Loopback`, which binds
 `127.0.0.1`; `Public` binds `0.0.0.0`. Invalid or whitespace-only values fail
@@ -70,7 +70,7 @@ environments must remain loopback unless a focused test explicitly selects
 When LoginEngine runs in `Loopback` mode, its advertised `ZoneIP` must remain a
 loopback address. When LoginEngine runs in `Public` mode, `ZoneIP` must be a
 concrete non-loopback address so the official client receives a usable
-ZoneEngine handoff target. `0.0.0.0` is a listener bind address, not an
+ZoneEngine_New handoff target. `0.0.0.0` is a listener bind address, not an
 advertised client destination.
 
 Public mode changes listener reachability only. It does not authorize packet,

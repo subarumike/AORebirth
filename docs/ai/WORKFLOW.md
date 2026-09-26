@@ -1,8 +1,18 @@
 # Workflow
 
+This document defines approved command forms; it does not authorize actions by
+itself. Run automated fixture, unit, regression, smoke, or acceptance suites
+only when Mike explicitly requests them. A section described as mandatory is
+mandatory only for an explicitly requested workflow or acceptance event within
+that section's scope.
+
 ## First Checks
 
-### NewEngine runtime and Legacy retirement
+### Historical Legacy-retirement validation
+
+This subsection records the completed retirement workflow. It is not a routine
+first check and does not redefine the active task. `ZoneEngine_New` is the only
+supported zone runtime.
 
 NewEngine is the only supported zone runtime. Mike authorized retirement of the
 old engine after the content cleanup reached master. Preserve all durable-state
@@ -161,7 +171,8 @@ Stop-after-success rule:
 NPC, vendor, quest and dialogue definitions live in the validated editable
 GameData and NewEngine content sources. Do not regenerate compiled Accepted
 catalogs or evidence-based spawn authorization.
-Run `dotnet test AORebirth\Server\ZoneEngine_New.Tests\ZoneEngine_New.Tests.csproj`
+When Mike explicitly requests the applicable automated suite, run
+`dotnet test AORebirth\Server\ZoneEngine_New.Tests\ZoneEngine_New.Tests.csproj`
 for NPC composition, content boundary, weapon selection and nano cancellation gates.
 The established exact-source and connected acceptance wrappers remain required.
 
@@ -412,7 +423,8 @@ lease/staging/transaction residue. See
 
 ## Mandatory local integration gate
 
-Run the complete deterministic gate from a clean worktree:
+When Mike explicitly requests this acceptance event, run the complete
+deterministic gate from a clean worktree:
 
 ```cmd
 cmd /d /c tools\run_mandatory_integration_gate.cmd
@@ -459,7 +471,12 @@ The upstream ODS is provenance only because its mission cells after level 133
 were precision-coerced. Do not generate the complete graph from that ODS and do
 not make production depend on either spreadsheet file.
 
-## Database-Wide Official Playfield Placement Import
+## Historical: Retired ZoneEngine Official Playfield Placement Import
+
+This retained workflow governs offline placement evidence from the retired
+ZoneEngine era. `ZoneEngine_New` does not compile or load the generated official
+placement catalog, and the current derived Linux inventory rejects that obsolete
+runtime corpus. This section does not define current runtime content validation.
 
 Import the verified official type-`1000014` placement corpus from the read-only
 AO Stripdown extraction with:
@@ -494,21 +511,18 @@ and rendered to
 count means the adapter cannot honestly enumerate that dynamic or external
 representation offline; it must not be treated as zero.
 
-The generated corpus remains an evidence layer and never authorizes identity or
-behavior. The Windows project is the single content-inventory owner and copies
-the four canonical global files plus all 630 exact-cased shards to
-`Content\Official\PlayfieldPlacements`; the governed Linux inventory is derived
-from that project and copies the same files. `ZoneEngine
---validate-official-placements` loads the packaged files relative to the built
-binary, verifies every pinned digest and global/per-playfield invariant, and
-emits the deterministic `official-placement-build-manifest.json` plus
-`PLACEMENT_PROVENANCE.env`. Normal startup and spawn materialization do not
-consume the catalog. `ResourceInstance -> PlayfieldId` is accepted only for
-this build-validated corpus, with the original resource instance retained. The
-source build label `18.8.62_EP1` means the official old-graphics-client
+The generated corpus remains an offline evidence layer and never authorizes
+identity or behavior. It is not a `ZoneEngine_New` build input, packaged runtime
+catalog, or validation contract. `ResourceInstance -> PlayfieldId` was accepted
+only within this evidence corpus, with the original resource instance retained.
+The source build label `18.8.62_EP1` means the official old-graphics-client
 extraction source; it is not a gameplay-content or spawn-content partition.
 
-## PF4582 Authoritative Placement Import
+## Historical: Retired ZoneEngine PF4582 Placement Import
+
+These retained commands and generated-C# targets describe the retired
+ZoneEngine. They are provenance only and do not define or validate
+`ZoneEngine_New` runtime content.
 
 Regenerate the normalized ICC Shuttleport placement catalog and audit report
 from the checked-in authoritative source and runtime evidence map with:
@@ -574,9 +588,9 @@ cmd /d /c Tools\reconcile_pf4582_official_source.cmd --test
 ```
 
 The generated official overlay and `IccShuttleportOfficialPlacementCatalog*.cs`
-are evidence/future-generation layers only. They are not consumed by
-`IccShuttleportSpawn`; the current runtime catalog remains 206 records, 25
-active, and 181 blocked. `NCNN` has no `SourceNpcId`, profile, or activation.
+are retired-engine evidence/future-generation layers only. They were not
+consumed by `IccShuttleportSpawn`; the retired-engine baseline was 206 records,
+25 active, and 181 blocked. `NCNN` had no `SourceNpcId`, profile, or activation.
 
 Regenerate and test the corrected structural bridge report with:
 
@@ -630,7 +644,11 @@ boss, scripted, summon, pet, temporary-add, vendor, static, container, and
 quest-owned content must stay with their explicit owners and cannot inherit the
 ordinary policy.
 
-### NPC Chase Navigation Validation
+### Historical retired-ZoneEngine chase validation
+
+This subsection documents retained Legacy fixture coverage. It does not define
+an active `ZoneEngine_New` runtime owner and is not a current-engine test
+requirement.
 
 Run the focused shared/PF127 navigation suite first:
 
@@ -638,7 +656,7 @@ Run the focused shared/PF127 navigation suite first:
 cmd /d /c tools\run_aotomation_messaging_tests.cmd /TestCaseFilter:"FullyQualifiedName~SmokeLounge.AOtomation.Messaging.Tests.NpcChaseNavigationTests"
 ```
 
-The global owner is `ZoneEngine.Core.Navigation`. PF127 is the first enabled provider and Vergil is its representative end-to-end case; no capture launcher or client injection is part of this deterministic validation. To enable another playfield, first promote authoritative versioned collision/navigation input, add an `IPlayfieldChaseNavigationProvider`, register it in `PlayfieldChaseNavigationProviderFactory`, add representative collision/route/failure/combat tests, and then perform private-client validation. Do not add enemy-specific pathfinding or reuse PF127 assumptions in another playfield.
+The historical owner was `ZoneEngine.Core.Navigation`. PF127 was the first enabled provider and Vergil was its representative end-to-end case; no capture launcher or client injection was part of this deterministic validation. This retained procedure does not authorize adding Legacy providers or changing `ZoneEngine_New`.
 
 ## Database
 
@@ -854,7 +872,7 @@ remain unresolved. Names, `MonsterData`, and proximity are never used as the joi
 For mission-terminal and mission-lifecycle **analyze and implement**, **ALWAYS**
 use the dedicated x86 mission analyzer:
 
-`C:\Users\nermi\source\repos\AORebirth\tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe`
+`tools-temp\AOSharpMissionCaptureAnalyzer\bin\Debug\AOSharpMissionCaptureAnalyzer.exe`
 
 Do not substitute ad-hoc Python/log greps, the geometry `AOSharpCaptureAnalyzer`,
 or the legacy server mission decoder as the first analysis step. When Mike hands
