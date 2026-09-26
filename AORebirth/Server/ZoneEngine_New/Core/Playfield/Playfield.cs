@@ -226,11 +226,12 @@ namespace ZoneEngine_New.Core.Playfield
         {
             ArgumentNullException.ThrowIfNull(position);
             var at = new AORebirth.Core.Vector.Vector3(position.x, position.y, position.z);
+            var spawn = new System.Numerics.Vector3((float)position.x, (float)position.y, (float)position.z);
+            // Straight down first: a spawn placed above its floor belongs on the first surface under it,
+            // not on a nearer ledge beside it. Only with nothing below does the nearest polygon win.
             if (Pathfinder != null
-                && Pathfinder.TrySnap(
-                    new System.Numerics.Vector3((float)position.x, (float)position.y, (float)position.z),
-                    NavMeshPathfinder.SpawnSnapExtent,
-                    out System.Numerics.Vector3 snapped))
+                && (Pathfinder.TrySnapDown(spawn, NavMeshPathfinder.SpawnSnapExtent, out System.Numerics.Vector3 snapped)
+                    || Pathfinder.TrySnap(spawn, NavMeshPathfinder.SpawnSnapExtent, out snapped)))
                 at = new AORebirth.Core.Vector.Vector3(snapped.X, snapped.Y, snapped.Z);
 
             return SnapFeetToFloor(at);

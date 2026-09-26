@@ -27,6 +27,12 @@ namespace AORebirth.World.Pathfinding
         /// <summary>Search radius used when placing an NPC onto the mesh at spawn.</summary>
         public const float SpawnSnapExtent = 64f;
 
+        /// <summary>XZ half-width of the column <see cref="TrySnapDown"/> gathers polygons from.</summary>
+        const float ColumnHalfWidth = 0.05f;
+
+        /// <summary>Stacked floors a column can hold before the rest are ignored.</summary>
+        const int MaxColumnPolys = 64;
+
         readonly DtNavMeshQuery _query;
         readonly DtQueryDefaultFilter _filter;
         readonly RcVec3f _extents;
@@ -116,6 +122,53 @@ namespace AORebirth.World.Pathfinding
                 return false;
 
             snapped = new Vector3(nearest.X, nearest.Y, nearest.Z);
+            return true;
+        }
+
+        /// <summary>
+        /// Snaps straight down: the highest polygon under (<paramref name="position"/>.X, .Z) whose surface is at
+        /// or below the position (plus <see cref="NavMeshBuildSettings.AgentMaxClimb"/> for feet placed slightly
+        /// under the floor), searching at most <paramref name="maxDrop"/> down. Taking the first surface below,
+        /// not the nearest in 3D, keeps a placement over a pit or stairwell on the floor under it rather than on
+        /// the lip beside it; a bridge overhead is ignored and a bridge underneath wins over the ground below it.
+        /// </summary>
+        public bool TrySnapDown(Vector3 position, float maxDrop, out Vector3 snapped)
+        {
+            snapped = default;
+            if (maxDrop <= 0f)
+                return false;
+
+            float above = Settings.AgentMaxClimb;
+            float half = (maxDrop + above) * 0.5f;
+            var center = new RcVec3f(position.X, position.Y + above - half, position.Z);
+            var extents = new RcVec3f(ColumnHalfWidth, half, ColumnHalfWidth);
+
+            var polys = new long[MaxColumnPolys];
+            var collect = new DtCollectPolysQuery(polys, polys.Length);
+            if (_query.QueryPolygons(center, extents, _filter, ref collect).Failed())
+                return false;
+
+            bool found = false;
+            float best = float.NegativeInfinity;
+            var at = new RcVec3f(position.X, position.Y, position.Z);
+            for (int i = 0; i < collect.NumCollected(); i++)
+            {
+                // GetPolyHeight only succeeds when the XZ point lies inside the polygon.
+                if (_query.GetPolyHeight(polys[i], at, out float height).Failed())
+                    continue;
+                if (height > position.Y + above || height < position.Y - maxDrop)
+                    continue;
+                if (height <= best)
+                    continue;
+
+                best = height;
+                found = true;
+            }
+
+            if (!found)
+                return false;
+
+            snapped = new Vector3(position.X, best, position.Z);
             return true;
         }
 

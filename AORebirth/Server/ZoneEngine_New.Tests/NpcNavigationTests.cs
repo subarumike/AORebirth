@@ -76,39 +76,29 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(result.Reached, result.Report);
         }
 
+        /// <summary>
+        /// Abmouth Supremus's spawn sits over the lower floor but 9m above it, 4m from the edge of the floor
+        /// above. The nearest polygon in 3D is that upper floor; the spawn belongs on the floor straight down.
+        /// </summary>
+        [TestMethod]
+        public void Pf127_AbmouthSpawnSnapsStraightDownNotOntoTheNearerFloorAbove()
+        {
+            using LoadedPlayfield loaded = Load(127);
+            var spawn = new Vector3(357.05, 76.11, 99.07);
+
+            Vector3 at = loaded.Playfield.SnapNpcSpawn(spawn);
+
+            Assert.AreEqual(spawn.x, at.x, 0.01);
+            Assert.AreEqual(spawn.z, at.z, 0.01);
+            Assert.AreEqual(67.02, at.y, 0.5, "Abmouth belongs on the lower floor (live 356.96, 67.02, 98.96).");
+        }
+
         static ChaseResult Chase(int playfieldId, Vector3 mobAt, Vector3 playerAt, int weaponRange = 0, bool mobAtLivePosition = false)
         {
-            var data = new GameDataStore(new StubLogger());
-            DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
-            if (!System.IO.File.Exists(System.IO.Path.Combine(data.RootPath, GameDataPaths.PlayfieldNavMeshRelativePath(playfieldId))))
-            {
-                Assert.Inconclusive(
-                    "No Navmesh.dat for playfield " + playfieldId.ToString(CultureInfo.InvariantCulture) + " under " + data.RootPath
-                    + ". Point " + GameDataPaths.EnvironmentVariableName + " at a GameData folder that has one.");
-            }
-
-            Assert.IsTrue(
-                NavMeshPathfinder.TryLoad(data.RootPath, playfieldId, out NavMeshPathfinder? finder, out string? failure),
-                "Navmesh for playfield " + playfieldId.ToString(CultureInfo.InvariantCulture) + " did not load: " + failure);
-            // Same collision as ACGPlayfield.Build: Collision.dat plus the static dungeon rooms. The navmesh
-            // is baked from that merge, so a world without the rooms has floors the NPC can path over but not stand on.
-            using PlayfieldWorldSimulation world = PlayfieldWorldSimulation.Create(
-                playfieldId,
-                DungeonPlayfieldBinder.WithDungeonCollision(
-                    playfieldId,
-                    data.GetPlayfieldGeometry(playfieldId),
-                    DungeonPlayfieldBinder.TryBuild(data.RootPath, playfieldId, generator: null, new StubLogger())),
-                data.GetPlayfieldMetaData(playfieldId),
-                DestinationsCatalog.Instance,
-                data,
-                new StubLogger());
-
-            using ServiceProvider services = new ServiceCollection()
-                .AddSingleton<IGameData>(data)
-                .AddSingleton(new WorldSimulationAccess { Instance = world })
-                .AddSingleton(new DynelRegistry())
-                .BuildServiceProvider();
-            Playfield playfield = CreatePlayfield(playfieldId, services, finder!);
+            using LoadedPlayfield loaded = Load(playfieldId);
+            NavMeshPathfinder finder = loaded.Finder;
+            ServiceProvider services = loaded.Services;
+            Playfield playfield = loaded.Playfield;
 
             var catalog = new StubCatalog().AddWeapon(9001, 1);
             catalog.Require(9001).Stats[CharacterStat.AttackRange] = weaponRange;
@@ -138,7 +128,7 @@ namespace ZoneEngine_New.Tests
             var plans = new List<string>();
             string lastPlan = string.Empty;
             var route = new List<NumVector3>();
-            float best = RouteMeters(finder!, npc.Position, player.Position, route);
+            float best = RouteMeters(finder, npc.Position, player.Position, route);
             double bestAt = 0;
             double t = 0;
             for (int tick = 0; t < TimeoutSeconds; tick++, t += TickSeconds)
@@ -157,7 +147,7 @@ namespace ZoneEngine_New.Tests
                 if (CanSwing(brain, npc, player))
                     return new ChaseResult(true, Describe("reached", t, brain, npc, player, trail, route, plans));
 
-                float left = RouteMeters(finder!, npc.Position, player.Position, route);
+                float left = RouteMeters(finder, npc.Position, player.Position, route);
                 if (left < best - ProgressMeters)
                 {
                     best = left;
@@ -254,6 +244,54 @@ namespace ZoneEngine_New.Tests
             foreach (var point in npc.Motor.CopyRemainingWaypoints())
                 text.Append(CultureInfo.InvariantCulture, $" ({point.X:F1},{point.Z:F1})");
             return text.ToString();
+        }
+
+        static LoadedPlayfield Load(int playfieldId)
+        {
+            var data = new GameDataStore(new StubLogger());
+            DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
+            if (!System.IO.File.Exists(System.IO.Path.Combine(data.RootPath, GameDataPaths.PlayfieldNavMeshRelativePath(playfieldId))))
+            {
+                Assert.Inconclusive(
+                    "No Navmesh.dat for playfield " + playfieldId.ToString(CultureInfo.InvariantCulture) + " under " + data.RootPath
+                    + ". Point " + GameDataPaths.EnvironmentVariableName + " at a GameData folder that has one.");
+            }
+
+            Assert.IsTrue(
+                NavMeshPathfinder.TryLoad(data.RootPath, playfieldId, out NavMeshPathfinder? finder, out string? failure),
+                "Navmesh for playfield " + playfieldId.ToString(CultureInfo.InvariantCulture) + " did not load: " + failure);
+            // Same collision as ACGPlayfield.Build: Collision.dat plus the static dungeon rooms. The navmesh
+            // is baked from that merge, so a world without the rooms has floors the NPC can path over but not stand on.
+            PlayfieldWorldSimulation world = PlayfieldWorldSimulation.Create(
+                playfieldId,
+                DungeonPlayfieldBinder.WithDungeonCollision(
+                    playfieldId,
+                    data.GetPlayfieldGeometry(playfieldId),
+                    DungeonPlayfieldBinder.TryBuild(data.RootPath, playfieldId, generator: null, new StubLogger())),
+                data.GetPlayfieldMetaData(playfieldId),
+                DestinationsCatalog.Instance,
+                data,
+                new StubLogger());
+
+            ServiceProvider services = new ServiceCollection()
+                .AddSingleton<IGameData>(data)
+                .AddSingleton(new WorldSimulationAccess { Instance = world })
+                .AddSingleton(new DynelRegistry())
+                .BuildServiceProvider();
+            return new LoadedPlayfield(finder!, world, services, CreatePlayfield(playfieldId, services, finder!));
+        }
+
+        sealed record LoadedPlayfield(
+            NavMeshPathfinder Finder,
+            PlayfieldWorldSimulation World,
+            ServiceProvider Services,
+            Playfield Playfield) : IDisposable
+        {
+            public void Dispose()
+            {
+                Services.Dispose();
+                World.Dispose();
+            }
         }
 
         static Playfield CreatePlayfield(int id, ServiceProvider services, NavMeshPathfinder finder)
