@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Movement
     using N3Lite;
     using N3Lite.Surfaces;
 
+    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Playfield;
@@ -596,7 +597,10 @@ namespace ZoneEngine_New.Core.Movement
             {
                 TickStallWatch.Stage("motor.path", _character.Identity.Instance);
                 if (_npc != null)
+                {
                     _npc.AdvanceGuide(dt);
+                    HoldGuideAtCorner();
+                }
                 else
                     SteerAlongPlayerPath();
             }
@@ -620,6 +624,23 @@ namespace ZoneEngine_New.Core.Movement
 
             if (_npc != null && HasPath && NpcPathFinished())
                 ClearPath();
+        }
+
+        /// <summary>
+        /// The guide follows the whole route, but it stops at a sharp turn until the body gets there.
+        /// Otherwise it runs around the corner and the body steers back through the wall.
+        /// </summary>
+        void HoldGuideAtCorner()
+        {
+            if (_path.Count < 3 || _npc!.Guide.MaxSpeed <= 0f)
+                return;
+
+            float guideDistance = _npc.Guide.Time * _npc.Guide.MaxSpeed;
+            float bodyDistance = NpcBrain.DistanceAlongPath(_path, _character.Position.x, _character.Position.z, guideDistance);
+            float corner = NpcBrain.DistanceUntilTurn(_path, NpcFollowTarget.PathCornerTurnDegrees, bodyDistance);
+            float clamped = NpcBrain.ClampGuideDistance(guideDistance, bodyDistance, corner);
+            if (clamped < guideDistance - 0.01f)
+                _npc.Guide.UpdateTime(clamped / _npc.Guide.MaxSpeed);
         }
 
         /// <summary>

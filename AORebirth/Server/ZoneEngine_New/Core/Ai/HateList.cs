@@ -71,6 +71,12 @@ namespace ZoneEngine_New.Core.Ai
 
         public const float NearbyRange = 30f;
 
+        /// <summary>
+        /// BreedHostility proximity aggro radius. Separate from <see cref="NearbyRange"/>, which is how far a
+        /// new attacker can be for the NPC to fight back: shrinking that would leash an NPC nuked from range.
+        /// </summary>
+        public const float ProximityAggroRange = 15f;
+
         public const float MaxLeashRange = 70f;
 
         public const float ArriveHomeMeters = 1.5f;
@@ -80,6 +86,15 @@ namespace ZoneEngine_New.Core.Ai
         /// chance when the target is still out of LOS or attack range.
         /// </summary>
         public const float PathEndGiveUpMeters = 1.5f;
+
+        /// <summary>
+        /// ...and only when the last point is within this height of the NPC. A path ending right above
+        /// or below, on another floor, still has a ramp or stairs to walk.
+        /// </summary>
+        public const float PathEndGiveUpHeightMeters = 2f;
+
+        /// <summary>Stuck-warps in a row without real progress before the NPC evades home and resets.</summary>
+        public const int MaxStuckWarps = 2;
 
         /// <summary>Hold chase this long after the last real chance so a jump over cover does not leash.</summary>
         public const double NoChanceGraceSeconds = 2;
@@ -94,6 +109,13 @@ namespace ZoneEngine_New.Core.Ai
         }
 
         public static bool IsProximityHostile(int breedHostility) => breedHostility > 0;
+
+        /// <summary>
+        /// A new target must be within <see cref="NearbyRange"/>. The target already being chased keeps
+        /// out to <see cref="MaxLeashRange"/>: a route around a wall can carry the NPC past
+        /// <see cref="NearbyRange"/>, and dropping it there leashes, walks back into range and chases again.
+        /// </summary>
+        public static float EngageRange(bool isCurrentTarget) => isCurrentTarget ? MaxLeashRange : NearbyRange;
 
         public static bool IsNearby(Vector3 from, Vector3 to, float range)
             => Vector3.Abs(to - from) <= range;

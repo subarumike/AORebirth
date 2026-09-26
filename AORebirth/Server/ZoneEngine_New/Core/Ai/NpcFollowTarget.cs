@@ -27,6 +27,15 @@ namespace ZoneEngine_New.Core.Ai
         public const double PathLookaheadSeconds = 1.5;
 
         /// <summary>
+        /// The steer point waits at a turn sharper than this until the body reaches it.
+        /// Running the steer point past the turn pulls the body back through the wall.
+        /// </summary>
+        public const float PathCornerTurnDegrees = 25f;
+
+        /// <summary>The steer point held at a turn is released once the body is this close to it.</summary>
+        public const float PathCornerReleaseMeters = 0.5f;
+
+        /// <summary>
         /// Seconds of travel before the next segment replaces the current one. Shorter than the lookahead so
         /// the segment end stays ahead of the NPC and neither server nor client brakes between segments.
         /// </summary>
@@ -35,7 +44,11 @@ namespace ZoneEngine_New.Core.Ai
         /// <summary>A pathing NPC that has not moved <see cref="PathStuckProgressMeters"/> in this long is warped ahead.</summary>
         public const double PathStuckWarpSeconds = 3;
 
-        public const float PathStuckProgressMeters = 1f;
+        /// <summary>
+        /// Net distance from where progress was last counted. Larger than the loop an NPC circles when it
+        /// cannot follow its path, e.g. at a switchback its body cannot climb.
+        /// </summary>
+        public const float PathStuckProgressMeters = 2.5f;
 
         public const float MinAnnounceDeltaMeters = 2.0f;
 

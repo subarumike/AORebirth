@@ -29,8 +29,13 @@ namespace ZoneEngine_New.Core.Ai
             if (!_brain.HasHome || _brain.HasArrivedHome())
                 return _nodeState = NodeState.Success;
 
-            _brain.PathTo(_brain.Home!);
-            return _nodeState = NodeState.Running;
+            // Run home when there is a route. Snap only when there is none, or the walk home gets
+            // stuck; the reset that follows heals either way.
+            if (_brain.ReturnHome())
+                return _nodeState = NodeState.Running;
+
+            _brain.WarpHome();
+            return _nodeState = NodeState.Success;
         }
     }
 
