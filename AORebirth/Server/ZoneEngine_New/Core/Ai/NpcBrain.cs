@@ -38,6 +38,10 @@ namespace ZoneEngine_New.Core.Ai
         DateTime _reachCacheUtc;
         bool _reachCacheResult;
         DateTime _lastChanceUtc;
+        int _stuckWarps;
+        bool _evading;
+        bool _returningHome;
+        bool _returnFailed;
 
         NpcBrain(NpcCharacter npc, Vector3? home, NpcAiProfile profile)
         {
@@ -70,6 +74,12 @@ namespace ZoneEngine_New.Core.Ai
 
         public bool IsBusy => !Hate.IsEmpty || _leashing || Npc.FightingTarget.Instance != 0;
 
+        /// <summary>
+        /// Leashing home. Latched from the moment the leash starts until the reset at home: hate is
+        /// cleared and HP restored up front, attacks miss, hostile nanos do not land and no threat is taken.
+        /// </summary>
+        public bool IsEvading => _evading;
+
         public static NpcBrain Create(NpcCharacter npc, Vector3? home = null, NpcAiProfile? profile = null)
         {
             ArgumentNullException.ThrowIfNull(npc);
@@ -95,7 +105,12 @@ namespace ZoneEngine_New.Core.Ai
             _tree.Tick((float)deltaTime);
         }
 
-        public void AddThreat(Identity identity, float amount) => Hate.Add(identity, amount);
+        public void AddThreat(Identity identity, float amount)
+        {
+            if (_evading)
+                return;
+            Hate.Add(identity, amount);
+        }
 
         public void ClearHate()
         {
@@ -130,7 +145,7 @@ namespace ZoneEngine_New.Core.Ai
         {
             if (player == null || !player.IsPlayer || player.IsDead)
                 return;
-            if (!Npc.Attackable)
+            if (!Npc.Attackable || _evading)
                 return;
             if (!NpcAiRules.IsProximityHostile(Npc.Stats.GetOrZero(NpcAiRules.BreedHostilityStat)))
                 return;
@@ -147,9 +162,30 @@ namespace ZoneEngine_New.Core.Ai
         public bool ShouldLeash()
         {
             TickStallWatch.Stage("brain.leash", Npc.Identity.Instance);
-            bool leash = NpcAiRules.ShouldLeash(Hate, Home, Npc.Position, IsEngageable);
+            bool leash = _evading || NpcAiRules.ShouldLeash(Hate, Home, Npc.Position, IsEngageable);
+            if (leash)
+                BeginEvade();
             _leashing = leash;
             return leash;
+        }
+
+        /// <summary>
+        /// Commits to the leash. Clearing hate here, not on arrival, stops the leash condition flipping back
+        /// to combat on the way home; healing and stripping what others cast on it means nothing done to the
+        /// NPC before or during the return sticks, so running it home cannot be used to whittle it down.
+        /// Buffs the NPC or its own items put on itself stay.
+        /// </summary>
+        void BeginEvade()
+        {
+            if (_evading)
+                return;
+
+            _evading = true;
+            ClearHate();
+            StopFighting();
+            StopPathing();
+            Nanos.NanoRuntime.StripForeignBuffs(Npc);
+            Npc.OnReset();
         }
 
         public bool HasNearbyHate()
@@ -212,8 +248,7 @@ namespace ZoneEngine_New.Core.Ai
             MsgVector3 last = remaining[remaining.Length - 1];
             return !PathEndsUnderNpc(
                 new System.Numerics.Vector3((float)Npc.Position.x, (float)Npc.Position.y, (float)Npc.Position.z),
-                last.X,
-                last.Z);
+                new System.Numerics.Vector3(last.X, last.Y, last.Z));
         }
 
         public bool CanPathTo(Character target)
@@ -297,7 +332,26 @@ namespace ZoneEngine_New.Core.Ai
             {
                 if (IsStuck(now))
                 {
+                    // Warping ahead did not help: the body cannot follow this route (e.g. navmesh over
+                    // collision it cannot climb). Evade rather than stand there taking hits; if it is
+                    // the walk home that is stuck, give up on walking and let the caller snap home.
+                    if (_stuckWarps >= NpcAiRules.MaxStuckWarps)
+                    {
+                        if (_returningHome)
+                        {
+                            _returnFailed = true;
+                            StopPathing();
+                        }
+                        else
+                        {
+                            BeginEvade();
+                        }
+
+                        return;
+                    }
+
                     WarpAlongPath(now);
+                    _stuckWarps++;
                     active = false;
                 }
                 else if (!ShouldReplan(destination))
@@ -306,10 +360,10 @@ namespace ZoneEngine_New.Core.Ai
 
             PlanRoute(destination);
             Vector3 start = Npc.Position;
+            Vector3 routeEnd = _routeScratch[_routeScratch.Count - 1];
             if (PathEndsUnderNpc(
                 new System.Numerics.Vector3((float)start.x, (float)start.y, (float)start.z),
-                (float)_routeScratch[_routeScratch.Count - 1].x,
-                (float)_routeScratch[_routeScratch.Count - 1].z))
+                new System.Numerics.Vector3((float)routeEnd.x, (float)routeEnd.y, (float)routeEnd.z)))
                 return;
 
             float lookaheadMeters = (float)(Npc.Motor.Vehicle.MaxVel * NpcFollowTarget.PathLookaheadSeconds);
@@ -486,6 +540,7 @@ namespace ZoneEngine_New.Core.Ai
             if (Vector3.Abs(Npc.Position - _progressAnchor) >= NpcFollowTarget.PathStuckProgressMeters)
             {
                 ResetProgress(now);
+                _stuckWarps = 0;
                 return false;
             }
 
@@ -566,13 +621,31 @@ namespace ZoneEngine_New.Core.Ai
         public void StopFighting() => NpcAiCombat.AnnounceStopFight(Npc);
 
         /// <summary>
-        /// Leash because someone nearby has no route and is out of attack range.
-        /// Places the NPC on its home spot. The following reset heals and clears hate.
+        /// Runs home along the navmesh. False when the NPC should snap home with <see cref="WarpHome"/>
+        /// instead: there is no route home from here, or the walk made no progress through
+        /// <see cref="NpcAiRules.MaxStuckWarps"/> stuck-warps.
         /// </summary>
-        public bool WarpHomeIfTargetUnreachable()
+        public bool ReturnHome()
         {
-            if (!HasHome || !HasNearbyUnreachableTarget())
+            if (!HasHome || _returnFailed)
                 return false;
+
+            if (!_returningHome)
+            {
+                if (!CanWalkTo(Home!))
+                    return false;
+                _returningHome = true;
+            }
+
+            PathTo(Home!);
+            return !_returnFailed && Npc.Motor.HasPath;
+        }
+
+        /// <summary>Places the NPC on its home spot. The following reset heals and clears hate.</summary>
+        public void WarpHome()
+        {
+            if (!HasHome)
+                return;
 
             Vector3 home = Home!;
             Npc.Motor.ClearPath();
@@ -580,31 +653,33 @@ namespace ZoneEngine_New.Core.Ai
             NpcFollowTarget.AnnounceStop(Npc, home);
             _followAnnounced = false;
             ProgressSinceUtc = default;
-            return true;
         }
 
-        bool HasNearbyUnreachableTarget()
+        /// <summary>A complete navmesh route from here ends at <paramref name="destination"/>. No navmesh: true.</summary>
+        bool CanWalkTo(Vector3 destination)
         {
-            foreach (HateEntry entry in Hate.Entries)
-            {
-                Character? target = Resolve(entry.Identity);
-                if (target == null)
-                    continue;
-                if (Npc.GetEdgeDistanceTo(target) > NpcAiRules.NearbyRange)
-                    continue;
-                // A leftover path must not count. CanAttackNow still means they can fight from here.
-                if (CanAttackNow(target) || CanPathTo(target))
-                    continue;
+            NavMeshPathfinder? finder = Npc.Playfield?.Pathfinder;
+            if (finder == null)
                 return true;
-            }
 
-            return false;
+            Vector3 from = HeightfieldOrSelf(Npc.Position);
+            Vector3 to = HeightfieldOrSelf(destination);
+            var start = new System.Numerics.Vector3((float)from.x, (float)from.y, (float)from.z);
+            var end = new System.Numerics.Vector3((float)to.x, (float)to.y, (float)to.z);
+            if (!finder.TrySnap(start, out _) || !finder.TryFindPath(start, end, _planScratch) || _planScratch.Count == 0)
+                return false;
+
+            return System.Numerics.Vector3.Distance(_planScratch[_planScratch.Count - 1], end) <= NpcAiRules.ArriveHomeMeters;
         }
 
         public void ResetOutOfCombat()
         {
             TickStallWatch.Stage("brain.reset", Npc.Identity.Instance);
             _leashing = false;
+            _evading = false;
+            _stuckWarps = 0;
+            _returningHome = false;
+            _returnFailed = false;
             _reachCacheId = Identity.None;
             _reachCacheResult = false;
             ClearHate();
@@ -655,16 +730,20 @@ namespace ZoneEngine_New.Core.Ai
             if (path == null || path.Count == 0)
                 return true;
 
-            System.Numerics.Vector3 end = path[path.Count - 1];
-            return PathEndsUnderNpc(npc, end.X, end.Z);
+            return PathEndsUnderNpc(npc, path[path.Count - 1]);
         }
 
-        static bool PathEndsUnderNpc(System.Numerics.Vector3 npc, float endX, float endZ)
+        /// <summary>
+        /// The route's last point is at the NPC's feet: close in XZ and on the same level. A target on the
+        /// floor directly above or below is still reachable by the ramp or stairs the route takes.
+        /// </summary>
+        static bool PathEndsUnderNpc(System.Numerics.Vector3 npc, System.Numerics.Vector3 end)
         {
-            float dx = endX - npc.X;
-            float dz = endZ - npc.Z;
+            float dx = end.X - npc.X;
+            float dz = end.Z - npc.Z;
             float limit = NpcAiRules.PathEndGiveUpMeters;
-            return (dx * dx) + (dz * dz) <= limit * limit;
+            return (dx * dx) + (dz * dz) <= limit * limit
+                && MathF.Abs(end.Y - npc.Y) <= NpcAiRules.PathEndGiveUpHeightMeters;
         }
     }
 }

@@ -185,6 +185,8 @@ namespace ZoneEngine_New.Core.Entities
                 Brain?.AddThreat(attacker.Identity, hpRemoved);
         }
 
+        public override bool IsEvading => Brain?.IsEvading == true;
+
         /// <summary>
         /// Fight ended without a kill. Restores HP, clears fight state, and drops kill credit.
         /// </summary>

@@ -44,7 +44,11 @@ namespace ZoneEngine_New.Core.Ai
         /// <summary>A pathing NPC that has not moved <see cref="PathStuckProgressMeters"/> in this long is warped ahead.</summary>
         public const double PathStuckWarpSeconds = 3;
 
-        public const float PathStuckProgressMeters = 1f;
+        /// <summary>
+        /// Net distance from where progress was last counted. Larger than the loop an NPC circles when it
+        /// cannot follow its path, e.g. at a switchback its body cannot climb.
+        /// </summary>
+        public const float PathStuckProgressMeters = 2.5f;
 
         public const float MinAnnounceDeltaMeters = 2.0f;
 

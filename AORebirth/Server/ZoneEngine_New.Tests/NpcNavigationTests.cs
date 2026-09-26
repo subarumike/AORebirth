@@ -63,7 +63,20 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(result.Reached, result.Report);
         }
 
-        static ChaseResult Chase(int playfieldId, Vector3 mobAt, Vector3 playerAt, int weaponRange = 0)
+        /// <summary>
+        /// Live: Delmus stood on the floor directly above Abmouth Supremus and hit it with no reply. The route
+        /// up the ramp ends 1.25m (XZ) from Abmouth, so a flat path-end check called it "ends under the NPC" and
+        /// gave up. A 2m weapon makes the NPC climb to the player's floor rather than count as in range through it.
+        /// </summary>
+        [TestMethod]
+        public void Pf127_AbmouthReachesThePlayerStandingOnTheFloorAbove()
+        {
+            ChaseResult result = Chase(127, new Vector3(353.92, 68.47, 96.25), new Vector3(353.91, 73.61, 95.86), weaponRange: 2, mobAtLivePosition: true);
+
+            Assert.IsTrue(result.Reached, result.Report);
+        }
+
+        static ChaseResult Chase(int playfieldId, Vector3 mobAt, Vector3 playerAt, int weaponRange = 0, bool mobAtLivePosition = false)
         {
             var data = new GameDataStore(new StubLogger());
             DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
@@ -77,9 +90,14 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(
                 NavMeshPathfinder.TryLoad(data.RootPath, playfieldId, out NavMeshPathfinder? finder, out string? failure),
                 "Navmesh for playfield " + playfieldId.ToString(CultureInfo.InvariantCulture) + " did not load: " + failure);
+            // Same collision as ACGPlayfield.Build: Collision.dat plus the static dungeon rooms. The navmesh
+            // is baked from that merge, so a world without the rooms has floors the NPC can path over but not stand on.
             using PlayfieldWorldSimulation world = PlayfieldWorldSimulation.Create(
                 playfieldId,
-                data.GetPlayfieldGeometry(playfieldId),
+                DungeonPlayfieldBinder.WithDungeonCollision(
+                    playfieldId,
+                    data.GetPlayfieldGeometry(playfieldId),
+                    DungeonPlayfieldBinder.TryBuild(data.RootPath, playfieldId, generator: null, new StubLogger())),
                 data.GetPlayfieldMetaData(playfieldId),
                 DestinationsCatalog.Instance,
                 data,
@@ -104,7 +122,8 @@ namespace ZoneEngine_New.Tests
                 registry.Register(character);
             }
 
-            npc.Position = playfield.SnapNpcSpawn(mobAt);
+            // A live NPC mid-fight is wherever it walked to, not on its spawn's navmesh snap.
+            npc.Position = mobAtLivePosition ? playfield.SnapFeetToFloor(mobAt) : playfield.SnapNpcSpawn(mobAt);
             player.Position = playfield.SnapFeetToFloor(playerAt);
             if (weaponRange > 0)
             {
@@ -210,14 +229,14 @@ namespace ZoneEngine_New.Tests
             string guide = npcSim == null
                 ? "n/a"
                 : string.Create(CultureInfo.InvariantCulture, $"({(float)npcSim.Guide.GuidePos.X:F2},{(float)npcSim.Guide.GuidePos.Z:F2})");
-            text.Append(CultureInfo.InvariantCulture, $"guide={guide} velocity=({sim.Velocity.X:F2},{sim.Velocity.Z:F2}) ");
+            text.Append(CultureInfo.InvariantCulture, $"guide={guide} velocity=({sim.Velocity.X:F2},{sim.Velocity.Z:F2}) falling={sim.FallingEnabled} airborne={sim.Airborne} surface={sim.Surface != null} ");
             text.Append(CultureInfo.InvariantCulture, $"motor hasPath={npc.Motor.HasPath} waypoints:");
             foreach (var point in npc.Motor.CopyRemainingWaypoints())
-                text.Append(CultureInfo.InvariantCulture, $" ({point.X:F1},{point.Z:F1})");
+                text.Append(CultureInfo.InvariantCulture, $" ({point.X:F1},{point.Y:F1},{point.Z:F1})");
             text.AppendLine();
             text.Append("route:");
             foreach (NumVector3 point in route)
-                text.Append(CultureInfo.InvariantCulture, $" ({point.X:F1},{point.Z:F1})");
+                text.Append(CultureInfo.InvariantCulture, $" ({point.X:F1},{point.Y:F1},{point.Z:F1})");
             text.AppendLine();
             text.AppendLine("plans:");
             for (int i = Math.Max(0, plans.Count - 25); i < plans.Count; i++)
@@ -225,7 +244,7 @@ namespace ZoneEngine_New.Tests
             text.Append("trail (4/s):");
             int from = Math.Max(0, trail.Count - 40);
             for (int i = from; i < trail.Count; i++)
-                text.Append(CultureInfo.InvariantCulture, $" ({trail[i].x:F1},{trail[i].z:F1})");
+                text.Append(CultureInfo.InvariantCulture, $" ({trail[i].x:F1},{trail[i].y:F1},{trail[i].z:F1})");
             return text.ToString();
         }
 

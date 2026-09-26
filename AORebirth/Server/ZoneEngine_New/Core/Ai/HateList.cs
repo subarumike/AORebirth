@@ -81,6 +81,15 @@ namespace ZoneEngine_New.Core.Ai
         /// </summary>
         public const float PathEndGiveUpMeters = 1.5f;
 
+        /// <summary>
+        /// ...and only when the last point is within this height of the NPC. A path ending right above
+        /// or below, on another floor, still has a ramp or stairs to walk.
+        /// </summary>
+        public const float PathEndGiveUpHeightMeters = 2f;
+
+        /// <summary>Stuck-warps in a row without real progress before the NPC evades home and resets.</summary>
+        public const int MaxStuckWarps = 2;
+
         /// <summary>Hold chase this long after the last real chance so a jump over cover does not leash.</summary>
         public const double NoChanceGraceSeconds = 2;
 

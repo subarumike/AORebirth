@@ -178,6 +178,23 @@ namespace ZoneEngine_New.Core.Nanos
             return true;
         }
 
+        /// <summary>
+        /// Removes every NCU entry another character put on <paramref name="owner"/>: debuffs, DoTs and
+        /// buffs cast by others. What the owner or its own items cast on it (source = owner) stays, as do
+        /// entries with no recorded source.
+        /// </summary>
+        public static int StripForeignBuffs(Character owner)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+
+            Identity self = owner.Identity;
+            List<Buff> removed = owner.RemoveBuffs(
+                buff => buff.Source.Instance != 0 && buff.Source != self);
+            for (int i = 0; i < removed.Count; i++)
+                AnnounceBuffRemoved(owner, removed[i]);
+            return removed.Count;
+        }
+
         /// <summary>Spell removal of every NCU entry, including uncancellable buffs.</summary>
         public static bool StripAllBuffs(Character owner)
         {
@@ -272,6 +289,9 @@ namespace ZoneEngine_New.Core.Nanos
             if (spell.IsHostile && !IsHostileNanoTarget(source, target))
                 return false;
 
+            if (spell.IsHostile && target.IsEvading)
+                return false;
+
             if (!spell.IsBuff)
             {
                 ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: false, inventory, items);
@@ -353,6 +373,21 @@ namespace ZoneEngine_New.Core.Nanos
                 ? 0
                 : NanoDelayCalculator.RechargeTimeCentiseconds(spell.RechargeDelayCentiseconds);
             caster.StartNanoRecharge(recharge, nowUtc);
+
+            // Resisted: an evading NPC is untouchable on its way home. The cast is spent; nothing lands.
+            if (spell.IsHostile && recipient!.IsEvading)
+            {
+                ClientFeedback.Send(caster, ClientFeedback.TargetResisted);
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Nano resisted by evading target caster={0} nano={1} target={2}",
+                        caster.Identity.Instance,
+                        spell.Id,
+                        cast.Target.Instance));
+                return;
+            }
 
             if (!spell.IsBuff)
             {

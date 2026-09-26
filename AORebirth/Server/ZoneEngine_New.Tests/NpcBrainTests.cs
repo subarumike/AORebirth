@@ -148,10 +148,12 @@ namespace ZoneEngine_New.Tests
             brain.AddThreat(new Identity { Type = IdentityType.CanbeAffected, Instance = 4244 }, 10f);
             Assert.IsTrue(brain.ShouldLeash());
 
+            // The leash commits at once: hate gone and HP restored before the walk home starts.
             brain.Tick(0.1);
-            Assert.IsFalse(brain.Hate.IsEmpty);
+            Assert.IsTrue(brain.IsEvading);
+            Assert.IsTrue(brain.Hate.IsEmpty);
             Assert.IsTrue(npc.Motor.HasPath);
-            Assert.AreEqual(20, npc.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(100, npc.Stats.GetOrZero(CharacterStat.Health));
 
             npc.Position = home;
             brain.Tick(0.1);
@@ -303,6 +305,18 @@ namespace ZoneEngine_New.Tests
             };
 
             Assert.IsTrue(NpcBrain.PathEndsUnderNpc(new System.Numerics.Vector3(0f, 0f, 0f), path));
+        }
+
+        [TestMethod]
+        public void PathDoesNotEndUnderNpcWhenLastWaypointIsOnTheFloorAbove()
+        {
+            var path = new System.Collections.Generic.List<System.Numerics.Vector3>
+            {
+                new(-9f, 2.5f, 0.8f),
+                new(0.1f, 4.9f, -1.2f)
+            };
+
+            Assert.IsFalse(NpcBrain.PathEndsUnderNpc(new System.Numerics.Vector3(0f, 0f, 0f), path));
         }
 
         [TestMethod]
@@ -518,6 +532,143 @@ namespace ZoneEngine_New.Tests
 
             Assert.AreEqual(0, npc.Position.x, 1e-3);
             Assert.AreEqual(lookahead, SegmentEnd(npc).X, 1e-3);
+        }
+
+        [TestMethod]
+        public void PathToEvadesHomeAfterStuckWarpsMakeNoProgress()
+        {
+            NpcCharacter npc = CreateNpc();
+            var home = new Vector3(0, 0, 0);
+            npc.Position = home;
+            NpcBrain brain = NpcBrain.Create(npc, home);
+            var target = new Vector3(20, 0, 0);
+
+            brain.PathTo(target);
+            for (int warp = 0; warp < NpcAiRules.MaxStuckWarps; warp++)
+            {
+                brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds + 1));
+                brain.PathTo(target);
+                Assert.IsFalse(brain.ShouldLeash(), "warp " + warp + " should not evade yet");
+            }
+
+            brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds + 1));
+            brain.PathTo(target);
+
+            Assert.IsTrue(brain.ShouldLeash());
+            Assert.IsFalse(npc.Motor.HasPath);
+
+            // Evading runs home rather than snapping.
+            double evadedAt = npc.Position.x;
+            Assert.IsTrue(brain.ReturnHome());
+            Assert.IsTrue(npc.Motor.HasPath);
+            Assert.AreEqual(evadedAt, npc.Position.x, 1e-3);
+            Assert.IsTrue(SegmentEnd(npc).X < evadedAt);
+
+            brain.ResetOutOfCombat();
+            Assert.IsFalse(brain.ShouldLeash());
+        }
+
+        [TestMethod]
+        [Timeout(5000)]
+        public void EvadingNpcIgnoresThreatAndDamageUntilItIsHome()
+        {
+            NpcCharacter npc = CreateNpc();
+            Vector3 home = new(0, 0, 0);
+            npc.Position = new Vector3(10, 0, 0);
+            npc.Stats.Set(CharacterStat.MaxHealth, 100);
+            npc.Stats.Set(CharacterStat.Health, 100);
+            NpcBrain brain = NpcBrain.Create(npc, home);
+            var attacker = new Identity { Type = IdentityType.CanbeAffected, Instance = 4245 };
+
+            brain.AddThreat(attacker, 10f);
+            Assert.IsTrue(brain.ShouldLeash());
+            Assert.IsTrue(npc.IsEvading);
+
+            // Hits on the way home: no threat, no HP loss, and the leash does not flip back to combat.
+            brain.AddThreat(attacker, 50f);
+            Assert.IsFalse(npc.ApplyDamage(npc, 40, HitType.Normal));
+            brain.Tick(0.1);
+            Assert.IsTrue(brain.Hate.IsEmpty);
+            Assert.AreEqual(100, npc.Stats.GetOrZero(CharacterStat.Health));
+            Assert.IsTrue(brain.ShouldLeash());
+
+            npc.Position = home;
+            brain.Tick(0.1);
+            Assert.IsFalse(brain.IsEvading);
+            Assert.IsFalse(brain.ShouldLeash());
+
+            brain.AddThreat(attacker, 5f);
+            Assert.IsFalse(brain.Hate.IsEmpty);
+        }
+
+        [TestMethod]
+        [Timeout(5000)]
+        public void EvadeStripsWhatOthersCastButKeepsTheNpcsOwnBuffs()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(10, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, new Vector3(0, 0, 0));
+            var player = new Identity { Type = IdentityType.CanbeAffected, Instance = 4246 };
+            System.DateTime now = System.DateTime.UtcNow;
+
+            // Self-cast, and what its own worn items cast (WearCastNano casts wearer -> wearer).
+            npc.TryApplyBuff(ZoneEngine_New.Tests.TestNanos.Create(5001, strain: 1), npc.Identity, now, out _, out _);
+            npc.TryApplyBuff(ZoneEngine_New.Tests.TestNanos.Create(5002, strain: 2), npc.Identity, now, out _, out _);
+            // A player's debuff and DoT.
+            npc.TryApplyBuff(ZoneEngine_New.Tests.TestNanos.Create(5003, strain: 3), player, now, out _, out _);
+            npc.TryApplyBuff(ZoneEngine_New.Tests.TestNanos.Create(5004, strain: 4), player, now, out _, out _);
+            Assert.AreEqual(4, npc.Buffs.Count);
+
+            brain.AddThreat(player, 10f);
+            Assert.IsTrue(brain.ShouldLeash());
+
+            CollectionAssert.AreEquivalent(new[] { 5001, 5002 }, System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(npc.Buffs, buff => buff.Id)));
+        }
+
+        [TestMethod]
+        public void ReturnHomeSnapsWhenTheWalkHomeKeepsGettingStuck()
+        {
+            NpcCharacter npc = CreateNpc();
+            var home = new Vector3(0, 0, 0);
+            npc.Position = new Vector3(30, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, home);
+
+            Assert.IsTrue(brain.ReturnHome());
+            for (int warp = 0; warp < NpcAiRules.MaxStuckWarps; warp++)
+            {
+                brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds + 1));
+                Assert.IsTrue(brain.ReturnHome(), "warp " + warp + " should keep walking");
+            }
+
+            brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds + 1));
+            Assert.IsFalse(brain.ReturnHome());
+
+            brain.WarpHome();
+            Assert.AreEqual(0, npc.Position.x, 1e-3);
+            Assert.IsTrue(brain.HasArrivedHome());
+        }
+
+        [TestMethod]
+        public void RealProgressClearsTheStuckWarpCount()
+        {
+            NpcCharacter npc = CreateNpc();
+            npc.Position = new Vector3(0, 0, 0);
+            NpcBrain brain = NpcBrain.Create(npc, npc.Position);
+            var target = new Vector3(40, 0, 0);
+
+            brain.PathTo(target);
+            for (int warp = 0; warp < NpcAiRules.MaxStuckWarps; warp++)
+            {
+                brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds + 1));
+                brain.PathTo(target);
+            }
+
+            npc.Position = new Vector3(npc.Position.x + NpcFollowTarget.PathStuckProgressMeters + 0.5, 0, 0);
+            brain.PathTo(target);
+            brain.ProgressSinceUtc = System.DateTime.UtcNow.AddSeconds(-(NpcFollowTarget.PathStuckWarpSeconds + 1));
+            brain.PathTo(target);
+
+            Assert.IsFalse(brain.ShouldLeash());
         }
 
         static SmokeLounge.AOtomation.Messaging.GameData.Vector3 SegmentEnd(NpcCharacter npc)

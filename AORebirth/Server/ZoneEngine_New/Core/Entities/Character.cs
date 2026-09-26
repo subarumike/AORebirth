@@ -1163,7 +1163,8 @@ namespace ZoneEngine_New.Core.Entities
                 characterWeapon.LogicalSlot,
                 weapon,
                 IsPlayer);
-            if (!result.IsHit)
+            // An evading NPC is untouchable on its way home: every swing is a miss.
+            if (!result.IsHit || target.IsEvading)
             {
                 Cell?.Announce(
                     new MissedAttackInfoMessage
@@ -1229,7 +1230,7 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public virtual bool ApplyDamage(Character attacker, int damage, HitType hitType)
         {
-            if (_deathNotified || damage <= 0)
+            if (_deathNotified || damage <= 0 || IsEvading)
                 return false;
 
             // Same-character hits are item and status effects. Cross-character damage is an attack.
@@ -1294,6 +1295,9 @@ namespace ZoneEngine_New.Core.Entities
         protected virtual void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
         {
         }
+
+        /// <summary>Leashing home: takes no damage, attacks miss and hostile nanos do not land.</summary>
+        public virtual bool IsEvading => false;
 
         internal Character? TryResolveFightingTarget()
         {
@@ -1598,6 +1602,28 @@ namespace ZoneEngine_New.Core.Entities
 
             var removed = new List<Buff>(_buffs);
             _buffs.Clear();
+            OnBuffsChanged();
+            return removed;
+        }
+
+        /// <summary>Removes and returns every buff <paramref name="match"/> selects. Ignores <see cref="ItemTemplate.CanCancel"/>.</summary>
+        public List<Buff> RemoveBuffs(Func<Buff, bool> match)
+        {
+            ArgumentNullException.ThrowIfNull(match);
+            List<Buff>? removed = null;
+            for (int i = _buffs.Count - 1; i >= 0; i--)
+            {
+                if (!match(_buffs[i]))
+                    continue;
+
+                removed ??= [];
+                removed.Add(_buffs[i]);
+                _buffs.RemoveAt(i);
+            }
+
+            if (removed == null)
+                return [];
+
             OnBuffsChanged();
             return removed;
         }

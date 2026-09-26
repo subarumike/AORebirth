@@ -26,16 +26,16 @@ namespace ZoneEngine_New.Core.Ai
         {
             TickStallWatch.Stage("node.return-to-spawn", _brain.Npc.Identity.Instance);
             _brain.StopFighting();
-            // A target standing across a gap still has hate, but no route. Walking the long way
-            // home leaves the NPC in range the whole trip. Snap home and let reset heal it.
-            if (_brain.WarpHomeIfTargetUnreachable())
-                return _nodeState = NodeState.Success;
-
             if (!_brain.HasHome || _brain.HasArrivedHome())
                 return _nodeState = NodeState.Success;
 
-            _brain.PathTo(_brain.Home!);
-            return _nodeState = NodeState.Running;
+            // Run home when there is a route. Snap only when there is none, or the walk home gets
+            // stuck; the reset that follows heals either way.
+            if (_brain.ReturnHome())
+                return _nodeState = NodeState.Running;
+
+            _brain.WarpHome();
+            return _nodeState = NodeState.Success;
         }
     }
 

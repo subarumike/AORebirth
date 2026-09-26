@@ -19,6 +19,9 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"You're unable to perform this action; please check the requirements of the item." Key name unknown.</summary>
         public const int CheckItemRequirements = 141178878;
 
+        /// <summary>"Target resisted." (category 110).</summary>
+        public const int TargetResisted = 205237300;
+
         public static void Send(Character character, string key)
             => Send(character, unchecked((int)ElfHash(key)));
 
