@@ -509,7 +509,6 @@ namespace AORebirth.Tools.RDBDataExtractor
                 Path.Combine(baseDir, "FunctionSets.cfg"),
                 Path.Combine(baseDir, "..", "..", "..", "FunctionSets.cfg"),
                 Path.Combine(RepositoryRootResolver.Resolve(), "Tools", "RDBDataExtractor", "FunctionSets.cfg"),
-                Path.Combine(RepositoryRootResolver.Resolve(), "Tools", "Algorithman", "Extractor Serializer", "FunctionSets.cfg"),
             };
 
             for (int i = 0; i < candidates.Length; i++)
