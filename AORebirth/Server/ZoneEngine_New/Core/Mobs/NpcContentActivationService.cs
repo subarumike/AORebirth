@@ -212,15 +212,11 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
                 failure = "Stock row " + row.StockRowId + " does not retain ShopInvHash " + vendor.StockGroupHash + ".";
                 return false;
             }
-            if (!gameData.TryGetAssignedItemHash(row.LowId, row.HighId, out string assignedHash)
-                || !gameData.TryGetHashInstance(assignedHash, out HashInstance assigned)
-                || !ExactPair(assigned, row.LowId, row.HighId))
-            {
-                ranges = [];
-                failure = "Stock row " + row.StockRowId + " has no unique exact hash assignment for "
-                    + row.LowId + "/" + row.HighId + ".";
-                return false;
-            }
+            string assignedHash = string.Empty;
+            if (gameData.TryGetAssignedItemHash(row.LowId, row.HighId, out string correlatedHash)
+                && gameData.TryGetHashInstance(correlatedHash, out HashInstance assigned)
+                && ExactPair(assigned, row.LowId, row.HighId))
+                assignedHash = correlatedHash;
             if (!catalog.TryGet(row.LowId, out _) || !catalog.TryGet(row.HighId, out _))
             {
                 ranges = [];

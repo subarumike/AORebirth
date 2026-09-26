@@ -26,7 +26,7 @@ namespace ZoneEngine_New.Core.Trade
 
         public int Quality { get; }
 
-        /// <summary>The exact item-pair correlation used by DAO-backed stock.</summary>
+        /// <summary>The exact item-pair correlation used by DAO-backed stock, when uniquely available.</summary>
         public string ItemHash { get; }
     }
 
@@ -97,8 +97,7 @@ namespace ZoneEngine_New.Core.Trade
             for (int i = 0; i < ranges.Count; i++)
             {
                 ShopStockRange range = ranges[i];
-                if (string.IsNullOrWhiteSpace(range.ItemHash)
-                    || range.LowId <= 0
+                if (range.LowId <= 0
                     || range.HighId <= 0
                     || range.MinimumQuality <= 0
                     || range.MaximumQuality < range.MinimumQuality)
