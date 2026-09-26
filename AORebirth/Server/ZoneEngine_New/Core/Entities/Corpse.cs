@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Entities
     using System;
     using System.Buffers.Binary;
     using System.Collections.Generic;
+    using System.Linq;
 
     using AORebirth.Enums;
 
@@ -12,6 +13,7 @@ namespace ZoneEngine_New.Core.Entities
 
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.Teams;
 
     using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
@@ -70,7 +72,12 @@ namespace ZoneEngine_New.Core.Entities
             if (LootWinner.Instance == 0 || DateTime.UtcNow >= ReservedUntilUtc)
                 return true;
 
-            return player.Identity.Instance == LootWinner.Instance;
+            if (player.Identity.Instance == LootWinner.Instance)
+                return true;
+
+            // The winner's teammates share loot rights.
+            TeamSnapshot? team = Playfield?.GetService<TeamService>()?.GetTeam(player);
+            return team != null && team.MemberIds.Contains(LootWinner.Instance);
         }
 
         /// <summary>

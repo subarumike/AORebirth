@@ -22,6 +22,7 @@ namespace ZoneEngine_New.Core.Entities
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Teams;
 
     using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
     using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
@@ -171,6 +172,9 @@ namespace ZoneEngine_New.Core.Entities
 
         readonly Dictionary<WeaponSlot, Action> _weaponAttackHandlers = new();
         readonly KillRewardResolver _killRewards = new();
+
+        /// <summary>Teammates farther than this from the victim get no kill XP share. Server choice, not capture-backed.</summary>
+        const double TeamShareRange = 100.0;
 
         /// <summary>Current auto-attack target; <see cref="Identity.None"/> when not fighting.</summary>
         public Identity FightingTarget { get; private set; } = Identity.None;
@@ -536,13 +540,50 @@ namespace ZoneEngine_New.Core.Entities
                 if (!registry.TryGet(identity, out Dynel? dynel) || dynel is not Character killer)
                     continue;
 
-                int amount = share.Amount;
-                int killerLevel = killer.Stats.GetOrOne(CharacterStat.Level);
-                if (killerLevel > victimLevel + extract.LevelDelta)
-                    amount = 1;
+                List<Character> recipients = CollectNearbyTeam(playfield, registry, killer);
+                int each = share.Amount / recipients.Count;
+                int leftover = share.Amount - each * recipients.Count;
+                for (int r = 0; r < recipients.Count; r++)
+                {
+                    Character recipient = recipients[r];
+                    int amount = r == 0 ? each + leftover : each;
+                    if (amount <= 0)
+                        continue;
 
-                killer.AwardXp(amount, XpSource.Kill);
+                    int recipientLevel = recipient.Stats.GetOrOne(CharacterStat.Level);
+                    if (recipientLevel > victimLevel + extract.LevelDelta)
+                        amount = 1;
+
+                    recipient.AwardXp(amount, XpSource.Kill);
+                }
             }
+        }
+
+        /// <summary>
+        /// Killer first, then living teammates on this playfield within <see cref="TeamShareRange"/> of the victim.
+        /// </summary>
+        List<Character> CollectNearbyTeam(Playfield playfield, DynelRegistry registry, Character killer)
+        {
+            var recipients = new List<Character> { killer };
+            TeamSnapshot? team = killer is Player player ? playfield.GetService<TeamService>()?.GetTeam(player) : null;
+            if (team == null)
+                return recipients;
+
+            for (int i = 0; i < team.MemberIds.Count; i++)
+            {
+                int memberId = team.MemberIds[i];
+                if (memberId == killer.Identity.Instance)
+                    continue;
+                if (!registry.TryGet(new Identity { Type = IdentityType.CanbeAffected, Instance = memberId }, out Dynel? dynel)
+                    || dynel is not Player mate || mate.IsDead)
+                    continue;
+                if (Distance3D(mate) > TeamShareRange)
+                    continue;
+
+                recipients.Add(mate);
+            }
+
+            return recipients;
         }
 
         void AwardAlienXp(IReadOnlyList<int> present)
