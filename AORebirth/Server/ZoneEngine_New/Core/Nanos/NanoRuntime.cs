@@ -132,6 +132,32 @@ namespace ZoneEngine_New.Core.Nanos
             return NanoCastRefusal.None;
         }
 
+        /// <summary>Reads a nano template. False when the id is not a template.</summary>
+        public static bool TryGetSpell(Character caster, int nanoId, out NanoSpell? spell)
+        {
+            ArgumentNullException.ThrowIfNull(caster);
+            spell = null;
+            return nanoId > 0 && TryResolveSpell(caster, nanoId, out spell) && spell != null;
+        }
+
+        /// <summary>
+        /// The <see cref="TryStartCast"/> gates without refusing, logging or starting anything:
+        /// caster state, requirements, nano cost, target NCU and hostile-target legality.
+        /// </summary>
+        public static bool CanStartCast(Character caster, NanoSpell spell, Character recipient, DateTime nowUtc)
+        {
+            ArgumentNullException.ThrowIfNull(caster);
+            ArgumentNullException.ThrowIfNull(spell);
+            ArgumentNullException.ThrowIfNull(recipient);
+
+            NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, ResolveNanoCost(caster, spell), nowUtc);
+            if (NanoCastRules.Evaluate(attempt) != NanoCastRefusal.None)
+                return false;
+            if (!TargetCanHoldBuff(spell, recipient))
+                return false;
+            return !spell.IsHostile || IsHostileNanoTarget(caster, recipient);
+        }
+
         /// <summary>
         /// Spell removal of one nano id. Absent ids are a successful no-op.
         /// Uncancellable and hostile buffs are removed.

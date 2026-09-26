@@ -16,6 +16,7 @@ namespace ZoneEngine_New.Core.Commands
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
 
     public sealed class NpcCommand : IGmCommand
@@ -35,7 +36,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".npc source|template|loot|equipment|position";
+        public string Usage => ".npc source|template|loot|equipment|nanos|position";
 
         public void Execute(GmCommandContext context)
         {
@@ -72,6 +73,12 @@ namespace ZoneEngine_New.Core.Commands
             if (string.Equals(verb, "equipment", StringComparison.OrdinalIgnoreCase))
             {
                 GmCommandFeedback.SendLines(context.Session, context.Player, DumpEquipment(npc));
+                return;
+            }
+
+            if (string.Equals(verb, "nanos", StringComparison.OrdinalIgnoreCase))
+            {
+                GmCommandFeedback.SendLines(context.Session, context.Player, DumpNanos(npc));
                 return;
             }
 
@@ -405,6 +412,58 @@ namespace ZoneEngine_New.Core.Commands
                 }
 
                 lines.Add(line);
+            }
+
+            return lines;
+        }
+
+        /// <summary>Uploaded nanos (from equipped crystals), the nano pool, cast state and running buffs.</summary>
+        List<string> DumpNanos(NpcCharacter npc)
+        {
+            DateTime now = DateTime.UtcNow;
+            List<string> lines =
+            [
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Nanos: {0} uploaded, nano {1}/{2}, casting={3} recharging={4} ncu={5}",
+                    npc.UploadedNanoIds.Count,
+                    npc.Stats.GetOrZero(CharacterStat.CurrentNano),
+                    npc.Stats.GetOrZero(CharacterStat.MaxNanoEnergy),
+                    npc.PendingCast?.Spell.Id.ToString(CultureInfo.InvariantCulture) ?? "no",
+                    npc.IsInNanoRecharge(now),
+                    npc.MaxNcu)
+            ];
+
+            for (int i = 0; i < npc.UploadedNanoIds.Count; i++)
+            {
+                int nanoId = npc.UploadedNanoIds[i];
+                if (!NanoRuntime.TryGetSpell(npc, nanoId, out NanoSpell? spell) || spell == null)
+                {
+                    lines.Add("  " + FormatItemId(nanoId) + " (unresolved)");
+                    continue;
+                }
+
+                lines.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "  {0} kind={1} cost={2} reqsMet={3}",
+                        FormatItemId(nanoId),
+                        spell.IsHostile ? "hostile" : spell.IsBuff ? "buff" : "friendly",
+                        spell.NanoPointCost,
+                        spell.MeetsActionRequirements(stat => npc.Stats.Get(stat), ActionType.ToUse)));
+            }
+
+            IReadOnlyList<Buff> buffs = npc.Buffs;
+            lines.Add(string.Format(CultureInfo.InvariantCulture, "Running: {0}", buffs.Count));
+            for (int i = 0; i < buffs.Count; i++)
+            {
+                lines.Add(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "  {0} from={1} {2}s left",
+                        FormatItemId(buffs[i].Id),
+                        buffs[i].Source.Instance,
+                        buffs[i].RemainingCentiseconds(now) / 100));
             }
 
             return lines;

@@ -21,6 +21,7 @@ namespace ZoneEngine_New.Core.Ai
     public sealed class NpcBrain
     {
         readonly NpcBehaviourTree _tree;
+        readonly NpcNanoCaster _nanos;
         readonly List<Vector3> _pathScratch = new(2);
         readonly List<Vector3> _routeScratch = new(8);
         readonly List<System.Numerics.Vector3> _reachPathScratch = new(8);
@@ -57,6 +58,7 @@ namespace ZoneEngine_New.Core.Ai
             _tree = new NpcBehaviourTree(new BehaviourRoot(blackboard), this, profile);
             _tree.SetupTree();
             _tree.Enable();
+            _nanos = new NpcNanoCaster(this);
         }
 
         public NpcCharacter Npc { get; }
@@ -105,6 +107,8 @@ namespace ZoneEngine_New.Core.Ai
             ScanProximity();
             TickStallWatch.Stage("brain.tree", Npc.Identity.Instance);
             _tree.Tick((float)deltaTime);
+            TickStallWatch.Stage("brain.nanos", Npc.Identity.Instance);
+            _nanos.Tick(DateTime.UtcNow);
         }
 
         public void AddThreat(Identity identity, float amount)
