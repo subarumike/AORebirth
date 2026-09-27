@@ -165,20 +165,28 @@ REQUIRES_REVIEW
 
 Never assume an existing Linux-private change is legitimate merely because it already exists.
 
-## WINDOWS FIRST, LINUX SECOND
+## WINDOWS TO LINUX PIPELINE
+
+Public Windows/master remains the authoritative product/runtime source.
+
+Every Linux port starts from the exact current public Windows/master SHA.
 
 Required sequence:
 
 public Windows/master implementation
 → Windows validation
 → public master commit/push
-→ Linux reconciliation to that exact master SHA
+→ fetch exact public master SHA
+→ reconcile/port that source to Linux
 → Linux build/test
-→ Linux package
+→ Linux package validation
+→ push validated Linux port commits to PRIVATE Linux Git
 → deployment approval
 → Linux deployment
 
 Never reverse this sequence.
+
+The Linux private repository must preserve traceability to the exact public-master SHA it was derived from.
 
 ## EXACT-SHA REQUIREMENT
 
@@ -249,7 +257,7 @@ Public GitHub `master` is authoritative for AORebirth product/runtime behavior, 
 
 The required relationship is:
 
-`public master -> existing private Linux checkout -> private Linux build/package/deployment`
+`public Windows/master -> fetch exact authoritative SHA -> port/reconcile to Linux -> validate Linux build/package -> push Linux result to PRIVATE Linux Git -> deployment`
 
 Rules:
 
@@ -270,18 +278,94 @@ Rules:
 - Private/protected GameData must never be committed or published to public GitHub.
 - Capture/evidence stores must never be copied into the public repository or Linux runtime merely for convenience.
 
-### PRIVATE LINUX PUSH RULE
+## PRIVATE LINUX GIT ROLE
 
-The normal repository instruction to push commits after creating them does NOT automatically authorize pushing private Linux work.
+The private Linux Git repository exists to store:
 
-Before ANY private Linux push:
+- the Linux port of authoritative public-master source
+- legitimate Linux compilation adaptations
+- Linux OS/platform adaptations
+- filesystem/case-sensitivity adaptations
+- Linux packaging
+- service/systemd integration
+- deployment tooling
+- Linux configuration/environment wiring
+- native-library/platform adaptations
+- private Linux build/acceptance history
+
+It must remain private.
+
+It may later be shared with authorized Linux developers without making the Linux infrastructure public.
+
+It is NOT the authority for independent gameplay/runtime development.
+
+## PRODUCT FIXES DISCOVERED DURING LINUX PORTING
+
+If Linux porting reveals a gameplay, runtime, protocol, persistence, DAO, content, combat, NPC, mission, item, nano, world, authentication, or other product defect:
+
+STOP the Linux-only fix.
+
+Fix the product behavior on public Windows/master first.
+
+Then:
+
+public master fix/validation/push
+→ fetch new exact public master SHA
+→ reconcile/port that new SHA to Linux
+→ validate
+→ push resulting Linux port to private Linux Git
+
+Never solve product defects only inside private Linux Git.
+
+## REMOTE DIRECTION
+
+The intended logical relationship is:
+
+PUBLIC WINDOWS REMOTE = authoritative source/input
+PRIVATE LINUX REMOTE = Linux port destination/output
+
+Never push Linux-port branches, private Linux infrastructure, or Linux-private history to the public AORebirth repository.
+
+Once the private Linux repository is established, the preferred checkout topology is:
+
+- `public` -> public `subarumike/AORebirth` source remote
+- `origin` -> private AORebirth Linux Git destination
+
+Do not assume or configure those remote names until the private repository actually exists and is verified.
+
+## PRIVATE LINUX PUSH RULE
+
+For an authorized Linux port/build pipeline, pushing the validated Linux result to the verified private Linux Git repository is an expected pipeline step.
+
+Before any private Linux push:
 
 1. identify the exact destination remote;
-2. verify that destination is private;
-3. verify it is the intended existing AORebirth Linux destination;
-4. obtain Mike's explicit authorization for that push.
+2. verify the destination is private;
+3. verify it is the intended AORebirth private Linux repository;
+4. record the public Windows/master SHA from which the Linux result was derived;
+5. verify the task authorizes continuing through the Linux push stage.
 
-If those conditions are not satisfied, STOP before pushing.
+If the destination is public, ambiguous, missing, or unverified:
+
+STOP.
+
+Never substitute the public AORebirth repository for the private Linux destination.
+
+## PRIVACY
+
+Keep private:
+
+- Linux-specific private repository/history
+- Linux infrastructure
+- build/deployment internals
+- server/connection details
+- service configuration
+- protected/private GameData
+- credentials
+- internal acceptance/deployment receipts
+- private build artifacts
+
+Existing public `LinuxBuild` files do not authorize publishing additional private Linux material.
 
 ### STOP CONDITIONS
 
