@@ -21,15 +21,14 @@ public static class GeneratedMissionCorpseProjection
             || livePlayfield > GeneratedMissionIdentitySpace.MaximumLivePlayfield2
             || receiver.Type != IdentityType.CanbeAffected || receiver.Instance <= 0)
             throw new InvalidOperationException("Corpse projection requires the exact durable generated NPC death.");
-        var source = evidence.CopySpawnMessage();
-        if (!source.TailFullyDecoded || source.UndecodedTail?.Length > 0)
-            throw new InvalidOperationException("Corpse source appearance is not fully decoded.");
+        var source = evidence.Appearance;
+        source.Validate();
         int catMesh = GeneratedMissionCorpseWire.MissionCatMeshMappings()
             .Where(pair => pair.Key == evidence.MonsterData).Select(pair => pair.Value).SingleOrDefault();
         var appearance = MissionCorpseContent.Current;
         byte[] wire = GeneratedMissionCorpseWire.Build(evidence.Name, state.RuntimeInstance, state.RuntimeInstance,
             receiver.Instance, livePlayfield, state.X, state.Y, state.Z, livePlayfield,
-            source.MonsterScale, appearance.Sex, appearance.Breed, appearance.Race, catMesh, evidence.MonsterData,
+            source.Scale, appearance.Sex, appearance.Breed, appearance.Race, catMesh, evidence.MonsterData,
             state.CorpseClaimed ? 0 : state.CorpseCredits);
         // The shared typed CFU decoder cannot represent this accepted name/material tail.
         // Preserve the body exactly; replace only the ordinary current transport marker.

@@ -102,7 +102,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="../../GameData/Missions/**/*.json">
+    <Content Include="../../GameData/Missions/**/*.json" Exclude="../../GameData/Missions/RollBodies.json;../../GameData/Missions/RollTemplate.json;../../GameData/Missions/Provenance.json">
       <Link>GameData/Missions/%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -191,7 +191,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <!-- Full GameData tree (items.dat, NpcTemplates, Playfields metadata/spawns). -->
-    <Content Include="..\..\GameData\**\*">
+    <Content Include="..\..\GameData\**\*" Exclude="..\..\GameData\Missions\RollBodies.json;..\..\GameData\Missions\RollTemplate.json;..\..\GameData\Missions\Provenance.json">
       <Link>GameData\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

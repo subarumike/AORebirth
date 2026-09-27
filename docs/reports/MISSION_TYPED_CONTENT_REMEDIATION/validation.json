@@ -1,0 +1,538 @@
+{
+  "public_base": "3c904f760513af8110b78e353c09a9296a0d76a9",
+  "newengine_total": 869,
+  "newengine_passed": 867,
+  "newengine_failed": [
+    {
+      "name": "Pf2064_return_exit_matches_the_legacy_statel_collision_envelope",
+      "class": "ZoneEngine_New.Tests.BuildingExitProxyTests",
+      "outcome": "Failed"
+    },
+    {
+      "name": "Pf127_AbmouthReachesThePlayerStandingOnTheFloorAbove",
+      "class": "ZoneEngine_New.Tests.NpcNavigationTests",
+      "outcome": "Failed"
+    }
+  ],
+  "mission_test_results": [
+    {
+      "name": "OfficialFindAndReturnItemIconsMapToCapturedBehavior",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FullProgressPreservesEveryOfficialLevelTokenCellAndExactFactionPairs",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionTokenPolicyTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "GeneratedRollUsesTheClampedCharacterLevelConsistently",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FailedLockpickCommitPreservesSourceMissionInventoryAndNoAcknowledgement",
+      "class": "ZoneEngine_New.Tests.AuthoredQuestTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "DelayedClaimAndAcknowledgementRequireExactSessionWorldAndLiveOwner",
+      "class": "ZoneEngine_New.Tests.MissionCorpseInteractionLeaseTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "UnresolvedSliderCombinationsFallBackCategoricallyToNeutralEvidence",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CapturedQuestAlternativeTemplateRoundTripsByteForByte",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollTemplateContractTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissingDifficultyPositionAndMissingCellFailClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "AcceptedMissionExpirySerializesAsFourLosslessWireBytes",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollTemplateContractTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ReconnectedSessionCannotCloseInheritClaimOrReceiveDelayedAcknowledgements",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionCorpseInteractionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissingLevelFailsClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NativeCombatUsesTemplateStatsWithoutCapturedAttackMetadata",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ContinuousSliderBytesDecodeAsSignedPercentAndRejectInvalidRange",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "AcceptedKeyUsesFrozenOwnedArtifactInsteadOfCurrentContentTemplate",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "WeaponPoolAndNpcStatsChangeWithSameBinary",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "RollFeeRulesPreserveDeductionAndInsufficientCreditBehavior",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CommonMissionServiceDoesNotReactivateCompletedDojaAfterCooldown",
+      "class": "ZoneEngine_New.Tests.AuthoredQuestTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CapturedFixtureAccessorsReturnDefensiveCopies",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollTemplateContractTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ReplayUsesOriginalBindingAndNeverPublishesAnotherKey",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ProductionSourcesHaveNoHistoricalMissionPacketConsumers",
+      "class": "ZoneEngine_New.Tests.MissionPacketIndependenceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MalisRollableNanosAreDistinctFamiliesAtOneLockedQuality",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "DuplicateAndConflictingLevelRowsFailClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "RecreatedWorldPreservesDamagedMovedAndDeadNpcStateInsteadOfRespawningDefaults",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionMaterializationTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissionLayoutsLoadWithoutProvenancePermission",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "SarahRestoreUsesExistingExactJournalBuildersForOnlyActiveMissions",
+      "class": "ZoneEngine_New.Tests.AuthoredQuestTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FullInventoryLeavesMissionAndRewardUntouched",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "InactiveExpiredIncompleteAndUnownedMissionsCannotGrant",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "EveryCapturedRollBodyRoundTripsAndMatchesItsGoldenHash",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollTemplateContractTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "AllCapturedDifficultyDetentsGenerateForNeutralLeftAndUnresolvedProfiles",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CapturedLibraryCoversEveryFinalizedMissionTypeWithCompatibleActions",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "OfferDefinitionsAreCopiedWithoutSharingMutableState",
+      "class": "ZoneEngine_New.Tests.MissionPacketIndependenceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "EveryPermanentStaticObjectSerializesWithLiveIdentityAndNoHistoricalDecoder",
+      "class": "ZoneEngine_New.Tests.MissionPacketIndependenceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "GeneratedRollsDoNotMutateCapturedBodies",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "AmbiguousMissionWeaponPoolIsRejected",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "EndedMissionReturnsToFrozenExteriorWithoutMutatingRepositorySnapshot",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionLoginPlanTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "SuppliedDurableAllocatorOwnsEveryGeneratedIdentity",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionRollProjectionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "VariableNamesKeepNullAndTailWithoutPaddingAndCashPatchesOnlyValue",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionCorpseWireTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "AdmissionUsesCurrentDirectoryOwnerAndRetainsReplayProtection",
+      "class": "ZoneEngine_New.Tests.CharacterDaoConsumerTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "UnexpectedExtraRowAndColumnsFailClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "DuplicateDifficultyCellFailsClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "OpenCloseReopenPreservesWireOrderSingleClaimAndEachDelayedAcknowledgement",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionCorpseInteractionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CorpseReplyForcesAcceptedTemp4WithoutChangingOrdinaryRepliesOrRequestTargets",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionCorpseInteractionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "OutOfRangeLevelIndexQualityAndTokenFailClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "GeneratedFiveOfferSetsAreIndependentlyCoherent",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ExactMissionKeyAndCleanupSupportEveryLegacyOwnedTopLevelPage",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "DojaTradePinsStagedItemAndDeclineLeavesInventoryAndMissionUntouched",
+      "class": "ZoneEngine_New.Tests.DialogueTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MalformedHeaderFailsClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "UnchangedCapturedCombinationPreservesExactText",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "TruncatedAndEmptyPayloadsFailClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissionLevelSourceIsEditableAndInvalidCellsAreRejected",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "AcgNpcDifficultyReusesStableMissionQualityPolicy",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CapturedBundleHashesUseDaoCanonicalHexWithoutChangingDigest",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionRollProjectionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "LockpickGrantRetirementAndMissionHandoffShareOneCommit",
+      "class": "ZoneEngine_New.Tests.AuthoredQuestTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ReturnOffersRetargetTheirObjectiveToTheIssuingTerminal",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "SharedMissionCorpseTemplateIsUnchangedFromAcceptedLegacySource",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionCorpseWireTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FinalizedQl42RewardPairsRemainExactEvidence",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ValidCompleteGraphLoadsAndResolvesEveryLevelAndDifficulty",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "SignedSliderValuesAreStoredWithoutByteWrap",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionRollProjectionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "EveryBundleRestoresOnlyUnclaimedUnexpiredExactCorpseWithoutNpcRespawn",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionMaterializationTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NewRuntimeCannotFallBackToFileIdentityAllocation",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionRollProjectionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "PermanentMissionInputsContainNoEmbeddedHistoricalPacketPayloads",
+      "class": "ZoneEngine_New.Tests.MissionPacketIndependenceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "UnknownCommitQuarantinesWithoutPublishingOrRetrying",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "WeaponAssignmentDoesNotRequireEvidenceMetadata",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "EveryAcceptedMissionNpcProducesExactLegacyCorpseBytesFromDurableDeath",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionMaterializationTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissionGrantPlanIsPureCapacityCheckedAndPublishedOnce",
+      "class": "ZoneEngine_New.Tests.InventoryActionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "KnownRollbackDoesNotPublishOrQuarantineAndAllowsExplicitRetry",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "PlayerAndMissionNpcUseNativeTemplateWeaponSwings (True)",
+      "class": "ZoneEngine_New.Tests.MissionNpcCombatPolicyTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ImpossibleSemanticValuesFailClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ForeignBankNestedContainerAndStaleLoadedArtifactRemainPending",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "UnopenedBankUsesExactDurableOwnerWithoutCreatingPartialHydration",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "LateMarcoFailureRollsBackEveryGrantSourceMissionAndRewardStat",
+      "class": "ZoneEngine_New.Tests.AuthoredQuestTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "LeftCapturedSliderProfileReproducesItsObservedTypeCohort",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "TypedWorldChestWireRoundTripsAndOwnedFormOmitsOnlyItsTransform",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionMaterializationTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ProgressUsesExactAmbientPopulationAndNeverTheOlderEightySixPercentThreshold",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionTokenPolicyTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FrozenSqlProjectionPreservesEveryDestinationRewardAndWireField",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionRollProjectionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissionGrantCanPublishSilentlyForItsOwnCapturedPacketContract",
+      "class": "ZoneEngine_New.Tests.InventoryActionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "BankCleanupKnownRollbackAndUnknownCommitNeverRemoveLiveItems",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ArtifactPoolReloadUsesEditedDataWithSameBinary",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "DifficultyWireValuesAreOneBasedAndLevel60EasiestIsQl42",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissionActorCombatCapabilityUsesItsNativeEnabledState",
+      "class": "ZoneEngine_New.Tests.MissionNpcCombatPolicyTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "GeneratedRollPreservesClientTitleWidthFreshExpiryAndRoundTrips",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollTemplateContractTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "GeneratedRollRejectsUnsupportedDifficultyAndSliderWireValues",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ForeignOrIncompletePersistedObjectSetCannotExposeAPartialWorld",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionMaterializationTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissionRollFailsExplicitlyWithoutAValidGraph",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MalformedNumericTokensFailClosed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CompletionWithoutSealedTokenPolicyFailsClosedBeforeAnyRewardMutation",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ActiveOwnedMissionPreservesExactSavedPositionAndHydratedInventory",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionLoginPlanTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "ClosedInitiatingSessionCannotClaimEvenBeforePlayerReferenceIsUnbound",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionCorpseInteractionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "AllFiveAcceptedBundlesMaterializeThroughActualNpcFactoryWithExactIdentityAndLife",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionMaterializationTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "LevelFourAndCapturedLevelSixtyRowsRemainExact",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionLevelGraphTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "GeneratedRollPreservesOneCompleteCapturedServerResponseEnvelope",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollTemplateContractTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "MissionRollDeadlineUsesThePrivateServerGameTimeAnchor",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollTemplateContractTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "NativeCombatRejectsConfiguredNonWeaponTemplate",
+      "class": "ZoneEngine_New.Tests.MissionContentEditabilityTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "KnownClaimFailureCancelsAllQueuedAcknowledgementsWithoutAutomaticRetry",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionCorpseInteractionTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "TypedContentRejectsConflictingPlacementAndOwnedWorldObjects",
+      "class": "ZoneEngine_New.Tests.MissionPacketIndependenceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "GeneratedRollsAreDeterministicForTheSameSeed",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "PlayerAndMissionNpcUseNativeTemplateWeaponSwings (False)",
+      "class": "ZoneEngine_New.Tests.MissionNpcCombatPolicyTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "EveryNpcAppearanceAndDurableBundleIdentityMatchesItsOfflineSource",
+      "class": "ZoneEngine_New.Tests.MissionPacketIndependenceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "RewardPreservesUnsnapshottedBaseStatsAndPublishesOnlyAfterCommit",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "CompatibilityLayerRejectsTextObjectiveAndRewardContradictions",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "LevelFourNeutralIccRollStaysInTheTerminalPlayfield",
+      "class": "SmokeLounge.AOtomation.Messaging.Tests.MissionRollSemanticsTests",
+      "outcome": "Passed"
+    },
+    {
+      "name": "TokenGrantUsesSealedLevelSideAndCountInTheSameRewardTransaction",
+      "class": "ZoneEngine_New.Tests.GeneratedMissionServiceTests",
+      "outcome": "Passed"
+    }
+  ],
+  "startup_and_connected_lifecycle": "BLOCKED_DOCKER_INITIALIZATION",
+  "commit_gate": "NOT_PASSED",
+  "secret_scan": "PASS",
+  "git_diff_check": "PASS",
+  "private_historical_missions_equal_public_fixture": true,
+  "private_source_layout_format": 1,
+  "private_source_modified": false,
+  "canonical_capture_collection_modified": false,
+  "mandatory_clean_worktree_gate": "NOT_RUN_UNCOMMITTED_CANDIDATE"
+}

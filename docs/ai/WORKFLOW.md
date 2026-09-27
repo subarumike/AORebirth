@@ -446,6 +446,46 @@ It fails on artifact drift, generation-identity drift, Git drift, timeout, or
 lease/staging/transaction residue. See
 `docs/project/GENERATED_COMBAT_PIPELINE.md` for the complete contract.
 
+## Offline mission normalization and isolated validation
+
+Permanent mission content is `MissionOffers.json` and format-2 `Layouts.json`.
+The runtime must not read historical response bodies or layout packet payloads.
+To reproduce the public normalized content into a **new** output directory after
+building the Windows engine, use this explicit offline-only command:
+
+```cmd
+cmd /d /c Tools\normalize_mission_content.cmd AORebirth\Built\Debug\ZoneEngine_New\ZoneEngine_New.dll AORebirth\GameData\Missions build-verify\mission-normalized Tests\Fixtures\Gameplay\Missions\HistoricalLayouts.json
+```
+
+The tool reads the retained public `RollBodies.json` and explicitly supplied
+historical layout fixture. It never invokes engine startup, discovers capture
+locations, overwrites inputs, or publishes outputs automatically. It requires
+byte-identical offer/static serialization before producing typed content and a
+field/provenance inventory. Use a fresh output path for another run.
+
+When mission validation is explicitly requested, provide a separate full
+GameData copy containing the normalized files, with `RollBodies.json`,
+`RollTemplate.json`, `Provenance.json` and every historical layout payload alias
+absent. Do not alter private GameData or historical evidence to create it.
+
+```cmd
+cmd /d /c Tools\run_normalized_mission_tests.cmd <absolute-normalized-GameData-copy>
+cmd /d /c Tools\run_newengine_connected_acceptance.cmd --engine <absolute-built-ZoneEngine_New.dll> --login-engine <absolute-built-LoginEngine.exe-or-dll> --runtime-gamedata <absolute-normalized-GameData-copy>
+```
+
+The first command runs the complete NewEngine suite using the existing
+`AO_REBIRTH_GAMEDATA_PATH` selection. The second extends the existing disposable
+connected fixture with the same explicit root; it requires working Docker and
+its pinned MySQL image. Component tests do not prove full process startup or
+connected mission lifecycle acceptance. The connected fixture currently verifies
+accepted mission hydration/reconnect. For the scoped typed-mission connected
+matrix, append `--mission-matrix` to the normalized connected command above.
+This mode exercises authenticated roll/offer serialization, acceptance, entrance
+use, NPC appearance and weapon messages, combat/death, typed corpse projection,
+logout and accepted-mission restoration. It uses disposable pre-start fixture
+setup and authenticated protocol actions; it does not control the AO client.
+It does not replace or relax assertions in the broader nano/inventory scenario.
+
 ## Mandatory local integration gate
 
 When Mike explicitly requests this acceptance event, run the complete

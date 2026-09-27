@@ -224,8 +224,7 @@ public sealed partial class GeneratedMissionAcgService
                 if (npc.Stats.GetOrZero(CharacterStat.Health) != state.CurrentHealth || npc.Stats.GetOrZero(CharacterStat.MaxHealth) != state.MaxHealth)
                     throw new InvalidOperationException("Mission NPC adapter did not preserve the frozen difficulty health policy.");
             }
-            else if (new ZoneMessageCodec().Deserialize(source.CopyPacket())?.Body == null)
-                throw new InvalidOperationException("Accepted static object wire is unavailable.");
+            else (source.Spawn ?? throw new InvalidOperationException("Mission object content is unavailable.")).Validate();
             result.Add(state);
         }
         return result;

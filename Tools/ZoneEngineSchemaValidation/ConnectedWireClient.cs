@@ -14,8 +14,12 @@ sealed class ConnectedWireClient : IDisposable
     readonly NetworkStream network;
     readonly bool paddedLoginFrames;
     Stream input;
+    ushort nextCompressedPacket = 1;
     public List<MessageBody> Received { get; } = [];
     public List<byte[]> Packets { get; } = [];
+    // A scenario may validate an explicitly supported opaque packet in full.
+    // Unrecognized packets still use the normal decoder and fail normally.
+    public Func<byte[], bool>? IsVerifiedOpaquePacket { get; set; }
     public ConnectedWireClient(int port, bool paddedLoginFrames = false)
     {
         this.paddedLoginFrames = paddedLoginFrames;
@@ -73,7 +77,14 @@ sealed class ConnectedWireClient : IDisposable
             input = new ZLibStream(network, CompressionMode.Decompress, leaveOpen: true);
             return null;
         }
+        if (!ReferenceEquals(input, network))
+        {
+            ushort number = BinaryPrimitives.ReadUInt16BigEndian(packet);
+            if (number != nextCompressedPacket) throw new FixtureFailure("connected-invalid-compressed-sequence");
+            nextCompressedPacket = unchecked((ushort)(nextCompressedPacket + 1));
+        }
         Packets.Add(packet);
+        if (IsVerifiedOpaquePacket?.Invoke(packet) == true) return null;
         using var stream = new MemoryStream(packet);
         return serializer.Deserialize(stream)?.Body;
     }

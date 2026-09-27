@@ -10,15 +10,10 @@ using ZoneEngine.Core.Missions;
 using WireReader = SmokeLounge.AOtomation.Messaging.Serialization.StreamReader;
 using WireWriter = SmokeLounge.AOtomation.Messaging.Serialization.StreamWriter;
 
-/// <summary>One codec for frozen DAO offers and accepted packet fixtures. Never constructs game content.</summary>
+/// <summary>Codec for current DAO-owned offers. Historical mission responses are normalized offline.</summary>
 internal static class GeneratedMissionWire
 {
     static readonly SerializerResolver Resolver = new SerializerResolverBuilder<MessageBody>().Build();
-    static readonly byte[][] Captures = MissionRollCaptureLibrary.CapturedRollBodiesHex.Select(Convert.FromHexString).ToArray();
-    internal static int CapturedCount => Captures.Length;
-    internal static byte[] CapturedBody(int index) => (byte[])Captures[index].Clone();
-    internal static byte[] TemplateBody => Convert.FromHexString(MissionRollCaptureTemplate.CapturedPacketHex)[MissionRollCaptureTemplate.TransportHeaderLength..];
-    internal static QuestAlternativeMessage DecodeTemplate() => Read(TemplateBody);
     internal static QuestAlternativeMessage Read(byte[] body)
     {
         ArgumentNullException.ThrowIfNull(body);

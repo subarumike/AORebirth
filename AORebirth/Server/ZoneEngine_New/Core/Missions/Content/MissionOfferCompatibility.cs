@@ -112,9 +112,9 @@ namespace ZoneEngine.Core.Missions
             return true;
         }
 
-        internal static bool TryDescribeCaptured(
+        internal static bool TryDescribeContent(
             QuestInfo offer,
-            Identity capturedTerminal,
+            Identity templateTerminal,
             out MissionOfferDescriptor descriptor,
             out string error)
         {
@@ -126,16 +126,16 @@ namespace ZoneEngine.Core.Missions
             if (offer.QuestActions.Length != 1
                 || (int)offer.QuestActions[0].Playfield.Type != (int)IdentityType.Playfield2
                 || offer.QuestActions[0].Playfield.Instance == 0
-                || !HasCapturedObjectiveShape(descriptor.Type, offer.QuestActions[0]))
+                || !HasContentObjectiveShape(descriptor.Type, offer.QuestActions[0]))
             {
-                error = "Captured objective slot shape does not match icon/type.";
+                error = "Content objective slot shape does not match icon/type.";
                 return false;
             }
 
             if (descriptor.Type == MissionRollType.FindItemReturn
-                && offer.QuestActions[0].Unknown1 != capturedTerminal)
+                && offer.QuestActions[0].Unknown1 != templateTerminal)
             {
-                error = "Captured return objective does not reference its issuing terminal.";
+                error = "Content return objective does not reference its issuing terminal.";
                 return false;
             }
 
@@ -148,7 +148,7 @@ namespace ZoneEngine.Core.Missions
                 || offer.ItemRewards.Length != 1
                 || offer.ItemRewards[0] == null)
             {
-                error = "Captured target or reward shell does not match the finalized corpus.";
+                error = "Content target or reward shell does not match the typed content contract.";
                 return false;
             }
 
@@ -163,7 +163,7 @@ namespace ZoneEngine.Core.Missions
                     info.Substring(0, 28),
                     StringComparison.Ordinal))
             {
-                error = "Captured text shell does not match its exact prefix family.";
+                error = "Content text shell does not match its exact prefix family.";
                 return false;
             }
 
@@ -312,7 +312,7 @@ namespace ZoneEngine.Core.Missions
                 ? text : throw new ArgumentOutOfRangeException(nameof(type));
         }
 
-        private static bool HasCapturedObjectiveShape(
+        private static bool HasContentObjectiveShape(
             MissionRollType type,
             QuestActionList action)
         {

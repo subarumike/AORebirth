@@ -216,7 +216,7 @@ static partial class ConnectedAcceptanceSmoke
     static ConnectedWireClient Enter(DisposableSchemaDatabase fixture, string password)
         => EnterWithHandoff(fixture, Authorize(fixture, password));
 
-    static ZoneLoginMessage Authorize(DisposableSchemaDatabase fixture, string password, string account = Account, int owner = Owner)
+    internal static ZoneLoginMessage Authorize(DisposableSchemaDatabase fixture, string password, string account = Account, int owner = Owner)
     {
         using var login = new ConnectedWireClient(fixture.LoginPort, paddedLoginFrames: true);
         login.Send(new UserLoginMessage { UserName = account, ClientVersion = "18.8.53_EP1" });

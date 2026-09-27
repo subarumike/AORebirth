@@ -23,9 +23,8 @@ public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Laz
             || state.CurrentHealth > state.MaxHealth || state.IsDead
             || state.RuntimeInstance != evidence.RuntimeInstance || state.RuntimeType != evidence.RuntimeType)
             throw new InvalidOperationException("Mission NPC requires its exact live durable level/health and identity.");
-        var source = evidence.CopySpawnMessage();
-        if (!source.TailFullyDecoded || source.UndecodedTail?.Length > 0)
-            throw new InvalidOperationException("Mission NPC appearance must be a completely decoded accepted spawn.");
+        var source = evidence.Appearance;
+        source.Validate();
         var npc = new GeneratedMissionNpcCharacter(new Identity { Type = (IdentityType)state.RuntimeType,
             Instance = state.RuntimeInstance }, items, missions) { Name = evidence.Name, AggroRadius = _content.AggroRadius };
 
@@ -34,7 +33,7 @@ public sealed class GeneratedMissionNpcFactory(IItemTemplateCatalog catalog, Laz
         npc.Stats.Set(CharacterStat.MaxHealth, state.MaxHealth.Value);
         npc.Stats.Set(CharacterStat.Health, state.CurrentHealth.Value);
         npc.Stats.Set(CharacterStat.MonsterData, evidence.MonsterData);
-        npc.Stats.Set(CharacterStat.Scale, source.MonsterScale);
+        npc.Stats.Set(CharacterStat.Scale, source.Scale);
         npc.Stats.Set(CharacterStat.HeadMesh, checked((int)(source.HeadMesh ?? 0)));
         foreach (var texture in source.Textures ?? []) npc.SetSpawnTexture(texture.Place, texture.Id);
         foreach (var mesh in source.Meshes ?? []) npc.AddSpawnMesh(mesh);

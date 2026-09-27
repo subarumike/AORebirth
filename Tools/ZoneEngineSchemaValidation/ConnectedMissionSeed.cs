@@ -6,7 +6,7 @@ using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Missions;
 
-/// <summary>Administrative pre-start fixture only. Uses accepted generator, captured bundles and production DAO.</summary>
+/// <summary>Administrative pre-start fixture only. Uses accepted generator, typed bundles and production DAO.</summary>
 static class ConnectedMissionSeed
 {
     public static GeneratedMissionBinding Create(DisposableSchemaDatabase fixture, int owner)
@@ -16,8 +16,9 @@ static class ConnectedMissionSeed
         var request = new QuestAlternativeMessage { Identity = character, LevelSlider = 1,
             MissionTerminalIdentity = new Identity { Type = (IdentityType)0xDAC1, Instance = 12345 }, QuestInfos = [] };
         int offerId = dao.ReserveIdentities("offer", 5);
-        var response = MissionRollService.BuildRollResponseDeterministic(request, character, 60, 710,
-            500, 500, MissionLocationSide.Omni, 1234, 4567, offerId, 1201445827);
+        int nextOffer = offerId;
+        var response = GeneratedMissionRollService.Generate(request, character, 60, 710,
+            500, 500, MissionLocationSide.Omni, 1234, 4567, 1201445827, () => nextOffer++);
         DateTime now = DateTime.UtcNow;
         var batch = GeneratedMissionRollProjection.Create(request, response, 710, 0, 1234, 4567, now);
         batch.CurrentCash = 1234;
@@ -27,19 +28,17 @@ static class ConnectedMissionSeed
         int seed;
         unchecked { seed = 17; foreach (int value in new[] { offer.OfferType, offer.OfferInstance, 50000, owner, offer.MissionType, offer.Quality }) seed = seed * 31 + value; }
         var catalog = MissionAcgLayoutCatalogLoader.Load(MissionAcgCapturedLayoutCatalog.CreateBundles(), []);
-        var bundle = MissionAcgLayoutSelector.Select(catalog, new MissionAcgSelectionInput(seed,
-            (MissionRollType)offer.MissionType, offer.Quality, new(50000, owner)));
+        var bundle = MissionGenerationSettings.Current.Select(catalog, offer.MissionType, offer.Quality, seed);
         int quest = dao.ReserveIdentities("quest", 1), pf = dao.ReserveIdentities("playfield", 1);
         int key = new MySqlInventoryRepository(new SilentLogger()).LeaseInstanceIdBlock(1);
-        var immutable = new MissionAcgInstanceBinding(MissionAcgInstanceBinding.CurrentFormatVersion,
-            new(0xDAC3, quest), new(offer.OfferType, offer.OfferInstance), new(50000, owner), null,
-            (MissionRollType)offer.MissionType, offer.Quality, seed, new(0xC76D, key),
-            new(offer.EntranceType, offer.EntranceInstance), offer.EntranceLow, offer.EntranceHigh,
-            offer.DestinationX, offer.DestinationY, offer.DestinationZ,
-            new(offer.IssuingTerminalType, offer.IssuingTerminalInstance), bundle.LayoutId,
-            bundle.GeneratorPayloadSha256, bundle.BuildingIdentity, pf, now, now.AddHours(48), true);
-        var record = new MissionAcgBindingRecord(immutable,
-            new MissionAcgInstanceState(MissionAcgLifecycleState.Active, MissionAcgCleanupState.None, now, null), string.Empty);
+        var record = new GeneratedMissionBinding {
+            OwnerId = owner, OfferType = offer.OfferType, OfferInstance = offer.OfferInstance,
+            QuestType = 0xDAC3, QuestInstance = quest, KeyInstance = key, Offer = offer,
+            BundleId = bundle.LayoutId, BundleSha256 = GeneratedMissionAcgService.CanonicalBundleHash(bundle),
+            BuildingType = bundle.BuildingIdentity.Type, BuildingInstance = bundle.BuildingIdentity.Instance,
+            LivePlayfield = pf, AcceptedAtUtcTicks = now.Ticks, ExpiresAtUtcTicks = now.AddHours(48).Ticks,
+            State = GeneratedMissionState.Active, Version = 1
+        };
         if (!MissionAcgRuntimeMaterializer.TryMaterialize(record, bundle, null, now, out var instance, out string failure))
             throw new FixtureFailure("connected-generated-materialization-" + failure);
         var objects = instance.Objects.Select(source =>
@@ -55,8 +54,8 @@ static class ConnectedMissionSeed
             {
                 var evidence = new GeneratedMissionNpcEvidence(source, bundle, offer.Quality, offer.MissionType);
                 var random = new Random(unchecked(seed ^ evidence.CapturedSlot * 397 ^ evidence.CapturedInstance));
-                state.Level = MissionNpcDifficultyPolicy.ResolveLevel(offer.Quality, random);
-                state.MaxHealth = MissionNpcDifficultyPolicy.ResolveHealth(state.Level.Value, random);
+                state.Level = MissionGenerationSettings.Current.Level.Sample(offer.Quality, random);
+                state.MaxHealth = MissionGenerationSettings.Current.Health.Sample(state.Level.Value, random);
                 state.CurrentHealth = state.MaxHealth;
             }
             return state;
@@ -68,7 +67,7 @@ static class ConnectedMissionSeed
             BundleId = bundle.LayoutId, BundleSha256 = GeneratedMissionAcgService.CanonicalBundleHash(bundle),
             BuildingType = bundle.BuildingIdentity.Type, BuildingInstance = bundle.BuildingIdentity.Instance, LivePlayfield = pf,
             ObjectiveType = objective.Identity.RuntimeIdentity.Type, ObjectiveInstance = objective.Identity.RuntimeIdentity.Instance,
-            ObjectiveTemplateId = slot.TemplateId, ObjectiveInteraction = (int)MissionAcgObjectiveContract.InteractionFor((MissionRollType)offer.MissionType),
+            ObjectiveTemplateId = slot.TemplateId, ObjectiveInteraction = MissionRollPolicy.Current.ObjectiveInteraction((MissionRollType)offer.MissionType),
             RequiredCount = 1, AcceptedAtUtcTicks = now.Ticks, ExpiresAtUtcTicks = now.AddHours(48).Ticks, Objects = objects,
             Artifacts = [new MissionItemInstanceData { InstanceId = key, ContainerType = 104, ContainerInstance = owner,
                 ContainerPlacement = 67, ItemType = 0xC76D, LowId = 28577, HighId = 28577, Quality = 1, StackCount = 1, Source = 0 }] };

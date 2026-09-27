@@ -11,12 +11,10 @@ using System.IO;
 // Serialized field names belong to the existing editable Layouts.json contract.
 // These records contain no world content or lifecycle/persistence algorithms.
 internal enum MissionAcgWireCategory { Unknown, Door, Chest, Terminal }
-internal enum MissionAcgRetargetCategory { Unknown, CharacterInstance, Playfield2Instance, ParentIdentityType, ParentIdentityInstance, DynelIdentityType, DynelIdentityInstance, BuildingIdentityType, BuildingIdentityInstance }
 internal enum MissionAcgLayoutCompletenessState { CompleteSelectable = 1, StructurallyCompleteObjectiveIncomplete, IncompleteNonSelectable, ConflictingRejected }
 internal sealed record MissionAcgIdentityRecord(int Type, int Instance);
 internal sealed record MissionAcgPointRecord(float X, float Y, float Z);
 internal sealed record MissionAcgRotationRecord(float X, float Y, float Z, float W);
-internal sealed record MissionAcgRetargetSlotRecord(MissionAcgRetargetCategory Category, int Slot, int ByteOffset, int CapturedValue);
 internal sealed record MissionAcgNpcTextureRecord(int Slot, int TextureId, int Unknown = 0);
 internal sealed record MissionAcgNpcMeshRecord(int Position, int MeshId, int Unknown1, int Unknown2);
 
@@ -24,13 +22,10 @@ internal sealed class MissionAcgWireRecord
 {
     public MissionAcgWireCategory Category { get; init; }
     public int Slot { get; init; }
-    public string PacketHex { get; init; } = "";
-    public string PacketSha256 => MissionAcgHash.ComputeSha256(CopyPacketBytes());
+    public MissionSpawnContent Spawn { get; init; }
     public MissionAcgIdentityRecord CapturedIdentity { get; init; }
     public int? CapturedPlayfield2 { get; init; }
     public MissionAcgIdentityRecord CapturedParentIdentity { get; init; }
-    public IReadOnlyList<MissionAcgRetargetSlotRecord> RetargetSlots { get; init; } = [];
-    internal byte[] CopyPacketBytes() => Convert.FromHexString(PacketHex);
 }
 
 internal sealed class MissionAcgProvenanceRecord
@@ -74,10 +69,9 @@ internal class MissionLayoutPlacement
     public MissionAcgRotationRecord Heading { get; init; }
     public int TemplateId { get; init; }
     public string Name { get; init; } = "";
-    public string RawPacketHex { get; init; } = "";
-    public string RawPacketSha256 => RawPacketHex.Length == 0 ? "" : MissionAcgHash.ComputeSha256(CopyRawPacket());
+    public MissionSpawnContent Spawn { get; init; }
+    public MissionNpcAppearance Appearance { get; init; }
     public IReadOnlyList<MissionAcgProvenanceRecord> Provenance { get; init; } = [];
-    internal byte[] CopyRawPacket() => Convert.FromHexString(RawPacketHex);
 }
 
 internal sealed class MissionAcgNpcSlotRecord : MissionLayoutPlacement
@@ -140,7 +134,7 @@ internal sealed record MissionAcgLayoutExclusion(string LayoutId, int SourcePlay
 
 internal sealed class MissionAcgLayoutBundle
 {
-    internal const int CurrentFormatVersion = 1;
+    internal const int CurrentFormatVersion = 2;
     public int BundleFormatVersion { get; init; }
     public string LayoutId { get; init; } = "";
     public int SourcePlayfield2 { get; init; }
@@ -180,9 +174,8 @@ internal sealed class MissionAcgLayoutBundle
             throw new InvalidDataException("Invalid mission layout structure.");
         foreach (var wire in WireRecords)
             if (wire.Slot < 0 || wire.Category == MissionAcgWireCategory.Unknown || !Enum.IsDefined(wire.Category)
-                || wire.RetargetSlots == null || wire.RetargetSlots.Any(slot => slot == null || slot.Slot < 0 || slot.ByteOffset < 0
-                    || slot.Category == MissionAcgRetargetCategory.Unknown || !Enum.IsDefined(slot.Category)))
-                throw new InvalidDataException("Invalid mission layout wire or retarget slot.");
+                || wire.Spawn == null)
+                throw new InvalidDataException("Invalid typed mission object definition.");
     }
 }
 

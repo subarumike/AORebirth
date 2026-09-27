@@ -26,6 +26,8 @@ internal static class MissionContentJson
     static object? ReadValue(JsonElement node, Type type)
     {
         if (node.ValueKind == JsonValueKind.Null) return null;
+        if (type == typeof(MissionSpawnContent) || type == typeof(MissionNpcAppearance))
+            return JsonSerializer.Deserialize(node.GetRawText(), type, MissionTypedJson.Options);
         var nullable = Nullable.GetUnderlyingType(type);
         if (nullable != null) return ReadValue(node, nullable);
         if (type == typeof(string)) return node.GetString();

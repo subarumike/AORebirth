@@ -11,7 +11,7 @@ using ZoneEngine_New.Core.Entities;
 /// <summary>Composes editable mission content into a five-offer packet before the DAO publishes and charges it.</summary>
 internal static class GeneratedMissionRollService
 {
-    sealed record Shell(byte[] Body, int Index, Identity Terminal, MissionOfferDescriptor Description);
+    sealed record Shell(QuestInfo Definition, Identity Terminal, MissionOfferDescriptor Description);
 
     internal static QuestAlternativeMessage Generate(QuestAlternativeMessage request, Identity character, int characterLevel,
         int terminalPlayfield, float terminalX, float terminalZ, MissionLocationSide side,
@@ -24,7 +24,7 @@ internal static class GeneratedMissionRollService
         int quality = MissionLevelRuntime.GetMissionQuality(characterLevel, request.LevelSlider);
         var random = new Random(seed);
         var policy = MissionRollPolicy.Current;
-        var response = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody((int)((uint)nonce % (uint)GeneratedMissionWire.CapturedCount)));
+        var response = MissionOfferContent.Current.CopyResponse((int)((uint)nonce % (uint)MissionOfferContent.Current.Responses.Length));
         response.Identity = character;
         response.MissionTerminalIdentity = request.MissionTerminalIdentity;
         var locations = new MissionRollLocations(level, terminalPlayfield, terminalX, terminalZ, side);
@@ -35,10 +35,10 @@ internal static class GeneratedMissionRollService
         response.QuestInfos = types.Select(type =>
         {
             var candidates = shells.Where(s => s.Description.Type == type && MissionOfferCompatibility.IsCompatibleWithSliders(s.Description, sliders)).ToArray();
-            if (candidates.Length == 0) throw new InvalidOperationException("No compatible packet shell exists for " + type);
+            if (candidates.Length == 0) throw new InvalidOperationException("No compatible typed offer definition exists for " + type);
             var template = candidates[random.Next(candidates.Length)];
-            // Decode the complete captured envelope so repeated types never share mutable arrays.
-            var offer = GeneratedMissionWire.Read(template.Body).QuestInfos[template.Index];
+            // Copy typed content so repeated types never share mutable arrays.
+            var offer = MissionTypedJson.Copy(template.Definition);
             var originalText = MissionOfferTextBuilder.Capture(offer);
             int identity = durableIds();
             if (identity <= 0 || !identities.Add(identity)) throw new InvalidOperationException("Durable mission identities must be positive and unique.");
@@ -77,14 +77,10 @@ internal static class GeneratedMissionRollService
     static Shell[] ReadShells()
     {
         var shells = new List<Shell>();
-        for (int index = 0; index < GeneratedMissionWire.CapturedCount; index++)
-        {
-            byte[] body = GeneratedMissionWire.CapturedBody(index);
-            var packet = GeneratedMissionWire.Read(body);
-            for (int offer = 0; offer < (packet.QuestInfos?.Length ?? 0); offer++)
-                if (MissionOfferCompatibility.TryDescribeCaptured(packet.QuestInfos![offer], packet.MissionTerminalIdentity, out var descriptor, out _))
-                    shells.Add(new(body, offer, packet.MissionTerminalIdentity, descriptor));
-        }
+        foreach (var response in MissionOfferContent.Current.Responses)
+            foreach (var offer in response.QuestInfos)
+                if (MissionOfferCompatibility.TryDescribeContent(offer, response.MissionTerminalIdentity, out var descriptor, out _))
+                    shells.Add(new(offer, response.MissionTerminalIdentity, descriptor));
         return shells.ToArray();
     }
 }

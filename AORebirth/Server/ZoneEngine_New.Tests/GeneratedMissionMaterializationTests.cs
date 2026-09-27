@@ -67,14 +67,14 @@ public sealed class GeneratedMissionMaterializationTests
     }
 
     [TestMethod]
-    public void AcceptedWorldChestWireRoundTripsAndOwnedFormOmitsOnlyItsTransform()
+    public void TypedWorldChestWireRoundTripsAndOwnedFormOmitsOnlyItsTransform()
     {
         var codec = new ZoneMessageCodec();
         int checkedPackets = 0;
         foreach (var bundle in MissionAcgCapturedLayoutCatalog.CreateBundles())
         foreach (var wire in bundle.WireRecords.Where(w => w.Category == MissionAcgWireCategory.Chest))
         {
-            byte[] original = wire.CopyPacketBytes();
+            byte[] original = codec.Serialize(MissionTypedJson.Copy(wire.Spawn.Chest!), 0, 12345);
             var message = codec.Deserialize(original)!;
             var chest = (ChestItemFullUpdateMessage)message.Body;
             Assert.AreEqual(Identity.None, chest.Owner);
@@ -145,7 +145,7 @@ public sealed class GeneratedMissionMaterializationTests
                     .Select(pair => pair.Value).SingleOrDefault();
                 var expected = GeneratedMissionCorpseWire.Build(evidence.Name, row.RuntimeInstance, row.RuntimeInstance,
                     binding.OwnerId, binding.LivePlayfield, row.X, row.Y, row.Z, binding.LivePlayfield,
-                    evidence.CopySpawnMessage().MonsterScale, 2, 1, 1, catMesh, evidence.MonsterData, 29);
+                    evidence.Appearance.Scale, 2, 1, 1, catMesh, evidence.MonsterData, 29);
                 CollectionAssert.AreEqual(expected.AsSpan(16).ToArray(), corpse.AsSpan(16).ToArray());
                 Assert.AreEqual(0xDFDF, BinaryPrimitives.ReadUInt16BigEndian(corpse.AsSpan(0, 2)));
                 row.CorpseClaimed = true;

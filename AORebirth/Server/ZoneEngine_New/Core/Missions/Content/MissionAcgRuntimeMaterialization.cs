@@ -52,7 +52,7 @@ namespace ZoneEngine.Core.Missions
 
     internal sealed class MissionAcgRuntimeObject
     {
-        private readonly byte[] packet;
+        private readonly MissionSpawnContent spawn;
 
         internal MissionAcgRuntimeObject(
             MissionAcgRuntimeIdentityEntry identity,
@@ -60,7 +60,7 @@ namespace ZoneEngine.Core.Missions
             MissionAcgRotationRecord heading,
             int templateId,
             string name,
-            byte[] packet)
+            MissionSpawnContent spawn)
         {
             if (identity == null)
             {
@@ -72,7 +72,7 @@ namespace ZoneEngine.Core.Missions
             this.Heading = heading;
             this.TemplateId = templateId;
             this.Name = name ?? string.Empty;
-            this.packet = packet == null ? new byte[0] : (byte[])packet.Clone();
+            this.spawn = spawn;
         }
 
         internal MissionAcgRuntimeIdentityEntry Identity { get; private set; }
@@ -85,18 +85,7 @@ namespace ZoneEngine.Core.Missions
 
         internal string Name { get; private set; }
 
-        internal bool HasPacket
-        {
-            get
-            {
-                return this.packet.Length != 0;
-            }
-        }
-
-        internal byte[] CopyPacket()
-        {
-            return (byte[])this.packet.Clone();
-        }
+        internal MissionSpawnContent Spawn => this.spawn;
     }
 
     internal sealed class MissionAcgRuntimeDoorState
@@ -565,12 +554,7 @@ namespace ZoneEngine.Core.Missions
                     dynel.Heading,
                     dynel.TemplateId,
                     dynel.Name,
-                    dynel.Wire == null
-                        ? new byte[0]
-                        : RetargetWire(
-                            dynel.Wire,
-                            bindingRecord,
-                            byCaptured));
+                    dynel.Wire?.Spawn);
             }
 
             for (int i = 0; i < bundle.NpcSlots.Count; i++)
@@ -587,13 +571,7 @@ namespace ZoneEngine.Core.Missions
                     npc.Heading,
                     npc.TemplateId,
                     npc.Name,
-                    RetargetOpaqueCapturedPacket(
-                        npc.CopyRawPacket(),
-                        npc.CapturedIdentity,
-                        npc.CapturedPlayfield2,
-                        bundle.CapturedPlayerIdentity,
-                        bindingRecord,
-                        identity.RuntimeIdentity));
+                    null);
             }
 
             for (int i = 0; i < bundle.ObjectiveSlots.Count; i++)
@@ -610,13 +588,7 @@ namespace ZoneEngine.Core.Missions
                     objective.Heading,
                     objective.TemplateId,
                     objective.Name,
-                    RetargetOpaqueCapturedPacket(
-                        objective.CopyRawPacket(),
-                        objective.CapturedIdentity,
-                        objective.CapturedPlayfield2,
-                        bundle.CapturedPlayerIdentity,
-                        bindingRecord,
-                        identity.RuntimeIdentity));
+                    objective.Spawn);
             }
 
             instance = new MissionAcgMaterializedInstance(
@@ -964,7 +936,7 @@ namespace ZoneEngine.Core.Missions
             MissionAcgRotationRecord heading,
             int templateId,
             string name,
-            byte[] packet)
+            MissionSpawnContent spawn)
         {
             string key = IdentityKey(identity.RuntimeIdentity);
             if (!added.Add(key))
@@ -987,135 +959,7 @@ namespace ZoneEngine.Core.Missions
                     heading,
                     templateId,
                     name,
-                    packet));
-        }
-
-        private static byte[] RetargetWire(
-            MissionAcgWireRecord wire,
-            GeneratedMissionBinding binding,
-            IDictionary<string, MissionAcgRuntimeIdentityEntry> byCaptured)
-        {
-            byte[] packet = wire.CopyPacketBytes();
-            MissionAcgRuntimeIdentityEntry runtime =
-                byCaptured[IdentityKey(wire.CapturedIdentity)];
-            for (int i = 0; i < wire.RetargetSlots.Count; i++)
-            {
-                MissionAcgRetargetSlotRecord slot = wire.RetargetSlots[i];
-                if (MissionAcgHash.ReadInt32BigEndian(packet, slot.ByteOffset)
-                    != slot.CapturedValue)
-                {
-                    throw new InvalidOperationException(
-                        "Captured retarget slot no longer matches packet evidence.");
-                }
-
-                int value;
-                switch (slot.Category)
-                {
-                    case MissionAcgRetargetCategory.CharacterInstance:
-                        value = binding.OwnerId;
-                        break;
-                    case MissionAcgRetargetCategory.Playfield2Instance:
-                        value = binding.LivePlayfield;
-                        break;
-                    case MissionAcgRetargetCategory.DynelIdentityType:
-                        value = runtime.RuntimeIdentity.Type;
-                        break;
-                    case MissionAcgRetargetCategory.DynelIdentityInstance:
-                        value = runtime.RuntimeIdentity.Instance;
-                        break;
-                    case MissionAcgRetargetCategory.ParentIdentityType:
-                        value =
-                            wire.CapturedParentIdentity == null
-                                ? slot.CapturedValue
-                                : 50000;
-                        break;
-                    case MissionAcgRetargetCategory.ParentIdentityInstance:
-                        value =
-                            wire.CapturedParentIdentity == null
-                                ? slot.CapturedValue
-                                : binding.OwnerId;
-                        break;
-                    case MissionAcgRetargetCategory.BuildingIdentityType:
-                        value = binding.BuildingType;
-                        break;
-                    case MissionAcgRetargetCategory.BuildingIdentityInstance:
-                        value = binding.BuildingInstance;
-                        break;
-                    default:
-                        throw new InvalidOperationException(
-                            "Unsupported captured retarget category.");
-                }
-
-                WriteInt32BigEndian(packet, slot.ByteOffset, value);
-            }
-
-            return packet;
-        }
-
-        private static byte[] RetargetOpaqueCapturedPacket(
-            byte[] packet,
-            MissionAcgIdentityRecord capturedIdentity,
-            int? capturedPlayfield2,
-            MissionAcgIdentityRecord capturedPlayer,
-            GeneratedMissionBinding binding,
-            MissionAcgIdentityRecord runtimeIdentity)
-        {
-            if (packet == null || packet.Length == 0)
-            {
-                return new byte[0];
-            }
-
-            ReplaceInt32(packet, capturedIdentity.Type, runtimeIdentity.Type);
-            ReplaceInt32(packet, capturedIdentity.Instance, runtimeIdentity.Instance);
-            if (capturedPlayfield2.HasValue)
-            {
-                ReplaceInt32(
-                    packet,
-                    capturedPlayfield2.Value,
-                    binding.LivePlayfield);
-            }
-
-            if (capturedPlayer != null)
-            {
-                ReplaceInt32(
-                    packet,
-                    capturedPlayer.Instance,
-                    binding.OwnerId);
-            }
-
-            return packet;
-        }
-
-        private static void ReplaceInt32(byte[] packet, int from, int to)
-        {
-            if (from == to)
-            {
-                return;
-            }
-
-            byte b0 = (byte)(from >> 24);
-            byte b1 = (byte)(from >> 16);
-            byte b2 = (byte)(from >> 8);
-            byte b3 = (byte)from;
-            for (int i = 0; i + 4 <= packet.Length; i++)
-            {
-                if (packet[i] == b0
-                    && packet[i + 1] == b1
-                    && packet[i + 2] == b2
-                    && packet[i + 3] == b3)
-                {
-                    WriteInt32BigEndian(packet, i, to);
-                    i += 3;
-                }
-            }
-        }
-
-        private static void WriteInt32BigEndian(byte[] bytes, int offset, int value)
-        {
-            bytes[offset] = (byte)(value >> 24);
-            bytes[offset + 1] = (byte)(value >> 16);
-            bytes[offset + 2] = (byte)(value >> 8);
-            bytes[offset + 3] = (byte)value;
+                    spawn));
         }
 
         private static string IdentityKey(MissionAcgIdentityRecord identity)

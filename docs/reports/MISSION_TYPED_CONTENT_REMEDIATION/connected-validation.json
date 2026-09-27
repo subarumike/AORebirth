@@ -1,0 +1,64 @@
+{
+  "base_sha": "3c904f760513af8110b78e353c09a9296a0d76a9",
+  "branch": "codex/mission-typed-content",
+  "runtime_gamedata": "C:\\Users\\Mike\\.codex\\worktrees\\mission-typed-content\\AORebirth-fresh\\build-verify\\mission-runtime\\GameData",
+  "absent_files": {
+    "RollBodies.json": true,
+    "RollTemplate.json": true,
+    "Provenance.json": true
+  },
+  "normalized_inputs": {
+    "MissionOffers.json": {
+      "sha256": "ae24bada3100d1874135b3d6081a29da99a9f8c3ec5d4ede099866d64ae607b3",
+      "forbidden_fields": []
+    },
+    "Layouts.json": {
+      "sha256": "f9456d5025fa36340dd876732d62b1a39d3f402154ab0e6fdfa4988c99825c37",
+      "forbidden_fields": []
+    }
+  },
+  "protected_candidate_sources": {
+    "protected_files": 2332,
+    "modified": []
+  },
+  "connected_results": [
+    "NORMALIZED_RUNTIME_INPUTS=PASS HISTORICAL_ROLL_BODIES=ABSENT HISTORICAL_LAYOUT_PACKETS=ABSENT",
+    "MISSION_FULL_STARTUP=PASS ZONE_PID=38100 LOGIN_PID=22740 ZONE_SHA256=0edccb79623ae03ae55041b033e27328b39d090fad4d3f405184cc2391de67b1 LOGIN_SHA256=095f69449814e6b375d4b337f3bce9390e6ef333899b4b45a20901a668d9d618",
+    "MISSION_LOGIN=PASS",
+    "MISSION_ROLL=PASS OFFER_SERIALIZATION=PASS OFFERS=5",
+    "MISSION_SELECTED_TYPE=FindPerson",
+    "MISSION_ACCEPTANCE=PASS BUNDLE=capture-20260728-012547-00D734E7-0016700C-d5413273f69b018b HASH=d5413273f69b018b66fcd6fe31bfa7be15b338cb6cb8fd17d83f7e14c4e4be82",
+    "MISSION_ENTRY=PASS LIVE_PLAYFIELD=1441792",
+    "MISSION_NPC_CREATION=PASS MISSION_NPC_APPEARANCE=PASS MISSION_STATIC_OBJECTS=PASS",
+    "MISSION_NPC_WEAPON_BEHAVIOR=PASS NPC_ATTACKED_PLAYER=PASS",
+    "MISSION_CORPSE_EXACT_WIRE=PASS SHA256=3AC2C3E2A7379F294EF22A39EDF7BA3C1034C7D91A486FFA131F0534FBD2A231",
+    "MISSION_NPC_DEATH=PASS MISSION_CORPSE_PROJECTION=PASS EXACT_BYTES=430",
+    "MISSION_LOGOUT=PASS",
+    "MISSION_CORPSE_EXACT_WIRE=PASS SHA256=C0A4FF3E73B372D7AC5DBE8A896DF1F01A8B0442C22597BC6B9ABAD0E5BD1B62",
+    "MISSION_RECONNECT=PASS ACCEPTED_MISSION_RESTORATION=PASS",
+    "MISSION_LOGOUT=PASS",
+    "CONNECTED_MISSION_MATRIX=PASS",
+    "DISPOSABLE_CONTAINER_RESIDUE=NONE DISPOSABLE_NETWORK_RESIDUE=NONE DISPOSABLE_CLEANUP=PASS"
+  ],
+  "windows_build": "PASS",
+  "secret_scan": "PASS",
+  "newengine_suite": {
+    "passed": 867,
+    "failed": 2,
+    "total": 869,
+    "failures": "established baseline"
+  },
+  "messaging_suite": {
+    "passed": 632,
+    "failed": 2,
+    "total": 634,
+    "failures": "established baseline"
+  },
+  "os_file_access_trace": "UNVERIFIED: WPR FileIO denied 0x80070005",
+  "exact_sha_acceptance": "REFUSED: TRACKED_SOURCE_CLEAN=FAIL (uncommitted candidate)",
+  "commit_created": false,
+  "push_performed": false,
+  "diff_check": "PASS",
+  "engine_cleanup": "PASS: governed processes absent and ports clear",
+  "wpr_recording": "NONE"
+}

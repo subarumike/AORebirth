@@ -11,7 +11,9 @@ using MySqlConnector;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Logging;
 
-bool connected = args.Length == 5 && args[0] == "--run-connected" && args[3] == "--login-engine" && File.Exists(args[4]);
+bool missionMatrix = args.Length == 8 && args[7] == "--mission-matrix";
+bool isolated = (args.Length == 7 || missionMatrix) && args[5] == "--runtime-gamedata";
+bool connected = (args.Length == 5 || isolated) && args[0] == "--run-connected" && args[3] == "--login-engine" && File.Exists(args[4]);
 if ((!connected && (args.Length != 3 || args[0] != "--run-disposable")) || args[1] != "--engine" || !File.Exists(args[2]))
 {
     Console.Error.WriteLine("USAGE: ZoneEngineSchemaValidation --run-disposable --engine <absolute ZoneEngine_New.dll> OR --run-connected --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll>. Creates its own loopback-only, labeled disposable MySQL. Never reads production connection settings.");
@@ -19,6 +21,7 @@ if ((!connected && (args.Length != 3 || args[0] != "--run-disposable")) || args[
 }
 try
 {
+    if (isolated) FixtureEnvironment.SelectNormalizedGameData(args[6]);
     using var fixture = new DisposableSchemaDatabase();
     fixture.Start();
     using var connection = fixture.Open();
@@ -28,6 +31,11 @@ try
     {
         Require(MigrationSmoke.Run(fixture, MigrateArgs(), Console.Out) == 0, "connected-explicit-migration");
         EngineSmoke.Validate(args[2], fixture, SchemaState.SCHEMA_CURRENT);
+        if (missionMatrix)
+        {
+            ConnectedMissionMatrix.Validate(args[2], args[4], fixture, connection);
+            return 0;
+        }
         ConnectedAcceptanceSmoke.Validate(args[2], args[4], fixture, connection);
         return ConnectedAcceptanceSmoke.HandoffRejected ? 0 : 2;
     }
@@ -124,6 +132,17 @@ static class FixtureSql
     public static long Scalar(MySqlConnection connection, string sql) { using var command = new MySqlCommand(sql, connection); return Convert.ToInt64(command.ExecuteScalar(), CultureInfo.InvariantCulture); }
     public static void CreateBaseline(MySqlConnection connection)
     {
+        // Full playfield activation reads the existing shop DAO even when this
+        // fixture has no vendors. Install only its canonical table definitions,
+        // before engine startup, without importing unrelated vendor seed data.
+        foreach (string table in new[] { "vendors", "vendortemplate", "shopinventorytemplates" })
+        {
+            string sql = File.ReadAllText(Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(),
+                "AORebirth", "Libraries", "Source", "AORebirth.Database", "SqlTables", table + ".sql"));
+            var definition = Regex.Match(sql, @"CREATE TABLE[^;]+;", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            if (!definition.Success) throw new FixtureFailure("fixture-canonical-table-missing-" + table);
+            Execute(connection, definition.Value);
+        }
         // Minimal exact DAO contract fixture; no unrelated SqlTables bootstrap or seed data.
         // The canonical bootstrap includes its full teleport seed corpus as individual inserts.
         Execute(connection, File.ReadAllText(Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(),
@@ -279,7 +298,14 @@ static class MigrationSmoke
         // substitute. Its connection is supplied only through its own environment key.
         var start = new ProcessStartInfo("dotnet") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
         FixtureEnvironment.ClearInheritedRuntimeSettings(start);
-        start.ArgumentList.Add(typeof(MigrationCommand).Assembly.Location);
+        // A project-reference copy does not carry this executable's private
+        // dependency closure (the fixture uses the shared ASP.NET logging stack).
+        // Launch the separately built operator package required by this test.
+        var fixtureOutput = new DirectoryInfo(AppContext.BaseDirectory);
+        string migration = Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(), "Tools", "DatabaseMigrationTool", "bin",
+            fixtureOutput.Parent!.Name, fixtureOutput.Name, Path.GetFileName(typeof(MigrationCommand).Assembly.Location));
+        if (!File.Exists(migration)) throw new FixtureFailure("standalone-migration-tool-not-built");
+        start.ArgumentList.Add(migration);
         foreach (string argument in arguments) start.ArgumentList.Add(argument);
         start.Environment["AO_REBIRTH_MIGRATION_CONNECTION"] = fixture.ConnectionString;
         using var process = Process.Start(start) ?? throw new FixtureFailure("migration-tool-start-failed");
@@ -295,11 +321,30 @@ static class MigrationSmoke
 
 static class FixtureEnvironment
 {
+    public static string? RuntimeGameDataRoot { get; private set; }
+    public static void SelectNormalizedGameData(string path)
+    {
+        string root = Path.GetFullPath(path);
+        string missions = Path.Combine(root, "Missions");
+        if (!File.Exists(Path.Combine(missions, "MissionOffers.json")) || !File.Exists(Path.Combine(missions, "Layouts.json"))
+            || File.Exists(Path.Combine(missions, "RollBodies.json")) || File.Exists(Path.Combine(missions, "RollTemplate.json")))
+            throw new FixtureFailure("normalized-mission-inputs-not-isolated");
+        foreach (string file in new[] { "MissionOffers.json", "Layouts.json" })
+        {
+            string content = File.ReadAllText(Path.Combine(missions, file));
+            if (new[] { "\"RawPacketHex\"", "\"PacketHex\"", "\"RawPacket\"", "\"PacketBytes\"", "\"RawBody\"", "\"UndecodedTail\"", "\"RetargetSlots\"" }.Any(token => content.Contains(token, StringComparison.OrdinalIgnoreCase)))
+                throw new FixtureFailure("historical-payload-in-normalized-content");
+        }
+        RuntimeGameDataRoot = root;
+        Environment.SetEnvironmentVariable("AO_REBIRTH_GAMEDATA_PATH", root);
+        Console.WriteLine("NORMALIZED_RUNTIME_INPUTS=PASS HISTORICAL_ROLL_BODIES=ABSENT HISTORICAL_LAYOUT_PACKETS=ABSENT");
+    }
     public static void ClearInheritedRuntimeSettings(ProcessStartInfo start)
     {
         foreach (string key in start.Environment.Keys.Where(key => key.StartsWith("AO_REBIRTH_", StringComparison.OrdinalIgnoreCase)).ToArray())
             start.Environment.Remove(key);
         start.Environment.Remove("NOTIFY_SOCKET");
+        if (RuntimeGameDataRoot != null) start.Environment["AO_REBIRTH_GAMEDATA_PATH"] = RuntimeGameDataRoot;
     }
 }
 

@@ -178,8 +178,6 @@ namespace ZoneEngine.Core.Missions
     /// </summary>
     internal static class MissionAcgLayoutCatalogLoader
     {
-        internal const int ExplicitlyIncompleteShapePlayfield2 = 1441804;
-
         internal static MissionAcgLayoutCatalog Load(
             IEnumerable<MissionAcgLayoutBundle> layouts,
             IEnumerable<MissionAcgLayoutExclusion> exclusions)
@@ -412,26 +410,8 @@ namespace ZoneEngine.Core.Missions
                         "Completeness flags conflict with bundle content."));
             }
 
-            if (layout.SourcePlayfield2 == ExplicitlyIncompleteShapePlayfield2 && layout.IsSelectable)
-            {
-                issues.Add(
-                    Issue(
-                        MissionAcgCatalogValidationCode.IncompleteShapeSelectable,
-                        layout,
-                        "PF2 1441804 is an NPC-only incomplete capture and cannot be selectable."));
-            }
-
             if (layout.IsSelectable)
             {
-                if (IsZeroIdentity(layout.CapturedPlayerIdentity))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.SelectionConflict,
-                            layout,
-                            "Selectable layout has no captured player identity for wire retargeting."));
-                }
-
                 if (!completeness.IsSelectionComplete)
                 {
                     issues.Add(
@@ -524,147 +504,27 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        private static void ValidateWire(
-            MissionAcgLayoutBundle layout,
-            ICollection<MissionAcgCatalogValidationIssue> issues)
+        private static void ValidateWire(MissionAcgLayoutBundle layout, ICollection<MissionAcgCatalogValidationIssue> issues)
         {
-            var wireSlots = new HashSet<string>(StringComparer.Ordinal);
-            var packetHashes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var slots = new HashSet<string>(StringComparer.Ordinal);
             var identities = new HashSet<string>(StringComparer.Ordinal);
-            for (int i = 0; i < layout.WireRecords.Count; i++)
+            foreach (var wire in layout.WireRecords)
             {
-                MissionAcgWireRecord wire = layout.WireRecords[i];
-                if (!Enum.IsDefined(typeof(MissionAcgWireCategory), wire.Category)
-                    || wire.Category == MissionAcgWireCategory.Unknown)
+                if (!Enum.IsDefined(typeof(MissionAcgWireCategory), wire.Category) || wire.Category == MissionAcgWireCategory.Unknown
+                    || !slots.Add(((int)wire.Category) + ":" + wire.Slot) || IsZeroIdentity(wire.CapturedIdentity)
+                    || !identities.Add(wire.CapturedIdentity.Type + ":" + wire.CapturedIdentity.Instance)
+                    || wire.CapturedPlayfield2 != layout.SourcePlayfield2)
+                    AddStructuredIssue(layout, issues, "Invalid or duplicate typed dynel slot/identity/playfield.");
+                try
                 {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.WireConflict,
-                            layout,
-                            "Wire category is outside the supported enum domain."));
+                    var spawn = wire.Spawn ?? throw new InvalidOperationException("Missing typed dynel content.");
+                    spawn.Validate();
+                    if (wire.Category == MissionAcgWireCategory.Door && spawn.Door == null
+                        || wire.Category == MissionAcgWireCategory.Chest && spawn.Chest == null
+                        || wire.Category == MissionAcgWireCategory.Terminal && spawn.Item == null)
+                        throw new InvalidOperationException("Dynel category conflicts with its typed definition.");
                 }
-
-                string wireKey = ((int)wire.Category) + ":" + wire.Slot;
-                if (!wireSlots.Add(wireKey))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.WireConflict,
-                            layout,
-                            "Duplicate wire category/slot " + wireKey + "."));
-                }
-
-                if (!packetHashes.Add(wire.PacketSha256))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.WireConflict,
-                            layout,
-                            "Duplicate wire packet SHA-256 at " + wireKey + "."));
-                }
-
-                byte[] packet = wire.CopyPacketBytes();
-                string actualHash = MissionAcgHash.ComputeSha256(packet);
-                if (!HasValidWireEnvelope(wire, packet))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.WireConflict,
-                            layout,
-                            "Wire packet does not match its decoded N3 envelope at "
-                            + wireKey
-                            + "."));
-                }
-
-                if (!string.Equals(actualHash, wire.PacketSha256, StringComparison.OrdinalIgnoreCase))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.WireConflict,
-                            layout,
-                            "Wire SHA-256 mismatch at " + wireKey + "."));
-                }
-
-                if (wire.CapturedIdentity != null)
-                {
-                    string identityKey =
-                        wire.CapturedIdentity.Type + ":" + wire.CapturedIdentity.Instance;
-                    if (!identities.Add(identityKey))
-                    {
-                        issues.Add(
-                            Issue(
-                                MissionAcgCatalogValidationCode.WireConflict,
-                                layout,
-                                "Duplicate captured dynel identity " + identityKey + "."));
-                    }
-
-                    if (!IdentityAtOffset(packet, 20, wire.CapturedIdentity))
-                    {
-                        issues.Add(
-                            Issue(
-                                MissionAcgCatalogValidationCode.WireConflict,
-                                layout,
-                                "Captured dynel identity is absent from " + wireKey + "."));
-                    }
-                }
-
-                if (wire.CapturedParentIdentity != null
-                    && !IdentityAtOffset(packet, 33, wire.CapturedParentIdentity))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.WireConflict,
-                            layout,
-                            "Captured parent identity is absent from " + wireKey + "."));
-                }
-
-                if (wire.CapturedPlayfield2.HasValue
-                    && (wire.CapturedPlayfield2.Value != layout.SourcePlayfield2
-                        || packet.Length < 73
-                        || MissionAcgHash.ReadInt32BigEndian(packet, 69)
-                        != wire.CapturedPlayfield2.Value))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.WireConflict,
-                            layout,
-                            "Captured PF2 conflicts with the bundle source PF2 at " + wireKey + "."));
-                }
-
-                ValidateRetargetSlots(layout, wire, packet, issues);
-            }
-        }
-
-        private static void ValidateCaptureCounts(
-            MissionAcgLayoutBundle layout,
-            ICollection<MissionAcgCatalogValidationIssue> issues)
-        {
-            MissionAcgCaptureCountsRecord counts = layout.CaptureCounts;
-            if (counts == null)
-            {
-                if (layout.IsSelectable)
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.CaptureCountConflict,
-                            layout,
-                            "Selectable generated layout has no raw-versus-normalized capture counts."));
-                }
-
-                return;
-            }
-
-            if (counts.NormalizedDoorSlotCount != layout.Doors.Count
-                || counts.NormalizedChestSlotCount != layout.Chests.Count
-                || counts.NormalizedTerminalSlotCount != layout.Terminals.Count
-                || counts.NormalizedNpcSlotCount != layout.NpcSlots.Count
-                || counts.NormalizedObjectiveSlotCount != layout.ObjectiveSlots.Count)
-            {
-                issues.Add(
-                    Issue(
-                        MissionAcgCatalogValidationCode.CaptureCountConflict,
-                        layout,
-                        "Normalized capture counts conflict with runtime slot collections."));
+                catch (Exception error) { AddStructuredIssue(layout, issues, error.Message); }
             }
         }
 
@@ -713,8 +573,8 @@ namespace ZoneEngine.Core.Missions
                     dynel.CapturedParentIdentity,
                     dynel.Position,
                     dynel.Heading,
-                    wire == null ? new byte[0] : wire.CopyPacketBytes(),
-                    wire == null ? string.Empty : wire.PacketSha256,
+                    wire?.Spawn,
+                    null,
                     dynel.Provenance,
                     identities,
                     issues);
@@ -741,8 +601,8 @@ namespace ZoneEngine.Core.Missions
                     npc.CapturedParentIdentity,
                     npc.Position,
                     npc.Heading,
-                    npc.CopyRawPacket(),
-                    npc.RawPacketSha256,
+                    npc.Spawn,
+                    npc.Appearance,
                     npc.Provenance,
                     identities,
                     issues);
@@ -780,8 +640,8 @@ namespace ZoneEngine.Core.Missions
                     objective.CapturedParentIdentity,
                     objective.Position,
                     objective.Heading,
-                    objective.CopyRawPacket(),
-                    objective.RawPacketSha256,
+                    objective.Spawn,
+                    objective.Appearance,
                     objective.Provenance,
                     identities,
                     issues);
@@ -798,8 +658,8 @@ namespace ZoneEngine.Core.Missions
                     layout.Exit.CapturedParentIdentity,
                     layout.Exit.Position,
                     layout.Exit.Heading,
-                    layout.Exit.CopyRawPacket(),
-                    layout.Exit.RawPacketSha256,
+                    layout.Exit.Spawn,
+                    layout.Exit.Appearance,
                     layout.Exit.Provenance,
                     identities,
                     issues);
@@ -815,8 +675,8 @@ namespace ZoneEngine.Core.Missions
             MissionAcgIdentityRecord parentIdentity,
             MissionAcgPointRecord position,
             MissionAcgRotationRecord heading,
-            byte[] rawPacket,
-            string storedRawPacketSha256,
+            MissionSpawnContent spawn,
+            MissionNpcAppearance appearance,
             IReadOnlyList<MissionAcgProvenanceRecord> provenance,
             IDictionary<string, StructuredIdentityEvidence> identities,
             ICollection<MissionAcgCatalogValidationIssue> issues)
@@ -826,14 +686,14 @@ namespace ZoneEngine.Core.Missions
             bool hasIdentity = !IsZeroIdentity(identity);
             if (required && !hasIdentity)
             {
-                AddStructuredIssue(layout, issues, label + " has no captured identity.");
+                AddStructuredIssue(layout, issues, label + " has no placement identity.");
             }
 
             if (!capturedPlayfield2.HasValue)
             {
                 if (required)
                 {
-                    AddStructuredIssue(layout, issues, label + " has no captured PF2.");
+                    AddStructuredIssue(layout, issues, label + " has no source playfield.");
                 }
             }
             else if (capturedPlayfield2.Value != layout.SourcePlayfield2)
@@ -848,7 +708,7 @@ namespace ZoneEngine.Core.Missions
             {
                 if (required)
                 {
-                    AddStructuredIssue(layout, issues, label + " has no captured position.");
+                    AddStructuredIssue(layout, issues, label + " has no placement position.");
                 }
             }
             else if (!IsFinite(position))
@@ -869,44 +729,14 @@ namespace ZoneEngine.Core.Missions
                         label + " heading contains NaN/Infinity."));
             }
 
-            byte[] packet = rawPacket ?? new byte[0];
-            string actualHash =
-                packet.Length == 0 ? string.Empty : MissionAcgHash.ComputeSha256(packet);
-            if (packet.Length == 0)
+            try
             {
-                if (required)
-                {
-                    AddStructuredIssue(layout, issues, label + " has no preserved raw packet.");
-                }
+                if (appearance != null) appearance.Validate();
+                else if (spawn != null) spawn.ValidatePlacement(identity, capturedPlayfield2);
+                else if (required) throw new InvalidOperationException(label + " has no permanent typed content.");
             }
-            else
-            {
-                if (!string.Equals(
-                        actualHash,
-                        storedRawPacketSha256,
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    AddStructuredIssue(layout, issues, label + " raw packet SHA-256 is invalid.");
-                }
-
-                if (hasIdentity && !IdentityAtOffset(packet, 20, identity))
-                {
-                    AddStructuredIssue(
-                        layout,
-                        issues,
-                        label + " captured identity is absent from its raw packet.");
-                }
-
-                if (!IsZeroIdentity(parentIdentity)
-                    && !string.Equals(category, "npc", StringComparison.Ordinal)
-                    && !IdentityAtOffset(packet, 33, parentIdentity))
-                {
-                    AddStructuredIssue(
-                        layout,
-                        issues,
-                        label + " parent identity is absent from its raw packet.");
-                }
-            }
+            catch (Exception error) { AddStructuredIssue(layout, issues, error.Message); }
+            string contentSignature = System.Text.Json.JsonSerializer.Serialize(new { spawn, appearance }, MissionTypedJson.Options);
 
             if (hasIdentity)
             {
@@ -919,7 +749,7 @@ namespace ZoneEngine.Core.Missions
                     parentIdentity,
                     position,
                     heading,
-                    actualHash,
+                    contentSignature,
                     identities,
                     issues);
             }
@@ -934,7 +764,7 @@ namespace ZoneEngine.Core.Missions
             MissionAcgIdentityRecord parentIdentity,
             MissionAcgPointRecord position,
             MissionAcgRotationRecord heading,
-            string rawPacketSha256,
+            string contentSignature,
             IDictionary<string, StructuredIdentityEvidence> identities,
             ICollection<MissionAcgCatalogValidationIssue> issues)
         {
@@ -947,7 +777,7 @@ namespace ZoneEngine.Core.Missions
                     parentIdentity,
                     position,
                     heading,
-                    rawPacketSha256);
+                    contentSignature);
             StructuredIdentityEvidence existing;
             if (!identities.TryGetValue(key, out existing))
             {
@@ -961,7 +791,7 @@ namespace ZoneEngine.Core.Missions
                 AddStructuredIssue(
                     layout,
                     issues,
-                    "Captured identity "
+                    "Placement identity "
                     + key
                     + " is reused by conflicting "
                     + existing.Category
@@ -1038,143 +868,6 @@ namespace ZoneEngine.Core.Missions
             return !float.IsNaN(value) && !float.IsInfinity(value);
         }
 
-        private static void ValidateRetargetSlots(
-            MissionAcgLayoutBundle layout,
-            MissionAcgWireRecord wire,
-            byte[] packet,
-            ICollection<MissionAcgCatalogValidationIssue> issues)
-        {
-            var keys = new HashSet<string>(StringComparer.Ordinal);
-            var offsets = new HashSet<int>();
-            for (int i = 0; i < wire.RetargetSlots.Count; i++)
-            {
-                MissionAcgRetargetSlotRecord slot = wire.RetargetSlots[i];
-                if (!Enum.IsDefined(typeof(MissionAcgRetargetCategory), slot.Category)
-                    || slot.Category == MissionAcgRetargetCategory.Unknown)
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.RetargetConflict,
-                            layout,
-                            "Retarget category is outside the supported enum domain."));
-                }
-
-                string key = ((int)slot.Category) + ":" + slot.Slot;
-                if (!keys.Add(key)
-                    || !offsets.Add(slot.ByteOffset)
-                    || slot.ByteOffset + 4 > packet.Length
-                    || MissionAcgHash.ReadInt32BigEndian(packet, slot.ByteOffset)
-                    != slot.CapturedValue
-                    || !IsRetargetBoundToEvidence(layout, wire, slot))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.RetargetConflict,
-                            layout,
-                            "Invalid or conflicting retarget slot "
-                            + key
-                            + " for "
-                            + wire.Category
-                            + ":"
-                            + wire.Slot
-                            + "."));
-                }
-            }
-
-            if (layout.IsSelectable)
-            {
-                int expectedCount = wire.CapturedParentIdentity == null ? 4 : 6;
-                if (wire.RetargetSlots.Count != expectedCount
-                    || !HasRetargetCategory(
-                        wire,
-                        MissionAcgRetargetCategory.CharacterInstance)
-                    || !HasRetargetCategory(
-                        wire,
-                        MissionAcgRetargetCategory.Playfield2Instance)
-                    || !HasRetargetCategory(
-                        wire,
-                        MissionAcgRetargetCategory.DynelIdentityType)
-                    || !HasRetargetCategory(
-                        wire,
-                        MissionAcgRetargetCategory.DynelIdentityInstance)
-                    || (wire.CapturedParentIdentity != null
-                        && (!HasRetargetCategory(
-                                wire,
-                                MissionAcgRetargetCategory.ParentIdentityType)
-                            || !HasRetargetCategory(
-                                wire,
-                                MissionAcgRetargetCategory.ParentIdentityInstance))))
-                {
-                    issues.Add(
-                        Issue(
-                            MissionAcgCatalogValidationCode.RetargetConflict,
-                            layout,
-                            "Selectable wire "
-                            + wire.Category
-                            + ":"
-                            + wire.Slot
-                            + " does not contain the exact required retarget mapping set."));
-                }
-            }
-        }
-
-        private static bool IsRetargetBoundToEvidence(
-            MissionAcgLayoutBundle layout,
-            MissionAcgWireRecord wire,
-            MissionAcgRetargetSlotRecord slot)
-        {
-            if (slot.Slot != 0)
-            {
-                return false;
-            }
-
-            switch (slot.Category)
-            {
-                case MissionAcgRetargetCategory.CharacterInstance:
-                    return !IsZeroIdentity(layout.CapturedPlayerIdentity)
-                           && slot.ByteOffset == 12
-                           && slot.CapturedValue
-                           == layout.CapturedPlayerIdentity.Instance;
-                case MissionAcgRetargetCategory.Playfield2Instance:
-                    return wire.CapturedPlayfield2.HasValue
-                           && slot.ByteOffset == 69
-                           && slot.CapturedValue == wire.CapturedPlayfield2.Value;
-                case MissionAcgRetargetCategory.ParentIdentityType:
-                    return wire.CapturedParentIdentity != null
-                           && slot.ByteOffset == 33
-                           && slot.CapturedValue == wire.CapturedParentIdentity.Type;
-                case MissionAcgRetargetCategory.ParentIdentityInstance:
-                    return wire.CapturedParentIdentity != null
-                           && slot.ByteOffset == 37
-                           && slot.CapturedValue == wire.CapturedParentIdentity.Instance;
-                case MissionAcgRetargetCategory.DynelIdentityType:
-                    return wire.CapturedIdentity != null
-                           && slot.ByteOffset == 20
-                           && slot.CapturedValue == wire.CapturedIdentity.Type;
-                case MissionAcgRetargetCategory.DynelIdentityInstance:
-                    return wire.CapturedIdentity != null
-                           && slot.ByteOffset == 24
-                           && slot.CapturedValue == wire.CapturedIdentity.Instance;
-                default:
-                    return false;
-            }
-        }
-
-        private static bool HasRetargetCategory(
-            MissionAcgWireRecord wire,
-            MissionAcgRetargetCategory category)
-        {
-            for (int i = 0; i < wire.RetargetSlots.Count; i++)
-            {
-                if (wire.RetargetSlots[i].Category == category)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private static void ValidateExclusions(
             IEnumerable<MissionAcgLayoutExclusion> exclusions,
             IDictionary<int, MissionAcgLayoutBundle> playfieldIds,
@@ -1239,7 +932,7 @@ namespace ZoneEngine.Core.Missions
                 MissionAcgIdentityRecord parentIdentity,
                 MissionAcgPointRecord position,
                 MissionAcgRotationRecord heading,
-                string rawPacketSha256)
+                string contentSignature)
             {
                 this.Category = category;
                 this.Slot = slot;
@@ -1247,7 +940,7 @@ namespace ZoneEngine.Core.Missions
                 this.ParentIdentity = parentIdentity;
                 this.Position = position;
                 this.Heading = heading;
-                this.RawPacketSha256 = rawPacketSha256 ?? string.Empty;
+                this.ContentSignature = contentSignature ?? string.Empty;
             }
 
             internal string Category { get; private set; }
@@ -1262,7 +955,7 @@ namespace ZoneEngine.Core.Missions
 
             internal MissionAcgRotationRecord Heading { get; private set; }
 
-            internal string RawPacketSha256 { get; private set; }
+            internal string ContentSignature { get; private set; }
 
             internal static bool AreCoherent(
                 StructuredIdentityEvidence left,
@@ -1272,11 +965,11 @@ namespace ZoneEngine.Core.Missions
                        && IdentityEquals(left.ParentIdentity, right.ParentIdentity)
                        && PointEquals(left.Position, right.Position)
                        && RotationEquals(left.Heading, right.Heading)
-                       && !string.IsNullOrEmpty(left.RawPacketSha256)
+                       && !string.IsNullOrEmpty(left.ContentSignature)
                        && string.Equals(
-                           left.RawPacketSha256,
-                           right.RawPacketSha256,
-                           StringComparison.OrdinalIgnoreCase);
+                           left.ContentSignature,
+                           right.ContentSignature,
+                           StringComparison.Ordinal);
             }
 
             private static bool IdentityEquals(
@@ -1326,46 +1019,6 @@ namespace ZoneEngine.Core.Missions
                        && left.Z.Equals(right.Z)
                        && left.W.Equals(right.W);
             }
-        }
-
-        private static bool HasValidWireEnvelope(
-            MissionAcgWireRecord wire,
-            byte[] packet)
-        {
-            return packet != null
-                   && packet.Length >= 73
-                   && ((packet[6] << 8) | packet[7]) == packet.Length
-                   && MissionAcgHash.ReadInt32BigEndian(packet, 16)
-                   == ExpectedWireN3Type(wire.Category);
-        }
-
-        private static int ExpectedWireN3Type(MissionAcgWireCategory category)
-        {
-            switch (category)
-            {
-                case MissionAcgWireCategory.Door:
-                    return unchecked((int)0x365A5071);
-                case MissionAcgWireCategory.Chest:
-                    return unchecked((int)0x465A5D73);
-                case MissionAcgWireCategory.Terminal:
-                    return unchecked((int)0x3B11256F);
-                default:
-                    return 0;
-            }
-        }
-
-        private static bool IdentityAtOffset(
-            byte[] packet,
-            int offset,
-            MissionAcgIdentityRecord identity)
-        {
-            return packet != null
-                   && identity != null
-                   && offset >= 0
-                   && offset + 8 <= packet.Length
-                   && MissionAcgHash.ReadInt32BigEndian(packet, offset) == identity.Type
-                   && MissionAcgHash.ReadInt32BigEndian(packet, offset + 4)
-                   == identity.Instance;
         }
 
         private static MissionAcgCatalogValidationIssue Issue(

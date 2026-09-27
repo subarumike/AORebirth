@@ -23,15 +23,17 @@ public interface IGeneratedMissionNpcFactory
 /// <summary>Exact accepted bundle NPC evidence, not a name/template similarity lookup.</summary>
 public sealed class GeneratedMissionNpcEvidence
 {
-    readonly byte[] _packet;
+    public MissionNpcAppearance Appearance { get; }
     internal GeneratedMissionNpcEvidence(MissionAcgRuntimeObject source, MissionAcgLayoutBundle bundle, int quality, int missionType)
     {
         CapturedType = source.Identity.CapturedIdentity.Type; CapturedInstance = source.Identity.CapturedIdentity.Instance;
         RuntimeType = source.Identity.RuntimeIdentity.Type; RuntimeInstance = source.Identity.RuntimeIdentity.Instance;
         TemplateId = source.TemplateId; Name = source.Name; MissionQuality = quality;
         IsFindPerson = missionType == (int)MissionRollType.FindPerson && source.Identity.Kind == MissionAcgRuntimeObjectKind.ObjectiveNpc;
-        BundleId = bundle.LayoutId; BundleSha256 = bundle.GeneratorPayloadSha256; SourcePlayfield2 = bundle.SourcePlayfield2; _packet = source.CopyPacket();
+        BundleId = bundle.LayoutId; BundleSha256 = bundle.GeneratorPayloadSha256; SourcePlayfield2 = bundle.SourcePlayfield2;
         var slot = bundle.NpcSlots.Single(value => value.CapturedIdentity.Equals(source.Identity.CapturedIdentity));
+        Appearance = MissionTypedJson.Copy(slot.Appearance);
+        Appearance.Validate();
         CapturedSlot = slot.Slot; CapturedLevel = slot.CapturedLevel; CapturedHealth = slot.CapturedHealth;
         CapturedHealthDamage = slot.CapturedHealthDamage; MonsterData = slot.MonsterData;
     }
@@ -51,9 +53,6 @@ public sealed class GeneratedMissionNpcEvidence
     public int CapturedHealth { get; }
     public int CapturedHealthDamage { get; }
     public int MonsterData { get; }
-    public SimpleCharFullUpdateMessage CopySpawnMessage()
-        => new ZoneMessageCodec().Deserialize((byte[])_packet.Clone())?.Body as SimpleCharFullUpdateMessage
-            ?? throw new InvalidOperationException("Accepted NPC evidence is not a complete SCFU.");
 }
 
 /// <summary>One immutable SQL binding plus its exact accepted bundle and durable object snapshot.</summary>
@@ -162,7 +161,7 @@ public sealed class GeneratedMissionWorld
                 if (dynel.Identity.Type != (IdentityType)state.RuntimeType || dynel.Identity.Instance != state.RuntimeInstance)
                     throw new InvalidOperationException("Mission NPC adapter changed authoritative runtime identity.");
             }
-            else dynel = new MissionStaticDynel(state, source.CopyPacket(), _use);
+            else dynel = new MissionStaticDynel(state, source.Spawn, _instance.BindingRecord, _use);
             dynel.Playfield = playfield; dynel.Position = new Vector3(state.X, state.Y, state.Z);
             dynel.Rotation = new Quaternion(state.HeadingX, state.HeadingY, state.HeadingZ, state.HeadingW);
             result.Add(dynel);
@@ -210,14 +209,14 @@ public sealed class GeneratedMissionWorld
     sealed class MissionStaticDynel : Dynel, IUsableDynel
     {
         readonly GeneratedMissionObject _state;
-        readonly byte[] _packet;
+        readonly MissionSpawnContent _spawn;
+        readonly GeneratedMissionBinding _binding;
         readonly Func<Player, GeneratedMissionObject, bool> _use;
-        public MissionStaticDynel(GeneratedMissionObject state, byte[] packet, Func<Player, GeneratedMissionObject, bool> use)
+        public MissionStaticDynel(GeneratedMissionObject state, MissionSpawnContent spawn, GeneratedMissionBinding binding, Func<Player, GeneratedMissionObject, bool> use)
             : base(new Identity { Type = (IdentityType)state.RuntimeType, Instance = state.RuntimeInstance })
-        { _state = state; _packet = packet; _use = use; }
+        { _state = state; _spawn = spawn; _binding = binding; _use = use; }
         public override MessageBody BuildSpawnMessage()
-            => new ZoneMessageCodec().Deserialize((byte[])_packet.Clone())?.Body
-                ?? throw new InvalidOperationException("Mission static object has no complete accepted wire projection.");
+            => _spawn.Create(_binding, new MissionAcgIdentityRecord(_state.RuntimeType, _state.RuntimeInstance));
         public bool TryUse(Player player) => player.Identity.Instance == _state.OwnerId && player.Playfield == Playfield
             && GetEdgeDistanceTo(player) <= 8.0 && _use(player, _state);
     }

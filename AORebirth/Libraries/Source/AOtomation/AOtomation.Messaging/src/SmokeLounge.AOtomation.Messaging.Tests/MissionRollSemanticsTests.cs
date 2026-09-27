@@ -140,15 +140,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         public void CapturedLibraryCoversEveryFinalizedMissionTypeWithCompatibleActions()
         {
             var types = new HashSet<MissionRollType>();
-            for (int rollIndex = 0; rollIndex < GeneratedMissionWire.CapturedCount; rollIndex++)
+            for (int rollIndex = 0; rollIndex < MissionHistoricalTestPackets.CapturedCount; rollIndex++)
             {
-                QuestAlternativeMessage roll = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(rollIndex));
+                QuestAlternativeMessage roll = GeneratedMissionWire.Read(MissionHistoricalTestPackets.CapturedBody(rollIndex));
                 foreach (QuestInfo offer in roll.QuestInfos)
                 {
                     MissionOfferDescriptor descriptor;
                     string error;
                     Assert.IsTrue(
-                        MissionOfferCompatibility.TryDescribeCaptured(
+                        MissionOfferCompatibility.TryDescribeContent(
                             offer,
                             roll.MissionTerminalIdentity,
                             out descriptor,
@@ -242,10 +242,10 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void GeneratedRollsDoNotMutateCapturedBodies()
         {
-            var before = new byte[GeneratedMissionWire.CapturedCount][];
+            var before = new byte[MissionHistoricalTestPackets.CapturedCount][];
             for (int i = 0; i < before.Length; i++)
             {
-                before[i] = GeneratedMissionWire.CapturedBody(i);
+                before[i] = MissionHistoricalTestPackets.CapturedBody(i);
             }
 
             for (int seed = 0; seed < 16; seed++)
@@ -255,7 +255,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
             for (int i = 0; i < before.Length; i++)
             {
-                CollectionAssert.AreEqual(before[i], GeneratedMissionWire.CapturedBody(i), "roll " + i);
+                CollectionAssert.AreEqual(before[i], MissionHistoricalTestPackets.CapturedBody(i), "roll " + i);
             }
         }
 
@@ -471,14 +471,14 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void UnchangedCapturedCombinationPreservesExactText()
         {
-            QuestAlternativeMessage roll = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(0));
+            QuestAlternativeMessage roll = GeneratedMissionWire.Read(MissionHistoricalTestPackets.CapturedBody(0));
             QuestInfo offer = roll.QuestInfos[0];
             string originalTitle = offer.ShortInfo;
             string originalDescription = offer.Info;
             MissionOfferDescriptor descriptor;
             string error;
             Assert.IsTrue(
-                MissionOfferCompatibility.TryDescribeCaptured(
+                MissionOfferCompatibility.TryDescribeContent(
                     offer,
                     roll.MissionTerminalIdentity,
                     out descriptor,

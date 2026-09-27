@@ -1,0 +1,47 @@
+{
+  "bundles": [
+    {
+      "bundle_id": "capture-20260728-001044-00D734E2-0015F008-ffe4327ac8af0f0a",
+      "generator_sha256": "ffe4327ac8af0f0a41a04cff7fe53ecd40c55a027f10a2cda2cd2a8fc18f1269",
+      "npc_slots": 7,
+      "dynels": 19,
+      "objectives": 1,
+      "identity_changed": false
+    },
+    {
+      "bundle_id": "capture-20260728-003410-00D6FC77-0016C80E-f7f00e3344bd12f2",
+      "generator_sha256": "f7f00e3344bd12f2d7d302761403c9c5b083fc8a181417c7f2c9748da501ff59",
+      "npc_slots": 21,
+      "dynels": 36,
+      "objectives": 1,
+      "identity_changed": false
+    },
+    {
+      "bundle_id": "capture-20260728-005042-00D6FC78-00169802-3cfe53d3a32b5067",
+      "generator_sha256": "3cfe53d3a32b50679530bdfd5ff7572405eb8865f4ab0c13308c7bcd935bf431",
+      "npc_slots": 18,
+      "dynels": 40,
+      "objectives": 1,
+      "identity_changed": false
+    },
+    {
+      "bundle_id": "capture-20260728-010220-00D734E5-0015F00F-e75f1326a72db6d4",
+      "generator_sha256": "e75f1326a72db6d42ddb5ebd72320338148193e6469e70b1c30b2d8a0f6d1926",
+      "npc_slots": 19,
+      "dynels": 29,
+      "objectives": 1,
+      "identity_changed": false
+    },
+    {
+      "bundle_id": "capture-20260728-012547-00D734E7-0016700C-d5413273f69b018b",
+      "generator_sha256": "d5413273f69b018b66fcd6fe31bfa7be15b338cb6cb8fd17d83f7e14c4e4be82",
+      "npc_slots": 14,
+      "dynels": 25,
+      "objectives": 1,
+      "identity_changed": false
+    }
+  ],
+  "local_persisted_bindings": 0,
+  "local_query": "READ_ONLY_LOCAL_QUERY_COMPLETED",
+  "production_database_audited": false
+}
