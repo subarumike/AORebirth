@@ -37,7 +37,7 @@ static class CharacterPersistenceGameplaySmoke
         var stats = new MySqlStatRepository(logger, dao);
         IGameData data = DispatchProxy.Create<IGameData, CatalogRoot>();
         ((CatalogRoot)(object)data).Root = FixtureEnvironment.RuntimeGameDataRoot ?? Path.Combine(Path.GetDirectoryName(binary)!, "GameData");
-        var catalog = new ItemTemplateCatalog(new MySqlItemNameRepository(logger, dao), data, logger);
+        var catalog = new ItemTemplateCatalog(data, logger);
         var builder = new ItemBuilder(catalog, logger);
         var loader = new CharacterHydrationService(characters, stats, inventory, nanos, new MySqlActiveNanoRepository(dao), new MySqlSkillLockRepository(dao), logger);
         var snapshot = new CharacterSnapshotService(characters, stats, logger);
