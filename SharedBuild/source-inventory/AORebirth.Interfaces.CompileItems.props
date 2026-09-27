@@ -34,6 +34,7 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Shops/IShopDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Shops/ShopStockData.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Shops/ShopVendorData.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Teams/ITeamLevelEligibilityDao.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/AORebirth.Interfaces/Properties/AssemblyInfo.cs" />
   </ItemGroup>
 </Project>
