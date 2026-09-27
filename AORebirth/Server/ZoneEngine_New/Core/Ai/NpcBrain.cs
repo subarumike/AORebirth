@@ -155,7 +155,9 @@ namespace ZoneEngine_New.Core.Ai
                 TryProximityAggro(player);
         }
 
-        /// <summary>Adds 1 hate when BreedHostility &gt; 0 and the player is nearby and not already listed.</summary>
+        /// <summary>
+        /// Adds 1 hate when BreedHostility &gt; 0 and the player is nearby, in line of sight and not already listed.
+        /// </summary>
         public void TryProximityAggro(Character player)
         {
             if (player == null || !player.IsPlayer || player.IsDead)
@@ -167,6 +169,9 @@ namespace ZoneEngine_New.Core.Ai
             if (Hate.Contains(player.Identity))
                 return;
             if (Npc.GetEdgeDistanceTo(player) > NpcAiRules.ProximityAggroRange)
+                return;
+            // Unprovoked aggro needs sight. Once the player is on the hate list, chasing around walls is fine.
+            if (!Npc.HasLineOfSightTo(player))
                 return;
             if (!HasChance(player))
                 return;
