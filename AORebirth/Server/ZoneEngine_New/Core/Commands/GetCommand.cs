@@ -9,14 +9,26 @@ namespace ZoneEngine_New.Core.Commands
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine_New.Core.Quests;
 
     public sealed class GetCommand : IGmCommand
     {
+        readonly QuestService? _quests;
+
+        public GetCommand()
+        {
+        }
+
+        public GetCommand(QuestService quests)
+        {
+            _quests = quests;
+        }
+
         public string Name => "get";
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".get stat <statName|statId> | .get stats | .get buffs";
+        public string Usage => ".get stat <statName|statId> | .get stats | .get buffs | .get quests";
 
         public void Execute(GmCommandContext context)
         {
@@ -44,6 +56,12 @@ namespace ZoneEngine_New.Core.Commands
             if (string.Equals(verb, "buffs", StringComparison.OrdinalIgnoreCase))
             {
                 ExecuteBuffs(context);
+                return;
+            }
+
+            if (string.Equals(verb, "quests", StringComparison.OrdinalIgnoreCase))
+            {
+                ExecuteQuests(context);
                 return;
             }
 
@@ -103,6 +121,42 @@ namespace ZoneEngine_New.Core.Commands
                 subject.Stats,
                 Player.FullCharacterStatSets,
                 Player.FullCharacterStatSetNames);
+
+            GmCommandFeedback.SendLines(context.Session, context.Player, lines);
+        }
+
+        /// <summary>The targeted player's (or your own) quests with progress, state and expiry.</summary>
+        void ExecuteQuests(GmCommandContext context)
+        {
+            if (_quests == null)
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, "Quests are not available.");
+                return;
+            }
+
+            Player subject = context.ResolveSubject();
+            QuestLog log = _quests.GetLog(subject);
+            var lines = new List<string>
+            {
+                string.Format(CultureInfo.InvariantCulture, "{0} quests: {1}", subject.Name ?? string.Empty, log.Quests.Count)
+            };
+
+            foreach (PlayerQuest quest in log.Quests.Values)
+            {
+                lines.Add(string.Format(
+                    CultureInfo.InvariantCulture,
+                    "  {0} {1} [{2} {3}] {4} {5}/{6}{7}",
+                    quest.QuestId,
+                    quest.Template.Name,
+                    quest.Source,
+                    quest.Template.Action,
+                    quest.State,
+                    quest.Progress,
+                    quest.RequiredCount,
+                    quest.ExpiresAtUtc is DateTime expires
+                        ? string.Format(CultureInfo.InvariantCulture, " expires {0:u}", expires)
+                        : string.Empty));
+            }
 
             GmCommandFeedback.SendLines(context.Session, context.Player, lines);
         }

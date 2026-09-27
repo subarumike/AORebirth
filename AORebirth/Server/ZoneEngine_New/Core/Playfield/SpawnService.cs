@@ -106,7 +106,7 @@ namespace ZoneEngine_New.Core.Playfield
                         hash));
             }
 
-            return SpawnMob(template, position, heading, level, spawnSource);
+            return SpawnMob(template, position, heading, level, spawnSource, spawnHash: hash);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace ZoneEngine_New.Core.Playfield
                 if (!NpcTemplateValidation.CanSpawn(templates[i]))
                     continue;
 
-                spawned.Add(SpawnMob(templates[i], position, heading, level, spawnSource));
+                spawned.Add(SpawnMob(templates[i], position, heading, level, spawnSource, spawnHash: hash));
             }
 
             return spawned;
@@ -143,7 +143,8 @@ namespace ZoneEngine_New.Core.Playfield
             Vector3 position,
             Quaternion? heading = null,
             int? level = null,
-            SpawnSource spawnSource = SpawnSource.None)
+            SpawnSource spawnSource = SpawnSource.None,
+            string? spawnHash = null)
         {
             ArgumentNullException.ThrowIfNull(template);
             ArgumentNullException.ThrowIfNull(position);
@@ -159,6 +160,7 @@ namespace ZoneEngine_New.Core.Playfield
                 Playfield = _playfield,
                 Name = template.Name,
                 MobTemplate = template,
+                SpawnHash = spawnHash ?? template.Hash,
                 Attackable = template.Attackable,
                 Position = at,
                 Rotation = heading ?? new Quaternion(),
@@ -840,6 +842,20 @@ namespace ZoneEngine_New.Core.Playfield
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Authored quest restore failed character={0}; continuing with world visibility",
+                        player.Identity.Instance));
+            }
+
+            try
+            {
+                _playfield.GetService<Quests.QuestService>()?.Restore(player);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(
+                    ex,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Quest restore failed character={0}; continuing with world visibility",
                         player.Identity.Instance));
             }
         }

@@ -57,6 +57,12 @@ namespace ZoneEngine_New.Core.Entities
 
         public NpcBrain? Brain { get; private set; }
 
+        /// <summary>
+        /// The hash this NPC was spawned from (a family/META hash from Spawns.json or a command). The resolved
+        /// <see cref="MobTemplate"/> carries the child leaf hash instead. Quests name NPCs by this one.
+        /// </summary>
+        public string? SpawnHash { get; init; }
+
         public bool IsAiBusy => Brain?.IsBusy == true;
 
         /// <summary>

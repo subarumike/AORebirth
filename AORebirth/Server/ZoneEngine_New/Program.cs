@@ -251,6 +251,11 @@ namespace ZoneEngine_New
                     player.Playfield?.DispatchPlayerProjection(player, action)));
             services.AddSingleton<VicinityChatRelay>();
 
+            //Quests
+            services.AddSingleton<ZoneEngine_New.Core.Quests.QuestCatalog>();
+            services.AddSingleton<ICharacterQuestStore, MySqlCharacterQuestStore>();
+            services.AddSingleton<ZoneEngine_New.Core.Quests.QuestService>();
+
             //Commands
             services.AddSingleton<IGmCommand, SpawnCommand>();
             services.AddSingleton<IGmCommand, TeleportCommand>();
@@ -269,6 +274,7 @@ namespace ZoneEngine_New
             AddMessageHandler<CharInPlayMessageHandler>(services);
             AddMessageHandler<LookAtMessageHandler>(services);
             AddMessageHandler<AttackMessageHandler>(services);
+            AddMessageHandler<CharSecSpecAttackMessageHandler>(services);
             AddMessageHandler<StopFightMessageHandler>(services);
             AddMessageHandler<GenericCmdMessageHandler>(services);
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);

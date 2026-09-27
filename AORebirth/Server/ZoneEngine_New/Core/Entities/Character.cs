@@ -144,6 +144,35 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>Client text 1000/222040796.</summary>
+        /// <summary>Special attacks waiting to tell the client their skill lock ran out, by stat id.</summary>
+        readonly Dictionary<int, DateTime> _specialsAvailableAt = new();
+
+        /// <summary>Sends SpecialAvailable for <paramref name="statId"/> once <paramref name="atUtc"/> passes.</summary>
+        public void ScheduleSpecialAvailable(int statId, DateTime atUtc) => _specialsAvailableAt[statId] = atUtc;
+
+        void TickSpecialsAvailable(DateTime nowUtc)
+        {
+            if (_specialsAvailableAt.Count == 0)
+                return;
+
+            List<int>? ready = null;
+            foreach (KeyValuePair<int, DateTime> pair in _specialsAvailableAt)
+            {
+                if (pair.Value <= nowUtc)
+                    (ready ??= []).Add(pair.Key);
+            }
+
+            if (ready == null)
+                return;
+
+            foreach (int statId in ready)
+            {
+                _specialsAvailableAt.Remove(statId);
+                if (this is Player player)
+                    SpecialAttacks.SendAvailable(player, statId);
+            }
+        }
+
         public void SendSkillLocked(int statId, TimeSpan remaining)
         {
             if (this is not Player player || player.Session == null)
@@ -538,6 +567,36 @@ namespace ZoneEngine_New.Core.Entities
             AwardRegularXp(playfield, present);
             AwardAlienXp(playfield, present);
             AwardPvpTitle(present);
+            AdvanceKillQuests(playfield, present);
+        }
+
+        /// <summary>
+        /// Kill quests advance for everyone with kill credit and their nearby teammates, the same players
+        /// who share the XP, regardless of level eligibility.
+        /// </summary>
+        void AdvanceKillQuests(Playfield playfield, IReadOnlyList<int> present)
+        {
+            if (this is not NpcCharacter npc || playfield.GetService<Quests.QuestService>() is not Quests.QuestService quests)
+                return;
+
+            DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
+            var players = new List<Player>();
+            var seen = new HashSet<int>();
+            for (int i = 0; i < present.Count; i++)
+            {
+                if (!_killRewards.TryGetIdentity(present[i], out Identity identity)
+                    || !registry.TryGet(identity, out Dynel? dynel) || dynel is not Character killer)
+                    continue;
+
+                foreach (Character member in CollectNearbyTeamMembers(playfield, registry, killer))
+                {
+                    if (member is Player player && seen.Add(player.Identity.Instance))
+                        players.Add(player);
+                }
+            }
+
+            if (players.Count > 0)
+                quests.OnNpcKilled(npc, players);
         }
 
         List<int> CollectPresentQualifiers(Playfield playfield)
@@ -827,6 +886,21 @@ namespace ZoneEngine_New.Core.Entities
 
             if (identity.Instance == 0)
                 ResetAllWeaponAttacks();
+        }
+
+        /// <summary>True while a living character has this one as its fighting target.</summary>
+        public bool IsBeingFought
+        {
+            get
+            {
+                foreach (Character attacker in _attackers)
+                {
+                    if (!attacker.IsDead && attacker.FightingTarget == Identity)
+                        return true;
+                }
+
+                return false;
+            }
         }
 
         /// <summary>
@@ -1234,6 +1308,7 @@ namespace ZoneEngine_New.Core.Entities
             if (!IsDead && UsesPassiveRegen)
                 TickPassiveRegen(deltaTime);
             NanoRuntime.Tick(this, DateTime.UtcNow);
+            TickSpecialsAvailable(DateTime.UtcNow);
             base.Tick(deltaTime);
         }
 

@@ -1313,14 +1313,14 @@ namespace AOSharpMissionCaptureAnalyzer
         {
             return new List<NamedIntValue>
                        {
-                           NamedInt("Unknown1", quest.Unknown1),
+                           NamedInt("Unknown1", quest.Version),
                            NamedInt("Unknown2", quest.Unknown2),
                            NamedInt("Unknown3", quest.Unknown3),
-                           NamedInt("Unknown4", quest.Unknown4),
-                           NamedInt("Unknown5", quest.Unknown5),
-                           NamedInt("Unknown6", quest.Unknown6),
+                           NamedInt("Unknown4", quest.Flags),
+                           NamedInt("Unknown5", quest.RewardDescriptorVersion),
+                           NamedInt("Unknown6", quest.CashReward),
                            NamedInt("Unknown7", quest.Unknown7),
-                           NamedInt("Unknown8", quest.Unknown8),
+                           NamedInt("Unknown8", quest.ExperienceReward),
                            NamedInt("Unknown9", quest.Unknown9),
                            NamedInt("Unknown10", quest.Unknown10),
                            NamedInt("Unknown11", quest.Unknown11),

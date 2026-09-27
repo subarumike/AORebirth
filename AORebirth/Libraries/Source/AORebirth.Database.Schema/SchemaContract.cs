@@ -27,7 +27,8 @@ public static class SchemaContract
         "20260905_item_instance_id_sequence.sql",
         "20260906_item_instances_source.sql",
         "20260908_generated_mission_state.sql",
-        "20260925_character_skill_locks.sql"
+        "20260925_character_skill_locks.sql",
+        "20260927_character_quests.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -46,7 +47,7 @@ public static class SchemaContract
         "item_instances", "item_instance_id_sequence", "schema_migrations",
         "generatedmissionsequences", "generatedmissionbatches", "generatedmissionoffers",
         "generatedmissionbindings", "generatedmissionobservations", "generatedmissionartifacts", "generatedmissionobjects",
-        "characterskilllocks"
+        "characterskilllocks", "characterquests", "generatedquests"
     });
 
     public static readonly IReadOnlyList<(string Table, string Columns)> UniqueKeys = Array.AsReadOnly(new[]
@@ -63,7 +64,8 @@ public static class SchemaContract
         ("generatedmissionbindings", "ActivePlayfield"), ("generatedmissionbindings", "KeyInstance"),
         ("generatedmissionobservations", "OwnerId,QuestType,QuestInstance,ObservationIdentity"),
         ("generatedmissionartifacts", "InstanceId"), ("generatedmissionobjects", "QuestType,QuestInstance,RuntimeType,RuntimeInstance"),
-        ("generatedmissionobjects", "RuntimeType,RuntimeInstance"), ("characterskilllocks", "CharacterId,StatId")
+        ("generatedmissionobjects", "RuntimeType,RuntimeInstance"), ("characterskilllocks", "CharacterId,StatId"),
+        ("characterquests", "CharacterId,QuestId"), ("generatedquests", "QuestId")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()
@@ -138,6 +140,13 @@ public static class SchemaContract
         Add("generatedmissionobjects", "bigint", "Version UpdatedAtUtcTicks DiedAtUtcTicks CorpseExpiresAtUtcTicks", false);
         Add("characterskilllocks", "int", "CharacterId StatId", false);
         Add("characterskilllocks", "bigint", "ExpiresAtUtcTicks", false);
+        Add("characterquests", "int", "CharacterId Source State Progress RequiredCount", false);
+        Add("characterquests", "bigint", "AssignedAtUtcTicks UpdatedAtUtcTicks", false);
+        Add("characterquests", "varchar", "QuestId");
+        Add("generatedquests", "int", "OwnerType OwnerId", false);
+        Add("generatedquests", "bigint", "CreatedAtUtcTicks ExpiresAtUtcTicks UpdatedAtUtcTicks", false);
+        Add("generatedquests", "varchar", "QuestId");
+        Add("generatedquests", "mediumtext", "DefinitionJson AcgBuildingGeneratorJson");
         return result.AsReadOnly();
     }
 }

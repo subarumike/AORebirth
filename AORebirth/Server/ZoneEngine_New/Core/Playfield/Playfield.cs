@@ -57,7 +57,14 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly Lock _tickSync = new();
         private int _nextContainerInventoryHandle = 1;
         // TEMP: WIFU Identity.Instance until real weapon-instance identity allocation exists.
-        private int _nextWeaponInstanceId = 1;
+        /// <summary>
+        /// First announced weapon id. Weapon items reach the client as WeaponInstance (51018) : item InstanceId, and
+        /// item_instance_id_sequence counts up from 1, so announced weapons use a separate range above it. Sharing ids
+        /// made the client resolve a player's own weapon to an NPC weapon it had seen with the same id.
+        /// </summary>
+        private const int FirstWeaponInstanceId = 0x70000000;
+
+        private int _nextWeaponInstanceId = FirstWeaponInstanceId;
         private volatile bool _disposed;
         private readonly ConcurrentDictionary<PlayfieldTransfer, byte> _outgoingTransfers = new();
         private readonly ConcurrentDictionary<PlayfieldTransfer, byte> _incomingTransfers = new();
@@ -319,13 +326,13 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>
         /// TEMP: Playfield-scoped unique id for WeaponItemFullUpdate Identity.Instance.
-        /// Increments on every WIFU build; not tied to inventory item.InstanceId.
+        /// Increments on every WIFU build; kept above every inventory item InstanceId.
         /// </summary>
         public int AllocateWeaponInstanceId()
         {
             int id = _nextWeaponInstanceId;
             if (_nextWeaponInstanceId == int.MaxValue)
-                _nextWeaponInstanceId = 1;
+                _nextWeaponInstanceId = FirstWeaponInstanceId;
             else
                 _nextWeaponInstanceId++;
 
@@ -628,6 +635,8 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_playfieldManager.Teams);
             services.AddSingleton(_playfieldManager.Missions);
             services.AddSingleton(_playfieldManager.AuthoredQuests);
+            if (_playfieldManager.Quests != null)
+                services.AddSingleton(_playfieldManager.Quests);
             services.AddSingleton(_playfieldManager.Dialogues);
             services.AddSingleton(_playfieldManager.ItemTemplates);
             services.AddSingleton(_playerHydrator);

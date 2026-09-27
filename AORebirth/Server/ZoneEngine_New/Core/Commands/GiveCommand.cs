@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Commands
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine_New.Core.Quests;
 
     public sealed class GiveCommand : IGmCommand
     {
@@ -20,14 +21,18 @@ namespace ZoneEngine_New.Core.Commands
         private readonly InventoryFlushService _flush;
         private readonly HashItemMinter _minter;
         private readonly IInventoryRepository _inventory;
+        private readonly QuestService _quests;
 
         public GiveCommand(
             IItemBuilder items,
             IItemTemplateCatalog catalog,
             InventoryFlushService flush,
             HashItemMinter minter,
-            IInventoryRepository inventory)
+            IInventoryRepository inventory,
+            QuestService quests)
         {
+            ArgumentNullException.ThrowIfNull(quests);
+            _quests = quests;
             ArgumentNullException.ThrowIfNull(items);
             ArgumentNullException.ThrowIfNull(catalog);
             ArgumentNullException.ThrowIfNull(flush);
@@ -44,7 +49,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".give item <low> <high> <ql> | .give item <hash> <ql> | .give buff <nanoId>";
+        public string Usage => ".give item <low> <high> <ql> | .give item <hash> <ql> | .give buff <nanoId> | .give quest <hash>";
 
         public void Execute(GmCommandContext context)
         {
@@ -66,6 +71,12 @@ namespace ZoneEngine_New.Core.Commands
             if (string.Equals(verb, "buff", StringComparison.OrdinalIgnoreCase))
             {
                 ExecuteBuff(context);
+                return;
+            }
+
+            if (string.Equals(verb, "quest", StringComparison.OrdinalIgnoreCase))
+            {
+                ExecuteQuest(context);
                 return;
             }
 
@@ -182,6 +193,26 @@ namespace ZoneEngine_New.Core.Commands
                         item.Name,
                         item.Quality));
             }
+        }
+
+        /// <summary>Gives a Quests.json quest, or an existing generated quest by id, to the targeted player or yourself.</summary>
+        void ExecuteQuest(GmCommandContext context)
+        {
+            if (context.Args.Length < 2 || string.IsNullOrWhiteSpace(context.Args[1]))
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, "Usage: .give quest <hash>");
+                return;
+            }
+
+            Player subject = context.ResolveSubject();
+            string id = context.Args[1].Trim().ToUpperInvariant();
+            // Template hashes are four characters; generated quest ids are longer and start with G.
+            string result;
+            if (id.Length > 4 && id[0] == 'G')
+                _quests.TryAssignGenerated(subject, id, out result);
+            else
+                _quests.TryAssignTemplate(subject, id, out result);
+            GmCommandFeedback.Send(context.Session, context.Player, result);
         }
 
         void ExecuteBuff(GmCommandContext context)

@@ -70,7 +70,8 @@ namespace ZoneEngine_New.Core.Playfield
             AuthoredQuestService authoredQuests,
             DialogueService dialogues,
             IItemTemplateCatalog itemTemplates,
-            IShopDao shopDao)
+            IShopDao shopDao,
+            Quests.QuestService? quests = null)
         {
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
@@ -106,6 +107,7 @@ namespace ZoneEngine_New.Core.Playfield
             AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
             Dialogues = dialogues ?? throw new ArgumentNullException(nameof(dialogues));
             ItemTemplates = itemTemplates ?? throw new ArgumentNullException(nameof(itemTemplates));
+            Quests = quests;
         }
 
         public TeamService Teams { get; }
@@ -113,6 +115,9 @@ namespace ZoneEngine_New.Core.Playfield
         public AuthoredQuestService AuthoredQuests { get; }
         public DialogueService Dialogues { get; }
         public IItemTemplateCatalog ItemTemplates { get; }
+
+        /// <summary>Root quest service, forwarded into every playfield container.</summary>
+        public Quests.QuestService? Quests { get; }
 
         /// <summary>Releases only the exact ended, empty mission lease; never an ordinary playfield.</summary>
         public bool TryReleaseMission(GeneratedMissionBinding binding)

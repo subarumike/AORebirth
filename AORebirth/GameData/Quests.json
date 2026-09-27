@@ -1,0 +1,26 @@
+[
+    {
+      "Hash": "KION",
+      "Name": "Kill one Leet.",
+      "QasInstance": 21205,
+      "Scope": "Solo",
+      "Action": "KillOne",
+      "Summary": "kill the target NPC",
+      "Objective": {
+        "Count": null,
+        "Npc": "LE01",
+        "SpecItem": null,
+        "WorldItem": null
+      },
+      "Flags": "NoCash",
+      "MissionBit": null,
+      "NextStep": "KLTR",
+      "Reward": {
+        "Hash": "DIRM",
+        "Credits": 0,
+        "Xp": 300,
+        "Records": null
+      }
+    }
+]
+  

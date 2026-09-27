@@ -1,5 +1,7 @@
 namespace ZoneEngine_New.Core.Helpers
 {
+    using System.Text;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
@@ -34,6 +36,54 @@ namespace ZoneEngine_New.Core.Helpers
                 return;
 
             player.Session.Send(Create(player.Identity, messageId));
+        }
+
+        /// <summary>
+        /// Category 110 feedback text the client formats itself. Retail quest kill progress (capture 2026-09-27):
+        /// Unknown1 0, then "~&" + base-85 category + base-85 message id, then each argument as 'i' + base-85 int or
+        /// 's' + (length + 1) + text.
+        /// </summary>
+        public static void SendFormatted(Character character, int messageId, params object[] args)
+        {
+            if (character is not Player player || player.Session == null)
+                return;
+
+            var text = new StringBuilder("~&").Append(Base85(CategoryId)).Append(Base85(messageId));
+            foreach (object arg in args)
+            {
+                if (arg is int number)
+                    text.Append('i').Append(Base85(number));
+                else
+                {
+                    string value = arg?.ToString() ?? string.Empty;
+                    if (value.Length > 254)
+                        value = value[..254];
+                    text.Append('s').Append((char)(value.Length + 1)).Append(value);
+                }
+            }
+
+            player.Session.Send(new FormatFeedbackMessage
+            {
+                Identity = player.Identity,
+                Unknown = 1,
+                Unknown1 = 0,
+                Unknown2 = 0,
+                FormattedMessage = text.ToString()
+            });
+        }
+
+        /// <summary>Five base-85 digits offset by '!', most significant first (110 -> "!!!\":").</summary>
+        static string Base85(int value)
+        {
+            uint remaining = unchecked((uint)value);
+            var digits = new char[5];
+            for (int i = 4; i >= 0; i--)
+            {
+                digits[i] = (char)('!' + remaining % 85);
+                remaining /= 85;
+            }
+
+            return new string(digits);
         }
 
         public static FeedbackMessage Create(Identity identity, string key)

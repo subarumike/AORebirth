@@ -10,6 +10,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using Utility;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.Nanos;
@@ -24,6 +25,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
     public sealed class CharacterActionMessageHandler : IMessageHandler<CharacterActionMessage>
     {
+        /// <summary>Feedback category 110: "You failed to hide as you are currently fighting."</summary>
+        const int FailedToHideWhileFighting = 247632055;
+
         private readonly InventoryActionService _inventoryActions;
         private readonly TeamService _teams;
         private readonly GeneratedMissionAcgService _missions;
@@ -83,6 +87,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     break;
 
                 case CharacterActionType.StartSneak: //TODO: Wire in hiding when sneaking
+                    if (player.IsBeingFought)
+                    {
+                        ClientFeedback.Send(player, FailedToHideWhileFighting);
+                        break;
+                    }
+
                     player.Motor.ApplyAction(MovementAction.SwitchToSneak);
                     AnnounceAction(player, CharacterActionType.StartedSneaking);
                     break;

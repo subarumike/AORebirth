@@ -244,7 +244,9 @@ namespace AORebirth.Database.Domain.Characters
                     parameters[6 + i * 4] = "@V" + index;
                     parameters[7 + i * 4] = stat.StatValue;
                 }
-                sql.Append(" AS incoming ON DUPLICATE KEY UPDATE StatValue=incoming.StatValue");
+                // VALUES() rather than the "AS alias" row reference: the alias form needs MySQL 8.0.19+ and fails on
+                // MariaDB and older MySQL; VALUES() works on all of them (newer MySQL only flags it as deprecated).
+                sql.Append(" ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)");
                 Execute(c, t, sql.ToString(), parameters);
             }
         }

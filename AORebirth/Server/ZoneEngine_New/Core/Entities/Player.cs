@@ -41,6 +41,9 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Rebuilt from active <see cref="FunctionType.ChangeActionRestriction"/> buffs.</summary>
         public ActionRestrictionFlags ActionRestrictionFlags { get; internal set; }
 
+        /// <summary>Quests from characterquests; loaded by <see cref="Quests.QuestService"/> on first use.</summary>
+        public Quests.QuestLog? QuestLog { get; set; }
+
         /// <summary>Skill trickle and training costs used by rebase and the trainer.</summary>
         public SkillCatalog SkillCatalog { get; init; } = SkillCatalog.Default;
 

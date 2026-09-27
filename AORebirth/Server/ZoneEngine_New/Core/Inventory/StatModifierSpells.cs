@@ -114,6 +114,19 @@ namespace ZoneEngine_New.Core.Inventory
                 stats.AddBonus(stat, (int)delta, dirty: true);
         }
 
+        /// <summary>Total flat Modify these functions add to <paramref name="stat"/>.</summary>
+        public static int SumModify(IReadOnlyList<ItemSpell> spells, CharacterStat stat)
+        {
+            int total = 0;
+            foreach (ItemSpell spell in spells)
+            {
+                if (TryReadModify(spell, out CharacterStat modified, out int delta) && modified == stat)
+                    total += delta;
+            }
+
+            return total;
+        }
+
         static bool TryReadModify(ItemSpell spell, out CharacterStat stat, out int delta)
         {
             stat = default;

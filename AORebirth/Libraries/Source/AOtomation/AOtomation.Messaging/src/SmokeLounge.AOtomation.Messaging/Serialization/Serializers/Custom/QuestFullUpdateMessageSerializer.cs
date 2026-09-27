@@ -98,17 +98,17 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             return new Quest
                    {
                        QuestId = reader.ReadIdentity(),
-                       Unknown1 = reader.ReadInt32(),
+                       Version = reader.ReadInt32(),
                        Unknown2 = reader.ReadInt32(),
                        Unknown3 = reader.ReadInt32(),
-                       Unknown4 = reader.ReadInt32(),
+                       Flags = reader.ReadInt32(),
                        ShortInfo = ReadNullTerminatedString(reader),
                        LongInfo = ReadLengthPrefixedString(reader),
                        UnknownId1 = reader.ReadIdentity(),
-                       Unknown5 = reader.ReadInt32(),
-                       Unknown6 = reader.ReadInt32(),
+                       RewardDescriptorVersion = reader.ReadInt32(),
+                       CashReward = reader.ReadInt32(),
                        Unknown7 = reader.ReadInt32(),
-                       Unknown8 = reader.ReadInt32(),
+                       ExperienceReward = reader.ReadInt32(),
                        Unknown9 = reader.ReadInt32(),
                        Unknown10 = reader.ReadInt32(),
                        MissionItemData = ReadX3F1Array(reader, ReadMissionItemReward),
@@ -152,17 +152,17 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
 
             writer.WriteIdentity(quest.QuestId);
-            writer.WriteInt32(quest.Unknown1);
+            writer.WriteInt32(quest.Version);
             writer.WriteInt32(quest.Unknown2);
             writer.WriteInt32(quest.Unknown3);
-            writer.WriteInt32(quest.Unknown4);
+            writer.WriteInt32(quest.Flags);
             WriteNullTerminatedString(writer, quest.ShortInfo);
             WriteLengthPrefixedString(writer, quest.LongInfo);
             writer.WriteIdentity(quest.UnknownId1);
-            writer.WriteInt32(quest.Unknown5);
-            writer.WriteInt32(quest.Unknown6);
+            writer.WriteInt32(quest.RewardDescriptorVersion);
+            writer.WriteInt32(quest.CashReward);
             writer.WriteInt32(quest.Unknown7);
-            writer.WriteInt32(quest.Unknown8);
+            writer.WriteInt32(quest.ExperienceReward);
             writer.WriteInt32(quest.Unknown9);
             writer.WriteInt32(quest.Unknown10);
             WriteX3F1Array(writer, quest.MissionItemData, WriteMissionItemReward);

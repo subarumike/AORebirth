@@ -44,7 +44,10 @@ namespace ZoneEngine_New.Core.Helpers
             CharacterStat? specialAttackStat = null,
             int? minDamageOverride = null,
             int? maxDamageOverride = null,
-            int? critBonusOverride = null)
+            int? critBonusOverride = null,
+            bool alwaysHits = false,
+            bool canCrit = true,
+            int? attackSkillOverride = null)
         {
             ArgumentNullException.ThrowIfNull(attacker);
             ArgumentNullException.ThrowIfNull(target);
@@ -54,7 +57,6 @@ namespace ZoneEngine_New.Core.Helpers
             int weaponCritBonus;
             int rawDamageType;
             int amsCap;
-            int fullAutoClip;
             ItemTemplate? attackDefendSource;
 
             if (weapon != null && weapon.LowId > 0)
@@ -64,7 +66,6 @@ namespace ZoneEngine_New.Core.Helpers
                 weaponCritBonus = NormalizeStat(weapon.GetStat(CharacterStat.DamageBonus));
                 rawDamageType = NormalizeStat(weapon.GetStat(CharacterStat.DamageType));
                 amsCap = NormalizeStat(weapon.GetStat(CharacterStat.AMSCap));
-                fullAutoClip = NormalizeStat(weapon.GetStat(CharacterStat.MaxEnergy));
                 attackDefendSource = weapon.Definition;
 
                 // Fist / incomplete templates often lack min/max. Fall back to natural damage so
@@ -89,7 +90,6 @@ namespace ZoneEngine_New.Core.Helpers
                 weaponCritBonus = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.DamageBonus));
                 rawDamageType = 0;
                 amsCap = 0;
-                fullAutoClip = 0;
                 attackDefendSource = null;
             }
 
@@ -101,18 +101,20 @@ namespace ZoneEngine_New.Core.Helpers
             if (weaponMin < 0 || weaponMax < weaponMin)
                 throw new ArgumentOutOfRangeException(nameof(minDamageOverride));
 
-            int attackRating = ResolveAttackRating(attacker, attackDefendSource, specialAttackStat);
+            // Specials use the weapon's own attack rating; the special's skill only shortens its recharge.
+            // Backstab uses the Sneak Attack skill as its attack rating instead of the weapon's attack lines.
+            int attackRating = attackSkillOverride.HasValue
+                ? NormalizeStat(attackSkillOverride.Value) + NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.AMSModifier))
+                : ResolveAttackRating(attacker, attackDefendSource);
             int defenseRating = ResolveDefenseRating(target, attackDefendSource);
             int cappedAttackRating = amsCap > 0 ? Math.Min(attackRating, amsCap) : attackRating;
 
-            if (!ResolveHit(attackRating, defenseRating))
+            if (!alwaysHits && !ResolveHit(attackRating, defenseRating))
                 return new DamageResult(false, 0, HitType.Normal);
 
             int overrideType = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.DamageOverrideType));
             if (overrideType > 0)
                 rawDamageType = overrideType;
-
-            ApplySpecialAttackWeaponScaling(specialAttackStat, fullAutoClip, ref weaponMin, ref weaponMax);
 
             int damageBonus = TryGetAddDamageStat(rawDamageType, out CharacterStat addDamageStat)
                 ? NormalizeStat(attacker.Stats.GetOrZero(addDamageStat))
@@ -122,7 +124,8 @@ namespace ZoneEngine_New.Core.Helpers
                 ? NormalizeStat(target.Stats.GetOrZero(armorStat))
                 : 0;
 
-            if (specialAttackStat == CharacterStat.AimedShot)
+            // Aimed Shot and Sneak Attack / Backstab ignore armour and start from the weapon's max damage.
+            if (specialAttackStat is CharacterStat.AimedShot or CharacterStat.SneakAttack)
             {
                 targetArmorClass = 0;
                 weaponMin = weaponMax;
@@ -149,7 +152,7 @@ namespace ZoneEngine_New.Core.Helpers
             HitType hitType = HitType.Normal;
             bool isBurst = specialAttackStat == CharacterStat.Burst;
             int critIncrease = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.CriticalIncrease));
-            if (!isBurst && NextInt(0, 100) < critIncrease)
+            if (canCrit && !isBurst && NextInt(0, 100) < critIncrease)
             {
                 hitType = HitType.Critical;
                 minDamage = maxDamage + weaponCritBonus;
@@ -160,12 +163,6 @@ namespace ZoneEngine_New.Core.Helpers
             int damage = minDamage >= rolledMaximum
                 ? minDamage
                 : NextInt(minDamage, rolledMaximum + 1);
-
-            if (specialAttackStat == CharacterStat.AimedShot)
-            {
-                damage *= NextInt(1, 5);
-                damage = Math.Min(13000, damage);
-            }
 
             return new DamageResult(true, Math.Max(1, damage), hitType);
         }
@@ -178,18 +175,14 @@ namespace ZoneEngine_New.Core.Helpers
             return new DamageResult(false, 0, HitType.Normal);
         }
 
-        static int ResolveAttackRating(
-            Character attacker,
-            ItemTemplate? template,
-            CharacterStat? specialAttackStat)
+        static int ResolveAttackRating(Character attacker, ItemTemplate? template)
         {
             int attackRating = 0;
             if (template?.Attack is { Count: > 0 })
             {
                 foreach (System.Collections.Generic.KeyValuePair<CharacterStat, int> entry in template.Attack)
                 {
-                    CharacterStat skill = specialAttackStat ?? entry.Key;
-                    attackRating += (entry.Value / 100) * NormalizeStat(attacker.Stats.GetOrZero(skill));
+                    attackRating += (entry.Value / 100) * NormalizeStat(attacker.Stats.GetOrZero(entry.Key));
                 }
             }
 
@@ -214,29 +207,6 @@ namespace ZoneEngine_New.Core.Helpers
                 (HitCoefficientA * (attackRating + HitCoefficientK) / (defenseRating + HitCoefficientL))
                 + HitCoefficientB;
             return NextDouble() <= hitPercentage;
-        }
-
-        static void ApplySpecialAttackWeaponScaling(
-            CharacterStat? specialAttackStat,
-            int fullAutoClip,
-            ref int weaponMin,
-            ref int weaponMax)
-        {
-            if (!specialAttackStat.HasValue)
-                return;
-
-            switch (specialAttackStat.Value)
-            {
-                case CharacterStat.Burst:
-                    weaponMin *= 3;
-                    weaponMax *= 3;
-                    break;
-                case CharacterStat.FullAuto:
-                    int clip = Math.Max(1, fullAutoClip);
-                    weaponMin *= clip;
-                    weaponMax *= clip;
-                    break;
-            }
         }
 
         static bool TryGetArmorStat(int rawDamageType, out CharacterStat armorStat)

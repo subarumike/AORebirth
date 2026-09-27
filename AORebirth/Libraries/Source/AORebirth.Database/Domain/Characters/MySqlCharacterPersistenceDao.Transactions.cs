@@ -22,7 +22,8 @@ namespace AORebirth.Database.Domain.Characters
                 throw new ArgumentException("Invalid or duplicate skill lock.", nameof(skillLocks));
             if (activeNanos != null
                 && (activeNanos.Any(n => n.NanoId <= 0 || n.NanoInstance <= 0 || n.DurationCentiseconds < 0 || n.ExpiresAtUtcTicks < 0)
-                    || activeNanos.Select(n => n.Strain).Distinct().Count() != activeNanos.Count
+                    // Strain 0 is "no strain": those nanos never conflict in NCU, so only real strains must be unique.
+                    || activeNanos.Where(n => n.Strain > 0).Select(n => n.Strain).Distinct().Count() != activeNanos.Count(n => n.Strain > 0)
                     || activeNanos.Select(n => n.NanoInstance).Distinct().Count() != activeNanos.Count))
                 throw new ArgumentException("Invalid or duplicate active nano identity.", nameof(activeNanos));
             Transaction((c, t) =>

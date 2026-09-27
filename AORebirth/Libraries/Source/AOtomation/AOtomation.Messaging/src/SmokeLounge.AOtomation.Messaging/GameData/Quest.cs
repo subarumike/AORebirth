@@ -9,7 +9,8 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         public Identity QuestId { get; set; }
 
         [AoMember(1)]
-        public int Unknown1 { get; set; }
+        /// <summary>Quest_t stream version; the client accepts 7-15 (Gamecode.dll FUN_100abc80).</summary>
+        public int Version { get; set; }
 
         [AoMember(2)]
         public int Unknown2 { get; set; }
@@ -18,7 +19,8 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         public int Unknown3 { get; set; }
 
         [AoMember(4)]
-        public int Unknown4 { get; set; }
+        /// <summary>Quest flags (Quest_t +0xa4); bit 0x100 is a team mission (N3Msg_IsTeamMission).</summary>
+        public int Flags { get; set; }
 
         [AoMember(5, SerializeSize = ArraySizeType.NullTerminated)]
         public string ShortInfo { get; set; }
@@ -30,16 +32,19 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         public Identity UnknownId1 { get; set; }
 
         [AoMember(8)]
-        public int Unknown5 { get; set; }
+        /// <summary>RewardBox_t stream version, 3-6 (Gamecode.dll FUN_10086e85).</summary>
+        public int RewardDescriptorVersion { get; set; }
 
         [AoMember(9)]
-        public int Unknown6 { get; set; }
+        /// <summary>Credits reward (RewardBox_t[0], N3Msg_QuestGetCashReward).</summary>
+        public int CashReward { get; set; }
 
         [AoMember(10)]
         public int Unknown7 { get; set; }
 
         [AoMember(11)]
-        public int Unknown8 { get; set; }
+        /// <summary>XP reward (RewardBox_t[1], N3Msg_QuestGetXPReward).</summary>
+        public int ExperienceReward { get; set; }
 
         [AoMember(12)]
         public int Unknown9 { get; set; }
@@ -134,6 +139,11 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         [AoMember(42, SerializeSize = ArraySizeType.X3F1)]
         public Identity[] FactionInfos { get; set; }
 
+        /// <summary>
+        /// Not part of Quest_t: the byte after the quest list (QuestFullUpdateIIR_t +0x28, Gamecode.dll FUN_100acd41),
+        /// so it only lines up for a one-quest update. Non-zero makes the client print Feedback_YouGotANewMission and
+        /// refresh the journal (FUN_10056abb); retail sends 1 on assignment and 0 when re-sending on zone entry.
+        /// </summary>
         [AoMember(43)]
         public byte Unknown28 { get; set; }
     }
