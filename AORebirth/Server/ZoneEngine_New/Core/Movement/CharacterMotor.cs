@@ -447,6 +447,19 @@ namespace ZoneEngine_New.Core.Movement
 
         public void Halt() => _sim.Halt();
 
+        /// <summary>
+        /// Root landed: drop every movement flag, any path and residual speed. True when the
+        /// character was moving, so the caller can tell observers it stopped.
+        /// </summary>
+        public bool StopForRoot()
+        {
+            bool moving = HasPath || _flags != MovementFlags.None || _sim.Speed > MovementConfig.SpeedStopEpsilon;
+            ClearPath();
+            StopAllFlags();
+            _sim.Halt();
+            return moving;
+        }
+
         public void ResetForPlayfieldTransfer(Vector3 position)
         {
             // Key releases on the old/loading connection may never reach this motor.
@@ -486,6 +499,9 @@ namespace ZoneEngine_New.Core.Movement
         public bool Consume(CharDCMoveMessage message)
         {
             ArgumentNullException.ThrowIfNull(message);
+            if (_character.IsRooted)
+                return ConsumeRooted(message);
+
             if (!TryAcceptClientPosition(message))
                 return false;
 
@@ -494,6 +510,63 @@ namespace ZoneEngine_New.Core.Movement
             ApplyClientHeading(message);
             return true;
         }
+
+        /// <summary>A rooted client that reported a position this far off gets pulled back.</summary>
+        const float RootDriftMeters = 0.25f;
+
+        /// <summary>Seconds between pull-backs, so a client pressing forward is not flooded.</summary>
+        const double RootCorrectionSeconds = 0.5;
+
+        DateTime _lastRootCorrectionUtc;
+
+        /// <summary>True when the last rooted move drifted and the client needs the server position again.</summary>
+        public bool RootCorrectionDue { get; private set; }
+
+        /// <summary>
+        /// Rooted: heading and turns still apply, but the position stays the server's and every
+        /// translation start becomes its stop. The rewritten message is what observers see.
+        /// </summary>
+        bool ConsumeRooted(CharDCMoveMessage message)
+        {
+            RootCorrectionDue = false;
+            Vector3 held = _character.Position;
+            if (message.Coordinates != null)
+            {
+                double dx = message.Coordinates.X - held.x;
+                double dy = message.Coordinates.Y - held.y;
+                double dz = message.Coordinates.Z - held.z;
+                DateTime now = DateTime.UtcNow;
+                if ((dx * dx) + (dy * dy) + (dz * dz) > RootDriftMeters * RootDriftMeters
+                    && (now - _lastRootCorrectionUtc).TotalSeconds >= RootCorrectionSeconds)
+                {
+                    RootCorrectionDue = true;
+                    _lastRootCorrectionUtc = now;
+                }
+
+                message.Coordinates = new MsgVector3(held.xf, held.yf, held.zf);
+            }
+
+            MovementAction action = RootedAction((MovementAction)message.MoveType);
+            message.MoveType = (byte)action;
+
+            ClearPath();
+            _sim.Halt();
+            ApplyAction(action);
+            ApplyClientHeading(message);
+            return true;
+        }
+
+        static MovementAction RootedAction(MovementAction action) => action switch
+        {
+            MovementAction.ForwardStart => MovementAction.ForwardStop,
+            MovementAction.BackwardStart => MovementAction.BackwardStop,
+            MovementAction.StrafeRightStart => MovementAction.StrafeRightStop,
+            MovementAction.StrafeLeftStart => MovementAction.StrafeLeftStop,
+            MovementAction.JumpStart => MovementAction.JumpStop,
+            MovementAction.ElevateUpStart => MovementAction.ElevateUpStop,
+            MovementAction.ElevateDownStart => MovementAction.ElevateDownStop,
+            _ => action
+        };
 
         bool TryAcceptClientPosition(CharDCMoveMessage message)
         {

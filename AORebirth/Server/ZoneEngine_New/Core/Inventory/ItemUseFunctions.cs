@@ -248,6 +248,10 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (delta < 0)
             {
+                // A hostile nano hit from someone else can break crowd control before its threat lands.
+                if (!ReferenceEquals(caster, target))
+                    target.RollBuffBreaks(BuffBreakCause.SpellAttack, caster);
+
                 int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
                 target.ApplyDamage(caster, -delta, HitType.Normal);
 

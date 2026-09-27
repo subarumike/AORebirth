@@ -7,7 +7,6 @@ namespace ZoneEngine_New.Core.Inventory
 
     using AORebirth.Core.GameData;
 
-    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory.Dat;
     using ZoneEngine_New.Core.Logging;
@@ -18,30 +17,16 @@ namespace ZoneEngine_New.Core.Inventory
         private readonly IZoneLogger _logger;
         private readonly string _itemsDatPath;
 
-        public ItemTemplateCatalog(IItemNameRepository names, IGameData gameData, IZoneLogger logger)
+        /// <summary>GameData items.dat is the only source of item templates, names included.</summary>
+        public ItemTemplateCatalog(IGameData gameData, IZoneLogger logger)
         {
-            ArgumentNullException.ThrowIfNull(names);
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
             _itemsDatPath = Path.Combine(gameData.RootPath, GameDataPaths.ItemsFileName);
             _templates = new Dictionary<int, ItemTemplate>(capacity: 130000);
 
-            IReadOnlyDictionary<int, string> nameMap = names.GetAllNames();
-            TryLoadItemsDat(nameMap);
-
-            foreach (KeyValuePair<int, string> pair in nameMap)
-            {
-                if (_templates.ContainsKey(pair.Key))
-                    continue;
-
-                _templates[pair.Key] = new ItemTemplate
-                {
-                    Id = pair.Key,
-                    Name = pair.Value ?? string.Empty,
-                    Quality = 1
-                };
-            }
+            TryLoadItemsDat();
 
             _logger.Info(
                 string.Format(
@@ -62,14 +47,14 @@ namespace ZoneEngine_New.Core.Inventory
                 string.Format(CultureInfo.InvariantCulture, "Item template {0} not found", aoid));
         }
 
-        private void TryLoadItemsDat(IReadOnlyDictionary<int, string> nameMap)
+        private void TryLoadItemsDat()
         {
             if (!File.Exists(_itemsDatPath))
             {
                 _logger.Warn(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "GameData items.dat not found at {0}; catalog will use name stubs only",
+                        "GameData items.dat not found at {0}; item catalog is empty",
                         _itemsDatPath));
                 return;
             }
@@ -80,8 +65,7 @@ namespace ZoneEngine_New.Core.Inventory
                 int merged = 0;
                 foreach (DatItemTemplate dat in loaded)
                 {
-                    nameMap.TryGetValue(dat.ID, out string? name);
-                    _templates[dat.ID] = DatItemMapper.ToTemplate(dat, name ?? string.Empty);
+                    _templates[dat.ID] = DatItemMapper.ToTemplate(dat, dat.Name ?? string.Empty);
                     merged++;
                 }
 
@@ -98,7 +82,7 @@ namespace ZoneEngine_New.Core.Inventory
                     exception,
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Failed to load GameData items.dat from {0}; continuing with name stubs",
+                        "Failed to load GameData items.dat from {0}; item catalog is empty",
                         _itemsDatPath));
             }
         }

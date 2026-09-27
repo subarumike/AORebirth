@@ -41,6 +41,17 @@ namespace ZoneEngine_New.Core.Commands
                     return;
                 }
             }
+            else if (stat == CharacterStat.AlienLevel && subject.IsPlayer)
+            {
+                if (!subject.TrySetAlienLevel(value))
+                {
+                    GmCommandFeedback.Send(
+                        context.Session,
+                        context.Player,
+                        "Invalid alien level or AlienXp table unavailable.");
+                    return;
+                }
+            }
             else
             {
                 subject.Stats.Set(stat, value, StatDetail.Base, dirty: true);

@@ -392,6 +392,8 @@ namespace ZoneEngine_New.Core.Nanos
 
             SendNanoDuration(source, target, applied);
             ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: true, inventory, items);
+            if (spell.IsHostile)
+                OnDebuffLanded(source, target, applied);
             return true;
         }
 
@@ -505,6 +507,8 @@ namespace ZoneEngine_New.Core.Nanos
 
             SendNanoDuration(caster, recipient, applied);
             ExecuteOnUseEffects(caster, recipient, spell, skipPassiveModifiers: true);
+            if (spell.IsHostile)
+                OnDebuffLanded(caster, recipient, applied);
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
@@ -546,15 +550,28 @@ namespace ZoneEngine_New.Core.Nanos
         /// Land still re-checks via <see cref="BuffApplyRules"/>; failure there finishes the
         /// cast without applying.
         /// </summary>
+        /// <summary>
+        /// A debuff landing can break crowd control already on the target, and a player's debuff
+        /// always puts the player on an NPC's hate list, so debuffing an idle mob pulls it.
+        /// A pacified NPC still ignores that threat.
+        /// </summary>
+        static void OnDebuffLanded(Character caster, Character recipient, Buff applied)
+        {
+            recipient.RollBuffBreaks(BuffBreakCause.Debuff, caster, except: applied);
+            if (recipient is NpcCharacter npc && caster.IsPlayer && !ReferenceEquals(caster, recipient))
+                npc.Brain?.AddThreat(caster.Identity, Ai.NpcAiRules.ProximityHate);
+        }
+
         static bool TargetCanHoldBuff(NanoSpell spell, Character? recipient)
         {
             if (recipient == null || !spell.IsBuff || !spell.ConsumesNcu)
                 return true;
 
+            // Same cap the landing uses, so a cast is never refused for NCU the buff would not need.
             BuffApplyDecision decision = BuffApplyRules.Evaluate(
                 spell,
                 recipient.Buffs,
-                recipient.MaxNcu,
+                recipient.BuffNcuCapacity,
                 out _);
             return decision != BuffApplyDecision.RefusedNotEnoughNcu;
         }

@@ -2,20 +2,25 @@ namespace ZoneEngine_New.Core.Ai
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
+
+    using Utility;
 
     /// <summary>
     /// Casts an NPC's uploaded nanos now and then. Every cast goes through <see cref="NanoRuntime"/>, so
     /// requirements, nano cost, recharge and NCU are the same as for players.
-    /// Hostile nanos go on the combat target. Friendly buffs, in or out of combat, go on a random pick of
-    /// self and nearby NPCs that lack them. Other friendly nanos (heals) go on the most hurt of those.
+    /// Hostile nanos go on the combat target. Friendly buffs, in or out of combat, go on the caster when it
+    /// lacks them, otherwise on a random nearby NPC that does. Heals go on the caster when it is hurt,
+    /// otherwise on the most hurt nearby NPC.
     /// </summary>
     sealed class NpcNanoCaster
     {
@@ -74,6 +79,20 @@ namespace ZoneEngine_New.Core.Ai
                 if (NanoRuntime.TryStartCast(Npc, spell.Id, target.Identity, nowUtc) != NanoCastRefusal.None)
                     continue;
 
+                LogUtil.Debug(
+                    DebugInfoDetail.Engine,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "NPC nano cast npc={0} nano={1} {2} kind={3} target={4} self={5} targetHp={6}% npcHp={7}%",
+                        Npc.Identity.Instance,
+                        spell.Id,
+                        spell.Name,
+                        spell.IsHostile ? "hostile" : IsHeal(spell) ? "heal" : IsBuffLike(spell) ? "buff" : "friendly",
+                        target.Identity.Instance,
+                        ReferenceEquals(target, Npc),
+                        HealthPercent(target),
+                        HealthPercent(Npc)));
+
                 _nextAttemptUtc = nowUtc.AddSeconds(Between(MinCastIntervalSeconds, MaxCastIntervalSeconds));
                 return;
             }
@@ -100,14 +119,20 @@ namespace ZoneEngine_New.Core.Ai
                 return NanoRuntime.CanStartCast(Npc, spell, enemy, nowUtc) ? enemy : null;
             }
 
-            if (spell.IsBuff)
+            // Heals, including heal-over-time buffs, only go on someone who is actually hurt.
+            // The caster looks after itself first; only then does it help a neighbour.
+            if (IsBuffLike(spell) && !IsHeal(spell))
             {
-                // Random pick among everyone who can take it, self included, so NPCs buff each other.
+                if (!HasNano(Npc, spell) && NanoRuntime.CanStartCast(Npc, spell, Npc, nowUtc))
+                    return Npc;
+
+                // Random pick among nearby NPCs that can take it, so NPCs buff each other.
                 Character? chosen = null;
                 int eligible = 0;
                 foreach (Character candidate in FriendlyCandidates(spell))
                 {
-                    if (HasNano(candidate, spell) || !NanoRuntime.CanStartCast(Npc, spell, candidate, nowUtc))
+                    if (ReferenceEquals(candidate, Npc)
+                        || HasNano(candidate, spell) || !NanoRuntime.CanStartCast(Npc, spell, candidate, nowUtc))
                         continue;
 
                     eligible++;
@@ -118,12 +143,19 @@ namespace ZoneEngine_New.Core.Ai
                 return chosen;
             }
 
+            if (HealthPercent(Npc) < HealBelowPercent && !HasNano(Npc, spell)
+                && NanoRuntime.CanStartCast(Npc, spell, Npc, nowUtc))
+                return Npc;
+
             Character? hurt = null;
             int lowest = HealBelowPercent;
             foreach (Character candidate in FriendlyCandidates(spell))
             {
+                if (ReferenceEquals(candidate, Npc))
+                    continue;
+
                 int percent = HealthPercent(candidate);
-                if (percent >= lowest || !NanoRuntime.CanStartCast(Npc, spell, candidate, nowUtc))
+                if (percent >= lowest || HasNano(candidate, spell) || !NanoRuntime.CanStartCast(Npc, spell, candidate, nowUtc))
                     continue;
 
                 lowest = percent;
@@ -188,18 +220,93 @@ namespace ZoneEngine_New.Core.Ai
             return Npc.GetEdgeDistanceTo(target) <= range && Npc.HasLineOfSightTo(target);
         }
 
-        /// <summary>The same nano or a same-strain one is already running on the target.</summary>
-        static bool HasNano(Character target, NanoSpell spell)
+        /// <summary>
+        /// The nano, a nano it casts (CastNano wrappers land a child id), or an equal-or-stronger
+        /// same-strain nano is already running on the target.
+        /// </summary>
+        bool HasNano(Character target, NanoSpell spell)
         {
-            if (!spell.IsBuff)
-                return false;
+            if (HasRunning(target, spell))
+                return true;
 
+            foreach (NanoSpell child in Children(spell))
+            {
+                if (HasRunning(target, child))
+                    return true;
+            }
+
+            return false;
+        }
+
+        static bool HasRunning(Character target, NanoSpell spell)
+        {
             IReadOnlyList<Buff> buffs = target.Buffs;
             for (int i = 0; i < buffs.Count; i++)
             {
                 if (buffs[i].Id == spell.Id
                     || (spell.NanoStrain > 0 && buffs[i].NanoStrain == spell.NanoStrain
                         && buffs[i].StackingOrder >= spell.StackingOrder))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>A buff itself, or a wrapper whose CastNano lands one.</summary>
+        bool IsBuffLike(NanoSpell spell)
+        {
+            if (spell.IsBuff)
+                return true;
+
+            foreach (NanoSpell child in Children(spell))
+            {
+                if (child.IsBuff)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>Nanos this one lands through its OnUse CastNano functions.</summary>
+        IEnumerable<NanoSpell> Children(NanoSpell spell)
+        {
+            if (!spell.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                yield break;
+
+            for (int i = 0; i < spells.Count; i++)
+            {
+                if (spells[i].Is(FunctionType.CastNano) && spells[i].TryReadInt(0, out int childId)
+                    && childId != spell.Id && Resolve(childId) is NanoSpell child)
+                    yield return child;
+            }
+        }
+
+        /// <summary>An OnUse Hit that raises Health, on the nano or a nano it casts: a heal or heal over time.</summary>
+        bool IsHeal(NanoSpell spell)
+        {
+            if (IsDirectHeal(spell))
+                return true;
+
+            foreach (NanoSpell child in Children(spell))
+            {
+                if (IsDirectHeal(child))
+                    return true;
+            }
+
+            return false;
+        }
+
+        static bool IsDirectHeal(NanoSpell spell)
+        {
+            if (!spell.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                return false;
+
+            for (int i = 0; i < spells.Count; i++)
+            {
+                ItemSpell hit = spells[i];
+                if (hit.Is(FunctionType.Hit)
+                    && hit.TryReadInt(0, out int stat) && stat == (int)CharacterStat.Health
+                    && hit.TryReadInt(1, out int amount) && amount > 0)
                     return true;
             }
 

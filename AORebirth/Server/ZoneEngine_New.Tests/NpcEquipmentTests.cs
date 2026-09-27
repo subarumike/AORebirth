@@ -27,7 +27,6 @@ namespace ZoneEngine_New.Tests
         {
             string gameDataRoot = FindGameDataRoot();
             var catalog = new ItemTemplateCatalog(
-                new EmptyNames(),
                 new StubGameData(new HashItemCatalog(new Dictionary<string, string[]>(), new Dictionary<string, HashInstance>()), rootPath: gameDataRoot),
                 new StubLogger());
 
@@ -354,18 +353,6 @@ namespace ZoneEngine_New.Tests
             }
 
             throw new DirectoryNotFoundException("GameData/items.dat not found from " + AppContext.BaseDirectory);
-        }
-
-        sealed class EmptyNames : IItemNameRepository
-        {
-            public bool TryGetName(int aoid, out string name)
-            {
-                name = string.Empty;
-                return false;
-            }
-
-            public IReadOnlyDictionary<int, string> GetAllNames()
-                => new Dictionary<int, string>();
         }
 
         sealed class CatalogItemBuilder : IItemBuilder

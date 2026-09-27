@@ -27,6 +27,14 @@ namespace ZoneEngine_New.Core.GameData
 
         bool TryGetXpLevel(int level, out XpLevelEntry entry);
 
+        int AlienXpLevelCount => 0;
+
+        bool TryGetAlienXpLevel(int level, out AlienXpLevelEntry entry)
+        {
+            entry = null!;
+            return false;
+        }
+
         bool CanResolveMobHash(string hash) => TryGetMobTemplate(hash, out _);
 
         /// <summary>Like <see cref="CanResolveMobHash"/> but false when only the placeholder fallback would match.</summary>

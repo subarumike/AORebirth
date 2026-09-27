@@ -27,7 +27,7 @@ public sealed class AcceptedVendorRealCatalogTests
         Assert.IsTrue(File.Exists(path), "The repository GameData/items.dat must be packaged; no synthetic catalog is permitted.");
         var data = new StubGameData(HashItemCatalog.Parse("{}")) { RootPath = dataRoot };
         // No SQL/name rows are supplied: the real catalog cannot turn missing templates into name-only stubs.
-        var catalog = new ItemTemplateCatalog(new NoNames(), data, new StubLogger());
+        var catalog = new ItemTemplateCatalog(data, new StubLogger());
         var items = new ItemBuilder(catalog, new StubLogger());
         var endpoints = Endpoints();
         var missing = new List<string>();
@@ -112,10 +112,5 @@ public sealed class AcceptedVendorRealCatalogTests
         return result;
     }
 
-    sealed class NoNames : IItemNameRepository
-    {
-        public bool TryGetName(int aoid, out string name) { name = string.Empty; return false; }
-        public IReadOnlyDictionary<int, string> GetAllNames() => new Dictionary<int, string>();
-    }
 }
 

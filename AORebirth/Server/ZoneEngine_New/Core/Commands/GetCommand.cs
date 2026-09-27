@@ -58,7 +58,9 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            Player subject = context.ResolveSubject();
+            if (!context.TryResolveCharacter(out Character subject))
+                return;
+
             if (!subject.Stats.TryGetValue(stat, out _))
             {
                 GmCommandFeedback.Send(
@@ -93,7 +95,9 @@ namespace ZoneEngine_New.Core.Commands
 
         static void ExecuteStats(GmCommandContext context)
         {
-            Player subject = context.ResolveSubject();
+            if (!context.TryResolveCharacter(out Character subject))
+                return;
+
             IReadOnlyList<string> lines = GetStatsAomlBuilder.BuildChatLines(
                 subject.Name ?? string.Empty,
                 subject.Stats,
