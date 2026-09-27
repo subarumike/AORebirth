@@ -71,6 +71,7 @@ namespace ZoneEngine_New.Tests
                 File.WriteAllText(Path.Combine(gameData, "VendingMachines.json"), "{}");
                 File.WriteAllText(Path.Combine(gameData, "MonsterData.json"), "{}");
                 File.WriteAllText(Path.Combine(gameData, "Xp.json"), "{}");
+                File.WriteAllText(Path.Combine(gameData, "AlienXp.json"), "{}");
                 File.WriteAllBytes(Path.Combine(gameData, "items.dat"), [1]);
 
                 RuntimeStartup.ValidatePackage(root, skipPlayfieldPackagePin: true);

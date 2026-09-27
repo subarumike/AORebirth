@@ -38,6 +38,19 @@ namespace ZoneEngine_New.Core.Entities
         Movement,
     }
 
+    /// <summary>What can break a crowd-control buff, each with its own chance stat on the nano.</summary>
+    public enum BuffBreakCause
+    {
+        /// <summary>A weapon strike that connected (not a miss).</summary>
+        Attack,
+
+        /// <summary>A hostile nano hit that did damage.</summary>
+        SpellAttack,
+
+        /// <summary>A hostile nano buff (debuff) landing.</summary>
+        Debuff,
+    }
+
     public enum XpSource
     {
         Kill,
@@ -51,6 +64,12 @@ namespace ZoneEngine_New.Core.Entities
     {
         const int MaxXpLevel = 220;
         const int KillXpCapPercent = 10;
+
+        /// <summary>NPCFamily of alien NPCs; only these grant alien XP.</summary>
+        const int AlienNpcFamily = 220;
+
+        /// <summary>Damage shares are split out of this so each killer's fraction survives integer math.</summary>
+        const int AlienShareBasis = 10000;
         const int QuestXpCapPercent = 20;
         const int MartialArtsSpecialLowId = 211357;
         const int MartialArtsSpecialHighId = 211358;
@@ -360,6 +379,33 @@ namespace ZoneEngine_New.Core.Entities
             return true;
         }
 
+        /// <summary>
+        /// GM/admin alien level set: AlienXP snaps to the start of <paramref name="alienLevel"/> (0 progress)
+        /// and AlienNextXP to the AlienXp.json step out of it; 0 at the top level.
+        /// </summary>
+        /// <returns>False if the level is outside 0..the last AlienXp.json row, or the table is missing.</returns>
+        public bool TrySetAlienLevel(int alienLevel)
+        {
+            if (!IsPlayer || alienLevel < 0)
+                return false;
+
+            IGameData? gameData = Playfield?.GetRequiredService<IGameData>();
+            if (gameData == null || gameData.AlienXpLevelCount == 0)
+                return false;
+            if (alienLevel > 0 && !gameData.TryGetAlienXpLevel(alienLevel, out _))
+                return false;
+
+            int next = gameData.TryGetAlienXpLevel(alienLevel + 1, out AlienXpLevelEntry step) && step.NextLevelXp > 0
+                ? step.NextLevelXp
+                : 0;
+
+            Stats.Set(CharacterStat.AlienLevel, alienLevel, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.AlienXP, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.AlienNextXP, next, StatDetail.Base, dirty: true);
+            FlushDirtyStats();
+            return true;
+        }
+
         void ApplyLevelUp(IGameData gameData, int levelBefore, int levelAfter, int lastGain)
         {
             Stats.Set(CharacterStat.TitleLevel, TitleLevelFor(levelAfter), StatDetail.Base, dirty: true);
@@ -490,7 +536,7 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             AwardRegularXp(playfield, present);
-            AwardAlienXp(present);
+            AwardAlienXp(playfield, present);
             AwardPvpTitle(present);
         }
 
@@ -530,6 +576,8 @@ namespace ZoneEngine_New.Core.Entities
 
             DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
             List<AwardShare> shares = _killRewards.Divide(extract.KillAward, present, AwardCredit.Shared);
+            var tooLow = new List<Character>();
+            var told = new HashSet<int>();
             for (int i = 0; i < shares.Count; i++)
             {
                 AwardShare share = shares[i];
@@ -540,29 +588,68 @@ namespace ZoneEngine_New.Core.Entities
                 if (!registry.TryGet(identity, out Dynel? dynel) || dynel is not Character killer)
                     continue;
 
-                List<Character> recipients = CollectNearbyTeam(playfield, registry, killer);
+                tooLow.Clear();
+                List<Character> recipients = CollectNearbyTeam(playfield, registry, killer, tooLow);
+                for (int t = 0; t < tooLow.Count; t++)
+                {
+                    if (told.Add(tooLow[t].Identity.Instance))
+                        ClientFeedback.Send(tooLow[t], ClientFeedback.TeammateTooHighForXp);
+                }
+
+                if (recipients.Count == 0)
+                    continue;
+
                 int each = share.Amount / recipients.Count;
                 int leftover = share.Amount - each * recipients.Count;
                 for (int r = 0; r < recipients.Count; r++)
                 {
-                    Character recipient = recipients[r];
                     int amount = r == 0 ? each + leftover : each;
                     if (amount <= 0)
                         continue;
 
-                    int recipientLevel = recipient.Stats.GetOrOne(CharacterStat.Level);
-                    if (recipientLevel > victimLevel + extract.LevelDelta)
+                    // A monster below the recipient's LevelEligibility.json range is worth 1 XP.
+                    int recipientLevel = recipients[r].Stats.GetOrOne(CharacterStat.Level);
+                    if (TeamLevelEligibility.Current.IsTooLowForMember(recipientLevel, victimLevel))
                         amount = 1;
 
-                    recipient.AwardXp(amount, XpSource.Kill);
+                    recipients[r].AwardXp(amount, XpSource.Kill);
                 }
             }
         }
 
         /// <summary>
-        /// Killer first, then living teammates on this playfield within <see cref="TeamShareRange"/> of the victim.
+        /// Killer and living teammates on this playfield within <see cref="TeamShareRange"/> of the victim that
+        /// can share XP. LevelEligibility.json gives the lowest level that shares with the highest one here;
+        /// anyone below it goes to <paramref name="tooLow"/> instead.
         /// </summary>
-        List<Character> CollectNearbyTeam(Playfield playfield, DynelRegistry registry, Character killer)
+        List<Character> CollectNearbyTeam(
+            Playfield playfield,
+            DynelRegistry registry,
+            Character killer,
+            List<Character>? tooLow = null)
+        {
+            List<Character> nearby = CollectNearbyTeamMembers(playfield, registry, killer);
+            if (nearby.Count < 2)
+                return nearby;
+
+            int highest = 0;
+            for (int i = 0; i < nearby.Count; i++)
+                highest = Math.Max(highest, nearby[i].Stats.GetOrOne(CharacterStat.Level));
+
+            var eligible = new List<Character>(nearby.Count);
+            for (int i = 0; i < nearby.Count; i++)
+            {
+                if (TeamLevelEligibility.Current.IsTooLowForMember(highest, nearby[i].Stats.GetOrOne(CharacterStat.Level)))
+                    tooLow?.Add(nearby[i]);
+                else
+                    eligible.Add(nearby[i]);
+            }
+
+            return eligible;
+        }
+
+        /// <summary>Killer first, then living teammates on this playfield within <see cref="TeamShareRange"/> of the victim.</summary>
+        List<Character> CollectNearbyTeamMembers(Playfield playfield, DynelRegistry registry, Character killer)
         {
             var recipients = new List<Character> { killer };
             TeamSnapshot? team = killer is Player player ? playfield.GetService<TeamService>()?.GetTeam(player) : null;
@@ -586,15 +673,95 @@ namespace ZoneEngine_New.Core.Entities
             return recipients;
         }
 
-        void AwardAlienXp(IReadOnlyList<int> present)
+        /// <summary>
+        /// Alien kills (NPCFamily 220). Each damage share is that killer's fraction of their solo AXP,
+        /// computed per recipient level, then split evenly with the nearby team like regular XP.
+        /// </summary>
+        void AwardAlienXp(Playfield playfield, IReadOnlyList<int> present)
         {
-            if (IsPlayer)
+            if (IsPlayer || Stats.GetOrZero(CharacterStat.NPCFamily) != AlienNpcFamily)
                 return;
 
-            _killRewards.Divide(ComputeAlienXpPool(), present, AwardCredit.Shared);
+            int monsterLevel = Stats.GetOrOne(CharacterStat.Level);
+            DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
+            List<AwardShare> shares = _killRewards.Divide(AlienShareBasis, present, AwardCredit.Shared);
+            for (int i = 0; i < shares.Count; i++)
+            {
+                AwardShare share = shares[i];
+                if (share.Amount <= 0 || !_killRewards.TryGetIdentity(share.PlayerInstance, out Identity identity))
+                    continue;
+                if (!registry.TryGet(identity, out Dynel? dynel) || dynel is not Character killer)
+                    continue;
+
+                List<Character> recipients = CollectNearbyTeam(playfield, registry, killer);
+                for (int r = 0; r < recipients.Count; r++)
+                {
+                    Character recipient = recipients[r];
+                    long solo = SoloAlienXp(recipient.Stats.GetOrOne(CharacterStat.Level), monsterLevel);
+                    long amount = solo * share.Amount / AlienShareBasis / recipients.Count;
+                    if (amount > 0)
+                        recipient.AwardAlienXp((int)amount);
+                }
+            }
         }
 
-        static int ComputeAlienXpPool() => 0;
+        /// <summary>SoloAxp = (1300 + PL) * (1 + (ML - PL) * 2.1 / ML), floored at 0.</summary>
+        internal static int SoloAlienXp(int playerLevel, int monsterLevel)
+        {
+            if (monsterLevel <= 0)
+                return 0;
+
+            double baseAxp = 1300 + playerLevel;
+            double solo = baseAxp * (1 + ((monsterLevel - playerLevel) * 2.1 / monsterLevel));
+            return solo <= 0 ? 0 : (int)solo;
+        }
+
+        /// <summary>
+        /// Adds alien XP. AlienXP is progress inside the current alien level; AlienNextXP is the
+        /// AlienXp.json step to the next level. One grant is capped at 10% of that step. Levels up through
+        /// the table while the progress covers it.
+        /// </summary>
+        public void AwardAlienXp(int amount)
+        {
+            if (amount <= 0 || !IsPlayer)
+                return;
+
+            IGameData? gameData = Playfield?.GetRequiredService<IGameData>();
+            if (gameData == null)
+                return;
+
+            int alienLevel = Stats.GetOrZero(CharacterStat.AlienLevel);
+
+            // Like kill XP, one grant is capped at 10% of the current alien level's bar.
+            if (gameData.TryGetAlienXpLevel(alienLevel + 1, out AlienXpLevelEntry current) && current.NextLevelXp > 0)
+            {
+                int cap = Math.Max(1, current.NextLevelXp * KillXpCapPercent / 100);
+                if (amount > cap)
+                    amount = cap;
+            }
+
+            long progress = (long)Stats.GetOrZero(CharacterStat.AlienXP) + amount;
+            int next = 0;
+            while (gameData.TryGetAlienXpLevel(alienLevel + 1, out AlienXpLevelEntry step) && step.NextLevelXp > 0)
+            {
+                next = step.NextLevelXp;
+                if (progress < next)
+                    break;
+
+                progress -= next;
+                alienLevel++;
+                next = 0;
+            }
+
+            // Past the last table row the bar stays full.
+            if (next == 0)
+                progress = 0;
+
+            Stats.Set(CharacterStat.AlienLevel, alienLevel, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.AlienXP, (int)Math.Min(progress, int.MaxValue), StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.AlienNextXP, next, StatDetail.Base, dirty: true);
+            FlushDirtyStats();
+        }
 
         void AwardPvpTitle(IReadOnlyList<int> present)
         {
@@ -1144,6 +1311,10 @@ namespace ZoneEngine_New.Core.Entities
 
         void TickWeapons(double deltaTime)
         {
+            // A nano cast pauses both the swing and the recharge; they resume where they were.
+            if (IsCastingNano)
+                return;
+
             // Parked full bars (waiting on LOS/range) must still Tick so they can fire,
             // but must not monopolize the exclusive charge slot.
             foreach (CharacterWeapon weapon in Weapons.Values)
@@ -1220,6 +1391,8 @@ namespace ZoneEngine_New.Core.Entities
                 return;
             }
 
+            // Break first so a broken pacify lets this strike's threat stick.
+            target.RollBuffBreaks(BuffBreakCause.Attack, this);
             target.ApplyDamage(this, result.Damage, result.HitType);
             if (weapon != null)
                 ApplyOnHitProcs(target, weapon);
@@ -1483,6 +1656,84 @@ namespace ZoneEngine_New.Core.Entities
 
         public bool IsCastingNano => PendingCast != null;
 
+        /// <summary>
+        /// NCU a buff has to fit into. NPCs are uncapped: their equipment and support nanos use catalog
+        /// NCU costs larger than their MaxNCU (Uklesh 205608 → 205606), and most NPCs have MaxNCU 0.
+        /// </summary>
+        public int BuffNcuCapacity => this is NpcCharacter ? int.MaxValue : MaxNcu;
+
+        /// <summary>RestrictAction bit that roots: the character cannot move while a buff carries it.</summary>
+        public const int RestrictMovementBit = 4;
+
+        /// <summary>A running buff (a root such as 56216, or a stun) holds RestrictAction with the movement bit.</summary>
+        public bool IsRooted
+            => HasBuffFunction(
+                FunctionType.RestrictAction,
+                spell => spell.TryReadInt(0, out int restricted) && (restricted & RestrictMovementBit) != 0);
+
+        /// <summary>A running buff holds Pacify (e.g. 100429 Wandering Mind): no aggression, no hate.</summary>
+        public bool IsPacified => HasBuffFunction(FunctionType.Pacify);
+
+        bool HasBuffFunction(FunctionType function, Func<ItemSpell, bool>? match = null)
+        {
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                IReadOnlyList<ItemSpell> spells = _buffs[i].ModifierSpells;
+                for (int s = 0; s < spells.Count; s++)
+                {
+                    if (spells[s].Is(function) && (match == null || match(spells[s])))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Rolls each running buff's break chance for <paramref name="cause"/> and strips the ones that
+        /// break: a connecting weapon strike, a hostile nano hit, or a debuff landing (not <paramref name="except"/>).
+        /// Breaking anything puts <paramref name="aggressor"/> straight on an NPC's hate list.
+        /// </summary>
+        public void RollBuffBreaks(BuffBreakCause cause, Character aggressor, Buff? except = null)
+        {
+            if (_buffs.Count == 0)
+                return;
+
+            CharacterStat chanceStat = cause switch
+            {
+                BuffBreakCause.Attack => BreakOnAttackStat,
+                BuffBreakCause.SpellAttack => CharacterStat.ChanceOfBreakOnSpellAttack,
+                _ => CharacterStat.ChanceOfBreakOnDebuff
+            };
+
+            List<int>? broken = null;
+            for (int i = 0; i < _buffs.Count; i++)
+            {
+                Buff buff = _buffs[i];
+                if (ReferenceEquals(buff, except) || !buff.Stats.TryGetValue(chanceStat, out int chance))
+                    continue;
+
+                chance = StatCollection.Normalize(chance);
+                if (chance > 0 && Random.Shared.Next(100) < chance)
+                    (broken ??= new List<int>()).Add(buff.Id);
+            }
+
+            if (broken == null)
+                return;
+
+            for (int i = 0; i < broken.Count; i++)
+                NanoRuntime.TryStripNano(this, broken[i]);
+
+            if (this is NpcCharacter npc && !ReferenceEquals(aggressor, this) && !aggressor.IsDead)
+                npc.Brain?.AddThreat(aggressor.Identity, Ai.NpcAiRules.ProximityHate);
+        }
+
+        /// <summary>
+        /// Stat 422, named ChanceOfUse in the stat tables, carries the break-on-attack chance on
+        /// crowd-control nanos (100429: 100).
+        /// </summary>
+        const CharacterStat BreakOnAttackStat = (CharacterStat)422;
+
         public bool IsInNanoRecharge(DateTime nowUtc) => nowUtc < _nanoRechargeUntilUtc;
 
         public void BeginNanoCast(PendingNanoCast cast)
@@ -1566,9 +1817,7 @@ namespace ZoneEngine_New.Core.Entities
             ArgumentNullException.ThrowIfNull(spell);
 
             applied = null;
-            // NPC equipment nanos (Uklesh 205608 → 205606) use catalog NCU costs larger than MaxNCU.
-            int ncuCap = this is NpcCharacter ? int.MaxValue : MaxNcu;
-            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, _buffs, ncuCap, out replaced);
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, _buffs, BuffNcuCapacity, out replaced);
             if (decision != BuffApplyDecision.Apply && decision != BuffApplyDecision.Replace)
                 return decision;
 
@@ -1816,8 +2065,44 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         protected void ApplyBuffBonuses()
         {
+            // VisualProfession shows the real profession unless a buff (e.g. False Profession) changes it.
+            int profession = Stats.GetOrZero(CharacterStat.Profession, StatDetail.Base);
+            if (Stats.Get(CharacterStat.VisualProfession, StatDetail.Base) != profession)
+                Stats.Set(CharacterStat.VisualProfession, profession, StatDetail.Base, dirty: true);
+
             for (int i = 0; i < _buffs.Count; i++)
                 StatModifierSpells.Apply(_buffs[i].ModifierSpells, Stats);
+
+            // Every buff change rebases, so a root landing stops the character here.
+            if (IsRooted)
+                StopForRoot();
+        }
+
+        /// <summary>
+        /// Wipes movement flags, path and speed. An NPC settles its FollowTarget; a player that was
+        /// moving is shown to observers as a full stop at the held position.
+        /// </summary>
+        void StopForRoot()
+        {
+            if (this is NpcCharacter npc)
+                npc.Brain?.StopPathing();
+
+            if (!Motor.StopForRoot() || !IsPlayer)
+                return;
+
+            Cell?.Announce(
+                new CharDCMoveMessage
+                {
+                    Identity = Identity,
+                    Unknown = 0x00,
+                    MoveType = (byte)MovementAction.FullStop,
+                    Heading = new MsgQuaternion { X = Rotation.xf, Y = Rotation.yf, Z = Rotation.zf, W = Rotation.wf },
+                    Coordinates = new MsgVector3 { X = Position.xf, Y = Position.yf, Z = Position.zf },
+                    Unknown1 = 0,
+                    AuxA = 0,
+                    AuxB = 0
+                },
+                this);
         }
 
         /// <summary>

@@ -345,12 +345,6 @@ internal static class Program
         Equal(1d, SkillTrickleTable.table[68, 0], "SkillTrickleTable low-id sentinel");
         Equal(364d, SkillTrickleTable.table[71, 0], "SkillTrickleTable final sentinel");
 
-        VerifyTableShape(XPTable.TableAlienXP, 31, 3, "Alien XP");
-        Equal(1d, XPTable.TableAlienXP[0, 0], "Alien XP first level");
-        Equal(1500d, XPTable.TableAlienXP[0, 1], "Alien XP first total");
-        Equal(31d, XPTable.TableAlienXP[30, 0], "Alien XP terminal level");
-        Equal(0d, XPTable.TableAlienXP[30, 2], "Alien XP terminal delta");
-
         VerifyTableShape(XPTable.TableRKXP, 200, 3, "RK XP");
         Equal(1d, XPTable.TableRKXP[0, 0], "RK XP first level");
         Equal(1450d, XPTable.TableRKXP[0, 2], "RK XP first delta");

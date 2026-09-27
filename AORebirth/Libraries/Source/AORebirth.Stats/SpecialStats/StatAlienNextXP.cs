@@ -33,8 +33,6 @@ namespace AORebirth.Stats.SpecialStats
 {
     #region Usings ...
 
-    using System;
-
     using AORebirth.Enums;
 
     #endregion
@@ -81,7 +79,7 @@ namespace AORebirth.Stats.SpecialStats
             get
             {
                 int level = this.Stats[StatIds.alienlevel].Value;
-                return Convert.ToInt32(XPTable.TableAlienXP[level, 2]);
+                return XPTable.AlienXpToNext(level);
             }
         }
 

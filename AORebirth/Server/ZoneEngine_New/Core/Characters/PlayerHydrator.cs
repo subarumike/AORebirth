@@ -95,6 +95,19 @@ namespace ZoneEngine_New.Core.Characters
             int level = player.Stats.GetOrOne(CharacterStat.Level);
             player.Stats.Set(CharacterStat.NextXP, GetNextXp(level), StatDetail.Base);
             player.Stats.Set(CharacterStat.LastXP, level > 1 ? GetNextXp(level - 1) : 0, StatDetail.Base);
+
+            // AlienXP is progress inside the alien level; AlienNextXP is the AlienXp.json step out of it.
+            // A character that never earned alien XP has neither stored, and Unset would reach the client.
+            if (StatCollection.IsUnset(player.Stats.Get(CharacterStat.AlienLevel)))
+                player.Stats.Set(CharacterStat.AlienLevel, 0, StatDetail.Base);
+            if (StatCollection.IsUnset(player.Stats.Get(CharacterStat.AlienXP)))
+                player.Stats.Set(CharacterStat.AlienXP, 0, StatDetail.Base);
+
+            int alienLevel = player.Stats.GetOrZero(CharacterStat.AlienLevel);
+            int alienNext = _gameData.TryGetAlienXpLevel(alienLevel + 1, out AlienXpLevelEntry step) && step.NextLevelXp > 0
+                ? step.NextLevelXp
+                : 0;
+            player.Stats.Set(CharacterStat.AlienNextXP, alienNext, StatDetail.Base);
         }
 
         int GetNextXp(int level)

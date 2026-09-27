@@ -110,7 +110,10 @@ internal sealed class GeneratedMissionNpcCharacter(Identity identity, IItemBuild
         if (target == null || target.Playfield != Playfield) return;
         if (!Weapons.Values.Any(weapon => GetEdgeDistanceTo(target) <= weapon.GetAttackRange()))
         {
-            Motor.NavigateTo(target.Position);
+            if (IsRooted)
+                Motor.ClearPath();
+            else
+                Motor.NavigateTo(target.Position);
             return;
         }
         Motor.Halt();

@@ -446,11 +446,13 @@ namespace ZoneEngine_New.Core.Commands
                 lines.Add(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "  {0} kind={1} cost={2} reqsMet={3}",
-                        FormatItemId(nanoId),
+                        "  {0} kind={1} cost={2} reqsMet={3}{4}",
+                        FormatNano(npc, nanoId, spell),
                         spell.IsHostile ? "hostile" : spell.IsBuff ? "buff" : "friendly",
                         spell.NanoPointCost,
-                        spell.MeetsActionRequirements(stat => npc.Stats.Get(stat), ActionType.ToUse)));
+                        spell.MeetsActionRequirements(stat => npc.Stats.Get(stat), ActionType.ToUse),
+                        // Every cast gate for a self-cast right now (nano, recharge, NCU, requirements).
+                        spell.IsHostile ? string.Empty : " selfCast=" + NanoRuntime.CanStartCast(npc, spell, npc, now)));
             }
 
             IReadOnlyList<Buff> buffs = npc.Buffs;
@@ -467,6 +469,32 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             return lines;
+        }
+
+        /// <summary>
+        /// Nano id with its name. Nano templates are often missing from itemnames, so fall back to the
+        /// name of the equipped crystal that uploaded it.
+        /// </summary>
+        string FormatNano(NpcCharacter npc, int nanoId, NanoSpell spell)
+        {
+            string name = !string.IsNullOrWhiteSpace(spell.Name) ? spell.Name : ItemName(nanoId);
+            if (!string.IsNullOrWhiteSpace(name) && name != "(unknown)")
+                return string.Format(CultureInfo.InvariantCulture, "{0} {1}", nanoId, name);
+
+            foreach (KeyValuePair<int, Item> slot in npc.Equipment.EnumerateSlots())
+            {
+                foreach (List<ItemSpell> spells in slot.Value.SpellList.Values)
+                {
+                    for (int i = 0; spells != null && i < spells.Count; i++)
+                    {
+                        if (spells[i].Is(FunctionType.UploadNano) && spells[i].TryReadInt(0, out int uploaded)
+                            && uploaded == nanoId)
+                            return string.Format(CultureInfo.InvariantCulture, "{0} via {1}", nanoId, slot.Value.Name);
+                    }
+                }
+            }
+
+            return FormatItemId(nanoId);
         }
 
         /// <summary>

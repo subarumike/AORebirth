@@ -39,6 +39,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (!player.Motor.Consume(message))
                 return;
 
+            // Rooted but the client moved (walked or teleported): snap it back in place with a soft
+            // intrazone teleport; heading is kept.
+            if (player.Motor.RootCorrectionDue && player.Playfield != null)
+                session.SendIntrazoneTeleport(player.Position, player.Rotation, player.Playfield.Identity.Instance);
+
             message.Identity = player.Identity;
             // S2C CharDCMove uses unknown 0. The client default of 1 is a local direct-control
             // command, and forwarding it makes the other client apply the move to itself.

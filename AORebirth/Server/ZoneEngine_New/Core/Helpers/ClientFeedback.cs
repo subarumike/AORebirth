@@ -22,6 +22,9 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"Target resisted." (category 110).</summary>
         public const int TargetResisted = 205237300;
 
+        /// <summary>"A too high level player in your team prevents you from receiving any experience." (category 110).</summary>
+        public const int TeammateTooHighForXp = 121950320;
+
         public static void Send(Character character, string key)
             => Send(character, unchecked((int)ElfHash(key)));
 

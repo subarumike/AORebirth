@@ -379,7 +379,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify)
-                || spell.Is(FunctionType.MonsterShape))
+                || spell.Is(FunctionType.ModifyPercentage) || spell.Is(FunctionType.MonsterShape))
             {
                 if (skipPassiveModifiers)
                     return true;
@@ -388,7 +388,8 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
             }
 
-            if ((spell.Is(FunctionType.SetFlag) || spell.Is(FunctionType.ChangeActionRestriction))
+            if ((spell.Is(FunctionType.SetFlag) || spell.Is(FunctionType.ChangeActionRestriction)
+                    || spell.Is(FunctionType.ChangeVariable))
                 && skipPassiveModifiers)
                 return true;
 

@@ -67,7 +67,6 @@ namespace AORebirth.LinuxBuild
 
             AddDatabaseAttributes(lines, databaseAssembly);
             AddRuntimeArray(lines, statsAssembly, "AORebirth.Stats.SkillTrickleTable", "table");
-            AddRuntimeArray(lines, statsAssembly, "AORebirth.Stats.SpecialStats.XPTable", "TableAlienXP");
             AddRuntimeArray(lines, statsAssembly, "AORebirth.Stats.SpecialStats.XPTable", "TableRKXP");
             AddRuntimeArray(lines, statsAssembly, "AORebirth.Stats.SpecialStats.XPTable", "TableShadowLandsSK");
             AddStatsTopology(lines, statsAssembly);

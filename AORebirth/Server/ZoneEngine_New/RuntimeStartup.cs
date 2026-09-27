@@ -98,7 +98,7 @@ namespace ZoneEngine_New
         {
             string gameData = GameDataPaths.Resolve(baseDirectory);
             // NpcTemplates.json is optional; GameDataStore logs and uses an empty catalog when it is absent.
-            foreach (string file in new[] { "ItemTemplates.json", "VendingMachines.json", "MonsterData.json", "Xp.json" })
+            foreach (string file in new[] { "ItemTemplates.json", "VendingMachines.json", "MonsterData.json", "Xp.json", "AlienXp.json" })
             {
                 using FileStream stream = File.OpenRead(Path.Combine(gameData, file));
                 using JsonDocument document = JsonDocument.Parse(stream);

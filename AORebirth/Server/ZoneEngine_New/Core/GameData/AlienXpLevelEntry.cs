@@ -1,13 +1,13 @@
 namespace ZoneEngine_New.Core.GameData
 {
     /// <summary>
-    /// One level row from GameData/Xp.json. FloorXp is the cumulative XP at the start of this level.
+    /// One alien level row from GameData/AlienXp.json.
+    /// NextLevelXp is the XP required to reach this alien level.
+    /// FloorXp is the cumulative XP before that step.
     /// </summary>
-    public sealed class XpLevelEntry
+    public sealed class AlienXpLevelEntry
     {
         public int Level { get; init; }
-
-        public int KillAward { get; init; }
 
         public int NextLevelXp { get; init; }
 

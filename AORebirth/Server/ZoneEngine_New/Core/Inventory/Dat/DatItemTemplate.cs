@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace ZoneEngine_New.Core.Inventory.Dat
 {
     using System;
@@ -10,39 +12,55 @@ namespace ZoneEngine_New.Core.Inventory.Dat
 
     /// <summary>
     /// MessagePack mirror of legacy Core.ItemTemplate for items.dat slices.
+    /// Member ids 0-12 pin the alphabetical order existing items.dat files were written in;
+    /// new fields go on the end so those files still unpack with the new field left empty.
     /// </summary>
     [Serializable]
     public sealed class DatItemTemplate
     {
+        [MessagePackMember(1)]
         public Dictionary<int, int> Attack = new();
 
+        [MessagePackMember(2)]
         public Dictionary<int, int> Defend = new();
 
+        [MessagePackMember(5)]
         public int Flags;
 
+        [MessagePackMember(6)]
         public int ID;
 
+        [MessagePackMember(7)]
         public int ItemType;
 
+        [MessagePackMember(8)]
         public int MultipleCount;
 
+        [MessagePackMember(9)]
         public int Nothing;
 
+        [MessagePackMember(10)]
         public int Quality;
 
+        [MessagePackMember(11)]
         public List<int> Relations = new();
 
+        [MessagePackMember(12)]
         public Dictionary<int, int> Stats = new();
 
+        [MessagePackMember(0)]
         public List<DatAction> Actions { get; set; } = new();
 
+        [MessagePackMember(4)]
         public List<DatEvent> Events { get; set; } = new();
 
-        /// <summary>
-        /// RDB record DynelType (e.g. Container = 51017). Trailing so older
-        /// MessagePack array slices still unpack with this left at 0.
-        /// </summary>
+        /// <summary>RDB record DynelType (e.g. Container = 51017).</summary>
+        [MessagePackMember(3)]
         public int DynelType;
+
+        /// <summary>RDB item or nano name. Null in files exported before names were written.</summary>
+        [MessagePackMember(13)]
+        public string? Name;
     }
 
     [Serializable]

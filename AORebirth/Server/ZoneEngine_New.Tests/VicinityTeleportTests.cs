@@ -279,7 +279,7 @@ namespace ZoneEngine_New.Tests
             const int marketTemplate = 225426;
             const int marketPlayfield = 4532;
             var data = new GameDataStore(new StubLogger());
-            var catalog = new ItemTemplateCatalog(new EmptyNames(), data, new StubLogger());
+            var catalog = new ItemTemplateCatalog(data, new StubLogger());
             Assert.IsTrue(catalog.TryGet(marketTemplate, out ItemTemplate marketItem));
             ItemSpell teleport = marketItem.SpellList[EventType.OnTargetInVicinity]
                 .Single(spell => spell.Is(FunctionType.Teleport));
@@ -363,7 +363,7 @@ namespace ZoneEngine_New.Tests
             int plazaRing = unchecked((int)0xC00011B2);
             int harbourRing = unchecked((int)0xC00211B2);
             var data = new GameDataStore(new StubLogger());
-            var catalog = new ItemTemplateCatalog(new EmptyNames(), data, new StubLogger());
+            var catalog = new ItemTemplateCatalog(data, new StubLogger());
             PlayfieldGeometryData harbourGeometry = data.GetPlayfieldGeometry(harbourId);
             var ring = harbourGeometry.Dynels!.Dynels.Single(dynel => dynel.TemplateId == returnTemplate);
             var onRing = new Vector3(ring.Position.X, ring.Position.Y, ring.Position.Z);
@@ -450,7 +450,7 @@ namespace ZoneEngine_New.Tests
             const int platformId = 4530;
             var data = new GameDataStore(new StubLogger());
             DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
-            var catalog = new ItemTemplateCatalog(new EmptyNames(), data, new StubLogger());
+            var catalog = new ItemTemplateCatalog(data, new StubLogger());
             PlayfieldGeometryData harbourGeometry = data.GetPlayfieldGeometry(harbourId);
             var ring = harbourGeometry.Dynels!.Dynels.Single(dynel => dynel.TemplateId == 225416);
             var onRing = new Vector3(ring.Position.X, ring.Position.Y, ring.Position.Z);
@@ -490,7 +490,7 @@ namespace ZoneEngine_New.Tests
             const float landingY = 199.52f;
             var data = new GameDataStore(new StubLogger());
             DestinationsCatalog.Instance.ConfigureRoot(data.RootPath);
-            var catalog = new ItemTemplateCatalog(new EmptyNames(), data, new StubLogger());
+            var catalog = new ItemTemplateCatalog(data, new StubLogger());
             PlayfieldGeometryData geometry = data.GetPlayfieldGeometry(platformId);
             using PlayfieldWorldSimulation world = PlayfieldWorldSimulation.Create(
                 platformId,
@@ -534,7 +534,7 @@ namespace ZoneEngine_New.Tests
             const int platformId = 4530;
             const int harbourTemplate = 225402;
             var data = new GameDataStore(new StubLogger());
-            var catalog = new ItemTemplateCatalog(new EmptyNames(), data, new StubLogger());
+            var catalog = new ItemTemplateCatalog(data, new StubLogger());
             PlayfieldGeometryData geometry = data.GetPlayfieldGeometry(platformId);
             var ring = geometry.Dynels!.Dynels.Single(dynel => dynel.TemplateId == harbourTemplate);
             var onRing = new Vector3(ring.Position.X, ring.Position.Y, ring.Position.Z);
@@ -685,18 +685,6 @@ namespace ZoneEngine_New.Tests
             }
 
             public void Close() => State = SessionState.Closed;
-        }
-
-        sealed class EmptyNames : IItemNameRepository
-        {
-            public bool TryGetName(int aoid, out string name)
-            {
-                name = string.Empty;
-                return false;
-            }
-
-            public IReadOnlyDictionary<int, string> GetAllNames()
-                => new Dictionary<int, string>();
         }
     }
 }

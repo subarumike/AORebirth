@@ -253,6 +253,8 @@ namespace ZoneEngine_New.Core.Nanos
 
             CanFlags can = ReadCan(child);
             bool self = ReferenceEquals(source, candidate);
+            if (child.IsHostile && !self && IsSparedByNpcArea(source, candidate))
+                return false;
             if ((can & (CanFlags.ApplyOnSelf | CanFlags.ApplyOnFriendly | CanFlags.ApplyOnHostile)) == 0)
             {
                 // Area nukes such as Volcanic Eruption store Can as 0 and IsHostile on the child.
@@ -273,6 +275,30 @@ namespace ZoneEngine_New.Core.Nanos
                     && (can & CanFlags.ApplyOnHostile) != 0;
 
             return !child.IsHostile || (accepted && CombatRules.CanAttack(source, candidate));
+        }
+
+        /// <summary>
+        /// An NPC's hostile area nano leaves other NPCs alone unless it is fighting that NPC.
+        /// Players' pets are fair game: they fight for their master. NPC-owned pets are spared.
+        /// </summary>
+        static bool IsSparedByNpcArea(Character source, Character candidate)
+        {
+            if (source.IsPlayer || candidate is not NpcCharacter npc)
+                return false;
+            if (IsPlayerPet(npc))
+                return false;
+
+            return source.FightingTarget != npc.Identity;
+        }
+
+        static bool IsPlayerPet(NpcCharacter npc)
+        {
+            int master = npc.Stats.GetOrZero(CharacterStat.PetMaster);
+            if (master == 0)
+                return false;
+
+            PlayfieldManager? manager = npc.Playfield?.GetService<PlayfieldManager>();
+            return manager != null && manager.FindPlayer(master, out _);
         }
 
         static CanFlags ReadCan(NanoSpell child)

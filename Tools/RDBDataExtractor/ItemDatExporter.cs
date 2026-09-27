@@ -15,7 +15,7 @@ namespace AORebirth.Tools.RDBDataExtractor
 
     /// <summary>
     /// Exports AODB <see cref="ItemObject"/> and <see cref="NanoObject"/> records
-    /// into one GameData/items.dat, including DynelType, events, and actions.
+    /// into one GameData/items.dat, including name, DynelType, events, and actions.
     /// </summary>
     internal sealed class ItemDatExporter
     {
@@ -103,14 +103,15 @@ namespace AORebirth.Tools.RDBDataExtractor
                 if (item == null)
                     continue;
 
-                templates.Add(
-                    ItemRdbMapper.Map(
-                        itemId,
-                        item.DynelType,
-                        item.Stats,
-                        item.SkillChecks,
-                        item.Modifiers,
-                        item.Requirements));
+                DatItemTemplate itemTemplate = ItemRdbMapper.Map(
+                    itemId,
+                    item.DynelType,
+                    item.Stats,
+                    item.SkillChecks,
+                    item.Modifiers,
+                    item.Requirements);
+                itemTemplate.Name = item.Name;
+                templates.Add(itemTemplate);
             }
 
             foreach (int nanoId in this.controller.RecordTypeToId[NanoRecordType].Keys.OrderBy(id => id))
@@ -121,14 +122,15 @@ namespace AORebirth.Tools.RDBDataExtractor
                 if (nano == null)
                     continue;
 
-                templates.Add(
-                    ItemRdbMapper.Map(
-                        nanoId,
-                        nano.DynelType,
-                        nano.Stats,
-                        nano.SkillChecks,
-                        nano.Modifiers,
-                        nano.Requirements));
+                DatItemTemplate nanoTemplate = ItemRdbMapper.Map(
+                    nanoId,
+                    nano.DynelType,
+                    nano.Stats,
+                    nano.SkillChecks,
+                    nano.Modifiers,
+                    nano.Requirements);
+                nanoTemplate.Name = nano.Name;
+                templates.Add(nanoTemplate);
             }
 
             templates.Sort((left, right) => left.ID.CompareTo(right.ID));

@@ -103,6 +103,14 @@ namespace ZoneEngine_New.Core.Ai
                 _tree.Reset();
             }
 
+            // Pacified: no aggression. Drop whatever hate or fight got in and stand down.
+            if (Npc.IsPacified && (!Hate.IsEmpty || Npc.FightingTarget.Instance != 0))
+            {
+                ClearHate();
+                StopFighting();
+                StopPathing();
+            }
+
             TickStallWatch.Stage("brain.scan", Npc.Identity.Instance);
             ScanProximity();
             TickStallWatch.Stage("brain.tree", Npc.Identity.Instance);
@@ -113,7 +121,8 @@ namespace ZoneEngine_New.Core.Ai
 
         public void AddThreat(Identity identity, float amount)
         {
-            if (_evading)
+            // Pacified NPCs keep no hate.
+            if (_evading || Npc.IsPacified)
                 return;
             Hate.Add(identity, amount);
         }
@@ -151,7 +160,7 @@ namespace ZoneEngine_New.Core.Ai
         {
             if (player == null || !player.IsPlayer || player.IsDead)
                 return;
-            if (!Npc.Attackable || _evading)
+            if (!Npc.Attackable || _evading || Npc.IsPacified)
                 return;
             if (!NpcAiRules.IsProximityHostile(Npc.Stats.GetOrZero(NpcAiRules.BreedHostilityStat)))
                 return;
@@ -331,6 +340,13 @@ namespace ZoneEngine_New.Core.Ai
         /// </summary>
         public void PathTo(Vector3 destination)
         {
+            // Rooted: settle where it stands; the stuck clock restarts once the root is gone.
+            if (Npc.IsRooted)
+            {
+                StopPathing();
+                return;
+            }
+
             destination = HeightfieldOrSelf(destination);
             DateTime now = DateTime.UtcNow;
             bool active = Npc.Motor.HasPath;
@@ -648,6 +664,13 @@ namespace ZoneEngine_New.Core.Ai
         {
             if (!HasHome || _returnFailed)
                 return false;
+
+            // Rooted on the way home: wait it out instead of snapping home.
+            if (Npc.IsRooted)
+            {
+                StopPathing();
+                return true;
+            }
 
             if (!_returningHome)
             {

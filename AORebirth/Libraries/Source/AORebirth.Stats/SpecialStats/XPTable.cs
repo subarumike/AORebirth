@@ -31,31 +31,100 @@
 
 namespace AORebirth.Stats.SpecialStats
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Text.RegularExpressions;
+
     /// <summary>
     /// </summary>
     public static class XPTable
     {
-        #region Static Fields
+        static readonly object AlienSync = new object();
+        static readonly Regex AlienXpRow = new Regex(
+            @"""(\d+)""\s*:\s*\{[^}]*""NextLevelXp""\s*:\s*(-?\d+)",
+            RegexOptions.CultureInvariant | RegexOptions.Compiled);
+        static Dictionary<int, int> _alienNextXp = new Dictionary<int, int>();
+        static bool _alienNextLoaded;
 
         /// <summary>
+        /// XP still required to leave <paramref name="currentAlienLevel"/>.
+        /// Alien level 0 reads level 1 in AlienXp.json.
         /// </summary>
-        public static double[,] TableAlienXP =
+        internal static int AlienXpToNext(int currentAlienLevel)
         {
-            { 01, 1500, 1500 }, { 02, 10500, 9000 }, { 03, 33000, 22500 },
-            { 04, 75000, 42000 }, { 05, 142500, 67500 }, { 06, 241500, 99000 },
-            { 07, 378000, 136500 }, { 08, 558000, 180000 }, { 09, 787500, 229500 },
-            { 10, 1072500, 285000 }, { 11, 1419000, 346500 },
-            { 12, 1833000, 414000 }, { 13, 2320500, 487500 },
-            { 14, 2887500, 567000 }, { 15, 3566910, 697410 },
-            { 16, 4442724, 857814 }, { 17, 5497836, 1055112 },
-            { 18, 6795623, 1297787 }, { 19, 8391901, 1596278 },
-            { 20, 10323398, 1931497 }, { 21, 12621879, 2298481 },
-            { 22, 15311102, 2689223 }, { 23, 18403708, 3092606 },
-            { 24, 21898353, 3494645 }, { 25, 25777409, 3879056 },
-            { 26, 30005580, 4228171 }, { 27, 34614287, 4608707 },
-            { 28, 39637777, 5023490 }, { 29, 45113381, 5475604 },
-            { 30, 51081790, 5968409 }, { 31, 0, 0 }
-        };
+            if (currentAlienLevel < 0 || currentAlienLevel == int.MaxValue)
+                return 0;
+
+            Dictionary<int, int> table = AlienNextByLevel();
+            int next;
+            if (table.TryGetValue(currentAlienLevel + 1, out next))
+                return next;
+
+            return 0;
+        }
+
+        static Dictionary<int, int> AlienNextByLevel()
+        {
+            if (_alienNextLoaded)
+                return _alienNextXp;
+
+            lock (AlienSync)
+            {
+                if (_alienNextLoaded)
+                    return _alienNextXp;
+
+                _alienNextXp = LoadAlienNextXp();
+                _alienNextLoaded = true;
+                return _alienNextXp;
+            }
+        }
+
+        static Dictionary<int, int> LoadAlienNextXp()
+        {
+            var levels = new Dictionary<int, int>();
+            try
+            {
+                string path = AlienXpPath();
+                if (!File.Exists(path))
+                    return levels;
+
+                string text = File.ReadAllText(path);
+                foreach (Match match in AlienXpRow.Matches(text))
+                {
+                    int level;
+                    int next;
+                    if (!int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out level)
+                        || level <= 0
+                        || !int.TryParse(match.Groups[2].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out next))
+                        continue;
+
+                    levels[level] = next;
+                }
+            }
+            catch (IOException)
+            {
+                return levels;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return levels;
+            }
+
+            return levels;
+        }
+
+        static string AlienXpPath()
+        {
+            string configured = Environment.GetEnvironmentVariable("AO_REBIRTH_GAMEDATA_PATH") ?? string.Empty;
+            if (configured.Trim().Length == 0)
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GameData", "AlienXp.json");
+
+            return Path.Combine(configured.Trim(), "AlienXp.json");
+        }
+
+        #region Static Fields
 
         /// <summary>
         /// </summary>

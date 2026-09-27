@@ -55,6 +55,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<int, VendingMachineDefinition> _vendingMachines = new();
         private readonly Dictionary<int, int> _catMeshByMonsterData = new();
         private readonly Dictionary<int, XpLevelEntry> _xpLevels = new();
+        private readonly Dictionary<int, AlienXpLevelEntry> _alienXpLevels = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
         private readonly Dictionary<int, PlayfieldSpawnsData> _playfieldSpawns = new();
         private readonly Dictionary<int, PlayfieldNpcContentCatalog> _playfieldNpcs = new();
@@ -87,6 +88,7 @@ namespace ZoneEngine_New.Core.GameData
             LoadVendingMachines();
             LoadMonsterData();
             LoadXpLevels();
+            LoadAlienXpLevels();
         }
 
         public string RootPath { get; }
@@ -116,6 +118,19 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return _xpLevels.TryGetValue(level, out entry!);
+        }
+
+        public int AlienXpLevelCount => _alienXpLevels.Count;
+
+        public bool TryGetAlienXpLevel(int level, out AlienXpLevelEntry entry)
+        {
+            if (level <= 0)
+            {
+                entry = null!;
+                return false;
+            }
+
+            return _alienXpLevels.TryGetValue(level, out entry!);
         }
 
         public bool CanResolveMobHash(string hash)
@@ -731,7 +746,6 @@ namespace ZoneEngine_New.Core.GameData
                             {
                                 Level = level,
                                 KillAward = row.KillAward,
-                                LevelDelta = row.LevelDelta,
                                 NextLevelXp = row.NextLevelXp,
                                 FloorXp = floorXp
                             }))
@@ -767,6 +781,98 @@ namespace ZoneEngine_New.Core.GameData
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Failed to load Xp.json from {0}; catalog empty",
+                        path));
+            }
+        }
+
+        private void LoadAlienXpLevels()
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.AlienXpFileName);
+            if (!File.Exists(path))
+            {
+                _logger.Warn(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "AlienXp.json not found at {0}; catalog empty",
+                        path));
+                return;
+            }
+
+            try
+            {
+                Dictionary<string, AlienXpLevelRow>? loaded =
+                    JsonSerializer.Deserialize<Dictionary<string, AlienXpLevelRow>>(
+                        File.ReadAllText(path),
+                        CatalogJsonOptions);
+                if (loaded == null)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "AlienXp.json was empty: {0}",
+                            path));
+                    return;
+                }
+
+                var parsed = new List<(int Level, AlienXpLevelRow Row)>();
+                int skipped = 0;
+                foreach (KeyValuePair<string, AlienXpLevelRow> pair in loaded)
+                {
+                    if (!int.TryParse(pair.Key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int level)
+                        || level <= 0
+                        || pair.Value == null)
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    parsed.Add((level, pair.Value));
+                }
+
+                parsed.Sort((left, right) => left.Level.CompareTo(right.Level));
+                int floorXp = 0;
+                foreach ((int level, AlienXpLevelRow row) in parsed)
+                {
+                    if (!_alienXpLevels.TryAdd(
+                            level,
+                            new AlienXpLevelEntry
+                            {
+                                Level = level,
+                                NextLevelXp = row.NextLevelXp,
+                                FloorXp = floorXp
+                            }))
+                    {
+                        skipped++;
+                        continue;
+                    }
+
+                    if (row.NextLevelXp > 0)
+                        floorXp += row.NextLevelXp;
+                }
+
+                _logger.Info(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "GameData alien xp levels={0} from {1}",
+                        _alienXpLevels.Count,
+                        path));
+
+                if (skipped > 0)
+                {
+                    _logger.Warn(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "GameData skipped {0} alien xp level rows (invalid or duplicate)",
+                            skipped));
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Failed to load AlienXp.json from {0}; catalog empty",
                         path));
             }
         }
@@ -1123,8 +1229,11 @@ namespace ZoneEngine_New.Core.GameData
         {
             public int KillAward { get; set; }
 
-            public int LevelDelta { get; set; }
+            public int NextLevelXp { get; set; }
+        }
 
+        private sealed class AlienXpLevelRow
+        {
             public int NextLevelXp { get; set; }
         }
     }
