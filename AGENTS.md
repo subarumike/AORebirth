@@ -241,6 +241,62 @@ STOP and report rather than improvising when:
 
 Do not work around these conditions silently.
 
+## PRIVATE LINUX SETUP AND PUBLICATION BOUNDARY
+
+The AORebirth Linux setup is PRIVATE and must remain private.
+
+Public GitHub `master` is authoritative for AORebirth product/runtime behavior, but that does NOT make the Linux infrastructure public.
+
+The required relationship is:
+
+`public master -> existing private Linux checkout -> private Linux build/package/deployment`
+
+Rules:
+
+- The private Linux repository/checkout must remain private.
+- Linux-specific adaptations must remain private unless Mike explicitly authorizes otherwise.
+- Linux build scripts, packaging details, deployment files, service/systemd files, environment/configuration files, server details, connection details, internal infrastructure, private GameData, build artifacts, acceptance artifacts, deployment receipts, and private Git history must remain private.
+- Never push, mirror, merge, publish, or copy the private Linux repository or its Git history into the public AORebirth repository.
+- Never publish private Linux infrastructure in public commits, pull requests, issues, logs, reports, or artifacts.
+- Existing tracked `LinuxBuild` files already present in public master do NOT authorize publishing additional material from the private Linux setup.
+- Public-master gameplay/runtime fixes must still be implemented and accepted on public master first.
+- The private Linux checkout then incorporates those authoritative public-master changes.
+- Do not implement gameplay/runtime fixes only inside the private Linux repository.
+- Read-only inspection of the existing private Linux checkout and its configured remotes is allowed when required for an authorized reconciliation/audit.
+- Do not change Linux remotes, remote URLs, remote ownership, or repository visibility during reconciliation unless Mike explicitly authorizes that exact action.
+- Do not create a new public Linux repository as a substitute for the existing private setup.
+- Do not invent or guess a private remote or connection.
+- Do not publish private Linux files merely because the public checkout lacks an equivalent file.
+- Private/protected GameData must never be committed or published to public GitHub.
+- Capture/evidence stores must never be copied into the public repository or Linux runtime merely for convenience.
+
+### PRIVATE LINUX PUSH RULE
+
+The normal repository instruction to push commits after creating them does NOT automatically authorize pushing private Linux work.
+
+Before ANY private Linux push:
+
+1. identify the exact destination remote;
+2. verify that destination is private;
+3. verify it is the intended existing AORebirth Linux destination;
+4. obtain Mike's explicit authorization for that push.
+
+If those conditions are not satisfied, STOP before pushing.
+
+### STOP CONDITIONS
+
+STOP and report if:
+
+- the existing private Linux checkout cannot be identified;
+- the private remote cannot be identified;
+- destination privacy cannot be verified;
+- a workflow would expose private Linux infrastructure publicly;
+- reconciliation appears to require publishing private history;
+- a public-master fix would require importing private Linux implementation into public source;
+- Linux deployment credentials, host details, or other private infrastructure would be exposed.
+
+Do not work around these conditions silently.
+
 ## GameData authority
 
 - `D:\AORebirth-fresh\GameData` is Mike's private full GameData dataset.
