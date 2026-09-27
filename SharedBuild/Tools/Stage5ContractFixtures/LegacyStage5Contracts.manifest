@@ -830,8 +830,8 @@ reference|System.Data|4.0.0.0|b77a5c561934e089
 reference|Utility|1.0.0.0|
 reference|locales|1.0.0.0|
 reference|mscorlib|4.0.0.0|b77a5c561934e089
-team-range|-1|false|1|4|true|true
-team-range|0|false|1|5|true|true
+team-range|-1|true|1|7|true|true
+team-range|0|true|1|7|true|true
 team-range|1|true|1|7|true|true
 team-range|2|true|1|8|true|true
 team-range|3|true|1|9|true|true
@@ -1052,8 +1052,8 @@ team-range|217|true|157|220|true|true
 team-range|218|true|158|220|true|true
 team-range|219|true|158|220|true|true
 team-range|220|true|159|220|true|true
-team-range|221|false|216|226|true|true
-team-range|1000|false|995|1005|true|true
+team-range|221|true|159|220|true|true
+team-range|1000|true|159|220|true|true
 static.registry|LftRegistry|verified
 static.registry|LftPlayfieldRegistry|verified
 topology.channel|ChatEngine.Channels.GlobalChannel;id=1;name=Global;type=General;flags=CantIgnore, NoInternational

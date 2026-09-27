@@ -290,11 +290,11 @@ type.enum-value|AttractorMesh|System.Int32:53055
 type.enum-value|AudioEffect|System.Int32:53011
 type.enum-value|BackMesh|System.Int32:53037
 type.enum-value|CanFly|System.Int32:53138
+type.enum-value|CastChance|System.Int32:53089
 type.enum-value|CastNano|System.Int32:53051
 type.enum-value|CastNano2|System.Int32:53242
 type.enum-value|CastNanoIfPossible|System.Int32:53206
 type.enum-value|CastNanoIfPossibleOnFightTarget|System.Int32:53212
-type.enum-value|CastStunNano|System.Int32:53089
 type.enum-value|CatMesh|System.Int32:53023
 type.enum-value|ChangeActionRestriction|System.Int32:53067
 type.enum-value|ChangeBodyMesh|System.Int32:53054
@@ -629,6 +629,27 @@ type.enum-value|SocialTemp|System.Int32:9
 type.enum-value|Swim|System.Int32:4
 type.enum-value|Walk|System.Int32:2
 type.end|AORebirth.Enums.MoveModes
+type.begin|AORebirth.Enums.NanoFlags
+type.kind|enum
+type.modifiers|sealed
+type.serializable-attribute|not-applicable
+type.enum-underlying|System.Int32
+type.enum-flags-attribute|true
+type.enum-value|BreakOnAttack|System.Int32:8
+type.enum-value|BreakOnDebuff|System.Int32:128
+type.enum-value|BreakOnSpellAttack|System.Int32:32
+type.enum-value|CannotRefresh|System.Int32:8388608
+type.enum-value|DontRemoveOnDeath|System.Int32:2097152
+type.enum-value|Interruptable|System.Int32:168
+type.enum-value|IsBuff|System.Int32:65536
+type.enum-value|IsHostile|System.Int32:32768
+type.enum-value|NoRemoveNoNCUFriendly|System.Int32:256
+type.enum-value|NoResistCannotFumble|System.Int32:2
+type.enum-value|NoTimerNotify|System.Int32:524288
+type.enum-value|None|System.Int32:0
+type.enum-value|NotRemovable|System.Int32:16384
+type.enum-value|WantCollision|System.Int32:-2147483648
+type.end|AORebirth.Enums.NanoFlags
 type.begin|AORebirth.Enums.Operator
 type.kind|enum
 type.modifiers|sealed
@@ -1029,7 +1050,6 @@ type.enum-value|invaderskilled|System.Int32:615
 type.enum-value|inventoryid|System.Int32:55
 type.enum-value|inventorytimeout|System.Int32:50
 type.enum-value|ip|System.Int32:53
-type.enum-value|isfightingme|System.Int32:410
 type.enum-value|isreadonly|System.Int32:435
 type.enum-value|isvehicle|System.Int32:658
 type.enum-value|itemanim|System.Int32:99
@@ -1155,6 +1175,7 @@ type.enum-value|npcvicinityplayers|System.Int32:518
 type.enum-value|nplevelup|System.Int32:604
 type.enum-value|npperskill|System.Int32:605
 type.enum-value|numattackeffects|System.Int32:291
+type.enum-value|numberoffightingopponents|System.Int32:410
 type.enum-value|numberofitems|System.Int32:396
 type.enum-value|numberofteammembers|System.Int32:587
 type.enum-value|numberonhatelist|System.Int32:529
@@ -2031,19 +2052,21 @@ type.modifiers|abstract
 type.serializable-attribute|not-applicable
 type.base|
 type.method|public instance abstract virtual AORebirth.Interfaces.Persistence.Characters.CharacterStateData LoadCharacter(System.Int32 characterId)
+type.method|public instance abstract virtual System.Boolean SaveOnlineCheckpoint(System.Int32 characterId,AORebirth.Interfaces.Persistence.Characters.CharacterStateData location,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterStatData> stats)
 type.method|public instance abstract virtual System.Collections.Generic.IDictionary<System.Int32,System.String> LoadItemNames()
 type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterStatData> LoadStats(System.Int32 characterId)
 type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedActiveNanoData> LoadActiveNanos(System.Int32 characterId)
 type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> LoadBankItems(System.Int32 characterId)
 type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> LoadCarriedItems(System.Int32 characterId)
 type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> LoadContainerItems(System.Int32 containerInstanceId)
+type.method|public instance abstract virtual System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedSkillLockData> LoadSkillLocks(System.Int32 characterId)
 type.method|public instance abstract virtual System.Collections.Generic.IList<System.Int32> LoadUploadedNanos(System.Int32 characterId)
 type.method|public instance abstract virtual System.Int32 LeaseItemInstanceIds(System.Int32 count)
 type.method|public instance abstract virtual System.Void CommitActiveNanos(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterActiveNanoData> characters)
 type.method|public instance abstract virtual System.Void CommitInventoryMutation(AORebirth.Interfaces.Persistence.Characters.CharacterInventoryMutationData mutation)
 type.method|public instance abstract virtual System.Void CommitItemCredits(AORebirth.Interfaces.Persistence.Characters.ItemCreditMutationData mutation)
 type.method|public instance abstract virtual System.Void InsertItem(AORebirth.Interfaces.Persistence.Characters.PersistedItemData item)
-type.method|public instance abstract virtual System.Void SaveInventoryAndUploadedNanos(System.Int32 characterId,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations,System.Collections.Generic.IList<System.Int32> uploadedNanoIds,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedActiveNanoData> activeNanos optional=true;default=null)
+type.method|public instance abstract virtual System.Void SaveInventoryAndUploadedNanos(System.Int32 characterId,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations,System.Collections.Generic.IList<System.Int32> uploadedNanoIds,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedActiveNanoData> activeNanos optional=true;default=null,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedSkillLockData> skillLocks optional=true;default=null)
 type.method|public instance abstract virtual System.Void SaveItemLocations(System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.PersistedItemData> inserts,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.ItemLocationData> locations)
 type.method|public instance abstract virtual System.Void SaveLocation(AORebirth.Interfaces.Persistence.Characters.CharacterStateData character,System.Int32 online)
 type.method|public instance abstract virtual System.Void SaveSnapshot(AORebirth.Interfaces.Persistence.Characters.CharacterStateData character,System.Int32 online,System.Collections.Generic.IList<AORebirth.Interfaces.Persistence.Characters.CharacterStatData> stats)
@@ -2163,6 +2186,19 @@ type.method|public instance special-name System.Void set_Quality(System.Int32 va
 type.method|public instance special-name System.Void set_Source(System.Int32 value)
 type.method|public instance special-name System.Void set_StackCount(System.Int32 value)
 type.end|AORebirth.Interfaces.Persistence.Characters.PersistedItemData
+type.begin|AORebirth.Interfaces.Persistence.Characters.PersistedSkillLockData
+type.kind|class
+type.modifiers|sealed
+type.serializable-attribute|false
+type.base|System.Object
+type.constructor|public instance .ctor()
+type.property|public instance System.Int32 StatId {get:public;set:public}
+type.property|public instance System.Int64 ExpiresAtUtcTicks {get:public;set:public}
+type.method|public instance special-name System.Int32 get_StatId()
+type.method|public instance special-name System.Int64 get_ExpiresAtUtcTicks()
+type.method|public instance special-name System.Void set_ExpiresAtUtcTicks(System.Int64 value)
+type.method|public instance special-name System.Void set_StatId(System.Int32 value)
+type.end|AORebirth.Interfaces.Persistence.Characters.PersistedSkillLockData
 type.begin|AORebirth.Interfaces.Persistence.Characters.StaleOnlineCharacterData
 type.kind|class
 type.modifiers|sealed
@@ -3484,6 +3520,17 @@ type.method|public instance special-name System.String get_StockGroupHash()
 type.method|public instance special-name System.String get_VendorName()
 type.method|public instance special-name System.String get_VendorTemplateHash()
 type.end|AORebirth.Interfaces.Persistence.Shops.ShopVendorData
+type.begin|AORebirth.Interfaces.Persistence.Teams.ITeamLevelEligibilityDao
+type.kind|interface
+type.modifiers|abstract
+type.serializable-attribute|not-applicable
+type.base|
+type.method|public instance abstract virtual System.Boolean IsCompatible(System.Int32 searcherLevel,System.Int32 candidateLevel)
+type.method|public instance abstract virtual System.Boolean IsTooHighForMember(System.Int32 memberLevel,System.Int32 inviteeLevel)
+type.method|public instance abstract virtual System.Boolean IsTooLowForMember(System.Int32 memberLevel,System.Int32 inviteeLevel)
+type.method|public instance abstract virtual System.Boolean TryGetRange(System.Int32 level,out System.Int32 minimum,out System.Int32 maximum)
+type.method|public instance abstract virtual System.Int32 ClampToConfiguredLevel(System.Int32 level)
+type.end|AORebirth.Interfaces.Persistence.Teams.ITeamLevelEligibilityDao
 assembly.end|AORebirth.Interfaces
 assembly.begin|AORebirth.ObjectManager
 assembly.name|AORebirth.ObjectManager
