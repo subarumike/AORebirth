@@ -218,14 +218,19 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         /// <summary>
-        /// Places an NPC on the walkable surface at spawn. Recast is only an XZ hint;
-        /// the authoritative Y is the collision floor under a torso-height ray. A Recast Y
-        /// that sits under that triangle made foot-height probes miss and drop the NPC.
+        /// Places an NPC on the walkable surface at spawn. The authored spot wins: when the collision
+        /// floor is right under it the NPC stands there, same XZ, even off the navmesh. Recast erodes
+        /// walkable area by the agent radius, so a spawn at a bridge edge or behind a desk has no
+        /// polygon under it; snapping to the mesh there dropped the NPC to the ground below or pulled
+        /// it through the obstacle. Only a spawn with no floor near it falls back to the navmesh.
         /// </summary>
         public AORebirth.Core.Vector.Vector3 SnapNpcSpawn(AORebirth.Core.Vector.Vector3 position)
         {
             ArgumentNullException.ThrowIfNull(position);
             var at = new AORebirth.Core.Vector.Vector3(position.x, position.y, position.z);
+            if (TrySnapFeetToFloor(at, out AORebirth.Core.Vector.Vector3 authored))
+                return authored;
+
             var spawn = new System.Numerics.Vector3((float)position.x, (float)position.y, (float)position.z);
             // Straight down first: a spawn placed above its floor belongs on the first surface under it,
             // not on a nearer ledge beside it. Only with nothing below does the nearest polygon win.
