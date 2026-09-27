@@ -911,7 +911,7 @@ namespace ZoneEngine_New.Core.Nanos
                     continue;
 
                 int have = caster.Stats.Get((CharacterStat)requirement.StatNumber);
-                if (ItemTemplate.EvaluateRequirement(have, requirement))
+                if (ItemTemplate.EvaluateLeaf(requirement, stat => caster.Stats.Get(stat)))
                     continue;
 
                 parts.Add(

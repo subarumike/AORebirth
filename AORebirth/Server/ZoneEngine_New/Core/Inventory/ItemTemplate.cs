@@ -167,9 +167,7 @@ namespace ZoneEngine_New.Core.Inventory
                     continue;
                 }
 
-                bool pass = EvaluateRequirement(
-                    getStat((CharacterStat)requirement.StatNumber),
-                    requirement);
+                bool pass = EvaluateLeaf(requirement, getStat);
 
                 if (!hasReal)
                 {
@@ -215,7 +213,7 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 if (!IsRequirementLinkOperator(requirement))
                 {
-                    values.Push(EvaluateRequirement(getStat((CharacterStat)requirement.StatNumber), requirement));
+                    values.Push(EvaluateLeaf(requirement, getStat));
                     continue;
                 }
 
@@ -394,6 +392,23 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
 
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria);
+        }
+
+        /// <summary>
+        /// One requirement leaf against the character. A VisualProfession requirement also passes on the
+        /// real Profession, so a disguise (False Profession) never locks a character out of its own nanos.
+        /// </summary>
+        public static bool EvaluateLeaf(ItemRequirement requirement, Func<CharacterStat, int> getStat)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+            ArgumentNullException.ThrowIfNull(getStat);
+
+            var stat = (CharacterStat)requirement.StatNumber;
+            if (EvaluateRequirement(getStat(stat), requirement))
+                return true;
+
+            return stat == CharacterStat.VisualProfession
+                && EvaluateRequirement(getStat(CharacterStat.Profession), requirement);
         }
 
         public static bool EvaluateRequirement(int statValue, ItemRequirement requirement)

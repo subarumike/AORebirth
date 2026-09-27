@@ -2761,8 +2761,11 @@ namespace ZoneEngine_New.Core.Entities
         protected InfoPacketMessage BuildCharacterInfoPacket(byte n3Unknown, InfoPacketType type, string firstName, string lastName)
         {
             int level = Stats.GetOrOne(CharacterStat.Level);
-            int profession = ClampProfession(Stats.GetOrZero(CharacterStat.Profession));
+            // Others see the visual profession (False Profession disguises); it follows Profession when not overridden.
             int visualProfession = ClampProfession(Stats.GetOrZero(CharacterStat.VisualProfession));
+            if (visualProfession == 0)
+                visualProfession = ClampProfession(Stats.GetOrZero(CharacterStat.Profession));
+            int profession = visualProfession;
             int health = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
             int maxHealth = Math.Max(1, Stats.GetOrZero(CharacterStat.MaxHealth));
             if (health > maxHealth)
