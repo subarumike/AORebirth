@@ -86,6 +86,161 @@ individual content definitions belong in the appropriate editable data source.
 - `ZoneEngine_New` is the active zone runtime. Legacy `ZoneEngine` is retired;
   historical references do not make it active.
 
+## AUTHORITATIVE SOURCE
+
+Public GitHub `master` is the authoritative AORebirth product/runtime source.
+
+Linux is a DERIVED BUILD of public master.
+
+Linux is NOT an independent gameplay/runtime branch.
+
+Any gameplay, protocol, persistence, content, NPC, mission, combat, item, nano, quest, shop, world, character, database behavior, or other product change must originate in Windows/public master first.
+
+Never implement a product/runtime fix directly in Linux because the Windows implementation does not compile or behave correctly on Linux.
+
+## LINUX-SPECIFIC CHANGES
+
+Linux-specific changes are permitted ONLY when strictly necessary for:
+
+* Linux compilation
+* OS/platform APIs
+* filesystem/path handling
+* case sensitivity
+* Linux packaging
+* service/systemd integration
+* deployment scripts
+* Linux configuration/environment wiring
+* native-library/platform dependencies
+* equivalent Linux infrastructure required to run the SAME public-master behavior
+
+Linux-specific code must preserve public-master semantics.
+
+A Linux port adaptation must not become an alternate implementation of gameplay behavior.
+
+## FORBIDDEN LINUX DRIFT
+
+Do NOT introduce Linux-only:
+
+* gameplay fixes
+* gameplay defaults
+* content
+* NPC behavior
+* mission behavior
+* combat behavior
+* item behavior
+* nano behavior
+* persistence semantics
+* DAO semantics
+* protocol behavior
+* authentication behavior
+* world/spawn behavior
+* shop behavior
+* quest/dialogue behavior
+* balancing
+* compatibility fallbacks that change gameplay
+* hard-coded game content
+
+If public master is wrong, STOP and fix public master first.
+
+## RECONCILIATION RULE
+
+Before every Linux build:
+
+1. Fetch current public `origin/master`.
+2. Record the exact authoritative SHA.
+3. Compare the Linux source/tree against that SHA.
+4. Inventory every difference.
+5. Classify every difference as:
+
+VALID_LINUX_PORT
+VALID_LINUX_BUILD
+VALID_LINUX_PACKAGING
+VALID_LINUX_SERVICE
+VALID_LINUX_CONFIGURATION
+STALE_LINUX_CHANGE
+INVALID_RUNTIME_DRIFT
+REQUIRES_REVIEW
+
+6. Remove/reconcile stale or invalid drift before treating the Linux build as valid.
+
+Never assume an existing Linux-private change is legitimate merely because it already exists.
+
+## WINDOWS FIRST, LINUX SECOND
+
+Required sequence:
+
+public Windows/master implementation
+→ Windows validation
+→ public master commit/push
+→ Linux reconciliation to that exact master SHA
+→ Linux build/test
+→ Linux package
+→ deployment approval
+→ Linux deployment
+
+Never reverse this sequence.
+
+## EXACT-SHA REQUIREMENT
+
+Every Linux build/report must identify:
+
+PUBLIC_MASTER_SHA
+LINUX_SOURCE_SHA
+PACKAGE_SOURCE_SHA
+
+The Linux candidate must be traceable to the exact public-master SHA plus explicitly documented Linux-only adaptations.
+
+Do not describe a Linux candidate as synchronized when those identities are unknown.
+
+## GAMEDATA / CONTENT
+
+Game content must remain data-driven.
+
+Do not solve missing Linux content by hard-coding it into C#.
+
+Private/protected GameData may be required for runtime/package operation, but it must not be committed or published merely to make a Linux build pass.
+
+Missing private runtime data is a packaging/deployment problem, not permission to invent replacement content.
+
+## CAPTURE DATA
+
+Historical capture/evidence data is research input only.
+
+Runtime must not consume historical capture directories or packet corpora directly.
+
+Do not copy `D:\AORebirthCaptures` or equivalent capture stores into Linux runtime/package data.
+
+Validated permanent content derived offline from captures may be legitimate GameData.
+
+## PAUSED/UNMERGED BRANCHES
+
+Never include work from an unmerged feature branch in Linux merely because it is locally available.
+
+Only authoritative public master is eligible unless Mike explicitly authorizes a specific exception.
+
+The currently paused mission typed-content branch must NOT be included in Linux until it is merged to public master.
+
+## TERMINOLOGY
+
+Use "Linux" for the AORebirth Linux backend/build.
+
+Do not substitute "Unix" when referring to this project.
+
+## STOP CONDITIONS
+
+STOP and report rather than improvising when:
+
+* Linux requires a gameplay/runtime semantic change
+* public master does not compile because of a product defect
+* Linux differs from public master for an unexplained reason
+* required private GameData is missing
+* a Linux-only workaround would change behavior
+* authoritative SHA cannot be established
+* reconciliation would discard unexplained work
+* an unmerged branch appears necessary
+
+Do not work around these conditions silently.
+
 ## GameData authority
 
 - `D:\AORebirth-fresh\GameData` is Mike's private full GameData dataset.
