@@ -110,6 +110,7 @@
             world.BakeWallTriggers(geometry.Walls);
             world.BakePortalTriggers(geometry.Dynels, playfieldId);
             world.BakeVicinityTriggers(geometry.Dynels, itemTemplates);
+            world.BakeMissionEntranceTriggers(geometry.Dynels);
             world.BakeExitProxyTriggers(gameData.GetExitProxyDoorInstances(playfieldId));
 
             int terrainChunks = surface?.Terrain != null ? geometry.Collision!.Terrain!.Chunks.Count : 0;
@@ -281,6 +282,8 @@
                 {
                     if (crossing.Trigger.Kind == ZoneTriggerKind.TargetVicinity)
                         FireTargetVicinity(playfield, player, crossing.Trigger);
+                    else if (crossing.Trigger.Kind == ZoneTriggerKind.MissionEntrance)
+                        EnterMissionEntrance(playfield, player, crossing.Trigger);
                     else
                         TryTransfer(playfield, player, crossing, now);
                 }
@@ -337,9 +340,15 @@
                 return false;
             }
 
-            if (hit.Volume.Kind == ZoneTriggerKind.TargetVicinity)
+            if (hit.Volume.Kind is ZoneTriggerKind.TargetVicinity or ZoneTriggerKind.MissionEntrance)
             {
                 crossing = new ZoneCrossing(0, position, hit.Volume);
+                return true;
+            }
+
+            if (hit.Volume.Kind == ZoneTriggerKind.DungeonExit && hit.Volume.Landing is AoVector3 outside)
+            {
+                crossing = new ZoneCrossing(hit.Volume.DestPlayfieldId, outside, hit.Volume, hit.Volume.LandingHeading);
                 return true;
             }
 
@@ -701,6 +710,95 @@
                 pad.MinY = y - h;
                 pad.MaxY = y + h;
                 _triggers.Add(pad);
+            }
+        }
+
+        /// <summary>
+        /// Makes a quest dungeon's exit door a walk-out: stepping into it returns the character to
+        /// <paramref name="landing"/> on <paramref name="exteriorPlayfieldId"/>, outside the ACG entrance. It records no
+        /// way back (the entrance, with a key, is the way back in).
+        /// </summary>
+        public void RegisterDungeonExit(float x, float y, float z, int doorInstance, int exteriorPlayfieldId, AoVector3 landing, AoQuaternion landingHeading)
+        {
+            if (exteriorPlayfieldId <= 0 || _triggers.HasDynel(ZoneTriggerKind.DungeonExit, doorInstance))
+                return;
+
+            const float r = TriggerVolumeCatalog.PortalRadius;
+            const float h = TriggerVolumeCatalog.PortalHalfHeight;
+            _triggers.Add(
+                new ZoneTriggerVolume
+                {
+                    Kind = ZoneTriggerKind.DungeonExit,
+                    Id = _nextTriggerId++,
+                    MinX = x - r,
+                    MaxX = x + r,
+                    MinZ = z - r,
+                    MaxZ = z + r,
+                    MinY = y - h,
+                    MaxY = y + h,
+                    CenterX = x,
+                    CenterY = y,
+                    CenterZ = z,
+                    Radius = r,
+                    DynelInstance = doorInstance,
+                    DestPlayfieldId = exteriorPlayfieldId,
+                    Landing = landing,
+                    LandingHeading = landingHeading
+                });
+        }
+
+        /// <summary>
+        /// Walking into a mission entrance. The quest dungeon service decides everything (carried key, the quest
+        /// behind this entrance, range, cooldown); without a matching key nothing happens and the character walks on.
+        /// The overlap memory keeps it from firing again until they step out and back in.
+        /// </summary>
+        void EnterMissionEntrance(PlayfieldType playfield, Player player, ZoneTriggerVolume entrance)
+        {
+            try
+            {
+                playfield.GetService<Quests.Dungeons.QuestDungeonService>()?.TryEnter(
+                    player, new SmokeLounge.AOtomation.Messaging.GameData.Identity { Type = IdentityType.MissionEntrance, Instance = entrance.DynelInstance });
+            }
+            catch (Exception exception)
+            {
+                _logger.Error(exception, "Mission entrance " + entrance.DynelInstance.ToString("X8", CultureInfo.InvariantCulture) + " entry failed");
+            }
+        }
+
+        /// <summary>One walk-in trigger per MissionEntrance dynel (0xDAC6) in this playfield's Dynels.dat.</summary>
+        void BakeMissionEntranceTriggers(PlayfieldDynels? dynels)
+        {
+            if (dynels?.Dynels == null)
+                return;
+
+            for (int i = 0; i < dynels.Dynels.Count; i++)
+            {
+                PlayfieldDynel d = dynels.Dynels[i];
+                if (d.IdentityType != (int)IdentityType.MissionEntrance)
+                    continue;
+
+                float x = d.Position.X;
+                float y = d.Position.Y;
+                float z = d.Position.Z;
+                const float r = TriggerVolumeCatalog.MissionEntranceRadius;
+                const float h = TriggerVolumeCatalog.PortalHalfHeight;
+                _triggers.Add(
+                    new ZoneTriggerVolume
+                    {
+                        Kind = ZoneTriggerKind.MissionEntrance,
+                        Id = _nextTriggerId++,
+                        MinX = x - r,
+                        MaxX = x + r,
+                        MinZ = z - r,
+                        MaxZ = z + r,
+                        MinY = y - h,
+                        MaxY = y + h,
+                        CenterX = x,
+                        CenterY = y,
+                        CenterZ = z,
+                        Radius = r,
+                        DynelInstance = d.IdentityInstance
+                    });
             }
         }
 

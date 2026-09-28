@@ -1,6 +1,7 @@
 namespace AORebirth.World.Collision
 {
     using System;
+    using System.Collections.Generic;
     using System.Numerics;
 
     using AORebirth.Core.GameData;
@@ -17,8 +18,12 @@ namespace AORebirth.World.Collision
             int tileMaxX,
             int tileMaxZ,
             Vector3 templatePos,
-            int templateFacing = 0)
+            int templateFacing = 0,
+            IReadOnlyList<int>? doorPosRots = null,
+            string? name = null)
         {
+            DoorPosRots = doorPosRots ?? Array.Empty<int>();
+            Name = name ?? string.Empty;
             if (tileMaxX <= tileMinX || tileMaxZ <= tileMinZ)
                 throw new ArgumentOutOfRangeException(nameof(tileMaxX), "Room tile rect is empty.");
 
@@ -49,6 +54,15 @@ namespace AORebirth.World.Collision
         /// <summary>Client <c>n3Room_t+0x68</c> half-tile origin in tile units.</summary>
         public Vector3 LocalOrigin { get; }
 
+        /// <summary>
+        /// The room's possible doorways (Rooms.json doorConnections posRot): (z x NumTilesX + x) x 4 + rotation, where
+        /// (x, z) is a tile of the room and rotation names that tile's edge (0 high z, 1 high x, 2 low z, 3 low x).
+        /// </summary>
+        public IReadOnlyList<int> DoorPosRots { get; }
+
+        /// <summary>Room name from the template (e.g. clan_mh7, clanvillage_entrance); empty when unknown.</summary>
+        public string Name { get; }
+
         public int NumTilesX => TileMaxX - TileMinX;
 
         public int NumTilesZ => TileMaxZ - TileMinZ;
@@ -74,7 +88,9 @@ namespace AORebirth.World.Collision
                 entry.TileX2,
                 entry.TileY2,
                 new Vector3(template[0], template[1], template[2]),
-                entry.Rotation);
+                entry.Rotation,
+                entry.DoorConnections == null ? null : Array.ConvertAll(entry.DoorConnections, link => link.PosRot),
+                entry.Name);
             return true;
         }
 

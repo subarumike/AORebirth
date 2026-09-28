@@ -16,6 +16,8 @@
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260925_character_skill_locks.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260927_character_quests.sql" Link="Migrations/%(Filename)%(Extension)" />
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260927_character_quests.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260928_quest_dungeon_keys.sql" Link="Migrations/%(Filename)%(Extension)" />
+    <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260928_quest_dungeon_keys.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/SqlTables/*.sql" Link="SqlTables/%(Filename)%(Extension)" />
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/SqlTables/*.sql" Link="SqlTables/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

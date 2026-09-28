@@ -572,7 +572,6 @@ namespace ZoneEngine_New.Core.Playfield
                 {
                     if (!ReferenceEquals(player.Playfield, this))
                         continue;
-                    _playfieldManager.Missions.PollLifecycle(player);
                     _characterSnapshot.CheckpointIfDue(player);
                 }
             }
@@ -633,10 +632,11 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_logger);
             services.AddSingleton(_playfieldManager);
             services.AddSingleton(_playfieldManager.Teams);
-            services.AddSingleton(_playfieldManager.Missions);
             services.AddSingleton(_playfieldManager.AuthoredQuests);
             if (_playfieldManager.Quests != null)
                 services.AddSingleton(_playfieldManager.Quests);
+            if (_playfieldManager.QuestDungeons != null)
+                services.AddSingleton(_playfieldManager.QuestDungeons);
             services.AddSingleton(_playfieldManager.Dialogues);
             services.AddSingleton(_playfieldManager.ItemTemplates);
             services.AddSingleton(_playerHydrator);

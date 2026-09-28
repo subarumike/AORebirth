@@ -7,7 +7,7 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Network;
 
-public sealed class QuestMessageHandler(GeneratedMissionAcgService missions, Quests.QuestService quests) : IMessageHandler<QuestMessage>
+public sealed class QuestMessageHandler(Quests.QuestService quests) : IMessageHandler<QuestMessage>
 {
     public Type MessageBodyType => typeof(QuestMessage);
     public void Handle(MessageBody body, IZoneSession session) => Handle((QuestMessage)body, session);
@@ -16,9 +16,7 @@ public sealed class QuestMessageHandler(GeneratedMissionAcgService missions, Que
         var player = session.Player;
         if (session.State != SessionState.InPlay || player == null || player.IsPersistenceQuarantined || player.IsDead
             || !message.Identity.Equals(player.Identity) || message.Action != QuestAction.Delete || (int)message.Mission.Type != 0xDAC3) return;
-        // Quests.json and generated quests first; any other mission id belongs to the generated-mission system.
-        if (quests.TryAbandon(player, message.Mission.Instance))
-            return;
-        missions.Abandon(player, message.Mission);
+        // Quests.json and generated quests (accepted missions) are the only journal entries a player can delete.
+        quests.TryAbandon(player, message.Mission.Instance);
     }
 }

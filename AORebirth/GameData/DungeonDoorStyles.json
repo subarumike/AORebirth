@@ -1,0 +1,27 @@
+{
+  "_comment": "Quest dungeon doors per ACG style. DoorTemplate / ExitTemplate are door item templates (StaticInstance; the template's Flags stat is the door's base flags), from captured live dungeons: 321 office, 324 clan, 341 mine/wild cave, 351. Doors are rolled from the dungeon seed: the exit always spawns open; interior doors spawn locked (flag 0x40) or open (0x80) by these chances. Live captures show about 15% of interior doors open and about 2% locked; locked stays 0 until lockpicking exists, since a locked door would block the dungeon.",
+  "OpenChancePercent": 15,
+  "LockedChancePercent": 0,
+  "Styles": [
+    {
+      "Style": 321,
+      "DoorTemplate": 41885,
+      "ExitTemplate": 41886
+    },
+    {
+      "Style": 324,
+      "DoorTemplate": 41557,
+      "ExitTemplate": 41555
+    },
+    {
+      "Style": 341,
+      "DoorTemplate": 41877,
+      "ExitTemplate": 41878
+    },
+    {
+      "Style": 351,
+      "DoorTemplate": 41883,
+      "ExitTemplate": 41884
+    }
+  ]
+}

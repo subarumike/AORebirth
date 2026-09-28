@@ -145,6 +145,12 @@ namespace ZoneEngine_New.Core.Playfield
 
         internal DateTime NextSpawnTime { get; set; }
 
+        /// <summary>False for one-shot points (quest dungeons): once its NPC is killed the point never spawns again.</summary>
+        internal bool RespawnsAfterDeath { get; init; } = true;
+
+        /// <summary>A one-shot point whose NPC was killed.</summary>
+        internal bool Retired { get; set; }
+
         internal int MemberCount => _members.Count;
 
         internal void AddMember(Dynel member)
@@ -178,6 +184,7 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly Dictionary<Dynel, HashSpawnPoint> _pointBySpawned = new();
         private int _spawnRate = 1;
         private bool _initialized;
+        private CellGrid? _grid;
 
         public HashSpawnSystem(
             Playfield playfield,
@@ -213,6 +220,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             _initialized = true;
             _spawnRate = locality.Policy.SpawnRate;
+            _grid = locality.Grid;
             LoadSpawns(locality.Grid);
             LoadDistrictSpawns(locality.Grid);
             locality.AttachHashSpawns(
@@ -460,6 +468,67 @@ namespace ZoneEngine_New.Core.Playfield
                     skipped));
         }
 
+        /// <summary>
+        /// Adds one district spawn point that was placed after the playfield loaded (a generated dungeon's rooms move
+        /// their style's district points into place). It behaves like a Districts.json point of
+        /// <paramref name="district"/>: same respawn chance and timer, unless <paramref name="respawns"/> is false, when its
+        /// NPC spawns once and never again after it is killed. Without district levels the template's level is kept.
+        /// </summary>
+        internal bool AddPlacedDistrictPoint(string hash, PlayfieldDistrictEntry district, Vector3 centre, float radius,
+            bool useDistrictLevels, bool respawns)
+        {
+            ArgumentNullException.ThrowIfNull(district);
+            if (string.IsNullOrEmpty(hash))
+                return false;
+
+            if (_grid == null)
+                return false;
+
+            int minLevel = useDistrictLevels ? district.NpcMinLevel : 0;
+            int maxLevel = useDistrictLevels ? district.NpcMaxLevel : 0;
+            bool isStatic = _gameData.IsStaticSpawnHash(hash);
+            if (!isStatic && !HasSpawnableMob(hash, Math.Max(1, minLevel)))
+                return false;
+            if (!_grid.TryResolveCell(centre, out Cell cell))
+                return false;
+
+            var entry = new PlayfieldSpawnEntry
+            {
+                DistrictIndex = district.DistrictIndex,
+                HashText = hash,
+                MinLevel = minLevel,
+                MaxLevel = maxLevel,
+                RespawnChance = district.RespawnChance,
+                RespawnTime = district.RespawnTime,
+                AngleW = DistrictFacingWidthDegrees,
+                Position = [centre.xf, centre.yf, centre.zf],
+                Radius = radius
+            };
+            var point = new HashSpawnPoint(
+                hash,
+                [new SpawnSite(centre, 0, DistrictFacingWidthDegrees, radius)],
+                Math.Max(0, district.RespawnTime),
+                district.RespawnChance,
+                minLevel,
+                maxLevel,
+                cell.Id,
+                entry,
+                isStatic)
+            {
+                RespawnsAfterDeath = respawns
+            };
+
+            if (!_pointsByCell.TryGetValue(cell.Id, out List<HashSpawnPoint>? list))
+            {
+                list = new List<HashSpawnPoint>();
+                _pointsByCell[cell.Id] = list;
+            }
+
+            list.Add(point);
+            _allPoints.Add(point);
+            return true;
+        }
+
         private bool HasInactiveEvent(PlayfieldSpawnEntry entry)
         {
             PlayfieldHashSpawnExtensionEvent[]? events = entry.Extensions?.Events;
@@ -556,6 +625,9 @@ namespace ZoneEngine_New.Core.Playfield
 
         private bool ShouldSpawn(HashSpawnPoint point, DateTime now)
         {
+            if (point.Retired)
+                return false;
+
             RecoverOrphanedSpawn(point);
 
             if (point.MemberCount > 0)
@@ -813,6 +885,8 @@ namespace ZoneEngine_New.Core.Playfield
 
             point.State = HashSpawnState.Dead;
             point.NextSpawnTime = DateTime.UtcNow.AddSeconds(point.RespawnTimeSeconds);
+            if (!point.RespawnsAfterDeath)
+                point.Retired = true;
             LogSpawnDeath(point, instance, name);
         }
 

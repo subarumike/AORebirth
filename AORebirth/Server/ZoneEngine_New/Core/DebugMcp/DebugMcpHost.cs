@@ -69,6 +69,7 @@ namespace ZoneEngine_New.Core.DebugMcp
             builder.Services.AddSingleton<IPlayfieldMetricsRegistry>(zoneServices.GetRequiredService<IPlayfieldMetricsRegistry>());
             builder.Services.AddSingleton(zoneServices.GetRequiredService<GeneratedMissionService>());
             builder.Services.AddSingleton(endpoint);
+            builder.Services.AddSingleton(zoneServices.GetRequiredService<Quests.Dungeons.QuestDungeonService>());
             builder.Services.AddMcpServer().WithHttpTransport().WithTools<ZoneDebugTools>();
 
             WebApplication app = builder.Build();

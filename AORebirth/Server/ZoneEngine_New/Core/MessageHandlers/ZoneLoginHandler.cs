@@ -2,6 +2,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
 {
     using System;
     using System.Globalization;
+    using System.Linq;
+    using AORebirth.Interfaces.Persistence.Missions;
     using System.Threading.Tasks;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -25,16 +27,19 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly ICharacterHydrationService _hydration;
         private readonly PlayfieldManager _playfieldManager;
         private readonly IZoneLogger _logger;
-        private readonly GeneratedMissionAcgService _missions;
+        private readonly IGeneratedMissionDao _retiredMissions;
         private readonly IZoneAdmissionGate _admission;
+        private readonly Quests.Dungeons.QuestDungeonService? _dungeons;
 
         public ZoneLoginHandler(
             ICharacterHydrationService hydration,
             PlayfieldManager playfieldManager,
             IZoneLogger logger,
-            GeneratedMissionAcgService missions,
-            IZoneAdmissionGate admission)
+            IGeneratedMissionDao retiredMissions,
+            IZoneAdmissionGate admission,
+            Quests.Dungeons.QuestDungeonService? dungeons = null)
         {
+            _dungeons = dungeons;
             ArgumentNullException.ThrowIfNull(hydration);
             ArgumentNullException.ThrowIfNull(playfieldManager);
             ArgumentNullException.ThrowIfNull(logger);
@@ -42,7 +47,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _hydration = hydration;
             _playfieldManager = playfieldManager;
             _logger = logger;
-            _missions = missions ?? throw new ArgumentNullException(nameof(missions));
+            _retiredMissions = retiredMissions ?? throw new ArgumentNullException(nameof(retiredMissions));
             _admission = admission ?? throw new ArgumentNullException(nameof(admission));
         }
 
@@ -117,19 +122,39 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
+            // Keys whose dungeon ended while this character was away are retired before their items load.
+            _dungeons?.RetireDeadKeysOnLogin(characterId);
+
             CharacterHydrationResult? hydration = await LoadHydrationAsync(session, characterId).ConfigureAwait(false);
             if (hydration == null || session.State != SessionState.Loading)
                 return;
 
             Playfield playfield;
             int storedPlayfield = hydration.Character.Playfield;
-            if (storedPlayfield >= GeneratedMissionIdentitySpace.MinimumLivePlayfield2
+            if (_dungeons != null && Quests.Dungeons.QuestDungeonIds.IsDungeonPlayfield(storedPlayfield))
+            {
+                (Playfield dungeonOrExterior, AORebirth.Core.Vector.Vector3? landing) = _dungeons.ResolveLogin(storedPlayfield);
+                playfield = dungeonOrExterior;
+                // Vector3 overloads != with v1.Equals, which throws for a null left operand.
+                if (landing is not null)
+                    hydration = WithLoginPosition(hydration, dungeonOrExterior.Identity.Instance, landing);
+            }
+            else if (storedPlayfield >= GeneratedMissionIdentitySpace.MinimumLivePlayfield2
                 && storedPlayfield <= GeneratedMissionIdentitySpace.MaximumLivePlayfield2)
             {
-                var plan = _missions.ResolveLogin(characterId, storedPlayfield);
-                hydration = ApplyMissionLoginPlan(hydration, plan);
-                playfield = plan.World != null ? _playfieldManager.GetOrCreateMission(plan.World)
-                    : _playfieldManager.GetOrCreate(plan.PlayfieldId);
+                // The old mission worlds are gone: a character saved inside one returns to where that mission was
+                // accepted (its offer's destination).
+                GeneratedMissionBinding? binding = _retiredMissions.ReadAccepted(characterId)
+                    .FirstOrDefault(value => value.LivePlayfield == storedPlayfield);
+                if (binding?.Offer == null || binding.Offer.DestinationPlayfield <= 0)
+                {
+                    FailLogin(session, characterId, "Saved inside a retired mission world with no way out.");
+                    return;
+                }
+
+                playfield = _playfieldManager.GetOrCreate(binding.Offer.DestinationPlayfield);
+                hydration = WithLoginPosition(hydration, binding.Offer.DestinationPlayfield,
+                    new AORebirth.Core.Vector.Vector3(binding.Offer.DestinationX, binding.Offer.DestinationY, binding.Offer.DestinationZ));
             }
             else playfield = _playfieldManager.GetOrCreate(storedPlayfield);
 
@@ -148,16 +173,16 @@ namespace ZoneEngine_New.Core.MessageHandlers
             EnqueueSpawn(session, playfield, hydration);
         }
 
-        internal static CharacterHydrationResult ApplyMissionLoginPlan(CharacterHydrationResult hydration, GeneratedMissionLoginPlan plan)
+        /// <summary>The same hydration, placed at <paramref name="position"/> on <paramref name="playfieldId"/>.</summary>
+        static CharacterHydrationResult WithLoginPosition(CharacterHydrationResult hydration, int playfieldId, AORebirth.Core.Vector.Vector3 position)
         {
-            if (plan.Position == null) return hydration;
             var source = hydration.Character;
             return new CharacterHydrationResult
             {
                 Character = new CharacterRecord
                 {
                     Id = source.Id, Name = source.Name, FirstName = source.FirstName, LastName = source.LastName,
-                    Playfield = plan.PlayfieldId, X = plan.Position.xf, Y = plan.Position.yf, Z = plan.Position.zf,
+                    Playfield = playfieldId, X = position.xf, Y = position.yf, Z = position.zf,
                     HeadingX = source.HeadingX, HeadingY = source.HeadingY, HeadingZ = source.HeadingZ, HeadingW = source.HeadingW
                 },
                 Stats = hydration.Stats, Items = hydration.Items, UploadedNanoIds = hydration.UploadedNanoIds

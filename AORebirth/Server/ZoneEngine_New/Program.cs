@@ -102,6 +102,8 @@ namespace ZoneEngine_New
                 chatEngineLink.Start();
                 playfieldManager = rootServices.GetRequiredService<PlayfieldManager>();
                 _ = rootServices.GetRequiredService<InventoryFlushService>();
+                // Subscribes to quest endings and starts the dungeon expiry and idle-release sweep.
+                _ = rootServices.GetRequiredService<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
                 try
@@ -230,9 +232,6 @@ namespace ZoneEngine_New
             services.AddSingleton<IMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
             services.AddSingleton<IGeneratedMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
             services.AddSingleton<GeneratedMissionService>();
-            services.AddSingleton(provider => new Lazy<GeneratedMissionAcgService>(provider.GetRequiredService<GeneratedMissionAcgService>));
-            services.AddSingleton<IGeneratedMissionNpcFactory, GeneratedMissionNpcFactory>();
-            services.AddSingleton<GeneratedMissionAcgService>();
             services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
             services.AddSingleton<AuthoredQuestService>();
             services.AddSingleton(_ => ZoneEngine_New.Core.Dialogue.DialogueCatalog.Load(AppContext.BaseDirectory));
@@ -255,6 +254,9 @@ namespace ZoneEngine_New
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestCatalog>();
             services.AddSingleton<ICharacterQuestStore, MySqlCharacterQuestStore>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestService>();
+            services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.MissionEntranceCatalog>();
+            services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
+            services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
 
             //Commands
             services.AddSingleton<IGmCommand, SpawnCommand>();
@@ -264,6 +266,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, GiveCommand>();
             services.AddSingleton<IGmCommand, NpcCommand>();
             services.AddSingleton<IGmCommand, ServerStatsCommand>();
+            services.AddSingleton<IGmCommand, QuestsCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
             services.AddSingleton<IZoneAdmissionGate, ZoneAdmissionGate>();
@@ -349,6 +352,7 @@ namespace ZoneEngine_New
             debugMcp = null;
             Cleanup(() => networkHost?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             networkHost = null;
+            Cleanup(() => rootServices?.GetService<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>()?.Dispose());
             Cleanup(() => playfieldManager?.Dispose());
             playfieldManager = null;
             Cleanup(() => rootServices?.GetRequiredService<TeamService>().Shutdown());
