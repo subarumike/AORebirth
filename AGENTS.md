@@ -86,6 +86,180 @@ individual content definitions belong in the appropriate editable data source.
 - `ZoneEngine_New` is the active zone runtime. Legacy `ZoneEngine` is retired;
   historical references do not make it active.
 
+## LEGACY CUTOVER WORKFLOWS ARE RETIRED
+
+The historical ZoneEngine -> ZoneEngine_New cutover is COMPLETE and RETIRED.
+
+`ZoneEngine_New` is the current authoritative zone runtime.
+
+Public GitHub `master` is the current product.
+
+Do NOT treat normal Linux porting or deployment as an engine cutover.
+
+Do NOT resurrect, infer, require, or preserve historical cutover machinery merely because it appears in:
+
+* old reports
+* old deployment receipts
+* old scripts
+* historical branches
+* comments
+* archived docs
+* previous acceptance artifacts
+* migration-era tooling
+* legacy terminology
+
+Historical cutover artifacts are evidence only.
+
+They are NOT current workflow authority.
+
+## CURRENT LINUX WORKFLOW
+
+The normal Linux workflow is:
+
+`public GitHub master -> port/reconcile to Linux -> build -> validate -> package -> push to private Linux Git`
+
+That is the Linux engineering workflow.
+
+Do not mix production deployment concerns into Linux source-port work unless Mike explicitly asks to deploy.
+
+## NORMAL LIVE DEPLOYMENT
+
+When Mike explicitly authorizes deployment, treat it as a NORMAL software-version deployment.
+
+Normal deployment means:
+
+1. verify the approved package;
+2. stop the required live services;
+3. take a current backup of the actual live database if schema changes are involved;
+4. apply the migrations required by current public master;
+5. install the approved Linux package;
+6. start services;
+7. verify startup, logs, listeners, and provenance;
+8. Mike performs live AO client acceptance.
+
+Do NOT automatically introduce:
+
+* prepared-schema-cutover workflows
+* engine-transition workflows
+* legacy/new-engine dual-running assumptions
+* special cutover manifests
+* previous-release pin systems
+* old cutover-specific migration gates
+* historical cutover session policing
+* old ZoneEngine compatibility checks
+* release-transition frameworks
+* extra rollback architecture beyond the established normal deployment/backup mechanism
+
+unless Mike explicitly requests that specific mechanism.
+
+## DATABASE MIGRATIONS
+
+Database migrations in public master are ordinary versioned schema changes.
+
+Treat them as:
+
+`current live schema -> migrations required by current public master`
+
+Do NOT reinterpret ordinary migrations as evidence that an engine cutover is occurring.
+
+If current master requires migrations:
+
+* identify the outstanding migrations;
+* back up the actual live database;
+* apply them in their defined order;
+* validate the resulting schema;
+* continue deployment.
+
+Do not build a new migration framework around them.
+
+## PUBLIC MASTER IS THE PRODUCT
+
+Do not use historical live SHA, historical private Linux SHA, or old release SHA as architectural authority.
+
+They matter only for:
+
+* understanding current live state;
+* rollback/recovery;
+* deployment delta.
+
+They do NOT define what Linux should become.
+
+Linux should become the current authoritative public master plus only required Linux-specific adaptations.
+
+## NO WORKFLOW ARCHAEOLOGY
+
+Do not search old reports, historical branches, old receipts, or archived deployment documents to invent requirements for the current workflow.
+
+Only inspect historical material when:
+
+* Mike explicitly asks;
+* a current failure cannot be explained from current source/workflow;
+* or exact provenance is required.
+
+Current authoritative files and current `AGENTS.md` override historical workflow descriptions.
+
+If old documentation conflicts with this rule, the old documentation is stale.
+
+## SIMPLEST CURRENT WORKFLOW WINS
+
+For Linux porting:
+
+`fetch master -> port -> build -> validate -> package -> private Git`
+
+For deployment:
+
+`backup if needed -> migrations if needed -> deploy -> start -> verify`
+
+Do not expand these into a larger framework without proving the current workflow cannot satisfy the requirement.
+
+## STOP INVENTING GATES
+
+A gate is valid only if it comes from:
+
+* current authoritative source;
+* current `AGENTS.md`;
+* current documented build/deployment workflow;
+* or Mike's explicit instruction.
+
+Do not invent gates from historical process residue.
+
+When an unexpected condition appears, first ask:
+
+`Is this actually required by current master/current Linux deployment?`
+
+If NO:
+
+* record it if useful;
+* do not block the task.
+
+## CURRENT ROLE SPLIT
+
+Windows developers:
+
+* own product/runtime development on public master;
+* own ordinary Windows defects and architecture cleanup.
+
+Linux workstream:
+
+* ports current public master faithfully;
+* fixes Linux-specific build/package/deployment problems;
+* deploys the resulting Linux package when authorized.
+
+Linux work does not take ownership of unrelated Windows cleanup.
+
+## REQUIRED BEHAVIOR
+
+If an old workflow/tool tries to force a retired cutover assumption:
+
+STOP USING THAT OLD WORKFLOW.
+
+Do not redesign current source to satisfy it.
+
+Either:
+
+* use the current normal workflow;
+* or update the private Linux tooling so it reflects the current normal workflow without changing product semantics.
+
 ## AUTHORITATIVE SOURCE
 
 Public GitHub `master` is the authoritative AORebirth product/runtime source.
@@ -104,7 +278,9 @@ AORebirth development responsibilities have changed.
 
 The Linux workstream is now STRICTLY responsible for:
 
-`public Windows/master -> Linux port -> Linux validation -> private Linux Git -> Linux deployment`
+`public GitHub master -> Linux port -> build -> validate -> package -> private Linux Git`
+
+Normal Linux deployment is a separate step, only when Mike explicitly authorizes it.
 
 Delmus and other Windows developers are responsible for normal Windows/public-master product development.
 
@@ -294,11 +470,12 @@ Required workflow:
 public Windows/master
 → fetch exact SHA
 → port/reconcile to Linux
+→ build Linux
 → validate Linux
+→ package/validate
 → push Linux result to private Linux Git
-→ package
-→ deployment approval
-→ deploy Linux
+
+Stop at private Linux Git unless Mike explicitly authorizes normal deployment.
 
 Public Windows/master is the input.
 
@@ -424,12 +601,10 @@ public Windows/master implementation
 → fetch exact public master SHA
 → reconcile/port that source to Linux
 → Linux build/test
-→ push validated Linux port commits to PRIVATE Linux Git
 → Linux package construction/validation
-→ deployment approval
-→ Linux deployment
+→ push validated Linux port commits to PRIVATE Linux Git
 
-Never reverse this sequence. Deployment requires Mike's explicit authorization.
+Never reverse this sequence. Stop here unless Mike explicitly authorizes normal deployment under NORMAL LIVE DEPLOYMENT.
 
 The Linux private repository must preserve traceability to the exact public-master SHA it was derived from.
 
@@ -504,7 +679,9 @@ Public GitHub `master` is authoritative for AORebirth product/runtime behavior, 
 
 The required relationship is:
 
-`public Windows/master -> fetch exact authoritative SHA -> port/reconcile to Linux -> validate Linux -> push Linux result to PRIVATE Linux Git -> package/validate -> deployment approval -> deployment`
+`public GitHub master -> fetch exact authoritative SHA -> port/reconcile to Linux -> build -> validate -> package/validate -> push Linux result to PRIVATE Linux Git`
+
+Production deployment is separate and requires Mike's explicit authorization.
 
 Rules:
 
@@ -564,7 +741,9 @@ After the Windows developers or the authorized absolute-blocker work complete it
 public master fix/validation/push
 → fetch new exact public master SHA
 → reconcile/port that new SHA to Linux
+→ build
 → validate
+→ package
 → push resulting Linux port to private Linux Git
 
 Never solve product defects only inside private Linux Git.
