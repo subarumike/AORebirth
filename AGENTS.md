@@ -98,6 +98,247 @@ Any gameplay, protocol, persistence, content, NPC, mission, combat, item, nano, 
 
 Never implement a product/runtime fix directly in Linux because the Windows implementation does not compile or behave correctly on Linux.
 
+## RESPONSIBILITY SPLIT
+
+AORebirth development responsibilities have changed.
+
+The Linux workstream is now STRICTLY responsible for:
+
+`public Windows/master -> Linux port -> Linux validation -> private Linux Git -> Linux deployment`
+
+Delmus and other Windows developers are responsible for normal Windows/public-master product development.
+
+The Linux workstream must NOT take ownership of ordinary Windows development issues.
+
+Public GitHub `master` remains the authoritative product/runtime source.
+
+Linux consumes and ports that source.
+
+## NO ROUTINE WINDOWS WORK
+
+During Linux-port work, do NOT stop and switch to Windows development merely because public master contains:
+
+* stale tests;
+* stale fixtures;
+* stale generated contracts;
+* architecture-guard findings;
+* code-style findings;
+* content-policy findings;
+* known baseline test failures;
+* incomplete Windows cleanup;
+* historical technical debt;
+* non-Linux regressions already present in public master.
+
+Record them as public-master baseline findings and continue Linux work when they do not prevent a faithful Linux port.
+
+Do not repair those issues on public master as part of normal Linux work.
+
+The Windows developers own them.
+
+## LINUX ACCEPTANCE BASELINE RULE
+
+Linux validation must distinguish:
+
+`PUBLIC_BASELINE_FAILURE`
+
+from:
+
+`LINUX_PORT_FAILURE`
+
+A failure that reproduces on the exact authoritative public-master source and is not caused by a Linux adaptation is a:
+
+`PUBLIC_BASELINE_FAILURE`
+
+It does NOT automatically block the Linux port.
+
+Linux acceptance may proceed with documented public baseline failures when:
+
+1. the same defect/failure is proven on exact public master;
+2. the Linux port did not introduce or worsen it;
+3. the failure is unrelated to Linux packaging/infrastructure correctness;
+4. runtime semantics remain faithful to public master;
+5. the acceptance receipt records the failure explicitly.
+
+Never hide, suppress, delete, or misreport baseline failures.
+
+Use explicit results such as:
+
+`PASS_WITH_PROVEN_PUBLIC_BASELINE_EXCEPTIONS`
+
+Do not record plain `PASS` when failures occurred.
+
+## ZERO NEW LINUX FAILURES
+
+The primary Linux acceptance requirement is:
+
+`NEW_LINUX_FAILURES=0`
+
+Any failure introduced by:
+
+* Linux project wiring;
+* Linux-specific source adaptation;
+* packaging;
+* filesystem handling;
+* path/case handling;
+* native dependencies;
+* service/systemd integration;
+* Linux configuration;
+* private Linux tooling;
+
+must be investigated and resolved before deployment.
+
+Do not classify a failure as baseline without proving it against exact public master.
+
+## ARCHITECTURE / CONTENT GUARDS
+
+An architecture, content, or policy guard failure inherited unchanged from authoritative public master is not automatically a Linux blocker.
+
+Example:
+
+If public master contains a hard-coded-content finding and the Linux port contains the exact same runtime source bytes, classify it as:
+
+`PUBLIC_BASELINE_ARCHITECTURE_FINDING`
+
+Record it and continue Linux work unless it prevents Linux compilation, package construction, startup, or faithful execution.
+
+Do NOT modify the guard merely to make Linux pass.
+
+Do NOT modify public Windows runtime merely because Linux encountered the inherited finding.
+
+Windows developers own the public-side remediation.
+
+## WHEN LINUX MAY TOUCH PUBLIC WINDOWS CODE
+
+The Linux workstream should change public Windows/master only for an ABSOLUTE BLOCKER.
+
+An absolute blocker means a proven defect in authoritative public master that:
+
+* prevents the product from compiling at all in its authoritative form; or
+* prevents Linux from faithfully implementing the same runtime semantics without introducing Linux-only behavior; or
+* causes a critical product/runtime failure that makes the Linux server fundamentally unusable; and
+* cannot correctly be handled as a Linux port/build/package adaptation.
+
+Before touching public master from the Linux workstream:
+
+1. prove the defect exists in public master;
+2. prove it is an absolute blocker;
+3. prove a Linux-only workaround would create semantic divergence;
+4. keep the public fix as small and platform-neutral as possible.
+
+Ordinary failing tests, stale contracts, architecture findings, cleanup opportunities, and technical debt are NOT absolute blockers.
+
+Default action:
+
+`record -> continue Linux port -> leave Windows repair to Windows developers`
+
+## PUBLIC MASTER MOVEMENT
+
+Public master may continue moving while Linux is being ported.
+
+When it moves:
+
+1. fetch new public master;
+2. audit the delta;
+3. reconcile the Linux port;
+4. retain valid Linux adaptations;
+5. drop adaptations superseded by public master;
+6. regenerate Linux adaptation/provenance receipts;
+7. rerun affected Linux validation.
+
+Do not attempt to freeze or control Windows development.
+
+## LINUX PORT AUTHORITY
+
+The Linux team may modify the PRIVATE Linux repository for:
+
+* Linux compilation/project wiring;
+* build tooling;
+* source inventories;
+* Linux-specific dependency wiring;
+* filesystem/path/case differences;
+* native-library support;
+* packaging;
+* service/systemd integration;
+* deployment tooling;
+* private acceptance tooling;
+* provenance and identity checks.
+
+Those adaptations must preserve authoritative public-master behavior.
+
+## FORBIDDEN LINUX PRODUCT DRIFT
+
+Do not introduce Linux-only changes to:
+
+* gameplay;
+* protocol semantics;
+* persistence behavior;
+* DAO semantics;
+* quests;
+* NPC behavior;
+* combat;
+* nanos;
+* items;
+* shops;
+* world/spawns;
+* character behavior;
+* balancing;
+* content;
+* authentication semantics.
+
+If Linux behavior would differ from public master, stop and classify the issue.
+
+## PRIVATE LINUX GIT FLOW
+
+Required workflow:
+
+public Windows/master
+→ fetch exact SHA
+→ port/reconcile to Linux
+→ validate Linux
+→ push Linux result to private Linux Git
+→ package
+→ deployment approval
+→ deploy Linux
+
+Public Windows/master is the input.
+
+Private Linux Git is the Linux output/history.
+
+Never push private Linux port history to public GitHub.
+
+## CURRENT QUESTJOURNAL FINDING
+
+The current inherited `QuestJournal.cs` architecture-guard finding involving:
+
+`NpcHashType = (IdentityType)0x000111D3`
+
+is NOT part of the Linux workstream unless separately proven to be an absolute runtime blocker.
+
+If the Linux runtime source matches public master, classify this current finding as:
+
+`PUBLIC_BASELINE_ARCHITECTURE_FINDING`
+
+Record it and continue Linux reconciliation/acceptance.
+
+Do not change QuestJournal or the architecture guard during Linux porting for this finding.
+
+## ACCEPTANCE REPORTING
+
+Linux reports must clearly separate:
+
+PUBLIC_BASELINE_FAILURES
+PUBLIC_BASELINE_ARCHITECTURE_FINDINGS
+LINUX_PORT_FAILURES
+NEW_LINUX_FAILURES
+
+Deployment readiness requires:
+
+`NEW_LINUX_FAILURES=0`
+
+and no unresolved Linux-port-specific blocker.
+
+It does NOT require the Linux workstream to repair every pre-existing Windows/public-master defect.
+
 ## LINUX-SPECIFIC CHANGES
 
 Linux-specific changes are permitted ONLY when strictly necessary for:
@@ -140,7 +381,11 @@ Do NOT introduce Linux-only:
 * compatibility fallbacks that change gameplay
 * hard-coded game content
 
-If public master is wrong, STOP and fix public master first.
+If public master has an inherited defect, apply the LINUX ACCEPTANCE BASELINE RULE.
+Record proven public baseline findings and continue a faithful Linux port. Only
+an ABSOLUTE BLOCKER under WHEN LINUX MAY TOUCH PUBLIC WINDOWS CODE justifies
+public-side remediation by the Linux workstream. Never introduce Linux-only
+product fixes.
 
 ## RECONCILIATION RULE
 
@@ -179,12 +424,12 @@ public Windows/master implementation
 → fetch exact public master SHA
 → reconcile/port that source to Linux
 → Linux build/test
-→ Linux package validation
 → push validated Linux port commits to PRIVATE Linux Git
+→ Linux package construction/validation
 → deployment approval
 → Linux deployment
 
-Never reverse this sequence.
+Never reverse this sequence. Deployment requires Mike's explicit authorization.
 
 The Linux private repository must preserve traceability to the exact public-master SHA it was derived from.
 
@@ -228,6 +473,8 @@ Only authoritative public master is eligible unless Mike explicitly authorizes a
 
 The currently paused mission typed-content branch must NOT be included in Linux until it is merged to public master.
 
+Keep `operations` history separate; do not merge it into the Linux port.
+
 ## TERMINOLOGY
 
 Use "Linux" for the AORebirth Linux backend/build.
@@ -239,7 +486,7 @@ Do not substitute "Unix" when referring to this project.
 STOP and report rather than improvising when:
 
 * Linux requires a gameplay/runtime semantic change
-* public master does not compile because of a product defect
+* an ABSOLUTE BLOCKER is proven under WHEN LINUX MAY TOUCH PUBLIC WINDOWS CODE
 * Linux differs from public master for an unexplained reason
 * required private GameData is missing
 * a Linux-only workaround would change behavior
@@ -257,7 +504,7 @@ Public GitHub `master` is authoritative for AORebirth product/runtime behavior, 
 
 The required relationship is:
 
-`public Windows/master -> fetch exact authoritative SHA -> port/reconcile to Linux -> validate Linux build/package -> push Linux result to PRIVATE Linux Git -> deployment`
+`public Windows/master -> fetch exact authoritative SHA -> port/reconcile to Linux -> validate Linux -> push Linux result to PRIVATE Linux Git -> package/validate -> deployment approval -> deployment`
 
 Rules:
 
@@ -303,11 +550,16 @@ It is NOT the authority for independent gameplay/runtime development.
 
 If Linux porting reveals a gameplay, runtime, protocol, persistence, DAO, content, combat, NPC, mission, item, nano, world, authentication, or other product defect:
 
-STOP the Linux-only fix.
+Do not implement a Linux-only product fix. Classify and record the finding under
+the LINUX ACCEPTANCE BASELINE RULE. Ordinary public-side remediation belongs to
+Delmus and the Windows developers; continue Linux work when a faithful port is
+possible.
 
-Fix the product behavior on public Windows/master first.
+Only a proven ABSOLUTE BLOCKER permits the Linux workstream to make the smallest
+platform-neutral public fix, following WHEN LINUX MAY TOUCH PUBLIC WINDOWS CODE.
+Any product fix must still be accepted on public Windows/master first.
 
-Then:
+After the Windows developers or the authorized absolute-blocker work complete it:
 
 public master fix/validation/push
 → fetch new exact public master SHA
