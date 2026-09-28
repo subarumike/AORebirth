@@ -23,17 +23,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
     {
         private readonly IInventoryRepository _inventoryRepository;
         private readonly IItemBuilder _items;
-        private readonly GeneratedMissionAcgService _missions;
         private readonly AuthoredQuestService _quests;
+        private readonly Quests.Dungeons.QuestDungeonService? _dungeons;
 
-        public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items, GeneratedMissionAcgService missions,
-            AuthoredQuestService quests)
+        public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items,
+            AuthoredQuestService quests, Quests.Dungeons.QuestDungeonService? dungeons = null)
         {
+            _dungeons = dungeons;
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
             _inventoryRepository = inventoryRepository;
             _items = items;
-            _missions = missions ?? throw new ArgumentNullException(nameof(missions));
             _quests = quests ?? throw new ArgumentNullException(nameof(quests));
         }
 
@@ -123,7 +123,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                             Deny(session, message, player, "accepted Strongbox item/target is not eligible");
                     }
                     else if (message.Target is { Length: >= 2 }
-                        && _missions.TryUseItemOnTarget(player, message.Target[0], message.Target[1]))
+                        && _dungeons?.TryDuplicate(player, message.Target[0], message.Target[1]) == true)
                         Acknowledge(session, message, message.Target[1]);
                     else if (message.Target is { Length: >= 2 }
                         && TryUseItemOnItem(player, playfield, message.Target[0], message.Target[1]))
@@ -272,11 +272,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (_missions.TryHandleCorpseUse(player, target,
-                corpse => Acknowledge(session, message, corpse, corpseUse: true),
-                () => Deny(session, message, player, "generated mission corpse is not eligible")))
-                return;
-
             if (playfield.GetRequiredService<QuestPropService>().ClaimsUseTarget(target))
             {
                 if (!playfield.GetRequiredService<QuestPropService>().TryUseProp(session, target,
@@ -285,10 +280,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (_missions.ClaimsExteriorMarker(player))
+            // A carried mission key for a quest dungeon behind this entrance takes the use.
+            if (_dungeons?.TryEnter(player, target) == true)
             {
-                if (_missions.TryEnterExterior(player, target)) Acknowledge(session, message, target);
-                else Deny(session, message, player, "generated mission entrance is not eligible");
+                Acknowledge(session, message, target);
                 return;
             }
 

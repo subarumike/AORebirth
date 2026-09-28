@@ -1,0 +1,67 @@
+{
+  "_comment": "Entrance rooms per ACG style and the door of each that is the dungeon's way in (index into the room's Rooms.json doorConnections). Nothing in the client or style data marks it: the client treats whichever door is left unpaired as the exit, and the entrance room is modelled with a plug filling that doorway, so it must face outside; placed any other way, the plug seals the way into the dungeon. Only rooms listed here are used as generated dungeon entrances. MainHalls: the style's main hall rooms (the *_mh* rooms); the first room past the entrance is always one of them. Source: 'geometry' = the only doorway the room's collision surfaces plug; 'live' = the unpaired door in a captured live layout. Not yet mapped (no single plug and no live layout): 320, 322, 362, 382, 386, 331 tarm_entrance1, and the other 341/351 entrances.",
+  "Styles": [
+    {
+      "Style": 320,
+      "Entrances": [],
+      "MainHalls": [73, 74, 75, 76, 77, 78, 79, 80]
+    },
+    {
+      "Style": 321,
+      "Entrances": [
+        {"Room": 50, "Name": "office_research_entrance", "ExitDoor": 0, "Source": "geometry"},
+        {"Room": 51, "Name": "production_factory_entrance", "ExitDoor": 0, "Source": "geometry"},
+        {"Room": 52, "Name": "living_ot_entrance", "ExitDoor": 0, "Source": "geometry, live"}
+      ],
+      "MainHalls": [61, 62, 63, 64, 65, 66, 67, 68]
+    },
+    {
+      "Style": 324,
+      "Entrances": [
+        {"Room": 34, "Name": "clanvillage_entrance", "ExitDoor": 0, "Source": "geometry"},
+        {"Room": 35, "Name": "clanstronghold_entrance", "ExitDoor": 0, "Source": "geometry, live"},
+        {"Room": 43, "Name": "militaryc_entrance", "ExitDoor": 0, "Source": "geometry"}
+      ],
+      "MainHalls": [47, 48, 49, 50, 51, 52, 53, 54]
+    },
+    {
+      "Style": 331,
+      "Entrances": [
+        {"Room": 1, "Name": "tarm_entrance2", "ExitDoor": 1, "Source": "geometry"},
+        {"Room": 2, "Name": "tarm_entrance3", "ExitDoor": 1, "Source": "geometry"}
+      ],
+      "MainHalls": []
+    },
+    {
+      "Style": 341,
+      "Entrances": [
+        {"Room": 19, "Name": "Mine_Entrance_Small_10", "ExitDoor": 1, "Source": "live"},
+        {"Room": 20, "Name": "Mine_Entrance_Small_11", "ExitDoor": 1, "Source": "live"},
+        {"Room": 64, "Name": "WildCave_Entrance_Small_03", "ExitDoor": 1, "Source": "live"}
+      ],
+      "MainHalls": [96, 97, 98, 99, 100, 101, 102]
+    },
+    {
+      "Style": 351,
+      "Entrances": [
+        {"Room": 68, "Name": "Subway_Ent_3", "ExitDoor": 0, "Source": "live"}
+      ],
+      "MainHalls": [73, 74, 75, 76, 77, 78, 79, 80]
+    },
+    {
+      "Style": 362,
+      "Entrances": [],
+      "MainHalls": [0, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    },
+    {
+      "Style": 382,
+      "Entrances": [],
+      "MainHalls": [0, 5, 6]
+    },
+    {
+      "Style": 386,
+      "Entrances": [],
+      "MainHalls": [0, 1, 2, 3, 4, 5, 6, 7]
+    }
+  ]
+}

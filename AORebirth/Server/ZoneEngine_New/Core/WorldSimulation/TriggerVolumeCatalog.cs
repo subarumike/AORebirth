@@ -23,7 +23,19 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// A dynel whose OnTargetInVicinity spells run when a character steps into its radius.
         /// Grid line-teleport pads use this instead of a walk-in door portal.
         /// </summary>
-        TargetVicinity = 4
+        TargetVicinity = 4,
+
+        /// <summary>
+        /// A MissionEntrance (0xDAC6) doorway into ACG quest dungeons. Walking in hands the character to the quest
+        /// dungeon service, which enters them only when a mission key they carry opens a dungeon behind it.
+        /// </summary>
+        MissionEntrance = 5,
+
+        /// <summary>
+        /// A quest dungeon's exit door. Walking into it returns the character outside the ACG entrance the dungeon
+        /// was entered from (<see cref="ZoneTriggerVolume.Landing"/> on <see cref="ZoneTriggerVolume.DestPlayfieldId"/>).
+        /// </summary>
+        DungeonExit = 6
     }
 
     public sealed class ZoneTriggerVolume
@@ -57,6 +69,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public float CenterY;
         public float CenterZ;
         public float Radius = TriggerVolumeCatalog.PortalRadius;
+
+        /// <summary>Fixed landing for a <see cref="ZoneTriggerKind.DungeonExit"/>.</summary>
+        public Vector3? Landing;
+
+        public AORebirth.Core.Vector.Quaternion? LandingHeading;
 
         /// <summary>OnTargetInVicinity spells for a <see cref="ZoneTriggerKind.TargetVicinity"/> pad.</summary>
         public Inventory.ItemTemplate? VicinityEvents;
@@ -102,6 +119,12 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// Radius of an OnTargetInVicinity pad when the placement has no VicinityRange.
         /// </summary>
         public const float TargetVicinityRadius = 1f;
+
+        /// <summary>
+        /// Radius of a mission entrance trigger (units). A little wider than a portal door: the entrance dynel marks
+        /// the building's doorway, which characters approach from anywhere across its width.
+        /// </summary>
+        public const float MissionEntranceRadius = 1.5f;
 
         readonly List<ZoneTriggerVolume> _all = new();
         readonly Dictionary<long, List<ZoneTriggerVolume>> _bins = new();
@@ -263,7 +286,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 return true;
             }
 
-            if (v.Kind is ZoneTriggerKind.PortalDynel or ZoneTriggerKind.ExitProxy or ZoneTriggerKind.TargetVicinity)
+            if (v.Kind is ZoneTriggerKind.PortalDynel or ZoneTriggerKind.ExitProxy or ZoneTriggerKind.TargetVicinity
+                or ZoneTriggerKind.MissionEntrance or ZoneTriggerKind.DungeonExit)
             {
                 if (MathF.Abs(y - v.CenterY) > HalfHeight(v))
                     return false;

@@ -31,13 +31,16 @@ namespace ZoneEngine_New.Core.DebugMcp
         readonly IPlayfieldMetricsRegistry _metrics;
         readonly GeneratedMissionService _missions;
         readonly DebugMcpEndpoint _endpoint;
+        readonly Quests.Dungeons.QuestDungeonService? _dungeons;
 
         public ZoneDebugTools(
             PlayfieldManager playfields,
             IPlayfieldMetricsRegistry metrics,
             GeneratedMissionService missions,
-            DebugMcpEndpoint endpoint)
+            DebugMcpEndpoint endpoint,
+            Quests.Dungeons.QuestDungeonService? dungeons = null)
         {
+            _dungeons = dungeons;
             ArgumentNullException.ThrowIfNull(playfields);
             ArgumentNullException.ThrowIfNull(metrics);
             ArgumentNullException.ThrowIfNull(missions);
@@ -64,7 +67,7 @@ namespace ZoneEngine_New.Core.DebugMcp
         }
 
         [McpServerTool(Name = "list_playfields")]
-        [System.ComponentModel.Description("Loaded playfields. Each row is id, ordinary or mission, player count, and dynel count. Capped.")]
+        [System.ComponentModel.Description("Loaded playfields. Each row is id, ordinary or quest-dungeon, player count, and dynel count. Capped.")]
         public string ListPlayfields()
         {
             IReadOnlyList<Playfield> playfields = _playfields.SnapshotPlayfields();
@@ -82,7 +85,7 @@ namespace ZoneEngine_New.Core.DebugMcp
                 rows.Add(new
                 {
                     id = playfield.Identity.Instance,
-                    kind = playfield is MissionPlayfield ? "mission" : "ordinary",
+                    kind = playfield is QuestDungeonPlayfield ? "quest-dungeon" : "ordinary",
                     players,
                     dynels
                 });
@@ -113,13 +116,13 @@ namespace ZoneEngine_New.Core.DebugMcp
         }
 
         [McpServerTool(Name = "get_player")]
-        [System.ComponentModel.Description("One online player by characterId or name. Includes position, heading, target, fight target, profession, breed, vitals, active nanos, and accepted mission bindings.")]
+        [System.ComponentModel.Description("One online player by characterId or name. Includes position, heading, target, fight target, profession, breed, vitals, active nanos, and open mission terminal offers.")]
         public string GetPlayer(int characterId = 0, string name = "")
         {
             if (!TryFindPlayer(characterId, name, out Player? player, out string? error))
                 return Error(error!);
             PlayerView view = ZoneDebugSnapshots.ProjectPlayer(player!);
-            object missions = ReadMissions(player!, includeOffers: false);
+            object missions = ReadMissions(player!);
             var nanos = new List<object>();
             foreach (Buff buff in player!.Buffs)
             {
@@ -278,12 +281,81 @@ namespace ZoneEngine_New.Core.DebugMcp
         }
 
         [McpServerTool(Name = "list_missions")]
-        [System.ComponentModel.Description("One online player's generated mission offers and accepted bindings. Read-only. Capped.")]
+        [System.ComponentModel.Description("One online player's open mission terminal offers (accepted missions are quests: see get_quests). Read-only. Capped.")]
         public string ListMissions(int characterId = 0, string name = "")
         {
             if (!TryFindPlayer(characterId, name, out Player? player, out string? error))
                 return Error(error!);
-            return Json(ReadMissions(player!, includeOffers: true));
+            return Json(ReadMissions(player!));
+        }
+
+        [McpServerTool(Name = "get_quests")]
+        [System.ComponentModel.Description("One online player's quest log (loaded quests only): id, name, action, state, progress, expiry, and for dungeon quests the stored seed, entrance and dungeon playfield and whether that dungeon is live. Read-only.")]
+        public string GetQuests(int characterId = 0, string name = "")
+        {
+            if (!TryFindPlayer(characterId, name, out Player? player, out string? error))
+                return Error(error!);
+
+            Quests.QuestLog? log = player!.QuestLog;
+            var rows = new List<object>();
+            foreach (Quests.PlayerQuest quest in log?.Quests.Values.ToArray() ?? [])
+            {
+                object? dungeon = null;
+                if (Quests.Dungeons.QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out Quests.Dungeons.QuestDungeonParameters parameters))
+                    dungeon = new
+                    {
+                        parameters.Seed,
+                        parameters.GeneratorVersion,
+                        parameters.DungeonPlayfield,
+                        parameters.EntranceInstance,
+                        parameters.EntrancePlayfield,
+                        parameters.EntranceName,
+                        entrance = new[] { parameters.EntranceX, parameters.EntranceY, parameters.EntranceZ },
+                        parameters.MissionType,
+                        live = _playfields.TryGetQuestDungeon(parameters.DungeonPlayfield, out _)
+                    };
+
+                rows.Add(new
+                {
+                    questId = quest.QuestId,
+                    name = quest.Template.Name,
+                    action = quest.Template.Action,
+                    state = quest.State.ToString(),
+                    progress = quest.Progress,
+                    required = quest.RequiredCount,
+                    expiresUtc = quest.ExpiresAtUtc?.ToString("o", CultureInfo.InvariantCulture),
+                    journalInstance = Quests.QuestJournal.JournalInstance(quest.QuestId),
+                    dungeon
+                });
+            }
+
+            return Json(new
+            {
+                characterId = player.Identity.Instance,
+                name = ZoneDebugSnapshots.DisplayName(player),
+                loaded = log != null,
+                count = rows.Count,
+                quests = rows
+            });
+        }
+
+        [McpServerTool(Name = "get_mission_keys")]
+        [System.ComponentModel.Description("One online player's mission keys and duplicators on their pages (and bank when opened): page, slot, item instance and wire identity, and the quest each key's stored link opens. Read-only; one database read.")]
+        public string GetMissionKeys(int characterId = 0, string name = "")
+        {
+            if (!TryFindPlayer(characterId, name, out Player? player, out string? error))
+                return Error(error!);
+            if (_dungeons == null)
+                return Error("Quest dungeons are not enabled.");
+
+            IReadOnlyList<object> keys = _dungeons.DescribeKeys(player!);
+            return Json(new
+            {
+                characterId = player!.Identity.Instance,
+                name = ZoneDebugSnapshots.DisplayName(player),
+                count = keys.Count,
+                keys
+            });
         }
 
         [McpServerTool(Name = "playfield_metrics")]
@@ -387,33 +459,13 @@ namespace ZoneEngine_New.Core.DebugMcp
             return true;
         }
 
-        object ReadMissions(Player player, bool includeOffers)
+        object ReadMissions(Player player)
         {
             try
             {
-                IReadOnlyList<GeneratedMissionBinding> accepted = _missions.ReadAccepted(player);
-                var bindings = new List<object>();
-                bool truncated = accepted.Count > ZoneDebugSnapshots.MaxMissions;
-                int bindingCount = Math.Min(accepted.Count, ZoneDebugSnapshots.MaxMissions);
-                for (int i = 0; i < bindingCount; i++)
-                    bindings.Add(ProjectBinding(accepted[i]));
-
-                if (!includeOffers)
-                {
-                    return new
-                    {
-                        characterId = player.Identity.Instance,
-                        accepted = bindings,
-                        truncated
-                    };
-                }
-
                 IReadOnlyList<GeneratedMissionOffer> offers = _missions.ReadOffers(player);
                 var offerRows = new List<object>();
-                if (offers.Count > ZoneDebugSnapshots.MaxMissions)
-                {
-                    truncated = true;
-                }
+                bool truncated = offers.Count > ZoneDebugSnapshots.MaxMissions;
                 int offerCount = Math.Min(offers.Count, ZoneDebugSnapshots.MaxMissions);
                 for (int i = 0; i < offerCount; i++)
                     offerRows.Add(ProjectOffer(offers[i]));
@@ -422,7 +474,6 @@ namespace ZoneEngine_New.Core.DebugMcp
                     characterId = player.Identity.Instance,
                     name = ZoneDebugSnapshots.DisplayName(player),
                     offers = offerRows,
-                    accepted = bindings,
                     truncated
                 };
             }
@@ -449,21 +500,6 @@ namespace ZoneEngine_New.Core.DebugMcp
                 offer.OfferInstance,
                 offer.DestinationPlayfield,
                 expiresUtc = Utc(offer.ExpiresAtUtcTicks)
-            };
-        }
-
-        static object ProjectBinding(GeneratedMissionBinding binding)
-        {
-            return new
-            {
-                title = binding.Offer == null ? null : binding.Offer.Title,
-                state = binding.State.ToString(),
-                binding.Progress,
-                binding.RequiredCount,
-                binding.LivePlayfield,
-                binding.QuestType,
-                binding.QuestInstance,
-                expiresUtc = Utc(binding.ExpiresAtUtcTicks)
             };
         }
 

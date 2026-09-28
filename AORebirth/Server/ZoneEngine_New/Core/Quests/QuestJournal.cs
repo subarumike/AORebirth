@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.Quests
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Missions;
 
     /// <summary>
     /// Client journal entries for Quests.json quests, laid out like the retail Rubi-Ka tutorial chain
@@ -40,9 +41,6 @@ namespace ZoneEngine_New.Core.Quests
         /// captured authored quests use, with the low 24 bits hashed from the quest id.
         /// </summary>
         const int InstancePrefix = 0x5A000000;
-
-        /// <summary>Identity type retail puts on NPC hash references (0x111D3).</summary>
-        const IdentityType NpcHashType = (IdentityType)0x000111D3;
 
         /// <summary>Icon for quests with no captured retail action (the captured Arete talk quest's icon).</summary>
         const int DefaultIconId = 244818;
@@ -108,6 +106,12 @@ namespace ZoneEngine_New.Core.Quests
             int journalInstance = JournalInstance(quest.QuestId);
             Layouts.TryGetValue(template.Action, out ActionLayout? layout);
 
+            // Dungeon quests (accepted terminal missions): the terminal's icon, and an action whatever the objective,
+            // because the action carries the waypoint to the dungeon entrance.
+            bool isDungeon = Dungeons.QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out Dungeons.QuestDungeonParameters dungeon);
+            if (isDungeon)
+                layout ??= new ActionLayout(DungeonActionVersion(dungeon.MissionType), DefaultIconId, 0xD2FC, TargetInSlot3: false);
+
             // Retail's per-quest slot pair: the action's UnknownId7 instance and UnknownArray1's entry share their low
             // 27 bits. Their meaning is unknown; any stable value per quest is sent.
             int slot = 0x04000000 | (journalInstance & 0x00FFFFFF);
@@ -136,10 +140,10 @@ namespace ZoneEngine_New.Core.Quests
                 UnknownHash1 = reward?.Hash ?? string.Empty,
                 Unknown14 = 220,
                 UnknownId2 = Copy(player.Identity),
-                MissionIconId = layout?.IconId ?? DefaultIconId,
+                MissionIconId = isDungeon && dungeon.MissionIconId > 0 ? dungeon.MissionIconId : layout?.IconId ?? DefaultIconId,
                 Unknown20 = 7200,
                 Unknown21 = 7200,
-                QuestActions = layout == null ? [] : [Action(layout, template, quest, slot)],
+                QuestActions = layout == null ? [] : [Action(player, layout, template, quest, slot, isDungeon ? dungeon : null)],
                 PlayerIds = [Copy(player.Identity)],
                 UnknownArray1 = [slot],
                 UnknownArray2 = [],
@@ -164,34 +168,67 @@ namespace ZoneEngine_New.Core.Quests
             };
         }
 
-        static QuestActionInfo Action(ActionLayout layout, QuestTemplate template, PlayerQuest quest, int slot)
+        /// <summary>Quest action version the generated-mission journal used per terminal roll type.</summary>
+        static int DungeonActionVersion(int missionType) => missionType switch { 2 => 15, 4 => 8, _ => 16 };
+
+        static QuestActionInfo Action(Player player, ActionLayout layout, QuestTemplate template, PlayerQuest quest, int slot,
+            Dungeons.QuestDungeonParameters? dungeon)
         {
             int target = FourCc(template.Objective.Npc);
             DateTime expires = quest.ExpiresAtUtc ?? quest.AssignedAtUtc + DisplayedLifetime;
-            uint expiresUnix = (uint)Math.Max(0, new DateTimeOffset(DateTime.SpecifyKind(expires, DateTimeKind.Utc)).ToUnixTimeSeconds());
+            uint expiresOnClient = ClientExpiry(player, DateTime.SpecifyKind(expires, DateTimeKind.Utc), DateTime.UtcNow);
 
             return new QuestActionInfo
             {
                 Version = layout.Version,
                 Action = new Identity(),
                 UnknownId1 = new Identity(),
-                UnknownId2 = layout.TargetInSlot3 ? new Identity() : new Identity { Type = NpcHashType, Instance = target },
+                UnknownId2 = layout.TargetInSlot3 ? new Identity() : new Identity { Type = IdentityType.NpcHash, Instance = target },
                 UnknownId3 = layout.TargetInSlot3 ? new Identity { Type = 0, Instance = target } : new Identity(),
                 UnknownId4 = new Identity(),
                 UnknownId5 = new Identity(),
                 UnknownId6 = new Identity(),
                 // Retail's four bytes here are the big-endian Unix time the quest expires.
-                UnknownHash1 = BigEndianChars(expiresUnix),
+                UnknownHash1 = BigEndianChars(expiresOnClient),
                 UnknownId7 = new Identity { Type = (IdentityType)layout.SlotType, Instance = 0x18000000 | slot },
-                PlayfieldId = new Identity()
+                // Waypoint: the dungeon entrance's playfield and position, with the entrance building's template pair.
+                PlayfieldId = dungeon == null
+                    ? new Identity()
+                    : new Identity { Type = (IdentityType)dungeon.DestinationType, Instance = dungeon.EntrancePlayfield },
+                Unknown10 = dungeon?.BuildingLowId ?? 0,
+                Unknown11 = dungeon?.BuildingHighId ?? 0,
+                Position = dungeon == null
+                    ? null
+                    : new SmokeLounge.AOtomation.Messaging.GameData.Vector3(dungeon.EntranceX, dungeon.EntranceY, dungeon.EntranceZ)
             };
+        }
+
+        /// <summary>
+        /// The expiry in the client's clock, which the journal counts "time left" against. Our GameTime starts that
+        /// clock at ClientClockBaseSeconds when the session's clock was synchronized (at world entry), so the
+        /// client's now is base + seconds since then; the expiry is that plus the quest's remaining seconds.
+        /// A Unix time here showed as thousands of days left.
+        /// </summary>
+        static uint ClientExpiry(Player player, DateTime expiresUtc, DateTime nowUtc)
+        {
+            if (expiresUtc <= nowUtc)
+                return 0;
+
+            DateTime synchronized = player.Session is Network.IGameTimeSession { GameTimeSynchronizedAtUtc: DateTime at } ? at : nowUtc;
+            long clientNow = MissionRollPolicy.Current.ClientClockBaseSeconds + (long)Math.Max(0, (nowUtc - synchronized).TotalSeconds);
+            long expires = clientNow + (long)Math.Ceiling((expiresUtc - nowUtc).TotalSeconds);
+            return (uint)Math.Min(expires, int.MaxValue);
         }
 
         static string LongInfo(QuestTemplate template)
         {
             var text = new StringBuilder(template.Name);
             if (!string.IsNullOrEmpty(template.Summary))
-                text.Append("<BR><BR>").Append(Capitalize(template.Summary)).Append('.');
+            {
+                text.Append("<BR><BR>").Append(Capitalize(template.Summary));
+                if (!template.Summary.EndsWith('.') && !template.Summary.EndsWith('!') && !template.Summary.EndsWith('?'))
+                    text.Append('.');
+            }
             return text.ToString();
         }
 

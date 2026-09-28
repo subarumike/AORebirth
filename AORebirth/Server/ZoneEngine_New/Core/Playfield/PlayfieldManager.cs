@@ -34,7 +34,9 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly Lock _sync = new();
         private readonly Dictionary<int, Playfield> _playfields = new();
         private readonly Dictionary<int, Player> _playersByCharacterId = new();
-        private readonly HashSet<int> _failedMissionReleases = new();
+
+        /// <summary>When each quest dungeon was first seen empty (UTC ticks); absent while occupied or just requested.</summary>
+        private readonly Dictionary<int, long> _dungeonEmptySince = new();
         private readonly IZoneLogger _logger;
         private readonly IMessageRouter _router;
         private readonly PlayerHydrator _playerHydrator;
@@ -66,13 +68,14 @@ namespace ZoneEngine_New.Core.Playfield
             CharacterSnapshotService characterSnapshot,
             IPlayfieldMetricsRegistry metricsRegistry,
             TeamService teams,
-            GeneratedMissionAcgService missions,
             AuthoredQuestService authoredQuests,
             DialogueService dialogues,
             IItemTemplateCatalog itemTemplates,
             IShopDao shopDao,
-            Quests.QuestService? quests = null)
+            Quests.QuestService? quests = null,
+            ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService? questDungeons = null)
         {
+            QuestDungeons = questDungeons;
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
             ArgumentNullException.ThrowIfNull(playerHydrator);
@@ -103,7 +106,6 @@ namespace ZoneEngine_New.Core.Playfield
             _metricsRegistry = metricsRegistry;
             _shopDao = shopDao;
             Teams = teams ?? throw new ArgumentNullException(nameof(teams));
-            Missions = missions ?? throw new ArgumentNullException(nameof(missions));
             AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
             Dialogues = dialogues ?? throw new ArgumentNullException(nameof(dialogues));
             ItemTemplates = itemTemplates ?? throw new ArgumentNullException(nameof(itemTemplates));
@@ -111,7 +113,6 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         public TeamService Teams { get; }
-        public GeneratedMissionAcgService Missions { get; }
         public AuthoredQuestService AuthoredQuests { get; }
         public DialogueService Dialogues { get; }
         public IItemTemplateCatalog ItemTemplates { get; }
@@ -119,40 +120,8 @@ namespace ZoneEngine_New.Core.Playfield
         /// <summary>Root quest service, forwarded into every playfield container.</summary>
         public Quests.QuestService? Quests { get; }
 
-        /// <summary>Releases only the exact ended, empty mission lease; never an ordinary playfield.</summary>
-        public bool TryReleaseMission(GeneratedMissionBinding binding)
-        {
-            ArgumentNullException.ThrowIfNull(binding);
-            if (binding.State == GeneratedMissionState.Active || binding.OwnerId <= 0) return false;
-            MissionPlayfield? released;
-            lock (_sync)
-            {
-                if (_disposed) return false;
-                if (_failedMissionReleases.Contains(binding.LivePlayfield)) return false;
-                if (!_playfields.TryGetValue(binding.LivePlayfield, out var existing)) return true;
-                if (existing is not MissionPlayfield mission) return false;
-                var world = mission.World;
-                if (world.OwnerId != binding.OwnerId || world.QuestType != binding.QuestType
-                    || world.QuestInstance != binding.QuestInstance || world.BundleId != binding.BundleId
-                    || world.BundleSha256 != binding.BundleSha256 || world.LivePlayfield != binding.LivePlayfield
-                    || world.BuildingType != binding.BuildingType || world.BuildingInstance != binding.BuildingInstance)
-                    return false;
-                if (mission.GetRequiredService<DynelRegistry>().PlayerEntities().Any()
-                    || _playersByCharacterId.Values.Any(player => ReferenceEquals(player.Playfield, mission))) return false;
-                _playfields.Remove(binding.LivePlayfield);
-                released = mission;
-            }
-            // Callers are on the exterior owner's tick, never this world's heartbeat.
-            // Do not join/dispose a heartbeat while holding the manager lock.
-            try { released.Dispose(); }
-            catch (Exception exception)
-            {
-                lock (_sync) _failedMissionReleases.Add(binding.LivePlayfield);
-                _logger.Error(exception, "Mission world disposal failed; release checkpoint remains pending until restart.");
-                return false;
-            }
-            return true;
-        }
+        /// <summary>Root quest dungeon service, forwarded into every playfield container.</summary>
+        public ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService? QuestDungeons { get; }
 
         public static TimeSpan ResolveLinkDeadTimeout()
         {
@@ -168,11 +137,14 @@ namespace ZoneEngine_New.Core.Playfield
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playfieldId);
 
-            // SQL-leased mission instances require their exact accepted binding;
-            // an unknown lease must never become an ordinary empty RDB playfield.
+            // Retired mission world ids (the old SQL-leased instances) must never become ordinary empty RDB playfields.
             if (playfieldId >= GeneratedMissionIdentitySpace.MinimumLivePlayfield2
                 && playfieldId <= GeneratedMissionIdentitySpace.MaximumLivePlayfield2)
-                throw new InvalidOperationException("A generated mission playfield requires its owned accepted world binding.");
+                throw new InvalidOperationException("A retired mission world id cannot become an ordinary playfield.");
+
+            // A quest dungeon id must never become an ordinary empty playfield (login, teleport or a crafted route).
+            if (ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonIds.IsDungeonPlayfield(playfieldId))
+                throw new InvalidOperationException("A quest dungeon playfield requires its quest's generated layout.");
 
             lock (_sync)
             {
@@ -285,21 +257,32 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
-        public MissionPlayfield GetOrCreateMission(GeneratedMissionWorld world)
+        /// <summary>
+        /// The live dungeon for <paramref name="questId"/>, built from <paramref name="layout"/> when none exists.
+        /// Requesting it restarts its empty timer, so a dungeon cannot be released under a player who is entering.
+        /// </summary>
+        public QuestDungeonPlayfield GetOrCreateQuestDungeon(int playfieldId, string questId,
+            ZoneEngine_New.Core.Quests.Dungeons.DungeonLayout layout, ZoneEngine_New.Core.Quests.Dungeons.MissionEntrance entrance,
+            string? targetHash = null)
         {
-            ArgumentNullException.ThrowIfNull(world);
-            if (world.LivePlayfield < GeneratedMissionIdentitySpace.MinimumLivePlayfield2
-                || world.LivePlayfield > GeneratedMissionIdentitySpace.MaximumLivePlayfield2)
-                throw new ArgumentOutOfRangeException(nameof(world), "Mission live identity is outside its governed SQL lease namespace.");
+            ArgumentNullException.ThrowIfNull(questId);
+            ArgumentNullException.ThrowIfNull(layout);
+            ArgumentNullException.ThrowIfNull(entrance);
+            if (!ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonIds.IsDungeonPlayfield(playfieldId))
+                throw new ArgumentOutOfRangeException(nameof(playfieldId), "Not a quest dungeon id.");
+
             lock (_sync)
             {
                 ObjectDisposedException.ThrowIf(_disposed, this);
-                if (_playfields.TryGetValue(world.LivePlayfield, out var existing))
-                    return RequireMissionWorld(existing, world);
+                if (_playfields.TryGetValue(playfieldId, out var existing))
+                {
+                    _dungeonEmptySince.Remove(playfieldId);
+                    return RequireQuestDungeon(existing, questId);
+                }
             }
 
-            MissionPlayfield created = new(world, _logger.CreateForPlayfield(world.LivePlayfield), _router,
-                this, _playerHydrator, _gameData, _items, _hashItems, _inventoryRepository, _instanceIds,
+            QuestDungeonPlayfield created = new(playfieldId, questId, layout, entrance, targetHash, _logger.CreateForPlayfield(playfieldId),
+                _router, this, _playerHydrator, _gameData, _items, _hashItems, _inventoryRepository, _instanceIds,
                 _inventoryMoves, _inventoryFlush, _trades, _characterSnapshot, _metricsRegistry, _shopDao);
             try
             {
@@ -307,13 +290,16 @@ namespace ZoneEngine_New.Core.Playfield
                 lock (_sync)
                 {
                     ObjectDisposedException.ThrowIf(_disposed, this);
-                    if (_playfields.TryGetValue(world.LivePlayfield, out var raced))
+                    if (_playfields.TryGetValue(playfieldId, out var raced))
                     {
-                        MissionPlayfield winner = RequireMissionWorld(raced, world);
+                        QuestDungeonPlayfield winner = RequireQuestDungeon(raced, questId);
+                        _dungeonEmptySince.Remove(playfieldId);
                         created.Dispose();
                         return winner;
                     }
-                    _playfields.Add(world.LivePlayfield, created);
+
+                    _playfields.Add(playfieldId, created);
+                    _dungeonEmptySince.Remove(playfieldId);
                 }
             }
             catch
@@ -321,15 +307,114 @@ namespace ZoneEngine_New.Core.Playfield
                 created.Dispose();
                 throw;
             }
+
             created.StartHeartbeat();
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest dungeon created playfield={0} quest={1}", playfieldId, questId));
             return created;
         }
 
-        private static MissionPlayfield RequireMissionWorld(Playfield candidate, GeneratedMissionWorld world)
+        public bool TryGetQuestDungeon(int playfieldId, out QuestDungeonPlayfield dungeon)
         {
-            if (candidate is not MissionPlayfield mission || !mission.World.Matches(world))
-                throw new InvalidOperationException("Mission live identity is already owned by a different immutable world binding.");
-            return mission;
+            lock (_sync)
+            {
+                dungeon = (_playfields.TryGetValue(playfieldId, out var existing) ? existing as QuestDungeonPlayfield : null)!;
+                return dungeon != null;
+            }
+        }
+
+        /// <summary>
+        /// Releases quest dungeons that have had nobody in them for <paramref name="emptyLifetime"/>. A player still
+        /// linked to the dungeon (in it, transferring, or link-dead) keeps it alive. Run off every playfield tick.
+        /// </summary>
+        public void SweepQuestDungeons(DateTime nowUtc, TimeSpan emptyLifetime)
+        {
+            var released = new List<QuestDungeonPlayfield>();
+            lock (_sync)
+            {
+                if (_disposed) return;
+                // One pass over players, not one per dungeon.
+                var withPlayers = new HashSet<Playfield>(ReferenceEqualityComparer.Instance);
+                foreach (Player player in _playersByCharacterId.Values)
+                    if (player.Playfield is Playfield current) withPlayers.Add(current);
+
+                foreach (Playfield playfield in _playfields.Values)
+                {
+                    if (playfield is not QuestDungeonPlayfield dungeon) continue;
+                    int id = dungeon.Identity.Instance;
+                    if (withPlayers.Contains(dungeon) || dungeon.GetRequiredService<DynelRegistry>().PlayerEntities().Any())
+                    {
+                        _dungeonEmptySince.Remove(id);
+                        continue;
+                    }
+
+                    if (!_dungeonEmptySince.TryGetValue(id, out long since))
+                    {
+                        _dungeonEmptySince[id] = nowUtc.Ticks;
+                        continue;
+                    }
+
+                    if (nowUtc.Ticks - since >= emptyLifetime.Ticks)
+                        released.Add(dungeon);
+                }
+
+                foreach (QuestDungeonPlayfield dungeon in released)
+                {
+                    _playfields.Remove(dungeon.Identity.Instance);
+                    _dungeonEmptySince.Remove(dungeon.Identity.Instance);
+                }
+            }
+
+            DisposeReleased(released);
+        }
+
+        /// <summary>Releases a quest's dungeon now if it is empty (its quest ended). False while occupied.</summary>
+        public bool TryReleaseQuestDungeon(int playfieldId, string questId)
+        {
+            QuestDungeonPlayfield? released;
+            lock (_sync)
+            {
+                if (_disposed || !_playfields.TryGetValue(playfieldId, out var existing)) return true;
+                if (existing is not QuestDungeonPlayfield dungeon || !string.Equals(dungeon.QuestId, questId, StringComparison.Ordinal)
+                    || IsOccupied(dungeon))
+                    return false;
+
+                _playfields.Remove(playfieldId);
+                _dungeonEmptySince.Remove(playfieldId);
+                released = dungeon;
+            }
+
+            DisposeReleased([released]);
+            return true;
+        }
+
+        // Caller holds _sync.
+        bool IsOccupied(Playfield playfield)
+            => playfield.GetRequiredService<DynelRegistry>().PlayerEntities().Any()
+                || _playersByCharacterId.Values.Any(player => ReferenceEquals(player.Playfield, playfield));
+
+        void DisposeReleased(List<QuestDungeonPlayfield> released)
+        {
+            // Never dispose (join a heartbeat) while holding the manager lock.
+            foreach (QuestDungeonPlayfield dungeon in released)
+            {
+                try
+                {
+                    dungeon.Dispose();
+                    _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest dungeon released playfield={0} quest={1}",
+                        dungeon.Identity.Instance, dungeon.QuestId));
+                }
+                catch (Exception exception)
+                {
+                    _logger.Error(exception, "Quest dungeon disposal failed playfield=" + dungeon.Identity.Instance);
+                }
+            }
+        }
+
+        static QuestDungeonPlayfield RequireQuestDungeon(Playfield candidate, string questId)
+        {
+            if (candidate is not QuestDungeonPlayfield dungeon || !string.Equals(dungeon.QuestId, questId, StringComparison.Ordinal))
+                throw new InvalidOperationException("Quest dungeon id is held by a different playfield.");
+            return dungeon;
         }
 
         public bool FindPlayer(int characterId, out Player player)

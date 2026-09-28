@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+    <RootNamespace>AORebirth.DungeonGenerator</RootNamespace>
+    <AssemblyName>AORebirth.DungeonGenerator</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <!-- Room templates (Rooms.json + GNDA tilemap) come from the collision library's style catalog. -->
+  <ItemGroup>
+    <ProjectReference Include="../AORebirth.World.Collision/AORebirth.World.Collision.csproj" />
+    <ProjectReference Include="$(AORebirthRepositoryRoot)/WindowsBuildNet10/Projects/SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
+  </ItemGroup>
+</Project>

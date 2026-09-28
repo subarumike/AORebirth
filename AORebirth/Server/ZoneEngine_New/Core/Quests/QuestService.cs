@@ -60,6 +60,12 @@ namespace ZoneEngine_New.Core.Quests
 
         public QuestCatalog Catalog => _catalog;
 
+        /// <summary>
+        /// A player's quest left the active state (abandoned, completed or expired), after it was saved and removed
+        /// from the journal. Raised on that player's playfield.
+        /// </summary>
+        public event Action<Player, PlayerQuest>? QuestEnded;
+
         /// <summary>The player's quests, loaded on first use. Expired generated quests are closed here.</summary>
         public QuestLog GetLog(Player player)
         {
@@ -93,6 +99,7 @@ namespace ZoneEngine_New.Core.Quests
                 QuestJournal.Delete(player, quest);
                 _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest abandoned char={0} quest={1} ({2})",
                     player.Identity.Instance, quest.QuestId, quest.Template.Name));
+                QuestEnded?.Invoke(player, quest);
                 return true;
             }
 
@@ -208,6 +215,34 @@ namespace ZoneEngine_New.Core.Quests
         }
 
         /// <summary>
+        /// Puts a generated quest that another service already stored (quest, character row and any items in one
+        /// transaction) into the player's log and journal, without writing it again.
+        /// </summary>
+        public PlayerQuest AdoptGenerated(Player player, string questId, QuestTemplate template, DateTime assignedAtUtc,
+            DateTime expiresAtUtc, string? acgJson)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(template);
+
+            var quest = new PlayerQuest
+            {
+                QuestId = questId,
+                Source = QuestSource.Generated,
+                Template = template,
+                State = QuestState.Active,
+                Progress = 0,
+                RequiredCount = template.RequiredCount,
+                AssignedAtUtc = assignedAtUtc,
+                ExpiresAtUtc = expiresAtUtc,
+                AcgBuildingGeneratorJson = acgJson
+            };
+
+            GetLog(player).Quests[questId] = quest;
+            QuestJournal.Send(player, quest, announce: true);
+            return quest;
+        }
+
+        /// <summary>
         /// Kill credit for <paramref name="npc"/>: each player's active kill quests on that NPC advance by one.
         /// The NPC matches on the hash it was spawned from (the dump's META hash) or its resolved template.
         /// </summary>
@@ -261,6 +296,7 @@ namespace ZoneEngine_New.Core.Quests
             QuestJournal.Delete(player, quest);
             ClientFeedback.Send(player, "Feedback_MissionAccomplished");
             GrantReward(player, quest.Template);
+            QuestEnded?.Invoke(player, quest);
 
             _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest completed char={0} quest={1} ({2})",
                 player.Identity.Instance, quest.QuestId, quest.Template.Name));
@@ -367,6 +403,7 @@ namespace ZoneEngine_New.Core.Quests
                 Save(player, quest);
                 QuestJournal.Delete(player, quest);
                 ClientFeedback.Send(player, "Feedback_QuestExpired");
+                QuestEnded?.Invoke(player, quest);
             }
         }
 

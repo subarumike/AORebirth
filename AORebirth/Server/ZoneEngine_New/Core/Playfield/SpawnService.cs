@@ -819,20 +819,6 @@ namespace ZoneEngine_New.Core.Playfield
         {
             try
             {
-                _playfieldManager.Missions.ReplayJournal(player);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(
-                    ex,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Mission journal restore failed character={0}; continuing with world visibility",
-                        player.Identity.Instance));
-            }
-
-            try
-            {
                 _playfieldManager.AuthoredQuests.Restore(player);
             }
             catch (Exception ex)
@@ -856,6 +842,21 @@ namespace ZoneEngine_New.Core.Playfield
                     string.Format(
                         CultureInfo.InvariantCulture,
                         "Quest restore failed character={0}; continuing with world visibility",
+                        player.Identity.Instance));
+            }
+
+            try
+            {
+                // The inventory list only carries the key template's name; each key's full name comes separately.
+                _playfield.GetService<Quests.Dungeons.QuestDungeonService>()?.RestoreKeys(player);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(
+                    ex,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Mission key restore failed character={0}; continuing with world visibility",
                         player.Identity.Instance));
             }
         }

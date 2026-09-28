@@ -579,13 +579,6 @@ namespace ZoneEngine_New.Core.Movement
             float z = message.Coordinates.Z;
 
             Playfield? playfield = _character.Playfield;
-            if (playfield is MissionPlayfield mission
-                && !mission.World.AcceptsMovement(_character, new Vector3(x, y, z)))
-                return false;
-            if (playfield is MissionPlayfield && _character is Player missionPlayer
-                && !playfield.GetRequiredService<ZoneEngine_New.Core.Missions.GeneratedMissionAcgService>()
-                    .TryPersistPlayerPosition(missionPlayer, new Vector3(x, y, z)))
-                return false;
             if (playfield != null)
             {
                 PlayfieldLocality locality = playfield.GetRequiredService<PlayfieldLocality>();
@@ -680,17 +673,7 @@ namespace ZoneEngine_New.Core.Movement
 
             HoldAltitudeOverVoid();
 
-            Vec3 previous = _sim.Position;
             _sim.Run(dt);
-
-            if (_character.Playfield is MissionPlayfield mission
-                && !mission.World.AcceptsMovement(_character, ToVector3(_sim.Position)))
-            {
-                _sim.Position = previous;
-                _sim.Halt();
-                _sim.VerticalVelocity = 0f;
-                return;
-            }
 
             _character.Position = ToVector3(_sim.Position);
             PullHeading();

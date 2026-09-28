@@ -30,14 +30,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         private readonly InventoryActionService _inventoryActions;
         private readonly TeamService _teams;
-        private readonly GeneratedMissionAcgService _missions;
 
-        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams,
-            GeneratedMissionAcgService missions)
+        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams)
         {
             _inventoryActions = inventoryActions;
             _teams = teams;
-            _missions = missions;
         }
 
         public Type MessageBodyType => typeof(CharacterActionMessage);
@@ -139,7 +136,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         break;
 
                     session.Send(target.BuildInfoPacket());
-                    _missions.TryInfoRequest(player, target.Identity);
                     break;
                 }
 

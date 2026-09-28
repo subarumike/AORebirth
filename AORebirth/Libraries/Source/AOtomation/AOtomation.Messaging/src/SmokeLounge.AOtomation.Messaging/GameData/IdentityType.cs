@@ -102,6 +102,9 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         IncomingTradeWindow = Bank,
 
+        /// <summary>NPC hash reference (instance = the hash as a FourCC), e.g. a quest action's kill target. Capture 0x111D3.</summary>
+        NpcHash = 0x000111D3,
+
         Playfield3 = 0x000186A1,
     }
 }
