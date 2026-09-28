@@ -341,6 +341,10 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
+        /// <summary>A district's respawn time in seconds: Districts.json stores minutes. Zero or negative means no timer.</summary>
+        private static int DistrictRespawnSeconds(PlayfieldDistrictEntry district)
+            => district.RespawnTime <= 0 ? 0 : (int)Math.Min(int.MaxValue, district.RespawnTime * 60L);
+
         /// <summary>Full circle: district wildlife faces any way.</summary>
         private const int DistrictFacingWidthDegrees = 360;
 
@@ -350,7 +354,7 @@ namespace ZoneEngine_New.Core.Playfield
         /// District wildlife (Districts.json): each spawn table entry keeps <c>count</c> of its hash alive. Every one
         /// of those is a normal hash spawn point pinned to one of the district's spawn locations, so cell heat,
         /// respawn chance and timer, and level rolls work the same as Spawns.json. Locations are shuffled and
-        /// shared round-robin across the district's entries. RespawnTime is seconds, as in Spawns.json.
+        /// shared round-robin across the district's entries. District RespawnTime is minutes (Spawns.json uses seconds).
         /// </summary>
         private void LoadDistrictSpawns(CellGrid grid)
         {
@@ -430,7 +434,7 @@ namespace ZoneEngine_New.Core.Playfield
                             MinLevel = district.NpcMinLevel,
                             MaxLevel = district.NpcMaxLevel,
                             RespawnChance = district.RespawnChance,
-                            RespawnTime = district.RespawnTime,
+                            RespawnTime = DistrictRespawnSeconds(district),
                             AngleW = DistrictFacingWidthDegrees,
                             Position = location.Position,
                             Radius = location.Radius
@@ -438,7 +442,7 @@ namespace ZoneEngine_New.Core.Playfield
                         var point = new HashSpawnPoint(
                             hash,
                             [new SpawnSite(centre, 0, DistrictFacingWidthDegrees, location.Radius)],
-                            Math.Max(0, district.RespawnTime),
+                            DistrictRespawnSeconds(district),
                             district.RespawnChance,
                             district.NpcMinLevel,
                             district.NpcMaxLevel,
@@ -499,7 +503,7 @@ namespace ZoneEngine_New.Core.Playfield
                 MinLevel = minLevel,
                 MaxLevel = maxLevel,
                 RespawnChance = district.RespawnChance,
-                RespawnTime = district.RespawnTime,
+                RespawnTime = DistrictRespawnSeconds(district),
                 AngleW = DistrictFacingWidthDegrees,
                 Position = [centre.xf, centre.yf, centre.zf],
                 Radius = radius
@@ -507,7 +511,7 @@ namespace ZoneEngine_New.Core.Playfield
             var point = new HashSpawnPoint(
                 hash,
                 [new SpawnSite(centre, 0, DistrictFacingWidthDegrees, radius)],
-                Math.Max(0, district.RespawnTime),
+                DistrictRespawnSeconds(district),
                 district.RespawnChance,
                 minLevel,
                 maxLevel,

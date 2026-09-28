@@ -39,7 +39,7 @@ public sealed class QuestDungeonPlayfield : Playfield
     PlayfieldWorldSimulation? _simulation;
 
     public QuestDungeonPlayfield(int playfieldId, string questId, DungeonLayout layout, MissionEntrance entrance,
-        string? targetHash, IZoneLogger logger, IMessageRouter router, PlayfieldManager manager, PlayerHydrator hydrator, IGameData data,
+        string? targetHash, int quality, IZoneLogger logger, IMessageRouter router, PlayfieldManager manager, PlayerHydrator hydrator, IGameData data,
         IItemBuilder items, HashItemMinter hashItems, IInventoryRepository inventory, IItemInstanceIdAllocator ids,
         InventoryMoveService moves, InventoryFlushService flush, TradeService trades, CharacterSnapshotService snapshot,
         IPlayfieldMetricsRegistry metrics, IShopDao shopDao)
@@ -50,6 +50,7 @@ public sealed class QuestDungeonPlayfield : Playfield
         Layout = layout ?? throw new ArgumentNullException(nameof(layout));
         Entrance = entrance ?? throw new ArgumentNullException(nameof(entrance));
         TargetHash = string.IsNullOrWhiteSpace(targetHash) ? null : targetHash;
+        Quality = Math.Max(0, quality);
     }
 
     public string QuestId { get; }
@@ -61,6 +62,9 @@ public sealed class QuestDungeonPlayfield : Playfield
 
     /// <summary>The NPC hash a kill-target quest wants killed here; null when the quest has no kill target.</summary>
     public string? TargetHash { get; }
+
+    /// <summary>The mission's quality level (0 when unknown); locked doors use it as their lock difficulty.</summary>
+    public int Quality { get; }
 
     public override void Build()
     {
@@ -330,7 +334,7 @@ public sealed class QuestDungeonPlayfield : Playfield
             }
 
             var door = new Door(new Identity { Type = IdentityType.Door, Instance = FirstDoorInstance + i }, templateId, flags,
-                (placement.Room << 16) | (placement.LinkedRoom & 0xFFFF))
+                (placement.Room << 16) | (placement.LinkedRoom & 0xFFFF), lockDifficulty: Math.Max(1, Quality))
             {
                 Playfield = this,
                 Position = new AORebirth.Core.Vector.Vector3(placement.Position.X, placement.Position.Y, placement.Position.Z),

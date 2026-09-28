@@ -223,10 +223,15 @@ namespace ZoneEngine_New.Core.Entities
             _combatWeaponSlots.Clear();
             int quality = Stats.GetOrOne(CharacterStat.Level);
             List<List<int>> pairs = template.Equipment;
+            (HashSet<int> bossModifiers, int keptBossModifier) = PickBossModifier(pairs, quality);
             for (int i = 0; i < pairs.Count; i++)
             {
                 List<int> pair = pairs[i];
                 if (pair == null || pair.Count < 1 || pair[0] <= 0)
+                    continue;
+
+                // Only the one boss modifier picked for this spawn is equipped; the rest are discarded.
+                if (bossModifiers.Contains(i) && i != keptBossModifier)
                     continue;
 
                 int lowId = pair[0];
@@ -237,6 +242,42 @@ namespace ZoneEngine_New.Core.Entities
 
                 TryExpandMonsterWeapon(gameData, item, quality, logger);
             }
+        }
+
+        /// <summary>Equipment items named "Boss Modifier Item (…)" are alternatives: each spawn keeps one at random.</summary>
+        const string BossModifierPrefix = "Boss Modifier Item";
+
+        /// <summary>
+        /// The template equipment entries that are boss modifiers, and the one picked for this spawn (-1 when there
+        /// are none). Names come from the item templates, so no instance is created for the discarded ones.
+        /// </summary>
+        (HashSet<int> Modifiers, int Kept) PickBossModifier(List<List<int>> pairs, int quality)
+        {
+            var modifiers = new HashSet<int>();
+            for (int i = 0; i < pairs.Count; i++)
+            {
+                List<int> pair = pairs[i];
+                if (pair == null || pair.Count < 1 || pair[0] <= 0)
+                    continue;
+
+                int lowId = pair[0];
+                int highId = pair.Count >= 2 && pair[1] > 0 ? pair[1] : lowId;
+                string? name = _items.CreateTemplate(lowId, highId, quality).Name;
+                if (name != null && name.StartsWith(BossModifierPrefix, StringComparison.OrdinalIgnoreCase))
+                    modifiers.Add(i);
+            }
+
+            if (modifiers.Count == 0)
+                return (modifiers, -1);
+
+            int pick = Random.Shared.Next(modifiers.Count);
+            foreach (int index in modifiers)
+            {
+                if (pick-- == 0)
+                    return (modifiers, index);
+            }
+
+            return (modifiers, -1);
         }
 
         void TryExpandMonsterWeapon(IGameData gameData, Item item, int quality, IZoneLogger? logger)

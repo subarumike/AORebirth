@@ -174,6 +174,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                     BuildingLowId = offer.EntranceLow,
                     BuildingHighId = offer.EntranceHigh,
                     MissionType = offer.MissionType,
+                    Quality = offer.Quality,
                     MissionIconId = MissionRollPolicy.Current.Icon((MissionRollType)offer.MissionType)
                 };
                 if (!_layouts.TryGenerate(parameters.Seed, parameters.GeneratorVersion, entrance.Instance, out _))
@@ -271,7 +272,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         return false;
 
                     QuestDungeonPlayfield world = _playfields.Value.GetOrCreateQuestDungeon(dungeon.Parameters.DungeonPlayfield, questId, layout, entrance,
-                        dungeon.TargetHash);
+                        dungeon.TargetHash, dungeon.Parameters.Quality);
                     session.TransferToPlayfield(world, layout.Spawn);
                     return true;
                 }
@@ -356,7 +357,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             {
                 if (!dungeon.Ended && dungeon.ExpiresAtUtcTicks > DateTime.UtcNow.Ticks && dungeon.Parameters.DungeonPlayfield == storedPlayfield
                     && _layouts.TryGenerate(dungeon.Parameters.Seed, dungeon.Parameters.GeneratorVersion, entrance.Instance, out DungeonLayout layout))
-                    return (playfields.GetOrCreateQuestDungeon(storedPlayfield, questId, layout, entrance, dungeon.TargetHash), layout.Spawn);
+                    return (playfields.GetOrCreateQuestDungeon(storedPlayfield, questId, layout, entrance, dungeon.TargetHash,
+                        dungeon.Parameters.Quality), layout.Spawn);
 
                 return (playfields.GetOrCreate(entrance.Playfield), new Vector3(entrance.X, entrance.Y, entrance.Z));
             }

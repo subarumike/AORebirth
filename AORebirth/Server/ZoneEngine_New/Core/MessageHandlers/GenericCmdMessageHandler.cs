@@ -123,6 +123,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
                             Deny(session, message, player, "accepted Strongbox item/target is not eligible");
                     }
                     else if (message.Target is { Length: >= 2 }
+                        && TryGetBreakAndEnter(player, playfield, message.Target[0], message.Target[1], out IBreakAndEnterTarget lockable))
+                    {
+                        if (lockable.TryBreakAndEnter(player))
+                            Acknowledge(session, message, message.Target[1]);
+                        else
+                            Deny(session, message, player, "break and enter target is not locked or out of reach");
+                    }
+                    else if (message.Target is { Length: >= 2 }
                         && _dungeons?.TryDuplicate(player, message.Target[0], message.Target[1]) == true)
                         Acknowledge(session, message, message.Target[1]);
                     else if (message.Target is { Length: >= 2 }
@@ -479,6 +487,24 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 item.Identity,
                 canUse,
                 isContainer);
+        }
+
+        /// <summary>
+        /// Break and Enter: an item with CanFlags.BreakAndEnter (a lock pick) from the player's inventory, used on a
+        /// lockable door or chest on the player's playfield. The item is not used up.
+        /// </summary>
+        static bool TryGetBreakAndEnter(Player player, Playfield playfield, Identity slot, Identity target, out IBreakAndEnterTarget lockable)
+        {
+            lockable = null!;
+            if (slot.Type != IdentityType.Inventory || !player.Inventory.IsHydrated
+                || !player.Inventory.TryGetItem(slot.Type, slot.Instance, out Item item) || !item.Can(CanFlags.BreakAndEnter))
+                return false;
+
+            if (!playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel) || dynel is not IBreakAndEnterTarget found)
+                return false;
+
+            lockable = found;
+            return true;
         }
 
         static void Acknowledge(IZoneSession session, GenericCmdMessage message, Identity target, bool corpseUse = false)

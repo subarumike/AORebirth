@@ -13,10 +13,10 @@ namespace ZoneEngine_New.Core.Entities
     /// stat is the door's base flags, plus its state bits: the client's IsLocked is
     /// HasFlag(0x40) (Gamecode.dll Door_t vtable +0xFC, 0x10085412) and closing a door clears 0x80
     /// (0x1008541A), so 0x80 is open. Using an unlocked door opens or closes it for everyone nearby; a locked door
-    /// refuses (the client already shows "It is locked").
+    /// refuses (the client already shows "It is locked"), but a Break and Enter item unlocks and opens it.
     /// Wire values are from captured live ACG dungeon doors.
     /// </summary>
-    public sealed class Door : Dynel, IUsableDynel
+    public sealed class Door : Dynel, IUsableDynel, IBreakAndEnterTarget
     {
         public const int OpenFlag = 0x80;
 
@@ -25,12 +25,13 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>How close a character must be to open or close a door (units).</summary>
         const float UseRange = 5f;
 
-        public Door(Identity identity, int templateId, int flags, int roomLink)
+        public Door(Identity identity, int templateId, int flags, int roomLink, int lockDifficulty = 0)
             : base(identity)
         {
             TemplateId = templateId;
             Flags = flags;
             RoomLink = roomLink;
+            LockDifficulty = Math.Max(0, lockDifficulty);
         }
 
         /// <summary>Door item template (StaticInstance, stat 23).</summary>
@@ -48,6 +49,9 @@ namespace ZoneEngine_New.Core.Entities
         public bool IsOpen => (Flags & OpenFlag) != 0;
 
         public bool IsLocked => (Flags & LockedFlag) != 0;
+
+        /// <summary>Stat 299, sent while the door is locked so the client lets a lock pick be tried on it.</summary>
+        public int LockDifficulty { get; }
 
         public override MessageBody BuildSpawnMessage()
         {
@@ -83,7 +87,8 @@ namespace ZoneEngine_New.Core.Entities
                     Stat((CharacterStat)192, 0),
                     Stat((CharacterStat)193, 0),
                     Stat((CharacterStat)195, 0),
-                    Stat((CharacterStat)259, 0)
+                    Stat((CharacterStat)259, 0),
+                    .. (IsLocked && LockDifficulty > 0 ? [Stat(CharacterStat.LockDifficulty, (uint)LockDifficulty)] : Array.Empty<GameTuple<CharacterStat, uint>>())
                 ],
                 Name = string.Empty,
                 Unknown4 = 2,
@@ -104,6 +109,23 @@ namespace ZoneEngine_New.Core.Entities
 
             Flags ^= OpenFlag;
             Playfield.GetRequiredService<PlayfieldLocality>().Announce(this, BuildSpawnMessage(), includeSelf: true);
+            return true;
+        }
+
+        /// <summary>
+        /// A Break and Enter item used on the locked door: it unlocks and opens for everyone nearby (the client's
+        /// unlock result does both).
+        /// </summary>
+        public bool TryBreakAndEnter(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (!IsLocked || Playfield == null || player.IsDead || !ReferenceEquals(player.Playfield, Playfield)
+                || GetEdgeDistanceTo(player) > UseRange)
+                return false;
+
+            Flags = (Flags & ~LockedFlag) | OpenFlag;
+            Playfield.GetRequiredService<PlayfieldLocality>().Announce(this,
+                BreakAndEnterActions.Result(Identity, player.Identity, BreakAndEnterActions.Unlocked), includeSelf: true);
             return true;
         }
 
