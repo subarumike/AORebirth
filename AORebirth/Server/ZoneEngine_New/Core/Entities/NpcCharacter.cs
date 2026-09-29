@@ -57,6 +57,21 @@ namespace ZoneEngine_New.Core.Entities
 
         public NpcBrain? Brain { get; private set; }
 
+        /// <summary>The pet state when this NPC is someone's summoned pet; null for ordinary NPCs.</summary>
+        public Pets.PetController? Pet { get; private set; }
+
+        /// <summary>The character that summoned this pet; null for ordinary NPCs.</summary>
+        public Character? PetOwner => Pet?.Owner;
+
+        /// <summary>Makes this NPC a pet. Called before it is first sent, so observers get it as one.</summary>
+        internal void BindPet(Pets.PetController controller)
+        {
+            ArgumentNullException.ThrowIfNull(controller);
+            Pet = controller;
+        }
+
+        internal void UnbindPet() => Pet = null;
+
         /// <summary>
         /// The hash this NPC was spawned from (a family/META hash from Spawns.json or a command). The resolved
         /// <see cref="MobTemplate"/> carries the child leaf hash instead. Quests name NPCs by this one.
@@ -113,6 +128,17 @@ namespace ZoneEngine_New.Core.Entities
 
             Brain?.OnOwnerDied();
 
+            // A pet's death gives nobody a reward and leaves no body to loot.
+            if (Pet != null)
+            {
+                ClearKillRewards();
+                Playfield?.GetService<Pets.PetService>()?.OnPetDied(this);
+            }
+
+            // An NPC's pets fall with it.
+            if (OwnedPets.Count > 0)
+                Playfield?.GetService<Pets.PetService>()?.DismissAll(this, "owner died");
+
             VendingMachine? shop = Shop;
             if (shop != null)
             {
@@ -121,6 +147,13 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             base.OnDeath(killer);
+        }
+
+        /// <summary>Pets leave no corpse.</summary>
+        protected override void SpawnDeathCorpse()
+        {
+            if (Pet == null)
+                base.SpawnDeathCorpse();
         }
 
         protected override void RemoveFromWorldAfterDeath()
@@ -187,7 +220,8 @@ namespace ZoneEngine_New.Core.Entities
 
         protected override void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
         {
-            if (attacker.IsPlayer)
+            // A player's pet draws threat like its owner does, so a mob turns on the pet that hits it.
+            if (attacker.IsPlayer || (attacker is NpcCharacter { PetOwner: Player }))
                 Brain?.AddThreat(attacker.Identity, hpRemoved);
         }
 
@@ -198,6 +232,10 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public void OnReset()
         {
+            // An NPC that resets sends its pets away.
+            if (OwnedPets.Count > 0)
+                Playfield?.GetService<Pets.PetService>()?.DismissAll(this, "owner reset");
+
             ClearKillRewards();
             int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
             if (maxHealth > 0)
@@ -450,6 +488,7 @@ namespace ZoneEngine_New.Core.Entities
 
             ApplyBuffBonuses();
             RebaseWearAppearance();
+            SyncPetRunSpeeds();
         }
 
         /// <summary>

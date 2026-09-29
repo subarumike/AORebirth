@@ -317,6 +317,8 @@ namespace ZoneEngine_New.Core.Entities
 
             if (!_inFullRebase)
                 AnnounceAppearanceIfChanged();
+
+            SyncPetRunSpeeds();
         }
 
         /// <summary>

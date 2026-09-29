@@ -293,6 +293,7 @@ namespace ZoneEngine_New
             AddMessageHandler<QuestAlternativeMessageHandler>(services);
             AddMessageHandler<CreateQuestMessageHandler>(services);
             AddMessageHandler<QuestMessageHandler>(services);
+            AddMessageHandler<PetCommandMessageHandler>(services);
             AddMessageHandler<TextMessageHandler>(services);
             AddMessageHandler<SkillMessageHandler>(services);
             AddMessageHandler<SetStatMessageHandler>(services);

@@ -144,7 +144,9 @@ namespace ZoneEngine_New.Core.Playfield
             Quaternion? heading = null,
             int? level = null,
             SpawnSource spawnSource = SpawnSource.None,
-            string? spawnHash = null)
+            string? spawnHash = null,
+            Action<NpcCharacter>? configure = null,
+            bool attachDefaultBrain = true)
         {
             ArgumentNullException.ThrowIfNull(template);
             ArgumentNullException.ThrowIfNull(position);
@@ -181,8 +183,11 @@ namespace ZoneEngine_New.Core.Playfield
                 _playfield.GetRequiredService<IInventoryRepository>());
             npc.Rebase();
             TryAttachShop(npc);
-            if (npc.Shop == null && npc.Attackable)
+            if (attachDefaultBrain && npc.Shop == null && npc.Attackable)
                 NpcBrain.Create(npc, new Vector3(at.x, at.y, at.z), NpcAiProfiles.Resolve(template.Hash));
+
+            // Anything the first spawn packet has to carry (a pet's PetMaster) goes on before it is registered.
+            configure?.Invoke(npc);
 
             _registry.Register(npc);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(npc);
@@ -817,6 +822,10 @@ namespace ZoneEngine_New.Core.Playfield
         /// </summary>
         void TryRestorePostSpawnContent(Player player)
         {
+            // The client lists its pets once it has zoned in (or reconnected).
+            if (player.OwnedPets.Count > 0)
+                _playfield.GetRequiredService<Pets.PetService>().AnnounceOwnedPets(player);
+
             try
             {
                 _playfieldManager.AuthoredQuests.Restore(player);
@@ -949,6 +958,9 @@ namespace ZoneEngine_New.Core.Playfield
             if (!ReferenceEquals(player.Playfield, _playfield))
                 throw new InvalidOperationException("Player is not on this playfield.");
 
+            // Pets zone with their owner: they leave here and are summoned again on arrival.
+            _playfield.GetRequiredService<Pets.PetService>().StashForTransfer(player);
+
             player.SetFightingTarget(Identity.None);
             player.SetTarget(Identity.None);
 
@@ -1042,6 +1054,7 @@ namespace ZoneEngine_New.Core.Playfield
             player.Logger = _logger;
             _registry.Register(player);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+            _playfield.GetRequiredService<Pets.PetService>().RestoreAfterTransfer(player);
             player.SaveState.MarkDirty();
             // The next trigger sample has to start at this landing. Keeping the position from
             // the last visit draws a segment through the pad they left by, which zones them back.
@@ -1062,6 +1075,10 @@ namespace ZoneEngine_New.Core.Playfield
         public void DespawnNpc(NpcCharacter npc)
         {
             ArgumentNullException.ThrowIfNull(npc);
+
+            // An NPC leaving the world takes its pets with it.
+            if (npc.OwnedPets.Count > 0)
+                _playfield.GetRequiredService<Pets.PetService>().DismissAll(npc, "owner despawned");
 
             _playfieldManager.Dialogues?.Detached(npc);
             _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>().Detached(npc);
@@ -1107,6 +1124,8 @@ namespace ZoneEngine_New.Core.Playfield
         private void DespawnPlayer(Player player)
         {
             int characterId = player.Identity.Instance;
+            // Logging out sends the player's pets away.
+            _playfield.GetRequiredService<Pets.PetService>().DismissAll(player, "owner logged out");
             player.SetFightingTarget(Identity.None);
             _playfieldManager.Dialogues.Detached(player);
             _playfieldManager.Teams.DetachPlayer(player);

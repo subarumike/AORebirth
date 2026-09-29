@@ -40,6 +40,16 @@ namespace ZoneEngine_New.Core.Helpers
             if (IsInRestrictedGas(target))
                 return false;
 
+            // A pet and its owner (and the owner's other pets) are one side.
+            Character attackerSide = attacker is NpcCharacter { PetOwner: Character attackerOwner } ? attackerOwner : attacker;
+            Character targetSide = target is NpcCharacter { PetOwner: Character targetOwner } ? targetOwner : target;
+            if (ReferenceEquals(attackerSide, targetSide))
+                return false;
+
+            // A player's pet only fights players (or their pets) its owner could fight.
+            if (attackerSide is Player && !ReferenceEquals(attackerSide, attacker))
+                return CanAttack(attackerSide, targetSide) || (targetSide is not Player && CanAttackNonPlayer(target));
+
             if (target is Player player)
             {
                 // Mobs can still hit players. Only another player needs the PvP flags.
@@ -51,6 +61,8 @@ namespace ZoneEngine_New.Core.Helpers
 
             return target is not NpcCharacter npc || npc.Attackable;
         }
+
+        static bool CanAttackNonPlayer(Character target) => target is not NpcCharacter npc || npc.Attackable;
 
         /// <summary>
         /// True when the only reason <see cref="CanAttack"/> fails is that the target player is not PvP-flagged.

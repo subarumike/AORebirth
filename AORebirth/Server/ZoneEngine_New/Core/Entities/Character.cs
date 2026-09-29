@@ -233,6 +233,12 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Characters that currently have this character as <see cref="FightingTarget"/>.</summary>
         readonly HashSet<Character> _attackers = new();
 
+        /// <summary>The pets this character has summoned.</summary>
+        public Pets.OwnedPets OwnedPets { get; } = new();
+
+        /// <summary>Characters currently fighting this one.</summary>
+        internal IReadOnlyCollection<Character> Attackers => _attackers;
+
         bool _publishingOpponentCount;
 
         /// <summary>Raised once when the corpse swap completes (after <see cref="CorpseSwapDelayMilliseconds"/>).</summary>
@@ -265,6 +271,10 @@ namespace ZoneEngine_New.Core.Entities
 
             _deathNotified = true;
             InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
+
+            // Dying sends this character's pets away.
+            if (OwnedPets.Count > 0)
+                Playfield?.GetService<Pets.PetService>()?.DismissAll(this, "owner died");
             SetFightingTarget(Identity.None);
             NanoRuntime.ClearBuffsOnDeath(this);
 
@@ -1529,8 +1539,10 @@ namespace ZoneEngine_New.Core.Entities
             int previousHealth = Math.Max(0, Stats.GetOrZero(CharacterStat.Health));
             int newHealth = Math.Max(0, previousHealth - damage);
             int hpRemoved = previousHealth - newHealth;
-            if (hpRemoved > 0 && attacker.IsPlayer && !ReferenceEquals(attacker, this))
-                _killRewards.Record(attacker.Identity, hpRemoved);
+            // A player's pet earns its owner the credit for the damage it does.
+            Character credited = attacker is NpcCharacter { PetOwner: Player petOwner } ? petOwner : attacker;
+            if (hpRemoved > 0 && credited.IsPlayer && !ReferenceEquals(credited, this))
+                _killRewards.Record(credited.Identity, hpRemoved);
 
             Stats.Set(CharacterStat.Health, newHealth, StatDetail.Base, dirty: true);
 
@@ -2199,6 +2211,19 @@ namespace ZoneEngine_New.Core.Entities
         #endregion
 
         public abstract void Rebase();
+
+        /// <summary>
+        /// After a stat rebase: this character's pets take its (possibly changed) run speed. Rebases are where
+        /// buffs and equipment land, so that is the only time the owner's speed can change.
+        /// </summary>
+        protected void SyncPetRunSpeeds()
+        {
+            foreach (NpcCharacter pet in OwnedPets.All)
+            {
+                if (Pets.PetService.MatchOwnerRunSpeed(pet, this))
+                    pet.FlushDirtyStats();
+            }
+        }
 
         /// <summary>
         /// Recomputes the bonus layer and anything derived from it, without touching weapons.

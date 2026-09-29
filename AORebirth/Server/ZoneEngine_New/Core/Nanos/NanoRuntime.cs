@@ -169,6 +169,9 @@ namespace ZoneEngine_New.Core.Nanos
             Identity resolvedTarget = recipient!.Identity;
             var cast = new PendingNanoCast(spell, resolvedTarget, nanoCost, attackTime, nowUtc);
             caster.BeginNanoCast(cast);
+
+            // The nano cost is paid as the cast starts; an interrupted or refused cast does not refund it.
+            SpendNano(caster, nanoCost);
             AnnounceCastStarted(caster, spell.Id, resolvedTarget);
 
             // Instant nanos have no cast bar; land them in the same tick.
@@ -402,8 +405,9 @@ namespace ZoneEngine_New.Core.Nanos
             NanoSpell spell = cast.Spell;
             Character? recipient = ResolveTarget(caster, cast.Target);
 
-            // Everything the up-front gate checked can have changed while the bar ran.
-            NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, cast.NanoCost, nowUtc);
+            // Everything the up-front gate checked can have changed while the bar ran. The nano cost was
+            // already paid at the start, so it is not checked again.
+            NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, nanoCost: 0, nowUtc);
             NanoCastRefusal refusal = NanoCastRules.Evaluate(attempt);
             // Cast bar already went out via CastNanoSpell; refusal must clear it.
             if (refusal != NanoCastRefusal.None)
@@ -442,7 +446,6 @@ namespace ZoneEngine_New.Core.Nanos
                 return;
             }
 
-            SpendNano(caster, cast.NanoCost);
             AnnounceCastFinished(caster, spell.Id);
 
             // NoTimerNotify nanos finish with no lockout. Everyone else waits the raw template delay.

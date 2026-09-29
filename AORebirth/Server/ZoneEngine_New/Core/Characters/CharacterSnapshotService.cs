@@ -189,7 +189,9 @@ namespace ZoneEngine_New.Core.Characters
             List<StatRecord> stats = [];
             foreach (var entry in player.Stats.GetEntries())
             {
-                if (entry.Stat == CharacterStat.NumberOfFightingOpponents)
+                // Runtime-only: opponent count is fight bookkeeping; Pets (251) is which pet slots are taken right
+                // now, and pets never outlive the session.
+                if (entry.Stat is CharacterStat.NumberOfFightingOpponents or CharacterStat.Pets)
                     continue;
 
                 if (StatCollection.IsUnset(entry.Base))

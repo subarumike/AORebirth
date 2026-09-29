@@ -126,8 +126,13 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 if (dynel.Cell == null)
                     continue;
 
-                if (IsCombatHot(dynel) || IsPetPinnedToConnectedPlayer(dynel, connectedPlayerInstances))
+                if (IsCombatHot(dynel))
                     _forcedHotCells.Add(dynel.Cell.Id);
+
+                // A connected player's pet heats cells like its owner does (hot around it, warm beyond), so it and
+                // whatever it fights keep ticking when it is away from the player.
+                if (IsPetPinnedToConnectedPlayer(dynel, connectedPlayerInstances) && !_playerCells.Contains(dynel.Cell.Id))
+                    _playerCells.Add(dynel.Cell.Id);
                 if (dynel is VendingMachine || dynel is NpcCharacter { Shop: not null, IsDead: false })
                     _vendorCells.Add(dynel.Cell.Id);
             }

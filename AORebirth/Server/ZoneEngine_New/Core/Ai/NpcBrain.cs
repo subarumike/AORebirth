@@ -20,7 +20,7 @@ namespace ZoneEngine_New.Core.Ai
 
     public sealed class NpcBrain
     {
-        readonly NpcBehaviourTree _tree;
+        readonly GroveGames.BehaviourTree.BehaviourTree _tree;
         readonly NpcNanoCaster _nanos;
         readonly List<Vector3> _pathScratch = new(2);
         readonly List<Vector3> _routeScratch = new(8);
@@ -59,6 +59,34 @@ namespace ZoneEngine_New.Core.Ai
             _tree.SetupTree();
             _tree.Enable();
             _nanos = new NpcNanoCaster(this);
+        }
+
+        /// <summary>A summoned pet's brain: the pet tree instead of the roaming-NPC one, and no home to leash to.</summary>
+        NpcBrain(NpcCharacter npc, Pets.PetController pet)
+        {
+            Npc = npc;
+            Home = null;
+            Hate = new HateList();
+            PatrolWaypoints = Array.Empty<Vector3>();
+            Pet = pet;
+
+            var blackboard = new Blackboard();
+            _tree = new PetBehaviourTree(new BehaviourRoot(blackboard), this);
+            _tree.SetupTree();
+            _tree.Enable();
+            _nanos = new NpcNanoCaster(this);
+        }
+
+        /// <summary>The pet state when this is a summoned pet's brain.</summary>
+        public Pets.PetController? Pet { get; }
+
+        public static NpcBrain CreatePet(NpcCharacter npc, Pets.PetController pet)
+        {
+            ArgumentNullException.ThrowIfNull(npc);
+            ArgumentNullException.ThrowIfNull(pet);
+            var brain = new NpcBrain(npc, pet);
+            npc.AttachBrain(brain);
+            return brain;
         }
 
         public NpcCharacter Npc { get; }
@@ -112,7 +140,9 @@ namespace ZoneEngine_New.Core.Ai
             }
 
             TickStallWatch.Stage("brain.scan", Npc.Identity.Instance);
-            ScanProximity();
+            // A pet picks its fights from its owner, never from who happens to walk by.
+            if (Pet == null)
+                ScanProximity();
             TickStallWatch.Stage("brain.tree", Npc.Identity.Instance);
             _tree.Tick((float)deltaTime);
             TickStallWatch.Stage("brain.nanos", Npc.Identity.Instance);
@@ -343,8 +373,17 @@ namespace ZoneEngine_New.Core.Ai
         /// moves. An NPC that stops making progress for
         /// <see cref="NpcFollowTarget.PathStuckWarpSeconds"/> is warped one replan interval along its path.
         /// </summary>
-        public void PathTo(Vector3 destination)
+        public void PathTo(Vector3 destination) => PathTo(destination, null);
+
+        /// <summary>
+        /// <see cref="PathTo(Vector3)"/> for a destination that keeps moving (a pet following its owner): a path
+        /// that already heads there is only replaced once the destination drifts <paramref name="replanDeltaMeters"/>
+        /// from it, or its end is nearly reached, so the NPC neither re-announces its path constantly nor brakes
+        /// at an end that is already stale.
+        /// </summary>
+        public void PathTo(Vector3 destination, float? replanDeltaMeters)
         {
+            _replanDeltaMeters = replanDeltaMeters ?? NpcFollowTarget.MinAnnounceDeltaMeters;
             // Rooted: settle where it stands; the stuck clock restarts once the root is gone.
             if (Npc.IsRooted)
             {
@@ -367,6 +406,15 @@ namespace ZoneEngine_New.Core.Ai
                     // the walk home that is stuck, give up on walking and let the caller snap home.
                     if (_stuckWarps >= NpcAiRules.MaxStuckWarps)
                     {
+                        // A pet that cannot walk on rejoins its owner (a player's pet) rather than evading.
+                        if (Pet != null)
+                        {
+                            Pet.WarpRequested = true;
+                            StopPathing();
+                            _stuckWarps = 0;
+                            return;
+                        }
+
                         if (_returningHome)
                         {
                             _returnFailed = true;
@@ -566,10 +614,25 @@ namespace ZoneEngine_New.Core.Ai
                 new System.Numerics.Vector3((float)Npc.Position.x, (float)Npc.Position.y, (float)Npc.Position.z),
                 new System.Numerics.Vector3((float)_segmentEnd.x, (float)_segmentEnd.y, (float)_segmentEnd.z));
 
+        /// <summary>The end is this close: a moving destination is re-planned before the NPC brakes into it.</summary>
+        const double NearSegmentEndMeters = 2.5;
+
+        /// <summary>…as long as the destination has moved at least this much.</summary>
+        const double NearEndReplanMeters = 1.0;
+
+        float _replanDeltaMeters = NpcFollowTarget.MinAnnounceDeltaMeters;
+
         bool ShouldReplan(Vector3 destination)
         {
             if (_segmentReachesDestination)
-                return Vector3.Abs(destination - _segmentDestination) >= NpcFollowTarget.MinAnnounceDeltaMeters;
+            {
+                double drift = Vector3.Abs(destination - _segmentDestination);
+                if (drift >= _replanDeltaMeters)
+                    return true;
+                return _replanDeltaMeters > NpcFollowTarget.MinAnnounceDeltaMeters
+                       && drift >= NearEndReplanMeters
+                       && Npc.Motor.RemainingPathMeters() <= NearSegmentEndMeters;
+            }
 
             double leftSeconds = NpcFollowTarget.PathLookaheadSeconds - NpcFollowTarget.PathReplanSeconds;
             return Npc.Motor.RemainingPathMeters() <= Npc.Motor.Vehicle.MaxVel * leftSeconds;
@@ -702,8 +765,26 @@ namespace ZoneEngine_New.Core.Ai
             ProgressSinceUtc = default;
         }
 
+        /// <summary>A heal order: casts a heal on <paramref name="target"/> now if one can land.</summary>
+        internal HealOrderResult TryHeal(Character target) => _nanos.TryHeal(target, DateTime.UtcNow);
+
+        /// <summary>Makes <paramref name="target"/> the one the chase and attack work on (a pet's chosen enemy).</summary>
+        internal void SetCurrentTarget(Identity target) => _currentTarget = target;
+
+        /// <summary>Places the NPC at <paramref name="position"/> on the floor and settles observers there.</summary>
+        internal void WarpTo(Vector3 position)
+        {
+            Vector3 at = HeightfieldOrSelf(position);
+            Npc.Motor.ClearPath();
+            Npc.Motor.Warp(at);
+            NpcFollowTarget.AnnounceStop(Npc, at);
+            _followAnnounced = false;
+            ProgressSinceUtc = default;
+            _stuckWarps = 0;
+        }
+
         /// <summary>A complete navmesh route from here ends at <paramref name="destination"/>. No navmesh: true.</summary>
-        bool CanWalkTo(Vector3 destination)
+        internal bool CanWalkTo(Vector3 destination)
         {
             NavMeshPathfinder? finder = Npc.Playfield?.Pathfinder;
             if (finder == null)

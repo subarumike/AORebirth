@@ -46,8 +46,9 @@ namespace ZoneEngine_New.Core.Characters
 
             foreach (StatRecord stat in hydration.Stats)
             {
-                // Opponent count is runtime fight bookkeeping, not a saved character row.
-                if (stat.StatId == (int)CharacterStat.NumberOfFightingOpponents)
+                // Opponent count is runtime fight bookkeeping and Pets is which pet slots are taken right now: neither
+                // is a saved character row (a stale stored Pets would block every summon).
+                if (stat.StatId is (int)CharacterStat.NumberOfFightingOpponents or (int)CharacterStat.Pets)
                     continue;
 
                 player.Stats.Set((CharacterStat)stat.StatId, stat.StatValue, StatDetail.Base);

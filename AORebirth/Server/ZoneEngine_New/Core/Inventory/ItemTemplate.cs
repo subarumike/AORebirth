@@ -424,6 +424,7 @@ namespace ZoneEngine_New.Core.Inventory
                 Operator.BitAnd => (statValue & required) != 0,
                 Operator.NotBitAnd => (statValue & required) == 0,
                 Operator.Unequal => statValue != required,
+                Operator.TestNumPets => Pets.PetTypes.TestNumPets(statValue, required),
                 Operator.True => true,
                 Operator.False => false,
                 // And/Or/Not and other non-comparison ops are requirement links, not checks.

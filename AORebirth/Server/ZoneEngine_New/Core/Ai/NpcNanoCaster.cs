@@ -20,8 +20,18 @@ namespace ZoneEngine_New.Core.Ai
     /// requirements, nano cost, recharge and NCU are the same as for players.
     /// Hostile nanos go on the combat target. Friendly buffs, in or out of combat, go on the caster when it
     /// lacks them, otherwise on a random nearby NPC that does. Heals go on the caster when it is hurt,
-    /// otherwise on the most hurt nearby NPC.
+    /// otherwise on the most hurt nearby NPC. A pet looks after its owner and the owner's other pets instead of
+    /// nearby NPCs. A summon (SummonPet) nano is cast once a fight starts, while that pet slot is free.
     /// </summary>
+    /// <summary>Outcome of a heal order.</summary>
+    enum HealOrderResult
+    {
+        Cast,
+        OutOfRange,
+        Busy,
+        NoHeal
+    }
+
     sealed class NpcNanoCaster
     {
         /// <summary>Wait after a cast before the next one.</summary>
@@ -98,6 +108,40 @@ namespace ZoneEngine_New.Core.Ai
             }
         }
 
+        /// <summary>
+        /// A heal order: casts the first heal this NPC has that can land on <paramref name="target"/> now.
+        /// <see cref="HealOrderResult.OutOfRange"/> when a heal exists but the target is too far or out of sight.
+        /// </summary>
+        public HealOrderResult TryHeal(Character target, DateTime nowUtc)
+        {
+            if (HealthPercent(target) >= 100)
+                return HealOrderResult.Busy;
+
+            if (Npc.IsDead || Npc.IsCastingNano || Npc.Playfield == null || Npc.UploadedNanoIds.Count == 0)
+                return HealOrderResult.Busy;
+            if (Npc.IsInNanoRecharge(nowUtc))
+                return HealOrderResult.Busy;
+
+            bool hasHeal = false;
+            foreach (int nanoId in Npc.UploadedNanoIds)
+            {
+                NanoSpell? spell = Resolve(nanoId);
+                if (spell == null || spell.IsHostile || !IsHeal(spell))
+                    continue;
+
+                hasHeal = true;
+                if (!InRange(spell, target, DefaultSupportRange) || !NanoRuntime.CanStartCast(Npc, spell, target, nowUtc))
+                    continue;
+                if (NanoRuntime.TryStartCast(Npc, spell.Id, target.Identity, nowUtc) != NanoCastRefusal.None)
+                    continue;
+
+                _nextAttemptUtc = nowUtc.AddSeconds(Between(MinCastIntervalSeconds, MaxCastIntervalSeconds));
+                return HealOrderResult.Cast;
+            }
+
+            return hasHeal ? HealOrderResult.OutOfRange : HealOrderResult.NoHeal;
+        }
+
         NanoSpell? Resolve(int nanoId)
         {
             if (!_spells.TryGetValue(nanoId, out NanoSpell? spell))
@@ -111,6 +155,14 @@ namespace ZoneEngine_New.Core.Ai
 
         Character? ChooseTarget(NanoSpell spell, DateTime nowUtc)
         {
+            if (TrySummonedPetType(spell, out int petType))
+            {
+                // Pets do not summon; an NPC calls its pet into a fight it is in, once per slot.
+                if (Npc.Pet != null || Npc.FightingTarget.Instance == 0 || Npc.OwnedPets.InSlotOf(petType) != null)
+                    return null;
+                return NanoRuntime.CanStartCast(Npc, spell, Npc, nowUtc) ? Npc : null;
+            }
+
             if (spell.IsHostile)
             {
                 Character? enemy = Npc.FightingTarget.Instance != 0 ? _brain.ResolveCurrentTarget() : null;
@@ -143,12 +195,14 @@ namespace ZoneEngine_New.Core.Ai
                 return chosen;
             }
 
-            if (HealthPercent(Npc) < HealBelowPercent && !HasNano(Npc, spell)
+            // A pet heals greedily, all the way to full; other NPCs only once someone is well hurt.
+            int healBelow = Npc.Pet != null ? 100 : HealBelowPercent;
+            if (HealthPercent(Npc) < healBelow && !HasNano(Npc, spell)
                 && NanoRuntime.CanStartCast(Npc, spell, Npc, nowUtc))
                 return Npc;
 
             Character? hurt = null;
-            int lowest = HealBelowPercent;
+            int lowest = healBelow;
             foreach (Character candidate in FriendlyCandidates(spell))
             {
                 if (ReferenceEquals(candidate, Npc))
@@ -165,13 +219,29 @@ namespace ZoneEngine_New.Core.Ai
             return hurt;
         }
 
-        /// <summary>Self, then living NPCs in range and sight that are not player pets.</summary>
+        /// <summary>
+        /// Self, then living NPCs in range and sight that are not player pets. A pet's friends are its owner and
+        /// the owner's other pets.
+        /// </summary>
         IEnumerable<Character> FriendlyCandidates(NanoSpell spell)
         {
             yield return Npc;
 
             if (!CanApplyOnFriendly(spell))
                 yield break;
+
+            if (Npc.PetOwner is Character owner)
+            {
+                if (!owner.IsDead && InRange(spell, owner, DefaultSupportRange))
+                    yield return owner;
+                foreach (NpcCharacter sibling in owner.OwnedPets.All)
+                {
+                    if (!ReferenceEquals(sibling, Npc) && !sibling.IsDead && InRange(spell, sibling, DefaultSupportRange))
+                        yield return sibling;
+                }
+
+                yield break;
+            }
 
             if (_allies.Count == 0)
             {
@@ -194,6 +264,25 @@ namespace ZoneEngine_New.Core.Ai
                 if (!ally.IsDead && InRange(spell, ally, DefaultSupportRange))
                     yield return ally;
             }
+        }
+
+        /// <summary>The nano summons a pet (an OnUse SummonPet); <paramref name="petType"/> is that pet's type.</summary>
+        bool TrySummonedPetType(NanoSpell spell, out int petType)
+        {
+            petType = 0;
+            if (!spell.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                return false;
+
+            for (int i = 0; i < spells.Count; i++)
+            {
+                if (spells[i].Is(FunctionType.SummonPet) && spells[i].TryReadString(0, out string hash) && hash.Length > 0)
+                {
+                    petType = Pets.PetTypeCatalog.For(Npc.Playfield!.GetRequiredService<GameData.IGameData>().RootPath).TypeOf(hash);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>A nano flagged only ApplyOnSelf stays on the caster.</summary>
@@ -296,18 +385,23 @@ namespace ZoneEngine_New.Core.Ai
             return false;
         }
 
+        /// <summary>
+        /// A Health-raising Hit in any of the nano's events: a direct heal (OnUse) or a heal over time (its ticks).
+        /// Looking only at OnUse let heal-over-time nanos pass as ordinary buffs, which go on anyone lacking them,
+        /// hurt or not.
+        /// </summary>
         static bool IsDirectHeal(NanoSpell spell)
         {
-            if (!spell.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
-                return false;
-
-            for (int i = 0; i < spells.Count; i++)
+            foreach (List<ItemSpell> spells in spell.SpellList.Values)
             {
-                ItemSpell hit = spells[i];
-                if (hit.Is(FunctionType.Hit)
-                    && hit.TryReadInt(0, out int stat) && stat == (int)CharacterStat.Health
-                    && hit.TryReadInt(1, out int amount) && amount > 0)
-                    return true;
+                for (int i = 0; i < spells.Count; i++)
+                {
+                    ItemSpell hit = spells[i];
+                    if (hit.Is(FunctionType.Hit)
+                        && hit.TryReadInt(0, out int stat) && stat == (int)CharacterStat.Health
+                        && hit.TryReadInt(1, out int amount) && amount > 0)
+                        return true;
+                }
             }
 
             return false;

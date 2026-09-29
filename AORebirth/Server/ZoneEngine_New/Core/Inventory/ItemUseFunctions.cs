@@ -82,6 +82,8 @@ namespace ZoneEngine_New.Core.Inventory
                     return target is Player proxyPlayer && TeleportProxy2(proxyPlayer, spell);
                 case FunctionType.SpawnMonster2:
                     return SpawnMonster2(target, spell);
+                case FunctionType.SummonPet:
+                    return SummonPet(target, spell);
                 case FunctionType.DestroyItem:
                     return DestroySubject(target, criteria);
                 case FunctionType.ToggleFlag:
@@ -830,6 +832,24 @@ namespace ZoneEngine_New.Core.Inventory
         /// Catalog shape from nano 205606: SpawnMonster2("KHAL", 73, 3600) — hash, level, lifetime.
         /// Lifetime is stored on the function; one-shot summons do not hash-respawn.
         /// </summary>
+        /// <summary>
+        /// SummonPet (mob hash, level, duration seconds; -1 or 0: until dismissed): the character the function runs
+        /// on gets the pet (the summoner: shell items and pet nanos target Self).
+        /// </summary>
+        static bool SummonPet(Character target, ItemSpell spell)
+        {
+            if (target.Playfield == null || target.IsDead)
+                return false;
+            if (!spell.TryReadString(0, out string hash) || hash.Length == 0)
+                return false;
+            if (!spell.TryReadInt(1, out int level))
+                level = 0;
+            if (!spell.TryReadInt(2, out int duration))
+                duration = -1;
+
+            return target.Playfield.GetRequiredService<Pets.PetService>().Summon(target, hash, level, duration) != null;
+        }
+
         static bool SpawnMonster2(Character target, ItemSpell spell)
         {
             Playfield? playfield = target.Playfield;
