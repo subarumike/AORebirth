@@ -198,6 +198,12 @@ namespace ZoneEngine_New.Core.Ai
                 return;
             if (Hate.Contains(player.Identity))
                 return;
+            // A "gray" NPC (below the player's LevelEligibility.json range, the same rule that makes its kill worth
+            // 1 XP) never starts a fight. It still fights back when attacked.
+            if (Teams.TeamLevelEligibility.Current.IsTooLowForMember(
+                    player.Stats.GetOrOne(CharacterStat.Level),
+                    Npc.Stats.GetOrOne(CharacterStat.Level)))
+                return;
             if (Npc.GetEdgeDistanceTo(player) > NpcAiRules.ProximityAggroRange)
                 return;
             // Unprovoked aggro needs sight. Once the player is on the hate list, chasing around walls is fine.

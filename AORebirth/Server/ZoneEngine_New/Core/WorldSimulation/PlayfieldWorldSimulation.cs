@@ -84,6 +84,8 @@
 
         public int VicinityTriggerCount => _triggers.VicinityTriggerCount;
 
+        public int TeleportalTriggerCount => _triggers.TeleportalTriggerCount;
+
         public static PlayfieldWorldSimulation Create(
             int playfieldId,
             PlayfieldGeometryData geometry,
@@ -111,14 +113,17 @@
             world.BakePortalTriggers(geometry.Dynels, playfieldId);
             world.BakeVicinityTriggers(geometry.Dynels, itemTemplates);
             world.BakeMissionEntranceTriggers(geometry.Dynels);
+            world.BakeExitDoorTriggers(geometry.Dynels, playfieldId);
             world.BakeExitProxyTriggers(gameData.GetExitProxyDoorInstances(playfieldId));
+            world.BakeTeleportalTriggers(geometry.Collision?.Teleportals);
 
             int terrainChunks = surface?.Terrain != null ? geometry.Collision!.Terrain!.Chunks.Count : 0;
             logger.Info(
                 $"World bake playfield={playfieldId} terrainChunks={terrainChunks}"
                 + $" surfaceCells={surface?.PopulatedCellCount ?? 0} surfaceTriangles={surface?.TriangleCount ?? 0}"
                 + $" wallTriggers={world.WallTriggerCount} portalTriggers={world.PortalTriggerCount}"
-                + $" vicinityTriggers={world.VicinityTriggerCount} exitTriggers={world.ExitTriggerCount}");
+                + $" vicinityTriggers={world.VicinityTriggerCount} exitTriggers={world.ExitTriggerCount}"
+                + $" teleportals={world.TeleportalTriggerCount}");
             if (surface != null && surface.OutsideTriangleCount > 0)
             {
                 logger.Warn(
@@ -284,6 +289,8 @@
                         FireTargetVicinity(playfield, player, crossing.Trigger);
                     else if (crossing.Trigger.Kind == ZoneTriggerKind.MissionEntrance)
                         EnterMissionEntrance(playfield, player, crossing.Trigger);
+                    else if (crossing.Trigger.Kind == ZoneTriggerKind.ExitDoor && crossing.DestPlayfieldId == 0)
+                        TellExitDestinationUnknown(player, crossing.Trigger);
                     else
                         TryTransfer(playfield, player, crossing, now);
                 }
@@ -346,6 +353,29 @@
                 return true;
             }
 
+            if (hit.Volume.Kind == ZoneTriggerKind.Teleportal)
+            {
+                destPlayfieldId = hit.Volume.DestPlayfieldId;
+                if (PortalDoorLandingResolver.TryResolveMidpointLanding(
+                        _destinations,
+                        destPlayfieldId,
+                        hit.Volume.DestIndex,
+                        out landing,
+                        out var teleportalHeading))
+                {
+                    crossing = new ZoneCrossing(destPlayfieldId, landing, hit.Volume, teleportalHeading);
+                    return true;
+                }
+
+                _logger.Warn(
+                    "Teleportal has no landing destPf="
+                    + destPlayfieldId
+                    + " destIdx="
+                    + hit.Volume.DestIndex
+                    + "; Destinations.dat for that playfield is missing or short.");
+                return false;
+            }
+
             if (hit.Volume.Kind == ZoneTriggerKind.DungeonExit && hit.Volume.Landing is AoVector3 outside)
             {
                 crossing = new ZoneCrossing(hit.Volume.DestPlayfieldId, outside, hit.Volume, hit.Volume.LandingHeading);
@@ -374,6 +404,26 @@
                           + hit.Volume.DestIndex
                           + " (Destinations.dat missing or short)."));
                 return false;
+            }
+
+            if (hit.Volume.Kind == ZoneTriggerKind.ExitDoor)
+            {
+                // Back out through the entrance the character recorded, as an exit proxy would; with none, the
+                // destination is unknown and the caller says so (DestPlayfieldId 0).
+                if (returnTo.IsSet
+                    && MatchesRecordedEntrance(returnTo, hit.Volume.DynelInstance)
+                    && PortalDoorLandingResolver.TryResolveDoorLanding(
+                        _gameData.GetPlayfieldGeometry(returnTo.PlayfieldId),
+                        returnTo.DoorInstance,
+                        PortalDoorLandingResolver.ExitDoorClearance,
+                        out landing, out var returnHeading))
+                {
+                    crossing = new ZoneCrossing(returnTo.PlayfieldId, landing, hit.Volume, returnHeading);
+                    return true;
+                }
+
+                crossing = new ZoneCrossing(0, position, hit.Volume);
+                return true;
             }
 
             if (hit.Volume.Kind == ZoneTriggerKind.ExitProxy)
@@ -433,6 +483,8 @@
         {
             if (doorInstance == 0
                 || _triggers.HasDynel(ZoneTriggerKind.TargetVicinity, doorInstance)
+                || _triggers.HasDynel(ZoneTriggerKind.ExitDoor, doorInstance)
+                || _triggers.HasDynel(ZoneTriggerKind.PortalDynel, doorInstance)
                 || !ExitProxyDoorCatalog.ShouldRegister(doorInstance, _gameData.GetConfiguredExitProxyDoorInstances(_playfieldId))
                 || !_exitProxyDoors.Add(doorInstance))
                 return;
@@ -580,6 +632,157 @@
                 records ? trigger.DynelInstance : 0,
                 StatDetail.Base,
                 dirty: true);
+        }
+
+        /// <summary>
+        /// Zone surface teleportals (AODB SurfaceResource.Teleportal, gathered by the collision loader): each becomes
+        /// an area trigger into its destination playfield's destination line.
+        /// </summary>
+        void BakeTeleportalTriggers(IReadOnlyList<AODB.Common.RDBObjects.SurfaceTeleportal>? teleportals)
+        {
+            if (teleportals == null)
+                return;
+
+            foreach (AODB.Common.RDBObjects.SurfaceTeleportal teleportal in teleportals)
+            {
+                if (teleportal.Area.Count < 3 || teleportal.DestinationPlayfield <= 0
+                    || teleportal.DestinationLine < 1 || teleportal.DestinationLine > byte.MaxValue)
+                    continue;
+
+                float minX = float.MaxValue, maxX = float.MinValue, minZ = float.MaxValue, maxZ = float.MinValue;
+                foreach (AODB.Common.Structs.Vector3 point in teleportal.Area)
+                {
+                    minX = MathF.Min(minX, point.X);
+                    maxX = MathF.Max(maxX, point.X);
+                    minZ = MathF.Min(minZ, point.Z);
+                    maxZ = MathF.Max(maxZ, point.Z);
+                }
+
+                _triggers.Add(
+                    new ZoneTriggerVolume
+                    {
+                        Kind = ZoneTriggerKind.Teleportal,
+                        Id = _nextTriggerId++,
+                        MinX = minX,
+                        MaxX = maxX,
+                        MinZ = minZ,
+                        MaxZ = maxZ,
+                        DestPlayfieldId = teleportal.DestinationPlayfield,
+                        DestIndex = (byte)teleportal.DestinationLine,
+                        Teleportal = teleportal
+                    });
+            }
+        }
+
+        /// <summary>
+        /// Doors the client treats as exits: their placement blob sets ExitInstance (the client then registers them as
+        /// entrance/exit doors and starts a zone change on contact). The destination is not in the data, so it comes
+        /// from the teleports table: a routed door becomes an ordinary door-to-door portal; an unrouted one becomes an
+        /// <see cref="ZoneTriggerKind.ExitDoor"/>. Doors that already zone by their own events are left alone.
+        /// </summary>
+        void BakeExitDoorTriggers(PlayfieldDynels? dynels, int playfieldId)
+        {
+            if (dynels?.Dynels == null)
+                return;
+
+            foreach (PlayfieldDynel d in dynels.Dynels)
+            {
+                // Only the door's own events count: a dynel instance is unique per identity type, and a Terminal
+                // (4313's lift pad) can share this door's number.
+                if (d.IdentityType != (int)IdentityType.Door
+                    || PortalDoorLandingResolver.TryReadPortal(d, out _)
+                    || ExitInstanceOf(d) <= 0)
+                    continue;
+
+                float x = d.Position.X;
+                float y = d.Position.Y;
+                float z = d.Position.Z;
+                const float r = TriggerVolumeCatalog.PortalRadius;
+                const float h = TriggerVolumeCatalog.PortalHalfHeight;
+                var volume = new ZoneTriggerVolume
+                {
+                    Kind = ZoneTriggerKind.ExitDoor,
+                    Id = _nextTriggerId++,
+                    MinX = x - r,
+                    MaxX = x + r,
+                    MinZ = z - r,
+                    MaxZ = z + r,
+                    MinY = y - h,
+                    MaxY = y + h,
+                    CenterX = x,
+                    CenterY = y,
+                    CenterZ = z,
+                    Radius = r,
+                    DynelInstance = d.IdentityInstance
+                };
+
+                if (_gameData.TryGetTeleportRoute(
+                        playfieldId,
+                        (int)IdentityType.Door,
+                        unchecked((uint)d.IdentityInstance),
+                        out int routedPlayfield,
+                        out int routedType,
+                        out uint routedInstance))
+                {
+                    if (routedType == (int)IdentityType.Door && routedPlayfield > 0 && routedPlayfield <= 0xFFFF
+                        && (routedInstance & 0xFF000000u) == 0xC0000000u
+                        && (routedInstance & 0xFFFFu) == (uint)routedPlayfield)
+                    {
+                        volume.Kind = ZoneTriggerKind.PortalDynel;
+                        volume.DestPlayfieldId = routedPlayfield;
+                        volume.LandingKind = PortalLandingKind.DoorDynel;
+                        volume.DestDoorInstance = unchecked((int)routedInstance);
+                        volume.DoorClearance = PortalDoorLandingResolver.ExitDoorClearance;
+                    }
+                    else
+                    {
+                        _logger.Warn(
+                            "Exit door route ignored: unsupported target playfield=" + playfieldId
+                            + " door=" + d.IdentityInstance.ToString("X8", CultureInfo.InvariantCulture)
+                            + " destinationPf=" + routedPlayfield + " destinationType=" + routedType);
+                    }
+                }
+
+                _triggers.Add(volume);
+            }
+        }
+
+        /// <summary>ExitInstance (189) set by a door's placement blob; 0 when it has none or the blob does not read.</summary>
+        static int ExitInstanceOf(PlayfieldDynel door)
+        {
+            if (door.Blob == null || door.Blob.Length <= 12)
+                return 0;
+
+            try
+            {
+                AODB.Common.RDBObjects.DynelBlob blob = new AODB.Common.RDBObjects.ItemBase().ReadDynelBlob(door.Blob);
+                foreach (KeyValuePair<int, int> stat in blob.AppliedStats)
+                {
+                    if (stat.Key == (int)CharacterStat.ExitInstance)
+                        return stat.Value;
+                }
+            }
+            catch (Exception)
+            {
+                // An unreadable blob is not an exit.
+            }
+
+            return 0;
+        }
+
+        void TellExitDestinationUnknown(Player player, ZoneTriggerVolume door)
+        {
+            player.Session?.Send(new SmokeLounge.AOtomation.Messaging.Messages.N3Messages.ChatTextMessage
+            {
+                Identity = player.Identity,
+                Text = "This exit's destination is unknown (door "
+                       + door.DynelInstance.ToString("X8", CultureInfo.InvariantCulture)
+                       + " on playfield " + _playfieldId + " has no teleports route)."
+            });
+            _logger.Warn(
+                "Exit door has no destination: playfield=" + _playfieldId
+                + " door=" + door.DynelInstance.ToString("X8", CultureInfo.InvariantCulture)
+                + " character=" + player.Identity.Instance);
         }
 
         void BakeWallTriggers(PlayfieldWalls? walls)

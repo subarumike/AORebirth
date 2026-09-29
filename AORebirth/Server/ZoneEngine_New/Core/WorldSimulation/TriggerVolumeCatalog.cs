@@ -35,7 +35,22 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// A quest dungeon's exit door. Walking into it returns the character outside the ACG entrance the dungeon
         /// was entered from (<see cref="ZoneTriggerVolume.Landing"/> on <see cref="ZoneTriggerVolume.DestPlayfieldId"/>).
         /// </summary>
-        DungeonExit = 6
+        DungeonExit = 6,
+
+        /// <summary>
+        /// A zone surface teleportal (Surfaces.dat / Collision.dat): stepping inside its X/Z polygon takes the character
+        /// to destination line <see cref="ZoneTriggerVolume.DestIndex"/> of <see cref="ZoneTriggerVolume.DestPlayfieldId"/>,
+        /// the zoning the client predicts from the same data.
+        /// </summary>
+        Teleportal = 7,
+
+        /// <summary>
+        /// A door whose placement data (Dynels.dat blob) sets ExitInstance: the client walks into it expecting a zone
+        /// change. With no teleports route it only returns a character through the entrance they recorded; otherwise
+        /// the character is told the destination is unknown. Routed exit doors are baked as
+        /// <see cref="PortalDynel"/> instead.
+        /// </summary>
+        ExitDoor = 8
     }
 
     public sealed class ZoneTriggerVolume
@@ -77,6 +92,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         /// <summary>OnTargetInVicinity spells for a <see cref="ZoneTriggerKind.TargetVicinity"/> pad.</summary>
         public Inventory.ItemTemplate? VicinityEvents;
+
+        /// <summary>Area of a <see cref="ZoneTriggerKind.Teleportal"/>.</summary>
+        public AODB.Common.RDBObjects.SurfaceTeleportal? Teleportal;
     }
 
     public readonly struct ZoneTriggerHit
@@ -137,6 +155,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         public int VicinityTriggerCount { get; private set; }
 
+        public int TeleportalTriggerCount { get; private set; }
+
         public int Count => _all.Count;
 
         public bool HasDynel(ZoneTriggerKind kind, int dynelInstance)
@@ -163,6 +183,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 ExitTriggerCount++;
             else if (volume.Kind == ZoneTriggerKind.TargetVicinity)
                 VicinityTriggerCount++;
+            else if (volume.Kind == ZoneTriggerKind.Teleportal)
+                TeleportalTriggerCount++;
 
             int minBinX = (int)MathF.Floor(volume.MinX / BinSize);
             int maxBinX = (int)MathF.Floor(volume.MaxX / BinSize);
@@ -286,8 +308,21 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 return true;
             }
 
+            if (v.Kind == ZoneTriggerKind.Teleportal)
+            {
+                // Inside the area at the end of the step; teleportals are wide regions, not thin lines.
+                if (v.Teleportal == null || !v.Teleportal.Contains(x, z))
+                    return false;
+
+                if (!overlappingIds.Add(v.Id))
+                    return false;
+
+                hit = new ZoneTriggerHit(v, 0f);
+                return true;
+            }
+
             if (v.Kind is ZoneTriggerKind.PortalDynel or ZoneTriggerKind.ExitProxy or ZoneTriggerKind.TargetVicinity
-                or ZoneTriggerKind.MissionEntrance or ZoneTriggerKind.DungeonExit)
+                or ZoneTriggerKind.MissionEntrance or ZoneTriggerKind.DungeonExit or ZoneTriggerKind.ExitDoor)
             {
                 if (MathF.Abs(y - v.CenterY) > HalfHeight(v))
                     return false;
@@ -414,6 +449,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
         {
             if (v.Kind == ZoneTriggerKind.WallBorder)
                 return MinimalDistance(v.SegAx, v.SegAz, v.SegBx, v.SegBz, x, z) < WallProximity;
+
+            if (v.Kind == ZoneTriggerKind.Teleportal)
+                return v.Teleportal != null && v.Teleportal.Contains(x, z);
 
             float dx = x - v.CenterX;
             float dz = z - v.CenterZ;

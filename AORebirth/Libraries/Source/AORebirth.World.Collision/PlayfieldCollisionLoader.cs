@@ -31,6 +31,7 @@ namespace AORebirth.World.Collision
 
             PlayfieldMetaData? meta = TryReadMetaData(gameDataRoot, playfieldId);
             var meshes = new List<CollisionTriangleMesh>();
+            var teleportals = new List<SurfaceTeleportal>();
             TerrainHeightfield? terrain = null;
 
             string collisionPath = Path.Combine(
@@ -89,18 +90,57 @@ namespace AORebirth.World.Collision
                         surfacePayload,
                         collisionPath + "#surface");
                     SurfaceResourceNormalizer.AppendMeshes(surface, cellId: null, meshes);
+                    AddTeleportal(surface, teleportals);
                 }
             }
 
-            AppendCellSurfaces(gameDataRoot, playfieldId, meshes);
+            AppendCellSurfaces(gameDataRoot, playfieldId, meshes, teleportals);
 
-            return new PlayfieldCollisionSet(playfieldId, meshes, terrain);
+            return new PlayfieldCollisionSet(playfieldId, meshes, terrain, teleportals);
+        }
+
+        /// <summary>
+        /// Keeps a surface's teleportal when the whole record decoded (AODB FooterOk) and no identical one (same
+        /// destination and area, copied into every cell it overlaps) is already listed.
+        /// </summary>
+        static void AddTeleportal(SurfaceResource surface, List<SurfaceTeleportal> teleportals)
+        {
+            SurfaceTeleportal? teleportal = surface.Teleportal;
+            if (teleportal == null || !surface.FooterOk)
+                return;
+
+            foreach (SurfaceTeleportal existing in teleportals)
+            {
+                if (existing.DestinationPlayfield == teleportal.DestinationPlayfield
+                    && existing.DestinationLine == teleportal.DestinationLine
+                    && SameArea(existing, teleportal))
+                    return;
+            }
+
+            teleportals.Add(teleportal);
+        }
+
+        static bool SameArea(SurfaceTeleportal a, SurfaceTeleportal b)
+        {
+            if (a.Area.Count != b.Area.Count)
+                return false;
+
+            for (int i = 0; i < a.Area.Count; i++)
+            {
+                if (MathF.Abs(a.Area[i].X - b.Area[i].X) > 0.01f
+                    || MathF.Abs(a.Area[i].Y - b.Area[i].Y) > 0.01f
+                    || MathF.Abs(a.Area[i].Z - b.Area[i].Z) > 0.01f)
+                    return false;
+            }
+
+            return true;
         }
 
         static void AppendCellSurfaces(
             string gameDataRoot,
             int playfieldId,
-            List<CollisionTriangleMesh> meshes)
+            List<CollisionTriangleMesh> meshes,
+            List<SurfaceTeleportal> teleportals)
         {
             string surfacesPath = Path.Combine(
                 gameDataRoot,
@@ -139,6 +179,7 @@ namespace AORebirth.World.Collision
                         + "#cell"
                         + entries[i].CellId.ToString(CultureInfo.InvariantCulture));
                     SurfaceResourceNormalizer.AppendMeshes(surface, entries[i].CellId, meshes);
+                    AddTeleportal(surface, teleportals);
                 }
                 catch
                 {

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `teleports` (
   `destinationType` int(15) NOT NULL DEFAULT '0',
   `destinationInstance` int(15) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1246 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1253 DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(116, 560, 51016, 3221815856, 1187, 51016, 3221357731);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(117, 560, 51016, 3221881392, 1186, 51016, 3221488802);
@@ -228,3 +228,5 @@ INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `des
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1226, 4541, 51016, 3223523773, 1614, 51016, 3221292622);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1227, 4541, 51016, 3223589309, 1614, 51016, 3221292622);
 INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1228, 4541, 51016, 3223654845, 1614, 51016, 3221292622);
+INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1251, 4001, 51016, 3221229473, 4313, 51016, 3221229785);
+INSERT INTO `teleports` (`Id`, `playfield`, `statelType`, `statelInstance`, `destinationPlayfield`, `destinationType`, `destinationInstance`) VALUES	(1252, 4313, 51016, 3221229785, 4001, 51016, 3221229473);
