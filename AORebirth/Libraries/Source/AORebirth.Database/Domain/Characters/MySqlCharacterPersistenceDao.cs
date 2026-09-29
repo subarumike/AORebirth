@@ -119,13 +119,16 @@ namespace AORebirth.Database.Domain.Characters
         public CharacterStateData LoadCharacter(int characterId)
         {
             if (characterId <= 0) return null;
-            var rows = Query("SELECT Id,Name,FirstName,LastName,Playfield,X,Y,Z,HeadingW,HeadingX,HeadingY,HeadingZ "
-                + "FROM characters WHERE Id=@Id LIMIT 1", r => new CharacterStateData
+            var rows = Query("SELECT c.Id,c.Name,c.FirstName,c.LastName,c.Playfield,c.X,c.Y,c.Z,"
+                + "c.HeadingW,c.HeadingX,c.HeadingY,c.HeadingZ,COALESCE(l.AccountFlags,0) "
+                + "FROM characters c LEFT JOIN login l ON l.Username=c.Username WHERE c.Id=@Id LIMIT 1",
+                r => new CharacterStateData
                 {
                     Id = r.GetInt32(0), Name = r.IsDBNull(1) ? null : r.GetString(1),
                     FirstName = r.IsDBNull(2) ? null : r.GetString(2), LastName = r.IsDBNull(3) ? null : r.GetString(3),
                     Playfield = r.GetInt32(4), X = r.GetFloat(5), Y = r.GetFloat(6), Z = r.GetFloat(7),
-                    HeadingW = r.GetFloat(8), HeadingX = r.GetFloat(9), HeadingY = r.GetFloat(10), HeadingZ = r.GetFloat(11)
+                    HeadingW = r.GetFloat(8), HeadingX = r.GetFloat(9), HeadingY = r.GetFloat(10), HeadingZ = r.GetFloat(11),
+                    AccountFlags = r.GetInt32(12)
                 }, "@Id", characterId);
             return rows.Count == 0 ? null : rows[0];
         }

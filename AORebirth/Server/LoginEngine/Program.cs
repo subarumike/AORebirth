@@ -53,8 +53,10 @@ namespace LoginEngine
     using LoginEngine.CoreServer;
     using LoginEngine.Packets;
 
+#if !AOREBIRTH_WIN_NET10
     using NBug;
     using NBug.Properties;
+#endif
 
     using NLog;
 
@@ -589,11 +591,17 @@ namespace LoginEngine
                 LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/LoginEngineLog.txt", LogLevel.Trace);
 
+#if AOREBIRTH_WIN_NET10
+                // NBug is .NET Framework only; log unhandled exceptions through NLog.
+                AppDomain.CurrentDomain.UnhandledException += UnhandledException;
+                TaskScheduler.UnobservedTaskException += UnobservedTaskException;
+#else
                 // NBug initialization
                 SettingsOverride.LoadCustomSettings("NBug.LoginEngine.config");
                 Settings.WriteLogToDisk = true;
                 AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
                 TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
+#endif
             }
             catch (Exception e)
             {
@@ -606,6 +614,25 @@ namespace LoginEngine
 
             return true;
         }
+
+#if AOREBIRTH_WIN_NET10
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception exception = e.ExceptionObject as Exception;
+            if (exception != null)
+                LogManager.GetCurrentClassLogger().Fatal(exception, "Unhandled LoginEngine exception");
+            else
+                LogManager.GetCurrentClassLogger().Fatal("Unhandled LoginEngine exception: {0}", e.ExceptionObject);
+
+            LogManager.Flush();
+        }
+
+        private static void UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            LogManager.GetCurrentClassLogger().Error(e.Exception, "Unobserved LoginEngine task exception");
+            LogManager.Flush();
+        }
+#endif
 
         /// <summary>
         /// </summary>

@@ -24,5 +24,6 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/ServerConsoleCommands.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/TestEmailRegex.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/WeakReference.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/Config/DebugMcpSettings.cs" />
   </ItemGroup>
 </Project>

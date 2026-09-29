@@ -66,6 +66,25 @@ namespace ZoneEngine_New.Core.Entities
 
         public static bool IsUnset(int value) => value == (int)CharacterStat.Unset;
 
+        /// <summary>Server bookkeeping stats the client never receives.</summary>
+        public static bool IsServerOnly(CharacterStat stat) => stat == CharacterStat.UsedIP;
+
+        /// <summary>
+        /// The value the client is sent for a stat, when it is not simply the stored base (a player's IP is sent as
+        /// what is left to spend). Null for every other stat.
+        /// </summary>
+        public Func<CharacterStat, int?>? WireValueOverride { get; set; }
+
+        /// <summary>The value the client is sent for <paramref name="stat"/>: the override, else the base.</summary>
+        public int WireValue(CharacterStat stat) => WireValueOverride?.Invoke(stat) ?? Get(stat, StatDetail.Base);
+
+        /// <summary>Queues <paramref name="stat"/> for the next StatMessage although its base did not change.</summary>
+        public void MarkDirty(CharacterStat stat)
+        {
+            if (!IsServerOnly(stat))
+                _dirty.Add(stat);
+        }
+
         /// <summary>
         /// Maps the Unset sentinel to 0; leaves all other values unchanged.
         /// Use when a raw int may already hold Unset (e.g. item template stats).
@@ -171,19 +190,21 @@ namespace ZoneEngine_New.Core.Entities
             if (_dirty.Count == 0)
                 return [];
 
-            var drained = new GameTuple<CharacterStat, uint>[_dirty.Count];
-            int index = 0;
+            var drained = new List<GameTuple<CharacterStat, uint>>(_dirty.Count);
             foreach (CharacterStat stat in _dirty)
             {
-                drained[index++] = new GameTuple<CharacterStat, uint>
+                if (IsServerOnly(stat))
+                    continue;
+
+                drained.Add(new GameTuple<CharacterStat, uint>
                 {
                     Value1 = stat,
-                    Value2 = (uint)Get(stat, StatDetail.Base)
-                };
+                    Value2 = (uint)WireValue(stat)
+                });
             }
 
             _dirty.Clear();
-            return drained;
+            return drained.ToArray();
         }
 
         /// <summary>Drops a single dirty flag without emitting a StatMessage for it.</summary>

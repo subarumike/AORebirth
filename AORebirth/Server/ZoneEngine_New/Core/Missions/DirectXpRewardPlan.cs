@@ -94,8 +94,6 @@ public sealed class DirectXpRewardPlan
         {
             values[CharacterStat.Level] = level;
             values[CharacterStat.TitleLevel] = Character.TitleLevelFor(level);
-            values[CharacterStat.IP] = checked(player.Stats.GetOrZero(CharacterStat.IP, StatDetail.Base)
-                + Character.TotalIpEarnedAtLevel(level) - Character.TotalIpEarnedAtLevel(before));
             PlanRefill(player, values);
         }
         return new(player, reward, before, level, shadow, values);
@@ -147,7 +145,7 @@ public sealed class DirectXpRewardPlan
             for (int level = LevelBefore + 1; level <= LevelAfter; level++)
                 player.Session?.Send(new NewLevelMessage
                 {
-                    Identity = player.Identity, Unknown = 0, Level = level, Ip = player.Stats.GetOrZero(CharacterStat.IP),
+                    Identity = player.Identity, Unknown = 0, Level = level, Ip = Math.Max(0, player.AvailableIp),
                     Xp = ExperienceAfter, LastSaveXp = checked((int)XpFloor(level)),
                     NextLevelXp = level >= 200 ? 0 : checked((int)XpFloor(level + 1)), Unknown1 = 0, Unknown2 = 4,
                     LastXp = Math.Max(0, player.Stats.GetOrZero(CharacterStat.LastXP))

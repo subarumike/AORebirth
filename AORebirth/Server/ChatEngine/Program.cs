@@ -56,7 +56,7 @@ namespace ChatEngine
 
     using locales;
 
-    #if !AOREBIRTH_LINUX
+    #if !AOREBIRTH_LINUX && !AOREBIRTH_WIN_NET10
     using NBug;
     using NBug.Properties;
     #endif
@@ -614,7 +614,7 @@ namespace ChatEngine
                 chatServer = null;
             }
 
-            #if AOREBIRTH_LINUX
+            #if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
             AppDomain.CurrentDomain.UnhandledException -= LinuxUnhandledException;
             TaskScheduler.UnobservedTaskException -= LinuxUnobservedTaskException;
             #endif
@@ -799,13 +799,16 @@ namespace ChatEngine
                 LogUtil.ApplyConfiguredDebugDetails();
                 #if !AOREBIRTH_LINUX
                 LogUtil.SetupFileLogging("${basedir}/ChatEngineLog.txt", LogLevel.Trace);
+                #endif
 
+                #if !AOREBIRTH_LINUX && !AOREBIRTH_WIN_NET10
                 // NBug initialization
                 SettingsOverride.LoadCustomSettings("NBug.ChatEngine.config");
                 Settings.WriteLogToDisk = true;
                 AppDomain.CurrentDomain.UnhandledException += Handler.UnhandledException;
                 TaskScheduler.UnobservedTaskException += Handler.UnobservedTaskException;
                 #else
+                // NBug is .NET Framework only; log unhandled exceptions through NLog.
                 AppDomain.CurrentDomain.UnhandledException += LinuxUnhandledException;
                 TaskScheduler.UnobservedTaskException += LinuxUnobservedTaskException;
                 #endif
@@ -822,7 +825,7 @@ namespace ChatEngine
             return true;
         }
 
-        #if AOREBIRTH_LINUX
+        #if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
         private static void LinuxUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Exception exception = e.ExceptionObject as Exception;

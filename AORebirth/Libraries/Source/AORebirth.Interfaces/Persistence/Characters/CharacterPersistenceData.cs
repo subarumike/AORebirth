@@ -17,6 +17,9 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public float HeadingX { get; set; }
         public float HeadingY { get; set; }
         public float HeadingZ { get; set; }
+
+        /// <summary>The owning account's login.AccountFlags (read at load; never saved from here).</summary>
+        public int AccountFlags { get; set; }
     }
 
     /// <summary>Persisted base value, not an effective value with equipment/nano modifiers applied.</summary>

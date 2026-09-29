@@ -242,20 +242,26 @@ namespace LoginEngine.Packets
             int playfield;
             float x, y, z;
 
-            if (startInSL)
-            {
-                playfield = 4001;
-                x = 850;
-                y = 43;
-                z = 565;
-            }
-            else
-            {
-                playfield = 6553;
-                x = 3607.6f;
-                y = 52.4f;
-                z = 785.7f;
-            }
+            // if (startInSL)
+            // {
+            //     playfield = 4001;
+            //     x = 850;
+            //     y = 43;
+            //     z = 565;
+            // }
+            // else
+            // {
+            //     playfield = 6553;
+            //     x = 3607.6f;
+            //     y = 52.4f;
+            //     z = 785.7f;
+            // }
+
+            // TEMPORARY: every new character on ICC. Restore the other starter areas above when implemented.
+            playfield = 4582;
+            x = 932f;
+            y = 20.6f;
+            z = 728f;
 
             DBCharacter character = CharacterDao.Instance.Get(charid);
             if (character != null)
@@ -305,26 +311,22 @@ namespace LoginEngine.Packets
 
             #region Statistics
 
-            switch (this.Breed)
+            // Fixed starter stats and breed abilities come from GameData/NewCharacter.json.
+            NewCharacterStats starter = NewCharacterStats.Current;
+            BreedAbilities breedAbilities = starter.AbilitiesFor(this.Breed);
+            if (breedAbilities == null)
             {
-                case 0x1: /* solitus */
-                    this.Abis = new[] { 6, 6, 6, 6, 6, 6 };
-                    break;
-                case 0x2: /* opifex */
-                    this.Abis = new[] { 3, 3, 10, 6, 6, 15 };
-                    break;
-                case 0x3: /* nanomage */
-                    this.Abis = new[] { 3, 10, 6, 15, 3, 3 };
-                    break;
-                case 0x4: /* atrox */
-                    this.Abis = new[] { 15, 3, 3, 3, 10, 6 };
-                    break;
-                default:
-                    Console.WriteLine("unknown breed: {0}", this.Breed);
-                    break;
+                throw new InvalidOperationException(
+                    "GameData NewCharacter.json has no starting abilities for breed " + this.Breed + ".");
             }
 
+            this.Abis = breedAbilities.ToLegacyOrder();
+
             List<DBStats> stats = new List<DBStats>();
+            foreach (StatValue starterStat in starter.Stats)
+            {
+                stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = starterStat.Stat, StatValue = starterStat.Value });
+            }
 
             // Transmit GM level into stats table
             stats.Add(
@@ -336,22 +338,11 @@ namespace LoginEngine.Packets
                     StatValue = LoginDataDao.Instance.GetByUsername(this.AccountName).GM
                 });
 
-            // Flags
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 0, StatValue = 0x00081241 });
-
-            // Level
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 54, StatValue = 1 });
-
             // SEXXX
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 59, StatValue = this.Gender });
 
             // Headmesh
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 64, StatValue = this.HeadMesh });
-
-            // Retail player appearance identity
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 33, StatValue = 0 });
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 89, StatValue = 1 });
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 673, StatValue = 31 });
 
             // MonsterScale
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 360, StatValue = this.MonsterScale });
@@ -391,22 +382,6 @@ namespace LoginEngine.Packets
 
             // Agility / 17
             stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 17, StatValue = this.Abis[5] });
-
-            // Title level
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 37, StatValue = 1 });
-
-            // Starter skill bases used by HP/NP formulas
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 152, StatValue = 5 });
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 132, StatValue = 5 });
-
-            // NPCFamily / 455
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 455, StatValue = 0 });
-
-            // ICC Commendations (capture-proven stat 695)
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 695, StatValue = 0 });
-
-            // Freelancers Inc. Tokens (stat 696 / DailyMissionResets)
-            stats.Add(new DBStats { Type = 50000, Instance = charID, StatId = 696, StatValue = 0 });
 
             stats.Add(
                 new DBStats
@@ -479,7 +454,6 @@ namespace LoginEngine.Packets
             }
 
             StarterVitalStats.Apply(charID, this.Breed, this.Profession, this.Abis);
-            StarterXpStats.Apply(charID);
 
             return charID;
         }

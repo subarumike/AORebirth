@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Full AORebirth.Database for the .NET 10 LoginEngine/ChatEngine build (ZoneEngine_New keeps its own trimmed projects). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>AORebirth.Database</AssemblyName>
+    <RootNamespace>AORebirth.Database</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_WIN_NET10;AOREBIRTH_WIN_NET10_ENGINES</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <NoWarn>$(NoWarn);CS8632;CS0618;CS0612;SYSLIB0011;SYSLIB0014;SYSLIB0021;SYSLIB0023;SYSLIB0051</NoWarn>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="6.1.4" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AORebirth.Enums.Engines.WinNet10.csproj" />
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
+    <ProjectReference Include="AORebirth.Interfaces.Engines.WinNet10.csproj" />
+    <ProjectReference Include="AORebirth.Exceptions.Engines.WinNet10.csproj" />
+    <ProjectReference Include="Utility.Engines.WinNet10.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(AORebirthRepositoryRoot)/SharedBuild/Compatibility/SystemDataLinqBinary.Portable.cs" Link="Compatibility/SystemDataLinqBinary.Portable.cs" />
+  </ItemGroup>
+
+  <Import Project="$(AORebirthRepositoryRoot)/SharedBuild/source-inventory/AORebirth.Database.CompileItems.props" />
+
+  <Import Project="$(AORebirthRepositoryRoot)/SharedBuild/source-inventory/AORebirth.Database.ContentItems.props" />
+</Project>

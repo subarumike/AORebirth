@@ -94,13 +94,13 @@ namespace ZoneEngine_New.Core.Characters
                     return Reject(out rejection, $"{skill} target {target} over ability cap {abilityCap}");
             }
 
-            int ip = stats.GetOrZero(CharacterStat.IP, StatDetail.Base);
+            int ip = player.AvailableIp;
             if (cost > ip)
                 return Reject(out rejection, $"cost {cost} exceeds ip {ip} (short {cost - ip})");
 
             foreach (GameTuple<CharacterStat, uint> pair in pairs)
                 stats.Set(pair.Value1, (int)pair.Value2, StatDetail.Base);
-            stats.Set(CharacterStat.IP, ip - (int)cost, StatDetail.Base);
+            stats.Set(CharacterStat.UsedIP, stats.GetOrZero(CharacterStat.UsedIP, StatDetail.Base) + (int)cost, StatDetail.Base);
             player.RebaseStats();
             return true;
         }
@@ -164,7 +164,7 @@ namespace ZoneEngine_New.Core.Characters
                 }
             }
 
-            reply.Add(Tuple(CharacterStat.IP, player.Stats.GetOrZero(CharacterStat.IP, StatDetail.Base)));
+            reply.Add(Tuple(CharacterStat.IP, Math.Max(0, player.AvailableIp)));
             return [.. reply];
         }
 

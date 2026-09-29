@@ -29,5 +29,8 @@ namespace ZoneEngine_New.Core.Data
         public float HeadingY { get; init; }
 
         public float HeadingZ { get; init; }
+
+        /// <summary>The owning account's login.AccountFlags; the character's AccountFlags stat is set from it.</summary>
+        public int AccountFlags { get; init; }
     }
 }

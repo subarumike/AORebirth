@@ -27,7 +27,7 @@ namespace ZoneEngine_New.Core.Data
         internal static void Run(Action operation, IZoneLogger? logger = null)
             => Run(() => { operation(); return 0; }, logger);
         internal static CharacterStateData Map(CharacterRecord v) => new CharacterStateData { Id = v.Id, Name = v.Name, FirstName = v.FirstName, LastName = v.LastName, Playfield = v.Playfield, X = v.X, Y = v.Y, Z = v.Z, HeadingW = v.HeadingW, HeadingX = v.HeadingX, HeadingY = v.HeadingY, HeadingZ = v.HeadingZ };
-        internal static CharacterRecord Map(CharacterStateData v) => new CharacterRecord { Id = v.Id, Name = v.Name, FirstName = v.FirstName, LastName = v.LastName, Playfield = v.Playfield, X = v.X, Y = v.Y, Z = v.Z, HeadingW = v.HeadingW, HeadingX = v.HeadingX, HeadingY = v.HeadingY, HeadingZ = v.HeadingZ };
+        internal static CharacterRecord Map(CharacterStateData v) => new CharacterRecord { Id = v.Id, Name = v.Name, FirstName = v.FirstName, LastName = v.LastName, Playfield = v.Playfield, X = v.X, Y = v.Y, Z = v.Z, HeadingW = v.HeadingW, HeadingX = v.HeadingX, HeadingY = v.HeadingY, HeadingZ = v.HeadingZ, AccountFlags = v.AccountFlags };
         internal static CharacterStatData Map(StatRecord v) => new CharacterStatData { StatId = v.StatId, StatValue = v.StatValue };
         internal static StatRecord Map(CharacterStatData v) => new StatRecord { StatId = v.StatId, StatValue = v.StatValue };
         internal static PersistedItemData Map(ItemInstanceRecord v) => new PersistedItemData { InstanceId = v.InstanceId, ContainerType = v.ContainerType, ContainerInstance = v.ContainerInstance, ContainerPlacement = v.ContainerPlacement, ItemType = v.ItemType, LowId = v.LowId, HighId = v.HighId, Quality = v.Quality, StackCount = v.StackCount, Source = (int)v.Source };

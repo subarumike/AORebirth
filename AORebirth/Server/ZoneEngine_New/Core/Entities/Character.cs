@@ -404,12 +404,7 @@ namespace ZoneEngine_New.Core.Entities
             {
                 Stats.Set(CharacterStat.TitleLevel, TitleLevelFor(level), StatDetail.Base, dirty: true);
 
-                int ipDelta = TotalIpEarnedAtLevel(level) - TotalIpEarnedAtLevel(levelBefore);
-                if (ipDelta != 0)
-                {
-                    int ip = Math.Max(0, Stats.GetOrZero(CharacterStat.IP) + ipDelta);
-                    Stats.Set(CharacterStat.IP, ip, StatDetail.Base, dirty: true);
-                }
+                ShiftLevelIpBonus(levelBefore, level);
 
                 ApplyLevelVitals();
             }
@@ -449,9 +444,7 @@ namespace ZoneEngine_New.Core.Entities
         {
             Stats.Set(CharacterStat.TitleLevel, TitleLevelFor(levelAfter), StatDetail.Base, dirty: true);
 
-            int ipGain = TotalIpEarnedAtLevel(levelAfter) - TotalIpEarnedAtLevel(levelBefore);
-            if (ipGain > 0)
-                Stats.Set(CharacterStat.IP, Stats.GetOrZero(CharacterStat.IP) + ipGain, StatDetail.Base, dirty: true);
+            ShiftLevelIpBonus(levelBefore, levelAfter);
 
             ApplyLevelVitals();
             FlushDirtyStats();
@@ -490,7 +483,7 @@ namespace ZoneEngine_New.Core.Entities
                 Identity = Identity,
                 Unknown = 0,
                 Level = level,
-                Ip = Math.Max(0, Stats.GetOrZero(CharacterStat.IP)),
+                Ip = Math.Max(0, AvailableIp),
                 Xp = Stats.GetOrZero(CharacterStat.XP),
                 LastSaveXp = lastSaveXp,
                 NextLevelXp = nextLevelXp,
@@ -518,6 +511,23 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>Lifetime IP earned at <paramref name="level"/> (legacy <c>StatIp</c> brackets).</summary>
+        /// <summary>
+        /// IP left to spend: the IP stat (extra IP from items as base, the IP the level grants as bonus) minus the
+        /// IP already spent (<see cref="CharacterStat.UsedIP"/>).
+        /// </summary>
+        public int AvailableIp => Stats.GetOrZero(CharacterStat.IP) - Stats.GetOrZero(CharacterStat.UsedIP);
+
+        /// <summary>Adds the IP the character's level grants to the IP bonus (bonuses are rebuilt on rebase).</summary>
+        protected void ApplyLevelIpBonus()
+            => Stats.AddBonus(CharacterStat.IP, TotalIpEarnedAtLevel(Stats.GetOrOne(CharacterStat.Level)));
+
+        /// <summary>A level change moves the level's share of the IP bonus and resends the IP left to spend.</summary>
+        void ShiftLevelIpBonus(int levelBefore, int levelAfter)
+        {
+            Stats.AddBonus(CharacterStat.IP, TotalIpEarnedAtLevel(levelAfter) - TotalIpEarnedAtLevel(levelBefore));
+            Stats.MarkDirty(CharacterStat.IP);
+        }
+
         internal static int TotalIpEarnedAtLevel(int level)
         {
             if (level < 1)

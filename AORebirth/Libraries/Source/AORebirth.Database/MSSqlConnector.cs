@@ -35,7 +35,7 @@ namespace AORebirth.Database
 
     using System;
     using System.Data;
-#if AOREBIRTH_LINUX
+#if AOREBIRTH_LINUX || AOREBIRTH_WIN_NET10
     using Microsoft.Data.SqlClient;
 #else
     using System.Data.SqlClient;

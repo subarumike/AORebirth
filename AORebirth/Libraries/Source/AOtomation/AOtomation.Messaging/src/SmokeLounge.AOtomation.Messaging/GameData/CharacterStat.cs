@@ -1272,6 +1272,12 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         Instance = 0x000003EA,
 
+        /// <summary>
+        /// AORebirth server-only: IP spent on skills and abilities. Never sent to the client; the client's IP is the
+        /// IP stat (extra IP as base, the level's IP as bonus) minus this.
+        /// </summary>
+        UsedIP = 0x00002710,
+
         /// <summary>Sentinel for missing / unset stat and item attribute values.</summary>
         Unset = 1234567890,
     }

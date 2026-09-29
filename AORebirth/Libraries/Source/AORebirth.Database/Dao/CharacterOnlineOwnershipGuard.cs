@@ -23,7 +23,7 @@ namespace AORebirth.Database.Dao
             new Dictionary<int, HeldZoneLease>();
         private static readonly HashSet<int> RecoveryCharacters = new HashSet<int>();
 
-#if !AOREBIRTH_WIN_NET10
+#if !AOREBIRTH_WIN_NET10 || AOREBIRTH_WIN_NET10_ENGINES
         public static IDisposable AcquireZoneOwnership(int characterId)
         {
             return AcquireZoneOwnership(characterId, CharacterDao.Instance.SetOnline);
@@ -80,7 +80,7 @@ namespace AORebirth.Database.Dao
             }
         }
 
-#if !AOREBIRTH_WIN_NET10
+#if !AOREBIRTH_WIN_NET10 || AOREBIRTH_WIN_NET10_ENGINES
         public static LoginOwnedOnlineCleanupResult TryClearLoginOwnership(int characterId)
         {
             return TryClearLoginOwnership(characterId, CharacterDao.Instance.SetOffline);

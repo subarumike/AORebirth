@@ -47,6 +47,8 @@ namespace AORebirth.Core.GameData
 
         public const string XpFileName = "Xp.json";
 
+        public const string NewCharacterFileName = "NewCharacter.json";
+
         public const string AlienXpFileName = "AlienXp.json";
 
         public const string SkillTrickleFileName = "SkillTrickle.json";

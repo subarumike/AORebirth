@@ -49,7 +49,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         "Skill training rejected character={0} pairs={1} ip={2}: {3} [{4}]",
                         player.Identity.Instance,
                         message.Skills?.Length ?? 0,
-                        player.Stats.GetOrZero(CharacterStat.IP, StatDetail.Base),
+                        player.AvailableIp,
                         rejection,
                         SkillTraining.DescribeRequest(player, message.Skills, player.SkillCatalog)));
             }

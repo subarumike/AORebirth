@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Full AORebirth.Communication for the .NET 10 LoginEngine/ChatEngine build (ZoneEngine_New keeps its own trimmed projects). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>AORebirth.Communication</AssemblyName>
+    <RootNamespace>AORebirth.Communication</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <DefineConstants>TRACE;AOREBIRTH_WIN_NET10;AOREBIRTH_WIN_NET10_ENGINES</DefineConstants>
+    <Deterministic>true</Deterministic>
+    <NoWarn>$(NoWarn);CS8632;CS0618;CS0612;SYSLIB0011;SYSLIB0014;SYSLIB0021;SYSLIB0023;SYSLIB0051</NoWarn>
+    <AORebirthRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</AORebirthRepositoryRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
+    <PackageReference Include="MemBus" Version="2.0.2" ExcludeAssets="all" PrivateAssets="all" NoWarn="NU1701" GeneratePathProperty="true" />
+    <Reference Include="$(NuGetPackageRoot)membus/2.0.2/lib/Net40-Client/MemBus.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="SmokeLounge.AOtomation.Messaging.WinNet10.csproj" />
+    <ProjectReference Include="Cell.Core.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="Cell.Util.ZoneNew.WinNet10.csproj" />
+    <ProjectReference Include="Utility.Engines.WinNet10.csproj" />
+  </ItemGroup>
+
+  <Import Project="$(AORebirthRepositoryRoot)/SharedBuild/source-inventory/AORebirth.Communication.CompileItems.props" />
+</Project>

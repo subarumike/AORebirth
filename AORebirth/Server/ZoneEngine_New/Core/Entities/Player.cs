@@ -82,6 +82,8 @@ namespace ZoneEngine_New.Core.Entities
             Logger = logger;
             _items = items;
             Inventory = new PlayerInventory();
+            // The client's IP is what is left to spend; it never sees the level bonus or UsedIP split.
+            Stats.WireValueOverride = stat => stat == CharacterStat.IP ? Math.Max(0, AvailableIp) : null;
             // Requirement folds use Stats.Get; keep this at 0 so Unset never fails NotBitAnd checks.
             Stats.Set(CharacterStat.SelectedTargetType, 0, StatDetail.Base);
             Stats.BaseChanged += stat =>
@@ -296,6 +298,7 @@ namespace ZoneEngine_New.Core.Entities
             // requirements.
             RebaseEquipBonuses();
             ApplyBuffBonuses();
+            ApplyLevelIpBonus();
             ActionRestrictionFlags = CombatRules.CollectActionRestrictions(Buffs, Stats);
             SkillCatalog.ApplyTrickle(Stats);
             RebaseWearAppearance();
@@ -622,6 +625,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.PVPSoloScore,
             CharacterStat.PVPTeamScore,
             CharacterStat.PVPDuelScore,
+            CharacterStat.Commendations,
+            CharacterStat.DailyMissionResets,
             //CharacterStat.UnreadMailCount,
             //CharacterStat.LastMailCheckTime,
             CharacterStat.SavedXP,
@@ -930,11 +935,40 @@ namespace ZoneEngine_New.Core.Entities
             return message;
         }
 
+        /// <summary>
+        /// Stats a new character does not store: never having been set means 0, and the client is sent 0 rather
+        /// than nothing.
+        /// </summary>
+        static readonly HashSet<CharacterStat> ZeroWhenUnsetStats =
+        [
+            CharacterStat.XP,
+            CharacterStat.LastSaveXP,
+            CharacterStat.UnsavedXP,
+            CharacterStat.SavedXP,
+            CharacterStat.Specialization,
+            CharacterStat.VP,
+            CharacterStat.Commendations,
+            CharacterStat.DailyMissionResets,
+            CharacterStat.PVPDuelKills,
+            CharacterStat.PVPDuelDeaths,
+            CharacterStat.PVPProfessionDuelKills,
+            CharacterStat.PVPProfessionDuelDeaths,
+            CharacterStat.PVPRankedSoloKills,
+            CharacterStat.PVPRankedSoloDeaths,
+            CharacterStat.PVPRankedTeamKills,
+            CharacterStat.PVPRankedTeamDeaths,
+            CharacterStat.PVPSoloScore,
+            CharacterStat.PVPTeamScore,
+            CharacterStat.PVPDuelScore,
+        ];
+
         static GameTuple<int, uint>[] BuildFullCharacterIntStats(StatCollection stats, CharacterStat[] ids)
         {
             // These are counted (stat id, value) arrays. Absent optional stats are omitted;
-            // an explicit stored zero remains distinct from an absent value.
-            ids = ids.Where(id => stats.TryGetValue(id, out _)).ToArray();
+            // an explicit stored zero remains distinct from an absent value. Stats in ZeroWhenUnsetStats are
+            // always sent, as 0 when unset.
+            ids = ids.Where(id => stats.TryGetValue(id, out _) || ZeroWhenUnsetStats.Contains(id)
+                                  || stats.WireValueOverride?.Invoke(id) != null).ToArray();
             var tuples = new GameTuple<int, uint>[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
@@ -942,7 +976,11 @@ namespace ZoneEngine_New.Core.Entities
                 tuples[i] = new GameTuple<int, uint>
                 {
                     Value1 = (int)id,
-                    Value2 = (uint)RequireWireStat(stats, id)
+                    Value2 = stats.WireValueOverride?.Invoke(id) is int overridden
+                        ? (uint)overridden
+                        : ZeroWhenUnsetStats.Contains(id)
+                            ? (uint)stats.GetOrZero(id)
+                            : (uint)RequireWireStat(stats, id)
                 };
             }
 
