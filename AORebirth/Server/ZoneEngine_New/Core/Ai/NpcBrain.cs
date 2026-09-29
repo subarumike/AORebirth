@@ -198,6 +198,10 @@ namespace ZoneEngine_New.Core.Ai
                 return;
             if (Hate.Contains(player.Identity))
                 return;
+            if (!NpcAiRules.SideAllowsProximityAggro(
+                    Npc.Stats.GetOrZero(CharacterStat.Side),
+                    player.Stats.GetOrZero(CharacterStat.Side)))
+                return;
             // A "gray" NPC (below the player's LevelEligibility.json range, the same rule that makes its kill worth
             // 1 XP) never starts a fight. It still fights back when attacked.
             if (Teams.TeamLevelEligibility.Current.IsTooLowForMember(
