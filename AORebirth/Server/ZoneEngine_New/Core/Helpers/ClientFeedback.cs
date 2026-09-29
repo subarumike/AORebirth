@@ -9,17 +9,18 @@ namespace ZoneEngine_New.Core.Helpers
 
     /// <summary>
     /// Unformatted client feedback. The client looks the line up with
-    /// GetText(category 110, ELF hash of the Feedback_* key) and shows it on channel 0x42000018.
+    /// GetText(category 110, ELF hash of the Feedback_* key). Retail Feedback body: Unknown1 0, category, message id
+    /// (capture 2026-09-29: 00000000 0000006E 0BCBE074); the client picks the feedback channel itself.
     /// </summary>
     internal static class ClientFeedback
     {
-        /// <summary>System-feedback window. The client passes this to its own feedback helper.</summary>
-        public const int Channel = 0x42000018;
-
         public const int CategoryId = 110;
 
         /// <summary>"You're unable to perform this action; please check the requirements of the item." Key name unknown.</summary>
         public const int CheckItemRequirements = 141178878;
+
+        /// <summary>"Target does not have enough nano controlling units (NCU) left." (category 110).</summary>
+        public const int TargetNotEnoughNcu = 220179189;
 
         /// <summary>"Target resisted." (category 110).</summary>
         public const int TargetResisted = 205237300;
@@ -94,7 +95,7 @@ namespace ZoneEngine_New.Core.Helpers
             {
                 Identity = identity,
                 Unknown = 1,
-                Unknown1 = Channel,
+                Unknown1 = 0,
                 CategoryId = CategoryId,
                 MessageId = messageId
             };

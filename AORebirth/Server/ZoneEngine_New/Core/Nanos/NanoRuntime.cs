@@ -660,7 +660,7 @@ namespace ZoneEngine_New.Core.Nanos
                     ClientFeedback.Send(caster, "Feedback_NanoprogramDidNotActivateNotEnoughNanoenergy");
                     return;
                 case NanoCastRefusal.NotEnoughNcu:
-                    ClientFeedback.Send(caster, "Feedback_NCUErrorNanoprogramCantReplaceOther");
+                    ClientFeedback.Send(caster, ClientFeedback.TargetNotEnoughNcu);
                     return;
                 case NanoCastRefusal.InvalidTarget:
                     ClientFeedback.Send(caster, "Feedback_UnableToExecuteOnThisTarget");
@@ -679,7 +679,7 @@ namespace ZoneEngine_New.Core.Nanos
             switch (decision)
             {
                 case BuffApplyDecision.RefusedNotEnoughNcu:
-                    ClientFeedback.Send(caster, "Feedback_NCUErrorNanoprogramCantReplaceOther");
+                    ClientFeedback.Send(caster, ClientFeedback.TargetNotEnoughNcu);
                     return;
                 case BuffApplyDecision.RefusedStrainStronger:
                     ClientFeedback.Send(caster, "Feedback_NCUErrorBetterProgramRunning");

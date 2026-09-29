@@ -108,11 +108,11 @@ public sealed partial class AuthoredQuestService
                 if (!action.AcknowledgementBeforeConsumption) acknowledge?.Invoke();
                 PublishStats(player, stats);
                 foreach (var entry in actions)
-                    if (!string.IsNullOrEmpty(entry.Feedback)) player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel, FormattedMessage = entry.Feedback });
+                    if (!string.IsNullOrEmpty(entry.Feedback)) player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = 0, FormattedMessage = entry.Feedback });
                 foreach (var grant in notifications.Where(x => !x.Definition.PublishBeforeConsumption)) SendOverflowGrant(player, grant.Item);
                 foreach (var entry in actions)
                 {
-                    if (entry.FeedbackMessage != 0) player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel, CategoryId = entry.FeedbackCategory, MessageId = entry.FeedbackMessage });
+                    if (entry.FeedbackMessage != 0) player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = 0, CategoryId = entry.FeedbackCategory, MessageId = entry.FeedbackMessage });
                     foreach (var quest in entry.DeleteJournals) AuthoredQuestJournal.Delete(player, quest, Content);
                     foreach (var quest in entry.SendJournals) AuthoredQuestJournal.Send(player, quest, _now(), Content);
                 }

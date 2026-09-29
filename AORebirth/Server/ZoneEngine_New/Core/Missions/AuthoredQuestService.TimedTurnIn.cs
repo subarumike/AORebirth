@@ -192,8 +192,8 @@ public sealed partial class AuthoredQuestService
         for (int pulse = 1; pulse <= reward / 2; pulse++)
             player.Session?.Send(new StatMessage { Identity = player.Identity,
                 Stats = [new() { Value1 = (CharacterStat)stat, Value2 = (uint)(previous + pulse * 2) }] });
-        player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel, FormattedMessage = text.Replace("{value}", finalValue.ToString(CultureInfo.InvariantCulture)) });
-        player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = ClientFeedback.Channel, CategoryId = 110, MessageId = 108871108 });
+        player.Session?.Send(new FormatFeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = 0, FormattedMessage = text.Replace("{value}", finalValue.ToString(CultureInfo.InvariantCulture)) });
+        player.Session?.Send(new FeedbackMessage { Identity = player.Identity, Unknown = 1, Unknown1 = 0, CategoryId = 110, MessageId = 108871108 });
     }
 
     static bool TryResolveTimedItem(TimedTurnInDefinition rule, Item item, out TimedItem definition)
