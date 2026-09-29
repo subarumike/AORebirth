@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Nanos
 {
     using System;
+    using System.Collections.Generic;
 
     using AORebirth.Enums;
 
@@ -45,6 +46,25 @@ namespace ZoneEngine_New.Core.Nanos
                 && !IsHostile
                 && (nanoFlags & NanoFlags.NotRemovable) == 0;
             IgnoresNcu = (nanoFlags & NanoFlags.NoRemoveNoNCUFriendly) != 0;
+            IsSelfOnly = (can & CanFlags.ApplyOnSelf) != 0 || AllFunctionsApplyToCaster();
+        }
+
+        /// <summary>
+        /// Client rule (Gamecode.dll 0x100a478a, NanoItem_t +0xBC): every function of every event applies to the
+        /// User or Wearer. An empty template counts too.
+        /// </summary>
+        bool AllFunctionsApplyToCaster()
+        {
+            foreach (List<ItemSpell> spells in SpellList.Values)
+            {
+                for (int i = 0; i < spells.Count; i++)
+                {
+                    if (spells[i].Target is not ((int)ItemTarget.User or (int)ItemTarget.Wearer))
+                        return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>Nano strain; nanos of one strain never stack. 0 means strainless.</summary>
@@ -77,6 +97,12 @@ namespace ZoneEngine_New.Core.Nanos
 
         /// <summary>True for nanos that only land on enemies (debuffs); these bypass NCU.</summary>
         public bool IsHostile { get; }
+
+        /// <summary>
+        /// Self-cast only: it lands on the caster whatever is targeted. Set by <see cref="CanFlags.ApplyOnSelf"/>,
+        /// or when every function applies to the User or Wearer (the client's own self-target rule).
+        /// </summary>
+        public bool IsSelfOnly { get; }
 
         /// <summary>True when <see cref="NanoFlags.NoRemoveNoNCUFriendly"/> skips the NCU gate.</summary>
         public bool IgnoresNcu { get; }

@@ -141,6 +141,10 @@ namespace ZoneEngine_New.Core.Nanos
                 return NanoCastRefusal.NotUploaded;
             }
 
+            // A self-only nano lands on the caster whatever the client had targeted.
+            if (spell.IsSelfOnly)
+                target = caster.Identity;
+
             Character? recipient = ResolveTarget(caster, target);
             int nanoCost = ResolveNanoCost(caster, spell);
             NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, nanoCost, nowUtc);
@@ -201,6 +205,10 @@ namespace ZoneEngine_New.Core.Nanos
             ArgumentNullException.ThrowIfNull(caster);
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(recipient);
+
+            // A self-only nano would land on the caster instead.
+            if (spell.IsSelfOnly && !ReferenceEquals(caster, recipient))
+                return false;
 
             NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, ResolveNanoCost(caster, spell), nowUtc);
             if (NanoCastRules.Evaluate(attempt) != NanoCastRefusal.None)
