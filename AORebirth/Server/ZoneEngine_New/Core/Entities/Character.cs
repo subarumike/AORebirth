@@ -1488,11 +1488,11 @@ namespace ZoneEngine_New.Core.Entities
 
             // Break first so a broken pacify lets this strike's threat stick.
             target.RollBuffBreaks(BuffBreakCause.Attack, this);
-            target.ApplyDamage(this, result.Damage, result.HitType);
-            if (weapon != null)
-                ApplyOnHitProcs(target, weapon);
 
-            bool killingHit = target.IsDead;
+            // The hit is announced before the damage lands: a killing hit runs the target's death (stop fight,
+            // death action) inside ApplyDamage, and a client that already saw the death drops the AttackInfo,
+            // so its damage line never showed.
+            bool killingHit = result.Damage >= Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
             Cell?.Announce(
                 new AttackInfoMessage
                 {
@@ -1506,6 +1506,10 @@ namespace ZoneEngine_New.Core.Entities
                     Unknown6 = AttackInfoRules.ResolveWeaponInstance(characterWeapon, weapon, IsPlayer)
                 });
             // Weapon/unarmed auto-attacks stay AttackInfo-only. HealthDamage is for Hit/nano/status.
+
+            target.ApplyDamage(this, result.Damage, result.HitType);
+            if (weapon != null && !target.IsDead)
+                ApplyOnHitProcs(target, weapon);
         }
 
         /// <summary>
