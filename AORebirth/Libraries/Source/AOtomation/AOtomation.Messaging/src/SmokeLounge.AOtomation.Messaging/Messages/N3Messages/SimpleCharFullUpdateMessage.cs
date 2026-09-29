@@ -105,7 +105,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         public SimpleCharFullUpdateFlags SuppressedFlags { get; set; }
 
-        public byte[] ExtendedTextureOverrideData { get; set; }
+        /// <summary>Material texture overrides (flag HasExtendedTextures), written right after the run speed.</summary>
+        public TextureOverride[] TextureOverrides { get; set; }
 
         // Exact inbound body and any tail that could not be structurally decoded.
         // These are capture/evidence fields and are intentionally not serialized.

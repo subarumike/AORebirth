@@ -373,6 +373,10 @@ namespace ZoneEngine_New.Core.Inventory
             bool skipPassiveModifiers,
             SpellCriteria criteria)
         {
+            // Each function names who it applies to (User / Wearer / Self: whoever used the item or cast the
+            // nano; Target: the event target). A nano cast on someone else can still act on its caster, e.g. a
+            // pet summon. Its requirements are checked against that same character.
+            target = ItemUseFunctions.ResolveApplyOn(target, source, spell);
             if (!spell.MeetsRequirements(stat => criteria.Resolve(stat, id => target.Stats.Get(id))))
                 return false;
 

@@ -173,7 +173,7 @@ namespace ZoneEngine_New.Core.Playfield
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
             ApplyTextures(npc, template);
-            npc.SetExtendedTextureOverrideData(template.ExtendedTextureOverrideData);
+            npc.SetTextureOverrides(template.TextureOverrides);
             npc.FillEquipment(_gameData, _logger);
             WearCastNano.ApplyContainer(
                 npc,

@@ -2336,7 +2336,7 @@ namespace ZoneEngine_New.Core.Entities
         readonly Dictionary<int, Mesh> _handMeshes = new();
         readonly List<AOTextures> _textures = new();
         readonly List<Mesh> _meshes = new();
-        byte[]? _extendedTextureOverrideData;
+        TextureOverride[]? _textureOverrides;
         bool _appearanceViewStale = true;
 
         /// <summary>
@@ -2386,16 +2386,10 @@ namespace ZoneEngine_New.Core.Entities
             _appearanceViewStale = true;
         }
 
-        /// <summary>Template-authored SCFU extended texture override data.</summary>
-        public void SetExtendedTextureOverrideData(byte[]? data)
+        /// <summary>Template-authored material texture overrides (SCFU extended textures).</summary>
+        public void SetTextureOverrides(IReadOnlyList<TextureOverride>? overrides)
         {
-            if (data == null || data.Length == 0)
-            {
-                _extendedTextureOverrideData = null;
-                return;
-            }
-
-            _extendedTextureOverrideData = (byte[])data.Clone();
+            _textureOverrides = overrides == null || overrides.Count == 0 ? null : CloneTextureOverrides(overrides);
         }
 
         /// <summary>Template or authored-content mesh.</summary>
@@ -2990,7 +2984,7 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown2 = 0,
                 ActiveNanos = BuildActiveNanos(),
                 Waypoints = Motor.CopyRemainingWaypoints(),
-                ExtendedTextureOverrideData = CopyExtendedTextureOverrideData(),
+                TextureOverrides = CopyTextureOverrides(),
                 Textures = BuildTextures(isNpc),
                 Meshes = BuildMeshes(headMesh)
             };
@@ -3103,10 +3097,26 @@ namespace ZoneEngine_New.Core.Entities
             return scfu;
         }
 
-        internal byte[]? CopyExtendedTextureOverrideData()
-            => _extendedTextureOverrideData == null || _extendedTextureOverrideData.Length == 0
-                ? null
-                : (byte[])_extendedTextureOverrideData.Clone();
+        internal TextureOverride[]? CopyTextureOverrides()
+            => _textureOverrides == null ? null : CloneTextureOverrides(_textureOverrides);
+
+        static TextureOverride[] CloneTextureOverrides(IReadOnlyList<TextureOverride> overrides)
+        {
+            var copy = new TextureOverride[overrides.Count];
+            for (int i = 0; i < copy.Length; i++)
+            {
+                TextureOverride entry = overrides[i];
+                copy[i] = new TextureOverride
+                {
+                    Material = entry.Material,
+                    Texture = entry.Texture,
+                    Unknown1 = entry.Unknown1,
+                    Unknown2 = entry.Unknown2
+                };
+            }
+
+            return copy;
+        }
 
         /// <summary>Texture places as they appear on this character's own spawn packet.</summary>
         internal Texture[] BuildWireTextures() => BuildTextures(!IsPlayer);

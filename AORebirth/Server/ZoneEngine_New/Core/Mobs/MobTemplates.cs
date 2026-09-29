@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Core.Mobs
     using System.Collections.Generic;
     using System.Text.Json;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     public sealed class MobItemTableEntry
     {
         public string Hash { get; set; } = string.Empty;
@@ -57,7 +59,7 @@ namespace ZoneEngine_New.Core.Mobs
         public Dictionary<int, int> Textures { get; set; } = new();
 
         /// <summary>Opaque SCFU extended texture override payload copied from template data.</summary>
-        public byte[] ExtendedTextureOverrideData { get; set; } = [];
+        public List<TextureOverride> TextureOverrides { get; set; } = new();
 
         /// <summary>Optional raw CorpseFullUpdate template for NPCs whose corpse visuals are not codec-representable.</summary>
         public MobCorpseFullUpdateTemplate? CorpseFullUpdateTemplate { get; set; }

@@ -206,7 +206,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             ScfuTail tail;
             if (TryDecodeTail(remaining, flags, message.Identity, out tail))
             {
-                message.ExtendedTextureOverrideData = tail.ExtendedTextureOverrideData;
+                message.TextureOverrides = tail.TextureOverrides;
                 message.ActiveNanos = tail.ActiveNanos;
                 message.Waypoints = tail.Waypoints;
                 message.Textures = tail.Textures;
@@ -219,7 +219,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
             else
             {
-                message.ExtendedTextureOverrideData = new byte[0];
+                message.TextureOverrides = new TextureOverride[0];
                 message.ActiveNanos = new ActiveNano[0];
                 message.Waypoints = new Vector3[0];
                 message.Textures = new Texture[0];
@@ -457,10 +457,17 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
                 streamWriter.WriteInt32(fightingTarget.Instance);
             }
 
-            if (scfu.ExtendedTextureOverrideData != null && scfu.ExtendedTextureOverrideData.Length > 0)
+            if (scfu.TextureOverrides != null && scfu.TextureOverrides.Length > 0)
             {
                 flags |= SimpleCharFullUpdateFlags.HasExtendedTextures;
-                streamWriter.WriteBytes(scfu.ExtendedTextureOverrideData);
+                streamWriter.WriteInt32((scfu.TextureOverrides.Length + 1) * 0x3F1);
+                foreach (var textureOverride in scfu.TextureOverrides)
+                {
+                    streamWriter.WriteString(textureOverride.Material ?? string.Empty, TextureOverride.MaterialNameLength);
+                    streamWriter.WriteInt32(textureOverride.Texture);
+                    streamWriter.WriteInt32(textureOverride.Unknown1);
+                    streamWriter.WriteInt32(textureOverride.Unknown2);
+                }
             }
 
             // Preview Additional/Suppressed so IsImmune / UnknownFlag3 padding matches final flags.
@@ -676,24 +683,45 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             out ScfuTail result)
         {
             result = null;
-            int firstOffset = flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedTextures) ? 1 : 0;
-            int lastOffset = flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedTextures)
-                                 ? Math.Max(1, bytes.Length - 17)
-                                 : 0;
-
-            for (int offset = firstOffset; offset <= lastOffset; offset++)
+            var overrides = new List<TextureOverride>();
+            int offset = 0;
+            if (flags.HasFlag(SimpleCharFullUpdateFlags.HasExtendedTextures))
             {
-                ScfuTail candidate;
-                if (TryDecodeTailAt(bytes, offset, flags, identity, out candidate))
+                using (var memoryStream = new System.IO.MemoryStream(bytes, false))
+                using (var reader = new StreamReader(memoryStream))
                 {
-                    candidate.ExtendedTextureOverrideData = new byte[offset];
-                    Buffer.BlockCopy(bytes, 0, candidate.ExtendedTextureOverrideData, 0, offset);
-                    result = candidate;
-                    return true;
+                    int count;
+                    if (!TryReadX3F1Count(reader, out count)
+                        || reader.Length - reader.Position < (long)count * TextureOverride.WireSize)
+                    {
+                        return false;
+                    }
+
+                    for (int index = 0; index < count; index++)
+                    {
+                        overrides.Add(
+                            new TextureOverride
+                            {
+                                Material = reader.ReadString(TextureOverride.MaterialNameLength),
+                                Texture = reader.ReadInt32(),
+                                Unknown1 = reader.ReadInt32(),
+                                Unknown2 = reader.ReadInt32()
+                            });
+                    }
+
+                    offset = (int)reader.Position;
                 }
             }
 
-            return false;
+            ScfuTail candidate;
+            if (!TryDecodeTailAt(bytes, offset, flags, identity, out candidate))
+            {
+                return false;
+            }
+
+            candidate.TextureOverrides = overrides.ToArray();
+            result = candidate;
+            return true;
         }
 
         private static bool TryDecodeTailAt(
@@ -839,7 +867,7 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
 
         private sealed class ScfuTail
         {
-            public byte[] ExtendedTextureOverrideData { get; set; }
+            public TextureOverride[] TextureOverrides { get; set; }
 
             public ActiveNano[] ActiveNanos { get; set; }
 

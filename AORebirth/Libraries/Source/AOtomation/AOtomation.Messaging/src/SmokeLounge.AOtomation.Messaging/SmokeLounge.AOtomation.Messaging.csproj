@@ -190,6 +190,7 @@
     <Compile Include="GameData\SimplePcInfo.cs" />
     <Compile Include="GameData\SpecialAttackInfo.cs" />
     <Compile Include="GameData\Texture.cs" />
+    <Compile Include="GameData\TextureOverride.cs" />
     <Compile Include="GameData\Tower.cs" />
     <Compile Include="GameData\TowerField.cs" />
     <Compile Include="GameData\TowerInfoPacket.cs" />

@@ -97,7 +97,22 @@ namespace ZoneEngine_New.Core.Logging
             Line("ScfuTowerUnk", scfu.ScfuTowerUnk);
             Line("IsImmunePadding", scfu.IsImmunePadding);
             Line("UnknownFlag3Padding", scfu.UnknownFlag3Padding);
-            Line("ExtendedTextureOverrideData", FormatBytes(scfu.ExtendedTextureOverrideData));
+            TextureOverride[] overrides = scfu.TextureOverrides ?? [];
+            Line("TextureOverrides.Count", overrides.Length);
+            for (int i = 0; i < overrides.Length; i++)
+            {
+                TextureOverride entry = overrides[i];
+                Line(
+                    "TextureOverrides[" + i + "]",
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Material={0} Texture={1} Unknown1={2} Unknown2={3}",
+                        entry.Material,
+                        entry.Texture,
+                        entry.Unknown1,
+                        entry.Unknown2));
+            }
+
 
             ActiveNano[] nanos = scfu.ActiveNanos ?? [];
             Line("ActiveNanos.Count", nanos.Length);

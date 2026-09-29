@@ -50,6 +50,10 @@ namespace ZoneEngine_New.Core.Helpers
             if (attackerSide is Player && !ReferenceEquals(attackerSide, attacker))
                 return CanAttack(attackerSide, targetSide) || (targetSide is not Player && CanAttackNonPlayer(target));
 
+            // A player's pet is attacked under the same rules as its owner (PvP flags for players, mobs always).
+            if (targetSide is Player && !ReferenceEquals(targetSide, target))
+                return CanAttack(attacker, targetSide);
+
             if (target is Player player)
             {
                 // Mobs can still hit players. Only another player needs the PvP flags.
@@ -76,6 +80,14 @@ namespace ZoneEngine_New.Core.Helpers
                 return false;
             if (IsInRestrictedGas(target))
                 return false;
+
+            // A player's pet is blocked exactly when its owner is.
+            if (target is NpcCharacter { PetOwner: Player petOwner })
+            {
+                if (ReferenceEquals(petOwner, attacker))
+                    return false;
+                target = petOwner;
+            }
 
             return target is Player player && (player.ActionRestrictionFlags & PlayerAttackable) == 0;
         }

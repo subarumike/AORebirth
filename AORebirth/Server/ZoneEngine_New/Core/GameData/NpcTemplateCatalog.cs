@@ -370,7 +370,7 @@ namespace ZoneEngine_New.Core.GameData
                 MaxLevel = max,
                 UnresolvedPlaceholder = isFallback,
                 Equipment = CopyPairs(nearest.Equipment),
-                ExtendedTextureOverrideData = CopyBytes(nearest.ExtendedTextureOverrideData),
+                TextureOverrides = new List<TextureOverride>(nearest.TextureOverrides),
                 CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(nearest.CorpseFullUpdateTemplate),
                 KnuBotId = nearest.KnuBotId,
                 ItemTable = CopyLoot(nearest.LootTable)
@@ -567,7 +567,8 @@ namespace ZoneEngine_New.Core.GameData
 
         public List<List<int>> Equipment { get; set; } = new();
 
-        public byte[] ExtendedTextureOverrideData { get; set; } = [];
+        /// <summary>Material texture overrides sent on the spawn packet (SCFU extended textures).</summary>
+        public List<TextureOverride> TextureOverrides { get; set; } = new();
 
         public MobCorpseFullUpdateTemplate? CorpseFullUpdateTemplate { get; set; }
 
