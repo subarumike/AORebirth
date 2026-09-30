@@ -46,7 +46,10 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Interpolated worn items and expanded monster weapons. Capacity 50.</summary>
         public Container Equipment { get; }
 
-        /// <summary>False for vendors and other non-combat NPCs.</summary>
+        /// <summary>
+        /// False for NoCombat NPCs: vendors and other non-combat NPCs. A NoCombat NPC cannot be attacked, attack, cast or
+        /// be cast on.
+        /// </summary>
         public bool Attackable { get; set; } = true;
 
         /// <summary>

@@ -163,7 +163,7 @@ namespace ZoneEngine_New.Core.Playfield
                 Name = template.Name,
                 MobTemplate = template,
                 SpawnHash = spawnHash ?? template.Hash,
-                Attackable = template.Attackable,
+                Attackable = !template.Has(NpcFeature.NoCombat),
                 Position = at,
                 Rotation = heading ?? new Quaternion(),
                 SpawnSource = spawnSource

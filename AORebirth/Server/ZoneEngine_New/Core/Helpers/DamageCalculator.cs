@@ -65,6 +65,10 @@ namespace ZoneEngine_New.Core.Helpers
                 weaponMax = Math.Max(weaponMin, NormalizeStat(weapon.GetStat(CharacterStat.MaxDamage)));
                 weaponCritBonus = NormalizeStat(weapon.GetStat(CharacterStat.DamageBonus));
                 rawDamageType = NormalizeStat(weapon.GetStat(CharacterStat.DamageType));
+                // Fists, Martial Arts and Brawl items carry no DamageType: they hit as melee like any melee weapon, so
+                // melee damage modifiers and Melee AC apply.
+                if (rawDamageType == 0)
+                    rawDamageType = MeleeDamageType;
                 amsCap = NormalizeStat(weapon.GetStat(CharacterStat.AMSCap));
                 attackDefendSource = weapon.Definition;
 
@@ -242,6 +246,8 @@ namespace ZoneEngine_New.Core.Helpers
                     return false;
             }
         }
+
+        const int MeleeDamageType = 91;
 
         static bool TryGetAddDamageStat(int rawDamageType, out CharacterStat addDamageStat)
         {

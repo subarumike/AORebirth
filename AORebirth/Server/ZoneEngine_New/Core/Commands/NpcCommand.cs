@@ -293,13 +293,13 @@ namespace ZoneEngine_New.Core.Commands
             lines.Add(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "Template: {0} hash={1} templateId={2} knuBot={3} hasHeadMesh={4} attackable={5} levels={6}-{7}",
+                    "Template: {0} hash={1} templateId={2} knuBot={3} hasHeadMesh={4} features={5} levels={6}-{7}",
                     template.Name,
                     template.Hash,
                     template.TemplateId,
                     template.KnuBotId,
                     template.HasHeadMesh,
-                    template.Attackable,
+                    template.Features.Count == 0 ? "none" : string.Join(",", template.Features),
                     template.MinLevel,
                     template.MaxLevel));
 

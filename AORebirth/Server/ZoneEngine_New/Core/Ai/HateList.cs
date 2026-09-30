@@ -111,6 +111,16 @@ namespace ZoneEngine_New.Core.Ai
         public static bool IsProximityHostile(int breedHostility) => breedHostility > 0;
 
         /// <summary>
+        /// Unprovoked aggro range from the NPC's own stats: ProximityRangeOutdoors (454) on outdoor playfields,
+        /// ProximityRangeIndoors (484) indoors. <see cref="ProximityAggroRange"/> when the NPC has none.
+        /// </summary>
+        public static float ProximityAggroRangeFor(Func<CharacterStat, int> stats, bool outdoor)
+        {
+            int range = stats(outdoor ? CharacterStat.ProximityRangeOutdoors : CharacterStat.ProximityRangeIndoors);
+            return range > 0 ? range : ProximityAggroRange;
+        }
+
+        /// <summary>
         /// Faction rule for unprovoked aggro (Side stat): a Neutral NPC never starts a fight, and a Clan or Omni NPC
         /// never starts one with a character of its own side. Monster-side NPCs are not limited by side.
         /// </summary>

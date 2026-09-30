@@ -1772,6 +1772,20 @@ namespace ZoneEngine_New.Core.Entities
                 FunctionType.RestrictAction,
                 spell => spell.TryReadInt(0, out int restricted) && (restricted & RestrictMovementBit) != 0);
 
+        /// <summary>RestrictAction bit that forbids fighting (e.g. 304935 Immortal).</summary>
+        public const int RestrictFightingBit = 2;
+
+        /// <summary>
+        /// A running buff holds RestrictAction with the fighting bit: this character cannot attack. Others can still
+        /// attack it. Refreshed on every rebase (<see cref="ApplyBuffBonuses"/>), so it lifts when the buff ends.
+        /// </summary>
+        public bool CombatRestricted { get; private set; }
+
+        bool HasCombatRestriction
+            => HasBuffFunction(
+                FunctionType.RestrictAction,
+                spell => spell.TryReadInt(0, out int restricted) && (restricted & RestrictFightingBit) != 0);
+
         /// <summary>A running buff holds Pacify (e.g. 100429 Wandering Mind): no aggression, no hate.</summary>
         public bool IsPacified => HasBuffFunction(FunctionType.Pacify);
 
@@ -2173,6 +2187,8 @@ namespace ZoneEngine_New.Core.Entities
 
             for (int i = 0; i < _buffs.Count; i++)
                 StatModifierSpells.Apply(_buffs[i].ModifierSpells, Stats);
+
+            CombatRestricted = HasCombatRestriction;
 
             // Every buff change rebases, so a root landing stops the character here.
             if (IsRooted)

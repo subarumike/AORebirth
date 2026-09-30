@@ -157,6 +157,9 @@ namespace ZoneEngine_New.Core.Nanos
             if (refusal == NanoCastRefusal.None && spell.IsHostile && !IsHostileNanoTarget(caster, recipient))
                 refusal = NanoCastRefusal.InvalidTarget;
 
+            if (refusal == NanoCastRefusal.None && (IsNoCombat(caster) || IsNoCombat(recipient)))
+                refusal = NanoCastRefusal.InvalidTarget;
+
             if (refusal != NanoCastRefusal.None)
             {
                 LogCastRefused(caster, nanoId, target, refusal, phase: "start", attempt: attempt, spell: spell);
@@ -205,6 +208,9 @@ namespace ZoneEngine_New.Core.Nanos
             ArgumentNullException.ThrowIfNull(caster);
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(recipient);
+
+            if (IsNoCombat(caster) || IsNoCombat(recipient))
+                return false;
 
             // A self-only nano would land on the caster instead.
             if (spell.IsSelfOnly && !ReferenceEquals(caster, recipient))
@@ -372,6 +378,9 @@ namespace ZoneEngine_New.Core.Nanos
             IItemBuilder items,
             DateTime nowUtc)
         {
+            if (IsNoCombat(source) || IsNoCombat(target))
+                return false;
+
             if (spell.IsHostile && !IsHostileNanoTarget(source, target))
                 return false;
 
@@ -433,7 +442,7 @@ namespace ZoneEngine_New.Core.Nanos
                 return;
             }
 
-            if (spell.IsHostile && !IsHostileNanoTarget(caster, recipient))
+            if ((spell.IsHostile && !IsHostileNanoTarget(caster, recipient)) || IsNoCombat(recipient))
             {
                 AnnounceCastInterrupted(caster, spell.Id);
                 Refuse(caster, NanoCastRefusal.InvalidTarget);
@@ -617,6 +626,9 @@ namespace ZoneEngine_New.Core.Nanos
             int remaining = Math.Max(0, caster.Stats.GetOrZero(CharacterStat.CurrentNano) - cost);
             caster.Stats.Set(CharacterStat.CurrentNano, remaining, StatDetail.Base, dirty: true);
         }
+
+        /// <summary>A NoCombat NPC (not attackable): it neither casts nanos nor has nanos cast on it.</summary>
+        static bool IsNoCombat(Character? character) => character is NpcCharacter { Attackable: false };
 
         /// <summary>
         /// Hostile nanos may land on the caster. Other targets still have to be legal to attack.
