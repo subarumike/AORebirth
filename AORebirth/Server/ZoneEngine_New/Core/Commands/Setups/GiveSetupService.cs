@@ -24,7 +24,7 @@ using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
 
 /// <summary>
-/// <c>.give setup &lt;url&gt;</c>: makes the issuer's worn weapons, armor and implants exactly the aosetups setup,
+/// <c>.give setup &lt;url&gt;</c>: makes the issuer's worn weapons, armor, implants and symbiants exactly the aosetups setup,
 /// sets the setup's profession and level, sets abilities and skills to the setup's IP raises, applies its buffs, then reloads the issuer in place so
 /// the client rebuilds from a full update. The web fetch runs off the tick; everything else runs on the
 /// issuer's playfield owner, and nothing is changed unless the setup resolved.
@@ -173,6 +173,18 @@ public sealed class GiveSetupService(
             }
 
             TryPlace(worn.Implant, relative, lowId, highId, implant.Quality, implant.Slot + " implant", placements, skipped);
+        }
+
+        foreach (AoSetupSymbiant symbiant in setup.Symbiants)
+        {
+            if (!ImplantSlotsByName.TryGetValue(symbiant.Slot, out int relative))
+            {
+                skipped.Add(symbiant.Slot + ": unknown symbiant slot");
+                continue;
+            }
+
+            int lowId = reference.TryResolveLowId(symbiant.HighId, symbiant.Quality, out int low) ? low : symbiant.HighId;
+            TryPlace(worn.Implant, relative, lowId, symbiant.HighId, symbiant.Quality, symbiant.Slot + " symbiant", placements, skipped);
         }
 
         var skills = new List<(CharacterStat Stat, int Base)>();

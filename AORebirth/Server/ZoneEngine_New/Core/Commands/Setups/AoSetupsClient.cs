@@ -14,6 +14,7 @@ public sealed record AoSetup(
     string Profession,
     IReadOnlyList<AoSetupItem> Items,
     IReadOnlyList<AoSetupImplant> Implants,
+    IReadOnlyList<AoSetupSymbiant> Symbiants,
     IReadOnlyList<AoSetupSkill> Skills,
     IReadOnlyList<int> Buffs);
 
@@ -22,6 +23,9 @@ public sealed record AoSetupItem(bool Weapon, string Slot, int HighId, int Quali
 
 /// <summary>Cluster ids are aosetups' own; <see cref="AoSetupsReference"/> turns them into an implant item.</summary>
 public sealed record AoSetupImplant(string Slot, int Quality, int Shiny, int Bright, int Faded);
+
+/// <summary>A symbiant worn in an implant slot. aosetups stores its high id and chosen QL, same as a weapon or armor piece.</summary>
+public sealed record AoSetupSymbiant(string Slot, int HighId, int Quality);
 
 /// <summary>Points raised with IP above the starting base, by the client's short skill label.</summary>
 public sealed record AoSetupSkill(string Name, int PointsFromIp);
@@ -115,12 +119,23 @@ public sealed class AoSetupsClient
         ReadItems(root, "clothes", weapon: false, items);
 
         var implants = new List<AoSetupImplant>();
+        var symbiants = new List<AoSetupSymbiant>();
         foreach (JsonElement implant in Array(root, "implants"))
         {
-            if (implant.ValueKind != JsonValueKind.Object || !TryString(implant, "slot", out string slot) || !TryInt(implant, "ql", out int ql))
+            if (implant.ValueKind != JsonValueKind.Object || !TryString(implant, "slot", out string slot))
                 continue;
-            if (implant.TryGetProperty("type", out JsonElement type) && type.ValueKind == JsonValueKind.String
-                && !string.Equals(type.GetString(), "implant", StringComparison.OrdinalIgnoreCase))
+
+            string type = implant.TryGetProperty("type", out JsonElement typeElement) && typeElement.ValueKind == JsonValueKind.String
+                ? typeElement.GetString() ?? string.Empty
+                : "implant";
+            if (string.Equals(type, "symbiant", StringComparison.OrdinalIgnoreCase))
+            {
+                if (TrySymbiant(implant, out int highId, out int quality))
+                    symbiants.Add(new AoSetupSymbiant(slot, highId, quality));
+                continue;
+            }
+
+            if (!string.Equals(type, "implant", StringComparison.OrdinalIgnoreCase) || !TryInt(implant, "ql", out int ql))
                 continue;
 
             implant.TryGetProperty("clusters", out JsonElement clusters);
@@ -149,7 +164,7 @@ public sealed class AoSetupsClient
         }
 
         string setupName = TryString(root, "name", out string value) ? value : string.Empty;
-        return new AoSetup(setupName, level, profession, items, implants, skills, buffs);
+        return new AoSetup(setupName, level, profession, items, implants, symbiants, skills, buffs);
     }
 
     static void ReadItems(JsonElement root, string property, bool weapon, List<AoSetupItem> into)
@@ -160,6 +175,25 @@ public sealed class AoSetupsClient
                 && TryInt(item, "highid", out int highId) && TryInt(item, "selectedQl", out int ql) && highId > 0)
                 into.Add(new AoSetupItem(weapon, slot, highId, Math.Max(1, ql)));
         }
+    }
+
+    /// <summary>
+    /// Symbiant rows carry the item under <c>symbiant.highid</c> / <c>symbiant.selectedQl</c>.
+    /// The row's own <c>ql</c> is the implant-quality field and is not the item quality.
+    /// </summary>
+    static bool TrySymbiant(JsonElement row, out int highId, out int quality)
+    {
+        highId = 0;
+        quality = 1;
+        if (!row.TryGetProperty("symbiant", out JsonElement symbiant) || symbiant.ValueKind != JsonValueKind.Object
+            || !TryInt(symbiant, "highid", out highId) || highId <= 0)
+            return false;
+
+        if (TryInt(symbiant, "selectedQl", out int selected))
+            quality = Math.Max(1, selected);
+        else if (TryInt(row, "ql", out int parentQl))
+            quality = Math.Max(1, parentQl);
+        return true;
     }
 
     static int Cluster(JsonElement clusters, string grade)
