@@ -208,15 +208,48 @@ public sealed class KnubotCatalog
         if (openers.Count == 0)
             errors.Add("Openers is empty");
 
+        var trades = new List<KnubotTrade>();
+        foreach (KeyValuePair<string, KnubotTradeFile> pair in file.Trades ?? new Dictionary<string, KnubotTradeFile>())
+        {
+            KnubotTradeFile source = pair.Value ?? new KnubotTradeFile();
+            var tradeErrors = new List<string>();
+            var items = new List<KnubotTradeItem>();
+            foreach (KnubotTradeItemFile item in source.Items ?? [])
+            {
+                string hash = (item?.Hash ?? string.Empty).Trim();
+                if (item == null || item.Count <= 0 || !load.TryItemTemplates(hash, out HashSet<int> templates))
+                    tradeErrors.Add("item needs a known Hash and a positive Count: '" + hash + "'");
+                else
+                    items.Add(new KnubotTradeItem(hash, templates, item.Count));
+            }
+
+            if (source.Credits < 0)
+                tradeErrors.Add("Credits cannot be negative");
+            if (items.Count == 0 && source.Credits == 0 && tradeErrors.Count == 0)
+                tradeErrors.Add("needs Items or Credits");
+
+            string target = (source.Goto ?? string.Empty).Trim();
+            if (target is not (KnubotScript.CloseTarget or KnubotScript.OpenerTarget) && !lines.ContainsKey(target))
+                tradeErrors.Add("Goto names unknown line '" + target + "'");
+
+            KnubotCondition[] conditions = Conditions(source.If, source.Requirements, load, tradeErrors);
+            foreach (string error in tradeErrors)
+                errors.Add("trade '" + pair.Key + "': " + error);
+
+            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target));
+        }
+
         foreach (KnubotLine line in lines.Values)
         {
+            if (trades.Count == 0 && Array.Exists(line.Effects, x => x is KnubotOpenTrade))
+                errors.Add("line '" + line.Id + "': {opentrade} needs a Trades section");
             if (line.Fail != null && !lines.ContainsKey(line.Fail))
                 errors.Add("line '" + line.Id + "': Fail names unknown line '" + line.Fail + "'");
             if (line.Goto != null && !lines.ContainsKey(line.Goto))
                 errors.Add("line '" + line.Id + "': {goto} names unknown line '" + line.Goto + "'");
         }
 
-        return new KnubotScript(id, npcs, openers.ToArray(), lines);
+        return new KnubotScript(id, npcs, openers.ToArray(), lines, trades.ToArray());
     }
 
     static KnubotCondition[] Conditions(string[]? texts, KnubotRequirementFile[]? requirements, KnubotLoadContext load, List<string> errors)

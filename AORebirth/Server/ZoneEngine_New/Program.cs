@@ -290,6 +290,9 @@ namespace ZoneEngine_New
             AddMessageHandler<KnuBotOpenChatWindowMessageHandler>(services);
             AddMessageHandler<KnuBotAnswerMessageHandler>(services);
             AddMessageHandler<KnuBotCloseChatWindowMessageHandler>(services);
+            AddMessageHandler<KnuBotStartTradeMessageHandler>(services);
+            AddMessageHandler<KnuBotTradeMessageHandler>(services);
+            AddMessageHandler<KnuBotFinishTradeMessageHandler>(services);
             AddMessageHandler<RaidCmdMessageHandler>(services);
             AddMessageHandler<TeamChatMessageHandler>(services);
             AddMessageHandler<QuestAlternativeMessageHandler>(services);

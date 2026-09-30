@@ -16,6 +16,7 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Logging;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
+using ZoneEngine_New.Core.Trade;
 
 /// <summary>
 /// Knubot conversations: open picks the first opener whose conditions pass, each line applies its effects
@@ -171,24 +172,171 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
                     "<font color=#FF0000>[Debug] Dead end: '{0}' has no content yet.</font>", Render(conversation, reply.Text)), 0), 0));
                 QueueReplies(conversation, offered);
             }
-            else if (reply.Goto == KnubotScript.CloseTarget)
-                QueueClose(conversation, DefaultCloseSeconds);
-            else if (reply.Goto == KnubotScript.OpenerTarget)
-            {
-                KnubotContext context = Context(conversation);
-                KnubotOpener? opener = conversation.Script.Openers.FirstOrDefault(x => x.Passes(context));
-                if (opener?.Say == null)
-                {
-                    if (opener?.Vicinity != null)
-                        SayNearby(conversation.Npc, conversation.Playfield, opener.Vicinity);
-                    QueueClose(conversation, DefaultCloseSeconds);
-                }
-                else
-                    Say(conversation, opener.Say, 0);
-            }
             else
-                Say(conversation, reply.Goto, 0);
+                Continue(conversation, reply.Goto);
 
+            Pump(conversation);
+            return true;
+        }
+    }
+
+    /// <summary>Goes where a reply or trade points: a line, <c>close</c>, or <c>opener</c>.</summary>
+    void Continue(Conversation conversation, string target)
+    {
+        if (target == KnubotScript.CloseTarget)
+        {
+            QueueClose(conversation, DefaultCloseSeconds);
+            return;
+        }
+
+        if (target != KnubotScript.OpenerTarget)
+        {
+            Say(conversation, target, 0);
+            return;
+        }
+
+        KnubotContext context = Context(conversation);
+        KnubotOpener? opener = conversation.Script.Openers.FirstOrDefault(x => x.Passes(context));
+        if (opener?.Say == null)
+        {
+            if (opener?.Vicinity != null)
+                SayNearby(conversation.Npc, conversation.Playfield, opener.Vicinity);
+            QueueClose(conversation, DefaultCloseSeconds);
+        }
+        else
+            Say(conversation, opener.Say, 0);
+    }
+
+    /// <summary>Text the Give Item window is opened with; the client needs at least one character.</summary>
+    public static string TradeText(NpcCharacter npc) => string.IsNullOrWhiteSpace(npc.Name) ? "Trade" : npc.Name;
+
+    /// <summary>
+    /// The player opened the Give Item window on the NPC directly. Joins the chat already open with that NPC, or opens
+    /// one without an opener line, so a matching trade has somewhere to say its line. True when the NPC has a script.
+    /// </summary>
+    public bool TryStartTrade(IZoneSession transport, Identity target)
+    {
+        if (!Current(transport, out Player player, out Playfield playfield))
+            return false;
+
+        lock (player.PersistenceGate)
+        {
+            if (!playfield.GetRequiredService<DynelRegistry>().TryGet(target, out var dynel) || dynel is not NpcCharacter npc
+                || !catalog.TryResolve(npc, out KnubotScript script))
+                return false;
+
+            if (script.Trades.Length == 0 || !InReach(player, npc))
+                return true;
+
+            if (_sessions.TryGetValue(player.Identity.Instance, out Conversation? conversation))
+            {
+                bool usable = Valid(conversation) && !conversation.Closing;
+                if (usable && !ReferenceEquals(conversation.Npc, npc))
+                    return true;
+
+                if (!usable)
+                {
+                    Remove(conversation);
+                    conversation = null;
+                }
+            }
+
+            if (conversation == null)
+            {
+                HashSet<string> met = _met.GetValue(player, _ => new HashSet<string>(StringComparer.Ordinal));
+                conversation = new Conversation(player, transport, npc, playfield, script, met.Contains(script.Id), _milliseconds());
+                if (!_sessions.TryAdd(player.Identity.Instance, conversation))
+                    return true;
+
+                met.Add(script.Id);
+                conversation.Packets.Enqueue(Outgoing.Packet(new KnuBotOpenChatWindowMessage
+                {
+                    Identity = player.Identity, Target = npc.Identity, Unknown1 = 2, Unknown2 = 1
+                }, 0));
+                Pump(conversation);
+            }
+
+            conversation.LastActivityAt = _milliseconds();
+            effects.Trades.TryOpenKnubot(player, npc, TradeText(npc));
+            return true;
+        }
+    }
+
+    /// <summary>An item put into or taken out of the Give Item window.</summary>
+    public bool TryTrade(IZoneSession transport, KnuBotTradeMessage message)
+    {
+        if (!TryConversation(transport, message.Target, out Conversation conversation))
+            return false;
+
+        lock (conversation.Player.PersistenceGate)
+        {
+            if (!Valid(conversation))
+                return true;
+
+            conversation.LastActivityAt = _milliseconds();
+            effects.Trades.HandleKnubot(conversation.Player, message);
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// The player accepted or declined the Give Item window. On accept the first trade whose conditions pass and
+    /// which the window matches exactly is taken and the chat goes to its Goto; anything else hands every item back
+    /// and refunds the <paramref name="credits"/> the client already took off its Cash.
+    /// </summary>
+    public bool TryFinishTrade(IZoneSession transport, Identity target, bool decline, int credits)
+    {
+        if (!TryConversation(transport, target, out Conversation conversation))
+        {
+            // No chat behind the window (it closed meanwhile): hand everything back.
+            if (Current(transport, out Player player, out _))
+            {
+                lock (player.PersistenceGate)
+                {
+                    if (effects.Trades.TryGetSession(player, out TradeSession orphan) && orphan.Kind == TradeKind.Knubot
+                        && orphan.Npc != null && orphan.Npc.Identity == target)
+                        effects.Trades.EndKnubot(player, orphan.Npc, decline ? 0 : credits, "no chat");
+                }
+            }
+
+            return false;
+        }
+
+        lock (conversation.Player.PersistenceGate)
+        {
+            Player player = conversation.Player;
+            NpcCharacter npc = conversation.Npc;
+            if (!effects.Trades.TryGetKnubot(player, npc, out TradeSession session))
+                return true;
+
+            int refund = decline ? 0 : credits;
+            if (decline)
+            {
+                effects.Trades.EndKnubot(player, npc, refund, "declined");
+                return true;
+            }
+
+            // Like answers, a trade is only taken once the NPC's current line is fully out.
+            if (!Valid(conversation) || conversation.Closing || conversation.Packets.Count != 0)
+            {
+                effects.Trades.EndKnubot(player, npc, refund, "npc busy");
+                return true;
+            }
+
+            KnubotContext context = Context(conversation);
+            ZoneEngine_New.Core.Inventory.Item[] offered = session.InitiatorOffer.Items.Values.ToArray();
+            KnubotTrade? trade = conversation.Script.Trades.FirstOrDefault(x => KnubotCondition.All(x.If, context) && x.Matches(offered, credits));
+            if (trade == null || !effects.Trades.TryCommitKnubot(player, npc, credits))
+            {
+                effects.Trades.EndKnubot(player, npc, refund, trade == null ? "no matching trade" : "commit failed");
+                return true;
+            }
+
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot {0}: trade '{1}' taken from char={2}",
+                conversation.Script.Id, trade.Id, player.Identity.Instance));
+            conversation.LastActivityAt = _milliseconds();
+            conversation.Replies = [];
+            Continue(conversation, trade.Goto);
             Pump(conversation);
             return true;
         }
@@ -291,6 +439,14 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
         // Evaluated after the line's effects, so a reply can depend on what the line just gave.
         KnubotContext context = Context(conversation);
         KnubotReply[] visible = line.Replies.Where(x => KnubotCondition.All(x.If, context)).ToArray();
+
+        // A line that opened the Give Item window waits for the trade rather than closing (which would cancel it).
+        if (line.CloseSeconds == null && visible.Length == 0 && effects.Trades.TryGetKnubot(conversation.Player, conversation.Npc, out _))
+        {
+            QueueReplies(conversation, [KnubotScript.Goodbye]);
+            return;
+        }
+
         if (line.CloseSeconds != null || visible.Length == 0)
         {
             QueueClose(conversation, line.CloseSeconds ?? DefaultCloseSeconds);
@@ -421,6 +577,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
         _sessions.TryRemove(new KeyValuePair<int, Conversation>(conversation.Player.Identity.Instance, conversation));
         conversation.Packets.Clear();
         conversation.Replies = [];
+        effects.Trades.EndKnubot(conversation.Player, conversation.Npc, 0, "chat closed");
     }
 
     KnubotContext Context(Conversation conversation)

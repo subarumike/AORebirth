@@ -6,6 +6,7 @@
     { "If": ["HasQuest T8Q1"], "Say": "8" },
     { "If": ["HasAnyQuest 91S8,0NEC,GFM9,R1FQ"], "Vicinity": "If you want something more to do, I suggest you go talk to Manager Travis Molen. He's up by the control tower!" },
     { "If": ["HasQuest Q5V8"], "Say": "11" },
+    { "If": ["HasCompletedQuest Q5V8"], "Say": "14" },
     { "If": ["HasCompletedQuest T8Q1"], "Say": "13" },
     { "Say": "6" }
   ],
@@ -23,7 +24,14 @@
     "killed_animals": { "Text": "I killed one of each of the animals now.", "Goto": "12" },
     "monster_parts": { "Text": "Monster parts?" },
     "dont_have_any": { "Text": "I don't have any." },
-    "find_stacklund": { "Text": "Where can I find Mr. Stacklund?" }
+    "find_stacklund": { "Text": "Where can I find Mr. Stacklund?" },
+    "what_now": { "Text": "What do I do now?", "Goto": "15" },
+    "belt": { "Text": "What do I do with this belt you gave me?" },
+    "have_3_parts": { "Text": "I have 3 monster parts for you.", "Goto": "16" },
+    "be_right_back": { "Text": "All right. I'll be right back with three monster parts for you in a bit." },
+    "find_inspector": { "Text": "How do I find the inspector?" },
+    "have_parts_here": { "Text": "I have three monster parts for you right here.", "Goto": "16" },
+    "found_other_things": { "Text": "Ok. I found some  other things too though." }
   },
   "Lines": {
     "1": {
@@ -112,6 +120,35 @@
     "13": {
       "Text": "Hello there, how may I help you?",
       "Replies": ["found_creatures"]
+    },
+    "14": {
+      "Text": "Hello there, how may I help you?",
+      "Replies": ["what_now", "belt", "have_3_parts"]
+    },
+    "15": {
+      "Text": [
+        "Well, if you haven't already, you could go talk to the ICC Bio-Inspector. I'm sure he will find something for you to do, he's always swamped. Later, when you have your bearings of the island, you could head up to the platform and talk to the Shuttleport manager.",
+        "{givequest HYIY}"
+      ],
+      "Replies": ["be_right_back", "find_inspector", "have_parts_here"]
+    },
+    "16": {
+      "Text": "Excellent!{opentrade}"
+    },
+    "17": {
+      "Text": [
+        "Thank you.  Excellent work!  Here are some first aid kits for the trouble.  If you get more parts, please don't hesitate to bring them to me.",
+        "{spawn TALA 4}",
+        "{spawn BSNR 4}"
+      ],
+      "Replies": ["found_other_things", "what_now"]
+    }
+  },
+  "Trades": {
+    "monster_parts": {
+      "If": ["HasCompletedQuest Q5V8"],
+      "Items": [{ "Hash": "MOPA", "Count": 3 }],
+      "Goto": "17"
     }
   }
 }

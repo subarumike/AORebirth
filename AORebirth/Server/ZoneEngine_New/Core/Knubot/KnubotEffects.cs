@@ -77,20 +77,25 @@ public abstract record KnubotEffect
     }
 }
 
-/// <summary><c>{givequest HASH}</c>: gives a Quests.json quest the player does not hold active.</summary>
+/// <summary>
+/// <c>{givequest HASH}</c>: gives a Quests.json quest. A quest the player already holds active is skipped,
+/// so the rest of the line still plays.
+/// </summary>
 public sealed record KnubotAcceptQuest(string Hash) : KnubotEffect
 {
     public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
     {
-        if (plan.QuestState(context, Hash) == QuestState.Active)
-            return false;
-
         plan.Quests[Hash] = QuestState.Active;
         return true;
     }
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)
-        => services.Quests.TryAssignTemplate(context.Player, Hash, out _);
+    {
+        if (context.Quests.GetLog(context.Player).Quests.TryGetValue(Hash, out PlayerQuest? quest) && quest.State == QuestState.Active)
+            return;
+
+        services.Quests.TryAssignTemplate(context.Player, Hash, out _);
+    }
 }
 
 /// <summary><c>{completequest HASH}</c>: completes an active quest, granting its reward and next step.</summary>
@@ -147,6 +152,15 @@ public sealed record KnubotOpenShop : KnubotEffect
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)
         => services.Trades.TryOpenShop(context.Player, context.Npc.Shop!);
+}
+
+/// <summary><c>{opentrade}</c>: opens the NPC's Give Item window for the script's Trades.</summary>
+public sealed record KnubotOpenTrade : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => context.Script.Trades.Length != 0;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+        => services.Trades.TryOpenKnubot(context.Player, context.Npc, KnubotService.TradeText(context.Npc));
 }
 
 /// <summary>Main-inventory item helpers shared by conditions and effects.</summary>

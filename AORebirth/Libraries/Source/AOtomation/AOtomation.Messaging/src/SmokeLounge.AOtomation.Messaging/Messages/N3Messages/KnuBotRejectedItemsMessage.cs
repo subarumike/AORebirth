@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="KnuBotRejectedItemsMessage.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -42,11 +42,17 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         // before Unknown2 (capture 20260716-Reset-perks #23, len=47). Without an explicit size the array
         // defaults to NoSerialization and the count is dropped, yielding a short 43-byte packet the client
         // cannot parse, so the trade ("Give Item") window never closes.
+        // Ends the client's KnuBot trade: each item still in its trade container that matches an entry moves
+        // back to the first free inventory slot; every other item there is removed (the NPC kept it).
         [AoMember(2, SerializeSize = ArraySizeType.Int32)]
         public KnuBotRejectedItem[] Items { get; set; }
 
+        /// <summary>
+        /// Credits handed back to the client, which adds them to its own Cash (Gamecode.dll
+        /// KnubotRejectedItemsIIR_c). Refunds what the client took off when it accepted a trade that failed.
+        /// </summary>
         [AoMember(3)]
-        public int Unknown2 { get; set; }
+        public int Credits { get; set; }
 
         #endregion
     }

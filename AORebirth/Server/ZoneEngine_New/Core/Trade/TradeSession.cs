@@ -14,7 +14,10 @@ namespace ZoneEngine_New.Core.Trade
         Player = 0,
 
         /// <summary>A player buying from / selling to a vending machine.</summary>
-        Shop = 1
+        Shop = 1,
+
+        /// <summary>A player handing items to a Knubot NPC ("Give Item" window).</summary>
+        Knubot = 2
     }
 
     /// <summary>One side of a trade: the items that character has put on the table plus their credits.</summary>
@@ -88,7 +91,8 @@ namespace ZoneEngine_New.Core.Trade
     /// <summary>
     /// A live trade window. Player trades hold two <see cref="TradeOffer"/>s; shop trades use
     /// <see cref="Initiator"/>'s offer for what the player is selling and <see cref="ShopPicks"/>
-    /// for the stock indices they intend to buy.
+    /// for the stock indices they intend to buy; Knubot trades use <see cref="Initiator"/>'s offer for
+    /// what the player is giving <see cref="Npc"/>.
     /// </summary>
     public sealed class TradeSession
     {
@@ -99,7 +103,8 @@ namespace ZoneEngine_New.Core.Trade
             TradeKind kind,
             Player initiator,
             Player? partner,
-            VendingMachine? machine)
+            VendingMachine? machine,
+            NpcCharacter? npc = null)
         {
             ArgumentNullException.ThrowIfNull(initiator);
 
@@ -108,6 +113,7 @@ namespace ZoneEngine_New.Core.Trade
             Initiator = initiator;
             Partner = partner;
             Machine = machine;
+            Npc = npc;
             AcceptedShopTransport = machine?.Stock.IsConfiguredSnapshot == true ? initiator.Session : null;
             InitiatorOffer = new TradeOffer();
             PartnerOffer = new TradeOffer();
@@ -124,6 +130,9 @@ namespace ZoneEngine_New.Core.Trade
 
         /// <summary>Machine for <see cref="TradeKind.Shop"/>; null for player trades.</summary>
         public VendingMachine? Machine { get; }
+
+        /// <summary>NPC for <see cref="TradeKind.Knubot"/>; null otherwise.</summary>
+        public NpcCharacter? Npc { get; }
         internal ZoneEngine_New.Core.Network.IZoneSession? AcceptedShopTransport { get; }
 
         public TradeOffer InitiatorOffer { get; }
@@ -137,7 +146,12 @@ namespace ZoneEngine_New.Core.Trade
         public bool Committing { get; set; }
 
         /// <summary>The dynel the window is anchored to, used for the range check.</summary>
-        public Dynel? Anchor => Kind == TradeKind.Shop ? (Dynel?)Machine : Partner;
+        public Dynel? Anchor => Kind switch
+        {
+            TradeKind.Shop => Machine,
+            TradeKind.Knubot => Npc,
+            _ => Partner
+        };
 
         public bool Involves(Player player)
             => ReferenceEquals(Initiator, player) || ReferenceEquals(Partner, player);

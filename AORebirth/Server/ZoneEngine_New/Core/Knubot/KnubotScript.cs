@@ -18,6 +18,34 @@ public sealed class KnubotScriptFile
     public Dictionary<string, KnubotReplyFile> Replies { get; set; } = new(StringComparer.Ordinal);
 
     public Dictionary<string, KnubotLineFile> Lines { get; set; } = new(StringComparer.Ordinal);
+
+    /// <summary>
+    /// What the NPC takes in its Give Item window, tried in file order when the player accepts. Opened by a line's
+    /// <c>{opentrade}</c> or by the player directly.
+    /// </summary>
+    public Dictionary<string, KnubotTradeFile> Trades { get; set; } = new(StringComparer.Ordinal);
+}
+
+/// <summary>
+/// One trade: the window must hold exactly <see cref="Items"/> (by stack count) and the player must offer exactly
+/// <see cref="Credits"/>. Conditions work as on replies.
+/// </summary>
+public sealed class KnubotTradeFile
+{
+    public string[] If { get; set; } = [];
+    public KnubotRequirementFile[] Requirements { get; set; } = [];
+    public KnubotTradeItemFile[] Items { get; set; } = [];
+    public int Credits { get; set; }
+
+    /// <summary>A line id, <c>close</c>, or <c>opener</c>, as on a reply.</summary>
+    public string Goto { get; set; } = string.Empty;
+}
+
+public sealed class KnubotTradeItemFile
+{
+    /// <summary>Item hash; any QL minted from it matches.</summary>
+    public string Hash { get; set; } = string.Empty;
+    public int Count { get; set; } = 1;
 }
 
 public sealed class KnubotOpenerFile
@@ -98,7 +126,8 @@ public sealed class KnubotRequirementFile
 }
 
 /// <summary>A validated, read-only script.</summary>
-public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] openers, IReadOnlyDictionary<string, KnubotLine> lines)
+public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] openers, IReadOnlyDictionary<string, KnubotLine> lines,
+    KnubotTrade[] trades)
 {
     public const string CloseTarget = "close";
     public const string OpenerTarget = "opener";
@@ -110,6 +139,7 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
     public string[] Npcs { get; } = npcs;
     public KnubotOpener[] Openers { get; } = openers;
     public IReadOnlyDictionary<string, KnubotLine> Lines { get; } = lines;
+    public KnubotTrade[] Trades { get; } = trades;
 
     /// <summary>A reply with no content behind it yet: the engine says a debug line and offers the same replies again.</summary>
     public bool IsDeadEnd(KnubotReply reply)
@@ -125,6 +155,45 @@ public sealed record KnubotOpener(KnubotCondition[] If, KnubotCondition[] Any, s
 
 /// <summary><see cref="Id"/> is the reply's key in the script's Replies, for logs.</summary>
 public sealed record KnubotReply(string Id, KnubotTextPiece[] Text, KnubotCondition[] If, string Goto);
+
+/// <summary><see cref="Id"/> is the trade's key in the script's Trades, for logs.</summary>
+public sealed record KnubotTrade(string Id, KnubotCondition[] If, KnubotTradeItem[] Items, int Credits, string Goto)
+{
+    /// <summary>
+    /// True when <paramref name="offered"/> is exactly this trade: every item counts toward one wanted hash, every
+    /// count is met, nothing is left over, and the credits are exact.
+    /// </summary>
+    public bool Matches(IEnumerable<ZoneEngine_New.Core.Inventory.Item> offered, int credits)
+    {
+        if (credits != Credits)
+            return false;
+
+        int[] missing = new int[Items.Length];
+        for (int i = 0; i < Items.Length; i++)
+            missing[i] = Items[i].Count;
+
+        foreach (ZoneEngine_New.Core.Inventory.Item item in offered)
+        {
+            int count = Math.Max(1, item.StackCount);
+            int wanted = Array.FindIndex(Items, x => x.Matches(item.LowId, item.HighId));
+            while (wanted >= 0 && missing[wanted] < count)
+                wanted = Array.FindIndex(Items, wanted + 1, x => x.Matches(item.LowId, item.HighId));
+
+            if (wanted < 0)
+                return false;
+
+            missing[wanted] -= count;
+        }
+
+        return Array.TrueForAll(missing, x => x == 0);
+    }
+}
+
+/// <summary><see cref="TemplateIds"/> is every AOID <see cref="Hash"/> can mint.</summary>
+public sealed record KnubotTradeItem(string Hash, HashSet<int> TemplateIds, int Count)
+{
+    public bool Matches(int lowId, int highId) => TemplateIds.Contains(lowId) || TemplateIds.Contains(highId);
+}
 
 /// <summary><see cref="Effects"/> is every effect in <see cref="Pieces"/>, checked together before the line starts.</summary>
 public sealed record KnubotLine(

@@ -32,3 +32,16 @@ public sealed class KnuBotCloseChatWindowMessageHandler(KnubotService knubot) : 
 {
     protected override void Dispatch(KnuBotCloseChatWindowMessage message, IZoneSession session) => knubot.TryClose(session, message.Target);
 }
+public sealed class KnuBotStartTradeMessageHandler(KnubotService knubot) : KnubotMessageHandler<KnuBotStartTradeMessage>
+{
+    protected override void Dispatch(KnuBotStartTradeMessage message, IZoneSession session) => knubot.TryStartTrade(session, message.Target);
+}
+public sealed class KnuBotTradeMessageHandler(KnubotService knubot) : KnubotMessageHandler<KnuBotTradeMessage>
+{
+    protected override void Dispatch(KnuBotTradeMessage message, IZoneSession session) => knubot.TryTrade(session, message);
+}
+public sealed class KnuBotFinishTradeMessageHandler(KnubotService knubot) : KnubotMessageHandler<KnuBotFinishTradeMessage>
+{
+    protected override void Dispatch(KnuBotFinishTradeMessage message, IZoneSession session)
+        => knubot.TryFinishTrade(session, message.Target, message.Decline != 0, message.Amount);
+}
