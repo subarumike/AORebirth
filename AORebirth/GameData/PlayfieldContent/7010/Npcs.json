@@ -79,7 +79,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": true,
       "Passive": true,
       "Attackable": true,
       "TickLiving": true,

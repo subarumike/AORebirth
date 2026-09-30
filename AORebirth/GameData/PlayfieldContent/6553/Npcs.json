@@ -86,7 +86,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": true,
       "Passive": true,
       "Attackable": true,
       "TickLiving": true,
@@ -182,7 +181,6 @@
           "Layer": 0
         }
       ],
-      "HasDialogue": true,
       "Passive": true,
       "Attackable": true,
       "TickLiving": true,
@@ -260,7 +258,6 @@
           "Layer": 4
         }
       ],
-      "HasDialogue": true,
       "Passive": true,
       "Attackable": true,
       "TickLiving": true,
@@ -438,7 +435,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": true,
       "Passive": true,
       "Attackable": true,
       "TickLiving": true,

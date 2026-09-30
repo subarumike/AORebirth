@@ -1,7 +1,4 @@
 {
-  "DialoguePacks": [
-    "dialogue/nascence-life-dialogs.dialogue.json"
-  ],
   "QuestPacks": [
     "quests/nascence-life.quests.json"
   ]

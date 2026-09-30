@@ -140,6 +140,25 @@ namespace ZoneEngine_New.Core.Quests
         }
 
         /// <summary>
+        /// Completes an active quest on request (an NPC turn-in): saves it, removes the journal entry, grants the
+        /// reward and assigns NextStep, exactly as a finished kill objective does. False when it is not active.
+        /// </summary>
+        public bool TryComplete(Player player, string questId, out string result)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (!GetLog(player).Quests.TryGetValue(questId ?? string.Empty, out PlayerQuest? quest) || !quest.IsActive)
+            {
+                result = string.Format(CultureInfo.InvariantCulture, "{0} has no active quest {1}.", player.Name, questId);
+                return false;
+            }
+
+            quest.Progress = quest.RequiredCount;
+            Complete(player, quest);
+            result = string.Format(CultureInfo.InvariantCulture, "Completed quest {0} ({1}) for {2}.", quest.QuestId, quest.Template.Name, player.Name);
+            return true;
+        }
+
+        /// <summary>
         /// Creates a generated quest in Quests.json format without assigning it: a terminal offer, or one quest a
         /// whole team shares. It gets its own id, expires at <paramref name="expiresAtUtc"/>, and may carry ACG
         /// building generator data. Returns the id to assign with <see cref="TryAssignGenerated"/>.

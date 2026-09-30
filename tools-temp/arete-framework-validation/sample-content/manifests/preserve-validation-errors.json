@@ -1,8 +1,0 @@
-{
-  "DialoguePacks": [
-    "../dialogue/missing-npc-identity.json"
-  ],
-  "QuestPacks": [
-    "../quests/missing-step-id.json"
-  ]
-}

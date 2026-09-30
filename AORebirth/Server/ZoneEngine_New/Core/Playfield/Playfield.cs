@@ -470,7 +470,7 @@ namespace ZoneEngine_New.Core.Playfield
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
                 foreach (PlayfieldTransfer transfer in _incomingTransfers.Keys) transfer.RequestReturn();
                 foreach (PlayfieldTransfer transfer in _outgoingTransfers.Keys) transfer.SourceShutdown();
-                _playfieldManager.Dialogues.Shutdown(this);
+                _playfieldManager.Knubot?.Shutdown(this);
                 GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Shutdown();
                 Player[] remaining = [.. _dynelRegistry.PlayerEntities()];
                 foreach (Player player in remaining)
@@ -567,7 +567,7 @@ namespace ZoneEngine_New.Core.Playfield
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("stats.rebase");
                 DrainRebases();
-                _playfieldManager.Dialogues.Tick(this);
+                _playfieldManager.Knubot?.Tick(this);
                 foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
                 {
                     if (!ReferenceEquals(player.Playfield, this))
@@ -637,7 +637,8 @@ namespace ZoneEngine_New.Core.Playfield
                 services.AddSingleton(_playfieldManager.Quests);
             if (_playfieldManager.QuestDungeons != null)
                 services.AddSingleton(_playfieldManager.QuestDungeons);
-            services.AddSingleton(_playfieldManager.Dialogues);
+            if (_playfieldManager.Knubot != null)
+                services.AddSingleton(_playfieldManager.Knubot.Catalog);
             services.AddSingleton(_playfieldManager.ItemTemplates);
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);

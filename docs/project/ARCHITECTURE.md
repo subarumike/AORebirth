@@ -87,7 +87,8 @@ Important files and directories:
 - Historical retired-ZoneEngine provenance: `docs/reference/pf4582/official/`, `Tools/reconcile_pf4582_official_source.py`, and the retired `IccShuttleportOfficialPlacementCatalog*.cs` targets retain byte-pinned official EP1 structural evidence and 206-to-207 reconciliation. Those generated-C# targets are not `ZoneEngine_New` inputs. The official `HashSpawnPoint_t` parser and packed four-byte `ACGHash_t` scalar/tag are proven; terminal identity remains unresolved. The retired baseline was 25 active / 181 blocked, and `NCNN` had null `SourceNpcId`.
 - `Tools/import_official_playfield_placements.py`, `docs/reference/playfields/official-placement-source-manifest.json`, and `docs/generated/playfields/`: normalized official placement evidence for tooling and tests. `OfficialPlayfieldPlacementCatalog` validates that evidence but is not compiled into or consumed by `ZoneEngine_New`.
 - `AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs`: world and playfield orchestration — **do not add new system ecosystems here**; extract reusable mechanics to `Core/<System>/` (see `docs/project/SUBSYSTEMS.md`).
-- `AORebirth/Server/ZoneEngine_New/Core/Dialogue/`, `Missions/`, and `Inventory/`: current gameplay-system owners.
+- `AORebirth/Server/ZoneEngine_New/Core/Knubot/`, `Missions/`, and `Inventory/`: current gameplay-system owners.
+  Knubot NPC conversations are data in `GameData/Knubot/**/*.json`.
 - `AORebirth/Server/ZoneEngine_New/Core/Network/` and `MessageHandlers/`: zone networking and thin message dispatch.
 - `AORebirth/Server/ZoneEngine_New/Core/Commands/`: command surface.
 - `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging`: message models and serializer contracts.

@@ -34,7 +34,7 @@ public sealed class AuthoredQuestCatalog
     public static AuthoredQuestCatalog Load(string contentRoot)
     {
         var content = InteractionContent.Load(contentRoot);
-        content.LoadRegistries(contentRoot);
+        content.LoadQuestIndex(contentRoot);
         return new(content);
     }
 }

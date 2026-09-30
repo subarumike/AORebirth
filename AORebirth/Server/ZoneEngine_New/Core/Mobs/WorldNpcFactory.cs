@@ -85,6 +85,7 @@ public static class WorldNpcFactory
                 ?? throw new InvalidOperationException("Invalid vendor companion packet.");
             projection.Identity = shop.Identity; projection.NpcIdentity = Identity; projection.PlayfieldId = Playfield.Identity.Instance;
             yield return projection;
+            if (BuildKnubotStatMessage() is { } knubot) yield return knubot;
         }
         public override SimpleCharFullUpdateMessage BuildSpawnMessage()
         {

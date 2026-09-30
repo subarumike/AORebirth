@@ -22,11 +22,6 @@ internal static class AuthoredQuestFixture
     internal static bool TryGrantTailorMeasurement(this AuthoredQuestService service, Player player, int answer)
         => service.TryExecuteAction(player, "tailor-measurement-" + answer);
 }
-internal static class DialogueFixture
-{
-    internal const string Stan="SimpleChar:78E0FC65", Scarlett="SimpleChar:7A18B924", Tailor="SimpleChar:79135F51";
-    internal const string Zyvania="SimpleChar:7976BCF3", Sarah="SimpleChar:78E0FC69", Marco="SimpleChar:78E0FC81";
-}
 internal static class QuestPropFixture
 {
     internal const int StrongboxInstance=0x574187CE, RemainsInstance=0x574187CF;

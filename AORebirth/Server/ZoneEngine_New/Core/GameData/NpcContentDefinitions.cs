@@ -20,7 +20,6 @@ public sealed class WorldNpcDefinition
     public Dictionary<int, int> Stats { get; set; } = new();
     public WorldTexture[] Textures { get; set; } = [];
     public Mesh[] Meshes { get; set; } = [];
-    public bool HasDialogue { get; set; }
     public bool Passive { get; set; }
     public bool PassiveRegen { get; set; } = true;
     public bool Attackable { get; set; }

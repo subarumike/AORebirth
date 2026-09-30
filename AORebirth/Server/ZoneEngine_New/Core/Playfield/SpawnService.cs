@@ -966,7 +966,6 @@ namespace ZoneEngine_New.Core.Playfield
 
             player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             _trades.Cancel(player, "left playfield");
-            _playfieldManager.Dialogues.Detached(player);
             _flush.HardFlush(player);
 
             PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
@@ -1080,7 +1079,6 @@ namespace ZoneEngine_New.Core.Playfield
             if (npc.OwnedPets.Count > 0)
                 _playfield.GetRequiredService<Pets.PetService>().DismissAll(npc, "owner despawned");
 
-            _playfieldManager.Dialogues?.Detached(npc);
             _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>().Detached(npc);
 
             npc.SetFightingTarget(Identity.None);
@@ -1104,8 +1102,6 @@ namespace ZoneEngine_New.Core.Playfield
             if (oldSession == null || ReferenceEquals(oldSession, newSession))
                 return;
 
-            _playfieldManager.Dialogues.Detached(player);
-
             lock (oldSession)
             {
                 // Closing the old socket cannot race the accepted reconnect's ownership.
@@ -1127,7 +1123,6 @@ namespace ZoneEngine_New.Core.Playfield
             // Logging out sends the player's pets away.
             _playfield.GetRequiredService<Pets.PetService>().DismissAll(player, "owner logged out");
             player.SetFightingTarget(Identity.None);
-            _playfieldManager.Dialogues.Detached(player);
             _playfieldManager.Teams.DetachPlayer(player);
 
             if (!player.IsPersistenceQuarantined)

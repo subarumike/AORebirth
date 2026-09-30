@@ -78,7 +78,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": true,
       "Passive": true,
       "Attackable": true,
       "TickLiving": false,
@@ -343,7 +342,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": false,
       "Passive": true,
       "Attackable": true,
       "TickLiving": false,
@@ -668,7 +666,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": false,
       "Passive": true,
       "Attackable": true,
       "TickLiving": false,
@@ -981,7 +978,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": false,
       "Passive": true,
       "Attackable": true,
       "TickLiving": false,
@@ -1366,7 +1362,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": false,
       "Passive": true,
       "Attackable": true,
       "TickLiving": false,
@@ -1619,7 +1614,6 @@
           "Layer": 2
         }
       ],
-      "HasDialogue": false,
       "Passive": true,
       "Attackable": true,
       "TickLiving": false,

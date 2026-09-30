@@ -32,17 +32,15 @@ namespace ZoneEngine_New.Core.Missions.Content
         public bool IsValid => Validation.IsValid;
     }
 
-    /// <summary>The JSON manifest schema is shared by dialogue and quest content.</summary>
+    /// <summary>Content manifest: the quest packs one content folder contributes.</summary>
     public sealed class InteractionManifest
     {
-        public IList<string> DialoguePacks { get; set; } = new List<string>();
         public IList<string> QuestPacks { get; set; } = new List<string>();
 
         public static InteractionManifest Read(string path)
         {
             var manifest = ContentJson.Read<InteractionManifest>(path);
             string directory = Path.GetDirectoryName(Path.GetFullPath(path));
-            manifest.DialoguePacks = Resolve(manifest.DialoguePacks, directory);
             manifest.QuestPacks = Resolve(manifest.QuestPacks, directory);
             return manifest;
         }
@@ -56,7 +54,6 @@ namespace ZoneEngine_New.Core.Missions.Content
 
     internal static class ContentJson
     {
-        // The same serializer is used by the native dialogue reader and its .NET Framework source-linked tests.
         internal static T Read<T>(string path) where T : class
         {
             if (string.IsNullOrWhiteSpace(path)) throw new InvalidDataException("A content file path is required.");

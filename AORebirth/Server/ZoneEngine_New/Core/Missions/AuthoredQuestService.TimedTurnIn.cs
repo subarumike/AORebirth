@@ -199,16 +199,4 @@ public sealed partial class AuthoredQuestService
     static bool TryResolveTimedItem(TimedTurnInDefinition rule, Item item, out TimedItem definition)
     { definition = rule.Items.FirstOrDefault(x => x.ItemId == item.LowId || x.ItemId == item.HighId)!; return definition != null; }
     static bool LevelEligible(TimedItem item, int level) => level >= item.MinLevel && level <= item.MaxLevel;
-    bool CanOpenTimedTrade(Player player, TimedTurnInDefinition rule)
-    {
-        lock (player.PersistenceGate)
-        {
-            if (!IsCurrent(player) || !rule.Items.Any(x => x.Enabled && HasCarried(player, x.ItemId))) return false;
-            string? account = Account(player); if (account == null) return false;
-            try { return _dao.Execute(player.Identity.Instance, account, tx =>
-                tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State == MissionLifecycleState.Active
-                && !HasCooldown(tx, player.Identity.Instance, rule, out _)); }
-            catch (Exception e) { _logger.Error(e, "Timed turn-in eligibility could not be read."); return false; }
-        }
-    }
 }

@@ -16,7 +16,6 @@ public sealed class AcceptedSubwayMerchantTests
     public void AllSixCompiledPlacementsKeepExactSourceCapabilitiesAndCapturedScfu()
     {
         Assert.AreEqual(6, SubwayMerchantFixture.Definitions.Count);
-        Assert.AreEqual(1, SubwayMerchantFixture.Definitions.Count(definition => definition.Binding.HasDialogue));
         foreach (var pair in SubwayMerchantFixture.Definitions.Zip(CapturedSubwayVendorContentProvider.Definitions))
         {
             var definition = pair.First; var expected = pair.Second;
@@ -25,7 +24,6 @@ public sealed class AcceptedSubwayMerchantTests
             Assert.AreEqual("SimpleChar:" + expected.SourceNpcInstance.ToString("X8"), definition.Binding.ContentNpcIdentity);
             Assert.AreEqual(expected.SourceNpcInstance, npc.Identity.Instance);
             Assert.AreEqual(expected.HasCapturedStock, definition.Binding.HasVendor);
-            Assert.AreEqual(expected.SourceNpcInstance == 0x79135F51, definition.Binding.HasDialogue);
             Assert.IsTrue(definition.Binding.SourceIdentity.Contains(expected.Evidence, StringComparison.Ordinal));
             Assert.IsTrue(definition.Binding.SourceIdentity.Contains(expected.SourceVendorInstance.ToString("X8"), StringComparison.Ordinal));
             Assert.AreEqual(expected.X, npc.Position.xf); Assert.AreEqual(expected.Y, npc.Position.yf); Assert.AreEqual(expected.Z, npc.Position.zf);
