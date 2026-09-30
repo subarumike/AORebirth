@@ -50,7 +50,17 @@ namespace ZoneEngine_New.Core.Quests
                 foreach (QuestTemplate template in loaded ?? [])
                 {
                     if (string.IsNullOrEmpty(template.Hash) || !_templates.TryAdd(template.Hash, template))
+                    {
                         skipped++;
+                        continue;
+                    }
+
+                    if (template.MissionBit is int bit && !MissionBits.IsValid(bit))
+                    {
+                        logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0} MissionBit {1} is outside 0-{2}; ignored",
+                            template.Hash, bit, MissionBits.Count - 1));
+                        template.MissionBit = null;
+                    }
                 }
 
                 logger.Info(string.Format(CultureInfo.InvariantCulture, "GameData quests={0} skipped={1} from {2}", _templates.Count, skipped, path));

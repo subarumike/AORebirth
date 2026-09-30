@@ -104,8 +104,18 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             HashSet<string> met = _met.GetValue(player, _ => new HashSet<string>(StringComparer.Ordinal));
             var conversation = new Conversation(player, transport, npc, playfield, script, met.Contains(script.Id), _milliseconds());
             KnubotContext context = Context(conversation);
-            KnubotOpener? opener = script.Openers.FirstOrDefault(x => KnubotCondition.All(x.If, context));
-            if (opener == null || !_sessions.TryAdd(player.Identity.Instance, conversation))
+            KnubotOpener? opener = script.Openers.FirstOrDefault(x => x.Passes(context));
+            if (opener == null)
+                return true;
+
+            if (opener.Vicinity != null)
+            {
+                met.Add(script.Id);
+                SayNearby(npc, playfield, opener.Vicinity);
+                return true;
+            }
+
+            if (!_sessions.TryAdd(player.Identity.Instance, conversation))
                 return true;
 
             met.Add(script.Id);
@@ -113,9 +123,23 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             {
                 Identity = player.Identity, Target = npc.Identity, Unknown1 = 2, Unknown2 = 1
             }, 0));
-            Say(conversation, opener.Say, 0);
+            Say(conversation, opener.Say!, 0);
             Pump(conversation);
             return true;
+        }
+    }
+
+    /// <summary>Say range for players (/say), used for NPC lines spoken aloud.</summary>
+    const float VicinitySayRange = 10f;
+
+    /// <summary>The NPC says <paramref name="text"/> aloud to every player within say range.</summary>
+    static void SayNearby(NpcCharacter npc, Playfield playfield, string text)
+    {
+        var message = new ChatTextMessage { Identity = npc.Identity, Text = text, Unknown1 = 0, Unknown2 = 0, Unknown3 = 0 };
+        foreach (Player listener in playfield.GetRequiredService<DynelRegistry>().PlayerEntities())
+        {
+            if (listener.Session != null && listener.GetEdgeDistanceTo(npc) <= VicinitySayRange)
+                listener.Session.Send(message);
         }
     }
 
@@ -152,9 +176,13 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             else if (reply.Goto == KnubotScript.OpenerTarget)
             {
                 KnubotContext context = Context(conversation);
-                KnubotOpener? opener = conversation.Script.Openers.FirstOrDefault(x => KnubotCondition.All(x.If, context));
-                if (opener == null)
+                KnubotOpener? opener = conversation.Script.Openers.FirstOrDefault(x => x.Passes(context));
+                if (opener?.Say == null)
+                {
+                    if (opener?.Vicinity != null)
+                        SayNearby(conversation.Npc, conversation.Playfield, opener.Vicinity);
                     QueueClose(conversation, DefaultCloseSeconds);
+                }
                 else
                     Say(conversation, opener.Say, 0);
             }

@@ -318,7 +318,7 @@ public sealed class SkillTrainingTests
         player.Stats.Set(CharacterStat.IP, 1500, StatDetail.Base);
         for (CharacterStat ability = CharacterStat.Strength; ability <= CharacterStat.Psychic; ability++)
             player.Stats.Set(ability, 6, StatDetail.Base);
-        for (CharacterStat skill = CharacterStat.MartialArts; skill <= CharacterStat.NanoResist; skill++)
+        for (CharacterStat skill = CharacterStat.MartialArts; skill <= CharacterStat.NanoAC; skill++)
             player.Stats.Set(skill, SkillCatalog.SkillFloor, StatDetail.Base);
         return player;
     }

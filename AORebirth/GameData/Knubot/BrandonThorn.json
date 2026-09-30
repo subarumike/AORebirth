@@ -1,0 +1,117 @@
+{
+  "Notes": "Brandon Thorn. Captured by QuestDialogCapture in ICC Shuttleport (4582) at (934.9, 24.4, 760.6). Nearest HashSpawnPoint BNTO at (934.9, 24.8, 760.6), 0.4m away.",
+  "Npcs": ["BNTO"],
+  "Openers": [
+    { "If": ["!HasCompletedQuest H38F"], "Say": "1" },
+    { "If": ["HasQuest T8Q1"], "Say": "8" },
+    { "If": ["HasAnyQuest 91S8,0NEC,GFM9,R1FQ"], "Vicinity": "If you want something more to do, I suggest you go talk to Manager Travis Molen. He's up by the control tower!" },
+    { "If": ["HasQuest Q5V8"], "Say": "11" },
+    { "If": ["HasCompletedQuest T8Q1"], "Say": "13" },
+    { "Say": "6" }
+  ],
+  "Replies": {
+    "yes": { "Text": "Yes!", "If": ["!HasQuest L5G4"], "Goto": "7" },
+    "explain_skills": { "Text": "Can you explain the skill system to me?" },
+    "check_equipment": { "Text": "How do I check my equipment?" },
+    "how_fight": { "Text": "How do I fight?" },
+    "shuttle": { "Text": "What happened to the shuttle I was on?" },
+    "what_skills": { "Text": "What are skills exactly?" },
+    "aliens": { "Text": "There are aliens on this island?" },
+    "help_aliens": { "Text": "Can I help against the aliens?" },
+    "found_creatures": { "Text": "I found all the creatures.", "Goto": "9" },
+    "sure": { "Text": "Sure. No problem.", "Goto": "10" },
+    "killed_animals": { "Text": "I killed one of each of the animals now.", "Goto": "12" },
+    "monster_parts": { "Text": "Monster parts?" },
+    "dont_have_any": { "Text": "I don't have any." },
+    "find_stacklund": { "Text": "Where can I find Mr. Stacklund?" }
+  },
+  "Lines": {
+    "1": {
+      "Text": [
+        "{givequest H38F}",
+        "{completequest H38F}",
+        "Welcome ashore, my friend. Lucky thing the shuttle landed in the water, huh?",
+        "{delay 1}\\nAnyway, I'm Brandon Thorn, I'm a paramedic here at the ICC Shuttleport. I can provide you with the standard issue gear for all newcomers to Rubi-Ka. Because I use nanobots to assemble the equipment straight into your inventory. {emote}You can open your inventory by pressing 'i' or using the inventory icon on your gui.{/emote}\\nI hope you feel good enough to start working, we need all the help we can get here!",
+        "{delay 2}\\nAre you ready?"
+      ],
+      "Replies": ["yes", "explain_skills"]
+    },
+    "2": {
+      "Text": [
+        "Your skills define what you can do, and how good you are at it. Items require different skills to use or equip. The nano programs you will need have skill requirements for uploading and executing them, and many actions demand a certain amount in a specific skill or two to have any chance of succeeding. As you get more experienced on Rubi-Ka you get more improvement points to spend on your skills.",
+        "{delay 3}\\n{emote}Improvement points are granted every time you level. You can access your skill view to learn more from the left hand menu or by pressing 'U'.{/emote}"
+      ],
+      "Replies": ["check_equipment", "how_fight"]
+    },
+    "3": {
+      "Text": "{emote}To look at your inventory, open it by using the menu on the bottom left side of the screen, or by pressing 'I'. To examine a specific item, hold down Shift and left-click on the item. Equip your selected weapon by right-clicking it.{/emote}",
+      "Replies": ["shuttle", "what_skills", "how_fight"]
+    },
+    "4": {
+      "Text": "It was shot down, by aliens I imagine.  They seem to be everywhere these days, even on this island.  Lucky thing the shuttle didn't explode, and that you landed in the water.",
+      "Replies": ["aliens"]
+    },
+    "5": {
+      "Text": [
+        "Yes.  Lots of them.  One of their ships landed here, and aliens are pouring out.  They have overrun the docks and the main landing platform. ",
+        "{delay 3} The guards are still here, holding the aliens back, but apart from some key personnel everybody else has been evacuated by now."
+      ],
+      "Replies": ["help_aliens"]
+    },
+    "6": {
+      "Text": "{delay 1}Hello there, are you ready to help me?",
+      "Replies": ["yes", "explain_skills"]
+    },
+    "7": {
+      "Text": [
+        "{givequest L5G4}",
+        "{delay 1}Well, first have a look around, and see whether you can find one of each of the four species living around where we stand now, then return to me.",
+        "{delay 2}\\n{emote}You got a new mission. To look at the mission, open the mission window which can be done by either using the menu on the bottom right side of the screen, or by pressing CTRL+4. {/emote}"
+      ]
+    },
+    "8": {
+      "Text": [
+        "{completequest T8Q1}",
+        "So, how did it go?"
+      ],
+      "Replies": ["found_creatures", "explain_skills"]
+    },
+    "9": {
+      "Text": [
+        "Great!",
+        "{delay 2}\\nNormally we would use a holo chamber simulation to test your reflexes and get you used to the standard equipment, but since this isn't possible at the moment, I will have to ask you to fight some of the local wildlife to prove your fitness, I hope that's all right. "
+      ],
+      "Replies": ["sure"]
+    },
+    "10": {
+      "Text": [
+        "Good.",
+        "{delay 1} ",
+        "{givequest 91S8}",
+        "{delay 1} What you should do is kill one of each of the four creatures you located. Check your equipment and skills before starting out. It will make handling the local wildlife a lot easier."
+      ],
+      "Replies": ["check_equipment", "what_skills", "how_fight"]
+    },
+    "11": {
+      "Text": [
+        "{completequest Q5V8}",
+        "So, how did it go?"
+      ],
+      "Replies": ["killed_animals"]
+    },
+    "12": {
+      "Text": [
+        "Well done.",
+        "{delay 1}{givequest MWTD}",
+        "\\nNow, this belt I have here is something I have found, not quite sure if it is of any use, but take it to Equipment Vendor Antonio Stacklund and he'll help identify it for you.",
+        "{delay 1} He has a few items for sale that you might be interested in too.",
+        "{delay 1}\\nOh, and if you have any sizable monster parts, I would be interested in getting a few..."
+      ],
+      "Replies": ["monster_parts", "dont_have_any", "find_stacklund"]
+    },
+    "13": {
+      "Text": "Hello there, how may I help you?",
+      "Replies": ["found_creatures"]
+    }
+  }
+}

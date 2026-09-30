@@ -66,8 +66,8 @@ namespace ZoneEngine_New.Core.Ai
 
     public static class NpcAiRules
     {
-        /// <summary>AO BreedHostility. Messaging enum name for stat 204 is <see cref="CharacterStat.Taunt"/>.</summary>
-        public const CharacterStat BreedHostilityStat = CharacterStat.Taunt;
+        /// <summary>AO BreedHostility (stat 204).</summary>
+        public const CharacterStat BreedHostilityStat = CharacterStat.BreedHostility;
 
         public const float NearbyRange = 30f;
 

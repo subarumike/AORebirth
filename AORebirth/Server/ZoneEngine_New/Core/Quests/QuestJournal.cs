@@ -45,6 +45,13 @@ namespace ZoneEngine_New.Core.Quests
         /// <summary>Icon for quests with no captured retail action (the captured Arete talk quest's icon).</summary>
         const int DefaultIconId = 244818;
 
+        /// <summary>
+        /// Longest ShortInfo the client can hold. Quest_t reads it unbounded into a 32-byte field at +0x08 and then
+        /// terminates at +0x27 (Gamecode.dll FUN_100abc80); a longer name overwrites the fields after it and crashes
+        /// the client. The full name still goes in LongInfo.
+        /// </summary>
+        const int MaxShortInfoLength = 31;
+
         /// <summary>Retail sends the quest action's expiry five days after assignment, even for chain quests.</summary>
         static readonly TimeSpan DisplayedLifetime = TimeSpan.FromDays(5);
 
@@ -127,7 +134,7 @@ namespace ZoneEngine_New.Core.Quests
                 QuestId = new Identity { Type = IdentityType.Mission, Instance = journalInstance },
                 Version = 15,
                 Flags = flags,
-                ShortInfo = template.Name,
+                ShortInfo = ShortName(template.Name),
                 LongInfo = LongInfo(template),
                 // Retail names the giver NPC here; Quests.json has no giver, so the instance stays 0.
                 UnknownId1 = new Identity { Type = IdentityType.CanbeAffected, Instance = 0 },
@@ -219,6 +226,9 @@ namespace ZoneEngine_New.Core.Quests
             long expires = clientNow + (long)Math.Ceiling((expiresUtc - nowUtc).TotalSeconds);
             return (uint)Math.Min(expires, int.MaxValue);
         }
+
+        static string ShortName(string name)
+            => name.Length <= MaxShortInfoLength ? name : name[..MaxShortInfoLength];
 
         static string LongInfo(QuestTemplate template)
         {

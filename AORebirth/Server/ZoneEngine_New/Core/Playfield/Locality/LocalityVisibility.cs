@@ -169,6 +169,10 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             }
         }
 
+        internal bool IsVisibleTo(Dynel source, Player player)
+            => _visibleRecipientsBySource.TryGetValue(source.Identity.Long(), out HashSet<ulong>? keys)
+               && keys.Contains(player.Identity.Long());
+
         /// <summary>Owner-tick snapshot of exactly the existing Announce recipient filter.</summary>
         internal Player[] SnapshotObservers(Dynel source, bool includeSelf)
         {

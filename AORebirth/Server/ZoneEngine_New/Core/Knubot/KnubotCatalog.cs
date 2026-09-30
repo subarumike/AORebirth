@@ -183,16 +183,26 @@ public sealed class KnubotCatalog
         var openers = new List<KnubotOpener>();
         foreach (KnubotOpenerFile opener in file.Openers ?? [])
         {
-            if (opener == null || !lines.ContainsKey(opener.Say ?? string.Empty))
+            string? say = string.IsNullOrWhiteSpace(opener?.Say) ? null : opener!.Say!.Trim();
+            string? vicinity = string.IsNullOrWhiteSpace(opener?.Vicinity) ? null : opener!.Vicinity!.Trim();
+            if (opener == null || (say == null) == (vicinity == null))
             {
-                errors.Add("opener says unknown line '" + opener?.Say + "'");
+                errors.Add("opener needs exactly one of Say and Vicinity");
                 continue;
             }
 
+            if (say != null && !lines.ContainsKey(say))
+            {
+                errors.Add("opener says unknown line '" + say + "'");
+                continue;
+            }
+
+            string name = say ?? "vicinity '" + vicinity + "'";
             var openerErrors = new List<string>();
-            openers.Add(new KnubotOpener(Conditions(opener.If, opener.Requirements, load, openerErrors), opener.Say!));
+            openers.Add(new KnubotOpener(Conditions(opener.If, opener.Requirements, load, openerErrors),
+                Conditions(opener.Any, null, load, openerErrors), say, vicinity));
             foreach (string error in openerErrors)
-                errors.Add("opener '" + opener.Say + "': " + error);
+                errors.Add("opener " + name + ": " + error);
         }
 
         if (openers.Count == 0)

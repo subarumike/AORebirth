@@ -64,7 +64,7 @@ namespace ZoneEngine_New.Core.GameData
 
         public static bool IsAbility(CharacterStat stat) => stat is >= CharacterStat.Strength and <= CharacterStat.Psychic;
 
-        public static bool IsSkill(CharacterStat stat) => stat is >= CharacterStat.MartialArts and <= CharacterStat.NanoResist;
+        public static bool IsSkill(CharacterStat stat) => stat is >= CharacterStat.MartialArts and <= CharacterStat.NanoAC;
 
         public bool Trains(Breed breed, Profession profession) => _breeds.Contains(breed) && _professions.Contains(profession);
 

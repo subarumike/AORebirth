@@ -23,8 +23,17 @@ public sealed class KnubotScriptFile
 public sealed class KnubotOpenerFile
 {
     public string[] If { get; set; } = [];
+
+    /// <summary>At least one must pass (as well as every <see cref="If"/>). Empty: no extra check.</summary>
+    public string[] Any { get; set; } = [];
+
     public KnubotRequirementFile[] Requirements { get; set; } = [];
-    public string Say { get; set; } = string.Empty;
+
+    /// <summary>Line to open the chat with. Set this or <see cref="Vicinity"/>.</summary>
+    public string? Say { get; set; }
+
+    /// <summary>Said aloud by the NPC to players nearby instead of opening a chat.</summary>
+    public string? Vicinity { get; set; }
 }
 
 public sealed class KnubotLineFile
@@ -107,7 +116,12 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
         => reply.Goto is not (CloseTarget or OpenerTarget) && !Lines.ContainsKey(reply.Goto);
 }
 
-public sealed record KnubotOpener(KnubotCondition[] If, string Say);
+/// <summary>Exactly one of <see cref="Say"/> (a line id) and <see cref="Vicinity"/> (spoken text) is set.</summary>
+public sealed record KnubotOpener(KnubotCondition[] If, KnubotCondition[] Any, string? Say, string? Vicinity)
+{
+    public bool Passes(KnubotContext context)
+        => KnubotCondition.All(If, context) && (Any.Length == 0 || Array.Exists(Any, x => x.Passes(context)));
+}
 
 /// <summary><see cref="Id"/> is the reply's key in the script's Replies, for logs.</summary>
 public sealed record KnubotReply(string Id, KnubotTextPiece[] Text, KnubotCondition[] If, string Goto);

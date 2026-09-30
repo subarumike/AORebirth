@@ -51,7 +51,9 @@ public sealed class KnubotLoadContext(QuestCatalog quests, IGameData gameData, I
 
 /// <summary>
 /// One check from an <c>If</c> list. Prefix <c>!</c> to negate. Forms:
-/// <c>quest HASH none|active|done|failed|expired|abandoned</c>, <c>has ITEMHASH [count]</c>, <c>met</c>.
+/// <c>quest HASH none|active|done|failed|expired|abandoned</c>, <c>HasQuest HASH</c> (in the journal now),
+/// <c>HasAnyQuest HASH,HASH,...</c> (any of them in the journal now),
+/// <c>HasCompletedQuest HASH</c> (the quest's mission bit), <c>has ITEMHASH [count]</c>, <c>met</c>.
 /// Stat checks are <c>Requirements</c> rows, compiled by <see cref="TryParseRequirements"/>.
 /// </summary>
 public abstract record KnubotCondition(bool Negated)
@@ -100,6 +102,53 @@ public abstract record KnubotCondition(bool Negated)
                 }
 
                 condition = new KnubotQuestCondition(negated, words[1], state);
+                return true;
+
+            case "hasquest":
+                if (words.Length != 2 || !load.Quests.TryGet(words[1], out _))
+                {
+                    error = "expected 'HasQuest HASH' with a Quests.json hash: " + trimmed;
+                    return false;
+                }
+
+                condition = new KnubotQuestCondition(negated, words[1], QuestState.Active);
+                return true;
+
+            case "hasanyquest":
+                string[] hashes = string.Join(' ', words, 1, words.Length - 1)
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (hashes.Length == 0)
+                {
+                    error = "expected 'HasAnyQuest HASH,HASH,...': " + trimmed;
+                    return false;
+                }
+
+                foreach (string hash in hashes)
+                {
+                    if (!load.Quests.TryGet(hash, out _))
+                    {
+                        error = "HasAnyQuest names unknown Quests.json hash '" + hash + "': " + trimmed;
+                        return false;
+                    }
+                }
+
+                condition = new KnubotAnyQuestCondition(negated, hashes);
+                return true;
+
+            case "hascompletedquest":
+                if (words.Length != 2 || !load.Quests.TryGet(words[1], out QuestTemplate completed))
+                {
+                    error = "expected 'HasCompletedQuest HASH' with a Quests.json hash: " + trimmed;
+                    return false;
+                }
+
+                if (completed.MissionBit is not int bit)
+                {
+                    error = "quest " + words[1] + " has no MissionBit for HasCompletedQuest: " + trimmed;
+                    return false;
+                }
+
+                condition = new KnubotMissionBitCondition(negated, bit);
                 return true;
 
             case "has":
@@ -243,6 +292,28 @@ public sealed record KnubotQuestCondition(bool Negated, string Hash, QuestState?
         bool held = context.Quests.GetLog(context.Player).Quests.TryGetValue(Hash, out PlayerQuest? quest);
         return State == null ? !held : held && quest!.State == State;
     }
+}
+
+/// <summary>At least one of the quests is active in the player's journal.</summary>
+public sealed record KnubotAnyQuestCondition(bool Negated, string[] Hashes) : KnubotCondition(Negated)
+{
+    protected override bool Test(KnubotContext context)
+    {
+        IReadOnlyDictionary<string, PlayerQuest> quests = context.Quests.GetLog(context.Player).Quests;
+        foreach (string hash in Hashes)
+        {
+            if (quests.TryGetValue(hash, out PlayerQuest? quest) && quest.State == QuestState.Active)
+                return true;
+        }
+
+        return false;
+    }
+}
+
+/// <summary>The quest's mission bit is set: it was completed at some point, even if held again since.</summary>
+public sealed record KnubotMissionBitCondition(bool Negated, int Bit) : KnubotCondition(Negated)
+{
+    protected override bool Test(KnubotContext context) => MissionBits.Has(context.Player.Stats, Bit);
 }
 
 public sealed record KnubotHasCondition(bool Negated, HashSet<int> TemplateIds, int Count) : KnubotCondition(Negated)

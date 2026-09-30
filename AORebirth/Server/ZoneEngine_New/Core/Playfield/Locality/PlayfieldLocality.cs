@@ -124,6 +124,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         internal Player[] SnapshotObservers(Dynel source, bool includeSelf = false)
             => _visibility.SnapshotObservers(source, includeSelf);
 
+        /// <summary>True when <paramref name="source"/> is currently spawned on <paramref name="player"/>'s client.</summary>
+        public bool IsVisibleTo(Dynel source, Player player) => _visibility.IsVisibleTo(source, player);
+
         public void Tick(double deltaTime)
         {
             TickStallWatch.Stage("locality.cells");

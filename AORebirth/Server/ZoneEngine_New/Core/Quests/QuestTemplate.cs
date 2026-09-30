@@ -17,6 +17,9 @@ namespace ZoneEngine_New.Core.Quests
         /// <summary>Kill <see cref="QuestObjective.Count"/> of the objective NPC.</summary>
         public const string KillMultipleAction = "KillMultiple";
 
+        /// <summary>Select (target) the objective NPC.</summary>
+        public const string TargetNpcAction = "TargetNpc";
+
         public static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,

@@ -285,6 +285,41 @@ namespace ZoneEngine_New.Core.Quests
             }
         }
 
+        /// <summary>
+        /// <paramref name="player"/> selected <paramref name="npc"/>: active TargetNpc quests on that NPC complete when
+        /// the player has line of sight to it. Matches the same way as kill credit.
+        /// </summary>
+        public void OnNpcTargeted(Player player, NpcCharacter npc)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(npc);
+
+            List<PlayerQuest>? found = FindActiveOn(player, npc, QuestTemplate.TargetNpcAction);
+            // Raycast only when something would complete.
+            if (found != null && player.HasLineOfSightTo(npc))
+                CompleteAll(player, found);
+        }
+
+        List<PlayerQuest>? FindActiveOn(Player player, NpcCharacter npc, string action)
+        {
+            List<PlayerQuest>? found = null;
+            foreach (PlayerQuest quest in GetLog(player).Quests.Values)
+            {
+                if (quest.IsActive && string.Equals(quest.Template.Action, action, StringComparison.Ordinal)
+                    && Matches(npc, quest.Template.Objective.Npc))
+                    (found ??= new List<PlayerQuest>()).Add(quest);
+            }
+
+            return found;
+        }
+
+        /// <summary>Completing can assign a follow-up quest, so the log is not walked while completing.</summary>
+        void CompleteAll(Player player, List<PlayerQuest> quests)
+        {
+            for (int i = 0; i < quests.Count; i++)
+                Complete(player, quests[i]);
+        }
+
         static bool Matches(NpcCharacter npc, string? objectiveNpc)
         {
             if (string.IsNullOrEmpty(objectiveNpc))
@@ -312,6 +347,8 @@ namespace ZoneEngine_New.Core.Quests
         {
             quest.State = QuestState.Completed;
             Save(player, quest);
+            if (quest.Template.MissionBit is int bit && MissionBits.IsValid(bit))
+                MissionBits.Set(player.Stats, bit);
             QuestJournal.Delete(player, quest);
             ClientFeedback.Send(player, "Feedback_MissionAccomplished");
             GrantReward(player, quest.Template);
