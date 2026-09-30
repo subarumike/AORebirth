@@ -14,12 +14,16 @@ public sealed class KnubotScriptFile
     /// <summary>Tried in order when the chat opens; the first whose conditions all pass is said.</summary>
     public KnubotOpenerFile[] Openers { get; set; } = [];
 
+    /// <summary>Every reply the player can pick, by id; lines offer them by id so one reply is written once.</summary>
+    public Dictionary<string, KnubotReplyFile> Replies { get; set; } = new(StringComparer.Ordinal);
+
     public Dictionary<string, KnubotLineFile> Lines { get; set; } = new(StringComparer.Ordinal);
 }
 
 public sealed class KnubotOpenerFile
 {
     public string[] If { get; set; } = [];
+    public KnubotRequirementFile[] Requirements { get; set; } = [];
     public string Say { get; set; } = string.Empty;
 }
 
@@ -32,7 +36,8 @@ public sealed class KnubotLineFile
     /// <summary>Line said instead when this line's effects cannot be applied.</summary>
     public string? Fail { get; set; }
 
-    public KnubotReplyFile[] Replies { get; set; } = [];
+    /// <summary>Ids from the script's <see cref="KnubotScriptFile.Replies"/>, offered in this order.</summary>
+    public string[] Replies { get; set; } = [];
 }
 
 /// <summary>Reads a string, or an array of strings joined with \n.</summary>
@@ -64,9 +69,23 @@ public sealed class KnubotReplyFile
 {
     public string Text { get; set; } = string.Empty;
     public string[] If { get; set; } = [];
+    public KnubotRequirementFile[] Requirements { get; set; } = [];
 
     /// <summary>A line id, <c>close</c>, or <c>opener</c> (pick the opener again). Empty or unknown: a dead end.</summary>
     public string Goto { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// One criteria row, in the same form and evaluated the same way as item requirements: a leaf compares
+/// <see cref="Stat"/> to <see cref="Value"/> with <see cref="Operator"/> (EqualTo, Unequal, LessThan, GreaterThan,
+/// BitAnd, NotBitAnd); an And, Or or Not row (no Stat) links the rows before it in postfix order. Rows without
+/// links must all pass. Stat and Operator are names or numbers.
+/// </summary>
+public sealed class KnubotRequirementFile
+{
+    public string Stat { get; set; } = string.Empty;
+    public string Operator { get; set; } = string.Empty;
+    public int Value { get; set; }
 }
 
 /// <summary>A validated, read-only script.</summary>
@@ -87,8 +106,8 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
 
 public sealed record KnubotOpener(KnubotCondition[] If, string Say);
 
-/// <summary><see cref="Source"/> is the reply text as written, for logs and the dead-end line.</summary>
-public sealed record KnubotReply(string Source, KnubotTextPiece[] Text, KnubotCondition[] If, string Goto);
+/// <summary><see cref="Id"/> is the reply's key in the script's Replies, for logs.</summary>
+public sealed record KnubotReply(string Id, KnubotTextPiece[] Text, KnubotCondition[] If, string Goto);
 
 /// <summary><see cref="Effects"/> is every effect in <see cref="Pieces"/>, checked together before the line starts.</summary>
 public sealed record KnubotLine(

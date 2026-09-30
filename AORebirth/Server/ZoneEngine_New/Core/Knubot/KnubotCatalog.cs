@@ -86,7 +86,7 @@ public sealed class KnubotCatalog
             loaded++;
 
             var deadEnds = script.Lines.Values.SelectMany(line => line.Replies.Where(script.IsDeadEnd)
-                .Select(reply => "line '" + line.Id + "' reply '" + reply.Source + "'")).ToArray();
+                .Select(reply => "line '" + line.Id + "' reply '" + reply.Id + "'")).ToArray();
             if (deadEnds.Length != 0)
                 logger.Warn(string.Format(CultureInfo.InvariantCulture, "Knubot script {0} has {1} dead-end replies: {2}",
                     script.Id, deadEnds.Length, string.Join(", ", deadEnds)));
@@ -131,6 +131,24 @@ public sealed class KnubotCatalog
             return null;
         }
 
+        var replyTable = new Dictionary<string, KnubotReply>(StringComparer.Ordinal);
+        foreach (KeyValuePair<string, KnubotReplyFile> pair in file.Replies ?? new Dictionary<string, KnubotReplyFile>())
+        {
+            KnubotReplyFile? reply = pair.Value;
+            if (reply == null || string.IsNullOrWhiteSpace(reply.Text))
+            {
+                errors.Add("reply '" + pair.Key + "' needs Text");
+                continue;
+            }
+
+            var replyErrors = new List<string>();
+            KnubotParser.Parsed text = KnubotParser.Parse(reply.Text, reply: true, load, replyErrors);
+            replyTable[pair.Key] = new KnubotReply(pair.Key, text.Pieces.OfType<KnubotTextPiece>().ToArray(),
+                Conditions(reply.If, reply.Requirements, load, replyErrors), (reply.Goto ?? string.Empty).Trim());
+            foreach (string error in replyErrors)
+                errors.Add("reply '" + pair.Key + "': " + error);
+        }
+
         var lines = new Dictionary<string, KnubotLine>(StringComparer.Ordinal);
         foreach (KeyValuePair<string, KnubotLineFile> pair in file.Lines)
         {
@@ -147,17 +165,12 @@ public sealed class KnubotCatalog
                 lineErrors.Add("{goto} and {close} cannot both be set");
 
             var replies = new List<KnubotReply>();
-            foreach (KnubotReplyFile reply in source.Replies ?? [])
+            foreach (string replyId in source.Replies ?? [])
             {
-                if (reply == null || string.IsNullOrWhiteSpace(reply.Text))
-                {
-                    lineErrors.Add("a reply needs Text");
-                    continue;
-                }
-
-                KnubotParser.Parsed text = KnubotParser.Parse(reply.Text, reply: true, load, lineErrors);
-                replies.Add(new KnubotReply(reply.Text.Trim(), text.Pieces.OfType<KnubotTextPiece>().ToArray(),
-                    Conditions(reply.If, load, lineErrors), (reply.Goto ?? string.Empty).Trim()));
+                if (replyId != null && replyTable.TryGetValue(replyId.Trim(), out KnubotReply? reply))
+                    replies.Add(reply);
+                else
+                    lineErrors.Add("unknown reply '" + replyId + "'");
             }
 
             foreach (string error in lineErrors)
@@ -177,7 +190,7 @@ public sealed class KnubotCatalog
             }
 
             var openerErrors = new List<string>();
-            openers.Add(new KnubotOpener(Conditions(opener.If, load, openerErrors), opener.Say!));
+            openers.Add(new KnubotOpener(Conditions(opener.If, opener.Requirements, load, openerErrors), opener.Say!));
             foreach (string error in openerErrors)
                 errors.Add("opener '" + opener.Say + "': " + error);
         }
@@ -196,7 +209,7 @@ public sealed class KnubotCatalog
         return new KnubotScript(id, npcs, openers.ToArray(), lines);
     }
 
-    static KnubotCondition[] Conditions(string[]? texts, KnubotLoadContext load, List<string> errors)
+    static KnubotCondition[] Conditions(string[]? texts, KnubotRequirementFile[]? requirements, KnubotLoadContext load, List<string> errors)
     {
         var conditions = new List<KnubotCondition>();
         foreach (string text in texts ?? [])
@@ -206,6 +219,9 @@ public sealed class KnubotCatalog
             else
                 errors.Add(error);
         }
+
+        if (KnubotCondition.TryParseRequirements(requirements, errors) is KnubotRequirementCondition rows)
+            conditions.Add(rows);
 
         return conditions.ToArray();
     }

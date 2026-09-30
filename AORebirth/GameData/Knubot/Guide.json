@@ -4,46 +4,41 @@
   "Openers": [
     { "Say": "intro" }
   ],
+  "Replies": {
+    "who": { "Text": "Who are you?", "Goto": "who" },
+    "howto": { "Text": "I want to know how to play this game.", "Goto": "howto" },
+    "windows": { "Text": "I have some questions about the windows and menus.", "Goto": "windows" },
+    "goodbye": { "Text": "Goodbye", "Goto": "close" },
+    "windows_right": { "Text": "Tell me about the windows on the right.", "Goto": "windows_right" },
+    "inventory": { "Text": "Tell me about the Inventory.", "Goto": "inventory" },
+    "skills": { "Text": "Tell me about the Skill system." },
+    "shortcut_bar": { "Text": "Tell me about the Shortcut bar." },
+    "something_else": { "Text": "Let's talk about something else.", "Goto": "something_else" },
+    "browse_topics": { "Text": "I'd like to see all the topics and browse through them as I please." },
+    "tasks": { "Text": "I prefer doing tasks.", "Goto": "tasks" },
+    "mission_seen": { "Text": "Yes, I see it." },
+    "mission_not_seen": { "Text": "No." }
+  },
   "Lines": {
     "intro": {
       "Text": [
         "{delay 1}Hello. I am here to help you get acquainted with living on Rubi-Ka.",
         "{delay 1}Please don't hesitate to ask me for help if there is anything you are having difficulties with or want to know more about."
       ],
-      "Replies": [
-        { "Text": "Who are you?", "Goto": "who" },
-        { "Text": "I want to know how to play this game.", "Goto": "howto" },
-        { "Text": "I have some questions about the windows and menus.", "Goto": "windows" },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["who", "howto", "windows", "goodbye"]
     },
     "who": {
       "Text": "{delay 1}I am here to help you take your first few steps on Rubi-Ka. If you have any questions about how things are done here, please don't hesitate to ask.",
-      "Replies": [
-        { "Text": "I want to know how to play this game.", "Goto": "howto" },
-        { "Text": "I have some questions about the windows and menus.", "Goto": "windows" },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["howto", "windows", "goodbye"]
     },
     "something_else": {
       "Text": "{delay 1}OK. What do you want to talk about?",
-      "Replies": [
-        { "Text": "I want to know how to play this game.", "Goto": "howto" },
-        { "Text": "I have some questions about the windows and menus.", "Goto": "windows" },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["howto", "windows", "goodbye"]
     },
 
     "windows": {
       "Text": "{delay 1}Certainly! What part do you want to know about?",
-      "Replies": [
-        { "Text": "Tell me about the windows on the right.", "Goto": "windows_right" },
-        { "Text": "Tell me about the Inventory.", "Goto": "inventory" },
-        { "Text": "Tell me about the Skill system." },
-        { "Text": "Tell me about the Shortcut bar." },
-        { "Text": "Let's talk about something else.", "Goto": "something_else" },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["windows_right", "inventory", "skills", "shortcut_bar", "something_else", "goodbye"]
     },
     "windows_right": {
       "Text": [
@@ -53,10 +48,7 @@
         "{delay 1}What windows do you want me to tell you about?",
         "{delay 1}<font color=#FF0000>[Debug] Dead end: the individual window topics have no replies yet.</font>"
       ],
-      "Replies": [
-        { "Text": "Let's talk about something else.", "Goto": "something_else" },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["something_else", "goodbye"]
     },
     "inventory": {
       "Text": [
@@ -69,10 +61,7 @@
         "Using an item usually requires you to to be proficient in certain skills or be of a particular profession (such as trader or soldier).",
         "There is more information available on the Inventory and Using Items. Do you want to know more?"
       ],
-      "Replies": [
-        { "Text": "Let's talk about something else.", "Goto": "something_else" },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["something_else", "goodbye"]
     },
 
     "howto": {
@@ -80,11 +69,7 @@
         "{delay 1}I can provide you with information on a number of subjects. Just tell me what you would like to know more about.",
         "{delay 1}If you prefer a more hands-on approach, I could also give you a couple of simple tasks to complete."
       ],
-      "Replies": [
-        { "Text": "I'd like to see all the topics and browse through them as I please." },
-        { "Text": "I prefer doing tasks.", "Goto": "tasks" },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["browse_topics", "tasks", "goodbye"]
     },
     "tasks": {
       "Text": [
@@ -94,11 +79,7 @@
         "{delay 2}{givequest KION}",
         "{delay 2}To see the mission description press (Ctrl + 4). Can you see it?"
       ],
-      "Replies": [
-        { "Text": "Yes, I see it." },
-        { "Text": "No." },
-        { "Text": "Goodbye", "Goto": "close" }
-      ]
+      "Replies": ["mission_seen", "mission_not_seen", "goodbye"]
     }
   }
 }

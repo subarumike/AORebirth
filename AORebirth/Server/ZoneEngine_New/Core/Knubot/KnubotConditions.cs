@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
+using AORebirth.Enums;
+
 using SmokeLounge.AOtomation.Messaging.GameData;
 
 using ZoneEngine_New.Core.Entities;
@@ -49,8 +51,8 @@ public sealed class KnubotLoadContext(QuestCatalog quests, IGameData gameData, I
 
 /// <summary>
 /// One check from an <c>If</c> list. Prefix <c>!</c> to negate. Forms:
-/// <c>quest HASH none|active|done|failed|expired|abandoned</c>, <c>has ITEMHASH [count]</c>,
-/// <c>level MIN [MAX]</c>, <c>stat NAME = != &lt; &lt;= &gt; &gt;= VALUE</c>, <c>met</c>.
+/// <c>quest HASH none|active|done|failed|expired|abandoned</c>, <c>has ITEMHASH [count]</c>, <c>met</c>.
+/// Stat checks are <c>Requirements</c> rows, compiled by <see cref="TryParseRequirements"/>.
 /// </summary>
 public abstract record KnubotCondition(bool Negated)
 {
@@ -112,29 +114,6 @@ public abstract record KnubotCondition(bool Negated)
                 condition = new KnubotHasCondition(negated, templates, count);
                 return true;
 
-            case "level":
-                int max = int.MaxValue;
-                if (words.Length < 2 || words.Length > 3 || !TryPositive(words[1], out int min)
-                    || (words.Length == 3 && (!TryPositive(words[2], out max) || max < min)))
-                {
-                    error = "expected 'level MIN [MAX]': " + trimmed;
-                    return false;
-                }
-
-                condition = new KnubotStatCondition(negated, CharacterStat.Level, ">=", min, max);
-                return true;
-
-            case "stat":
-                if (words.Length != 4 || !TryStat(words[1], out CharacterStat stat) || !IsOperator(words[2])
-                    || !int.TryParse(words[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
-                {
-                    error = "expected 'stat NAME OP VALUE' (OP is = != < <= > >=): " + trimmed;
-                    return false;
-                }
-
-                condition = new KnubotStatCondition(negated, stat, words[2], value, null);
-                return true;
-
             case "met":
                 if (words.Length != 1)
                 {
@@ -149,6 +128,77 @@ public abstract record KnubotCondition(bool Negated)
                 error = "unknown condition '" + words[0] + "'";
                 return false;
         }
+    }
+
+    /// <summary>
+    /// <paramref name="rows"/> as one item-requirement expression, or null when there are none. Rejects operators
+    /// the item evaluator would silently pass and link rows that do not form one postfix expression.
+    /// </summary>
+    public static KnubotRequirementCondition? TryParseRequirements(KnubotRequirementFile[]? rows, List<string> errors)
+    {
+        if (rows == null || rows.Length == 0)
+            return null;
+
+        var requirements = new ItemRequirement[rows.Length];
+        int depth = 0;
+        bool linked = false, valid = true;
+        for (int i = 0; i < rows.Length; i++)
+        {
+            KnubotRequirementFile row = rows[i] ?? new KnubotRequirementFile();
+            string where = "requirement " + (i + 1) + ": ";
+            if (!TryOperator(row.Operator, out Operator op))
+            {
+                errors.Add(where + "unknown Operator '" + row.Operator + "' (EqualTo, Unequal, LessThan, GreaterThan, BitAnd, NotBitAnd, And, Or, Not)");
+                valid = false;
+                continue;
+            }
+
+            if (op is Operator.And or Operator.Or or Operator.Not)
+            {
+                linked = true;
+                int operands = op == Operator.Not ? 1 : 2;
+                if (!string.IsNullOrWhiteSpace(row.Stat) || depth < operands)
+                {
+                    errors.Add(where + op + " takes no Stat and needs " + operands + " rows before it");
+                    valid = false;
+                }
+
+                depth -= operands - 1;
+                requirements[i] = new ItemRequirement { Operator = (int)op };
+                continue;
+            }
+
+            if (!TryStat(row.Stat, out CharacterStat stat))
+            {
+                errors.Add(where + "unknown Stat '" + row.Stat + "'");
+                valid = false;
+                continue;
+            }
+
+            depth++;
+            requirements[i] = new ItemRequirement { StatNumber = (int)stat, Operator = (int)op, Value = row.Value };
+        }
+
+        if (valid && linked && depth != 1)
+        {
+            errors.Add("And/Or/Not rows must link every requirement into one expression");
+            valid = false;
+        }
+
+        return valid ? new KnubotRequirementCondition(requirements) : null;
+    }
+
+    static bool TryOperator(string word, out Operator op)
+    {
+        op = default;
+        if (string.IsNullOrWhiteSpace(word))
+            return false;
+
+        bool parsed = int.TryParse(word, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id)
+            ? Enum.IsDefined(typeof(Operator), op = (Operator)id)
+            : Enum.TryParse(word.Trim(), ignoreCase: true, out op) && Enum.IsDefined(op);
+        return parsed && op is Operator.EqualTo or Operator.Unequal or Operator.LessThan or Operator.GreaterThan
+            or Operator.BitAnd or Operator.NotBitAnd or Operator.And or Operator.Or or Operator.Not;
     }
 
     static bool TryQuestState(string word, out QuestState? state)
@@ -168,6 +218,10 @@ public abstract record KnubotCondition(bool Negated)
 
     static bool TryStat(string word, out CharacterStat stat)
     {
+        stat = default;
+        if (string.IsNullOrWhiteSpace(word))
+            return false;
+
         if (int.TryParse(word, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id) && Enum.IsDefined(typeof(CharacterStat), id))
         {
             stat = (CharacterStat)id;
@@ -176,8 +230,6 @@ public abstract record KnubotCondition(bool Negated)
 
         return Enum.TryParse(word, ignoreCase: true, out stat) && Enum.IsDefined(stat);
     }
-
-    static bool IsOperator(string op) => op is "=" or "!=" or "<" or "<=" or ">" or ">=";
 
     internal static bool TryPositive(string word, out int value)
         => int.TryParse(word, NumberStyles.Integer, CultureInfo.InvariantCulture, out value) && value > 0;
@@ -198,25 +250,11 @@ public sealed record KnubotHasCondition(bool Negated, HashSet<int> TemplateIds, 
     protected override bool Test(KnubotContext context) => KnubotItems.CountCarried(context.Player, TemplateIds) >= Count;
 }
 
-/// <summary><see cref="Max"/> set: an inclusive range (level); otherwise a comparison.</summary>
-public sealed record KnubotStatCondition(bool Negated, CharacterStat Stat, string Operator, int Value, int? Max) : KnubotCondition(Negated)
+/// <summary>Item-requirement rows, checked against the player's stats exactly as an item's requirements are.</summary>
+public sealed record KnubotRequirementCondition(ItemRequirement[] Requirements) : KnubotCondition(Negated: false)
 {
     protected override bool Test(KnubotContext context)
-    {
-        int current = context.Player.Stats.GetOrZero(Stat);
-        if (Max is int max)
-            return current >= Value && current <= max;
-
-        return Operator switch
-        {
-            "=" => current == Value,
-            "!=" => current != Value,
-            "<" => current < Value,
-            "<=" => current <= Value,
-            ">" => current > Value,
-            _ => current >= Value
-        };
-    }
+        => ItemTemplate.MeetsRequirements(Requirements, stat => context.Player.Stats.Get(stat));
 }
 
 public sealed record KnubotMetCondition(bool Negated) : KnubotCondition(Negated)
