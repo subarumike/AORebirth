@@ -269,7 +269,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             return;
         }
 
-        QueueReplies(conversation, visible);
+        QueueReplies(conversation, [.. visible, KnubotScript.Goodbye]);
     }
 
     /// <summary>The wire index is the position in this list; hidden replies can never be picked.</summary>

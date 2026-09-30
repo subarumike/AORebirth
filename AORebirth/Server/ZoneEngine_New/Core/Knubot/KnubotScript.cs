@@ -94,6 +94,9 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
     public const string CloseTarget = "close";
     public const string OpenerTarget = "opener";
 
+    /// <summary>Added by the engine after every reply list, so scripts never write their own.</summary>
+    public static readonly KnubotReply Goodbye = new("goodbye", [new KnubotTextPiece(KnubotTextKind.Literal, "Goodbye", Emote: false)], [], CloseTarget);
+
     public string Id { get; } = id;
     public string[] Npcs { get; } = npcs;
     public KnubotOpener[] Openers { get; } = openers;

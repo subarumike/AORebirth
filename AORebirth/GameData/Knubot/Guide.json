@@ -8,7 +8,6 @@
     "who": { "Text": "Who are you?", "Goto": "who" },
     "howto": { "Text": "I want to know how to play this game.", "Goto": "howto" },
     "windows": { "Text": "I have some questions about the windows and menus.", "Goto": "windows" },
-    "goodbye": { "Text": "Goodbye", "Goto": "close" },
     "windows_right": { "Text": "Tell me about the windows on the right.", "Goto": "windows_right" },
     "inventory": { "Text": "Tell me about the Inventory.", "Goto": "inventory" },
     "skills": { "Text": "Tell me about the Skill system." },
@@ -25,20 +24,20 @@
         "{delay 1}Hello. I am here to help you get acquainted with living on Rubi-Ka.",
         "{delay 1}Please don't hesitate to ask me for help if there is anything you are having difficulties with or want to know more about."
       ],
-      "Replies": ["who", "howto", "windows", "goodbye"]
+      "Replies": ["who", "howto", "windows"]
     },
     "who": {
       "Text": "{delay 1}I am here to help you take your first few steps on Rubi-Ka. If you have any questions about how things are done here, please don't hesitate to ask.",
-      "Replies": ["howto", "windows", "goodbye"]
+      "Replies": ["howto", "windows"]
     },
     "something_else": {
       "Text": "{delay 1}OK. What do you want to talk about?",
-      "Replies": ["howto", "windows", "goodbye"]
+      "Replies": ["howto", "windows"]
     },
 
     "windows": {
       "Text": "{delay 1}Certainly! What part do you want to know about?",
-      "Replies": ["windows_right", "inventory", "skills", "shortcut_bar", "something_else", "goodbye"]
+      "Replies": ["windows_right", "inventory", "skills", "shortcut_bar", "something_else"]
     },
     "windows_right": {
       "Text": [
@@ -48,7 +47,7 @@
         "{delay 1}What windows do you want me to tell you about?",
         "{delay 1}<font color=#FF0000>[Debug] Dead end: the individual window topics have no replies yet.</font>"
       ],
-      "Replies": ["something_else", "goodbye"]
+      "Replies": ["something_else"]
     },
     "inventory": {
       "Text": [
@@ -61,7 +60,7 @@
         "Using an item usually requires you to to be proficient in certain skills or be of a particular profession (such as trader or soldier).",
         "There is more information available on the Inventory and Using Items. Do you want to know more?"
       ],
-      "Replies": ["something_else", "goodbye"]
+      "Replies": ["something_else"]
     },
 
     "howto": {
@@ -69,7 +68,7 @@
         "{delay 1}I can provide you with information on a number of subjects. Just tell me what you would like to know more about.",
         "{delay 1}If you prefer a more hands-on approach, I could also give you a couple of simple tasks to complete."
       ],
-      "Replies": ["browse_topics", "tasks", "goodbye"]
+      "Replies": ["browse_topics", "tasks"]
     },
     "tasks": {
       "Text": [
@@ -79,7 +78,7 @@
         "{delay 2}{givequest KION}",
         "{delay 2}To see the mission description press (Ctrl + 4). Can you see it?"
       ],
-      "Replies": ["mission_seen", "mission_not_seen", "goodbye"]
+      "Replies": ["mission_seen", "mission_not_seen"]
     }
   }
 }
