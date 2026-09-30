@@ -991,9 +991,31 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(landing);
 
+            if (SendSamePlayfieldArrival(player, landing))
+                player.SendDeathRespawnAction();
+        }
+
+        /// <summary>
+        /// Reloads the player where they stand: the same arrival sequence as an in-zone respawn, so the
+        /// client rebuilds the character (equipment, stats, nanos) from a fresh full update, and observers
+        /// see a fresh spawn.
+        /// </summary>
+        public void ReloadInPlace(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (player.Session == null || player.IsDead)
+                return;
+
+            _playfield.GetRequiredService<PlayfieldLocality>().DeactivatePlayerVisibility(player);
+            SendSamePlayfieldArrival(player, player.Position);
+        }
+
+        /// <summary>N3Teleport, playfield ready block, self spawn packets, then locality visibility.</summary>
+        bool SendSamePlayfieldArrival(Player player, Vector3 landing)
+        {
             IZoneSession? session = player.Session;
             if (session == null)
-                return;
+                return false;
 
             int characterId = player.Identity.Instance;
             int playfieldId = _playfield.Identity.Instance;
@@ -1037,7 +1059,7 @@ namespace ZoneEngine_New.Core.Playfield
                 characterId);
 
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
-            player.SendDeathRespawnAction();
+            return true;
         }
 
         /// <summary>

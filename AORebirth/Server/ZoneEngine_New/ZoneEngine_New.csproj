@@ -226,6 +226,12 @@
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponSlots.cs">
       <Link>Enums\WeaponSlots.cs</Link>
     </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ArmorSlots.cs">
+      <Link>Enums\ArmorSlots.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Libraries\Source\AORebirth.Enums\ImplantSlots.cs">
+      <Link>Enums\ImplantSlots.cs</Link>
+    </Compile>
     <Compile Include="..\..\Libraries\Source\AORebirth.Enums\WeaponFlags.cs">
       <Link>Enums\WeaponFlags.cs</Link>
     </Compile>
