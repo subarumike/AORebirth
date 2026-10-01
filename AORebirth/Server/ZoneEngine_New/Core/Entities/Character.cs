@@ -71,12 +71,6 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Damage shares are split out of this so each killer's fraction survives integer math.</summary>
         const int AlienShareBasis = 10000;
         const int QuestXpCapPercent = 20;
-        const int MartialArtsSpecialLowId = 211357;
-        const int MartialArtsSpecialHighId = 211358;
-        const int DimachSpecialLowId = 42033;
-        const int DimachSpecialHighId = 42032;
-        const int BrawlSpecialLowId = 211401;
-        const int BrawlSpecialHighId = 211402;
 
         protected Character(Identity identity)
             : base(identity)
@@ -1086,6 +1080,16 @@ namespace ZoneEngine_New.Core.Entities
             if (!IsPlayer)
                 return specials.ToArray();
 
+            // Retail SAW advertises this character's own items (capture 2026-10-01, Keeper with low skills):
+            // MAAT 43712/144745 fist pair, DIIT 211399/211400 Keeper Dimach, BRAW 70292/70293 tier-1 Brawl.
+            Profession profession = (Profession)Stats.GetOrZero(CharacterStat.Profession);
+            (int maLowId, int maHighId, _) =
+                MartialArtsFistResolver.Resolve(profession, Stats.GetOrOne(CharacterStat.MartialArts));
+            (int brawlLowId, int brawlHighId, _) =
+                MartialArtsFistResolver.ResolveBrawl(Stats.GetOrZero(CharacterStat.Brawl));
+            (int dimachLowId, int dimachHighId, _) =
+                MartialArtsFistResolver.ResolveDimach(profession, Stats.GetOrZero(CharacterStat.Dimach));
+
             foreach (KeyValuePair<WeaponSlot, CharacterWeapon> pair in Weapons)
             {
                 Item? item = pair.Value?.Item;
@@ -1119,8 +1123,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            MartialArtsSpecialLowId,
-                            MartialArtsSpecialHighId,
+                            maLowId,
+                            maHighId,
                             CharacterStat.MartialArts,
                             "MAAT"));
                     maat = true;
@@ -1130,8 +1134,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            BrawlSpecialLowId,
-                            BrawlSpecialHighId,
+                            brawlLowId,
+                            brawlHighId,
                             CharacterStat.Brawl,
                             "BRAW"));
                     brawl = true;
@@ -1141,8 +1145,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            DimachSpecialLowId,
-                            DimachSpecialHighId,
+                            dimachLowId,
+                            dimachHighId,
                             CharacterStat.Dimach,
                             "DIIT"));
                     dimach = true;
@@ -1157,8 +1161,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            MartialArtsSpecialLowId,
-                            MartialArtsSpecialHighId,
+                            maLowId,
+                            maHighId,
                             CharacterStat.MartialArts,
                             "MAAT"));
                 }
@@ -1167,8 +1171,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            BrawlSpecialLowId,
-                            BrawlSpecialHighId,
+                            brawlLowId,
+                            brawlHighId,
                             CharacterStat.Brawl,
                             "BRAW"));
                 }
@@ -1177,8 +1181,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            DimachSpecialLowId,
-                            DimachSpecialHighId,
+                            dimachLowId,
+                            dimachHighId,
                             CharacterStat.Dimach,
                             "DIIT"));
                 }

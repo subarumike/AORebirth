@@ -197,7 +197,8 @@ namespace ZoneEngine_New.Core.Helpers
             {
                 Identity = attacker.Identity,
                 Unknown = 0,
-                Unknown1 = slot,
+                // Retail Brawl (capture 2026-10-01): slot 0, ammo -1; the Brawl Item is not a hand weapon.
+                Unknown1 = special == CharacterStat.Brawl ? 0 : slot,
                 Unknown2 = result.Damage,
                 Unknown3 = bullets,
                 Target = target.Identity,
