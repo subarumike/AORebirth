@@ -1,0 +1,964 @@
+{
+  "_comment": "Level-1 character create start packages from AORebirth_BACKUP_20260916 capture-backed StarterLoadout tables. Items include nano crystals; uploadedNanos is optional uploaded-nano ids when capture proves them.",
+  "packages": [
+    {
+      "professionId": 1,
+      "profession": "Soldier",
+      "evidence": "20260711-soldier-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121569,
+          "highId": 121569,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 70401,
+          "highId": 70401,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 2,
+      "profession": "MartialArtist",
+      "evidence": "20260711-MartialArtist-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 248339,
+          "highId": 248339,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 121565,
+          "highId": 121565,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 72,
+          "lowId": 28943,
+          "highId": 28943,
+          "quality": 4,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 3,
+      "profession": "Engineer",
+      "evidence": "20260711-engineer-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121567,
+          "highId": 121567,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 248338,
+          "highId": 248338,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 72,
+          "lowId": 43329,
+          "highId": 43329,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 4,
+      "profession": "Fixer",
+      "evidence": "20260711-fixer-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121571,
+          "highId": 121571,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 297633,
+          "highId": 297633,
+          "quality": 10,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 5,
+      "profession": "Agent",
+      "evidence": "20260711-agent-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121568,
+          "highId": 121568,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 56238,
+          "highId": 56238,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 6,
+      "profession": "Adventurer",
+      "evidence": "20260711-adventurer-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121567,
+          "highId": 121567,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 218404,
+          "highId": 218404,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 72,
+          "lowId": 82838,
+          "highId": 82838,
+          "quality": 20,
+          "count": 1
+        },
+        {
+          "placement": 73,
+          "lowId": 218404,
+          "highId": 218404,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 74,
+          "lowId": 121567,
+          "highId": 121567,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 7,
+      "profession": "Trader",
+      "evidence": "20260711-trader-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121570,
+          "highId": 121570,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 78417,
+          "highId": 78417,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 8,
+      "profession": "Bureaucrat",
+      "evidence": "20260711-Bureaucrat-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121567,
+          "highId": 121567,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 46456,
+          "highId": 46456,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 9,
+      "profession": "Enforcer",
+      "evidence": "20260711-enforcer-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 218406,
+          "highId": 218406,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 121564,
+          "highId": 121564,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 72,
+          "lowId": 100202,
+          "highId": 100202,
+          "quality": 17,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 10,
+      "profession": "Doctor",
+      "evidence": "20260711-doctor-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 121567,
+          "highId": 121567,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 28778,
+          "highId": 28778,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 11,
+      "profession": "Nanotechnician",
+      "evidence": "20260711-Nano-Technician-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 28815,
+          "highId": 28815,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 121567,
+          "highId": 121567,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 72,
+          "lowId": 297665,
+          "highId": 297665,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 12,
+      "profession": "Metaphysicist",
+      "evidence": "20260711-215715",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 248339,
+          "highId": 248339,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 43330,
+          "highId": 43330,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 72,
+          "lowId": 302163,
+          "highId": 302163,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 14,
+      "profession": "Keeper",
+      "evidence": "20260711-keeper-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 218403,
+          "highId": 218403,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 210529,
+          "highId": 210529,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    },
+    {
+      "professionId": 15,
+      "profession": "Shade",
+      "evidence": "20260711-shade-starter-kit",
+      "items": [
+        {
+          "placement": 64,
+          "lowId": 291082,
+          "highId": 291082,
+          "quality": 1,
+          "count": 50
+        },
+        {
+          "placement": 65,
+          "lowId": 291043,
+          "highId": 291043,
+          "quality": 1,
+          "count": 25
+        },
+        {
+          "placement": 66,
+          "lowId": 252158,
+          "highId": 252158,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 67,
+          "lowId": 292235,
+          "highId": 292235,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 68,
+          "lowId": 296977,
+          "highId": 296977,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 69,
+          "lowId": 287047,
+          "highId": 287047,
+          "quality": 25,
+          "count": 1
+        },
+        {
+          "placement": 70,
+          "lowId": 218395,
+          "highId": 218395,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 71,
+          "lowId": 211155,
+          "highId": 211155,
+          "quality": 1,
+          "count": 1
+        },
+        {
+          "placement": 72,
+          "lowId": 218395,
+          "highId": 218395,
+          "quality": 1,
+          "count": 1
+        }
+      ],
+      "uploadedNanos": []
+    }
+  ]
+}

@@ -80,22 +80,9 @@
     </Compile>
     <Compile Include="CoreClient\Client.cs" />
     <Compile Include="CoreClient\LoginHandoffLifecycle.cs" />
-    <Compile Include="CharacterCreation\AdventurerStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\AgentStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\BureaucratStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\DoctorStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\EngineerStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\EnforcerStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\FixerStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\KeeperStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\MartialArtistStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\MetaphysicistStarterLoadout.cs" />
     <Compile Include="CharacterCreation\NewCharacterStats.cs" />
-    <Compile Include="CharacterCreation\NanotechnicianStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\ShadeStarterLoadout.cs" />
-    <Compile Include="CharacterCreation\SoldierStarterLoadout.cs" />
+    <Compile Include="CharacterCreation\CharacterStartPackageApplier.cs" />
     <Compile Include="CharacterCreation\StarterVitalStats.cs" />
-    <Compile Include="CharacterCreation\TraderStarterLoadout.cs" />
     <Compile Include="Component\ClientFactory.cs" />
     <Compile Include="CoreServer\LoginServer.cs" />
     <Compile Include="MessageHandlers\CreateCharacterHandler.cs" />
@@ -147,6 +134,10 @@
   <ItemGroup>
     <Content Include="..\..\Config\Config.xml">
       <Link>Config.xml</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\GameData\StartPackages.json">
+      <Link>GameData\StartPackages.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
