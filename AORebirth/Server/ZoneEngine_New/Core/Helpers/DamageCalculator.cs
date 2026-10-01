@@ -249,7 +249,8 @@ namespace ZoneEngine_New.Core.Helpers
 
         const int MeleeDamageType = 91;
 
-        static bool TryGetAddDamageStat(int rawDamageType, out CharacterStat addDamageStat)
+        /// <summary>The attacker's "Add. X Dam." stat for a damage type (90-97, the same ids as the AC stats).</summary>
+        internal static bool TryGetAddDamageStat(int rawDamageType, out CharacterStat addDamageStat)
         {
             switch (rawDamageType)
             {

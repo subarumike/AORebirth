@@ -119,6 +119,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
                 case CharacterActionType.DeleteItem:
                 case CharacterActionType.Split:
+                case CharacterActionType.JoinItems:
                     _inventoryActions.Handle(player, message);
                     break;
 

@@ -38,20 +38,27 @@ namespace ZoneEngine_New.Core.Inventory
             ItemSpell spell,
             IInventoryRepository inventoryRepository,
             IItemBuilder items,
-            SpellCriteria? criteria = null)
+            SpellCriteria? criteria = null,
+            bool isTick = false)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
 
+            // Add Damage applies to a direct hit as it lands, never to a timed nano's later ticks.
+            bool addDamage = !isTick;
             switch ((FunctionType)spell.FunctionType)
             {
                 case FunctionType.OpenBank:
                     return target is Player bankPlayer
                         && OpenBank(bankPlayer, inventoryRepository, items);
                 case FunctionType.Hit:
-                    return Hit(target, source, spell);
+                    return Hit(target, source, spell, addDamage);
+                case FunctionType.AreaHit:
+                    return AreaHit(target, source, spell, addDamage);
+                case FunctionType.DrainHit:
+                    return DrainHit(target, source, spell, addDamage);
                 case FunctionType.Set:
                     return Set(target, spell);
                 case FunctionType.SetFlag:
@@ -137,7 +144,7 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
-        static bool Hit(Character target, Character? source, ItemSpell spell)
+        static bool Hit(Character target, Character? source, ItemSpell spell, bool addDamage)
         {
             if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int minHit))
                 return false;
@@ -176,12 +183,75 @@ namespace ZoneEngine_New.Core.Inventory
 
             var stat = (CharacterStat)statId;
             if (stat == CharacterStat.Health)
-                return ApplyHealthDelta(target, source, delta, acStat);
+                return ApplyHealthDelta(target, source, delta, acStat, addDamage);
 
             if (stat == CharacterStat.CurrentNano || stat == CharacterStat.NanoPool)
                 return ApplyNanoDelta(target, delta);
 
             target.Stats.Set(stat, target.Stats.GetOrZero(stat, StatDetail.Base) + delta, StatDetail.Base, dirty: true);
+            return true;
+        }
+
+        /// <summary>
+        /// DrainHit args: Stat, Min, Max, AC, Percent (Shade Dimach 213269-213274: Health, Melee AC, 70-80).
+        /// Damages <paramref name="target"/> like a hostile Hit, then heals the source by Percent of the
+        /// damage actually dealt. Only Health damage is supported.
+        /// </summary>
+        static bool DrainHit(Character target, Character? source, ItemSpell spell, bool addDamage)
+        {
+            if (!spell.TryReadInt(0, out int statId) || (CharacterStat)statId != CharacterStat.Health
+                || !spell.TryReadInt(1, out int minHit) || !spell.TryReadInt(2, out int maxHit))
+                return false;
+            spell.TryReadInt(3, out int acStat);
+            spell.TryReadInt(4, out int percent);
+            if (minHit > maxHit)
+                (minHit, maxHit) = (maxHit, minHit);
+            if (maxHit >= 0 || source == null || ReferenceEquals(source, target) || target.IsDead)
+                return false;
+
+            int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
+            ApplyHealthDelta(target, source, Random.Shared.Next(minHit, maxHit + 1), acStat, addDamage);
+            int dealt = before - Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
+            int drained = (int)((long)dealt * Math.Clamp(percent, 0, 100) / 100);
+            if (drained > 0 && !source.IsDead)
+                ApplyHealthDelta(source, source, drained, 0);
+            return true;
+        }
+
+        /// <summary>
+        /// AreaHit args: Stat, Min, Max, AC, Radius (item 129650: Health -40..-141 Chemical, 3 m).
+        /// Damages <paramref name="center"/> (the function's ApplyOn character) and everything the
+        /// user may attack within Radius metres of it, each with its own roll. Only hostile Health hits.
+        /// </summary>
+        static bool AreaHit(Character center, Character? source, ItemSpell spell, bool addDamage)
+        {
+            if (!spell.TryReadInt(0, out int statId) || (CharacterStat)statId != CharacterStat.Health
+                || !spell.TryReadInt(1, out int minHit) || !spell.TryReadInt(2, out int maxHit)
+                || !spell.TryReadInt(4, out int radius) || radius < 0)
+                return false;
+            spell.TryReadInt(3, out int acStat);
+            if (minHit > maxHit)
+                (minHit, maxHit) = (maxHit, minHit);
+            if (maxHit >= 0)
+                return false;
+
+            Character caster = source ?? center;
+            Playfield? playfield = center.Playfield;
+            DynelRegistry? registry = playfield?.GetService<DynelRegistry>();
+            if (registry == null)
+                return false;
+
+            foreach (Dynel dynel in registry.Dynels())
+            {
+                if (dynel is not Character candidate || candidate.IsDead || ReferenceEquals(candidate, caster)
+                    || !ReferenceEquals(candidate.Playfield, playfield)
+                    || center.Distance3D(candidate) > radius
+                    || !Helpers.CombatRules.CanAttack(caster, candidate))
+                    continue;
+
+                ApplyHealthDelta(candidate, caster, Random.Shared.Next(minHit, maxHit + 1), acStat, addDamage);
+            }
+
             return true;
         }
 
@@ -244,7 +314,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
         }
 
-        static bool ApplyHealthDelta(Character target, Character? source, int delta, int acStat)
+        static bool ApplyHealthDelta(Character target, Character? source, int delta, int acStat, bool addDamage = false)
         {
             Character caster = source ?? target;
 
@@ -252,7 +322,13 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 // A hostile nano hit from someone else can break crowd control before its threat lands.
                 if (!ReferenceEquals(caster, target))
+                {
                     target.RollBuffBreaks(BuffBreakCause.SpellAttack, caster);
+
+                    // Direct hits (nukes, DrainHit, AreaHit) gain the caster's Add Damage for their damage type.
+                    if (addDamage && Helpers.DamageCalculator.TryGetAddDamageStat(acStat, out CharacterStat addDamageStat))
+                        delta -= Math.Max(0, StatCollection.Normalize(caster.Stats.GetOrZero(addDamageStat)));
+                }
 
                 int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
                 target.ApplyDamage(caster, -delta, HitType.Normal);

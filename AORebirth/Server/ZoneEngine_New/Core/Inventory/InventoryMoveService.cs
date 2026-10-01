@@ -949,11 +949,12 @@ namespace ZoneEngine_New.Core.Inventory
             if (relativeSlot < 1 || relativeSlot > wearPage.Capacity)
                 return false;
 
-            int slotMask = item.GetStat(CharacterStat.Slot);
-            if (slotMask <= 0)
+            // Unsigned: some masks carry bit 31 (Morphing Memory 290619 = 0x80000201), which is negative as int.
+            uint slotMask = unchecked((uint)item.GetStat(CharacterStat.Slot));
+            if (slotMask == 0)
                 return false;
 
-            return (slotMask & (1 << relativeSlot)) != 0;
+            return (slotMask & (1u << relativeSlot)) != 0;
         }
 
         static double ResolveEquipDelaySeconds(Item item, bool isSocial)
@@ -968,10 +969,10 @@ namespace ZoneEngine_New.Core.Inventory
             return delay * 0.01;
         }
 
-        static int DecodeBackpackHandle(Identity sourceContainer)
+        internal static int DecodeBackpackHandle(Identity sourceContainer)
             => (int)(((uint)sourceContainer.Instance >> 16) & 0xffff);
 
-        static int DecodeBackpackSlot(Identity sourceContainer)
+        internal static int DecodeBackpackSlot(Identity sourceContainer)
             => (int)((uint)sourceContainer.Instance & 0xffff);
 
         sealed class PendingEquip

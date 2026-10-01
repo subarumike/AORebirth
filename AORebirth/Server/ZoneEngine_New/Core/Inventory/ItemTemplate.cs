@@ -132,6 +132,28 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
+        /// Stat checks of <paramref name="actionType"/> that fail. Empty when the action passes or is
+        /// missing; also empty when the expression fails without any single failing check.
+        /// </summary>
+        public IReadOnlyList<ItemRequirement> UnmetActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType)
+        {
+            ArgumentNullException.ThrowIfNull(getStat);
+
+            ItemAction? action = Actions.Find(candidate => candidate.ActionType == (int)actionType);
+            if (action == null || MeetsRequirements(action.Requirements, getStat))
+                return [];
+
+            var unmet = new List<ItemRequirement>();
+            foreach (ItemRequirement requirement in action.Requirements)
+            {
+                if (!IsRequirementLinkOperator(requirement) && !EvaluateLeaf(requirement, getStat))
+                    unmet.Add(requirement);
+            }
+
+            return unmet;
+        }
+
+        /// <summary>
         /// Legacy requirement expression fold (Events / Criteria):
         /// <list type="bullet">
         /// <item><see cref="IsRequirementLinkOperator"/> rows (And/Or/Not) are structural markers;

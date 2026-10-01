@@ -121,6 +121,15 @@ namespace ZoneEngine_New.Core.Inventory
         public bool Can(CanFlags flags)
             => ((CanFlags)(uint)GetStat(CharacterStat.Can) & flags) == flags;
 
+        /// <summary>
+        /// True when using this item spends or destroys it: the Consume flag or an OnUse DestroyItem.
+        /// <see cref="DestroyOne"/> cannot remove from wear pages, so such items are not usable while equipped.
+        /// </summary>
+        public bool DestroysOnUse
+            => Can(CanFlags.Consume)
+                || (SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
+                    && spells.Exists(spell => spell.FunctionType == (int)FunctionType.DestroyItem));
+
         public bool IsWieldableCombatWeapon()
             => (ItemClass)GetStat(CharacterStat.ItemClass) == ItemClass.Weapon;
 
@@ -174,8 +183,16 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
             if (Locked || !Can(CanFlags.Use))
                 return false;
+            // A function aimed at the fighting target would otherwise fall back to the user.
+            if (UsesFightingTarget && player.TryResolveFightingTarget() == null)
+                return false;
             return Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse);
         }
+
+        /// <summary>True when an OnUse function applies to the user's fighting target.</summary>
+        public bool UsesFightingTarget
+            => SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
+                && spells.Exists(spell => spell.Target == (int)ItemTarget.Fightingtarget);
 
         /// <summary>Runs OnUse spells and spends a consumable charge. Callers gate with <see cref="CanBeginUse"/>.</summary>
         public bool ExecuteUse(
@@ -188,10 +205,12 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
 
+            // The user is the source: Fightingtarget functions resolve through it and damage is credited to it.
             if (!Definition.ExecuteOnUseSpells(
                     player,
                     inventoryRepository,
                     items,
+                    source: player,
                     criteria: new SpellCriteria { Subject = this, SubjectSlot = slotIdentity }))
                 return false;
             if (Can(CanFlags.Consume))

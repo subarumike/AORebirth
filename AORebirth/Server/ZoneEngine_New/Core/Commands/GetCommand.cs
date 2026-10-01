@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.Commands
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Quests;
 
@@ -28,7 +29,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".get stat <statName|statId> | .get stats | .get buffs | .get quests";
+        public string Usage => ".get stat <statName|statId> | .get stats | .get buffs | .get quests | .get weapons";
 
         public void Execute(GmCommandContext context)
         {
@@ -62,6 +63,12 @@ namespace ZoneEngine_New.Core.Commands
             if (string.Equals(verb, "quests", StringComparison.OrdinalIgnoreCase))
             {
                 ExecuteQuests(context);
+                return;
+            }
+
+            if (string.Equals(verb, "weapons", StringComparison.OrdinalIgnoreCase))
+            {
+                ExecuteWeapons(context);
                 return;
             }
 
@@ -159,6 +166,18 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             GmCommandFeedback.SendLines(context.Session, context.Player, lines);
+        }
+
+        /// <summary>The target's armed weapons with their item template damage stats.</summary>
+        static void ExecuteWeapons(GmCommandContext context)
+        {
+            if (!context.TryResolveCharacter(out Character subject))
+                return;
+
+            GmCommandFeedback.SendLines(
+                context.Session,
+                context.Player,
+                GetWeaponsAomlBuilder.BuildChatLines(subject.Name ?? string.Empty, subject.Weapons));
         }
 
         static void ExecuteBuffs(GmCommandContext context)
@@ -325,6 +344,136 @@ namespace ZoneEngine_New.Core.Commands
 
             return chunks;
         }
+    }
+
+    /// <summary>
+    /// Builds AOML <c>text://</c> popup links for a character's armed weapons (template stats only).
+    /// One block per slot; a block is never split across popups.
+    /// </summary>
+    internal static class GetWeaponsAomlBuilder
+    {
+        const string Header = "#FFD700";
+        const string Name = "#FFFFFF";
+        const string Label = "#9CD6E4";
+        const string Value = "#FFA040";
+        const string Muted = "#8A8A8A";
+        const string Tag = "#FF6060";
+
+        public static IReadOnlyList<string> BuildChatLines(
+            string subjectName,
+            IReadOnlyDictionary<WeaponSlot, CharacterWeapon> weapons,
+            int maxBodyLength = GetStatsAomlBuilder.DefaultMaxBodyLength)
+        {
+            ArgumentNullException.ThrowIfNull(weapons);
+            if (maxBodyLength < 64)
+                throw new ArgumentOutOfRangeException(nameof(maxBodyLength));
+
+            string who = string.IsNullOrWhiteSpace(subjectName) ? "Target" : subjectName;
+            string title = string.Format(CultureInfo.InvariantCulture, "{0} Weapons ({1})", who, weapons.Count);
+            if (weapons.Count == 0)
+                return [GetStatsAomlBuilder.BuildLink(Color(Muted, "(no weapons)"), title)];
+
+            var blocks = new List<string>(weapons.Count);
+            foreach (KeyValuePair<WeaponSlot, CharacterWeapon> entry in weapons)
+                blocks.Add(FormatWeapon(entry.Key, entry.Value));
+
+            // Blank line between weapons; ChunkRows joins rows with a single <br>.
+            for (int i = 1; i < blocks.Count; i++)
+                blocks[i] = "<br>" + blocks[i];
+
+            IReadOnlyList<string> chunks = GetStatsAomlBuilder.ChunkRows(blocks, maxBodyLength);
+            var lines = new List<string>(chunks.Count);
+            for (int i = 0; i < chunks.Count; i++)
+            {
+                string body = chunks[i].StartsWith("<br>", StringComparison.Ordinal) ? chunks[i][4..] : chunks[i];
+                string label = chunks.Count == 1
+                    ? title
+                    : string.Format(CultureInfo.InvariantCulture, "{0} ({1}/{2})", title, i + 1, chunks.Count);
+                lines.Add(GetStatsAomlBuilder.BuildLink(body, label));
+            }
+
+            return lines;
+        }
+
+        static string FormatWeapon(WeaponSlot slot, CharacterWeapon weapon)
+        {
+            var text = new StringBuilder();
+            text.Append(Color(Header, "[" + slot + "]"))
+                .Append(' ').Append(Color(Muted, "wire " + weapon.WireSlot.ToString(CultureInfo.InvariantCulture)));
+            if (weapon.IsSyntheticFist)
+                text.Append(' ').Append(Color(Tag, "fist"));
+            if (!string.IsNullOrEmpty(weapon.SawTagName))
+                text.Append(' ').Append(Color(Tag, "saw " + weapon.SawTagName));
+
+            AppendItem(text, null, weapon.Item);
+            if (weapon.DamageOverride != null)
+                AppendItem(text, "Damage from", weapon.DamageOverride);
+            if (weapon.RangeSource != null && !ReferenceEquals(weapon.RangeSource, weapon.Item))
+                AppendItem(text, "Range from", weapon.RangeSource);
+            return text.ToString();
+        }
+
+        static void AppendItem(StringBuilder text, string? role, Item? item)
+        {
+            text.Append("<br>");
+            if (role != null)
+                text.Append(Color(Label, role + ": "));
+            if (item == null)
+            {
+                text.Append(Color(Muted, "(no item)"));
+                return;
+            }
+
+            text.Append(Color(Name, item.Name))
+                .Append(' ').Append(Color(Value, "QL " + item.Quality.ToString(CultureInfo.InvariantCulture)))
+                .Append(' ').Append(Color(Muted, string.Format(
+                    CultureInfo.InvariantCulture, "id {0}/{1} inst {2}", item.LowId, item.HighId, item.InstanceId)));
+
+            int critBonus = item.GetStat(CharacterStat.DamageBonus);
+            int amsCap = item.GetStat(CharacterStat.AMSCap);
+            text.Append("<br>").Append(Field("Damage", string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}-{1}",
+                    item.GetStat(CharacterStat.MinDamage),
+                    item.GetStat(CharacterStat.MaxDamage))))
+                .Append(Field("Crit", "+" + critBonus.ToString(CultureInfo.InvariantCulture)))
+                .Append(Field("Type", DamageTypeName(item.GetStat(CharacterStat.DamageType))));
+            if (amsCap > 0)
+                text.Append(Field("AMS cap", amsCap.ToString(CultureInfo.InvariantCulture)));
+
+            int initiative = item.GetStat(CharacterStat.InitiativeType);
+            text.Append("<br>").Append(Field("Attack", Seconds(item.GetStat(CharacterStat.AttackDelay))))
+                .Append(Field("Recharge", Seconds(item.GetStat(CharacterStat.RechargeDelay))))
+                .Append(Field("Range", item.GetStat(CharacterStat.AttackRange).ToString(CultureInfo.InvariantCulture)))
+                .Append(Field("Init", initiative > 0 ? ((CharacterStat)initiative).ToString() : "-"));
+            text.Append("<br>").Append(Field("Flags", item.GetWeaponFlags().ToString()));
+        }
+
+        static string Field(string label, string value)
+            => Color(Label, label + " ") + Color(Value, value) + "  ";
+
+        static string Color(string color, string text)
+            => "<font color=" + color + ">" + text + "</font>";
+
+        /// <summary>AttackDelay / RechargeDelay are centiseconds.</summary>
+        static string Seconds(int centiseconds)
+            => (centiseconds / 100.0).ToString("0.00", CultureInfo.InvariantCulture) + "s";
+
+        /// <summary>DamageType names the AC stat it is reduced by (90..97); 0 hits as melee.</summary>
+        static string DamageTypeName(int damageType)
+            => damageType switch
+            {
+                0 => "- (melee)",
+                90 => "Projectile",
+                91 => "Melee",
+                92 => "Energy",
+                93 => "Chemical",
+                94 => "Radiation",
+                95 => "Cold",
+                96 => "Poison",
+                97 => "Fire",
+                _ => damageType.ToString(CultureInfo.InvariantCulture)
+            };
     }
 
     /// <summary>Builds AOML <c>text://</c> popup links for a character's active NCU.</summary>

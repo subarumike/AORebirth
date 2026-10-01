@@ -197,7 +197,19 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         /// Same Target as the invite; parameters 0.
         /// </summary>
         TeamInviteAck = 0x000000A9,
- 
-		Split = 0x00000022,
+
+        /// <summary>
+        /// Client→server stack split. Target = stack slot, Parameter2 = amount. The client splits
+        /// locally before sending (Gamecode N3Msg_SplitItem @1001bd13 → FUN_1004a167); an inbound
+        /// 0x34 makes it split again, so the server never echoes this.
+        /// </summary>
+        Split = 0x00000034,
+
+        /// <summary>
+        /// Stack join. Target = stack kept, Parameter1:Parameter2 = stack merged into it
+        /// (Gamecode N3Msg_JoinItems @1001bb2a). The client changes nothing until the server
+        /// echoes the same action (FUN_10049fd6 → FUN_1002a40e adds the merged count to Target).
+        /// </summary>
+        JoinItems = 0x00000035,
     }
 }

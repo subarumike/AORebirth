@@ -90,7 +90,7 @@ namespace ZoneEngine_New.Core.Nanos
                 if (!spell.MeetsRequirements(stat => character.Stats.Get(stat)))
                     continue;
 
-                ItemUseFunctions.TryExecute(buff.Id, character, source, spell, inventory, items);
+                ItemUseFunctions.TryExecute(buff.Id, character, source, spell, inventory, items, isTick: true);
             }
         }
 

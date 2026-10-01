@@ -90,7 +90,13 @@ namespace ZoneEngine_New.Core.Inventory
                 return item.Use(player, slot, _inventoryRepository, _items) ? ItemUseStart.Executed : ItemUseStart.Rejected;
 
             if (!item.CanBeginUse(player))
+            {
+                if (item.UsesFightingTarget && player.TryResolveFightingTarget() == null)
+                    RequirementFeedback.SendText(player, "You need a fighting target to use this item.");
+                else
+                    RequirementFeedback.SendIfUnmet(player, item.Definition, ActionType.ToUse);
                 return ItemUseStart.Rejected;
+            }
 
             int instanceId = item.InstanceId;
             var pending = new PendingItemUse(
@@ -118,7 +124,10 @@ namespace ZoneEngine_New.Core.Inventory
                 return ItemUseStart.Rejected;
 
             if (!dynel.CanBeginUse(player))
+            {
+                RequirementFeedback.SendIfUnmet(player, dynel.Template, ActionType.ToUse);
                 return ItemUseStart.Rejected;
+            }
 
             var pending = new PendingItemUse(
                 player,
