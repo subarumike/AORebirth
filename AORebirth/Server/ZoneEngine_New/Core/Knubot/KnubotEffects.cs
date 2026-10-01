@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using AORebirth.Enums;
 
+using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
 using ZoneEngine_New.Core.Entities;
@@ -124,11 +125,14 @@ public sealed record KnubotCompleteQuest(string Hash) : KnubotEffect
 }
 
 /// <summary><c>{spawn ITEMHASH QL [count]}</c>: mints the item into the player's inventory.</summary>
-public sealed record KnubotSpawnItem(string Hash, int Quality, int Count) : KnubotEffect
+public sealed record KnubotSpawnItem(string Hash, int? Quality, int Count) : KnubotEffect
 {
+    /// <summary>The written QL, or the player's level when <see cref="Quality"/> is null (<c>level</c>).</summary>
+    int QualityFor(KnubotContext context) => Quality ?? context.Player.Stats.GetOrOne(CharacterStat.Level);
+
     public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
     {
-        if (!services.Minter.TryRollIds(Hash, Quality, out _, out _, out _))
+        if (!services.Minter.TryRollIds(Hash, QualityFor(context), out _, out _, out _))
             return false;
 
         plan.SlotsNeeded += Count;
@@ -139,7 +143,7 @@ public sealed record KnubotSpawnItem(string Hash, int Quality, int Count) : Knub
     {
         for (int i = 0; i < Count; i++)
         {
-            if (services.Minter.TryMint(Hash, Quality, ItemSource.Quest, out Item item))
+            if (services.Minter.TryMint(Hash, QualityFor(context), ItemSource.Quest, out Item item))
                 KnubotItems.Give(context.Player, item, services.Flush);
         }
     }

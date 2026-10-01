@@ -138,8 +138,8 @@
     "17": {
       "Text": [
         "Thank you.  Excellent work!  Here are some first aid kits for the trouble.  If you get more parts, please don't hesitate to bring them to me.",
-        "{spawn TALA 4}",
-        "{spawn BSNR 4}"
+        "{spawn TALA level}",
+        "{spawn BSNR level}"
       ],
       "Replies": ["found_other_things", "what_now"]
     }
