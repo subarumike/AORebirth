@@ -1,4 +1,5 @@
 {
+  "StartLocation": { "Playfield": 4582, "X": 932, "Y": 20.6, "Z": 728 },
   "Stats": [
     { "Stat": 0, "Name": "Flags", "Value": 528961 },
     { "Stat": 54, "Name": "Level", "Value": 1 },

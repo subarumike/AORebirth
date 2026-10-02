@@ -239,29 +239,7 @@ namespace LoginEngine.Packets
         /// </param>
         public void SendNameToStartPlayfield(bool startInSL, int charid)
         {
-            int playfield;
-            float x, y, z;
-
-            // if (startInSL)
-            // {
-            //     playfield = 4001;
-            //     x = 850;
-            //     y = 43;
-            //     z = 565;
-            // }
-            // else
-            // {
-            //     playfield = 6553;
-            //     x = 3607.6f;
-            //     y = 52.4f;
-            //     z = 785.7f;
-            // }
-
-            // TEMPORARY: every new character on ICC. Restore the other starter areas above when implemented.
-            playfield = 4582;
-            x = 932f;
-            y = 20.6f;
-            z = 728f;
+            NewCharacterStartLocation startLocation = NewCharacterStats.Current.StartLocation;
 
             DBCharacter character = CharacterDao.Instance.Get(charid);
             if (character != null)
@@ -269,9 +247,9 @@ namespace LoginEngine.Packets
                 CharacterDao.Instance.Save(
                     character // woo....
                     ,
-                    new { Id = charid, Playfield = playfield, X = x, Y = y, Z = z });
+                    new { Id = charid, Playfield = startLocation.Playfield, X = startLocation.X, Y = startLocation.Y, Z = startLocation.Z });
 
-                CharacterDao.Instance.SetPlayfield(charid, (int)IdentityType.Playfield, playfield);
+                CharacterDao.Instance.SetPlayfield(charid, (int)IdentityType.Playfield, startLocation.Playfield);
 
                 if (!startInSL)
                 {

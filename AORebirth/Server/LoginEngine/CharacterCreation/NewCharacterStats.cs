@@ -4,11 +4,12 @@ namespace LoginEngine.CharacterCreation
     using System.Collections.Generic;
     using System.IO;
     using System.Text.Json;
+    using System.Text.Json.Serialization;
 
     using AORebirth.Core.GameData;
 
     /// <summary>
-    /// GameData/NewCharacter.json: the stats every new character starts with, and each breed's starting
+    /// GameData/NewCharacter.json: the location and stats every new character starts with, and each breed's starting
     /// abilities. Stats taken from the creation choices (sex, head mesh, breed, profession, fatness, scale) or the
     /// account (GM level, expansions) are not in the file.
     /// </summary>
@@ -25,10 +26,11 @@ namespace LoginEngine.CharacterCreation
 
         readonly Dictionary<int, BreedAbilities> _breeds;
 
-        NewCharacterStats(IReadOnlyList<StatValue> stats, Dictionary<int, BreedAbilities> breeds)
+        NewCharacterStats(IReadOnlyList<StatValue> stats, Dictionary<int, BreedAbilities> breeds, NewCharacterStartLocation startLocation)
         {
             Stats = stats;
             _breeds = breeds;
+            StartLocation = startLocation;
         }
 
         /// <summary>Loaded from the runtime GameData tree on first use.</summary>
@@ -36,6 +38,8 @@ namespace LoginEngine.CharacterCreation
 
         /// <summary>Stat id and value pairs written for every new character.</summary>
         public IReadOnlyList<StatValue> Stats { get; }
+
+        public NewCharacterStartLocation StartLocation { get; }
 
         public static NewCharacterStats Load(string path)
         {
@@ -45,6 +49,12 @@ namespace LoginEngine.CharacterCreation
             NewCharacterFile file = JsonSerializer.Deserialize<NewCharacterFile>(File.ReadAllText(path), JsonOptions);
             if (file?.Stats == null || file.Breeds == null)
                 throw new InvalidDataException(path + " needs Stats and Breeds.");
+
+            if (file.StartLocation == null || file.StartLocation.Playfield <= 0
+                || float.IsNaN(file.StartLocation.X) || float.IsInfinity(file.StartLocation.X)
+                || float.IsNaN(file.StartLocation.Y) || float.IsInfinity(file.StartLocation.Y)
+                || float.IsNaN(file.StartLocation.Z) || float.IsInfinity(file.StartLocation.Z))
+                throw new InvalidDataException(path + ": StartLocation needs a positive Playfield and finite X, Y, Z.");
 
             var breeds = new Dictionary<int, BreedAbilities>();
             foreach (BreedAbilities breed in file.Breeds)
@@ -59,7 +69,7 @@ namespace LoginEngine.CharacterCreation
                     throw new InvalidDataException(path + ": each Stats entry needs a Stat id.");
             }
 
-            return new NewCharacterStats(file.Stats, breeds);
+            return new NewCharacterStats(file.Stats, breeds, file.StartLocation);
         }
 
         /// <summary>Starting abilities for a breed, or null when the file has none for it.</summary>
@@ -70,7 +80,24 @@ namespace LoginEngine.CharacterCreation
             public List<StatValue> Stats { get; set; }
 
             public List<BreedAbilities> Breeds { get; set; }
+
+            public NewCharacterStartLocation StartLocation { get; set; }
         }
+    }
+
+    internal sealed class NewCharacterStartLocation
+    {
+        [JsonRequired]
+        public int Playfield { get; set; }
+
+        [JsonRequired]
+        public float X { get; set; }
+
+        [JsonRequired]
+        public float Y { get; set; }
+
+        [JsonRequired]
+        public float Z { get; set; }
     }
 
     internal sealed class StatValue
