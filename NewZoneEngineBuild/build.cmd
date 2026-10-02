@@ -1,15 +1,15 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
-rem Build ChatEngine + LoginEngine (net48 packages.config) and ZoneEngine_New (net10.0).
+rem Build ChatEngine, LoginEngine and ZoneEngine_New with the existing net10.0 projects.
 rem Repo root is the parent of this folder. Run from anywhere.
 
 set "REPO=%~dp0.."
 set "VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 set "MSBUILD="
 set "CONFIG=Debug"
-set "CHAT_PROJ=AORebirth\Server\ChatEngine\ChatEngine.csproj"
-set "LOGIN_PROJ=AORebirth\Server\LoginEngine\LoginEngine.csproj"
+set "CHAT_PROJ=WindowsBuildNet10\Projects\ChatEngine.WinNet10.csproj"
+set "LOGIN_PROJ=WindowsBuildNet10\Projects\LoginEngine.WinNet10.csproj"
 set "ZONE_PROJ=AORebirth\Server\ZoneEngine_New\ZoneEngine_New.csproj"
 set "SLN=AORebirth\AORebirth.sln"
 set "CHAT_EXE=AORebirth\Built\Debug\ChatEngine.exe"
@@ -50,6 +50,20 @@ echo.
 echo [2/4] Restoring NuGet packages...
 call :RestorePackagesConfig
 if errorlevel 1 exit /b 1
+
+echo [NewZoneEngineBuild] Restoring ChatEngine PackageReferences (net10.0)...
+"%MSBUILD%" "%CHAT_PROJ%" /t:Restore /m:1 /nr:false /v:minimal
+if errorlevel 1 (
+    echo [NewZoneEngineBuild] ChatEngine restore failed.
+    exit /b 1
+)
+
+echo [NewZoneEngineBuild] Restoring LoginEngine PackageReferences (net10.0)...
+"%MSBUILD%" "%LOGIN_PROJ%" /t:Restore /m:1 /nr:false /v:minimal
+if errorlevel 1 (
+    echo [NewZoneEngineBuild] LoginEngine restore failed.
+    exit /b 1
+)
 
 echo [NewZoneEngineBuild] Restoring ZoneEngine_New PackageReferences (net10.0)...
 "%MSBUILD%" "%ZONE_PROJ%" /t:Restore /m:1 /nr:false /v:minimal
