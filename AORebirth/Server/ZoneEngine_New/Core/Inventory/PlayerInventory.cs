@@ -454,6 +454,22 @@ namespace ZoneEngine_New.Core.Inventory
             };
         }
 
+        /// <summary>
+        /// The client drops every bag window and bag inventory when it changes playfield, and handles
+        /// belong to the playfield that allocated them. Server-side contents stay; the next use of
+        /// each bag introduces it again on the new playfield.
+        /// </summary>
+        public void ResetBackpackClientState()
+        {
+            foreach (Container page in _backpackPages.Values)
+            {
+                page.IsOpen = false;
+                page.InventoryHandle = 0;
+            }
+
+            _handleToContainer.Clear();
+        }
+
         public void RegisterBackpackHandle(int handle, Identity containerIdentity)
         {
             if (handle <= 0 || containerIdentity.Type != IdentityType.Container || containerIdentity.Instance == 0)

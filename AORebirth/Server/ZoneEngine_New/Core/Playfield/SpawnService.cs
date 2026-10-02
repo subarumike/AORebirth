@@ -1071,6 +1071,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(position);
 
             player.Motor.ResetForPlayfieldTransfer(position);
+            player.Inventory.ResetBackpackClientState();
             player.Playfield = _playfield;
             player.Logger = _logger;
             _registry.Register(player);

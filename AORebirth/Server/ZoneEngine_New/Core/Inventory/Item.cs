@@ -304,7 +304,9 @@ namespace ZoneEngine_New.Core.Inventory
         {
             Identity containerIdentity = Identity;
             PlayerInventory inventory = player.Inventory;
-            bool pageKnown = inventory.TryGetBackpackPage(containerIdentity, out Container? page);
+            // A page without a handle has not been introduced to the client on this playfield.
+            bool pageKnown = inventory.TryGetBackpackPage(containerIdentity, out Container? page)
+                && page!.InventoryHandle != 0;
             if (pageKnown && page!.IsOpen)
             {
                 SendCloseAction(player, containerIdentity);
