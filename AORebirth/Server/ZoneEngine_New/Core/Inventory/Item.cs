@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Playfield.Locality;
 
     /// <summary>
     /// Dumb runtime item: occupancy ids + builder-baked effective <see cref="ItemTemplate"/>.
@@ -213,9 +214,32 @@ namespace ZoneEngine_New.Core.Inventory
                     source: player,
                     criteria: new SpellCriteria { Subject = this, SubjectSlot = slotIdentity }))
                 return false;
+            AnnounceUsed(player, slotIdentity);
             if (Can(CanFlags.Consume))
                 ConsumeCharge(player, slotIdentity);
             return true;
+        }
+
+        /// <summary>
+        /// TemplateAction Use after the OnUse functions ran, as live sends it (Health and Nano Stim, capture
+        /// 2026-10-02T15:43:13Z): low/high, QL, Unknown1 1, Action 3, Placement = the used slot, Unknown3/Unknown4 =
+        /// the user. The client plays the item's use effect (its GfxEffect) from it.
+        /// </summary>
+        void AnnounceUsed(Player player, Identity slotIdentity)
+        {
+            var used = new TemplateActionMessage
+            {
+                Identity = player.Identity,
+                ItemLowId = LowId,
+                ItemHighId = HighId,
+                Quality = Quality,
+                Unknown1 = 1,
+                Action = TemplateActionType.Use,
+                Placement = slotIdentity,
+                Unknown3 = (int)player.Identity.Type,
+                Unknown4 = player.Identity.Instance
+            };
+            player.Playfield?.GetRequiredService<PlayfieldLocality>().Announce(player, used, includeSelf: true);
         }
 
         /// <summary>
@@ -240,10 +264,19 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(player);
 
             PlayerInventory inventory = player.Inventory;
-            int placement = slotIdentity.Instance;
-            if (!inventory.TryResolvePageByPlacement(placement, out Container page, out bool isWearPage)
-                || isWearPage)
-                return false;
+            Container page;
+            int placement;
+            if (slotIdentity.Type == IdentityType.Backpack)
+            {
+                if (!inventory.TryGetCarriedBackpackItem(slotIdentity, out page, out placement, out _))
+                    return false;
+            }
+            else
+            {
+                placement = slotIdentity.Instance;
+                if (!inventory.TryResolvePageByPlacement(placement, out page, out bool isWearPage) || isWearPage)
+                    return false;
+            }
 
             if (!page.Content.TryGetValue(placement, out Item? occupant) || !ReferenceEquals(occupant, this))
                 return false;
@@ -263,7 +296,11 @@ namespace ZoneEngine_New.Core.Inventory
 
                 StackCount = 0;
                 inventory.Discard(this, ConsumedGraveyard(player));
-                SendDeleteItem(player, page.Identity.Type, placement);
+                // A bag slot is dropped by the packed Backpack identity the client used for it.
+                if (slotIdentity.Type == IdentityType.Backpack)
+                    SendDeleteItem(player, slotIdentity.Type, slotIdentity.Instance);
+                else
+                    SendDeleteItem(player, page.Identity.Type, placement);
             }
 
             player.Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);

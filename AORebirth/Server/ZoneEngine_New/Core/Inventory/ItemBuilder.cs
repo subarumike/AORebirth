@@ -47,12 +47,10 @@ namespace ZoneEngine_New.Core.Inventory
             int clampedQuality = definition.Quality;
 
             // A stored item owns its own count: it may have spent charges. Only a fresh mint takes
-            // the full count off the template.
+            // the full count off the template (MaxEnergy, else MultipleCount).
             int resolvedStack = stackCount;
-            if (instanceId == 0
-                && definition.Stats.TryGetValue(CharacterStat.MultipleCount, out int stackFromStats)
-                && stackFromStats > 0)
-                resolvedStack = stackFromStats;
+            if (instanceId == 0 && definition.MintStackCount > 1)
+                resolvedStack = definition.MintStackCount;
 
             Item item = new()
             {

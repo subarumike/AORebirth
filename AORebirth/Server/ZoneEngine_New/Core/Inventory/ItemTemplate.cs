@@ -74,6 +74,15 @@ namespace ZoneEngine_New.Core.Inventory
         public bool CanCancel { get; init; } = true;
 
         /// <summary>
+        /// The count a freshly minted item starts with: MaxEnergy when set, otherwise MultipleCount, otherwise 1.
+        /// Only a new mint takes it; a stored item keeps its own (possibly spent) count.
+        /// </summary>
+        public int MintStackCount
+            => Stats.TryGetValue(CharacterStat.MaxEnergy, out int maxEnergy) && maxEnergy > 0 ? maxEnergy
+                : Stats.TryGetValue(CharacterStat.MultipleCount, out int multipleCount) && multipleCount > 0 ? multipleCount
+                : 1;
+
+        /// <summary>
         /// The client's weapon type bitmask (Gamecode.dll 0x1009c8e1, weapon object +0x1F0), which feeds the
         /// EquippedWeapons / EquippedRHWeapon criteria stats: 0x02 when the weapon takes no ammo (melee), then one
         /// pair of bits per Attack skill carrying at least half the weight (ranged skills at 50%, melee and gun

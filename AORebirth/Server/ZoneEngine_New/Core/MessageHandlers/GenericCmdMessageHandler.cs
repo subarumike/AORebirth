@@ -176,6 +176,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case IdentityType.ArmorPage:
                 case IdentityType.ImplantPage:
                 case IdentityType.SocialPage:
+                case IdentityType.Backpack:
                     HandleUseInventoryItem(message, session, player, playfield, target);
                     break;
 
@@ -203,7 +204,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (!player.Inventory.TryGetItem(target.Type, target.Instance, out Item item))
+            if (!player.Inventory.TryGetUseItem(target, out Item item))
             {
                 Deny(
                     session,

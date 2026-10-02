@@ -200,6 +200,9 @@ public static class KnubotItems
 
     public static void Give(Player player, Item item, InventoryFlushService flush)
     {
+        if (InventoryStacking.TryGrantOntoStack(player, item, flush))
+            return;
+
         Container page = player.Inventory.Inventory;
         int slot = page.FindFreeSlot();
         if (slot < 0 || !page.Add(slot, item))

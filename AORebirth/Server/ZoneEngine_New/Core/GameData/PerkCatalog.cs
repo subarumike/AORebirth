@@ -59,6 +59,17 @@ namespace ZoneEngine_New.Core.GameData
 
         public int GetFlags(int perkId) => _perks.TryGetValue(perkId, out PerkEntry perk) ? perk.Flags : 0;
 
+        /// <summary>
+        /// Only the Perk and Alien categories are trained through TrainPerk: research (0x40/0x80) and special
+        /// (0x01, never alien) perks are not. Categories as in Perks.json: research, then alien, then special.
+        /// </summary>
+        public bool IsTrainable(int perkId)
+        {
+            if (!_perks.TryGetValue(perkId, out PerkEntry perk) || (perk.Flags & ResearchFlags) != 0)
+                return false;
+            return (perk.Flags & AlienFlag) != 0 || (perk.Flags & SpecialFlag) == 0;
+        }
+
         /// <summary>Paid with regular perk points: neither alien nor research (client mask 0xC2).</summary>
         public bool CostsPerkPoint(int perkId) => (GetFlags(perkId) & (AlienFlag | ResearchFlags)) == 0;
 

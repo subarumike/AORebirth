@@ -28,11 +28,8 @@ namespace ZoneEngine_New.Core.Inventory
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Largest stack a join may produce. The client allows 50000 (N3Msg_JoinItems), but inventory
-        /// packets carry Count as a short (PlayerInventory), so anything larger would display wrong.
-        /// </summary>
-        const int MaxStackCount = short.MaxValue;
+        /// <summary>Largest stack a join may produce: the client's 50000 (N3Msg_JoinItems).</summary>
+        const int MaxStackCount = InventoryStacking.MaxStackCount;
 
         public void Handle(Player player, CharacterActionMessage message)
         {

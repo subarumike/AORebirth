@@ -195,7 +195,7 @@ namespace ZoneEngine_New.Core.Inventory
                     out Item item))
                 return;
 
-            if (item.Locked)
+            if (player.Inventory.IsLockedForTransfer(item))
                 return;
 
             // TODO: Block temporary items on ClientContainerAddItem
@@ -317,7 +317,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (!player.Inventory.TryGetItem(source.Type, source.Instance, out item))
                 return false;
 
-            if (item.Locked)
+            if (player.Inventory.IsLockedForTransfer(item))
                 return false;
 
             slot = source.Instance;
@@ -512,7 +512,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (!player.Inventory.TryGetItem(source.Type, source.Instance, out item))
                 return false;
 
-            if (item.Locked)
+            if (player.Inventory.IsLockedForTransfer(item))
                 return false;
 
             slot = source.Instance;

@@ -225,10 +225,6 @@ namespace ZoneEngine_New.Core.Inventory
                         activeNanos,
                         skillLocks);
                     inventory?.MarkNewlyPersisted();
-                    if (trainedPerks != null)
-                        _trainedPerks!.Save(player.Identity.Instance, trainedPerks);
-                    if (perkLocks != null)
-                        _perkLocks!.Save(player.Identity.Instance, perkLocks);
                 }
                 catch (DatabaseCommitOutcomeUnknownException exception)
                 {
@@ -244,6 +240,7 @@ namespace ZoneEngine_New.Core.Inventory
                     player.RestoreDirtyUploadedNanos(nanos);
                     player.RestoreDirtyActiveNanos(activeNanos);
                     player.SkillLocks.RestoreDirty(skillLocks);
+                    // Not attempted: the perk sets stay dirty for the next flush.
                     player.TrainedPerks.RestoreDirty(trainedPerks);
                     player.PerkLocks.RestoreDirty(perkLocks);
                     _logger.Error(
@@ -254,6 +251,38 @@ namespace ZoneEngine_New.Core.Inventory
                             player.Identity.Instance));
                     throw;
                 }
+
+                // The coalesced transaction is committed. The perk sets are independent full replacements, so a
+                // failed or uncertain write is safe to repeat: it only leaves that set dirty for a retry and never
+                // hands the already committed inventory back to the queue.
+                SaveReplacementSet(player, trainedPerks, perks => _trainedPerks!.Save(player.Identity.Instance, perks),
+                    () => player.TrainedPerks.RestoreDirty(trainedPerks), "trained perks");
+                SaveReplacementSet(player, perkLocks, locks => _perkLocks!.Save(player.Identity.Instance, locks),
+                    () => player.PerkLocks.RestoreDirty(perkLocks), "perk locks");
+            }
+        }
+
+        void SaveReplacementSet<T>(Player player, T? snapshot, Action<T> save, Action restoreDirty, string what)
+            where T : class
+        {
+            if (snapshot == null)
+                return;
+
+            try
+            {
+                save(snapshot);
+            }
+            catch (Exception exception)
+            {
+                restoreDirty();
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "InventoryFlushService {0} write failed for character {1}; retrying on the next flush",
+                        what,
+                        player.Identity.Instance));
+                NotifyDirty(player);
             }
         }
 

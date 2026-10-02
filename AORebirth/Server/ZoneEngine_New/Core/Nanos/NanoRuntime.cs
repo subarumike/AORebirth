@@ -387,6 +387,9 @@ namespace ZoneEngine_New.Core.Nanos
             if (spell.IsHostile && target.IsEvading)
                 return false;
 
+            AnnounceImmediateLand(source, target, spell.Id);
+            AnnounceCastFinished(source, spell.Id);
+
             if (!spell.IsBuff)
             {
                 ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: false, inventory, items);
@@ -714,6 +717,26 @@ namespace ZoneEngine_New.Core.Nanos
                     NanoId = nanoId,
                     Unknown = 0,
                     Unknown1 = 0
+                });
+
+        /// <summary>
+        /// The effect of a nano an item or perk function lands with no cast (CastNano / AreaCastNano...): live sends
+        /// CastNanoSpell addressed to the recipient, Target = recipient, Unknown1 = 1, Caster = the user, then
+        /// SetNanoDuration for a buff (captures 2026-10-02T03:54:58Z Impale on a mob, 15:12:44Z Dance of Fools on
+        /// self). FinishNanoCasting(1, nano) follows (live 2026-10-02T15:28:59Z): client case 0x1d (Gamecode.dll
+        /// 0x1004f322) closes the pending cast entry CastNanoSpell opened and records the success result.
+        /// </summary>
+        static void AnnounceImmediateLand(Character source, Character target, int nanoId)
+            => Announce(
+                target,
+                new CastNanoSpellMessage
+                {
+                    Identity = target.Identity,
+                    NanoId = nanoId,
+                    Target = target.Identity,
+                    Unknown = 0,
+                    Unknown1 = 1,
+                    Caster = source.Identity
                 });
 
         static void AnnounceCastFinished(Character caster, int nanoId)

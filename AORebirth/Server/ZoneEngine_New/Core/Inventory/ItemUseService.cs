@@ -159,8 +159,16 @@ namespace ZoneEngine_New.Core.Inventory
             if (!player.TryPreparePerkAction(hash, out Player.PerkActionUse? use) || use == null)
                 return ItemUseStart.Rejected;
 
-            // Live answers an accepted UsePerk with QueuePerk (CharacterAction 0x50, Parameter1 2, Parameter2 the
-            // action's AttackDelay in centiseconds) and performs the action when the delay runs out.
+            // Attack vs defense rating decides at once. A miss is answered immediately (evade feedback and the
+            // OnFailure lock) with no QueuePerk, as in live capture 2026-10-02T13:02:33Z.
+            if (!player.PerkActionLands(use))
+            {
+                player.FailPerkAction(use, _inventoryRepository);
+                return ItemUseStart.Executed;
+            }
+
+            // A landing action: live answers with QueuePerk (CharacterAction 0x50, Parameter1 2, Parameter2 the
+            // action's AttackDelay in centiseconds) and performs it when the delay runs out.
             int delay = ClampDelay(use.Template.Stats.GetValueOrDefault(CharacterStat.AttackDelay));
             player.Session?.Send(new CharacterActionMessage
             {
@@ -286,7 +294,7 @@ namespace ZoneEngine_New.Core.Inventory
         {
             if (!player.Inventory.IsHydrated)
                 return "inventory not hydrated";
-            if (!player.Inventory.TryGetItem(slot.Type, slot.Instance, out Item current)
+            if (!player.Inventory.TryGetUseItem(slot, out Item current)
                 || !ReferenceEquals(current, item)
                 || current.InstanceId != instanceId)
                 return "slot changed";

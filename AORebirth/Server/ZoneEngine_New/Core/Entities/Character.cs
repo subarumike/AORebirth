@@ -94,11 +94,14 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>LockSkill cooldowns by stat id. Only players persist them.</summary>
         public SkillLocks SkillLocks { get; } = new();
 
-        public void LockSkill(int statId, int durationSeconds, DateTime nowUtc)
+        /// <summary>Locks <paramref name="statId"/>; returns the applied duration after SkillLockModifier.</summary>
+        public int LockSkill(int statId, int durationSeconds, DateTime nowUtc)
         {
-            SkillLocks.Lock(statId, ScaleSkillLock(statId, durationSeconds), nowUtc);
+            int seconds = ScaleSkillLock(statId, durationSeconds);
+            SkillLocks.Lock(statId, seconds, nowUtc);
             if (this is Player player)
                 Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(player);
+            return seconds;
         }
 
         /// <summary>

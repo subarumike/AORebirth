@@ -70,11 +70,12 @@ namespace ZoneEngine_New.Core.Helpers
                 return;
             }
 
+            // Every special attack, player or NPC, needs a target its attacker may engage.
+            if (!CombatRules.CanAttack(attacker, target))
+                return;
+
             if (attacker.FightingTarget.Instance == 0)
                 attacker.StartFighting(target.Identity, 0);
-
-            if (attacker.IsPlayer && !CombatRules.CanAttack(attacker, target))
-                return;
 
             attacker.SetFightingTarget(target.Identity);
 

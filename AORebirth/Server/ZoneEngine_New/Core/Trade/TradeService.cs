@@ -341,7 +341,7 @@ namespace ZoneEngine_New.Core.Trade
             if (page == null)
                 return;
 
-            if (!page.Content.TryGetValue(source.Instance, out Item? item) || item.Locked)
+            if (!page.Content.TryGetValue(source.Instance, out Item? item) || player.Inventory.IsLockedForTransfer(item))
                 return;
 
             if (InventoryMoveService.IsBagItem(item))
@@ -586,7 +586,7 @@ namespace ZoneEngine_New.Core.Trade
                     SetCash(initiator, initiatorCash);
                     SetCash(partner, partnerCash);
                     foreach (Delivery delivery in deliveries)
-                        SendGrant(delivery.Receiver, delivery.Item, delivery.Page);
+                        SendDelivery(delivery);
                 });
             }
             catch (Exception exception)
@@ -618,32 +618,83 @@ namespace ZoneEngine_New.Core.Trade
         // Reserve only durable main-inventory locations. Offers remain untouched until COMMIT.
         static void PlanDeliveries(IEnumerable<Item> items, Player receiver, List<Delivery> deliveries)
         {
+            if (!TryPlanDeliveries(items, receiver, deliveries))
+                throw new InvalidOperationException("Inventory has no durable location for the trade.");
+        }
+
+        /// <summary>
+        /// Plans each item in send order, as the client will place them: a stackable item that fits whole onto an
+        /// existing stack merges into it (the client parks the AddTemplate copy in its first free slot and folds it
+        /// in on the JoinItems echo, freeing that slot again); anything else takes the first free slot.
+        /// </summary>
+        static bool TryPlanDeliveries(IEnumerable<Item> items, Player receiver, List<Delivery> deliveries)
+        {
             Container page = receiver.Inventory.Inventory;
             var occupied = new HashSet<int>(page.Content.Keys);
+            var planned = new Dictionary<Item, int>(ReferenceEqualityComparer.Instance);
             foreach (Delivery delivery in deliveries)
-                if (ReferenceEquals(delivery.Receiver, receiver)) occupied.Add(delivery.Slot);
+            {
+                if (!ReferenceEquals(delivery.Receiver, receiver))
+                    continue;
+                if (delivery.MergeTarget == null)
+                    occupied.Add(delivery.Slot);
+                else
+                    planned[delivery.MergeTarget] = planned.GetValueOrDefault(delivery.MergeTarget) + delivery.Item.StackCount;
+            }
+
             foreach (Item item in items)
             {
                 int slot = page.Offset;
                 while (slot < page.Offset + page.Capacity && occupied.Contains(slot)) slot++;
                 if (slot == page.Offset + page.Capacity)
-                    throw new InvalidOperationException("Inventory has no durable location for the trade.");
+                    return false;
+
+                if (InventoryStacking.TryFindStackTarget(page, item, planned, out int targetSlot, out Item target))
+                {
+                    planned[target] = planned.GetValueOrDefault(target) + item.StackCount;
+                    deliveries.Add(new Delivery(item, receiver, page, slot, target, targetSlot));
+                    continue;
+                }
+
                 occupied.Add(slot);
                 deliveries.Add(new Delivery(item, receiver, page, slot));
             }
+
+            return true;
         }
 
         static void ApplyDeliveries(List<Delivery> deliveries)
         {
             foreach (Delivery delivery in deliveries)
             {
+                if (delivery.MergeTarget != null)
+                {
+                    if (!delivery.Page.Content.TryGetValue(delivery.MergeSlot, out Item? current)
+                        || !ReferenceEquals(current, delivery.MergeTarget))
+                        throw new InvalidOperationException("Planned trade stack changed after durable commit.");
+                    delivery.MergeTarget.StackCount += delivery.Item.StackCount;
+                    continue;
+                }
+
                 if (!delivery.Page.Add(delivery.Slot, delivery.Item))
                     throw new InvalidOperationException("Reserved trade location changed after durable commit.");
                 delivery.Item.IsPersisted = true;
             }
         }
 
-        sealed record Delivery(Item Item, Player Receiver, Container Page, int Slot);
+        static void SendDelivery(Delivery delivery)
+        {
+            if (delivery.MergeTarget != null)
+                InventoryStacking.SendGrantAndJoin(delivery.Receiver, delivery.Item, delivery.Page, delivery.MergeSlot, delivery.Slot);
+            else
+                SendGrant(delivery.Receiver, delivery.Item, delivery.Page);
+        }
+
+        /// <summary>
+        /// One item reaching a receiver. Slot is its own main-inventory slot, or for a merge (MergeTarget set) the
+        /// free slot the client parks the copy in before folding it into the stack at MergeSlot.
+        /// </summary>
+        sealed record Delivery(Item Item, Player Receiver, Container Page, int Slot, Item? MergeTarget = null, int MergeSlot = 0);
 
         void PersistPlan(Player first, int firstCash, Player? second, int secondCash,
             List<Delivery> deliveries, IReadOnlyList<Item> retired, Identity graveyard)
@@ -661,8 +712,41 @@ namespace ZoneEngine_New.Core.Trade
                     foreach (var insert in flush.Inserts) inserts[insert.InstanceId] = insert;
                     foreach (var update in flush.Updates) updates[update.InstanceId] = update;
                 }
+                var stackTotals = new Dictionary<Item, int>(ReferenceEqualityComparer.Instance);
                 foreach (Delivery delivery in deliveries)
-                    Place(delivery.Item, delivery.Page.Identity, delivery.Slot);
+                {
+                    if (delivery.MergeTarget == null)
+                    {
+                        Place(delivery.Item, delivery.Page.Identity, delivery.Slot);
+                        continue;
+                    }
+
+                    // A merged item gives up its own row (a traded stack is retired, a minted one never written)
+                    // and its count lands on the stack's row.
+                    if (delivery.Item.IsPersisted)
+                        Place(delivery.Item, new Identity { Type = IdentityType.None, Instance = delivery.Receiver.Identity.Instance },
+                            delivery.Item.InstanceId);
+                    else
+                    {
+                        inserts.Remove(delivery.Item.InstanceId);
+                        updates.Remove(delivery.Item.InstanceId);
+                    }
+
+                    stackTotals[delivery.MergeTarget] = stackTotals.GetValueOrDefault(delivery.MergeTarget, delivery.MergeTarget.StackCount)
+                        + delivery.Item.StackCount;
+                }
+
+                foreach (Delivery delivery in deliveries)
+                {
+                    if (delivery.MergeTarget is not Item target || !stackTotals.TryGetValue(target, out int total))
+                        continue;
+                    if (target.InstanceId <= 0 || !target.IsPersisted || total > InventoryStacking.MaxStackCount)
+                        throw new InvalidOperationException("Invalid trade stack merge.");
+                    updates[target.InstanceId] = new ItemLocationUpdate(target.InstanceId, (int)delivery.Page.Identity.Type,
+                        delivery.Page.Identity.Instance, delivery.MergeSlot, total);
+                    inserts.Remove(target.InstanceId);
+                }
+
                 foreach (Item item in retired)
                 {
                     inserts.Remove(item.InstanceId);
@@ -780,7 +864,7 @@ namespace ZoneEngine_New.Core.Trade
                 }
 
                 sellTotal += TradeRules.SellPrice(
-                    TradeRules.ItemValue(_catalog, item.LowId, item.HighId, item.Quality),
+                    TradeRules.StackValue(item, TradeRules.ItemValue(_catalog, item.LowId, item.HighId, item.Quality)),
                     machine.BuyModifier,
                     skillSteps);
             }
@@ -798,23 +882,13 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
-            // Overflow is intentionally memory-only; accepting money for a purchase there would
-            // lose the paid-for item on restart. Require real inventory before allocating ids.
-            if (!player.Inventory.HasFreeInventorySlots(purchases.Count))
-            {
-                ClientFeedback.Send(player, "Feedback_NoRoomInInventory");
-                return;
-            }
-
             // Mint first so unique duplication is checked against real items, and so a rejected
-            // purchase costs the player nothing. Ids are allocated here because a bag only gets its
-            // container identity once it has an instance id.
+            // purchase costs the player nothing.
             var minted = new List<MintedPurchase>(purchases.Count);
             foreach (Purchase purchase in purchases)
             {
                 ShopStockSlot stock = purchase.Stock;
                 Item item = _minter.Create(stock.LowId, stock.HighId, stock.Quality, ItemSource.Vendor);
-                item.AssignInstanceId(_ids.Allocate());
                 if (TradeRules.IsUnique(item)
                     && (TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId)
                         || ContainsTemplate(minted, item)))
@@ -826,6 +900,21 @@ namespace ZoneEngine_New.Core.Trade
                 minted.Add(new MintedPurchase(item, purchase.Price));
             }
 
+            // The same stackable line picked several times arrives as one stack, a new one past 50000. Ids are
+            // allocated after that because a bag only gets its container identity once it has an instance id.
+            List<Item> bought = ConsolidateStacks(minted.Select(p => p.Item).ToList(), template => _minter.Create(
+                template.LowId, template.HighId, template.Quality, ItemSource.Vendor));
+            foreach (Item item in bought)
+                item.AssignInstanceId(_ids.Allocate());
+
+            // Overflow is intentionally memory-only; accepting money for a purchase there would
+            // lose the paid-for item on restart. Require real inventory (or a stack to join) up front.
+            if (!TryPlanDeliveries(bought, player, new List<Delivery>()))
+            {
+                ClientFeedback.Send(player, "Feedback_NoRoomInInventory");
+                return;
+            }
+
             session.Committing = true;
             bool durable = false;
             int soldCount = offer.Count;
@@ -834,13 +923,13 @@ namespace ZoneEngine_New.Core.Trade
                 _flush.WithExclusivePlayers(player, null, () =>
                 {
                     var deliveries = new List<Delivery>();
-                    PlanDeliveries(minted.Select(p => p.Item), player, deliveries);
+                    PlanDeliveries(bought, player, deliveries);
                     PersistPlan(player, checked((int)finalCash), null, 0, deliveries, offer.Items.Values.ToArray(), machine.Identity);
                     durable = true;
                     offer.DrainAll();
                     ApplyDeliveries(deliveries);
                     SetCash(player, finalCash);
-                    foreach (Delivery delivery in deliveries) SendGrant(player, delivery.Item, delivery.Page);
+                    foreach (Delivery delivery in deliveries) SendDelivery(delivery);
                 });
             }
             catch (Exception exception)
@@ -865,6 +954,56 @@ namespace ZoneEngine_New.Core.Trade
                     soldCount,
                     buyTotal,
                     sellTotal));
+        }
+
+        /// <summary>
+        /// Folds stackable items of the same low/high/QL into as few stacks as the 50000 cap allows, in order of
+        /// first appearance. The total count is unchanged; <paramref name="mint"/> supplies an extra item only when
+        /// a group's total needs more stacks than it has items.
+        /// </summary>
+        static List<Item> ConsolidateStacks(List<Item> items, Func<Item, Item> mint)
+        {
+            var result = new List<Item>(items.Count);
+            var groups = new Dictionary<(int, int, int), List<Item>>();
+            var order = new List<(int, int, int)>();
+            foreach (Item item in items)
+            {
+                if (!InventoryStacking.IsStackable(item))
+                {
+                    result.Add(item);
+                    continue;
+                }
+
+                var key = (item.LowId, item.HighId, item.Quality);
+                if (!groups.TryGetValue(key, out List<Item>? group))
+                {
+                    groups[key] = group = [];
+                    order.Add(key);
+                }
+
+                group.Add(item);
+            }
+
+            foreach (var key in order)
+            {
+                List<Item> group = groups[key];
+                long remaining = 0;
+                foreach (Item item in group)
+                    remaining += item.StackCount;
+
+                int index = 0;
+                while (remaining > 0)
+                {
+                    Item stack = index < group.Count ? group[index] : mint(group[0]);
+                    index++;
+                    int count = (int)Math.Min(remaining, InventoryStacking.MaxStackCount);
+                    stack.StackCount = count;
+                    remaining -= count;
+                    result.Add(stack);
+                }
+            }
+
+            return result;
         }
 
         static bool ContainsTemplate(List<MintedPurchase> items, Item candidate)
@@ -990,7 +1129,7 @@ namespace ZoneEngine_New.Core.Trade
 
             // The client has already moved the item into the first free index of its trade container.
             int clientSlot = FirstFreeOfferSlot(offer);
-            if (page == null || !page.Content.TryGetValue(source.Instance, out Item? item) || item.Locked)
+            if (page == null || !page.Content.TryGetValue(source.Instance, out Item? item) || player.Inventory.IsLockedForTransfer(item))
             {
                 // Nothing the server can take: undo the client's move so its view matches.
                 if (clientSlot >= 0)

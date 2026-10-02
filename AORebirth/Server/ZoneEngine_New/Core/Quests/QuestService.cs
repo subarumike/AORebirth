@@ -409,6 +409,9 @@ namespace ZoneEngine_New.Core.Quests
             }
 
             Item item = _items.CreateWithNewInstance(reward.Id, reward.HighId ?? reward.Id, Math.Max(1, reward.Quality), ItemSource.Quest);
+            if (InventoryStacking.TryGrantOntoStack(player, item, _flush))
+                return;
+
             if (!player.Inventory.Inventory.Add(slot, item))
                 return;
 

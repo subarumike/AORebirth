@@ -153,6 +153,21 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
+            if (InventoryStacking.TryGrantOntoStack(subject, item, _flush))
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Gave {0} QL{1} x{2} to {3} (stacked)",
+                        item.Name,
+                        item.Quality,
+                        item.StackCount,
+                        PlayerSubjectName(subject, context.Player)));
+                return;
+            }
+
             int slot = subject.Inventory.Inventory.FindFreeSlot();
             if (slot < 0)
             {

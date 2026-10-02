@@ -139,6 +139,38 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
+        /// Item Use slot: a carried or wear page slot, or a slot in a bag the player carries (Backpack identity,
+        /// instance = bag handle << 16 | slot). The bag must be hydrated, removable from and not locked
+        /// (mid-move/trade); bags in the bank or on the ground are not usable.
+        /// </summary>
+        public bool TryGetUseItem(Identity slot, out Item item)
+        {
+            if (slot.Type != IdentityType.Backpack)
+                return TryGetItem(slot.Type, slot.Instance, out item);
+
+            return TryGetCarriedBackpackItem(slot, out _, out _, out item);
+        }
+
+        /// <summary>The page, placement and item a carried bag's packed Backpack slot names.</summary>
+        public bool TryGetCarriedBackpackItem(Identity slot, out Container page, out int placement, out Item item)
+        {
+            item = null!;
+            placement = (int)((uint)slot.Instance & 0xffff);
+            int handle = (int)(((uint)slot.Instance >> 16) & 0xffff);
+            if (slot.Type != IdentityType.Backpack || !IsHydrated || handle == 0
+                || !TryGetOwnedBackpackPageByHandle(handle, out page))
+            {
+                page = null!;
+                return false;
+            }
+
+            return page.IsHydrated && page.LinkedItem is { Locked: false }
+                && (page.Flags & ContainerFlags.CanRemove) != 0
+                && placement >= page.Offset && placement < page.Offset + page.Capacity
+                && page.Content.TryGetValue(placement, out item!);
+        }
+
+        /// <summary>
         /// Resolves a carried/wear page from placement range. Ignores client IdentityType.
         /// </summary>
         public bool TryResolvePageByPlacement(int placement, out Container page, out bool isWearPage)
@@ -265,6 +297,27 @@ namespace ZoneEngine_New.Core.Inventory
 
             slot = targetPlacement;
             return true;
+        }
+
+        /// <summary>
+        /// The item may not change hands or move: it is locked, or it is a bag holding a locked item (an item use
+        /// waiting on its AttackDelay). Moving such a bag would carry the pending use away with it.
+        /// </summary>
+        public bool IsLockedForTransfer(Item item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            if (item.Locked)
+                return true;
+            if (!InventoryMoveService.IsBagItem(item) || !TryGetBackpackPage(item.Identity, out Container page))
+                return false;
+
+            foreach (Item content in page.Content.Values)
+            {
+                if (content.Locked)
+                    return true;
+            }
+
+            return false;
         }
 
         public bool TryGetBackpackPage(Identity containerIdentity, out Container page)
@@ -433,7 +486,7 @@ namespace ZoneEngine_New.Core.Inventory
                     {
                         Placement = pair.Key,
                         Flags = item.ToInventoryPacketFlags(),
-                        Count = (short)Math.Clamp(Math.Max(1, item.StackCount), 1, short.MaxValue),
+                        Count = InventoryStacking.WireCount(item.StackCount),
                         Identity = item.Identity.Instance != 0
                             ? item.Identity
                             : new Identity { Type = IdentityType.BankByRef, Instance = pair.Key },
@@ -826,7 +879,7 @@ namespace ZoneEngine_New.Core.Inventory
                 {
                     Placement = slotEntry.Key,
                     Flags = item.ToInventoryPacketFlags(),
-                    Count = (short)Math.Clamp(item.StackCount, short.MinValue, short.MaxValue),
+                    Count = InventoryStacking.WireCount(item.StackCount),
                     Identity = item.Identity.Instance != 0
                         ? item.Identity
                         : new Identity { Type = pageType, Instance = slotEntry.Key },

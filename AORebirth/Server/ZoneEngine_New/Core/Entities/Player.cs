@@ -131,7 +131,12 @@ namespace ZoneEngine_New.Core.Entities
             Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(this);
             if (durationSeconds > 0)
                 AnnouncePerkLock(perkId, durationSeconds, nowUtc);
+            else if (_announcedPerkLocks.Remove(perkId))
+                AnnouncePerkAvailable(perkId);
         }
+
+        /// <summary>Perk locks shown on the client, by expiry; each gets PerkAvailable when it runs out.</summary>
+        readonly Dictionary<int, DateTime> _announcedPerkLocks = new();
 
         /// <summary>
         /// Shows the lock on the client: PerkUnavailable (CharacterAction 0xCF, Parameter1 = perk id,
@@ -143,6 +148,8 @@ namespace ZoneEngine_New.Core.Entities
             if (Session?.State != SessionState.InPlay)
                 return;
 
+            _announcedPerkLocks[perkId] = nowUtc.AddSeconds(seconds);
+
             Session.Send(new CharacterActionMessage
             {
                 Identity = Identity,
@@ -151,6 +158,48 @@ namespace ZoneEngine_New.Core.Entities
                 Parameter1 = perkId,
                 Parameter2 = seconds
             });
+        }
+
+        /// <summary>
+        /// The lock ran out: PerkAvailable (CharacterAction 0xCE, Parameter1 0, Parameter2 = perk id; live capture
+        /// sends it when a 65 s Dance of Fools lock ends) re-enables the perk's action buttons.
+        /// </summary>
+        void AnnouncePerkAvailable(int perkId)
+        {
+            if (Session?.State != SessionState.InPlay)
+                return;
+
+            Session.Send(new CharacterActionMessage
+            {
+                Identity = Identity,
+                Action = CharacterActionType.PerkAvailable,
+                Target = Identity.None,
+                Parameter1 = 0,
+                Parameter2 = perkId
+            });
+        }
+
+        void TickPerkLocks()
+        {
+            if (_announcedPerkLocks.Count == 0)
+                return;
+
+            DateTime nowUtc = DateTime.UtcNow;
+            List<int>? expired = null;
+            foreach ((int perkId, DateTime expiresUtc) in _announcedPerkLocks)
+            {
+                if (expiresUtc <= nowUtc && !PerkLocks.IsLocked(perkId, nowUtc))
+                    (expired ??= []).Add(perkId);
+            }
+
+            if (expired == null)
+                return;
+
+            foreach (int perkId in expired)
+            {
+                _announcedPerkLocks.Remove(perkId);
+                AnnouncePerkAvailable(perkId);
+            }
         }
 
         /// <summary>
@@ -218,7 +267,7 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Trains <paramref name="perkId"/> under the client's own rules (Gamecode.dll 0x100536d7): a known,
-        /// untrained, non-special perk whose previous tier is trained, whose expansion is owned, with a free
+        /// untrained Perk or Alien category perk whose previous tier is trained, whose expansion is owned, with a free
         /// perk point (alien perks: alien perk point; research: none) and whose perk item ToWear requirements
         /// pass. Refreshes the perk templates and actions and rebases stats.
         /// </summary>
@@ -227,8 +276,7 @@ namespace ZoneEngine_New.Core.Entities
             if (!PerkCatalog.TryGetItemId(perkId, out int itemId) || TrainedPerks.Contains(perkId))
                 return false;
 
-            int flags = PerkCatalog.GetFlags(perkId);
-            if ((flags & PerkCatalog.SpecialFlag) != 0)
+            if (!PerkCatalog.IsTrainable(perkId))
                 return false;
             if (PerkCatalog.TryGetPreviousId(perkId, out int previousId) && !TrainedPerks.Contains(previousId))
                 return false;
@@ -260,9 +308,14 @@ namespace ZoneEngine_New.Core.Entities
             return true;
         }
 
+        /// <summary>One perk untrain (reset) per hour.</summary>
+        public const int PerkResetCooldownSeconds = 3600;
+
         /// <summary>
-        /// Untrains <paramref name="perkId"/> when it is the highest trained tier of its line.
-        /// Refreshes the perk templates and actions and rebases stats.
+        /// Untrains <paramref name="perkId"/> when it is the highest trained tier of its line and no untrain happened
+        /// in the last <see cref="PerkResetCooldownSeconds"/>. The cooldown is a lock on LastPerkResetTime in
+        /// <see cref="Character.SkillLocks"/> (persisted with the other locks, never scaled; the stat value itself is
+        /// left to the client, which stamps it with game time). Refreshes the perk templates and actions and rebases.
         /// </summary>
         public bool TryUntrainPerk(int perkId, Action? confirm = null)
         {
@@ -274,9 +327,19 @@ namespace ZoneEngine_New.Core.Entities
                     return false;
             }
 
+            DateTime nowUtc = DateTime.UtcNow;
+            TimeSpan wait = SkillLocks.Remaining((int)CharacterStat.LastPerkResetTime, nowUtc);
+            if (wait > TimeSpan.Zero)
+            {
+                RequirementFeedback.SendText(this, string.Format(CultureInfo.InvariantCulture,
+                    "You can reset another perk in {0:00}:{1:00}:{2:00}.", (int)wait.TotalHours, wait.Minutes, wait.Seconds));
+                return false;
+            }
+
             if (!TrainedPerks.Remove(perkId))
                 return false;
 
+            SkillLocks.Lock((int)CharacterStat.LastPerkResetTime, PerkResetCooldownSeconds, nowUtc);
             OnTrainedPerksChanged(confirm);
             return true;
         }
@@ -452,6 +515,10 @@ namespace ZoneEngine_New.Core.Entities
                     RequirementFeedback.SendText(this, "Your target is out of range.");
                 else if (failure == NoLineOfSightFailure)
                     RequirementFeedback.SendText(this, "Your target is not in line of sight.");
+                else if (failure == NotAttackableFailure)
+                    ClientFeedback.Send(this, CombatRules.IsPvpAttackBlocked(this, target)
+                        ? "Feedback_PvpNotAllowedInThisDistrict"
+                        : "Feedback_StartingAttackFailed");
                 return false;
             }
 
@@ -462,6 +529,8 @@ namespace ZoneEngine_New.Core.Entities
         const string OutOfRangeFailure = "target out of range";
 
         const string NoLineOfSightFailure = "target not in line of sight";
+
+        const string NotAttackableFailure = "target not attackable";
 
         /// <summary>
         /// Gates checked when a perk action starts and again when its AttackDelay ends: still held, not locked,
@@ -480,6 +549,8 @@ namespace ZoneEngine_New.Core.Entities
             {
                 if (use.Target.IsDead || !ReferenceEquals(use.Target.Playfield, Playfield))
                     return "target gone";
+                if (IsHostilePerkAction(use.Template) && !CombatRules.CanAttack(this, use.Target))
+                    return NotAttackableFailure;
                 if (GetEdgeDistanceTo(use.Target) > PerkActionRange(use.Template))
                     return OutOfRangeFailure;
                 if (!HasLineOfSightTo(use.Target))
@@ -490,8 +561,25 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
-        /// Runs the perk action's OnUse functions with this player as the source, then announces it as live does
-        /// after the hit and feedback: TemplateAction PerkAction (low/high, QL, performer, target).
+        /// A perk action that did not land (<see cref="PerkActionLands"/>), as live answers it straight away (capture
+        /// 2026-10-02T13:02:33Z): "Target evaded your &lt;action&gt;!" (FormatFeedback 110/79653355 with the "evaded"
+        /// reference and the action name), "Target resisted." (Feedback 110/205237300), then the template's OnFailure
+        /// functions (Perforate / Pulverize LockPerk, sent as PerkUnavailable).
+        /// </summary>
+        public void FailPerkAction(PerkActionUse use, IInventoryRepository inventoryRepository)
+        {
+            ArgumentNullException.ThrowIfNull(use);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ClientFeedback.SendFormatted(this, ClientFeedback.TargetVerbYourAction,
+                new ClientFeedback.TextReference(ClientFeedback.CategoryId, ClientFeedback.Evaded), use.Template.Name ?? string.Empty);
+            ClientFeedback.Send(this, ClientFeedback.TargetResisted);
+            use.Template.ExecuteSpells(EventType.OnFailure, use.Target, inventoryRepository, _items, source: this);
+        }
+
+        /// <summary>
+        /// Performs a perk action that landed: its OnUse functions run with this player as the source and always hit;
+        /// then it is announced as live does after the hit and feedback: TemplateAction PerkAction (low/high, QL,
+        /// performer, target).
         /// </summary>
         public bool ExecutePerkAction(PerkActionUse use, IInventoryRepository inventoryRepository)
         {
@@ -517,6 +605,29 @@ namespace ZoneEngine_New.Core.Entities
             return true;
         }
 
+        /// <summary>
+        /// Whether a perk action aimed at another character succeeds, deterministically: this player's attack rating
+        /// (the action's Attack skills weighted against this player, plus Add All Offense) must reach the target's
+        /// defense rating (the action's Defend skills weighted against the target, plus Add All Defense). Pulverize:
+        /// 2H Blunt 100% + AAO vs skill 155 at 85% + AAD. Self-only actions and actions without Attack or Defend skills
+        /// always succeed. Decided when the action is used: live answers a miss at once, with no QueuePerk.
+        /// </summary>
+        public bool PerkActionLands(PerkActionUse use)
+        {
+            // TODO: Placeholder. This is not even close to the correct perk action landing formula.
+            if (ReferenceEquals(use.Target, this) || use.Template.Attack.Count == 0 || use.Template.Defend.Count == 0)
+                return true;
+
+            long attackRating = WeightedSkill(use.Template.Attack) + Stats.GetOrZero(CharacterStat.AMSModifier);
+
+            long defenseSkill = 0;
+            foreach ((CharacterStat stat, int percent) in use.Template.Defend)
+                defenseSkill += (long)use.Target.Stats.GetOrZero(stat) * percent;
+            long defenseRating = defenseSkill / 100 + use.Target.Stats.GetOrZero(CharacterStat.DMSModifier);
+
+            return attackRating >= defenseRating;
+        }
+
         /// <summary>Template AttackRange in meters; a missing or zero range means touch range.</summary>
         static double PerkActionRange(ItemTemplate template)
         {
@@ -539,6 +650,29 @@ namespace ZoneEngine_New.Core.Entities
                 return null;
 
             return selected;
+        }
+
+        /// <summary>
+        /// An attack: an OnUse damage function (Hit, SpecialHit, DrainHit, AreaHit with a negative amount) aimed at
+        /// the target. Such a perk action, like any attack, needs a target the player may engage (CombatRules).
+        /// </summary>
+        static bool IsHostilePerkAction(ItemTemplate template)
+        {
+            if (!template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                return false;
+
+            foreach (ItemSpell spell in spells)
+            {
+                if (spell.Target is not ((int)ItemTarget.Target or (int)ItemTarget.Fightingtarget))
+                    continue;
+                if (!spell.Is(FunctionType.Hit) && !spell.Is(FunctionType.SpecialHit)
+                    && !spell.Is(FunctionType.DrainHit) && !spell.Is(FunctionType.AreaHit))
+                    continue;
+                if (spell.TryReadInt(1, out int amount) && amount < 0)
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -677,6 +811,7 @@ namespace ZoneEngine_New.Core.Entities
         public override void Tick(double deltaTime)
         {
             base.Tick(deltaTime);
+            TickPerkLocks();
             if (!_respawnPending)
                 return;
 

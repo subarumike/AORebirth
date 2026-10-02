@@ -398,7 +398,23 @@ namespace ZoneEngine_New.Core.Inventory
             if (!TryReadSkillLock(spell, out int statId, out int durationSeconds))
                 return false;
 
-            ResolveApplyOn(target, source, spell).LockSkill(statId, durationSeconds, DateTime.UtcNow);
+            Character locked = ResolveApplyOn(target, source, spell);
+            int seconds = locked.LockSkill(statId, durationSeconds, DateTime.UtcNow);
+
+            // Live shows the lock on the client as SpecialUsed (CharacterAction 0xAA, Parameter1 = stat,
+            // Parameter2 = seconds): Health and Nano Stim LockSkill [123, 40], capture 2026-10-02T15:43:13Z.
+            if (seconds > 0 && locked is Player player && player.Session != null)
+            {
+                player.Session.Send(new CharacterActionMessage
+                {
+                    Identity = player.Identity,
+                    Action = CharacterActionType.SpecialUsed,
+                    Target = Identity.None,
+                    Parameter1 = statId,
+                    Parameter2 = seconds
+                });
+            }
+
             return true;
         }
 
@@ -506,6 +522,8 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (!player.Playfield.GetRequiredService<HashItemMinter>().TryMint(hash, quality, ItemSource.Other, out Item item))
                 return false;
+            if (InventoryStacking.TryGrantOntoStack(player, item, player.Playfield.GetService<InventoryFlushService>()))
+                return true;
             if (!player.Inventory.TryPlace(item, out Container page, out int slot))
                 return false;
 
