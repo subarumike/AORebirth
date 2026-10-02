@@ -16,6 +16,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Nanos;
@@ -39,7 +40,8 @@ namespace ZoneEngine_New.Core.Inventory
             IInventoryRepository inventoryRepository,
             IItemBuilder items,
             SpellCriteria? criteria = null,
-            bool isTick = false)
+            bool isTick = false,
+            int templateDamageType = 0)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
@@ -55,6 +57,11 @@ namespace ZoneEngine_New.Core.Inventory
                         && OpenBank(bankPlayer, inventoryRepository, items);
                 case FunctionType.Hit:
                     return Hit(target, source, spell, addDamage);
+                // SpecialHit (perk attacks such as Pulverize [Health, -72, -145, 0]) carries Hit's arguments; with
+                // no damage type of its own it hits as the template's DamageType (Pulverize 436 = MeleeAC, which
+                // live HealthDamage reports as type 91).
+                case FunctionType.SpecialHit:
+                    return Hit(target, source, spell, addDamage, templateDamageType);
                 case FunctionType.AreaHit:
                     return AreaHit(target, source, spell, addDamage);
                 case FunctionType.DrainHit:
@@ -67,11 +74,15 @@ namespace ZoneEngine_New.Core.Inventory
                     return ClearFlag(target, spell);
                 case FunctionType.SystemText:
                 case FunctionType.Text:
-                    return target is Player textPlayer && SystemText(textPlayer, spell);
+                    // The text goes to whoever the function names: a perk attack's Wearer text ("You successfully
+                    // perform ...") belongs to the attacker, not the target it hit.
+                    return ResolveApplyOn(target, source, spell) is not Player textPlayer || SystemText(textPlayer, spell);
                 case FunctionType.SaveChar:
                     return true;
                 case FunctionType.LockSkill:
                     return LockSkill(target, source, spell);
+                case FunctionType.LockPerk:
+                    return LockPerk(target, source, spell);
                 case FunctionType.UploadNano:
                     return target is Player uploadPlayer && UploadNano(uploadPlayer, spell);
                 case FunctionType.CastNano:
@@ -144,7 +155,7 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
-        static bool Hit(Character target, Character? source, ItemSpell spell, bool addDamage)
+        static bool Hit(Character target, Character? source, ItemSpell spell, bool addDamage, int defaultAcStat = 0)
         {
             if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int minHit))
                 return false;
@@ -169,6 +180,9 @@ namespace ZoneEngine_New.Core.Inventory
                         maxHit = minHit;
                 }
             }
+
+            if (acStat == 0)
+                acStat = defaultAcStat;
 
             if (minHit > maxHit)
             {
@@ -388,6 +402,26 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
+        /// <summary>
+        /// LockPerk [3, perk id, seconds]: the perk's actions stay unusable (IsPerkUnlocked fails) until the lock
+        /// expires, e.g. Heal [3, 401, 240] on use and [3, 401, 20] on failure. Only players hold perks.
+        /// </summary>
+        internal static bool TryReadPerkLock(ItemSpell spell, out int perkId, out int durationSeconds)
+        {
+            durationSeconds = 0;
+            return spell.TryReadInt(1, out perkId) && spell.TryReadInt(2, out durationSeconds);
+        }
+
+        static bool LockPerk(Character target, Character? source, ItemSpell spell)
+        {
+            if (!TryReadPerkLock(spell, out int perkId, out int durationSeconds))
+                return false;
+
+            if (ResolveApplyOn(target, source, spell) is Player player)
+                player.LockPerk(perkId, durationSeconds, DateTime.UtcNow);
+            return true;
+        }
+
         static bool Set(Character target, ItemSpell spell)
         {
             if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int value))
@@ -567,6 +601,13 @@ namespace ZoneEngine_New.Core.Inventory
         {
             if (player.Session == null || !spell.TryReadString(0, out string text) || text.Length == 0)
                 return false;
+
+            if (spell.Is(FunctionType.SystemText))
+            {
+                // Live: FormatFeedback 110/707 with the text as its one argument.
+                ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, text);
+                return true;
+            }
 
             player.Session.Send(
                 new ChatTextMessage

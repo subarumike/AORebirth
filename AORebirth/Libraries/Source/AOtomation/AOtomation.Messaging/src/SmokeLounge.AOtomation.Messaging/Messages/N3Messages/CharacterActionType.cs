@@ -134,6 +134,11 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         TrainPerk = 0x000000BB,
 
         /// <summary>
+        /// Client→server: untrain a perk by PacketID (Parameter2). ZoneEngine RX log 2026-10-02T01:16:53Z.
+        /// </summary>
+        UntrainPerk = 0x000000BC,
+
+        /// <summary>
         /// Server→client: all trained perks cleared (full reset). Capture 20260716-Reset-perks (Action=201).
         /// </summary>
         ClearAllPerks = 0x000000C9,

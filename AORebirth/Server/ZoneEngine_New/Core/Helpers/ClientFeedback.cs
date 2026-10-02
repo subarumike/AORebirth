@@ -28,6 +28,15 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"A too high level player in your team prevents you from receiving any experience." (category 110).</summary>
         public const int TeammateTooHighForXp = 121950320;
 
+        /// <summary>"You are already running this action!" (category 110). Live perk spam capture 2026-10-02T03:54:58Z.</summary>
+        public const int AlreadyRunningAction = 171187118;
+
+        /// <summary>
+        /// Plain text passthrough: one string argument shown as is. Live sends item SystemText (53044, "You
+        /// successfully perform an Impale attack.") as FormatFeedback 110/707 (capture 2026-10-02T03:54:58Z).
+        /// </summary>
+        public const int PlainText = 707;
+
         public static void Send(Character character, string key)
             => Send(character, unchecked((int)ElfHash(key)));
 

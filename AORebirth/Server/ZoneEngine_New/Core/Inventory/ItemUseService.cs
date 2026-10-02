@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Inventory
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
@@ -136,6 +137,47 @@ namespace ZoneEngine_New.Core.Inventory
                 () => dynel.ExecuteUse(player),
                 lockTarget: null);
             return Begin(pending, ResolveDelayCentiseconds(dynel));
+        }
+
+        /// <summary>
+        /// UsePerk (Perk Actions button). The action template's AttackDelay runs like an item use; the perk is
+        /// re-checked (still held, unlocked, requirements, target alive and in AttackRange) before OnUse runs.
+        /// </summary>
+        public ItemUseStart TryBeginPerkAction(Player player, int hash)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            if (!ReferenceEquals(player.Playfield, _playfield) || _moves.HasPending(player.Identity.Instance))
+                return ItemUseStart.Rejected;
+
+            if (HasPending(player.Identity.Instance))
+            {
+                ClientFeedback.Send(player, ClientFeedback.AlreadyRunningAction);
+                return ItemUseStart.Rejected;
+            }
+
+            if (!player.TryPreparePerkAction(hash, out Player.PerkActionUse? use) || use == null)
+                return ItemUseStart.Rejected;
+
+            // Live answers an accepted UsePerk with QueuePerk (CharacterAction 0x50, Parameter1 2, Parameter2 the
+            // action's AttackDelay in centiseconds) and performs the action when the delay runs out.
+            int delay = ClampDelay(use.Template.Stats.GetValueOrDefault(CharacterStat.AttackDelay));
+            player.Session?.Send(new CharacterActionMessage
+            {
+                Identity = player.Identity,
+                Action = CharacterActionType.QueuePerk,
+                Target = Identity.None,
+                Parameter1 = 2,
+                Parameter2 = delay
+            });
+
+            var pending = new PendingItemUse(
+                player,
+                string.Format(CultureInfo.InvariantCulture, "perkAction={0:X8} template={1}", hash, use.Template.Id),
+                () => player.RevalidatePerkAction(use),
+                () => player.ExecutePerkAction(use, _inventoryRepository),
+                lockTarget: null);
+            return Begin(pending, delay);
         }
 
         ItemUseStart Begin(PendingItemUse pending, int delayCentiseconds)

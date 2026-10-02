@@ -74,6 +74,42 @@ namespace ZoneEngine_New.Core.Inventory
         public bool CanCancel { get; init; } = true;
 
         /// <summary>
+        /// The client's weapon type bitmask (Gamecode.dll 0x1009c8e1, weapon object +0x1F0), which feeds the
+        /// EquippedWeapons / EquippedRHWeapon criteria stats: 0x02 when the weapon takes no ammo (melee), then one
+        /// pair of bits per Attack skill carrying at least half the weight (ranged skills at 50%, melee and gun
+        /// skills above 50%), e.g. 2H Blunt 0x102, Pistol 0x404.
+        /// </summary>
+        public int GetWeaponTypeFlags()
+        {
+            int flags = Stats.TryGetValue(CharacterStat.AmmoType, out int ammoType) && ammoType >= 1 ? 0 : 0x02;
+            foreach ((CharacterStat skill, int percent) in Attack)
+            {
+                flags |= (int)skill switch
+                {
+                    111 when percent >= 50 => 0x0C,     // Bow
+                    114 when percent >= 50 => 0x14,     // MG / SMG
+                    133 when percent >= 50 => 0x4004,
+                    134 when percent >= 50 => 0x04,
+                    110 when percent >= 50 => 0x10004,  // Heavy weapons
+                    109 when percent >= 50 => 0x8004,   // Grenade
+                    103 when percent > 50 => 0x22,      // 1H Edged
+                    102 when percent > 50 => 0x42,      // 1H Blunt
+                    105 when percent > 50 => 0x82,      // 2H Edged
+                    107 when percent > 50 => 0x102,     // 2H Blunt
+                    104 when percent > 50 => 0x4002,    // Melee energy
+                    106 when percent > 50 => 0x202,     // Piercing
+                    112 when percent > 50 => 0x404,     // Pistol
+                    116 when percent > 50 => 0x804,     // Assault rifle
+                    113 when percent > 50 => 0x1004,    // Rifle
+                    115 when percent > 50 => 0x2004,    // Shotgun
+                    _ => 0
+                };
+            }
+
+            return flags;
+        }
+
+        /// <summary>
         /// Combat style from InitiativeType; handedness from MultiMelee/MultiRanged presence.
         /// </summary>
         public WeaponFlags GetWeaponFlags()
@@ -114,7 +150,12 @@ namespace ZoneEngine_New.Core.Inventory
         /// True when <paramref name="actionType"/> is missing, or the action's requirement
         /// expression passes (legacy Events fold: leaf compares + And/Or/Not links).
         /// </summary>
-        public bool MeetsActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType)
+        /// <param name="resolve">
+        /// Optional character context for leaves a stat value cannot answer (HasPerk, IsPerkLocked,
+        /// HasNotRunningNano): returns the leaf's result, or null to compare the stat as usual.
+        /// </param>
+        public bool MeetsActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType,
+            Func<ItemRequirement, bool?>? resolve = null)
         {
             ArgumentNullException.ThrowIfNull(getStat);
 
@@ -128,7 +169,7 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
 
-            return action == null || MeetsRequirements(action.Requirements, getStat);
+            return action == null || MeetsRequirements(action.Requirements, getStat, resolve);
         }
 
         /// <summary>
@@ -164,7 +205,8 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         public static bool MeetsRequirements(
             IReadOnlyList<ItemRequirement> requirements,
-            Func<CharacterStat, int> getStat)
+            Func<CharacterStat, int> getStat,
+            Func<ItemRequirement, bool?>? resolve = null)
         {
             ArgumentNullException.ThrowIfNull(requirements);
             ArgumentNullException.ThrowIfNull(getStat);
@@ -173,7 +215,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (count == 0)
                 return true;
 
-            if (TryEvaluatePostfix(requirements, getStat, out bool expression))
+            if (TryEvaluatePostfix(requirements, getStat, resolve, out bool expression))
                 return expression;
 
             bool result = true;
@@ -189,7 +231,7 @@ namespace ZoneEngine_New.Core.Inventory
                     continue;
                 }
 
-                bool pass = EvaluateLeaf(requirement, getStat);
+                bool pass = EvaluateLeaf(requirement, getStat, resolve);
 
                 if (!hasReal)
                 {
@@ -210,7 +252,7 @@ namespace ZoneEngine_New.Core.Inventory
         // AODB exports Criteria as postfix leaves and link operators. Older data can instead
         // carry ChildOperator on leaves; retain that representation's existing fold above.
         static bool TryEvaluatePostfix(IReadOnlyList<ItemRequirement> requirements,
-            Func<CharacterStat, int> getStat, out bool result)
+            Func<CharacterStat, int> getStat, Func<ItemRequirement, bool?>? resolve, out bool result)
         {
             result = false;
             bool hasLeaf = false;
@@ -235,7 +277,7 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 if (!IsRequirementLinkOperator(requirement))
                 {
-                    values.Push(EvaluateLeaf(requirement, getStat));
+                    values.Push(EvaluateLeaf(requirement, getStat, resolve));
                     continue;
                 }
 
@@ -417,17 +459,22 @@ namespace ZoneEngine_New.Core.Inventory
                 && skipPassiveModifiers)
                 return true;
 
-            return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria);
+            return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria,
+                templateDamageType: Stats.TryGetValue(CharacterStat.DamageType, out int damageType) ? damageType : 0);
         }
 
         /// <summary>
         /// One requirement leaf against the character. A VisualProfession requirement also passes on the
         /// real Profession, so a disguise (False Profession) never locks a character out of its own nanos.
         /// </summary>
-        public static bool EvaluateLeaf(ItemRequirement requirement, Func<CharacterStat, int> getStat)
+        public static bool EvaluateLeaf(ItemRequirement requirement, Func<CharacterStat, int> getStat,
+            Func<ItemRequirement, bool?>? resolve = null)
         {
             ArgumentNullException.ThrowIfNull(requirement);
             ArgumentNullException.ThrowIfNull(getStat);
+
+            if (resolve?.Invoke(requirement) is bool resolved)
+                return resolved;
 
             var stat = (CharacterStat)requirement.StatNumber;
             if (EvaluateRequirement(getStat(stat), requirement))

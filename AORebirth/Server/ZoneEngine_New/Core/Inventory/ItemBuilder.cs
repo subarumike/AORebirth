@@ -312,7 +312,9 @@ namespace ZoneEngine_New.Core.Inventory
             int argCount = Math.Min(copy.Arguments.Count, high.Arguments.Count);
             for (int i = 0; i < argCount; i++)
             {
-                if (low.Arguments[i] is int lowInt && high.Arguments[i] is int highInt)
+                if (low.Arguments[i] is int lowId && high.Arguments[i] is int highId && IsIdentifierArgument(low, i))
+                    copy.Arguments[i] = lowId != 0 ? lowId : highId;
+                else if (low.Arguments[i] is int lowInt && high.Arguments[i] is int highInt)
                     copy.Arguments[i] = LerpInt(lowInt, highInt, factor);
                 else if (low.Arguments[i] is float lowFloat && high.Arguments[i] is float highFloat)
                     copy.Arguments[i] = lowFloat + (factor * (highFloat - lowFloat));
@@ -320,6 +322,16 @@ namespace ZoneEngine_New.Core.Inventory
 
             return copy;
         }
+
+        /// <summary>
+        /// Arguments that name something (a stat, a damage type) rather than an amount; QL interpolation keeps
+        /// them instead of blending. Hit-family [stat, min, max, damage type]: Pulverize tier 2 low has damage type
+        /// 91 (MeleeAC) and high 0, which a blend turned into an unknown type 22.
+        /// </summary>
+        private static bool IsIdentifierArgument(ItemSpell spell, int index)
+            => index == 0
+               || (index == 3 && (spell.Is(FunctionType.Hit) || spell.Is(FunctionType.SpecialHit)
+                   || spell.Is(FunctionType.AreaHit) || spell.Is(FunctionType.DrainHit)));
 
         private static List<ItemAction> LerpActions(List<ItemAction> low, List<ItemAction> high, float factor)
         {

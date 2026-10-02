@@ -22,6 +22,8 @@ namespace ZoneEngine_New.Core.Inventory
 
         private readonly Lazy<PlayfieldManager> _playfieldManager;
         private readonly ICharacterCoalesceCommit _persist;
+        private readonly ITrainedPerkRepository? _trainedPerks;
+        private readonly IPerkLockRepository? _perkLocks;
         private readonly IZoneLogger _logger;
         private readonly object _scheduleGate = new();
         private readonly Dictionary<int, long> _dueAtMs = new();
@@ -32,7 +34,9 @@ namespace ZoneEngine_New.Core.Inventory
         public InventoryFlushService(
             Lazy<PlayfieldManager> playfieldManager,
             ICharacterCoalesceCommit persist,
-            IZoneLogger logger)
+            IZoneLogger logger,
+            ITrainedPerkRepository? trainedPerks = null,
+            IPerkLockRepository? perkLocks = null)
         {
             ArgumentNullException.ThrowIfNull(playfieldManager);
             ArgumentNullException.ThrowIfNull(persist);
@@ -40,6 +44,8 @@ namespace ZoneEngine_New.Core.Inventory
 
             _playfieldManager = playfieldManager;
             _persist = persist;
+            _trainedPerks = trainedPerks;
+            _perkLocks = perkLocks;
             _logger = logger;
 
             _writer = new Thread(WriterLoop)
@@ -203,7 +209,10 @@ namespace ZoneEngine_New.Core.Inventory
                 int[] nanos = player.DrainDirtyUploadedNanos();
                 List<ActiveNanoRecord>? activeNanos = player.TakeDirtyActiveNanos();
                 List<SkillLockRecord>? skillLocks = player.SkillLocks.TakeDirty(DateTime.UtcNow);
-                if (inventory == null && nanos.Length == 0 && activeNanos == null && skillLocks == null)
+                int[]? trainedPerks = _trainedPerks == null ? null : player.TrainedPerks.TakeDirty();
+                List<SkillLockRecord>? perkLocks = _perkLocks == null ? null : player.PerkLocks.TakeDirty(DateTime.UtcNow);
+                if (inventory == null && nanos.Length == 0 && activeNanos == null && skillLocks == null && trainedPerks == null
+                    && perkLocks == null)
                     return;
 
                 try
@@ -216,6 +225,10 @@ namespace ZoneEngine_New.Core.Inventory
                         activeNanos,
                         skillLocks);
                     inventory?.MarkNewlyPersisted();
+                    if (trainedPerks != null)
+                        _trainedPerks!.Save(player.Identity.Instance, trainedPerks);
+                    if (perkLocks != null)
+                        _perkLocks!.Save(player.Identity.Instance, perkLocks);
                 }
                 catch (DatabaseCommitOutcomeUnknownException exception)
                 {
@@ -231,6 +244,8 @@ namespace ZoneEngine_New.Core.Inventory
                     player.RestoreDirtyUploadedNanos(nanos);
                     player.RestoreDirtyActiveNanos(activeNanos);
                     player.SkillLocks.RestoreDirty(skillLocks);
+                    player.TrainedPerks.RestoreDirty(trainedPerks);
+                    player.PerkLocks.RestoreDirty(perkLocks);
                     _logger.Error(
                         exception,
                         string.Format(
@@ -244,7 +259,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         static bool HasDirtyState(Player player)
             => player.Inventory.HasDirtyEntries || player.HasDirtyUploadedNanos || player.HasDirtyActiveNanos
-                || player.SkillLocks.IsDirty;
+                || player.SkillLocks.IsDirty || player.TrainedPerks.IsDirty || player.PerkLocks.IsDirty;
 
         public void Dispose()
         {

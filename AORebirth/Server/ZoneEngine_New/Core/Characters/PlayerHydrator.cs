@@ -46,9 +46,8 @@ namespace ZoneEngine_New.Core.Characters
 
             foreach (StatRecord stat in hydration.Stats)
             {
-                // Opponent count is runtime fight bookkeeping and Pets is which pet slots are taken right now: neither
-                // is a saved character row (a stale stored Pets would block every summon).
-                if (stat.StatId is (int)CharacterStat.NumberOfFightingOpponents or (int)CharacterStat.Pets)
+                // Runtime-only stats are rebuilt by rebase; a stale stored Pets would block every summon.
+                if (StatCollection.IsRuntimeOnly((CharacterStat)stat.StatId))
                     continue;
 
                 player.Stats.Set((CharacterStat)stat.StatId, stat.StatValue, StatDetail.Base);
@@ -68,9 +67,13 @@ namespace ZoneEngine_New.Core.Characters
 
             RestoreActiveNanos(player, hydration);
 
+            player.LoadTrainedPerks(hydration.TrainedPerkIds);
+
             DateTime nowUtc = DateTime.UtcNow;
             foreach (SkillLockRecord record in hydration.SkillLocks)
                 player.SkillLocks.Restore(record.StatId, new DateTime(record.ExpiresAtUtcTicks, DateTimeKind.Utc), nowUtc);
+            foreach (SkillLockRecord record in hydration.PerkLocks)
+                player.PerkLocks.Restore(record.StatId, new DateTime(record.ExpiresAtUtcTicks, DateTimeKind.Utc), nowUtc);
         }
 
         /// <summary>

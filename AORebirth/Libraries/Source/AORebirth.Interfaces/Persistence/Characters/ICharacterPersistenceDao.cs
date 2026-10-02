@@ -20,6 +20,14 @@ namespace AORebirth.Interfaces.Persistence.Characters
         IList<int> LoadUploadedNanos(int characterId);
         IList<PersistedActiveNanoData> LoadActiveNanos(int characterId);
         IList<PersistedSkillLockData> LoadSkillLocks(int characterId);
+        /// <summary>Trained perk ids (charactersperks.PacketId).</summary>
+        IList<int> LoadTrainedPerks(int characterId);
+        /// <summary>Replaces the character's trained perk ids in one transaction.</summary>
+        void SaveTrainedPerks(int characterId, IList<int> perkIds);
+        /// <summary>LockPerk cooldowns (characterperklocks).</summary>
+        IList<PersistedPerkLockData> LoadPerkLocks(int characterId);
+        /// <summary>Replaces the character's perk locks in one transaction.</summary>
+        void SavePerkLocks(int characterId, IList<PersistedPerkLockData> perkLocks);
         int LeaseItemInstanceIds(int count);
         void SaveLocation(CharacterStateData character, int online);
         void SaveSnapshot(CharacterStateData character, int online, IList<CharacterStatData> stats);

@@ -719,6 +719,7 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(full);
             SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
+            player.SendPerkActions();
 
             _playfieldManager.Teams.AttachPlayer(player);
             _playfieldManager.Teams.RefreshPlayer(player);
@@ -800,6 +801,7 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(reconnectFull);
             SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
+            player.SendPerkActions();
 
             _playfieldManager.Teams.AttachPlayer(player);
             _playfieldManager.Teams.RefreshPlayer(player);
@@ -1006,16 +1008,22 @@ namespace ZoneEngine_New.Core.Playfield
             if (player.Session == null || player.IsDead)
                 return;
 
-            _playfield.GetRequiredService<PlayfieldLocality>().DeactivatePlayerVisibility(player);
             SendSamePlayfieldArrival(player, player.Position);
         }
 
-        /// <summary>N3Teleport, playfield ready block, self spawn packets, then locality visibility.</summary>
+        /// <summary>
+        /// N3Teleport, playfield ready block, self spawn packets, then locality visibility. The client drops
+        /// every dynel on the teleport, so the player's visible set is cleared first and activation resends
+        /// all of it, including cells the player could already see.
+        /// </summary>
         bool SendSamePlayfieldArrival(Player player, Vector3 landing)
         {
             IZoneSession? session = player.Session;
             if (session == null)
                 return false;
+
+            PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
+            locality.DeactivatePlayerVisibility(player);
 
             int characterId = player.Identity.Instance;
             int playfieldId = _playfield.Identity.Instance;
@@ -1042,6 +1050,7 @@ namespace ZoneEngine_New.Core.Playfield
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
             session.Send(player.BuildFullCharacterMessage());
+            player.SendPerkActions();
 
             session.Send(
                 new GameTimeMessage
@@ -1058,7 +1067,7 @@ namespace ZoneEngine_New.Core.Playfield
                 playfieldId,
                 characterId);
 
-            _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+            locality.ActivatePlayerVisibility(player);
             return true;
         }
 

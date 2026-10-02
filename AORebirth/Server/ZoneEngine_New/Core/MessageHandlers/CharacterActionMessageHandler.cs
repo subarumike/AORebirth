@@ -123,6 +123,23 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     _inventoryActions.Handle(player, message);
                     break;
 
+                case CharacterActionType.UsePerk:
+                    // Perk Actions button (Gamecode.dll 0x1004277c): Parameter2 = the button's action hash.
+                    player.Playfield?.GetService<ItemUseService>()?.TryBeginPerkAction(player, message.Parameter2);
+                    break;
+
+                case CharacterActionType.TrainPerk:
+                    // Client train request: Parameter2 = perk id. The accepted request goes back unchanged;
+                    // client case 0x48 (Gamecode.dll 0x100536d7) then adds the perk to its own map.
+                    player.TryTrainPerk(message.Parameter2, () => session.Send(message));
+                    break;
+
+                case CharacterActionType.UntrainPerk:
+                    // Client untrain request: Parameter2 = perk id. The accepted request goes back unchanged;
+                    // client case 0x49 (Gamecode.dll 0x10053362) then removes the perk from its map.
+                    player.TryUntrainPerk(message.Parameter2, () => session.Send(message));
+                    break;
+
                 case CharacterActionType.InfoRequest:
                 {
                     Playfield? playfield = player.Playfield;

@@ -273,6 +273,10 @@ namespace AORebirth.Database.Dao
                 "DELETE FROM charactersperks WHERE CharacterId=@CharacterId",
                 new { CharacterId = id },
                 transaction);
+            connection.Execute(
+                "DELETE FROM characterperklocks WHERE CharacterId=@CharacterId",
+                new { CharacterId = id },
+                transaction);
         }
 
         /// <summary>
