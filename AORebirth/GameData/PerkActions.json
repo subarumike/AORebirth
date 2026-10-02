@@ -1,0 +1,3003 @@
+{
+  "PerkActions": [
+    {
+      "Hash": "ABFI",
+      "Name": "Absolute Fist",
+      "ActionId": 266003
+    },
+    {
+      "Hash": "ACNO",
+      "Name": "Access Notum Source",
+      "ActionId": 227312
+    },
+    {
+      "Hash": "AEDE",
+      "Name": "Accelerate Decaying Quarks",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226128, "HighId": 226129, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226130, "HighId": 226131, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226132, "HighId": 226133, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "AGAM",
+      "Name": "Concussive Shot",
+      "ActionId": 266031
+    },
+    {
+      "Hash": "AHTA",
+      "Name": "Underground Sutures",
+      "ActionId": 265976
+    },
+    {
+      "Hash": "AINO",
+      "Name": "Annihilate Notum Molecules",
+      "ActionId": 227218
+    },
+    {
+      "Hash": "ALPM",
+      "Name": "Nano-Enhanced Targeting",
+      "ActionId": 263400
+    },
+    {
+      "Hash": "AMPI",
+      "Name": "Armor Piercing Shot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225876, "HighId": 225877, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225878, "HighId": 225879, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225880, "HighId": 225881, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "AOQO",
+      "Name": "Crave",
+      "ActionId": 253075
+    },
+    {
+      "Hash": "AORA",
+      "Name": "Destructive Signal",
+      "ActionId": 263774
+    },
+    {
+      "Hash": "ARDI",
+      "Name": "Guardian",
+      "ActionId": 227338
+    },
+    {
+      "Hash": "ASTR",
+      "Name": "Assume Target",
+      "ActionId": 252383
+    },
+    {
+      "Hash": "ATHM",
+      "Name": "Strengthen Spirit",
+      "ActionId": 266168
+    },
+    {
+      "Hash": "ATLI",
+      "Name": "Attack Ligaments",
+      "ActionId": 266165
+    },
+    {
+      "Hash": "AUAN",
+      "Name": "Arouse Anger",
+      "Tiers": [
+        { "Tier": 1, "LowId": 251184, "HighId": 251185, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 251186, "HighId": 251187, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 251188, "HighId": 251189, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "AUIN",
+      "Name": "Exchange Product",
+      "ActionId": 266105
+    },
+    {
+      "Hash": "AVAL",
+      "Name": "Avalanche",
+      "ActionId": 227076
+    },
+    {
+      "Hash": "AVWR",
+      "Name": "Antiseptic",
+      "ActionId": 263487
+    },
+    {
+      "Hash": "AWAK",
+      "Name": "Awakening",
+      "ActionId": 251237
+    },
+    {
+      "Hash": "BAHL",
+      "Name": "Battlegroup Heal 2",
+      "ActionId": 215457
+    },
+    {
+      "Hash": "BAOY",
+      "Name": "Balance of Yin and Yang",
+      "SkillModifier": 1.4546,
+      "Tiers": [
+        { "Tier": 1, "LowId": 227044, "HighId": 227045, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227046, "HighId": 227047, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227048, "HighId": 227049, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 4, "LowId": 227050, "HighId": 227051, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "BAOZ",
+      "Name": "Bane of Farzad",
+      "ActionId": 230402
+    },
+    {
+      "Hash": "BARM",
+      "Name": "Laser Aim",
+      "ActionId": 263412
+    },
+    {
+      "Hash": "BASS",
+      "Name": "Tear Ligaments",
+      "ActionId": 263640
+    },
+    {
+      "Hash": "BCLG",
+      "Name": "Blackened Legacy",
+      "ActionId": 266090
+    },
+    {
+      "Hash": "BDNB",
+      "Name": "Heal",
+      "SkillModifier": 1.4546,
+      "Tiers": [
+        { "Tier": 1, "LowId": 227223, "HighId": 227222, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227224, "HighId": 227225, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227226, "HighId": 227227, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 4, "LowId": 227228, "HighId": 227229, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "BDTA",
+      "Name": "Dangerous Culture",
+      "ActionId": 263476
+    },
+    {
+      "Hash": "BFEI",
+      "Name": "Grasp",
+      "ActionId": 227712
+    },
+    {
+      "Hash": "BGON",
+      "Name": "Blade of Night",
+      "ActionId": 227328
+    },
+    {
+      "Hash": "BHOS",
+      "Name": "Bane of the Giseleh",
+      "ActionId": 289800
+    },
+    {
+      "Hash": "BIBW",
+      "Name": "Blindside Blow",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225862, "HighId": 225863, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225864, "HighId": 225865, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225866, "HighId": 225867, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "BICC",
+      "Name": "Bio Cocoon",
+      "ActionId": 215577
+    },
+    {
+      "Hash": "BIRG",
+      "Name": "Bio Regrowth",
+      "ActionId": 215599
+    },
+    {
+      "Hash": "BIRJ",
+      "Name": "Bio Rejuvenation",
+      "ActionId": 215578
+    },
+    {
+      "Hash": "BISI",
+      "Name": "Bio Shield",
+      "ActionId": 215568
+    },
+    {
+      "Hash": "BISK",
+      "Name": "Nocturnal Strike",
+      "ActionId": 251234
+    },
+    {
+      "Hash": "BISM",
+      "Name": "Big Smash",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225847, "HighId": 225848, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225849, "HighId": 225850, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225851, "HighId": 225852, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "BITP",
+      "Name": "Bring the Pain",
+      "ActionId": 226536
+    },
+    {
+      "Hash": "BJOJ",
+      "Name": "Bane of Jareck",
+      "ActionId": 230403
+    },
+    {
+      "Hash": "BLAK",
+      "Name": "Blackfist",
+      "ActionId": 215356
+    },
+    {
+      "Hash": "BLNN",
+      "Name": "Blast Nano",
+      "ActionId": 227320
+    },
+    {
+      "Hash": "BLWO",
+      "Name": "Bleeding Wounds",
+      "ActionId": 227363
+    },
+    {
+      "Hash": "BLWR",
+      "Name": "Blade Whirlwind",
+      "ActionId": 226853
+    },
+    {
+      "Hash": "BNDE",
+      "Name": "Drone Explosives",
+      "ActionId": 263790
+    },
+    {
+      "Hash": "BNOA",
+      "Name": "Bane of Nadira",
+      "ActionId": 230404
+    },
+    {
+      "Hash": "BNOE",
+      "Name": "Bane of Elyn",
+      "ActionId": 230400
+    },
+    {
+      "Hash": "BNOI",
+      "Name": "Blessing of Life",
+      "ActionId": 216602
+    },
+    {
+      "Hash": "BNOL",
+      "Name": "Bane of Eldini",
+      "ActionId": 230401
+    },
+    {
+      "Hash": "BNTH",
+      "Name": "Fighting Chance",
+      "ActionId": 265964
+    },
+    {
+      "Hash": "BRDE",
+      "Name": "Breach Defenses",
+      "ActionId": 213413
+    },
+    {
+      "Hash": "BRLG",
+      "Name": "Vortex of Hate",
+      "ActionId": 263624
+    },
+    {
+      "Hash": "BSHZ",
+      "Name": "Inspire Ire",
+      "ActionId": 263608
+    },
+    {
+      "Hash": "BTH4",
+      "Name": "Battlegroup Heal 4",
+      "ActionId": 215459
+    },
+    {
+      "Hash": "BTHA",
+      "Name": "Battlegroup Heal 1",
+      "ActionId": 215456
+    },
+    {
+      "Hash": "BTHE",
+      "Name": "Battlegroup Heal 3",
+      "ActionId": 215458
+    },
+    {
+      "Hash": "BTOH",
+      "Name": "Bane of the Challenger",
+      "ActionId": 230415
+    },
+    {
+      "Hash": "BTTR",
+      "Name": "Combustion",
+      "ActionId": 263372
+    },
+    {
+      "Hash": "BUKE",
+      "Name": "Violation Buffer",
+      "ActionId": 263620
+    },
+    {
+      "Hash": "BXUX",
+      "Name": "Charge",
+      "Tiers": [
+        { "Tier": 1, "LowId": 227817, "HighId": 227818, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227819, "HighId": 227820, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227821, "HighId": 227822, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "CCSH",
+      "Name": "Concussive Shot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226490, "HighId": 226491, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226492, "HighId": 226493, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226494, "HighId": 226495, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "CETM",
+      "Name": "Gear Assault Absorption",
+      "ActionId": 266191
+    },
+    {
+      "Hash": "CHBI",
+      "Name": "Chemical Blindness",
+      "ActionId": 214368
+    },
+    {
+      "Hash": "CHMD",
+      "Name": "Chaotic Modulation",
+      "ActionId": 227700
+    },
+    {
+      "Hash": "CICD",
+      "Name": "Chi Conductor",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226170, "HighId": 226171, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226172, "HighId": 226173, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226174, "HighId": 226175, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "CICS",
+      "Name": "Pathogen",
+      "ActionId": 263485
+    },
+    {
+      "Hash": "CILO",
+      "Name": "Harvest Energy",
+      "ActionId": 266209
+    },
+    {
+      "Hash": "CKHE",
+      "Name": "Blackheart",
+      "ActionId": 266028
+    },
+    {
+      "Hash": "CLEA",
+      "Name": "Cleave",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226032, "HighId": 226033, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226034, "HighId": 226035, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226036, "HighId": 226037, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "CLFE",
+      "Name": "Clipfever",
+      "ActionId": 248196
+    },
+    {
+      "Hash": "CNBU",
+      "Name": "Contained Burst",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226195, "HighId": 226196, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226197, "HighId": 226198, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226199, "HighId": 226200, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "CNDE",
+      "Name": "Honor Restored",
+      "ActionId": 266218
+    },
+    {
+      "Hash": "CNRE",
+      "Name": "Channel Rage",
+      "ActionId": 227693
+    },
+    {
+      "Hash": "CNTM",
+      "Name": "Convulsive Tremor",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225275, "HighId": 225276, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225277, "HighId": 225278, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225279, "HighId": 225280, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "CNWI",
+      "Name": "Confound With Rules",
+      "ActionId": 227066
+    },
+    {
+      "Hash": "COCC",
+      "Name": "Controlled Chance",
+      "ActionId": 252478
+    },
+    {
+      "Hash": "COLL",
+      "Name": "Collapser",
+      "ActionId": 253090
+    },
+    {
+      "Hash": "COTS",
+      "Name": "Consume the Soul",
+      "ActionId": 239839
+    },
+    {
+      "Hash": "CPES",
+      "Name": "Capture Essence",
+      "ActionId": 225440
+    },
+    {
+      "Hash": "CPSI",
+      "Name": "Capture Spirit",
+      "ActionId": 225455
+    },
+    {
+      "Hash": "CPVI",
+      "Name": "Capture Vigor",
+      "ActionId": 225439
+    },
+    {
+      "Hash": "CSOA",
+      "Name": "Cause of Anger",
+      "ActionId": 251190
+    },
+    {
+      "Hash": "CTAU",
+      "Name": "Chaotic Assumption",
+      "ActionId": 252462
+    },
+    {
+      "Hash": "CTER",
+      "Name": "Chaotic Energy",
+      "ActionId": 227788
+    },
+    {
+      "Hash": "CTVI",
+      "Name": "Capture Vitality",
+      "ActionId": 225456
+    },
+    {
+      "Hash": "CUBO",
+      "Name": "Crush Bone",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226528, "HighId": 226529, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226530, "HighId": 226531, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226532, "HighId": 226533, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "CUTO",
+      "Name": "Curing Touch",
+      "ActionId": 215864
+    },
+    {
+      "Hash": "CVSH",
+      "Name": "Successful Targeting",
+      "ActionId": 266188
+    },
+    {
+      "Hash": "CXWZ",
+      "Name": "Fuzz",
+      "ActionId": 253104
+    },
+    {
+      "Hash": "DAOF",
+      "Name": "Dance of Fools",
+      "ActionId": 211453
+    },
+    {
+      "Hash": "DBSE",
+      "Name": "Self Preservation",
+      "ActionId": 263368
+    },
+    {
+      "Hash": "DBSH",
+      "Name": "Double Shot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226244, "HighId": 226245, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226246, "HighId": 226247, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226248, "HighId": 226249, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DBST",
+      "Name": "Debilitating Strike",
+      "ActionId": 266203
+    },
+    {
+      "Hash": "DCSN",
+      "Name": "Evasive Stance",
+      "ActionId": 239811
+    },
+    {
+      "Hash": "DEAM",
+      "Name": "Devotional Armor",
+      "ActionId": 215856
+    },
+    {
+      "Hash": "DECT",
+      "Name": "Deep Cuts",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226376, "HighId": 226377, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226378, "HighId": 226379, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226380, "HighId": 226381, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DEES",
+      "Name": "Devour Essence",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225347, "HighId": 225348, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225349, "HighId": 225350, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225351, "HighId": 225352, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DETA",
+      "Name": "Contaminated Bullets",
+      "ActionId": 265970
+    },
+    {
+      "Hash": "DETH",
+      "Name": "Drone Missiles",
+      "ActionId": 263770
+    },
+    {
+      "Hash": "DEVI",
+      "Name": "Devour Vigor",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225341, "HighId": 225342, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225343, "HighId": 225344, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225345, "HighId": 225346, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DEWV",
+      "Name": "Personal Protection",
+      "ActionId": 263762
+    },
+    {
+      "Hash": "DFIE",
+      "Name": "Refinance Loans",
+      "ActionId": 266194
+    },
+    {
+      "Hash": "DFPY",
+      "Name": "Rigid Liquidation",
+      "ActionId": 266197
+    },
+    {
+      "Hash": "DIFF",
+      "Name": "Diffuse",
+      "ActionId": 248125
+    },
+    {
+      "Hash": "DIFI",
+      "Name": "Dimensional Fist",
+      "Tiers": [
+        { "Tier": 1, "LowId": 216958, "HighId": 216959, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 216960, "HighId": 216961, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 216962, "HighId": 216963, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DIHI",
+      "Name": "Dizzying Heights",
+      "ActionId": 252541
+    },
+    {
+      "Hash": "DIMS",
+      "Name": "Energy Transfer",
+      "ActionId": 263754
+    },
+    {
+      "Hash": "DINT",
+      "Name": "Disable Natural Healing",
+      "ActionId": 227070
+    },
+    {
+      "Hash": "DNCU",
+      "Name": "Blood Transfusion",
+      "ActionId": 263480
+    },
+    {
+      "Hash": "DOSA",
+      "Name": "Double Stab",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225618, "HighId": 225619, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225621, "HighId": 225623, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225620, "HighId": 225622, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DOTE",
+      "Name": "Dodge the Blame",
+      "ActionId": 227062
+    },
+    {
+      "Hash": "DOTO",
+      "Name": "Doom Touch",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226363, "HighId": 226364, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226365, "HighId": 226366, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226367, "HighId": 226368, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DOVI",
+      "Name": "Devour Vitality",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225353, "HighId": 225354, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225355, "HighId": 225356, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225357, "HighId": 225358, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DRBO",
+      "Name": "Draw Blood",
+      "ActionId": 216613
+    },
+    {
+      "Hash": "DRES",
+      "Name": "Drain Essence",
+      "ActionId": 266055
+    },
+    {
+      "Hash": "DREX",
+      "Name": "Cushion Blows",
+      "ActionId": 263746
+    },
+    {
+      "Hash": "DRKI",
+      "Name": "Disrupt Ki",
+      "ActionId": 266070
+    },
+    {
+      "Hash": "DRRC",
+      "Name": "Endure Barrage",
+      "ActionId": 263750
+    },
+    {
+      "Hash": "DRTR",
+      "Name": "Bending The Rules",
+      "ActionId": 265971
+    },
+    {
+      "Hash": "DSRE",
+      "Name": "Unstable Library",
+      "ActionId": 266079
+    },
+    {
+      "Hash": "DTSG",
+      "Name": "Reactive Armor",
+      "ActionId": 263766
+    },
+    {
+      "Hash": "DTSI",
+      "Name": "Death Strike",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225840, "HighId": 225841, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225842, "HighId": 225843, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225844, "HighId": 225845, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DTSN",
+      "Name": "Detonate Stoneworks",
+      "ActionId": 227191
+    },
+    {
+      "Hash": "DVBL",
+      "Name": "Devastating Blow",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226537, "HighId": 226538, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226539, "HighId": 226540, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226541, "HighId": 226542, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "DVSP",
+      "Name": "Devious Spirit",
+      "ActionId": 266022
+    },
+    {
+      "Hash": "DZTU",
+      "Name": "Eschew the Faithless",
+      "ActionId": 266147
+    },
+    {
+      "Hash": "DZWI",
+      "Name": "Dazzle With Lights",
+      "ActionId": 227348
+    },
+    {
+      "Hash": "EADE",
+      "Name": "Leadership",
+      "ActionId": 225575
+    },
+    {
+      "Hash": "EARH",
+      "Name": "Bearhug",
+      "ActionId": 227713
+    },
+    {
+      "Hash": "EARS",
+      "Name": "Clearshot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 252344, "HighId": 252345, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 252346, "HighId": 252347, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 252349, "HighId": 252350, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "EASH",
+      "Name": "Easy Shot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225813, "HighId": 225814, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225816, "HighId": 225817, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225819, "HighId": 225820, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "EAST",
+      "Name": "Evasive Stance",
+      "ActionId": 214181
+    },
+    {
+      "Hash": "ECAL",
+      "Name": "Recalibrate",
+      "ActionId": 251274
+    },
+    {
+      "Hash": "ECAT",
+      "Name": "Hecatomb",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225651, "HighId": 225652, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225653, "HighId": 225654, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225655, "HighId": 225656, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "ECON",
+      "Name": "Reconstruction",
+      "ActionId": 229119
+    },
+    {
+      "Hash": "ECPR",
+      "Name": "Deplete Assets",
+      "ActionId": 266064
+    },
+    {
+      "Hash": "EDAL",
+      "Name": "Medallion",
+      "ActionId": 251902
+    },
+    {
+      "Hash": "EEED",
+      "Name": "Violence",
+      "ActionId": 227336
+    },
+    {
+      "Hash": "EETR",
+      "Name": "Splinter Preservation",
+      "ActionId": 263758
+    },
+    {
+      "Hash": "EGST",
+      "Name": "Economic Nanobot Use",
+      "ActionId": 266006
+    },
+    {
+      "Hash": "EHHA",
+      "Name": "Enhanced Heal",
+      "ActionId": 227036
+    },
+    {
+      "Hash": "EISH",
+      "Name": "No Escape!",
+      "ActionId": 263404
+    },
+    {
+      "Hash": "EJXL",
+      "Name": "Escape",
+      "ActionId": 214386
+    },
+    {
+      "Hash": "ELTE",
+      "Name": "Elementary Teleportation",
+      "ActionId": 227421
+    },
+    {
+      "Hash": "ELTY",
+      "Name": "Dirty Tricks",
+      "ActionId": 265956
+    },
+    {
+      "Hash": "EMBA",
+      "Name": "Deep Six Initiative",
+      "ActionId": 266138
+    },
+    {
+      "Hash": "ENGR",
+      "Name": "Gravity Shift Item",
+      "ActionId": 285165
+    },
+    {
+      "Hash": "ENIS",
+      "Name": "Encase in Stone",
+      "ActionId": 227190
+    },
+    {
+      "Hash": "ERAM",
+      "Name": "Emergency Bandages",
+      "ActionId": 266034
+    },
+    {
+      "Hash": "ERGI",
+      "Name": "Energize",
+      "ActionId": 226852
+    },
+    {
+      "Hash": "ERIV",
+      "Name": "Derivate",
+      "ActionId": 252526
+    },
+    {
+      "Hash": "ERRU",
+      "Name": "Freak Shield",
+      "ActionId": 251899
+    },
+    {
+      "Hash": "ESCR",
+      "Name": "Accumulated Interest",
+      "ActionId": 266227
+    },
+    {
+      "Hash": "ESLP",
+      "Name": "Accelerated Reality",
+      "ActionId": 266224
+    },
+    {
+      "Hash": "ESTU",
+      "Name": "Pure Strike",
+      "ActionId": 266159
+    },
+    {
+      "Hash": "ETBU",
+      "Name": "Eat Bullets",
+      "Tiers": [
+        { "Tier": 1, "LowId": 283671, "HighId": 283672, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 283673, "HighId": 283674, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 283675, "HighId": 283676, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "ETTO",
+      "Name": "Ethereal Touch",
+      "ActionId": 216948
+    },
+    {
+      "Hash": "ETTU",
+      "Name": "Ignore the Unrepentant",
+      "ActionId": 266162
+    },
+    {
+      "Hash": "EUSR",
+      "Name": "Elusive Spirit",
+      "ActionId": 266025
+    },
+    {
+      "Hash": "EVPI",
+      "Name": "Thoughtful Means",
+      "ActionId": 266076
+    },
+    {
+      "Hash": "EXTE",
+      "Name": "Exploration Teleportation",
+      "ActionId": 227476
+    },
+    {
+      "Hash": "EXUL",
+      "Name": "Exultation",
+      "ActionId": 216947
+    },
+    {
+      "Hash": "FAAG",
+      "Name": "Fade Anger",
+      "ActionId": 227634
+    },
+    {
+      "Hash": "FAAM",
+      "Name": "Fade Armor",
+      "ActionId": 226237
+    },
+    {
+      "Hash": "FDTF",
+      "Name": "Find the Flaw",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225882, "HighId": 225883, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225884, "HighId": 225885, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225886, "HighId": 225887, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "FEBN",
+      "Name": "Field Bandage",
+      "Tiers": [
+        { "Tier": 1, "LowId": 227329, "HighId": 227330, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227331, "HighId": 227332, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227333, "HighId": 227334, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "FEIU",
+      "Name": "Ambient Purification",
+      "ActionId": 266200
+    },
+    {
+      "Hash": "FEWH",
+      "Name": "Nanobot Contingent Arrest",
+      "ActionId": 266206
+    },
+    {
+      "Hash": "FFRE",
+      "Name": "Righteous Smite",
+      "ActionId": 266114
+    },
+    {
+      "Hash": "FGCH",
+      "Name": "Slip Them A Mickey",
+      "ActionId": 265950
+    },
+    {
+      "Hash": "FHRE",
+      "Name": "Virtuous Reaper",
+      "ActionId": 266111
+    },
+    {
+      "Hash": "FIIN",
+      "Name": "Escape The System",
+      "ActionId": 265949
+    },
+    {
+      "Hash": "FLFC",
+      "Name": "Flim Focus",
+      "ActionId": 250649
+    },
+    {
+      "Hash": "FLQI",
+      "Name": "Flesh Quiver",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226162, "HighId": 226163, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226164, "HighId": 226165, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226166, "HighId": 226167, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "FLSS",
+      "Name": "Followup Smash",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225855, "HighId": 225856, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225857, "HighId": 225858, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225859, "HighId": 225860, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "FNSO",
+      "Name": "Intense Metabolism",
+      "ActionId": 265955
+    },
+    {
+      "Hash": "FNXF",
+      "Name": "Reject",
+      "ActionId": 254313
+    },
+    {
+      "Hash": "FODB",
+      "Name": "Escrow",
+      "ActionId": 266144
+    },
+    {
+      "Hash": "FOIT",
+      "Name": "Forms in Triplicate",
+      "ActionId": 263425
+    },
+    {
+      "Hash": "FOOP",
+      "Name": "Force Opponent",
+      "Tiers": [
+        { "Tier": 1, "LowId": 252312, "HighId": 252313, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 252314, "HighId": 252315, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 252316, "HighId": 252317, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "FPHK",
+      "Name": "Silence",
+      "ActionId": 239349
+    },
+    {
+      "Hash": "FRFR",
+      "Name": "Fire Frenzy",
+      "ActionId": 253107
+    },
+    {
+      "Hash": "FROL",
+      "Name": "Fortress of Light",
+      "ActionId": 215361
+    },
+    {
+      "Hash": "FTSE",
+      "Name": "Righteous Strike",
+      "ActionId": 266108
+    },
+    {
+      "Hash": "FUAM",
+      "Name": "On The Double",
+      "ActionId": 266037
+    },
+    {
+      "Hash": "FUFR",
+      "Name": "Full Frontal",
+      "ActionId": 252399
+    },
+    {
+      "Hash": "FYOC",
+      "Name": "Flurry of Cuts",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225801, "HighId": 225802, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225803, "HighId": 225804, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225805, "HighId": 225806, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "GADA",
+      "Name": "Gather Darkness",
+      "ActionId": 215352
+    },
+    {
+      "Hash": "GALG",
+      "Name": "Gather Light",
+      "ActionId": 239347
+    },
+    {
+      "Hash": "GALI",
+      "Name": "Gather Light",
+      "ActionId": 215354
+    },
+    {
+      "Hash": "GDZH",
+      "Name": "Taunt",
+      "Tiers": [
+        { "Tier": 1, "LowId": 227152, "HighId": 227153, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227154, "HighId": 227155, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227156, "HighId": 227157, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "GEON",
+      "Name": "Unopened Letter",
+      "ActionId": 266046
+    },
+    {
+      "Hash": "GETA",
+      "Name": "Bootleg Remedies",
+      "ActionId": 265978
+    },
+    {
+      "Hash": "GIOC",
+      "Name": "Grip of Colossus",
+      "ActionId": 227714
+    },
+    {
+      "Hash": "GLQD",
+      "Name": "Removal 1",
+      "ActionId": 225474
+    },
+    {
+      "Hash": "GMPQ",
+      "Name": "Life",
+      "ActionId": 215373
+    },
+    {
+      "Hash": "GOKK",
+      "Name": "Groin Kick",
+      "ActionId": 227807
+    },
+    {
+      "Hash": "GOVE",
+      "Name": "Governance",
+      "ActionId": 225577
+    },
+    {
+      "Hash": "GRDR",
+      "Name": "Target Acquired",
+      "ActionId": 266096
+    },
+    {
+      "Hash": "GRPU",
+      "Name": "Great Purge",
+      "ActionId": 225479
+    },
+    {
+      "Hash": "GUBL",
+      "Name": "Gutting Blow",
+      "ActionId": 227364
+    },
+    {
+      "Hash": "GUES",
+      "Name": "Guesstimate",
+      "ActionId": 252444
+    },
+    {
+      "Hash": "GUSO",
+      "Name": "Notum-Charged Rounds",
+      "ActionId": 263420
+    },
+    {
+      "Hash": "GUTR",
+      "Name": "Luck\u0027s Calamity",
+      "ActionId": 265977
+    },
+    {
+      "Hash": "GUYI",
+      "Name": "Break",
+      "ActionId": 253063
+    },
+    {
+      "Hash": "GVKQ",
+      "Name": "Ego Strike",
+      "ActionId": 266012
+    },
+    {
+      "Hash": "HAAD",
+      "Name": "Hale and Hearty",
+      "ActionId": 225505
+    },
+    {
+      "Hash": "HAHB",
+      "Name": "Healing Herbs",
+      "ActionId": 263344
+    },
+    {
+      "Hash": "HATU",
+      "Name": "Mind Wail",
+      "ActionId": 266129
+    },
+    {
+      "Hash": "HLMD",
+      "Name": "Healing Meditation",
+      "ActionId": 266120
+    },
+    {
+      "Hash": "HMAD",
+      "Name": "Hammer and Anvil",
+      "ActionId": 227493
+    },
+    {
+      "Hash": "HOTA",
+      "Name": "Hostile Takeover",
+      "ActionId": 252461
+    },
+    {
+      "Hash": "HOTH",
+      "Name": "Honoring the Ancients",
+      "ActionId": 226854
+    },
+    {
+      "Hash": "HRSV",
+      "Name": "Concealed Surprise",
+      "ActionId": 266084
+    },
+    {
+      "Hash": "ICMO",
+      "Name": "Increase Momentum",
+      "ActionId": 266135
+    },
+    {
+      "Hash": "IFAD",
+      "Name": "Inflation Adjustment",
+      "ActionId": 263436
+    },
+    {
+      "Hash": "IGFL",
+      "Name": "Ignition Flare",
+      "ActionId": 213010
+    },
+    {
+      "Hash": "IGHW",
+      "Name": "Highway",
+      "ActionId": 251204
+    },
+    {
+      "Hash": "IGPI",
+      "Name": "Ignore Pain",
+      "ActionId": 263604
+    },
+    {
+      "Hash": "IIFW",
+      "Name": "Intense Metabolism",
+      "ActionId": 263380
+    },
+    {
+      "Hash": "IILW",
+      "Name": "Cure 1",
+      "ActionId": 225481
+    },
+    {
+      "Hash": "IISR",
+      "Name": "Initial Strike",
+      "ActionId": 253134
+    },
+    {
+      "Hash": "IKSR",
+      "Name": "Regain Focus",
+      "ActionId": 266009
+    },
+    {
+      "Hash": "IMPA",
+      "Name": "Impale",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225599, "HighId": 225600, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225601, "HighId": 225602, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225603, "HighId": 225604, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "INAM",
+      "Name": "Furious Ammunition",
+      "ActionId": 266040
+    },
+    {
+      "Hash": "INCA",
+      "Name": "Incapacitate",
+      "ActionId": 226169
+    },
+    {
+      "Hash": "INHE",
+      "Name": "Shield of the Ogre",
+      "ActionId": 263636
+    },
+    {
+      "Hash": "INNO",
+      "Name": "Install Notum Depletion Device",
+      "ActionId": 229920
+    },
+    {
+      "Hash": "IOBE",
+      "Name": "Massive Vitae Plan",
+      "ActionId": 263495
+    },
+    {
+      "Hash": "IPPP",
+      "Name": "Cripple",
+      "ActionId": 248966
+    },
+    {
+      "Hash": "ISCL",
+      "Name": "Insurance Claim",
+      "ActionId": 236592
+    },
+    {
+      "Hash": "ISEX",
+      "Name": "Install Explosive Device",
+      "ActionId": 229898
+    },
+    {
+      "Hash": "ISIR",
+      "Name": "Vile Rage",
+      "ActionId": 263628
+    },
+    {
+      "Hash": "ISKI",
+      "Name": "Fish In A Barrel",
+      "ActionId": 265961
+    },
+    {
+      "Hash": "ISOR",
+      "Name": "Disorientate",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225266, "HighId": 225267, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225268, "HighId": 225269, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225270, "HighId": 225271, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "ISRG",
+      "Name": "Inspire Rage",
+      "ActionId": 263632
+    },
+    {
+      "Hash": "IXUL",
+      "Name": "Stab",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225581, "HighId": 225582, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225583, "HighId": 225584, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225585, "HighId": 225586, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "JABU",
+      "Name": "Jarring Burst",
+      "ActionId": 213977
+    },
+    {
+      "Hash": "JBWB",
+      "Name": "Point Blank",
+      "Tiers": [
+        { "Tier": 1, "LowId": 302068, "HighId": 302069, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 302070, "HighId": 302071, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 302072, "HighId": 302073, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "JGTG",
+      "Name": "Insight",
+      "ActionId": 252324
+    },
+    {
+      "Hash": "JJRM",
+      "Name": "Blur",
+      "ActionId": 248113
+    },
+    {
+      "Hash": "JKRS",
+      "Name": "Blackstep",
+      "ActionId": 215350
+    },
+    {
+      "Hash": "JWNU",
+      "Name": "Misery",
+      "ActionId": 215369
+    },
+    {
+      "Hash": "KAMN",
+      "Name": "Ka Mon",
+      "ActionId": 252300
+    },
+    {
+      "Hash": "KAWP",
+      "Name": "Gore",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225641, "HighId": 225642, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225643, "HighId": 225644, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225645, "HighId": 225646, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "KEFI",
+      "Name": "Ken Fi",
+      "ActionId": 252296
+    },
+    {
+      "Hash": "KESI",
+      "Name": "Ken Si",
+      "ActionId": 252298
+    },
+    {
+      "Hash": "KLFP",
+      "Name": "Anesthetic",
+      "ActionId": 263499
+    },
+    {
+      "Hash": "KLVO",
+      "Name": "Bore",
+      "ActionId": 253078
+    },
+    {
+      "Hash": "KNEN",
+      "Name": "Knowledge Enhancer",
+      "ActionId": 227359
+    },
+    {
+      "Hash": "LACE",
+      "Name": "Lacerate",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225629, "HighId": 225630, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225631, "HighId": 225632, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225633, "HighId": 225634, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "LAON",
+      "Name": "Lay on Hands",
+      "ActionId": 215791
+    },
+    {
+      "Hash": "LAPI",
+      "Name": "Laser Paint Target",
+      "ActionId": 226688
+    },
+    {
+      "Hash": "LEHR",
+      "Name": "Restore Vigor",
+      "ActionId": 263352
+    },
+    {
+      "Hash": "LGSH",
+      "Name": "Leg Shot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226500, "HighId": 226501, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226502, "HighId": 226503, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226504, "HighId": 226505, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "LIBU",
+      "Name": "Light Bullet",
+      "Tiers": [
+        { "Tier": 1, "LowId": 281519, "HighId": 281520, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 281521, "HighId": 281522, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 281518, "HighId": 281523, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "LIFE",
+      "Name": "Lifeblood",
+      "ActionId": 216612
+    },
+    {
+      "Hash": "LIGH",
+      "Name": "Lightstep",
+      "ActionId": 215353
+    },
+    {
+      "Hash": "LIKL",
+      "Name": "Light Killer",
+      "Tiers": [
+        { "Tier": 1, "LowId": 281528, "HighId": 281529, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 281530, "HighId": 281531, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 281532, "HighId": 281533, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "LIMB",
+      "Name": "Limber",
+      "ActionId": 214399
+    },
+    {
+      "Hash": "LMSO",
+      "Name": "Plasteel Piercing Rounds",
+      "ActionId": 263416
+    },
+    {
+      "Hash": "LOOD",
+      "Name": "Bloodletting",
+      "ActionId": 226685
+    },
+    {
+      "Hash": "LTPA",
+      "Name": "Please Hold",
+      "ActionId": 263452
+    },
+    {
+      "Hash": "LVSF",
+      "Name": "Purge 2",
+      "ActionId": 225477
+    },
+    {
+      "Hash": "MAOS",
+      "Name": "Mark of Sufferance",
+      "ActionId": 226881
+    },
+    {
+      "Hash": "MAPO",
+      "Name": "Malicious Prohibition",
+      "ActionId": 227040
+    },
+    {
+      "Hash": "MCFL",
+      "Name": "Machete Flurry",
+      "ActionId": 263330
+    },
+    {
+      "Hash": "MCSL",
+      "Name": "Machete Slice",
+      "ActionId": 263336
+    },
+    {
+      "Hash": "MDID",
+      "Name": "Removal 2",
+      "ActionId": 225475
+    },
+    {
+      "Hash": "MEDE",
+      "Name": "Diffuse Rage",
+      "ActionId": 266126
+    },
+    {
+      "Hash": "MEOU",
+      "Name": "Mark of the Unhallowed",
+      "ActionId": 226903
+    },
+    {
+      "Hash": "MERM",
+      "Name": "Medicinal Remedy",
+      "ActionId": 266117
+    },
+    {
+      "Hash": "MESC",
+      "Name": "Memory Scrabble",
+      "ActionId": 252447
+    },
+    {
+      "Hash": "MGRE",
+      "Name": "Mongo Rage",
+      "ActionId": 252490
+    },
+    {
+      "Hash": "MHBO",
+      "Name": "Charring Blow",
+      "ActionId": 263332
+    },
+    {
+      "Hash": "MKOH",
+      "Name": "Mark of the Unclean",
+      "ActionId": 226900
+    },
+    {
+      "Hash": "MKOP",
+      "Name": "Chaos Ritual",
+      "ActionId": 248127
+    },
+    {
+      "Hash": "MKOV",
+      "Name": "Mark of Vengeance",
+      "ActionId": 226895
+    },
+    {
+      "Hash": "MLIG",
+      "Name": "Cure 2",
+      "ActionId": 225482
+    },
+    {
+      "Hash": "MLOT",
+      "Name": "Tick",
+      "Tiers": [
+        { "Tier": 1, "LowId": 252367, "HighId": 252368, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 252369, "HighId": 252370, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 252371, "HighId": 252372, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "MMAT",
+      "Name": "Astringent",
+      "ActionId": 263472
+    },
+    {
+      "Hash": "MOHB",
+      "Name": "Feel",
+      "ActionId": 253045
+    },
+    {
+      "Hash": "MORN",
+      "Name": "Morning",
+      "ActionId": 215371
+    },
+    {
+      "Hash": "MPLO",
+      "Name": "Implode",
+      "ActionId": 253092
+    },
+    {
+      "Hash": "MTHM",
+      "Name": "Vaccinate 1",
+      "ActionId": 225483
+    },
+    {
+      "Hash": "MZOV",
+      "Name": "Muzzle Overload",
+      "ActionId": 248201
+    },
+    {
+      "Hash": "NESL",
+      "Name": "Neutronium Slug",
+      "ActionId": 213979
+    },
+    {
+      "Hash": "NFHV",
+      "Name": "Death",
+      "ActionId": 215370
+    },
+    {
+      "Hash": "NFIN",
+      "Name": "Confinement",
+      "ActionId": 252402
+    },
+    {
+      "Hash": "NFLA",
+      "Name": "Muscle Memory",
+      "ActionId": 263491
+    },
+    {
+      "Hash": "NIKI",
+      "Name": "Night Killer",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226225, "HighId": 226226, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226227, "HighId": 226228, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226229, "HighId": 226230, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "NMWT",
+      "Name": "Hatred",
+      "Tiers": [
+        { "Tier": 1, "LowId": 227158, "HighId": 227159, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227160, "HighId": 227161, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227162, "HighId": 227163, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "NNFA",
+      "Name": "Nano Feast",
+      "ActionId": 253119
+    },
+    {
+      "Hash": "NNSH",
+      "Name": "Nano Shakes",
+      "ActionId": 227194
+    },
+    {
+      "Hash": "NOOV",
+      "Name": "Notum Overflow",
+      "ActionId": 227324
+    },
+    {
+      "Hash": "NOSD",
+      "Name": "Notum Shield",
+      "ActionId": 253017
+    },
+    {
+      "Hash": "NOSM",
+      "Name": "Deadeye",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226347, "HighId": 226348, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226349, "HighId": 226350, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226351, "HighId": 226352, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "NPAV",
+      "Name": "Rebate",
+      "ActionId": 266061
+    },
+    {
+      "Hash": "NPSR",
+      "Name": "Napalm Spray",
+      "ActionId": 226700
+    },
+    {
+      "Hash": "NRQU",
+      "Name": "Sword",
+      "ActionId": 252559
+    },
+    {
+      "Hash": "NTIT",
+      "Name": "Antitrust",
+      "ActionId": 251766
+    },
+    {
+      "Hash": "NTTS",
+      "Name": "Nano Transmission",
+      "ActionId": 248164
+    },
+    {
+      "Hash": "NUBO",
+      "Name": "NCU Booster",
+      "ActionId": 214069
+    },
+    {
+      "Hash": "NUTL",
+      "Name": "Mobility Embargo",
+      "ActionId": 263432
+    },
+    {
+      "Hash": "NXWD",
+      "Name": "Next Window Over",
+      "ActionId": 263464
+    },
+    {
+      "Hash": "OBLI",
+      "Name": "Obliterate",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226155, "HighId": 226156, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226157, "HighId": 226158, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226159, "HighId": 226160, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "OEKT",
+      "Name": "Cell Killer",
+      "ActionId": 263388
+    },
+    {
+      "Hash": "OEMG",
+      "Name": "Overwhelming Might",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226110, "HighId": 226111, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226112, "HighId": 226113, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226114, "HighId": 226115, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "OIOB",
+      "Name": "Sacrifice",
+      "ActionId": 248242
+    },
+    {
+      "Hash": "OMLB",
+      "Name": "Optimized Library",
+      "ActionId": 266699
+    },
+    {
+      "Hash": "ONEW",
+      "Name": "Stoneworks",
+      "ActionId": 227326
+    },
+    {
+      "Hash": "ONFP",
+      "Name": "ECM 1",
+      "ActionId": 225472
+    },
+    {
+      "Hash": "ONFU",
+      "Name": "Toxic Confusion",
+      "ActionId": 266185
+    },
+    {
+      "Hash": "OONM",
+      "Name": "Moonmist",
+      "ActionId": 248727
+    },
+    {
+      "Hash": "OPBO",
+      "Name": "Optimize Bot Protocol",
+      "ActionId": 251905
+    },
+    {
+      "Hash": "OPKN",
+      "Name": "Opportunity Knocks",
+      "ActionId": 252475
+    },
+    {
+      "Hash": "OPSH",
+      "Name": "Body Tackle",
+      "ActionId": 252487
+    },
+    {
+      "Hash": "OSVI",
+      "Name": "Obscure Vision",
+      "ActionId": 215351
+    },
+    {
+      "Hash": "OSVS",
+      "Name": "Obscure Vision",
+      "ActionId": 239348
+    },
+    {
+      "Hash": "PALA",
+      "Name": "Pain Lance",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226053, "HighId": 226054, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226055, "HighId": 226056, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226057, "HighId": 226058, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PAOD",
+      "Name": "Path of Darkness",
+      "ActionId": 215362
+    },
+    {
+      "Hash": "PAWU",
+      "Name": "Papercut",
+      "ActionId": 263448
+    },
+    {
+      "Hash": "PEHO",
+      "Name": "Lost Paperwork",
+      "ActionId": 263444
+    },
+    {
+      "Hash": "PELA",
+      "Name": "Peel Layers",
+      "ActionId": 252386
+    },
+    {
+      "Hash": "PENR",
+      "Name": "Pen",
+      "ActionId": 253014
+    },
+    {
+      "Hash": "PERC",
+      "Name": "Wait In That Queue",
+      "ActionId": 263428
+    },
+    {
+      "Hash": "PERF",
+      "Name": "Perforate",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225589, "HighId": 225590, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225593, "HighId": 225594, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225597, "HighId": 225598, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PERN",
+      "Name": "Supernova",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226134, "HighId": 226135, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226136, "HighId": 226137, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226138, "HighId": 226139, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PGOT",
+      "Name": "Power of Light",
+      "ActionId": 281526
+    },
+    {
+      "Hash": "PGST",
+      "Name": "Circular Logic",
+      "ActionId": 266015
+    },
+    {
+      "Hash": "PHOD",
+      "Name": "Path of Darkness",
+      "ActionId": 239352
+    },
+    {
+      "Hash": "PHOI",
+      "Name": "Path of Light",
+      "ActionId": 239353
+    },
+    {
+      "Hash": "PIJT",
+      "Name": "Silence",
+      "ActionId": 215368
+    },
+    {
+      "Hash": "PLSN",
+      "Name": "Twisted Caress",
+      "ActionId": 266153
+    },
+    {
+      "Hash": "PNSI",
+      "Name": "Pinpoint Strike",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225834, "HighId": 225835, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225836, "HighId": 225837, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225838, "HighId": 225839, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PNSO",
+      "Name": "Disable Cuffs",
+      "ActionId": 263408
+    },
+    {
+      "Hash": "PNTG",
+      "Name": "Sow Despair",
+      "ActionId": 266073
+    },
+    {
+      "Hash": "POBL",
+      "Name": "Power Blast",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226506, "HighId": 226507, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226508, "HighId": 226509, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226510, "HighId": 226511, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "POMW",
+      "Name": "Devour",
+      "Tiers": [
+        { "Tier": 1, "LowId": 227365, "HighId": 227366, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227367, "HighId": 227368, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227369, "HighId": 227370, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "POPS",
+      "Name": "Popshot",
+      "ActionId": 252352
+    },
+    {
+      "Hash": "POSH",
+      "Name": "Power Shock",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225828, "HighId": 225829, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225830, "HighId": 225831, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225832, "HighId": 225833, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "POVO",
+      "Name": "Power Volley",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225821, "HighId": 225822, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225823, "HighId": 225824, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225825, "HighId": 225826, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PROV",
+      "Name": "Program Overload",
+      "ActionId": 250661
+    },
+    {
+      "Hash": "PSHR",
+      "Name": "Basic Dressing",
+      "ActionId": 263348
+    },
+    {
+      "Hash": "PSSI",
+      "Name": "Poison Sprinkle",
+      "ActionId": 214367
+    },
+    {
+      "Hash": "PTOL",
+      "Name": "Path of Light",
+      "ActionId": 215365
+    },
+    {
+      "Hash": "PTXJ",
+      "Name": "Beckoning",
+      "ActionId": 251230
+    },
+    {
+      "Hash": "PUHE",
+      "Name": "Purple Heart",
+      "ActionId": 248244
+    },
+    {
+      "Hash": "PULV",
+      "Name": "Pulverize",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226104, "HighId": 226105, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226106, "HighId": 226107, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226108, "HighId": 226109, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PUPP",
+      "Name": "Puppeteer",
+      "ActionId": 251297
+    },
+    {
+      "Hash": "PWBL",
+      "Name": "Power Bolt",
+      "Tiers": [
+        { "Tier": 1, "LowId": 248818, "HighId": 248819, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 248820, "HighId": 248821, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 248843, "HighId": 248844, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PWCO",
+      "Name": "Power Combo",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226513, "HighId": 226514, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226515, "HighId": 226516, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226517, "HighId": 226518, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "PWSU",
+      "Name": "Thermal Reprieve",
+      "ActionId": 266021
+    },
+    {
+      "Hash": "PYPL",
+      "Name": "Payment Plan",
+      "ActionId": 266099
+    },
+    {
+      "Hash": "QDAF",
+      "Name": "Close Call",
+      "ActionId": 248144
+    },
+    {
+      "Hash": "QISH",
+      "Name": "Quick Shot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226238, "HighId": 226239, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226240, "HighId": 226241, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226242, "HighId": 226243, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "QJOP",
+      "Name": "Seppuku Slash",
+      "ActionId": 226382
+    },
+    {
+      "Hash": "QKMW",
+      "Name": "Blackfist",
+      "ActionId": 239355
+    },
+    {
+      "Hash": "QPSW",
+      "Name": "Source Tap",
+      "ActionId": 266018
+    },
+    {
+      "Hash": "QUBS",
+      "Name": "Quick Bash",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226519, "HighId": 226520, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226521, "HighId": 226522, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226523, "HighId": 226524, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "QUCN",
+      "Name": "Quark Containment Field",
+      "ActionId": 227358
+    },
+    {
+      "Hash": "QUCT",
+      "Name": "Quick Cut",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225788, "HighId": 225789, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225790, "HighId": 225791, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225792, "HighId": 225793, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "RAGO",
+      "Name": "Dragonfire",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226177, "HighId": 226178, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226179, "HighId": 226180, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226181, "HighId": 226182, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "RALI",
+      "Name": "Reap Life",
+      "ActionId": 227641
+    },
+    {
+      "Hash": "RANQ",
+      "Name": "Tranquilizer",
+      "ActionId": 214202
+    },
+    {
+      "Hash": "RANS",
+      "Name": "Transfix",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226038, "HighId": 226039, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226040, "HighId": 226041, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226042, "HighId": 226043, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "RAOF",
+      "Name": "Rain of Light",
+      "ActionId": 215355
+    },
+    {
+      "Hash": "RATD",
+      "Name": "Road to Darkness",
+      "ActionId": 239354
+    },
+    {
+      "Hash": "REAT",
+      "Name": "Mistreatment",
+      "ActionId": 248140
+    },
+    {
+      "Hash": "REDN",
+      "Name": "Reconstruct DNA",
+      "ActionId": 227236
+    },
+    {
+      "Hash": "REDU",
+      "Name": "Red Dusk",
+      "ActionId": 248729
+    },
+    {
+      "Hash": "REDW",
+      "Name": "Red Dawn",
+      "Tiers": [
+        { "Tier": 1, "LowId": 254454, "HighId": 254455, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 254456, "HighId": 254457, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 254458, "HighId": 254459, "LowQl": 100, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "REFC",
+      "Name": "Super-Ego Strike",
+      "ActionId": 266132
+    },
+    {
+      "Hash": "RELA",
+      "Name": "Redeem Last Wish",
+      "ActionId": 253137
+    },
+    {
+      "Hash": "REPE",
+      "Name": "Repair Pet",
+      "ActionId": 229660
+    },
+    {
+      "Hash": "RERP",
+      "Name": "Destructive Theorem",
+      "ActionId": 263778
+    },
+    {
+      "Hash": "RESL",
+      "Name": "Reinforce Slugs",
+      "ActionId": 213438
+    },
+    {
+      "Hash": "RFLA",
+      "Name": "Unforgiven Debts",
+      "ActionId": 266102
+    },
+    {
+      "Hash": "RGNN",
+      "Name": "Regain Nano",
+      "ActionId": 214068
+    },
+    {
+      "Hash": "RHBO",
+      "Name": "Subjugation",
+      "ActionId": 265988
+    },
+    {
+      "Hash": "RIBW",
+      "Name": "Raging Blow",
+      "ActionId": 263596
+    },
+    {
+      "Hash": "RIFE",
+      "Name": "Ribbon Flesh",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225807, "HighId": 225808, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225809, "HighId": 225810, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225811, "HighId": 225812, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "RIFU",
+      "Name": "Righteous Fury",
+      "ActionId": 210894
+    },
+    {
+      "Hash": "RISM",
+      "Name": "Symbiotic Bypass",
+      "ActionId": 265994
+    },
+    {
+      "Hash": "RIST",
+      "Name": "Benevolent Barrier",
+      "ActionId": 265991
+    },
+    {
+      "Hash": "RIVA",
+      "Name": "Blinded by Delights",
+      "ActionId": 252539
+    },
+    {
+      "Hash": "RIWR",
+      "Name": "Righteous Wrath",
+      "Tiers": [
+        { "Tier": 1, "LowId": 272375, "HighId": 272376, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "RLOD",
+      "Name": "Ritual of Devotion",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225317, "HighId": 225318, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225319, "HighId": 225320, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225321, "HighId": 225322, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "ROTO",
+      "Name": "Road to Darkness",
+      "ActionId": 215363
+    },
+    {
+      "Hash": "RPPR",
+      "Name": "Assault Force Relief",
+      "ActionId": 263782
+    },
+    {
+      "Hash": "RSBN",
+      "Name": "Inflammation",
+      "ActionId": 263497
+    },
+    {
+      "Hash": "RSIG",
+      "Name": "Clearsight",
+      "ActionId": 252355
+    },
+    {
+      "Hash": "RSME",
+      "Name": "Fuse Body Armor",
+      "ActionId": 266215
+    },
+    {
+      "Hash": "RTDE",
+      "Name": "Congenial Encasement",
+      "ActionId": 263786
+    },
+    {
+      "Hash": "RTMO",
+      "Name": "Graze Jugular Vein",
+      "ActionId": 266212
+    },
+    {
+      "Hash": "RTOB",
+      "Name": "Ritual of Blood",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225335, "HighId": 225336, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225337, "HighId": 225338, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225339, "HighId": 225340, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "RTOZ",
+      "Name": "Ritual of Zeal",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225323, "HighId": 225324, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225325, "HighId": 225326, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225327, "HighId": 225328, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "RUOS",
+      "Name": "Ritual of Spirit",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225329, "HighId": 225330, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225331, "HighId": 225332, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225333, "HighId": 225334, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SAAI",
+      "Name": "Slice and Dice",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226044, "HighId": 226045, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226046, "HighId": 226047, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226048, "HighId": 226049, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SAGF",
+      "Name": "Shadowed Gift",
+      "ActionId": 266087
+    },
+    {
+      "Hash": "SAOD",
+      "Name": "Slam of Darkness",
+      "ActionId": 215357
+    },
+    {
+      "Hash": "SAQA",
+      "Name": "Sabotage Quark Field",
+      "ActionId": 212997
+    },
+    {
+      "Hash": "SCOD",
+      "Name": "Scream of Death",
+      "ActionId": 215358
+    },
+    {
+      "Hash": "SCOL",
+      "Name": "Screen of Light",
+      "ActionId": 215359
+    },
+    {
+      "Hash": "SCWR",
+      "Name": "Spectator Wrath",
+      "Tiers": [
+        { "Tier": 1, "LowId": 272383, "HighId": 272384, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SDBU",
+      "Name": "Shadow Bullet",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226231, "HighId": 226232, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226233, "HighId": 226234, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226235, "HighId": 226236, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SDIR",
+      "Name": "Misdirection",
+      "ActionId": 266182
+    },
+    {
+      "Hash": "SDOD",
+      "Name": "Slam of Darkness",
+      "ActionId": 239357
+    },
+    {
+      "Hash": "SEIC",
+      "Name": "Skin Protection",
+      "ActionId": 263356
+    },
+    {
+      "Hash": "SFOH",
+      "Name": "Screen of Light",
+      "ActionId": 239356
+    },
+    {
+      "Hash": "SHFS",
+      "Name": "Smashing Fist",
+      "ActionId": 266000
+    },
+    {
+      "Hash": "SHKL",
+      "Name": "Shadow Killer",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226219, "HighId": 226220, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226221, "HighId": 226222, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226223, "HighId": 226224, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SHRL",
+      "Name": "Layered Amnesty",
+      "ActionId": 266082
+    },
+    {
+      "Hash": "SHRM",
+      "Name": "Skill Drain Removal",
+      "ActionId": 225470
+    },
+    {
+      "Hash": "SHSB",
+      "Name": "Shadow Stab",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226213, "HighId": 226214, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226215, "HighId": 226216, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226217, "HighId": 226218, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SIOL",
+      "Name": "Shield of Light",
+      "ActionId": 215360
+    },
+    {
+      "Hash": "SIPL",
+      "Name": "Silent Plague",
+      "ActionId": 251281
+    },
+    {
+      "Hash": "SITM",
+      "Name": "Backyard Bandages",
+      "ActionId": 265967
+    },
+    {
+      "Hash": "SLRS",
+      "Name": "Self Reconstruction",
+      "ActionId": 266123
+    },
+    {
+      "Hash": "SLSU",
+      "Name": "Solid Slug",
+      "ActionId": 213978
+    },
+    {
+      "Hash": "SLWU",
+      "Name": "Seal Wounds",
+      "ActionId": 214369
+    },
+    {
+      "Hash": "SMSM",
+      "Name": "Seismic Smash",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226119, "HighId": 226120, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226121, "HighId": 226122, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226123, "HighId": 226124, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SNFI",
+      "Name": "Stone Fist",
+      "ActionId": 227072
+    },
+    {
+      "Hash": "SNSH",
+      "Name": "Snipe Shot 1",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226201, "HighId": 226202, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226203, "HighId": 226204, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226205, "HighId": 226206, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SODS",
+      "Name": "Suppress Fury",
+      "ActionId": 266174
+    },
+    {
+      "Hash": "SOID",
+      "Name": "Aesir Absorption",
+      "ActionId": 263360
+    },
+    {
+      "Hash": "SOUP",
+      "Name": "Soften Up",
+      "ActionId": 226679
+    },
+    {
+      "Hash": "SPBG",
+      "Name": "Siphon Being",
+      "ActionId": 266058
+    },
+    {
+      "Hash": "SPBX",
+      "Name": "Siphon Box",
+      "ActionId": 229658
+    },
+    {
+      "Hash": "SPDL",
+      "Name": "Spirit Dissolution",
+      "ActionId": 226369
+    },
+    {
+      "Hash": "SPHE",
+      "Name": "Sphere",
+      "ActionId": 253033
+    },
+    {
+      "Hash": "SPHO",
+      "Name": "Supressive Horde",
+      "ActionId": 248183
+    },
+    {
+      "Hash": "SPLI",
+      "Name": "Sap Life",
+      "ActionId": 266052
+    },
+    {
+      "Hash": "SPOU",
+      "Name": "Spirit of Purity",
+      "ActionId": 241258
+    },
+    {
+      "Hash": "SPS2",
+      "Name": "Snipe Shot 2",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226207, "HighId": 226208, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226209, "HighId": 226210, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226211, "HighId": 226212, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "SRAY",
+      "Name": "Shoot Artery",
+      "ActionId": 266093
+    },
+    {
+      "Hash": "SRPI",
+      "Name": "Suppressive Primer",
+      "ActionId": 227360
+    },
+    {
+      "Hash": "SSIN",
+      "Name": "Assassinate",
+      "ActionId": 226496
+    },
+    {
+      "Hash": "STFS",
+      "Name": "Stinging Fist",
+      "ActionId": 265997
+    },
+    {
+      "Hash": "STHB",
+      "Name": "Soothing Herbs",
+      "ActionId": 263340
+    },
+    {
+      "Hash": "STIV",
+      "Name": "Vaccinate 2",
+      "ActionId": 225484
+    },
+    {
+      "Hash": "STKI",
+      "Name": "Strengthen Ki",
+      "ActionId": 266150
+    },
+    {
+      "Hash": "STNA",
+      "Name": "Strip Nano",
+      "ActionId": 227219
+    },
+    {
+      "Hash": "STNT",
+      "Name": "Stop Notum Flow",
+      "ActionId": 227322
+    },
+    {
+      "Hash": "STOB",
+      "Name": "Spirit of Blessing",
+      "ActionId": 241166
+    },
+    {
+      "Hash": "SUBD",
+      "Name": "Reconditioned",
+      "ActionId": 266141
+    },
+    {
+      "Hash": "SUKB",
+      "Name": "Hope",
+      "ActionId": 215372
+    },
+    {
+      "Hash": "SURE",
+      "Name": "Shutdown Removal",
+      "ActionId": 225471
+    },
+    {
+      "Hash": "SURV",
+      "Name": "Survival",
+      "ActionId": 253048
+    },
+    {
+      "Hash": "SVSS",
+      "Name": "Deflation",
+      "ActionId": 263440
+    },
+    {
+      "Hash": "SWDE",
+      "Name": "Anticipated Evasion",
+      "ActionId": 266177
+    },
+    {
+      "Hash": "SWDO",
+      "Name": "Sow Doubt",
+      "ActionId": 266171
+    },
+    {
+      "Hash": "SWTO",
+      "Name": "Faithful Reconstruction",
+      "ActionId": 266156
+    },
+    {
+      "Hash": "SWYI",
+      "Name": "Opening",
+      "ActionId": 252523
+    },
+    {
+      "Hash": "TABL",
+      "Name": "Improved Focus",
+      "ActionId": 263384
+    },
+    {
+      "Hash": "TABX",
+      "Name": "Taunt Box",
+      "ActionId": 229132
+    },
+    {
+      "Hash": "TAHA",
+      "Name": "Team Heal",
+      "ActionId": 214129
+    },
+    {
+      "Hash": "TAHC",
+      "Name": "Tacky Hack",
+      "ActionId": 253030
+    },
+    {
+      "Hash": "TAHL",
+      "Name": "Nano Heal",
+      "ActionId": 233837
+    },
+    {
+      "Hash": "TANT",
+      "Name": "Tap Notum Source",
+      "ActionId": 227221
+    },
+    {
+      "Hash": "TAVI",
+      "Name": "Tap Vitae",
+      "ActionId": 248233
+    },
+    {
+      "Hash": "TAWO",
+      "Name": "Taint Wounds",
+      "ActionId": 214366
+    },
+    {
+      "Hash": "TEDT",
+      "Name": "Thermal Detonation",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226141, "HighId": 226142, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226143, "HighId": 226144, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226145, "HighId": 226146, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "TEHL",
+      "Name": "Team Hale and Hearty",
+      "ActionId": 225506
+    },
+    {
+      "Hash": "TELG",
+      "Name": "Air of Hatred",
+      "ActionId": 263616
+    },
+    {
+      "Hash": "TGHA",
+      "Name": "Trigger Happy",
+      "Tiers": [
+        { "Tier": 1, "LowId": 283665, "HighId": 283666, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 283667, "HighId": 283668, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 283669, "HighId": 283670, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "THCH",
+      "Name": "The Choice",
+      "ActionId": 215364
+    },
+    {
+      "Hash": "THCO",
+      "Name": "The Choice",
+      "ActionId": 215367
+    },
+    {
+      "Hash": "THDI",
+      "Name": "The Director",
+      "ActionId": 225578
+    },
+    {
+      "Hash": "THOG",
+      "Name": "Anatomic Blight",
+      "ActionId": 263489
+    },
+    {
+      "Hash": "TISC",
+      "Name": "Toxic Shock",
+      "ActionId": 226918
+    },
+    {
+      "Hash": "TPFO",
+      "Name": "Restrictive Bandaging",
+      "ActionId": 263501
+    },
+    {
+      "Hash": "TQKB",
+      "Name": "Misery",
+      "ActionId": 239351
+    },
+    {
+      "Hash": "TRAC",
+      "Name": "Tracer",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226184, "HighId": 226185, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226186, "HighId": 226187, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226193, "HighId": 226194, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "TREH",
+      "Name": "Powered Nano Fortress",
+      "ActionId": 266049
+    },
+    {
+      "Hash": "TRFO",
+      "Name": "Troll Form",
+      "ActionId": 227068
+    },
+    {
+      "Hash": "TRHN",
+      "Name": "Tremor Hand",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226797, "HighId": 226798, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226799, "HighId": 226800, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226801, "HighId": 226802, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "TROP",
+      "Name": "Atrophy",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226356, "HighId": 226357, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226358, "HighId": 226359, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226360, "HighId": 226361, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "TRPR",
+      "Name": "Thermal Primer",
+      "ActionId": 227361
+    },
+    {
+      "Hash": "TRTA",
+      "Name": "Triangulate Target",
+      "ActionId": 226699
+    },
+    {
+      "Hash": "TRTR",
+      "Name": "Treatment Transfer",
+      "ActionId": 214120
+    },
+    {
+      "Hash": "TRUC",
+      "Name": "Deconstruction",
+      "ActionId": 229669
+    },
+    {
+      "Hash": "TTEI",
+      "Name": "Purge 1",
+      "ActionId": 225476
+    },
+    {
+      "Hash": "TTSH",
+      "Name": "The Shot",
+      "ActionId": 251284
+    },
+    {
+      "Hash": "TUOF",
+      "Name": "Tunnel of Light",
+      "ActionId": 215366
+    },
+    {
+      "Hash": "TXAI",
+      "Name": "Tax Audit",
+      "ActionId": 263456
+    },
+    {
+      "Hash": "TXXD",
+      "Name": "Headbutt",
+      "Tiers": [
+        { "Tier": 1, "LowId": 227809, "HighId": 227810, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 227811, "HighId": 227812, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 227813, "HighId": 227814, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "TZIR",
+      "Name": "Blackstep",
+      "ActionId": 239346
+    },
+    {
+      "Hash": "UABL",
+      "Name": "Unsealed Blight",
+      "ActionId": 225465
+    },
+    {
+      "Hash": "UCCU",
+      "Name": "Succumb",
+      "ActionId": 227065
+    },
+    {
+      "Hash": "UEBN",
+      "Name": "Unexpected Bonus",
+      "ActionId": 266043
+    },
+    {
+      "Hash": "UKGF",
+      "Name": "Purify",
+      "ActionId": 252331
+    },
+    {
+      "Hash": "UNCG",
+      "Name": "Unsealed Contagion",
+      "ActionId": 225468
+    },
+    {
+      "Hash": "UNFU",
+      "Name": "Unhallowed Fury",
+      "ActionId": 210895
+    },
+    {
+      "Hash": "UNPS",
+      "Name": "Unsealed Pestilence",
+      "ActionId": 225469
+    },
+    {
+      "Hash": "UNWR",
+      "Name": "Unhallowed Wrath",
+      "Tiers": [
+        { "Tier": 1, "LowId": 272391, "HighId": 272392, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "UPRU",
+      "Name": "Debt Collection",
+      "ActionId": 266067
+    },
+    {
+      "Hash": "USLI",
+      "Name": "Looping Service",
+      "ActionId": 266698
+    },
+    {
+      "Hash": "USVH",
+      "Name": "Bluntness",
+      "ActionId": 253060
+    },
+    {
+      "Hash": "UTIL",
+      "Name": "Utilize",
+      "ActionId": 250651
+    },
+    {
+      "Hash": "UVGQ",
+      "Name": "ECM 2",
+      "ActionId": 225473
+    },
+    {
+      "Hash": "VASK",
+      "Name": "Vital Shock",
+      "ActionId": 226687
+    },
+    {
+      "Hash": "VERR",
+      "Name": "Overrule",
+      "ActionId": 251789
+    },
+    {
+      "Hash": "VICO",
+      "Name": "Viral Combination",
+      "ActionId": 215724
+    },
+    {
+      "Hash": "VIWP",
+      "Name": "Viral Wipe",
+      "ActionId": 227237
+    },
+    {
+      "Hash": "VNSM",
+      "Name": "Shrug Off Hits",
+      "ActionId": 263600
+    },
+    {
+      "Hash": "WEBS",
+      "Name": "Weapon Bash",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225869, "HighId": 225870, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225871, "HighId": 225872, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225873, "HighId": 225874, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "WEPA",
+      "Name": "Minor Nanobot Enhance",
+      "ActionId": 263376
+    },
+    {
+      "Hash": "WFOT",
+      "Name": "Wit of the Atrox",
+      "ActionId": 252508
+    },
+    {
+      "Hash": "WKTA",
+      "Name": "Grim Reaper",
+      "ActionId": 263392
+    },
+    {
+      "Hash": "WLMA",
+      "Name": "Ferocious Hits",
+      "ActionId": 263365
+    },
+    {
+      "Hash": "WOOF",
+      "Name": "My Own Fortress",
+      "ActionId": 252511
+    },
+    {
+      "Hash": "WQTV",
+      "Name": "Flay",
+      "Tiers": [
+        { "Tier": 1, "LowId": 225794, "HighId": 225795, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 225796, "HighId": 225797, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 225798, "HighId": 225799, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "WRTK",
+      "Name": "Combust",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226148, "HighId": 226149, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 2, "LowId": 226150, "HighId": 226151, "LowQl": 1, "HighQl": 500 },
+        { "Tier": 3, "LowId": 226152, "HighId": 226153, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "WRWN",
+      "Name": "Wrong Window",
+      "ActionId": 263468
+    },
+    {
+      "Hash": "XCSF",
+      "Name": "Bust Kneecaps",
+      "ActionId": 263612
+    },
+    {
+      "Hash": "XDGJ",
+      "Name": "Called Shot",
+      "Tiers": [
+        { "Tier": 1, "LowId": 226732, "HighId": 226733, "LowQl": 1, "HighQl": 500 }
+      ]
+    },
+    {
+      "Hash": "XHJU",
+      "Name": "Harmonize Body and Mind",
+      "ActionId": 227151
+    },
+    {
+      "Hash": "XQQM",
+      "Name": "Morning",
+      "ActionId": 239350
+    },
+    {
+      "Hash": "XSCR",
+      "Name": "Broken Ankle",
+      "ActionId": 263396
+    },
+    {
+      "Hash": "YEQE",
+      "Name": "Numb",
+      "ActionId": 248962
+    },
+    {
+      "Hash": "YGXT",
+      "Name": "Bot Confinement",
+      "ActionId": 253122
+    },
+    {
+      "Hash": "YMBI",
+      "Name": "Symbiosis",
+      "ActionId": 225286
+    },
+    {
+      "Hash": "YQTZ",
+      "Name": "Healing Care",
+      "ActionId": 263493
+    },
+    {
+      "Hash": "ZANA",
+      "Name": "Zap Nano",
+      "ActionId": 227500
+    },
+    {
+      "Hash": "ZHEO",
+      "Name": "Social Services",
+      "ActionId": 263460
+    }
+  ],
+  "Notes": [
+    "Generated from items.dat: every perk item (AddPerkAction slot >= 10000) OnWear function 53182 args [slot = 10000 + perk PacketID, 4-char action hash, flag, action template id].",
+    "ActionId: single-template action. Tiered actions start at Tier 1 LowId (the id function 53182 grants); ActionId appears beside Tiers only when the granted id is not Tier 1 LowId.",
+    "Tiers: same-named templates within 30 ids of ActionId that have OnUse functions and are not referenced by another same-named template (cast/proc effects). Pairs are low QL then higher QL in id order; when that leaves templates over, lows and highs are each sorted by effect size and zipped (blocks such as Heal and Light Bullet are stored out of tier order).",
+    "Skill scaling: skill = Tier 1 LowId template's Attack skill map (weighted by percentage) x SkillModifier (default 1.0). Each 1000 skill is one tier with QL LowQl-HighQl inside it, as Brawl Item (1-1000 tier 1, 1001-2000 tier 2, ...); skill past the last tier caps at its HighQl.",
+    "BDNB Heal SkillModifier 1.4546 (4000 / 2750): tier 4 QL 500 (2200 heal) lands at 2750 First Aid. Not yet capture-confirmed.",
+    "BAOY Balance of Yin and Yang uses Heal's SkillModifier 1.4546: tier 4 QL 500 (2300 heal) lands at 2750 Dimach. Not yet capture-confirmed.",
+    "QL 998/999 same-named copies, perk items, and other hashes' action templates are excluded from tiers. Non-perk grant LIMB from item 211296 (Phat Lewt - A Marius Doll, slot 1) is excluded.",
+    "Review: the same-named block did not split cleanly into low/high pairs; UnpairedIds lists the leftover templates for manual confirmation."
+  ]
+}
