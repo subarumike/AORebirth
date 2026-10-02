@@ -172,8 +172,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
             switch (target.Type)
             {
                 case IdentityType.Inventory:
+                case IdentityType.WeaponPage:
                 case IdentityType.ArmorPage:
+                case IdentityType.ImplantPage:
                 case IdentityType.SocialPage:
+                case IdentityType.Backpack:
                     HandleUseInventoryItem(message, session, player, playfield, target);
                     break;
 
@@ -181,7 +184,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     player.Logger.Info(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "GenericCmd Use treating {0} as world dynel (not Inventory/ArmorPage/SocialPage)",
+                            "GenericCmd Use treating {0} as world dynel (not Inventory or a wear page)",
                             target.Type));
                     HandleUseWorldDynel(message, session, player, playfield, target);
                     break;
@@ -201,7 +204,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (!player.Inventory.TryGetItem(target.Type, target.Instance, out Item item))
+            if (!player.Inventory.TryGetUseItem(target, out Item item))
             {
                 Deny(
                     session,
@@ -234,6 +237,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     item.Can(CanFlags.Use),
                     (ItemClass)item.GetStat(CharacterStat.ItemClass),
                     item.GetStat(CharacterStat.ItemClass)));
+
+            // Equipped items may be used unless the use would spend or destroy them.
+            if (target.Type.IsWearPage() && item.DestroysOnUse)
+            {
+                Deny(session, message, player, "equipped item is consumed or destroyed on use; unequip it first");
+                return;
+            }
 
             if (_quests.IsAuthoredItem(item))
             {

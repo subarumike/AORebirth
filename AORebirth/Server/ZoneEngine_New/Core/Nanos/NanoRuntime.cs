@@ -90,7 +90,7 @@ namespace ZoneEngine_New.Core.Nanos
                 if (!spell.MeetsRequirements(stat => character.Stats.Get(stat)))
                     continue;
 
-                ItemUseFunctions.TryExecute(buff.Id, character, source, spell, inventory, items);
+                ItemUseFunctions.TryExecute(buff.Id, character, source, spell, inventory, items, isTick: true);
             }
         }
 
@@ -157,6 +157,9 @@ namespace ZoneEngine_New.Core.Nanos
             if (refusal == NanoCastRefusal.None && spell.IsHostile && !IsHostileNanoTarget(caster, recipient))
                 refusal = NanoCastRefusal.InvalidTarget;
 
+            if (refusal == NanoCastRefusal.None && (IsNoCombat(caster) || IsNoCombat(recipient)))
+                refusal = NanoCastRefusal.InvalidTarget;
+
             if (refusal != NanoCastRefusal.None)
             {
                 LogCastRefused(caster, nanoId, target, refusal, phase: "start", attempt: attempt, spell: spell);
@@ -205,6 +208,9 @@ namespace ZoneEngine_New.Core.Nanos
             ArgumentNullException.ThrowIfNull(caster);
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(recipient);
+
+            if (IsNoCombat(caster) || IsNoCombat(recipient))
+                return false;
 
             // A self-only nano would land on the caster instead.
             if (spell.IsSelfOnly && !ReferenceEquals(caster, recipient))
@@ -372,11 +378,17 @@ namespace ZoneEngine_New.Core.Nanos
             IItemBuilder items,
             DateTime nowUtc)
         {
+            if (IsNoCombat(source) || IsNoCombat(target))
+                return false;
+
             if (spell.IsHostile && !IsHostileNanoTarget(source, target))
                 return false;
 
             if (spell.IsHostile && target.IsEvading)
                 return false;
+
+            AnnounceImmediateLand(source, target, spell.Id);
+            AnnounceCastFinished(source, spell.Id);
 
             if (!spell.IsBuff)
             {
@@ -433,7 +445,7 @@ namespace ZoneEngine_New.Core.Nanos
                 return;
             }
 
-            if (spell.IsHostile && !IsHostileNanoTarget(caster, recipient))
+            if ((spell.IsHostile && !IsHostileNanoTarget(caster, recipient)) || IsNoCombat(recipient))
             {
                 AnnounceCastInterrupted(caster, spell.Id);
                 Refuse(caster, NanoCastRefusal.InvalidTarget);
@@ -549,7 +561,8 @@ namespace ZoneEngine_New.Core.Nanos
                 IsUploaded = !caster.IsPlayer || caster.UploadedNanoIds.Contains(spell.Id),
                 RequirementsMet = spell.MeetsActionRequirements(
                     stat => caster.Stats.Get(stat),
-                    ActionType.ToUse),
+                    ActionType.ToUse,
+                    getTargetStat: recipient == null ? null : stat => recipient.Stats.Get(stat)),
                 TargetExists = recipient != null,
                 TargetIsDead = recipient?.IsDead == true,
                 CurrentNano = caster.Stats.GetOrZero(CharacterStat.CurrentNano),
@@ -617,6 +630,9 @@ namespace ZoneEngine_New.Core.Nanos
             int remaining = Math.Max(0, caster.Stats.GetOrZero(CharacterStat.CurrentNano) - cost);
             caster.Stats.Set(CharacterStat.CurrentNano, remaining, StatDetail.Base, dirty: true);
         }
+
+        /// <summary>A NoCombat NPC (not attackable): it neither casts nanos nor has nanos cast on it.</summary>
+        static bool IsNoCombat(Character? character) => character is NpcCharacter { Attackable: false };
 
         /// <summary>
         /// Hostile nanos may land on the caster. Other targets still have to be legal to attack.
@@ -702,6 +718,26 @@ namespace ZoneEngine_New.Core.Nanos
                     NanoId = nanoId,
                     Unknown = 0,
                     Unknown1 = 0
+                });
+
+        /// <summary>
+        /// The effect of a nano an item or perk function lands with no cast (CastNano / AreaCastNano...): live sends
+        /// CastNanoSpell addressed to the recipient, Target = recipient, Unknown1 = 1, Caster = the user, then
+        /// SetNanoDuration for a buff (captures 2026-10-02T03:54:58Z Impale on a mob, 15:12:44Z Dance of Fools on
+        /// self). FinishNanoCasting(1, nano) follows (live 2026-10-02T15:28:59Z): client case 0x1d (Gamecode.dll
+        /// 0x1004f322) closes the pending cast entry CastNanoSpell opened and records the success result.
+        /// </summary>
+        static void AnnounceImmediateLand(Character source, Character target, int nanoId)
+            => Announce(
+                target,
+                new CastNanoSpellMessage
+                {
+                    Identity = target.Identity,
+                    NanoId = nanoId,
+                    Target = target.Identity,
+                    Unknown = 0,
+                    Unknown1 = 1,
+                    Caster = source.Identity
                 });
 
         static void AnnounceCastFinished(Character caster, int nanoId)

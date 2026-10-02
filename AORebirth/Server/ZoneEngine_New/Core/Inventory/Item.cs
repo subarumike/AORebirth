@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Playfield.Locality;
 
     /// <summary>
     /// Dumb runtime item: occupancy ids + builder-baked effective <see cref="ItemTemplate"/>.
@@ -74,6 +75,12 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         public bool Locked { get; set; }
 
+        /// <summary>
+        /// Over-equipped level 0-4 (25% penalty per level) while worn, set by the wearer's rebase
+        /// (<see cref="OverEquip"/>). Runtime only.
+        /// </summary>
+        public int OverEquipLevel { get; internal set; }
+
         public ItemTemplate Definition { get; init; } = null!;
 
         public string Name => Definition.Name;
@@ -120,6 +127,15 @@ namespace ZoneEngine_New.Core.Inventory
         /// <summary>True when the item's Can stat includes all of <paramref name="flags"/>.</summary>
         public bool Can(CanFlags flags)
             => ((CanFlags)(uint)GetStat(CharacterStat.Can) & flags) == flags;
+
+        /// <summary>
+        /// True when using this item spends or destroys it: the Consume flag or an OnUse DestroyItem.
+        /// <see cref="DestroyOne"/> cannot remove from wear pages, so such items are not usable while equipped.
+        /// </summary>
+        public bool DestroysOnUse
+            => Can(CanFlags.Consume)
+                || (SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
+                    && spells.Exists(spell => spell.FunctionType == (int)FunctionType.DestroyItem));
 
         public bool IsWieldableCombatWeapon()
             => (ItemClass)GetStat(CharacterStat.ItemClass) == ItemClass.Weapon;
@@ -174,8 +190,16 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
             if (Locked || !Can(CanFlags.Use))
                 return false;
+            // A function aimed at the fighting target would otherwise fall back to the user.
+            if (UsesFightingTarget && player.TryResolveFightingTarget() == null)
+                return false;
             return Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse);
         }
+
+        /// <summary>True when an OnUse function applies to the user's fighting target.</summary>
+        public bool UsesFightingTarget
+            => SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
+                && spells.Exists(spell => spell.Target == (int)ItemTarget.Fightingtarget);
 
         /// <summary>Runs OnUse spells and spends a consumable charge. Callers gate with <see cref="CanBeginUse"/>.</summary>
         public bool ExecuteUse(
@@ -188,15 +212,40 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
 
+            // The user is the source: Fightingtarget functions resolve through it and damage is credited to it.
             if (!Definition.ExecuteOnUseSpells(
                     player,
                     inventoryRepository,
                     items,
+                    source: player,
                     criteria: new SpellCriteria { Subject = this, SubjectSlot = slotIdentity }))
                 return false;
+            AnnounceUsed(player, slotIdentity);
             if (Can(CanFlags.Consume))
                 ConsumeCharge(player, slotIdentity);
             return true;
+        }
+
+        /// <summary>
+        /// TemplateAction Use after the OnUse functions ran, as live sends it (Health and Nano Stim, capture
+        /// 2026-10-02T15:43:13Z): low/high, QL, Unknown1 1, Action 3, Placement = the used slot, Unknown3/Unknown4 =
+        /// the user. The client plays the item's use effect (its GfxEffect) from it.
+        /// </summary>
+        void AnnounceUsed(Player player, Identity slotIdentity)
+        {
+            var used = new TemplateActionMessage
+            {
+                Identity = player.Identity,
+                ItemLowId = LowId,
+                ItemHighId = HighId,
+                Quality = Quality,
+                Unknown1 = 1,
+                Action = TemplateActionType.Use,
+                Placement = slotIdentity,
+                Unknown3 = (int)player.Identity.Type,
+                Unknown4 = player.Identity.Instance
+            };
+            player.Playfield?.GetRequiredService<PlayfieldLocality>().Announce(player, used, includeSelf: true);
         }
 
         /// <summary>
@@ -221,10 +270,19 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(player);
 
             PlayerInventory inventory = player.Inventory;
-            int placement = slotIdentity.Instance;
-            if (!inventory.TryResolvePageByPlacement(placement, out Container page, out bool isWearPage)
-                || isWearPage)
-                return false;
+            Container page;
+            int placement;
+            if (slotIdentity.Type == IdentityType.Backpack)
+            {
+                if (!inventory.TryGetCarriedBackpackItem(slotIdentity, out page, out placement, out _))
+                    return false;
+            }
+            else
+            {
+                placement = slotIdentity.Instance;
+                if (!inventory.TryResolvePageByPlacement(placement, out page, out bool isWearPage) || isWearPage)
+                    return false;
+            }
 
             if (!page.Content.TryGetValue(placement, out Item? occupant) || !ReferenceEquals(occupant, this))
                 return false;
@@ -244,7 +302,11 @@ namespace ZoneEngine_New.Core.Inventory
 
                 StackCount = 0;
                 inventory.Discard(this, ConsumedGraveyard(player));
-                SendDeleteItem(player, page.Identity.Type, placement);
+                // A bag slot is dropped by the packed Backpack identity the client used for it.
+                if (slotIdentity.Type == IdentityType.Backpack)
+                    SendDeleteItem(player, slotIdentity.Type, slotIdentity.Instance);
+                else
+                    SendDeleteItem(player, page.Identity.Type, placement);
             }
 
             player.Playfield?.GetRequiredService<InventoryFlushService>().NotifyDirty(player);
@@ -285,7 +347,9 @@ namespace ZoneEngine_New.Core.Inventory
         {
             Identity containerIdentity = Identity;
             PlayerInventory inventory = player.Inventory;
-            bool pageKnown = inventory.TryGetBackpackPage(containerIdentity, out Container? page);
+            // A page without a handle has not been introduced to the client on this playfield.
+            bool pageKnown = inventory.TryGetBackpackPage(containerIdentity, out Container? page)
+                && page!.InventoryHandle != 0;
             if (pageKnown && page!.IsOpen)
             {
                 SendCloseAction(player, containerIdentity);

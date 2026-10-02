@@ -140,6 +140,25 @@ namespace ZoneEngine_New.Core.Quests
         }
 
         /// <summary>
+        /// Completes an active quest on request (an NPC turn-in): saves it, removes the journal entry, grants the
+        /// reward and assigns NextStep, exactly as a finished kill objective does. False when it is not active.
+        /// </summary>
+        public bool TryComplete(Player player, string questId, out string result)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (!GetLog(player).Quests.TryGetValue(questId ?? string.Empty, out PlayerQuest? quest) || !quest.IsActive)
+            {
+                result = string.Format(CultureInfo.InvariantCulture, "{0} has no active quest {1}.", player.Name, questId);
+                return false;
+            }
+
+            quest.Progress = quest.RequiredCount;
+            Complete(player, quest);
+            result = string.Format(CultureInfo.InvariantCulture, "Completed quest {0} ({1}) for {2}.", quest.QuestId, quest.Template.Name, player.Name);
+            return true;
+        }
+
+        /// <summary>
         /// Creates a generated quest in Quests.json format without assigning it: a terminal offer, or one quest a
         /// whole team shares. It gets its own id, expires at <paramref name="expiresAtUtc"/>, and may carry ACG
         /// building generator data. Returns the id to assign with <see cref="TryAssignGenerated"/>.
@@ -266,6 +285,41 @@ namespace ZoneEngine_New.Core.Quests
             }
         }
 
+        /// <summary>
+        /// <paramref name="player"/> selected <paramref name="npc"/>: active TargetNpc quests on that NPC complete when
+        /// the player has line of sight to it. Matches the same way as kill credit.
+        /// </summary>
+        public void OnNpcTargeted(Player player, NpcCharacter npc)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(npc);
+
+            List<PlayerQuest>? found = FindActiveOn(player, npc, QuestTemplate.TargetNpcAction);
+            // Raycast only when something would complete.
+            if (found != null && player.HasLineOfSightTo(npc))
+                CompleteAll(player, found);
+        }
+
+        List<PlayerQuest>? FindActiveOn(Player player, NpcCharacter npc, string action)
+        {
+            List<PlayerQuest>? found = null;
+            foreach (PlayerQuest quest in GetLog(player).Quests.Values)
+            {
+                if (quest.IsActive && string.Equals(quest.Template.Action, action, StringComparison.Ordinal)
+                    && Matches(npc, quest.Template.Objective.Npc))
+                    (found ??= new List<PlayerQuest>()).Add(quest);
+            }
+
+            return found;
+        }
+
+        /// <summary>Completing can assign a follow-up quest, so the log is not walked while completing.</summary>
+        void CompleteAll(Player player, List<PlayerQuest> quests)
+        {
+            for (int i = 0; i < quests.Count; i++)
+                Complete(player, quests[i]);
+        }
+
         static bool Matches(NpcCharacter npc, string? objectiveNpc)
         {
             if (string.IsNullOrEmpty(objectiveNpc))
@@ -293,6 +347,8 @@ namespace ZoneEngine_New.Core.Quests
         {
             quest.State = QuestState.Completed;
             Save(player, quest);
+            if (quest.Template.MissionBit is int bit && MissionBits.IsValid(bit))
+                MissionBits.Set(player.Stats, bit);
             QuestJournal.Delete(player, quest);
             ClientFeedback.Send(player, "Feedback_MissionAccomplished");
             GrantReward(player, quest.Template);
@@ -353,6 +409,9 @@ namespace ZoneEngine_New.Core.Quests
             }
 
             Item item = _items.CreateWithNewInstance(reward.Id, reward.HighId ?? reward.Id, Math.Max(1, reward.Quality), ItemSource.Quest);
+            if (InventoryStacking.TryGrantOntoStack(player, item, _flush))
+                return;
+
             if (!player.Inventory.Inventory.Add(slot, item))
                 return;
 

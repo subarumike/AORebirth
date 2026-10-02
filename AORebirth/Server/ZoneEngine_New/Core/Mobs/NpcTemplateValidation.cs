@@ -12,7 +12,7 @@ public static class NpcTemplateValidation
         && !string.IsNullOrWhiteSpace(template.Hash)
         && !string.IsNullOrWhiteSpace(template.Name)
         && template.Stats != null
-        && (!template.UnresolvedPlaceholder || !template.Attackable);
+        && (!template.UnresolvedPlaceholder || template.Has(NpcFeature.NoCombat));
 
     public static void RequireSpawnable(MobTemplate template)
     {

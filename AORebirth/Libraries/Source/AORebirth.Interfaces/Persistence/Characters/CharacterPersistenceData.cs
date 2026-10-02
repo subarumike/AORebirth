@@ -100,6 +100,13 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public long ExpiresAtUtcTicks { get; set; }
     }
 
+    /// <summary>One LockPerk cooldown: perk id (charactersperks.PacketId) and absolute UTC expiry.</summary>
+    public sealed class PersistedPerkLockData
+    {
+        public int PerkId { get; set; }
+        public long ExpiresAtUtcTicks { get; set; }
+    }
+
     public sealed class CharacterActiveNanoData
     {
         public int CharacterId { get; set; }

@@ -29,7 +29,8 @@ public static class SchemaContract
         "20260908_generated_mission_state.sql",
         "20260925_character_skill_locks.sql",
         "20260927_character_quests.sql",
-        "20260928_quest_dungeon_keys.sql"
+        "20260928_quest_dungeon_keys.sql",
+        "20261001_character_perk_locks.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -48,7 +49,8 @@ public static class SchemaContract
         "item_instances", "item_instance_id_sequence", "schema_migrations",
         "generatedmissionsequences", "generatedmissionbatches", "generatedmissionoffers",
         "generatedmissionbindings", "generatedmissionobservations", "generatedmissionartifacts", "generatedmissionobjects",
-        "characterskilllocks", "characterquests", "generatedquests", "questdungeonkeys"
+        "characterskilllocks", "characterquests", "generatedquests", "questdungeonkeys",
+        "characterperklocks"
     });
 
     public static readonly IReadOnlyList<(string Table, string Columns)> UniqueKeys = Array.AsReadOnly(new[]
@@ -66,7 +68,8 @@ public static class SchemaContract
         ("generatedmissionobservations", "OwnerId,QuestType,QuestInstance,ObservationIdentity"),
         ("generatedmissionartifacts", "InstanceId"), ("generatedmissionobjects", "QuestType,QuestInstance,RuntimeType,RuntimeInstance"),
         ("generatedmissionobjects", "RuntimeType,RuntimeInstance"), ("characterskilllocks", "CharacterId,StatId"),
-        ("characterquests", "CharacterId,QuestId"), ("generatedquests", "QuestId"), ("questdungeonkeys", "KeyInstanceId")
+        ("characterquests", "CharacterId,QuestId"), ("generatedquests", "QuestId"), ("questdungeonkeys", "KeyInstanceId"),
+        ("characterperklocks", "CharacterId,PerkId")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()
@@ -151,6 +154,8 @@ public static class SchemaContract
         Add("questdungeonkeys", "int", "KeyInstanceId", false);
         Add("questdungeonkeys", "bigint", "CreatedAtUtcTicks", false);
         Add("questdungeonkeys", "varchar", "QuestId");
+        Add("characterperklocks", "int", "CharacterId PerkId", false);
+        Add("characterperklocks", "bigint", "ExpiresAtUtcTicks", false);
         return result.AsReadOnly();
     }
 }

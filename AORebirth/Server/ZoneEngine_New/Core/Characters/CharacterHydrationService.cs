@@ -17,6 +17,8 @@ namespace ZoneEngine_New.Core.Characters
         private readonly IUploadedNanoRepository _uploadedNanos;
         private readonly IActiveNanoRepository _activeNanos;
         private readonly ISkillLockRepository _skillLocks;
+        private readonly ITrainedPerkRepository? _trainedPerks;
+        private readonly IPerkLockRepository? _perkLocks;
         private readonly IZoneLogger _logger;
 
         public CharacterHydrationService(
@@ -26,7 +28,9 @@ namespace ZoneEngine_New.Core.Characters
             IUploadedNanoRepository uploadedNanos,
             IActiveNanoRepository activeNanos,
             ISkillLockRepository skillLocks,
-            IZoneLogger logger)
+            IZoneLogger logger,
+            ITrainedPerkRepository? trainedPerks = null,
+            IPerkLockRepository? perkLocks = null)
         {
             ArgumentNullException.ThrowIfNull(skillLocks);
             ArgumentNullException.ThrowIfNull(characters);
@@ -42,6 +46,8 @@ namespace ZoneEngine_New.Core.Characters
             _uploadedNanos = uploadedNanos;
             _activeNanos = activeNanos;
             _skillLocks = skillLocks;
+            _trainedPerks = trainedPerks;
+            _perkLocks = perkLocks;
             _logger = logger;
         }
 
@@ -61,7 +67,9 @@ namespace ZoneEngine_New.Core.Characters
                 Items = _inventory.GetCarriedItems(characterId),
                 UploadedNanoIds = _uploadedNanos.GetForCharacter(characterId),
                 ActiveNanos = _activeNanos.GetForCharacter(characterId),
-                SkillLocks = _skillLocks.GetForCharacter(characterId)
+                SkillLocks = _skillLocks.GetForCharacter(characterId),
+                TrainedPerkIds = _trainedPerks?.GetForCharacter(characterId) ?? [],
+                PerkLocks = _perkLocks?.GetForCharacter(characterId) ?? []
             };
 
             CharacterHydrationValidationResult validation = CharacterHydrationValidator.Validate(result);

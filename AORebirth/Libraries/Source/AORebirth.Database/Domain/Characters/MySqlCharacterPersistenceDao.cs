@@ -4,6 +4,7 @@ namespace AORebirth.Database.Domain.Characters
     using System.Collections.Generic;
     using System.Data;
     using System.Globalization;
+    using System.Linq;
     using System.Text;
     using AORebirth.Interfaces.Persistence.Characters;
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -154,6 +155,51 @@ namespace AORebirth.Database.Domain.Characters
         {
             if (characterId <= 0) return new List<int>();
             return Query("SELECT NanoId FROM charactersuploadednanos WHERE CharacterId=@Id", r => r.GetInt32(0), "@Id", characterId);
+        }
+
+        public IList<int> LoadTrainedPerks(int characterId)
+        {
+            if (characterId <= 0) return new List<int>();
+            return Query("SELECT DISTINCT PacketId FROM charactersperks WHERE CharacterId=@Id ORDER BY PacketId", r => r.GetInt32(0), "@Id", characterId);
+        }
+
+        public void SaveTrainedPerks(int characterId, IList<int> perkIds)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (perkIds == null) throw new ArgumentNullException(nameof(perkIds));
+            if (perkIds.Any(id => id <= 0) || perkIds.Distinct().Count() != perkIds.Count)
+                throw new ArgumentException("Invalid or duplicate perk id.", nameof(perkIds));
+            Transaction((c, t) =>
+            {
+                Execute(c, t, "DELETE FROM charactersperks WHERE CharacterId=@Id", "@Id", characterId);
+                foreach (int perkId in perkIds)
+                    Execute(c, t, "INSERT INTO charactersperks (CharacterId,PacketId) VALUES (@Id,@Perk)", "@Id", characterId, "@Perk", perkId);
+                return 0;
+            });
+        }
+
+        public IList<PersistedPerkLockData> LoadPerkLocks(int characterId)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            return Query("SELECT PerkId,ExpiresAtUtcTicks FROM characterperklocks WHERE CharacterId=@Id ORDER BY PerkId",
+                r => new PersistedPerkLockData { PerkId = r.GetInt32(0), ExpiresAtUtcTicks = r.GetInt64(1) }, "@Id", characterId);
+        }
+
+        public void SavePerkLocks(int characterId, IList<PersistedPerkLockData> perkLocks)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (perkLocks == null) throw new ArgumentNullException(nameof(perkLocks));
+            if (perkLocks.Any(l => l.PerkId <= 0 || l.ExpiresAtUtcTicks <= 0)
+                || perkLocks.Select(l => l.PerkId).Distinct().Count() != perkLocks.Count)
+                throw new ArgumentException("Invalid or duplicate perk lock.", nameof(perkLocks));
+            Transaction((c, t) =>
+            {
+                Execute(c, t, "DELETE FROM characterperklocks WHERE CharacterId=@Id", "@Id", characterId);
+                foreach (var perkLock in perkLocks)
+                    Execute(c, t, "INSERT INTO characterperklocks (CharacterId,PerkId,ExpiresAtUtcTicks) VALUES (@Id,@Perk,@Expiry)",
+                        "@Id", characterId, "@Perk", perkLock.PerkId, "@Expiry", perkLock.ExpiresAtUtcTicks);
+                return 0;
+            });
         }
 
         public void SaveLocation(CharacterStateData character, int online)

@@ -16,6 +16,7 @@ namespace ZoneEngine_New.Core.Inventory
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Nanos;
@@ -38,20 +39,34 @@ namespace ZoneEngine_New.Core.Inventory
             ItemSpell spell,
             IInventoryRepository inventoryRepository,
             IItemBuilder items,
-            SpellCriteria? criteria = null)
+            SpellCriteria? criteria = null,
+            bool isTick = false,
+            int templateDamageType = 0,
+            ItemTemplate? sourceTemplate = null)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
 
+            // Add Damage applies to a direct hit as it lands, never to a timed nano's later ticks.
+            bool addDamage = !isTick;
             switch ((FunctionType)spell.FunctionType)
             {
                 case FunctionType.OpenBank:
                     return target is Player bankPlayer
                         && OpenBank(bankPlayer, inventoryRepository, items);
                 case FunctionType.Hit:
-                    return Hit(target, source, spell);
+                    return Hit(target, source, spell, addDamage);
+                // SpecialHit (perk attacks such as Pulverize [Health, -72, -145, 0]) carries Hit's arguments; with
+                // no damage type of its own it hits as the template's DamageType (Pulverize 436 = MeleeAC, which
+                // live HealthDamage reports as type 91).
+                case FunctionType.SpecialHit:
+                    return Hit(target, source, spell, addDamage, templateDamageType);
+                case FunctionType.AreaHit:
+                    return AreaHit(target, source, spell, addDamage);
+                case FunctionType.DrainHit:
+                    return DrainHit(target, source, spell, addDamage);
                 case FunctionType.Set:
                     return Set(target, spell);
                 case FunctionType.SetFlag:
@@ -60,11 +75,15 @@ namespace ZoneEngine_New.Core.Inventory
                     return ClearFlag(target, spell);
                 case FunctionType.SystemText:
                 case FunctionType.Text:
-                    return target is Player textPlayer && SystemText(textPlayer, spell);
+                    // The text goes to whoever the function names: a perk attack's Wearer text ("You successfully
+                    // perform ...") belongs to the attacker, not the target it hit.
+                    return ResolveApplyOn(target, source, spell) is not Player textPlayer || SystemText(textPlayer, spell);
                 case FunctionType.SaveChar:
                     return true;
                 case FunctionType.LockSkill:
                     return LockSkill(target, source, spell);
+                case FunctionType.LockPerk:
+                    return LockPerk(target, source, spell);
                 case FunctionType.UploadNano:
                     return target is Player uploadPlayer && UploadNano(uploadPlayer, spell);
                 case FunctionType.CastNano:
@@ -83,7 +102,7 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.SpawnMonster2:
                     return SpawnMonster2(target, spell);
                 case FunctionType.SummonPet:
-                    return SummonPet(target, spell);
+                    return SummonPet(target, spell, sourceTemplate);
                 case FunctionType.DestroyItem:
                     return DestroySubject(target, criteria);
                 case FunctionType.ToggleFlag:
@@ -137,7 +156,7 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
-        static bool Hit(Character target, Character? source, ItemSpell spell)
+        static bool Hit(Character target, Character? source, ItemSpell spell, bool addDamage, int defaultAcStat = 0)
         {
             if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int minHit))
                 return false;
@@ -163,6 +182,9 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
 
+            if (acStat == 0)
+                acStat = defaultAcStat;
+
             if (minHit > maxHit)
             {
                 int swap = minHit;
@@ -176,12 +198,75 @@ namespace ZoneEngine_New.Core.Inventory
 
             var stat = (CharacterStat)statId;
             if (stat == CharacterStat.Health)
-                return ApplyHealthDelta(target, source, delta, acStat);
+                return ApplyHealthDelta(target, source, delta, acStat, addDamage);
 
             if (stat == CharacterStat.CurrentNano || stat == CharacterStat.NanoPool)
                 return ApplyNanoDelta(target, delta);
 
             target.Stats.Set(stat, target.Stats.GetOrZero(stat, StatDetail.Base) + delta, StatDetail.Base, dirty: true);
+            return true;
+        }
+
+        /// <summary>
+        /// DrainHit args: Stat, Min, Max, AC, Percent (Shade Dimach 213269-213274: Health, Melee AC, 70-80).
+        /// Damages <paramref name="target"/> like a hostile Hit, then heals the source by Percent of the
+        /// damage actually dealt. Only Health damage is supported.
+        /// </summary>
+        static bool DrainHit(Character target, Character? source, ItemSpell spell, bool addDamage)
+        {
+            if (!spell.TryReadInt(0, out int statId) || (CharacterStat)statId != CharacterStat.Health
+                || !spell.TryReadInt(1, out int minHit) || !spell.TryReadInt(2, out int maxHit))
+                return false;
+            spell.TryReadInt(3, out int acStat);
+            spell.TryReadInt(4, out int percent);
+            if (minHit > maxHit)
+                (minHit, maxHit) = (maxHit, minHit);
+            if (maxHit >= 0 || source == null || ReferenceEquals(source, target) || target.IsDead)
+                return false;
+
+            int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
+            ApplyHealthDelta(target, source, Random.Shared.Next(minHit, maxHit + 1), acStat, addDamage);
+            int dealt = before - Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
+            int drained = (int)((long)dealt * Math.Clamp(percent, 0, 100) / 100);
+            if (drained > 0 && !source.IsDead)
+                ApplyHealthDelta(source, source, drained, 0);
+            return true;
+        }
+
+        /// <summary>
+        /// AreaHit args: Stat, Min, Max, AC, Radius (item 129650: Health -40..-141 Chemical, 3 m).
+        /// Damages <paramref name="center"/> (the function's ApplyOn character) and everything the
+        /// user may attack within Radius metres of it, each with its own roll. Only hostile Health hits.
+        /// </summary>
+        static bool AreaHit(Character center, Character? source, ItemSpell spell, bool addDamage)
+        {
+            if (!spell.TryReadInt(0, out int statId) || (CharacterStat)statId != CharacterStat.Health
+                || !spell.TryReadInt(1, out int minHit) || !spell.TryReadInt(2, out int maxHit)
+                || !spell.TryReadInt(4, out int radius) || radius < 0)
+                return false;
+            spell.TryReadInt(3, out int acStat);
+            if (minHit > maxHit)
+                (minHit, maxHit) = (maxHit, minHit);
+            if (maxHit >= 0)
+                return false;
+
+            Character caster = source ?? center;
+            Playfield? playfield = center.Playfield;
+            DynelRegistry? registry = playfield?.GetService<DynelRegistry>();
+            if (registry == null)
+                return false;
+
+            foreach (Dynel dynel in registry.Dynels())
+            {
+                if (dynel is not Character candidate || candidate.IsDead || ReferenceEquals(candidate, caster)
+                    || !ReferenceEquals(candidate.Playfield, playfield)
+                    || center.Distance3D(candidate) > radius
+                    || !Helpers.CombatRules.CanAttack(caster, candidate))
+                    continue;
+
+                ApplyHealthDelta(candidate, caster, Random.Shared.Next(minHit, maxHit + 1), acStat, addDamage);
+            }
+
             return true;
         }
 
@@ -244,7 +329,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
         }
 
-        static bool ApplyHealthDelta(Character target, Character? source, int delta, int acStat)
+        static bool ApplyHealthDelta(Character target, Character? source, int delta, int acStat, bool addDamage = false)
         {
             Character caster = source ?? target;
 
@@ -252,7 +337,13 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 // A hostile nano hit from someone else can break crowd control before its threat lands.
                 if (!ReferenceEquals(caster, target))
+                {
                     target.RollBuffBreaks(BuffBreakCause.SpellAttack, caster);
+
+                    // Direct hits (nukes, DrainHit, AreaHit) gain the caster's Add Damage for their damage type.
+                    if (addDamage && Helpers.DamageCalculator.TryGetAddDamageStat(acStat, out CharacterStat addDamageStat))
+                        delta -= Math.Max(0, StatCollection.Normalize(caster.Stats.GetOrZero(addDamageStat)));
+                }
 
                 int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
                 target.ApplyDamage(caster, -delta, HitType.Normal);
@@ -308,7 +399,47 @@ namespace ZoneEngine_New.Core.Inventory
             if (!TryReadSkillLock(spell, out int statId, out int durationSeconds))
                 return false;
 
-            ResolveApplyOn(target, source, spell).LockSkill(statId, durationSeconds, DateTime.UtcNow);
+            Character locked = ResolveApplyOn(target, source, spell);
+            int seconds = locked.LockSkill(statId, durationSeconds, DateTime.UtcNow);
+
+            // Live shows the lock on the client as SpecialUsed (CharacterAction 0xAA, Parameter1 = stat,
+            // Parameter2 = seconds): Health and Nano Stim LockSkill [123, 40], capture 2026-10-02T15:43:13Z.
+            if (seconds > 0 && locked is Player player && player.Session != null)
+            {
+                player.Session.Send(new CharacterActionMessage
+                {
+                    Identity = player.Identity,
+                    Action = CharacterActionType.SpecialUsed,
+                    Target = Identity.None,
+                    Parameter1 = statId,
+                    Parameter2 = seconds
+                });
+
+                // SpecialAvailable (0xA4, Parameter2 = stat) when the lock runs out: live 15 s Treatment lock,
+                // capture 2026-10-02T16:41:09Z -> 16:41:24Z.
+                player.ScheduleSpecialAvailable(statId, DateTime.UtcNow.AddSeconds(seconds));
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// LockPerk [3, perk id, seconds]: the perk's actions stay unusable (IsPerkUnlocked fails) until the lock
+        /// expires, e.g. Heal [3, 401, 240] on use and [3, 401, 20] on failure. Only players hold perks.
+        /// </summary>
+        internal static bool TryReadPerkLock(ItemSpell spell, out int perkId, out int durationSeconds)
+        {
+            durationSeconds = 0;
+            return spell.TryReadInt(1, out perkId) && spell.TryReadInt(2, out durationSeconds);
+        }
+
+        static bool LockPerk(Character target, Character? source, ItemSpell spell)
+        {
+            if (!TryReadPerkLock(spell, out int perkId, out int durationSeconds))
+                return false;
+
+            if (ResolveApplyOn(target, source, spell) is Player player)
+                player.LockPerk(perkId, durationSeconds, DateTime.UtcNow);
             return true;
         }
 
@@ -396,6 +527,8 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (!player.Playfield.GetRequiredService<HashItemMinter>().TryMint(hash, quality, ItemSource.Other, out Item item))
                 return false;
+            if (InventoryStacking.TryGrantOntoStack(player, item, player.Playfield.GetService<InventoryFlushService>()))
+                return true;
             if (!player.Inventory.TryPlace(item, out Container page, out int slot))
                 return false;
 
@@ -491,6 +624,13 @@ namespace ZoneEngine_New.Core.Inventory
         {
             if (player.Session == null || !spell.TryReadString(0, out string text) || text.Length == 0)
                 return false;
+
+            if (spell.Is(FunctionType.SystemText))
+            {
+                // Live: FormatFeedback 110/707 with the text as its one argument.
+                ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, text);
+                return true;
+            }
 
             player.Session.Send(
                 new ChatTextMessage
@@ -836,7 +976,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// SummonPet (mob hash, level, duration seconds; -1 or 0: until dismissed): the character the function runs
         /// on gets the pet (the summoner: shell items and pet nanos target Self).
         /// </summary>
-        static bool SummonPet(Character target, ItemSpell spell)
+        static bool SummonPet(Character target, ItemSpell spell, ItemTemplate? sourceTemplate)
         {
             if (target.Playfield == null || target.IsDead)
                 return false;
@@ -847,7 +987,11 @@ namespace ZoneEngine_New.Core.Inventory
             if (!spell.TryReadInt(2, out int duration))
                 duration = -1;
 
-            return target.Playfield.GetRequiredService<Pets.PetService>().Summon(target, hash, level, duration) != null;
+            // The summoning nano's / item's ToUse rows decide later whether the pet is over-equipped.
+            IReadOnlyList<ItemRequirement> summonRequirements =
+                sourceTemplate?.Actions.Find(action => action.ActionType == (int)ActionType.ToUse)?.Requirements ?? [];
+            return target.Playfield.GetRequiredService<Pets.PetService>()
+                .Summon(target, hash, level, duration, summonRequirements) != null;
         }
 
         static bool SpawnMonster2(Character target, ItemSpell spell)

@@ -97,7 +97,7 @@ public sealed class AcceptedSubwayShopRuntimeTests
     {
         using var w = new World(missingTemplate: CapturedSubwayVendorContentProvider.Definitions[0].VendorTemplateId);
         Assert.IsTrue(w.Activation.TryGetBinding(w.Merchant, out var binding));
-        Assert.AreEqual("SimpleChar:79135F51", binding.ContentNpcIdentity); Assert.IsTrue(binding.HasDialogue);
+        Assert.AreEqual("SimpleChar:79135F51", binding.ContentNpcIdentity);
         Assert.IsNull(w.Merchant.Shop); Assert.IsFalse(w.Merchant.TryUse(w.Player));
         Assert.IsFalse(w.Trade.TryGetSession(w.Player, out _)); Assert.AreEqual(0, w.Persistence.Calls);
     }

@@ -15,7 +15,8 @@ namespace ZoneEngine_New.Core.Inventory
     /// </summary>
     public static class StatModifierSpells
     {
-        public static void Apply(IReadOnlyList<ItemSpell> spells, StatCollection stats)
+        /// <param name="overEquipLevel">The source item's over-equipped level (<see cref="Inventory.OverEquip"/>); it scales Modify only.</param>
+        public static void Apply(IReadOnlyList<ItemSpell> spells, StatCollection stats, int overEquipLevel = 0)
         {
             if (spells == null || stats == null)
                 return;
@@ -65,6 +66,8 @@ namespace ZoneEngine_New.Core.Inventory
                 if (stat == CharacterStat.Cash || stat == CharacterStat.Health)
                     continue;
 
+                if (spell.Is(FunctionType.Modify))
+                    delta = Inventory.OverEquip.ScaleModifier(stat, delta, overEquipLevel);
                 stats.AddBonus(stat, delta, dirty: true);
             }
         }

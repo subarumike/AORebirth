@@ -86,15 +86,15 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         DeadTimer = 0x00000022, 
 
-        AccessCount = 0x00000023, 
+        DamageToPet = 0x00000023, 
 
         AttackCount = 0x00000024, 
 
         TitleLevel = 0x00000025, 
 
-        BackMesh = 0x00000026, 
+        CombatRange = 0x00000026, 
 
-        ShoulderMesh = 0x00000027, 
+        DamageToPetMultiplier = 0x00000027, 
 
         AlienXP = 0x00000028, 
 
@@ -144,13 +144,15 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         HeadMesh = 0x00000040, 
 
-        HairTexture = 0x00000041, 
+        MissionBits5 = 0x00000041,
 
-        HairColourRGB = 0x00000043, 
+        MissionBits6 = 0x00000042,
 
-        NumConstructedQuest = 0x00000044, 
+        MissionBits7 = 0x00000043,
 
-        MaxConstructedQuest = 0x00000045, 
+        VeteranPoints = 0x00000044, 
+
+        MonthsPaid = 0x00000045, 
 
         SpeedPenalty = 0x00000046, 
 
@@ -160,7 +162,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         Value = 0x0000004A, 
 
-        StrainOmniTokens = 0x0000004B, 
+        MetaType = 0x0000004B, 
 
         ItemClass = 0x0000004C,
 
@@ -346,7 +348,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         FullAuto = 0x000000A7, 
 
-        NanoResist = 0x000000A8, 
+        NanoAC = 0x000000A8, 
 
         AlienLevel = 0x000000A9, 
 
@@ -402,7 +404,8 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         OrientationMode = 0x000000C5, 
 
-        SessionTime = 0x000000C6, 
+        /// <summary>Mission bits 384-415. Named SessionTime in older stat tables.</summary>
+        MissionBits13 = 0x000000C6,
 
         RP = 0x000000C7, 
 
@@ -414,7 +417,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         Extroverty = 0x000000CB, 
 
-        Taunt = 0x000000CC, 
+        BreedHostility = 0x000000CC, 
 
         ReflectProjectileAC = 0x000000CD, 
 
@@ -608,7 +611,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         ClanPrice = 0x0000012E, 
 
-        ClanUpkeep = 0x0000012F, 
+        MissionBits3 = 0x0000012F, 
 
         ClanType = 0x00000130, 
 
@@ -828,7 +831,7 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         SelectedTarget = 0x000001AF, 
 
-        ErrorCode = 0x000001B0, 
+        MissionBits4 = 0x000001B0, 
 
         OwnerInstance = 0x000001B1, 
 
@@ -1004,7 +1007,11 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         ProcInitiative4 = 0x0000021E, 
 
-        FactionModifier = 0x0000021F, 
+        FactionModifier = 0x0000021F,
+
+        MissionBits8 = 0x00000220,
+
+        MissionBits9 = 0x00000221,
 
         StackingLine2 = 0x00000222, 
 
@@ -1126,7 +1133,13 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         InvadersKilled = 0x00000267, 
 
-        KilledByInvaders = 0x00000268, 
+        KilledByInvaders = 0x00000268,
+
+        MissionBits10 = 0x00000269,
+
+        MissionBits11 = 0x0000026A,
+
+        MissionBits12 = 0x0000026B,
 
         HouseTemplate = 0x0000026C, 
 
@@ -1171,6 +1184,12 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         CityInstance = 0x00000280, 
 
         DistanceToSpawnpoint = 0x00000281, 
+
+        CityTerminalRechargePercent = 0x00000282,
+
+        UnreadMailCount = 0x00000289,
+
+        LastMailCheckTime = 0x0000028A,
 
         AdvantageHash1 = 0x0000028B, 
 
@@ -1238,11 +1257,31 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         PVPTeamScore = 0x000002AB, 
 
-        PVPDuelScore = 0x000002AC, 
+        PVPDuelScore = 0x000002AC,
+
+        MissionBits14 = 0x000002AD,
+
+        MissionBits15 = 0x000002AE,
+
+        Rarity = 0x000002B0,
+
+        HealReactivity = 0x000002B1,
+
+        EquippedRHWeapon = 0x000002B2,
+
+        FullIPRPoints = 0x000002B3,
+
+        MissionBits16 = 0x000002B4,
+
+        MissionBits17 = 0x000002B5,
+
+        MissionBits18 = 0x000002B6,
 
         Commendations = 0x000002B7, 
 
         DailyMissionResets = 0x000002B8, 
+
+        VeteranMonths = 0x000002B9,
 
         ACGItemSeed = 0x000002BC, 
 
@@ -1277,6 +1316,15 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         /// IP stat (extra IP as base, the level's IP as bonus) minus this.
         /// </summary>
         UsedIP = 0x00002710,
+
+        /// <summary>
+        /// AORebirth server-only: mission bits 576-607. The client has 18 mission bit stats (0-575), but quest data
+        /// uses bits up to 611. Never sent to the client.
+        /// </summary>
+        MissionBits19 = 0x00002711,
+
+        /// <summary>AORebirth server-only: mission bits 608-639. Never sent to the client.</summary>
+        MissionBits20 = 0x00002712,
 
         /// <summary>Sentinel for missing / unset stat and item attribute values.</summary>
         Unset = 1234567890,

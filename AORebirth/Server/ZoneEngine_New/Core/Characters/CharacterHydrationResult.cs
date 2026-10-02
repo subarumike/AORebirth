@@ -20,6 +20,12 @@ namespace ZoneEngine_New.Core.Characters
         /// <summary>Stored LockSkill cooldowns. Expired entries are dropped on apply.</summary>
         public IReadOnlyList<SkillLockRecord> SkillLocks { get; init; } = [];
 
+        /// <summary>Trained perk ids from charactersperks.</summary>
+        public IReadOnlyList<int> TrainedPerkIds { get; init; } = [];
+
+        /// <summary>Stored LockPerk cooldowns (StatId = perk id). Expired entries are dropped on apply.</summary>
+        public IReadOnlyList<SkillLockRecord> PerkLocks { get; init; } = [];
+
         public bool IsSpawnReady => CharacterHydrationValidator.Validate(this).IsValid;
     }
 }

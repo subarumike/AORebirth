@@ -17,6 +17,14 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 
+    /// <summary>What a <see cref="KnuBotTradeMessage"/> does with its item.</summary>
+    public enum KnuBotTradeAction
+    {
+        Add = 0,
+
+        Remove = 1
+    }
+
     [AoContract((int)N3MessageType.KnuBotTrade)]
     public class KnuBotTradeMessage : N3Message
     {
@@ -31,22 +39,30 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         #region AoMember Properties
 
+        // Client layout (Gamecode.dll KnubotTradeIIR_c, built by n3EngineClientAnarchy_t::
+        // N3Msg_NPCChatAddTradeItem / N3Msg_NPCChatRemoveTradeItem): short 2, NPC identity, int action,
+        // an identity the client always sends as zero, then the item's identity.
+
         [AoMember(0)]
         public short Unknown1 { get; set; }
 
+        /// <summary>The NPC the item is given to.</summary>
         [AoMember(1)]
         public Identity Target { get; set; }
 
         [AoMember(2)]
-        public int Unknown2 { get; set; }
+        public KnuBotTradeAction Action { get; set; }
 
+        /// <summary>Always zero from the client.</summary>
         [AoMember(3)]
-        public int Unknown3 { get; set; }
+        public Identity Unknown2 { get; set; }
 
+        /// <summary>
+        /// Add: where the item comes from (Inventory or OverflowWindow, instance = slot). Remove: the item's
+        /// index in the client's KnuBot trade container (instance = index). The client has already moved the
+        /// item locally when this arrives.
+        /// </summary>
         [AoMember(4)]
-        public int Unknown4 { get; set; }
-
-        [AoMember(5)]
         public Identity Container { get; set; }
 
         #endregion

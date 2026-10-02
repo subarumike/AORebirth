@@ -61,6 +61,22 @@ namespace ZoneEngine_New.Core.Entities
 
         public bool IsLocked(int statId, DateTime nowUtc) => Remaining(statId, nowUtc) > TimeSpan.Zero;
 
+        /// <summary>Every unexpired lock and its remaining time.</summary>
+        public List<(int Id, TimeSpan Remaining)> Active(DateTime nowUtc)
+        {
+            lock (_gate)
+            {
+                var active = new List<(int, TimeSpan)>(_expiresAtUtc.Count);
+                foreach (KeyValuePair<int, DateTime> entry in _expiresAtUtc)
+                {
+                    if (entry.Value > nowUtc)
+                        active.Add((entry.Key, entry.Value - nowUtc));
+                }
+
+                return active;
+            }
+        }
+
         /// <summary>The unexpired set to persist, or null when nothing changed since the last take.</summary>
         public List<SkillLockRecord>? TakeDirty(DateTime nowUtc)
         {

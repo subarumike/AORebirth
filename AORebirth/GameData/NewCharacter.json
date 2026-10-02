@@ -80,7 +80,7 @@
     { "Stat": 165, "Name": "BreakingEntry", "Value": 5 },
     { "Stat": 166, "Name": "VehicleGround", "Value": 5 },
     { "Stat": 167, "Name": "FullAuto", "Value": 5 },
-    { "Stat": 168, "Name": "NanoResist", "Value": 5 }
+    { "Stat": 168, "Name": "NanoAC", "Value": 5 }
   ],
   "Breeds": [
     { "Breed": 1, "Name": "Solitus", "Strength": 6, "Agility": 6, "Stamina": 6, "Intelligence": 6, "Sense": 6, "Psychic": 6 },

@@ -350,9 +350,6 @@
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Missions\Content\InteractionFiles.cs"><Link>MissionContentInteractionFiles.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Missions\Content\QuestDefinitions.cs"><Link>QuestDefinitions.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Missions\Content\QuestIndex.cs"><Link>QuestIndex.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentDefinitions.cs"><Link>DialogueContentDefinitions.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentRegistry.cs"><Link>DialogueContentRegistry.cs</Link></Compile>
-    <Compile Include="..\..\..\..\..\..\Server\ZoneEngine_New\Core\Dialogue\ContentValidation.cs"><Link>DialogueContentValidation.cs</Link></Compile>
     <Compile Include="..\..\..\..\..\..\..\Tests\Fixtures\Gameplay\Playfields\SubwayLootPoolRules.cs">
       <Link>SubwayLootPoolRules.cs</Link>
     </Compile>
@@ -442,40 +439,16 @@
       <Link>Content\Arete\rex-larsson\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json">
-      <Link>Content\Arete\rex-larsson\dialogue\rex-larsson.dialogue.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\rex-larsson\quests\rex-larsson.quests.json">
       <Link>Content\Arete\rex-larsson\quests\rex-larsson.quests.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\marcus-stone\manifest.json">
-      <Link>Content\Arete\marcus-stone\manifest.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json">
-      <Link>Content\Arete\marcus-stone\dialogue\marcus-stone.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\windcaller-karrec\manifest.json">
       <Link>Content\Subway\windcaller-karrec\manifest.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json">
-      <Link>Content\Subway\windcaller-karrec\dialogue\windcaller-karrec.dialogue.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json">
       <Link>Content\Subway\windcaller-karrec\quests\windcaller-karrec.quests.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\tailor\manifest.json">
-      <Link>Content\Subway\tailor\manifest.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\..\..\..\..\Server\ZoneEngine_New\Content\Subway\tailor\dialogue\tailor.dialogue.json">
-      <Link>Content\Subway\tailor\dialogue\tailor.dialogue.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ProjectReference Include="..\SmokeLounge.AOtomation.Messaging\SmokeLounge.AOtomation.Messaging.csproj">

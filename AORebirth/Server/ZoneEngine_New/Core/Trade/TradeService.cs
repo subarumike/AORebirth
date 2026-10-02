@@ -238,6 +238,10 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
+            // A Knubot window is driven by the KnuBot trade messages only.
+            if (session.Kind == TradeKind.Knubot)
+                return;
+
             if (session.Machine?.Stock.IsConfiguredSnapshot == true
                 && (session.AcceptedShopTransport == null || !IsCurrentAcceptedShop(player, session.Machine, session.AcceptedShopTransport)))
             {
@@ -337,7 +341,7 @@ namespace ZoneEngine_New.Core.Trade
             if (page == null)
                 return;
 
-            if (!page.Content.TryGetValue(source.Instance, out Item? item) || item.Locked)
+            if (!page.Content.TryGetValue(source.Instance, out Item? item) || player.Inventory.IsLockedForTransfer(item))
                 return;
 
             if (InventoryMoveService.IsBagItem(item))
@@ -582,7 +586,7 @@ namespace ZoneEngine_New.Core.Trade
                     SetCash(initiator, initiatorCash);
                     SetCash(partner, partnerCash);
                     foreach (Delivery delivery in deliveries)
-                        SendGrant(delivery.Receiver, delivery.Item, delivery.Page);
+                        SendDelivery(delivery);
                 });
             }
             catch (Exception exception)
@@ -614,32 +618,83 @@ namespace ZoneEngine_New.Core.Trade
         // Reserve only durable main-inventory locations. Offers remain untouched until COMMIT.
         static void PlanDeliveries(IEnumerable<Item> items, Player receiver, List<Delivery> deliveries)
         {
+            if (!TryPlanDeliveries(items, receiver, deliveries))
+                throw new InvalidOperationException("Inventory has no durable location for the trade.");
+        }
+
+        /// <summary>
+        /// Plans each item in send order, as the client will place them: a stackable item that fits whole onto an
+        /// existing stack merges into it (the client parks the AddTemplate copy in its first free slot and folds it
+        /// in on the JoinItems echo, freeing that slot again); anything else takes the first free slot.
+        /// </summary>
+        static bool TryPlanDeliveries(IEnumerable<Item> items, Player receiver, List<Delivery> deliveries)
+        {
             Container page = receiver.Inventory.Inventory;
             var occupied = new HashSet<int>(page.Content.Keys);
+            var planned = new Dictionary<Item, int>(ReferenceEqualityComparer.Instance);
             foreach (Delivery delivery in deliveries)
-                if (ReferenceEquals(delivery.Receiver, receiver)) occupied.Add(delivery.Slot);
+            {
+                if (!ReferenceEquals(delivery.Receiver, receiver))
+                    continue;
+                if (delivery.MergeTarget == null)
+                    occupied.Add(delivery.Slot);
+                else
+                    planned[delivery.MergeTarget] = planned.GetValueOrDefault(delivery.MergeTarget) + delivery.Item.StackCount;
+            }
+
             foreach (Item item in items)
             {
                 int slot = page.Offset;
                 while (slot < page.Offset + page.Capacity && occupied.Contains(slot)) slot++;
                 if (slot == page.Offset + page.Capacity)
-                    throw new InvalidOperationException("Inventory has no durable location for the trade.");
+                    return false;
+
+                if (InventoryStacking.TryFindStackTarget(page, item, planned, out int targetSlot, out Item target))
+                {
+                    planned[target] = planned.GetValueOrDefault(target) + item.StackCount;
+                    deliveries.Add(new Delivery(item, receiver, page, slot, target, targetSlot));
+                    continue;
+                }
+
                 occupied.Add(slot);
                 deliveries.Add(new Delivery(item, receiver, page, slot));
             }
+
+            return true;
         }
 
         static void ApplyDeliveries(List<Delivery> deliveries)
         {
             foreach (Delivery delivery in deliveries)
             {
+                if (delivery.MergeTarget != null)
+                {
+                    if (!delivery.Page.Content.TryGetValue(delivery.MergeSlot, out Item? current)
+                        || !ReferenceEquals(current, delivery.MergeTarget))
+                        throw new InvalidOperationException("Planned trade stack changed after durable commit.");
+                    delivery.MergeTarget.StackCount += delivery.Item.StackCount;
+                    continue;
+                }
+
                 if (!delivery.Page.Add(delivery.Slot, delivery.Item))
                     throw new InvalidOperationException("Reserved trade location changed after durable commit.");
                 delivery.Item.IsPersisted = true;
             }
         }
 
-        sealed record Delivery(Item Item, Player Receiver, Container Page, int Slot);
+        static void SendDelivery(Delivery delivery)
+        {
+            if (delivery.MergeTarget != null)
+                InventoryStacking.SendGrantAndJoin(delivery.Receiver, delivery.Item, delivery.Page, delivery.MergeSlot, delivery.Slot);
+            else
+                SendGrant(delivery.Receiver, delivery.Item, delivery.Page);
+        }
+
+        /// <summary>
+        /// One item reaching a receiver. Slot is its own main-inventory slot, or for a merge (MergeTarget set) the
+        /// free slot the client parks the copy in before folding it into the stack at MergeSlot.
+        /// </summary>
+        sealed record Delivery(Item Item, Player Receiver, Container Page, int Slot, Item? MergeTarget = null, int MergeSlot = 0);
 
         void PersistPlan(Player first, int firstCash, Player? second, int secondCash,
             List<Delivery> deliveries, IReadOnlyList<Item> retired, Identity graveyard)
@@ -657,8 +712,41 @@ namespace ZoneEngine_New.Core.Trade
                     foreach (var insert in flush.Inserts) inserts[insert.InstanceId] = insert;
                     foreach (var update in flush.Updates) updates[update.InstanceId] = update;
                 }
+                var stackTotals = new Dictionary<Item, int>(ReferenceEqualityComparer.Instance);
                 foreach (Delivery delivery in deliveries)
-                    Place(delivery.Item, delivery.Page.Identity, delivery.Slot);
+                {
+                    if (delivery.MergeTarget == null)
+                    {
+                        Place(delivery.Item, delivery.Page.Identity, delivery.Slot);
+                        continue;
+                    }
+
+                    // A merged item gives up its own row (a traded stack is retired, a minted one never written)
+                    // and its count lands on the stack's row.
+                    if (delivery.Item.IsPersisted)
+                        Place(delivery.Item, new Identity { Type = IdentityType.None, Instance = delivery.Receiver.Identity.Instance },
+                            delivery.Item.InstanceId);
+                    else
+                    {
+                        inserts.Remove(delivery.Item.InstanceId);
+                        updates.Remove(delivery.Item.InstanceId);
+                    }
+
+                    stackTotals[delivery.MergeTarget] = stackTotals.GetValueOrDefault(delivery.MergeTarget, delivery.MergeTarget.StackCount)
+                        + delivery.Item.StackCount;
+                }
+
+                foreach (Delivery delivery in deliveries)
+                {
+                    if (delivery.MergeTarget is not Item target || !stackTotals.TryGetValue(target, out int total))
+                        continue;
+                    if (target.InstanceId <= 0 || !target.IsPersisted || total > InventoryStacking.MaxStackCount)
+                        throw new InvalidOperationException("Invalid trade stack merge.");
+                    updates[target.InstanceId] = new ItemLocationUpdate(target.InstanceId, (int)delivery.Page.Identity.Type,
+                        delivery.Page.Identity.Instance, delivery.MergeSlot, total);
+                    inserts.Remove(target.InstanceId);
+                }
+
                 foreach (Item item in retired)
                 {
                     inserts.Remove(item.InstanceId);
@@ -776,7 +864,7 @@ namespace ZoneEngine_New.Core.Trade
                 }
 
                 sellTotal += TradeRules.SellPrice(
-                    TradeRules.ItemValue(_catalog, item.LowId, item.HighId, item.Quality),
+                    TradeRules.StackValue(item, TradeRules.ItemValue(_catalog, item.LowId, item.HighId, item.Quality)),
                     machine.BuyModifier,
                     skillSteps);
             }
@@ -794,23 +882,13 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
-            // Overflow is intentionally memory-only; accepting money for a purchase there would
-            // lose the paid-for item on restart. Require real inventory before allocating ids.
-            if (!player.Inventory.HasFreeInventorySlots(purchases.Count))
-            {
-                ClientFeedback.Send(player, "Feedback_NoRoomInInventory");
-                return;
-            }
-
             // Mint first so unique duplication is checked against real items, and so a rejected
-            // purchase costs the player nothing. Ids are allocated here because a bag only gets its
-            // container identity once it has an instance id.
+            // purchase costs the player nothing.
             var minted = new List<MintedPurchase>(purchases.Count);
             foreach (Purchase purchase in purchases)
             {
                 ShopStockSlot stock = purchase.Stock;
                 Item item = _minter.Create(stock.LowId, stock.HighId, stock.Quality, ItemSource.Vendor);
-                item.AssignInstanceId(_ids.Allocate());
                 if (TradeRules.IsUnique(item)
                     && (TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId)
                         || ContainsTemplate(minted, item)))
@@ -822,6 +900,21 @@ namespace ZoneEngine_New.Core.Trade
                 minted.Add(new MintedPurchase(item, purchase.Price));
             }
 
+            // The same stackable line picked several times arrives as one stack, a new one past 50000. Ids are
+            // allocated after that because a bag only gets its container identity once it has an instance id.
+            List<Item> bought = ConsolidateStacks(minted.Select(p => p.Item).ToList(), template => _minter.Create(
+                template.LowId, template.HighId, template.Quality, ItemSource.Vendor));
+            foreach (Item item in bought)
+                item.AssignInstanceId(_ids.Allocate());
+
+            // Overflow is intentionally memory-only; accepting money for a purchase there would
+            // lose the paid-for item on restart. Require real inventory (or a stack to join) up front.
+            if (!TryPlanDeliveries(bought, player, new List<Delivery>()))
+            {
+                ClientFeedback.Send(player, "Feedback_NoRoomInInventory");
+                return;
+            }
+
             session.Committing = true;
             bool durable = false;
             int soldCount = offer.Count;
@@ -830,13 +923,13 @@ namespace ZoneEngine_New.Core.Trade
                 _flush.WithExclusivePlayers(player, null, () =>
                 {
                     var deliveries = new List<Delivery>();
-                    PlanDeliveries(minted.Select(p => p.Item), player, deliveries);
+                    PlanDeliveries(bought, player, deliveries);
                     PersistPlan(player, checked((int)finalCash), null, 0, deliveries, offer.Items.Values.ToArray(), machine.Identity);
                     durable = true;
                     offer.DrainAll();
                     ApplyDeliveries(deliveries);
                     SetCash(player, finalCash);
-                    foreach (Delivery delivery in deliveries) SendGrant(player, delivery.Item, delivery.Page);
+                    foreach (Delivery delivery in deliveries) SendDelivery(delivery);
                 });
             }
             catch (Exception exception)
@@ -861,6 +954,56 @@ namespace ZoneEngine_New.Core.Trade
                     soldCount,
                     buyTotal,
                     sellTotal));
+        }
+
+        /// <summary>
+        /// Folds stackable items of the same low/high/QL into as few stacks as the 50000 cap allows, in order of
+        /// first appearance. The total count is unchanged; <paramref name="mint"/> supplies an extra item only when
+        /// a group's total needs more stacks than it has items.
+        /// </summary>
+        static List<Item> ConsolidateStacks(List<Item> items, Func<Item, Item> mint)
+        {
+            var result = new List<Item>(items.Count);
+            var groups = new Dictionary<(int, int, int), List<Item>>();
+            var order = new List<(int, int, int)>();
+            foreach (Item item in items)
+            {
+                if (!InventoryStacking.IsStackable(item))
+                {
+                    result.Add(item);
+                    continue;
+                }
+
+                var key = (item.LowId, item.HighId, item.Quality);
+                if (!groups.TryGetValue(key, out List<Item>? group))
+                {
+                    groups[key] = group = [];
+                    order.Add(key);
+                }
+
+                group.Add(item);
+            }
+
+            foreach (var key in order)
+            {
+                List<Item> group = groups[key];
+                long remaining = 0;
+                foreach (Item item in group)
+                    remaining += item.StackCount;
+
+                int index = 0;
+                while (remaining > 0)
+                {
+                    Item stack = index < group.Count ? group[index] : mint(group[0]);
+                    index++;
+                    int count = (int)Math.Min(remaining, InventoryStacking.MaxStackCount);
+                    stack.StackCount = count;
+                    remaining -= count;
+                    result.Add(stack);
+                }
+            }
+
+            return result;
         }
 
         static bool ContainsTemplate(List<MintedPurchase> items, Item candidate)
@@ -900,6 +1043,299 @@ namespace ZoneEngine_New.Core.Trade
 
             public int Price { get; }
         }
+
+        #endregion
+
+        #region Knubot
+
+        /// <summary>
+        /// Opens the "Give Item" window for <paramref name="npc"/>. The client moves each item into its own
+        /// KnuBot trade container as it sends it (Gamecode.dll N3Msg_NPCChatAddTradeItem), so the server mirrors
+        /// that container: items leave the player's page and sit locked in <see cref="TradeSession.InitiatorOffer"/>
+        /// at the index the client used, the first free one. Nothing is written until the trade commits, so an
+        /// interrupted trade leaves every item at its stored location.
+        /// </summary>
+        public bool TryOpenKnubot(Player player, NpcCharacter npc, string message)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(npc);
+
+            if (player.Session == null || player.Playfield == null || !player.Inventory.IsHydrated || player.IsDead
+                || npc.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield))
+                return false;
+
+            if (player.GetEdgeDistanceTo(npc) > RangeCancelDistance)
+            {
+                ClientFeedback.Send(player, "Feedback_TooFarAway");
+                return false;
+            }
+
+            if (TryGetSession(player, out TradeSession existing))
+            {
+                if (existing.Kind == TradeKind.Knubot && ReferenceEquals(existing.Npc, npc))
+                    return true;
+
+                Close(existing, "opening another trade");
+            }
+
+            Register(player, new TradeSession(Identity.None, TradeKind.Knubot, player, partner: null, machine: null, npc));
+
+            // The client rejects an empty text (length must be 1..10000).
+            player.Session.Send(new KnuBotStartTradeMessage
+            {
+                Identity = player.Identity,
+                Unknown1 = 2,
+                Target = npc.Identity,
+                NumberOfItemSlotsInTradeWindow = TradeOffer.Capacity,
+                Message = string.IsNullOrWhiteSpace(message) ? "Trade" : message
+            });
+
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot trade opened player={0} npc={1}",
+                player.Identity.Instance, npc.Identity.Instance));
+            return true;
+        }
+
+        /// <summary>The Knubot trade <paramref name="player"/> has open with <paramref name="npc"/>, if any.</summary>
+        public bool TryGetKnubot(Player player, NpcCharacter npc, out TradeSession session)
+            => TryGetSession(player, out session) && session.Kind == TradeKind.Knubot && ReferenceEquals(session.Npc, npc)
+                && !session.Committing;
+
+        /// <summary>An item put into or taken out of the Give Item window.</summary>
+        public void HandleKnubot(Player player, KnuBotTradeMessage message)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(message);
+
+            if (player.Session == null || player.Playfield == null || !player.Inventory.IsHydrated
+                || !TryGetSession(player, out TradeSession session) || session.Kind != TradeKind.Knubot || session.Committing
+                || session.Npc == null || message.Target != session.Npc.Identity
+                || player.GetEdgeDistanceTo(session.Npc) > RangeCancelDistance)
+                return;
+
+            if (message.Action == KnuBotTradeAction.Add)
+                AddKnubotItem(player, session.InitiatorOffer, message.Container);
+            else if (message.Action == KnuBotTradeAction.Remove)
+                RemoveKnubotItem(player, session.InitiatorOffer, message.Container.Instance);
+        }
+
+        void AddKnubotItem(Player player, TradeOffer offer, Identity source)
+        {
+            Container page = source.Type switch
+            {
+                IdentityType.Inventory => player.Inventory.Inventory,
+                IdentityType.OverflowWindow => player.Inventory.Overflow,
+                _ => null!
+            };
+
+            // The client has already moved the item into the first free index of its trade container.
+            int clientSlot = FirstFreeOfferSlot(offer);
+            if (page == null || !page.Content.TryGetValue(source.Instance, out Item? item) || player.Inventory.IsLockedForTransfer(item))
+            {
+                // Nothing the server can take: undo the client's move so its view matches.
+                if (clientSlot >= 0)
+                    SendReturnToInventory(player, clientSlot);
+                return;
+            }
+
+            // No-drop items are allowed: the NPC only consumes them, they never reach another player.
+            string? refusal = InventoryMoveService.IsBagItem(item) ? "Feedback_ItemCantBeTraded"
+                : clientSlot < 0 ? "Feedback_CantTradeMoreItems"
+                : null;
+            if (refusal != null)
+            {
+                ClientFeedback.Send(player, refusal);
+                if (clientSlot >= 0)
+                    UndoKnubotAdd(player, page, source.Instance, item, clientSlot);
+                return;
+            }
+
+            if (page.Remove(source.Instance) == null)
+                return;
+
+            offer.Add(item);
+        }
+
+        /// <summary>
+        /// The client sends the item back to the first free main-inventory slot; the server re-homes it the same way
+        /// so both agree where it is.
+        /// </summary>
+        void UndoKnubotAdd(Player player, Container page, int slot, Item item, int clientSlot)
+        {
+            if (TryPlaceMain(player, item, out Container target, out int targetSlot, removeFrom: page, removeSlot: slot))
+            {
+                player.Inventory.MarkDirty(item, target, targetSlot);
+                _flush.NotifyDirty(player);
+            }
+
+            SendReturnToInventory(player, clientSlot);
+        }
+
+        void RemoveKnubotItem(Player player, TradeOffer offer, int tradeSlot)
+        {
+            Item? item = offer.Remove(tradeSlot);
+            if (item == null)
+                return;
+
+            // The client only takes an item back into main inventory; with no room it leaves it in the window.
+            if (!TryPlaceMain(player, item, out Container page, out int slot))
+            {
+                offer.TryRestore(tradeSlot, item);
+                ClientFeedback.Send(player, "Feedback_InventoryFull");
+                return;
+            }
+
+            player.Inventory.MarkDirty(item, page, slot);
+            _flush.NotifyDirty(player);
+        }
+
+        /// <summary>
+        /// The NPC keeps everything in the window and takes <paramref name="credits"/>, which the client already took
+        /// off its own Cash when it accepted. Returns false when nothing changed hands; the caller then ends the
+        /// window with <see cref="EndKnubot(Player, NpcCharacter, int, string)"/>.
+        /// </summary>
+        public bool TryCommitKnubot(Player player, NpcCharacter npc, int credits)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(npc);
+
+            if (!TryGetKnubot(player, npc, out TradeSession session) || credits < 0
+                || player.Stats.GetOrZero(CharacterStat.Cash) < credits)
+                return false;
+
+            TradeOffer offer = session.InitiatorOffer;
+            Item[] given = offer.Items.OrderBy(x => x.Key).Select(x => x.Value).ToArray();
+            int finalCash = player.Stats.GetOrZero(CharacterStat.Cash) - credits;
+
+            session.Committing = true;
+            bool durable = false;
+            try
+            {
+                _flush.WithExclusivePlayers(player, null, () =>
+                {
+                    PersistPlan(player, finalCash, null, 0, [], given, npc.Identity);
+                    durable = true;
+                    offer.DrainAll();
+                    SetCash(player, finalCash);
+                });
+            }
+            catch (Exception exception)
+            {
+                FailedCommit(session, exception, durable);
+                return false;
+            }
+
+            Unregister(player);
+
+            // An empty list removes every item still in the client's window and closes it.
+            player.Session?.Send(RejectedItemsFrame(player, npc, [], 0));
+
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot trade completed player={0} npc={1} items={2} credits={3}",
+                player.Identity.Instance, npc.Identity.Instance, given.Length, credits));
+            return true;
+        }
+
+        /// <summary>Ends <paramref name="player"/>'s Knubot trade with <paramref name="npc"/>, handing everything back.</summary>
+        public void EndKnubot(Player player, NpcCharacter npc, int refundCredits, string reason)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(npc);
+
+            if (TryGetKnubot(player, npc, out TradeSession session))
+                EndKnubot(session, refundCredits, reason);
+        }
+
+        /// <summary>
+        /// Hands every item back in window order, as the client does: each goes to the first free main-inventory
+        /// slot and is listed in KnuBotRejectedItems; one that no longer fits is left off the list (the client drops
+        /// its copy) and goes to overflow if it may. <paramref name="refundCredits"/> gives back what the client took
+        /// off its Cash when it accepted.
+        /// </summary>
+        void EndKnubot(TradeSession session, int refundCredits, string reason)
+        {
+            if (session.Committing)
+                return;
+
+            session.Committing = true;
+            Player player = session.Initiator;
+            TradeOffer offer = session.InitiatorOffer;
+            var returned = new List<KnuBotRejectedItem>(offer.Count);
+            var overflowed = new List<(Item Item, Container Page)>();
+            foreach (int tradeSlot in offer.Items.Keys.OrderBy(x => x).ToArray())
+            {
+                Item item = offer.Remove(tradeSlot)!;
+                if (TryPlaceMain(player, item, out Container page, out int slot))
+                {
+                    player.Inventory.MarkDirty(item, page, slot);
+                    returned.Add(RejectedItem(item));
+                }
+                else if (player.Inventory.TryPlace(item, out page, out slot))
+                {
+                    player.Inventory.MarkDirty(item, page, slot);
+                    overflowed.Add((item, page));
+                }
+                else
+                {
+                    // A stored item may not live in overflow; its row never moved, so it is back at its old slot on relog.
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture,
+                        "Knubot trade return failed instance={0} owner={1}; no free slot", item.InstanceId, player.Identity.Instance));
+                    ClientFeedback.Send(player, "Feedback_NoRoomInInventory");
+                }
+            }
+
+            _flush.NotifyDirty(player);
+            Unregister(player);
+
+            if (session.Npc != null)
+                player.Session?.Send(RejectedItemsFrame(player, session.Npc, returned.ToArray(), Math.Max(0, refundCredits)));
+            foreach ((Item item, Container page) in overflowed)
+                SendGrant(player, item, page);
+
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot trade closed player={0} returned={1} overflow={2} reason={3}",
+                player.Identity.Instance, returned.Count, overflowed.Count, reason));
+        }
+
+        static int FirstFreeOfferSlot(TradeOffer offer)
+        {
+            for (int slot = 0; slot < TradeOffer.Capacity; slot++)
+            {
+                if (!offer.Items.ContainsKey(slot))
+                    return slot;
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Places <paramref name="item"/> in the first free main-inventory slot, the slot the client picks for an item
+        /// coming out of its trade window. <paramref name="removeFrom"/> frees the item's current slot first.
+        /// </summary>
+        static bool TryPlaceMain(Player player, Item item, out Container page, out int slot,
+            Container? removeFrom = null, int removeSlot = 0)
+        {
+            page = player.Inventory.Inventory;
+            removeFrom?.Remove(removeSlot);
+            slot = page.FindFreeSlot();
+            if (slot >= 0 && page.Add(slot, item))
+                return true;
+
+            removeFrom?.Add(removeSlot, item);
+            return false;
+        }
+
+        /// <summary>How the client finds the item in its window: instanced items by identity, others by template and QL.</summary>
+        static KnuBotRejectedItem RejectedItem(Item item) => item.Identity.Type != IdentityType.None
+            ? new KnuBotRejectedItem { LowId = (int)item.Identity.Type, HighId = item.Identity.Instance, Quality = -1 }
+            : new KnuBotRejectedItem { LowId = item.LowId, HighId = item.HighId, Quality = item.Quality };
+
+        static KnuBotRejectedItemsMessage RejectedItemsFrame(Player player, NpcCharacter npc, KnuBotRejectedItem[] items, int credits)
+            => new()
+            {
+                Identity = player.Identity,
+                Unknown1 = 2,
+                Target = npc.Identity,
+                Items = items,
+                Credits = credits
+            };
 
         #endregion
 
@@ -955,6 +1391,12 @@ namespace ZoneEngine_New.Core.Trade
         {
             if (session.Committing)
                 return;
+
+            if (session.Kind == TradeKind.Knubot)
+            {
+                EndKnubot(session, 0, reason);
+                return;
+            }
 
             session.Committing = true;
 
@@ -1082,6 +1524,13 @@ namespace ZoneEngine_New.Core.Trade
 
                 Dynel anchor = owner != null ? owner : machine;
                 return initiator.GetEdgeDistanceTo(anchor) > RangeCancelDistance;
+            }
+
+            if (session.Kind == TradeKind.Knubot)
+            {
+                NpcCharacter? npc = session.Npc;
+                return npc == null || npc.IsDead || !ReferenceEquals(npc.Playfield, playfield)
+                    || initiator.GetEdgeDistanceTo(npc) > RangeCancelDistance;
             }
 
             Player? partner = session.Partner;

@@ -47,3 +47,7 @@ developer checkout resynchronization remain active.
 The complete earlier source history, production receipts and operational details
 are preserved privately. This retirement includes no production deployment or
 production database operation. See BUILD_ACCEPTANCE_BOUNDARY.md.
+
+NPC dialogue: Knubot scripts (`GameData/Knubot/**/*.json`, `ZoneEngine_New/Core/Knubot`) drive all NPC
+conversations; an NPC talks only when a script names it. The Arete, garden vendor, Nascence, Subway and
+Zyvania NPCs have no scripts yet and are silent.

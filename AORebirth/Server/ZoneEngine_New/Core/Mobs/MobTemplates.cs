@@ -37,8 +37,13 @@ namespace ZoneEngine_New.Core.Mobs
         /// <summary>Per-band stats copied from NpcTemplates.json.</summary>
         public Dictionary<int, int> Stats { get; set; } = new();
 
-        /// <summary>When false, players cannot fight this NPC and it gets no combat brain.</summary>
-        public bool Attackable { get; set; } = true;
+        /// <summary>
+        /// Behaviour switches from the level entry's "Features" (plus NoCombat for the unresolved placeholder and for
+        /// blue-named NPCs).
+        /// </summary>
+        public HashSet<NpcFeature> Features { get; set; } = new();
+
+        public bool Has(NpcFeature feature) => Features.Contains(feature);
 
         public int MinLevel { get; set; }
 
@@ -65,10 +70,6 @@ namespace ZoneEngine_New.Core.Mobs
         public MobCorpseFullUpdateTemplate? CorpseFullUpdateTemplate { get; set; }
 
         public int KnuBotId { get; set; }
-
-        public string RawFeatures { get; set; } = string.Empty;
-
-        public JsonElement? Features { get; set; }
 
         public List<MobItemTableEntry> ItemTable { get; set; } = new();
 

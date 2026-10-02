@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Inventory
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
@@ -90,7 +91,13 @@ namespace ZoneEngine_New.Core.Inventory
                 return item.Use(player, slot, _inventoryRepository, _items) ? ItemUseStart.Executed : ItemUseStart.Rejected;
 
             if (!item.CanBeginUse(player))
+            {
+                if (item.UsesFightingTarget && player.TryResolveFightingTarget() == null)
+                    RequirementFeedback.SendText(player, "You need a fighting target to use this item.");
+                else
+                    RequirementFeedback.SendIfUnmet(player, item.Definition, ActionType.ToUse);
                 return ItemUseStart.Rejected;
+            }
 
             int instanceId = item.InstanceId;
             var pending = new PendingItemUse(
@@ -118,7 +125,10 @@ namespace ZoneEngine_New.Core.Inventory
                 return ItemUseStart.Rejected;
 
             if (!dynel.CanBeginUse(player))
+            {
+                RequirementFeedback.SendIfUnmet(player, dynel.Template, ActionType.ToUse);
                 return ItemUseStart.Rejected;
+            }
 
             var pending = new PendingItemUse(
                 player,
@@ -127,6 +137,55 @@ namespace ZoneEngine_New.Core.Inventory
                 () => dynel.ExecuteUse(player),
                 lockTarget: null);
             return Begin(pending, ResolveDelayCentiseconds(dynel));
+        }
+
+        /// <summary>
+        /// UsePerk (Perk Actions button). The action template's AttackDelay runs like an item use; the perk is
+        /// re-checked (still held, unlocked, requirements, target alive and in AttackRange) before OnUse runs.
+        /// </summary>
+        public ItemUseStart TryBeginPerkAction(Player player, int hash)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            if (!ReferenceEquals(player.Playfield, _playfield) || _moves.HasPending(player.Identity.Instance))
+                return ItemUseStart.Rejected;
+
+            if (HasPending(player.Identity.Instance))
+            {
+                ClientFeedback.Send(player, ClientFeedback.AlreadyRunningAction);
+                return ItemUseStart.Rejected;
+            }
+
+            if (!player.TryPreparePerkAction(hash, out Player.PerkActionUse? use) || use == null)
+                return ItemUseStart.Rejected;
+
+            // Attack vs defense rating decides at once. A miss is answered immediately (evade feedback and the
+            // OnFailure lock) with no QueuePerk, as in live capture 2026-10-02T13:02:33Z.
+            if (!player.PerkActionLands(use))
+            {
+                player.FailPerkAction(use, _inventoryRepository);
+                return ItemUseStart.Executed;
+            }
+
+            // A landing action: live answers with QueuePerk (CharacterAction 0x50, Parameter1 2, Parameter2 the
+            // action's AttackDelay in centiseconds) and performs it when the delay runs out.
+            int delay = ClampDelay(use.Template.Stats.GetValueOrDefault(CharacterStat.AttackDelay));
+            player.Session?.Send(new CharacterActionMessage
+            {
+                Identity = player.Identity,
+                Action = CharacterActionType.QueuePerk,
+                Target = Identity.None,
+                Parameter1 = 2,
+                Parameter2 = delay
+            });
+
+            var pending = new PendingItemUse(
+                player,
+                string.Format(CultureInfo.InvariantCulture, "perkAction={0:X8} template={1}", hash, use.Template.Id),
+                () => player.RevalidatePerkAction(use),
+                () => player.ExecutePerkAction(use, _inventoryRepository),
+                lockTarget: null);
+            return Begin(pending, delay);
         }
 
         ItemUseStart Begin(PendingItemUse pending, int delayCentiseconds)
@@ -235,7 +294,7 @@ namespace ZoneEngine_New.Core.Inventory
         {
             if (!player.Inventory.IsHydrated)
                 return "inventory not hydrated";
-            if (!player.Inventory.TryGetItem(slot.Type, slot.Instance, out Item current)
+            if (!player.Inventory.TryGetUseItem(slot, out Item current)
                 || !ReferenceEquals(current, item)
                 || current.InstanceId != instanceId)
                 return "slot changed";

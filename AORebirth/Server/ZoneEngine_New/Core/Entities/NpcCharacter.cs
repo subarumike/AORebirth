@@ -46,7 +46,10 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Interpolated worn items and expanded monster weapons. Capacity 50.</summary>
         public Container Equipment { get; }
 
-        /// <summary>False for vendors and other non-combat NPCs.</summary>
+        /// <summary>
+        /// False for NoCombat NPCs: vendors and other non-combat NPCs. A NoCombat NPC cannot be attacked, attack, cast or
+        /// be cast on.
+        /// </summary>
         public bool Attackable { get; set; } = true;
 
         /// <summary>
@@ -173,6 +176,25 @@ namespace ZoneEngine_New.Core.Entities
             VendingMachine? shop = Shop;
             if (shop != null && !IsDead)
                 yield return shop.BuildSpawnMessage();
+
+            if (BuildKnubotStatMessage() is { } knubot)
+                yield return knubot;
+        }
+
+        /// <summary>
+        /// HasKnubotData for an NPC with a Knubot script: without it the client's use action on the NPC
+        /// is a trade, with it the client opens the KnuBot chat.
+        /// </summary>
+        protected StatMessage? BuildKnubotStatMessage()
+        {
+            if (IsDead || Playfield?.GetService<Knubot.KnubotCatalog>() is not { } knubot || !knubot.TryResolve(this, out _))
+                return null;
+
+            return new StatMessage
+            {
+                Identity = Identity,
+                Stats = [new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.HasKnubotData, Value2 = 1 }]
+            };
         }
 
         void SetCharacterFlag(CharacterFlags flag, bool set)

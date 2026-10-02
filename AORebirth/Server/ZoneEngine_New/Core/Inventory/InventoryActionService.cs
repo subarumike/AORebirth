@@ -28,14 +28,17 @@ namespace ZoneEngine_New.Core.Inventory
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>Largest stack a join may produce: the client's 50000 (N3Msg_JoinItems).</summary>
+        const int MaxStackCount = InventoryStacking.MaxStackCount;
+
         public void Handle(Player player, CharacterActionMessage message)
         {
             if (player.Session?.State != SessionState.InPlay || player.IsDead || player.IsPersistenceQuarantined)
                 return;
-            if (!TryResolveOwnedSlot(player, message.Target, out _, out Item item)) return;
-            if (message.Action == CharacterActionType.DeleteItem
-                && TryDelete(player, message.Target, item.InstanceId))
+            if (message.Action == CharacterActionType.DeleteItem)
             {
+                if (!TryResolveOwnedSlot(player, message.Target, out _, out Item item)
+                    || !TryDelete(player, message.Target, item.InstanceId)) return;
                 player.Session?.Send(new CharacterActionMessage
                 {
                     Identity = player.Identity, Action = message.Action, Target = message.Target,
@@ -45,8 +48,21 @@ namespace ZoneEngine_New.Core.Inventory
             }
             else if (message.Action == CharacterActionType.Split)
             {
-                // The supported Legacy path does not send a fabricated split acknowledgement.
-                TrySplit(player, message.Target, item.InstanceId, message.Parameter2);
+                // The client already split locally; an echoed 0x34 would split it a second time.
+                if (TryResolveStackSlot(player, message.Target, out _, out _, out Item item))
+                    TrySplit(player, message.Target, item.InstanceId, message.Parameter2);
+            }
+            else if (message.Action == CharacterActionType.JoinItems)
+            {
+                var source = new Identity { Type = (IdentityType)message.Parameter1, Instance = message.Parameter2 };
+                if (!TryJoin(player, message.Target, source)) return;
+                // The client merges only on this echo; same Target/source layout as its request.
+                player.Session?.Send(new CharacterActionMessage
+                {
+                    Identity = player.Identity, Action = message.Action, Target = message.Target,
+                    Unknown = message.Unknown, Unknown1 = message.Unknown1, Unknown2 = message.Unknown2,
+                    Parameter1 = message.Parameter1, Parameter2 = message.Parameter2
+                });
             }
         }
 
@@ -73,11 +89,13 @@ namespace ZoneEngine_New.Core.Inventory
         public bool TrySplit(Player player, Identity slot, int expectedInstanceId, int amount)
         {
             if (player.Session?.State != SessionState.InPlay || player.IsPersistenceQuarantined || player.IsDead
-                || !TryResolveOwnedSlot(player, slot, out Container page, out Item item)
-                || item.InstanceId != expectedInstanceId || page.Identity.Type.IsWearPage()
-                || page.Identity.Type == IdentityType.OverflowWindow || InventoryMoveService.IsBagItem(item)
-                || !item.Can(CanFlags.Stackable) || item.Can(CanFlags.CantSplit)
+                || !TryResolveStackSlot(player, slot, out Container page, out int placement, out Item item)
+                || item.InstanceId != expectedInstanceId || !IsStackPage(page)
+                || !IsStackable(item) || item.Can(CanFlags.CantSplit)
+                // Two instances of a unique item would bypass the one-per-character rule.
+                || Trade.TradeRules.IsUnique(item)
                 || amount <= 0 || amount >= item.StackCount) return false;
+            // Same rule the client used for its local split: the page's first free slot.
             int destination = page.FindFreeSlot();
             if (destination < 0) return false;
             int originalCount = item.StackCount;
@@ -91,9 +109,9 @@ namespace ZoneEngine_New.Core.Inventory
                 StackCount = amount, Source = item.Source, Definition = item.Definition
             };
             return TryCommit(player,
-                [new InventoryRowChange(item, page.Identity, slot.Instance, originalCount - amount),
+                [new InventoryRowChange(item, page.Identity, placement, originalCount - amount),
                  new InventoryRowChange(split, page.Identity, destination, amount)],
-                () => IsCurrent(page, slot.Instance, item, expectedInstanceId)
+                () => IsCurrent(page, placement, item, expectedInstanceId)
                     && item.StackCount == originalCount && !page.Content.ContainsKey(destination),
                 () =>
                 {
@@ -101,6 +119,68 @@ namespace ZoneEngine_New.Core.Inventory
                     if (!page.Add(destination, split)) throw new InvalidOperationException("Reserved split slot changed.");
                 });
         }
+
+        /// <summary>
+        /// Merges <paramref name="source"/> into <paramref name="target"/>. The client keeps the
+        /// Target slot and drops the source slot (FUN_1002a40e), so the source row is retired.
+        /// </summary>
+        public bool TryJoin(Player player, Identity target, Identity source)
+        {
+            if (player.Session?.State != SessionState.InPlay || player.IsPersistenceQuarantined || player.IsDead
+                || target.Type != source.Type || target.Instance == source.Instance
+                || !TryResolveStackSlot(player, target, out Container page, out int targetSlot, out Item kept)
+                || !TryResolveStackSlot(player, source, out Container sourcePage, out int sourceSlot, out Item merged)
+                || !ReferenceEquals(page, sourcePage) || targetSlot == sourceSlot || ReferenceEquals(kept, merged)
+                || !IsStackPage(page) || !IsStackable(kept) || !IsStackable(merged)
+                || kept.LowId != merged.LowId || kept.HighId != merged.HighId || kept.Quality != merged.Quality)
+                return false;
+            int keptId = kept.InstanceId, mergedId = merged.InstanceId;
+            int keptCount = kept.StackCount, mergedCount = merged.StackCount;
+            if (keptCount <= 0 || mergedCount <= 0 || (long)keptCount + mergedCount > MaxStackCount) return false;
+            int total = keptCount + mergedCount;
+            var graveyard = new Identity { Type = IdentityType.None, Instance = player.Identity.Instance };
+            return TryCommit(player,
+                [new InventoryRowChange(kept, page.Identity, targetSlot, total),
+                 new InventoryRowChange(merged, graveyard, mergedId, mergedCount, Retired: true)],
+                () => IsCurrent(page, targetSlot, kept, keptId) && IsCurrent(page, sourceSlot, merged, mergedId)
+                    && kept.StackCount == keptCount && merged.StackCount == mergedCount,
+                () =>
+                {
+                    page.Content.Remove(sourceSlot);
+                    kept.StackCount = total;
+                });
+        }
+
+        /// <summary>
+        /// Stack slot for split/join: an owned page slot, or a carried bag's packed 0x6B
+        /// handle/slot. Bags in the bank, loot, or mid-trade/move are not owned stack pages.
+        /// </summary>
+        static bool TryResolveStackSlot(Player player, Identity slot, out Container page, out int placement, out Item item)
+        {
+            if (slot.Type != IdentityType.Backpack)
+            {
+                placement = slot.Instance;
+                return TryResolveOwnedSlot(player, slot, out page, out item);
+            }
+
+            page = null!; item = null!;
+            placement = InventoryMoveService.DecodeBackpackSlot(slot);
+            int handle = InventoryMoveService.DecodeBackpackHandle(slot);
+            // Unhydrated bag pages have rows not yet loaded; a free slot there may be occupied.
+            return player.Inventory.IsHydrated && handle != 0
+                && player.Inventory.TryGetOwnedBackpackPageByHandle(handle, out page)
+                && page.IsHydrated && page.LinkedItem is { Locked: false }
+                && (page.Flags & ContainerFlags.CanRemove) != 0
+                && placement >= page.Offset && placement < page.Offset + page.Capacity
+                && page.Content.TryGetValue(placement, out item!) && !item.Locked && item.InstanceId > 0;
+        }
+
+        /// <summary>Wear pages hold one item per slot; overflow is memory-only and never persisted.</summary>
+        static bool IsStackPage(Container page)
+            => !page.Identity.Type.IsWearPage() && page.Identity.Type != IdentityType.OverflowWindow;
+
+        static bool IsStackable(Item item)
+            => item.Can(CanFlags.Stackable) && !InventoryMoveService.IsBagItem(item);
 
         public static bool TryResolveOwnedSlot(Player player, Identity slot, out Container page, out Item item)
         {

@@ -10,6 +10,7 @@ namespace ZoneEngine_New.Core.Pets
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Playfield;
@@ -46,7 +47,8 @@ namespace ZoneEngine_New.Core.Pets
         /// <paramref name="owner"/>, lasting <paramref name="durationSeconds"/> (0 or less: until dismissed).
         /// A pet already in the same slot is dismissed first.
         /// </summary>
-        public NpcCharacter? Summon(Character owner, string hash, int level, int durationSeconds)
+        public NpcCharacter? Summon(Character owner, string hash, int level, int durationSeconds,
+            IReadOnlyList<ItemRequirement>? summonRequirements = null)
         {
             ArgumentNullException.ThrowIfNull(owner);
             if (string.IsNullOrWhiteSpace(hash) || owner.IsDead || !ReferenceEquals(owner.Playfield, _playfield))
@@ -55,10 +57,12 @@ namespace ZoneEngine_New.Core.Pets
                 return null;
 
             DateTime? expires = durationSeconds > 0 ? DateTime.UtcNow.AddSeconds(durationSeconds) : null;
-            return Spawn(owner, hash.Trim(), Types.TypeOf(hash.Trim()), level, expires, PetMode.Guard, healthPercent: 100);
+            return Spawn(owner, hash.Trim(), Types.TypeOf(hash.Trim()), level, expires, PetMode.Guard, healthPercent: 100,
+                summonRequirements ?? []);
         }
 
-        NpcCharacter? Spawn(Character owner, string hash, int type, int level, DateTime? expires, PetMode mode, int healthPercent)
+        NpcCharacter? Spawn(Character owner, string hash, int type, int level, DateTime? expires, PetMode mode, int healthPercent,
+            IReadOnlyList<ItemRequirement> summonRequirements)
         {
             if (!_gameData.TryResolveMobTemplate(hash, level > 0 ? level : null, out MobTemplate template)
                 || !NpcTemplateValidation.CanSpawn(template))
@@ -70,7 +74,7 @@ namespace ZoneEngine_New.Core.Pets
             if (owner.OwnedPets.InSlotOf(type) is NpcCharacter previous)
                 Dismiss(previous, "replaced");
 
-            var controller = new PetController(owner, type, hash, level, expires);
+            var controller = new PetController(owner, type, hash, level, expires, summonRequirements);
             if (owner is Player && mode is PetMode.Follow or PetMode.Guard)
                 controller.Order(mode);
 
@@ -104,6 +108,7 @@ namespace ZoneEngine_New.Core.Pets
             PublishPetsStat(owner);
             if (owner is Player player)
                 SendAddPet(player, pet);
+            RefreshOverEquip(pet);
 
             _logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "Summoned pet id={0} hash={1} type={2} level={3} owner={4} expires={5}",
@@ -188,7 +193,7 @@ namespace ZoneEngine_New.Core.Pets
                     _ => controller.Mode
                 };
                 owner.OwnedPets.Stash.Add(new PetStash(controller.Hash, controller.Type, controller.Level,
-                    controller.ExpiresUtc, mode, HealthPercent(pet)));
+                    controller.ExpiresUtc, mode, HealthPercent(pet), controller.SummonRequirements));
             }
 
             foreach (NpcCharacter pet in pets)
@@ -219,7 +224,7 @@ namespace ZoneEngine_New.Core.Pets
             {
                 if (pet.ExpiresUtc is DateTime expires && now >= expires)
                     continue;
-                Spawn(owner, pet.Hash, pet.Type, pet.Level, pet.ExpiresUtc, pet.Mode, pet.HealthPercent);
+                Spawn(owner, pet.Hash, pet.Type, pet.Level, pet.ExpiresUtc, pet.Mode, pet.HealthPercent, pet.SummonRequirements);
             }
         }
 
@@ -249,6 +254,10 @@ namespace ZoneEngine_New.Core.Pets
             foreach (NpcCharacter pet in ResolveOwned(owner, petIdentities))
             {
                 PetController controller = pet.Pet!;
+                // An over-equipped pet ignores every command; its owner can still dismiss it.
+                if (controller.IsOverEquipped && command != PetCommandCode.Terminate)
+                    continue;
+
                 switch (command)
                 {
                     case PetCommandCode.Follow:
@@ -326,6 +335,43 @@ namespace ZoneEngine_New.Core.Pets
                 return target;
 
             return owner;
+        }
+
+        /// <summary>
+        /// Re-judges whether each of <paramref name="owner"/>'s pets is over-equipped (after the owner's stats were
+        /// rebased). A pet that becomes OE drops what it was doing and follows.
+        /// </summary>
+        public void RefreshOverEquip(Character owner)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+            if (owner is not Player || owner.OwnedPets.Count == 0)
+                return;
+
+            foreach (NpcCharacter pet in owner.OwnedPets.All)
+                RefreshOverEquip(pet);
+        }
+
+        void RefreshOverEquip(NpcCharacter pet)
+        {
+            PetController? controller = pet.Pet;
+            if (controller == null || controller.Owner is not Player owner)
+                return;
+
+            bool overEquipped = OverEquip.ComputeLevel(controller.SummonRequirements, owner.Stats) > 0;
+            if (overEquipped == controller.IsOverEquipped)
+                return;
+
+            controller.IsOverEquipped = overEquipped;
+            if (overEquipped)
+            {
+                controller.EndHeal();
+                controller.Order(PetMode.Follow);
+                StandDown(pet);
+            }
+
+            _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                "Pet id={0} hash={1} owner={2} over-equipped={3}",
+                pet.Identity.Instance, controller.Hash, owner.Identity.Instance, overEquipped));
         }
 
         static void StandDown(NpcCharacter pet)

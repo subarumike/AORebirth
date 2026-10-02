@@ -163,7 +163,7 @@ namespace ZoneEngine_New.Core.Playfield
                 Name = template.Name,
                 MobTemplate = template,
                 SpawnHash = spawnHash ?? template.Hash,
-                Attackable = template.Attackable,
+                Attackable = !template.Has(NpcFeature.NoCombat),
                 Position = at,
                 Rotation = heading ?? new Quaternion(),
                 SpawnSource = spawnSource
@@ -719,6 +719,7 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(full);
             SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
+            player.SendPerkActions();
 
             _playfieldManager.Teams.AttachPlayer(player);
             _playfieldManager.Teams.RefreshPlayer(player);
@@ -800,6 +801,7 @@ namespace ZoneEngine_New.Core.Playfield
             session.Send(reconnectFull);
             SendRetailWorldEntryCompletion(session, player);
             session.State = SessionState.InPlay;
+            player.SendPerkActions();
 
             _playfieldManager.Teams.AttachPlayer(player);
             _playfieldManager.Teams.RefreshPlayer(player);
@@ -966,7 +968,6 @@ namespace ZoneEngine_New.Core.Playfield
 
             player.InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
             _trades.Cancel(player, "left playfield");
-            _playfieldManager.Dialogues.Detached(player);
             _flush.HardFlush(player);
 
             PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
@@ -992,9 +993,37 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(landing);
 
+            if (SendSamePlayfieldArrival(player, landing))
+                player.SendDeathRespawnAction();
+        }
+
+        /// <summary>
+        /// Reloads the player where they stand: the same arrival sequence as an in-zone respawn, so the
+        /// client rebuilds the character (equipment, stats, nanos) from a fresh full update, and observers
+        /// see a fresh spawn.
+        /// </summary>
+        public void ReloadInPlace(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (player.Session == null || player.IsDead)
+                return;
+
+            SendSamePlayfieldArrival(player, player.Position);
+        }
+
+        /// <summary>
+        /// N3Teleport, playfield ready block, self spawn packets, then locality visibility. The client drops
+        /// every dynel on the teleport, so the player's visible set is cleared first and activation resends
+        /// all of it, including cells the player could already see.
+        /// </summary>
+        bool SendSamePlayfieldArrival(Player player, Vector3 landing)
+        {
             IZoneSession? session = player.Session;
             if (session == null)
-                return;
+                return false;
+
+            PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
+            locality.DeactivatePlayerVisibility(player);
 
             int characterId = player.Identity.Instance;
             int playfieldId = _playfield.Identity.Instance;
@@ -1021,6 +1050,7 @@ namespace ZoneEngine_New.Core.Playfield
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
             session.Send(player.BuildFullCharacterMessage());
+            player.SendPerkActions();
 
             session.Send(
                 new GameTimeMessage
@@ -1037,8 +1067,8 @@ namespace ZoneEngine_New.Core.Playfield
                 playfieldId,
                 characterId);
 
-            _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
-            player.SendDeathRespawnAction();
+            locality.ActivatePlayerVisibility(player);
+            return true;
         }
 
         /// <summary>
@@ -1050,6 +1080,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(position);
 
             player.Motor.ResetForPlayfieldTransfer(position);
+            player.Inventory.ResetBackpackClientState();
             player.Playfield = _playfield;
             player.Logger = _logger;
             _registry.Register(player);
@@ -1080,7 +1111,6 @@ namespace ZoneEngine_New.Core.Playfield
             if (npc.OwnedPets.Count > 0)
                 _playfield.GetRequiredService<Pets.PetService>().DismissAll(npc, "owner despawned");
 
-            _playfieldManager.Dialogues?.Detached(npc);
             _playfield.GetRequiredService<ZoneEngine_New.Core.Mobs.NpcContentActivationService>().Detached(npc);
 
             npc.SetFightingTarget(Identity.None);
@@ -1104,8 +1134,6 @@ namespace ZoneEngine_New.Core.Playfield
             if (oldSession == null || ReferenceEquals(oldSession, newSession))
                 return;
 
-            _playfieldManager.Dialogues.Detached(player);
-
             lock (oldSession)
             {
                 // Closing the old socket cannot race the accepted reconnect's ownership.
@@ -1127,7 +1155,6 @@ namespace ZoneEngine_New.Core.Playfield
             // Logging out sends the player's pets away.
             _playfield.GetRequiredService<Pets.PetService>().DismissAll(player, "owner logged out");
             player.SetFightingTarget(Identity.None);
-            _playfieldManager.Dialogues.Detached(player);
             _playfieldManager.Teams.DetachPlayer(player);
 
             if (!player.IsPersistenceQuarantined)

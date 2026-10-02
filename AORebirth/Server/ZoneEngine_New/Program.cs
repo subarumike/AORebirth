@@ -197,6 +197,8 @@ namespace ZoneEngine_New
             services.AddSingleton<MySqlActiveNanoRepository>();
             services.AddSingleton<IActiveNanoRepository>(provider => provider.GetRequiredService<MySqlActiveNanoRepository>());
             services.AddSingleton<ISkillLockRepository, MySqlSkillLockRepository>();
+            services.AddSingleton<ITrainedPerkRepository, MySqlTrainedPerkRepository>();
+            services.AddSingleton<IPerkLockRepository, MySqlPerkLockRepository>();
             services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();
             services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();
@@ -234,9 +236,6 @@ namespace ZoneEngine_New
             services.AddSingleton<GeneratedMissionService>();
             services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
             services.AddSingleton<AuthoredQuestService>();
-            services.AddSingleton(_ => ZoneEngine_New.Core.Dialogue.DialogueCatalog.Load(AppContext.BaseDirectory));
-            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueActionRouter>();
-            services.AddSingleton<ZoneEngine_New.Core.Dialogue.DialogueService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
             services.AddSingleton<TradeService>();
@@ -258,11 +257,18 @@ namespace ZoneEngine_New
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
 
+            //Knubot
+            services.AddSingleton<ZoneEngine_New.Core.Knubot.KnubotCatalog>();
+            services.AddSingleton<ZoneEngine_New.Core.Knubot.KnubotEffectServices>();
+            services.AddSingleton<ZoneEngine_New.Core.Knubot.KnubotService>();
+
             //Commands
             services.AddSingleton<IGmCommand, SpawnCommand>();
             services.AddSingleton<IGmCommand, TeleportCommand>();
             services.AddSingleton<IGmCommand, SetCommand>();
             services.AddSingleton<IGmCommand, GetCommand>();
+            services.AddSingleton<ZoneEngine_New.Core.Commands.Setups.AoSetupsClient>();
+            services.AddSingleton<ZoneEngine_New.Core.Commands.Setups.GiveSetupService>();
             services.AddSingleton<IGmCommand, GiveCommand>();
             services.AddSingleton<IGmCommand, NpcCommand>();
             services.AddSingleton<IGmCommand, ServerStatsCommand>();
@@ -286,6 +292,7 @@ namespace ZoneEngine_New
             AddMessageHandler<KnuBotOpenChatWindowMessageHandler>(services);
             AddMessageHandler<KnuBotAnswerMessageHandler>(services);
             AddMessageHandler<KnuBotCloseChatWindowMessageHandler>(services);
+            AddMessageHandler<KnuBotStartTradeMessageHandler>(services);
             AddMessageHandler<KnuBotTradeMessageHandler>(services);
             AddMessageHandler<KnuBotFinishTradeMessageHandler>(services);
             AddMessageHandler<RaidCmdMessageHandler>(services);

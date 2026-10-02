@@ -1,0 +1,84 @@
+{
+  "Notes": "Rubi-Ka newcomer Guide. (Backyard)",
+  "Npcs": ["CLGD"],
+  "Openers": [
+    { "Say": "intro" }
+  ],
+  "Replies": {
+    "who": { "Text": "Who are you?", "Goto": "who" },
+    "howto": { "Text": "I want to know how to play this game.", "Goto": "howto" },
+    "windows": { "Text": "I have some questions about the windows and menus.", "Goto": "windows" },
+    "windows_right": { "Text": "Tell me about the windows on the right.", "Goto": "windows_right" },
+    "inventory": { "Text": "Tell me about the Inventory.", "Goto": "inventory" },
+    "skills": { "Text": "Tell me about the Skill system." },
+    "shortcut_bar": { "Text": "Tell me about the Shortcut bar." },
+    "something_else": { "Text": "Let's talk about something else.", "Goto": "something_else" },
+    "browse_topics": { "Text": "I'd like to see all the topics and browse through them as I please." },
+    "tasks": { "Text": "I prefer doing tasks.", "Goto": "tasks" },
+    "mission_seen": { "Text": "Yes, I see it." },
+    "mission_not_seen": { "Text": "No." }
+  },
+  "Lines": {
+    "intro": {
+      "Text": [
+        "{delay 1}Hello. I am here to help you get acquainted with living on Rubi-Ka.",
+        "{delay 1}Please don't hesitate to ask me for help if there is anything you are having difficulties with or want to know more about."
+      ],
+      "Replies": ["who", "howto", "windows"]
+    },
+    "who": {
+      "Text": "{delay 1}I am here to help you take your first few steps on Rubi-Ka. If you have any questions about how things are done here, please don't hesitate to ask.",
+      "Replies": ["howto", "windows"]
+    },
+    "something_else": {
+      "Text": "{delay 1}OK. What do you want to talk about?",
+      "Replies": ["howto", "windows"]
+    },
+
+    "windows": {
+      "Text": "{delay 1}Certainly! What part do you want to know about?",
+      "Replies": ["windows_right", "inventory", "skills", "shortcut_bar", "something_else"]
+    },
+    "windows_right": {
+      "Text": [
+        "{delay 1}By holding down the CTRL-key and pressing keys 1 to 9, you can open and close various sub-menu windows.",
+        "{delay 1}Notice that the windows that are open are highlighted.",
+        "{delay 1}You can also minimize and maximize the windows by clicking on the window label.",
+        "{delay 1}What windows do you want me to tell you about?",
+        "{delay 1}<font color=#FF0000>[Debug] Dead end: the individual window topics have no replies yet.</font>"
+      ],
+      "Replies": ["something_else"]
+    },
+    "inventory": {
+      "Text": [
+        "If you want to open your Inventory, press ' i ' on your keyboard",
+        "You can pick up any item from the inventory by left-clicking on the item. You can now move the item wherever you want it.",
+        "If you want to pick up an item from the ground, simply double-left-click on it, and it will be transferred to your inventory.",
+        "If you right-click on an item in the inventory, you will use that item (Note: not all items can be used, and some have specific requirements for you to be able to use them).",
+        "With your inventory open, right-click on your weapon to hold it in your hand. If you right-click an hold on an item, a short menu will appear, with various options for that item. Hold the mouse button down and move the cursor over the icons to see what their functions are.",
+        "If you hold down the ' SHIFT ' key and left-click on an item, you will get a detailed description of that item in a new window. Here you will find out what the item is for, and what the requirements for using the item is.",
+        "Using an item usually requires you to to be proficient in certain skills or be of a particular profession (such as trader or soldier).",
+        "There is more information available on the Inventory and Using Items. Do you want to know more?"
+      ],
+      "Replies": ["something_else"]
+    },
+
+    "howto": {
+      "Text": [
+        "{delay 1}I can provide you with information on a number of subjects. Just tell me what you would like to know more about.",
+        "{delay 1}If you prefer a more hands-on approach, I could also give you a couple of simple tasks to complete."
+      ],
+      "Replies": ["browse_topics", "tasks"]
+    },
+    "tasks": {
+      "Text": [
+        "{delay 1}Excellent! Let's start right away with missions.",
+        "{delay 1}More often than not, you will have the opportunity to receive missions. Once accepted, a description will be stored for your convenience.",
+        "{delay 2}Hold on, I'll give you a mission now.",
+        "{delay 2}{givequest KION}",
+        "{delay 2}To see the mission description press (Ctrl + 4). Can you see it?"
+      ],
+      "Replies": ["mission_seen", "mission_not_seen"]
+    }
+  }
+}

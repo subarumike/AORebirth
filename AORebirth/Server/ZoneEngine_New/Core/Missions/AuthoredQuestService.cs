@@ -48,18 +48,6 @@ public sealed partial class AuthoredQuestService
         return action.Key != null && TryExecuteAction(player, action.Key, slot, item);
     }
 
-    public bool CanExecuteAction(Player player, string key)
-    {
-        if (Content.TimedTurnIns.FirstOrDefault(x => x.Key == key) is { } timed) return CanOpenTimedTrade(player, timed);
-        if (!Content.Actions.TryGetValue(key, out var action)) return false;
-        lock (player.PersistenceGate)
-        {
-            if (!IsCurrent(player)) return false;
-            try { return _dao.Execute(player.Identity.Instance, null!, tx => Conditions(player, action, tx)); }
-            catch (Exception e) { _logger.Error(e, "Interaction state could not be read."); return false; }
-        }
-    }
-
     public bool TryExecuteAction(Player player, string key, Identity slot = default, Item? item = null, Action? acknowledge = null)
     {
         if (Content.TimedTurnIns.FirstOrDefault(x => x.Key == key) is { } timed)
@@ -127,23 +115,6 @@ public sealed partial class AuthoredQuestService
             && action.RequireMissions.All(Matches) && !action.RejectMissions.Any(Matches)
             && !action.RejectCarried.Any(x => HasCarried(player, x))
             && (action.AnyMissions.Length + action.AnyCarried.Length == 0 || action.AnyMissions.Any(Matches) || action.AnyCarried.Any(x => HasCarried(player, x)));
-    }
-
-    public bool TryResolveDialogueStart(Player player, DialogueBinding binding, bool priorOpen, out string? node)
-    {
-        node = null;
-        lock (player.PersistenceGate)
-        {
-            if (!IsCurrent(player) || !binding.Enabled || (binding.Playfields.Length != 0 && !binding.Playfields.Contains(player.Playfield!.Identity.Instance))) return false;
-            try
-            {
-                var missions = _dao.GetMissions(player.Identity.Instance);
-                node = binding.Starts.FirstOrDefault(x => x.Carried.Any(id => HasCarried(player, id)) || x.Missions.Any(c => missions.Any(m => m.QuestId == c.Quest && c.States.Contains(m.State.ToString()))))?.Node;
-                if (node == null && priorOpen && !string.IsNullOrEmpty(binding.ReopenNode)) node = binding.ReopenNode;
-                return true;
-            }
-            catch (Exception e) { _logger.Error(e, "Dialogue state could not be read."); return false; }
-        }
     }
 
     public void Restore(Player player)

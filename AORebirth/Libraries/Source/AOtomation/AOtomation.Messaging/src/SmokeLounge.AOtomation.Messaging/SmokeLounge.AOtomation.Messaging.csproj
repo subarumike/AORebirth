@@ -152,6 +152,7 @@
     <Compile Include="GameData\FollowStopInfo.cs" />
     <Compile Include="GameData\FollowTargetInfo.cs" />
     <Compile Include="GameData\FullCharacterSub.cs" />
+    <Compile Include="GameData\PerkMapEntry.cs" />
     <Compile Include="GameData\FullCharacterSub2.cs" />
     <Compile Include="GameData\GameTuple.cs" />
     <Compile Include="GameData\CharacterInfo.cs" />

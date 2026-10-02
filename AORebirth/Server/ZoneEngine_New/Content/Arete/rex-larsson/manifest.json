@@ -1,7 +1,4 @@
 {
-  "DialoguePacks": [
-    "dialogue/rex-larsson.dialogue.json"
-  ],
   "QuestPacks": [
     "quests/rex-larsson.quests.json"
   ]

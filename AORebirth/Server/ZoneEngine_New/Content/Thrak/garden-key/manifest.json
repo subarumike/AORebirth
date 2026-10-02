@@ -1,7 +1,4 @@
 {
-  "DialoguePacks": [
-    "dialogue/thrak-garden-key.dialogue.json"
-  ],
   "QuestPacks": [
     "quests/thrak-garden-key.quests.json"
   ]

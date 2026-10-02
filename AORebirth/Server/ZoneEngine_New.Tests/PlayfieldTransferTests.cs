@@ -19,7 +19,6 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.SystemMessages;
 using ZoneEngine_New.Core.Characters;
 using ZoneEngine_New.Core.Data;
-using ZoneEngine_New.Core.Dialogue;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.GameData;
@@ -460,7 +459,6 @@ public sealed class PlayfieldTransferTests
             Set(Manager, "_sync", new Lock()); Set(Manager, "_playersByCharacterId", new Dictionary<int, Player>());
             Set(Manager, "<Teams>k__BackingField", new TeamService(dispatchOnOwner: (player, action) =>
                 player.Playfield?.DispatchPlayerProjection(player, action)));
-            Set(Manager, "<Dialogues>k__BackingField", new DialogueService(null!, null!));
             _flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => Manager), Persist, new StubLogger());
             Set(_trades, "_gate", new object()); Set(_trades, "_byPlayer", new Dictionary<int, TradeSession>());
         }

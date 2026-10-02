@@ -66,8 +66,17 @@ namespace ZoneEngine_New.Core.Entities
 
         public static bool IsUnset(int value) => value == (int)CharacterStat.Unset;
 
+        /// <summary>
+        /// Runtime stats rebuilt every session and never stored: fight bookkeeping, taken pet slots, and the
+        /// equipped weapon type criteria the client derives from the weapon page.
+        /// </summary>
+        public static bool IsRuntimeOnly(CharacterStat stat)
+            => stat is CharacterStat.NumberOfFightingOpponents or CharacterStat.Pets
+                or CharacterStat.EquippedWeapons or CharacterStat.EquippedRHWeapon;
+
         /// <summary>Server bookkeeping stats the client never receives.</summary>
-        public static bool IsServerOnly(CharacterStat stat) => stat == CharacterStat.UsedIP;
+        public static bool IsServerOnly(CharacterStat stat)
+            => stat is CharacterStat.UsedIP or CharacterStat.MissionBits19 or CharacterStat.MissionBits20;
 
         /// <summary>
         /// The value the client is sent for a stat, when it is not simply the stored base (a player's IP is sent as

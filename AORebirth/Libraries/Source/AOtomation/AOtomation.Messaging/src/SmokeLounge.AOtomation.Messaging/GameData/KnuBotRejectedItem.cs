@@ -16,6 +16,10 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 {
     using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 
+    /// <summary>
+    /// One item to hand back. A template item is matched on LowId, HighId and Quality; an instanced item on
+    /// its identity, sent as LowId = type, HighId = instance, Quality = -1 (Gamecode.dll KnubotRejectedItemsIIR_c).
+    /// </summary>
     public class KnuBotRejectedItem
     {
         #region AoMember Properties

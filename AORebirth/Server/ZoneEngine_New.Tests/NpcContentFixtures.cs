@@ -28,7 +28,7 @@ internal static class SocialNpcFixture
     internal sealed record Definition(WorldNpcDefinition Content)
     {
         internal NpcContentBinding Binding => new(Content.Key, Content.Provenance, Content.ContentNpcIdentity,
-            Content.PlayfieldId, Content.HasDialogue, Content.Vendor != null);
+            Content.PlayfieldId, Content.Vendor != null);
         internal NpcCharacter Create(IItemBuilder items) => WorldNpcFactory.Create(Content, items);
     }
     internal static IReadOnlyList<Definition> Definitions { get; } = LoadDefinitions();

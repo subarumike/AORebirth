@@ -102,6 +102,23 @@ namespace ZoneEngine_New.Core.Trade
             return PricingSkillSteps(shopper.Stats.GetOrZero((CharacterStat)pricingSkill));
         }
 
+        /// <summary>
+        /// Value of a stackable item's current count: a minted stack (MintStackCount units) is worth the template
+        /// value, and part of one is worth its share, rounded down. Splitting a stack and selling the pieces
+        /// therefore never pays more than selling it whole. A non-stackable item cannot be split and is worth the
+        /// full value whatever its count (a weapon's MaxEnergy, a stim's charges).
+        /// </summary>
+        public static int StackValue(Item item, int templateValue)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            if (!item.Can(CanFlags.Stackable))
+                return templateValue;
+
+            int full = Math.Max(1, item.Definition.MintStackCount);
+            long value = (long)templateValue * Math.Max(0, item.StackCount) / full;
+            return (int)Math.Min(value, int.MaxValue);
+        }
+
         /// <summary>Skill discount steps from a raw Computer Literacy value, clamped to 0-3000.</summary>
         public static int PricingSkillSteps(int computerLiteracy)
         {

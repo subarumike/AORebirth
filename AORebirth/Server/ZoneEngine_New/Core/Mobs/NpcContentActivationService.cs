@@ -15,7 +15,7 @@ using ZoneEngine_New.Core.Trade;
 
 /// <summary>Capabilities belong to a complete loaded content placement, never to an actor name.</summary>
 internal sealed record NpcContentBinding(string PlacementIdentity, string SourceIdentity,
-    string ContentNpcIdentity, int PlayfieldId, bool HasDialogue, bool HasVendor);
+    string ContentNpcIdentity, int PlayfieldId, bool HasVendor);
 
 internal sealed record ShopContentBinding(string PlacementIdentity, string SourceIdentity, int PlayfieldId);
 
@@ -48,7 +48,7 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
                 throw new InvalidOperationException("Content NPC identity collision: " + definition.Key);
             try
             {
-                Bind(npc, new(definition.Key, definition.Provenance, definition.ContentNpcIdentity, definition.PlayfieldId, definition.HasDialogue, definition.Vendor != null));
+                Bind(npc, new(definition.Key, definition.Provenance, definition.ContentNpcIdentity, definition.PlayfieldId, definition.Vendor != null));
                 npc.Died += OnDied;
                 if (npc.Shop != null) npc.Shop.Playfield = playfield;
                 locality.RegisterDynel(npc);
@@ -261,7 +261,7 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
     {
         if (_stopped || binding.PlayfieldId != playfield.Identity.Instance
             || string.IsNullOrWhiteSpace(binding.PlacementIdentity)
-            || (binding.HasDialogue && string.IsNullOrWhiteSpace(binding.ContentNpcIdentity)) || !IsCurrent(npc)
+            || !IsCurrent(npc)
             || _bindings.Values.Any(existing => existing.PlacementIdentity == binding.PlacementIdentity))
             throw new InvalidOperationException("Content NPC binding is incomplete, duplicate, or no longer current.");
         _bindings.Add(npc, binding);

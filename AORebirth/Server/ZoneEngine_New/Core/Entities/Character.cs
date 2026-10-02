@@ -71,12 +71,6 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Damage shares are split out of this so each killer's fraction survives integer math.</summary>
         const int AlienShareBasis = 10000;
         const int QuestXpCapPercent = 20;
-        const int MartialArtsSpecialLowId = 211357;
-        const int MartialArtsSpecialHighId = 211358;
-        const int DimachSpecialLowId = 42033;
-        const int DimachSpecialHighId = 42032;
-        const int BrawlSpecialLowId = 211401;
-        const int BrawlSpecialHighId = 211402;
 
         protected Character(Identity identity)
             : base(identity)
@@ -100,11 +94,14 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>LockSkill cooldowns by stat id. Only players persist them.</summary>
         public SkillLocks SkillLocks { get; } = new();
 
-        public void LockSkill(int statId, int durationSeconds, DateTime nowUtc)
+        /// <summary>Locks <paramref name="statId"/>; returns the applied duration after SkillLockModifier.</summary>
+        public int LockSkill(int statId, int durationSeconds, DateTime nowUtc)
         {
-            SkillLocks.Lock(statId, ScaleSkillLock(statId, durationSeconds), nowUtc);
+            int seconds = ScaleSkillLock(statId, durationSeconds);
+            SkillLocks.Lock(statId, seconds, nowUtc);
             if (this is Player player)
                 Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(player);
+            return seconds;
         }
 
         /// <summary>
@@ -1086,6 +1083,16 @@ namespace ZoneEngine_New.Core.Entities
             if (!IsPlayer)
                 return specials.ToArray();
 
+            // Retail SAW advertises this character's own items (capture 2026-10-01, Keeper with low skills):
+            // MAAT 43712/144745 fist pair, DIIT 211399/211400 Keeper Dimach, BRAW 70292/70293 tier-1 Brawl.
+            Profession profession = (Profession)Stats.GetOrZero(CharacterStat.Profession);
+            (int maLowId, int maHighId, _) =
+                MartialArtsFistResolver.Resolve(profession, Stats.GetOrOne(CharacterStat.MartialArts));
+            (int brawlLowId, int brawlHighId, _) =
+                MartialArtsFistResolver.ResolveBrawl(Stats.GetOrZero(CharacterStat.Brawl));
+            (int dimachLowId, int dimachHighId, _) =
+                MartialArtsFistResolver.ResolveDimach(profession, Stats.GetOrZero(CharacterStat.Dimach));
+
             foreach (KeyValuePair<WeaponSlot, CharacterWeapon> pair in Weapons)
             {
                 Item? item = pair.Value?.Item;
@@ -1119,8 +1126,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            MartialArtsSpecialLowId,
-                            MartialArtsSpecialHighId,
+                            maLowId,
+                            maHighId,
                             CharacterStat.MartialArts,
                             "MAAT"));
                     maat = true;
@@ -1130,8 +1137,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            BrawlSpecialLowId,
-                            BrawlSpecialHighId,
+                            brawlLowId,
+                            brawlHighId,
                             CharacterStat.Brawl,
                             "BRAW"));
                     brawl = true;
@@ -1141,8 +1148,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            DimachSpecialLowId,
-                            DimachSpecialHighId,
+                            dimachLowId,
+                            dimachHighId,
                             CharacterStat.Dimach,
                             "DIIT"));
                     dimach = true;
@@ -1157,8 +1164,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            MartialArtsSpecialLowId,
-                            MartialArtsSpecialHighId,
+                            maLowId,
+                            maHighId,
                             CharacterStat.MartialArts,
                             "MAAT"));
                 }
@@ -1167,8 +1174,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            BrawlSpecialLowId,
-                            BrawlSpecialHighId,
+                            brawlLowId,
+                            brawlHighId,
                             CharacterStat.Brawl,
                             "BRAW"));
                 }
@@ -1177,8 +1184,8 @@ namespace ZoneEngine_New.Core.Entities
                 {
                     specials.Add(
                         CreateSpecialAttack(
-                            DimachSpecialLowId,
-                            DimachSpecialHighId,
+                            dimachLowId,
+                            dimachHighId,
                             CharacterStat.Dimach,
                             "DIIT"));
                 }
@@ -1772,6 +1779,20 @@ namespace ZoneEngine_New.Core.Entities
                 FunctionType.RestrictAction,
                 spell => spell.TryReadInt(0, out int restricted) && (restricted & RestrictMovementBit) != 0);
 
+        /// <summary>RestrictAction bit that forbids fighting (e.g. 304935 Immortal).</summary>
+        public const int RestrictFightingBit = 2;
+
+        /// <summary>
+        /// A running buff holds RestrictAction with the fighting bit: this character cannot attack. Others can still
+        /// attack it. Refreshed on every rebase (<see cref="ApplyBuffBonuses"/>), so it lifts when the buff ends.
+        /// </summary>
+        public bool CombatRestricted { get; private set; }
+
+        bool HasCombatRestriction
+            => HasBuffFunction(
+                FunctionType.RestrictAction,
+                spell => spell.TryReadInt(0, out int restricted) && (restricted & RestrictFightingBit) != 0);
+
         /// <summary>A running buff holds Pacify (e.g. 100429 Wandering Mind): no aggression, no hate.</summary>
         public bool IsPacified => HasBuffFunction(FunctionType.Pacify);
 
@@ -2173,6 +2194,8 @@ namespace ZoneEngine_New.Core.Entities
 
             for (int i = 0; i < _buffs.Count; i++)
                 StatModifierSpells.Apply(_buffs[i].ModifierSpells, Stats);
+
+            CombatRestricted = HasCombatRestriction;
 
             // Every buff change rebases, so a root landing stops the character here.
             if (IsRooted)
@@ -2955,9 +2978,11 @@ namespace ZoneEngine_New.Core.Entities
             int runSpeedBase = Stats.GetOrZero(CharacterStat.RunSpeed, StatDetail.Base);
             int npcFamily = Stats.Get(CharacterStat.NPCFamily);
             int losHeight = Stats.GetOrZero((CharacterStat)466);
-            bool isNpc = !IsPlayer
-                && !StatCollection.IsUnset(npcFamily)
-                && npcFamily != 0;
+            // Every non-player gets the NPC character info. NPCFamily 0 is a real family (Newland Militia Guard and
+            // 78 other templates); sending those as a PC made the client never show them.
+            bool isNpc = !IsPlayer;
+            if (StatCollection.IsUnset(npcFamily))
+                npcFamily = 0;
 
             // Unset VisualFlags truncates to 722 on the wire; live NPC SCFUs use 31.
             short wireVisualFlags = StatCollection.IsUnset(visualFlags)

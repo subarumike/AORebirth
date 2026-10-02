@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Characters;
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
@@ -88,7 +89,7 @@ namespace ZoneEngine_New.Core.Entities
             Stats.Set(CharacterStat.SelectedTargetType, 0, StatDetail.Base);
             Stats.BaseChanged += stat =>
             {
-                if (!CharacterSaveState.IsCheckpointOnly(stat))
+                if (!CharacterSaveState.IsCheckpointOnly(stat) && !StatCollection.IsRuntimeOnly(stat))
                     SaveState.MarkDirty();
             };
         }
@@ -111,7 +112,639 @@ namespace ZoneEngine_New.Core.Entities
 
         public PlayerInventory Inventory { get; }
 
-        //TODO: Put perks here
+        /// <summary>Perk definitions (perk id to perk item) used to build <see cref="PerkTemplates"/>.</summary>
+        public PerkCatalog PerkCatalog { get; init; } = PerkCatalog.Default;
+
+        /// <summary>Perk action templates, tiers and skill rates (PerkActions.json) used by <see cref="TryUsePerkAction"/>.</summary>
+        public PerkActionCatalog PerkActionCatalog { get; init; } = PerkActionCatalog.Default;
+
+        /// <summary>Trained perk ids: the persistent perk state (charactersperks).</summary>
+        public TrainedPerks TrainedPerks { get; } = new();
+
+        /// <summary>LockPerk cooldowns keyed by perk id (characterperklocks).</summary>
+        public SkillLocks PerkLocks { get; } = new();
+
+        /// <summary>LockPerk: the perk's actions are unusable for <paramref name="durationSeconds"/>; zero or less clears it.</summary>
+        public void LockPerk(int perkId, int durationSeconds, DateTime nowUtc)
+        {
+            PerkLocks.Lock(perkId, durationSeconds, nowUtc);
+            Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(this);
+            if (durationSeconds > 0)
+                AnnouncePerkLock(perkId, durationSeconds, nowUtc);
+            else if (_announcedPerkLocks.Remove(perkId))
+                AnnouncePerkAvailable(perkId);
+        }
+
+        /// <summary>Perk locks shown on the client, by expiry; each gets PerkAvailable when it runs out.</summary>
+        readonly Dictionary<int, DateTime> _announcedPerkLocks = new();
+
+        /// <summary>
+        /// Shows the lock on the client: PerkUnavailable (CharacterAction 0xCF, Parameter1 = perk id,
+        /// Parameter2 = seconds; live capture 2026-10-02T03:54:58Z). Client case 0x59 (Gamecode.dll 0x1005393d)
+        /// starts its own timer for the perk and greys the perk's action button until it runs out.
+        /// </summary>
+        void AnnouncePerkLock(int perkId, int seconds, DateTime nowUtc)
+        {
+            if (Session?.State != SessionState.InPlay)
+                return;
+
+            _announcedPerkLocks[perkId] = nowUtc.AddSeconds(seconds);
+
+            Session.Send(new CharacterActionMessage
+            {
+                Identity = Identity,
+                Action = CharacterActionType.PerkUnavailable,
+                Target = Identity.None,
+                Parameter1 = perkId,
+                Parameter2 = seconds
+            });
+        }
+
+        /// <summary>
+        /// The lock ran out: PerkAvailable (CharacterAction 0xCE, Parameter1 0, Parameter2 = perk id; live capture
+        /// sends it when a 65 s Dance of Fools lock ends) re-enables the perk's action buttons.
+        /// </summary>
+        void AnnouncePerkAvailable(int perkId)
+        {
+            if (Session?.State != SessionState.InPlay)
+                return;
+
+            Session.Send(new CharacterActionMessage
+            {
+                Identity = Identity,
+                Action = CharacterActionType.PerkAvailable,
+                Target = Identity.None,
+                Parameter1 = 0,
+                Parameter2 = perkId
+            });
+        }
+
+        void TickPerkLocks()
+        {
+            if (_announcedPerkLocks.Count == 0)
+                return;
+
+            DateTime nowUtc = DateTime.UtcNow;
+            List<int>? expired = null;
+            foreach ((int perkId, DateTime expiresUtc) in _announcedPerkLocks)
+            {
+                if (expiresUtc <= nowUtc && !PerkLocks.IsLocked(perkId, nowUtc))
+                    (expired ??= []).Add(perkId);
+            }
+
+            if (expired == null)
+                return;
+
+            foreach (int perkId in expired)
+            {
+                _announcedPerkLocks.Remove(perkId);
+                AnnouncePerkAvailable(perkId);
+            }
+        }
+
+        /// <summary>
+        /// Requirement leaves a stat value cannot answer, resolved against this player: HasPerk / HasNotPerk
+        /// (trained perks), IsPerkLocked / IsPerkUnlocked (LockPerk cooldowns) and HasNotRunningNano (NCU).
+        /// The leaf's Value is the perk or nano id. Null leaves every other leaf to the stat comparison.
+        /// </summary>
+        public bool? ResolvePerkRequirement(ItemRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+            int id = requirement.Value;
+            return (Operator)requirement.Operator switch
+            {
+                Operator.HasPerk => TrainedPerks.Contains(id),
+                Operator.HasNotPerk => !TrainedPerks.Contains(id),
+                Operator.IsPerkLocked => PerkLocks.IsLocked(id, DateTime.UtcNow),
+                Operator.IsPerkUnlocked => !PerkLocks.IsLocked(id, DateTime.UtcNow),
+                Operator.HasNotRunningNano => !Buffs.Any(buff => buff.Id == id),
+                Operator.IsPetOverEquipped => OwnedPets.All.Any(pet => pet.Pet?.IsOverEquipped == true),
+                _ => null
+            };
+        }
+
+        ItemTemplate[] _perkTemplates = [];
+        PerkAction[] _perkActions = [];
+
+        /// <summary>
+        /// One Perk Actions grant from a perk item's OnWear AddAction (53182) function:
+        /// [slot = 10000 + perk id, 4-char hash, flag, action template id].
+        /// </summary>
+        public readonly record struct PerkAction(int ActionTemplateId, int Slot, int Hash);
+
+        /// <summary>Perk actions granted by <see cref="PerkTemplates"/>. Rebuilt with the templates.</summary>
+        public IReadOnlyList<PerkAction> PerkActions => _perkActions;
+
+        /// <summary>
+        /// Item templates of <see cref="TrainedPerks"/>. Rebuilt only on train, untrain and login;
+        /// <see cref="RebaseStats"/> reapplies their stats from here.
+        /// </summary>
+        public IReadOnlyList<ItemTemplate> PerkTemplates => _perkTemplates;
+
+        /// <summary>Login: the stored perks become the trained set and their templates are built.</summary>
+        public void LoadTrainedPerks(IEnumerable<int> perkIds)
+        {
+            ArgumentNullException.ThrowIfNull(perkIds);
+            TrainedPerks.Restore(perkIds);
+            RebasePerkTemplates();
+        }
+
+        /// <summary>Regular perk points spent: trained perks that are neither alien nor research.</summary>
+        public int UsedPerkPoints => TrainedPerks.Snapshot().Count(PerkCatalog.CostsPerkPoint);
+
+        public int UsedAlienPerkPoints => TrainedPerks.Snapshot().Count(PerkCatalog.CostsAlienPerkPoint);
+
+        public int AvailablePerkPoints
+            => PerkCatalog.EarnedPerkPoints(Stats.GetOrZero(CharacterStat.Level)) - UsedPerkPoints;
+
+        public int AvailableAlienPerkPoints
+            => PerkCatalog.EarnedAlienPerkPoints(Stats.GetOrZero(CharacterStat.AlienLevel)) - UsedAlienPerkPoints;
+
+        /// <summary>Expansion bit for Shadowlands; regular perks need it (Gamecode.dll 0x100536d7).</summary>
+        const int ShadowlandsExpansionBit = 0x02;
+
+        /// <summary>Expansion bit for Alien Invasion; alien perks need it.</summary>
+        const int AlienInvasionExpansionBit = 0x08;
+
+        /// <summary>
+        /// Trains <paramref name="perkId"/> under the client's own rules (Gamecode.dll 0x100536d7): a known,
+        /// untrained Perk or Alien category perk whose previous tier is trained, whose expansion is owned, with a free
+        /// perk point (alien perks: alien perk point; research: none) and whose perk item ToWear requirements
+        /// pass. Refreshes the perk templates and actions and rebases stats.
+        /// </summary>
+        public bool TryTrainPerk(int perkId, Action? confirm = null)
+        {
+            if (!PerkCatalog.TryGetItemId(perkId, out int itemId) || TrainedPerks.Contains(perkId))
+                return false;
+
+            if (!PerkCatalog.IsTrainable(perkId))
+                return false;
+            if (PerkCatalog.TryGetPreviousId(perkId, out int previousId) && !TrainedPerks.Contains(previousId))
+                return false;
+
+            int expansion = Stats.GetOrZero(CharacterStat.Expansion);
+            if (PerkCatalog.CostsPerkPoint(perkId)
+                && ((expansion & ShadowlandsExpansionBit) == 0 || AvailablePerkPoints <= 0))
+                return false;
+            if (PerkCatalog.CostsAlienPerkPoint(perkId)
+                && ((expansion & AlienInvasionExpansionBit) == 0 || AvailableAlienPerkPoints <= 0))
+                return false;
+
+            try
+            {
+                if (!_items.CreateTemplate(itemId, itemId, quality: 1).MeetsActionRequirements(stat => Stats.Get(stat), ActionType.ToWear, ResolvePerkRequirement))
+                    return false;
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception, string.Format(CultureInfo.InvariantCulture,
+                    "Perk {0} item {1} has no item template; it cannot be trained.", perkId, itemId));
+                return false;
+            }
+
+            if (!TrainedPerks.Add(perkId))
+                return false;
+
+            OnTrainedPerksChanged(confirm);
+            return true;
+        }
+
+        /// <summary>One perk untrain (reset) per hour.</summary>
+        public const int PerkResetCooldownSeconds = 3600;
+
+        /// <summary>
+        /// Untrains <paramref name="perkId"/> when it is the highest trained tier of its line and no untrain happened
+        /// in the last <see cref="PerkResetCooldownSeconds"/>. The cooldown is a lock on LastPerkResetTime in
+        /// <see cref="Character.SkillLocks"/> (persisted with the other locks, never scaled; the stat value itself is
+        /// left to the client, which stamps it with game time). Refreshes the perk templates and actions and rebases.
+        /// </summary>
+        public bool TryUntrainPerk(int perkId, Action? confirm = null)
+        {
+            if (!TrainedPerks.Contains(perkId))
+                return false;
+            foreach (int trained in TrainedPerks.Snapshot())
+            {
+                if (PerkCatalog.TryGetPreviousId(trained, out int previousId) && previousId == perkId)
+                    return false;
+            }
+
+            DateTime nowUtc = DateTime.UtcNow;
+            TimeSpan wait = SkillLocks.Remaining((int)CharacterStat.LastPerkResetTime, nowUtc);
+            if (wait > TimeSpan.Zero)
+            {
+                RequirementFeedback.SendText(this, string.Format(CultureInfo.InvariantCulture,
+                    "You can reset another perk in {0:00}:{1:00}:{2:00}.", (int)wait.TotalHours, wait.Minutes, wait.Seconds));
+                return false;
+            }
+
+            if (!TrainedPerks.Remove(perkId))
+                return false;
+
+            SkillLocks.Lock((int)CharacterStat.LastPerkResetTime, PerkResetCooldownSeconds, nowUtc);
+            OnTrainedPerksChanged(confirm);
+            return true;
+        }
+
+        /// <summary><paramref name="confirm"/> (the client's train/untrain echo) goes out before the perk action changes.</summary>
+        void OnTrainedPerksChanged(Action? confirm)
+        {
+            PerkAction[] before = _perkActions;
+            RebasePerkTemplates();
+            confirm?.Invoke();
+            AnnouncePerkActionChanges(before, _perkActions);
+            RebaseStats();
+            Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(this);
+        }
+
+        /// <summary>Rebuilds <see cref="PerkTemplates"/> and <see cref="PerkActions"/> from <see cref="TrainedPerks"/>.</summary>
+        public void RebasePerkTemplates()
+        {
+            int[] perkIds = TrainedPerks.Snapshot();
+            var templates = new List<ItemTemplate>(perkIds.Length);
+            foreach (int perkId in perkIds)
+            {
+                if (!PerkCatalog.TryGetItemId(perkId, out int itemId))
+                {
+                    Logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Trained perk {0} on character {1} is not in Perks.json; it grants nothing.", perkId, Identity.Instance));
+                    continue;
+                }
+
+                try
+                {
+                    templates.Add(_items.CreateTemplate(itemId, itemId, quality: 1));
+                }
+                catch (Exception exception)
+                {
+                    Logger.Error(exception, string.Format(CultureInfo.InvariantCulture,
+                        "Perk {0} item {1} has no item template; it grants nothing.", perkId, itemId));
+                }
+            }
+
+            _perkTemplates = templates.ToArray();
+            RebasePerkActions();
+        }
+
+        /// <summary>Rebuilds <see cref="PerkActions"/> from the perk templates' OnWear AddAction functions.</summary>
+        void RebasePerkActions()
+        {
+            var actions = new List<PerkAction>();
+            foreach (ItemTemplate perk in _perkTemplates)
+            {
+                if (!perk.SpellList.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
+                    continue;
+
+                foreach (ItemSpell spell in wear)
+                {
+                    if (!spell.Is(FunctionType.AddAction)
+                        || !spell.TryReadInt(0, out int slot)
+                        || !spell.TryReadInt(3, out int actionTemplateId)
+                        || !TryReadPerkActionHash(spell, out int hash))
+                        continue;
+
+                    actions.Add(new PerkAction(actionTemplateId, slot, hash));
+                }
+            }
+
+            _perkActions = actions.ToArray();
+        }
+
+        /// <summary>Login / FullCharacter: every held perk action and running perk lock goes to the client.</summary>
+        public void SendPerkActions()
+        {
+            AnnouncePerkActionChanges([], _perkActions);
+
+            DateTime nowUtc = DateTime.UtcNow;
+            foreach ((int perkId, TimeSpan remaining) in PerkLocks.Active(nowUtc))
+                AnnouncePerkLock(perkId, (int)Math.Ceiling(remaining.TotalSeconds), nowUtc);
+        }
+
+        /// <summary>
+        /// RemovePerkAction for actions no longer held, AddPerkAction for new ones. Client case 0x43
+        /// (Gamecode.dll 0x10043026) keys the button on Parameter1 (slot), builds its identity from
+        /// Parameter2 (hash) and stores Target.Instance (action template); Target.Type is not read.
+        /// </summary>
+        void AnnouncePerkActionChanges(PerkAction[] before, PerkAction[] after)
+        {
+            IZoneSession? session = Session;
+            if (session?.State != SessionState.InPlay)
+                return;
+
+            foreach (PerkAction action in before)
+            {
+                if (Array.IndexOf(after, action) < 0)
+                    session.Send(BuildPerkActionMessage(CharacterActionType.RemovePerkAction, action));
+            }
+
+            foreach (PerkAction action in after)
+            {
+                if (Array.IndexOf(before, action) < 0)
+                    session.Send(BuildPerkActionMessage(CharacterActionType.AddPerkAction, action));
+            }
+        }
+
+        CharacterActionMessage BuildPerkActionMessage(CharacterActionType type, PerkAction action)
+            => new()
+            {
+                Identity = Identity,
+                Action = type,
+                Target = new Identity { Instance = action.ActionTemplateId },
+                Parameter1 = action.Slot,
+                Parameter2 = action.Hash
+            };
+
+        /// <summary>
+        /// FullCharacter perk map (Gamecode.dll 0x10053ac9 / 0x10052b7d): per trained perk the key id, then
+        /// version marker 0xFFFFFF00, the perk id and a value the client keeps only for research perks.
+        /// </summary>
+        public PerkMapEntry[] BuildPerkMap()
+            => TrainedPerks.Snapshot()
+                .Select(perkId => new PerkMapEntry { Key = perkId, Marker = PerkMapEntry.VersionZero, PerkId = perkId })
+                .ToArray();
+
+        /// <summary>
+        /// A perk action use waiting out its AttackDelay: the resolved template (low/high pair at Quality) and
+        /// who it lands on.
+        /// </summary>
+        public sealed record PerkActionUse(int Hash, ItemTemplate Template, int LowId, int HighId, int Quality, Character Target);
+
+        /// <summary>
+        /// UsePerk start: the perk action <paramref name="hash"/> only when a trained perk grants it. A tiered
+        /// action picks its tier and QL from the action's Attack skills; its cooldown, ToUse requirements, target
+        /// and AttackRange must pass. The use runs after the template's AttackDelay (ItemUseService).
+        /// </summary>
+        public bool TryPreparePerkAction(int hash, out PerkActionUse? use)
+        {
+            use = null;
+            if (Session == null || Playfield == null || IsDead)
+                return false;
+
+            int index = Array.FindIndex(_perkActions, action => action.Hash == hash);
+            if (index < 0)
+                return false;
+
+            ItemTemplate template;
+            int lowId, highId, quality;
+            try
+            {
+                (template, lowId, highId, quality) = ResolvePerkActionTemplate(_perkActions[index]);
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception, string.Format(CultureInfo.InvariantCulture,
+                    "Perk action {0:X8} has no usable template.", hash));
+                return false;
+            }
+
+            // Target / Fightingtarget functions (Pulverize's hit) land on who the player is fighting, else the
+            // selected character; User / Wearer functions (LockPerk, feedback) resolve to this player as source.
+            Character target = this;
+            if (template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
+                && spells.Exists(spell => spell.Target is (int)ItemTarget.Target or (int)ItemTarget.Fightingtarget))
+            {
+                Character? resolved = ResolvePerkActionTarget();
+                if (resolved == null)
+                    return false;
+                target = resolved;
+            }
+
+            var candidate = new PerkActionUse(hash, template, lowId, highId, quality, target);
+            string? failure = RevalidatePerkAction(candidate);
+            if (failure != null)
+            {
+                if (failure == OutOfRangeFailure)
+                    RequirementFeedback.SendText(this, "Your target is out of range.");
+                else if (failure == NoLineOfSightFailure)
+                    RequirementFeedback.SendText(this, "Your target is not in line of sight.");
+                else if (failure == NotAttackableFailure)
+                    ClientFeedback.Send(this, CombatRules.IsPvpAttackBlocked(this, target)
+                        ? "Feedback_PvpNotAllowedInThisDistrict"
+                        : "Feedback_StartingAttackFailed");
+                return false;
+            }
+
+            use = candidate;
+            return true;
+        }
+
+        const string OutOfRangeFailure = "target out of range";
+
+        const string NoLineOfSightFailure = "target not in line of sight";
+
+        const string NotAttackableFailure = "target not attackable";
+
+        /// <summary>
+        /// Gates checked when a perk action starts and again when its AttackDelay ends: still held, not locked,
+        /// ToUse requirements, and a living target within the template's AttackRange. Null when still valid.
+        /// </summary>
+        public string? RevalidatePerkAction(PerkActionUse use)
+        {
+            ArgumentNullException.ThrowIfNull(use);
+            if (Array.FindIndex(_perkActions, action => action.Hash == use.Hash) < 0)
+                return "perk action no longer held";
+            if (IsPerkActionLocked(use.Template))
+                return "perk locked";
+            if (!use.Template.MeetsActionRequirements(stat => Stats.Get(stat), ActionType.ToUse, ResolvePerkRequirement))
+                return "use requirements failed";
+            if (!ReferenceEquals(use.Target, this))
+            {
+                if (use.Target.IsDead || !ReferenceEquals(use.Target.Playfield, Playfield))
+                    return "target gone";
+                if (IsHostilePerkAction(use.Template) && !CombatRules.CanAttack(this, use.Target))
+                    return NotAttackableFailure;
+                if (GetEdgeDistanceTo(use.Target) > PerkActionRange(use.Template))
+                    return OutOfRangeFailure;
+                if (!HasLineOfSightTo(use.Target))
+                    return NoLineOfSightFailure;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// A perk action that did not land (<see cref="PerkActionLands"/>), as live answers it straight away (capture
+        /// 2026-10-02T13:02:33Z): "Target evaded your &lt;action&gt;!" (FormatFeedback 110/79653355 with the "evaded"
+        /// reference and the action name), "Target resisted." (Feedback 110/205237300), then the template's OnFailure
+        /// functions (Perforate / Pulverize LockPerk, sent as PerkUnavailable).
+        /// </summary>
+        public void FailPerkAction(PerkActionUse use, IInventoryRepository inventoryRepository)
+        {
+            ArgumentNullException.ThrowIfNull(use);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            ClientFeedback.SendFormatted(this, ClientFeedback.TargetVerbYourAction,
+                new ClientFeedback.TextReference(ClientFeedback.CategoryId, ClientFeedback.Evaded), use.Template.Name ?? string.Empty);
+            ClientFeedback.Send(this, ClientFeedback.TargetResisted);
+            use.Template.ExecuteSpells(EventType.OnFailure, use.Target, inventoryRepository, _items, source: this);
+        }
+
+        /// <summary>
+        /// Performs a perk action that landed: its OnUse functions run with this player as the source and always hit;
+        /// then it is announced as live does after the hit and feedback: TemplateAction PerkAction (low/high, QL,
+        /// performer, target).
+        /// </summary>
+        public bool ExecutePerkAction(PerkActionUse use, IInventoryRepository inventoryRepository)
+        {
+            ArgumentNullException.ThrowIfNull(use);
+            ArgumentNullException.ThrowIfNull(inventoryRepository);
+            if (!use.Template.ExecuteOnUseSpells(use.Target, inventoryRepository, _items, source: this))
+                return false;
+
+            Character shown = ReferenceEquals(use.Target, this) ? TryResolveFightingTarget() ?? this : use.Target;
+            var performed = new TemplateActionMessage
+            {
+                Identity = Identity,
+                ItemLowId = use.LowId,
+                ItemHighId = use.HighId,
+                Quality = use.Quality,
+                Unknown1 = 1,
+                Action = TemplateActionType.PerkAction,
+                Placement = Identity,
+                Unknown3 = (int)shown.Identity.Type,
+                Unknown4 = shown.Identity.Instance
+            };
+            Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, performed, includeSelf: true);
+            return true;
+        }
+
+        /// <summary>
+        /// Whether a perk action aimed at another character succeeds, deterministically: this player's attack rating
+        /// (the action's Attack skills weighted against this player, plus Add All Offense) must reach the target's
+        /// defense rating (the action's Defend skills weighted against the target, plus Add All Defense). Pulverize:
+        /// 2H Blunt 100% + AAO vs skill 155 at 85% + AAD. Self-only actions and actions without Attack or Defend skills
+        /// always succeed. Decided when the action is used: live answers a miss at once, with no QueuePerk.
+        /// </summary>
+        public bool PerkActionLands(PerkActionUse use)
+        {
+            // TODO: Placeholder. This is not even close to the correct perk action landing formula.
+            if (ReferenceEquals(use.Target, this) || use.Template.Attack.Count == 0 || use.Template.Defend.Count == 0)
+                return true;
+
+            long attackRating = WeightedSkill(use.Template.Attack) + Stats.GetOrZero(CharacterStat.AMSModifier);
+
+            long defenseSkill = 0;
+            foreach ((CharacterStat stat, int percent) in use.Template.Defend)
+                defenseSkill += (long)use.Target.Stats.GetOrZero(stat) * percent;
+            long defenseRating = defenseSkill / 100 + use.Target.Stats.GetOrZero(CharacterStat.DMSModifier);
+
+            return attackRating >= defenseRating;
+        }
+
+        /// <summary>Template AttackRange in meters; a missing or zero range means touch range.</summary>
+        static double PerkActionRange(ItemTemplate template)
+        {
+            double range = template.Stats.TryGetValue(CharacterStat.AttackRange, out int value)
+                ? StatCollection.Normalize(value)
+                : 0;
+            return range > 0 ? range : 1;
+        }
+
+        /// <summary>The fighting target, else the selected living character other than this player.</summary>
+        Character? ResolvePerkActionTarget()
+        {
+            Character? fighting = TryResolveFightingTarget();
+            if (fighting != null)
+                return fighting;
+
+            if (Target.Instance == 0 || Target == Identity || Playfield == null
+                || !Playfield.GetRequiredService<DynelRegistry>().TryGet(Target, out Dynel? dynel)
+                || dynel is not Character selected || selected.IsDead)
+                return null;
+
+            return selected;
+        }
+
+        /// <summary>
+        /// An attack: an OnUse damage function (Hit, SpecialHit, DrainHit, AreaHit with a negative amount) aimed at
+        /// the target. Such a perk action, like any attack, needs a target the player may engage (CombatRules).
+        /// </summary>
+        static bool IsHostilePerkAction(ItemTemplate template)
+        {
+            if (!template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                return false;
+
+            foreach (ItemSpell spell in spells)
+            {
+                if (spell.Target is not ((int)ItemTarget.Target or (int)ItemTarget.Fightingtarget))
+                    continue;
+                if (!spell.Is(FunctionType.Hit) && !spell.Is(FunctionType.SpecialHit)
+                    && !spell.Is(FunctionType.DrainHit) && !spell.Is(FunctionType.AreaHit))
+                    continue;
+                if (spell.TryReadInt(1, out int amount) && amount < 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// True while a perk the action would lock (its OnUse LockPerk) is still locked, so a use cannot
+        /// bypass the cooldown even when the action's ToUse criteria omit IsPerkUnlocked.
+        /// </summary>
+        bool IsPerkActionLocked(ItemTemplate template)
+        {
+            if (!template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                return false;
+
+            DateTime nowUtc = DateTime.UtcNow;
+            foreach (ItemSpell spell in spells)
+            {
+                if (spell.Is(FunctionType.LockPerk)
+                    && ItemUseFunctions.TryReadPerkLock(spell, out int perkId, out _)
+                    && PerkLocks.IsLocked(perkId, nowUtc))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// The granted template, or for a tiered action (PerkActions.json) the tier pair interpolated at the QL
+        /// the player's weighted Attack skill reaches.
+        /// </summary>
+        (ItemTemplate Template, int LowId, int HighId, int Quality) ResolvePerkActionTemplate(PerkAction action)
+        {
+            if (!PerkActionCatalog.TryGet(action.Hash, out PerkActionDefinition definition) || definition.Tiers.Length == 0)
+            {
+                int id = action.ActionTemplateId;
+                return (_items.CreateTemplate(id, id, quality: 1), id, id, 1);
+            }
+
+            PerkActionTier first = definition.Tiers[0];
+            ItemTemplate skillSource = _items.CreateTemplate(first.LowId, first.LowId, first.LowQl);
+            (PerkActionTier tier, int quality) = definition.Resolve(WeightedSkill(skillSource.Attack));
+            return (_items.CreateTemplate(tier.LowId, tier.HighId, quality), tier.LowId, tier.HighId, quality);
+        }
+
+        /// <summary>Attack skill map (stat to percent) weighted against this player's skills.</summary>
+        int WeightedSkill(IReadOnlyDictionary<CharacterStat, int> attack)
+        {
+            long total = 0;
+            foreach ((CharacterStat stat, int percent) in attack)
+                total += (long)Stats.GetOrZero(stat) * percent;
+            return (int)Math.Clamp(total / 100, 0, int.MaxValue);
+        }
+
+        /// <summary>The 4-char hash argument as stored (int) or as text packed big-endian ("CNRE" = 0x434E5245).</summary>
+        static bool TryReadPerkActionHash(ItemSpell spell, out int hash)
+        {
+            if (spell.TryReadInt(1, out hash))
+                return true;
+            if (!spell.TryReadString(1, out string text) || text.Length != 4)
+                return false;
+
+            hash = (text[0] << 24) | (text[1] << 16) | (text[2] << 8) | text[3];
+            return true;
+        }
+
+        /// <summary>Applies the OnWear stat functions of every perk template as bonuses.</summary>
+        void RebasePerks()
+        {
+            foreach (ItemTemplate perk in _perkTemplates)
+            {
+                if (perk.SpellList.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
+                    StatModifierSpells.Apply(wear, Stats);
+            }
+        }
 
 
         /// <summary>
@@ -179,6 +812,7 @@ namespace ZoneEngine_New.Core.Entities
         public override void Tick(double deltaTime)
         {
             base.Tick(deltaTime);
+            TickPerkLocks();
             if (!_respawnPending)
                 return;
 
@@ -296,11 +930,14 @@ namespace ZoneEngine_New.Core.Entities
             // ability values, so equipment and buffs have to be in place before those are
             // recomputed. Worn appearance follows the bonus pass because its spells carry stat
             // requirements.
-            RebaseEquipBonuses();
-            ApplyBuffBonuses();
-            ApplyLevelIpBonus();
+            // Over-equipped items are judged on the full buffed skills with every item at full strength, then the
+            // bonus layers are rebuilt once with their penalties (one extra pass, only while something is OE).
+            if (Inventory.IsHydrated)
+                Inventory.ResetOverEquip();
+            ApplyBonusLayers();
+            if (Inventory.IsHydrated && Inventory.ApplyOverEquip(Stats))
+                ApplyBonusLayers();
             ActionRestrictionFlags = CombatRules.CollectActionRestrictions(Buffs, Stats);
-            SkillCatalog.ApplyTrickle(Stats);
             RebaseWearAppearance();
             RebaseMaxHealth();
             RebaseMaxNano();
@@ -322,6 +959,8 @@ namespace ZoneEngine_New.Core.Entities
                 AnnounceAppearanceIfChanged();
 
             SyncPetRunSpeeds();
+            if (OwnedPets.Count > 0)
+                Playfield?.GetService<Pets.PetService>()?.RefreshOverEquip(this);
         }
 
         /// <summary>
@@ -426,6 +1065,16 @@ namespace ZoneEngine_New.Core.Entities
         const CharacterStat OverrideTextureWeaponRightStat = (CharacterStat)1009;
         const CharacterStat OverrideTextureWeaponLeftStat = (CharacterStat)1010;
 
+        /// <summary>Every bonus layer from scratch: equipment (clears the layer first), perks, buffs, level IP, trickle.</summary>
+        void ApplyBonusLayers()
+        {
+            RebaseEquipBonuses();
+            RebasePerks();
+            ApplyBuffBonuses();
+            ApplyLevelIpBonus();
+            SkillCatalog.ApplyTrickle(Stats);
+        }
+
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
         {
             var messages = new List<WeaponItemFullUpdateMessage>();
@@ -483,6 +1132,7 @@ namespace ZoneEngine_New.Core.Entities
             {
                 ArmMartialArtsFist(_items, WeaponSlot.MainHand);
                 ResetAllWeaponAttacks();
+                RebaseEquippedWeaponStats();
                 return;
             }
 
@@ -505,11 +1155,36 @@ namespace ZoneEngine_New.Core.Entities
 
             bool maCombined = (right?.IsMaCombinedWeapon() == true) || (left?.IsMaCombinedWeapon() == true);
             FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
+            RebaseEquippedWeaponStats();
 
             SyncHandWeaponMeshes();
 
             if (!_inFullRebase)
                 AnnounceAppearanceIfChanged();
+        }
+
+        /// <summary>
+        /// The client's own derivation (Gamecode.dll 0x1006a3f7) on every weapon page change: EquippedWeapons =
+        /// weapon page slot 0 held | right hand and left hand weapon type flags; EquippedRHWeapon = slot 0 held |
+        /// right hand flags. Item criteria such as Pulverize's [EquippedRHWeapon BitAnd 256] read them. Runtime
+        /// only, never persisted and not sent: the client keeps its own copy.
+        /// </summary>
+        void RebaseEquippedWeaponStats()
+        {
+            int equipped = 0;
+            int rightHand = 0;
+            if (Inventory.IsHydrated)
+            {
+                IReadOnlyDictionary<int, Item> weapons = Inventory.Equipment.Content;
+                int slotZero = weapons.ContainsKey(0) ? 1 : 0;
+                int right = weapons.GetValueOrDefault((int)WeaponSlots.Righthand)?.Definition.GetWeaponTypeFlags() ?? 0;
+                int left = weapons.GetValueOrDefault((int)WeaponSlots.LeftHand)?.Definition.GetWeaponTypeFlags() ?? 0;
+                equipped = slotZero | right | left;
+                rightHand = slotZero | right;
+            }
+
+            Stats.Set(CharacterStat.EquippedWeapons, equipped, StatDetail.Base);
+            Stats.Set(CharacterStat.EquippedRHWeapon, rightHand, StatDetail.Base);
         }
 
         bool SyncHandWeaponMeshes()
@@ -627,8 +1302,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.PVPDuelScore,
             CharacterStat.Commendations,
             CharacterStat.DailyMissionResets,
-            //CharacterStat.UnreadMailCount,
-            //CharacterStat.LastMailCheckTime,
+            CharacterStat.UnreadMailCount,
+            CharacterStat.LastMailCheckTime,
             CharacterStat.SavedXP,
             CharacterStat.Flags,
             //CharacterStat.Features,
@@ -636,7 +1311,7 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.ApartmentsOwned,
             CharacterStat.Scale,
             CharacterStat.VisualProfession,
-            // CharacterStat.NanoAC,
+            CharacterStat.NanoAC,
             CharacterStat.CurrentNano,
             CharacterStat.MaxNanoEnergy,
             CharacterStat.LastConcretePlayfieldInstance,
@@ -647,17 +1322,22 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.MapsD,
             CharacterStat.MissionBits1,
             CharacterStat.MissionBits2,
-            // CharacterStat.MissionBits3,
-            // CharacterStat.MissionBits4,
-            // CharacterStat.MissionBits5,
-            // CharacterStat.MissionBits6,
-            // CharacterStat.MissionBits7,
-            // CharacterStat.MissionBits8,
-            // CharacterStat.MissionBits9,
-            // CharacterStat.MissionBits10,
-            // CharacterStat.MissionBits11,
-            // CharacterStat.MissionBits12,
-            CharacterStat.SessionTime,
+            CharacterStat.MissionBits3,
+            CharacterStat.MissionBits4,
+            CharacterStat.MissionBits5,
+            CharacterStat.MissionBits6,
+            CharacterStat.MissionBits7,
+            CharacterStat.MissionBits8,
+            CharacterStat.MissionBits9,
+            CharacterStat.MissionBits10,
+            CharacterStat.MissionBits11,
+            CharacterStat.MissionBits12,
+            CharacterStat.MissionBits13,
+            CharacterStat.MissionBits14,
+            CharacterStat.MissionBits15,
+            CharacterStat.MissionBits16,
+            CharacterStat.MissionBits17,
+            CharacterStat.MissionBits18,
             // CharacterStat.AutoAttackFlags,
             CharacterStat.PersonalResearchLevel,
             CharacterStat.GlobalResearchLevel,
@@ -923,7 +1603,7 @@ namespace ZoneEngine_New.Core.Entities
             message.Unknown10 = 0;
             message.Unknown11 = [];
             message.Unknown12 = [];
-            message.Unknown13 = [];
+            message.Unknown13 = BuildPerkMap();
 
             // Team / raid conditional blocks not wired yet.
             // message.Unknown10 = ...

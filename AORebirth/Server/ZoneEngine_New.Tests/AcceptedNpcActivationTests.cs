@@ -22,7 +22,7 @@ public sealed class AcceptedNpcActivationTests
         Assert.IsTrue(f.Service.TryGetBinding(npc, out var binding));
         Assert.AreEqual("SimpleChar:7A18B924", binding.ContentNpcIdentity);
         Assert.AreEqual(unchecked((int)0x7A18B924), npc.Identity.Instance);
-        Assert.IsTrue(binding.HasDialogue); Assert.IsFalse(binding.HasVendor); // DOJA hand-in is dialogue trade, not a shop.
+        Assert.IsFalse(binding.HasVendor);
         Assert.AreEqual(150, npc.Stats.GetOrZero(CharacterStat.Level));
         Assert.AreEqual(16042, npc.Stats.GetOrZero(CharacterStat.Health));
         Assert.AreEqual(16042, npc.Stats.GetOrZero(CharacterStat.MaxHealth));

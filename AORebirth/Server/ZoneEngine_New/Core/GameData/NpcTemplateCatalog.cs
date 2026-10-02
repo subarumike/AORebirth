@@ -18,7 +18,8 @@ namespace ZoneEngine_New.Core.GameData
     {
         static readonly JsonSerializerOptions JsonOptions = new()
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
         };
 
         readonly Dictionary<string, string[]> _families;
@@ -365,7 +366,7 @@ namespace ZoneEngine_New.Core.GameData
                 TemplateId = nearest.TemplateId,
                 HasHeadMesh = nearest.HasHeadMesh,
                 Stats = stats,
-                Attackable = !isFallback && nearest.Attackable,
+                Features = ResolveFeatures(nearest, stats, isFallback),
                 MinLevel = min,
                 MaxLevel = max,
                 UnresolvedPlaceholder = isFallback,
@@ -375,6 +376,19 @@ namespace ZoneEngine_New.Core.GameData
                 KnuBotId = nearest.KnuBotId,
                 ItemTable = CopyLoot(nearest.LootTable)
             };
+        }
+
+        /// <summary>
+        /// The level entry's features. The unresolved placeholder and blue-named NPCs (friendly, non-combat) are always
+        /// NoCombat.
+        /// </summary>
+        static HashSet<NpcFeature> ResolveFeatures(NpcLevelBand band, Dictionary<int, int> stats, bool isFallback)
+        {
+            var features = new HashSet<NpcFeature>(band.Features ?? new List<NpcFeature>());
+            if (isFallback
+                || (stats.TryGetValue((int)CharacterStat.Flags, out int flags) && Helpers.CombatRules.IsBlueNameNpc(flags)))
+                features.Add(NpcFeature.NoCombat);
+            return features;
         }
 
         static void SelectBands(
@@ -561,7 +575,8 @@ namespace ZoneEngine_New.Core.GameData
 
         public bool HasHeadMesh { get; set; }
 
-        public bool Attackable { get; set; } = true;
+        /// <summary>Behaviour switches, e.g. "Features": ["NoCombat"].</summary>
+        public List<NpcFeature> Features { get; set; } = new();
 
         public int KnuBotId { get; set; }
 

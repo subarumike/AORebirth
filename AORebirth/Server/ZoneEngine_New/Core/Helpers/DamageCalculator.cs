@@ -65,6 +65,10 @@ namespace ZoneEngine_New.Core.Helpers
                 weaponMax = Math.Max(weaponMin, NormalizeStat(weapon.GetStat(CharacterStat.MaxDamage)));
                 weaponCritBonus = NormalizeStat(weapon.GetStat(CharacterStat.DamageBonus));
                 rawDamageType = NormalizeStat(weapon.GetStat(CharacterStat.DamageType));
+                // Fists, Martial Arts and Brawl items carry no DamageType: they hit as melee like any melee weapon, so
+                // melee damage modifiers and Melee AC apply.
+                if (rawDamageType == 0)
+                    rawDamageType = MeleeDamageType;
                 amsCap = NormalizeStat(weapon.GetStat(CharacterStat.AMSCap));
                 attackDefendSource = weapon.Definition;
 
@@ -91,6 +95,15 @@ namespace ZoneEngine_New.Core.Helpers
                 rawDamageType = 0;
                 amsCap = 0;
                 attackDefendSource = null;
+            }
+
+            // An over-equipped hand weapon hits for less: MinDamage, MaxDamage and DamageBonus lose 25% per level
+            // (Gamecode.dll FUN_1009b337; level 4 = no damage).
+            if (weapon != null && attackDefendSource != null && weapon.OverEquipLevel > 0)
+            {
+                weaponMin = Inventory.OverEquip.ScaleDamage(weaponMin, weapon.OverEquipLevel);
+                weaponMax = Math.Max(weaponMin, Inventory.OverEquip.ScaleDamage(weaponMax, weapon.OverEquipLevel));
+                weaponCritBonus = Inventory.OverEquip.ScaleDamage(weaponCritBonus, weapon.OverEquipLevel);
             }
 
             // Existing accepted NPC contracts may own numeric damage while the real
@@ -243,7 +256,10 @@ namespace ZoneEngine_New.Core.Helpers
             }
         }
 
-        static bool TryGetAddDamageStat(int rawDamageType, out CharacterStat addDamageStat)
+        const int MeleeDamageType = 91;
+
+        /// <summary>The attacker's "Add. X Dam." stat for a damage type (90-97, the same ids as the AC stats).</summary>
+        internal static bool TryGetAddDamageStat(int rawDamageType, out CharacterStat addDamageStat)
         {
             switch (rawDamageType)
             {

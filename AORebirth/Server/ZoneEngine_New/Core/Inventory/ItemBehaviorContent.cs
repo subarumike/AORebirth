@@ -17,6 +17,12 @@ public sealed class ItemBehaviorContent
     public ItemPackageContent[] Packages { get; set; } = [];
     public VitalItemContent[] VitalItems { get; set; } = [];
     public FistWeaponContent[] FistWeapons { get; set; } = [];
+
+    /// <summary>Brawl Item template pairs by Brawl skill tier; rows carry no profession.</summary>
+    public FistWeaponContent[] BrawlWeapons { get; set; } = [];
+
+    /// <summary>Dimach Item template pairs by profession (null = everyone else) and Dimach skill tier.</summary>
+    public FistWeaponContent[] DimachWeapons { get; set; } = [];
     public WornMeshOverrideContent[] WornMeshOverrides { get; set; } = [];
     public string[] Provenance { get; set; } = [];
 
@@ -38,9 +44,19 @@ public sealed class ItemBehaviorContent
             || result.VitalItems.SelectMany(v => v.TemplateIds).Distinct().Count() != result.VitalItems.Sum(v => v.TemplateIds.Length))
             throw new InvalidDataException("Invalid or ambiguous item behavior content.");
         if (result.FistWeapons.Any(value => value.Tier <= 0 || value.LowId <= 0 || value.HighId <= 0
+                || value.MidId < 0 || (value.MidId > 0) != (value.MidQuality > 0)
                 || value.Profession.HasValue && !Enum.IsDefined(value.Profession.Value))
             || result.FistWeapons.Select(value => (value.Profession, value.Tier)).Distinct().Count() != result.FistWeapons.Length)
             throw new InvalidDataException("Invalid or ambiguous unarmed weapon assignment.");
+        if (result.BrawlWeapons.Any(value => value.Tier <= 0 || value.LowId <= 0 || value.HighId <= 0
+                || value.Profession.HasValue || value.MidId < 0 || (value.MidId > 0) != (value.MidQuality > 0))
+            || result.BrawlWeapons.Select(value => value.Tier).Distinct().Count() != result.BrawlWeapons.Length)
+            throw new InvalidDataException("Invalid or ambiguous brawl item assignment.");
+        if (result.DimachWeapons.Any(value => value.Tier <= 0 || value.LowId <= 0 || value.HighId <= 0
+                || value.MidId < 0 || (value.MidId > 0) != (value.MidQuality > 0)
+                || value.Profession.HasValue && !Enum.IsDefined(value.Profession.Value))
+            || result.DimachWeapons.Select(value => (value.Profession, value.Tier)).Distinct().Count() != result.DimachWeapons.Length)
+            throw new InvalidDataException("Invalid or ambiguous dimach item assignment.");
         if (result.WornMeshOverrides.Any(value => value.TemplateIds.Length == 0
                 || value.TemplateIds.Any(id => id <= 0)
                 || value.MeshId <= 0
@@ -75,6 +91,11 @@ public sealed class FistWeaponContent
     public int Tier { get; set; }
     public int LowId { get; set; }
     public int HighId { get; set; }
+
+    /// <summary>Optional intermediate template at <see cref="MidQuality"/>; 0 when the tier is one pair.</summary>
+    public int MidId { get; set; }
+
+    public int MidQuality { get; set; }
 }
 
 public sealed class ItemPackageContent

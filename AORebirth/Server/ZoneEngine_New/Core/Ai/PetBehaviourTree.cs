@@ -241,11 +241,15 @@ namespace ZoneEngine_New.Core.Ai
 
         /// <summary>
         /// Who the pet looks after: the character a heal order put it on while that one is still here, otherwise
-        /// its owner if it is a heal pet. Other pets look after no one unless ordered to.
+        /// its owner if it is a heal pet. Other pets look after no one unless ordered to. An over-equipped pet heals
+        /// no one: it only follows.
         /// </summary>
         public static Character? Charge(NpcBrain brain)
         {
             PetController pet = brain.Pet!;
+            if (pet.IsOverEquipped)
+                return null;
+
             if (pet.HealTarget.Instance != 0)
             {
                 if (ResolveFriend(brain.Npc, pet.HealTarget) is Character ordered)

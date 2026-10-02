@@ -22,6 +22,7 @@ namespace ZoneEngine_New.Core.Commands
         private readonly HashItemMinter _minter;
         private readonly IInventoryRepository _inventory;
         private readonly QuestService _quests;
+        private readonly Setups.GiveSetupService _setups;
 
         public GiveCommand(
             IItemBuilder items,
@@ -29,8 +30,11 @@ namespace ZoneEngine_New.Core.Commands
             InventoryFlushService flush,
             HashItemMinter minter,
             IInventoryRepository inventory,
-            QuestService quests)
+            QuestService quests,
+            Setups.GiveSetupService setups)
         {
+            ArgumentNullException.ThrowIfNull(setups);
+            _setups = setups;
             ArgumentNullException.ThrowIfNull(quests);
             _quests = quests;
             ArgumentNullException.ThrowIfNull(items);
@@ -49,7 +53,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".give item <low> <high> <ql> | .give item <hash> <ql> | .give buff <nanoId> | .give quest <hash>";
+        public string Usage => ".give item <low> <high> <ql> | .give item <hash> <ql> | .give buff <nanoId> | .give quest <hash> | .give setup <aosetups url>";
 
         public void Execute(GmCommandContext context)
         {
@@ -77,6 +81,13 @@ namespace ZoneEngine_New.Core.Commands
             if (string.Equals(verb, "quest", StringComparison.OrdinalIgnoreCase))
             {
                 ExecuteQuest(context);
+                return;
+            }
+
+            if (string.Equals(verb, "setup", StringComparison.OrdinalIgnoreCase))
+            {
+                // Always the issuer: a setup replaces worn gear and skills.
+                _setups.Start(context.Session, context.Player, context.Args.Length > 1 ? context.Args[1] : string.Empty);
                 return;
             }
 
@@ -139,6 +150,21 @@ namespace ZoneEngine_New.Core.Commands
             if (!subject.Inventory.IsHydrated)
             {
                 GmCommandFeedback.Send(context.Session, context.Player, "Target inventory is not loaded.");
+                return;
+            }
+
+            if (InventoryStacking.TryGrantOntoStack(subject, item, _flush))
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "Gave {0} QL{1} x{2} to {3} (stacked)",
+                        item.Name,
+                        item.Quality,
+                        item.StackCount,
+                        PlayerSubjectName(subject, context.Player)));
                 return;
             }
 

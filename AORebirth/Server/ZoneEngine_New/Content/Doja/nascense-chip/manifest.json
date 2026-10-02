@@ -1,7 +1,4 @@
 {
-  "DialoguePacks": [
-    "dialogue/doja-nascense.dialogue.json"
-  ],
   "QuestPacks": [
     "quests/doja-nascense.quests.json"
   ]

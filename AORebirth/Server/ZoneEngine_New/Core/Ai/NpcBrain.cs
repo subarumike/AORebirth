@@ -208,7 +208,9 @@ namespace ZoneEngine_New.Core.Ai
                     player.Stats.GetOrOne(CharacterStat.Level),
                     Npc.Stats.GetOrOne(CharacterStat.Level)))
                 return;
-            if (Npc.GetEdgeDistanceTo(player) > NpcAiRules.ProximityAggroRange)
+            bool outdoor = Npc.Playfield?.GetRequiredService<ZoneEngine_New.Core.Playfield.Locality.PlayfieldLocality>().Grid.IsOutdoor ?? true;
+            float range = NpcAiRules.ProximityAggroRangeFor(stat => Npc.Stats.GetOrZero(stat), outdoor);
+            if (Npc.GetEdgeDistanceTo(player) > range)
                 return;
             // Unprovoked aggro needs sight. Once the player is on the hate list, chasing around walls is fine.
             if (!Npc.HasLineOfSightTo(player))

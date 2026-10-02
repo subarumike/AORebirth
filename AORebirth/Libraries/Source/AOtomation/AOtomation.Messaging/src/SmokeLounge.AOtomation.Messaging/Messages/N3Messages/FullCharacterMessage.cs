@@ -95,8 +95,9 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(18, SerializeSize = ArraySizeType.X3F1)]
         public object[] Unknown12 { get; set; }
 
+        /// <summary>Trained perk map; the client's last FullCharacter read (Gamecode.dll 0x10053ac9).</summary>
         [AoMember(19, SerializeSize = ArraySizeType.X3F1)]
-        public object[] Unknown13 { get; set; }
+        public PerkMapEntry[] Unknown13 { get; set; }
 
 
         #endregion

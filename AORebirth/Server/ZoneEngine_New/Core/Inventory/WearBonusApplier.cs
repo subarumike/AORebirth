@@ -33,9 +33,10 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(item);
             ArgumentNullException.ThrowIfNull(stats);
 
+            // The client re-applies only OnWear functions at the over-equipped level (Gamecode.dll FUN_1004b624).
             Dictionary<EventType, List<ItemSpell>> spells = item.SpellList;
             if (spells.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
-                StatModifierSpells.Apply(wear, stats);
+                StatModifierSpells.Apply(wear, stats, item.OverEquipLevel);
 
             if (includeWield && spells.TryGetValue(EventType.OnWield, out List<ItemSpell>? wield))
                 StatModifierSpells.Apply(wield, stats);

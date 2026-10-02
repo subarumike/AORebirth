@@ -66,8 +66,8 @@ namespace ZoneEngine_New.Core.Ai
 
     public static class NpcAiRules
     {
-        /// <summary>AO BreedHostility. Messaging enum name for stat 204 is <see cref="CharacterStat.Taunt"/>.</summary>
-        public const CharacterStat BreedHostilityStat = CharacterStat.Taunt;
+        /// <summary>AO BreedHostility (stat 204).</summary>
+        public const CharacterStat BreedHostilityStat = CharacterStat.BreedHostility;
 
         public const float NearbyRange = 30f;
 
@@ -109,6 +109,16 @@ namespace ZoneEngine_New.Core.Ai
         }
 
         public static bool IsProximityHostile(int breedHostility) => breedHostility > 0;
+
+        /// <summary>
+        /// Unprovoked aggro range from the NPC's own stats: ProximityRangeOutdoors (454) on outdoor playfields,
+        /// ProximityRangeIndoors (484) indoors. <see cref="ProximityAggroRange"/> when the NPC has none.
+        /// </summary>
+        public static float ProximityAggroRangeFor(Func<CharacterStat, int> stats, bool outdoor)
+        {
+            int range = stats(outdoor ? CharacterStat.ProximityRangeOutdoors : CharacterStat.ProximityRangeIndoors);
+            return range > 0 ? range : ProximityAggroRange;
+        }
 
         /// <summary>
         /// Faction rule for unprovoked aggro (Side stat): a Neutral NPC never starts a fight, and a Clan or Omni NPC

@@ -250,7 +250,7 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual("Editable Fixture", template.Name);
             Assert.AreEqual(43296, template.TemplateId);
             Assert.AreEqual(1131, template.KnuBotId);
-            Assert.IsTrue(template.Attackable);
+            Assert.IsFalse(template.Has(NpcFeature.NoCombat));
             Assert.AreEqual(1, template.MinLevel);
             Assert.AreEqual(250, template.MaxLevel);
             Assert.AreEqual(2, template.Equipment.Count);
@@ -279,14 +279,14 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(catalog.TryResolve("AAAA", 1, out MobTemplate aaaa));
             Assert.AreEqual("AAAA", aaaa.Hash);
             Assert.AreEqual("To Be Determined", aaaa.Name);
-            Assert.IsFalse(aaaa.Attackable);
+            Assert.IsTrue(aaaa.Has(NpcFeature.NoCombat));
             Assert.IsTrue(aaaa.UnresolvedPlaceholder);
 
             Assert.IsTrue(catalog.CanResolve("ZZZZ"));
             Assert.IsTrue(catalog.TryResolve("ZZZZ", 1, out MobTemplate fallback));
             Assert.AreEqual("AAAA", fallback.Hash);
             Assert.AreEqual("To Be Determined", fallback.Name);
-            Assert.IsFalse(fallback.Attackable);
+            Assert.IsTrue(fallback.Has(NpcFeature.NoCombat));
             Assert.IsTrue(fallback.UnresolvedPlaceholder);
 
             Assert.IsFalse(catalog.CanResolve("CYCLE"));

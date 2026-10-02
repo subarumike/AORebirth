@@ -50,8 +50,7 @@ public sealed class PlayfieldNpcContentCatalog
             if (npc == null || npc.PlayfieldId != PlayfieldId || string.IsNullOrWhiteSpace(npc.Key)
                 || !keys.Add(npc.Key) || npc.InstanceId <= 0 || !identities.Add(npc.InstanceId)
                 || string.IsNullOrWhiteSpace(npc.Name) || npc.Stats == null || npc.Textures == null
-                || npc.Meshes == null || npc.Presentation == null
-                || (npc.HasDialogue && string.IsNullOrWhiteSpace(npc.ContentNpcIdentity)))
+                || npc.Meshes == null || npc.Presentation == null)
                 throw new InvalidDataException("Invalid or duplicate playfield NPC definition.");
 
             RequireTransform(npc.Position, npc.Rotation, npc.Key);

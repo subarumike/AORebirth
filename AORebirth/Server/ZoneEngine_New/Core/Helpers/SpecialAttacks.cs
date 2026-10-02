@@ -8,6 +8,7 @@ namespace ZoneEngine_New.Core.Helpers
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
@@ -16,7 +17,7 @@ namespace ZoneEngine_New.Core.Helpers
 
     /// <summary>
     /// Weapon special attacks requested by CharSecSpecAttack: Brawl, Fast Attack, Burst, Fling Shot, Aimed Shot,
-    /// Full Auto, and Sneak Attack (which becomes Backstab for Shades and Adventurers). Dimach is not implemented.
+    /// Full Auto, Sneak Attack (which becomes Backstab for Shades and Adventurers) and Dimach.
     /// Rules from AOWiki "Special Attack" and AO-Universe "Attack Rating, Weapon Damage and Special Attacks".
     /// </summary>
     public static class SpecialAttacks
@@ -39,13 +40,6 @@ namespace ZoneEngine_New.Core.Helpers
 
         /// <summary>Burst fires up to three shots, each rolled on its own.</summary>
         const int BurstShots = 3;
-
-        /// <summary>Brawl strikes with the Brawl Item (QL1 211401 to QL500 211402) at the Brawl skill's quality.</summary>
-        const int BrawlItemLowId = 211401;
-
-        const int BrawlItemHighId = 211402;
-
-        const int BrawlItemMaxQuality = 500;
 
         /// <summary>
         /// Backstab gates on Sneak Attack without nano buffs (equipment and implants count), by profession: usable,
@@ -76,11 +70,12 @@ namespace ZoneEngine_New.Core.Helpers
                 return;
             }
 
+            // Every special attack, player or NPC, needs a target its attacker may engage.
+            if (!CombatRules.CanAttack(attacker, target))
+                return;
+
             if (attacker.FightingTarget.Instance == 0)
                 attacker.StartFighting(target.Identity, 0);
-
-            if (attacker.IsPlayer && !CombatRules.CanAttack(attacker, target))
-                return;
 
             attacker.SetFightingTarget(target.Identity);
 
@@ -114,9 +109,19 @@ namespace ZoneEngine_New.Core.Helpers
             if (special is CharacterStat.AimedShot or CharacterStat.SneakAttack && IsSneaking(attacker))
                 StopSneaking(attacker);
 
-            Resolve(attacker, target, special, weapon, slot, backstab);
+            // Brawl and Dimach strike with a skill-tier item instead of the hand weapon's damage.
+            Item? specialItem = special switch
+            {
+                CharacterStat.Brawl => BrawlItem(attacker),
+                CharacterStat.Dimach => DimachItem(attacker),
+                _ => null
+            };
+            if (special == CharacterStat.Dimach && specialItem == null)
+                return;
 
-            int seconds = RechargeSeconds(attacker, special, weapon.DamageItem, backstab);
+            Resolve(attacker, target, special, weapon, slot, backstab, specialItem);
+
+            int seconds = RechargeSeconds(attacker, special, specialItem ?? weapon.DamageItem, backstab);
             attacker.LockSkill((int)special, seconds, now);
             attacker.ScheduleSpecialAvailable((int)special, now.AddSeconds(seconds));
             if (attacker is Player player)
@@ -127,18 +132,33 @@ namespace ZoneEngine_New.Core.Helpers
         public static void SendAvailable(Player player, int statId)
             => player.Session?.Send(Action(player, CharacterActionType.SpecialAvailable, 0, statId));
 
-        static void Resolve(Character attacker, Character target, CharacterStat special, CharacterWeapon weapon, int slot, bool backstab)
+        static void Resolve(
+            Character attacker, Character target, CharacterStat special, CharacterWeapon weapon, int slot, bool backstab,
+            Item? specialItem)
         {
             Item? item = weapon.DamageItem;
             DamageCalculator.DamageResult result;
             int bullets;
-            if (special == CharacterStat.FullAuto)
+            if (special == CharacterStat.Dimach && specialItem != null && HealsOrDrains(specialItem))
+            {
+                // Keeper heal / Shade drain: the item's own functions are the whole effect.
+                RunItemFunctions(attacker, specialItem);
+                return;
+            }
+
+            if (special == CharacterStat.Dimach)
+            {
+                // Dimach never misses; attack rating still scales its damage.
+                result = DamageCalculator.CalculateFromWeapon(attacker, target, specialItem, special, alwaysHits: true);
+                bullets = -1;
+            }
+            else if (special == CharacterStat.FullAuto)
                 result = RollFullAuto(attacker, target, item, out bullets);
             else if (special == CharacterStat.Burst)
                 result = RollBurst(attacker, target, item, out bullets);
             else if (special == CharacterStat.Brawl)
             {
-                result = DamageCalculator.CalculateFromWeapon(attacker, target, BrawlItem(attacker) ?? item, special);
+                result = DamageCalculator.CalculateFromWeapon(attacker, target, specialItem ?? item, special);
                 bullets = -1;
             }
             else if (special is CharacterStat.AimedShot or CharacterStat.SneakAttack)
@@ -178,7 +198,8 @@ namespace ZoneEngine_New.Core.Helpers
             {
                 Identity = attacker.Identity,
                 Unknown = 0,
-                Unknown1 = slot,
+                // Retail Brawl (capture 2026-10-01): slot 0, ammo -1; the Brawl Item is not a hand weapon.
+                Unknown1 = special == CharacterStat.Brawl ? 0 : slot,
                 Unknown2 = result.Damage,
                 Unknown3 = bullets,
                 Target = target.Identity,
@@ -271,22 +292,66 @@ namespace ZoneEngine_New.Core.Helpers
             return new DamageCalculator.DamageResult(anyHit, total, HitType.Normal);
         }
 
-        /// <summary>The Brawl Item at the attacker's Brawl skill as its quality: its damage and attack skill drive Brawl.</summary>
+        /// <summary>
+        /// The Brawl Item for the attacker's Brawl skill: each 1000 skill is a QL 1-500 template pair
+        /// (ItemBehavior.json BrawlWeapons). Its damage and attack skill drive Brawl.
+        /// </summary>
         static Item? BrawlItem(Character attacker)
         {
             IItemBuilder? items = attacker.Playfield?.GetService<IItemBuilder>();
             if (items == null)
                 return null;
 
-            int quality = Math.Clamp(attacker.Stats.GetOrZero(CharacterStat.Brawl), 1, BrawlItemMaxQuality);
             try
             {
-                return items.Create(BrawlItemLowId, BrawlItemHighId, quality, ItemSource.Other);
+                (int lowId, int highId, int quality) =
+                    MartialArtsFistResolver.ResolveBrawl(attacker.Stats.GetOrZero(CharacterStat.Brawl));
+                return items.Create(lowId, highId, quality, ItemSource.Other);
             }
             catch (Exception)
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// The Dimach Item for the attacker's profession and Dimach skill (ItemBehavior.json DimachWeapons):
+        /// Martial Artist and everyone else deal damage, Shade drains, Keeper heals itself.
+        /// </summary>
+        static Item? DimachItem(Character attacker)
+        {
+            IItemBuilder? items = attacker.Playfield?.GetService<IItemBuilder>();
+            if (items == null)
+                return null;
+
+            try
+            {
+                (int lowId, int highId, int quality) = MartialArtsFistResolver.ResolveDimach(
+                    (Profession)attacker.Stats.GetOrZero(CharacterStat.Profession),
+                    attacker.Stats.GetOrZero(CharacterStat.Dimach));
+                return items.Create(lowId, highId, quality, ItemSource.Other);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>A Dimach Item whose OnUse heals (Hit) or drains (DrainHit) instead of rolling weapon damage.</summary>
+        static bool HealsOrDrains(Item item)
+            => item.SpellList.TryGetValue(EventType.OnUse, out System.Collections.Generic.List<ItemSpell>? spells)
+                && spells.Exists(spell => spell.Is(FunctionType.Hit) || spell.Is(FunctionType.DrainHit));
+
+        /// <summary>Runs the item's OnUse functions with the attacker as user; Fightingtarget is its fight target.</summary>
+        static void RunItemFunctions(Character attacker, Item item)
+        {
+            var playfield = attacker.Playfield;
+            IInventoryRepository? inventory = playfield?.GetService<IInventoryRepository>();
+            IItemBuilder? items = playfield?.GetService<IItemBuilder>();
+            if (inventory == null || items == null)
+                return;
+
+            item.Definition.ExecuteOnUseSpells(attacker, inventory, items, source: attacker);
         }
 
         /// <summary>
@@ -389,6 +454,10 @@ namespace ZoneEngine_New.Core.Helpers
                     return backstab ? Math.Max(1, (int)((40 - (skill / 150.0)) / 2)) : seconds;
                 }
 
+                // Dimach: the Dimach Item's own RechargeDelay (30 min Martial Artist, 8 min others, 5 min Keeper/Shade).
+                case CharacterStat.Dimach:
+                    return Math.Max(1, (int)rechargeSeconds);
+
                 // Brawl: a fixed 15 seconds.
                 default:
                     return FlatRechargeSeconds;
@@ -434,6 +503,7 @@ namespace ZoneEngine_New.Core.Helpers
                 case CharacterStat.AimedShot: flag = CanFlags.AimedShot; return true;
                 case CharacterStat.FullAuto: flag = CanFlags.FullAuto; return true;
                 case CharacterStat.SneakAttack: flag = CanFlags.SneakAttack; return true;
+                case CharacterStat.Dimach: flag = CanFlags.Dimach; return true;
                 default: flag = 0; return false;
             }
         }

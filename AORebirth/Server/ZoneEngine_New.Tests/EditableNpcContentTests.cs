@@ -74,13 +74,13 @@ public sealed class EditableNpcContentTests
         Assert.IsTrue(catalog.CanResolve("AAAA"));
         Assert.IsTrue(catalog.TryResolve("AAAA", 1, out MobTemplate aaaa));
         Assert.AreEqual("Marker", aaaa.Name);
-        Assert.IsFalse(aaaa.Attackable);
+        Assert.IsTrue(aaaa.Has(NpcFeature.NoCombat));
         Assert.IsTrue(aaaa.UnresolvedPlaceholder);
         Assert.IsTrue(NpcTemplateValidation.CanSpawn(aaaa));
         Assert.IsTrue(catalog.CanResolve("MISSING"));
         Assert.IsTrue(catalog.TryResolve("MISSING", 1, out MobTemplate fallback));
         Assert.AreEqual(MobTemplate.FallbackHash, fallback.Hash);
-        Assert.IsFalse(fallback.Attackable);
+        Assert.IsTrue(fallback.Has(NpcFeature.NoCombat));
         Assert.IsTrue(NpcTemplateValidation.CanSpawn(fallback));
 
         using var fixture = new TempContent();

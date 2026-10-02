@@ -6,12 +6,10 @@ using System.Text.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using ZoneEngine_New.Core.Dialogue;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Nanos;
 using ZoneEngine_New.Core.Inventory;
-using ZoneEngine.Core.Arete.Dialogue;
 
 [TestClass]
 public sealed class InteractionEditabilityTests
@@ -39,46 +37,6 @@ public sealed class InteractionEditabilityTests
         Assert.AreEqual(0,world.Dao.Items[10].ContainerType); // Consumption preserves the historical row.
         Assert.AreEqual(43379,world.Dao.Items.Values.Single(x => x.ContainerType != 0).LowId);
         Assert.AreEqual(8,world.Dao.Items.Values.Single(x => x.ContainerType != 0).Quality);
-    }
-    [TestMethod]
-    public void Same_binary_uses_changed_dialogue_action_binding_after_data_reload()
-    {
-        var content = Content();
-        content.Dialogues[DialogueFixture.Stan].Routes.Single(x=>x.Node=="stan_goldman_003").Action="accept-sarah-job";
-        using var world = new AuthoredQuestTests.World(content: Reload(content));
-        world.Activate(AuthoredQuestFixture.TalkSarah);
-        var router = new DialogueActionRouter(world.Service);
-        Assert.AreEqual(DialogueActionOutcome.Continue,router.ApplyAnswer(world.Player,DialogueFixture.Stan,"stan_goldman_003",0));
-        Assert.AreEqual(AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState.Active,world.Dao.GetMission(new(111,AuthoredQuestFixture.FindThief)).State);
-        Assert.IsNull(world.Dao.GetMission(new(111,AuthoredQuestFixture.BuyLockpick)));
-    }
-    [TestMethod]
-    public void Same_binary_projects_edited_dialogue_text_from_existing_pack_model()
-    {
-        var catalog=DialogueCatalog.Load(AppContext.BaseDirectory);
-        Assert.IsTrue(catalog.TryGet(DialogueFixture.Stan,out var npc));
-        var root=npc.Nodes.Single(x=>x.Id==npc.RootNodeId);
-        root.PromptSegments.Clear(); root.PromptText="An operator edited this conversation.";
-        var pack = new DialogueContentPack { Identity = new() { Id="editable-fixture", Version="1", Source="" }, Npcs=[npc] };
-        string file = Path.Combine(Path.GetTempPath(), "aor-dialogue-" + Guid.NewGuid().ToString("N") + ".json");
-        DialogueContentRegistry registry = new();
-        try
-        {
-            File.WriteAllText(file,JsonSerializer.Serialize(pack));
-            var loaded = new DialogueContentPackLoader().LoadFile(file);
-            Assert.IsTrue(loaded.IsValid,string.Join("; ",loaded.Validation.Errors));
-            Assert.IsTrue(registry.Load(loaded.Packs).IsValid);
-        }
-        finally { File.Delete(file); }
-        var node=new DialogueGraph(registry).StartSessionAtNode(DialogueFixture.Stan,null);
-        var messages=DialogueWire.Node(new(){Type=IdentityType.CanbeAffected,Instance=111},new(){Type=IdentityType.CanbeAffected,Instance=222},"Tester",node).ToArray();
-        Assert.AreEqual(root.PromptText,messages.OfType<KnuBotAppendTextMessage>().Single().Text);
-    }
-    [TestMethod]
-    public void Invalid_content_action_reference_is_rejected_before_runtime_mutation()
-    {
-        var content=Content(); content.Dialogues[DialogueFixture.Stan].Routes[0].Action="absent-action";
-        Assert.ThrowsExactly<InvalidDataException>(()=>content.Validate());
     }
     [TestMethod]
     public void Blank_provenance_does_not_block_valid_operator_authored_quest_reward()

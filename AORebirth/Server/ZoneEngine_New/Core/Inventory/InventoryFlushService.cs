@@ -22,6 +22,8 @@ namespace ZoneEngine_New.Core.Inventory
 
         private readonly Lazy<PlayfieldManager> _playfieldManager;
         private readonly ICharacterCoalesceCommit _persist;
+        private readonly ITrainedPerkRepository? _trainedPerks;
+        private readonly IPerkLockRepository? _perkLocks;
         private readonly IZoneLogger _logger;
         private readonly object _scheduleGate = new();
         private readonly Dictionary<int, long> _dueAtMs = new();
@@ -32,7 +34,9 @@ namespace ZoneEngine_New.Core.Inventory
         public InventoryFlushService(
             Lazy<PlayfieldManager> playfieldManager,
             ICharacterCoalesceCommit persist,
-            IZoneLogger logger)
+            IZoneLogger logger,
+            ITrainedPerkRepository? trainedPerks = null,
+            IPerkLockRepository? perkLocks = null)
         {
             ArgumentNullException.ThrowIfNull(playfieldManager);
             ArgumentNullException.ThrowIfNull(persist);
@@ -40,6 +44,8 @@ namespace ZoneEngine_New.Core.Inventory
 
             _playfieldManager = playfieldManager;
             _persist = persist;
+            _trainedPerks = trainedPerks;
+            _perkLocks = perkLocks;
             _logger = logger;
 
             _writer = new Thread(WriterLoop)
@@ -203,7 +209,10 @@ namespace ZoneEngine_New.Core.Inventory
                 int[] nanos = player.DrainDirtyUploadedNanos();
                 List<ActiveNanoRecord>? activeNanos = player.TakeDirtyActiveNanos();
                 List<SkillLockRecord>? skillLocks = player.SkillLocks.TakeDirty(DateTime.UtcNow);
-                if (inventory == null && nanos.Length == 0 && activeNanos == null && skillLocks == null)
+                int[]? trainedPerks = _trainedPerks == null ? null : player.TrainedPerks.TakeDirty();
+                List<SkillLockRecord>? perkLocks = _perkLocks == null ? null : player.PerkLocks.TakeDirty(DateTime.UtcNow);
+                if (inventory == null && nanos.Length == 0 && activeNanos == null && skillLocks == null && trainedPerks == null
+                    && perkLocks == null)
                     return;
 
                 try
@@ -231,6 +240,9 @@ namespace ZoneEngine_New.Core.Inventory
                     player.RestoreDirtyUploadedNanos(nanos);
                     player.RestoreDirtyActiveNanos(activeNanos);
                     player.SkillLocks.RestoreDirty(skillLocks);
+                    // Not attempted: the perk sets stay dirty for the next flush.
+                    player.TrainedPerks.RestoreDirty(trainedPerks);
+                    player.PerkLocks.RestoreDirty(perkLocks);
                     _logger.Error(
                         exception,
                         string.Format(
@@ -239,12 +251,44 @@ namespace ZoneEngine_New.Core.Inventory
                             player.Identity.Instance));
                     throw;
                 }
+
+                // The coalesced transaction is committed. The perk sets are independent full replacements, so a
+                // failed or uncertain write is safe to repeat: it only leaves that set dirty for a retry and never
+                // hands the already committed inventory back to the queue.
+                SaveReplacementSet(player, trainedPerks, perks => _trainedPerks!.Save(player.Identity.Instance, perks),
+                    () => player.TrainedPerks.RestoreDirty(trainedPerks), "trained perks");
+                SaveReplacementSet(player, perkLocks, locks => _perkLocks!.Save(player.Identity.Instance, locks),
+                    () => player.PerkLocks.RestoreDirty(perkLocks), "perk locks");
+            }
+        }
+
+        void SaveReplacementSet<T>(Player player, T? snapshot, Action<T> save, Action restoreDirty, string what)
+            where T : class
+        {
+            if (snapshot == null)
+                return;
+
+            try
+            {
+                save(snapshot);
+            }
+            catch (Exception exception)
+            {
+                restoreDirty();
+                _logger.Error(
+                    exception,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "InventoryFlushService {0} write failed for character {1}; retrying on the next flush",
+                        what,
+                        player.Identity.Instance));
+                NotifyDirty(player);
             }
         }
 
         static bool HasDirtyState(Player player)
             => player.Inventory.HasDirtyEntries || player.HasDirtyUploadedNanos || player.HasDirtyActiveNanos
-                || player.SkillLocks.IsDirty;
+                || player.SkillLocks.IsDirty || player.TrainedPerks.IsDirty || player.PerkLocks.IsDirty;
 
         public void Dispose()
         {

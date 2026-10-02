@@ -1,0 +1,3996 @@
+{
+  "PerkLines": [
+    {
+      "Name": "Alien Technology Expertise",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1250, "ItemId": 247748 },
+        { "Tier": 2, "Id": 1251, "ItemId": 247749 },
+        { "Tier": 3, "Id": 1252, "ItemId": 256082 }
+      ]
+    },
+    {
+      "Name": "Ancient Knowledge",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1120, "ItemId": 252301 },
+        { "Tier": 2, "Id": 1121, "ItemId": 252302 },
+        { "Tier": 3, "Id": 1122, "ItemId": 252303 },
+        { "Tier": 4, "Id": 1123, "ItemId": 252304 },
+        { "Tier": 5, "Id": 1124, "ItemId": 252305 },
+        { "Tier": 6, "Id": 1125, "ItemId": 252306 },
+        { "Tier": 7, "Id": 1126, "ItemId": 252307 },
+        { "Tier": 8, "Id": 1127, "ItemId": 252308 },
+        { "Tier": 9, "Id": 1128, "ItemId": 252309 },
+        { "Tier": 10, "Id": 1129, "ItemId": 252310 }
+      ]
+    },
+    {
+      "Name": "Ancient Matrix",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1060, "ItemId": 250663 },
+        { "Tier": 2, "Id": 1061, "ItemId": 250664 },
+        { "Tier": 3, "Id": 1062, "ItemId": 250665 },
+        { "Tier": 4, "Id": 1063, "ItemId": 250666 },
+        { "Tier": 5, "Id": 1064, "ItemId": 250667 },
+        { "Tier": 6, "Id": 1065, "ItemId": 250668 },
+        { "Tier": 7, "Id": 1066, "ItemId": 250669 },
+        { "Tier": 8, "Id": 1067, "ItemId": 250670 },
+        { "Tier": 9, "Id": 1068, "ItemId": 250671 },
+        { "Tier": 10, "Id": 1069, "ItemId": 250672 }
+      ]
+    },
+    {
+      "Name": "Atrox Primary Genome",
+      "Category": "Alien",
+      "Flags": 34,
+      "Perks": [
+        { "Tier": 1, "Id": 1290, "ItemId": 252492 },
+        { "Tier": 2, "Id": 1291, "ItemId": 252493 },
+        { "Tier": 3, "Id": 1292, "ItemId": 252494 },
+        { "Tier": 4, "Id": 1293, "ItemId": 252495 },
+        { "Tier": 5, "Id": 1294, "ItemId": 252496 },
+        { "Tier": 6, "Id": 1295, "ItemId": 252497 },
+        { "Tier": 7, "Id": 1296, "ItemId": 252498 },
+        { "Tier": 8, "Id": 1297, "ItemId": 252499 },
+        { "Tier": 9, "Id": 1298, "ItemId": 252500 },
+        { "Tier": 10, "Id": 1299, "ItemId": 252501 }
+      ]
+    },
+    {
+      "Name": "Atrox Secondary Genome",
+      "Category": "Alien",
+      "Flags": 34,
+      "Perks": [
+        { "Tier": 1, "Id": 1300, "ItemId": 252512 },
+        { "Tier": 2, "Id": 1301, "ItemId": 252513 },
+        { "Tier": 3, "Id": 1302, "ItemId": 252514 },
+        { "Tier": 4, "Id": 1303, "ItemId": 252515 },
+        { "Tier": 5, "Id": 1304, "ItemId": 252516 },
+        { "Tier": 6, "Id": 1305, "ItemId": 252517 },
+        { "Tier": 7, "Id": 1306, "ItemId": 252518 },
+        { "Tier": 8, "Id": 1307, "ItemId": 252519 },
+        { "Tier": 9, "Id": 1308, "ItemId": 252520 },
+        { "Tier": 10, "Id": 1309, "ItemId": 252521 }
+      ]
+    },
+    {
+      "Name": "Champion of Heavy Artillery",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1170, "ItemId": 253108 },
+        { "Tier": 2, "Id": 1171, "ItemId": 253109 },
+        { "Tier": 3, "Id": 1172, "ItemId": 253110 },
+        { "Tier": 4, "Id": 1173, "ItemId": 253111 },
+        { "Tier": 5, "Id": 1174, "ItemId": 253112 },
+        { "Tier": 6, "Id": 1175, "ItemId": 253113 },
+        { "Tier": 7, "Id": 1176, "ItemId": 253114 },
+        { "Tier": 8, "Id": 1177, "ItemId": 253115 },
+        { "Tier": 9, "Id": 1178, "ItemId": 253116 },
+        { "Tier": 10, "Id": 1179, "ItemId": 253117 }
+      ]
+    },
+    {
+      "Name": "Champion of Heavy Infantry",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1140, "ItemId": 253064 },
+        { "Tier": 2, "Id": 1141, "ItemId": 253065 },
+        { "Tier": 3, "Id": 1142, "ItemId": 253066 },
+        { "Tier": 4, "Id": 1143, "ItemId": 253067 },
+        { "Tier": 5, "Id": 1144, "ItemId": 253068 },
+        { "Tier": 6, "Id": 1145, "ItemId": 253069 },
+        { "Tier": 7, "Id": 1146, "ItemId": 253070 },
+        { "Tier": 8, "Id": 1147, "ItemId": 253071 },
+        { "Tier": 9, "Id": 1148, "ItemId": 253072 },
+        { "Tier": 10, "Id": 1149, "ItemId": 253073 }
+      ]
+    },
+    {
+      "Name": "Champion of Light Artillery",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1160, "ItemId": 253093 },
+        { "Tier": 2, "Id": 1161, "ItemId": 253094 },
+        { "Tier": 3, "Id": 1162, "ItemId": 253095 },
+        { "Tier": 4, "Id": 1163, "ItemId": 253096 },
+        { "Tier": 5, "Id": 1164, "ItemId": 253097 },
+        { "Tier": 6, "Id": 1165, "ItemId": 253098 },
+        { "Tier": 7, "Id": 1166, "ItemId": 253099 },
+        { "Tier": 8, "Id": 1167, "ItemId": 253100 },
+        { "Tier": 9, "Id": 1168, "ItemId": 253101 },
+        { "Tier": 10, "Id": 1169, "ItemId": 253102 }
+      ]
+    },
+    {
+      "Name": "Champion of Light Infantry",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1150, "ItemId": 253079 },
+        { "Tier": 2, "Id": 1151, "ItemId": 253080 },
+        { "Tier": 3, "Id": 1152, "ItemId": 253081 },
+        { "Tier": 4, "Id": 1153, "ItemId": 253082 },
+        { "Tier": 5, "Id": 1154, "ItemId": 253083 },
+        { "Tier": 6, "Id": 1155, "ItemId": 253084 },
+        { "Tier": 7, "Id": 1156, "ItemId": 253085 },
+        { "Tier": 8, "Id": 1157, "ItemId": 253086 },
+        { "Tier": 9, "Id": 1158, "ItemId": 253087 },
+        { "Tier": 10, "Id": 1159, "ItemId": 253088 }
+      ]
+    },
+    {
+      "Name": "Champion of Nano Combat",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1180, "ItemId": 253123 },
+        { "Tier": 2, "Id": 1181, "ItemId": 253124 },
+        { "Tier": 3, "Id": 1182, "ItemId": 253125 },
+        { "Tier": 4, "Id": 1183, "ItemId": 253126 },
+        { "Tier": 5, "Id": 1184, "ItemId": 253127 },
+        { "Tier": 6, "Id": 1185, "ItemId": 253128 },
+        { "Tier": 7, "Id": 1186, "ItemId": 253129 },
+        { "Tier": 8, "Id": 1187, "ItemId": 253130 },
+        { "Tier": 9, "Id": 1188, "ItemId": 253131 },
+        { "Tier": 10, "Id": 1189, "ItemId": 253132 }
+      ]
+    },
+    {
+      "Name": "Combat Knowledge",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1270, "ItemId": 253140 },
+        { "Tier": 2, "Id": 1271, "ItemId": 253141 },
+        { "Tier": 3, "Id": 1272, "ItemId": 253142 },
+        { "Tier": 4, "Id": 1273, "ItemId": 253143 },
+        { "Tier": 5, "Id": 1274, "ItemId": 253144 },
+        { "Tier": 6, "Id": 1275, "ItemId": 253145 },
+        { "Tier": 7, "Id": 1276, "ItemId": 253146 },
+        { "Tier": 8, "Id": 1277, "ItemId": 253147 }
+      ]
+    },
+    {
+      "Name": "Counterweight",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1210, "ItemId": 252403 },
+        { "Tier": 2, "Id": 1211, "ItemId": 252404 },
+        { "Tier": 3, "Id": 1212, "ItemId": 252405 },
+        { "Tier": 4, "Id": 1213, "ItemId": 252406 },
+        { "Tier": 5, "Id": 1214, "ItemId": 252407 },
+        { "Tier": 6, "Id": 1215, "ItemId": 252408 }
+      ]
+    },
+    {
+      "Name": "Creative Mind",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1110, "ItemId": 251906 },
+        { "Tier": 2, "Id": 1111, "ItemId": 251907 },
+        { "Tier": 3, "Id": 1112, "ItemId": 251908 },
+        { "Tier": 4, "Id": 1113, "ItemId": 251909 },
+        { "Tier": 5, "Id": 1114, "ItemId": 251910 },
+        { "Tier": 6, "Id": 1115, "ItemId": 251911 },
+        { "Tier": 7, "Id": 1116, "ItemId": 251912 },
+        { "Tier": 8, "Id": 1117, "ItemId": 251913 },
+        { "Tier": 9, "Id": 1118, "ItemId": 251914 },
+        { "Tier": 10, "Id": 1119, "ItemId": 251915 }
+      ]
+    },
+    {
+      "Name": "Crusade",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1130, "ItemId": 252332 },
+        { "Tier": 2, "Id": 1131, "ItemId": 252333 },
+        { "Tier": 3, "Id": 1132, "ItemId": 252334 },
+        { "Tier": 4, "Id": 1133, "ItemId": 252335 },
+        { "Tier": 5, "Id": 1134, "ItemId": 252336 },
+        { "Tier": 6, "Id": 1135, "ItemId": 252337 },
+        { "Tier": 7, "Id": 1136, "ItemId": 252338 },
+        { "Tier": 8, "Id": 1137, "ItemId": 252339 },
+        { "Tier": 9, "Id": 1138, "ItemId": 252340 },
+        { "Tier": 10, "Id": 1139, "ItemId": 252341 }
+      ]
+    },
+    {
+      "Name": "Dark Kin",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1050, "ItemId": 248967 },
+        { "Tier": 2, "Id": 1051, "ItemId": 248968 },
+        { "Tier": 3, "Id": 1052, "ItemId": 248969 },
+        { "Tier": 4, "Id": 1053, "ItemId": 248970 },
+        { "Tier": 5, "Id": 1054, "ItemId": 248971 },
+        { "Tier": 6, "Id": 1055, "ItemId": 248972 },
+        { "Tier": 7, "Id": 1056, "ItemId": 248973 },
+        { "Tier": 8, "Id": 1057, "ItemId": 248974 },
+        { "Tier": 9, "Id": 1058, "ItemId": 248975 },
+        { "Tier": 10, "Id": 1059, "ItemId": 248976 }
+      ]
+    },
+    {
+      "Name": "Embrace",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1010, "ItemId": 248130 },
+        { "Tier": 2, "Id": 1011, "ItemId": 248131 },
+        { "Tier": 3, "Id": 1012, "ItemId": 248132 },
+        { "Tier": 4, "Id": 1013, "ItemId": 248133 },
+        { "Tier": 5, "Id": 1014, "ItemId": 248134 },
+        { "Tier": 6, "Id": 1015, "ItemId": 248135 },
+        { "Tier": 7, "Id": 1016, "ItemId": 248136 },
+        { "Tier": 8, "Id": 1017, "ItemId": 248137 },
+        { "Tier": 9, "Id": 1018, "ItemId": 248138 },
+        { "Tier": 10, "Id": 1019, "ItemId": 248139 }
+      ]
+    },
+    {
+      "Name": "Illogical Patterns",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1220, "ItemId": 252448 },
+        { "Tier": 2, "Id": 1221, "ItemId": 252449 },
+        { "Tier": 3, "Id": 1222, "ItemId": 252450 },
+        { "Tier": 4, "Id": 1223, "ItemId": 252451 },
+        { "Tier": 5, "Id": 1224, "ItemId": 252452 },
+        { "Tier": 6, "Id": 1225, "ItemId": 252453 },
+        { "Tier": 7, "Id": 1226, "ItemId": 252454 },
+        { "Tier": 8, "Id": 1227, "ItemId": 252455 }
+      ]
+    },
+    {
+      "Name": "Loophole",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1100, "ItemId": 251790 },
+        { "Tier": 2, "Id": 1101, "ItemId": 251791 },
+        { "Tier": 3, "Id": 1102, "ItemId": 251792 },
+        { "Tier": 4, "Id": 1103, "ItemId": 251793 },
+        { "Tier": 5, "Id": 1104, "ItemId": 251794 },
+        { "Tier": 6, "Id": 1105, "ItemId": 251795 },
+        { "Tier": 7, "Id": 1106, "ItemId": 251796 },
+        { "Tier": 8, "Id": 1107, "ItemId": 251797 },
+        { "Tier": 9, "Id": 1108, "ItemId": 251798 },
+        { "Tier": 10, "Id": 1109, "ItemId": 251799 }
+      ]
+    },
+    {
+      "Name": "Made",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1090, "ItemId": 251285 },
+        { "Tier": 2, "Id": 1091, "ItemId": 251286 },
+        { "Tier": 3, "Id": 1092, "ItemId": 251287 },
+        { "Tier": 4, "Id": 1093, "ItemId": 251288 },
+        { "Tier": 5, "Id": 1094, "ItemId": 251289 },
+        { "Tier": 6, "Id": 1095, "ItemId": 251290 },
+        { "Tier": 7, "Id": 1096, "ItemId": 251291 },
+        { "Tier": 8, "Id": 1097, "ItemId": 251292 },
+        { "Tier": 9, "Id": 1098, "ItemId": 251293 },
+        { "Tier": 10, "Id": 1099, "ItemId": 251294 }
+      ]
+    },
+    {
+      "Name": "Mutate",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1070, "ItemId": 251205 },
+        { "Tier": 2, "Id": 1071, "ItemId": 251206 },
+        { "Tier": 3, "Id": 1072, "ItemId": 251207 },
+        { "Tier": 4, "Id": 1073, "ItemId": 251208 },
+        { "Tier": 5, "Id": 1074, "ItemId": 251209 },
+        { "Tier": 6, "Id": 1075, "ItemId": 251210 },
+        { "Tier": 7, "Id": 1076, "ItemId": 251211 },
+        { "Tier": 8, "Id": 1077, "ItemId": 251212 },
+        { "Tier": 9, "Id": 1078, "ItemId": 251213 },
+        { "Tier": 10, "Id": 1079, "ItemId": 251214 }
+      ]
+    },
+    {
+      "Name": "Nanobreed Primary Genome",
+      "Category": "Alien",
+      "Flags": 18,
+      "Perks": [
+        { "Tier": 1, "Id": 1330, "ItemId": 252560 },
+        { "Tier": 2, "Id": 1331, "ItemId": 252561 },
+        { "Tier": 3, "Id": 1332, "ItemId": 252562 },
+        { "Tier": 4, "Id": 1333, "ItemId": 252563 },
+        { "Tier": 5, "Id": 1334, "ItemId": 252564 },
+        { "Tier": 6, "Id": 1335, "ItemId": 252565 },
+        { "Tier": 7, "Id": 1336, "ItemId": 252566 },
+        { "Tier": 8, "Id": 1337, "ItemId": 252567 },
+        { "Tier": 9, "Id": 1338, "ItemId": 252568 },
+        { "Tier": 10, "Id": 1339, "ItemId": 252569 }
+      ]
+    },
+    {
+      "Name": "Nanobreed Secondary Genome",
+      "Category": "Alien",
+      "Flags": 18,
+      "Perks": [
+        { "Tier": 1, "Id": 1340, "ItemId": 253018 },
+        { "Tier": 2, "Id": 1341, "ItemId": 253019 },
+        { "Tier": 3, "Id": 1342, "ItemId": 253020 },
+        { "Tier": 4, "Id": 1343, "ItemId": 253021 },
+        { "Tier": 5, "Id": 1344, "ItemId": 253022 },
+        { "Tier": 6, "Id": 1345, "ItemId": 253023 },
+        { "Tier": 7, "Id": 1346, "ItemId": 253024 },
+        { "Tier": 8, "Id": 1347, "ItemId": 253025 },
+        { "Tier": 9, "Id": 1348, "ItemId": 253026 },
+        { "Tier": 10, "Id": 1349, "ItemId": 253027 }
+      ]
+    },
+    {
+      "Name": "Nanomorph",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1200, "ItemId": 252387 },
+        { "Tier": 2, "Id": 1201, "ItemId": 252388 },
+        { "Tier": 3, "Id": 1202, "ItemId": 252389 },
+        { "Tier": 4, "Id": 1203, "ItemId": 252390 },
+        { "Tier": 5, "Id": 1204, "ItemId": 252391 },
+        { "Tier": 6, "Id": 1205, "ItemId": 252392 },
+        { "Tier": 7, "Id": 1206, "ItemId": 252393 },
+        { "Tier": 8, "Id": 1207, "ItemId": 252394 },
+        { "Tier": 9, "Id": 1208, "ItemId": 252395 },
+        { "Tier": 10, "Id": 1209, "ItemId": 252396 }
+      ]
+    },
+    {
+      "Name": "Opifex Primary Genome",
+      "Category": "Alien",
+      "Flags": 10,
+      "Perks": [
+        { "Tier": 1, "Id": 1310, "ItemId": 252527 },
+        { "Tier": 2, "Id": 1311, "ItemId": 252528 },
+        { "Tier": 3, "Id": 1312, "ItemId": 252529 },
+        { "Tier": 4, "Id": 1313, "ItemId": 252530 },
+        { "Tier": 5, "Id": 1314, "ItemId": 252531 },
+        { "Tier": 6, "Id": 1315, "ItemId": 252532 },
+        { "Tier": 7, "Id": 1316, "ItemId": 252533 },
+        { "Tier": 8, "Id": 1317, "ItemId": 252534 },
+        { "Tier": 9, "Id": 1318, "ItemId": 252535 },
+        { "Tier": 10, "Id": 1319, "ItemId": 252536 }
+      ]
+    },
+    {
+      "Name": "Opifex Secondary Genome",
+      "Category": "Alien",
+      "Flags": 10,
+      "Perks": [
+        { "Tier": 1, "Id": 1320, "ItemId": 252542 },
+        { "Tier": 2, "Id": 1321, "ItemId": 252543 },
+        { "Tier": 3, "Id": 1322, "ItemId": 252544 },
+        { "Tier": 4, "Id": 1323, "ItemId": 252545 },
+        { "Tier": 5, "Id": 1324, "ItemId": 252546 },
+        { "Tier": 6, "Id": 1325, "ItemId": 252547 },
+        { "Tier": 7, "Id": 1326, "ItemId": 252548 },
+        { "Tier": 8, "Id": 1327, "ItemId": 252549 },
+        { "Tier": 9, "Id": 1328, "ItemId": 252550 },
+        { "Tier": 10, "Id": 1329, "ItemId": 252551 }
+      ]
+    },
+    {
+      "Name": "Opportunist",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1240, "ItemId": 252479 },
+        { "Tier": 2, "Id": 1241, "ItemId": 252480 },
+        { "Tier": 3, "Id": 1242, "ItemId": 252481 },
+        { "Tier": 4, "Id": 1243, "ItemId": 252482 },
+        { "Tier": 5, "Id": 1244, "ItemId": 252483 },
+        { "Tier": 6, "Id": 1245, "ItemId": 252484 }
+      ]
+    },
+    {
+      "Name": "Power In Numbers",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1020, "ItemId": 248165 },
+        { "Tier": 2, "Id": 1021, "ItemId": 248166 },
+        { "Tier": 3, "Id": 1022, "ItemId": 248167 },
+        { "Tier": 4, "Id": 1023, "ItemId": 248168 },
+        { "Tier": 5, "Id": 1024, "ItemId": 248169 },
+        { "Tier": 6, "Id": 1025, "ItemId": 248170 },
+        { "Tier": 7, "Id": 1026, "ItemId": 248171 },
+        { "Tier": 8, "Id": 1027, "ItemId": 248172 },
+        { "Tier": 9, "Id": 1028, "ItemId": 248173 },
+        { "Tier": 10, "Id": 1029, "ItemId": 248174 }
+      ]
+    },
+    {
+      "Name": "Ranger",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1190, "ItemId": 252356 },
+        { "Tier": 2, "Id": 1191, "ItemId": 252357 },
+        { "Tier": 3, "Id": 1192, "ItemId": 252358 },
+        { "Tier": 4, "Id": 1193, "ItemId": 252359 },
+        { "Tier": 5, "Id": 1194, "ItemId": 252360 },
+        { "Tier": 6, "Id": 1195, "ItemId": 252361 },
+        { "Tier": 7, "Id": 1196, "ItemId": 254415 },
+        { "Tier": 8, "Id": 1197, "ItemId": 254416 },
+        { "Tier": 9, "Id": 1198, "ItemId": 254417 },
+        { "Tier": 10, "Id": 1199, "ItemId": 254418 }
+      ]
+    },
+    {
+      "Name": "Shadow",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1000, "ItemId": 248115 },
+        { "Tier": 2, "Id": 1001, "ItemId": 248116 },
+        { "Tier": 3, "Id": 1002, "ItemId": 248117 },
+        { "Tier": 4, "Id": 1003, "ItemId": 248118 },
+        { "Tier": 5, "Id": 1004, "ItemId": 248119 },
+        { "Tier": 6, "Id": 1005, "ItemId": 248120 },
+        { "Tier": 7, "Id": 1006, "ItemId": 248121 },
+        { "Tier": 8, "Id": 1007, "ItemId": 248122 },
+        { "Tier": 9, "Id": 1008, "ItemId": 248123 },
+        { "Tier": 10, "Id": 1009, "ItemId": 248124 }
+      ]
+    },
+    {
+      "Name": "Solitus Primary Genome",
+      "Category": "Alien",
+      "Flags": 6,
+      "Perks": [
+        { "Tier": 1, "Id": 1350, "ItemId": 253034 },
+        { "Tier": 2, "Id": 1351, "ItemId": 253035 },
+        { "Tier": 3, "Id": 1352, "ItemId": 253036 },
+        { "Tier": 4, "Id": 1353, "ItemId": 253037 },
+        { "Tier": 5, "Id": 1354, "ItemId": 253038 },
+        { "Tier": 6, "Id": 1355, "ItemId": 253039 },
+        { "Tier": 7, "Id": 1356, "ItemId": 253040 },
+        { "Tier": 8, "Id": 1357, "ItemId": 253041 },
+        { "Tier": 9, "Id": 1358, "ItemId": 253042 },
+        { "Tier": 10, "Id": 1359, "ItemId": 253043 }
+      ]
+    },
+    {
+      "Name": "Solitus Seconday Genome",
+      "Category": "Alien",
+      "Flags": 6,
+      "Perks": [
+        { "Tier": 1, "Id": 1360, "ItemId": 253049 },
+        { "Tier": 2, "Id": 1361, "ItemId": 253050 },
+        { "Tier": 3, "Id": 1362, "ItemId": 253051 },
+        { "Tier": 4, "Id": 1363, "ItemId": 253052 },
+        { "Tier": 5, "Id": 1364, "ItemId": 253053 },
+        { "Tier": 6, "Id": 1365, "ItemId": 253054 },
+        { "Tier": 7, "Id": 1366, "ItemId": 253055 },
+        { "Tier": 8, "Id": 1367, "ItemId": 253056 },
+        { "Tier": 9, "Id": 1368, "ItemId": 253057 },
+        { "Tier": 10, "Id": 1369, "ItemId": 253058 }
+      ]
+    },
+    {
+      "Name": "The Call",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1080, "ItemId": 251244 },
+        { "Tier": 2, "Id": 1081, "ItemId": 251245 },
+        { "Tier": 3, "Id": 1082, "ItemId": 251246 },
+        { "Tier": 4, "Id": 1083, "ItemId": 251247 },
+        { "Tier": 5, "Id": 1084, "ItemId": 251248 },
+        { "Tier": 6, "Id": 1085, "ItemId": 251249 },
+        { "Tier": 7, "Id": 1086, "ItemId": 251250 },
+        { "Tier": 8, "Id": 1087, "ItemId": 251251 },
+        { "Tier": 9, "Id": 1088, "ItemId": 251252 },
+        { "Tier": 10, "Id": 1089, "ItemId": 251253 }
+      ]
+    },
+    {
+      "Name": "The Unknown Factor",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1230, "ItemId": 252463 },
+        { "Tier": 2, "Id": 1231, "ItemId": 252464 },
+        { "Tier": 3, "Id": 1232, "ItemId": 252465 },
+        { "Tier": 4, "Id": 1233, "ItemId": 252466 },
+        { "Tier": 5, "Id": 1234, "ItemId": 252467 },
+        { "Tier": 6, "Id": 1235, "ItemId": 252468 },
+        { "Tier": 7, "Id": 1236, "ItemId": 252469 },
+        { "Tier": 8, "Id": 1237, "ItemId": 252470 }
+      ]
+    },
+    {
+      "Name": "Volunteer",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1030, "ItemId": 248245 },
+        { "Tier": 2, "Id": 1031, "ItemId": 248246 },
+        { "Tier": 3, "Id": 1032, "ItemId": 248247 },
+        { "Tier": 4, "Id": 1033, "ItemId": 248248 },
+        { "Tier": 5, "Id": 1034, "ItemId": 248249 },
+        { "Tier": 6, "Id": 1035, "ItemId": 248250 },
+        { "Tier": 7, "Id": 1036, "ItemId": 248251 },
+        { "Tier": 8, "Id": 1037, "ItemId": 248252 },
+        { "Tier": 9, "Id": 1038, "ItemId": 248253 },
+        { "Tier": 10, "Id": 1039, "ItemId": 248254 }
+      ]
+    },
+    {
+      "Name": "Xuyun",
+      "Category": "Alien",
+      "Flags": 2,
+      "Perks": [
+        { "Tier": 1, "Id": 1040, "ItemId": 248731 },
+        { "Tier": 2, "Id": 1041, "ItemId": 248732 },
+        { "Tier": 3, "Id": 1042, "ItemId": 248733 },
+        { "Tier": 4, "Id": 1043, "ItemId": 248734 },
+        { "Tier": 5, "Id": 1044, "ItemId": 248735 },
+        { "Tier": 6, "Id": 1045, "ItemId": 248736 },
+        { "Tier": 7, "Id": 1046, "ItemId": 248737 },
+        { "Tier": 8, "Id": 1047, "ItemId": 248738 },
+        { "Tier": 9, "Id": 1048, "ItemId": 248739 },
+        { "Tier": 10, "Id": 1049, "ItemId": 248740 }
+      ]
+    },
+    {
+      "Name": "Accumulator",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 100, "ItemId": 210830 },
+        { "Tier": 2, "Id": 101, "ItemId": 210831 },
+        { "Tier": 3, "Id": 102, "ItemId": 210832 },
+        { "Tier": 4, "Id": 103, "ItemId": 210833 },
+        { "Tier": 5, "Id": 104, "ItemId": 210834 },
+        { "Tier": 6, "Id": 105, "ItemId": 210835 },
+        { "Tier": 7, "Id": 106, "ItemId": 210836 },
+        { "Tier": 8, "Id": 107, "ItemId": 210837 },
+        { "Tier": 9, "Id": 108, "ItemId": 210838 },
+        { "Tier": 10, "Id": 109, "ItemId": 210839 }
+      ]
+    },
+    {
+      "Name": "Acrobat",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 110, "ItemId": 211655 },
+        { "Tier": 2, "Id": 111, "ItemId": 211656 },
+        { "Tier": 3, "Id": 112, "ItemId": 211657 },
+        { "Tier": 4, "Id": 113, "ItemId": 211658 }
+      ]
+    },
+    {
+      "Name": "Alchemist",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 120, "ItemId": 211676 },
+        { "Tier": 2, "Id": 121, "ItemId": 211677 },
+        { "Tier": 3, "Id": 122, "ItemId": 211678 },
+        { "Tier": 4, "Id": 123, "ItemId": 211679 },
+        { "Tier": 5, "Id": 124, "ItemId": 211680 },
+        { "Tier": 6, "Id": 125, "ItemId": 211681 }
+      ]
+    },
+    {
+      "Name": "Ambidextrous",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 130, "ItemId": 211135 },
+        { "Tier": 2, "Id": 131, "ItemId": 211136 },
+        { "Tier": 3, "Id": 132, "ItemId": 211137 },
+        { "Tier": 4, "Id": 133, "ItemId": 211138 },
+        { "Tier": 5, "Id": 134, "ItemId": 212177 }
+      ]
+    },
+    {
+      "Name": "Assassin",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 140, "ItemId": 210842 },
+        { "Tier": 2, "Id": 141, "ItemId": 210843 },
+        { "Tier": 3, "Id": 142, "ItemId": 210844 },
+        { "Tier": 4, "Id": 143, "ItemId": 210845 },
+        { "Tier": 5, "Id": 144, "ItemId": 210846 },
+        { "Tier": 6, "Id": 145, "ItemId": 210847 },
+        { "Tier": 7, "Id": 146, "ItemId": 210848 },
+        { "Tier": 8, "Id": 147, "ItemId": 210849 },
+        { "Tier": 9, "Id": 148, "ItemId": 210850 },
+        { "Tier": 10, "Id": 149, "ItemId": 210851 }
+      ]
+    },
+    {
+      "Name": "Assault Force Medic",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 150, "ItemId": 211682 },
+        { "Tier": 2, "Id": 151, "ItemId": 211683 },
+        { "Tier": 3, "Id": 152, "ItemId": 211684 },
+        { "Tier": 4, "Id": 153, "ItemId": 211685 },
+        { "Tier": 5, "Id": 154, "ItemId": 211686 },
+        { "Tier": 6, "Id": 155, "ItemId": 211687 },
+        { "Tier": 7, "Id": 156, "ItemId": 211688 },
+        { "Tier": 8, "Id": 157, "ItemId": 211689 },
+        { "Tier": 9, "Id": 158, "ItemId": 211690 },
+        { "Tier": 10, "Id": 159, "ItemId": 211691 }
+      ]
+    },
+    {
+      "Name": "Aura of Revival",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 160, "ItemId": 212161 },
+        { "Tier": 2, "Id": 161, "ItemId": 212164 },
+        { "Tier": 3, "Id": 162, "ItemId": 212165 },
+        { "Tier": 4, "Id": 163, "ItemId": 212166 },
+        { "Tier": 5, "Id": 164, "ItemId": 212167 },
+        { "Tier": 6, "Id": 165, "ItemId": 212168 },
+        { "Tier": 7, "Id": 166, "ItemId": 212169 },
+        { "Tier": 8, "Id": 167, "ItemId": 212170 },
+        { "Tier": 9, "Id": 168, "ItemId": 212171 },
+        { "Tier": 10, "Id": 169, "ItemId": 212172 }
+      ]
+    },
+    {
+      "Name": "Bio Shielding",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 170, "ItemId": 211666 },
+        { "Tier": 2, "Id": 171, "ItemId": 211667 },
+        { "Tier": 3, "Id": 172, "ItemId": 211668 },
+        { "Tier": 4, "Id": 173, "ItemId": 211669 },
+        { "Tier": 5, "Id": 174, "ItemId": 211670 },
+        { "Tier": 6, "Id": 175, "ItemId": 211671 },
+        { "Tier": 7, "Id": 176, "ItemId": 211672 },
+        { "Tier": 8, "Id": 177, "ItemId": 211673 },
+        { "Tier": 9, "Id": 178, "ItemId": 211674 },
+        { "Tier": 10, "Id": 179, "ItemId": 211675 }
+      ]
+    },
+    {
+      "Name": "Black Ops",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 180, "ItemId": 211692 },
+        { "Tier": 2, "Id": 181, "ItemId": 211693 },
+        { "Tier": 3, "Id": 182, "ItemId": 211694 },
+        { "Tier": 4, "Id": 183, "ItemId": 211695 },
+        { "Tier": 5, "Id": 184, "ItemId": 211696 },
+        { "Tier": 6, "Id": 185, "ItemId": 211697 },
+        { "Tier": 7, "Id": 186, "ItemId": 211698 },
+        { "Tier": 8, "Id": 187, "ItemId": 211699 },
+        { "Tier": 9, "Id": 188, "ItemId": 211700 },
+        { "Tier": 10, "Id": 189, "ItemId": 211701 }
+      ]
+    },
+    {
+      "Name": "Blessing",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 190, "ItemId": 211702 },
+        { "Tier": 2, "Id": 191, "ItemId": 211703 },
+        { "Tier": 3, "Id": 192, "ItemId": 211704 },
+        { "Tier": 4, "Id": 193, "ItemId": 211705 },
+        { "Tier": 5, "Id": 194, "ItemId": 211706 },
+        { "Tier": 6, "Id": 195, "ItemId": 211707 },
+        { "Tier": 7, "Id": 196, "ItemId": 211708 },
+        { "Tier": 8, "Id": 197, "ItemId": 211709 },
+        { "Tier": 9, "Id": 198, "ItemId": 211710 },
+        { "Tier": 10, "Id": 199, "ItemId": 211711 }
+      ]
+    },
+    {
+      "Name": "Blunt Mastery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 200, "ItemId": 211712 },
+        { "Tier": 2, "Id": 201, "ItemId": 211713 },
+        { "Tier": 3, "Id": 202, "ItemId": 211714 },
+        { "Tier": 4, "Id": 203, "ItemId": 211715 },
+        { "Tier": 5, "Id": 204, "ItemId": 225939 },
+        { "Tier": 6, "Id": 205, "ItemId": 225940 },
+        { "Tier": 7, "Id": 206, "ItemId": 225941 },
+        { "Tier": 8, "Id": 207, "ItemId": 225942 },
+        { "Tier": 9, "Id": 208, "ItemId": 225943 },
+        { "Tier": 10, "Id": 209, "ItemId": 225944 }
+      ]
+    },
+    {
+      "Name": "Bone Crusher",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 900, "ItemId": 225960 },
+        { "Tier": 2, "Id": 901, "ItemId": 225961 },
+        { "Tier": 3, "Id": 902, "ItemId": 225962 },
+        { "Tier": 4, "Id": 903, "ItemId": 225963 },
+        { "Tier": 5, "Id": 904, "ItemId": 225964 },
+        { "Tier": 6, "Id": 905, "ItemId": 225965 },
+        { "Tier": 7, "Id": 906, "ItemId": 225966 },
+        { "Tier": 8, "Id": 907, "ItemId": 225967 },
+        { "Tier": 9, "Id": 908, "ItemId": 225968 },
+        { "Tier": 10, "Id": 909, "ItemId": 225969 }
+      ]
+    },
+    {
+      "Name": "Brawler",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 210, "ItemId": 211722 },
+        { "Tier": 2, "Id": 211, "ItemId": 211723 },
+        { "Tier": 3, "Id": 212, "ItemId": 211724 },
+        { "Tier": 4, "Id": 213, "ItemId": 211725 },
+        { "Tier": 5, "Id": 214, "ItemId": 211726 },
+        { "Tier": 6, "Id": 215, "ItemId": 211727 }
+      ]
+    },
+    {
+      "Name": "Bureaucratic Shuffle",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 220, "ItemId": 211728 },
+        { "Tier": 2, "Id": 221, "ItemId": 211729 },
+        { "Tier": 3, "Id": 222, "ItemId": 211730 },
+        { "Tier": 4, "Id": 223, "ItemId": 211731 },
+        { "Tier": 5, "Id": 224, "ItemId": 211732 },
+        { "Tier": 6, "Id": 225, "ItemId": 211733 },
+        { "Tier": 7, "Id": 226, "ItemId": 211734 },
+        { "Tier": 8, "Id": 227, "ItemId": 211735 },
+        { "Tier": 9, "Id": 228, "ItemId": 211736 },
+        { "Tier": 10, "Id": 229, "ItemId": 211737 }
+      ]
+    },
+    {
+      "Name": "Careful in Battle",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 230, "ItemId": 211738 },
+        { "Tier": 2, "Id": 231, "ItemId": 211739 },
+        { "Tier": 3, "Id": 232, "ItemId": 211740 },
+        { "Tier": 4, "Id": 233, "ItemId": 211741 },
+        { "Tier": 5, "Id": 234, "ItemId": 211742 },
+        { "Tier": 6, "Id": 235, "ItemId": 211743 },
+        { "Tier": 7, "Id": 236, "ItemId": 211744 },
+        { "Tier": 8, "Id": 237, "ItemId": 211745 },
+        { "Tier": 9, "Id": 238, "ItemId": 211746 },
+        { "Tier": 10, "Id": 239, "ItemId": 211747 }
+      ]
+    },
+    {
+      "Name": "Cartographer",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 240, "ItemId": 211748 },
+        { "Tier": 2, "Id": 241, "ItemId": 211749 },
+        { "Tier": 3, "Id": 242, "ItemId": 211750 },
+        { "Tier": 4, "Id": 243, "ItemId": 211751 },
+        { "Tier": 5, "Id": 244, "ItemId": 211752 }
+      ]
+    },
+    {
+      "Name": "Channel Rage",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 250, "ItemId": 211753 },
+        { "Tier": 2, "Id": 251, "ItemId": 211754 },
+        { "Tier": 3, "Id": 252, "ItemId": 211755 },
+        { "Tier": 4, "Id": 253, "ItemId": 211756 },
+        { "Tier": 5, "Id": 254, "ItemId": 211757 },
+        { "Tier": 6, "Id": 255, "ItemId": 211758 },
+        { "Tier": 7, "Id": 256, "ItemId": 211759 },
+        { "Tier": 8, "Id": 257, "ItemId": 211760 },
+        { "Tier": 9, "Id": 258, "ItemId": 211761 },
+        { "Tier": 10, "Id": 259, "ItemId": 211762 }
+      ]
+    },
+    {
+      "Name": "Channeling of Notum",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 260, "ItemId": 211043 },
+        { "Tier": 2, "Id": 261, "ItemId": 211044 },
+        { "Tier": 3, "Id": 262, "ItemId": 211045 },
+        { "Tier": 4, "Id": 263, "ItemId": 211046 }
+      ]
+    },
+    {
+      "Name": "Colossal Health",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 270, "ItemId": 211763 },
+        { "Tier": 2, "Id": 271, "ItemId": 211764 },
+        { "Tier": 3, "Id": 272, "ItemId": 211765 },
+        { "Tier": 4, "Id": 273, "ItemId": 211766 },
+        { "Tier": 5, "Id": 274, "ItemId": 211767 },
+        { "Tier": 6, "Id": 275, "ItemId": 211768 },
+        { "Tier": 7, "Id": 276, "ItemId": 211769 },
+        { "Tier": 8, "Id": 277, "ItemId": 211770 },
+        { "Tier": 9, "Id": 278, "ItemId": 211771 },
+        { "Tier": 10, "Id": 279, "ItemId": 211772 }
+      ]
+    },
+    {
+      "Name": "Commanding Presence",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 280, "ItemId": 210931 },
+        { "Tier": 2, "Id": 281, "ItemId": 210932 },
+        { "Tier": 3, "Id": 282, "ItemId": 210933 },
+        { "Tier": 4, "Id": 283, "ItemId": 210934 },
+        { "Tier": 5, "Id": 284, "ItemId": 210935 },
+        { "Tier": 6, "Id": 285, "ItemId": 210936 },
+        { "Tier": 7, "Id": 286, "ItemId": 210937 },
+        { "Tier": 8, "Id": 287, "ItemId": 210938 },
+        { "Tier": 9, "Id": 288, "ItemId": 210939 },
+        { "Tier": 10, "Id": 289, "ItemId": 210940 }
+      ]
+    },
+    {
+      "Name": "Cybernetic Samurai",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 770, "ItemId": 212069 },
+        { "Tier": 2, "Id": 771, "ItemId": 212070 },
+        { "Tier": 3, "Id": 772, "ItemId": 212071 },
+        { "Tier": 4, "Id": 773, "ItemId": 212072 },
+        { "Tier": 5, "Id": 774, "ItemId": 212073 },
+        { "Tier": 6, "Id": 775, "ItemId": 212074 },
+        { "Tier": 7, "Id": 776, "ItemId": 212075 },
+        { "Tier": 8, "Id": 777, "ItemId": 212076 },
+        { "Tier": 9, "Id": 778, "ItemId": 212077 },
+        { "Tier": 10, "Id": 779, "ItemId": 212078 }
+      ]
+    },
+    {
+      "Name": "Demolitions",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 860, "ItemId": 211823 },
+        { "Tier": 2, "Id": 861, "ItemId": 211824 },
+        { "Tier": 3, "Id": 862, "ItemId": 211825 },
+        { "Tier": 4, "Id": 863, "ItemId": 211826 },
+        { "Tier": 5, "Id": 864, "ItemId": 211827 },
+        { "Tier": 6, "Id": 865, "ItemId": 211828 },
+        { "Tier": 7, "Id": 866, "ItemId": 211829 },
+        { "Tier": 8, "Id": 867, "ItemId": 211830 },
+        { "Tier": 9, "Id": 868, "ItemId": 211831 },
+        { "Tier": 10, "Id": 869, "ItemId": 211832 }
+      ]
+    },
+    {
+      "Name": "Directorship",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 290, "ItemId": 223630 },
+        { "Tier": 2, "Id": 291, "ItemId": 223631 },
+        { "Tier": 3, "Id": 292, "ItemId": 223632 },
+        { "Tier": 4, "Id": 293, "ItemId": 223633 },
+        { "Tier": 5, "Id": 294, "ItemId": 223634 },
+        { "Tier": 6, "Id": 295, "ItemId": 223635 },
+        { "Tier": 7, "Id": 296, "ItemId": 223636 },
+        { "Tier": 8, "Id": 297, "ItemId": 223637 },
+        { "Tier": 9, "Id": 298, "ItemId": 223638 },
+        { "Tier": 10, "Id": 299, "ItemId": 223639 }
+      ]
+    },
+    {
+      "Name": "Disharmony",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 300, "ItemId": 211783 },
+        { "Tier": 2, "Id": 301, "ItemId": 211784 },
+        { "Tier": 3, "Id": 302, "ItemId": 211785 },
+        { "Tier": 4, "Id": 303, "ItemId": 211786 },
+        { "Tier": 5, "Id": 304, "ItemId": 211787 },
+        { "Tier": 6, "Id": 305, "ItemId": 211788 },
+        { "Tier": 7, "Id": 306, "ItemId": 211789 },
+        { "Tier": 8, "Id": 307, "ItemId": 211790 },
+        { "Tier": 9, "Id": 308, "ItemId": 211791 },
+        { "Tier": 10, "Id": 309, "ItemId": 211792 }
+      ]
+    },
+    {
+      "Name": "Distill Life",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 310, "ItemId": 211773 },
+        { "Tier": 2, "Id": 311, "ItemId": 211774 },
+        { "Tier": 3, "Id": 312, "ItemId": 211775 },
+        { "Tier": 4, "Id": 313, "ItemId": 211776 },
+        { "Tier": 5, "Id": 314, "ItemId": 211777 },
+        { "Tier": 6, "Id": 315, "ItemId": 211778 },
+        { "Tier": 7, "Id": 316, "ItemId": 211779 },
+        { "Tier": 8, "Id": 317, "ItemId": 211780 },
+        { "Tier": 9, "Id": 318, "ItemId": 211781 },
+        { "Tier": 10, "Id": 319, "ItemId": 211782 }
+      ]
+    },
+    {
+      "Name": "Edged Mastery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 320, "ItemId": 211660 },
+        { "Tier": 2, "Id": 321, "ItemId": 211661 },
+        { "Tier": 3, "Id": 322, "ItemId": 211662 },
+        { "Tier": 4, "Id": 323, "ItemId": 211663 },
+        { "Tier": 5, "Id": 324, "ItemId": 211664 },
+        { "Tier": 6, "Id": 325, "ItemId": 211665 },
+        { "Tier": 7, "Id": 326, "ItemId": 212173 },
+        { "Tier": 8, "Id": 327, "ItemId": 212174 },
+        { "Tier": 9, "Id": 328, "ItemId": 212175 },
+        { "Tier": 10, "Id": 329, "ItemId": 212176 }
+      ]
+    },
+    {
+      "Name": "Enhance DNA",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 330, "ItemId": 211793 },
+        { "Tier": 2, "Id": 331, "ItemId": 211794 },
+        { "Tier": 3, "Id": 332, "ItemId": 211795 },
+        { "Tier": 4, "Id": 333, "ItemId": 211796 },
+        { "Tier": 5, "Id": 334, "ItemId": 211797 },
+        { "Tier": 6, "Id": 335, "ItemId": 211798 },
+        { "Tier": 7, "Id": 336, "ItemId": 211799 },
+        { "Tier": 8, "Id": 337, "ItemId": 211800 },
+        { "Tier": 9, "Id": 338, "ItemId": 211801 },
+        { "Tier": 10, "Id": 339, "ItemId": 211802 }
+      ]
+    },
+    {
+      "Name": "Enhance Health",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 340, "ItemId": 211051 },
+        { "Tier": 2, "Id": 341, "ItemId": 211052 },
+        { "Tier": 3, "Id": 342, "ItemId": 211053 },
+        { "Tier": 4, "Id": 343, "ItemId": 211054 },
+        { "Tier": 5, "Id": 344, "ItemId": 211055 },
+        { "Tier": 6, "Id": 345, "ItemId": 211056 },
+        { "Tier": 7, "Id": 346, "ItemId": 212180 }
+      ]
+    },
+    {
+      "Name": "Enhance Nano",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 350, "ItemId": 211059 },
+        { "Tier": 2, "Id": 351, "ItemId": 211060 },
+        { "Tier": 3, "Id": 352, "ItemId": 211061 },
+        { "Tier": 4, "Id": 353, "ItemId": 211062 },
+        { "Tier": 5, "Id": 354, "ItemId": 211063 },
+        { "Tier": 6, "Id": 355, "ItemId": 211064 },
+        { "Tier": 7, "Id": 356, "ItemId": 212183 }
+      ]
+    },
+    {
+      "Name": "Enhanced Nano Damage",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 360, "ItemId": 212117 },
+        { "Tier": 2, "Id": 361, "ItemId": 212118 },
+        { "Tier": 3, "Id": 362, "ItemId": 212119 },
+        { "Tier": 4, "Id": 363, "ItemId": 212120 },
+        { "Tier": 5, "Id": 364, "ItemId": 212121 },
+        { "Tier": 6, "Id": 365, "ItemId": 212122 }
+      ]
+    },
+    {
+      "Name": "Essence of Notum",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 370, "ItemId": 211809 },
+        { "Tier": 2, "Id": 371, "ItemId": 211810 },
+        { "Tier": 3, "Id": 372, "ItemId": 211811 }
+      ]
+    },
+    {
+      "Name": "Explorer",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 380, "ItemId": 211812 },
+        { "Tier": 2, "Id": 381, "ItemId": 211813 },
+        { "Tier": 3, "Id": 382, "ItemId": 211814 },
+        { "Tier": 4, "Id": 383, "ItemId": 211815 }
+      ]
+    },
+    {
+      "Name": "Ferocity of Nature",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 390, "ItemId": 211816 },
+        { "Tier": 2, "Id": 391, "ItemId": 211817 },
+        { "Tier": 3, "Id": 392, "ItemId": 211818 }
+      ]
+    },
+    {
+      "Name": "First Aid",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 400, "ItemId": 211819 },
+        { "Tier": 2, "Id": 401, "ItemId": 211820 },
+        { "Tier": 3, "Id": 402, "ItemId": 211821 },
+        { "Tier": 4, "Id": 403, "ItemId": 211822 }
+      ]
+    },
+    {
+      "Name": "Form of Troll",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 420, "ItemId": 211843 },
+        { "Tier": 2, "Id": 421, "ItemId": 211844 },
+        { "Tier": 3, "Id": 422, "ItemId": 211845 },
+        { "Tier": 4, "Id": 423, "ItemId": 211846 },
+        { "Tier": 5, "Id": 424, "ItemId": 211847 },
+        { "Tier": 6, "Id": 425, "ItemId": 211848 },
+        { "Tier": 7, "Id": 426, "ItemId": 211849 },
+        { "Tier": 8, "Id": 427, "ItemId": 211850 },
+        { "Tier": 9, "Id": 428, "ItemId": 211851 },
+        { "Tier": 10, "Id": 429, "ItemId": 211852 }
+      ]
+    },
+    {
+      "Name": "Freak Strength",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 430, "ItemId": 211853 },
+        { "Tier": 2, "Id": 431, "ItemId": 211854 },
+        { "Tier": 3, "Id": 432, "ItemId": 211855 }
+      ]
+    },
+    {
+      "Name": "Gadgeteer",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 450, "ItemId": 211856 },
+        { "Tier": 2, "Id": 451, "ItemId": 211857 },
+        { "Tier": 3, "Id": 452, "ItemId": 211858 },
+        { "Tier": 4, "Id": 453, "ItemId": 211859 },
+        { "Tier": 5, "Id": 454, "ItemId": 211860 },
+        { "Tier": 6, "Id": 455, "ItemId": 211861 },
+        { "Tier": 7, "Id": 456, "ItemId": 211862 },
+        { "Tier": 8, "Id": 457, "ItemId": 211863 },
+        { "Tier": 9, "Id": 458, "ItemId": 211864 },
+        { "Tier": 10, "Id": 459, "ItemId": 211865 }
+      ]
+    },
+    {
+      "Name": "Genius",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 460, "ItemId": 211866 },
+        { "Tier": 2, "Id": 461, "ItemId": 211867 },
+        { "Tier": 3, "Id": 462, "ItemId": 211868 }
+      ]
+    },
+    {
+      "Name": "Grid NCU Extension",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 470, "ItemId": 211869 },
+        { "Tier": 2, "Id": 471, "ItemId": 211870 },
+        { "Tier": 3, "Id": 472, "ItemId": 211871 },
+        { "Tier": 4, "Id": 473, "ItemId": 211872 }
+      ]
+    },
+    {
+      "Name": "Heavy Ranged",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 480, "ItemId": 211873 },
+        { "Tier": 2, "Id": 481, "ItemId": 211874 },
+        { "Tier": 3, "Id": 482, "ItemId": 211875 },
+        { "Tier": 4, "Id": 483, "ItemId": 211876 },
+        { "Tier": 5, "Id": 484, "ItemId": 211877 },
+        { "Tier": 6, "Id": 485, "ItemId": 211878 },
+        { "Tier": 7, "Id": 486, "ItemId": 211879 },
+        { "Tier": 8, "Id": 487, "ItemId": 211880 }
+      ]
+    },
+    {
+      "Name": "Hit and Run",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 930, "ItemId": 283677 },
+        { "Tier": 2, "Id": 931, "ItemId": 283678 },
+        { "Tier": 3, "Id": 932, "ItemId": 283679 },
+        { "Tier": 4, "Id": 933, "ItemId": 283680 },
+        { "Tier": 5, "Id": 934, "ItemId": 283681 },
+        { "Tier": 6, "Id": 935, "ItemId": 283682 }
+      ]
+    },
+    {
+      "Name": "Holy Mark",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 490, "ItemId": 211881 },
+        { "Tier": 2, "Id": 491, "ItemId": 211882 },
+        { "Tier": 3, "Id": 492, "ItemId": 211883 },
+        { "Tier": 4, "Id": 493, "ItemId": 211884 },
+        { "Tier": 5, "Id": 494, "ItemId": 211885 },
+        { "Tier": 6, "Id": 495, "ItemId": 211886 },
+        { "Tier": 7, "Id": 496, "ItemId": 211887 },
+        { "Tier": 8, "Id": 497, "ItemId": 211888 },
+        { "Tier": 9, "Id": 498, "ItemId": 211889 },
+        { "Tier": 10, "Id": 499, "ItemId": 211890 }
+      ]
+    },
+    {
+      "Name": "Insurance Agent",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 620, "ItemId": 236593 },
+        { "Tier": 2, "Id": 621, "ItemId": 236594 },
+        { "Tier": 3, "Id": 622, "ItemId": 236595 },
+        { "Tier": 4, "Id": 623, "ItemId": 236596 },
+        { "Tier": 5, "Id": 624, "ItemId": 236597 }
+      ]
+    },
+    {
+      "Name": "Kung-Fu Master",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 510, "ItemId": 211901 },
+        { "Tier": 2, "Id": 511, "ItemId": 211902 },
+        { "Tier": 3, "Id": 512, "ItemId": 211903 },
+        { "Tier": 4, "Id": 513, "ItemId": 211904 },
+        { "Tier": 5, "Id": 514, "ItemId": 211905 }
+      ]
+    },
+    {
+      "Name": "Lightstalker",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 920, "ItemId": 281534 },
+        { "Tier": 2, "Id": 921, "ItemId": 281535 },
+        { "Tier": 3, "Id": 922, "ItemId": 281536 },
+        { "Tier": 4, "Id": 923, "ItemId": 281537 },
+        { "Tier": 5, "Id": 924, "ItemId": 281538 },
+        { "Tier": 6, "Id": 925, "ItemId": 281539 }
+      ]
+    },
+    {
+      "Name": "Manners of Mongo",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 520, "ItemId": 211906 },
+        { "Tier": 2, "Id": 521, "ItemId": 211907 },
+        { "Tier": 3, "Id": 522, "ItemId": 211908 },
+        { "Tier": 4, "Id": 523, "ItemId": 211909 },
+        { "Tier": 5, "Id": 524, "ItemId": 211910 },
+        { "Tier": 6, "Id": 525, "ItemId": 211911 },
+        { "Tier": 7, "Id": 526, "ItemId": 211912 },
+        { "Tier": 8, "Id": 527, "ItemId": 211913 },
+        { "Tier": 9, "Id": 528, "ItemId": 211914 },
+        { "Tier": 10, "Id": 529, "ItemId": 211915 }
+      ]
+    },
+    {
+      "Name": "Mechanic",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 530, "ItemId": 211916 },
+        { "Tier": 2, "Id": 531, "ItemId": 211917 },
+        { "Tier": 3, "Id": 532, "ItemId": 211918 },
+        { "Tier": 4, "Id": 533, "ItemId": 211919 },
+        { "Tier": 5, "Id": 534, "ItemId": 211920 },
+        { "Tier": 6, "Id": 535, "ItemId": 211921 },
+        { "Tier": 7, "Id": 536, "ItemId": 211922 },
+        { "Tier": 8, "Id": 537, "ItemId": 211923 },
+        { "Tier": 9, "Id": 538, "ItemId": 211924 },
+        { "Tier": 10, "Id": 539, "ItemId": 211925 }
+      ]
+    },
+    {
+      "Name": "Motorist",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 850, "ItemId": 211070 },
+        { "Tier": 2, "Id": 851, "ItemId": 211067 },
+        { "Tier": 3, "Id": 852, "ItemId": 211068 },
+        { "Tier": 4, "Id": 853, "ItemId": 211069 }
+      ]
+    },
+    {
+      "Name": "Mountaineer",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 540, "ItemId": 211926 },
+        { "Tier": 2, "Id": 541, "ItemId": 211927 },
+        { "Tier": 3, "Id": 542, "ItemId": 211928 },
+        { "Tier": 4, "Id": 543, "ItemId": 211929 },
+        { "Tier": 5, "Id": 544, "ItemId": 211930 }
+      ]
+    },
+    {
+      "Name": "Nano Doctorate",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 550, "ItemId": 211931 },
+        { "Tier": 2, "Id": 551, "ItemId": 211932 },
+        { "Tier": 3, "Id": 552, "ItemId": 211933 },
+        { "Tier": 4, "Id": 553, "ItemId": 211934 },
+        { "Tier": 5, "Id": 554, "ItemId": 211935 },
+        { "Tier": 6, "Id": 555, "ItemId": 211936 },
+        { "Tier": 7, "Id": 556, "ItemId": 211937 },
+        { "Tier": 8, "Id": 557, "ItemId": 229958 },
+        { "Tier": 9, "Id": 558, "ItemId": 229959 },
+        { "Tier": 10, "Id": 559, "ItemId": 229960 }
+      ]
+    },
+    {
+      "Name": "Nano Surgeon",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 560, "ItemId": 211941 },
+        { "Tier": 2, "Id": 561, "ItemId": 211942 },
+        { "Tier": 3, "Id": 562, "ItemId": 211943 },
+        { "Tier": 4, "Id": 563, "ItemId": 211944 },
+        { "Tier": 5, "Id": 564, "ItemId": 211945 },
+        { "Tier": 6, "Id": 565, "ItemId": 211946 }
+      ]
+    },
+    {
+      "Name": "NCU Extensions",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 570, "ItemId": 211116 },
+        { "Tier": 2, "Id": 571, "ItemId": 211117 },
+        { "Tier": 3, "Id": 572, "ItemId": 211118 },
+        { "Tier": 4, "Id": 573, "ItemId": 211119 },
+        { "Tier": 5, "Id": 574, "ItemId": 211120 },
+        { "Tier": 6, "Id": 575, "ItemId": 211121 },
+        { "Tier": 7, "Id": 576, "ItemId": 211122 },
+        { "Tier": 8, "Id": 577, "ItemId": 212187 }
+      ]
+    },
+    {
+      "Name": "Notum Repulsor",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 580, "ItemId": 212133 },
+        { "Tier": 2, "Id": 581, "ItemId": 212134 },
+        { "Tier": 3, "Id": 582, "ItemId": 212135 },
+        { "Tier": 4, "Id": 583, "ItemId": 212136 },
+        { "Tier": 5, "Id": 584, "ItemId": 212137 },
+        { "Tier": 6, "Id": 585, "ItemId": 212138 },
+        { "Tier": 7, "Id": 586, "ItemId": 212139 },
+        { "Tier": 8, "Id": 587, "ItemId": 212140 }
+      ]
+    },
+    {
+      "Name": "Notum Siphon",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 590, "ItemId": 223600 },
+        { "Tier": 2, "Id": 591, "ItemId": 223601 },
+        { "Tier": 3, "Id": 592, "ItemId": 223602 },
+        { "Tier": 4, "Id": 593, "ItemId": 223603 },
+        { "Tier": 5, "Id": 594, "ItemId": 223604 },
+        { "Tier": 6, "Id": 595, "ItemId": 223605 },
+        { "Tier": 7, "Id": 596, "ItemId": 223606 },
+        { "Tier": 8, "Id": 597, "ItemId": 223607 },
+        { "Tier": 9, "Id": 598, "ItemId": 223608 },
+        { "Tier": 10, "Id": 599, "ItemId": 223609 }
+      ]
+    },
+    {
+      "Name": "Notum Source",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 600, "ItemId": 211947 },
+        { "Tier": 2, "Id": 601, "ItemId": 211948 },
+        { "Tier": 3, "Id": 602, "ItemId": 211949 },
+        { "Tier": 4, "Id": 603, "ItemId": 211950 },
+        { "Tier": 5, "Id": 604, "ItemId": 211951 },
+        { "Tier": 6, "Id": 605, "ItemId": 211952 },
+        { "Tier": 7, "Id": 606, "ItemId": 211953 },
+        { "Tier": 8, "Id": 607, "ItemId": 211954 },
+        { "Tier": 9, "Id": 608, "ItemId": 211955 },
+        { "Tier": 10, "Id": 609, "ItemId": 211956 }
+      ]
+    },
+    {
+      "Name": "Outdoorsman",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 610, "ItemId": 231354 },
+        { "Tier": 2, "Id": 611, "ItemId": 231355 },
+        { "Tier": 3, "Id": 612, "ItemId": 231356 }
+      ]
+    },
+    {
+      "Name": "Piercing Mastery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 870, "ItemId": 211967 },
+        { "Tier": 2, "Id": 871, "ItemId": 211968 },
+        { "Tier": 3, "Id": 872, "ItemId": 211969 },
+        { "Tier": 4, "Id": 873, "ItemId": 211970 },
+        { "Tier": 5, "Id": 874, "ItemId": 211971 },
+        { "Tier": 6, "Id": 875, "ItemId": 211972 },
+        { "Tier": 7, "Id": 876, "ItemId": 211973 },
+        { "Tier": 8, "Id": 877, "ItemId": 211974 },
+        { "Tier": 9, "Id": 878, "ItemId": 211975 },
+        { "Tier": 10, "Id": 879, "ItemId": 211976 }
+      ]
+    },
+    {
+      "Name": "Pistol Mastery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 640, "ItemId": 211977 },
+        { "Tier": 2, "Id": 641, "ItemId": 211978 },
+        { "Tier": 3, "Id": 642, "ItemId": 211979 },
+        { "Tier": 4, "Id": 643, "ItemId": 211980 },
+        { "Tier": 5, "Id": 644, "ItemId": 211981 },
+        { "Tier": 6, "Id": 645, "ItemId": 216630 },
+        { "Tier": 7, "Id": 646, "ItemId": 216631 },
+        { "Tier": 8, "Id": 647, "ItemId": 216632 },
+        { "Tier": 9, "Id": 648, "ItemId": 216633 },
+        { "Tier": 10, "Id": 649, "ItemId": 216634 }
+      ]
+    },
+    {
+      "Name": "Power Up",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 650, "ItemId": 211987 },
+        { "Tier": 2, "Id": 651, "ItemId": 213398 },
+        { "Tier": 3, "Id": 652, "ItemId": 213399 },
+        { "Tier": 4, "Id": 653, "ItemId": 213400 },
+        { "Tier": 5, "Id": 654, "ItemId": 213401 },
+        { "Tier": 6, "Id": 655, "ItemId": 213402 },
+        { "Tier": 7, "Id": 656, "ItemId": 213403 },
+        { "Tier": 8, "Id": 657, "ItemId": 213404 },
+        { "Tier": 9, "Id": 658, "ItemId": 213409 },
+        { "Tier": 10, "Id": 659, "ItemId": 213410 }
+      ]
+    },
+    {
+      "Name": "Reaver",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 890, "ItemId": 225946 },
+        { "Tier": 2, "Id": 891, "ItemId": 225947 },
+        { "Tier": 3, "Id": 892, "ItemId": 225948 },
+        { "Tier": 4, "Id": 893, "ItemId": 225949 },
+        { "Tier": 5, "Id": 894, "ItemId": 225950 },
+        { "Tier": 6, "Id": 895, "ItemId": 225951 },
+        { "Tier": 7, "Id": 896, "ItemId": 225952 },
+        { "Tier": 8, "Id": 897, "ItemId": 225953 },
+        { "Tier": 9, "Id": 898, "ItemId": 225954 },
+        { "Tier": 10, "Id": 899, "ItemId": 225955 }
+      ]
+    },
+    {
+      "Name": "Rifle Mastery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 500, "ItemId": 211891 },
+        { "Tier": 2, "Id": 501, "ItemId": 211892 },
+        { "Tier": 3, "Id": 502, "ItemId": 211893 },
+        { "Tier": 4, "Id": 503, "ItemId": 211894 },
+        { "Tier": 5, "Id": 504, "ItemId": 211895 },
+        { "Tier": 6, "Id": 505, "ItemId": 211896 },
+        { "Tier": 7, "Id": 506, "ItemId": 211897 },
+        { "Tier": 8, "Id": 507, "ItemId": 216627 },
+        { "Tier": 9, "Id": 508, "ItemId": 216628 },
+        { "Tier": 10, "Id": 509, "ItemId": 216629 }
+      ]
+    },
+    {
+      "Name": "Shade Touch",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 880, "ItemId": 212144 },
+        { "Tier": 2, "Id": 881, "ItemId": 212145 },
+        { "Tier": 3, "Id": 882, "ItemId": 212146 },
+        { "Tier": 4, "Id": 883, "ItemId": 212147 },
+        { "Tier": 5, "Id": 884, "ItemId": 212148 },
+        { "Tier": 6, "Id": 885, "ItemId": 212149 },
+        { "Tier": 7, "Id": 886, "ItemId": 212150 }
+      ]
+    },
+    {
+      "Name": "Shadowsneak",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 660, "ItemId": 211997 },
+        { "Tier": 2, "Id": 661, "ItemId": 211998 },
+        { "Tier": 3, "Id": 662, "ItemId": 211999 },
+        { "Tier": 4, "Id": 663, "ItemId": 212000 },
+        { "Tier": 5, "Id": 664, "ItemId": 212001 },
+        { "Tier": 6, "Id": 665, "ItemId": 212002 },
+        { "Tier": 7, "Id": 666, "ItemId": 212003 },
+        { "Tier": 8, "Id": 667, "ItemId": 212004 },
+        { "Tier": 9, "Id": 668, "ItemId": 212005 },
+        { "Tier": 10, "Id": 669, "ItemId": 212006 }
+      ]
+    },
+    {
+      "Name": "Shadowstalker",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 670, "ItemId": 212007 },
+        { "Tier": 2, "Id": 671, "ItemId": 212008 },
+        { "Tier": 3, "Id": 672, "ItemId": 212009 },
+        { "Tier": 4, "Id": 673, "ItemId": 212010 },
+        { "Tier": 5, "Id": 674, "ItemId": 212011 },
+        { "Tier": 6, "Id": 675, "ItemId": 212012 }
+      ]
+    },
+    {
+      "Name": "Sharpshooter",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 680, "ItemId": 212013 },
+        { "Tier": 2, "Id": 681, "ItemId": 212014 },
+        { "Tier": 3, "Id": 682, "ItemId": 212015 },
+        { "Tier": 4, "Id": 683, "ItemId": 212016 },
+        { "Tier": 5, "Id": 684, "ItemId": 212017 },
+        { "Tier": 6, "Id": 685, "ItemId": 212018 }
+      ]
+    },
+    {
+      "Name": "Shotgun Mastery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 700, "ItemId": 216635 },
+        { "Tier": 2, "Id": 701, "ItemId": 216636 },
+        { "Tier": 3, "Id": 702, "ItemId": 216637 },
+        { "Tier": 4, "Id": 703, "ItemId": 216638 },
+        { "Tier": 5, "Id": 704, "ItemId": 216639 },
+        { "Tier": 6, "Id": 705, "ItemId": 216640 },
+        { "Tier": 7, "Id": 706, "ItemId": 216641 },
+        { "Tier": 8, "Id": 707, "ItemId": 216642 },
+        { "Tier": 9, "Id": 708, "ItemId": 216643 },
+        { "Tier": 10, "Id": 709, "ItemId": 216644 }
+      ]
+    },
+    {
+      "Name": "SMG Mastery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 710, "ItemId": 212019 },
+        { "Tier": 2, "Id": 711, "ItemId": 212020 },
+        { "Tier": 3, "Id": 712, "ItemId": 212021 },
+        { "Tier": 4, "Id": 713, "ItemId": 212022 },
+        { "Tier": 5, "Id": 714, "ItemId": 212023 },
+        { "Tier": 6, "Id": 715, "ItemId": 212024 },
+        { "Tier": 7, "Id": 716, "ItemId": 212025 },
+        { "Tier": 8, "Id": 717, "ItemId": 212026 },
+        { "Tier": 9, "Id": 718, "ItemId": 212027 },
+        { "Tier": 10, "Id": 719, "ItemId": 212028 }
+      ]
+    },
+    {
+      "Name": "Soothing Spirits",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 720, "ItemId": 211125 },
+        { "Tier": 2, "Id": 721, "ItemId": 211126 },
+        { "Tier": 3, "Id": 722, "ItemId": 211127 },
+        { "Tier": 4, "Id": 723, "ItemId": 211128 },
+        { "Tier": 5, "Id": 724, "ItemId": 211129 },
+        { "Tier": 6, "Id": 725, "ItemId": 211130 },
+        { "Tier": 7, "Id": 726, "ItemId": 211131 },
+        { "Tier": 8, "Id": 727, "ItemId": 211132 },
+        { "Tier": 9, "Id": 728, "ItemId": 211133 },
+        { "Tier": 10, "Id": 729, "ItemId": 212189 }
+      ]
+    },
+    {
+      "Name": "Spatial Displacement",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 440, "ItemId": 212123 },
+        { "Tier": 2, "Id": 441, "ItemId": 212124 },
+        { "Tier": 3, "Id": 442, "ItemId": 212125 },
+        { "Tier": 4, "Id": 443, "ItemId": 212126 },
+        { "Tier": 5, "Id": 444, "ItemId": 212127 },
+        { "Tier": 6, "Id": 445, "ItemId": 212128 },
+        { "Tier": 7, "Id": 446, "ItemId": 212129 },
+        { "Tier": 8, "Id": 447, "ItemId": 212130 },
+        { "Tier": 9, "Id": 448, "ItemId": 212131 },
+        { "Tier": 10, "Id": 449, "ItemId": 212132 }
+      ]
+    },
+    {
+      "Name": "Special Forces",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 730, "ItemId": 212029 },
+        { "Tier": 2, "Id": 731, "ItemId": 212030 },
+        { "Tier": 3, "Id": 732, "ItemId": 212031 },
+        { "Tier": 4, "Id": 733, "ItemId": 212032 },
+        { "Tier": 5, "Id": 734, "ItemId": 212033 },
+        { "Tier": 6, "Id": 735, "ItemId": 212034 },
+        { "Tier": 7, "Id": 736, "ItemId": 212035 },
+        { "Tier": 8, "Id": 737, "ItemId": 212036 },
+        { "Tier": 9, "Id": 738, "ItemId": 212037 },
+        { "Tier": 10, "Id": 739, "ItemId": 212038 }
+      ]
+    },
+    {
+      "Name": "Specialist Healer",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 740, "ItemId": 212039 },
+        { "Tier": 2, "Id": 741, "ItemId": 212040 },
+        { "Tier": 3, "Id": 742, "ItemId": 212041 },
+        { "Tier": 4, "Id": 743, "ItemId": 212042 },
+        { "Tier": 5, "Id": 744, "ItemId": 212043 },
+        { "Tier": 6, "Id": 745, "ItemId": 212044 },
+        { "Tier": 7, "Id": 746, "ItemId": 212045 },
+        { "Tier": 8, "Id": 747, "ItemId": 212046 },
+        { "Tier": 9, "Id": 748, "ItemId": 212047 },
+        { "Tier": 10, "Id": 749, "ItemId": 212048 }
+      ]
+    },
+    {
+      "Name": "Spirit Phylactery",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 630, "ItemId": 212049 },
+        { "Tier": 2, "Id": 631, "ItemId": 212050 },
+        { "Tier": 3, "Id": 632, "ItemId": 212051 },
+        { "Tier": 4, "Id": 633, "ItemId": 212052 },
+        { "Tier": 5, "Id": 634, "ItemId": 212053 },
+        { "Tier": 6, "Id": 635, "ItemId": 212054 },
+        { "Tier": 7, "Id": 636, "ItemId": 212055 },
+        { "Tier": 8, "Id": 637, "ItemId": 212056 },
+        { "Tier": 9, "Id": 638, "ItemId": 212057 },
+        { "Tier": 10, "Id": 639, "ItemId": 212058 }
+      ]
+    },
+    {
+      "Name": "Spiritual Master",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 750, "ItemId": 212059 },
+        { "Tier": 2, "Id": 751, "ItemId": 212060 },
+        { "Tier": 3, "Id": 752, "ItemId": 212061 },
+        { "Tier": 4, "Id": 753, "ItemId": 212062 },
+        { "Tier": 5, "Id": 754, "ItemId": 212063 },
+        { "Tier": 6, "Id": 755, "ItemId": 212064 },
+        { "Tier": 7, "Id": 756, "ItemId": 212065 },
+        { "Tier": 8, "Id": 757, "ItemId": 212066 },
+        { "Tier": 9, "Id": 758, "ItemId": 212067 },
+        { "Tier": 10, "Id": 759, "ItemId": 212068 }
+      ]
+    },
+    {
+      "Name": "Starfall",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 760, "ItemId": 212107 },
+        { "Tier": 2, "Id": 761, "ItemId": 212108 },
+        { "Tier": 3, "Id": 762, "ItemId": 212109 },
+        { "Tier": 4, "Id": 763, "ItemId": 212110 },
+        { "Tier": 5, "Id": 764, "ItemId": 212111 },
+        { "Tier": 6, "Id": 765, "ItemId": 212112 },
+        { "Tier": 7, "Id": 766, "ItemId": 212113 },
+        { "Tier": 8, "Id": 767, "ItemId": 212114 },
+        { "Tier": 9, "Id": 768, "ItemId": 212115 },
+        { "Tier": 10, "Id": 769, "ItemId": 212116 }
+      ]
+    },
+    {
+      "Name": "Sublime Rapport",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 690, "ItemId": 212151 },
+        { "Tier": 2, "Id": 691, "ItemId": 212152 },
+        { "Tier": 3, "Id": 692, "ItemId": 212153 },
+        { "Tier": 4, "Id": 693, "ItemId": 212154 },
+        { "Tier": 5, "Id": 694, "ItemId": 212155 },
+        { "Tier": 6, "Id": 695, "ItemId": 212156 },
+        { "Tier": 7, "Id": 696, "ItemId": 212157 },
+        { "Tier": 8, "Id": 697, "ItemId": 212158 },
+        { "Tier": 9, "Id": 698, "ItemId": 212159 },
+        { "Tier": 10, "Id": 699, "ItemId": 212160 }
+      ]
+    },
+    {
+      "Name": "Theoretical Research",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 780, "ItemId": 212079 },
+        { "Tier": 2, "Id": 781, "ItemId": 212080 },
+        { "Tier": 3, "Id": 782, "ItemId": 212081 },
+        { "Tier": 4, "Id": 783, "ItemId": 212082 },
+        { "Tier": 5, "Id": 784, "ItemId": 212083 },
+        { "Tier": 6, "Id": 785, "ItemId": 212084 },
+        { "Tier": 7, "Id": 786, "ItemId": 212085 },
+        { "Tier": 8, "Id": 787, "ItemId": 212086 },
+        { "Tier": 9, "Id": 788, "ItemId": 212087 },
+        { "Tier": 10, "Id": 789, "ItemId": 212088 }
+      ]
+    },
+    {
+      "Name": "Thief",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 790, "ItemId": 212089 },
+        { "Tier": 2, "Id": 791, "ItemId": 212090 },
+        { "Tier": 3, "Id": 792, "ItemId": 212091 },
+        { "Tier": 4, "Id": 793, "ItemId": 212092 }
+      ]
+    },
+    {
+      "Name": "Tinkerer",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 800, "ItemId": 212093 },
+        { "Tier": 2, "Id": 801, "ItemId": 212094 },
+        { "Tier": 3, "Id": 802, "ItemId": 212095 },
+        { "Tier": 4, "Id": 803, "ItemId": 212096 }
+      ]
+    },
+    {
+      "Name": "Totemic Rites",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 810, "ItemId": 212097 },
+        { "Tier": 2, "Id": 811, "ItemId": 212098 },
+        { "Tier": 3, "Id": 812, "ItemId": 212099 },
+        { "Tier": 4, "Id": 813, "ItemId": 212100 },
+        { "Tier": 5, "Id": 814, "ItemId": 212101 },
+        { "Tier": 6, "Id": 815, "ItemId": 212102 },
+        { "Tier": 7, "Id": 816, "ItemId": 212103 },
+        { "Tier": 8, "Id": 817, "ItemId": 212104 },
+        { "Tier": 9, "Id": 818, "ItemId": 212105 },
+        { "Tier": 10, "Id": 819, "ItemId": 212106 }
+      ]
+    },
+    {
+      "Name": "Training Seminar",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 820, "ItemId": 211072 },
+        { "Tier": 2, "Id": 821, "ItemId": 211073 },
+        { "Tier": 3, "Id": 822, "ItemId": 211074 },
+        { "Tier": 4, "Id": 823, "ItemId": 212190 }
+      ]
+    },
+    {
+      "Name": "Unstunnable",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 830, "ItemId": 211080 },
+        { "Tier": 2, "Id": 831, "ItemId": 211077 },
+        { "Tier": 3, "Id": 832, "ItemId": 211078 },
+        { "Tier": 4, "Id": 833, "ItemId": 211079 }
+      ]
+    },
+    {
+      "Name": "Worm ICE",
+      "Category": "Perk",
+      "Flags": 0,
+      "Perks": [
+        { "Tier": 1, "Id": 840, "ItemId": 223610 },
+        { "Tier": 2, "Id": 841, "ItemId": 223611 },
+        { "Tier": 3, "Id": 842, "ItemId": 223612 },
+        { "Tier": 4, "Id": 843, "ItemId": 223613 },
+        { "Tier": 5, "Id": 844, "ItemId": 223614 },
+        { "Tier": 6, "Id": 845, "ItemId": 223615 },
+        { "Tier": 7, "Id": 846, "ItemId": 223616 },
+        { "Tier": 8, "Id": 847, "ItemId": 223617 },
+        { "Tier": 9, "Id": 848, "ItemId": 223618 },
+        { "Tier": 10, "Id": 849, "ItemId": 223619 }
+      ]
+    },
+    {
+      "Name": "Acquisition",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2440, "ItemId": 261355 },
+        { "Tier": 2, "Id": 2441, "ItemId": 261356 },
+        { "Tier": 3, "Id": 2442, "ItemId": 261357 },
+        { "Tier": 4, "Id": 2443, "ItemId": 261358 },
+        { "Tier": 5, "Id": 2444, "ItemId": 261359 },
+        { "Tier": 6, "Id": 2445, "ItemId": 261360 },
+        { "Tier": 7, "Id": 2446, "ItemId": 261361 },
+        { "Tier": 8, "Id": 2447, "ItemId": 261362 },
+        { "Tier": 9, "Id": 2448, "ItemId": 261363 },
+        { "Tier": 10, "Id": 2449, "ItemId": 261364 }
+      ]
+    },
+    {
+      "Name": "Aggressive Pricing",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2960, "ItemId": 262119 },
+        { "Tier": 2, "Id": 2961, "ItemId": 262120 },
+        { "Tier": 3, "Id": 2962, "ItemId": 262121 },
+        { "Tier": 4, "Id": 2963, "ItemId": 262122 },
+        { "Tier": 5, "Id": 2964, "ItemId": 262123 },
+        { "Tier": 6, "Id": 2965, "ItemId": 262124 },
+        { "Tier": 7, "Id": 2966, "ItemId": 262125 },
+        { "Tier": 8, "Id": 2967, "ItemId": 262126 },
+        { "Tier": 9, "Id": 2968, "ItemId": 262127 },
+        { "Tier": 10, "Id": 2969, "ItemId": 262128 }
+      ]
+    },
+    {
+      "Name": "Aggressive Surgery",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2290, "ItemId": 261186 },
+        { "Tier": 2, "Id": 2291, "ItemId": 261187 },
+        { "Tier": 3, "Id": 2292, "ItemId": 261188 },
+        { "Tier": 4, "Id": 2293, "ItemId": 261189 },
+        { "Tier": 5, "Id": 2294, "ItemId": 261190 },
+        { "Tier": 6, "Id": 2295, "ItemId": 261191 },
+        { "Tier": 7, "Id": 2296, "ItemId": 261192 },
+        { "Tier": 8, "Id": 2297, "ItemId": 261193 },
+        { "Tier": 9, "Id": 2298, "ItemId": 261194 },
+        { "Tier": 10, "Id": 2299, "ItemId": 261195 }
+      ]
+    },
+    {
+      "Name": "Alacrity",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2620, "ItemId": 261538 },
+        { "Tier": 2, "Id": 2621, "ItemId": 261539 },
+        { "Tier": 3, "Id": 2622, "ItemId": 261540 },
+        { "Tier": 4, "Id": 2623, "ItemId": 261541 },
+        { "Tier": 5, "Id": 2624, "ItemId": 261542 },
+        { "Tier": 6, "Id": 2625, "ItemId": 261543 },
+        { "Tier": 7, "Id": 2626, "ItemId": 261544 },
+        { "Tier": 8, "Id": 2627, "ItemId": 261545 },
+        { "Tier": 9, "Id": 2628, "ItemId": 261546 },
+        { "Tier": 10, "Id": 2629, "ItemId": 261547 }
+      ]
+    },
+    {
+      "Name": "Ambushing",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2920, "ItemId": 262078 },
+        { "Tier": 2, "Id": 2921, "ItemId": 262079 },
+        { "Tier": 3, "Id": 2922, "ItemId": 262080 },
+        { "Tier": 4, "Id": 2923, "ItemId": 262081 },
+        { "Tier": 5, "Id": 2924, "ItemId": 262082 },
+        { "Tier": 6, "Id": 2925, "ItemId": 262083 },
+        { "Tier": 7, "Id": 2926, "ItemId": 262084 },
+        { "Tier": 8, "Id": 2927, "ItemId": 262085 },
+        { "Tier": 9, "Id": 2928, "ItemId": 262086 },
+        { "Tier": 10, "Id": 2929, "ItemId": 262087 }
+      ]
+    },
+    {
+      "Name": "Anger Management",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2340, "ItemId": 261239 },
+        { "Tier": 2, "Id": 2341, "ItemId": 261240 },
+        { "Tier": 3, "Id": 2342, "ItemId": 261241 },
+        { "Tier": 4, "Id": 2343, "ItemId": 261242 },
+        { "Tier": 5, "Id": 2344, "ItemId": 261243 },
+        { "Tier": 6, "Id": 2345, "ItemId": 261244 },
+        { "Tier": 7, "Id": 2346, "ItemId": 261245 },
+        { "Tier": 8, "Id": 2347, "ItemId": 261246 },
+        { "Tier": 9, "Id": 2348, "ItemId": 261247 },
+        { "Tier": 10, "Id": 2349, "ItemId": 261248 }
+      ]
+    },
+    {
+      "Name": "Angst",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2710, "ItemId": 261868 },
+        { "Tier": 2, "Id": 2711, "ItemId": 261869 },
+        { "Tier": 3, "Id": 2712, "ItemId": 261870 },
+        { "Tier": 4, "Id": 2713, "ItemId": 261871 },
+        { "Tier": 5, "Id": 2714, "ItemId": 261872 },
+        { "Tier": 6, "Id": 2715, "ItemId": 261873 },
+        { "Tier": 7, "Id": 2716, "ItemId": 261874 },
+        { "Tier": 8, "Id": 2717, "ItemId": 261875 },
+        { "Tier": 9, "Id": 2718, "ItemId": 261876 },
+        { "Tier": 10, "Id": 2719, "ItemId": 261877 }
+      ]
+    },
+    {
+      "Name": "Anti-Personnel Turret",
+      "Category": "Research",
+      "Flags": 384,
+      "Perks": [
+        { "Tier": 1, "Id": 3030, "ItemId": 262589 }
+      ]
+    },
+    {
+      "Name": "Anti-Personnel Turret Armor Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3040, "ItemId": 262591 },
+        { "Tier": 2, "Id": 3041, "ItemId": 262592 },
+        { "Tier": 3, "Id": 3042, "ItemId": 262593 }
+      ]
+    },
+    {
+      "Name": "Anti-Personnel Turret Weapon Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3050, "ItemId": 262594 },
+        { "Tier": 2, "Id": 3051, "ItemId": 262595 },
+        { "Tier": 3, "Id": 3052, "ItemId": 262596 }
+      ]
+    },
+    {
+      "Name": "Anti-Vehicular Battery",
+      "Category": "Research",
+      "Flags": 384,
+      "Perks": [
+        { "Tier": 1, "Id": 3060, "ItemId": 262597 }
+      ]
+    },
+    {
+      "Name": "Anti-Vehicular Battery Armor Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3070, "ItemId": 262598 },
+        { "Tier": 2, "Id": 3071, "ItemId": 262599 },
+        { "Tier": 3, "Id": 3072, "ItemId": 262600 }
+      ]
+    },
+    {
+      "Name": "Anti-Vehicular Battery Weapon Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3080, "ItemId": 262601 },
+        { "Tier": 2, "Id": 3081, "ItemId": 262602 },
+        { "Tier": 3, "Id": 3082, "ItemId": 262603 }
+      ]
+    },
+    {
+      "Name": "Apotheosis",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 10002, "ItemId": 303268 },
+        { "Tier": 2, "Id": 10003, "ItemId": 303269 },
+        { "Tier": 3, "Id": 10004, "ItemId": 303270 },
+        { "Tier": 4, "Id": 10005, "ItemId": 303271 },
+        { "Tier": 5, "Id": 10006, "ItemId": 303272 },
+        { "Tier": 6, "Id": 10007, "ItemId": 303273 },
+        { "Tier": 7, "Id": 10008, "ItemId": 303274 },
+        { "Tier": 8, "Id": 10009, "ItemId": 303275 },
+        { "Tier": 9, "Id": 10010, "ItemId": 303276 },
+        { "Tier": 10, "Id": 10011, "ItemId": 303277 }
+      ]
+    },
+    {
+      "Name": "Assassin\u0027s Awareness",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2860, "ItemId": 262018 },
+        { "Tier": 2, "Id": 2861, "ItemId": 262019 },
+        { "Tier": 3, "Id": 2862, "ItemId": 262020 },
+        { "Tier": 4, "Id": 2863, "ItemId": 262021 },
+        { "Tier": 5, "Id": 2864, "ItemId": 262022 },
+        { "Tier": 6, "Id": 2865, "ItemId": 262023 },
+        { "Tier": 7, "Id": 2866, "ItemId": 262024 },
+        { "Tier": 8, "Id": 2867, "ItemId": 262025 },
+        { "Tier": 9, "Id": 2868, "ItemId": 262026 },
+        { "Tier": 10, "Id": 2869, "ItemId": 262027 }
+      ]
+    },
+    {
+      "Name": "Bedside Manner",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2230, "ItemId": 261126 },
+        { "Tier": 2, "Id": 2231, "ItemId": 261127 },
+        { "Tier": 3, "Id": 2232, "ItemId": 261128 },
+        { "Tier": 4, "Id": 2233, "ItemId": 261129 },
+        { "Tier": 5, "Id": 2234, "ItemId": 261130 },
+        { "Tier": 6, "Id": 2235, "ItemId": 261131 },
+        { "Tier": 7, "Id": 2236, "ItemId": 261132 },
+        { "Tier": 8, "Id": 2237, "ItemId": 261133 },
+        { "Tier": 9, "Id": 2238, "ItemId": 261134 },
+        { "Tier": 10, "Id": 2239, "ItemId": 261135 }
+      ]
+    },
+    {
+      "Name": "Brawlers Sense",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2320, "ItemId": 261219 },
+        { "Tier": 2, "Id": 2321, "ItemId": 261220 },
+        { "Tier": 3, "Id": 2322, "ItemId": 261221 },
+        { "Tier": 4, "Id": 2323, "ItemId": 261222 },
+        { "Tier": 5, "Id": 2324, "ItemId": 261223 },
+        { "Tier": 6, "Id": 2325, "ItemId": 261224 },
+        { "Tier": 7, "Id": 2326, "ItemId": 261225 },
+        { "Tier": 8, "Id": 2327, "ItemId": 261226 },
+        { "Tier": 9, "Id": 2328, "ItemId": 261227 },
+        { "Tier": 10, "Id": 2329, "ItemId": 261228 }
+      ]
+    },
+    {
+      "Name": "Brutality",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2360, "ItemId": 261259 },
+        { "Tier": 2, "Id": 2361, "ItemId": 261260 },
+        { "Tier": 3, "Id": 2362, "ItemId": 261261 },
+        { "Tier": 4, "Id": 2363, "ItemId": 261262 },
+        { "Tier": 5, "Id": 2364, "ItemId": 261263 },
+        { "Tier": 6, "Id": 2365, "ItemId": 261264 },
+        { "Tier": 7, "Id": 2366, "ItemId": 261265 },
+        { "Tier": 8, "Id": 2367, "ItemId": 261266 },
+        { "Tier": 9, "Id": 2368, "ItemId": 261267 },
+        { "Tier": 10, "Id": 2369, "ItemId": 261268 }
+      ]
+    },
+    {
+      "Name": "Champion",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2510, "ItemId": 261425 },
+        { "Tier": 2, "Id": 2511, "ItemId": 261426 },
+        { "Tier": 3, "Id": 2512, "ItemId": 261427 },
+        { "Tier": 4, "Id": 2513, "ItemId": 261428 },
+        { "Tier": 5, "Id": 2514, "ItemId": 261429 },
+        { "Tier": 6, "Id": 2515, "ItemId": 261430 },
+        { "Tier": 7, "Id": 2516, "ItemId": 261431 },
+        { "Tier": 8, "Id": 2517, "ItemId": 261432 },
+        { "Tier": 9, "Id": 2518, "ItemId": 261433 },
+        { "Tier": 10, "Id": 2519, "ItemId": 261434 }
+      ]
+    },
+    {
+      "Name": "Classified Ops",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2840, "ItemId": 261998 },
+        { "Tier": 2, "Id": 2841, "ItemId": 261999 },
+        { "Tier": 3, "Id": 2842, "ItemId": 262000 },
+        { "Tier": 4, "Id": 2843, "ItemId": 262001 },
+        { "Tier": 5, "Id": 2844, "ItemId": 262002 },
+        { "Tier": 6, "Id": 2845, "ItemId": 262003 },
+        { "Tier": 7, "Id": 2846, "ItemId": 262004 },
+        { "Tier": 8, "Id": 2847, "ItemId": 262005 },
+        { "Tier": 9, "Id": 2848, "ItemId": 262006 },
+        { "Tier": 10, "Id": 2849, "ItemId": 262007 }
+      ]
+    },
+    {
+      "Name": "Cognizance",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2640, "ItemId": 261558 },
+        { "Tier": 2, "Id": 2641, "ItemId": 261559 },
+        { "Tier": 3, "Id": 2642, "ItemId": 261560 },
+        { "Tier": 4, "Id": 2643, "ItemId": 261561 },
+        { "Tier": 5, "Id": 2644, "ItemId": 261562 },
+        { "Tier": 6, "Id": 2645, "ItemId": 261563 },
+        { "Tier": 7, "Id": 2646, "ItemId": 261564 },
+        { "Tier": 8, "Id": 2647, "ItemId": 261565 },
+        { "Tier": 9, "Id": 2648, "ItemId": 261566 },
+        { "Tier": 10, "Id": 2649, "ItemId": 261567 }
+      ]
+    },
+    {
+      "Name": "Combat Applications",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2430, "ItemId": 261344 },
+        { "Tier": 2, "Id": 2431, "ItemId": 261345 },
+        { "Tier": 3, "Id": 2432, "ItemId": 261346 },
+        { "Tier": 4, "Id": 2433, "ItemId": 261347 },
+        { "Tier": 5, "Id": 2434, "ItemId": 261348 },
+        { "Tier": 6, "Id": 2435, "ItemId": 261349 },
+        { "Tier": 7, "Id": 2436, "ItemId": 261350 },
+        { "Tier": 8, "Id": 2437, "ItemId": 261351 },
+        { "Tier": 9, "Id": 2438, "ItemId": 261352 },
+        { "Tier": 10, "Id": 2439, "ItemId": 261353 }
+      ]
+    },
+    {
+      "Name": "Combat Execution",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2750, "ItemId": 261908 },
+        { "Tier": 2, "Id": 2751, "ItemId": 261909 },
+        { "Tier": 3, "Id": 2752, "ItemId": 261910 },
+        { "Tier": 4, "Id": 2753, "ItemId": 261911 },
+        { "Tier": 5, "Id": 2754, "ItemId": 261912 },
+        { "Tier": 6, "Id": 2755, "ItemId": 261913 },
+        { "Tier": 7, "Id": 2756, "ItemId": 261914 },
+        { "Tier": 8, "Id": 2757, "ItemId": 261915 },
+        { "Tier": 9, "Id": 2758, "ItemId": 261916 },
+        { "Tier": 10, "Id": 2759, "ItemId": 261917 }
+      ]
+    },
+    {
+      "Name": "Combat Sense",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2810, "ItemId": 261968 },
+        { "Tier": 2, "Id": 2811, "ItemId": 261969 },
+        { "Tier": 3, "Id": 2812, "ItemId": 261970 },
+        { "Tier": 4, "Id": 2813, "ItemId": 261971 },
+        { "Tier": 5, "Id": 2814, "ItemId": 261972 },
+        { "Tier": 6, "Id": 2815, "ItemId": 261973 },
+        { "Tier": 7, "Id": 2816, "ItemId": 261974 },
+        { "Tier": 8, "Id": 2817, "ItemId": 261975 },
+        { "Tier": 9, "Id": 2818, "ItemId": 261976 },
+        { "Tier": 10, "Id": 2819, "ItemId": 261977 }
+      ]
+    },
+    {
+      "Name": "Cunning",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2460, "ItemId": 261375 },
+        { "Tier": 2, "Id": 2461, "ItemId": 261376 },
+        { "Tier": 3, "Id": 2462, "ItemId": 261377 },
+        { "Tier": 4, "Id": 2463, "ItemId": 261378 },
+        { "Tier": 5, "Id": 2464, "ItemId": 261379 },
+        { "Tier": 6, "Id": 2465, "ItemId": 261380 },
+        { "Tier": 7, "Id": 2466, "ItemId": 261381 },
+        { "Tier": 8, "Id": 2467, "ItemId": 261382 },
+        { "Tier": 9, "Id": 2468, "ItemId": 261383 },
+        { "Tier": 10, "Id": 2469, "ItemId": 261384 }
+      ]
+    },
+    {
+      "Name": "Diagnosis",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2250, "ItemId": 261146 },
+        { "Tier": 2, "Id": 2251, "ItemId": 261147 },
+        { "Tier": 3, "Id": 2252, "ItemId": 261148 },
+        { "Tier": 4, "Id": 2253, "ItemId": 261149 },
+        { "Tier": 5, "Id": 2254, "ItemId": 261150 },
+        { "Tier": 6, "Id": 2255, "ItemId": 261151 },
+        { "Tier": 7, "Id": 2256, "ItemId": 261152 },
+        { "Tier": 8, "Id": 2257, "ItemId": 261153 },
+        { "Tier": 9, "Id": 2258, "ItemId": 261154 },
+        { "Tier": 10, "Id": 2259, "ItemId": 261155 }
+      ]
+    },
+    {
+      "Name": "Direct Action",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2110, "ItemId": 260965 },
+        { "Tier": 2, "Id": 2111, "ItemId": 260966 },
+        { "Tier": 3, "Id": 2112, "ItemId": 260967 },
+        { "Tier": 4, "Id": 2113, "ItemId": 260968 },
+        { "Tier": 5, "Id": 2114, "ItemId": 260969 },
+        { "Tier": 6, "Id": 2115, "ItemId": 260970 },
+        { "Tier": 7, "Id": 2116, "ItemId": 260971 },
+        { "Tier": 8, "Id": 2117, "ItemId": 260972 },
+        { "Tier": 9, "Id": 2118, "ItemId": 260973 },
+        { "Tier": 10, "Id": 2119, "ItemId": 260974 }
+      ]
+    },
+    {
+      "Name": "Discipline",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2770, "ItemId": 261928 },
+        { "Tier": 2, "Id": 2771, "ItemId": 261929 },
+        { "Tier": 3, "Id": 2772, "ItemId": 261930 },
+        { "Tier": 4, "Id": 2773, "ItemId": 261931 },
+        { "Tier": 5, "Id": 2774, "ItemId": 261932 },
+        { "Tier": 6, "Id": 2775, "ItemId": 261933 },
+        { "Tier": 7, "Id": 2776, "ItemId": 261934 },
+        { "Tier": 8, "Id": 2777, "ItemId": 261935 },
+        { "Tier": 9, "Id": 2778, "ItemId": 261936 },
+        { "Tier": 10, "Id": 2779, "ItemId": 261937 }
+      ]
+    },
+    {
+      "Name": "Door-To-Door Salesman",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2970, "ItemId": 262129 },
+        { "Tier": 2, "Id": 2971, "ItemId": 262130 },
+        { "Tier": 3, "Id": 2972, "ItemId": 262131 },
+        { "Tier": 4, "Id": 2973, "ItemId": 262132 },
+        { "Tier": 5, "Id": 2974, "ItemId": 262133 },
+        { "Tier": 6, "Id": 2975, "ItemId": 262134 },
+        { "Tier": 7, "Id": 2976, "ItemId": 262135 },
+        { "Tier": 8, "Id": 2977, "ItemId": 262136 },
+        { "Tier": 9, "Id": 2978, "ItemId": 262137 },
+        { "Tier": 10, "Id": 2979, "ItemId": 262138 }
+      ]
+    },
+    {
+      "Name": "Empathy",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2600, "ItemId": 261518 },
+        { "Tier": 2, "Id": 2601, "ItemId": 261519 },
+        { "Tier": 3, "Id": 2602, "ItemId": 261520 },
+        { "Tier": 4, "Id": 2603, "ItemId": 261521 },
+        { "Tier": 5, "Id": 2604, "ItemId": 261522 },
+        { "Tier": 6, "Id": 2605, "ItemId": 261523 },
+        { "Tier": 7, "Id": 2606, "ItemId": 261524 },
+        { "Tier": 8, "Id": 2607, "ItemId": 261525 },
+        { "Tier": 9, "Id": 2608, "ItemId": 261526 },
+        { "Tier": 10, "Id": 2609, "ItemId": 261527 }
+      ]
+    },
+    {
+      "Name": "End Certification",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2090, "ItemId": 261015 },
+        { "Tier": 2, "Id": 2091, "ItemId": 261016 },
+        { "Tier": 3, "Id": 2092, "ItemId": 261017 },
+        { "Tier": 4, "Id": 2093, "ItemId": 261018 },
+        { "Tier": 5, "Id": 2094, "ItemId": 261019 },
+        { "Tier": 6, "Id": 2095, "ItemId": 261020 },
+        { "Tier": 7, "Id": 2096, "ItemId": 261021 },
+        { "Tier": 8, "Id": 2097, "ItemId": 261022 },
+        { "Tier": 9, "Id": 2098, "ItemId": 261023 },
+        { "Tier": 10, "Id": 2099, "ItemId": 261024 }
+      ]
+    },
+    {
+      "Name": "Endurance",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2300, "ItemId": 261199 },
+        { "Tier": 2, "Id": 2301, "ItemId": 261200 },
+        { "Tier": 3, "Id": 2302, "ItemId": 261201 },
+        { "Tier": 4, "Id": 2303, "ItemId": 261202 },
+        { "Tier": 5, "Id": 2304, "ItemId": 261203 },
+        { "Tier": 6, "Id": 2305, "ItemId": 261204 },
+        { "Tier": 7, "Id": 2306, "ItemId": 261205 },
+        { "Tier": 8, "Id": 2307, "ItemId": 261206 },
+        { "Tier": 9, "Id": 2308, "ItemId": 261207 },
+        { "Tier": 10, "Id": 2309, "ItemId": 261208 }
+      ]
+    },
+    {
+      "Name": "Ergonomics",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2410, "ItemId": 261324 },
+        { "Tier": 2, "Id": 2411, "ItemId": 261325 },
+        { "Tier": 3, "Id": 2412, "ItemId": 261326 },
+        { "Tier": 4, "Id": 2413, "ItemId": 261327 },
+        { "Tier": 5, "Id": 2414, "ItemId": 261328 },
+        { "Tier": 6, "Id": 2415, "ItemId": 261329 },
+        { "Tier": 7, "Id": 2416, "ItemId": 261330 },
+        { "Tier": 8, "Id": 2417, "ItemId": 261331 },
+        { "Tier": 9, "Id": 2418, "ItemId": 261332 },
+        { "Tier": 10, "Id": 2419, "ItemId": 261333 }
+      ]
+    },
+    {
+      "Name": "Executive Decisions",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2190, "ItemId": 261075 },
+        { "Tier": 2, "Id": 2191, "ItemId": 261076 },
+        { "Tier": 3, "Id": 2192, "ItemId": 261077 },
+        { "Tier": 4, "Id": 2193, "ItemId": 261078 },
+        { "Tier": 5, "Id": 2194, "ItemId": 261079 },
+        { "Tier": 6, "Id": 2195, "ItemId": 261080 },
+        { "Tier": 7, "Id": 2196, "ItemId": 261081 },
+        { "Tier": 8, "Id": 2197, "ItemId": 261082 },
+        { "Tier": 9, "Id": 2198, "ItemId": 261083 },
+        { "Tier": 10, "Id": 2199, "ItemId": 261084 }
+      ]
+    },
+    {
+      "Name": "Exemplar",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2520, "ItemId": 261435 },
+        { "Tier": 2, "Id": 2521, "ItemId": 261436 },
+        { "Tier": 3, "Id": 2522, "ItemId": 261437 },
+        { "Tier": 4, "Id": 2523, "ItemId": 261438 },
+        { "Tier": 5, "Id": 2524, "ItemId": 261439 },
+        { "Tier": 6, "Id": 2525, "ItemId": 261440 },
+        { "Tier": 7, "Id": 2526, "ItemId": 261441 },
+        { "Tier": 8, "Id": 2527, "ItemId": 261442 },
+        { "Tier": 9, "Id": 2528, "ItemId": 261443 },
+        { "Tier": 10, "Id": 2529, "ItemId": 261444 }
+      ]
+    },
+    {
+      "Name": "Exploration",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2020, "ItemId": 260870 },
+        { "Tier": 2, "Id": 2021, "ItemId": 260871 },
+        { "Tier": 3, "Id": 2022, "ItemId": 260872 },
+        { "Tier": 4, "Id": 2023, "ItemId": 260873 },
+        { "Tier": 5, "Id": 2024, "ItemId": 260874 },
+        { "Tier": 6, "Id": 2025, "ItemId": 260875 },
+        { "Tier": 7, "Id": 2026, "ItemId": 260876 },
+        { "Tier": 8, "Id": 2027, "ItemId": 260877 },
+        { "Tier": 9, "Id": 2028, "ItemId": 260878 },
+        { "Tier": 10, "Id": 2029, "ItemId": 260879 }
+      ]
+    },
+    {
+      "Name": "Eye for a Deal",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2930, "ItemId": 262089 },
+        { "Tier": 2, "Id": 2931, "ItemId": 262090 },
+        { "Tier": 3, "Id": 2932, "ItemId": 262091 },
+        { "Tier": 4, "Id": 2933, "ItemId": 262092 },
+        { "Tier": 5, "Id": 2934, "ItemId": 262093 },
+        { "Tier": 6, "Id": 2935, "ItemId": 262094 },
+        { "Tier": 7, "Id": 2936, "ItemId": 262095 },
+        { "Tier": 8, "Id": 2937, "ItemId": 262096 },
+        { "Tier": 9, "Id": 2938, "ItemId": 262097 },
+        { "Tier": 10, "Id": 2939, "ItemId": 262098 }
+      ]
+    },
+    {
+      "Name": "Fallback Plan",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2490, "ItemId": 261405 },
+        { "Tier": 2, "Id": 2491, "ItemId": 261406 },
+        { "Tier": 3, "Id": 2492, "ItemId": 261407 },
+        { "Tier": 4, "Id": 2493, "ItemId": 261408 },
+        { "Tier": 5, "Id": 2494, "ItemId": 261409 },
+        { "Tier": 6, "Id": 2495, "ItemId": 261410 },
+        { "Tier": 7, "Id": 2496, "ItemId": 261411 },
+        { "Tier": 8, "Id": 2497, "ItemId": 261412 },
+        { "Tier": 9, "Id": 2498, "ItemId": 261413 },
+        { "Tier": 10, "Id": 2499, "ItemId": 261414 }
+      ]
+    },
+    {
+      "Name": "Fast Talk",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2940, "ItemId": 262099 },
+        { "Tier": 2, "Id": 2941, "ItemId": 262100 },
+        { "Tier": 3, "Id": 2942, "ItemId": 262101 },
+        { "Tier": 4, "Id": 2943, "ItemId": 262102 },
+        { "Tier": 5, "Id": 2944, "ItemId": 262103 },
+        { "Tier": 6, "Id": 2945, "ItemId": 262104 },
+        { "Tier": 7, "Id": 2946, "ItemId": 262105 },
+        { "Tier": 8, "Id": 2947, "ItemId": 262106 },
+        { "Tier": 9, "Id": 2948, "ItemId": 262107 },
+        { "Tier": 10, "Id": 2949, "ItemId": 262108 }
+      ]
+    },
+    {
+      "Name": "Fitness",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2120, "ItemId": 260975 },
+        { "Tier": 2, "Id": 2121, "ItemId": 260976 },
+        { "Tier": 3, "Id": 2122, "ItemId": 260977 },
+        { "Tier": 4, "Id": 2123, "ItemId": 260978 },
+        { "Tier": 5, "Id": 2124, "ItemId": 260979 },
+        { "Tier": 6, "Id": 2125, "ItemId": 260980 },
+        { "Tier": 7, "Id": 2126, "ItemId": 260981 },
+        { "Tier": 8, "Id": 2127, "ItemId": 260982 },
+        { "Tier": 9, "Id": 2128, "ItemId": 260983 },
+        { "Tier": 10, "Id": 2129, "ItemId": 260984 }
+      ]
+    },
+    {
+      "Name": "Flexibility",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2310, "ItemId": 261209 },
+        { "Tier": 2, "Id": 2311, "ItemId": 261210 },
+        { "Tier": 3, "Id": 2312, "ItemId": 261211 },
+        { "Tier": 4, "Id": 2313, "ItemId": 261212 },
+        { "Tier": 5, "Id": 2314, "ItemId": 261213 },
+        { "Tier": 6, "Id": 2315, "ItemId": 261214 },
+        { "Tier": 7, "Id": 2316, "ItemId": 261215 },
+        { "Tier": 8, "Id": 2317, "ItemId": 261216 },
+        { "Tier": 9, "Id": 2318, "ItemId": 261217 },
+        { "Tier": 10, "Id": 2319, "ItemId": 261218 }
+      ]
+    },
+    {
+      "Name": "Force Recon",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2850, "ItemId": 262008 },
+        { "Tier": 2, "Id": 2851, "ItemId": 262009 },
+        { "Tier": 3, "Id": 2852, "ItemId": 262010 },
+        { "Tier": 4, "Id": 2853, "ItemId": 262011 },
+        { "Tier": 5, "Id": 2854, "ItemId": 262012 },
+        { "Tier": 6, "Id": 2855, "ItemId": 262013 },
+        { "Tier": 7, "Id": 2856, "ItemId": 262014 },
+        { "Tier": 8, "Id": 2857, "ItemId": 262015 },
+        { "Tier": 9, "Id": 2858, "ItemId": 262016 },
+        { "Tier": 10, "Id": 2859, "ItemId": 262017 }
+      ]
+    },
+    {
+      "Name": "Foresight",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2650, "ItemId": 261808 },
+        { "Tier": 2, "Id": 2651, "ItemId": 261809 },
+        { "Tier": 3, "Id": 2652, "ItemId": 261810 },
+        { "Tier": 4, "Id": 2653, "ItemId": 261811 },
+        { "Tier": 5, "Id": 2654, "ItemId": 261812 },
+        { "Tier": 6, "Id": 2655, "ItemId": 261813 },
+        { "Tier": 7, "Id": 2656, "ItemId": 261814 },
+        { "Tier": 8, "Id": 2657, "ItemId": 261815 },
+        { "Tier": 9, "Id": 2658, "ItemId": 261816 },
+        { "Tier": 10, "Id": 2659, "ItemId": 261817 }
+      ]
+    },
+    {
+      "Name": "Forward Observer",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2830, "ItemId": 261988 },
+        { "Tier": 2, "Id": 2831, "ItemId": 261989 },
+        { "Tier": 3, "Id": 2832, "ItemId": 261990 },
+        { "Tier": 4, "Id": 2833, "ItemId": 261991 },
+        { "Tier": 5, "Id": 2834, "ItemId": 261992 },
+        { "Tier": 6, "Id": 2835, "ItemId": 261993 },
+        { "Tier": 7, "Id": 2836, "ItemId": 261994 },
+        { "Tier": 8, "Id": 2837, "ItemId": 261995 },
+        { "Tier": 9, "Id": 2838, "ItemId": 261996 },
+        { "Tier": 10, "Id": 2839, "ItemId": 261997 }
+      ]
+    },
+    {
+      "Name": "Game Warden",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2070, "ItemId": 260935 },
+        { "Tier": 2, "Id": 2071, "ItemId": 260936 },
+        { "Tier": 3, "Id": 2072, "ItemId": 260937 },
+        { "Tier": 4, "Id": 2073, "ItemId": 260938 },
+        { "Tier": 5, "Id": 2074, "ItemId": 260939 },
+        { "Tier": 6, "Id": 2075, "ItemId": 260940 },
+        { "Tier": 7, "Id": 2076, "ItemId": 260941 },
+        { "Tier": 8, "Id": 2077, "ItemId": 260942 },
+        { "Tier": 9, "Id": 2078, "ItemId": 260943 },
+        { "Tier": 10, "Id": 2079, "ItemId": 260944 }
+      ]
+    },
+    {
+      "Name": "Global Advantage - Combat Knowledge",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3212, "ItemId": 268786 },
+        { "Tier": 2, "Id": 3213, "ItemId": 268787 },
+        { "Tier": 3, "Id": 3214, "ItemId": 268788 }
+      ]
+    },
+    {
+      "Name": "Global Advantage - Defensive Power",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3206, "ItemId": 268780 },
+        { "Tier": 2, "Id": 3207, "ItemId": 268781 },
+        { "Tier": 3, "Id": 3208, "ItemId": 268782 }
+      ]
+    },
+    {
+      "Name": "Global Advantage - Health",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3200, "ItemId": 268730 },
+        { "Tier": 2, "Id": 3201, "ItemId": 268731 },
+        { "Tier": 3, "Id": 3202, "ItemId": 268732 }
+      ]
+    },
+    {
+      "Name": "Global Advantage - Medical Knowledge",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3209, "ItemId": 268783 },
+        { "Tier": 2, "Id": 3210, "ItemId": 268784 },
+        { "Tier": 3, "Id": 3211, "ItemId": 268785 }
+      ]
+    },
+    {
+      "Name": "Global Advantage - Nano Technology Knowledge",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3215, "ItemId": 268789 },
+        { "Tier": 2, "Id": 3216, "ItemId": 268790 },
+        { "Tier": 3, "Id": 3217, "ItemId": 268791 }
+      ]
+    },
+    {
+      "Name": "Global Advantage - Offensive Power",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3203, "ItemId": 268777 },
+        { "Tier": 2, "Id": 3204, "ItemId": 268778 },
+        { "Tier": 3, "Id": 3205, "ItemId": 268779 }
+      ]
+    },
+    {
+      "Name": "Gunslinger",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2050, "ItemId": 260915 },
+        { "Tier": 2, "Id": 2051, "ItemId": 260916 },
+        { "Tier": 3, "Id": 2052, "ItemId": 260917 },
+        { "Tier": 4, "Id": 2053, "ItemId": 260918 },
+        { "Tier": 5, "Id": 2054, "ItemId": 260919 },
+        { "Tier": 6, "Id": 2055, "ItemId": 260920 },
+        { "Tier": 7, "Id": 2056, "ItemId": 260921 },
+        { "Tier": 8, "Id": 2057, "ItemId": 260922 },
+        { "Tier": 9, "Id": 2058, "ItemId": 260923 },
+        { "Tier": 10, "Id": 2059, "ItemId": 260924 }
+      ]
+    },
+    {
+      "Name": "Hard Labor",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2350, "ItemId": 261249 },
+        { "Tier": 2, "Id": 2351, "ItemId": 261250 },
+        { "Tier": 3, "Id": 2352, "ItemId": 261251 },
+        { "Tier": 4, "Id": 2353, "ItemId": 261252 },
+        { "Tier": 5, "Id": 2354, "ItemId": 261253 },
+        { "Tier": 6, "Id": 2355, "ItemId": 261254 },
+        { "Tier": 7, "Id": 2356, "ItemId": 261255 },
+        { "Tier": 8, "Id": 2357, "ItemId": 261256 },
+        { "Tier": 9, "Id": 2358, "ItemId": 261257 },
+        { "Tier": 10, "Id": 2359, "ItemId": 261258 }
+      ]
+    },
+    {
+      "Name": "Honed Senses",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2870, "ItemId": 262028 },
+        { "Tier": 2, "Id": 2871, "ItemId": 262029 },
+        { "Tier": 3, "Id": 2872, "ItemId": 262030 },
+        { "Tier": 4, "Id": 2873, "ItemId": 262031 },
+        { "Tier": 5, "Id": 2874, "ItemId": 262032 },
+        { "Tier": 6, "Id": 2875, "ItemId": 262033 },
+        { "Tier": 7, "Id": 2876, "ItemId": 262034 },
+        { "Tier": 8, "Id": 2877, "ItemId": 262035 },
+        { "Tier": 9, "Id": 2878, "ItemId": 262036 },
+        { "Tier": 10, "Id": 2879, "ItemId": 262037 }
+      ]
+    },
+    {
+      "Name": "Hostile Negotiations",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2220, "ItemId": 261105 },
+        { "Tier": 2, "Id": 2221, "ItemId": 261106 },
+        { "Tier": 3, "Id": 2222, "ItemId": 261107 },
+        { "Tier": 4, "Id": 2223, "ItemId": 261108 },
+        { "Tier": 5, "Id": 2224, "ItemId": 261109 },
+        { "Tier": 6, "Id": 2225, "ItemId": 261110 },
+        { "Tier": 7, "Id": 2226, "ItemId": 261111 },
+        { "Tier": 8, "Id": 2227, "ItemId": 261112 },
+        { "Tier": 9, "Id": 2228, "ItemId": 261113 },
+        { "Tier": 10, "Id": 2229, "ItemId": 261114 }
+      ]
+    },
+    {
+      "Name": "Hostile Takeover",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2990, "ItemId": 262149 },
+        { "Tier": 2, "Id": 2991, "ItemId": 262150 },
+        { "Tier": 3, "Id": 2992, "ItemId": 262151 },
+        { "Tier": 4, "Id": 2993, "ItemId": 262152 },
+        { "Tier": 5, "Id": 2994, "ItemId": 262153 },
+        { "Tier": 6, "Id": 2995, "ItemId": 262154 },
+        { "Tier": 7, "Id": 2996, "ItemId": 262155 },
+        { "Tier": 8, "Id": 2997, "ItemId": 262156 },
+        { "Tier": 9, "Id": 2998, "ItemId": 262157 },
+        { "Tier": 10, "Id": 2999, "ItemId": 262158 }
+      ]
+    },
+    {
+      "Name": "Human Resources",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2160, "ItemId": 261115 },
+        { "Tier": 2, "Id": 2161, "ItemId": 261116 },
+        { "Tier": 3, "Id": 2162, "ItemId": 261117 },
+        { "Tier": 4, "Id": 2163, "ItemId": 261118 },
+        { "Tier": 5, "Id": 2164, "ItemId": 261119 },
+        { "Tier": 6, "Id": 2165, "ItemId": 261120 },
+        { "Tier": 7, "Id": 2166, "ItemId": 261121 },
+        { "Tier": 8, "Id": 2167, "ItemId": 261122 },
+        { "Tier": 9, "Id": 2168, "ItemId": 261123 },
+        { "Tier": 10, "Id": 2169, "ItemId": 261124 }
+      ]
+    },
+    {
+      "Name": "Insurance",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2500, "ItemId": 261415 },
+        { "Tier": 2, "Id": 2501, "ItemId": 261416 },
+        { "Tier": 3, "Id": 2502, "ItemId": 261417 },
+        { "Tier": 4, "Id": 2503, "ItemId": 261418 },
+        { "Tier": 5, "Id": 2504, "ItemId": 261419 },
+        { "Tier": 6, "Id": 2505, "ItemId": 261420 },
+        { "Tier": 7, "Id": 2506, "ItemId": 261421 },
+        { "Tier": 8, "Id": 2507, "ItemId": 261422 },
+        { "Tier": 9, "Id": 2508, "ItemId": 261423 },
+        { "Tier": 10, "Id": 2509, "ItemId": 261424 }
+      ]
+    },
+    {
+      "Name": "Intellectual Refinement",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2720, "ItemId": 261878 },
+        { "Tier": 2, "Id": 2721, "ItemId": 261879 },
+        { "Tier": 3, "Id": 2722, "ItemId": 261880 },
+        { "Tier": 4, "Id": 2723, "ItemId": 261881 },
+        { "Tier": 5, "Id": 2724, "ItemId": 261882 },
+        { "Tier": 6, "Id": 2725, "ItemId": 261883 },
+        { "Tier": 7, "Id": 2726, "ItemId": 261884 },
+        { "Tier": 8, "Id": 2727, "ItemId": 261885 },
+        { "Tier": 9, "Id": 2728, "ItemId": 261886 },
+        { "Tier": 10, "Id": 2729, "ItemId": 261887 }
+      ]
+    },
+    {
+      "Name": "Internship",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2260, "ItemId": 261156 },
+        { "Tier": 2, "Id": 2261, "ItemId": 261157 },
+        { "Tier": 3, "Id": 2262, "ItemId": 261158 },
+        { "Tier": 4, "Id": 2263, "ItemId": 261159 },
+        { "Tier": 5, "Id": 2264, "ItemId": 261160 },
+        { "Tier": 6, "Id": 2265, "ItemId": 261161 },
+        { "Tier": 7, "Id": 2266, "ItemId": 261162 },
+        { "Tier": 8, "Id": 2267, "ItemId": 261163 },
+        { "Tier": 9, "Id": 2268, "ItemId": 261164 },
+        { "Tier": 10, "Id": 2269, "ItemId": 261165 }
+      ]
+    },
+    {
+      "Name": "Intuition",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2130, "ItemId": 260985 },
+        { "Tier": 2, "Id": 2131, "ItemId": 260986 },
+        { "Tier": 3, "Id": 2132, "ItemId": 260987 },
+        { "Tier": 4, "Id": 2133, "ItemId": 260988 },
+        { "Tier": 5, "Id": 2134, "ItemId": 260989 },
+        { "Tier": 6, "Id": 2135, "ItemId": 260990 },
+        { "Tier": 7, "Id": 2136, "ItemId": 260991 },
+        { "Tier": 8, "Id": 2137, "ItemId": 260992 },
+        { "Tier": 9, "Id": 2138, "ItemId": 260993 },
+        { "Tier": 10, "Id": 2139, "ItemId": 260994 }
+      ]
+    },
+    {
+      "Name": "Intuition",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2580, "ItemId": 261495 },
+        { "Tier": 2, "Id": 2581, "ItemId": 261496 },
+        { "Tier": 3, "Id": 2582, "ItemId": 261497 },
+        { "Tier": 4, "Id": 2583, "ItemId": 261498 },
+        { "Tier": 5, "Id": 2584, "ItemId": 261499 },
+        { "Tier": 6, "Id": 2585, "ItemId": 261500 },
+        { "Tier": 7, "Id": 2586, "ItemId": 261501 },
+        { "Tier": 8, "Id": 2587, "ItemId": 261502 },
+        { "Tier": 9, "Id": 2588, "ItemId": 261503 },
+        { "Tier": 10, "Id": 2589, "ItemId": 261504 }
+      ]
+    },
+    {
+      "Name": "Jealousy",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2700, "ItemId": 261858 },
+        { "Tier": 2, "Id": 2701, "ItemId": 261859 },
+        { "Tier": 3, "Id": 2702, "ItemId": 261860 },
+        { "Tier": 4, "Id": 2703, "ItemId": 261861 },
+        { "Tier": 5, "Id": 2704, "ItemId": 261862 },
+        { "Tier": 6, "Id": 2705, "ItemId": 261863 },
+        { "Tier": 7, "Id": 2706, "ItemId": 261864 },
+        { "Tier": 8, "Id": 2707, "ItemId": 261865 },
+        { "Tier": 9, "Id": 2708, "ItemId": 261866 },
+        { "Tier": 10, "Id": 2709, "ItemId": 261867 }
+      ]
+    },
+    {
+      "Name": "Judgement",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2550, "ItemId": 261465 },
+        { "Tier": 2, "Id": 2551, "ItemId": 261466 },
+        { "Tier": 3, "Id": 2552, "ItemId": 261467 },
+        { "Tier": 4, "Id": 2553, "ItemId": 261468 },
+        { "Tier": 5, "Id": 2554, "ItemId": 261469 },
+        { "Tier": 6, "Id": 2555, "ItemId": 261470 },
+        { "Tier": 7, "Id": 2556, "ItemId": 261471 },
+        { "Tier": 8, "Id": 2557, "ItemId": 261472 },
+        { "Tier": 9, "Id": 2558, "ItemId": 261473 },
+        { "Tier": 10, "Id": 2559, "ItemId": 261474 }
+      ]
+    },
+    {
+      "Name": "Keen Eyes",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2030, "ItemId": 260895 },
+        { "Tier": 2, "Id": 2031, "ItemId": 260896 },
+        { "Tier": 3, "Id": 2032, "ItemId": 260897 },
+        { "Tier": 4, "Id": 2033, "ItemId": 260898 },
+        { "Tier": 5, "Id": 2034, "ItemId": 260899 },
+        { "Tier": 6, "Id": 2035, "ItemId": 260900 },
+        { "Tier": 7, "Id": 2036, "ItemId": 260901 },
+        { "Tier": 8, "Id": 2037, "ItemId": 260902 },
+        { "Tier": 9, "Id": 2038, "ItemId": 260903 },
+        { "Tier": 10, "Id": 2039, "ItemId": 260904 }
+      ]
+    },
+    {
+      "Name": "Killing Blows",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2880, "ItemId": 262038 },
+        { "Tier": 2, "Id": 2881, "ItemId": 262039 },
+        { "Tier": 3, "Id": 2882, "ItemId": 262040 },
+        { "Tier": 4, "Id": 2883, "ItemId": 262041 },
+        { "Tier": 5, "Id": 2884, "ItemId": 262042 },
+        { "Tier": 6, "Id": 2885, "ItemId": 262043 },
+        { "Tier": 7, "Id": 2886, "ItemId": 262044 },
+        { "Tier": 8, "Id": 2887, "ItemId": 262045 },
+        { "Tier": 9, "Id": 2888, "ItemId": 262046 },
+        { "Tier": 10, "Id": 2889, "ItemId": 262047 }
+      ]
+    },
+    {
+      "Name": "Kinetic Mastery",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2780, "ItemId": 261938 },
+        { "Tier": 2, "Id": 2781, "ItemId": 261939 },
+        { "Tier": 3, "Id": 2782, "ItemId": 261940 },
+        { "Tier": 4, "Id": 2783, "ItemId": 261941 },
+        { "Tier": 5, "Id": 2784, "ItemId": 261942 },
+        { "Tier": 6, "Id": 2785, "ItemId": 261943 },
+        { "Tier": 7, "Id": 2786, "ItemId": 261944 },
+        { "Tier": 8, "Id": 2787, "ItemId": 261945 },
+        { "Tier": 9, "Id": 2788, "ItemId": 261946 },
+        { "Tier": 10, "Id": 2789, "ItemId": 261947 }
+      ]
+    },
+    {
+      "Name": "Kneecapping",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2330, "ItemId": 261229 },
+        { "Tier": 2, "Id": 2331, "ItemId": 261230 },
+        { "Tier": 3, "Id": 2332, "ItemId": 261231 },
+        { "Tier": 4, "Id": 2333, "ItemId": 261232 },
+        { "Tier": 5, "Id": 2334, "ItemId": 261233 },
+        { "Tier": 6, "Id": 2335, "ItemId": 261234 },
+        { "Tier": 7, "Id": 2336, "ItemId": 261235 },
+        { "Tier": 8, "Id": 2337, "ItemId": 261236 },
+        { "Tier": 9, "Id": 2338, "ItemId": 261237 },
+        { "Tier": 10, "Id": 2339, "ItemId": 261238 }
+      ]
+    },
+    {
+      "Name": "Lithe",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2910, "ItemId": 262068 },
+        { "Tier": 2, "Id": 2911, "ItemId": 262069 },
+        { "Tier": 3, "Id": 2912, "ItemId": 262070 },
+        { "Tier": 4, "Id": 2913, "ItemId": 262071 },
+        { "Tier": 5, "Id": 2914, "ItemId": 262072 },
+        { "Tier": 6, "Id": 2915, "ItemId": 262073 },
+        { "Tier": 7, "Id": 2916, "ItemId": 262074 },
+        { "Tier": 8, "Id": 2917, "ItemId": 262075 },
+        { "Tier": 9, "Id": 2918, "ItemId": 262076 },
+        { "Tier": 10, "Id": 2919, "ItemId": 262077 }
+      ]
+    },
+    {
+      "Name": "Loyalty",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2540, "ItemId": 261455 },
+        { "Tier": 2, "Id": 2541, "ItemId": 261456 },
+        { "Tier": 3, "Id": 2542, "ItemId": 261457 },
+        { "Tier": 4, "Id": 2543, "ItemId": 261458 },
+        { "Tier": 5, "Id": 2544, "ItemId": 261459 },
+        { "Tier": 6, "Id": 2545, "ItemId": 261460 },
+        { "Tier": 7, "Id": 2546, "ItemId": 261461 },
+        { "Tier": 8, "Id": 2547, "ItemId": 261462 },
+        { "Tier": 9, "Id": 2548, "ItemId": 261463 },
+        { "Tier": 10, "Id": 2549, "ItemId": 261464 }
+      ]
+    },
+    {
+      "Name": "Malicious Forethought",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2900, "ItemId": 262058 },
+        { "Tier": 2, "Id": 2901, "ItemId": 262059 },
+        { "Tier": 3, "Id": 2902, "ItemId": 262060 },
+        { "Tier": 4, "Id": 2903, "ItemId": 262061 },
+        { "Tier": 5, "Id": 2904, "ItemId": 262062 },
+        { "Tier": 6, "Id": 2905, "ItemId": 262063 },
+        { "Tier": 7, "Id": 2906, "ItemId": 262064 },
+        { "Tier": 8, "Id": 2907, "ItemId": 262065 },
+        { "Tier": 9, "Id": 2908, "ItemId": 262066 },
+        { "Tier": 10, "Id": 2909, "ItemId": 262067 }
+      ]
+    },
+    {
+      "Name": "Market Awareness",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2210, "ItemId": 261095 },
+        { "Tier": 2, "Id": 2211, "ItemId": 261096 },
+        { "Tier": 3, "Id": 2212, "ItemId": 261097 },
+        { "Tier": 4, "Id": 2213, "ItemId": 261098 },
+        { "Tier": 5, "Id": 2214, "ItemId": 261099 },
+        { "Tier": 6, "Id": 2215, "ItemId": 261100 },
+        { "Tier": 7, "Id": 2216, "ItemId": 261101 },
+        { "Tier": 8, "Id": 2217, "ItemId": 261102 },
+        { "Tier": 9, "Id": 2218, "ItemId": 261103 },
+        { "Tier": 10, "Id": 2219, "ItemId": 261104 }
+      ]
+    },
+    {
+      "Name": "Marksmanship",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2150, "ItemId": 261005 },
+        { "Tier": 2, "Id": 2151, "ItemId": 261006 },
+        { "Tier": 3, "Id": 2152, "ItemId": 261007 },
+        { "Tier": 4, "Id": 2153, "ItemId": 261008 },
+        { "Tier": 5, "Id": 2154, "ItemId": 261009 },
+        { "Tier": 6, "Id": 2155, "ItemId": 261010 },
+        { "Tier": 7, "Id": 2156, "ItemId": 261011 },
+        { "Tier": 8, "Id": 2157, "ItemId": 261012 },
+        { "Tier": 9, "Id": 2158, "ItemId": 261013 },
+        { "Tier": 10, "Id": 2159, "ItemId": 261014 }
+      ]
+    },
+    {
+      "Name": "Marksmanship",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2820, "ItemId": 261978 },
+        { "Tier": 2, "Id": 2821, "ItemId": 261979 },
+        { "Tier": 3, "Id": 2822, "ItemId": 261980 },
+        { "Tier": 4, "Id": 2823, "ItemId": 261981 },
+        { "Tier": 5, "Id": 2824, "ItemId": 261982 },
+        { "Tier": 6, "Id": 2825, "ItemId": 261983 },
+        { "Tier": 7, "Id": 2826, "ItemId": 261984 },
+        { "Tier": 8, "Id": 2827, "ItemId": 261985 },
+        { "Tier": 9, "Id": 2828, "ItemId": 261986 },
+        { "Tier": 10, "Id": 2829, "ItemId": 261987 }
+      ]
+    },
+    {
+      "Name": "Mechanical Assistance",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2390, "ItemId": 261304 },
+        { "Tier": 2, "Id": 2391, "ItemId": 261305 },
+        { "Tier": 3, "Id": 2392, "ItemId": 261306 },
+        { "Tier": 4, "Id": 2393, "ItemId": 261307 },
+        { "Tier": 5, "Id": 2394, "ItemId": 261308 },
+        { "Tier": 6, "Id": 2395, "ItemId": 261309 },
+        { "Tier": 7, "Id": 2396, "ItemId": 261310 },
+        { "Tier": 8, "Id": 2397, "ItemId": 261311 },
+        { "Tier": 9, "Id": 2398, "ItemId": 261312 },
+        { "Tier": 10, "Id": 2399, "ItemId": 261313 }
+      ]
+    },
+    {
+      "Name": "Mechanized Assault Vehicle",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3120, "ItemId": 263034 }
+      ]
+    },
+    {
+      "Name": "Mechanized Assault Vehicle Armor Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3130, "ItemId": 263035 },
+        { "Tier": 2, "Id": 3131, "ItemId": 263036 },
+        { "Tier": 3, "Id": 3132, "ItemId": 263037 }
+      ]
+    },
+    {
+      "Name": "Mechanized Assault Vehicle Weapon Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3140, "ItemId": 263038 },
+        { "Tier": 2, "Id": 3141, "ItemId": 263039 },
+        { "Tier": 3, "Id": 3142, "ItemId": 263040 }
+      ]
+    },
+    {
+      "Name": "Mechanized Scout Vehicle",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3090, "ItemId": 263027 }
+      ]
+    },
+    {
+      "Name": "Mechanized Scout Vehicle Armor Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3100, "ItemId": 263028 },
+        { "Tier": 2, "Id": 3101, "ItemId": 263029 },
+        { "Tier": 3, "Id": 3102, "ItemId": 263030 }
+      ]
+    },
+    {
+      "Name": "Mechanized Scout Vehicle Weapon Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3110, "ItemId": 263031 },
+        { "Tier": 2, "Id": 3111, "ItemId": 263032 },
+        { "Tier": 3, "Id": 3112, "ItemId": 263033 }
+      ]
+    },
+    {
+      "Name": "Meditation",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2590, "ItemId": 261508 },
+        { "Tier": 2, "Id": 2591, "ItemId": 261509 },
+        { "Tier": 3, "Id": 2592, "ItemId": 261510 },
+        { "Tier": 4, "Id": 2593, "ItemId": 261511 },
+        { "Tier": 5, "Id": 2594, "ItemId": 261512 },
+        { "Tier": 6, "Id": 2595, "ItemId": 261513 },
+        { "Tier": 7, "Id": 2596, "ItemId": 261514 },
+        { "Tier": 8, "Id": 2597, "ItemId": 261515 },
+        { "Tier": 9, "Id": 2598, "ItemId": 261516 },
+        { "Tier": 10, "Id": 2599, "ItemId": 261517 }
+      ]
+    },
+    {
+      "Name": "Military Hardware",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2420, "ItemId": 261334 },
+        { "Tier": 2, "Id": 2421, "ItemId": 261335 },
+        { "Tier": 3, "Id": 2422, "ItemId": 261336 },
+        { "Tier": 4, "Id": 2423, "ItemId": 261337 },
+        { "Tier": 5, "Id": 2424, "ItemId": 261338 },
+        { "Tier": 6, "Id": 2425, "ItemId": 261339 },
+        { "Tier": 7, "Id": 2426, "ItemId": 261340 },
+        { "Tier": 8, "Id": 2427, "ItemId": 261341 },
+        { "Tier": 9, "Id": 2428, "ItemId": 261342 },
+        { "Tier": 10, "Id": 2429, "ItemId": 261343 }
+      ]
+    },
+    {
+      "Name": "Nano Theory",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2730, "ItemId": 261888 },
+        { "Tier": 2, "Id": 2731, "ItemId": 261889 },
+        { "Tier": 3, "Id": 2732, "ItemId": 261890 },
+        { "Tier": 4, "Id": 2733, "ItemId": 261891 },
+        { "Tier": 5, "Id": 2734, "ItemId": 261892 },
+        { "Tier": 6, "Id": 2735, "ItemId": 261893 },
+        { "Tier": 7, "Id": 2736, "ItemId": 261894 },
+        { "Tier": 8, "Id": 2737, "ItemId": 261895 },
+        { "Tier": 9, "Id": 2738, "ItemId": 261896 },
+        { "Tier": 10, "Id": 2739, "ItemId": 261897 }
+      ]
+    },
+    {
+      "Name": "Nimble",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2610, "ItemId": 261528 },
+        { "Tier": 2, "Id": 2611, "ItemId": 261529 },
+        { "Tier": 3, "Id": 2612, "ItemId": 261530 },
+        { "Tier": 4, "Id": 2613, "ItemId": 261531 },
+        { "Tier": 5, "Id": 2614, "ItemId": 261532 },
+        { "Tier": 6, "Id": 2615, "ItemId": 261533 },
+        { "Tier": 7, "Id": 2616, "ItemId": 261534 },
+        { "Tier": 8, "Id": 2617, "ItemId": 261535 },
+        { "Tier": 9, "Id": 2618, "ItemId": 261536 },
+        { "Tier": 10, "Id": 2619, "ItemId": 261537 }
+      ]
+    },
+    {
+      "Name": "Paragon",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2570, "ItemId": 261485 },
+        { "Tier": 2, "Id": 2571, "ItemId": 261486 },
+        { "Tier": 3, "Id": 2572, "ItemId": 261487 },
+        { "Tier": 4, "Id": 2573, "ItemId": 261488 },
+        { "Tier": 5, "Id": 2574, "ItemId": 261489 },
+        { "Tier": 6, "Id": 2575, "ItemId": 261490 },
+        { "Tier": 7, "Id": 2576, "ItemId": 261491 },
+        { "Tier": 8, "Id": 2577, "ItemId": 261492 },
+        { "Tier": 9, "Id": 2578, "ItemId": 261493 },
+        { "Tier": 10, "Id": 2579, "ItemId": 261494 }
+      ]
+    },
+    {
+      "Name": "Particle Physics",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2740, "ItemId": 261898 },
+        { "Tier": 2, "Id": 2741, "ItemId": 261899 },
+        { "Tier": 3, "Id": 2742, "ItemId": 261900 },
+        { "Tier": 4, "Id": 2743, "ItemId": 261901 },
+        { "Tier": 5, "Id": 2744, "ItemId": 261902 },
+        { "Tier": 6, "Id": 2745, "ItemId": 261903 },
+        { "Tier": 7, "Id": 2746, "ItemId": 261904 },
+        { "Tier": 8, "Id": 2747, "ItemId": 261905 },
+        { "Tier": 9, "Id": 2748, "ItemId": 261906 },
+        { "Tier": 10, "Id": 2749, "ItemId": 261907 }
+      ]
+    },
+    {
+      "Name": "Perseverences",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2690, "ItemId": 261848 },
+        { "Tier": 2, "Id": 2691, "ItemId": 261849 },
+        { "Tier": 3, "Id": 2692, "ItemId": 261850 },
+        { "Tier": 4, "Id": 2693, "ItemId": 261851 },
+        { "Tier": 5, "Id": 2694, "ItemId": 261852 },
+        { "Tier": 6, "Id": 2695, "ItemId": 261853 },
+        { "Tier": 7, "Id": 2696, "ItemId": 261854 },
+        { "Tier": 8, "Id": 2697, "ItemId": 261855 },
+        { "Tier": 9, "Id": 2698, "ItemId": 261856 },
+        { "Tier": 10, "Id": 2699, "ItemId": 261857 }
+      ]
+    },
+    {
+      "Name": "Personal Mechanized Vehicle",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3000, "ItemId": 262430 }
+      ]
+    },
+    {
+      "Name": "Personal Mechanized Vehicle Armor Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3010, "ItemId": 262431 },
+        { "Tier": 2, "Id": 3011, "ItemId": 262432 },
+        { "Tier": 3, "Id": 3012, "ItemId": 262433 }
+      ]
+    },
+    {
+      "Name": "Personal Mechanized Vehicle Weapon Upgrade",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3020, "ItemId": 262434 },
+        { "Tier": 2, "Id": 3021, "ItemId": 262435 },
+        { "Tier": 3, "Id": 3022, "ItemId": 262436 }
+      ]
+    },
+    {
+      "Name": "PMV Obsidian Edition",
+      "Category": "Research",
+      "Flags": 128,
+      "Perks": [
+        { "Tier": 1, "Id": 3218, "ItemId": 287335 }
+      ]
+    },
+    {
+      "Name": "Practical Application",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2370, "ItemId": 261284 },
+        { "Tier": 2, "Id": 2371, "ItemId": 261285 },
+        { "Tier": 3, "Id": 2372, "ItemId": 261286 },
+        { "Tier": 4, "Id": 2373, "ItemId": 261287 },
+        { "Tier": 5, "Id": 2374, "ItemId": 261288 },
+        { "Tier": 6, "Id": 2375, "ItemId": 261289 },
+        { "Tier": 7, "Id": 2376, "ItemId": 261290 },
+        { "Tier": 8, "Id": 2377, "ItemId": 261291 },
+        { "Tier": 9, "Id": 2378, "ItemId": 261292 },
+        { "Tier": 10, "Id": 2379, "ItemId": 261293 }
+      ]
+    },
+    {
+      "Name": "Practical Use",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2760, "ItemId": 261918 },
+        { "Tier": 2, "Id": 2761, "ItemId": 261919 },
+        { "Tier": 3, "Id": 2762, "ItemId": 261920 },
+        { "Tier": 4, "Id": 2763, "ItemId": 261921 },
+        { "Tier": 5, "Id": 2764, "ItemId": 261922 },
+        { "Tier": 6, "Id": 2765, "ItemId": 261923 },
+        { "Tier": 7, "Id": 2766, "ItemId": 261924 },
+        { "Tier": 8, "Id": 2767, "ItemId": 261925 },
+        { "Tier": 9, "Id": 2768, "ItemId": 261926 },
+        { "Tier": 10, "Id": 2769, "ItemId": 261927 }
+      ]
+    },
+    {
+      "Name": "Process Refinement",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2400, "ItemId": 261314 },
+        { "Tier": 2, "Id": 2401, "ItemId": 261315 },
+        { "Tier": 3, "Id": 2402, "ItemId": 261316 },
+        { "Tier": 4, "Id": 2403, "ItemId": 261317 },
+        { "Tier": 5, "Id": 2404, "ItemId": 261318 },
+        { "Tier": 6, "Id": 2405, "ItemId": 261319 },
+        { "Tier": 7, "Id": 2406, "ItemId": 261320 },
+        { "Tier": 8, "Id": 2407, "ItemId": 261321 },
+        { "Tier": 9, "Id": 2408, "ItemId": 261322 },
+        { "Tier": 10, "Id": 2409, "ItemId": 261323 }
+      ]
+    },
+    {
+      "Name": "Process Theory",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2180, "ItemId": 261065 },
+        { "Tier": 2, "Id": 2181, "ItemId": 261066 },
+        { "Tier": 3, "Id": 2182, "ItemId": 261067 },
+        { "Tier": 4, "Id": 2183, "ItemId": 261068 },
+        { "Tier": 5, "Id": 2184, "ItemId": 261069 },
+        { "Tier": 6, "Id": 2185, "ItemId": 261070 },
+        { "Tier": 7, "Id": 2186, "ItemId": 261071 },
+        { "Tier": 8, "Id": 2187, "ItemId": 261072 },
+        { "Tier": 9, "Id": 2188, "ItemId": 261073 },
+        { "Tier": 10, "Id": 2189, "ItemId": 261074 }
+      ]
+    },
+    {
+      "Name": "Professional Development",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2200, "ItemId": 261085 },
+        { "Tier": 2, "Id": 2201, "ItemId": 261086 },
+        { "Tier": 3, "Id": 2202, "ItemId": 261087 },
+        { "Tier": 4, "Id": 2203, "ItemId": 261088 },
+        { "Tier": 5, "Id": 2204, "ItemId": 261089 },
+        { "Tier": 6, "Id": 2205, "ItemId": 261090 },
+        { "Tier": 7, "Id": 2206, "ItemId": 261091 },
+        { "Tier": 8, "Id": 2207, "ItemId": 261092 },
+        { "Tier": 9, "Id": 2208, "ItemId": 261093 },
+        { "Tier": 10, "Id": 2209, "ItemId": 261094 }
+      ]
+    },
+    {
+      "Name": "Reflex",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2630, "ItemId": 261548 },
+        { "Tier": 2, "Id": 2631, "ItemId": 261549 },
+        { "Tier": 3, "Id": 2632, "ItemId": 261550 },
+        { "Tier": 4, "Id": 2633, "ItemId": 261551 },
+        { "Tier": 5, "Id": 2634, "ItemId": 261552 },
+        { "Tier": 6, "Id": 2635, "ItemId": 261553 },
+        { "Tier": 7, "Id": 2636, "ItemId": 261554 },
+        { "Tier": 8, "Id": 2637, "ItemId": 261555 },
+        { "Tier": 9, "Id": 2638, "ItemId": 261556 },
+        { "Tier": 10, "Id": 2639, "ItemId": 261557 }
+      ]
+    },
+    {
+      "Name": "Rehabilitation",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2240, "ItemId": 261136 },
+        { "Tier": 2, "Id": 2241, "ItemId": 261137 },
+        { "Tier": 3, "Id": 2242, "ItemId": 261138 },
+        { "Tier": 4, "Id": 2243, "ItemId": 261139 },
+        { "Tier": 5, "Id": 2244, "ItemId": 261140 },
+        { "Tier": 6, "Id": 2245, "ItemId": 261141 },
+        { "Tier": 7, "Id": 2246, "ItemId": 261142 },
+        { "Tier": 8, "Id": 2247, "ItemId": 261143 },
+        { "Tier": 9, "Id": 2248, "ItemId": 261144 },
+        { "Tier": 10, "Id": 2249, "ItemId": 261145 }
+      ]
+    },
+    {
+      "Name": "Respectable Businessman",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2480, "ItemId": 261395 },
+        { "Tier": 2, "Id": 2481, "ItemId": 261396 },
+        { "Tier": 3, "Id": 2482, "ItemId": 261397 },
+        { "Tier": 4, "Id": 2483, "ItemId": 261398 },
+        { "Tier": 5, "Id": 2484, "ItemId": 261399 },
+        { "Tier": 6, "Id": 2485, "ItemId": 261400 },
+        { "Tier": 7, "Id": 2486, "ItemId": 261401 },
+        { "Tier": 8, "Id": 2487, "ItemId": 261402 },
+        { "Tier": 9, "Id": 2488, "ItemId": 261403 },
+        { "Tier": 10, "Id": 2489, "ItemId": 261404 }
+      ]
+    },
+    {
+      "Name": "Safari Guide",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2080, "ItemId": 260945 },
+        { "Tier": 2, "Id": 2081, "ItemId": 260946 },
+        { "Tier": 3, "Id": 2082, "ItemId": 260947 },
+        { "Tier": 4, "Id": 2083, "ItemId": 260948 },
+        { "Tier": 5, "Id": 2084, "ItemId": 260949 },
+        { "Tier": 6, "Id": 2085, "ItemId": 260950 },
+        { "Tier": 7, "Id": 2086, "ItemId": 260951 },
+        { "Tier": 8, "Id": 2087, "ItemId": 260952 },
+        { "Tier": 9, "Id": 2088, "ItemId": 260953 },
+        { "Tier": 10, "Id": 2089, "ItemId": 260954 }
+      ]
+    },
+    {
+      "Name": "Sensible Investment",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2950, "ItemId": 262109 },
+        { "Tier": 2, "Id": 2951, "ItemId": 262110 },
+        { "Tier": 3, "Id": 2952, "ItemId": 262111 },
+        { "Tier": 4, "Id": 2953, "ItemId": 262112 },
+        { "Tier": 5, "Id": 2954, "ItemId": 262113 },
+        { "Tier": 6, "Id": 2955, "ItemId": 262114 },
+        { "Tier": 7, "Id": 2956, "ItemId": 262115 },
+        { "Tier": 8, "Id": 2957, "ItemId": 262116 },
+        { "Tier": 9, "Id": 2958, "ItemId": 262117 },
+        { "Tier": 10, "Id": 2959, "ItemId": 262118 }
+      ]
+    },
+    {
+      "Name": "Sensitive Negotiations",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2980, "ItemId": 262139 },
+        { "Tier": 2, "Id": 2981, "ItemId": 262140 },
+        { "Tier": 3, "Id": 2982, "ItemId": 262141 },
+        { "Tier": 4, "Id": 2983, "ItemId": 262142 },
+        { "Tier": 5, "Id": 2984, "ItemId": 262143 },
+        { "Tier": 6, "Id": 2985, "ItemId": 262144 },
+        { "Tier": 7, "Id": 2986, "ItemId": 262145 },
+        { "Tier": 8, "Id": 2987, "ItemId": 262146 },
+        { "Tier": 9, "Id": 2988, "ItemId": 262147 },
+        { "Tier": 10, "Id": 2989, "ItemId": 262148 }
+      ]
+    },
+    {
+      "Name": "Serendipity",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2380, "ItemId": 261294 },
+        { "Tier": 2, "Id": 2381, "ItemId": 261295 },
+        { "Tier": 3, "Id": 2382, "ItemId": 261296 },
+        { "Tier": 4, "Id": 2383, "ItemId": 261297 },
+        { "Tier": 5, "Id": 2384, "ItemId": 261298 },
+        { "Tier": 6, "Id": 2385, "ItemId": 261299 },
+        { "Tier": 7, "Id": 2386, "ItemId": 261300 },
+        { "Tier": 8, "Id": 2387, "ItemId": 261301 },
+        { "Tier": 9, "Id": 2388, "ItemId": 261302 },
+        { "Tier": 10, "Id": 2389, "ItemId": 261303 }
+      ]
+    },
+    {
+      "Name": "Smuggler\u0027s Sense",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2470, "ItemId": 261385 },
+        { "Tier": 2, "Id": 2471, "ItemId": 261386 },
+        { "Tier": 3, "Id": 2472, "ItemId": 261387 },
+        { "Tier": 4, "Id": 2473, "ItemId": 261388 },
+        { "Tier": 5, "Id": 2474, "ItemId": 261389 },
+        { "Tier": 6, "Id": 2475, "ItemId": 261390 },
+        { "Tier": 7, "Id": 2476, "ItemId": 261391 },
+        { "Tier": 8, "Id": 2477, "ItemId": 261392 },
+        { "Tier": 9, "Id": 2478, "ItemId": 261393 },
+        { "Tier": 10, "Id": 2479, "ItemId": 261394 }
+      ]
+    },
+    {
+      "Name": "Spatial Awareness",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2670, "ItemId": 261828 },
+        { "Tier": 2, "Id": 2671, "ItemId": 261829 },
+        { "Tier": 3, "Id": 2672, "ItemId": 261830 },
+        { "Tier": 4, "Id": 2673, "ItemId": 261831 },
+        { "Tier": 5, "Id": 2674, "ItemId": 261832 },
+        { "Tier": 6, "Id": 2675, "ItemId": 261833 },
+        { "Tier": 7, "Id": 2676, "ItemId": 261834 },
+        { "Tier": 8, "Id": 2677, "ItemId": 261835 },
+        { "Tier": 9, "Id": 2678, "ItemId": 261836 },
+        { "Tier": 10, "Id": 2679, "ItemId": 261837 }
+      ]
+    },
+    {
+      "Name": "Stealth",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2140, "ItemId": 260995 },
+        { "Tier": 2, "Id": 2141, "ItemId": 260996 },
+        { "Tier": 3, "Id": 2142, "ItemId": 260997 },
+        { "Tier": 4, "Id": 2143, "ItemId": 260998 },
+        { "Tier": 5, "Id": 2144, "ItemId": 260999 },
+        { "Tier": 6, "Id": 2145, "ItemId": 261000 },
+        { "Tier": 7, "Id": 2146, "ItemId": 261001 },
+        { "Tier": 8, "Id": 2147, "ItemId": 261002 },
+        { "Tier": 9, "Id": 2148, "ItemId": 261003 },
+        { "Tier": 10, "Id": 2149, "ItemId": 261004 }
+      ]
+    },
+    {
+      "Name": "Stiletto Mastery",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2890, "ItemId": 262048 },
+        { "Tier": 2, "Id": 2891, "ItemId": 262049 },
+        { "Tier": 3, "Id": 2892, "ItemId": 262050 },
+        { "Tier": 4, "Id": 2893, "ItemId": 262051 },
+        { "Tier": 5, "Id": 2894, "ItemId": 262052 },
+        { "Tier": 6, "Id": 2895, "ItemId": 262053 },
+        { "Tier": 7, "Id": 2896, "ItemId": 262054 },
+        { "Tier": 8, "Id": 2897, "ItemId": 262055 },
+        { "Tier": 9, "Id": 2898, "ItemId": 262056 },
+        { "Tier": 10, "Id": 2899, "ItemId": 262057 }
+      ]
+    },
+    {
+      "Name": "Strategic Planning",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2800, "ItemId": 261958 },
+        { "Tier": 2, "Id": 2801, "ItemId": 261959 },
+        { "Tier": 3, "Id": 2802, "ItemId": 261960 },
+        { "Tier": 4, "Id": 2803, "ItemId": 261961 },
+        { "Tier": 5, "Id": 2804, "ItemId": 261962 },
+        { "Tier": 6, "Id": 2805, "ItemId": 261963 },
+        { "Tier": 7, "Id": 2806, "ItemId": 261964 },
+        { "Tier": 8, "Id": 2807, "ItemId": 261965 },
+        { "Tier": 9, "Id": 2808, "ItemId": 261966 },
+        { "Tier": 10, "Id": 2809, "ItemId": 261967 }
+      ]
+    },
+    {
+      "Name": "Subtlety",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2450, "ItemId": 261365 },
+        { "Tier": 2, "Id": 2451, "ItemId": 261366 },
+        { "Tier": 3, "Id": 2452, "ItemId": 261367 },
+        { "Tier": 4, "Id": 2453, "ItemId": 261368 },
+        { "Tier": 5, "Id": 2454, "ItemId": 261369 },
+        { "Tier": 6, "Id": 2455, "ItemId": 261370 },
+        { "Tier": 7, "Id": 2456, "ItemId": 261371 },
+        { "Tier": 8, "Id": 2457, "ItemId": 261372 },
+        { "Tier": 9, "Id": 2458, "ItemId": 261373 },
+        { "Tier": 10, "Id": 2459, "ItemId": 261374 }
+      ]
+    },
+    {
+      "Name": "Sweep and Clear",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2790, "ItemId": 261948 },
+        { "Tier": 2, "Id": 2791, "ItemId": 261949 },
+        { "Tier": 3, "Id": 2792, "ItemId": 261950 },
+        { "Tier": 4, "Id": 2793, "ItemId": 261951 },
+        { "Tier": 5, "Id": 2794, "ItemId": 261952 },
+        { "Tier": 6, "Id": 2795, "ItemId": 261953 },
+        { "Tier": 7, "Id": 2796, "ItemId": 261954 },
+        { "Tier": 8, "Id": 2797, "ItemId": 261955 },
+        { "Tier": 9, "Id": 2798, "ItemId": 261956 },
+        { "Tier": 10, "Id": 2799, "ItemId": 261957 }
+      ]
+    },
+    {
+      "Name": "Sympathy",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2660, "ItemId": 261818 },
+        { "Tier": 2, "Id": 2661, "ItemId": 261819 },
+        { "Tier": 3, "Id": 2662, "ItemId": 261820 },
+        { "Tier": 4, "Id": 2663, "ItemId": 261821 },
+        { "Tier": 5, "Id": 2664, "ItemId": 261822 },
+        { "Tier": 6, "Id": 2665, "ItemId": 261823 },
+        { "Tier": 7, "Id": 2666, "ItemId": 261824 },
+        { "Tier": 8, "Id": 2667, "ItemId": 261825 },
+        { "Tier": 9, "Id": 2668, "ItemId": 261826 },
+        { "Tier": 10, "Id": 2669, "ItemId": 261827 }
+      ]
+    },
+    {
+      "Name": "Team Building",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2170, "ItemId": 261055 },
+        { "Tier": 2, "Id": 2171, "ItemId": 261056 },
+        { "Tier": 3, "Id": 2172, "ItemId": 261057 },
+        { "Tier": 4, "Id": 2173, "ItemId": 261058 },
+        { "Tier": 5, "Id": 2174, "ItemId": 261059 },
+        { "Tier": 6, "Id": 2175, "ItemId": 261060 },
+        { "Tier": 7, "Id": 2176, "ItemId": 261061 },
+        { "Tier": 8, "Id": 2177, "ItemId": 261062 },
+        { "Tier": 9, "Id": 2178, "ItemId": 261063 },
+        { "Tier": 10, "Id": 2179, "ItemId": 261064 }
+      ]
+    },
+    {
+      "Name": "Threat Assessment",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2100, "ItemId": 260955 },
+        { "Tier": 2, "Id": 2101, "ItemId": 260956 },
+        { "Tier": 3, "Id": 2102, "ItemId": 260957 },
+        { "Tier": 4, "Id": 2103, "ItemId": 260958 },
+        { "Tier": 5, "Id": 2104, "ItemId": 260959 },
+        { "Tier": 6, "Id": 2105, "ItemId": 260960 },
+        { "Tier": 7, "Id": 2106, "ItemId": 260961 },
+        { "Tier": 8, "Id": 2107, "ItemId": 260962 },
+        { "Tier": 9, "Id": 2108, "ItemId": 260963 },
+        { "Tier": 10, "Id": 2109, "ItemId": 260964 }
+      ]
+    },
+    {
+      "Name": "Toxicology",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2280, "ItemId": 261176 },
+        { "Tier": 2, "Id": 2281, "ItemId": 261177 },
+        { "Tier": 3, "Id": 2282, "ItemId": 261178 },
+        { "Tier": 4, "Id": 2283, "ItemId": 261179 },
+        { "Tier": 5, "Id": 2284, "ItemId": 261180 },
+        { "Tier": 6, "Id": 2285, "ItemId": 261181 },
+        { "Tier": 7, "Id": 2286, "ItemId": 261182 },
+        { "Tier": 8, "Id": 2287, "ItemId": 261183 },
+        { "Tier": 9, "Id": 2288, "ItemId": 261184 },
+        { "Tier": 10, "Id": 2289, "ItemId": 261185 }
+      ]
+    },
+    {
+      "Name": "Trauma",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2680, "ItemId": 261838 },
+        { "Tier": 2, "Id": 2681, "ItemId": 261839 },
+        { "Tier": 3, "Id": 2682, "ItemId": 261840 },
+        { "Tier": 4, "Id": 2683, "ItemId": 261841 },
+        { "Tier": 5, "Id": 2684, "ItemId": 261842 },
+        { "Tier": 6, "Id": 2685, "ItemId": 261843 },
+        { "Tier": 7, "Id": 2686, "ItemId": 261844 },
+        { "Tier": 8, "Id": 2687, "ItemId": 261845 },
+        { "Tier": 9, "Id": 2688, "ItemId": 261846 },
+        { "Tier": 10, "Id": 2689, "ItemId": 261847 }
+      ]
+    },
+    {
+      "Name": "Underground Doctor",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2270, "ItemId": 261166 },
+        { "Tier": 2, "Id": 2271, "ItemId": 261167 },
+        { "Tier": 3, "Id": 2272, "ItemId": 261168 },
+        { "Tier": 4, "Id": 2273, "ItemId": 261169 },
+        { "Tier": 5, "Id": 2274, "ItemId": 261170 },
+        { "Tier": 6, "Id": 2275, "ItemId": 261171 },
+        { "Tier": 7, "Id": 2276, "ItemId": 261172 },
+        { "Tier": 8, "Id": 2277, "ItemId": 261173 },
+        { "Tier": 9, "Id": 2278, "ItemId": 261174 },
+        { "Tier": 10, "Id": 2279, "ItemId": 261175 }
+      ]
+    },
+    {
+      "Name": "Virtue",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2560, "ItemId": 261475 },
+        { "Tier": 2, "Id": 2561, "ItemId": 261476 },
+        { "Tier": 3, "Id": 2562, "ItemId": 261477 },
+        { "Tier": 4, "Id": 2563, "ItemId": 261478 },
+        { "Tier": 5, "Id": 2564, "ItemId": 261479 },
+        { "Tier": 6, "Id": 2565, "ItemId": 261480 },
+        { "Tier": 7, "Id": 2566, "ItemId": 261481 },
+        { "Tier": 8, "Id": 2567, "ItemId": 261482 },
+        { "Tier": 9, "Id": 2568, "ItemId": 261483 },
+        { "Tier": 10, "Id": 2569, "ItemId": 261484 }
+      ]
+    },
+    {
+      "Name": "Wilderness Lore",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2040, "ItemId": 260905 },
+        { "Tier": 2, "Id": 2041, "ItemId": 260906 },
+        { "Tier": 3, "Id": 2042, "ItemId": 260907 },
+        { "Tier": 4, "Id": 2043, "ItemId": 260908 },
+        { "Tier": 5, "Id": 2044, "ItemId": 260909 },
+        { "Tier": 6, "Id": 2045, "ItemId": 260910 },
+        { "Tier": 7, "Id": 2046, "ItemId": 260911 },
+        { "Tier": 8, "Id": 2047, "ItemId": 260912 },
+        { "Tier": 9, "Id": 2048, "ItemId": 260913 },
+        { "Tier": 10, "Id": 2049, "ItemId": 260914 }
+      ]
+    },
+    {
+      "Name": "Wilderness Survival",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2060, "ItemId": 260925 },
+        { "Tier": 2, "Id": 2061, "ItemId": 260926 },
+        { "Tier": 3, "Id": 2062, "ItemId": 260927 },
+        { "Tier": 4, "Id": 2063, "ItemId": 260928 },
+        { "Tier": 5, "Id": 2064, "ItemId": 260929 },
+        { "Tier": 6, "Id": 2065, "ItemId": 260930 },
+        { "Tier": 7, "Id": 2066, "ItemId": 260931 },
+        { "Tier": 8, "Id": 2067, "ItemId": 260932 },
+        { "Tier": 9, "Id": 2068, "ItemId": 260933 },
+        { "Tier": 10, "Id": 2069, "ItemId": 260934 }
+      ]
+    },
+    {
+      "Name": "Wisdom",
+      "Category": "Research",
+      "Flags": 64,
+      "Perks": [
+        { "Tier": 1, "Id": 2530, "ItemId": 261445 },
+        { "Tier": 2, "Id": 2531, "ItemId": 261446 },
+        { "Tier": 3, "Id": 2532, "ItemId": 261447 },
+        { "Tier": 4, "Id": 2533, "ItemId": 261448 },
+        { "Tier": 5, "Id": 2534, "ItemId": 261449 },
+        { "Tier": 6, "Id": 2535, "ItemId": 261450 },
+        { "Tier": 7, "Id": 2536, "ItemId": 261451 },
+        { "Tier": 8, "Id": 2537, "ItemId": 261452 },
+        { "Tier": 9, "Id": 2538, "ItemId": 261453 },
+        { "Tier": 10, "Id": 2539, "ItemId": 261454 }
+      ]
+    },
+    {
+      "Name": "(item 2898004 missing)",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 10001, "ItemId": 2898004 }
+      ]
+    },
+    {
+      "Name": "Adumbrated",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5002, "ItemId": 215392 }
+      ]
+    },
+    {
+      "Name": "Ambigous",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5033, "ItemId": 230908 }
+      ]
+    },
+    {
+      "Name": "Balanced",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5028, "ItemId": 230903 }
+      ]
+    },
+    {
+      "Name": "Benighted",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5004, "ItemId": 215393 }
+      ]
+    },
+    {
+      "Name": "Black",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5009, "ItemId": 215394 }
+      ]
+    },
+    {
+      "Name": "Blazing",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5018, "ItemId": 215395 }
+      ]
+    },
+    {
+      "Name": "Bright",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5020, "ItemId": 215396 }
+      ]
+    },
+    {
+      "Name": "Casual",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5029, "ItemId": 230904 }
+      ]
+    },
+    {
+      "Name": "Cloudless",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5013, "ItemId": 215397 }
+      ]
+    },
+    {
+      "Name": "Dark",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5008, "ItemId": 215398 }
+      ]
+    },
+    {
+      "Name": "Darkened",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5003, "ItemId": 215399 }
+      ]
+    },
+    {
+      "Name": "Doubtful",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5025, "ItemId": 230900 }
+      ]
+    },
+    {
+      "Name": "Dubious",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5026, "ItemId": 230901 }
+      ]
+    },
+    {
+      "Name": "Dusky",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5010, "ItemId": 215400 }
+      ]
+    },
+    {
+      "Name": "Gloomy",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5011, "ItemId": 215401 }
+      ]
+    },
+    {
+      "Name": "Indeterminated",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5032, "ItemId": 230907 }
+      ]
+    },
+    {
+      "Name": "Loustrous",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5014, "ItemId": 215402 }
+      ]
+    },
+    {
+      "Name": "Luminous",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5022, "ItemId": 215403 }
+      ]
+    },
+    {
+      "Name": "Metoric",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5024, "ItemId": 215404 }
+      ]
+    },
+    {
+      "Name": "Murky",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5007, "ItemId": 215405 }
+      ]
+    },
+    {
+      "Name": "Noctivagant",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5005, "ItemId": 215406 }
+      ]
+    },
+    {
+      "Name": "Noctivagous",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5006, "ItemId": 215407 }
+      ]
+    },
+    {
+      "Name": "Nocturnal",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5012, "ItemId": 215408 }
+      ]
+    },
+    {
+      "Name": "Radient",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5016, "ItemId": 215409 }
+      ]
+    },
+    {
+      "Name": "Scintillant",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5021, "ItemId": 215410 }
+      ]
+    },
+    {
+      "Name": "Shady",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5001, "ItemId": 215374 }
+      ]
+    },
+    {
+      "Name": "Shiny",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5015, "ItemId": 215411 }
+      ]
+    },
+    {
+      "Name": "Splendent",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5023, "ItemId": 215412 }
+      ]
+    },
+    {
+      "Name": "Splendid",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5017, "ItemId": 215413 }
+      ]
+    },
+    {
+      "Name": "Uncertain",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5030, "ItemId": 230905 }
+      ]
+    },
+    {
+      "Name": "Undecided",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5036, "ItemId": 230911 }
+      ]
+    },
+    {
+      "Name": "Undefinable",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5027, "ItemId": 230902 }
+      ]
+    },
+    {
+      "Name": "Undetermined",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5035, "ItemId": 230910 }
+      ]
+    },
+    {
+      "Name": "Unsettled",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5034, "ItemId": 230909 }
+      ]
+    },
+    {
+      "Name": "Vague",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5031, "ItemId": 230906 }
+      ]
+    },
+    {
+      "Name": "Vivid",
+      "Category": "Special",
+      "Flags": 1,
+      "Perks": [
+        { "Tier": 1, "Id": 5019, "ItemId": 246221 }
+      ]
+    }
+  ],
+  "Notes": [
+    "Generated from the client resource database perk records (type 1000036; Gamecode.dll loads them by GetIdentityVec(0xF4264)): 36 bytes = type, Id, version, ItemId, PreviousId, Flags, ProfessionMask, Field14, Field18. A line is the PreviousId chain from a record with PreviousId 0; Tier is the position in that chain. Where a perk is the PreviousId of several perks (global research branches), each branch is its own line. Name is the perk item's items.dat name.",
+    "Flags (Gamecode.dll N3Msg_Is*): 0x01 special perk, 0x02 alien (AI) perk, 0x40/0x80 research (0x80 Field18 is multiplied by 1000), 0x100 usable only in the owner's land control area. 0x04/0x08/0x10/0x20 appear only with 0x02 and are not decoded. Line Flags are tier 1's; a tier lists its own only where they differ."
+  ]
+}

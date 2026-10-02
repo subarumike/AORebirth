@@ -21,7 +21,6 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.Missions;
-    using ZoneEngine_New.Core.Dialogue;
     using ZoneEngine_New.Core.WorldSimulation;
     using ZoneEngine.Core.Missions;
     using AORebirth.Interfaces.Persistence.Missions;
@@ -69,13 +68,14 @@ namespace ZoneEngine_New.Core.Playfield
             IPlayfieldMetricsRegistry metricsRegistry,
             TeamService teams,
             AuthoredQuestService authoredQuests,
-            DialogueService dialogues,
             IItemTemplateCatalog itemTemplates,
             IShopDao shopDao,
             Quests.QuestService? quests = null,
-            ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService? questDungeons = null)
+            ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService? questDungeons = null,
+            ZoneEngine_New.Core.Knubot.KnubotService? knubot = null)
         {
             QuestDungeons = questDungeons;
+            Knubot = knubot;
             ArgumentNullException.ThrowIfNull(logger);
             ArgumentNullException.ThrowIfNull(router);
             ArgumentNullException.ThrowIfNull(playerHydrator);
@@ -107,14 +107,16 @@ namespace ZoneEngine_New.Core.Playfield
             _shopDao = shopDao;
             Teams = teams ?? throw new ArgumentNullException(nameof(teams));
             AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
-            Dialogues = dialogues ?? throw new ArgumentNullException(nameof(dialogues));
             ItemTemplates = itemTemplates ?? throw new ArgumentNullException(nameof(itemTemplates));
             Quests = quests;
         }
 
         public TeamService Teams { get; }
         public AuthoredQuestService AuthoredQuests { get; }
-        public DialogueService Dialogues { get; }
+
+        /// <summary>Knubot NPC conversations, ticked on every playfield owner.</summary>
+        public ZoneEngine_New.Core.Knubot.KnubotService? Knubot { get; }
+
         public IItemTemplateCatalog ItemTemplates { get; }
 
         /// <summary>Root quest service, forwarded into every playfield container.</summary>

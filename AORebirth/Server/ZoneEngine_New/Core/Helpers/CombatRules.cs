@@ -40,6 +40,10 @@ namespace ZoneEngine_New.Core.Helpers
             if (IsInRestrictedGas(target))
                 return false;
 
+            // A NoCombat NPC does not attack, and neither does anyone whose fighting a buff restricts.
+            if (attacker is NpcCharacter { Attackable: false } || attacker.CombatRestricted)
+                return false;
+
             // A pet and its owner (and the owner's other pets) are one side.
             Character attackerSide = attacker is NpcCharacter { PetOwner: Character attackerOwner } ? attackerOwner : attacker;
             Character targetSide = target is NpcCharacter { PetOwner: Character targetOwner } ? targetOwner : target;
@@ -67,6 +71,14 @@ namespace ZoneEngine_New.Core.Helpers
         }
 
         static bool CanAttackNonPlayer(Character target) => target is not NpcCharacter npc || npc.Attackable;
+
+        /// <summary>
+        /// A blue-named NPC (Flags stat bit <see cref="SmokeLounge.AOtomation.Messaging.GameData.CharacterFlags.HasBlueName"/>):
+        /// the friendly, non-combat NPCs (receptionists, recruiters, vendors, quest givers). They are not attackable.
+        /// </summary>
+        public static bool IsBlueNameNpc(int flags)
+            => !Entities.StatCollection.IsUnset(flags)
+               && (flags & (int)SmokeLounge.AOtomation.Messaging.GameData.CharacterFlags.HasBlueName) != 0;
 
         /// <summary>
         /// True when the only reason <see cref="CanAttack"/> fails is that the target player is not PvP-flagged.

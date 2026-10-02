@@ -28,6 +28,24 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"A too high level player in your team prevents you from receiving any experience." (category 110).</summary>
         public const int TeammateTooHighForXp = 121950320;
 
+        /// <summary>"You are already running this action!" (category 110). Live perk spam capture 2026-10-02T03:54:58Z.</summary>
+        public const int AlreadyRunningAction = 171187118;
+
+        /// <summary>
+        /// Plain text passthrough: one string argument shown as is. Live sends item SystemText (53044, "You
+        /// successfully perform an Impale attack.") as FormatFeedback 110/707 (capture 2026-10-02T03:54:58Z).
+        /// </summary>
+        public const int PlainText = 707;
+
+        /// <summary>"Target %s your %s!" (category 110). A perk that fails to land: live capture 2026-10-02T13:02:33Z.</summary>
+        public const int TargetVerbYourAction = 79653355;
+
+        /// <summary>"evaded" (category 110), the verb live puts in <see cref="TargetVerbYourAction"/>.</summary>
+        public const int Evaded = 114064052;
+
+        /// <summary>A text argument the client looks up itself: 'R' + base-85 category + base-85 message id.</summary>
+        public readonly record struct TextReference(int Category, int MessageId);
+
         public static void Send(Character character, string key)
             => Send(character, unchecked((int)ElfHash(key)));
 
@@ -41,8 +59,8 @@ namespace ZoneEngine_New.Core.Helpers
 
         /// <summary>
         /// Category 110 feedback text the client formats itself. Retail quest kill progress (capture 2026-09-27):
-        /// Unknown1 0, then "~&" + base-85 category + base-85 message id, then each argument as 'i' + base-85 int or
-        /// 's' + (length + 1) + text.
+        /// Unknown1 0, then "~&" + base-85 category + base-85 message id, then each argument as 'i' + base-85 int,
+        /// 'R' + base-85 category + base-85 id for a <see cref="TextReference"/>, or 's' + (length + 1) + text.
         /// </summary>
         public static void SendFormatted(Character character, int messageId, params object[] args)
         {
@@ -54,6 +72,8 @@ namespace ZoneEngine_New.Core.Helpers
             {
                 if (arg is int number)
                     text.Append('i').Append(Base85(number));
+                else if (arg is TextReference reference)
+                    text.Append('R').Append(Base85(reference.Category)).Append(Base85(reference.MessageId));
                 else
                 {
                     string value = arg?.ToString() ?? string.Empty;
