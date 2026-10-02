@@ -6,6 +6,7 @@ namespace ZoneEngine_New.Core.Pets
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -16,15 +17,26 @@ namespace ZoneEngine_New.Core.Pets
     /// </summary>
     public sealed class PetController
     {
-        public PetController(Character owner, int type, string hash, int level, DateTime? expiresUtc)
+        public PetController(Character owner, int type, string hash, int level, DateTime? expiresUtc,
+            IReadOnlyList<ItemRequirement>? summonRequirements = null)
         {
             Owner = owner ?? throw new ArgumentNullException(nameof(owner));
             Type = type;
             Hash = hash ?? throw new ArgumentNullException(nameof(hash));
             Level = level;
             ExpiresUtc = expiresUtc;
+            SummonRequirements = summonRequirements ?? [];
             Mode = owner is Player ? PetMode.Guard : PetMode.Assist;
         }
+
+        /// <summary>ToUse rows of the nano or item that summoned the pet: its owner must keep within 80% of them.</summary>
+        public IReadOnlyList<ItemRequirement> SummonRequirements { get; }
+
+        /// <summary>
+        /// The owner's skills fell under 80% of <see cref="SummonRequirements"/>: the pet follows and ignores every
+        /// command until they recover.
+        /// </summary>
+        public bool IsOverEquipped { get; internal set; }
 
         public Character Owner { get; }
 
@@ -108,7 +120,8 @@ namespace ZoneEngine_New.Core.Pets
     }
 
     /// <summary>A pet carried through a zone change: it is despawned on the way out and summoned again on arrival.</summary>
-    public sealed record PetStash(string Hash, int Type, int Level, DateTime? ExpiresUtc, PetMode Mode, int HealthPercent);
+    public sealed record PetStash(string Hash, int Type, int Level, DateTime? ExpiresUtc, PetMode Mode, int HealthPercent,
+        IReadOnlyList<ItemRequirement> SummonRequirements);
 
     /// <summary>The pets a character owns, one per pet slot, in summon order (which is also their formation order).</summary>
     public sealed class OwnedPets

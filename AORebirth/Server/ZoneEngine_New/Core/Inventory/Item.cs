@@ -75,6 +75,12 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         public bool Locked { get; set; }
 
+        /// <summary>
+        /// Over-equipped level 0-4 (25% penalty per level) while worn, set by the wearer's rebase
+        /// (<see cref="OverEquip"/>). Runtime only.
+        /// </summary>
+        public int OverEquipLevel { get; internal set; }
+
         public ItemTemplate Definition { get; init; } = null!;
 
         public string Name => Definition.Name;

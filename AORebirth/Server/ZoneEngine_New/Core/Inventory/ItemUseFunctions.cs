@@ -41,7 +41,8 @@ namespace ZoneEngine_New.Core.Inventory
             IItemBuilder items,
             SpellCriteria? criteria = null,
             bool isTick = false,
-            int templateDamageType = 0)
+            int templateDamageType = 0,
+            ItemTemplate? sourceTemplate = null)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
@@ -101,7 +102,7 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.SpawnMonster2:
                     return SpawnMonster2(target, spell);
                 case FunctionType.SummonPet:
-                    return SummonPet(target, spell);
+                    return SummonPet(target, spell, sourceTemplate);
                 case FunctionType.DestroyItem:
                     return DestroySubject(target, criteria);
                 case FunctionType.ToggleFlag:
@@ -413,6 +414,10 @@ namespace ZoneEngine_New.Core.Inventory
                     Parameter1 = statId,
                     Parameter2 = seconds
                 });
+
+                // SpecialAvailable (0xA4, Parameter2 = stat) when the lock runs out: live 15 s Treatment lock,
+                // capture 2026-10-02T16:41:09Z -> 16:41:24Z.
+                player.ScheduleSpecialAvailable(statId, DateTime.UtcNow.AddSeconds(seconds));
             }
 
             return true;
@@ -971,7 +976,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// SummonPet (mob hash, level, duration seconds; -1 or 0: until dismissed): the character the function runs
         /// on gets the pet (the summoner: shell items and pet nanos target Self).
         /// </summary>
-        static bool SummonPet(Character target, ItemSpell spell)
+        static bool SummonPet(Character target, ItemSpell spell, ItemTemplate? sourceTemplate)
         {
             if (target.Playfield == null || target.IsDead)
                 return false;
@@ -982,7 +987,11 @@ namespace ZoneEngine_New.Core.Inventory
             if (!spell.TryReadInt(2, out int duration))
                 duration = -1;
 
-            return target.Playfield.GetRequiredService<Pets.PetService>().Summon(target, hash, level, duration) != null;
+            // The summoning nano's / item's ToUse rows decide later whether the pet is over-equipped.
+            IReadOnlyList<ItemRequirement> summonRequirements =
+                sourceTemplate?.Actions.Find(action => action.ActionType == (int)ActionType.ToUse)?.Requirements ?? [];
+            return target.Playfield.GetRequiredService<Pets.PetService>()
+                .Summon(target, hash, level, duration, summonRequirements) != null;
         }
 
         static bool SpawnMonster2(Character target, ItemSpell spell)

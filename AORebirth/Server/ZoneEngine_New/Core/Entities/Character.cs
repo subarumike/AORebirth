@@ -2978,9 +2978,11 @@ namespace ZoneEngine_New.Core.Entities
             int runSpeedBase = Stats.GetOrZero(CharacterStat.RunSpeed, StatDetail.Base);
             int npcFamily = Stats.Get(CharacterStat.NPCFamily);
             int losHeight = Stats.GetOrZero((CharacterStat)466);
-            bool isNpc = !IsPlayer
-                && !StatCollection.IsUnset(npcFamily)
-                && npcFamily != 0;
+            // Every non-player gets the NPC character info. NPCFamily 0 is a real family (Newland Militia Guard and
+            // 78 other templates); sending those as a PC made the client never show them.
+            bool isNpc = !IsPlayer;
+            if (StatCollection.IsUnset(npcFamily))
+                npcFamily = 0;
 
             // Unset VisualFlags truncates to 722 on the wire; live NPC SCFUs use 31.
             short wireVisualFlags = StatCollection.IsUnset(visualFlags)

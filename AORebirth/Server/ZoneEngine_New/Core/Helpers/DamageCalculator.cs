@@ -97,6 +97,15 @@ namespace ZoneEngine_New.Core.Helpers
                 attackDefendSource = null;
             }
 
+            // An over-equipped hand weapon hits for less: MinDamage, MaxDamage and DamageBonus lose 25% per level
+            // (Gamecode.dll FUN_1009b337; level 4 = no damage).
+            if (weapon != null && attackDefendSource != null && weapon.OverEquipLevel > 0)
+            {
+                weaponMin = Inventory.OverEquip.ScaleDamage(weaponMin, weapon.OverEquipLevel);
+                weaponMax = Math.Max(weaponMin, Inventory.OverEquip.ScaleDamage(weaponMax, weapon.OverEquipLevel));
+                weaponCritBonus = Inventory.OverEquip.ScaleDamage(weaponCritBonus, weapon.OverEquipLevel);
+            }
+
             // Existing accepted NPC contracts may own numeric damage while the real
             // equipped template continues to own its attack/defense skill definition.
             weaponMin = minDamageOverride ?? weaponMin;

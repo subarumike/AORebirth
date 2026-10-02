@@ -818,6 +818,45 @@ namespace ZoneEngine_New.Core.Inventory
             WearBonusApplier.ApplyContainer(Social, includeWield: false, stats);
         }
 
+        /// <summary>Clears every worn item's over-equipped level (before the unpenalised bonus pass).</summary>
+        public void ResetOverEquip()
+        {
+            foreach (Container page in WornPages())
+                foreach (Item item in page.Content.Values)
+                    item.OverEquipLevel = 0;
+        }
+
+        /// <summary>
+        /// Sets each worn item's over-equipped level from <paramref name="stats"/> (the full, unpenalised
+        /// values). True when any item is over-equipped.
+        /// </summary>
+        public bool ApplyOverEquip(StatCollection stats)
+        {
+            ArgumentNullException.ThrowIfNull(stats);
+            bool any = false;
+            foreach (Container page in WornPages())
+            {
+                foreach (KeyValuePair<int, Item> slot in page.Content)
+                {
+                    slot.Value.OverEquipLevel = OverEquip.ComputeLevel(slot.Value, page.Identity.Type, slot.Key, stats);
+                    any |= slot.Value.OverEquipLevel > 0;
+                }
+            }
+
+            return any;
+        }
+
+        IEnumerable<Container> WornPages()
+        {
+            if (!IsHydrated)
+                yield break;
+
+            yield return Equipment;
+            yield return Armor;
+            yield return Implant;
+            yield return Social;
+        }
+
         public IEnumerable<InventorySlot> BuildInventorySlots()
         {
             foreach (InventorySlot slot in BuildPageSlots(IdentityType.Inventory, Inventory))

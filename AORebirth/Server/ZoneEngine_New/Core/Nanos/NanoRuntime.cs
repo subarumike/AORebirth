@@ -561,7 +561,8 @@ namespace ZoneEngine_New.Core.Nanos
                 IsUploaded = !caster.IsPlayer || caster.UploadedNanoIds.Contains(spell.Id),
                 RequirementsMet = spell.MeetsActionRequirements(
                     stat => caster.Stats.Get(stat),
-                    ActionType.ToUse),
+                    ActionType.ToUse,
+                    getTargetStat: recipient == null ? null : stat => recipient.Stats.Get(stat)),
                 TargetExists = recipient != null,
                 TargetIsDead = recipient?.IsDead == true,
                 CurrentNano = caster.Stats.GetOrZero(CharacterStat.CurrentNano),

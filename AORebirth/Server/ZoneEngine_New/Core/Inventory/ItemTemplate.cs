@@ -163,8 +163,12 @@ namespace ZoneEngine_New.Core.Inventory
         /// Optional character context for leaves a stat value cannot answer (HasPerk, IsPerkLocked,
         /// HasNotRunningNano): returns the leaf's result, or null to compare the stat as usual.
         /// </param>
+        /// <param name="getTargetStat">
+        /// The action's target, for checks an OnTarget marker aims at it (Fists of Stellar Harmony: the target must
+        /// also be a Martial Artist). Null reads those checks from <paramref name="getStat"/>.
+        /// </param>
         public bool MeetsActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType,
-            Func<ItemRequirement, bool?>? resolve = null)
+            Func<ItemRequirement, bool?>? resolve = null, Func<CharacterStat, int>? getTargetStat = null)
         {
             ArgumentNullException.ThrowIfNull(getStat);
 
@@ -178,7 +182,7 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
 
-            return action == null || MeetsRequirements(action.Requirements, getStat, resolve);
+            return action == null || MeetsRequirements(action.Requirements, getStat, resolve, getTargetStat);
         }
 
         /// <summary>
@@ -196,7 +200,8 @@ namespace ZoneEngine_New.Core.Inventory
             var unmet = new List<ItemRequirement>();
             foreach (ItemRequirement requirement in action.Requirements)
             {
-                if (!IsRequirementLinkOperator(requirement) && !EvaluateLeaf(requirement, getStat))
+                if (!IsRequirementLinkOperator(requirement) && !IsSubjectSelector(requirement)
+                    && !EvaluateLeaf(requirement, getStat))
                     unmet.Add(requirement);
             }
 
@@ -215,7 +220,8 @@ namespace ZoneEngine_New.Core.Inventory
         public static bool MeetsRequirements(
             IReadOnlyList<ItemRequirement> requirements,
             Func<CharacterStat, int> getStat,
-            Func<ItemRequirement, bool?>? resolve = null)
+            Func<ItemRequirement, bool?>? resolve = null,
+            Func<CharacterStat, int>? getTargetStat = null)
         {
             ArgumentNullException.ThrowIfNull(requirements);
             ArgumentNullException.ThrowIfNull(getStat);
@@ -224,11 +230,12 @@ namespace ZoneEngine_New.Core.Inventory
             if (count == 0)
                 return true;
 
-            if (TryEvaluatePostfix(requirements, getStat, resolve, out bool expression))
+            if (TryEvaluatePostfix(requirements, getStat, resolve, getTargetStat, out bool expression))
                 return expression;
 
             bool result = true;
             bool hasReal = false;
+            Func<CharacterStat, int>? subject = null;
             for (int i = 0; i < count; i++)
             {
                 ItemRequirement requirement = requirements[i];
@@ -240,7 +247,14 @@ namespace ZoneEngine_New.Core.Inventory
                     continue;
                 }
 
-                bool pass = EvaluateLeaf(requirement, getStat, resolve);
+                if (IsSubjectSelector(requirement))
+                {
+                    subject = SelectSubject(requirement, getStat, getTargetStat);
+                    continue;
+                }
+
+                bool pass = EvaluateLeaf(requirement, subject ?? getStat, resolve);
+                subject = null;
 
                 if (!hasReal)
                 {
@@ -261,7 +275,8 @@ namespace ZoneEngine_New.Core.Inventory
         // AODB exports Criteria as postfix leaves and link operators. Older data can instead
         // carry ChildOperator on leaves; retain that representation's existing fold above.
         static bool TryEvaluatePostfix(IReadOnlyList<ItemRequirement> requirements,
-            Func<CharacterStat, int> getStat, Func<ItemRequirement, bool?>? resolve, out bool result)
+            Func<CharacterStat, int> getStat, Func<ItemRequirement, bool?>? resolve,
+            Func<CharacterStat, int>? getTargetStat, out bool result)
         {
             result = false;
             bool hasLeaf = false;
@@ -270,7 +285,7 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 if (IsRequirementLinkOperator(requirement))
                     hasLink = true;
-                else
+                else if (!IsSubjectSelector(requirement))
                 {
                     if (requirement.ChildOperator != 0)
                         return false;
@@ -282,11 +297,19 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             var values = new Stack<bool>();
+            Func<CharacterStat, int>? subject = null;
             foreach (ItemRequirement requirement in requirements)
             {
+                if (IsSubjectSelector(requirement))
+                {
+                    subject = SelectSubject(requirement, getStat, getTargetStat);
+                    continue;
+                }
+
                 if (!IsRequirementLinkOperator(requirement))
                 {
-                    values.Push(EvaluateLeaf(requirement, getStat, resolve));
+                    values.Push(EvaluateLeaf(requirement, subject ?? getStat, resolve));
+                    subject = null;
                     continue;
                 }
 
@@ -308,6 +331,23 @@ namespace ZoneEngine_New.Core.Inventory
                 result = values.Pop();
             return true;
         }
+
+        /// <summary>
+        /// OnTarget / OnSelf / OnUser / OnCaster rows name whose stats the next check reads; they are not checks
+        /// themselves (Fists of Stellar Harmony ToUse: caster skills, caster VisualProfession 2, OnTarget,
+        /// VisualProfession 2).
+        /// </summary>
+        public static bool IsSubjectSelector(ItemRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+
+            return (Operator)requirement.Operator is Operator.OnTarget or Operator.OnSelf or Operator.OnUser
+                or Operator.OnCaster;
+        }
+
+        static Func<CharacterStat, int> SelectSubject(ItemRequirement selector, Func<CharacterStat, int> getStat,
+            Func<CharacterStat, int>? getTargetStat)
+            => (Operator)selector.Operator == Operator.OnTarget && getTargetStat != null ? getTargetStat : getStat;
 
         /// <summary>
         /// And/Or/Not rows are expression-tree link operators, not stat checks.
@@ -469,7 +509,8 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
 
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria,
-                templateDamageType: Stats.TryGetValue(CharacterStat.DamageType, out int damageType) ? damageType : 0);
+                templateDamageType: Stats.TryGetValue(CharacterStat.DamageType, out int damageType) ? damageType : 0,
+                sourceTemplate: this);
         }
 
         /// <summary>
@@ -485,12 +526,14 @@ namespace ZoneEngine_New.Core.Inventory
             if (resolve?.Invoke(requirement) is bool resolved)
                 return resolved;
 
+            // A stat the character does not hold reads as 0 (the Unset sentinel would fail "MonsterData EqualTo 0",
+            // the not-morphed check on Holiday Hologram Blast, and pass any GreaterThan).
             var stat = (CharacterStat)requirement.StatNumber;
-            if (EvaluateRequirement(getStat(stat), requirement))
+            if (EvaluateRequirement(StatCollection.Normalize(getStat(stat)), requirement))
                 return true;
 
             return stat == CharacterStat.VisualProfession
-                && EvaluateRequirement(getStat(CharacterStat.Profession), requirement);
+                && EvaluateRequirement(StatCollection.Normalize(getStat(CharacterStat.Profession)), requirement);
         }
 
         public static bool EvaluateRequirement(int statValue, ItemRequirement requirement)

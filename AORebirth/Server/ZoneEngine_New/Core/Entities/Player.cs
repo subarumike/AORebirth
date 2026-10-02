@@ -218,6 +218,7 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.IsPerkLocked => PerkLocks.IsLocked(id, DateTime.UtcNow),
                 Operator.IsPerkUnlocked => !PerkLocks.IsLocked(id, DateTime.UtcNow),
                 Operator.HasNotRunningNano => !Buffs.Any(buff => buff.Id == id),
+                Operator.IsPetOverEquipped => OwnedPets.All.Any(pet => pet.Pet?.IsOverEquipped == true),
                 _ => null
             };
         }
@@ -929,12 +930,14 @@ namespace ZoneEngine_New.Core.Entities
             // ability values, so equipment and buffs have to be in place before those are
             // recomputed. Worn appearance follows the bonus pass because its spells carry stat
             // requirements.
-            RebaseEquipBonuses();
-            RebasePerks();
-            ApplyBuffBonuses();
-            ApplyLevelIpBonus();
+            // Over-equipped items are judged on the full buffed skills with every item at full strength, then the
+            // bonus layers are rebuilt once with their penalties (one extra pass, only while something is OE).
+            if (Inventory.IsHydrated)
+                Inventory.ResetOverEquip();
+            ApplyBonusLayers();
+            if (Inventory.IsHydrated && Inventory.ApplyOverEquip(Stats))
+                ApplyBonusLayers();
             ActionRestrictionFlags = CombatRules.CollectActionRestrictions(Buffs, Stats);
-            SkillCatalog.ApplyTrickle(Stats);
             RebaseWearAppearance();
             RebaseMaxHealth();
             RebaseMaxNano();
@@ -956,6 +959,8 @@ namespace ZoneEngine_New.Core.Entities
                 AnnounceAppearanceIfChanged();
 
             SyncPetRunSpeeds();
+            if (OwnedPets.Count > 0)
+                Playfield?.GetService<Pets.PetService>()?.RefreshOverEquip(this);
         }
 
         /// <summary>
@@ -1059,6 +1064,16 @@ namespace ZoneEngine_New.Core.Entities
         const CharacterStat WeaponMeshLeftStat = (CharacterStat)1007;
         const CharacterStat OverrideTextureWeaponRightStat = (CharacterStat)1009;
         const CharacterStat OverrideTextureWeaponLeftStat = (CharacterStat)1010;
+
+        /// <summary>Every bonus layer from scratch: equipment (clears the layer first), perks, buffs, level IP, trickle.</summary>
+        void ApplyBonusLayers()
+        {
+            RebaseEquipBonuses();
+            RebasePerks();
+            ApplyBuffBonuses();
+            ApplyLevelIpBonus();
+            SkillCatalog.ApplyTrickle(Stats);
+        }
 
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
         {
