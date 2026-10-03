@@ -82,6 +82,8 @@ namespace ZoneEngine_New.Core.Inventory
                     return true;
                 case FunctionType.LockSkill:
                     return LockSkill(target, source, spell);
+                case FunctionType.TimedEffect:
+                    return TimedEffect(templateId, target, source, spell);
                 case FunctionType.LockPerk:
                     return LockPerk(target, source, spell);
                 case FunctionType.UploadNano:
@@ -384,6 +386,26 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
 
             target.Stats.Set(CharacterStat.CurrentNano, next, StatDetail.Base, dirty: true);
+            return true;
+        }
+
+        /// <summary>
+        /// TimedEffect [stat, amount, duration in centiseconds]: the stat gains the amount until the duration runs out
+        /// (Computer Literacy Tutoring Device 55686: [161, 50, 12000] = +50 Computer Literacy for 2 minutes). Not
+        /// saved: a logout ends it.
+        /// </summary>
+        static bool TimedEffect(int templateId, Character target, Character? source, ItemSpell spell)
+        {
+            if (!spell.TryReadInt(0, out int statId) || !spell.TryReadInt(1, out int amount)
+                || !spell.TryReadInt(2, out int durationCentiseconds) || durationCentiseconds <= 0 || amount == 0)
+                return false;
+
+            var stat = (CharacterStat)statId;
+            if (stat is CharacterStat.Health or CharacterStat.Cash)
+                return false;
+
+            ResolveApplyOn(target, source, spell).AddTimedEffect(
+                templateId, stat, amount, DateTime.UtcNow.AddMilliseconds(durationCentiseconds * 10.0));
             return true;
         }
 

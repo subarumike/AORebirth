@@ -147,6 +147,38 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Sends SpecialAvailable for <paramref name="statId"/> once <paramref name="atUtc"/> passes.</summary>
         public void ScheduleSpecialAvailable(int statId, DateTime atUtc) => _specialsAvailableAt[statId] = atUtc;
 
+        /// <summary>
+        /// TimedEffect (53014) stat bonuses, e.g. a tutoring device's +50 Computer Literacy for two minutes. Memory
+        /// only: they go with the character through zone changes and are gone after a logout.
+        /// </summary>
+        readonly List<TimedStatEffect> _timedEffects = new();
+
+        sealed record TimedStatEffect(int SourceId, CharacterStat Stat, int Amount, DateTime ExpiresUtc);
+
+        /// <summary>
+        /// Adds <paramref name="amount"/> to <paramref name="stat"/> until <paramref name="expiresUtc"/>. The same
+        /// source on the same stat replaces its earlier effect instead of stacking.
+        /// </summary>
+        public void AddTimedEffect(int sourceId, CharacterStat stat, int amount, DateTime expiresUtc)
+        {
+            _timedEffects.RemoveAll(effect => effect.SourceId == sourceId && effect.Stat == stat);
+            _timedEffects.Add(new TimedStatEffect(sourceId, stat, amount, expiresUtc));
+            MarkRebaseDirty();
+        }
+
+        /// <summary>Rebase bonus layer: every running TimedEffect.</summary>
+        protected void ApplyTimedEffectBonuses()
+        {
+            foreach (TimedStatEffect effect in _timedEffects)
+                Stats.AddBonus(effect.Stat, effect.Amount, dirty: true);
+        }
+
+        void TickTimedEffects(DateTime nowUtc)
+        {
+            if (_timedEffects.Count > 0 && _timedEffects.RemoveAll(effect => effect.ExpiresUtc <= nowUtc) > 0)
+                MarkRebaseDirty();
+        }
+
         void TickSpecialsAvailable(DateTime nowUtc)
         {
             if (_specialsAvailableAt.Count == 0)
@@ -1336,6 +1368,7 @@ namespace ZoneEngine_New.Core.Entities
                 TickPassiveRegen(deltaTime);
             NanoRuntime.Tick(this, DateTime.UtcNow);
             TickSpecialsAvailable(DateTime.UtcNow);
+            TickTimedEffects(DateTime.UtcNow);
             base.Tick(deltaTime);
         }
 

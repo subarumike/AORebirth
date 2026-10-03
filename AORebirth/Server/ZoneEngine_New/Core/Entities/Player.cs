@@ -1071,6 +1071,7 @@ namespace ZoneEngine_New.Core.Entities
             RebaseEquipBonuses();
             RebasePerks();
             ApplyBuffBonuses();
+            ApplyTimedEffectBonuses();
             ApplyLevelIpBonus();
             SkillCatalog.ApplyTrickle(Stats);
         }

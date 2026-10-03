@@ -131,6 +131,8 @@ namespace ZoneEngine_New.Core.Trade
                 machine.Stock.EnsureFresh(definition, _minter, Random.Shared);
             }
 
+            machine.Stock.EnsureSorted(slot => _catalog.TryGet(slot.LowId, out ItemTemplate template) ? template.Name : string.Empty);
+
             Identity bag = player.Playfield.GetRequiredService<DynelRegistry>().AllocateTempBagIdentity();
             var session = new TradeSession(bag, TradeKind.Shop, player, partner: null, machine);
             Register(player, session);
