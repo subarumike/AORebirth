@@ -1,9 +1,12 @@
 namespace ZoneEngine_New.Core.MessageHandlers
 {
     using System;
+    using System.Globalization;
 
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+
+    using Utility;
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Network;
@@ -35,6 +38,21 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 && (message.Identity.Type != player.Identity.Type
                     || message.Identity.Instance != player.Identity.Instance))
                 return;
+
+            if (message.Coordinates != null && LogUtil.HasDetail(DebugInfoDetail.Network))
+            {
+                LogUtil.Debug(
+                    DebugInfoDetail.Network,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "CharDCMove character={0} playfield={1} action={2} position=({3:R},{4:R},{5:R})",
+                        player.Identity.Instance,
+                        player.Playfield?.Identity.Instance,
+                        message.MoveType,
+                        message.Coordinates.X,
+                        message.Coordinates.Y,
+                        message.Coordinates.Z));
+            }
 
             if (!player.Motor.Consume(message))
                 return;

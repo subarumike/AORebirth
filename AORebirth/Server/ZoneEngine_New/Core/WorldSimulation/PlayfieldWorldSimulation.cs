@@ -12,6 +12,8 @@
     using N3Lite;
     using N3Lite.Surfaces;
 
+    using Utility;
+
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
@@ -322,6 +324,22 @@
             float z = (float)position.z;
             if (!_triggers.TrySample(fromX, fromZ, x, y, z, overlappingIds, out ZoneTriggerHit hit))
                 return false;
+
+            if (LogUtil.HasDetail(DebugInfoDetail.Network))
+            {
+                _logger.Debug(string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Zone trigger sampled kind={0} door={1:X8} from=({2:R},{3:R}) to=({4:R},{5:R},{6:R}) returnPf={7} returnDoor={8:X8}",
+                    hit.Volume.Kind,
+                    hit.Volume.DynelInstance,
+                    fromX,
+                    fromZ,
+                    x,
+                    y,
+                    z,
+                    returnTo.PlayfieldId,
+                    returnTo.DoorInstance));
+            }
 
             landing = position;
             if (hit.Volume.Kind == ZoneTriggerKind.WallBorder)
