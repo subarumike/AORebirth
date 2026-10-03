@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Trade
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -58,6 +59,7 @@ namespace ZoneEngine_New.Core.Trade
         public const int IdleRefreshMinutes = 10;
 
         readonly List<ShopStockSlot> _slots = new();
+        bool _sorted;
         ShopStockRange[]? _configuredRanges;
         int _openTrades;
         long _idleSinceMs = Environment.TickCount64;
@@ -82,6 +84,7 @@ namespace ZoneEngine_New.Core.Trade
                 copy.Add(slot);
             }
             _slots.Clear(); _slots.AddRange(copy);
+            _sorted = false;
             IsGenerated = true; IsConfiguredSnapshot = true; ConfigurationUnavailableReason = null;
         }
 
@@ -182,6 +185,28 @@ namespace ZoneEngine_New.Core.Trade
             _idleSinceMs = Environment.TickCount64;
         }
 
+        /// <summary>
+        /// Orders the stock by item name, then QL (then template ids): Item 1 QL5, Item 1 QL10, Item 2 QL5.
+        /// Once per generated list, and never while a shopper holds the window open: their picks are indices into
+        /// this list.
+        /// </summary>
+        internal void EnsureSorted(Func<ShopStockSlot, string> nameOf)
+        {
+            ArgumentNullException.ThrowIfNull(nameOf);
+            if (_sorted || _openTrades != 0)
+                return;
+
+            List<ShopStockSlot> ordered = _slots
+                .OrderBy(slot => nameOf(slot) ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(slot => slot.Quality)
+                .ThenBy(slot => slot.LowId)
+                .ThenBy(slot => slot.HighId)
+                .ToList();
+            _slots.Clear();
+            _slots.AddRange(ordered);
+            _sorted = true;
+        }
+
         public bool TryGetSlot(int index, out ShopStockSlot slot)
         {
             if (index < 0 || index >= _slots.Count)
@@ -219,6 +244,7 @@ namespace ZoneEngine_New.Core.Trade
         void Generate(VendingMachineDefinition definition, HashItemMinter minter, Random random)
         {
             _slots.Clear();
+            _sorted = false;
             List<HashInstance> leaves = new();
 
             foreach (VendingMachineStockEntry entry in definition.UsableEntries())
@@ -266,6 +292,7 @@ namespace ZoneEngine_New.Core.Trade
             ShopStockRange[] ranges = _configuredRanges
                 ?? throw new InvalidOperationException("Configured shop ranges are unavailable.");
             _slots.Clear();
+            _sorted = false;
             foreach (ShopStockRange range in ranges)
             {
                 int quality = random.Next(range.MinimumQuality, range.MaximumQuality + 1);
