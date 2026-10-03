@@ -196,13 +196,27 @@ Build:
 cmd /d /c tools\build_aorebirth_debug.cmd
 ```
 
-Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse. The `cmd.exe` build wrapper resolves `MSBuild.exe` from the latest installed Visual Studio through `vswhere.exe`, preserves unrelated processes, verifies required packages under `AORebirth\packages`, and restores packages explicitly before build only when required package folders are missing. It builds the shared libraries, `LoginEngine`, `DatabasePreflight`, and `WebEngine` using:
+The normal build wrapper delegates to `NewZoneEngineBuild\build.cmd`, which
+builds the existing .NET 10 ChatEngine/LoginEngine project graph and
+`ZoneEngine_New`. It resolves Visual Studio MSBuild through `vswhere.exe`,
+restores SDK package references and enforces `ACTIVE_CHECKOUT_WINS` before
+building. It also builds the read-only .NET Framework DatabasePreflight into
+`AORebirth/Built/Debug/DatabasePreflight` with isolated referenced assemblies;
+optional WebEngine is outside this normal core-engine build.
+The retained mixed-framework auxiliary implementation below
+the forwarding wrapper is historical and does not run.
+
+Do not use raw AORebirth MSBuild validation with `/m` or MSBuild node reuse.
+The current wrapper builds with:
 
 ```cmd
 MSBuild.exe <project> /t:Build /p:Configuration=Debug /m:1 /nr:false /v:minimal
 ```
 
-Legacy build-time NuGet restore through `.nuget\NuGet.targets` has been removed from project files. If required package folders are missing, the wrapper runs explicit solution restore before build with visible progress and timeout handling:
+Build-time NuGet restore through `.nuget\NuGet.targets` was removed from project
+files. The database preflight's .NET Framework references still require the
+existing packages.config folders. When those are missing, the wrapper restores
+them explicitly through the solution before building the isolated preflight:
 
 ```cmd
 MSBuild.exe AORebirth\AORebirth.sln /t:Restore /p:RestorePackagesConfig=true /m:1 /nr:false /v:minimal

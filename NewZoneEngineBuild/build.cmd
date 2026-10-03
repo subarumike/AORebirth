@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
-rem Build ChatEngine, LoginEngine and ZoneEngine_New with the existing net10.0 projects.
+rem Build the current .NET 10 ChatEngine, LoginEngine and ZoneEngine_New projects.
 rem Repo root is the parent of this folder. Run from anywhere.
 
 set "REPO=%~dp0.."
@@ -11,6 +11,8 @@ set "CONFIG=Debug"
 set "CHAT_PROJ=WindowsBuildNet10\Projects\ChatEngine.WinNet10.csproj"
 set "LOGIN_PROJ=WindowsBuildNet10\Projects\LoginEngine.WinNet10.csproj"
 set "ZONE_PROJ=AORebirth\Server\ZoneEngine_New\ZoneEngine_New.csproj"
+set "PREFLIGHT_PROJ=Tools\DatabasePreflight\DatabasePreflight.csproj"
+set "PREFLIGHT_DIR=%REPO%\AORebirth\Built\Debug\DatabasePreflight"
 set "SLN=AORebirth\AORebirth.sln"
 set "CHAT_EXE=AORebirth\Built\Debug\ChatEngine.exe"
 set "LOGIN_EXE=AORebirth\Built\Debug\LoginEngine.exe"
@@ -50,15 +52,11 @@ echo.
 echo [2/4] Restoring NuGet packages...
 call :RestorePackagesConfig
 if errorlevel 1 exit /b 1
-
-echo [NewZoneEngineBuild] Restoring ChatEngine PackageReferences (net10.0)...
 "%MSBUILD%" "%CHAT_PROJ%" /t:Restore /m:1 /nr:false /v:minimal
 if errorlevel 1 (
     echo [NewZoneEngineBuild] ChatEngine restore failed.
     exit /b 1
 )
-
-echo [NewZoneEngineBuild] Restoring LoginEngine PackageReferences (net10.0)...
 "%MSBUILD%" "%LOGIN_PROJ%" /t:Restore /m:1 /nr:false /v:minimal
 if errorlevel 1 (
     echo [NewZoneEngineBuild] LoginEngine restore failed.
@@ -81,6 +79,16 @@ if errorlevel 1 (
 
 echo.
 echo [3/4] Building ChatEngine, LoginEngine, ZoneEngine_New (%CONFIG%)...
+echo [NewZoneEngineBuild] Building the database preflight with isolated framework dependencies...
+"%MSBUILD%" "%PREFLIGHT_PROJ%" /t:Build /p:Configuration=%CONFIG% /p:OutDir="%PREFLIGHT_DIR%/" /m:1 /nr:false /v:minimal
+if errorlevel 1 (
+    echo [NewZoneEngineBuild] DatabasePreflight build failed.
+    exit /b 1
+)
+if not exist "%PREFLIGHT_DIR%\DatabasePreflight.exe" (
+    echo [NewZoneEngineBuild] Missing isolated DatabasePreflight.exe.
+    exit /b 1
+)
 "%MSBUILD%" "%CHAT_PROJ%" /t:Build /p:Configuration=%CONFIG% /m:1 /nr:false /v:minimal
 if errorlevel 1 (
     echo [NewZoneEngineBuild] ChatEngine build failed.

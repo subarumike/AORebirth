@@ -1,4 +1,9 @@
 @echo off
+rem Current governed engines use the public-master .NET 10 project graph.
+call "%~dp0..\NewZoneEngineBuild\build.cmd" %*
+exit /b %errorlevel%
+
+rem Retired mixed-framework auxiliary workflow retained below as history only.
 call "%~dp0select_python_runtime.cmd"
 if errorlevel 1 exit /b 1
 if not "%AO_REBIRTH_GENERATED_COMBAT_LEASE_DELEGATION%"=="" (

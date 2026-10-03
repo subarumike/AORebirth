@@ -1,6 +1,16 @@
 # AORebirth Project State
 
-Updated: 2026-09-22
+Updated: 2026-10-02
+
+The normal Windows build now uses the existing .NET 10 ChatEngine/LoginEngine
+projects and ZoneEngine_New through NewZoneEngineBuild/build.cmd. The read-only
+.NET Framework DatabasePreflight has an isolated output directory so its
+referenced assemblies do not overwrite core-engine dependencies.
+
+Movement and zone-trigger diagnostics are gated by the existing Network debug
+category. They record incoming coordinates and sampled crossings without
+changing movement or zoning behavior. The intermittent exit-zoning cause and
+live client acceptance remain unresolved.
 
 Linux source governance now requires literal equality between public GitHub
 master, linux-private/master, Linux build HEAD and live Login/Zone source SHAs.
