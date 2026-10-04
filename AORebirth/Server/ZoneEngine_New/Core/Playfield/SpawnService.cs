@@ -782,6 +782,9 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage());
             StealSessionIfNeeded(player, session);
             player.EnterOnline(session);
+            // The reconnecting client starts with no keys held: whatever the old connection was doing (a crash never
+            // sends its key releases) must not come back in the spawn's movement status.
+            player.StopInPlace();
 
             session.State = SessionState.SpawnReady;
 

@@ -58,16 +58,16 @@ namespace ZoneEngine_New.Core.Entities
         public int WireSlot { get; set; } = -1;
 
         /// <summary>
-        /// NPC visual right-hand weapon. When set it supplies the damage roll, damage type and
-        /// melee/ranged style, while <see cref="Item"/> keeps timing and OnHit procs.
+        /// NPC visual right-hand weapon: only how the swing is shown (the right-hand AttackInfo slot instead of the
+        /// monster weapon's SAW tag). Damage, timing and procs stay with the monster weapon <see cref="Item"/>.
         /// </summary>
-        public Item? DamageOverride { get; set; }
+        public Item? VisualHand { get; set; }
 
         /// <summary>Item whose AttackRange this weapon uses. Falls back to <see cref="Item"/>.</summary>
         public Item? RangeSource { get; set; }
 
-        /// <summary>Item that rolls damage for this weapon's swings.</summary>
-        public Item? DamageItem => DamageOverride ?? Item;
+        /// <summary>Item that rolls damage for this weapon's swings: the armed item (an NPC's monster weapon).</summary>
+        public Item? DamageItem => Item;
 
         /// <summary>
         /// NPC SAW / AttackInfo weapon tag (4-char packed int). Zero for player hands / fists.
@@ -110,9 +110,18 @@ namespace ZoneEngine_New.Core.Entities
             if (source == null)
                 return DefaultMeleeAttackRange;
 
-            double range = Math.Max(0, StatCollection.Normalize(source.GetStat(CharacterStat.AttackRange)));
-            return range > 0.0 ? range : DefaultMeleeAttackRange;
+            int range = Math.Max(0, StatCollection.Normalize(source.GetStat(CharacterStat.AttackRange)));
+            if (range <= 0)
+                return DefaultMeleeAttackRange;
+
+            // The client's weapon range (Gamecode.dll 0x1009a9b2): the weapon's AttackRange raised by the wielder's
+            // WeaponRange percent, truncated, at most 40.
+            int weaponRange = StatCollection.Normalize(Wielder?.Stats.Get(CharacterStat.WeaponRange) ?? 0);
+            return Math.Min(MaxAttackRange, (int)(range + (long)range * weaponRange / 100.0));
         }
+
+        /// <summary>The client never lets a weapon reach further than this.</summary>
+        public const int MaxAttackRange = 40;
 
         public bool IsInRange()
         {

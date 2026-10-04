@@ -520,8 +520,8 @@ namespace ZoneEngine_New.Core.Entities
         protected override IEnumerable<Container> AppearanceWearPages => [Equipment];
 
         /// <summary>
-        /// First melee/ranged equipment item; later ones are ignored. Drawn in the right hand and
-        /// overrides monster weapon damage.
+        /// First melee/ranged equipment item; later ones are ignored. Drawn in the right hand and shown as
+        /// the swinging weapon; the monster weapon still rolls the damage.
         /// </summary>
         public Item? VisualRightHand { get; private set; }
 
@@ -573,7 +573,7 @@ namespace ZoneEngine_New.Core.Entities
                 ArmFromItem(logical, slot.Value, wireSlot: armed, sawHash: sawHash);
                 rangeSource ??= slot.Value;
                 CharacterWeapon weapon = Weapons[logical];
-                weapon.DamageOverride = VisualRightHand;
+                weapon.VisualHand = VisualRightHand;
                 weapon.RangeSource = rangeSource;
                 weapon.RefreshEffectiveSpeeds();
                 armed++;

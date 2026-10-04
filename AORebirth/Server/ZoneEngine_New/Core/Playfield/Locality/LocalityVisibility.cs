@@ -44,7 +44,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             // A stale object's cleanup must not withdraw its replacement's visibility.
             // PlayfieldLocality still removes the old reference from its own cell/set.
             if (!_byIdentity.TryGetValue(key, out Dynel? current) || !ReferenceEquals(current, dynel)) return;
-            DespawnSourceFromObservers(dynel);
+            if (!NeverDespawns(dynel))
+                DespawnSourceFromObservers(dynel);
             RemoveSourceState(key);
             ForgetRecipient(key);
             _byIdentity.Remove(key);
@@ -110,7 +111,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             {
                 foreach (ulong sourceKey in new List<ulong>(visibleSources))
                 {
-                    if (_byIdentity.TryGetValue(sourceKey, out Dynel? source))
+                    if (_byIdentity.TryGetValue(sourceKey, out Dynel? source) && !NeverDespawns(source))
                     {
                         LeaveVisibility(player, source);
                     }
@@ -210,7 +211,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                     continue;
                 }
 
-                if (!IsPinnedVisibility(recipient, source))
+                if (!IsPinnedVisibility(recipient, source) && !NeverDespawns(source))
                 {
                     LeaveVisibility(recipient, source);
                 }
@@ -238,7 +239,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 {
                     TryEnterVisibility(recipient, source);
                 }
-                else if (!shouldBeVisible && isVisible && !IsPinnedVisibility(recipient, source))
+                else if (!shouldBeVisible && isVisible && !IsPinnedVisibility(recipient, source) && !NeverDespawns(source))
                 {
                     LeaveVisibility(recipient, source);
                 }
@@ -319,6 +320,13 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             if (!MarkVisibleEntry(recipient, source))
             {
                 return false;
+            }
+
+            // The client already has the playfield's own statics from its Dynels.dat: they join the visible set (so
+            // their announcements reach the player) without a spawn packet.
+            if (IsClientResident(source))
+            {
+                return true;
             }
 
             try
@@ -532,6 +540,20 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                    && !ReferenceEquals(recipient, source)
                    && recipient.Identity != source.Identity;
         }
+
+        /// <summary>
+        /// A playfield static from Dynels.dat under its own identity: the client loads it with the playfield, so it is
+        /// never spawned or despawned. Vending machines are excluded: they get a server identity the client must be
+        /// sent.
+        /// </summary>
+        private static bool IsClientResident(Dynel source)
+            => source.SpawnSource == SpawnSource.StaticDynel && source is not VendingMachine;
+
+        /// <summary>
+        /// Sources that stay on a client once it has them: playfield statics, and dungeon doors (spawned when first
+        /// seen, then kept until the client leaves the playfield, which unloads them itself).
+        /// </summary>
+        private static bool NeverDespawns(Dynel source) => IsClientResident(source) || source is Door;
 
         private static bool IsPinnedVisibility(Player recipient, Dynel source)
         {

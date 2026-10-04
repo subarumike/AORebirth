@@ -193,7 +193,7 @@ namespace ZoneEngine_New.Core.Inventory
             // A function aimed at the fighting target would otherwise fall back to the user.
             if (UsesFightingTarget && player.TryResolveFightingTarget() == null)
                 return false;
-            return Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse);
+            return Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse, player.ResolvePerkRequirement);
         }
 
         /// <summary>True when an OnUse function applies to the user's fighting target.</summary>

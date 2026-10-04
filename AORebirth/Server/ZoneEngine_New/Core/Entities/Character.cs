@@ -2239,7 +2239,13 @@ namespace ZoneEngine_New.Core.Entities
         /// Wipes movement flags, path and speed. An NPC settles its FollowTarget; a player that was
         /// moving is shown to observers as a full stop at the held position.
         /// </summary>
-        void StopForRoot()
+        void StopForRoot() => StopInPlace();
+
+        /// <summary>
+        /// Stops the character where it stands (root, a player's disconnect, a reconnect): no input flags, path or
+        /// speed left, and observers see a full stop if it was moving.
+        /// </summary>
+        public void StopInPlace()
         {
             if (this is NpcCharacter npc)
                 npc.Brain?.StopPathing();

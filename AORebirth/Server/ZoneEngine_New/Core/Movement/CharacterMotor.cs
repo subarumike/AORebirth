@@ -1027,6 +1027,11 @@ namespace ZoneEngine_New.Core.Movement
                 _sim.DisableFalling();
             ApplyFlagsToAxes();
             SyncMovementModeStat();
+
+            // WaitState as the client keeps it for itself: entering Sit (mode 8) sets 2 (Gamecode.dll 0x1006d4bc),
+            // leaving a mode sets 0 (0x1006e032). Item criteria such as the Health and Nano Recharger's
+            // [WaitState EqualTo 2] ("You must be sitting") read it.
+            _character.Stats.Set(CharacterStat.WaitState, state == MovementState.Sit ? 2 : 0, StatDetail.Base);
         }
 
         void LeaveMovementState()

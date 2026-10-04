@@ -133,8 +133,10 @@ namespace ZoneEngine_New.Core.Helpers
                 ? NormalizeStat(attacker.Stats.GetOrZero(addDamageStat))
                 : 0;
 
+            // Armour only ever reduces damage: a negative AC adds none (live: a level 13 Workman Striker hits a
+            // -405 Melee AC character for 14-32, its weapon's own range).
             int targetArmorClass = TryGetArmorStat(rawDamageType, out CharacterStat armorStat)
-                ? NormalizeStat(target.Stats.GetOrZero(armorStat))
+                ? Math.Max(0, NormalizeStat(target.Stats.GetOrZero(armorStat)))
                 : 0;
 
             // Aimed Shot and Sneak Attack / Backstab ignore armour and start from the weapon's max damage.
@@ -144,23 +146,12 @@ namespace ZoneEngine_New.Core.Helpers
                 weaponMin = weaponMax;
             }
 
-            int minDamage;
-            int maxDamage;
-            if (cappedAttackRating < 1000)
-            {
-                minDamage = (int)(weaponMin * (1 + (cappedAttackRating / 400.0)) + damageBonus);
-                maxDamage = Math.Max(
-                    (int)((weaponMax * (1 + (cappedAttackRating / 400.0)) + damageBonus) - (targetArmorClass / 10.0)),
-                    minDamage);
-            }
-            else
-            {
-                double multiplier = 3.5 + ((cappedAttackRating - 1000) * Post1000DamageReduction / 400.0);
-                minDamage = (int)(weaponMin * multiplier + damageBonus);
-                maxDamage = Math.Max((int)(weaponMax * multiplier + damageBonus), minDamage);
-            }
-
-            maxDamage -= targetArmorClass / 10;
+            double multiplier = cappedAttackRating < 1000
+                ? 1 + (cappedAttackRating / 400.0)
+                : 3.5 + ((cappedAttackRating - 1000) * Post1000DamageReduction / 400.0);
+            int minDamage = (int)(weaponMin * multiplier + damageBonus);
+            // AC/10 comes off the maximum once, never below the minimum.
+            int maxDamage = Math.Max((int)((weaponMax * multiplier) + damageBonus - (targetArmorClass / 10.0)), minDamage);
 
             HitType hitType = HitType.Normal;
             bool isBurst = specialAttackStat == CharacterStat.Burst;
@@ -195,7 +186,7 @@ namespace ZoneEngine_New.Core.Helpers
             {
                 foreach (System.Collections.Generic.KeyValuePair<CharacterStat, int> entry in template.Attack)
                 {
-                    attackRating += (entry.Value / 100) * NormalizeStat(attacker.Stats.GetOrZero(entry.Key));
+                    attackRating += (int)((long)entry.Value * NormalizeStat(attacker.Stats.GetOrZero(entry.Key)) / 100);
                 }
             }
 
@@ -208,7 +199,7 @@ namespace ZoneEngine_New.Core.Helpers
             if (template?.Defend is { Count: > 0 })
             {
                 foreach (System.Collections.Generic.KeyValuePair<CharacterStat, int> entry in template.Defend)
-                    defenseRating += (entry.Value / 100) * NormalizeStat(target.Stats.GetOrZero(entry.Key));
+                    defenseRating += (int)((long)entry.Value * NormalizeStat(target.Stats.GetOrZero(entry.Key)) / 100);
             }
 
             return defenseRating + NormalizeStat(target.Stats.GetOrZero(CharacterStat.DMSModifier));

@@ -19,6 +19,7 @@ namespace ZoneEngine_New.Core.Entities
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.Playfield.Locality;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -219,9 +220,56 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.IsPerkUnlocked => !PerkLocks.IsLocked(id, DateTime.UtcNow),
                 Operator.HasNotRunningNano => !Buffs.Any(buff => buff.Id == id),
                 Operator.IsPetOverEquipped => OwnedPets.All.Any(pet => pet.Pet?.IsOverEquipped == true),
+                Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
+                Operator.MustAlliedCombat => IsAlliedInCombat(),
                 _ => null
             };
         }
+
+        /// <summary>
+        /// Allied combat (MustAlliedCombat / MustNotAlliedCombat): this player, its pets, its teammates on this
+        /// playfield and their pets: true when any of them is attacking something or being attacked.
+        /// </summary>
+        public bool IsAlliedInCombat()
+        {
+            if (InCombatWithPets(this))
+                return true;
+
+            Playfield? playfield = Playfield;
+            TeamSnapshot? team = playfield?.GetService<TeamService>()?.GetTeam(this);
+            if (playfield == null || team == null)
+                return false;
+
+            DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
+            foreach (int memberId in team.MemberIds)
+            {
+                if (memberId == Identity.Instance)
+                    continue;
+                if (registry.TryGet(new Identity { Type = IdentityType.CanbeAffected, Instance = memberId }, out Dynel? dynel)
+                    && dynel is Player mate && InCombatWithPets(mate))
+                    return true;
+            }
+
+            return false;
+        }
+
+        static bool InCombatWithPets(Character character)
+        {
+            if (IsInCombat(character))
+                return true;
+
+            foreach (NpcCharacter pet in character.OwnedPets.All)
+            {
+                if (IsInCombat(pet))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>Attacking something (a fighting target) or being attacked (on someone's attacker list).</summary>
+        static bool IsInCombat(Character character)
+            => !character.IsDead && (character.FightingTarget.Instance != 0 || character.Attackers.Count > 0);
 
         ItemTemplate[] _perkTemplates = [];
         PerkAction[] _perkActions = [];
@@ -812,6 +860,12 @@ namespace ZoneEngine_New.Core.Entities
         public override void Tick(double deltaTime)
         {
             base.Tick(deltaTime);
+            if (_linkDeadStopPending)
+            {
+                _linkDeadStopPending = false;
+                StopInPlace();
+            }
+
             TickPerkLocks();
             if (!_respawnPending)
                 return;
@@ -1248,7 +1302,15 @@ namespace ZoneEngine_New.Core.Entities
             ConnectionPhase = PlayerConnectionPhase.LinkDead;
             LinkDeadUntilUtc = DateTime.UtcNow + timeout;
             Session = null;
+            _linkDeadStopPending = true;
         }
+
+        /// <summary>
+        /// Set when the transport drops (on its thread); the next tick, on the playfield thread, stops the character
+        /// in place. The released keys of a crashed client never arrive, so its last movement input would otherwise
+        /// carry on (and come back as a run animation on reconnect).
+        /// </summary>
+        volatile bool _linkDeadStopPending;
 
         public bool HasLinkDeadExpired(DateTime now)
             => ConnectionPhase == PlayerConnectionPhase.LinkDead

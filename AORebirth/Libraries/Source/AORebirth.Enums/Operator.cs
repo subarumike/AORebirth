@@ -257,6 +257,18 @@ namespace AORebirth.Enums
         /// </summary>
         IsPetOverEquipped = 75,
 
+        /// <summary>The target is the caster's own pet (client ConvertCriteria "MustBeCastersPet").</summary>
+        MustBeCastersPet = 118,
+
+        /// <summary>
+        /// The user, its pets, its team or their pets are fighting (client "MustAlliedCombat"; the client's own
+        /// evaluator passes it, the server decides).
+        /// </summary>
+        MustAlliedCombat = 135,
+
+        /// <summary>Nobody allied is fighting (client "MustNotAlliedCombat"; see <see cref="MustAlliedCombat"/>).</summary>
+        MustNotAlliedCombat = 136,
+
         /// <summary>
         /// </summary>
         IsPlayerOrPlayerControlledPet = 86,

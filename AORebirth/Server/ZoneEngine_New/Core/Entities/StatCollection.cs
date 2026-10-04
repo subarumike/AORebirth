@@ -72,7 +72,7 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public static bool IsRuntimeOnly(CharacterStat stat)
             => stat is CharacterStat.NumberOfFightingOpponents or CharacterStat.Pets
-                or CharacterStat.EquippedWeapons or CharacterStat.EquippedRHWeapon;
+                or CharacterStat.EquippedWeapons or CharacterStat.EquippedRHWeapon or CharacterStat.WaitState;
 
         /// <summary>Server bookkeeping stats the client never receives.</summary>
         public static bool IsServerOnly(CharacterStat stat)

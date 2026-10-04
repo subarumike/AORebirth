@@ -35,17 +35,23 @@ namespace ZoneEngine_New.Core.Entities
         protected override bool CanOpenLoot(Player player) => !IsLocked && base.CanOpenLoot(player);
 
         /// <summary>A Break and Enter item used on the locked chest: it unlocks (and the client opens it) for the user.</summary>
-        public bool TryBreakAndEnter(Player player)
+        public BreakAndEnterResult TryBreakAndEnter(Player player, int pickRating)
         {
             ArgumentNullException.ThrowIfNull(player);
             if (!IsLocked || Playfield == null || player.IsDead || !ReferenceEquals(player.Playfield, Playfield)
                 || GetEdgeDistanceTo(player) > OpenRange)
-                return false;
+                return BreakAndEnterResult.Refused;
+
+            if (pickRating < LockDifficulty)
+            {
+                BreakAndEnterActions.SendFailed(this, player);
+                return BreakAndEnterResult.Failed;
+            }
 
             IsLocked = false;
             Playfield.GetRequiredService<PlayfieldLocality>().Announce(this,
                 BreakAndEnterActions.Result(Identity, player.Identity, BreakAndEnterActions.Unlocked), includeSelf: true);
-            return true;
+            return BreakAndEnterResult.Unlocked;
         }
     }
 }

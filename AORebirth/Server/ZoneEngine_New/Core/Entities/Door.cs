@@ -116,17 +116,23 @@ namespace ZoneEngine_New.Core.Entities
         /// A Break and Enter item used on the locked door: it unlocks and opens for everyone nearby (the client's
         /// unlock result does both).
         /// </summary>
-        public bool TryBreakAndEnter(Player player)
+        public BreakAndEnterResult TryBreakAndEnter(Player player, int pickRating)
         {
             ArgumentNullException.ThrowIfNull(player);
             if (!IsLocked || Playfield == null || player.IsDead || !ReferenceEquals(player.Playfield, Playfield)
                 || GetEdgeDistanceTo(player) > UseRange)
-                return false;
+                return BreakAndEnterResult.Refused;
+
+            if (pickRating < LockDifficulty)
+            {
+                BreakAndEnterActions.SendFailed(this, player);
+                return BreakAndEnterResult.Failed;
+            }
 
             Flags = (Flags & ~LockedFlag) | OpenFlag;
             Playfield.GetRequiredService<PlayfieldLocality>().Announce(this,
                 BreakAndEnterActions.Result(Identity, player.Identity, BreakAndEnterActions.Unlocked), includeSelf: true);
-            return true;
+            return BreakAndEnterResult.Unlocked;
         }
 
         /// <summary>Heading for a door turned <paramref name="yawDegrees"/> about the vertical axis.</summary>
