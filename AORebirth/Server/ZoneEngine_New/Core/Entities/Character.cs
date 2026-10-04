@@ -83,12 +83,20 @@ namespace ZoneEngine_New.Core.Entities
             Stats.Set(CharacterStat.NumberOfFightingOpponents, 0, StatDetail.Base);
         }
 
+        /// <summary>
+        /// The body radius the client's range checks subtract: CharRadius * Scale / 100, Scale at least 1
+        /// (Gamecode.dll 0x10044e56, recomputed on every appearance build and Scale change). NPCs get CharRadius from
+        /// their MonsterData record. A character without one (players, an NPC whose MonsterData has no record) keeps
+        /// the client's initial radius of 1.0, unscaled (the radius object starts at 1.0f, Gamecode.dll 0x10044912;
+        /// live: the in-range indicator at Scale 90 matches 1.0, not 0.9).
+        /// </summary>
         public override double GetCollisionRadius()
         {
-            int scale = Stats.GetOrZero(CharacterStat.Scale);
-            if (scale <= 0)
-                scale = 100;
-            return (scale * CharacterRadius) / 100.0;
+            if (!Stats.TryGetValue(CharacterStat.CharRadius, out int charRadius) || StatCollection.IsUnset(charRadius))
+                return DefaultCollisionRadius;
+
+            int scale = Math.Max(1, Stats.GetOrZero(CharacterStat.Scale));
+            return charRadius * (double)scale / 100.0;
         }
 
         /// <summary>LockSkill cooldowns by stat id. Only players persist them.</summary>

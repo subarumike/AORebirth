@@ -172,6 +172,16 @@ namespace ZoneEngine_New.Core.Playfield
             foreach (var entry in resolvedStats)
                 npc.Stats.Set((CharacterStat)entry.Key, entry.Value);
 
+            // The client writes the MonsterData record's stats onto an NPC (Gamecode.dll 0x100523d3); Mass and
+            // CharRadius (its weapon-range body radius) come from there, not the template.
+            if (_gameData.TryGetMonsterBodyStats(npc.Stats.GetOrZero(CharacterStat.MonsterData), out int? mass, out int? charRadius))
+            {
+                if (mass != null)
+                    npc.Stats.Set(CharacterStat.Mass, mass.Value);
+                if (charRadius != null)
+                    npc.Stats.Set(CharacterStat.CharRadius, charRadius.Value);
+            }
+
             ApplyTextures(npc, template);
             npc.SetTextureOverrides(template.TextureOverrides);
             npc.FillEquipment(_gameData, _logger);

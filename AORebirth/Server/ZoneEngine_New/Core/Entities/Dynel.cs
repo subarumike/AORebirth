@@ -69,8 +69,11 @@ namespace ZoneEngine_New.Core.Entities
                 : new Quaternion(value.xf, value.yf, value.zf, value.wf);
         }
 
-        // TODO: determine the actual radius of each dynel.
-        public const float CharacterRadius = 0.5f;
+        /// <summary>
+        /// Body radius of a character without CharRadius (no MonsterData record, players): the client's initial
+        /// radius, 1.0, not scaled.
+        /// </summary>
+        public const double DefaultCollisionRadius = 1.0;
 
         public double Distance3D(Dynel other)
         {
