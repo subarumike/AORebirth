@@ -860,6 +860,7 @@ namespace ZoneEngine_New.Core.Entities
         public override void Tick(double deltaTime)
         {
             base.Tick(deltaTime);
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("player.tick", Identity.Instance);
             if (_linkDeadStopPending)
             {
                 _linkDeadStopPending = false;
@@ -906,6 +907,28 @@ namespace ZoneEngine_New.Core.Entities
                 throw new InvalidOperationException("No respawn destination is configured.");
 
             Vector3 landing = new Vector3(respawn.Position[0], respawn.Position[1], respawn.Position[2]);
+
+            // Never build the respawn playfield on this tick: stay dead while it builds in the background, and
+            // respawn once it is ready.
+            PlayfieldManager manager = playfield.GetRequiredService<PlayfieldManager>();
+            if (playfield.Identity.Instance != respawn.PlayfieldId && !manager.TryGet(respawn.PlayfieldId, out _))
+            {
+                bool queued = manager.WithPlayfield(respawn.PlayfieldId, this, _ =>
+                {
+                    if (IsDead && Playfield != null)
+                        TryRespawn();
+                });
+
+                // Another move is already waiting on a build: try again next tick rather than drop the respawn.
+                if (!queued)
+                {
+                    _respawnPending = true;
+                    _respawnRemainingSeconds = 0;
+                }
+
+                return;
+            }
+
             Revive();
 
             Logger.Info(
@@ -926,7 +949,7 @@ namespace ZoneEngine_New.Core.Entities
 
             AnnounceDeathCleared();
 
-            Playfield destination = playfield.GetRequiredService<PlayfieldManager>().GetOrCreate(respawn.PlayfieldId);
+            Playfield destination = manager.GetOrCreate(respawn.PlayfieldId);
             if (Session != null)
             {
                 Session.TransferToPlayfield(destination, landing);
@@ -1584,7 +1607,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.TemporarySkillReduction,
             CharacterStat.InsuranceTime,
             CharacterStat.MaxNCU,
-            CharacterStat.CurrentNano,
+            // CurrentNano goes only in the 32-bit Stats1 block: a 16-bit copy here cannot carry a nano pool above
+            // 32767 (gear such as Blackmane's Stat Buffer adds 2,000,000) and aborted the spawn.
             CharacterStat.MapFlags,
             CharacterStat.ChangeSideCount,
         ];

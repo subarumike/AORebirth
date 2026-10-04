@@ -145,21 +145,25 @@
         }
 
         public bool HasLineOfSight(AoVector3 from, AoVector3 to)
+            => HasLineOfSight((float)from.x, (float)from.y, (float)from.z, (float)to.x, (float)to.y, (float)to.z);
+
+        /// <summary>Same, from coordinates: the hot path (every NPC engage and aggro check) allocates nothing.</summary>
+        public bool HasLineOfSight(float fromX, float fromY, float fromZ, float toX, float toY, float toZ)
         {
             long nowMs = Environment.TickCount64;
-            // Quantize to ~0.25u. Include all axes â€” the prior 8-bit to.xz key collided often.
+            // Quantize to ~0.25u. Include all axes; the prior 8-bit to.xz key collided often.
             int key = HashCode.Combine(
-                (int)(from.x * 4f),
-                (int)(from.y * 4f),
-                (int)(from.z * 4f),
-                (int)(to.x * 4f),
-                (int)(to.y * 4f),
-                (int)(to.z * 4f));
+                (int)(fromX * 4f),
+                (int)(fromY * 4f),
+                (int)(fromZ * 4f),
+                (int)(toX * 4f),
+                (int)(toY * 4f),
+                (int)(toZ * 4f));
 
             if (_losCache.TryGetValue(key, out LosCacheEntry entry) && nowMs < entry.ExpireMs)
                 return entry.Clear;
 
-            bool clear = IsSegmentClear(ToVec3(from), ToVec3(to));
+            bool clear = IsSegmentClear(new Vec3(fromX, fromY, fromZ), new Vec3(toX, toY, toZ));
             _losCache[key] = new LosCacheEntry
             {
                 Clear = clear,
@@ -597,32 +601,38 @@
             if (session == null)
                 return;
 
-            PlayfieldType destination = source.GetRequiredService<PlayfieldManager>()
-                .GetOrCreate(destPlayfieldId);
-
-            WriteProxyReturn(player, source.Identity.Instance, crossing.Trigger);
-            if (crossing.Trigger.RecordsReturn
-                && destination is ACGPlayfield acg
-                && acg.World != null)
-            {
-                acg.World.RegisterExitProxyDoor(crossing.Trigger.DestDoorInstance);
-            }
-
             int id = player.Identity.Instance;
             _zoneGraceUntil[id] = now + 3.0;
 
             // The character is leaving this world; a stale previous position would fake a crossing
             // if they come back, and the destination reseeds its own overlap set on first sighting.
             _playerTriggerState.Remove(id);
-            _logger.Info(
-                $"Zone trigger transfer character={id} from={source.Identity.Instance} to={destPlayfieldId}");
 
-            // Door and explicit LineTeleport arrivals face along their landing clearance; borders keep
-            // the character's current heading rather than imposing a global compass direction.
-            if (crossing.Heading is { } heading)
-                session.TransferToPlayfield(destination, crossing.Landing, heading);
-            else
-                session.TransferToPlayfield(destination, crossing.Landing);
+            // An unloaded destination builds in the background; the crossing completes on this player's tick
+            // once it is ready, and only if they are still here with a session.
+            source.GetRequiredService<PlayfieldManager>().WithPlayfield(destPlayfieldId, player, destination =>
+            {
+                if (!ReferenceEquals(player.Playfield, source) || player.Session is not IZoneSession current)
+                    return;
+
+                WriteProxyReturn(player, source.Identity.Instance, crossing.Trigger);
+                if (crossing.Trigger.RecordsReturn
+                    && destination is ACGPlayfield acg
+                    && acg.World != null)
+                {
+                    acg.World.RegisterExitProxyDoor(crossing.Trigger.DestDoorInstance);
+                }
+
+                _logger.Info(
+                    $"Zone trigger transfer character={id} from={source.Identity.Instance} to={destPlayfieldId}");
+
+                // Door and explicit LineTeleport arrivals face along their landing clearance; borders keep
+                // the character's current heading rather than imposing a global compass direction.
+                if (crossing.Heading is { } heading)
+                    current.TransferToPlayfield(destination, crossing.Landing, heading);
+                else
+                    current.TransferToPlayfield(destination, crossing.Landing);
+            });
         }
 
         static ProxyReturn ReadProxyReturn(Player player)

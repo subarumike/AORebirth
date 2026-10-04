@@ -17,6 +17,7 @@ namespace ZoneEngine_New.Core.Entities
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Movement;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Nanos;
@@ -1369,14 +1370,22 @@ namespace ZoneEngine_New.Core.Entities
                 }
             }
 
+            int instance = Identity.Instance;
+            TickStallWatch.Stage("char.motor", instance);
             Motor.Tick(deltaTime);
+            TickStallWatch.Stage("char.combat", instance);
             if (FightingTarget.Instance != 0 && TryResolveFightingTarget() != null)
                 TickCombat(deltaTime);
+            TickStallWatch.Stage("char.regen", instance);
             if (!IsDead && UsesPassiveRegen)
                 TickPassiveRegen(deltaTime);
+            TickStallWatch.Stage("char.nanos", instance);
             NanoRuntime.Tick(this, DateTime.UtcNow);
+            TickStallWatch.Stage("char.specials", instance);
             TickSpecialsAvailable(DateTime.UtcNow);
+            TickStallWatch.Stage("char.effects", instance);
             TickTimedEffects(DateTime.UtcNow);
+            TickStallWatch.Stage("dynel.flush", instance);
             base.Tick(deltaTime);
         }
 

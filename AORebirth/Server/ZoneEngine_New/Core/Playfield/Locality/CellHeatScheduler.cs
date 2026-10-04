@@ -88,8 +88,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 for (int i = 0; i < _tickDynelBuffer.Count; i++)
                 {
                     Dynel dynel = _tickDynelBuffer[i];
-                    TickStallWatch.Stage("heat.dynel.indoor", dynel.Identity.Instance);
+                    TickStallWatch.BeginDynel("heat.dynel.indoor", dynel);
                     dynel.Tick(heartbeatDeltaTime);
+                    TickStallWatch.EndDynel();
                 }
 
                 TickStallWatch.Stage("heat.indoorspawn");
@@ -199,8 +200,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 for (int i = 0; i < _tickDynelBuffer.Count; i++)
                 {
                     Dynel dynel = _tickDynelBuffer[i];
-                    TickStallWatch.Stage("heat.dynel", dynel.Identity.Instance);
+                    TickStallWatch.BeginDynel("heat.dynel", dynel);
                     dynel.Tick(elapsed);
+                    TickStallWatch.EndDynel();
                 }
             }
 

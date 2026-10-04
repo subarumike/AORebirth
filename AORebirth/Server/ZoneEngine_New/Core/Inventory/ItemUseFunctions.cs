@@ -699,28 +699,26 @@ namespace ZoneEngine_New.Core.Inventory
                     return false;
             }
 
-            Playfield destination = samePlayfield
-                ? source
-                : source.GetRequiredService<PlayfieldManager>().GetOrCreate(playfieldId);
-            Vector3 landing = destination.SnapFeetToFloor(new Vector3(x, y, z));
-
             ClearProxyReturn(player);
             source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
 
-            if (playfieldId == 0)
-            {
-                FinishIntrazoneLineTeleport(player, source, landing, source.Identity.Instance);
-                return true;
-            }
-
             if (samePlayfield)
             {
-                FinishSamePlayfieldMove(player, source, landing, heading: null);
+                Vector3 local = source.SnapFeetToFloor(new Vector3(x, y, z));
+                if (playfieldId == 0)
+                    FinishIntrazoneLineTeleport(player, source, local, source.Identity.Instance);
+                else
+                    FinishSamePlayfieldMove(player, source, local, heading: null);
                 return true;
             }
 
-            player.Session.TransferToPlayfield(destination, landing);
-            return true;
+            // An unloaded destination builds in the background; the move completes on this player's tick.
+            return source.GetRequiredService<PlayfieldManager>().WithPlayfield(playfieldId, player, destination =>
+            {
+                if (!ReferenceEquals(player.Playfield, source) || player.Session is not { } session)
+                    return;
+                session.TransferToPlayfield(destination, destination.SnapFeetToFloor(new Vector3(x, y, z)));
+            });
         }
 
         /// <summary>
@@ -779,9 +777,12 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             player.Rotation = heading;
-            Playfield destPlayfield = source.GetRequiredService<PlayfieldManager>().GetOrCreate(playfieldId);
-            player.Session.TransferToPlayfield(destPlayfield, landing, heading);
-            return true;
+            return source.GetRequiredService<PlayfieldManager>().WithPlayfield(playfieldId, player, destPlayfield =>
+            {
+                if (!ReferenceEquals(player.Playfield, source) || player.Session is not { } session)
+                    return;
+                session.TransferToPlayfield(destPlayfield, landing, heading);
+            });
         }
 
         static void ClearProxyReturn(Player player)
@@ -927,13 +928,15 @@ namespace ZoneEngine_New.Core.Inventory
 
             player.Rotation = heading;
 
-            Playfield arrival = source.GetRequiredService<PlayfieldManager>().GetOrCreate(destPlayfield);
-            if (!landsOnLine && arrival is ACGPlayfield acg)
-                acg.World?.RegisterExitProxyDoor(destDoor);
-
             source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
-            player.Session.TransferToPlayfield(arrival, landing, heading);
-            return true;
+            return source.GetRequiredService<PlayfieldManager>().WithPlayfield(destPlayfield, player, arrival =>
+            {
+                if (!ReferenceEquals(player.Playfield, source) || player.Session is not { } session)
+                    return;
+                if (!landsOnLine && arrival is ACGPlayfield acg)
+                    acg.World?.RegisterExitProxyDoor(destDoor);
+                session.TransferToPlayfield(arrival, landing, heading);
+            });
         }
 
         /// <summary>
@@ -984,10 +987,12 @@ namespace ZoneEngine_New.Core.Inventory
             player.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
             player.Rotation = heading;
 
-            Playfield destPlayfield = source.GetRequiredService<PlayfieldManager>()
-                .GetOrCreate(destination.PlayfieldId);
-            player.Session.TransferToPlayfield(destPlayfield, landing, heading);
-            return true;
+            return source.GetRequiredService<PlayfieldManager>().WithPlayfield(destination.PlayfieldId, player, destPlayfield =>
+            {
+                if (!ReferenceEquals(player.Playfield, source) || player.Session is not { } session)
+                    return;
+                session.TransferToPlayfield(destPlayfield, landing, heading);
+            });
         }
 
         /// <summary>

@@ -67,16 +67,21 @@ namespace ZoneEngine_New.Core.Entities
         public static bool IsUnset(int value) => value == (int)CharacterStat.Unset;
 
         /// <summary>
-        /// Runtime stats rebuilt every session and never stored: fight bookkeeping, taken pet slots, and the
-        /// equipped weapon type criteria the client derives from the weapon page.
+        /// Runtime stats rebuilt every session and never stored: fight bookkeeping, taken pet slots, the
+        /// equipped weapon type criteria the client derives from the weapon page, and the vitals. Max health and
+        /// max nano are recomputed on rebase, and current health and nano are set from the stored
+        /// PercentRemainingHealth / PercentRemainingNano, so a stale or buff-inflated value is never loaded back.
         /// </summary>
         public static bool IsRuntimeOnly(CharacterStat stat)
             => stat is CharacterStat.NumberOfFightingOpponents or CharacterStat.Pets
-                or CharacterStat.EquippedWeapons or CharacterStat.EquippedRHWeapon or CharacterStat.WaitState;
+                or CharacterStat.EquippedWeapons or CharacterStat.EquippedRHWeapon or CharacterStat.WaitState
+                or CharacterStat.Health or CharacterStat.CurrentNano
+                or CharacterStat.MaxHealth or CharacterStat.MaxNanoEnergy;
 
         /// <summary>Server bookkeeping stats the client never receives.</summary>
         public static bool IsServerOnly(CharacterStat stat)
-            => stat is CharacterStat.UsedIP or CharacterStat.MissionBits19 or CharacterStat.MissionBits20;
+            => stat is CharacterStat.UsedIP or CharacterStat.MissionBits19 or CharacterStat.MissionBits20
+                or CharacterStat.DebugFlags;
 
         /// <summary>
         /// The value the client is sent for a stat, when it is not simply the stored base (a player's IP is sent as

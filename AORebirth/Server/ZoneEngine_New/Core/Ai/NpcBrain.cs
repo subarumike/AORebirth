@@ -40,9 +40,18 @@ namespace ZoneEngine_New.Core.Ai
         Vector3 _reachCachePos = new(0, 0, 0);
         DateTime _reachCacheUtc;
         bool _reachCacheResult;
+
+        // Each cached reach answer lives for its own jittered time and target movement (mean unchanged), so a pack
+        // that aggroed on the same tick spreads its re-checks over many ticks instead of searching in one burst.
+        double _reachCacheSeconds = NpcFollowTarget.PathReplanSeconds;
+        float _reachCacheMeters = NpcFollowTarget.MinAnnounceDeltaMeters;
+        const double ReachCacheJitter = 0.25;
         DateTime _lastChanceUtc;
         int _stuckWarps;
         bool _evading;
+
+        /// <summary>Set when a hate target's reach map was too large; the next leash check resets the NPC.</summary>
+        bool _resetForUnreachable;
         bool _returningHome;
         bool _returnFailed;
 
@@ -59,6 +68,8 @@ namespace ZoneEngine_New.Core.Ai
             _tree.SetupTree();
             _tree.Enable();
             _nanos = new NpcNanoCaster(this);
+            _isEngageable = IsEngageable;
+            _thinkElapsed = ThinkPhase(npc);
         }
 
         /// <summary>A summoned pet's brain: the pet tree instead of the roaming-NPC one, and no home to leash to.</summary>
@@ -75,7 +86,26 @@ namespace ZoneEngine_New.Core.Ai
             _tree.SetupTree();
             _tree.Enable();
             _nanos = new NpcNanoCaster(this);
+            _isEngageable = IsEngageable;
+            _thinkElapsed = ThinkPhase(npc);
         }
+
+        /// <summary>The engage test, created once: passing the method group allocated a delegate on every call.</summary>
+        readonly Func<Identity, bool> _isEngageable;
+
+        /// <summary>Time gathered since the last think; the brain thinks once it reaches the think interval.</summary>
+        double _thinkElapsed;
+
+        /// <summary>Counts thinks; engage answers are kept for the think that computed them.</summary>
+        long _thinkSerial;
+
+        long _engageSerial = -1;
+        readonly Dictionary<ulong, bool> _engageByTarget = new();
+        readonly List<Player> _nearbyPlayers = new();
+
+        /// <summary>A start offset spread over the interval, so brains that spawn together do not think in the same tick.</summary>
+        static double ThinkPhase(NpcCharacter npc)
+            => (npc.Identity.Instance % 997) / 997.0 * NpcAiRules.BrainThinkSeconds;
 
         /// <summary>The pet state when this is a summoned pet's brain.</summary>
         public Pets.PetController? Pet { get; }
@@ -124,6 +154,15 @@ namespace ZoneEngine_New.Core.Ai
         {
             if (Npc.IsDead)
                 return;
+
+            // Think on the brain's own cadence with the time gathered since its last think; movement and combat
+            // swings keep running every tick in the character.
+            _thinkElapsed += deltaTime;
+            if (_thinkElapsed < NpcAiRules.BrainThinkSeconds)
+                return;
+            deltaTime = _thinkElapsed;
+            _thinkElapsed = 0;
+            _thinkSerial++;
 
             if (_treeResetPending)
             {
@@ -181,8 +220,13 @@ namespace ZoneEngine_New.Core.Ai
             if (Npc.Playfield == null)
                 return;
 
-            foreach (Player player in Npc.Playfield.GetRequiredService<DynelRegistry>().PlayerEntities())
-                TryProximityAggro(player);
+            // Only this NPC's cell and the cells touching it (wider only for an aggro range longer than a cell).
+            var locality = Npc.Playfield.GetRequiredService<ZoneEngine_New.Core.Playfield.Locality.PlayfieldLocality>();
+            float range = NpcAiRules.ProximityAggroRangeFor(Npc.Stats, locality.Grid.IsOutdoor);
+            locality.CollectNearby(Npc, range, _nearbyPlayers);
+            for (int i = 0; i < _nearbyPlayers.Count; i++)
+                TryProximityAggro(_nearbyPlayers[i]);
+            _nearbyPlayers.Clear();
         }
 
         /// <summary>
@@ -209,7 +253,7 @@ namespace ZoneEngine_New.Core.Ai
                     Npc.Stats.GetOrOne(CharacterStat.Level)))
                 return;
             bool outdoor = Npc.Playfield?.GetRequiredService<ZoneEngine_New.Core.Playfield.Locality.PlayfieldLocality>().Grid.IsOutdoor ?? true;
-            float range = NpcAiRules.ProximityAggroRangeFor(stat => Npc.Stats.GetOrZero(stat), outdoor);
+            float range = NpcAiRules.ProximityAggroRangeFor(Npc.Stats, outdoor);
             if (Npc.GetEdgeDistanceTo(player) > range)
                 return;
             // Unprovoked aggro needs sight. Once the player is on the hate list, chasing around walls is fine.
@@ -224,7 +268,10 @@ namespace ZoneEngine_New.Core.Ai
         public bool ShouldLeash()
         {
             TickStallWatch.Stage("brain.leash", Npc.Identity.Instance);
-            bool leash = _evading || NpcAiRules.ShouldLeash(Hate, Home, Npc.Position, IsEngageable);
+            // A target whose reach map was too costly to build means this fight cannot be judged: reset now rather
+            // than search again (and stop players standing out of reach from farming a stuck mob).
+            bool leash = _evading || _resetForUnreachable || NpcAiRules.ShouldLeash(Hate, Home, Npc.Position, _isEngageable);
+            _resetForUnreachable = false;
             if (leash)
                 BeginEvade();
             _leashing = leash;
@@ -253,13 +300,13 @@ namespace ZoneEngine_New.Core.Ai
         public bool HasNearbyHate()
         {
             TickStallWatch.Stage("brain.hate", Npc.Identity.Instance);
-            return NpcAiRules.TryHighestNearby(Hate, IsEngageable, out _, out _);
+            return NpcAiRules.TryHighestNearby(Hate, _isEngageable, out _, out _);
         }
 
         public bool TrySelectHighestThreat()
         {
             TickStallWatch.Stage("brain.select", Npc.Identity.Instance);
-            if (!NpcAiRules.TryHighestNearby(Hate, IsEngageable, out Identity identity, out _))
+            if (!NpcAiRules.TryHighestNearby(Hate, _isEngageable, out Identity identity, out _))
             {
                 _currentTarget = Identity.None;
                 return false;
@@ -313,6 +360,9 @@ namespace ZoneEngine_New.Core.Ai
                 new System.Numerics.Vector3(last.X, last.Y, last.Z));
         }
 
+        /// <summary>A factor in [1 - jitter, 1 + jitter], mean 1.</summary>
+        static double Jitter() => 1.0 + ReachCacheJitter * (2.0 * Random.Shared.NextDouble() - 1.0);
+
         public bool CanPathTo(Character target)
         {
             ArgumentNullException.ThrowIfNull(target);
@@ -323,32 +373,36 @@ namespace ZoneEngine_New.Core.Ai
             DateTime now = DateTime.UtcNow;
             Vector3 cachedEnd = HeightfieldOrSelf(target.Position);
             if (_reachCacheId == target.Identity
-                && (now - _reachCacheUtc).TotalSeconds < NpcFollowTarget.PathReplanSeconds
-                && Vector3.Abs(cachedEnd - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters)
+                && (now - _reachCacheUtc).TotalSeconds < _reachCacheSeconds
+                && Vector3.Abs(cachedEnd - _reachCachePos) < _reachCacheMeters)
+            {
+                PathDiag.CacheHit(PathDiag.Reach);
                 return _reachCacheResult;
+            }
 
             Vector3 startPos = HeightfieldOrSelf(Npc.Position);
             Vector3 endPos = cachedEnd;
             var start = new System.Numerics.Vector3((float)startPos.x, (float)startPos.y, (float)startPos.z);
             var end = new System.Numerics.Vector3((float)endPos.x, (float)endPos.y, (float)endPos.z);
 
-            // Off-mesh starts stay movable so holes and future off-mesh links are not a wall.
-            // A complete path that ends under the NPC is not a chase chance once the target
-            // is also out of attack range — they cannot get closer. In-range fight-back is
-            // decided by HasChance before this runs.
-            bool foundPath = finder.TryFindPath(start, end, _reachPathScratch);
-            bool reachable;
-            if (!finder.TrySnap(start, out _))
-                reachable = true;
-            else if (foundPath)
-                reachable = !PathEndsUnderNpc(start, _reachPathScratch);
-            else
-                reachable = !finder.TrySnap(end, out _);
+            // One shared map per target answers every NPC asking about it (no per-NPC search). Off-mesh starts stay
+            // movable so holes and future off-mesh links are not a wall. A route that ends under the NPC is not a
+            // chase chance once the target is also out of attack range: they cannot get closer. In-range fight-back
+            // is decided by HasChance before this runs.
+            ReachMap map = Npc.Playfield!.GetRequiredService<ReachMaps>().Get(target, finder, endPos);
+            ReachAnswer answer = finder.Reaches(map, start);
+            if (answer == ReachAnswer.Reachable && map.Kind == ReachMapKind.Flooded && PathEndsUnderNpc(start, map.EndPoint))
+                answer = ReachAnswer.Unreachable;
+            if (answer == ReachAnswer.TooLarge && (Hate.Contains(target.Identity) || Npc.FightingTarget == target.Identity))
+                _resetForUnreachable = true;
+            bool reachable = answer == ReachAnswer.Reachable;
             _reachCacheId = target.Identity;
             _reachCacheStart = new Vector3(startPos.x, startPos.y, startPos.z);
             _reachCachePos = new Vector3(endPos.x, endPos.y, endPos.z);
             _reachCacheUtc = now;
             _reachCacheResult = reachable;
+            _reachCacheSeconds = NpcFollowTarget.PathReplanSeconds * Jitter();
+            _reachCacheMeters = (float)(NpcFollowTarget.MinAnnounceDeltaMeters * Jitter());
             return reachable;
         }
 
@@ -708,6 +762,7 @@ namespace ZoneEngine_New.Core.Ai
                 && Vector3.Abs(destination - _reachCachePos) < NpcFollowTarget.MinAnnounceDeltaMeters
                 && Vector3.Abs(startPos - _reachCacheStart) < MovementConfig.PathArrivalRadius)
             {
+                PathDiag.CacheHit(PathDiag.Route);
                 AppendRoute(_reachPathScratch);
                 return;
             }
@@ -717,7 +772,7 @@ namespace ZoneEngine_New.Core.Ai
             {
                 var start = new System.Numerics.Vector3((float)startPos.x, (float)startPos.y, (float)startPos.z);
                 var end = new System.Numerics.Vector3((float)destination.x, (float)destination.y, (float)destination.z);
-                if (finder.TryFindPath(start, end, _planScratch) && _planScratch.Count > 0)
+                if (PathDiag.TryFindPath(finder, start, end, _planScratch, PathDiag.Route) && _planScratch.Count > 0)
                 {
                     AppendRoute(_planScratch);
                     return;
@@ -806,7 +861,7 @@ namespace ZoneEngine_New.Core.Ai
             Vector3 to = HeightfieldOrSelf(destination);
             var start = new System.Numerics.Vector3((float)from.x, (float)from.y, (float)from.z);
             var end = new System.Numerics.Vector3((float)to.x, (float)to.y, (float)to.z);
-            if (!finder.TrySnap(start, out _) || !finder.TryFindPath(start, end, _planScratch) || _planScratch.Count == 0)
+            if (!finder.TrySnap(start, out _) || !PathDiag.TryFindPath(finder, start, end, _planScratch, PathDiag.Walk) || _planScratch.Count == 0)
                 return false;
 
             return System.Numerics.Vector3.Distance(_planScratch[_planScratch.Count - 1], end) <= NpcAiRules.ArriveHomeMeters;
@@ -817,6 +872,7 @@ namespace ZoneEngine_New.Core.Ai
             TickStallWatch.Stage("brain.reset", Npc.Identity.Instance);
             _leashing = false;
             _evading = false;
+            _resetForUnreachable = false;
             _stuckWarps = 0;
             _returningHome = false;
             _returnFailed = false;
@@ -855,7 +911,29 @@ namespace ZoneEngine_New.Core.Ai
             return null;
         }
 
+        /// <summary>
+        /// Leash, hate and target choice all ask this of every hate entry in the same think; the answer cannot change
+        /// within it, so it is worked out once per entry per think (line of sight and reach included).
+        /// </summary>
         bool IsEngageable(Identity identity)
+        {
+            if (_engageSerial != _thinkSerial)
+            {
+                _engageByTarget.Clear();
+                _engageSerial = _thinkSerial;
+            }
+
+            // The current target gets the longer, sticky engage range, so its answer is kept apart.
+            ulong key = identity.Long() ^ (identity == _currentTarget ? 1UL << 63 : 0UL);
+            if (_engageByTarget.TryGetValue(key, out bool known))
+                return known;
+
+            bool engageable = ComputeEngageable(identity);
+            _engageByTarget[key] = engageable;
+            return engageable;
+        }
+
+        bool ComputeEngageable(Identity identity)
         {
             Character? target = Resolve(identity);
             return target != null

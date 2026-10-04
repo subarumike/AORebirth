@@ -151,12 +151,15 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(template);
             ArgumentNullException.ThrowIfNull(position);
 
+            using Metrics.TickStallWatch.StageScope stageScope = Metrics.TickStallWatch.Enter("spawn.stats", 0);
             NpcTemplateValidation.RequireSpawnable(template);
             int? spawnLevel = NpcTemplateLevelPolicy.ClampRequestedLevel(template, level);
             var resolvedStats = _gameData.ComposeNpcStats(template, spawnLevel);
             NpcTemplateLevelPolicy.RequireExactLevel(template, spawnLevel, resolvedStats);
             Identity identity = _registry.AllocateNpcIdentity();
+            Metrics.TickStallWatch.Stage("spawn.snap", identity.Instance);
             Vector3 at = _playfield.SnapNpcSpawn(position);
+            Metrics.TickStallWatch.Stage("spawn.build", identity.Instance);
             NpcCharacter npc = new NpcCharacter(identity, _items)
             {
                 Playfield = _playfield,
@@ -182,15 +185,18 @@ namespace ZoneEngine_New.Core.Playfield
                     npc.Stats.Set(CharacterStat.CharRadius, charRadius.Value);
             }
 
+            Metrics.TickStallWatch.Stage("spawn.equip", identity.Instance);
             ApplyTextures(npc, template);
             npc.SetTextureOverrides(template.TextureOverrides);
             npc.FillEquipment(_gameData, _logger);
+            Metrics.TickStallWatch.Stage("equip.wearcast", identity.Instance);
             WearCastNano.ApplyContainer(
                 npc,
                 npc.Equipment,
                 includeWield: true,
                 _items,
                 _playfield.GetRequiredService<IInventoryRepository>());
+            Metrics.TickStallWatch.Stage("spawn.rebase", identity.Instance);
             npc.Rebase();
             TryAttachShop(npc);
             if (attachDefaultBrain && npc.Shop == null && npc.Attackable)
@@ -199,9 +205,11 @@ namespace ZoneEngine_New.Core.Playfield
             // Anything the first spawn packet has to carry (a pet's PetMaster) goes on before it is registered.
             configure?.Invoke(npc);
 
+            Metrics.TickStallWatch.Stage("spawn.register", identity.Instance);
             _registry.Register(npc);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(npc);
 
+            Metrics.TickStallWatch.Stage("spawn.log", identity.Instance);
             _logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -708,8 +716,10 @@ namespace ZoneEngine_New.Core.Playfield
                 });
                 return;
             }
+            using Metrics.TickStallWatch.StageScope stageScope = Metrics.TickStallWatch.Enter("arrive.hydrate", characterId);
             Player player = SpawnPlayer(session, command.Hydration);
 
+            Metrics.TickStallWatch.Stage("arrive.self", characterId);
             session.State = SessionState.SpawnReady;
             // InitiateCompression + ChatServerInfo + PlayfieldAnarchyF + GameTime are sent from ZoneLoginHandler.
 
@@ -731,12 +741,15 @@ namespace ZoneEngine_New.Core.Playfield
             session.State = SessionState.InPlay;
             player.SendPerkActions();
 
+            Metrics.TickStallWatch.Stage("arrive.teams", characterId);
             _playfieldManager.Teams.AttachPlayer(player);
             _playfieldManager.Teams.RefreshPlayer(player);
 
+            Metrics.TickStallWatch.Stage("arrive.visibility", characterId);
             // Visibility must activate even when journal/quest restore fails; otherwise nearby
             // hash-spawns never send SCFU and the client cannot see or tab NPCs.
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
+            Metrics.TickStallWatch.Stage("arrive.content", characterId);
             TryRestorePostSpawnContent(player);
 
             _logger.Info(

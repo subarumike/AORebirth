@@ -1,10 +1,12 @@
 namespace ZoneEngine_New.Core.Playfield
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -33,6 +35,12 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly Lock _sync = new();
         private readonly Dictionary<int, Playfield> _playfields = new();
         private readonly Dictionary<int, Player> _playersByCharacterId = new();
+
+        /// <summary>Playfields being built off every tick thread; one build per id, shared by every waiter.</summary>
+        private readonly ConcurrentDictionary<int, Lazy<Task<Playfield>>> _building = new();
+
+        /// <summary>Players waiting on a background build to move (character id to playfield id): one move at a time.</summary>
+        private readonly ConcurrentDictionary<int, int> _pendingMoveByCharacter = new();
 
         /// <summary>When each quest dungeon was first seen empty (UTC ticks); absent while occupied or just requested.</summary>
         private readonly Dictionary<int, long> _dungeonEmptySince = new();
@@ -135,7 +143,105 @@ namespace ZoneEngine_New.Core.Playfield
             return TimeSpan.FromSeconds(seconds);
         }
 
+        /// <summary>
+        /// The playfield, building it on the calling thread when it is not loaded. A tick thread should not build: use
+        /// <see cref="WithPlayfield"/>. Joins a background build already running for the same id instead of building
+        /// it twice.
+        /// </summary>
         public Playfield GetOrCreate(int playfieldId)
+        {
+            if (_building.TryGetValue(playfieldId, out Lazy<Task<Playfield>>? pending))
+                return pending.Value.GetAwaiter().GetResult();
+
+            return GetOrCreateCore(playfieldId);
+        }
+
+        /// <summary>
+        /// Runs <paramref name="then"/> with the destination on <paramref name="player"/>'s own playfield tick. When the
+        /// destination is loaded that is right now, on the caller's thread, exactly as a direct call. Otherwise the
+        /// destination is built on a background thread (no tick waits on it) and <paramref name="then"/> is queued to
+        /// the player's playfield once it is ready; it must re-check anything that may have changed meanwhile (session,
+        /// playfield, death). False when the player already has a move waiting on a build; the request is dropped.
+        /// </summary>
+        public bool WithPlayfield(int playfieldId, Player player, Action<Playfield> then)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(then);
+
+            if (TryGet(playfieldId, out Playfield? loaded) && loaded != null)
+            {
+                then(loaded);
+                return true;
+            }
+
+            int characterId = player.Identity.Instance;
+            if (!_pendingMoveByCharacter.TryAdd(characterId, playfieldId))
+                return false;
+
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Playfield {0} building in background for character {1}",
+                    playfieldId,
+                    characterId));
+
+            BuildInBackground(playfieldId).ContinueWith(
+                build =>
+                {
+                    if (!build.IsCompletedSuccessfully)
+                    {
+                        _pendingMoveByCharacter.TryRemove(characterId, out _);
+                        _logger.Error(
+                            build.Exception?.GetBaseException() ?? new InvalidOperationException("Playfield build was cancelled."),
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                "Background build of playfield {0} failed; character {1} stays put",
+                                playfieldId,
+                                characterId));
+                        return;
+                    }
+
+                    Playfield ready = build.Result;
+                    Playfield? owner = player.Playfield;
+                    if (owner == null)
+                    {
+                        _pendingMoveByCharacter.TryRemove(characterId, out _);
+                        return;
+                    }
+
+                    owner.DispatchPlayerProjection(player, () =>
+                    {
+                        _pendingMoveByCharacter.TryRemove(characterId, out _);
+                        then(ready);
+                    });
+                },
+                CancellationToken.None,
+                TaskContinuationOptions.None,
+                TaskScheduler.Default);
+            return true;
+        }
+
+        Task<Playfield> BuildInBackground(int playfieldId)
+        {
+            Lazy<Task<Playfield>> build = _building.GetOrAdd(
+                playfieldId,
+                id => new Lazy<Task<Playfield>>(
+                    () => Task.Run(() =>
+                    {
+                        try
+                        {
+                            return GetOrCreateCore(id);
+                        }
+                        finally
+                        {
+                            _building.TryRemove(id, out _);
+                        }
+                    }),
+                    LazyThreadSafetyMode.ExecutionAndPublication));
+            return build.Value;
+        }
+
+        private Playfield GetOrCreateCore(int playfieldId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playfieldId);
 
@@ -158,6 +264,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             // Construct outside the manager lock. Playfield starts a heartbeat thread that may
             // call back into Register/Unregister/FindPlayer; holding _sync here deadlocks login.
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.construct", playfieldId);
             IZoneLogger playfieldLogger = _logger.CreateForPlayfield(playfieldId);
             Identity identity = new Identity
             {
@@ -207,6 +314,7 @@ namespace ZoneEngine_New.Core.Playfield
                     _shopDao);
             }
 
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.build", playfieldId);
             created.Build();
 
             lock (_sync)
@@ -228,6 +336,7 @@ namespace ZoneEngine_New.Core.Playfield
                         playfieldId));
             }
 
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.start", playfieldId);
             created.StartHeartbeat();
             return created;
         }
@@ -458,6 +567,8 @@ namespace ZoneEngine_New.Core.Playfield
                     throw new InvalidOperationException("A character already has an authoritative player instance.");
                 _playersByCharacterId[characterId] = player;
             }
+
+            ZoneEngine_New.Core.Metrics.WatchdogFeed.Sync(player);
         }
 
         public void UnregisterPlayer(Player player)
@@ -473,6 +584,11 @@ namespace ZoneEngine_New.Core.Playfield
                     _playersByCharacterId.Remove(characterId);
                 }
             }
+
+            // A move queued behind a background build is dropped with its player; free the slot.
+            _pendingMoveByCharacter.TryRemove(characterId, out _);
+
+            ZoneEngine_New.Core.Metrics.WatchdogFeed.Remove(player);
         }
 
         public void Dispose()

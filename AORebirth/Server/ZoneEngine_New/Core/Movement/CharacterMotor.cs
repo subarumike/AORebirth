@@ -426,10 +426,12 @@ namespace ZoneEngine_New.Core.Movement
                     start = startFloor;
                 if (playfield != null && playfield.TrySnapFeetToFloor(destination, out Vector3 destFloor))
                     destination = destFloor;
-                if (finder.TryFindPath(
+                if (PathDiag.TryFindPath(
+                    finder,
                     new System.Numerics.Vector3((float)start.x, (float)start.y, (float)start.z),
                     new System.Numerics.Vector3((float)destination.x, (float)destination.y, (float)destination.z),
-                    _navMeshScratch)
+                    _navMeshScratch,
+                    PathDiag.Motor)
                     && _navMeshScratch.Count > 0)
                 {
                     for (int i = 0; i < _navMeshScratch.Count; i++)

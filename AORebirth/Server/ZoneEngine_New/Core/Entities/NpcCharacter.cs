@@ -283,6 +283,7 @@ namespace ZoneEngine_New.Core.Entities
             _combatWeaponSlots.Clear();
             int quality = Stats.GetOrOne(CharacterStat.Level);
             List<List<int>> pairs = template.Equipment;
+            TickStallWatch.Stage("equip.bossmod", Identity.Instance);
             (HashSet<int> bossModifiers, int keptBossModifier) = PickBossModifier(pairs, quality);
             for (int i = 0; i < pairs.Count; i++)
             {
@@ -296,10 +297,13 @@ namespace ZoneEngine_New.Core.Entities
 
                 int lowId = pair[0];
                 int highId = pair.Count >= 2 && pair[1] > 0 ? pair[1] : lowId;
+                TickStallWatch.Stage("equip.create", lowId);
                 Item item = _items.CreateWithNewInstance(lowId, highId, quality, ItemSource.Other);
+                TickStallWatch.Stage("equip.add", lowId);
                 if (!TryAddEquipment(item, logger))
                     return;
 
+                TickStallWatch.Stage("equip.weapon", lowId);
                 TryExpandMonsterWeapon(gameData, item, quality, logger);
             }
         }

@@ -273,6 +273,8 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, NpcCommand>();
             services.AddSingleton<IGmCommand, ServerStatsCommand>();
             services.AddSingleton<IGmCommand, QuestsCommand>();
+            services.AddSingleton<IGmCommand, DiagCommand>();
+            services.AddSingleton<IGmCommand, DebugCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
             services.AddSingleton<IZoneAdmissionGate, ZoneAdmissionGate>();
@@ -380,6 +382,7 @@ namespace ZoneEngine_New
                 LogUtil.ApplyConfiguredDebugDetails();
                 LogUtil.SetupFileLogging("${basedir}/ZoneEngine_NewLog.txt", LogLevel.Trace);
                 DebugMcpLogBuffer.Shared.Install();
+                ZoneEngine_New.Core.Logging.AsyncLogging.Install();
                 LogActiveConfiguration();
             }
             catch (Exception)

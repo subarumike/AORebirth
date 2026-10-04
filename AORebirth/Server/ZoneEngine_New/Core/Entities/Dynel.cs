@@ -78,8 +78,13 @@ namespace ZoneEngine_New.Core.Entities
         public double Distance3D(Dynel other)
         {
             ArgumentNullException.ThrowIfNull(other);
-            Vector3 delta = Position - other.Position;
-            return Vector3.Abs(delta);
+            // Component math: this runs thousands of times a tick, and Vector3 is a class.
+            Vector3 a = Position;
+            Vector3 b = other.Position;
+            double dx = a.x - b.x;
+            double dy = a.y - b.y;
+            double dz = a.z - b.z;
+            return Math.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
         }
 
         public virtual double GetCollisionRadius() => 0.0;
@@ -108,14 +113,17 @@ namespace ZoneEngine_New.Core.Entities
             if (world == null)
                 return true;
 
+            using Metrics.TickStallWatch.StageScope scope = Metrics.TickStallWatch.Enter("los", Identity.Instance);
             const float eye = Movement.MovementConfig.LineOfSightEyeHeight;
-            Vector3 from = new(Position.x, Position.y + eye, Position.z);
-            Vector3 to = new(other.Position.x, other.Position.y + eye, other.Position.z);
-            double dist = Vector3.Abs(to - from);
-            if (dist > 200)
+            Vector3 a = Position;
+            Vector3 b = other.Position;
+            float fx = (float)a.x, fy = (float)a.y + eye, fz = (float)a.z;
+            float tx = (float)b.x, ty = (float)b.y + eye, tz = (float)b.z;
+            float dx = tx - fx, dy = ty - fy, dz = tz - fz;
+            if ((dx * dx) + (dy * dy) + (dz * dz) > 200f * 200f)
                 return false;
 
-            return world.HasLineOfSight(from, to);
+            return world.HasLineOfSight(fx, fy, fz, tx, ty, tz);
         }
 
         public virtual MessageBody BuildSpawnMessage()

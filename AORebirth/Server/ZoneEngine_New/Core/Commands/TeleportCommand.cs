@@ -110,11 +110,12 @@ namespace ZoneEngine_New.Core.Commands
                     return;
                 }
 
-                // Building a playfield that is not loaded yet takes a moment; say so before it starts.
+                // Building a playfield that is not loaded yet takes a moment (off every tick); say so before it starts.
                 if (!_playfieldManager.Value.TryGet(playfieldId, out _))
                     GmCommandFeedback.Send(context.Session, context.Player, "Initializing playfield, please wait...");
 
-                Relocate(context, subject, _playfieldManager.Value.GetOrCreate(playfieldId), landing, who);
+                if (!_playfieldManager.Value.WithPlayfield(playfieldId, subject, destination => Relocate(context, subject, destination, landing, who)))
+                    GmCommandFeedback.Send(context.Session, context.Player, "Target is already changing playfield.");
                 return;
             }
 

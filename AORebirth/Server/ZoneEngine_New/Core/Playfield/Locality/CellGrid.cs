@@ -59,6 +59,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         internal int NumZonesX => _numZonesX;
 
+        /// <summary>World size of one cell (outdoor grid).</summary>
+        internal float CellWorldSize => _cellWorldSize;
+
         internal int NumZonesZ => _numZonesZ;
 
         internal float WorldSizeX => _worldSizeX;

@@ -111,7 +111,10 @@ namespace ZoneEngine_New.Core.Inventory
             if ((flags & visibilityNibble) == 0)
                 return unchecked((short)baselinePacketFlags);
 
-            return unchecked((short)flags);
+            // An owned item always shows in its container. Some templates (Blackmane's Stat Buffer, the Rings of
+            // Tattered Flame / Weeping Flesh / Eternal Night) carry no Visible bit, and the client then leaves their
+            // slots looking empty even though they are occupied.
+            return unchecked((short)(flags | (int)AORebirth.Enums.ItemFlags.Visible));
         }
 
         /// <summary>Durable <c>item_instances</c> row for this instance at the given location.</summary>
