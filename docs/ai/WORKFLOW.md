@@ -518,7 +518,8 @@ placement catalog, and the current derived Linux inventory rejects that obsolete
 runtime corpus. This section does not define current runtime content validation.
 
 Import the verified official type-`1000014` placement corpus from the read-only
-AO Stripdown extraction with:
+offline extraction under ignored `.local/official-playfield-placement-inputs`
+inside this checkout with:
 
 ```cmd
 cmd /d /c Tools\import_official_playfield_placements.cmd --write
@@ -993,6 +994,12 @@ Also provide this evidence table before any SQL or game-data edit:
 Local SQL/data patches must include exact rows affected, pre-apply verification query, apply command, post-apply verification query, rollback query, and confirmation that no unrelated rows changed.
 
 ## Evidence
+
+Historical capture-era research scripts, retired Legacy projects and external
+extraction paths are not prerequisites for normal development, engine builds,
+private GameData selection or Linux delivery. Current runtime inputs resolve
+from the selected GameData tree. Retained offline research workflows run only
+when separately requested; their historical references do not restore authority.
 
 Use this source order:
 

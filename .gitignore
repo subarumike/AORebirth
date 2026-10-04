@@ -153,4 +153,6 @@ __pycache__/
 /password decoder/
 logs/
 /GameData/
+/PrivateGameData/
+/GameData.rar
 /AO-Content-Dump-main/

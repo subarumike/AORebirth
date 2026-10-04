@@ -1,5 +1,9 @@
 # CellAO Project Working Reference (Codex + Mike)
 
+Historical reference only. The paths and source priorities below describe the
+2026-06-01 workstation; they are not current dependencies or operating instructions.
+Use `AI_START_HERE.md` and current repository governance for normal development.
+
 Last updated: 2026-06-01 (America/Chicago)
 
 ## 1) Environment and Safety Rules

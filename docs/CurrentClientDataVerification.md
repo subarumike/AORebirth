@@ -1,5 +1,8 @@
 # Current Client Data Verification
 
+Historical 2026-06-14 snapshot. External workstation paths below are provenance
+only and are not prerequisites for current development, builds or delivery.
+
 Generated: 2026-06-14 02:34:33
 
 ## Scope

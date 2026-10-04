@@ -16,7 +16,7 @@ from typing import Any, Iterable, Mapping
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SOURCE_ROOT = Path(r"C:\Users\Mike\Documents\AO stripdown")
+DEFAULT_SOURCE_ROOT = REPOSITORY_ROOT / ".local" / "official-playfield-placement-inputs"
 
 SOURCE_CLIENT_VARIANT = "EP1_OLD_GRAPHICS_CLIENT"
 SOURCE_CLIENT_BUILD = "18.8.62_EP1"
@@ -406,7 +406,7 @@ def _validate_source_record(
 
 def load_source_corpus(source_root: Path) -> SourceCorpus:
     source_root = source_root.expanduser().resolve()
-    _require(source_root.is_dir(), f"AO Stripdown source root is missing: {source_root}")
+    _require(source_root.is_dir(), f"official extraction input root is missing: {source_root}")
     _require(source_root != REPOSITORY_ROOT.resolve(), "AORebirth cannot be used as its own official extraction source")
 
     artifacts: dict[str, Any] = {}
@@ -1881,7 +1881,7 @@ def main(argv: list[str] | None = None) -> int:
         "--source-root",
         type=Path,
         default=DEFAULT_SOURCE_ROOT,
-        help="explicit read-only AO Stripdown repository root",
+        help="read-only official extraction inputs (default: repository .local/official-playfield-placement-inputs)",
     )
     parser.add_argument(
         "--refresh-runtime-authorization",

@@ -51,8 +51,9 @@ Create a maintainable, evidence-backed local AO server that can support login, c
 
 - `AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging`
 - `AORebirth/Libraries/Source/msgpack-cli`
-- `C:\Users\Mike\Documents\AO stripdown\Anarchy Online`
-- `C:\Users\Mike\Documents\New project\external\never-knows-best`
+- Historical external extraction references are optional provenance, not current
+  workspace dependencies. The retained placement importer uses repository-local
+  offline inputs documented in `docs/ai/WORKFLOW.md`.
 - Public reference repos inspected from `https://gitlab.com/never-knows-best`, especially AOSharp, AODB, AOSharp.Clientless, and Anarchy Online NavMeshes.
 
 ## Repository Overview

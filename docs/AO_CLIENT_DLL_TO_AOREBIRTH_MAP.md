@@ -1,5 +1,8 @@
 # AO Client DLL To AORebirth Map
 
+Historical 2026-07-09 reference. External extraction paths below are provenance
+only and are not prerequisites for current development, builds or delivery.
+
 ## Scope And Snapshot
 
 This report cross-references the replacement-client Ghidra corpus in
