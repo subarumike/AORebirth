@@ -79,9 +79,9 @@ namespace ZoneEngine_New.Core.Helpers
             Item? weapon,
             bool attackerIsPlayer = true)
         {
-            // NPC: right hand when a visual weapon overrides the monster weapon, else 0.
+            // NPC: right hand when a visual weapon is shown swinging, else 0.
             if (!attackerIsPlayer)
-                return armed?.DamageOverride != null ? (int)WeaponSlots.Righthand : 0;
+                return armed?.VisualHand != null ? (int)WeaponSlots.Righthand : 0;
 
             // Player synthetic fist / PhysicalInit: slot 0.
             if (IsUnarmedPresentation(armed, weapon))
@@ -101,7 +101,7 @@ namespace ZoneEngine_New.Core.Helpers
         {
             // NPC monster weapons: AttackInfo Unknown6 must equal SAW SpecialAttack.Unknown3,
             // unless a visual weapon overrides the swing.
-            if (armed != null && armed.SawTag != 0 && armed.DamageOverride == null)
+            if (armed != null && armed.SawTag != 0 && armed.VisualHand == null)
                 return armed.SawTag;
 
             // Private-server player unarmed rows use instance 0 (not AOEmu's 100).

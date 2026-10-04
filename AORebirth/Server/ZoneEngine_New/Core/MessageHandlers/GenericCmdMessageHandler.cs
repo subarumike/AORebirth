@@ -14,6 +14,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Network;
@@ -123,12 +124,24 @@ namespace ZoneEngine_New.Core.MessageHandlers
                             Deny(session, message, player, "accepted Strongbox item/target is not eligible");
                     }
                     else if (message.Target is { Length: >= 2 }
-                        && TryGetBreakAndEnter(player, playfield, message.Target[0], message.Target[1], out IBreakAndEnterTarget lockable))
+                        && TryGetBreakAndEnter(player, playfield, message.Target[0], message.Target[1], out IBreakAndEnterTarget lockable,
+                            out Item pick))
                     {
-                        if (lockable.TryBreakAndEnter(player))
-                            Acknowledge(session, message, message.Target[1]);
-                        else
-                            Deny(session, message, player, "break and enter target is not locked or out of reach");
+                        // A pick that opens the lock gets "Lockpicking successful." from the server (the client has no
+                        // success text of its own) and the ack; a failed pick (0x65, "Lockpicking failed.") is refused.
+                        switch (lockable.TryBreakAndEnter(player, PickRating(player, pick)))
+                        {
+                            case BreakAndEnterResult.Unlocked:
+                                ClientFeedback.Send(player, ClientFeedback.LockpickingSuccessful);
+                                Acknowledge(session, message, message.Target[1]);
+                                break;
+                            case BreakAndEnterResult.Failed:
+                                Deny(session, message);
+                                break;
+                            default:
+                                Deny(session, message, player, "break and enter target is not locked or out of reach");
+                                break;
+                        }
                     }
                     else if (message.Target is { Length: >= 2 }
                         && _dungeons?.TryDuplicate(player, message.Target[0], message.Target[1]) == true)
@@ -503,9 +516,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
         /// Break and Enter: an item with CanFlags.BreakAndEnter (a lock pick) from the player's inventory, used on a
         /// lockable door or chest on the player's playfield. The item is not used up.
         /// </summary>
-        static bool TryGetBreakAndEnter(Player player, Playfield playfield, Identity slot, Identity target, out IBreakAndEnterTarget lockable)
+        static bool TryGetBreakAndEnter(Player player, Playfield playfield, Identity slot, Identity target, out IBreakAndEnterTarget lockable,
+            out Item pick)
         {
             lockable = null!;
+            pick = null!;
             if (slot.Type != IdentityType.Inventory || !player.Inventory.IsHydrated
                 || !player.Inventory.TryGetItem(slot.Type, slot.Instance, out Item item) || !item.Can(CanFlags.BreakAndEnter))
                 return false;
@@ -514,7 +529,24 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return false;
 
             lockable = found;
+            pick = item;
             return true;
+        }
+
+        /// <summary>
+        /// The pick's rating against a lock: the lock pick's Attack skills weighted against the player (Lock Pick 95577:
+        /// 100% of skill 135), or Break and Entry when the item lists none. It must reach the lock's LockDifficulty.
+        /// </summary>
+        static int PickRating(Player player, Item pick)
+        {
+            var attack = pick.Definition.Attack;
+            if (attack.Count == 0)
+                return player.Stats.GetOrZero(CharacterStat.BreakingEntry);
+
+            long total = 0;
+            foreach ((CharacterStat stat, int percent) in attack)
+                total += (long)player.Stats.GetOrZero(stat) * percent;
+            return (int)Math.Clamp(total / 100, 0, int.MaxValue);
         }
 
         static void Acknowledge(IZoneSession session, GenericCmdMessage message, Identity target, bool corpseUse = false)

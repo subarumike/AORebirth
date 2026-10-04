@@ -54,6 +54,9 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly DynelRegistry _dynelRegistry;
         private readonly PlayfieldInboundQueue _inbound = new();
         private PlayfieldHeartbeat? _heartBeat;
+
+        /// <summary>Configured heartbeat rate (ticks per second); 0 before the heartbeat starts.</summary>
+        internal int TickRate => _heartBeat?.TickRate ?? 0;
         private readonly Lock _tickSync = new();
         private int _nextContainerInventoryHandle = 1;
         // TEMP: WIFU Identity.Instance until real weapon-instance identity allocation exists.
@@ -123,12 +126,18 @@ namespace ZoneEngine_New.Core.Playfield
             _characterSnapshot = characterSnapshot;
             _shopDao = shopDao;
             _metrics = metricsRegistry.GetOrCreate(playfieldIdentity.Instance);
+            int id = playfieldIdentity.Instance;
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.metadata", id);
             MetaData = _gameData.GetPlayfieldMetaData(playfieldIdentity.Instance);
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.geometry", id);
             Geometry = _gameData.GetPlayfieldGeometry(playfieldIdentity.Instance);
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.navmesh", id);
             Pathfinder = TryLoadPathfinder(_gameData.RootPath, playfieldIdentity.Instance, _logger);
 
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.services", id);
             _serviceProvider = BuildServices().BuildServiceProvider();
             _dynelRegistry = _serviceProvider.GetRequiredService<DynelRegistry>();
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.hashspawns", id);
             _serviceProvider.GetRequiredService<HashSpawnSystem>().Initialize(
                 _serviceProvider.GetRequiredService<PlayfieldLocality>());
 
@@ -153,6 +162,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             _built = true;
             Stopwatch sw = Stopwatch.StartNew();
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.statics", Identity.Instance);
             int staticDynels = SpawnStaticDynels();
             sw.Stop();
             _metrics.RecordBuild(sw.Elapsed.TotalMilliseconds);
@@ -179,8 +189,10 @@ namespace ZoneEngine_New.Core.Playfield
             if (_heartBeat != null || _disposed)
                 return;
 
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.activate", Identity.Instance);
             GetRequiredService<NpcContentActivationService>().Activate();
             GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Activate();
+            ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.heartbeat", Identity.Instance);
             _heartBeat = new PlayfieldHeartbeat(Identity, Tick);
         }
 
@@ -532,7 +544,7 @@ namespace ZoneEngine_New.Core.Playfield
 
         public void Tick(double deltaTime)
         {
-            ZoneEngine_New.Core.Metrics.TickStallWatch.BeginTick(Identity.Instance);
+            ZoneEngine_New.Core.Metrics.TickStallWatch.BeginTick(Identity.Instance, TickRate > 0 ? 1000.0 / TickRate : 0);
             try { TickCore(deltaTime); }
             finally { ZoneEngine_New.Core.Metrics.TickStallWatch.EndTick(); }
         }
@@ -548,11 +560,15 @@ namespace ZoneEngine_New.Core.Playfield
                 SpawnService spawn = _serviceProvider.GetRequiredService<SpawnService>();
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inbound.drain");
                 _inbound.Drain(_router, spawn, this);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("spawn.tick");
                 spawn.Tick();
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("npc.activation");
                 GetRequiredService<NpcContentActivationService>().Tick();
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inventory.moves");
                 _inventoryMoves.Tick(this, deltaTime);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("itemuse");
                 GetRequiredService<ItemUseService>().Tick(deltaTime);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("trades");
                 _trades.Tick(this, deltaTime);
 
                 WorldSimulation.PlayfieldWorldSimulation? world = WorldAccess.Instance;
@@ -564,10 +580,13 @@ namespace ZoneEngine_New.Core.Playfield
                     _metrics.WorldSimTick.Record(ElapsedMilliseconds(worldStart));
                 }
 
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("locality");
                 _serviceProvider.GetRequiredService<PlayfieldLocality>().Tick(deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("stats.rebase");
                 DrainRebases();
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("knubot");
                 _playfieldManager.Knubot?.Tick(this);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("checkpoint");
                 foreach (Player player in new System.Collections.Generic.List<Player>(_dynelRegistry.PlayerEntities()))
                 {
                     if (!ReferenceEquals(player.Playfield, this))
@@ -593,8 +612,9 @@ namespace ZoneEngine_New.Core.Playfield
                 logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        "Playfield navmesh loaded id={0}",
-                        playfieldId));
+                        "Playfield navmesh loaded id={0} islands={1}",
+                        playfieldId,
+                        pathfinder.IslandCount));
                 return pathfinder;
             }
 
@@ -682,6 +702,7 @@ namespace ZoneEngine_New.Core.Playfield
                 return locality;
             });
             services.AddSingleton<SpawnService>();
+            services.AddSingleton<ZoneEngine_New.Core.Ai.ReachMaps>();
             services.AddSingleton(provider => new Pets.PetService(this, _gameData, _logger));
             services.AddSingleton(_shopDao);
             services.AddSingleton<NpcContentActivationService>();

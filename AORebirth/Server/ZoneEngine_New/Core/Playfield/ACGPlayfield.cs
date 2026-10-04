@@ -76,6 +76,7 @@ namespace ZoneEngine_New.Core.Playfield
             try
             {
                 MarkBuilt();
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.dungeon", Identity.Instance);
                 AORebirth.World.Collision.DungeonWorldLayout? dungeon = DungeonPlayfieldBinder.TryBuild(
                     GameData.RootPath,
                     Identity.Instance,
@@ -84,6 +85,7 @@ namespace ZoneEngine_New.Core.Playfield
                 if (dungeon != null)
                     GetRequiredService<PlayfieldLocality>().ApplyDungeonRooms(dungeon.Rooms);
 
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.world", Identity.Instance);
                 _world = WorldSimulation.PlayfieldWorldSimulation.Create(
                     Identity.Instance,
                     DungeonPlayfieldBinder.WithDungeonCollision(Identity.Instance, Geometry, dungeon),
@@ -97,8 +99,10 @@ namespace ZoneEngine_New.Core.Playfield
                 wallTriggers = _world.WallTriggerCount;
                 portalTriggers = _world.PortalTriggerCount;
 
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.worldservices", Identity.Instance);
                 RegisterWorldServices(_world);
 
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.statics", Identity.Instance);
                 int staticDynels = SpawnStaticDynels();
 
                 sw.Stop();

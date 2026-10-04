@@ -32,6 +32,13 @@ namespace ZoneEngine_New.Core.Metrics
 
         public (double? averageMs, int sampleCount) Average(int windowSeconds)
         {
+            (double? averageMs, _, int sampleCount) = Summarize(windowSeconds);
+            return (averageMs, sampleCount);
+        }
+
+        /// <summary>Average, worst and count of the samples recorded inside the last <paramref name="windowSeconds"/>.</summary>
+        public (double? averageMs, double? maxMs, int sampleCount) Summarize(int windowSeconds)
+        {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(windowSeconds);
 
             long now = Stopwatch.GetTimestamp();
@@ -41,9 +48,10 @@ namespace ZoneEngine_New.Core.Metrics
             lock (_sync)
             {
                 if (_count == 0)
-                    return (null, 0);
+                    return (null, null, 0);
 
                 double sum = 0.0;
+                double max = 0.0;
                 int matched = 0;
                 int start = (_writeIndex - _count + Capacity) % Capacity;
                 for (int i = 0; i < _count; i++)
@@ -53,13 +61,14 @@ namespace ZoneEngine_New.Core.Metrics
                         continue;
 
                     sum += _durationsMs[index];
+                    max = Math.Max(max, _durationsMs[index]);
                     matched++;
                 }
 
                 if (matched == 0)
-                    return (null, 0);
+                    return (null, null, 0);
 
-                return (sum / matched, matched);
+                return (sum / matched, max, matched);
             }
         }
     }
@@ -101,7 +110,7 @@ namespace ZoneEngine_New.Core.Metrics
             lock (_sync)
                 buildMs = _buildElapsedMs;
 
-            (double? tickAvg, int tickCount) = TickExecution.Average(windowSeconds);
+            (double? tickAvg, double? tickMax, int tickCount) = TickExecution.Summarize(windowSeconds);
             (double? worldAvg, int worldCount) = WorldSimTick.Average(windowSeconds);
 
             return new PlayfieldMetricsSnapshot(
@@ -111,7 +120,10 @@ namespace ZoneEngine_New.Core.Metrics
                 tickAvg,
                 tickCount,
                 worldAvg,
-                worldCount);
+                worldCount)
+            {
+                TickMaxMs = tickMax
+            };
         }
     }
 
@@ -144,6 +156,8 @@ namespace ZoneEngine_New.Core.Metrics
         public double? TickAverageMs { get; }
 
         public int TickSampleCount { get; }
+
+        public double? TickMaxMs { get; init; }
 
         public double? WorldSimAverageMs { get; }
 

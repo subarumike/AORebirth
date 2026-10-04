@@ -406,8 +406,8 @@ namespace ZoneEngine_New.Core.Commands
                 text.Append(' ').Append(Color(Tag, "saw " + weapon.SawTagName));
 
             AppendItem(text, null, weapon.Item);
-            if (weapon.DamageOverride != null)
-                AppendItem(text, "Damage from", weapon.DamageOverride);
+            if (weapon.VisualHand != null)
+                AppendItem(text, "Visual", weapon.VisualHand);
             if (weapon.RangeSource != null && !ReferenceEquals(weapon.RangeSource, weapon.Item))
                 AppendItem(text, "Range from", weapon.RangeSource);
             return text.ToString();

@@ -54,6 +54,7 @@ namespace ZoneEngine_New.Core.GameData
             new Dictionary<string, HashInstance>(StringComparer.Ordinal));
         private readonly Dictionary<int, VendingMachineDefinition> _vendingMachines = new();
         private readonly Dictionary<int, int> _catMeshByMonsterData = new();
+        private readonly Dictionary<int, (int? Mass, int? CharRadius)> _bodyStatsByMonsterData = new();
         private readonly Dictionary<int, XpLevelEntry> _xpLevels = new();
         private readonly Dictionary<int, AlienXpLevelEntry> _alienXpLevels = new();
         private readonly Dictionary<int, PlayfieldMetaData?> _playfieldMetaData = new();
@@ -232,6 +233,18 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return _catMeshByMonsterData.TryGetValue(monsterData, out catMesh);
+        }
+
+        public bool TryGetMonsterBodyStats(int monsterData, out int? mass, out int? charRadius)
+        {
+            mass = null;
+            charRadius = null;
+            if (monsterData <= 0 || !_bodyStatsByMonsterData.TryGetValue(monsterData, out (int? Mass, int? CharRadius) body))
+                return false;
+
+            mass = body.Mass;
+            charRadius = body.CharRadius;
+            return true;
         }
 
         public bool TryGetPlayfieldCharacterAppearanceOverride(int playfieldId, out uint monsterData)
@@ -648,7 +661,14 @@ namespace ZoneEngine_New.Core.GameData
                 int skipped = 0;
                 foreach (MonsterDataCatMeshPairing pairing in loaded)
                 {
-                    if (pairing.MonsterData <= 0 || pairing.CatMesh <= 0)
+                    if (pairing.MonsterData > 0 && (pairing.Mass != null || pairing.CharRadius != null))
+                        _bodyStatsByMonsterData.TryAdd(pairing.MonsterData, (pairing.Mass, pairing.CharRadius));
+
+                    // A record without a mesh has body stats only.
+                    if (pairing.MonsterData > 0 && pairing.CatMesh <= 0)
+                        continue;
+
+                    if (pairing.MonsterData <= 0)
                     {
                         skipped++;
                         continue;
@@ -1223,6 +1243,12 @@ namespace ZoneEngine_New.Core.GameData
             public int MonsterData { get; set; }
 
             public int CatMesh { get; set; }
+
+            /// <summary>MonsterData stat 2.</summary>
+            public int? Mass { get; set; }
+
+            /// <summary>MonsterData stat 421.</summary>
+            public int? CharRadius { get; set; }
         }
 
         private sealed class XpLevelRow

@@ -63,7 +63,8 @@ namespace ZoneEngine_New.Core.Inventory
                 if (!IsCastFunction(spell) || !spell.MeetsRequirements(wearer.Stats))
                     continue;
 
-                NanoCastFunctions.TryExecute(wearer, wearer, spell, items, inventory);
+                using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("equip.cast", item.LowId))
+                    NanoCastFunctions.TryExecute(wearer, wearer, spell, items, inventory);
             }
         }
 

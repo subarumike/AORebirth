@@ -256,7 +256,11 @@ namespace ZoneEngine_New.Core.Commands
                 // A GM jump is not a proxy entry: it leaves no way back through an exit proxy.
                 self.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
                 self.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
-                self.Session.TransferToPlayfield(_playfields.Value.GetOrCreate(entrance.Playfield), landing);
+                _playfields.Value.WithPlayfield(entrance.Playfield, self, destination =>
+                {
+                    if (ReferenceEquals(self.Playfield, playfield))
+                        self.Session?.TransferToPlayfield(destination, landing);
+                });
                 return;
             }
 

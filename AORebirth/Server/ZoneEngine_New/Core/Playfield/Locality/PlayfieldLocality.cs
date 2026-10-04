@@ -24,6 +24,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly CellHeatScheduler _heatScheduler;
         private readonly HashSet<Dynel> _tracked = [];
         private readonly List<Dynel> _tickBuffer = [];
+        private readonly List<int> _nearbyCellBuffer = [];
 
         public PlayfieldLocality(int playfieldId, PlayfieldMetaData? metaData)
         {
@@ -37,6 +38,69 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         }
 
         internal CellGrid Grid => _grid;
+
+        /// <summary>
+        /// Fills <paramref name="results"/> with the dynels an NPC concerns itself with: those in
+        /// <paramref name="center"/>'s cell and the cells touching it. Indoors the playfield is one cell, and a
+        /// dungeon's rooms have no grid adjacency, so both return every occupant. Includes <paramref name="center"/>.
+        /// Tick thread only (shares a scratch buffer).
+        /// </summary>
+        internal void CollectNearby(Dynel center, List<Dynel> results) => CollectNearby(center, 0f, results);
+
+        /// <summary>
+        /// Same, typed: only occupants that are <typeparamref name="T"/>. <paramref name="reachMeters"/> is the
+        /// farthest the caller will act (an aggro range); the ring is the adjacent cells, and grows past them only
+        /// when that reach is longer than a cell, so data-driven ranges are never cut short.
+        /// </summary>
+        internal void CollectNearby<T>(Dynel center, float reachMeters, List<T> results)
+            where T : Dynel
+        {
+            ArgumentNullException.ThrowIfNull(center);
+            ArgumentNullException.ThrowIfNull(results);
+            results.Clear();
+
+            if (!_grid.IsOutdoor || _grid.IsDungeon)
+            {
+                foreach (Dynel dynel in _grid.OccupantsInAllCells())
+                {
+                    if (dynel is T typed)
+                        results.Add(typed);
+                }
+
+                return;
+            }
+
+            int cellId = center.Cell?.Id ?? (_grid.TryGetCellId(center.Position, out int resolved) ? resolved : CellGrid.NonLocalCellId);
+            if (cellId == CellGrid.NonLocalCellId)
+                return;
+
+            _grid.CollectNeighbors(cellId, RingFor(reachMeters), _nearbyCellBuffer);
+            for (int i = 0; i < _nearbyCellBuffer.Count; i++)
+            {
+                if (!_grid.TryGetCell(_nearbyCellBuffer[i], out Cell cell))
+                    continue;
+                foreach (Dynel dynel in cell.Occupants)
+                {
+                    if (dynel is T typed)
+                        results.Add(typed);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Body radii a range check measured edge-to-edge can add to centre distance. Generous on purpose: it only
+        /// decides whether a long reach needs a second ring of cells.
+        /// </summary>
+        const float ReachBodyMarginMeters = 5f;
+
+        /// <summary>Adjacent cells (1), or more when <paramref name="reachMeters"/> plus body margin passes one cell.</summary>
+        int RingFor(float reachMeters)
+        {
+            float cell = _grid.CellWorldSize;
+            if (reachMeters <= 0f || cell <= 0f)
+                return 1;
+            return Math.Max(1, (int)Math.Ceiling((reachMeters + ReachBodyMarginMeters) / cell));
+        }
 
         internal LocalityPolicy Policy => _policy;
 

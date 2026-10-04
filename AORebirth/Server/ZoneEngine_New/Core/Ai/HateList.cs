@@ -61,7 +61,8 @@ namespace ZoneEngine_New.Core.Ai
 
         public void Clear() => _entries.Clear();
 
-        public IEnumerable<HateEntry> Entries => _entries.Values;
+        /// <summary>The entries, as the dictionary's own collection so a foreach over it does not allocate.</summary>
+        public Dictionary<ulong, HateEntry>.ValueCollection Entries => _entries.Values;
     }
 
     public static class NpcAiRules
@@ -86,6 +87,25 @@ namespace ZoneEngine_New.Core.Ai
         /// chance when the target is still out of LOS or attack range.
         /// </summary>
         public const float PathEndGiveUpMeters = 1.5f;
+
+        /// <summary>
+        /// A target counts as reachable only by a route that stays within this distance of the target. A target that
+        /// needs a longer detour (a rock top reached from the far side of a hill) is unreachable for a chase, and the
+        /// NPC leashes and resets as for any unreachable target.
+        /// </summary>
+        public const float ReachRadiusMeters = 60f;
+
+        /// <summary>
+        /// How often an NPC brain thinks (aggro scan, target choice, chase and leash decisions, nano choice). Movement and
+        /// combat swings still run every playfield tick. Brains are staggered so they spread across ticks.
+        /// </summary>
+        public const double BrainThinkSeconds = 0.5;
+
+        /// <summary>
+        /// Polygons a target's reach map may flood before it is too costly to answer. An NPC whose target's map passes
+        /// this resets at once instead of searching again.
+        /// </summary>
+        public const int ReachMapMaxPolys = 4096;
 
         /// <summary>
         /// ...and only when the last point is within this height of the NPC. A path ending right above
@@ -114,6 +134,13 @@ namespace ZoneEngine_New.Core.Ai
         /// Unprovoked aggro range from the NPC's own stats: ProximityRangeOutdoors (454) on outdoor playfields,
         /// ProximityRangeIndoors (484) indoors. <see cref="ProximityAggroRange"/> when the NPC has none.
         /// </summary>
+        /// <summary>Same, read straight from <paramref name="stats"/> (no delegate per call).</summary>
+        public static float ProximityAggroRangeFor(ZoneEngine_New.Core.Entities.StatCollection stats, bool outdoor)
+        {
+            int range = stats.GetOrZero(outdoor ? CharacterStat.ProximityRangeOutdoors : CharacterStat.ProximityRangeIndoors);
+            return range > 0 ? range : ProximityAggroRange;
+        }
+
         public static float ProximityAggroRangeFor(Func<CharacterStat, int> stats, bool outdoor)
         {
             int range = stats(outdoor ? CharacterStat.ProximityRangeOutdoors : CharacterStat.ProximityRangeIndoors);

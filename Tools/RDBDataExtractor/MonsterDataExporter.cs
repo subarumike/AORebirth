@@ -12,9 +12,10 @@ namespace AORebirth.Tools.RDBDataExtractor
     using AORebirth.Core.GameData;
 
     /// <summary>
-    /// Exports MonsterData id → CatMesh id pairings from RDB MonsterData records.
-    /// CatMesh comes from MonsterData stat <see cref="StatId.mesh"/> (12), which holds
-    /// the CatMesh resource id (see docs/reference/enemies/EnemyNpcDllAodbMap.md).
+    /// Exports per-MonsterData body data from RDB MonsterData records: the CatMesh id (stat
+    /// <see cref="StatId.mesh"/>, 12; see docs/reference/enemies/EnemyNpcDllAodbMap.md), Mass (stat 2) and
+    /// CharRadius (stat 421), the radius the client's weapon range check uses (CharRadius * Scale / 100,
+    /// Gamecode.dll 0x10044e56).
     /// </summary>
     internal sealed class MonsterDataExporter
     {
@@ -92,15 +93,20 @@ namespace AORebirth.Tools.RDBDataExtractor
                 if (record == null || record.Stats == null)
                     continue;
 
+                // Records without a mesh still carry Mass and CharRadius, so every record is written (catMesh 0).
                 uint catMesh;
-                if (!record.Stats.TryGetValue((int)StatId.mesh, out catMesh) || catMesh == 0)
-                    continue;
+                if (!record.Stats.TryGetValue((int)StatId.mesh, out catMesh))
+                    catMesh = 0;
 
+                uint mass;
+                uint charRadius;
                 pairings.Add(
                     new MonsterDataCatMeshPairing
                     {
                         MonsterData = monsterDataId,
                         CatMesh = (int)catMesh,
+                        Mass = record.Stats.TryGetValue((int)StatId.volumemass, out mass) ? (int?)mass : null,
+                        CharRadius = record.Stats.TryGetValue((int)StatId.charradius, out charRadius) ? (int?)charRadius : null,
                     });
             }
 
@@ -112,6 +118,12 @@ namespace AORebirth.Tools.RDBDataExtractor
             public int MonsterData { get; set; }
 
             public int CatMesh { get; set; }
+
+            /// <summary>Stat 2 (Mass).</summary>
+            public int? Mass { get; set; }
+
+            /// <summary>Stat 421 (CharRadius).</summary>
+            public int? CharRadius { get; set; }
         }
     }
 }

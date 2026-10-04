@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.Ai
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Playfield.Locality;
 
     using Utility;
 
@@ -51,6 +52,7 @@ namespace ZoneEngine_New.Core.Ai
         readonly NpcBrain _brain;
         readonly Dictionary<int, NanoSpell?> _spells = new();
         readonly List<Character> _allies = new();
+        readonly List<Dynel> _nearby = new();
         readonly Random _random;
         DateTime _nextAttemptUtc;
 
@@ -245,7 +247,9 @@ namespace ZoneEngine_New.Core.Ai
 
             if (_allies.Count == 0)
             {
-                foreach (Dynel dynel in Npc.Playfield!.GetRequiredService<DynelRegistry>().Dynels())
+                // Only this NPC's cell and the cells touching it; never the whole playfield.
+                Npc.Playfield!.GetRequiredService<PlayfieldLocality>().CollectNearby(Npc, _nearby);
+                foreach (Dynel dynel in _nearby)
                 {
                     if (dynel is not NpcCharacter other || ReferenceEquals(other, Npc) || other.IsDead)
                         continue;
@@ -256,6 +260,8 @@ namespace ZoneEngine_New.Core.Ai
 
                     _allies.Add(other);
                 }
+
+                _nearby.Clear();
             }
 
             for (int i = 0; i < _allies.Count; i++)

@@ -18,8 +18,19 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Stat 299 the client needs on a lockable target; 0 when the target has no lock.</summary>
         int LockDifficulty { get; }
 
-        /// <summary>Unlocks the target for <paramref name="player"/>; false when it is not locked or out of reach.</summary>
-        bool TryBreakAndEnter(Player player);
+        /// <summary>
+        /// A pick attempt by <paramref name="player"/> with a lock pick rating of <paramref name="pickRating"/>:
+        /// <see cref="BreakAndEnterResult.Refused"/> when the target is not locked or out of reach, otherwise the pick
+        /// succeeds (and unlocks) once the rating reaches <see cref="LockDifficulty"/> or fails.
+        /// </summary>
+        BreakAndEnterResult TryBreakAndEnter(Player player, int pickRating);
+    }
+
+    public enum BreakAndEnterResult
+    {
+        Refused,
+        Failed,
+        Unlocked,
     }
 
     /// <summary>
@@ -32,6 +43,12 @@ namespace ZoneEngine_New.Core.Entities
         public const int Unlocked = 0x64;
 
         public const int Failed = 0x65;
+
+        /// <summary>
+        /// A failed pick: 0x65 to the picker alone ("Lockpicking failed"; every observer would show it otherwise).
+        /// </summary>
+        public static void SendFailed(IBreakAndEnterTarget target, Player player)
+            => player.Session?.Send(Result(target.Identity, player.Identity, Failed));
 
         public static ActionMessage Result(Identity target, Identity actor, int code) => new()
         {

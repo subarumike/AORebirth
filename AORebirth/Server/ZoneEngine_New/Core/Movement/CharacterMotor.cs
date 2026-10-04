@@ -426,10 +426,12 @@ namespace ZoneEngine_New.Core.Movement
                     start = startFloor;
                 if (playfield != null && playfield.TrySnapFeetToFloor(destination, out Vector3 destFloor))
                     destination = destFloor;
-                if (finder.TryFindPath(
+                if (PathDiag.TryFindPath(
+                    finder,
                     new System.Numerics.Vector3((float)start.x, (float)start.y, (float)start.z),
                     new System.Numerics.Vector3((float)destination.x, (float)destination.y, (float)destination.z),
-                    _navMeshScratch)
+                    _navMeshScratch,
+                    PathDiag.Motor)
                     && _navMeshScratch.Count > 0)
                 {
                     for (int i = 0; i < _navMeshScratch.Count; i++)
@@ -1027,6 +1029,11 @@ namespace ZoneEngine_New.Core.Movement
                 _sim.DisableFalling();
             ApplyFlagsToAxes();
             SyncMovementModeStat();
+
+            // WaitState as the client keeps it for itself: entering Sit (mode 8) sets 2 (Gamecode.dll 0x1006d4bc),
+            // leaving a mode sets 0 (0x1006e032). Item criteria such as the Health and Nano Recharger's
+            // [WaitState EqualTo 2] ("You must be sitting") read it.
+            _character.Stats.Set(CharacterStat.WaitState, state == MovementState.Sit ? 2 : 0, StatDetail.Base);
         }
 
         void LeaveMovementState()

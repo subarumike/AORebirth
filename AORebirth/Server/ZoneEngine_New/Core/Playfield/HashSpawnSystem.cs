@@ -763,6 +763,7 @@ namespace ZoneEngine_New.Core.Playfield
 
         private int SpawnMobBranches(HashSpawnPoint point, int? level)
         {
+            using Metrics.TickStallWatch.StageScope stageScope = Metrics.TickStallWatch.Enter("spawn.templates", point.CellId);
             var templates = new List<MobTemplate>();
             _gameData.CollectMobSpawns(point.HashText, level, templates);
             int spawned = 0;
@@ -771,6 +772,7 @@ namespace ZoneEngine_New.Core.Playfield
                 if (!NpcTemplateValidation.CanSpawn(templates[i]))
                     continue;
 
+                Metrics.TickStallWatch.Stage("spawn.place", point.CellId);
                 PickSpawnTransform(point, out Vector3 position, out Quaternion heading);
                 NpcCharacter character = _spawnService.SpawnMob(
                     templates[i],

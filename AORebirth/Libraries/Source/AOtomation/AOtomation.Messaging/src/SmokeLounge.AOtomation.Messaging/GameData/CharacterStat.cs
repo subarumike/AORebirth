@@ -1326,6 +1326,12 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         /// <summary>AORebirth server-only: mission bits 608-639. Never sent to the client.</summary>
         MissionBits20 = 0x00002712,
 
+        /// <summary>
+        /// AORebirth server-only: GM debug channel bitmask toggled with <c>.debug</c> (bit 0 = watchdog). Never sent
+        /// to the client.
+        /// </summary>
+        DebugFlags = 0x00002713,
+
         /// <summary>Sentinel for missing / unset stat and item attribute values.</summary>
         Unset = 1234567890,
     }

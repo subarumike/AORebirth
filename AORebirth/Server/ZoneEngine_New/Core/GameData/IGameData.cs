@@ -93,6 +93,17 @@ namespace ZoneEngine_New.Core.GameData
 
         bool TryGetCatMesh(int monsterData, out int catMesh);
 
+        /// <summary>
+        /// Mass (stat 2) and CharRadius (stat 421) from a MonsterData record. The client writes a MonsterData record's
+        /// stats onto an NPC when its MonsterData is set (Gamecode.dll 0x10052466 -> 0x100523d3; players are skipped).
+        /// </summary>
+        bool TryGetMonsterBodyStats(int monsterData, out int? mass, out int? charRadius)
+        {
+            mass = null;
+            charRadius = null;
+            return false;
+        }
+
         /// <summary>Playfield-local character MonsterData override for SimpleCharFullUpdate.</summary>
         bool TryGetPlayfieldCharacterAppearanceOverride(int playfieldId, out uint monsterData);
 

@@ -156,7 +156,7 @@ namespace ZoneEngine_New.Core.Ai
                 return straight;
 
             List<System.Numerics.Vector3> route = _routeScratch ??= new List<System.Numerics.Vector3>(16);
-            if (!finder.TryFindPath(start, end, route) || route.Count == 0)
+            if (!PathDiag.TryFindPath(finder, start, end, route, PathDiag.Pet) || route.Count == 0)
                 return double.PositiveInfinity;
 
             // A route that stops short of the owner does not reach it.

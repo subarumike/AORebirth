@@ -17,6 +17,7 @@ namespace ZoneEngine_New.Core.Entities
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Movement;
+    using ZoneEngine_New.Core.Metrics;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Nanos;
@@ -83,12 +84,20 @@ namespace ZoneEngine_New.Core.Entities
             Stats.Set(CharacterStat.NumberOfFightingOpponents, 0, StatDetail.Base);
         }
 
+        /// <summary>
+        /// The body radius the client's range checks subtract: CharRadius * Scale / 100, Scale at least 1
+        /// (Gamecode.dll 0x10044e56, recomputed on every appearance build and Scale change). NPCs get CharRadius from
+        /// their MonsterData record. A character without one (players, an NPC whose MonsterData has no record) keeps
+        /// the client's initial radius of 1.0, unscaled (the radius object starts at 1.0f, Gamecode.dll 0x10044912;
+        /// live: the in-range indicator at Scale 90 matches 1.0, not 0.9).
+        /// </summary>
         public override double GetCollisionRadius()
         {
-            int scale = Stats.GetOrZero(CharacterStat.Scale);
-            if (scale <= 0)
-                scale = 100;
-            return (scale * CharacterRadius) / 100.0;
+            if (!Stats.TryGetValue(CharacterStat.CharRadius, out int charRadius) || StatCollection.IsUnset(charRadius))
+                return DefaultCollisionRadius;
+
+            int scale = Math.Max(1, Stats.GetOrZero(CharacterStat.Scale));
+            return charRadius * (double)scale / 100.0;
         }
 
         /// <summary>LockSkill cooldowns by stat id. Only players persist them.</summary>
@@ -1361,14 +1370,22 @@ namespace ZoneEngine_New.Core.Entities
                 }
             }
 
+            int instance = Identity.Instance;
+            TickStallWatch.Stage("char.motor", instance);
             Motor.Tick(deltaTime);
+            TickStallWatch.Stage("char.combat", instance);
             if (FightingTarget.Instance != 0 && TryResolveFightingTarget() != null)
                 TickCombat(deltaTime);
+            TickStallWatch.Stage("char.regen", instance);
             if (!IsDead && UsesPassiveRegen)
                 TickPassiveRegen(deltaTime);
+            TickStallWatch.Stage("char.nanos", instance);
             NanoRuntime.Tick(this, DateTime.UtcNow);
+            TickStallWatch.Stage("char.specials", instance);
             TickSpecialsAvailable(DateTime.UtcNow);
+            TickStallWatch.Stage("char.effects", instance);
             TickTimedEffects(DateTime.UtcNow);
+            TickStallWatch.Stage("dynel.flush", instance);
             base.Tick(deltaTime);
         }
 
@@ -2239,7 +2256,13 @@ namespace ZoneEngine_New.Core.Entities
         /// Wipes movement flags, path and speed. An NPC settles its FollowTarget; a player that was
         /// moving is shown to observers as a full stop at the held position.
         /// </summary>
-        void StopForRoot()
+        void StopForRoot() => StopInPlace();
+
+        /// <summary>
+        /// Stops the character where it stands (root, a player's disconnect, a reconnect): no input flags, path or
+        /// speed left, and observers see a full stop if it was moving.
+        /// </summary>
+        public void StopInPlace()
         {
             if (this is NpcCharacter npc)
                 npc.Brain?.StopPathing();

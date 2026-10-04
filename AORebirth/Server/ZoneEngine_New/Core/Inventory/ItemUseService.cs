@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Inventory
 
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Network;
@@ -90,6 +91,9 @@ namespace ZoneEngine_New.Core.Inventory
             if (item.IsBackpackUse)
                 return item.Use(player, slot, _inventoryRepository, _items) ? ItemUseStart.Executed : ItemUseStart.Rejected;
 
+            if (RejectMissingSpawnHash(player, item.Definition))
+                return ItemUseStart.Rejected;
+
             if (!item.CanBeginUse(player))
             {
                 if (item.UsesFightingTarget && player.TryResolveFightingTarget() == null)
@@ -122,6 +126,9 @@ namespace ZoneEngine_New.Core.Inventory
             if (!ReferenceEquals(player.Playfield, _playfield)
                 || HasPending(player.Identity.Instance)
                 || _moves.HasPending(player.Identity.Instance))
+                return ItemUseStart.Rejected;
+
+            if (RejectMissingSpawnHash(player, dynel.Template))
                 return ItemUseStart.Rejected;
 
             if (!dynel.CanBeginUse(player))
@@ -186,6 +193,21 @@ namespace ZoneEngine_New.Core.Inventory
                 () => player.ExecutePerkAction(use, _inventoryRepository),
                 lockTarget: null);
             return Begin(pending, delay);
+        }
+
+        /// <summary>
+        /// A use that would spawn an item or NPC hash the server has no data for is refused before anything runs, with
+        /// a chat line naming the hash so the player can report it.
+        /// </summary>
+        bool RejectMissingSpawnHash(Player player, ItemTemplate template)
+        {
+            if (!SpawnHashCheck.TryFindMissingHash(template, _playfield.GetRequiredService<IGameData>(), out string hash))
+                return false;
+
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                "Use blocked char={0} template={1}: spawn hash {2} is not defined", player.Identity.Instance, template.Id, hash));
+            Tell(player, SpawnHashCheck.NotImplementedText(hash));
+            return true;
         }
 
         ItemUseStart Begin(PendingItemUse pending, int delayCentiseconds)

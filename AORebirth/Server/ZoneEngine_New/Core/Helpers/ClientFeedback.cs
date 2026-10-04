@@ -40,6 +40,13 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"Target %s your %s!" (category 110). A perk that fails to land: live capture 2026-10-02T13:02:33Z.</summary>
         public const int TargetVerbYourAction = 79653355;
 
+        /// <summary>
+        /// "Lockpicking successful." (category 110). The client shows nothing of its own when a pick opens a lock (the
+        /// 0x64 action result only unlocks and opens it; Gamecode.dll has only Feedback_LockpickingFailed), so the
+        /// server sends it.
+        /// </summary>
+        public const int LockpickingSuccessful = 265781900;
+
         /// <summary>"evaded" (category 110), the verb live puts in <see cref="TargetVerbYourAction"/>.</summary>
         public const int Evaded = 114064052;
 

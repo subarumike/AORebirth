@@ -562,6 +562,7 @@ namespace ZoneEngine_New.Core.Nanos
                 RequirementsMet = spell.MeetsActionRequirements(
                     stat => caster.Stats.Get(stat),
                     ActionType.ToUse,
+                    resolve: caster is Player casterPlayer ? casterPlayer.ResolvePerkRequirement : null,
                     getTargetStat: recipient == null ? null : stat => recipient.Stats.Get(stat)),
                 TargetExists = recipient != null,
                 TargetIsDead = recipient?.IsDead == true,

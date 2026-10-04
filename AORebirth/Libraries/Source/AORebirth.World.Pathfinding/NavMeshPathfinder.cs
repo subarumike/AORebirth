@@ -36,6 +36,12 @@ namespace AORebirth.World.Pathfinding
         readonly DtNavMeshQuery _query;
         readonly DtQueryDefaultFilter _filter;
         readonly RcVec3f _extents;
+        readonly NavMeshIslands _islands;
+
+        // Reach-map flood scratch, grown on demand.
+        long[] _reachRefs = [];
+        long[] _reachParents = [];
+        float[] _reachCosts = [];
 
         NavMeshPathfinder(int playfieldId, DtNavMesh mesh, NavMeshBuildSettings settings)
         {
@@ -46,11 +52,23 @@ namespace AORebirth.World.Pathfinding
             float pathHoriz = MathF.Max(settings.AgentRadius, PathQueryHorizontal);
             float pathVert = settings.AgentHeight + settings.AgentMaxClimb + PathQueryHorizontal;
             _extents = new RcVec3f(pathHoriz, pathVert, pathHoriz);
+            _islands = NavMeshIslands.Build(mesh);
         }
+
+        /// <summary>Separate connected regions of this navmesh.</summary>
+        public int IslandCount => _islands.Count;
 
         public int PlayfieldId { get; }
 
         public NavMeshBuildSettings Settings { get; }
+
+        /// <summary>How the most recent <see cref="TryFindPath"/> ended. Diagnostics only; tick-thread state.</summary>
+        public PathSearchOutcome LastOutcome { get; private set; }
+
+        /// <summary>Corridor search iterations the most recent <see cref="TryFindPath"/> used (cap <see cref="SearchIterationCap"/>).</summary>
+        public int LastIterations { get; private set; }
+
+        public static int SearchIterationCap => MaxSearchIters;
 
         public static bool TryLoad(string gameDataRoot, int playfieldId, out NavMeshPathfinder? pathfinder)
         {
@@ -189,11 +207,25 @@ namespace AORebirth.World.Pathfinding
         {
             ArgumentNullException.ThrowIfNull(waypoints);
             waypoints.Clear();
+            LastIterations = 0;
 
             if (!TryResolveEnds(start, end, out PolyEnds ends))
+            {
+                LastOutcome = PathSearchOutcome.NoEnds;
                 return false;
+            }
             if (!IsOnMesh(end, ends.EndPt))
+            {
+                LastOutcome = PathSearchOutcome.EndOffMesh;
                 return false;
+            }
+
+            // No route exists between separate islands; skip the search that would run to its cap proving it.
+            if (_islands.AreDisconnected(ends.StartRef, ends.EndRef))
+            {
+                LastOutcome = PathSearchOutcome.Disconnected;
+                return false;
+            }
 
             Span<long> path = stackalloc long[MaxPathPolys];
             if (!TrySearchCorridor(ends, path, out int pathCount) || pathCount <= 0)
@@ -210,7 +242,10 @@ namespace AORebirth.World.Pathfinding
                 straight.Length,
                 0);
             if (straightStatus.Failed() || straightCount <= 0)
+            {
+                LastOutcome = PathSearchOutcome.NoStraightPath;
                 return false;
+            }
 
             int first = 0;
             if (straightCount > 1 && IsNear(straight[0].pos, start))
@@ -219,7 +254,83 @@ namespace AORebirth.World.Pathfinding
             for (int i = first; i < straightCount; i++)
                 waypoints.Add(straight[i].pos);
 
+            LastOutcome = waypoints.Count > 0 ? PathSearchOutcome.Found : PathSearchOutcome.NoStraightPath;
             return waypoints.Count > 0;
+        }
+
+        /// <summary>
+        /// Floods outward from <paramref name="target"/> over polygons whose route stays within
+        /// <paramref name="radius"/> of it, so walkers can test reachability with <see cref="Reaches"/>. The end is
+        /// resolved exactly as <see cref="TryFindPath"/> resolves it. More than <paramref name="maxPolys"/> polygons
+        /// gives <see cref="ReachMapKind.TooLarge"/>. Tick-thread state; not thread safe.
+        /// </summary>
+        public ReachMap BuildReachMap(Vector3 target, float radius, int maxPolys)
+        {
+            if (!TrySnap(target, out _))
+                return new ReachMap(ReachMapKind.TargetNoMesh, null, target, 0);
+
+            DtStatus status = _query.FindNearestPoly(target, _extents, _filter, out long endRef, out RcVec3f endPt, out _);
+            if (status.Failed() || endRef == 0)
+                return new ReachMap(ReachMapKind.TargetNoMesh, null, target, 0);
+
+            var end = new Vector3(endPt.X, endPt.Y, endPt.Z);
+            if (!IsOnMesh(target, endPt))
+                return new ReachMap(ReachMapKind.TargetOffMesh, null, end, 0);
+
+            // One slot past the limit tells "exactly full" from "ran out of room".
+            int capacity = maxPolys + 1;
+            if (_reachRefs.Length < capacity)
+            {
+                _reachRefs = new long[capacity];
+                _reachParents = new long[capacity];
+                _reachCosts = new float[capacity];
+            }
+
+            DtStatus flood = _query.FindPolysAroundCircle(
+                endRef,
+                endPt,
+                radius,
+                _filter,
+                _reachRefs.AsSpan(0, capacity),
+                _reachParents.AsSpan(0, capacity),
+                _reachCosts.AsSpan(0, capacity),
+                out int count,
+                capacity);
+            if (flood.Failed() || count > maxPolys)
+                return new ReachMap(ReachMapKind.TooLarge, null, end, count);
+
+            var polys = new HashSet<long>(count);
+            for (int i = 0; i < count; i++)
+                polys.Add(_reachRefs[i]);
+            return new ReachMap(ReachMapKind.Flooded, polys, end, count);
+        }
+
+        /// <summary>
+        /// Whether a walker at <paramref name="start"/> reaches <paramref name="map"/>'s target. A walker off the mesh
+        /// counts as reaching (holes and off-mesh links are not walls), as does any walker when the target is nowhere
+        /// near the mesh.
+        /// </summary>
+        public ReachAnswer Reaches(ReachMap map, Vector3 start)
+        {
+            ArgumentNullException.ThrowIfNull(map);
+            if (!TrySnap(start, out _))
+                return ReachAnswer.Reachable;
+
+            switch (map.Kind)
+            {
+                case ReachMapKind.TargetNoMesh:
+                    return ReachAnswer.Reachable;
+                case ReachMapKind.TargetOffMesh:
+                    return ReachAnswer.Unreachable;
+                case ReachMapKind.TooLarge:
+                    return ReachAnswer.TooLarge;
+            }
+
+            DtStatus status = _query.FindNearestPoly(start, _extents, _filter, out long startRef, out _, out _);
+            if (status.Failed() || startRef == 0)
+                return ReachAnswer.Reachable;
+
+            return map.Contains(startRef) ? ReachAnswer.Reachable : ReachAnswer.Unreachable;
         }
 
         public void Dispose()
@@ -237,14 +348,32 @@ namespace AORebirth.World.Pathfinding
                 _filter,
                 0);
             if (init.Failed())
+            {
+                LastOutcome = PathSearchOutcome.SearchFailed;
                 return false;
+            }
 
-            DtStatus update = _query.UpdateSlicedFindPath(MaxSearchIters, out _);
-            if (update.Failed() || update.InProgress() || update.IsPartial() || !update.Succeeded())
+            DtStatus update = _query.UpdateSlicedFindPath(MaxSearchIters, out int iterations);
+            LastIterations = iterations;
+            if (update.InProgress())
+            {
+                LastOutcome = PathSearchOutcome.IterationCap;
                 return false;
+            }
+            if (update.Failed() || update.IsPartial() || !update.Succeeded())
+            {
+                LastOutcome = update.IsPartial() ? PathSearchOutcome.Partial : PathSearchOutcome.SearchFailed;
+                return false;
+            }
 
             DtStatus finalized = _query.FinalizeSlicedFindPath(path, out pathCount, path.Length);
-            return !finalized.Failed() && !finalized.IsPartial() && pathCount > 0;
+            if (finalized.Failed() || finalized.IsPartial() || pathCount <= 0)
+            {
+                LastOutcome = finalized.IsPartial() ? PathSearchOutcome.Partial : PathSearchOutcome.SearchFailed;
+                return false;
+            }
+
+            return true;
         }
 
         bool TryResolveEnds(Vector3 start, Vector3 end, out PolyEnds ends)
@@ -314,5 +443,32 @@ namespace AORebirth.World.Pathfinding
 
             public RcVec3f EndPt { get; }
         }
+    }
+
+    /// <summary>How a <see cref="NavMeshPathfinder.TryFindPath"/> call ended.</summary>
+    public enum PathSearchOutcome
+    {
+        Found = 0,
+
+        /// <summary>Start or end had no navmesh polygon nearby.</summary>
+        NoEnds,
+
+        /// <summary>The end snapped to a polygon too far from the requested point.</summary>
+        EndOffMesh,
+
+        /// <summary>The corridor search failed outright.</summary>
+        SearchFailed,
+
+        /// <summary>The corridor search ran out of iterations before reaching the end.</summary>
+        IterationCap,
+
+        /// <summary>The corridor search only reached part of the way (end unreachable).</summary>
+        Partial,
+
+        /// <summary>A corridor was found but no straight path could be built along it.</summary>
+        NoStraightPath,
+
+        /// <summary>Start and end are on separate navmesh islands; answered without searching.</summary>
+        Disconnected
     }
 }
