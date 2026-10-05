@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.Playfield
     using Microsoft.Extensions.DependencyInjection;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Ai;
@@ -762,6 +763,8 @@ namespace ZoneEngine_New.Core.Playfield
             SendSpawnMovement(session, player);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
+            foreach (MessageBody stance in player.BuildCombatStanceMessages())
+                session.Send(stance);
             // The client establishes vending dynels at the pre-FullCharacter world-entry
             // boundary. The complete locality activation below sends every remaining dynel.
             _playfield.GetRequiredService<PlayfieldLocality>().PrimeVendingMachineVisibility(player);
@@ -851,6 +854,8 @@ namespace ZoneEngine_New.Core.Playfield
             SendSpawnMovement(session, player);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
+            foreach (MessageBody stance in player.BuildCombatStanceMessages())
+                session.Send(stance);
             // Reconnect must use the same pre-FullCharacter vending boundary as initial entry.
             _playfield.GetRequiredService<PlayfieldLocality>().PrimeVendingMachineVisibility(player);
             SendRetailWorldEntryReadyBlock(session, player);
@@ -1105,6 +1110,8 @@ namespace ZoneEngine_New.Core.Playfield
             SendSpawnMovement(session, player);
             foreach (WeaponItemFullUpdateMessage wifu in player.BuildWeaponInstanceMessages())
                 session.Send(wifu);
+            foreach (MessageBody stance in player.BuildCombatStanceMessages())
+                session.Send(stance);
             session.Send(player.BuildFullCharacterMessage());
             player.SendPerkActions();
 

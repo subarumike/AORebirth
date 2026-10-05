@@ -6,17 +6,11 @@ namespace ZoneEngine_New.Core.Commands
 
     using AORebirth.Core.GameData;
 
-    using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
-    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Playfield;
-    using ZoneEngine_New.Core.Playfield.Locality;
 
     using CharacterStat = SmokeLounge.AOtomation.Messaging.GameData.CharacterStat;
-    using MsgQuaternion = SmokeLounge.AOtomation.Messaging.GameData.Quaternion;
-    using MsgVector3 = SmokeLounge.AOtomation.Messaging.GameData.Vector3;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     public sealed class TeleportCommand : IGmCommand
@@ -214,18 +208,8 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            subject.Position = landing;
-            current.GetRequiredService<PlayfieldLocality>().Announce(subject, new CharDCMoveMessage
-            {
-                Identity = subject.Identity,
-                Unknown = 0x00,
-                MoveType = (byte)MovementAction.FullStop,
-                Heading = new MsgQuaternion { X = subject.Rotation.xf, Y = subject.Rotation.yf, Z = subject.Rotation.zf, W = subject.Rotation.wf },
-                Coordinates = new MsgVector3 { X = subject.Position.xf, Y = subject.Position.yf, Z = subject.Position.zf },
-                Unknown1 = 0,
-                AuxA = 0,
-                AuxB = 0
-            }, includeSelf: true);
+            // Same playfield: a soft teleport, no zone transfer.
+            subject.TeleportWithinPlayfield(landing);
 
             GmCommandFeedback.Send(context.Session, context.Player, toIssuer);
             if (!ReferenceEquals(subject, context.Player) && subject.Session != null)

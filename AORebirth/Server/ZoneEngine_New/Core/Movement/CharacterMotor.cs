@@ -653,6 +653,9 @@ namespace ZoneEngine_New.Core.Movement
             if (_character.Rotation != null && !ReferenceEquals(_character.Rotation, _syncedRotation))
                 ApplyHeadingToSim(_character.Rotation);
 
+            if (_npc != null)
+                SettleNpcVehicle();
+
             bool idle = !HasPath
                 && (_flags & (TranslationFlags | TurnFlags)) == 0
                 && !_sim.Airborne
@@ -666,6 +669,8 @@ namespace ZoneEngine_New.Core.Movement
                 TickStallWatch.Stage("motor.path", _character.Identity.Instance);
                 if (_npc != null)
                 {
+                    // N3Lite 0.1.9's AdvanceGuide no longer re-reads MaxVel; keep the guide at the current speed.
+                    _npc.Guide.UpdateMaxSpeed(_npc.MaxVel);
                     _npc.AdvanceGuide(dt);
                     HoldGuideAtCorner();
                 }
@@ -680,8 +685,23 @@ namespace ZoneEngine_New.Core.Movement
             _character.Position = ToVector3(_sim.Position);
             PullHeading();
 
-            if (_npc != null && HasPath && NpcPathFinished())
+            if (_npc != null && _path.Count > 0 && (_npc.Path.Empty || NpcPathFinished()))
                 ClearPath();
+        }
+
+        /// <summary>
+        /// Keeps the motor in step with N3Lite's NPC vehicle between ticks. The vehicle clears its own path when the
+        /// body halts within reach of the end (<c>NpcVehicleSim.OnHalt</c>), so ours finishes with it and raises
+        /// <see cref="PathCompleted"/>. With no path the vehicle only integrates while airborne
+        /// (<c>NpcVehicleSim.IsRunEnabled</c>), so leftover ground speed it can no longer brake off is dropped.
+        /// </summary>
+        void SettleNpcVehicle()
+        {
+            if (_path.Count > 0 && _npc!.Path.Empty)
+                ClearPath();
+
+            if (!HasPath && !_sim.Airborne && _sim.Speed > 0f)
+                _sim.Halt();
         }
 
         /// <summary>
@@ -702,8 +722,9 @@ namespace ZoneEngine_New.Core.Movement
         }
 
         /// <summary>
-        /// The guide has consumed the whole path and the body has arrived, or has stopped trying
-        /// (<c>SteeringDirArrive</c> halts once it passes the target, and a wall halts it too).
+        /// The guide has consumed the whole path and the body has arrived, or has stopped trying. A halt near the end
+        /// already cleared the vehicle's path (<c>NpcVehicleSim.OnHalt</c>); this catches the rest, such as a wall
+        /// stopping the body further out. Call only while the vehicle still has a path.
         /// </summary>
         bool NpcPathFinished()
         {

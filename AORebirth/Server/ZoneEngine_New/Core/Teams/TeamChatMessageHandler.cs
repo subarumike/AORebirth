@@ -7,8 +7,8 @@ namespace ZoneEngine_New.Core.Teams
     using ZoneEngine_New.Core.MessageHandlers;
     using ZoneEngine_New.Core.Network;
 
-    /// <summary>The existing N3 /team and /invite route; never consumes ordinary vicinity text.</summary>
-    public sealed class TeamChatMessageHandler(TeamService teams) : IMessageHandler<ChatCmdMessage>
+    /// <summary>The N3 ChatCmd route: /team, /invite and /stuck; never consumes ordinary vicinity text.</summary>
+    public sealed class TeamChatMessageHandler(TeamService teams, Characters.StuckService stuck) : IMessageHandler<ChatCmdMessage>
     {
         public Type MessageBodyType => typeof(ChatCmdMessage);
         public void Handle(MessageBody body, IZoneSession session) => Handle((ChatCmdMessage)body, session);
@@ -26,6 +26,8 @@ namespace ZoneEngine_New.Core.Teams
                 teams.TryHandleChatCommand(player, args);
             else if (args[0].Equals("invite", StringComparison.OrdinalIgnoreCase) && args.Length == 2)
                 teams.TryHandleChatCommand(player, ["team", "invite", args[1]]);
+            else if (args[0].Equals("stuck", StringComparison.OrdinalIgnoreCase))
+                stuck.TryUnstick(player);
             else
                 player.Logger.Warn("Unsupported ChatCmd command=" + args[0]);
         }

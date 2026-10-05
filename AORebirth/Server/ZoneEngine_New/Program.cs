@@ -214,6 +214,16 @@ namespace ZoneEngine_New
                 return catalog;
             });
             services.AddSingleton<IGameData, GameDataStore>();
+            services.AddSingleton(provider =>
+            {
+                string path = ZoneEngine_New.Core.Configuration.GameplaySettings.ResolvePath(
+                    provider.GetRequiredService<IGameData>().RootPath);
+                var settings = ZoneEngine_New.Core.Configuration.GameplaySettings.Load(path);
+                provider.GetRequiredService<IZoneLogger>().Info(
+                    $"Gameplay config stuckCooldownSeconds={settings.StuckCooldownSeconds} stuckLocation=pf {settings.StuckLocation!.Playfield} ({settings.StuckLocation.X}, {settings.StuckLocation.Y}, {settings.StuckLocation.Z}) from {path}");
+                return settings;
+            });
+            services.AddSingleton<ZoneEngine_New.Core.Characters.StuckService>();
             services.AddSingleton<HashItemMinter>();
             services.AddSingleton<PlayerHydrator>();
             services.AddSingleton<ICharacterHydrationService, CharacterHydrationService>();
@@ -289,6 +299,7 @@ namespace ZoneEngine_New
             AddMessageHandler<CharSecSpecAttackMessageHandler>(services);
             AddMessageHandler<StopFightMessageHandler>(services);
             AddMessageHandler<SocialActionCmdMessageHandler>(services);
+            AddMessageHandler<FollowTargetMessageHandler>(services);
             AddMessageHandler<GenericCmdMessageHandler>(services);
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<ClientContainerAddItemMessageHandler>(services);

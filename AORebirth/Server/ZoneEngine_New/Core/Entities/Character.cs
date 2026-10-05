@@ -1174,17 +1174,8 @@ namespace ZoneEngine_New.Core.Entities
                     maat = true;
                 }
 
-                if (!brawl && (martialArtsItem || item.Can(CanFlags.Brawl)))
-                {
-                    specials.Add(
-                        CreateSpecialAttack(
-                            brawlLowId,
-                            brawlHighId,
-                            CharacterStat.Brawl,
-                            "BRAW"));
-                    brawl = true;
-                }
-
+                // Live order is MAAT, DIIT, BRAW (capture 2026-10-05T13:27:56Z, two combined-MA weapons: exactly those
+                // three entries and no per-weapon ones).
                 if (!dimach && (martialArtsItem || item.Can(CanFlags.Dimach)))
                 {
                     specials.Add(
@@ -1194,6 +1185,17 @@ namespace ZoneEngine_New.Core.Entities
                             CharacterStat.Dimach,
                             "DIIT"));
                     dimach = true;
+                }
+
+                if (!brawl && (martialArtsItem || item.Can(CanFlags.Brawl)))
+                {
+                    specials.Add(
+                        CreateSpecialAttack(
+                            brawlLowId,
+                            brawlHighId,
+                            CharacterStat.Brawl,
+                            "BRAW"));
+                    brawl = true;
                 }
             }
 
@@ -1211,16 +1213,6 @@ namespace ZoneEngine_New.Core.Entities
                             "MAAT"));
                 }
 
-                if (!brawl)
-                {
-                    specials.Add(
-                        CreateSpecialAttack(
-                            brawlLowId,
-                            brawlHighId,
-                            CharacterStat.Brawl,
-                            "BRAW"));
-                }
-
                 if (!dimach)
                 {
                     specials.Add(
@@ -1229,6 +1221,16 @@ namespace ZoneEngine_New.Core.Entities
                             dimachHighId,
                             CharacterStat.Dimach,
                             "DIIT"));
+                }
+
+                if (!brawl)
+                {
+                    specials.Add(
+                        CreateSpecialAttack(
+                            brawlLowId,
+                            brawlHighId,
+                            CharacterStat.Brawl,
+                            "BRAW"));
                 }
             }
 
@@ -1534,6 +1536,8 @@ namespace ZoneEngine_New.Core.Entities
                     new MissedAttackInfoMessage
                     {
                         Identity = Identity,
+                        // Live player misses carry N3 Unknown 1 (capture 2026-10-05T13:34:41Z, slots 0/8/6).
+                        Unknown = (byte)(IsPlayer ? 1 : 0),
                         Unknown1 = -1,
                         Unknown2 = attackInfoSlot,
                         Unknown3 = Identity,
@@ -1922,11 +1926,15 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>RestrictAction bit that roots: the character cannot move while a buff carries it.</summary>
         public const int RestrictMovementBit = 4;
 
-        /// <summary>A running buff (a root such as 56216, or a stun) holds RestrictAction with the movement bit.</summary>
+        /// <summary>
+        /// Held in place: a running root holds RestrictAction with the movement bit (56216), and a running stun holds
+        /// the Stun function (53122, no arguments: Neural Stunner 28625, Chains of Iron 30060, Stunned 128221).
+        /// </summary>
         public bool IsRooted
             => HasBuffFunction(
                 FunctionType.RestrictAction,
-                spell => spell.TryReadInt(0, out int restricted) && (restricted & RestrictMovementBit) != 0);
+                spell => spell.TryReadInt(0, out int restricted) && (restricted & RestrictMovementBit) != 0)
+                || HasBuffFunction(FunctionType.Stun);
 
         /// <summary>RestrictAction bit that forbids fighting (e.g. 304935 Immortal).</summary>
         public const int RestrictFightingBit = 2;
@@ -2213,6 +2221,10 @@ namespace ZoneEngine_New.Core.Entities
         void OnBuffsChanged()
         {
             SyncUsedNcu();
+            // A root or stun holds the character the moment it lands, not when the queued rebase gets to it: the body
+            // would otherwise keep running on the last held input while its client already stands still.
+            if (IsRooted)
+                StopInPlace();
             MarkRebaseDirty();
             SnapshotActiveNanosForPersistence();
         }

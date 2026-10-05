@@ -424,23 +424,9 @@ namespace ZoneEngine_New.Core.Inventory
             Character locked = ResolveApplyOn(target, source, spell);
             int seconds = locked.LockSkill(statId, durationSeconds, DateTime.UtcNow);
 
-            // Live shows the lock on the client as SpecialUsed (CharacterAction 0xAA, Parameter1 = stat,
-            // Parameter2 = seconds): Health and Nano Stim LockSkill [123, 40], capture 2026-10-02T15:43:13Z.
-            if (seconds > 0 && locked is Player player && player.Session != null)
-            {
-                player.Session.Send(new CharacterActionMessage
-                {
-                    Identity = player.Identity,
-                    Action = CharacterActionType.SpecialUsed,
-                    Target = Identity.None,
-                    Parameter1 = statId,
-                    Parameter2 = seconds
-                });
-
-                // SpecialAvailable (0xA4, Parameter2 = stat) when the lock runs out: live 15 s Treatment lock,
-                // capture 2026-10-02T16:41:09Z -> 16:41:24Z.
-                player.ScheduleSpecialAvailable(statId, DateTime.UtcNow.AddSeconds(seconds));
-            }
+            // Health and Nano Stim LockSkill [123, 40] shows as SpecialUsed, then SpecialAvailable when it runs out.
+            if (locked is Player player)
+                player.ShowSkillLock(statId, seconds);
 
             return true;
         }

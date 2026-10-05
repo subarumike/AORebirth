@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Entities
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
+    using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Characters;
@@ -226,6 +227,81 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.MustAlliedCombat => IsAlliedInCombat(),
                 _ => null
             };
+        }
+
+        /// <summary>
+        /// Moves this player to <paramref name="landing"/> on its current playfield, as a LineTeleport lift does: the motor
+        /// is warped (path and speed dropped), the client snaps in place from an intrazone N3Teleport without unloading
+        /// the zone, and observers see a full stop at the landing.
+        /// </summary>
+        public void TeleportWithinPlayfield(Vector3 landing)
+        {
+            ArgumentNullException.ThrowIfNull(landing);
+            if (Playfield is not Playfield playfield)
+                return;
+
+            Motor.Warp(landing);
+            Session?.SendIntrazoneTeleport(landing, Rotation, playfield.Identity.Instance);
+            playfield.GetRequiredService<PlayfieldLocality>().Announce(this, new CharDCMoveMessage
+            {
+                Identity = Identity,
+                Unknown = 0x00,
+                MoveType = (byte)Movement.MovementAction.FullStop,
+                Heading = new SmokeLounge.AOtomation.Messaging.GameData.Quaternion
+                {
+                    X = Rotation.xf, Y = Rotation.yf, Z = Rotation.zf, W = Rotation.wf
+                },
+                Coordinates = new SmokeLounge.AOtomation.Messaging.GameData.Vector3 { X = landing.xf, Y = landing.yf, Z = landing.zf },
+                Unknown1 = 0,
+                AuxA = 0,
+                AuxB = 0
+            });
+        }
+
+        /// <summary>
+        /// Shows a skill lock on the client as live does: SpecialUsed (CharacterAction 0xAA, Parameter1 = stat,
+        /// Parameter2 = seconds; capture 2026-10-02T15:43:13Z), then SpecialAvailable when it runs out
+        /// (capture 2026-10-02T16:41:09Z).
+        /// </summary>
+        public void ShowSkillLock(int statId, int seconds)
+        {
+            if (seconds <= 0 || Session == null)
+                return;
+
+            Session.Send(new CharacterActionMessage
+            {
+                Identity = Identity,
+                Action = CharacterActionType.SpecialUsed,
+                Target = Identity.None,
+                Parameter1 = statId,
+                Parameter2 = seconds
+            });
+            ScheduleSpecialAvailable(statId, DateTime.UtcNow.AddSeconds(seconds));
+        }
+
+        /// <summary>The character this player's client last had a /follow acknowledged for.</summary>
+        Identity _followAckTarget = Identity.None;
+
+        DateTime _followAckedUtc = DateTime.MinValue;
+
+        /// <summary>
+        /// A pass-on FollowTarget comes back from the client after it executes the server's ack. A request for the
+        /// target just acknowledged inside this window is that reflection, not a new /follow.
+        /// </summary>
+        const double FollowReflectionWindowSeconds = 1.0;
+
+        /// <summary>
+        /// Records a /follow acknowledgement. False when <paramref name="target"/> was acknowledged a moment ago, so the
+        /// request is the client reflecting the ack and must not be answered again.
+        /// </summary>
+        public bool TryBeginFollowAck(Identity target, DateTime nowUtc)
+        {
+            if (target == _followAckTarget && (nowUtc - _followAckedUtc).TotalSeconds < FollowReflectionWindowSeconds)
+                return false;
+
+            _followAckTarget = target;
+            _followAckedUtc = nowUtc;
+            return true;
         }
 
         /// <summary>
@@ -1164,6 +1240,44 @@ namespace ZoneEngine_New.Core.Entities
             SkillCatalog.ApplyTrickle(Stats);
         }
 
+        /// <summary>True while a combined-MA weapon is in either hand: the MA fist swings beside the weapons.</summary>
+        bool _combinedMartialArts;
+
+        /// <summary>
+        /// CharacterAction ChangeAnimationAndStance (0xA7). The client's CharacterAction handler (Gamecode.dll
+        /// 0x1005d3ff, case 0xA7) sets character flag 0x800 when the parameter is non-zero and clears it on 0. With
+        /// weapons in hand, the client only mounts SAW's MAAT fist (key 100) at slot 0 when that flag is set
+        /// (0x1006af29), and AttackInfo slot 0 / Unknown6 100 animates only a mounted weapon (0x1006a55f). Both
+        /// parameters carry the value; the case reads the second.
+        /// </summary>
+        CharacterActionMessage BuildCombinedMartialArtsStance()
+        {
+            int on = _combinedMartialArts ? 1 : 0;
+            return new CharacterActionMessage
+            {
+                Identity = Identity,
+                Action = CharacterActionType.ChangeAnimationAndStance,
+                Target = Identity.None,
+                Parameter1 = on,
+                Parameter2 = on
+            };
+        }
+
+        /// <summary>Stance state a client needs right after this player's spawn and weapon instances.</summary>
+        public IEnumerable<MessageBody> BuildCombatStanceMessages()
+        {
+            if (_combinedMartialArts)
+                yield return BuildCombinedMartialArtsStance();
+        }
+
+        public override IEnumerable<MessageBody> BuildSpawnCompanionMessages()
+        {
+            foreach (MessageBody message in base.BuildSpawnCompanionMessages())
+                yield return message;
+            foreach (MessageBody message in BuildCombatStanceMessages())
+                yield return message;
+        }
+
         public override List<WeaponItemFullUpdateMessage> BuildWeaponInstanceMessages()
         {
             var messages = new List<WeaponItemFullUpdateMessage>();
@@ -1245,6 +1359,12 @@ namespace ZoneEngine_New.Core.Entities
             bool maCombined = (right?.IsMaCombinedWeapon() == true) || (left?.IsMaCombinedWeapon() == true);
             FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
             RebaseEquippedWeaponStats();
+            if (maCombined != _combinedMartialArts)
+            {
+                _combinedMartialArts = maCombined;
+                if (Session?.State == SessionState.InPlay)
+                    Cell?.Announce(BuildCombinedMartialArtsStance());
+            }
 
             SyncHandWeaponMeshes();
 

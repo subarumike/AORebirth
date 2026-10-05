@@ -97,6 +97,9 @@ namespace ZoneEngine_New.Core.Helpers
         public static int ResolveWeaponSlot(WeaponSlot slot, Item? weapon)
             => ResolveWeaponSlot(armed: null, slot, weapon, attackerIsPlayer: true);
 
+        /// <summary>AttackInfo Unknown6 for the combined-MA fist hit (live, two combined-MA weapons).</summary>
+        public const int CombinedMartialArtsInstance = 100;
+
         public static int ResolveWeaponInstance(CharacterWeapon? armed, Item? weapon, bool attackerIsPlayer)
         {
             // NPC monster weapons: AttackInfo Unknown6 must equal SAW SpecialAttack.Unknown3,
@@ -104,9 +107,13 @@ namespace ZoneEngine_New.Core.Helpers
             if (armed != null && armed.SawTag != 0 && armed.VisualHand == null)
                 return armed.SawTag;
 
+            // The combined-MA fist that swings beside combined-MA weapons: slot 0, Unknown6 100. The weapons' own hits
+            // keep slot 6/8 and 0 (capture 2026-10-05T13:34:38Z..13:34:45Z).
+            if (attackerIsPlayer && armed != null && armed.IsSyntheticFist && armed.LogicalSlot == WeaponSlot.CombinedMA)
+                return CombinedMartialArtsInstance;
+
             // Private-server player unarmed rows use instance 0 (not AOEmu's 100).
             _ = weapon;
-            _ = attackerIsPlayer;
             return 0;
         }
 
@@ -129,9 +136,10 @@ namespace ZoneEngine_New.Core.Helpers
             if (armed != null && armed.SawTag != 0)
                 return false;
 
-            // Synthetic MA fists / unarmed stay AttackInfo-only.
+            // Synthetic MA fists / unarmed stay AttackInfo-only. A real weapon that also carries Martial Arts (a combined-MA
+            // weapon such as the Notum-Infused Silvertail Dagger, MA 225) still swings as a weapon, so the client needs its
+            // WIFU like any other; without it the client only ever plays the MA attack.
             if ((armed != null && armed.IsSyntheticFist)
-                || item.IsMaCombinedWeapon()
                 || IsUnarmedPresentation(armed, item))
                 return false;
 
