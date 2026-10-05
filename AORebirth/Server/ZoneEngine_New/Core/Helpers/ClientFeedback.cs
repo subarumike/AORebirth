@@ -47,6 +47,21 @@ namespace ZoneEngine_New.Core.Helpers
         /// </summary>
         public const int LockpickingSuccessful = 265781900;
 
+        /// <summary>
+        /// "You can loot these remains." (category 110). Live sends it to a solo loot winner after the kill's death
+        /// action and before the CorpseFullUpdate (capture 2026-10-05T01:45:30Z).
+        /// </summary>
+        public const int CanLootRemains = 249752371;
+
+        /// <summary>
+        /// "All team members can loot these remains." (text.mdb category 110, id 0x03940D94). We send it as zone
+        /// Feedback, which shows the same text.
+        /// NOTE: live may send this from the chat server instead. A live team kill showed the line with no zone
+        /// Feedback or FormatFeedback packet (capture 2026-10-05T01:51:33Z), and the client never raises the id itself.
+        /// A team-kill capture that includes chat-server traffic would confirm the real packet and chat tab.
+        /// </summary>
+        public const int AllTeamMembersCanLootRemains = 0x03940D94;
+
         /// <summary>"evaded" (category 110), the verb live puts in <see cref="TargetVerbYourAction"/>.</summary>
         public const int Evaded = 114064052;
 

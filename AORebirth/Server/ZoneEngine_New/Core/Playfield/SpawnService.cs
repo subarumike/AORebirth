@@ -17,6 +17,8 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
+    using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
@@ -455,6 +457,32 @@ namespace ZoneEngine_New.Core.Playfield
                 && sell > 0;
 
         /// <summary>
+        /// Tells whoever holds loot rights before the corpse spawns. A solo winner gets "You can loot these remains."
+        /// (live zone Feedback, capture 2026-10-05T01:45:30Z). A team shares the rights (<see cref="Corpse"/>), so every
+        /// member on this playfield gets "All team members can loot these remains." (text.mdb category 110). Live's
+        /// team line did not arrive on the zone connection; sending it as zone Feedback shows the same text.
+        /// </summary>
+        void AnnounceLootRights(Identity lootWinner)
+        {
+            if (!_registry.TryGet(lootWinner, out Dynel? winnerDynel) || winnerDynel is not Player winner)
+                return;
+
+            TeamSnapshot? team = _playfield.GetService<TeamService>()?.GetTeam(winner);
+            if (team == null)
+            {
+                ClientFeedback.Send(winner, ClientFeedback.CanLootRemains);
+                return;
+            }
+
+            foreach (int memberId in team.MemberIds)
+            {
+                var member = new Identity { Type = winner.Identity.Type, Instance = memberId };
+                if (_registry.TryGet(member, out Dynel? memberDynel) && memberDynel is Player teammate)
+                    ClientFeedback.Send(teammate, ClientFeedback.AllTeamMembersCanLootRemains);
+            }
+        }
+
+        /// <summary>
         /// Spawns a corpse for a dead character. Resolves loot before cell registration (spawn packet).
         /// </summary>
         public Corpse SpawnCorpse(Character dead)
@@ -472,6 +500,8 @@ namespace ZoneEngine_New.Core.Playfield
             {
                 corpse.LootWinner = lootWinner;
                 corpse.ReservedUntilUtc = DateTime.UtcNow.AddSeconds(Corpse.LootReserveSeconds);
+
+                AnnounceLootRights(lootWinner);
             }
 
             corpse.ResolveLoot(_hashItems);
