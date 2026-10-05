@@ -59,26 +59,46 @@ namespace ZoneEngine_New.Core.Commands
                 })
                 .ToList();
 
-            var lines = new List<string>(entries.Count + 16)
-            {
-                string.Format(CultureInfo.InvariantCulture, "Players online: {0}", entries.Count)
-            };
-
+            // One block per profession so a page break never separates a heading from its players.
+            var blocks = new List<string>();
             foreach (var group in entries
                 .GroupBy(entry => entry.Profession)
                 .OrderBy(group => ProfessionName(group.Key), StringComparer.Ordinal))
             {
-                lines.Add(string.Format(CultureInfo.InvariantCulture, "{0} ({1})", ProfessionName(group.Key), group.Count()));
+                var block = new System.Text.StringBuilder();
+                block.Append(DiagAoml.Section(ProfessionName(group.Key)))
+                    .Append(' ')
+                    .Append(DiagAoml.Muted("(" + group.Count().ToString(CultureInfo.InvariantCulture) + ")"));
+
                 foreach (var entry in group
                     .OrderByDescending(entry => entry.Level)
                     .ThenBy(entry => entry.Name, StringComparer.OrdinalIgnoreCase))
                 {
-                    lines.Add(string.Format(CultureInfo.InvariantCulture, "  {0} - level {1}", entry.Name, entry.Level));
+                    block.Append("<br>")
+                        .Append(DiagAoml.Indent)
+                        .Append(DiagAoml.Name(DiagAoml.Safe(entry.Name)))
+                        .Append("&#160;&#160;")
+                        .Append(DiagAoml.Label("Lvl"))
+                        .Append(' ')
+                        .Append(DiagAoml.Color(LevelColor(entry.Level), entry.Level.ToString(CultureInfo.InvariantCulture)));
                 }
+
+                blocks.Add(block.ToString());
             }
 
-            GmCommandFeedback.SendLines(context.Session, context.Player, lines);
+            string title = string.Format(CultureInfo.InvariantCulture, "Players Online ({0})", entries.Count);
+            GmCommandFeedback.SendLines(context.Session, context.Player, DiagAoml.Pages(title, header: null, blocks));
         }
+
+        /// <summary>Level tiers at a glance: grey under 50, green under 100, cyan under 150, yellow under 200, orange 200+.</summary>
+        static string LevelColor(int level) => level switch
+        {
+            >= 200 => DiagAoml.Orange,
+            >= 150 => DiagAoml.Yellow,
+            >= 100 => DiagAoml.Cyan,
+            >= 50 => DiagAoml.Green,
+            _ => DiagAoml.Grey
+        };
 
         static string ProfessionName(int profession)
         {
