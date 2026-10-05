@@ -205,7 +205,8 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Requirement leaves a stat value cannot answer, resolved against this player: HasPerk / HasNotPerk
-        /// (trained perks), IsPerkLocked / IsPerkUnlocked (LockPerk cooldowns) and HasNotRunningNano (NCU).
+        /// (trained perks), IsPerkLocked / IsPerkUnlocked (LockPerk cooldowns) and HasRunningNano / HasNotRunningNano
+        /// (NCU; Hecatomb needs Performed Gore 234025 running).
         /// The leaf's Value is the perk or nano id. Null leaves every other leaf to the stat comparison.
         /// </summary>
         public bool? ResolvePerkRequirement(ItemRequirement requirement)
@@ -218,6 +219,7 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.HasNotPerk => !TrainedPerks.Contains(id),
                 Operator.IsPerkLocked => PerkLocks.IsLocked(id, DateTime.UtcNow),
                 Operator.IsPerkUnlocked => !PerkLocks.IsLocked(id, DateTime.UtcNow),
+                Operator.HasRunningNano => Buffs.Any(buff => buff.Id == id),
                 Operator.HasNotRunningNano => !Buffs.Any(buff => buff.Id == id),
                 Operator.IsPetOverEquipped => OwnedPets.All.Any(pet => pet.Pet?.IsOverEquipped == true),
                 Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
@@ -575,6 +577,15 @@ namespace ZoneEngine_New.Core.Entities
             return true;
         }
 
+        /// <summary>
+        /// A stat as a perk action's ToUse criteria read it. TargetFacing is not stored: it is 1 while this player stands
+        /// behind the action's target (Stab: [TargetFacing EqualTo 1]) and 0 otherwise, self-targeted included.
+        /// </summary>
+        int PerkActionStat(CharacterStat stat, Character target)
+            => stat == CharacterStat.TargetFacing
+                ? (!ReferenceEquals(target, this) && SpecialAttacks.IsBehind(this, target) ? 1 : 0)
+                : Stats.Get(stat);
+
         const string OutOfRangeFailure = "target out of range";
 
         const string NoLineOfSightFailure = "target not in line of sight";
@@ -592,7 +603,7 @@ namespace ZoneEngine_New.Core.Entities
                 return "perk action no longer held";
             if (IsPerkActionLocked(use.Template))
                 return "perk locked";
-            if (!use.Template.MeetsActionRequirements(stat => Stats.Get(stat), ActionType.ToUse, ResolvePerkRequirement))
+            if (!use.Template.MeetsActionRequirements(stat => PerkActionStat(stat, use.Target), ActionType.ToUse, ResolvePerkRequirement))
                 return "use requirements failed";
             if (!ReferenceEquals(use.Target, this))
             {

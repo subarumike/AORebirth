@@ -387,7 +387,7 @@ namespace ZoneEngine_New.Core.Helpers
         }
 
         /// <summary>True when <paramref name="attacker"/> is in the half-space behind <paramref name="target"/>'s facing.</summary>
-        static bool IsBehind(Character attacker, Character target)
+        internal static bool IsBehind(Character attacker, Character target)
         {
             var forward = (AORebirth.Core.Vector.Vector3)target.Rotation.RotateVector3(AORebirth.Core.Vector.Vector3.AxisZ);
             double toAttackerX = attacker.Position.x - target.Position.x;
