@@ -164,9 +164,17 @@ namespace ZoneEngine_New.Core.GameData
         /// A parent with <c>SpawnAll</c> contributes every child branch. Any other parent contributes one random child.
         /// </summary>
         public void CollectSpawns(string hash, List<HashInstance> into)
+            => CollectSpawns(hash, into, canPick: null);
+
+        /// <summary>
+        /// Same as <see cref="CollectSpawns(string, List{HashInstance})"/>, but a random category pick only
+        /// considers children accepted by <paramref name="canPick"/>. A category with no accepted child
+        /// contributes nothing. SpawnAll branches are not filtered; random picks beneath them still are.
+        /// </summary>
+        public void CollectSpawns(string hash, List<HashInstance> into, Func<string, bool>? canPick)
         {
             ArgumentNullException.ThrowIfNull(into);
-            CollectSpawns(hash, into, new HashSet<string>(StringComparer.Ordinal));
+            CollectSpawns(hash, into, new HashSet<string>(StringComparer.Ordinal), canPick);
         }
 
         /// <summary>
@@ -222,7 +230,7 @@ namespace ZoneEngine_New.Core.GameData
             return false;
         }
 
-        void CollectSpawns(string hash, List<HashInstance> into, HashSet<string> trail)
+        void CollectSpawns(string hash, List<HashInstance> into, HashSet<string> trail, Func<string, bool>? canPick)
         {
             if (string.IsNullOrEmpty(hash) || !trail.Add(hash))
                 return;
@@ -234,13 +242,13 @@ namespace ZoneEngine_New.Core.GameData
                     if (_spawnAll.Contains(hash))
                     {
                         for (int i = 0; i < children.Length; i++)
-                            CollectSpawns(children[i], into, trail);
+                            CollectSpawns(children[i], into, trail, canPick);
                         return;
                     }
 
-                    string child = children[_random.Next(children.Length)];
+                    string? child = PickChild(children, canPick);
                     if (!string.IsNullOrEmpty(child))
-                        CollectSpawns(child, into, trail);
+                        CollectSpawns(child, into, trail, canPick);
                     return;
                 }
 
@@ -251,6 +259,34 @@ namespace ZoneEngine_New.Core.GameData
             {
                 trail.Remove(hash);
             }
+        }
+
+        string? PickChild(string[] children, Func<string, bool>? canPick)
+        {
+            if (canPick == null)
+                return children[_random.Next(children.Length)];
+
+            int eligible = 0;
+            for (int i = 0; i < children.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(children[i]) && canPick(children[i]))
+                    eligible++;
+            }
+
+            if (eligible == 0)
+                return null;
+
+            int pick = _random.Next(eligible);
+            for (int i = 0; i < children.Length; i++)
+            {
+                if (string.IsNullOrEmpty(children[i]) || !canPick(children[i]))
+                    continue;
+                if (pick == 0)
+                    return children[i];
+                pick--;
+            }
+
+            return null;
         }
 
         public static int ClampQuality(HashInstance instance, int desiredQuality)

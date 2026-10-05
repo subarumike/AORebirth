@@ -1,5 +1,6 @@
 namespace ZoneEngine_New.Core.GameData
 {
+    using System;
     using System.Collections.Generic;
 
     using AORebirth.Core.GameData;
@@ -78,6 +79,13 @@ namespace ZoneEngine_New.Core.GameData
         /// A parent with optional SpawnAll contributes every child branch; other parents contribute one random child.
         /// </summary>
         void CollectHashSpawns(string hash, List<HashInstance> into);
+
+        /// <summary>
+        /// Same as <see cref="CollectHashSpawns(string, List{HashInstance})"/>, but random category picks only
+        /// consider child hashes accepted by <paramref name="canPick"/>.
+        /// </summary>
+        void CollectHashSpawns(string hash, List<HashInstance> into, Func<string, bool> canPick)
+            => CollectHashSpawns(hash, into);
 
         /// <summary>
         /// NPCs one spawn of <paramref name="hash"/> should create.
