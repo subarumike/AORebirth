@@ -219,14 +219,21 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         static void ApplyStand(Player player)
         {
-            player.Motor.ApplyAction(MovementAction.LeaveSit);
+            // StandUp ends sit, and also sleep and lounge (entered via SocialActionCmd 68/69).
+            MovementAction leave = player.Motor.State switch
+            {
+                MovementState.Sleep => MovementAction.LeaveSleep,
+                MovementState.Lounge => MovementAction.LeaveLounge,
+                _ => MovementAction.LeaveSit
+            };
+            player.Motor.ApplyAction(leave);
 
             Cell? cell = player.Cell;
             if (cell == null)
                 return;
 
             AnnounceAction(player, CharacterActionType.StandUp);
-            cell.Announce(CreatePostureMove(player, (byte)MovementAction.LeaveSit));
+            cell.Announce(CreatePostureMove(player, (byte)leave));
         }
 
         static void AnnounceAction(Player player, CharacterActionType action)

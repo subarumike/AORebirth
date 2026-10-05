@@ -235,7 +235,8 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            if (!player.Stats.TryGetValue(CharacterStat.GmLevel, out int gmLevel) || gmLevel < command.RequiredGmLevel)
+            // A player with no GmLevel stat is level 0, which still runs RequiredGmLevel 0 commands such as .online.
+            if (player.Stats.GetOrZero(CharacterStat.GmLevel) < command.RequiredGmLevel)
             {
                 GmCommandFeedback.Send(session, player, "Insufficient GM level.");
                 return;

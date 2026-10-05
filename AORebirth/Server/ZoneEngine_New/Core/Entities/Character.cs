@@ -1664,6 +1664,94 @@ namespace ZoneEngine_New.Core.Entities
                 sourcePlayer.Session?.Send(message);
         }
 
+        /// <summary>
+        /// Plays an emote on this character for every client that can see it, this character's own included.
+        /// Server-initiated path: NPC behaviour, scripted content, or commands.
+        /// </summary>
+        public void PlaySocialAction(SocialAction action)
+            => AnnounceSocialAction(
+                new SocialActionCmdMessage
+                {
+                    Identity = Identity,
+                    CommandState = SocialActionExecuteState,
+                    CommandRef = 0,
+                    Action = action
+                });
+
+        /// <summary>
+        /// Relays an emote this character's client requested, keeping the client's command ref so the sender
+        /// recognises its own command. Returns false when the request is dropped: not this character, an
+        /// out-of-range anim id, a reflection of the command just relayed, or inside the spam window.
+        /// </summary>
+        public bool TryRelaySocialAction(SocialActionCmdMessage request)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            string? dropped = SocialActionDropReason(request, DateTime.UtcNow);
+            LogUtil.Debug(
+                DebugInfoDetail.Network,
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "SocialActionCmd character={0} identity={1} state={2} ref={3} action={4}({5}) result={6}",
+                    Identity.Instance,
+                    request.Identity,
+                    request.CommandState,
+                    request.CommandRef,
+                    request.Action,
+                    (int)request.Action,
+                    dropped ?? "relayed"));
+            if (dropped != null)
+                return false;
+
+            DateTime nowUtc = DateTime.UtcNow;
+
+            _lastSocialActionUtc = nowUtc;
+            _lastSocialActionRef = request.CommandRef;
+            _hasRelayedSocialRef = true;
+            AnnounceSocialAction(
+                new SocialActionCmdMessage
+                {
+                    Identity = Identity,
+                    CommandState = SocialActionExecuteState,
+                    CommandRef = request.CommandRef,
+                    Action = request.Action
+                });
+            return true;
+        }
+
+        string? SocialActionDropReason(SocialActionCmdMessage request, DateTime nowUtc)
+        {
+            // A client sends back commands it executed, including other characters' emotes; those name the other
+            // character and must never be replayed as this one's.
+            if (request.Identity.Instance != Identity.Instance)
+                return "other-identity";
+
+            int animId = (int)request.Action;
+            if (animId < MinSocialAnimId || animId > MaxSocialAnimId)
+                return "anim-out-of-range";
+
+            // The sender also reflects our echo of its own command, with the same ref.
+            if (_hasRelayedSocialRef && request.CommandRef == _lastSocialActionRef)
+                return "reflected-echo";
+
+            if ((nowUtc - _lastSocialActionUtc).TotalMilliseconds < SocialActionMinIntervalMilliseconds)
+                return "spam-window";
+
+            return null;
+        }
+
+        void AnnounceSocialAction(SocialActionCmdMessage message)
+        {
+            if (Cell != null)
+            {
+                Cell.Announce(message);
+                return;
+            }
+
+            if (this is Player player)
+                player.Session?.Send(message);
+        }
+
         protected virtual void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
         {
         }
@@ -1799,6 +1887,17 @@ namespace ZoneEngine_New.Core.Entities
         int _lastLandedNanoId;
         int _lastLandedTargetInstance;
         DateTime _lastLandedAtUtc = DateTime.MinValue;
+
+        // Each relayed emote fans out to every nearby client, so cap how often one client can trigger it.
+        const int SocialActionMinIntervalMilliseconds = 250;
+        DateTime _lastSocialActionUtc = DateTime.MinValue;
+        int _lastSocialActionRef;
+        bool _hasRelayedSocialRef;
+
+        // SocialActionCmd_t: the client executes only CommandState 1 and accepts AbstractAnimID 1..71.
+        const int SocialActionExecuteState = 1;
+        const int MinSocialAnimId = 1;
+        const int MaxSocialAnimId = 0x47;
 
         /// <summary>Active NCU entries, oldest first.</summary>
         public IReadOnlyList<Buff> Buffs => _buffs;

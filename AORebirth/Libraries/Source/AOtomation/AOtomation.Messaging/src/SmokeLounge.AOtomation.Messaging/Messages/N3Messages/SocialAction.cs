@@ -126,7 +126,18 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         RelaxingLegshake = 30, 
 
-        RelaxingLounge = 69, 
+        /// <summary>
+        /// Sleep posture (RX 2026-10-05T00:51:03Z). The client only sends it while sitting, sleeping or lounging
+        /// (Feedback_MustSitToLoungeOrSleep, Gamecode.dll 0x10026b4f); executing it switches movement mode 0x21.
+        /// Left with CharacterAction StandUp.
+        /// </summary>
+        RelaxingSleep = 68,
+
+        /// <summary>
+        /// Lounge posture (RX 2026-10-05T00:51:10Z). Same rules as <see cref="RelaxingSleep"/>; executing it
+        /// switches movement mode 0x22. Left with CharacterAction StandUp.
+        /// </summary>
+        RelaxingLounge = 69,
 
         RelaxingRead = 43, 
 

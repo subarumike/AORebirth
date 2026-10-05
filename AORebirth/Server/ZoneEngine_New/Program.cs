@@ -275,6 +275,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, QuestsCommand>();
             services.AddSingleton<IGmCommand, DiagCommand>();
             services.AddSingleton<IGmCommand, DebugCommand>();
+            services.AddSingleton<IGmCommand, OnlineCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
             services.AddSingleton<IZoneAdmissionGate, ZoneAdmissionGate>();
@@ -287,6 +288,7 @@ namespace ZoneEngine_New
             AddMessageHandler<AttackMessageHandler>(services);
             AddMessageHandler<CharSecSpecAttackMessageHandler>(services);
             AddMessageHandler<StopFightMessageHandler>(services);
+            AddMessageHandler<SocialActionCmdMessageHandler>(services);
             AddMessageHandler<GenericCmdMessageHandler>(services);
             AddMessageHandler<ClientMoveItemToInventoryMessageHandler>(services);
             AddMessageHandler<ClientContainerAddItemMessageHandler>(services);

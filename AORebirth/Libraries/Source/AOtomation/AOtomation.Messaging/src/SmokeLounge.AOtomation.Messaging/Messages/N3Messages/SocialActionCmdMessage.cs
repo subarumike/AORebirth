@@ -30,22 +30,28 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         #region AoMember Properties
 
+        // Gamecode.dll SocialActionCmd_t: n3Command_t::WriteSubClass (N3.dll 0x100037c5) writes +0x18 and +0x1c,
+        // then SocialActionCmd_t (0x1007ad2a) writes the AbstractAnimID at +0x20.
+
+        /// <summary>
+        /// n3Command_t +0x18. The client executes the command (plays the emote, and for sleep/lounge switches
+        /// movement mode 0x21/0x22) only when this is 1 (Gamecode.dll 0x1007ac9e). Client requests send 1.
+        /// </summary>
         [AoMember(0)]
-        public byte Unknown1 { get; set; }
+        public int CommandState { get; set; }
 
+        /// <summary>
+        /// n3Command_t +0x1c: the sending client's command reference, a per-client counter. A client recognises
+        /// its own command by this ref (n3Command_t::IsForeign, N3.dll 0x100037e8) and does not replay the
+        /// animation for it.
+        /// </summary>
         [AoMember(1)]
-        public byte Unknown2 { get; set; }
+        public int CommandRef { get; set; }
 
+        /// <summary>
+        /// AbstractAnimID. The client rejects a read outside 1..71 (Gamecode.dll 0x1007ad4a).
+        /// </summary>
         [AoMember(2)]
-        public byte Unknown3 { get; set; }
-
-        [AoMember(3)]
-        public byte Unknown4 { get; set; }
-
-        [AoMember(4)]
-        public int Unknown5 { get; set; }
-
-        [AoMember(5)]
         public SocialAction Action { get; set; }
 
         #endregion
