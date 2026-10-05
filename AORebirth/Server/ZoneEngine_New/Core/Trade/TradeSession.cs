@@ -23,7 +23,7 @@ namespace ZoneEngine_New.Core.Trade
     /// <summary>One side of a trade: the items that character has put on the table plus their credits.</summary>
     public sealed class TradeOffer
     {
-        public const int Capacity = 6;
+        public const int Capacity = 20;
 
         readonly Dictionary<int, Item> _items = new();
 
