@@ -97,7 +97,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (!item.CanBeginUse(player))
             {
                 if (item.UsesFightingTarget && player.TryResolveFightingTarget() == null)
-                    RequirementFeedback.SendText(player, "You need a fighting target to use this item.");
+                    ClientFeedback.Send(player, ClientFeedback.RequiresFightingTarget);
                 else
                     RequirementFeedback.SendIfUnmet(player, item.Definition, ActionType.ToUse, resolve: player.ResolvePerkRequirement);
                 return ItemUseStart.Rejected;

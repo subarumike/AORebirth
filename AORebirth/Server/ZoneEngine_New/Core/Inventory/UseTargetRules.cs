@@ -98,7 +98,7 @@ namespace ZoneEngine_New.Core.Inventory
             switch (failure)
             {
                 case Failure.NoFightingTarget:
-                    RequirementFeedback.SendText(user, "You need a fighting target to use this.");
+                    ClientFeedback.Send(user, ClientFeedback.RequiresFightingTarget);
                     break;
                 case Failure.NoHostileTarget:
                     RequirementFeedback.SendText(user, "You need a hostile target to use this.");

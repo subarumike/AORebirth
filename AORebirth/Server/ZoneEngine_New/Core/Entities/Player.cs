@@ -662,7 +662,8 @@ namespace ZoneEngine_New.Core.Entities
                         ? "Feedback_PvpNotAllowedInThisDistrict"
                         : "Feedback_StartingAttackFailed");
                 else if (failure == UseRequirementsFailure)
-                    ClientFeedback.Send(this, ClientFeedback.PerkRequirementsNotMet);
+                    RequirementFeedback.SendIfUnmet(this, template, ActionType.ToUse,
+                        stat => PerkActionStat(stat, target), ResolvePerkRequirement);
                 return false;
             }
 

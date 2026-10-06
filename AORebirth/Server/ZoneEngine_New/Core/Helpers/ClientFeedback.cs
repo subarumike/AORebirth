@@ -29,10 +29,10 @@ namespace ZoneEngine_New.Core.Helpers
         public const int TeammateTooHighForXp = 121950320;
 
         /// <summary>
-        /// A perk action refused for its use requirements (Stab while not behind the target). Live sends only this
-        /// Feedback, no arguments, once per attempt (capture 2026-10-06T14:02:52Z). Key name unknown.
+        /// "This item requires a fighting-target to be applied on." (category 110, 0x0186D9F4). Live sends only this
+        /// Feedback, no arguments, once per refused Stab before the fight started (capture 2026-10-06T14:02:52Z).
         /// </summary>
-        public const int PerkRequirementsNotMet = 25615860;
+        public const int RequiresFightingTarget = 0x0186D9F4;
 
         /// <summary>"You are already running this action!" (category 110). Live perk spam capture 2026-10-02T03:54:58Z.</summary>
         public const int AlreadyRunningAction = 171187118;
@@ -57,7 +57,7 @@ namespace ZoneEngine_New.Core.Helpers
         /// "You can loot these remains." (category 110). Live sends it to a solo loot winner after the kill's death
         /// action and before the CorpseFullUpdate (capture 2026-10-05T01:45:30Z).
         /// </summary>
-        public const int CanLootRemains = 249752371;
+        public const int CanLootRemains = 0x0EE3EB33;
 
         /// <summary>
         /// "All team members can loot these remains." (text.mdb category 110, id 0x03940D94). We send it as zone
