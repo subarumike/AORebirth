@@ -75,6 +75,9 @@ namespace ZoneEngine_New.Core.Entities
         const int DeathRespawnActionParameter2 = 295830;
 
         bool _respawnPending;
+
+        /// <summary>An in-zone respawn has despawned this player for observers; the respawn itself runs next tick.</summary>
+        bool _respawnObserversCleared;
         double _respawnRemainingSeconds;
         DateTime _diedAtUtc;
 
@@ -650,7 +653,7 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             var candidate = new PerkActionUse(hash, template, lowId, highId, quality, target);
-            string? failure = RevalidatePerkAction(candidate);
+            string? failure = RevalidatePerkAction(candidate, starting: true);
             if (failure != null)
             {
                 if (failure == OutOfRangeFailure)
@@ -689,17 +692,18 @@ namespace ZoneEngine_New.Core.Entities
         const string UseRequirementsFailure = "use requirements failed";
 
         /// <summary>
-        /// Gates checked when a perk action starts and again when its AttackDelay ends: still held, not locked,
-        /// ToUse requirements, and a living target within the template's AttackRange. Null when still valid.
+        /// Gates checked when a perk action is asked for and again when its AttackDelay ends: still held, not locked, and
+        /// a living, attackable target (the fighting target when the action needs one). ToUse requirements, AttackRange
+        /// and line of sight only when <paramref name="starting"/>: met then, the action fires. Null when still valid.
         /// </summary>
-        public string? RevalidatePerkAction(PerkActionUse use)
+        public string? RevalidatePerkAction(PerkActionUse use, bool starting)
         {
             ArgumentNullException.ThrowIfNull(use);
             if (Array.FindIndex(_perkActions, action => action.Hash == use.Hash) < 0)
                 return "perk action no longer held";
             if (IsPerkActionLocked(use.Template))
                 return "perk locked";
-            if (!use.Template.MeetsActionRequirements(stat => PerkActionStat(stat, use.Target), ActionType.ToUse, ResolvePerkRequirement))
+            if (starting && !use.Template.MeetsActionRequirements(stat => PerkActionStat(stat, use.Target), ActionType.ToUse, ResolvePerkRequirement))
                 return UseRequirementsFailure;
             if (!ReferenceEquals(use.Target, this))
             {
@@ -710,10 +714,10 @@ namespace ZoneEngine_New.Core.Entities
                     && !CombatRules.CanAttack(this, use.Target))
                     return NotAttackableFailure;
                 if (UseTargetRules.NeedsFightingTarget(can) && !ReferenceEquals(TryResolveFightingTarget(), use.Target))
-                    return "no longer the fighting target";
-                if (GetEdgeDistanceTo(use.Target) > PerkActionRange(use.Template))
+                    return UseTargetRules.LostFightingTarget;
+                if (starting && GetEdgeDistanceTo(use.Target) > PerkActionRange(use.Template))
                     return OutOfRangeFailure;
-                if (!HasLineOfSightTo(use.Target))
+                if (starting && !HasLineOfSightTo(use.Target))
                     return NoLineOfSightFailure;
             }
 
@@ -941,6 +945,7 @@ namespace ZoneEngine_New.Core.Entities
                 return;
 
             base.OnDeath(killer);
+            _respawnObserversCleared = false;
             _respawnPending = true;
             _respawnRemainingSeconds = RespawnGracePeriodMilliseconds / 1000.0;
             _diedAtUtc = DateTime.UtcNow;
@@ -1040,6 +1045,18 @@ namespace ZoneEngine_New.Core.Entities
                 return;
             }
 
+            // In-zone respawn: observers in range keep the dead copy unless it is despawned, and they only show the
+            // fresh spawn when it comes on a later tick than the despawn. Despawn now, respawn next tick.
+            if (playfield.Identity.Instance == respawn.PlayfieldId && !_respawnObserversCleared)
+            {
+                playfield.GetRequiredService<PlayfieldLocality>().DespawnForObservers(this);
+                _respawnObserversCleared = true;
+                _respawnPending = true;
+                _respawnRemainingSeconds = 0;
+                return;
+            }
+
+            _respawnObserversCleared = false;
             Revive();
 
             Logger.Info(
@@ -1385,7 +1402,10 @@ namespace ZoneEngine_New.Core.Entities
                 armedOff = true;
             }
 
-            bool maCombined = (right?.IsMaCombinedWeapon() == true) || (left?.IsMaCombinedWeapon() == true);
+            // Combined MA only when every wielded weapon allows it: one MA-combined weapon next to a normal one does not.
+            bool maCombined = (armedMain || armedOff)
+                && (!armedMain || right!.IsMaCombinedWeapon())
+                && (!armedOff || left!.IsMaCombinedWeapon());
             FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
             RebaseEquippedWeaponStats();
             if (maCombined != _combinedMartialArts)

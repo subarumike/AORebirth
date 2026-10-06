@@ -163,6 +163,13 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             _visibility.DeactivatePlayerVisibility(player);
         }
 
+        /// <inheritdoc cref="LocalityVisibility.DespawnForObservers"/>
+        public void DespawnForObservers(Dynel source)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            _visibility.DespawnForObservers(source);
+        }
+
         public void UnregisterDynel(Dynel dynel)
         {
             if (dynel == null)

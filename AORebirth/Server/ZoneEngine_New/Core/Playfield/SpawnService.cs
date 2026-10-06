@@ -1091,7 +1091,9 @@ namespace ZoneEngine_New.Core.Playfield
 
             Vector3 onFloor = _playfield.SnapFeetToFloor(landing);
             session.SendSamePlayfieldRespawnTeleport(onFloor);
-            player.Position = onFloor;
+            // The client rebuilds this character standing still: drop input held before death (its key releases
+            // never arrive) and any path, or observers are told it is still running.
+            player.Motor.ResetForPlayfieldTransfer(onFloor);
 
             session.Send(
                 _playfield.CreatePlayfieldAnarchyFMessage(

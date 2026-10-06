@@ -42,10 +42,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
             try
             {
                 DateTime now = DateTime.UtcNow;
-                int first = _dao.ReserveIdentities("offer", 5);
+                int first;
+                using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.reserve-ids", player.Identity.Instance))
+                    first = _dao.ReserveIdentities("offer", 5);
                 int next = first;
                 int seed = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
                 int nonce = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
+                var generating = ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.generate", player.Identity.Instance);
                 var response = GeneratedMissionRollService.Generate(message, player.Identity, level,
                     playfield.Identity.Instance, player.Position.xf, player.Position.zf,
                     side,
@@ -53,7 +56,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."));
                 var batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,
                     MissionRollPolicy.Current.Fee(level), seed, nonce, now);
+                generating.Dispose();
+                var committing = ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.commit", player.Identity.Instance);
                 var result = _missions.PublishOffers(player, batch);
+                committing.Dispose();
                 if (result.Status == GeneratedMissionResultStatus.Applied)
                     session.Send(response);
                 else if (!player.IsPersistenceQuarantined)

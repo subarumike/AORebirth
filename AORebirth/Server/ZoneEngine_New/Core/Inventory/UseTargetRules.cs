@@ -19,6 +19,12 @@ namespace ZoneEngine_New.Core.Inventory
     /// </summary>
     internal static class UseTargetRules
     {
+        /// <summary>
+        /// Why a delayed use was dropped when it lost its fighting target (attack stopped, target changed); answered with
+        /// <see cref="ClientFeedback.RequiresFightingTarget"/> instead of the generic failure line.
+        /// </summary>
+        public const string LostFightingTarget = "no longer the fighting target";
+
         public enum Failure
         {
             None,

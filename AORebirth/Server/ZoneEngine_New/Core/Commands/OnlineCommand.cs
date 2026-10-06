@@ -13,7 +13,8 @@ namespace ZoneEngine_New.Core.Commands
 
     /// <summary>
     /// <c>.online</c>: every player online, grouped by real profession (not VisualProfession), highest level first.
-    /// Open to everyone, so each caller is held to a short cooldown.
+    /// Open to everyone, so each caller is held to a short cooldown. A caller who may use .tp gets a [TP] link beside
+    /// every other named player that says <c>.tp to &lt;name&gt;</c>.
     /// </summary>
     public sealed class OnlineCommand : IGmCommand
     {
@@ -47,6 +48,7 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             _lastUseUtc[callerId] = nowUtc;
+            bool canTeleport = context.Player.Stats.GetOrZero(CharacterStat.GmLevel) >= TeleportCommand.GmLevel;
 
             var entries = _playfields.Value.SnapshotPlayers()
                 .Select(player => new
@@ -54,6 +56,7 @@ namespace ZoneEngine_New.Core.Commands
                     Name = string.IsNullOrEmpty(player.Name)
                         ? player.Identity.Instance.ToString(CultureInfo.InvariantCulture)
                         : player.Name,
+                    Teleportable = canTeleport && !string.IsNullOrEmpty(player.Name) && player.Identity.Instance != callerId,
                     Level = player.Stats.GetOrZero(CharacterStat.Level),
                     Profession = player.Stats.GetOrZero(CharacterStat.Profession)
                 })
@@ -81,6 +84,8 @@ namespace ZoneEngine_New.Core.Commands
                         .Append(DiagAoml.Label("Lvl"))
                         .Append(' ')
                         .Append(DiagAoml.Color(LevelColor(entry.Level), entry.Level.ToString(CultureInfo.InvariantCulture)));
+                    if (entry.Teleportable)
+                        block.Append("&#160;&#160;").Append(DiagAoml.Link(".tp to " + DiagAoml.Safe(entry.Name), "[TP]"));
                 }
 
                 blocks.Add(block.ToString());

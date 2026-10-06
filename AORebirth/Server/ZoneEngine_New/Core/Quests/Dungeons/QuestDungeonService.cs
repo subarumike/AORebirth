@@ -143,9 +143,11 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                     return "Mission dungeons are unavailable.";
 
                 DateTime now = DateTime.UtcNow;
-                GeneratedMissionOffer? offer = _offers.ReadOffers(player.Identity.Instance).FirstOrDefault(value =>
-                    value.OfferType == (int)offerIdentity.Type && value.OfferInstance == offerIdentity.Instance
-                    && value.State == GeneratedMissionState.Offered && value.ExpiresAtUtcTicks > now.Ticks);
+                GeneratedMissionOffer? offer;
+                using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.read-offers", player.Identity.Instance))
+                    offer = _offers.ReadOffers(player.Identity.Instance).FirstOrDefault(value =>
+                        value.OfferType == (int)offerIdentity.Type && value.OfferInstance == offerIdentity.Instance
+                        && value.State == GeneratedMissionState.Offered && value.ExpiresAtUtcTicks > now.Ticks);
                 if (offer == null)
                     return "That mission is no longer offered.";
 
@@ -177,8 +179,11 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                     Quality = offer.Quality,
                     MissionIconId = MissionRollPolicy.Current.Icon((MissionRollType)offer.MissionType)
                 };
-                if (!_layouts.TryGenerate(parameters.Seed, parameters.GeneratorVersion, entrance.Instance, out _))
-                    return "Mission dungeons are unavailable.";
+                using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.layout", player.Identity.Instance))
+                {
+                    if (!_layouts.TryGenerate(parameters.Seed, parameters.GeneratorVersion, entrance.Instance, out _))
+                        return "Mission dungeons are unavailable.";
+                }
 
                 QuestTemplate template = BuildTemplate(questId, offer);
                 DateTime expires = now.AddSeconds(MissionRollPolicy.Current.AcceptedLifetimeSeconds);
@@ -186,7 +191,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
 
                 try
                 {
-                    _flush.HardFlush(player);
+                    using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.flush", player.Identity.Instance))
+                        _flush.HardFlush(player);
                     Item key = CreateKey();
                     if (!InventoryGrantPlan.TryCreate(player, [key], out InventoryGrantPlan plan))
                         return "Your inventory is full.";
@@ -214,14 +220,18 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         UpdatedAtUtcTicks = now.Ticks
                     };
 
-                    if (!_store.TryAcceptOfferQuest(player.Identity.Instance, offer.OfferType, offer.OfferInstance, quest, characterRow,
-                        KeyRow(plan.Rows[0], now), now.Ticks))
+                    bool accepted;
+                    using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.commit", player.Identity.Instance))
+                        accepted = _store.TryAcceptOfferQuest(player.Identity.Instance, offer.OfferType, offer.OfferInstance, quest,
+                            characterRow, KeyRow(plan.Rows[0], now), now.Ticks);
+                    if (!accepted)
                         return "That mission is no longer offered.";
 
                     _dungeons[questId] = new CachedDungeon(parameters, expires.Ticks, KillTarget(template));
                     plan.PublishAfterCommit(notify: false);
                     SendKey(player, key, plan.Rows[0].ContainerPlacement, parameters.EntranceName);
-                    _quests.AdoptGenerated(player, questId, template, now, expires, parametersJson);
+                    using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.adopt", player.Identity.Instance))
+                        _quests.AdoptGenerated(player, questId, template, now, expires, parametersJson);
                     _logger.Info(string.Format(CultureInfo.InvariantCulture,
                         "Dungeon quest accepted char={0} quest={1} offer={2}:{3} entrance={4} ({5}) dungeon={6}",
                         player.Identity.Instance, questId, offer.OfferType, offer.OfferInstance, entrance.Instance, entrance.Name, dungeonPlayfield));

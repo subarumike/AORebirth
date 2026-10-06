@@ -184,8 +184,17 @@ namespace ZoneEngine_New.Core.Inventory
         public bool IsBackpackUse
             => Identity.Type == IdentityType.Container && Identity.Instance != 0 && Can(CanFlags.Use);
 
-        /// <summary>Gates checked when a use starts and again when a delayed use completes.</summary>
+        /// <summary>Gates checked when a use starts: <see cref="CanStillUse"/> plus the ToUse requirements.</summary>
         public bool CanBeginUse(Player player)
+            => CanStillUse(player)
+                && Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse, player.ResolvePerkRequirement);
+
+        /// <summary>
+        /// Gates checked again when a delayed use completes. ToUse requirements are not among them: met when the use
+        /// started, it fires. The item stays locked in its slot meanwhile (ItemUseService), so it cannot be moved,
+        /// traded or used twice; skill locks are enforced when its functions run.
+        /// </summary>
+        public bool CanStillUse(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
 
@@ -194,9 +203,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (Locked || !Can(CanFlags.Use))
                 return false;
             // A function aimed at the fighting target would otherwise fall back to the user.
-            if (UsesFightingTarget && player.TryResolveFightingTarget() == null)
-                return false;
-            return Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse, player.ResolvePerkRequirement);
+            return !UsesFightingTarget || player.TryResolveFightingTarget() != null;
         }
 
         /// <summary>True when an OnUse function applies to the user's fighting target.</summary>

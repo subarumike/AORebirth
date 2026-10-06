@@ -353,7 +353,8 @@ namespace ZoneEngine_New.Core.Nanos
             int nanoId,
             IItemBuilder items,
             IInventoryRepository inventory,
-            DateTime nowUtc)
+            DateTime nowUtc,
+            bool gmApply = false)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(target);
@@ -367,25 +368,34 @@ namespace ZoneEngine_New.Core.Nanos
             if (template.Id != nanoId)
                 return false;
 
-            return LandImmediate(source, target, NanoSpell.From(template), inventory, items, nowUtc);
+            return LandImmediate(source, target, NanoSpell.From(template), inventory, items, nowUtc, gmApply);
         }
 
+        /// <summary>
+        /// Lands <paramref name="spell"/> at once. <paramref name="gmApply"/> (a GM's .give nano): combat legality does
+        /// not apply, so a hostile-flagged nano such as PvP Enabled (202732) lands on any living character, and the
+        /// target does not treat the GM as an attacker. NCU and strain rules still apply.
+        /// </summary>
         static bool LandImmediate(
             Character source,
             Character target,
             NanoSpell spell,
             IInventoryRepository inventory,
             IItemBuilder items,
-            DateTime nowUtc)
+            DateTime nowUtc,
+            bool gmApply = false)
         {
-            if (IsNoCombat(source) || IsNoCombat(target))
-                return false;
+            if (!gmApply)
+            {
+                if (IsNoCombat(source) || IsNoCombat(target))
+                    return false;
 
-            if (spell.IsHostile && !IsHostileNanoTarget(source, target))
-                return false;
+                if (spell.IsHostile && !IsHostileNanoTarget(source, target))
+                    return false;
 
-            if (spell.IsHostile && target.IsEvading)
-                return false;
+                if (spell.IsHostile && target.IsEvading)
+                    return false;
+            }
 
             AnnounceImmediateLand(source, target, spell.Id);
             AnnounceCastFinished(source, spell.Id);
@@ -415,7 +425,7 @@ namespace ZoneEngine_New.Core.Nanos
 
             SendNanoDuration(source, target, applied);
             ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: true, inventory, items);
-            if (spell.IsHostile)
+            if (spell.IsHostile && !gmApply)
                 OnDebuffLanded(source, target, applied);
             return true;
         }

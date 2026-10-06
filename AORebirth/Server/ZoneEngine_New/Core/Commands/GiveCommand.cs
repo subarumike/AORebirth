@@ -283,7 +283,7 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            if (!NanoRuntime.TryApplyImmediate(context.Player, subject, nanoId, _items, _inventory, DateTime.UtcNow))
+            if (!NanoRuntime.TryApplyImmediate(context.Player, subject, nanoId, _items, _inventory, DateTime.UtcNow, gmApply: true))
             {
                 GmCommandFeedback.Send(
                     context.Session,

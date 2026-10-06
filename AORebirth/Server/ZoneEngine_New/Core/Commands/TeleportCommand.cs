@@ -28,7 +28,10 @@ namespace ZoneEngine_New.Core.Commands
 
         public string Name => "tp";
 
-        public int RequiredGmLevel => 1;
+        /// <summary>GM level that runs .tp; <see cref="OnlineCommand"/> offers [TP] links from it.</summary>
+        public const int GmLevel = 1;
+
+        public int RequiredGmLevel => GmLevel;
 
         public string Usage =>
             ".tp <x> <z> <playfieldId> or .tp <x> <y> <z> <playfieldId> (look-at player if selected) | .tp summon <character name> | .tp to <character name>";

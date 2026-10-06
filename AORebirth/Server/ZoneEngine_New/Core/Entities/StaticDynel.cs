@@ -52,8 +52,17 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>False for uses that open a UI rather than run template spells.</summary>
         protected virtual bool DelaysUse => true;
 
-        /// <summary>Gates checked when a use starts and again when a delayed use completes.</summary>
+        /// <summary>Gates checked when a use is asked for: <see cref="CanStillUse"/>, within reach and the ToUse requirements.</summary>
         public bool CanBeginUse(Player player)
+            => CanStillUse(player)
+                && GetEdgeDistanceTo(player) <= LootableDynel.OpenRange
+                && Template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse);
+
+        /// <summary>
+        /// Gates checked again when a delayed use completes: the user is on this object's playfield. Reach and ToUse
+        /// requirements met when the use was asked for are not checked again.
+        /// </summary>
+        public bool CanStillUse(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
 
@@ -64,10 +73,7 @@ namespace ZoneEngine_New.Core.Entities
                 || player.Playfield.Identity.Instance != Playfield.Identity.Instance)
                 return false;
 
-            if (GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
-                return false;
-
-            return Template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse);
+            return true;
         }
 
         /// <summary>Runs the use. Callers gate with <see cref="CanBeginUse"/>.</summary>

@@ -271,8 +271,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
             ItemUseStart start = uses.TryBegin(player, target, item);
             if (start == ItemUseStart.Rejected)
             {
-                Deny(session, message, player, uses.HasPending(player.Identity.Instance)
-                    ? "Use failed: another item use is pending"
+                Deny(session, message, player, uses.IsQueueFull(player.Identity.Instance)
+                    ? "Use failed: action queue is full"
                     : DescribeInventoryUseFailure(player, item));
                 return;
             }
