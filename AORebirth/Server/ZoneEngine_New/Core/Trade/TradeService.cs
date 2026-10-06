@@ -322,7 +322,23 @@ namespace ZoneEngine_New.Core.Trade
                 return;
             }
 
+            LogShopPick(player, session, message, "added");
             Acknowledge(player, message);
+        }
+
+        /// <summary>Shop buy-queue diagnostics: what the client sent and the queue (stock indexes) afterwards.</summary>
+        static void LogShopPick(Player player, TradeSession session, TradeMessage message, string result)
+        {
+            var stock = session.Machine?.Stock;
+            string picks = string.Join(",", session.ShopPicks.Select(index =>
+                stock != null && stock.TryGetSlot(index, out ShopStockSlot slot)
+                    ? index.ToString(CultureInfo.InvariantCulture) + ":" + slot.LowId.ToString(CultureInfo.InvariantCulture)
+                    : index.ToString(CultureInfo.InvariantCulture)));
+            player.Logger.Info(string.Format(CultureInfo.InvariantCulture,
+                "Shop pick {0} action={1} target={2}:{3} container={4}:{5} params={6},{7},{8},{9} queue=[{10}]",
+                result, message.Action, (int)message.Target.Type, message.Target.Instance,
+                (int)message.Container.Type, message.Container.Instance,
+                message.Param1, message.Param2, message.Param3, message.Param4, picks));
         }
 
         void AddOfferedItem(Player player, TradeSession session, TradeMessage message)
@@ -387,12 +403,15 @@ namespace ZoneEngine_New.Core.Trade
 
             if (session.Kind == TradeKind.Shop && IsShopSide(session, message.Target))
             {
-                if (!session.RemoveShopPick(message.Container.Instance))
+                bool removed = session.RemoveShopPick(message.Container.Instance);
+                LogShopPick(player, session, message, removed ? "removed" : "remove-rejected");
+                if (!removed)
                     return;
 
+                // One frame per side. An extra echo of the request (also under the player's identity) made the client
+                // take a second copy out of the cart.
                 player.Session!.Send(RemoveAck(player.Identity, message));
                 player.Session.Send(RemoveAck(session.Machine!.ShopIdentity, message));
-                Acknowledge(player, message);
                 return;
             }
 

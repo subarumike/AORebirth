@@ -189,15 +189,17 @@ namespace ZoneEngine_New.Core.Trade
         }
 
         /// <summary>
-        /// Removes the pane entry at <paramref name="paneSlot"/>. The client addresses buy-pane
-        /// entries by their position, so later picks shift down.
+        /// Removes one queued pick of <paramref name="stockIndex"/>. The client names a buy-pane entry by the same stock
+        /// identity it added (container 111:stock index, also when the slot was queued several times), not by its pane
+        /// position. Queued copies of one stock slot are identical, so the last one goes.
         /// </summary>
-        public bool RemoveShopPick(int paneSlot)
+        public bool RemoveShopPick(int stockIndex)
         {
-            if (paneSlot < 0 || paneSlot >= _shopPicks.Count)
+            int at = _shopPicks.LastIndexOf(stockIndex);
+            if (at < 0)
                 return false;
 
-            _shopPicks.RemoveAt(paneSlot);
+            _shopPicks.RemoveAt(at);
             return true;
         }
 
