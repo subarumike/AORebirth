@@ -129,6 +129,28 @@ namespace ZoneEngine_New.Core.Entities
             if (IsDead)
                 return;
 
+            ReleaseForDeath("vendor died");
+            base.OnDeath(killer);
+        }
+
+        /// <summary>
+        /// GM <c>.despawn</c>: the same NPC cleanup as a death, then <see cref="Character.DespawnAsDeath"/>. The NPC always
+        /// leaves the world, including kinds that keep their dead body around for a while.
+        /// </summary>
+        public override void DespawnAsDeath()
+        {
+            if (IsDead)
+                return;
+
+            ReleaseForDeath("vendor despawned");
+            base.DespawnAsDeath();
+            if (Playfield != null)
+                Playfield.GetRequiredService<SpawnService>().DespawnNpc(this);
+        }
+
+        /// <summary>What an NPC lets go of when it dies or is despawned as dead: its brain, pet bookkeeping, pets and shop.</summary>
+        void ReleaseForDeath(string shopCloseReason)
+        {
             Brain?.OnOwnerDied();
 
             // A pet's death gives nobody a reward and leaves no body to loot.
@@ -146,10 +168,8 @@ namespace ZoneEngine_New.Core.Entities
             if (shop != null)
             {
                 SetCharacterFlag(CharacterFlags.HasItemsForSale, false);
-                Playfield?.GetRequiredService<TradeService>().CloseMachine(shop, "vendor died");
+                Playfield?.GetRequiredService<TradeService>().CloseMachine(shop, shopCloseReason);
             }
-
-            base.OnDeath(killer);
         }
 
         /// <summary>Pets leave no corpse.</summary>

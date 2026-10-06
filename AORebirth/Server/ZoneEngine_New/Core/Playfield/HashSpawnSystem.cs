@@ -886,6 +886,34 @@ namespace ZoneEngine_New.Core.Playfield
             if (npc.Playfield != null)
                 _spawnService.DespawnNpc(npc);
 
+            MarkMemberDead(point, instance, name);
+        }
+
+        /// <summary>
+        /// Removes a spawn point's static member as if it had died (GM <c>.despawn</c>): the point respawns on its
+        /// normal timer once every member is gone, or retires when it does not respawn after death. False when this
+        /// static is not owned by a spawn point.
+        /// </summary>
+        public bool TryDespawnStaticAsDeath(StaticDynel dynel)
+        {
+            ArgumentNullException.ThrowIfNull(dynel);
+            if (!_pointBySpawned.TryGetValue(dynel, out HashSpawnPoint? point))
+                return false;
+
+            _pointBySpawned.Remove(dynel);
+            point.RemoveMember(dynel);
+            int instance = dynel.Identity.Instance;
+            string? name = dynel.Template.Name;
+            if (dynel.Playfield != null)
+                _spawnService.DespawnStatic(dynel);
+
+            MarkMemberDead(point, instance, name);
+            return true;
+        }
+
+        /// <summary>A member died or was despawned as dead: once the point is empty it waits out its respawn time.</summary>
+        void MarkMemberDead(HashSpawnPoint point, int instance, string? name)
+        {
             if (point.MemberCount > 0)
                 return;
 

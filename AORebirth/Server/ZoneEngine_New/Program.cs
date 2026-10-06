@@ -286,6 +286,10 @@ namespace ZoneEngine_New
             services.AddSingleton<IGmCommand, DiagCommand>();
             services.AddSingleton<IGmCommand, DebugCommand>();
             services.AddSingleton<IGmCommand, OnlineCommand>();
+            services.AddSingleton<IGmCommand, DespawnCommand>();
+            services.AddSingleton<ZoneEngine_New.Core.Lifecycle.IEngineShutdown, ProgramShutdown>();
+            services.AddSingleton<ZoneEngine_New.Core.Lifecycle.ShutdownScheduler>();
+            services.AddSingleton<IGmCommand, ShutdownCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton<ZoneLoginHandler>();
             services.AddSingleton<IZoneAdmissionGate, ZoneAdmissionGate>();
@@ -560,6 +564,22 @@ namespace ZoneEngine_New
                         Console.WriteLine("Commands: debug [flags], exit, quit");
                         break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// GM-scheduled shutdown (<c>.shutdown</c>): the same save-and-stop as a console exit, then the process ends.
+        /// The interactive command loop may be blocked reading the console, so the flag alone would not stop it.
+        /// </summary>
+        private sealed class ProgramShutdown : ZoneEngine_New.Core.Lifecycle.IEngineShutdown
+        {
+            public void Shutdown(string reason)
+            {
+                try { Console.WriteLine("ZoneEngine_New shutdown requested: " + reason + "; saving players."); }
+                catch (Exception) { }
+                exited = true;
+                bool ok = Program.Shutdown();
+                Environment.Exit(ok ? 0 : 3);
             }
         }
 

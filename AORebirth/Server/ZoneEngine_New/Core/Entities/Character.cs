@@ -333,6 +333,29 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
+        /// A GM removal treated as a death by whatever spawned this character: <see cref="Died"/> fires, so hash spawn
+        /// points schedule the respawn and content NPCs unbind, and the character leaves the world. Unlike a real death
+        /// there is no death animation, corpse, loot, XP or kill credit. Players are never removed this way.
+        /// </summary>
+        public virtual void DespawnAsDeath()
+        {
+            if (_deathNotified || IsPlayer)
+                return;
+
+            _deathNotified = true;
+            _corpseSwapPending = false;
+            InterruptTimedActions(TimedActionInterrupt.LeavePlayfield);
+            if (OwnedPets.Count > 0)
+                Playfield?.GetService<Pets.PetService>()?.DismissAll(this, "owner despawned");
+            SetFightingTarget(Identity.None);
+            NanoRuntime.ClearBuffsOnDeath(this);
+            ClearKillRewards();
+
+            Died?.Invoke(this);
+            RemoveFromWorldAfterDeath();
+        }
+
+        /// <summary>
         /// Clears death and restores health/nano so the character can live again.
         /// </summary>
         public virtual void Revive()
