@@ -206,10 +206,13 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Requirement leaves a stat value cannot answer, resolved against this player: HasPerk / HasNotPerk
-        /// (trained perks), IsPerkLocked / IsPerkUnlocked (LockPerk cooldowns) and HasRunningNano / HasNotRunningNano
-        /// (NCU; Hecatomb needs Performed Gore 234025 running).
-        /// The leaf's Value is the perk or nano id. Null leaves every other leaf to the stat comparison.
+        /// (trained perks), IsPerkLocked / IsPerkUnlocked (LockPerk cooldowns), pet and allied-combat state, then
+        /// the NCU leaves of <see cref="Character.ResolveRequirement"/> (Hecatomb needs Performed Gore 234025 running).
+        /// Null leaves every other leaf to the stat comparison.
         /// </summary>
+        public override bool? ResolveRequirement(ItemRequirement requirement) => ResolvePerkRequirement(requirement);
+
+        /// <inheritdoc cref="ResolveRequirement"/>
         public bool? ResolvePerkRequirement(ItemRequirement requirement)
         {
             ArgumentNullException.ThrowIfNull(requirement);
@@ -220,12 +223,10 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.HasNotPerk => !TrainedPerks.Contains(id),
                 Operator.IsPerkLocked => PerkLocks.IsLocked(id, DateTime.UtcNow),
                 Operator.IsPerkUnlocked => !PerkLocks.IsLocked(id, DateTime.UtcNow),
-                Operator.HasRunningNano => Buffs.Any(buff => buff.Id == id),
-                Operator.HasNotRunningNano => !Buffs.Any(buff => buff.Id == id),
                 Operator.IsPetOverEquipped => OwnedPets.All.Any(pet => pet.Pet?.IsOverEquipped == true),
                 Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
                 Operator.MustAlliedCombat => IsAlliedInCombat(),
-                _ => null
+                _ => base.ResolveRequirement(requirement)
             };
         }
 
@@ -622,15 +623,29 @@ namespace ZoneEngine_New.Core.Entities
                 return false;
             }
 
-            // Target / Fightingtarget functions (Pulverize's hit) land on who the player is fighting, else the
-            // selected character; User / Wearer functions (LockPerk, feedback) resolve to this player as source.
+            // ApplyOnFightingTarget actions need the character being fought; ApplyOnHostile ones any attackable character,
+            // without having to be fighting it (UseTargetRules). Otherwise Target / Fightingtarget functions (Pulverize's
+            // hit) land on who the player is fighting, else the selected character; User / Wearer functions (LockPerk,
+            // feedback) resolve to this player as source.
             Character target = this;
-            if (template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
+            CanFlags can = UseTargetRules.CanOf(template);
+            if (UseTargetRules.IsHostileTargeted(can))
+            {
+                if (!UseTargetRules.TryResolve(this, can, out target, out UseTargetRules.Failure targetFailure))
+                {
+                    UseTargetRules.SendFailure(this, targetFailure, TryResolveFightingTarget());
+                    return false;
+                }
+            }
+            else if (template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
                 && spells.Exists(spell => spell.Target is (int)ItemTarget.Target or (int)ItemTarget.Fightingtarget))
             {
                 Character? resolved = ResolvePerkActionTarget();
                 if (resolved == null)
+                {
+                    RequirementFeedback.SendText(this, "You need a target to use this.");
                     return false;
+                }
                 target = resolved;
             }
 
@@ -646,6 +661,8 @@ namespace ZoneEngine_New.Core.Entities
                     ClientFeedback.Send(this, CombatRules.IsPvpAttackBlocked(this, target)
                         ? "Feedback_PvpNotAllowedInThisDistrict"
                         : "Feedback_StartingAttackFailed");
+                else if (failure == UseRequirementsFailure)
+                    ClientFeedback.Send(this, ClientFeedback.PerkRequirementsNotMet);
                 return false;
             }
 
@@ -668,6 +685,8 @@ namespace ZoneEngine_New.Core.Entities
 
         const string NotAttackableFailure = "target not attackable";
 
+        const string UseRequirementsFailure = "use requirements failed";
+
         /// <summary>
         /// Gates checked when a perk action starts and again when its AttackDelay ends: still held, not locked,
         /// ToUse requirements, and a living target within the template's AttackRange. Null when still valid.
@@ -680,13 +699,17 @@ namespace ZoneEngine_New.Core.Entities
             if (IsPerkActionLocked(use.Template))
                 return "perk locked";
             if (!use.Template.MeetsActionRequirements(stat => PerkActionStat(stat, use.Target), ActionType.ToUse, ResolvePerkRequirement))
-                return "use requirements failed";
+                return UseRequirementsFailure;
             if (!ReferenceEquals(use.Target, this))
             {
                 if (use.Target.IsDead || !ReferenceEquals(use.Target.Playfield, Playfield))
                     return "target gone";
-                if (IsHostilePerkAction(use.Template) && !CombatRules.CanAttack(this, use.Target))
+                CanFlags can = UseTargetRules.CanOf(use.Template);
+                if ((IsHostilePerkAction(use.Template) || UseTargetRules.IsHostileTargeted(can))
+                    && !CombatRules.CanAttack(this, use.Target))
                     return NotAttackableFailure;
+                if (UseTargetRules.NeedsFightingTarget(can) && !ReferenceEquals(TryResolveFightingTarget(), use.Target))
+                    return "no longer the fighting target";
                 if (GetEdgeDistanceTo(use.Target) > PerkActionRange(use.Template))
                     return OutOfRangeFailure;
                 if (!HasLineOfSightTo(use.Target))

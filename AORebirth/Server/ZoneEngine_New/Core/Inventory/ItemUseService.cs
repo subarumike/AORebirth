@@ -99,17 +99,28 @@ namespace ZoneEngine_New.Core.Inventory
                 if (item.UsesFightingTarget && player.TryResolveFightingTarget() == null)
                     RequirementFeedback.SendText(player, "You need a fighting target to use this item.");
                 else
-                    RequirementFeedback.SendIfUnmet(player, item.Definition, ActionType.ToUse);
+                    RequirementFeedback.SendIfUnmet(player, item.Definition, ActionType.ToUse, resolve: player.ResolvePerkRequirement);
+                return ItemUseStart.Rejected;
+            }
+
+            // ApplyOnHostile / ApplyOnFightingTarget items are used on a hostile, not on the user (UseTargetRules).
+            CanFlags can = UseTargetRules.CanOf(item.Definition);
+            Character useTarget = player;
+            if (UseTargetRules.IsHostileTargeted(can)
+                && !UseTargetRules.TryResolve(player, can, out useTarget, out UseTargetRules.Failure targetFailure))
+            {
+                UseTargetRules.SendFailure(player, targetFailure, player.TryResolveFightingTarget());
                 return ItemUseStart.Rejected;
             }
 
             int instanceId = item.InstanceId;
             var pending = new PendingItemUse(
                 player,
-                string.Format(CultureInfo.InvariantCulture, "slot={0}:{1} low={2} instanceId={3}",
-                    slot.Type, slot.Instance, item.LowId, instanceId),
-                () => RevalidateInventory(player, slot, item, instanceId),
-                () => item.ExecuteUse(player, slot, _inventoryRepository, _items),
+                string.Format(CultureInfo.InvariantCulture, "slot={0}:{1} low={2} instanceId={3} target={4}",
+                    slot.Type, slot.Instance, item.LowId, instanceId, useTarget.Identity.Instance),
+                () => RevalidateInventory(player, slot, item, instanceId)
+                    ?? (UseTargetRules.Revalidate(player, can, useTarget) is { } failure ? "target " + failure : null),
+                () => item.ExecuteUse(player, slot, _inventoryRepository, _items, useTarget),
                 lockTarget: locked => item.Locked = locked);
             return Begin(pending, ResolveDelayCentiseconds(item));
         }

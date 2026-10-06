@@ -58,7 +58,8 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            if (!_gameData.CanResolveMobHash(hash))
+            // A GM-typed hash must name a real template; the AAAA placeholder fallback is for world data only.
+            if (!_gameData.HasMobTemplate(hash))
             {
                 GmCommandFeedback.Send(
                     context.Session,

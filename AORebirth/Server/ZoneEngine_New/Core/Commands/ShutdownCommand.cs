@@ -18,7 +18,8 @@ namespace ZoneEngine_New.Core.Commands
 
         public string Name => "shutdown";
 
-        public int RequiredGmLevel => 1;
+        /// <summary>Stopping the whole engine is reserved for top-level GMs.</summary>
+        public int RequiredGmLevel => 1000;
 
         public string Usage => ".shutdown <seconds> | .shutdown abort";
 

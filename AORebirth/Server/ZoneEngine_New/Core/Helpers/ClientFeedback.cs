@@ -28,6 +28,12 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"A too high level player in your team prevents you from receiving any experience." (category 110).</summary>
         public const int TeammateTooHighForXp = 121950320;
 
+        /// <summary>
+        /// A perk action refused for its use requirements (Stab while not behind the target). Live sends only this
+        /// Feedback, no arguments, once per attempt (capture 2026-10-06T14:02:52Z). Key name unknown.
+        /// </summary>
+        public const int PerkRequirementsNotMet = 25615860;
+
         /// <summary>"You are already running this action!" (category 110). Live perk spam capture 2026-10-02T03:54:58Z.</summary>
         public const int AlreadyRunningAction = 171187118;
 

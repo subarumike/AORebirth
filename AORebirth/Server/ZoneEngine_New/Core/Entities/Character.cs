@@ -711,11 +711,15 @@ namespace ZoneEngine_New.Core.Entities
 
             IGameData gameData = playfield.GetRequiredService<IGameData>();
             int victimLevel = Stats.GetOrOne(CharacterStat.Level);
-            if (!gameData.TryGetXpLevel(victimLevel, out XpLevelEntry extract) || extract.KillAward <= 0)
+
+            // The level's kill award plus the monster's own XP stat (its template's extra worth), shared the same way.
+            long pool = gameData.TryGetXpLevel(victimLevel, out XpLevelEntry extract) ? Math.Max(0, extract.KillAward) : 0;
+            pool += Math.Max(0, Stats.GetOrZero(CharacterStat.XP));
+            if (pool <= 0)
                 return;
 
             DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
-            List<AwardShare> shares = _killRewards.Divide(extract.KillAward, present, AwardCredit.Shared);
+            List<AwardShare> shares = _killRewards.Divide((int)Math.Min(pool, int.MaxValue), present, AwardCredit.Shared);
             var tooLow = new List<Character>();
             var told = new HashSet<int>();
             for (int i = 0; i < shares.Count; i++)
@@ -1928,6 +1932,25 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>Active NCU entries, oldest first.</summary>
         public IReadOnlyList<Buff> Buffs => _buffs;
+
+        /// <summary>
+        /// Requirement leaves a stat value cannot answer, read from this character's NCU: HasRunningNano /
+        /// HasNotRunningNano (Value = nano id) and HasRunningNanoLine / HasNotRunningNanoLine (Value = nano line,
+        /// matched against the running buff's strain). Null leaves every other leaf to the stat comparison.
+        /// </summary>
+        public virtual bool? ResolveRequirement(ItemRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+            int value = requirement.Value;
+            return (Operator)requirement.Operator switch
+            {
+                Operator.HasRunningNano => _buffs.Any(buff => buff.Id == value),
+                Operator.HasNotRunningNano => !_buffs.Any(buff => buff.Id == value),
+                Operator.HasRunningNanoLine => _buffs.Any(buff => buff.NanoStrain == value),
+                Operator.HasNotRunningNanoLine => !_buffs.Any(buff => buff.NanoStrain == value),
+                _ => null
+            };
+        }
 
         /// <summary>NCU consumed by friendly buffs that use NCU; mirrored into CurrentNCU.</summary>
         public int UsedNcu { get; private set; }

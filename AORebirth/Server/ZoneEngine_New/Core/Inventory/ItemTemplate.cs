@@ -186,23 +186,35 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// Stat checks of <paramref name="actionType"/> that fail. Empty when the action passes or is
-        /// missing; also empty when the expression fails without any single failing check.
+        /// Checks of <paramref name="actionType"/> that fail, each with the value it read and whether it read the
+        /// target (an OnTarget leaf). Empty when the action passes or is missing; also empty when the expression fails
+        /// without any single failing check.
         /// </summary>
-        public IReadOnlyList<ItemRequirement> UnmetActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType)
+        public IReadOnlyList<UnmetRequirement> UnmetActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType,
+            Func<ItemRequirement, bool?>? resolve = null, Func<CharacterStat, int>? getTargetStat = null)
         {
             ArgumentNullException.ThrowIfNull(getStat);
 
             ItemAction? action = Actions.Find(candidate => candidate.ActionType == (int)actionType);
-            if (action == null || MeetsRequirements(action.Requirements, getStat))
+            if (action == null || MeetsRequirements(action.Requirements, getStat, resolve, getTargetStat))
                 return [];
 
-            var unmet = new List<ItemRequirement>();
+            var unmet = new List<UnmetRequirement>();
+            bool onTarget = false;
             foreach (ItemRequirement requirement in action.Requirements)
             {
-                if (!IsRequirementLinkOperator(requirement) && !IsSubjectSelector(requirement)
-                    && !EvaluateLeaf(requirement, getStat))
-                    unmet.Add(requirement);
+                if (IsRequirementLinkOperator(requirement))
+                    continue;
+                if (IsSubjectSelector(requirement))
+                {
+                    onTarget = (Operator)requirement.Operator == Operator.OnTarget && getTargetStat != null;
+                    continue;
+                }
+
+                Func<CharacterStat, int> reader = onTarget ? getTargetStat! : getStat;
+                if (!EvaluateLeaf(requirement, reader, resolve))
+                    unmet.Add(new UnmetRequirement(requirement, reader((CharacterStat)requirement.StatNumber), onTarget));
+                onTarget = false;
             }
 
             return unmet;
@@ -223,19 +235,41 @@ namespace ZoneEngine_New.Core.Inventory
             Func<ItemRequirement, bool?>? resolve = null,
             Func<CharacterStat, int>? getTargetStat = null)
         {
-            ArgumentNullException.ThrowIfNull(requirements);
             ArgumentNullException.ThrowIfNull(getStat);
+
+            // One resolver for every subject; OnTarget only switches the stat reader (the long-standing behaviour).
+            return MeetsRequirements(
+                requirements,
+                new RequirementSubject(getStat, resolve),
+                user: null,
+                target: getTargetStat != null ? new RequirementSubject(getTargetStat, resolve) : null);
+        }
+
+        /// <summary>
+        /// Same fold with a subject per selector: OnUser / OnCaster read <paramref name="user"/>, OnTarget reads
+        /// <paramref name="target"/>, OnSelf and leaves without a selector read <paramref name="self"/>. A missing subject
+        /// falls back to <paramref name="self"/>. Each subject brings its own resolver for leaves a stat value cannot
+        /// answer (HasRunningNano, HasRunningNanoLine, HasPerk, ...).
+        /// </summary>
+        public static bool MeetsRequirements(
+            IReadOnlyList<ItemRequirement> requirements,
+            RequirementSubject self,
+            RequirementSubject? user,
+            RequirementSubject? target)
+        {
+            ArgumentNullException.ThrowIfNull(requirements);
+            ArgumentNullException.ThrowIfNull(self.GetStat);
 
             int count = requirements.Count;
             if (count == 0)
                 return true;
 
-            if (TryEvaluatePostfix(requirements, getStat, resolve, getTargetStat, out bool expression))
+            if (TryEvaluatePostfix(requirements, self, user, target, out bool expression))
                 return expression;
 
             bool result = true;
             bool hasReal = false;
-            Func<CharacterStat, int>? subject = null;
+            RequirementSubject? subject = null;
             for (int i = 0; i < count; i++)
             {
                 ItemRequirement requirement = requirements[i];
@@ -249,11 +283,12 @@ namespace ZoneEngine_New.Core.Inventory
 
                 if (IsSubjectSelector(requirement))
                 {
-                    subject = SelectSubject(requirement, getStat, getTargetStat);
+                    subject = SelectSubject(requirement, self, user, target);
                     continue;
                 }
 
-                bool pass = EvaluateLeaf(requirement, subject ?? getStat, resolve);
+                RequirementSubject reader = subject ?? self;
+                bool pass = EvaluateLeaf(requirement, reader.GetStat, reader.Resolve);
                 subject = null;
 
                 if (!hasReal)
@@ -275,8 +310,7 @@ namespace ZoneEngine_New.Core.Inventory
         // AODB exports Criteria as postfix leaves and link operators. Older data can instead
         // carry ChildOperator on leaves; retain that representation's existing fold above.
         static bool TryEvaluatePostfix(IReadOnlyList<ItemRequirement> requirements,
-            Func<CharacterStat, int> getStat, Func<ItemRequirement, bool?>? resolve,
-            Func<CharacterStat, int>? getTargetStat, out bool result)
+            RequirementSubject self, RequirementSubject? user, RequirementSubject? target, out bool result)
         {
             result = false;
             bool hasLeaf = false;
@@ -297,18 +331,19 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             var values = new Stack<bool>();
-            Func<CharacterStat, int>? subject = null;
+            RequirementSubject? subject = null;
             foreach (ItemRequirement requirement in requirements)
             {
                 if (IsSubjectSelector(requirement))
                 {
-                    subject = SelectSubject(requirement, getStat, getTargetStat);
+                    subject = SelectSubject(requirement, self, user, target);
                     continue;
                 }
 
                 if (!IsRequirementLinkOperator(requirement))
                 {
-                    values.Push(EvaluateLeaf(requirement, subject ?? getStat, resolve));
+                    RequirementSubject reader = subject ?? self;
+                    values.Push(EvaluateLeaf(requirement, reader.GetStat, reader.Resolve));
                     subject = null;
                     continue;
                 }
@@ -345,9 +380,14 @@ namespace ZoneEngine_New.Core.Inventory
                 or Operator.OnCaster;
         }
 
-        static Func<CharacterStat, int> SelectSubject(ItemRequirement selector, Func<CharacterStat, int> getStat,
-            Func<CharacterStat, int>? getTargetStat)
-            => (Operator)selector.Operator == Operator.OnTarget && getTargetStat != null ? getTargetStat : getStat;
+        static RequirementSubject SelectSubject(ItemRequirement selector, RequirementSubject self,
+            RequirementSubject? user, RequirementSubject? target)
+            => (Operator)selector.Operator switch
+            {
+                Operator.OnTarget => target ?? self,
+                Operator.OnUser or Operator.OnCaster => user ?? self,
+                _ => self
+            };
 
         /// <summary>
         /// And/Or/Not rows are expression-tree link operators, not stat checks.
@@ -488,9 +528,19 @@ namespace ZoneEngine_New.Core.Inventory
         {
             // Each function names who it applies to (User / Wearer / Self: whoever used the item or cast the
             // nano; Target: the event target). A nano cast on someone else can still act on its caster, e.g. a
-            // pet summon. Its requirements are checked against that same character.
+            // pet summon. Unselected requirement leaves are checked against that same character; OnUser / OnCaster
+            // leaves read the user and OnTarget leaves the event target, so staged functions (Ritual of Devotion
+            // 225317: stage 1 while no line-495 nano runs on the user, each later stage while the previous one runs)
+            // pick exactly one branch.
+            Character eventTarget = target;
+            Character user = source ?? target;
             target = ItemUseFunctions.ResolveApplyOn(target, source, spell);
-            if (!spell.MeetsRequirements(stat => criteria.Resolve(stat, id => target.Stats.Get(id))))
+            Character applyOn = target;
+            if (!ItemTemplate.MeetsRequirements(
+                    spell.Requirements,
+                    new RequirementSubject(stat => criteria.Resolve(stat, id => applyOn.Stats.Get(id)), applyOn.ResolveRequirement),
+                    new RequirementSubject(stat => user.Stats.Get(stat), user.ResolveRequirement),
+                    new RequirementSubject(stat => eventTarget.Stats.Get(stat), eventTarget.ResolveRequirement)))
                 return false;
 
             if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify)
@@ -557,4 +607,10 @@ namespace ZoneEngine_New.Core.Inventory
             };
         }
     }
+
+    /// <summary>Whose stats and character state a requirement leaf reads (see <see cref="ItemTemplate.MeetsRequirements(IReadOnlyList{ItemRequirement}, RequirementSubject, RequirementSubject?, RequirementSubject?)"/>).</summary>
+    /// <summary>A failing requirement leaf, the value it read and whether it read the target.</summary>
+    public readonly record struct UnmetRequirement(ItemRequirement Requirement, int Have, bool OnTarget);
+
+    public readonly record struct RequirementSubject(Func<CharacterStat, int> GetStat, Func<ItemRequirement, bool?>? Resolve = null);
 }

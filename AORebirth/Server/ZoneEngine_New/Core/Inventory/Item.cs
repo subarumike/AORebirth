@@ -204,12 +204,17 @@ namespace ZoneEngine_New.Core.Inventory
             => SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
                 && spells.Exists(spell => spell.Target == (int)ItemTarget.Fightingtarget);
 
-        /// <summary>Runs OnUse spells and spends a consumable charge. Callers gate with <see cref="CanBeginUse"/>.</summary>
+        /// <summary>
+        /// Runs OnUse spells and spends a consumable charge. Callers gate with <see cref="CanBeginUse"/>.
+        /// <paramref name="target"/> is who Target functions land on: the user unless the item applies to a hostile
+        /// (<see cref="UseTargetRules"/>).
+        /// </summary>
         public bool ExecuteUse(
             Player player,
             Identity slotIdentity,
             IInventoryRepository inventoryRepository,
-            IItemBuilder items)
+            IItemBuilder items,
+            Character? target = null)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(inventoryRepository);
@@ -217,7 +222,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             // The user is the source: Fightingtarget functions resolve through it and damage is credited to it.
             if (!Definition.ExecuteOnUseSpells(
-                    player,
+                    target ?? player,
                     inventoryRepository,
                     items,
                     source: player,
