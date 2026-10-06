@@ -275,6 +275,9 @@ namespace LoginEngine.Packets
         /// </returns>
         private int CreateNewChar()
         {
+            // Resolve and validate editable kit content before creating any character rows.
+            var startPackage = CharacterStartPackageApplier.RequirePackage(this.Profession);
+
             DBCharacter newCharacter = new DBCharacter
                                        {
                                            FirstName = string.Empty,
@@ -374,62 +377,8 @@ namespace LoginEngine.Packets
 
             #endregion
 
-            if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Metaphysicist)
-            {
-                MetaphysicistStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.MartialArtist)
-            {
-                MartialArtistStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Adventurer)
-            {
-                AdventurerStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Engineer)
-            {
-                EngineerStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Soldier)
-            {
-                SoldierStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Fixer)
-            {
-                FixerStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Keeper)
-            {
-                KeeperStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Agent)
-            {
-                AgentStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Enforcer)
-            {
-                EnforcerStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Trader)
-            {
-                TraderStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Doctor)
-            {
-                DoctorStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Bureaucrat)
-            {
-                BureaucratStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Nanotechnician)
-            {
-                NanotechnicianStarterLoadout.Apply(charID);
-            }
-            else if (this.Profession == (int)global::SmokeLounge.AOtomation.Messaging.GameData.Profession.Shade)
-            {
-                ShadeStarterLoadout.Apply(charID);
-            }
+            // Profession inventory + optional uploaded nanos from GameData/StartPackages.json (DAO).
+            CharacterStartPackageApplier.Apply(charID, startPackage);
 
             StarterVitalStats.Apply(charID, this.Breed, this.Profession, this.Abis);
 

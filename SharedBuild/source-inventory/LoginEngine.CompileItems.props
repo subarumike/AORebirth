@@ -6,22 +6,9 @@
     </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CoreClient/Client.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CoreClient/LoginHandoffLifecycle.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/AdventurerStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/AgentStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/BureaucratStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/DoctorStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/EngineerStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/EnforcerStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/FixerStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/KeeperStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/MartialArtistStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/MetaphysicistStarterLoadout.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/NewCharacterStats.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/NanotechnicianStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/ShadeStarterLoadout.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/SoldierStarterLoadout.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/CharacterStartPackageApplier.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/StarterVitalStats.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CharacterCreation/TraderStarterLoadout.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/Component/ClientFactory.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/CoreServer/LoginServer.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/LoginEngine/MessageHandlers/CreateCharacterHandler.cs" />

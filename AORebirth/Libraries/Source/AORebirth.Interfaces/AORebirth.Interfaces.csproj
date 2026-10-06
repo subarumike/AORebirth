@@ -78,6 +78,10 @@
     <Compile Include="Persistence\Shops\ShopStockData.cs" />
     <Compile Include="Persistence\Shops\ShopVendorData.cs" />
     <Compile Include="Persistence\Teams\ITeamLevelEligibilityDao.cs" />
+    <Compile Include="Persistence\CharacterCreation\ICharacterStartPackageDao.cs" />
+    <Compile Include="Persistence\CharacterCreation\CharacterStartPackageCatalog.cs" />
+    <Compile Include="Persistence\CharacterCreation\CharacterStartProfessionPackage.cs" />
+    <Compile Include="Persistence\CharacterCreation\CharacterStartPackageItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
