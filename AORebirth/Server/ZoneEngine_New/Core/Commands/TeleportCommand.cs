@@ -31,7 +31,7 @@ namespace ZoneEngine_New.Core.Commands
         public int RequiredGmLevel => 1;
 
         public string Usage =>
-            ".tp <x> <z> <playfieldId> or .tp <x> <y> <z> <playfieldId> (look-at player if selected) | .tp summon <character name>";
+            ".tp <x> <z> <playfieldId> or .tp <x> <y> <z> <playfieldId> (look-at player if selected) | .tp summon <character name> | .tp to <character name>";
 
         public void Execute(GmCommandContext context)
         {
@@ -40,6 +40,12 @@ namespace ZoneEngine_New.Core.Commands
             if (context.Args.Length >= 1 && string.Equals(context.Args[0], "summon", StringComparison.OrdinalIgnoreCase))
             {
                 Summon(context);
+                return;
+            }
+
+            if (context.Args.Length >= 1 && string.Equals(context.Args[0], "to", StringComparison.OrdinalIgnoreCase))
+            {
+                GoTo(context);
                 return;
             }
 
@@ -165,6 +171,52 @@ namespace ZoneEngine_New.Core.Commands
 
             Vector3 landing = new Vector3(context.Player.Position.xf, context.Player.Position.yf, context.Player.Position.zf);
             Relocate(context, subject, destination, landing, subject.Name);
+        }
+
+        /// <summary>
+        /// <c>.tp to &lt;name&gt;</c>: takes the issuer to an online character (matched by name, ignoring case): their
+        /// playfield and position, including a quest dungeon they are in. The reverse of <see cref="Summon"/>.
+        /// </summary>
+        void GoTo(GmCommandContext context)
+        {
+            if (context.Args.Length < 2)
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, "Usage: .tp to <character name>");
+                return;
+            }
+
+            string name = string.Join(" ", context.Args, 1, context.Args.Length - 1).Trim();
+            Player? target = null;
+            foreach (Player online in _playfieldManager.Value.SnapshotPlayers())
+            {
+                if (string.Equals(online.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    target = online;
+                    break;
+                }
+            }
+
+            if (target == null)
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, "No online character named " + name + ".");
+                return;
+            }
+
+            if (ReferenceEquals(target, context.Player))
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, "You cannot teleport to yourself.");
+                return;
+            }
+
+            if (target.Playfield is not Playfield destination)
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, target.Name + " is not on a playfield.");
+                return;
+            }
+
+            Vector3 at = target.Position;
+            Vector3 landing = new Vector3(at.xf, at.yf, at.zf);
+            Relocate(context, context.Player, destination, landing, "self");
         }
 
         /// <summary>
