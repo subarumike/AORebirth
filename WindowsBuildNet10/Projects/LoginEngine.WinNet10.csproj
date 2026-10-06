@@ -39,5 +39,6 @@
 
   <ItemGroup>
     <Content Include="$(AORebirthRepositoryRoot)/AORebirth/Config/Config.xml" Link="Config.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(AORebirthRepositoryRoot)/AORebirth/GameData/StartPackages.json" Link="GameData/StartPackages.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

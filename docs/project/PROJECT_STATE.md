@@ -1,6 +1,15 @@
 # AORebirth Project State
 
-Updated: 2026-10-02
+Updated: 2026-10-06
+
+OBSERVED (2026-10-06): Mike reports the JSON starter-kit change works after
+local client testing of source ac4720b9bb202ed48c44995c6ec16870600f9456.
+PROVEN: the approved Windows build and local restart completed, with database
+readiness and core-engine process/listener ownership verified. The catalog
+preserves all 121 starter item rows across 14 professions; validation runs
+before character insertion and respects the configured GameData root.
+No automated suites or schema changes were performed. The user did not enumerate
+profession-by-profession coverage. Linux deployment is not part of this result.
 
 The normal Windows build now uses the existing .NET 10 ChatEngine/LoginEngine
 projects and ZoneEngine_New through NewZoneEngineBuild/build.cmd. The read-only
