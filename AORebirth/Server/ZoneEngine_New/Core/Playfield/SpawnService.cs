@@ -865,7 +865,13 @@ namespace ZoneEngine_New.Core.Playfield
             player.SendPerkActions();
 
             _playfieldManager.Teams.AttachPlayer(player);
-            _playfieldManager.Teams.RefreshPlayer(player);
+            // A zone change keeps the client's team window: live sends no team packets on the new playfield (capture
+            // 2026-10-06T16:36:31Z), and a resent roster is appended, duplicating every member. Only a real reconnect
+            // (a fresh client) needs the roster.
+            if (player.ZoneReconnectPending)
+                player.ZoneReconnectPending = false;
+            else
+                _playfieldManager.Teams.RefreshPlayer(player);
 
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
             TryRestorePostSpawnContent(player);
@@ -1145,6 +1151,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(position);
 
             player.Motor.ResetForPlayfieldTransfer(position);
+            player.ZoneReconnectPending = true;
             player.Inventory.ResetBackpackClientState();
             player.Playfield = _playfield;
             player.Logger = _logger;

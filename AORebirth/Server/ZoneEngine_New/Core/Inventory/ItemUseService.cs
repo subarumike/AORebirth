@@ -100,6 +100,7 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(item);
 
+            // An item worn on the social page is used like any other: its own use requirements and OnUse effects apply.
             if (!ReferenceEquals(player.Playfield, _playfield)
                 || IsQueueFull(player.Identity.Instance)
                 || _moves.HasPending(player.Identity.Instance))

@@ -76,6 +76,12 @@ namespace ZoneEngine_New.Core.Entities
 
         bool _respawnPending;
 
+        /// <summary>
+        /// Set when this player lands on a playfield by transfer and its client is about to reconnect for the zone
+        /// change; the reconnect clears it. Such a client keeps its team window, so the roster is not sent again.
+        /// </summary>
+        internal bool ZoneReconnectPending { get; set; }
+
         /// <summary>An in-zone respawn has despawned this player for observers; the respawn itself runs next tick.</summary>
         bool _respawnObserversCleared;
         double _respawnRemainingSeconds;
@@ -209,7 +215,8 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Requirement leaves a stat value cannot answer, resolved against this player: HasPerk / HasNotPerk
-        /// (trained perks), IsPerkLocked / IsPerkUnlocked (LockPerk cooldowns), pet and allied-combat state, then
+        /// (trained perks), IsPerkLocked / IsPerkUnlocked (LockPerk cooldowns), pet and allied-combat state, worn and
+        /// wielded items (HasWornItem / HasWieldedItem and their negations; social clothing never counts), then
         /// the NCU leaves of <see cref="Character.ResolveRequirement"/> (Hecatomb needs Performed Gore 234025 running).
         /// Null leaves every other leaf to the stat comparison.
         /// </summary>
@@ -227,6 +234,11 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.IsPerkLocked => PerkLocks.IsLocked(id, DateTime.UtcNow),
                 Operator.IsPerkUnlocked => !PerkLocks.IsLocked(id, DateTime.UtcNow),
                 Operator.IsPetOverEquipped => OwnedPets.All.Any(pet => pet.Pet?.IsOverEquipped == true),
+                // Value is the item id. Social clothing is never equipped for these (PlayerInventory.IsEquipped).
+                Operator.HasWornItem => Inventory.IsEquipped(id, wieldedOnly: false),
+                Operator.HasNotWornItem => !Inventory.IsEquipped(id, wieldedOnly: false),
+                Operator.HasWieldedItem => Inventory.IsEquipped(id, wieldedOnly: true),
+                Operator.HasNotWieldedItem => !Inventory.IsEquipped(id, wieldedOnly: true),
                 Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
                 Operator.MustAlliedCombat => IsAlliedInCombat(),
                 _ => base.ResolveRequirement(requirement)
@@ -1206,15 +1218,41 @@ namespace ZoneEngine_New.Core.Entities
 
             Stats.Set(CharacterStat.VisualFlags, visualFlags, StatDetail.Base, dirty: true);
             RebaseWearAppearance();
+            // Live answers a toggle with the VisualFlags stat, then AppearanceUpdate (capture 2026-10-06T19:22:51Z).
+            FlushDirtyStats();
             AnnounceAppearance();
             return true;
         }
 
         void AnnounceAppearanceIfChanged()
         {
+            if (_appearanceDeferred)
+                return;
             if (ConsumeAppearanceDirty())
                 SendAppearanceUpdate();
         }
+
+        bool _appearanceDeferred;
+
+        /// <summary>
+        /// Full rebase that holds back a changed look; <see cref="AnnounceDeferredAppearance"/> sends it. An equipment
+        /// move uses it so AppearanceUpdate follows the move's ContainerAddItem, as live sends them.
+        /// </summary>
+        public void RebaseDeferringAppearance()
+        {
+            _appearanceDeferred = true;
+            try
+            {
+                Rebase();
+            }
+            finally
+            {
+                _appearanceDeferred = false;
+            }
+        }
+
+        /// <summary>Sends the look held back by <see cref="RebaseDeferringAppearance"/>, if it changed.</summary>
+        public void AnnounceDeferredAppearance() => AnnounceAppearanceIfChanged();
 
         void AnnounceAppearance()
         {
@@ -1236,14 +1274,9 @@ namespace ZoneEngine_New.Core.Entities
             if (!MaxHealthCalculator.TryCompute(Stats, out int maxHealth))
                 return;
 
-            int percent = ResolveVitalPercent(
-                CharacterStat.PercentRemainingHealth,
-                CharacterStat.Health,
-                CharacterStat.MaxHealth);
-            Stats.Set(CharacterStat.MaxHealth, maxHealth, StatDetail.Base, dirty: true);
             // Regen, heals and revive cap at the full max; scaling against the base alone would
             // drop a full character below it on every rebase and restart regen.
-            ApplyVitalFromPercent(CharacterStat.Health, Stats.GetOrZero(CharacterStat.MaxHealth), percent);
+            RebaseVital(CharacterStat.Health, CharacterStat.MaxHealth, CharacterStat.PercentRemainingHealth, maxHealth);
         }
 
         void RebaseMaxNano()
@@ -1251,12 +1284,7 @@ namespace ZoneEngine_New.Core.Entities
             if (!MaxNanoCalculator.TryCompute(Stats, out int maxNano))
                 return;
 
-            int percent = ResolveVitalPercent(
-                CharacterStat.PercentRemainingNano,
-                CharacterStat.CurrentNano,
-                CharacterStat.MaxNanoEnergy);
-            Stats.Set(CharacterStat.MaxNanoEnergy, maxNano, StatDetail.Base, dirty: true);
-            ApplyVitalFromPercent(CharacterStat.CurrentNano, Stats.GetOrZero(CharacterStat.MaxNanoEnergy), percent);
+            RebaseVital(CharacterStat.CurrentNano, CharacterStat.MaxNanoEnergy, CharacterStat.PercentRemainingNano, maxNano);
         }
 
         void RebaseEquipBonuses()
@@ -1492,6 +1520,21 @@ namespace ZoneEngine_New.Core.Entities
 
             Stats.Set(meshStat, meshId, StatDetail.Base, dirty: true);
             return true;
+        }
+
+        /// <summary>
+        /// WeaponItemFullUpdate for a weapon going into a social hand, sent at equip time under a fresh weapon-instance id.
+        /// The client mounts a social weapon only on a weapon object it holds; the item's own identity cannot be reused
+        /// mid-session (the inventory already registered it, and the duplicate crashed the client), so the Equip action
+        /// names this instance instead. Null when the weapon is not a wieldable combat weapon.
+        /// </summary>
+        public WeaponItemFullUpdateMessage? BuildSocialWeaponItemFullUpdate(Item item, int socialSlot)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            if (Playfield == null)
+                return null;
+            var instance = new Identity { Type = IdentityType.WeaponInstance, Instance = Playfield.AllocateWeaponInstanceId() };
+            return TryBuildWeaponItemFullUpdate(item, socialSlot, carriedIdentity: instance);
         }
 
         static int NormalizeVisualValue(int value)

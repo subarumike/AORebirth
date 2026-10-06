@@ -1888,6 +1888,55 @@ namespace ZoneEngine_New.Core.Entities
             return (int)Math.Clamp((long)Stats.GetOrZero(currentStat) * 100 / max, 0, 100);
         }
 
+        /// <summary>
+        /// Sets a vital's max and keeps the current value in step. With the old max known the current value scales by the
+        /// exact new/old ratio and is left untouched when the max did not change: going through the whole-number percent
+        /// stat dropped it to the nearest 1% of max on every rebase (17 HP at 1,700), which the client showed as
+        /// "attacked with nanobots for 17 points of unknown damage" between heal ticks. The stored percent only seeds the
+        /// first rebase (login), when there is no old max.
+        /// </summary>
+        protected void RebaseVital(CharacterStat currentStat, CharacterStat maxStat, CharacterStat percentStat, int newMax)
+        {
+            // The max this vital was last scaled against. The live max stat cannot serve: the bonus pass runs before the
+            // rebase, so it already carries the new gear / buff bonus and the ratio would come out at about 1.
+            int current = Stats.Get(currentStat);
+            if (!_vitalMaxes.TryGetValue(maxStat, out int oldMax) || oldMax <= 0 || StatCollection.IsUnset(current))
+            {
+                int percent = ResolveVitalPercent(percentStat, currentStat, maxStat);
+                Stats.Set(maxStat, newMax, StatDetail.Base, dirty: true);
+                _vitalMaxes[maxStat] = Stats.GetOrZero(maxStat);
+                ApplyVitalFromPercent(currentStat, _vitalMaxes[maxStat], percent);
+                return;
+            }
+
+            Stats.Set(maxStat, newMax, StatDetail.Base, dirty: true);
+            int max = Stats.GetOrZero(maxStat);
+            _vitalMaxes[maxStat] = max;
+            // Rounded down both ways, so swapping max-changing gear off and on can never gain a point; a full vital stays
+            // full at the new max.
+            long scaled = max == oldMax
+                ? current
+                : current >= oldMax
+                    ? max
+                    : (long)current * max / oldMax;
+            int value = (int)Math.Clamp(scaled, 0, Math.Max(0, max));
+            if (value == current)
+                return;
+
+            _applyingVitalFromPercent = true;
+            try
+            {
+                Stats.Set(currentStat, value, StatDetail.Base, dirty: true);
+            }
+            finally
+            {
+                _applyingVitalFromPercent = false;
+            }
+        }
+
+        /// <summary>Full max of each vital (MaxHealth, MaxNanoEnergy) as of its last rebase.</summary>
+        readonly Dictionary<CharacterStat, int> _vitalMaxes = new();
+
         /// <summary>Sets current vital from an already-resolved 0–100 percent of <paramref name="newMax"/>.</summary>
         protected void ApplyVitalFromPercent(CharacterStat currentStat, int newMax, int percent)
         {
@@ -2576,6 +2625,9 @@ namespace ZoneEngine_New.Core.Entities
 
         #region Appearance
 
+        /// <summary>VisualFlags bit that shows a worn helmet (HeadMesh); the client's helmet toggle clears it (live
+        /// 0x3F -> 0x3B, capture 2026-10-06T19:22:51Z).</summary>
+        const int ShowHelmetVisualFlag = 0x04;
         const int ShowSocialVisualFlag = 0x20;
         const int SocialOnlyVisualFlag = 0x40;
 
@@ -2690,6 +2742,16 @@ namespace ZoneEngine_New.Core.Entities
 
         protected bool ShowSocialAppearance => (VisualFlagsOrZero() & ShowSocialVisualFlag) != 0;
 
+        /// <summary>A worn helmet shows unless the player turned it off; characters without VisualFlags always show it.</summary>
+        bool ShowHelmetAppearance
+        {
+            get
+            {
+                int flags = Stats.Get(CharacterStat.VisualFlags);
+                return StatCollection.IsUnset(flags) || (flags & ShowHelmetVisualFlag) != 0;
+            }
+        }
+
         protected bool SocialOnlyAppearance =>
             ShowSocialAppearance && (VisualFlagsOrZero() & SocialOnlyVisualFlag) != 0;
 
@@ -2709,17 +2771,23 @@ namespace ZoneEngine_New.Core.Entities
             var textures = new Dictionary<int, int>();
             var meshes = new Dictionary<(int Position, int Layer), Mesh>();
 
+            bool robe = false;
             foreach (Container page in AppearanceWearPages)
             {
                 if (page == null)
                     continue;
 
                 foreach (KeyValuePair<int, Item> slot in page.EnumerateSlots())
+                {
                     ApplyWearAppearance(slot.Key, slot.Value, textures, meshes);
+                    robe |= WearsRobe(slot.Value);
+                }
             }
 
-            if (SameWearAppearance(textures, meshes))
+            if (robe == _wearRobe && SameWearAppearance(textures, meshes))
                 return;
+
+            _wearRobe = robe;
 
             _wearTextures.Clear();
             foreach (KeyValuePair<int, int> texture in textures)
@@ -2730,6 +2798,24 @@ namespace ZoneEngine_New.Core.Entities
                 _wearMeshes[mesh.Key] = mesh.Value;
 
             InvalidateAppearance();
+        }
+
+        /// <summary>True when the robe flag is shown for this character's worn look.</summary>
+        bool _wearRobe;
+
+        /// <summary>A worn ChangeBodyMesh "robe" whose requirements pass (the robe body shape).</summary>
+        bool WearsRobe(Item item)
+        {
+            foreach (ItemSpell spell in item.WearSpells)
+            {
+                if (spell.Is(FunctionType.ChangeBodyMesh)
+                    && spell.Arguments.Count > 0
+                    && string.Equals(spell.Arguments[0]?.ToString()?.TrimEnd('\0'), "robe", StringComparison.OrdinalIgnoreCase)
+                    && spell.MeetsRequirements(Stats))
+                    return true;
+            }
+
+            return false;
         }
 
         void ApplyWearAppearance(
@@ -2751,10 +2837,30 @@ namespace ZoneEngine_New.Core.Entities
                     continue;
                 }
 
-                if (TryReadWearMesh(slot, item, spell, out Mesh mesh))
-                    meshes[(mesh.Position, mesh.Layer)] = mesh;
+                if (spell.Is(FunctionType.HeadMesh) && !ShowHelmetAppearance)
+                    continue;
+
+                if (!TryReadWearMesh(slot, item, spell, out Mesh mesh))
+                    continue;
+
+                meshes[(mesh.Position, mesh.Layer)] = mesh;
+                // A body item's Shouldermesh dresses both shoulders: live sends it at positions 3 and 4 (tank armor
+                // 28735 family, capture 2026-10-06T18:44:27Z).
+                if (spell.Is(FunctionType.Shouldermesh) && IsBodySlot(slot))
+                {
+                    var other = new Mesh
+                    {
+                        Position = 4,
+                        Id = mesh.Id,
+                        OverrideTextureId = mesh.OverrideTextureId,
+                        Layer = mesh.Layer
+                    };
+                    meshes[(other.Position, other.Layer)] = other;
+                }
             }
         }
+
+        static bool IsBodySlot(int slot) => slot is 19 or 51;
 
         static bool TryReadWearMesh(int slot, Item item, ItemSpell spell, out Mesh mesh)
         {
@@ -2766,12 +2872,17 @@ namespace ZoneEngine_New.Core.Entities
                 // Live SCFU stacks an attractor below the head instead of replacing it.
                 layer = MeshLayer.Head;
             }
+            else if (spell.Is(FunctionType.HeadMesh))
+            {
+                layer = MeshLayer.Helmet;
+            }
             else if (spell.Is(FunctionType.Mesh)
-                || spell.Is(FunctionType.HeadMesh)
                 || spell.Is(FunctionType.BackMesh)
                 || spell.Is(FunctionType.Shouldermesh))
             {
-                layer = MeshLayer.Equipment;
+                // Body, back and shoulder pieces go on layer 0, listed ahead of the base mesh they cover (live
+                // AppearanceUpdate, capture 2026-10-06T18:44:27Z).
+                layer = MeshLayer.Head;
             }
             else
             {
@@ -2816,7 +2927,8 @@ namespace ZoneEngine_New.Core.Entities
                     return true;
                 case 19:
                 case 51:
-                    position = 5;
+                    // Body slot: the body mesh at 5; its Shouldermesh starts at 3 (and is mirrored to 4).
+                    position = spell.Is(FunctionType.Shouldermesh) ? 3 : 5;
                     return true;
                 case 20:
                 case 52:
@@ -2909,16 +3021,28 @@ namespace ZoneEngine_New.Core.Entities
                 }
             }
 
+            // Live order (AppearanceUpdate, capture 2026-10-06T18:44:27Z): by position; at each position the worn
+            // meshes first, then the base meshes, which stay listed underneath on layer 0. On other layers (a helmet
+            // over the head) the worn mesh still replaces the base one.
             _meshes.Clear();
-            foreach (Mesh mesh in _spawnMeshes)
-            {
-                if (!_wearMeshes.ContainsKey((mesh.Position, mesh.Layer)))
-                    _meshes.Add(mesh);
-            }
+            var positions = new SortedSet<int>(_spawnMeshes.Select(mesh => (int)mesh.Position));
+            foreach ((int position, _) in _wearMeshes.Keys)
+                positions.Add(position);
 
-            foreach (KeyValuePair<(int Position, int Layer), Mesh> mesh in
-                _wearMeshes.OrderBy(entry => entry.Key.Position).ThenBy(entry => entry.Key.Layer))
-                _meshes.Add(mesh.Value);
+            foreach (int position in positions)
+            {
+                foreach (KeyValuePair<(int Position, int Layer), Mesh> worn in _wearMeshes
+                    .Where(entry => entry.Key.Position == position)
+                    .OrderBy(entry => entry.Key.Layer))
+                    _meshes.Add(worn.Value);
+
+                foreach (Mesh mesh in _spawnMeshes)
+                {
+                    if (mesh.Position == position
+                        && (mesh.Layer == 0 || !_wearMeshes.ContainsKey((mesh.Position, mesh.Layer))))
+                        _meshes.Add(mesh);
+                }
+            }
 
             foreach (KeyValuePair<int, Mesh> mesh in _handMeshes.OrderBy(entry => entry.Key))
                 _meshes.Add(mesh.Value);
@@ -3006,18 +3130,28 @@ namespace ZoneEngine_New.Core.Entities
             Item item,
             int equipmentSlot,
             CharacterWeapon? armed = null,
-            bool visibleHand = false)
+            bool visibleHand = false,
+            Identity? carriedIdentity = null)
         {
-            if (!AttackInfoRules.HasVisibleWeaponMesh(item, equipmentSlot))
-                return null;
-            if (visibleHand && !item.IsWieldableCombatWeapon())
-                return null;
-            if (!visibleHand && !AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(item, armed))
-                return null;
+            if (carriedIdentity != null)
+            {
+                // A carried (not wielded) weapon announced under its own identity: live sends one per carried weapon
+                // before FullCharacter (capture 2026-10-06T21:00:38Z).
+                if (!item.IsWieldableCombatWeapon())
+                    return null;
+            }
+            else
+            {
+                if (!AttackInfoRules.HasVisibleWeaponMesh(item, equipmentSlot))
+                    return null;
+                if (visibleHand && !item.IsWieldableCombatWeapon())
+                    return null;
+                if (!visibleHand && !AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(item, armed))
+                    return null;
+            }
 
-            int weaponInstanceId = Playfield != null
-                ? Playfield.AllocateWeaponInstanceId()
-                : item.InstanceId;
+            int weaponInstanceId = carriedIdentity?.Instance
+                ?? (Playfield != null ? Playfield.AllocateWeaponInstanceId() : item.InstanceId);
             int playfieldId = Playfield != null ? Playfield.Identity.Instance : 0;
 
             int flags = item.Flags > 0 ? item.Flags : 0x403;
@@ -3093,7 +3227,9 @@ namespace ZoneEngine_New.Core.Entities
                 Textures = BuildTextures(isNpc),
                 Meshes = BuildMeshes(headMesh),
                 VisualFlags = wireVisualFlags,
-                Unknown1 = 0
+                // 1 while a worn robe (ChangeBodyMesh "robe", e.g. Medical Cloak 120628) shows: live AppearanceUpdate
+                // 2026-10-06T19:14:30Z.
+                Unknown1 = (byte)(_wearRobe ? 1 : 0)
             };
         }
 
@@ -3420,7 +3556,10 @@ namespace ZoneEngine_New.Core.Entities
             // mesh must survive, and unequipping it brings the character's own head back.
             if (!StatCollection.IsUnset(headMesh) && headMesh != 0 && !HasHeadSlotMesh(meshes))
             {
-                meshes.Add(
+                // Listed with the other position-0 meshes, after them (live AppearanceUpdate 2026-10-06T19:14:34Z).
+                int after = meshes.FindLastIndex(mesh => mesh.Position == 0);
+                meshes.Insert(
+                    after + 1,
                     new Mesh
                     {
                         Position = 0,

@@ -7,6 +7,8 @@ namespace AORebirth.Enums
     public enum MeshLayer : byte
     {
         Head = 0,
+        /// <summary>A worn helmet (HeadMesh): over the head, which stays listed (live AppearanceUpdate 2026-10-06T19:14:34Z).</summary>
+        Helmet = 2,
         Equipment = 4,
     }
 }

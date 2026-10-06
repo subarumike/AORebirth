@@ -803,7 +803,8 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// Clears character Bonus, then reapplies wear/wield <c>Modify</c> and <c>ScalingModify</c>
-        /// from equipped items. Weapons use OnWear+OnWield; armor/implants/social use OnWear.
+        /// from equipped items. Weapons use OnWear+OnWield; armor and implants use OnWear. Social clothing is
+        /// cosmetic (meshes and textures only) and adds nothing.
         /// </summary>
         public void ApplyWearBonuses(StatCollection stats)
         {
@@ -815,7 +816,6 @@ namespace ZoneEngine_New.Core.Inventory
             WearBonusApplier.ApplyContainer(Equipment, includeWield: true, stats);
             WearBonusApplier.ApplyContainer(Armor, includeWield: false, stats);
             WearBonusApplier.ApplyContainer(Implant, includeWield: false, stats);
-            WearBonusApplier.ApplyContainer(Social, includeWield: false, stats);
         }
 
         /// <summary>Clears every worn item's over-equipped level (before the unpenalised bonus pass).</summary>
@@ -846,6 +846,61 @@ namespace ZoneEngine_New.Core.Inventory
             return any;
         }
 
+        /// <summary>Social page slot (1-15) of the right hand: placement 0x3D (client drop, 2026-10-06).</summary>
+        public const int SocialRightHandSlot = 13;
+
+        /// <summary>Social page slot (1-15) of the left hand: placement 0x3F.</summary>
+        public const int SocialLeftHandSlot = 15;
+
+        /// <summary>
+        /// The weapon-page hand a social hand placement stands for: the social right and left hands are weapon slots
+        /// (fitted by the weapon's Righthand / LeftHand Slot bits). False for other social slots.
+        /// </summary>
+        public static bool TryGetSocialHand(Container socialPage, int slot, out WeaponSlots hand)
+        {
+            ArgumentNullException.ThrowIfNull(socialPage);
+            hand = default;
+            if (socialPage.Identity.Type != IdentityType.SocialPage)
+                return false;
+
+            int relative = slot - socialPage.Offset + 1;
+            if (relative == SocialRightHandSlot)
+                hand = WeaponSlots.Righthand;
+            else if (relative == SocialLeftHandSlot)
+                hand = WeaponSlots.LeftHand;
+            else
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// True when an item of template <paramref name="itemId"/> (low or high id) is equipped: on the weapon page when
+        /// <paramref name="wieldedOnly"/>, else on the weapon, armor or implant page. Social clothing never counts.
+        /// <paramref name="ignore"/> and <paramref name="ignoreToo"/> are items being moved, which do not count where
+        /// they stand (moving a one-only item between hands, or swapping, must not be blocked by the item itself).
+        /// </summary>
+        public bool IsEquipped(int itemId, bool wieldedOnly, Item? ignore = null, Item? ignoreToo = null)
+        {
+            if (!IsHydrated)
+                return false;
+
+            foreach (Container page in WornPages())
+            {
+                if (wieldedOnly && !ReferenceEquals(page, Equipment))
+                    continue;
+                foreach (Item item in page.Content.Values)
+                {
+                    if (ReferenceEquals(item, ignore) || ReferenceEquals(item, ignoreToo))
+                        continue;
+                    if (item.LowId == itemId || item.HighId == itemId)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>Pages whose items count as equipped (stats, over-equipping, worn checks); social clothing is cosmetic.</summary>
         IEnumerable<Container> WornPages()
         {
             if (!IsHydrated)
@@ -854,7 +909,6 @@ namespace ZoneEngine_New.Core.Inventory
             yield return Equipment;
             yield return Armor;
             yield return Implant;
-            yield return Social;
         }
 
         public IEnumerable<InventorySlot> BuildInventorySlots()

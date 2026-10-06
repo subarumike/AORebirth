@@ -238,7 +238,7 @@ public sealed class GiveSetupService(
             player.Stats.Set(stat, value, StatDetail.Base);
 
         player.Rebase();
-        foreach (Placement placement in placements.Values)
+        foreach (Placement placement in placements.Values.Where(placement => placement.Page.Identity.Type != IdentityType.SocialPage))
             WearCastNano.ApplyItem(player, placement.Item, includeWield: placement.Page.Identity.Type == IdentityType.WeaponPage, items, inventory);
 
         flush.NotifyDirty(player);

@@ -255,20 +255,28 @@ namespace ZoneEngine_New.Core.Inventory
 
             bool destIsWear = destPage.Identity.Type.IsWearPage();
             bool sourceIsWear = sourcePage.Identity.Type.IsWearPage();
-            if (destIsWear && !MeetsEquipRequirements(player, item, destPage, destSlot))
+            if (destIsWear && !MeetsEquipRequirements(player, item, destPage, destSlot, destOccupant))
+            {
+                LogEquipRefused(player, item, destPage, destSlot);
                 return;
+            }
 
             if (sourceIsWear
                 && destOccupant != null
-                && !MeetsEquipRequirements(player, destOccupant, sourcePage, sourceSlot))
+                && !MeetsEquipRequirements(player, destOccupant, sourcePage, sourceSlot, item))
+            {
+                LogEquipRefused(player, destOccupant, sourcePage, sourceSlot);
                 return;
+            }
 
             if (!MeetsWeaponHandPairing(player, item, destPage, destSlot, sourcePage, sourceSlot))
                 return;
 
-            double delaySeconds = ResolveEquipDelaySeconds(item, destPage.Identity.Type == IdentityType.SocialPage);
+            // Social clothing takes the default delay going on and coming off; an item going onto another wear page
+            // always takes its own.
+            double delaySeconds = ResolveEquipDelaySeconds(item, IsSocialMove(sourcePage, destPage));
             if (destOccupant != null)
-                delaySeconds += ResolveEquipDelaySeconds(destOccupant, sourcePage.Identity.Type == IdentityType.SocialPage);
+                delaySeconds += ResolveEquipDelaySeconds(destOccupant, IsSocialMove(destPage, sourcePage));
 
             var pending = new PendingEquip(
                 player,
@@ -583,18 +591,69 @@ namespace ZoneEngine_New.Core.Inventory
 
             // Live finish order (surgery-clinic + pants captures):
             // unequip CharacterAction/TemplateAction → ContainerAddItem → equip CharacterAction/TemplateAction.
-            // TemplateAction Unequip/Equip; Placement=(WearPage:absoluteSlot); cell-announced.
+            // TemplateAction Unequip/Equip; Placement=(WearPage:absoluteSlot); cell-announced. A changed look follows
+            // as AppearanceUpdate after the item has moved (social capture 2026-10-06T18:12:50Z): sent before the
+            // ContainerAddItem, the client rebuilt the look from the old slots and the meshes did not change.
             SendUnequipActions(player, pending);
-            player.Rebase();
+            player.RebaseDeferringAppearance();
             ApplyWearCastNanos(player, pending);
             SendAck(player, pending.AckSource, pending.AckTarget, pending.AckTargetPlacement);
             SendEquipActions(player, pending);
             NotifyEquipmentChanged(player, pending);
+            player.AnnounceDeferredAppearance();
+        }
+
+        /// <summary>
+        /// Weapon, armor and implant moves carry the equip / unequip CharacterAction and the wear TemplateAction. A social
+        /// move carries neither: live answers it with ContainerAddItem alone, then AppearanceUpdate (capture
+        /// 2026-10-06T18:12:48Z). The client applies an item's modifiers on those actions, so sending them for social
+        /// clothing made its stats come and go client-side.
+        /// </summary>
+        static bool SendsWearActions(Container page)
+            => page.Identity.Type.IsWearPage() && page.Identity.Type != IdentityType.SocialPage;
+
+        /// <summary>
+        /// A social right / left hand weapon: live sends the Equip / unequip CharacterAction with the social placement and
+        /// nothing else (no TemplateAction, no AppearanceUpdate); the client mounts the weapon and its stance itself.
+        /// Equipping one is preceded by StopFight (capture 2026-10-06T20:20:27Z).
+        /// </summary>
+        static bool IsSocialHand(Container page, int slot) => PlayerInventory.TryGetSocialHand(page, slot, out _);
+
+        /// <summary>
+        /// Social hand equip: a WeaponItemFullUpdate under a fresh weapon-instance id, StopFight (live), then the Equip
+        /// action naming that instance with the social placement, so the client mounts the weapon and its stance.
+        /// </summary>
+        static void SendSocialWeaponEquip(Player player, Item item, Container page, int slot, bool stopFight)
+        {
+            if (!PlayerInventory.TryGetSocialHand(page, slot, out _))
+                return;
+
+            WeaponItemFullUpdateMessage? wifu = player.BuildSocialWeaponItemFullUpdate(item, slot);
+            if (wifu != null)
+                player.Session?.Send(wifu);
+            if (stopFight)
+                SendSocialWeaponStopFight(player);
+            SendEquipCharacterAction(player, wifu?.Identity ?? ResolveEquipTarget(item), slot);
+        }
+
+        static void SendSocialWeaponStopFight(Player player)
+        {
+            // Live: N3 flag byte 0, Unknown1 1 (capture 2026-10-06T20:20:27Z).
+            var stop = new StopFightMessage { Identity = player.Identity, Unknown = 0, Unknown1 = 1 };
+            if (player.FightingTarget.Instance != 0)
+            {
+                player.Cell?.Announce(stop);
+                player.SetFightingTarget(Identity.None);
+            }
+            else
+            {
+                player.Session?.Send(stop);
+            }
         }
 
         static void SendUnequipActions(Player player, PendingEquip pending)
         {
-            if (pending.SourcePage.Identity.Type.IsWearPage())
+            if (SendsWearActions(pending.SourcePage))
             {
                 SendUnequipCharacterAction(player, pending.SourceSlot);
                 AnnounceWearTemplateAction(
@@ -604,8 +663,15 @@ namespace ZoneEngine_New.Core.Inventory
                     pending.SourceSlot,
                     TemplateActionType.Remove);
             }
+            else if (IsSocialHand(pending.SourcePage, pending.SourceSlot))
+            {
+                SendUnequipCharacterAction(player, pending.SourceSlot);
+            }
 
-            if (pending.SwappedItem != null && pending.DestPage.Identity.Type.IsWearPage())
+            if (pending.SwappedItem != null && IsSocialHand(pending.DestPage, pending.DestSlot))
+                SendUnequipCharacterAction(player, pending.DestSlot);
+
+            if (pending.SwappedItem != null && SendsWearActions(pending.DestPage))
             {
                 SendUnequipCharacterAction(player, pending.DestSlot);
                 AnnounceWearTemplateAction(
@@ -619,7 +685,13 @@ namespace ZoneEngine_New.Core.Inventory
 
         static void SendEquipActions(Player player, PendingEquip pending)
         {
-            if (pending.DestPage.Identity.Type.IsWearPage())
+            if (IsSocialHand(pending.DestPage, pending.DestSlot))
+                SendSocialWeaponEquip(player, pending.Item, pending.DestPage, pending.DestSlot, stopFight: true);
+
+            if (pending.SwappedItem != null && IsSocialHand(pending.SourcePage, pending.SourceSlot))
+                SendSocialWeaponEquip(player, pending.SwappedItem, pending.SourcePage, pending.SourceSlot, stopFight: false);
+
+            if (SendsWearActions(pending.DestPage))
             {
                 SendEquipCharacterAction(player, pending.Item, pending.DestSlot);
                 AnnounceWearTemplateAction(
@@ -631,7 +703,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             // Wear→wear swap: the vacated source slot now holds the swapped item.
-            if (pending.SwappedItem != null && pending.SourcePage.Identity.Type.IsWearPage())
+            if (pending.SwappedItem != null && SendsWearActions(pending.SourcePage))
             {
                 SendEquipCharacterAction(player, pending.SwappedItem, pending.SourceSlot);
                 AnnounceWearTemplateAction(
@@ -660,6 +732,9 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         static void SendEquipCharacterAction(Player player, Item item, int slot)
+            => SendEquipCharacterAction(player, ResolveEquipTarget(item), slot);
+
+        static void SendEquipCharacterAction(Player player, Identity target, int slot)
         {
             player.Session?.Send(
                 new CharacterActionMessage
@@ -668,7 +743,7 @@ namespace ZoneEngine_New.Core.Inventory
                     Unknown = 0,
                     Action = CharacterActionType.Equip,
                     Unknown1 = 0,
-                    Target = ResolveEquipTarget(item),
+                    Target = target,
                     Parameter1 = 0,
                     Parameter2 = slot,
                     Unknown2 = 0
@@ -725,7 +800,8 @@ namespace ZoneEngine_New.Core.Inventory
             if (items == null || inventory == null)
                 return;
 
-            if (pending.DestPage.Identity.Type.IsWearPage())
+            // Social clothing is cosmetic and runs no wear effects.
+            if (pending.DestPage.Identity.Type.IsWearPage() && pending.DestPage.Identity.Type != IdentityType.SocialPage)
                 WearCastNano.ApplyItem(
                     player,
                     pending.Item,
@@ -733,7 +809,8 @@ namespace ZoneEngine_New.Core.Inventory
                     items,
                     inventory);
 
-            if (pending.SwappedItem != null && pending.SourcePage.Identity.Type.IsWearPage())
+            if (pending.SwappedItem != null && pending.SourcePage.Identity.Type.IsWearPage()
+                && pending.SourcePage.Identity.Type != IdentityType.SocialPage)
                 WearCastNano.ApplyItem(
                     player,
                     pending.SwappedItem,
@@ -818,24 +895,50 @@ namespace ZoneEngine_New.Core.Inventory
                 });
         }
 
-        static bool MeetsEquipRequirements(Player player, Item item, Container wearPage, int destSlot)
+        /// <summary>
+        /// Page, slot and the item's wear or wield requirements. Worn / wielded item requirements (one-only sets such as
+        /// 231234's HasNotWornItem list or 85908's HasNotWieldedItem pair) leave out <paramref name="item"/> and
+        /// <paramref name="swappedWith"/>, which are the items changing place.
+        /// </summary>
+        static bool MeetsEquipRequirements(Player player, Item item, Container wearPage, int destSlot, Item? swappedWith)
         {
             // Slot bits are page-local. ItemClass must match the wear page first so a crafted
             // ClientMoveItemToInventory cannot land a weapon on armor/implant/social slots.
             // Can.Wear is not required; some legal weapons (e.g. 121564) omit it.
-            if (!FitsWearPage(item, wearPage))
+            if (!FitsWearPage(item, wearPage, destSlot))
                 return false;
             if (!FitsWearSlot(item, wearPage, destSlot))
                 return false;
+
+            // Social clothing is cosmetic: it only changes meshes and textures, so the slot is its only requirement.
+            if (wearPage.Identity.Type == IdentityType.SocialPage)
+                return true;
 
             ActionType needed = wearPage.Identity.Type == IdentityType.WeaponPage
                 ? ActionType.ToWield
                 : ActionType.ToWear;
 
-            return item.Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), needed);
+            PlayerInventory inventory = player.Inventory;
+            bool? Resolve(ItemRequirement requirement) => (Operator)requirement.Operator switch
+            {
+                Operator.HasWornItem => inventory.IsEquipped(requirement.Value, wieldedOnly: false, item, swappedWith),
+                Operator.HasNotWornItem => !inventory.IsEquipped(requirement.Value, wieldedOnly: false, item, swappedWith),
+                Operator.HasWieldedItem => inventory.IsEquipped(requirement.Value, wieldedOnly: true, item, swappedWith),
+                Operator.HasNotWieldedItem => !inventory.IsEquipped(requirement.Value, wieldedOnly: true, item, swappedWith),
+                _ => player.ResolvePerkRequirement(requirement)
+            };
+
+            return item.Definition.MeetsActionRequirements(stat => player.Stats.Get(stat), needed, Resolve);
         }
 
-        static bool FitsWearPage(Item item, Container wearPage)
+        void LogEquipRefused(Player player, Item item, Container page, int slot)
+            => _logger.Info(string.Format(CultureInfo.InvariantCulture,
+                "Equip refused char={0} item={1} ({2}) class={3} slotMask=0x{4:X} page={5} slot=0x{6:X} relative={7} pageFit={8} slotFit={9}",
+                player.Identity.Instance, item.LowId, item.Name, (ItemClass)item.GetStat(CharacterStat.ItemClass),
+                unchecked((uint)item.GetStat(CharacterStat.Slot)), page.Identity.Type, slot, slot - page.Offset + 1,
+                FitsWearPage(item, page, slot), FitsWearSlot(item, page, slot)));
+
+        static bool FitsWearPage(Item item, Container wearPage, int destSlot)
         {
             var itemClass = (ItemClass)item.GetStat(CharacterStat.ItemClass);
             return wearPage.Identity.Type switch
@@ -843,7 +946,10 @@ namespace ZoneEngine_New.Core.Inventory
                 IdentityType.WeaponPage => itemClass is ItemClass.Weapon or ItemClass.Utility,
                 IdentityType.ArmorPage => itemClass == ItemClass.Armor,
                 IdentityType.ImplantPage => itemClass == ItemClass.Implant,
-                IdentityType.SocialPage => itemClass == ItemClass.Armor,
+                // Social clothing, plus a weapon in the social right or left hand (cosmetic: it is shown in the hand
+                // while social is, and is never armed).
+                IdentityType.SocialPage => itemClass == ItemClass.Armor
+                    || (itemClass == ItemClass.Weapon && PlayerInventory.TryGetSocialHand(wearPage, destSlot, out _)),
                 _ => false
             };
         }
@@ -946,6 +1052,10 @@ namespace ZoneEngine_New.Core.Inventory
         static bool FitsWearSlot(Item item, Container wearPage, int destSlot)
         {
             int relativeSlot = destSlot - wearPage.Offset + 1;
+            // A weapon in a social hand fits by its weapon-page hand bit (Righthand 6 / LeftHand 8).
+            if ((ItemClass)item.GetStat(CharacterStat.ItemClass) == ItemClass.Weapon
+                && PlayerInventory.TryGetSocialHand(wearPage, destSlot, out WeaponSlots hand))
+                relativeSlot = (int)hand;
             if (relativeSlot < 1 || relativeSlot > wearPage.Capacity)
                 return false;
 
@@ -957,8 +1067,16 @@ namespace ZoneEngine_New.Core.Inventory
             return (slotMask & (1u << relativeSlot)) != 0;
         }
 
+        /// <summary>An item moving from <paramref name="from"/> to <paramref name="to"/> is put on or taken off as social clothing.</summary>
+        static bool IsSocialMove(Container from, Container to)
+            => to.Identity.Type == IdentityType.SocialPage
+                || (from.Identity.Type == IdentityType.SocialPage && !to.Identity.Type.IsWearPage());
+
         static double ResolveEquipDelaySeconds(Item item, bool isSocial)
         {
+            // Social clothing always takes the default delay: it keeps cosmetic swaps from being spammed (each one is
+            // announced to observers and saved). An item leaving the social page for the armor page is timed by the
+            // armor page's own call, so this cannot shortcut real equip delays.
             if (isSocial)
                 return DefaultEquipDelay * 0.01;
 
