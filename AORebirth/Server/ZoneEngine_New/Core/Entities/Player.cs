@@ -1036,6 +1036,11 @@ namespace ZoneEngine_New.Core.Entities
 
             AnnounceDeathCleared();
 
+            // Respawning elsewhere is not a proxy entry: an exit there must not send this character back through the
+            // entrance they took before dying.
+            Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+
             Playfield destination = manager.GetOrCreate(respawn.PlayfieldId);
             if (Session != null)
             {

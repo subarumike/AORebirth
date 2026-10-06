@@ -45,6 +45,9 @@
         readonly IGameData _gameData;
         readonly IZoneLogger _logger;
         readonly Dictionary<int, PlayerTriggerState> _playerTriggerState = new();
+        /// <summary>Seconds zone triggers ignore a character after it zones out, arrives, or line-teleports.</summary>
+        const double ZoneGraceSeconds = 3.0;
+
         readonly Dictionary<int, double> _zoneGraceUntil = new();
         readonly Dictionary<int, LosCacheEntry> _losCache = new();
         readonly HashSet<int> _exitProxyDoors = new();
@@ -479,19 +482,24 @@
             return false;
         }
 
+        /// <summary>
+        /// True when the character's recorded entrance is a real door in the recorded playfield, so any exit here may send
+        /// them back out through it. The record itself is the proof: only a return-recording proxy writes it, at the
+        /// moment it moves the character into a playfield, and every other way of changing playfield clears it (GM
+        /// jumps, /stuck, teleport items, cross-playfield death respawn).
+        /// Re-deriving the entrance from the door's walk-in portal data failed for doors that teleport from their
+        /// OnTargetInVicinity event (655 door C000028F into 1702, 566 door C0070236 into 1137): those carry no walk-in
+        /// portal, so the character was told the exit's destination is unknown although the return was recorded.
+        /// </summary>
         bool MatchesRecordedEntrance(ProxyReturn returnTo, int interiorDoor)
         {
+            _ = interiorDoor;
             var doors = _gameData.GetPlayfieldGeometry(returnTo.PlayfieldId).Dynels?.Dynels;
             if (doors == null) return false;
             foreach (PlayfieldDynel door in doors)
             {
-                if (door.IdentityType != (int)IdentityType.Door || door.IdentityInstance != returnTo.DoorInstance)
-                    continue;
-                // The global index also sees raw routes with no DAO override. Those may name
-                // a different room's door; they cannot redirect this character's recorded entry.
-                return PortalDoorLandingResolver.TryReadPortal(door, out var portal)
-                    && portal.RecordsReturn && portal.Kind == PortalLandingKind.DoorDynel
-                    && portal.PlayfieldId == _playfieldId && portal.DoorInstance == interiorDoor;
+                if (door.IdentityType == (int)IdentityType.Door && door.IdentityInstance == returnTo.DoorInstance)
+                    return true;
             }
             return false;
         }
@@ -602,7 +610,7 @@
                 return;
 
             int id = player.Identity.Instance;
-            _zoneGraceUntil[id] = now + 3.0;
+            _zoneGraceUntil[id] = now + ZoneGraceSeconds;
 
             // The character is leaving this world; a stale previous position would fake a crossing
             // if they come back, and the destination reseeds its own overlap set on first sighting.
@@ -867,7 +875,7 @@
         public void ForgetCharacterTriggers(int characterId)
         {
             DropCharacterTriggerMemory(characterId);
-            _zoneGraceUntil[characterId] = (Environment.TickCount64 / 1000.0) + 3.0;
+            _zoneGraceUntil[characterId] = (Environment.TickCount64 / 1000.0) + ZoneGraceSeconds;
         }
 
         /// <summary>

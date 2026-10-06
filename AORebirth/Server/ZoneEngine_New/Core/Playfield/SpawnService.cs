@@ -1152,7 +1152,9 @@ namespace ZoneEngine_New.Core.Playfield
             player.SaveState.MarkDirty();
             // The next trigger sample has to start at this landing. Keeping the position from
             // the last visit draws a segment through the pad they left by, which zones them back.
-            _playfield.GetService<WorldSimulationAccess>()?.Instance?.DropCharacterTriggerMemory(player.Identity.Instance);
+            // Zone triggers then stay off for the grace period, so a step off the landing (an exit
+            // door or border right beside it) cannot rezone the character straight away.
+            _playfield.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
 
             _logger.Info(
                 string.Format(
