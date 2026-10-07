@@ -543,28 +543,36 @@
                 float z = d.Position.Z;
                 const float r = TriggerVolumeCatalog.PortalRadius;
                 const float h = TriggerVolumeCatalog.PortalHalfHeight;
-                _triggers.Add(
-                    new ZoneTriggerVolume
-                    {
-                        Kind = ZoneTriggerKind.ExitProxy,
-                        Id = _nextTriggerId++,
-                        MinX = x - r,
-                        MaxX = x + r,
-                        MinZ = z - r,
-                        MaxZ = z + r,
-                        MinY = y - h,
-                        MaxY = y + h,
-                        CenterX = x,
-                        CenterY = y,
-                        CenterZ = z,
-                        Radius = r,
-                        DynelInstance = doorInstance
-                    });
+                var volume = new ZoneTriggerVolume
+                {
+                    Kind = ZoneTriggerKind.ExitProxy,
+                    Id = _nextTriggerId++,
+                    MinX = x - r,
+                    MaxX = x + r,
+                    MinZ = z - r,
+                    MaxZ = z + r,
+                    MinY = y - h,
+                    MaxY = y + h,
+                    CenterX = x,
+                    CenterY = y,
+                    CenterZ = z,
+                    Radius = r,
+                    DynelInstance = doorInstance
+                };
+
+                // A teleports route on the exit sends everyone to that door instead of back through their entrance
+                // (an entrance that records no return, such as 800's into 125, leaves nothing to go back to).
+                bool routed = TryApplyDoorRoute(volume, d.IdentityInstance);
+                _triggers.Add(volume);
                 _logger.Info(
-                    "Exit proxy registered playfield="
+                    (routed ? "Routed exit registered playfield=" : "Exit proxy registered playfield=")
                     + _playfieldId
                     + " door="
-                    + doorInstance.ToString("X8", CultureInfo.InvariantCulture));
+                    + doorInstance.ToString("X8", CultureInfo.InvariantCulture)
+                    + (routed
+                        ? " to=" + volume.DestPlayfieldId.ToString(CultureInfo.InvariantCulture) + "/"
+                          + volume.DestDoorInstance.ToString("X8", CultureInfo.InvariantCulture)
+                        : string.Empty));
                 return;
             }
         }
@@ -759,35 +767,43 @@
                     DynelInstance = d.IdentityInstance
                 };
 
-                if (_gameData.TryGetTeleportRoute(
-                        playfieldId,
-                        (int)IdentityType.Door,
-                        unchecked((uint)d.IdentityInstance),
-                        out int routedPlayfield,
-                        out int routedType,
-                        out uint routedInstance))
-                {
-                    if (routedType == (int)IdentityType.Door && routedPlayfield > 0 && routedPlayfield <= 0xFFFF
-                        && (routedInstance & 0xFF000000u) == 0xC0000000u
-                        && (routedInstance & 0xFFFFu) == (uint)routedPlayfield)
-                    {
-                        volume.Kind = ZoneTriggerKind.PortalDynel;
-                        volume.DestPlayfieldId = routedPlayfield;
-                        volume.LandingKind = PortalLandingKind.DoorDynel;
-                        volume.DestDoorInstance = unchecked((int)routedInstance);
-                        volume.DoorClearance = PortalDoorLandingResolver.ExitDoorClearance;
-                    }
-                    else
-                    {
-                        _logger.Warn(
-                            "Exit door route ignored: unsupported target playfield=" + playfieldId
-                            + " door=" + d.IdentityInstance.ToString("X8", CultureInfo.InvariantCulture)
-                            + " destinationPf=" + routedPlayfield + " destinationType=" + routedType);
-                    }
-                }
-
+                TryApplyDoorRoute(volume, d.IdentityInstance);
                 _triggers.Add(volume);
             }
+        }
+
+        /// <summary>
+        /// A teleports route on an exit door turns it into an ordinary door-to-door portal to the routed door. Only
+        /// routes to a door of the destination playfield (0xC0nnPPPP with PPPP the playfield) are supported.
+        /// </summary>
+        bool TryApplyDoorRoute(ZoneTriggerVolume volume, int doorInstance)
+        {
+            if (!_gameData.TryGetTeleportRoute(
+                    _playfieldId,
+                    (int)IdentityType.Door,
+                    unchecked((uint)doorInstance),
+                    out int routedPlayfield,
+                    out int routedType,
+                    out uint routedInstance))
+                return false;
+
+            if (routedType != (int)IdentityType.Door || routedPlayfield <= 0 || routedPlayfield > 0xFFFF
+                || (routedInstance & 0xFF000000u) != 0xC0000000u
+                || (routedInstance & 0xFFFFu) != (uint)routedPlayfield)
+            {
+                _logger.Warn(
+                    "Exit door route ignored: unsupported target playfield=" + _playfieldId
+                    + " door=" + doorInstance.ToString("X8", CultureInfo.InvariantCulture)
+                    + " destinationPf=" + routedPlayfield + " destinationType=" + routedType);
+                return false;
+            }
+
+            volume.Kind = ZoneTriggerKind.PortalDynel;
+            volume.DestPlayfieldId = routedPlayfield;
+            volume.LandingKind = PortalLandingKind.DoorDynel;
+            volume.DestDoorInstance = unchecked((int)routedInstance);
+            volume.DoorClearance = PortalDoorLandingResolver.ExitDoorClearance;
+            return true;
         }
 
         /// <summary>ExitInstance (189) set by a door's placement blob; 0 when it has none or the blob does not read.</summary>
