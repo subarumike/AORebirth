@@ -398,6 +398,13 @@ namespace ZoneEngine_New.Core.Entities
             if (!gameData.TryGetXpLevel(level, out XpLevelEntry current))
                 return;
 
+            if (source == XpSource.Kill)
+            {
+                amount = ApplyXpModifier(amount);
+                if (amount <= 0)
+                    return;
+            }
+
             int capPercent = source == XpSource.Kill ? KillXpCapPercent : QuestXpCapPercent;
             if (current.NextLevelXp > 0)
             {
@@ -849,6 +856,13 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
+        /// <summary>Kill and alien XP scaled by the XPModifier percentage, before the per-grant cap.</summary>
+        int ApplyXpModifier(int amount)
+        {
+            long scaled = (long)amount * (100 + Stats.GetOrZero(CharacterStat.XPModifier)) / 100;
+            return (int)Math.Clamp(scaled, 0, int.MaxValue);
+        }
+
         /// <summary>SoloAxp = (1300 + PL) * (1 + (ML - PL) * 2.1 / ML), floored at 0.</summary>
         internal static int SoloAlienXp(int playerLevel, int monsterLevel)
         {
@@ -872,6 +886,10 @@ namespace ZoneEngine_New.Core.Entities
 
             IGameData? gameData = Playfield?.GetRequiredService<IGameData>();
             if (gameData == null)
+                return;
+
+            amount = ApplyXpModifier(amount);
+            if (amount <= 0)
                 return;
 
             int alienLevel = Stats.GetOrZero(CharacterStat.AlienLevel);
