@@ -33,7 +33,12 @@ namespace ZoneEngine_New.Core.Network
     public sealed class ZoneSession : IZoneSession, IGameTimeSession, IAsyncDisposable
     {
         public DateTime? GameTimeSynchronizedAtUtc { get; private set; }
-        public void RecordGameTimeSynchronization(DateTime utcNow) => GameTimeSynchronizedAtUtc = utcNow;
+        public int GameTimeServerSeconds { get; private set; }
+        public void RecordGameTimeSynchronization(DateTime utcNow, int serverSeconds)
+        {
+            GameTimeSynchronizedAtUtc = utcNow;
+            GameTimeServerSeconds = serverSeconds;
+        }
         private const int HeaderLength = 16;
         private const int ReceiveChunkSize = 4096;
         private const int MaxPacketSize = 8192;

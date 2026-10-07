@@ -944,7 +944,7 @@ namespace ZoneEngine_New.Core.Playfield
             // Official capture 20260623-042326 sends the entering player's SCFU and
             // weapon state before GameTime, then SocialStatus before FullCharacter.
             if (session is IGameTimeSession clock)
-                clock.RecordGameTimeSynchronization(DateTime.UtcNow);
+                clock.RecordGameTimeSynchronization(DateTime.UtcNow, GameClock.ServerSeconds(GameClock.WorldEntryServerTime));
 
             session.Send(
                 new GameTimeMessage
@@ -952,10 +952,13 @@ namespace ZoneEngine_New.Core.Playfield
                     Identity = player.Identity,
                     Unknown1 = 30024.0f,
                     Unknown3 = 185408,
-                    Unknown4 = 80183.3125f
+                    Unknown4 = GameClock.WorldEntryServerTime
                 },
                 _playfield.Identity.Instance,
                 player.Identity.Instance);
+
+            // Before FullCharacter, so it carries the perk reset time in the clock just given.
+            player.SyncLastPerkResetTime();
 
             session.Send(
                 new StatMessage
@@ -1133,10 +1136,14 @@ namespace ZoneEngine_New.Core.Playfield
                     },
                     Unknown1 = 30024.0f,
                     Unknown3 = 185408,
-                    Unknown4 = 80183.3125f
+                    Unknown4 = GameClock.WorldEntryServerTime
                 },
                 playfieldId,
                 characterId);
+            if (session is IGameTimeSession resynced)
+                resynced.RecordGameTimeSynchronization(DateTime.UtcNow, GameClock.ServerSeconds(GameClock.WorldEntryServerTime));
+            player.SyncLastPerkResetTime();
+            player.FlushDirtyStats();
 
             locality.ActivatePlayerVisibility(player);
             return true;

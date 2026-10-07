@@ -19,7 +19,11 @@ internal static class AuthoredQuestJournal
         {
             player.Session.Send(new GameTimeMessage { Identity = player.Identity, Unknown1 = definition.ClockTime,
                 Unknown3 = definition.ClockUnknown3, Unknown4 = definition.ClockUnknown4 });
-            if (player.Session is IGameTimeSession clock) clock.RecordGameTimeSynchronization(now);
+            if (player.Session is IGameTimeSession clock)
+                clock.RecordGameTimeSynchronization(now, GameClock.ServerSeconds(definition.ClockUnknown4));
+            // The clock just moved: the perk reset timer follows it.
+            player.SyncLastPerkResetTime();
+            player.FlushDirtyStats();
         }
         if (definition.Packet is { } typed)
         {

@@ -451,14 +451,17 @@ namespace ZoneEngine_New.Core.Entities
             return true;
         }
 
-        /// <summary>One perk untrain (reset) per hour.</summary>
-        public const int PerkResetCooldownSeconds = 3600;
+        /// <summary>
+        /// One perk untrain (reset) per two hours: the client's perk reset timer is hard coded to 7200 seconds
+        /// (GUI.dll 0x10060d7e).
+        /// </summary>
+        public const int PerkResetCooldownSeconds = 7200;
 
         /// <summary>
         /// Untrains <paramref name="perkId"/> when it is the highest trained tier of its line and no untrain happened
         /// in the last <see cref="PerkResetCooldownSeconds"/>. The cooldown is a lock on LastPerkResetTime in
-        /// <see cref="Character.SkillLocks"/> (persisted with the other locks, never scaled; the stat value itself is
-        /// left to the client, which stamps it with game time). Refreshes the perk templates and actions and rebases.
+        /// <see cref="Character.SkillLocks"/> (persisted with the other locks, never scaled). The stat itself carries
+        /// the reset's Unix time for the client's timer. Refreshes the perk templates and actions and rebases.
         /// </summary>
         public bool TryUntrainPerk(int perkId, Action? confirm = null)
         {
@@ -483,8 +486,32 @@ namespace ZoneEngine_New.Core.Entities
                 return false;
 
             SkillLocks.Lock((int)CharacterStat.LastPerkResetTime, PerkResetCooldownSeconds, nowUtc);
+            SyncLastPerkResetTime();
             OnTrainedPerksChanged(confirm);
+            FlushDirtyStats();
             return true;
+        }
+
+        /// <summary>
+        /// LastPerkResetTime (577) for the client's perk reset timer (GUI.dll 0x10060d7e), which shows
+        /// 7200 - (clientServerTime - this) and nothing for 0. The client's server time is the last GameTime's server
+        /// time plus the seconds since it arrived (GameTime_t::Update / RunFunction), so the reset is given in that
+        /// clock, from the reset cooldown lock. Runtime only: it means something only against this session's GameTime.
+        /// </summary>
+        internal void SyncLastPerkResetTime()
+        {
+            int value = 0;
+            DateTime nowUtc = DateTime.UtcNow;
+            TimeSpan remaining = SkillLocks.Remaining((int)CharacterStat.LastPerkResetTime, nowUtc);
+            if (remaining > TimeSpan.Zero
+                && Session is Network.IGameTimeSession { GameTimeSynchronizedAtUtc: DateTime syncedUtc } clock)
+            {
+                DateTime resetUtc = nowUtc - (TimeSpan.FromSeconds(PerkResetCooldownSeconds) - remaining);
+                value = clock.GameTimeServerSeconds + (int)Math.Floor((resetUtc - syncedUtc).TotalSeconds);
+            }
+
+            if (Stats.Get(CharacterStat.LastPerkResetTime, StatDetail.Base) != value)
+                Stats.Set(CharacterStat.LastPerkResetTime, value, StatDetail.Base, dirty: true);
         }
 
         /// <summary><paramref name="confirm"/> (the client's train/untrain echo) goes out before the perk action changes.</summary>
@@ -1186,6 +1213,7 @@ namespace ZoneEngine_New.Core.Entities
                 Playfield?.GetService<Pets.PetService>()?.RefreshOverEquip(this);
 
             SyncXpKillRange();
+            SyncLastPerkResetTime();
 
             // A buff or debuff that moves Martial Arts across a weapon's combined-attack requirement changes the stance;
             // only then are the weapons re-armed, so ordinary buffs keep their swing timers.
@@ -2010,6 +2038,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.PVPSoloScore,
             CharacterStat.PVPTeamScore,
             CharacterStat.PVPDuelScore,
+            // The client shows no perk reset timer for 0; left out, its default reads as a reset far in the future.
+            CharacterStat.LastPerkResetTime,
         ];
 
         static GameTuple<int, uint>[] BuildFullCharacterIntStats(StatCollection stats, CharacterStat[] ids)
