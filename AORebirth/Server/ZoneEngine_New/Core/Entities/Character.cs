@@ -1106,6 +1106,7 @@ namespace ZoneEngine_New.Core.Entities
                 && !CombatRules.CanAttack(this, resolved))
                 return;
 
+            Motor.StandUp();
             SetFightingTarget(target);
             ResetAllWeaponAttacks();
             Cell?.Announce(BuildSpecialAttackWeaponMessage());
@@ -2833,10 +2834,23 @@ namespace ZoneEngine_New.Core.Entities
                 if (page == null)
                     continue;
 
+                List<KeyValuePair<int, Item>>? robes = null;
                 foreach (KeyValuePair<int, Item> slot in page.EnumerateSlots())
                 {
                     ApplyWearAppearance(slot.Key, slot.Value, textures, meshes);
-                    robe |= WearsRobe(slot.Value);
+                    if (WearsRobe(slot.Value))
+                    {
+                        robe = true;
+                        (robes ??= []).Add(slot);
+                    }
+                }
+
+                // A robe covers everything under it on its page: its textures win over pieces in later slots (a back
+                // slot robe comes before the chest, arms and legs).
+                if (robes != null)
+                {
+                    foreach (KeyValuePair<int, Item> slot in robes)
+                        ApplyWearAppearance(slot.Key, slot.Value, textures, meshes);
                 }
             }
 
@@ -2861,6 +2875,9 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>True when the robe flag is shown for this character's worn look.</summary>
         bool _wearRobe;
+
+        /// <summary>True while a worn robe gives the character the robe body shape.</summary>
+        public bool WearsRobeShape => _wearRobe;
 
         /// <summary>A worn ChangeBodyMesh "robe" whose requirements pass (the robe body shape).</summary>
         bool WearsRobe(Item item)
@@ -3444,7 +3461,9 @@ namespace ZoneEngine_New.Core.Entities
                 Level = (short)Stats.GetOrZero(CharacterStat.Level),
                 MonsterScale = (short)monsterScale,
                 VisualFlags = wireVisualFlags,
-                VisibleTitle = 0,
+                // The byte after VisualFlags is the body shape (Gamecode.dll 0x1007813a reads it into SimpleChar+0x208,
+                // as AppearanceUpdate's robe byte does in 0x1007199f): 1 while a worn robe shows.
+                VisibleTitle = (byte)(_wearRobe ? 1 : 0),
                 RunSpeedBase = (short)runSpeedBase,
                 Flags2 = 0,
                 Unknown2 = 0,

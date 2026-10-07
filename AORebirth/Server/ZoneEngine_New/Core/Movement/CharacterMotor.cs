@@ -1057,6 +1057,16 @@ namespace ZoneEngine_New.Core.Movement
             _character.Stats.Set(CharacterStat.WaitState, state == MovementState.Sit ? 2 : 0, StatDetail.Base);
         }
 
+        /// <summary>
+        /// Leaves Sit for the last walk/run mode. Attacking stands a seated character up on the client without a movement
+        /// change, so the attack does it here; otherwise the server would keep the character seated while it fights.
+        /// </summary>
+        public void StandUp()
+        {
+            if (_state == MovementState.Sit)
+                LeaveMovementState();
+        }
+
         void LeaveMovementState()
         {
             EnterMovementState(_lastSpeedMode is MovementState.Walk or MovementState.Run

@@ -149,14 +149,17 @@ namespace ZoneEngine_New.Core.Ai
 
         /// <summary>
         /// Faction rule for unprovoked aggro (Side stat): a Neutral NPC never starts a fight, and a Clan or Omni NPC
-        /// never starts one with a character of its own side. Monster-side NPCs are not limited by side.
+        /// never starts one with a character of its own side or a Neutral. Monster-side NPCs are not limited by side.
         /// </summary>
         public static bool SideAllowsProximityAggro(int npcSide, int targetSide)
         {
             if (npcSide == (int)Side.Neutral)
                 return false;
 
-            return !((npcSide == (int)Side.Clan || npcSide == (int)Side.Omni) && npcSide == targetSide);
+            if (npcSide == (int)Side.Clan || npcSide == (int)Side.Omni)
+                return targetSide != npcSide && targetSide != (int)Side.Neutral;
+
+            return true;
         }
 
         /// <summary>

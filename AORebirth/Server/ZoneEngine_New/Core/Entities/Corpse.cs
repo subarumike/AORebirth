@@ -33,6 +33,17 @@ namespace ZoneEngine_New.Core.Entities
         private const int DefaultFlags = 1579013;
         public const int LootReserveSeconds = 60;
 
+        // A player's corpse, from live "Remains of Aagent" (female Nanomage, capture 2026-10-07T17:53:00Z, as seen by
+        // another player): CanChangeClothes 1, DeadTimer 75, no cash, the body CAT mesh (5941, nanomage_female.cir),
+        // and its ItemAnimEffect differs from an NPC's in HeaderB, Unknown7, Unknown9 and MonsterData.
+        private const int PlayerDeadTimer = 75;
+        private const int PlayerAnimHeaderB = 0x3A24246F;
+        private const int PlayerAnimUnknown7 = 501;
+        private const int PlayerAnimUnknown9 = 3;
+
+        private readonly bool _ownerIsPlayer;
+        private readonly bool _ownerWoreRobe;
+
         private readonly IGameData _gameData;
         private bool _cashClaimed;
 
@@ -43,6 +54,8 @@ namespace ZoneEngine_New.Core.Entities
             ArgumentNullException.ThrowIfNull(gameData);
 
             _gameData = gameData;
+            _ownerIsPlayer = dead.IsPlayer;
+            _ownerWoreRobe = dead.WearsRobeShape;
             Owner = dead.Identity;
             Name = string.IsNullOrEmpty(dead.Name)
                 ? "Remains"
@@ -251,7 +264,7 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown5 = 0x32,
                 UnknownArray = [],
                 Unknown6 = 0x03,
-                AnimationEffects = BuildAnimationEffects(monsterData),
+                AnimationEffects = _ownerIsPlayer ? BuildPlayerAnimationEffects() : BuildAnimationEffects(monsterData),
                 // Dead character identity (AOSharp IdentityType.Character == CanbeAffected).
                 UnknownIdentity = Owner,
                 Textures = OwnerTextures.Length > 0 ? OwnerTextures : BuildDefaultTextures(),
@@ -289,12 +302,25 @@ namespace ZoneEngine_New.Core.Entities
             ];
 
             AddCopied(stats, CharacterStat.Scale);
-            stats.Add(Tuple(CharacterStat.CanChangeClothes, 0));
+            stats.Add(Tuple(CharacterStat.CanChangeClothes, _ownerIsPlayer ? 1 : 0));
             AddCopied(stats, CharacterStat.Sex);
             AddCopied(stats, CharacterStat.Breed);
             AddCopied(stats, CharacterStat.Race);
             stats.Add(Tuple(CharacterStat.CorpseType, (int)Owner.Type));
             stats.Add(Tuple(CharacterStat.CorpseInstance, Owner.Instance));
+
+            if (_ownerIsPlayer)
+            {
+                // Live order for a player's corpse: CATMesh, Cash 0, TimeExist, DeadTimer, HeadMesh.
+                int playerCatMesh = catMesh != 0 ? catMesh : BreedBodyCatMesh();
+                if (playerCatMesh != 0)
+                    stats.Add(Tuple(CharacterStat.CATMesh, playerCatMesh));
+                stats.Add(Tuple(CharacterStat.Cash, 0));
+                stats.Add(Tuple(CharacterStat.TimeExist, TimeExist));
+                stats.Add(Tuple(CharacterStat.DeadTimer, PlayerDeadTimer));
+                AddCopied(stats, CharacterStat.HeadMesh);
+                return stats.ToArray();
+            }
 
             if (catMesh != 0)
                 stats.Add(Tuple(CharacterStat.CATMesh, catMesh));
@@ -326,6 +352,63 @@ namespace ZoneEngine_New.Core.Entities
             ];
         }
 
+        /// <summary>
+        /// The body CAT mesh of a player without MonsterData. The client picks the base body from Breed and Sex
+        /// (Gamecode.dll 0x1005780e); the RDB also carries a fat, thin and robe .cir for each, picked here by Fatness
+        /// (0 thin, 1 normal, 2 fat) and the robe shape. Ids are the .cir names' CatMesh ids (RDB InfoObject names).
+        /// Live has shown only the normal body (5941, nanomage_female.cir); the variants are being tried. 0 when none.
+        /// </summary>
+        int BreedBodyCatMesh()
+        {
+            SourceStats.TryGetValue(CharacterStat.Breed, out int breed);
+            SourceStats.TryGetValue(CharacterStat.Sex, out int sex);
+            if (!SourceStats.TryGetValue(CharacterStat.Fatness, out int fatness))
+                fatness = 1;
+
+            // normal, fat, thin, robe, fat robe, thin robe
+            int[]? bodies = (breed, sex) switch
+            {
+                (1, 2) => [5907, 17532, 17534, 17870, 17867, 17872],   // solitus_male
+                (1, 3) => [5927, 17528, 17530, 17919, 17917, 17921],   // solitus_female
+                (2, 2) => [5914, 23377, 23378, 17915, 23376, 23379],   // opifex_male
+                (2, 3) => [5934, 23373, 23374, 17913, 23372, 23375],   // opifex_female
+                (3, 2) => [5921, 17905, 17909, 17903, 17907, 17911],   // nanomage_male
+                (3, 3) => [5941, 23368, 23370, 17901, 23369, 23371],   // nanomage_female
+                (4, 1) => [5900, 23365, 23366, 17899, 23364, 23367],   // athrox_male
+                (5, 1) => [41432, 41432, 41432, 41432, 41432, 41432],  // unfinished-breed
+                _ => null
+            };
+            if (bodies == null)
+                return 0;
+
+            int shape = fatness switch { 2 => 1, 0 => 2, _ => 0 };
+            return bodies[shape + (_ownerWoreRobe ? 3 : 0)];
+        }
+
+        /// <summary>
+        /// A player's corpse effect. Live's MonsterData field is 3 for a Nanomage whose Breed and Sex are both 3; it is
+        /// taken as the Breed until a capture of another breed tells them apart.
+        /// </summary>
+        AnimationEffect[] BuildPlayerAnimationEffects()
+        {
+            SourceStats.TryGetValue(CharacterStat.Breed, out int breed);
+            return
+            [
+                new AnimationEffect
+                {
+                    TypeId = (int)FunctionType.ItemAnimEffect,
+                    HeaderB = PlayerAnimHeaderB,
+                    HeaderC = 4,
+                    Duration = 0,
+                    Interval = 1,
+                    Unknown7 = PlayerAnimUnknown7,
+                    Unknown8 = 1,
+                    Unknown9 = PlayerAnimUnknown9,
+                    MonsterData = breed
+                }
+            ];
+        }
+
         bool TryResolveCatMesh(out int catMesh)
         {
             catMesh = 0;
@@ -344,11 +427,16 @@ namespace ZoneEngine_New.Core.Entities
                 CharacterStat.Breed,
                 CharacterStat.Race,
                 CharacterStat.Scale,
-                CharacterStat.MonsterData
+                CharacterStat.MonsterData,
+                CharacterStat.Fatness
             ];
 
             foreach (CharacterStat stat in copy)
             {
+                // A player's corpse is empty: their cash stays with them, so opening it must not hand out a copy.
+                if (stat == CharacterStat.Cash && dead.IsPlayer)
+                    continue;
+
                 int value = dead.Stats.Get(stat);
                 if (!StatCollection.IsUnset(value))
                     SourceStats[stat] = value;
