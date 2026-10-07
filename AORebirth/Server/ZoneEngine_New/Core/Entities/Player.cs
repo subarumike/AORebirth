@@ -665,6 +665,7 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             var candidate = new PerkActionUse(hash, template, lowId, highId, quality, target);
+            SyncCharState();
             string? failure = RevalidatePerkAction(candidate, starting: true);
             if (failure != null)
             {
@@ -1183,7 +1184,31 @@ namespace ZoneEngine_New.Core.Entities
             SyncPetRunSpeeds();
             if (OwnedPets.Count > 0)
                 Playfield?.GetService<Pets.PetService>()?.RefreshOverEquip(this);
+
+            // A buff or debuff that moves Martial Arts across a weapon's combined-attack requirement changes the stance;
+            // only then are the weapons re-armed, so ordinary buffs keep their swing timers.
+            if (!_inFullRebase && Inventory.IsHydrated && QualifiesForCombinedMartialArts() != _combinedMartialArts)
+                RebaseWeapons();
         }
+
+        /// <summary>
+        /// Combined martial arts needs every wielded weapon to allow it (its MartialArts stat, "MA for combined attack")
+        /// and the character's Martial Arts skill to meet each of those requirements.
+        /// </summary>
+        bool QualifiesForCombinedMartialArts()
+        {
+            Item? right = Inventory.Equipment.Content.GetValueOrDefault((int)WeaponSlots.Righthand);
+            Item? left = Inventory.Equipment.Content.GetValueOrDefault((int)WeaponSlots.LeftHand);
+            bool armedMain = right?.IsWieldableCombatWeapon() == true;
+            bool armedOff = left?.IsWieldableCombatWeapon() == true;
+            return (armedMain || armedOff)
+                && (!armedMain || MeetsCombinedMartialArts(right!))
+                && (!armedOff || MeetsCombinedMartialArts(left!));
+        }
+
+        bool MeetsCombinedMartialArts(Item weapon)
+            => weapon.IsMaCombinedWeapon()
+               && Stats.Get(CharacterStat.MartialArts) >= weapon.GetStat(CharacterStat.MartialArts);
 
         /// <summary>
         /// Armor carries the worn look, Social replaces it per slot once the client asks for social
@@ -1409,7 +1434,7 @@ namespace ZoneEngine_New.Core.Entities
             {
                 ArmMartialArtsFist(_items, WeaponSlot.MainHand);
                 ResetAllWeaponAttacks();
-                RebaseEquippedWeaponStats();
+                RebaseEquippedWeaponStats(martialArts: true);
                 return;
             }
 
@@ -1430,12 +1455,11 @@ namespace ZoneEngine_New.Core.Entities
                 armedOff = true;
             }
 
-            // Combined MA only when every wielded weapon allows it: one MA-combined weapon next to a normal one does not.
-            bool maCombined = (armedMain || armedOff)
-                && (!armedMain || right!.IsMaCombinedWeapon())
-                && (!armedOff || left!.IsMaCombinedWeapon());
+            // Combined MA only when every wielded weapon allows it and the MA skill meets each one's requirement: one
+            // MA-combined weapon next to a normal one does not.
+            bool maCombined = QualifiesForCombinedMartialArts();
             FinishWeaponRebase(_items, armedMain, armedOff, maCombined);
-            RebaseEquippedWeaponStats();
+            RebaseEquippedWeaponStats(martialArts: maCombined || (!armedMain && !armedOff));
             if (maCombined != _combinedMartialArts)
             {
                 _combinedMartialArts = maCombined;
@@ -1454,15 +1478,17 @@ namespace ZoneEngine_New.Core.Entities
         /// weapon page slot 0 held | right hand and left hand weapon type flags; EquippedRHWeapon = slot 0 held |
         /// right hand flags. Item criteria such as Pulverize's [EquippedRHWeapon BitAnd 256] read them. Runtime
         /// only, never persisted and not sent: the client keeps its own copy.
+        /// The 0x1 bit is martial arts: set with no weapon in either hand or with combined martial arts weapons, for
+        /// criteria such as [EquippedWeapons BitAnd 1].
         /// </summary>
-        void RebaseEquippedWeaponStats()
+        void RebaseEquippedWeaponStats(bool martialArts)
         {
-            int equipped = 0;
-            int rightHand = 0;
+            int equipped = martialArts ? 1 : 0;
+            int rightHand = equipped;
             if (Inventory.IsHydrated)
             {
                 IReadOnlyDictionary<int, Item> weapons = Inventory.Equipment.Content;
-                int slotZero = weapons.ContainsKey(0) ? 1 : 0;
+                int slotZero = equipped | (weapons.ContainsKey(0) ? 1 : 0);
                 int right = weapons.GetValueOrDefault((int)WeaponSlots.Righthand)?.Definition.GetWeaponTypeFlags() ?? 0;
                 int left = weapons.GetValueOrDefault((int)WeaponSlots.LeftHand)?.Definition.GetWeaponTypeFlags() ?? 0;
                 equipped = slotZero | right | left;

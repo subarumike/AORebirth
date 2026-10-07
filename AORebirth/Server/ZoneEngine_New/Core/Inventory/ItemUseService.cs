@@ -112,6 +112,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (RejectMissingSpawnHash(player, item.Definition))
                 return ItemUseStart.Rejected;
 
+            player.SyncCharState();
             if (!item.CanBeginUse(player))
             {
                 if (item.UsesFightingTarget && player.TryResolveFightingTarget() == null)
@@ -415,6 +416,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             Player player = pending.Player;
             string? failure = RevalidatePlayer(player) ?? pending.Revalidate();
+            int lockNotices = player.SkillLockNotices;
             if (failure == null && pending.Execute())
                 return true;
 
@@ -427,7 +429,8 @@ namespace ZoneEngine_New.Core.Inventory
                     failure ?? "OnUse spells returned false"));
             if (failure == UseTargetRules.LostFightingTarget)
                 ClientFeedback.Send(player, ClientFeedback.RequiresFightingTarget);
-            else
+            else if (player.SkillLockNotices == lockNotices)
+                // A skill lock already told the player when they can use it again.
                 Tell(player, FailedText);
             return false;
         }

@@ -211,8 +211,15 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
+        /// <summary>
+        /// Counts skill-lock refusals told to this character, so a caller can tell its action was already answered
+        /// with the lock line and needs no generic failure text on top.
+        /// </summary>
+        public int SkillLockNotices { get; private set; }
+
         public void SendSkillLocked(int statId, TimeSpan remaining)
         {
+            SkillLockNotices++;
             if (this is not Player player || player.Session == null)
                 return;
 
@@ -1432,6 +1439,7 @@ namespace ZoneEngine_New.Core.Entities
             TickSpecialsAvailable(DateTime.UtcNow);
             TickStallWatch.Stage("char.effects", instance);
             TickTimedEffects(DateTime.UtcNow);
+            SyncCharState();
             TickStallWatch.Stage("dynel.flush", instance);
             base.Tick(deltaTime);
         }
@@ -2029,6 +2037,23 @@ namespace ZoneEngine_New.Core.Entities
         public PendingNanoCast? PendingCast { get; private set; }
 
         public bool IsCastingNano => PendingCast != null;
+
+        /// <summary>
+        /// CharState (434) as the client's state machine sets it (Gamecode.dll 0x1007c1c6): 0 CharIdle_t, 4 CharMove_t,
+        /// 5 CharCastNano_t, 10 CharFight_t, 11 CharDie_t (7 CharTurn_t is not modelled). The client keeps one state
+        /// and the latest transition wins; with no event order here, dead beats casting beats fighting beats moving.
+        /// Runtime only, never sent: item criteria such as [CharState = 10] read it.
+        /// </summary>
+        public void SyncCharState()
+        {
+            int state = IsDead ? 11
+                : IsCastingNano ? 5
+                : FightingTarget.Instance != 0 ? 10
+                : Motor.IsMoving ? 4
+                : 0;
+            if (Stats.Get(CharacterStat.CharState, StatDetail.Base) != state)
+                Stats.Set(CharacterStat.CharState, state, StatDetail.Base);
+        }
 
         /// <summary>
         /// NCU a buff has to fit into. NPCs are uncapped: their equipment and support nanos use catalog
