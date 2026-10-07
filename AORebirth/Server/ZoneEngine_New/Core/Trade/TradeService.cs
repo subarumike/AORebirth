@@ -1421,13 +1421,17 @@ namespace ZoneEngine_New.Core.Trade
 
             session.Committing = true;
 
-            ReturnOffer(session.Initiator, session.InitiatorOffer);
+            // Live player-trade decline sends only the Decline frame; the client puts its own offered
+            // items back. Granting them again here showed a client-side duplicate.
+            bool clientRestores = session.Kind == TradeKind.Player;
+
+            ReturnOffer(session.Initiator, session.InitiatorOffer, clientRestores);
             Unregister(session.Initiator);
 
             Player? partner = session.Partner;
             if (partner != null)
             {
-                ReturnOffer(partner, session.PartnerOffer);
+                ReturnOffer(partner, session.PartnerOffer, clientRestores);
                 Unregister(partner);
             }
 
@@ -1459,14 +1463,15 @@ namespace ZoneEngine_New.Core.Trade
         /// item then goes to overflow only if it is not yet durable, otherwise it stays put and is
         /// reported, never silently dropped.
         /// </summary>
-        void ReturnOffer(Player owner, TradeOffer offer)
+        void ReturnOffer(Player owner, TradeOffer offer, bool clientRestores)
         {
             foreach (Item item in offer.DrainAll())
             {
                 if (owner.Inventory.TryPlace(item, out Container page, out int slot))
                 {
                     owner.Inventory.MarkDirty(item, page, slot);
-                    SendGrant(owner, item, page);
+                    if (!clientRestores)
+                        SendGrant(owner, item, page);
                     continue;
                 }
 
