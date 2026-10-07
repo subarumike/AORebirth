@@ -11,6 +11,9 @@ namespace ZoneEngine_New.Core.Commands
     {
         public string Name => "set";
 
+        /// <summary>Below this GM level, .set only changes the caller's own stats.</summary>
+        public const int OtherCharacterGmLevel = 100;
+
         public int RequiredGmLevel => 1;
 
         public string Usage => ".set <statName|statId> <value>";
@@ -27,8 +30,24 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
+            if (stat == CharacterStat.GmLevel)
+            {
+                GmCommandFeedback.Send(context.Session, context.Player, "GmLevel cannot be set with .set.");
+                return;
+            }
+
             if (!context.TryResolveCharacter(out Character subject))
                 return;
+
+            if (!ReferenceEquals(subject, context.Player)
+                && context.Player.Stats.GetOrZero(CharacterStat.GmLevel) < OtherCharacterGmLevel)
+            {
+                GmCommandFeedback.Send(
+                    context.Session,
+                    context.Player,
+                    "Setting another character's stats requires GM level " + OtherCharacterGmLevel + ".");
+                return;
+            }
 
             if (stat == CharacterStat.Level && subject.IsPlayer)
             {
