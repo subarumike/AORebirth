@@ -45,9 +45,6 @@
         readonly IGameData _gameData;
         readonly IZoneLogger _logger;
         readonly Dictionary<int, PlayerTriggerState> _playerTriggerState = new();
-        /// <summary>Seconds zone triggers ignore a character after it zones out, arrives, or line-teleports.</summary>
-        const double ZoneGraceSeconds = 3.0;
-
         readonly Dictionary<int, double> _zoneGraceUntil = new();
         readonly Dictionary<int, LosCacheEntry> _losCache = new();
         readonly HashSet<int> _exitProxyDoors = new();
@@ -256,6 +253,25 @@
 
         static Vec3 ToVec3(AoVector3 v) => new((float)v.x, (float)v.y, (float)v.z);
 
+        /// <summary>Chest height the door line of sight is taken from, above the feet.</summary>
+        const float DoorSightHeight = 1f;
+
+        /// <summary>How far short of the door's sphere centre the sight line stops, so the door frame does not block it.</summary>
+        const float DoorSightStandoff = 0.25f;
+
+        /// <summary>True when nothing in the playfield surface lies between the character's chest and the door's sphere centre.</summary>
+        bool CanReachDoor(float x, float y, float z, ZoneTriggerVolume door)
+        {
+            var from = new Vec3(x, y + DoorSightHeight, z);
+            var to = new Vec3(door.CenterX, door.CenterY, door.CenterZ);
+            Vec3 delta = to - from;
+            float length = delta.Length;
+            if (length <= DoorSightStandoff)
+                return true;
+
+            return IsSegmentClear(from, from + (delta * ((length - DoorSightStandoff) / length)));
+        }
+
         public void TickSoftTriggers(PlayfieldType playfield, double deltaTime)
         {
             ArgumentNullException.ThrowIfNull(playfield);
@@ -299,6 +315,14 @@
                         ReadProxyReturn(player),
                         out ZoneCrossing crossing))
                 {
+                    // A door's sphere and doorway reach through walls; the client can only touch it from where it can
+                    // reach it, so a door behind a wall stays armed until the character has a clear line to it.
+                    if (crossing.Trigger.DoorPlane && !CanReachDoor(x, y, z, crossing.Trigger))
+                    {
+                        state.Overlapping.Remove(crossing.Trigger.Id);
+                        continue;
+                    }
+
                     if (crossing.Trigger.Kind == ZoneTriggerKind.TargetVicinity)
                         FireTargetVicinity(playfield, player, crossing.Trigger);
                     else if (crossing.Trigger.Kind == ZoneTriggerKind.MissionEntrance)
@@ -562,6 +586,7 @@
 
                 // A teleports route on the exit sends everyone to that door instead of back through their entrance
                 // (an entrance that records no return, such as 800's into 125, leaves nothing to go back to).
+                ApplyClientSphere(volume, d.TemplateId, x, y, z, DoorRotation(d));
                 bool routed = TryApplyDoorRoute(volume, d.IdentityInstance);
                 _triggers.Add(volume);
                 _logger.Info(
@@ -625,7 +650,7 @@
                 return;
 
             int id = player.Identity.Instance;
-            _zoneGraceUntil[id] = now + ZoneGraceSeconds;
+            _zoneGraceUntil[id] = now + ZoneGrace.OnZone(id, now, source.Identity.Instance, destPlayfieldId);
 
             // The character is leaving this world; a stale previous position would fake a crossing
             // if they come back, and the destination reseeds its own overlap set on first sighting.
@@ -767,6 +792,7 @@
                     DynelInstance = d.IdentityInstance
                 };
 
+                ApplyClientSphere(volume, d.TemplateId, x, y, z, DoorRotation(d));
                 TryApplyDoorRoute(volume, d.IdentityInstance);
                 _triggers.Add(volume);
             }
@@ -898,7 +924,62 @@
         public void ForgetCharacterTriggers(int characterId)
         {
             DropCharacterTriggerMemory(characterId);
-            _zoneGraceUntil[characterId] = (Environment.TickCount64 / 1000.0) + ZoneGraceSeconds;
+            double now = Environment.TickCount64 / 1000.0;
+            _zoneGraceUntil[characterId] = now + ZoneGrace.Current(characterId, now);
+        }
+
+        /// <summary>
+        /// How long zone triggers ignore a character after a zone, per character across playfields. The first zone gets
+        /// a short grace so the character can turn straight back out (the client freezes a walk-in it thinks will zone
+        /// until the server answers). Only bouncing back and forth between the same two playfields builds a streak:
+        /// past <see cref="FreeZones"/> such zones, each within <see cref="ResetSeconds"/> of the last, the grace doubles,
+        /// which breaks an accidental door loop. Travelling on through different playfields never builds one.
+        /// </summary>
+        static class ZoneGrace
+        {
+            const double BaseSeconds = 0.5;
+            const double MaxSeconds = 4.0;
+            const double ResetSeconds = 10.0;
+            const int FreeZones = 3;
+
+            static readonly object Sync = new();
+            static readonly Dictionary<int, (double Grace, double LastZone, int Streak, long Pair)> State = new();
+
+            /// <summary>Records a zone from <paramref name="fromPlayfield"/> to <paramref name="toPlayfield"/> and returns the grace it earns.</summary>
+            public static double OnZone(int characterId, double now, int fromPlayfield, int toPlayfield)
+            {
+                long pair = ((long)Math.Min(fromPlayfield, toPlayfield) << 32) | (uint)Math.Max(fromPlayfield, toPlayfield);
+                lock (Sync)
+                {
+                    int streak = State.TryGetValue(characterId, out var last)
+                        && last.Pair == pair
+                        && now - last.LastZone < ResetSeconds
+                        ? last.Streak + 1
+                        : 1;
+                    double grace = streak <= FreeZones
+                        ? BaseSeconds
+                        : Math.Min(BaseSeconds * Math.Pow(2.0, streak - FreeZones), MaxSeconds);
+                    State[characterId] = (grace, now, streak, pair);
+                    return grace;
+                }
+            }
+
+            /// <summary>The grace from the character's latest zone, or the base grace once it has lapsed.</summary>
+            public static double Current(int characterId, double now)
+            {
+                lock (Sync)
+                {
+                    if (!State.TryGetValue(characterId, out var last))
+                        return BaseSeconds;
+                    if (now - last.LastZone >= ResetSeconds)
+                    {
+                        State.Remove(characterId);
+                        return BaseSeconds;
+                    }
+
+                    return last.Grace;
+                }
+            }
         }
 
         /// <summary>
@@ -980,14 +1061,15 @@
         /// <paramref name="landing"/> on <paramref name="exteriorPlayfieldId"/>, outside the ACG entrance. It records no
         /// way back (the entrance, with a key, is the way back in).
         /// </summary>
-        public void RegisterDungeonExit(float x, float y, float z, int doorInstance, int exteriorPlayfieldId, AoVector3 landing, AoQuaternion landingHeading)
+        public void RegisterDungeonExit(float x, float y, float z, int doorInstance, int exteriorPlayfieldId, AoVector3 landing, AoQuaternion landingHeading,
+            int templateId = 0, AoQuaternion? doorRotation = null)
         {
             if (exteriorPlayfieldId <= 0 || _triggers.HasDynel(ZoneTriggerKind.DungeonExit, doorInstance))
                 return;
 
             const float r = TriggerVolumeCatalog.PortalRadius;
             const float h = TriggerVolumeCatalog.PortalHalfHeight;
-            _triggers.Add(
+            var exit =
                 new ZoneTriggerVolume
                 {
                     Kind = ZoneTriggerKind.DungeonExit,
@@ -1006,8 +1088,29 @@
                     DestPlayfieldId = exteriorPlayfieldId,
                     Landing = landing,
                     LandingHeading = landingHeading
-                });
+                };
+            ApplyClientSphere(exit, templateId, x, y, z, doorRotation);
+            _triggers.Add(exit);
         }
+
+        /// <summary>
+        /// Gives a placed dynel's walk-in trigger the client's shape: its template's collision sphere against the player's
+        /// (GameData DynelCollision.json). Templates without one keep the default disc.
+        /// </summary>
+        void ApplyClientSphere(ZoneTriggerVolume volume, int templateId, float x, float y, float z, AoQuaternion? doorRotation = null)
+        {
+            if (templateId <= 0
+                || !_gameData.TryGetDynelCollisionSphere(templateId, out float radius, out float centerY)
+                || _gameData.PlayerCollisionSphere is not { } player)
+                return;
+
+            TriggerVolumeCatalog.MakeClientSphere(volume, x, y, z, radius, centerY, player.Radius, player.CenterY);
+            if (doorRotation != null)
+                TriggerVolumeCatalog.SetDoorPlane(volume, x, y, z, doorRotation);
+        }
+
+        static AoQuaternion DoorRotation(PlayfieldDynel d)
+            => new AoQuaternion(d.Heading.X, d.Heading.Y, d.Heading.Z, d.Heading.W);
 
         /// <summary>
         /// Walking into a mission entrance. The quest dungeon service decides everything (carried key, the quest
@@ -1044,7 +1147,7 @@
                 float z = d.Position.Z;
                 const float r = TriggerVolumeCatalog.MissionEntranceRadius;
                 const float h = TriggerVolumeCatalog.PortalHalfHeight;
-                _triggers.Add(
+                var entrance =
                     new ZoneTriggerVolume
                     {
                         Kind = ZoneTriggerKind.MissionEntrance,
@@ -1060,7 +1163,9 @@
                         CenterZ = z,
                         Radius = r,
                         DynelInstance = d.IdentityInstance
-                    });
+                    };
+                ApplyClientSphere(entrance, d.TemplateId, x, y, z);
+                _triggers.Add(entrance);
             }
         }
 
@@ -1083,7 +1188,7 @@
                 float z = d.Position.Z;
                 const float r = TriggerVolumeCatalog.PortalRadius;
                 const float h = TriggerVolumeCatalog.PortalHalfHeight;
-                _triggers.Add(
+                var door =
                     new ZoneTriggerVolume
                     {
                         Kind = ZoneTriggerKind.PortalDynel,
@@ -1105,7 +1210,10 @@
                         DoorClearance = portal.DoorClearance,
                         DestIndex = portal.DestinationIndex,
                         RecordsReturn = portal.RecordsReturn
-                    });
+                    };
+                ApplyClientSphere(door, d.TemplateId, x, y, z,
+                    d.IdentityType == (int)IdentityType.Door ? DoorRotation(d) : null);
+                _triggers.Add(door);
             }
         }
 

@@ -149,6 +149,20 @@ namespace ZoneEngine_New.Core.GameData
         IReadOnlyList<int>? GetDungeonExitDoors(int playfieldId) => null;
 
         /// <summary>
+        /// The client collision sphere of a door or mission entrance template (GameData DynelCollision.json): radius and
+        /// centre height above the dynel. False when the template has none.
+        /// </summary>
+        bool TryGetDynelCollisionSphere(int templateId, out float radius, out float centerY)
+        {
+            radius = 0f;
+            centerY = 0f;
+            return false;
+        }
+
+        /// <summary>The player body's collision sphere (radius, centre height above the feet); null without the data.</summary>
+        AORebirth.Core.GameData.CollisionSphereData? PlayerCollisionSphere => null;
+
+        /// <summary>
         /// DAO override for a placed door. False when this statel has no route.
         /// </summary>
         bool TryGetTeleportRoute(

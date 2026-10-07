@@ -365,7 +365,7 @@ public sealed class QuestDungeonPlayfield : Playfield
         AORebirth.Core.Vector.Vector3 landing = PortalDoorLandingResolver.LandingInFront(
             entrancePosition, entranceHeading, PortalDoorLandingResolver.ExitDoorClearance);
         _simulation.RegisterDungeonExit(exit.Position.xf, exit.Position.yf, exit.Position.zf, exit.Identity.Instance,
-            Entrance.Playfield, landing, entranceHeading);
+            Entrance.Playfield, landing, entranceHeading, exit.TemplateId, exit.Rotation);
     }
 
     protected override void OnDispose()

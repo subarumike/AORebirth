@@ -79,6 +79,7 @@ namespace AORebirth.Tools.RDBDataExtractor
 
                 bool exportPlayfields = !resolved.SkipPlayfields;
                 bool needRdb = !resolved.SkipMonsterData
+                    || !resolved.SkipDynelCollision
                     || !resolved.SkipItemsDat
                     || exportPlayfields;
                 if (needRdb)
@@ -104,6 +105,24 @@ namespace AORebirth.Tools.RDBDataExtractor
                             failed++;
                             Console.Error.WriteLine(
                                 "FAIL MonsterData "
+                                + exception.GetType().Name
+                                + ": "
+                                + exception.Message);
+                        }
+                    }
+
+                    if (!resolved.SkipDynelCollision)
+                    {
+                        try
+                        {
+                            // Reports its own line ("exported DynelCollision.json ...").
+                            new DynelCollisionExporter(controller, resolved.GameDataDirectory).Export(resolved.Overwrite);
+                        }
+                        catch (Exception exception)
+                        {
+                            failed++;
+                            Console.Error.WriteLine(
+                                "FAIL DynelCollision "
                                 + exception.GetType().Name
                                 + ": "
                                 + exception.Message);

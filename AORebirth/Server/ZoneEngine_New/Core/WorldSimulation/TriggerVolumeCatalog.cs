@@ -5,6 +5,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
     using ZoneEngine_New.Core.Entities;
 
+    using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     public enum ZoneTriggerKind : byte
@@ -85,6 +86,26 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public float CenterZ;
         public float Radius = TriggerVolumeCatalog.PortalRadius;
 
+        /// <summary>
+        /// The client's collision sphere instead of the default disc: centred at (CenterX, CenterY, CenterZ), with
+        /// <see cref="Radius"/> already widened by the player's own sphere, so it fires when the player's sphere centre
+        /// (feet + <see cref="ProbeHeight"/>) comes within Radius. See <see cref="TriggerVolumeCatalog.MakeClientSphere"/>.
+        /// </summary>
+        public bool Sphere;
+
+        /// <summary>Height of the player's collision sphere centre above the feet, for a <see cref="Sphere"/>.</summary>
+        public float ProbeHeight;
+
+        /// <summary>
+        /// A door's extra walk-in condition: the feet must also lie within <see cref="TriggerVolumeCatalog.DoorPlaneHalfDepth"/>
+        /// of the door's plane (normal PlaneNx/Ny/Nz, offset PlaneD). See <see cref="TriggerVolumeCatalog.SetDoorPlane"/>.
+        /// </summary>
+        public bool DoorPlane;
+        public float PlaneNx;
+        public float PlaneNy;
+        public float PlaneNz;
+        public float PlaneD;
+
         /// <summary>Fixed landing for a <see cref="ZoneTriggerKind.DungeonExit"/>.</summary>
         public Vector3? Landing;
 
@@ -143,6 +164,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// the building's doorway, which characters approach from anywhere across its width.
         /// </summary>
         public const float MissionEntranceRadius = 1.5f;
+
+        /// <summary>How far the feet may be from a door's plane and still walk through it (client: 0.8).</summary>
+        public const float DoorPlaneHalfDepth = 0.8f;
 
         readonly List<ZoneTriggerVolume> _all = new();
         readonly Dictionary<long, List<ZoneTriggerVolume>> _bins = new();
@@ -324,13 +348,24 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (v.Kind is ZoneTriggerKind.PortalDynel or ZoneTriggerKind.ExitProxy or ZoneTriggerKind.TargetVicinity
                 or ZoneTriggerKind.MissionEntrance or ZoneTriggerKind.DungeonExit or ZoneTriggerKind.ExitDoor)
             {
-                if (MathF.Abs(y - v.CenterY) > HalfHeight(v))
-                    return false;
-
-                // Sweep the movement against the disc so a fast run cannot skip through it.
+                // Sweep the movement against the trigger so a fast run cannot skip through it.
                 float dist = DistanceToSegment(fromX, fromZ, x, z, v.CenterX, v.CenterZ);
-                if (dist > v.Radius)
-                    return false;
+                if (v.Sphere)
+                {
+                    // The client's test: the player's collision sphere touching the dynel's.
+                    float dy = (y + v.ProbeHeight) - v.CenterY;
+                    if ((dist * dist) + (dy * dy) > v.Radius * v.Radius)
+                        return false;
+                    if (!InDoorPlane(v, x, y, z))
+                        return false;
+                }
+                else
+                {
+                    if (MathF.Abs(y - v.CenterY) > HalfHeight(v))
+                        return false;
+                    if (dist > v.Radius)
+                        return false;
+                }
 
                 if (!overlappingIds.Add(v.Id))
                     return false;
@@ -455,9 +490,68 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
             float dx = x - v.CenterX;
             float dz = z - v.CenterZ;
+            if (v.Sphere)
+            {
+                float dy = (y + v.ProbeHeight) - v.CenterY;
+                return (dx * dx) + (dy * dy) + (dz * dz) <= v.Radius * v.Radius && InDoorPlane(v, x, y, z);
+            }
+
             return (dx * dx) + (dz * dz) <= v.Radius * v.Radius
                 && MathF.Abs(y - v.CenterY) <= HalfHeight(v);
         }
+
+        /// <summary>
+        /// Shapes <paramref name="v"/> as the client's walk-in test for a placed dynel at (<paramref name="x"/>,
+        /// <paramref name="y"/>, <paramref name="z"/>): the dynel's collision sphere (radius, centre height) against the
+        /// player's (n3VisualDynel_t::UpdateCollision gives each a torso sphere; touching fires OnEnter/OnCollide).
+        /// </summary>
+        public static void MakeClientSphere(
+            ZoneTriggerVolume v,
+            float x,
+            float y,
+            float z,
+            float radius,
+            float centerY,
+            float playerRadius,
+            float playerCenterY)
+        {
+            ArgumentNullException.ThrowIfNull(v);
+            float reach = radius + playerRadius;
+            v.Sphere = true;
+            v.ProbeHeight = playerCenterY;
+            v.CenterX = x;
+            v.CenterY = y + centerY;
+            v.CenterZ = z;
+            v.Radius = reach;
+            v.MinX = x - reach;
+            v.MaxX = x + reach;
+            v.MinZ = z - reach;
+            v.MaxZ = z + reach;
+            // Feet heights whose probe point can still reach the sphere.
+            v.MinY = v.CenterY - reach - playerCenterY;
+            v.MaxY = v.CenterY + reach - playerCenterY;
+        }
+
+        /// <summary>
+        /// A door only zones once the player is also in its doorway: the client's Door_t walk-in check
+        /// (Gamecode.dll 0x1007f5db) requires |(feet - door) . (door rotation * +Z)| &lt; 0.8, so touching the door's
+        /// sphere from beside the door or above it does nothing.
+        /// </summary>
+        public static void SetDoorPlane(ZoneTriggerVolume v, float x, float y, float z, Quaternion rotation)
+        {
+            ArgumentNullException.ThrowIfNull(v);
+            ArgumentNullException.ThrowIfNull(rotation);
+            var normal = (Vector3)Quaternion.RotateVector3(rotation, Vector3.AxisZ);
+            v.DoorPlane = true;
+            v.PlaneNx = normal.xf;
+            v.PlaneNy = normal.yf;
+            v.PlaneNz = normal.zf;
+            v.PlaneD = (normal.xf * x) + (normal.yf * y) + (normal.zf * z);
+        }
+
+        static bool InDoorPlane(ZoneTriggerVolume v, float x, float y, float z)
+            => !v.DoorPlane
+               || MathF.Abs((v.PlaneNx * x) + (v.PlaneNy * y) + (v.PlaneNz * z) - v.PlaneD) < DoorPlaneHalfDepth;
 
         /// <summary>
         /// Vertical reach of a disc trigger. A vicinity pad reaches at least as far as a door:

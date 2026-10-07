@@ -167,6 +167,7 @@
     <Compile Include="Functions\IFunctions.cs" />
     <Compile Include="GameData\GameDataPaths.cs" />
     <Compile Include="GameData\PlayfieldCharacterAppearanceData.cs" />
+    <Compile Include="GameData\DynelCollisionData.cs" />
     <Compile Include="GameData\PlayfieldExitProxyDoorsData.cs" />
     <Compile Include="GameData\PlayfieldMetaData.cs" />
     <Compile Include="InternalMessaging\IIMSendAOtMessageToClient.cs" />

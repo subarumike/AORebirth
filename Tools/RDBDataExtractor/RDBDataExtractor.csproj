@@ -28,6 +28,8 @@
     so the GameData contracts are compiled from their single source location instead.
   -->
   <ItemGroup>
+    <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\DynelCollisionData.cs"
+             Link="GameData\DynelCollisionData.cs" />
     <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\GameDataPaths.cs"
              Link="GameData\GameDataPaths.cs" />
     <Compile Include="..\..\AORebirth\Libraries\Source\AORebirth.Core\GameData\PlayfieldCollisionDat.cs"

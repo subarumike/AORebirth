@@ -1041,6 +1041,65 @@ namespace ZoneEngine_New.Core.GameData
             return doors;
         }
 
+        readonly object _dynelCollisionSync = new();
+        DynelCollisionData? _dynelCollision;
+        bool _dynelCollisionLoaded;
+
+        public bool TryGetDynelCollisionSphere(int templateId, out float radius, out float centerY)
+        {
+            radius = 0f;
+            centerY = 0f;
+            DynelCollisionData? data = LoadDynelCollision();
+            if (data?.Templates == null
+                || !data.Templates.TryGetValue(templateId.ToString(CultureInfo.InvariantCulture), out CollisionSphereData? sphere)
+                || sphere == null || sphere.Radius <= 0f)
+                return false;
+
+            radius = sphere.Radius;
+            centerY = sphere.CenterY;
+            return true;
+        }
+
+        public CollisionSphereData? PlayerCollisionSphere => LoadDynelCollision()?.PlayerSphere;
+
+        DynelCollisionData? LoadDynelCollision()
+        {
+            lock (_dynelCollisionSync)
+            {
+                if (_dynelCollisionLoaded)
+                    return _dynelCollision;
+
+                _dynelCollisionLoaded = true;
+                string path = Path.Combine(RootPath, GameDataPaths.DynelCollisionFileName);
+                if (!File.Exists(path))
+                {
+                    _logger.Warn("DynelCollision.json not found at " + path + "; doors keep the default trigger cylinder");
+                    return null;
+                }
+
+                try
+                {
+                    DynelCollisionData? data = JsonSerializer.Deserialize<DynelCollisionData>(File.ReadAllText(path), CatalogJsonOptions);
+                    if (data == null || data.SchemaVersion != DynelCollisionData.SupportedSchemaVersion)
+                    {
+                        _logger.Warn("DynelCollision.json has an unsupported schema: " + path);
+                        return null;
+                    }
+
+                    _dynelCollision = data;
+                    _logger.Info(
+                        "GameData dynel collision templates=" + (data.Templates?.Count ?? 0).ToString(CultureInfo.InvariantCulture)
+                        + " player=" + (data.PlayerSphere != null ? "yes" : "no"));
+                    return data;
+                }
+                catch (Exception exception)
+                {
+                    _logger.Warn("DynelCollision.json could not be read: " + path + " (" + exception.Message + ")");
+                    return null;
+                }
+            }
+        }
+
         public IReadOnlyList<int>? GetDungeonExitDoors(int playfieldId)
         {
             if (playfieldId <= 0)

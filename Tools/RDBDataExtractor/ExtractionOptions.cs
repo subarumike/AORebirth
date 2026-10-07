@@ -46,6 +46,11 @@ namespace AORebirth.Tools.RDBDataExtractor
         public bool SkipMonsterData { get; set; }
 
         [Option(
+            "skip-dynel-collision",
+            HelpText = "Skip DynelCollision.json export (door and mission entrance collision spheres).")]
+        public bool SkipDynelCollision { get; set; }
+
+        [Option(
             "skip-items-dat",
             HelpText = "Skip GameData/items.dat export.")]
         public bool SkipItemsDat { get; set; }
@@ -105,6 +110,7 @@ namespace AORebirth.Tools.RDBDataExtractor
                 Overwrite = options.Overwrite,
                 SelfTest = false,
                 SkipMonsterData = options.SkipMonsterData,
+                SkipDynelCollision = options.SkipDynelCollision,
                 SkipItemsDat = options.SkipItemsDat,
                 SkipText = options.SkipText,
                 SkipPlayfields = options.SkipPlayfields,
