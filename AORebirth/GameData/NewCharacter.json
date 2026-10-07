@@ -13,6 +13,7 @@
     { "Stat": 181, "Name": "MaxNCU", "Value": 8 },
     { "Stat": 333, "Name": "PvP_Rating", "Value": 1300 },
     { "Stat": 51, "Name": "AggDef", "Value": 100 },
+    { "Stat": 379, "Name": "CriticalIncrease", "Value": 3 },
     { "Stat": 100, "Name": "MartialArts", "Value": 5 },
     { "Stat": 101, "Name": "MultiMelee", "Value": 5 },
     { "Stat": 102, "Name": "_1hBlunt", "Value": 5 },

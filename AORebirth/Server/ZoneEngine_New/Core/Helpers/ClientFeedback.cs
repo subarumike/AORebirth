@@ -22,6 +22,12 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"Target does not have enough nano controlling units (NCU) left." (category 110).</summary>
         public const int TargetNotEnoughNcu = 220179189;
 
+        /// <summary>
+        /// "Nano program executed successfully." (category 110, 0x076C7CA9). Live sends it to the caster after
+        /// FinishNanoCasting and before the nano's effects (summon capture 2026-10-07T21:09:22Z).
+        /// </summary>
+        public const int NanoExecutedSuccessfully = 124550313;
+
         /// <summary>"Target resisted." (category 110).</summary>
         public const int TargetResisted = 205237300;
 

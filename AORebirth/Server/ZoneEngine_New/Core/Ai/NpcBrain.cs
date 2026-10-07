@@ -182,10 +182,22 @@ namespace ZoneEngine_New.Core.Ai
             // A pet picks its fights from its owner, never from who happens to walk by.
             if (Pet == null)
                 ScanProximity();
+
+            // Channelling a cast roots the caster (pets too): no chasing or following until the cast ends.
+            if (Npc.IsCastingNano)
+            {
+                StopPathing();
+                return;
+            }
+
             TickStallWatch.Stage("brain.tree", Npc.Identity.Instance);
             _tree.Tick((float)deltaTime);
             TickStallWatch.Stage("brain.nanos", Npc.Identity.Instance);
             _nanos.Tick(DateTime.UtcNow);
+
+            // A cast begun this think (a pet heal in the tree, or the nano caster) stops it where it stands.
+            if (Npc.IsCastingNano)
+                StopPathing();
         }
 
         public void AddThreat(Identity identity, float amount)

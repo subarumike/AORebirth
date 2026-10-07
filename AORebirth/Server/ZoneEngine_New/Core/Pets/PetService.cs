@@ -58,12 +58,12 @@ namespace ZoneEngine_New.Core.Pets
 
             DateTime? expires = durationSeconds > 0 ? DateTime.UtcNow.AddSeconds(durationSeconds) : null;
             int type = Types.TypeOf(hash.Trim());
-            return Spawn(owner, hash.Trim(), type, level, expires, DefaultMode(type), healthPercent: 100,
+            return Spawn(owner, hash.Trim(), type, level, expires, DefaultMode(type), healthPercent: 100, nanoPercent: 100,
                 summonRequirements ?? []);
         }
 
         NpcCharacter? Spawn(Character owner, string hash, int type, int level, DateTime? expires, PetMode mode, int healthPercent,
-            IReadOnlyList<ItemRequirement> summonRequirements)
+            int nanoPercent, IReadOnlyList<ItemRequirement> summonRequirements)
         {
             if (!_gameData.TryResolveMobTemplate(hash, level > 0 ? level : null, out MobTemplate template)
                 || !NpcTemplateValidation.CanSpawn(template))
@@ -100,6 +100,13 @@ namespace ZoneEngine_New.Core.Pets
                         int max = npc.Stats.GetOrZero(CharacterStat.MaxHealth);
                         if (max > 0)
                             npc.Stats.Set(CharacterStat.Health, Math.Max(1, (int)(max * (long)healthPercent / 100)));
+                    }
+
+                    if (nanoPercent is >= 0 and < 100)
+                    {
+                        int max = npc.Stats.GetOrZero(CharacterStat.MaxNanoEnergy);
+                        if (max > 0)
+                            npc.Stats.Set(CharacterStat.CurrentNano, (int)(max * (long)nanoPercent / 100));
                     }
                 },
                 attachDefaultBrain: false);
@@ -194,7 +201,7 @@ namespace ZoneEngine_New.Core.Pets
                     _ => controller.Mode
                 };
                 owner.OwnedPets.Stash.Add(new PetStash(controller.Hash, controller.Type, controller.Level,
-                    controller.ExpiresUtc, mode, HealthPercent(pet), controller.SummonRequirements));
+                    controller.ExpiresUtc, mode, HealthPercent(pet), NanoPercent(pet), controller.SummonRequirements));
             }
 
             foreach (NpcCharacter pet in pets)
@@ -225,7 +232,8 @@ namespace ZoneEngine_New.Core.Pets
             {
                 if (pet.ExpiresUtc is DateTime expires && now >= expires)
                     continue;
-                Spawn(owner, pet.Hash, pet.Type, pet.Level, pet.ExpiresUtc, pet.Mode, pet.HealthPercent, pet.SummonRequirements);
+                Spawn(owner, pet.Hash, pet.Type, pet.Level, pet.ExpiresUtc, pet.Mode, pet.HealthPercent, pet.NanoPercent,
+                    pet.SummonRequirements);
             }
         }
 
@@ -459,6 +467,12 @@ namespace ZoneEngine_New.Core.Pets
         {
             int max = character.Stats.GetOrZero(CharacterStat.MaxHealth);
             return max <= 0 ? 100 : (int)Math.Clamp(100L * Math.Max(0, character.Stats.GetOrZero(CharacterStat.Health)) / max, 1, 100);
+        }
+
+        static int NanoPercent(Character character)
+        {
+            int max = character.Stats.GetOrZero(CharacterStat.MaxNanoEnergy);
+            return max <= 0 ? 100 : (int)Math.Clamp(100L * Math.Max(0, character.Stats.GetOrZero(CharacterStat.CurrentNano)) / max, 0, 100);
         }
 
         static void PublishPetsStat(Character owner)

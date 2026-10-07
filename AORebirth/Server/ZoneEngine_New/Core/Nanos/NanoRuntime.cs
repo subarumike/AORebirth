@@ -501,6 +501,7 @@ namespace ZoneEngine_New.Core.Nanos
 
             if (!spell.IsBuff)
             {
+                ClientFeedback.Send(caster, ClientFeedback.NanoExecutedSuccessfully);
                 ExecuteOnUseEffects(caster, recipient!, spell, skipPassiveModifiers: false);
                 return;
             }
@@ -538,6 +539,7 @@ namespace ZoneEngine_New.Core.Nanos
             if (replaced != null && replaced.Id != spell.Id)
                 AnnounceBuffRemoved(recipient, replaced);
 
+            ClientFeedback.Send(caster, ClientFeedback.NanoExecutedSuccessfully);
             SendNanoDuration(caster, recipient, applied);
             ExecuteOnUseEffects(caster, recipient, spell, skipPassiveModifiers: true);
             if (spell.IsHostile)

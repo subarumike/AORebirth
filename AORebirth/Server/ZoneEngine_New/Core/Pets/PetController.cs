@@ -121,7 +121,7 @@ namespace ZoneEngine_New.Core.Pets
 
     /// <summary>A pet carried through a zone change: it is despawned on the way out and summoned again on arrival.</summary>
     public sealed record PetStash(string Hash, int Type, int Level, DateTime? ExpiresUtc, PetMode Mode, int HealthPercent,
-        IReadOnlyList<ItemRequirement> SummonRequirements);
+        int NanoPercent, IReadOnlyList<ItemRequirement> SummonRequirements);
 
     /// <summary>The pets a character owns, one per pet slot, in summon order (which is also their formation order).</summary>
     public sealed class OwnedPets

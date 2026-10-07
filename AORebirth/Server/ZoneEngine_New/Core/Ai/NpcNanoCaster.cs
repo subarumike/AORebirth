@@ -197,6 +197,10 @@ namespace ZoneEngine_New.Core.Ai
                 return chosen;
             }
 
+            // A pet told to follow or wait heals no one.
+            if (Npc.Pet is { Mode: Pets.PetMode.Follow or Pets.PetMode.Wait })
+                return null;
+
             // A pet heals greedily, all the way to full; other NPCs only once someone is well hurt.
             int healBelow = Npc.Pet != null ? 100 : HealBelowPercent;
             if (HealthPercent(Npc) < healBelow && !HasNano(Npc, spell)
