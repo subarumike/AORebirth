@@ -57,7 +57,8 @@ namespace ZoneEngine_New.Core.Pets
                 return null;
 
             DateTime? expires = durationSeconds > 0 ? DateTime.UtcNow.AddSeconds(durationSeconds) : null;
-            return Spawn(owner, hash.Trim(), Types.TypeOf(hash.Trim()), level, expires, PetMode.Guard, healthPercent: 100,
+            int type = Types.TypeOf(hash.Trim());
+            return Spawn(owner, hash.Trim(), type, level, expires, DefaultMode(type), healthPercent: 100,
                 summonRequirements ?? []);
         }
 
@@ -258,18 +259,38 @@ namespace ZoneEngine_New.Core.Pets
                 if (controller.IsOverEquipped && command != PetCommandCode.Terminate)
                     continue;
 
+                bool healPet = IsHealPet(controller.Type);
                 switch (command)
                 {
                     case PetCommandCode.Follow:
                     case PetCommandCode.Behind:
                         controller.Order(PetMode.Follow);
+                        if (healPet)
+                            controller.EndHeal();
                         StandDown(pet);
                         break;
                     case PetCommandCode.Guard:
-                        controller.Order(PetMode.Guard);
+                        // A heal pet's guard is a heal order on its owner; a mezz pet's guard is follow, so it
+                        // only fights when sent at a target.
+                        if (healPet)
+                        {
+                            controller.Order(PetMode.Guard);
+                            controller.EndHeal();
+                        }
+                        else if (IsMezzPet(controller.Type))
+                        {
+                            controller.Order(PetMode.Follow);
+                            StandDown(pet);
+                        }
+                        else
+                        {
+                            controller.Order(PetMode.Guard);
+                        }
                         break;
                     case PetCommandCode.Wait:
                         controller.Order(PetMode.Wait, pet.Position);
+                        if (healPet)
+                            controller.EndHeal();
                         StandDown(pet);
                         break;
                     case PetCommandCode.Attack:
@@ -277,6 +298,9 @@ namespace ZoneEngine_New.Core.Pets
                             controller.Attack(target.Identity);
                         break;
                     case PetCommandCode.Heal:
+                        // A heal pet only heals out of follow and wait, so a heal order puts it back on duty.
+                        if (healPet && controller.Mode is PetMode.Follow or PetMode.Wait)
+                            controller.Order(PetMode.Guard);
                         controller.Heal(ResolveHealTarget(owner).Identity);
                         break;
                     case PetCommandCode.Terminate:
@@ -285,6 +309,17 @@ namespace ZoneEngine_New.Core.Pets
                 }
             }
         }
+
+        static bool IsHealPet(int type) => PetTypes.Slot(type) == PetTypes.Slot(PetTypes.Heal);
+
+        /// <summary>The Metaphysicist's mezz pet: it only fights when sent at a target.</summary>
+        static bool IsMezzPet(int type) => PetTypes.Slot(type) == PetTypes.Slot(PetTypes.Support);
+
+        /// <summary>
+        /// A newly summoned heal pet follows until told to heal or guard, and a mezz pet follows until sent at a
+        /// target; other pets guard.
+        /// </summary>
+        static PetMode DefaultMode(int type) => IsHealPet(type) || IsMezzPet(type) ? PetMode.Follow : PetMode.Guard;
 
         IEnumerable<NpcCharacter> ResolveOwned(Player owner, IReadOnlyList<Identity> petIdentities)
         {

@@ -250,6 +250,10 @@ namespace ZoneEngine_New.Core.Ai
             if (pet.IsOverEquipped)
                 return null;
 
+            bool healPet = PetTypes.Slot(pet.Type) == PetTypes.Slot(PetTypes.Heal);
+            if (healPet && pet.Mode is PetMode.Follow or PetMode.Wait)
+                return null;
+
             if (pet.HealTarget.Instance != 0)
             {
                 if (ResolveFriend(brain.Npc, pet.HealTarget) is Character ordered)
@@ -257,7 +261,7 @@ namespace ZoneEngine_New.Core.Ai
                 pet.EndHeal();
             }
 
-            return PetTypes.Slot(pet.Type) == PetTypes.Slot(PetTypes.Heal) ? pet.Owner : null;
+            return healPet ? pet.Owner : null;
         }
 
         public static int HealthPercent(Character character)
