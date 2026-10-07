@@ -765,14 +765,27 @@ namespace ZoneEngine_New.Core.Entities
                     if (amount <= 0)
                         continue;
 
-                    // A monster below the recipient's LevelEligibility.json range is worth 1 XP.
-                    int recipientLevel = recipients[r].Stats.GetOrOne(CharacterStat.Level);
-                    if (TeamLevelEligibility.Current.IsTooLowForMember(recipientLevel, victimLevel))
+                    // A monster the recipient's client shows gray (more than XPKillRange levels below them) is worth 1 XP.
+                    if (IsBelowKillRange(recipients[r], victimLevel, gameData))
                         amount = 1;
 
                     recipients[r].AwardXp(amount, XpSource.Kill);
                 }
             }
+        }
+
+        /// <summary>
+        /// The client's gray test (N3Msg_Consider): a victim more than XPKillRange levels below the recipient. The
+        /// recipient's own XPKillRange stat is what their client colors by; its Xp.json row stands in until it is set.
+        /// </summary>
+        static bool IsBelowKillRange(Character recipient, int victimLevel, IGameData gameData)
+        {
+            int level = recipient.Stats.GetOrOne(CharacterStat.Level);
+            int range = recipient.Stats.Get(CharacterStat.XPKillRange, StatDetail.Base);
+            if (StatCollection.IsUnset(range) || range <= 0)
+                range = gameData.TryGetXpLevel(level, out XpLevelEntry entry) ? entry.XpKillRange : 0;
+
+            return range > 0 && victimLevel < level - range;
         }
 
         /// <summary>
@@ -2827,6 +2840,9 @@ namespace ZoneEngine_New.Core.Entities
                 }
             }
 
+            foreach (Item item in AppearanceBackMeshItems)
+                ApplyBackMesh(item, meshes);
+
             if (robe == _wearRobe && SameWearAppearance(textures, meshes))
                 return;
 
@@ -2904,6 +2920,25 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         static bool IsBodySlot(int slot) => slot is 19 or 51;
+
+        /// <summary>
+        /// Armor page back slot (ArmorSlots.Back 3 + 16; 20 is the right shoulder). A utility item's BackMesh goes
+        /// where a back item's mesh does: position 5.
+        /// </summary>
+        const int BackSlot = 19;
+
+        /// <summary>Items outside <see cref="AppearanceWearPages"/> whose worn BackMesh still shows (a player's utility slots).</summary>
+        protected virtual IEnumerable<Item> AppearanceBackMeshItems => [];
+
+        void ApplyBackMesh(Item item, Dictionary<(int Position, int Layer), Mesh> meshes)
+        {
+            foreach (ItemSpell spell in item.WearSpells)
+            {
+                if (spell.Is(FunctionType.BackMesh) && spell.MeetsRequirements(Stats)
+                    && TryReadWearMesh(BackSlot, item, spell, out Mesh mesh))
+                    meshes[(mesh.Position, mesh.Layer)] = mesh;
+            }
+        }
 
         static bool TryReadWearMesh(int slot, Item item, ItemSpell spell, out Mesh mesh)
         {

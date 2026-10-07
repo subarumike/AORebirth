@@ -75,7 +75,7 @@ namespace ZoneEngine_New.Core.Entities
         public static bool IsRuntimeOnly(CharacterStat stat)
             => stat is CharacterStat.NumberOfFightingOpponents or CharacterStat.Pets
                 or CharacterStat.EquippedWeapons or CharacterStat.EquippedRHWeapon or CharacterStat.WaitState
-                or CharacterStat.CharState
+                or CharacterStat.CharState or CharacterStat.XPKillRange
                 or CharacterStat.Health or CharacterStat.CurrentNano
                 or CharacterStat.MaxHealth or CharacterStat.MaxNanoEnergy;
 

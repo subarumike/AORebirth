@@ -771,6 +771,7 @@ namespace ZoneEngine_New.Core.GameData
                                 Level = level,
                                 KillAward = row.KillAward,
                                 NextLevelXp = row.NextLevelXp,
+                                XpKillRange = row.XPKillRange,
                                 FloorXp = floorXp
                             }))
                     {
@@ -1311,6 +1312,8 @@ namespace ZoneEngine_New.Core.GameData
             public int KillAward { get; set; }
 
             public int NextLevelXp { get; set; }
+
+            public int XPKillRange { get; set; }
         }
 
         private sealed class AlienXpLevelRow

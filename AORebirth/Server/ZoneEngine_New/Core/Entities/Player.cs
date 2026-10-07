@@ -1185,10 +1185,28 @@ namespace ZoneEngine_New.Core.Entities
             if (OwnedPets.Count > 0)
                 Playfield?.GetService<Pets.PetService>()?.RefreshOverEquip(this);
 
+            SyncXpKillRange();
+
             // A buff or debuff that moves Martial Arts across a weapon's combined-attack requirement changes the stance;
             // only then are the weapons re-armed, so ordinary buffs keep their swing timers.
             if (!_inFullRebase && Inventory.IsHydrated && QualifiesForCombinedMartialArts() != _combinedMartialArts)
                 RebaseWeapons();
+        }
+
+        /// <summary>
+        /// XPKillRange (275) follows the level's Xp.json row. The client needs it to color targets; without it every
+        /// target shows gray.
+        /// </summary>
+        void SyncXpKillRange()
+        {
+            IGameData? gameData = Playfield?.GetService<IGameData>();
+            if (gameData == null
+                || !gameData.TryGetXpLevel(Stats.GetOrOne(CharacterStat.Level), out XpLevelEntry entry)
+                || entry.XpKillRange <= 0
+                || Stats.Get(CharacterStat.XPKillRange, StatDetail.Base) == entry.XpKillRange)
+                return;
+
+            Stats.Set(CharacterStat.XPKillRange, entry.XpKillRange, StatDetail.Base, dirty: true);
         }
 
         /// <summary>
@@ -1214,6 +1232,22 @@ namespace ZoneEngine_New.Core.Entities
         /// Armor carries the worn look, Social replaces it per slot once the client asks for social
         /// clothes, and social-only drops the armor layer entirely.
         /// </summary>
+        /// <summary>Utility slot items, whose worn BackMesh shows on the back (the Light Bar, 252157).</summary>
+        protected override IEnumerable<Item> AppearanceBackMeshItems
+        {
+            get
+            {
+                if (!Inventory.IsHydrated)
+                    yield break;
+
+                foreach (WeaponSlots slot in (WeaponSlots[])[WeaponSlots.Util1, WeaponSlots.Util2, WeaponSlots.Util3])
+                {
+                    if (Inventory.Equipment.Content.TryGetValue((int)slot, out Item? item))
+                        yield return item;
+                }
+            }
+        }
+
         protected override IEnumerable<Container> AppearanceWearPages
         {
             get
