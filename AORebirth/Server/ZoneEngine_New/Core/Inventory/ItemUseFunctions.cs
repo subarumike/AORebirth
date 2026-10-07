@@ -4,6 +4,7 @@ namespace ZoneEngine_New.Core.Inventory
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Text;
 
     using AORebirth.Core.GameData;
     using AORebirth.Enums;
@@ -635,6 +636,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (spell.Is(FunctionType.SystemText))
             {
+                text = FormatSystemText(player, spell, text);
                 // Live: FormatFeedback 110/707 with the text as its one argument.
                 ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, text);
                 return true;
@@ -650,6 +652,43 @@ namespace ZoneEngine_New.Core.Inventory
                     Unknown3 = 0
                 });
             return true;
+        }
+
+        static string FormatSystemText(Player player, ItemSpell spell, string text)
+        {
+            // RDB SystemText carries Text, four stat arguments, then ToClient. Older items.dat
+            // exports discarded those arguments; leave their text unchanged rather than guess a stat.
+            if (spell.ArgumentCount < 5 || !text.Contains('%'))
+                return text;
+
+            var formatted = new StringBuilder(text.Length);
+            int argument = 1;
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (text[i] != '%')
+                {
+                    formatted.Append(text[i]);
+                    continue;
+                }
+
+                if (++i == text.Length)
+                    return text;
+                if (text[i] == '%')
+                {
+                    formatted.Append('%');
+                    continue;
+                }
+
+                // Only the integer stat substitution evidenced in the RDB is handled here.
+                // Unknown formats retain the original text instead of consuming unrelated arguments.
+                if (text[i] != 'd' || argument > 4
+                    || !spell.TryReadInt(argument++, out int statId) || statId < 0)
+                    return text;
+
+                formatted.Append(player.Stats.GetOrZero((CharacterStat)statId).ToString(CultureInfo.InvariantCulture));
+            }
+
+            return formatted.ToString();
         }
 
         /// <summary>
