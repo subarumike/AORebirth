@@ -522,13 +522,15 @@ namespace ZoneEngine_New.Core.Entities
             ShiftLevelIpBonus(levelBefore, levelAfter);
 
             ApplyLevelVitals();
+
+            // Official live capture 2026-10-07 sends NewLevel before the XP stat update.
+            if (this is Player player && player.Session != null)
+            {
+                for (int gained = levelBefore + 1; gained <= levelAfter; gained++)
+                    player.Session.Send(BuildNewLevelMessage(gameData, gained, lastGain));
+            }
+
             FlushDirtyStats();
-
-            if (this is not Player player || player.Session == null)
-                return;
-
-            for (int gained = levelBefore + 1; gained <= levelAfter; gained++)
-                player.Session.Send(BuildNewLevelMessage(gameData, gained, lastGain));
         }
 
         void ApplyLevelVitals()
