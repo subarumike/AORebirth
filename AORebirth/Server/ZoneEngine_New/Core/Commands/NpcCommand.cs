@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Commands
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
 
     using AORebirth.Core.GameData;
     using AORebirth.Enums;
@@ -21,22 +22,28 @@ namespace ZoneEngine_New.Core.Commands
 
     public sealed class NpcCommand : IGmCommand
     {
+        /// <summary>Upper bound for one .npc loot roll simulation.</summary>
+        const int MaxLootRolls = 10000;
+
         private readonly IGameData _gameData;
         private readonly IItemTemplateCatalog _items;
+        private readonly HashItemMinter _minter;
 
-        public NpcCommand(IGameData gameData, IItemTemplateCatalog items)
+        public NpcCommand(IGameData gameData, IItemTemplateCatalog items, HashItemMinter minter)
         {
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(items);
+            ArgumentNullException.ThrowIfNull(minter);
             _gameData = gameData;
             _items = items;
+            _minter = minter;
         }
 
         public string Name => "npc";
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".npc source|template|loot|equipment|nanos|position";
+        public string Usage => ".npc source|template|loot [roll [count]]|equipment|nanos|position";
 
         public void Execute(GmCommandContext context)
         {
@@ -66,6 +73,24 @@ namespace ZoneEngine_New.Core.Commands
 
             if (string.Equals(verb, "loot", StringComparison.OrdinalIgnoreCase))
             {
+                if (context.Args.Length >= 2 && string.Equals(context.Args[1], "roll", StringComparison.OrdinalIgnoreCase))
+                {
+                    int rolls = 1;
+                    if (context.Args.Length >= 3
+                        && (!int.TryParse(context.Args[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out rolls)
+                            || rolls < 1 || rolls > MaxLootRolls))
+                    {
+                        GmCommandFeedback.Send(
+                            context.Session,
+                            context.Player,
+                            "Usage: .npc loot roll [1-" + MaxLootRolls.ToString(CultureInfo.InvariantCulture) + "]");
+                        return;
+                    }
+
+                    GmCommandFeedback.SendLines(context.Session, context.Player, SimulateLoot(npc, rolls));
+                    return;
+                }
+
                 GmCommandFeedback.SendLines(context.Session, context.Player, DumpLoot(npc));
                 return;
             }
@@ -560,6 +585,119 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             return lines;
+        }
+
+        /// <summary>
+        /// Rolls the target's loot table <paramref name="rolls"/> times with the corpse's own roll (no items minted)
+        /// and lists each item and quality with its drop count and effective drop rate (drops per corpse).
+        /// </summary>
+        IReadOnlyList<string> SimulateLoot(NpcCharacter npc, int rolls)
+        {
+            const string Gold = "#FFD700";
+            const string Grey = "#A0A0A0";
+            const string Green = "#66FF66";
+            const string White = "#FFFFFF";
+
+            MobTemplate? template = npc.MobTemplate;
+            if (template == null)
+                return ["No mob template on target."];
+
+            string npcName = string.IsNullOrWhiteSpace(template.Name) ? npc.Name ?? "NPC" : template.Name;
+            int level = npc.Stats.GetOrOne(CharacterStat.Level);
+            var drops = new Dictionary<(int LowId, int HighId, int Quality), int>();
+            var rolled = new List<(int LowId, int HighId, int Quality)>();
+            int emptyCorpses = 0;
+            int totalItems = 0;
+            for (int roll = 0; roll < rolls; roll++)
+            {
+                rolled.Clear();
+                LootableDynel.RollItemTable(template.ItemTable, level, _minter, Corpse.LootCapacity, rolled);
+                if (rolled.Count == 0)
+                    emptyCorpses++;
+                totalItems += rolled.Count;
+                foreach ((int LowId, int HighId, int Quality) item in rolled)
+                    drops[item] = drops.GetValueOrDefault(item) + 1;
+            }
+
+            var rows = new List<string>
+            {
+                Font(White, npcName.Replace('"', '\'')) + Font(Grey, string.Format(
+                    CultureInfo.InvariantCulture, "  level {0}, {1} {2}", level, rolls, rolls == 1 ? "roll" : "rolls")),
+                Font(Grey, string.Format(
+                    CultureInfo.InvariantCulture,
+                    "Items: {0} ({1:0.##} per corpse)   Empty corpses: {2} ({3:0.#}%)",
+                    totalItems,
+                    (double)totalItems / rolls,
+                    emptyCorpses,
+                    100.0 * emptyCorpses / rolls)),
+                string.Empty
+            };
+
+            if (drops.Count == 0)
+                rows.Add(Font(Grey, "Nothing dropped."));
+
+            // One row per item name: the quality range it dropped at, its drop count and effective rate.
+            var byName = new Dictionary<string, (int MinQl, int MaxQl, int Drops)>(StringComparer.OrdinalIgnoreCase);
+            foreach (KeyValuePair<(int LowId, int HighId, int Quality), int> drop in drops)
+            {
+                string name = LootDropName(drop.Key.LowId, drop.Key.HighId, drop.Key.Quality);
+                int quality = drop.Key.Quality;
+                byName[name] = byName.TryGetValue(name, out var seen)
+                    ? (Math.Min(seen.MinQl, quality), Math.Max(seen.MaxQl, quality), seen.Drops + drop.Value)
+                    : (quality, quality, drop.Value);
+            }
+
+            foreach (KeyValuePair<string, (int MinQl, int MaxQl, int Drops)> item in byName
+                         .OrderByDescending(d => d.Value.Drops)
+                         .ThenBy(d => d.Key, StringComparer.OrdinalIgnoreCase))
+            {
+                (int minQl, int maxQl, int count) = item.Value;
+                string quality = minQl == maxQl
+                    ? minQl.ToString(CultureInfo.InvariantCulture)
+                    : string.Format(CultureInfo.InvariantCulture, "{0}-{1}", minQl, maxQl);
+                rows.Add(
+                    Font(Gold, "QL " + quality) + "  "
+                    + Font(White, item.Key) + "  "
+                    + Font(Grey, string.Format(
+                        CultureInfo.InvariantCulture, "{0} {1}", count, count == 1 ? "drop" : "drops")) + "  "
+                    + Font(Green, string.Format(CultureInfo.InvariantCulture, "{0:0.##}%", 100.0 * count / rolls)));
+            }
+
+            string title = string.Format(
+                CultureInfo.InvariantCulture, "{0} loot roll x{1} ({2} items)", npcName, rolls, byName.Count);
+            IReadOnlyList<string> chunks = GetStatsAomlBuilder.ChunkRows(rows, GetStatsAomlBuilder.DefaultMaxBodyLength);
+            var lines = new List<string>(chunks.Count);
+            for (int i = 0; i < chunks.Count; i++)
+            {
+                string label = chunks.Count == 1
+                    ? title
+                    : string.Format(CultureInfo.InvariantCulture, "{0} ({1}/{2})", title, i + 1, chunks.Count);
+                lines.Add(GetStatsAomlBuilder.BuildLink(chunks[i], label.Replace('"', '\'')));
+            }
+
+            return lines;
+
+            static string Font(string color, string text) => "<font color=" + color + ">" + text + "</font>";
+        }
+
+        /// <summary>The name the rolled item would carry at its quality (built without an instance id).</summary>
+        string LootDropName(int lowId, int highId, int quality)
+        {
+            string name;
+            try
+            {
+                name = _minter.Create(lowId, highId, quality, ItemSource.Loot).Name;
+            }
+            catch (Exception)
+            {
+                name = string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(name))
+                name = ItemName(lowId);
+
+            // A double quote would terminate the text:// href.
+            return name.Replace('"', '\'');
         }
 
         string LootItemName(HashInstance instance)

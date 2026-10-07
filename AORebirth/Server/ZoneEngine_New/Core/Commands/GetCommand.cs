@@ -199,7 +199,8 @@ namespace ZoneEngine_New.Core.Commands
     /// <summary>Builds AOML <c>text://</c> popup links for FullCharacter stat sets.</summary>
     internal static class GetStatsAomlBuilder
     {
-        public const int DefaultMaxBodyLength = 900;
+        /// <summary>Popup body length before a GM listing is split into further links.</summary>
+        public const int DefaultMaxBodyLength = 4096;
 
         public static IReadOnlyList<string> BuildChatLines(
             string subjectName,

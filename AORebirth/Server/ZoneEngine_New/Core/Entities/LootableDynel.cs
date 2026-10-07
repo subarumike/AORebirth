@@ -76,36 +76,55 @@ namespace ZoneEngine_New.Core.Entities
         {
             ArgumentNullException.ThrowIfNull(minter);
 
-            if (ItemTable == null || ItemTable.Count == 0)
+            var rolled = new List<(int LowId, int HighId, int Quality)>();
+            RollItemTable(ItemTable, LootLevel, minter, Loot.Capacity, rolled);
+            for (int slot = 0; slot < rolled.Count; slot++)
+            {
+                (int lowId, int highId, int quality) = rolled[slot];
+                if (!Loot.Add(slot, minter.CreateWithNewInstance(lowId, highId, quality, ItemSource.Loot)))
+                    return;
+            }
+        }
+
+        /// <summary>
+        /// One corpse's loot roll: every item table row is tried Repeats times at its Chance, each hit rolls a quality
+        /// around <paramref name="level"/> and spawns its hash's items, until <paramref name="capacity"/> items.
+        /// Appends template ids and quality to <paramref name="into"/>; builds no items (GM loot simulation uses it too).
+        /// </summary>
+        public static void RollItemTable(
+            IReadOnlyList<MobItemTableEntry>? itemTable,
+            int level,
+            HashItemMinter minter,
+            int capacity,
+            List<(int LowId, int HighId, int Quality)> into)
+        {
+            ArgumentNullException.ThrowIfNull(minter);
+            ArgumentNullException.ThrowIfNull(into);
+            if (itemTable == null)
                 return;
 
-            int nextSlot = 0;
-            var minted = new List<Item>();
-            foreach (MobItemTableEntry entry in ItemTable)
+            int start = into.Count;
+            var spawned = new List<(int LowId, int HighId, int Quality)>();
+            foreach (MobItemTableEntry entry in itemTable)
             {
                 if (entry == null || string.IsNullOrEmpty(entry.Hash) || entry.Repeats <= 0)
                     continue;
 
                 for (int repeat = 0; repeat < entry.Repeats; repeat++)
                 {
-                    if (nextSlot >= Loot.Capacity)
+                    if (into.Count - start >= capacity)
                         return;
 
                     if (!RollChance(entry.Chance))
                         continue;
 
-                    int quality = RollQuality(LootLevel, entry.LevelMod);
-                    minted.Clear();
-                    minter.MintSpawns(entry.Hash, quality, ItemSource.Loot, minted);
-                    for (int i = 0; i < minted.Count; i++)
+                    spawned.Clear();
+                    minter.RollSpawnIds(entry.Hash, RollQuality(level, entry.LevelMod), spawned);
+                    for (int i = 0; i < spawned.Count; i++)
                     {
-                        if (nextSlot >= Loot.Capacity)
+                        if (into.Count - start >= capacity)
                             return;
-
-                        if (!Loot.Add(nextSlot, minted[i]))
-                            return;
-
-                        nextSlot++;
+                        into.Add(spawned[i]);
                     }
                 }
             }

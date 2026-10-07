@@ -79,6 +79,19 @@ namespace ZoneEngine_New.Core.Inventory
         public void MintSpawns(string hash, int desiredQuality, ItemSource source, List<Item> into)
         {
             ArgumentNullException.ThrowIfNull(into);
+            var rolled = new List<(int LowId, int HighId, int Quality)>();
+            RollSpawnIds(hash, desiredQuality, rolled);
+            foreach ((int lowId, int highId, int quality) in rolled)
+                into.Add(_items.CreateWithNewInstance(lowId, highId, quality, source));
+        }
+
+        /// <summary>
+        /// The template ids and quality of every item one roll of <paramref name="hash"/> spawns, without building
+        /// items (see <see cref="MintSpawns"/>). Appends to <paramref name="into"/>.
+        /// </summary>
+        public void RollSpawnIds(string hash, int desiredQuality, List<(int LowId, int HighId, int Quality)> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
             if (string.IsNullOrEmpty(hash))
                 return;
 
@@ -89,10 +102,8 @@ namespace ZoneEngine_New.Core.Inventory
             _gameData.CollectHashSpawns(hash, instances, child => CoversQuality(child, rollQuality));
             for (int i = 0; i < instances.Count; i++)
             {
-                if (!TryRollIdsFor(instances[i], desiredQuality, out int lowId, out int highId, out int quality))
-                    continue;
-
-                into.Add(_items.CreateWithNewInstance(lowId, highId, quality, source));
+                if (TryRollIdsFor(instances[i], desiredQuality, out int lowId, out int highId, out int quality))
+                    into.Add((lowId, highId, quality));
             }
         }
 
