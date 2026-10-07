@@ -119,7 +119,12 @@
             world.BakeVicinityTriggers(geometry.Dynels, itemTemplates);
             world.BakeMissionEntranceTriggers(geometry.Dynels);
             world.BakeExitDoorTriggers(geometry.Dynels, playfieldId);
-            world.BakeExitProxyTriggers(gameData.GetExitProxyDoorInstances(playfieldId));
+            // Configured exits (ExitProxyDoors.json, else a dungeon's doors that open onto no room) are the way out
+            // whichever door the entrances land on; without them every return-recording landing door is an exit.
+            IReadOnlyCollection<int>? configuredExits = gameData.GetConfiguredExitProxyDoorInstances(playfieldId);
+            world.BakeExitProxyTriggers(configuredExits != null
+                ? [.. configuredExits]
+                : gameData.GetExitProxyDoorInstances(playfieldId));
             world.BakeTeleportalTriggers(geometry.Collision?.Teleportals);
 
             int terrainChunks = surface?.Terrain != null ? geometry.Collision!.Terrain!.Chunks.Count : 0;
@@ -592,9 +597,11 @@
                     out landing, out heading);
             }
 
+            // Into a dungeon, an arrival aimed at an inner door lands on the dungeon's entrance instead, as the
+            // client's GetEntranceDoor falls back to its first entrance door.
             return PortalDoorLandingResolver.TryResolveDoorLanding(
                 _gameData.GetPlayfieldGeometry(portal.DestPlayfieldId),
-                portal.DestDoorInstance,
+                DungeonExitDoors.LandingDoor(portal.DestDoorInstance, _gameData.GetDungeonExitDoors(portal.DestPlayfieldId)),
                 portal.DoorClearance,
                 out landing, out heading);
         }

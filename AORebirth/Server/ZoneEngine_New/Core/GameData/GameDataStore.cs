@@ -63,6 +63,7 @@ namespace ZoneEngine_New.Core.GameData
         private readonly Dictionary<int, PlayfieldGeometryData> _playfieldGeometry = new();
         private readonly Dictionary<int, uint?> _playfieldCharacterAppearanceOverrides = new();
         private readonly Dictionary<int, int[]?> _exitProxyDoorAllowLists = new();
+        private readonly Dictionary<int, int[]?> _dungeonExitDoors = new();
         private readonly Lock _exitProxySync = new();
         private Dictionary<int, int[]>? _exitProxyDoorsByPlayfield;
         private readonly TeleportDestinationCatalog? _teleportDestinations;
@@ -1003,7 +1004,7 @@ namespace ZoneEngine_New.Core.GameData
                 GameDataPaths.PlayfieldExitProxyDoorsRelativePath(playfieldId));
 
             if (!File.Exists(path))
-                return null;
+                return (int[]?)GetDungeonExitDoors(playfieldId);
 
             PlayfieldExitProxyDoorsData? data;
             try
@@ -1037,6 +1038,57 @@ namespace ZoneEngine_New.Core.GameData
             Array.Copy(data.DoorInstances, doors, data.DoorInstances.Length);
             Array.Sort(doors);
             return doors;
+        }
+
+        public IReadOnlyList<int>? GetDungeonExitDoors(int playfieldId)
+        {
+            if (playfieldId <= 0)
+                return null;
+
+            lock (_playfieldSync)
+            {
+                if (!_dungeonExitDoors.TryGetValue(playfieldId, out int[]? exits))
+                {
+                    exits = ReadDungeonExitDoors(playfieldId);
+                    _dungeonExitDoors[playfieldId] = exits;
+                }
+
+                return exits;
+            }
+        }
+
+        /// <summary>
+        /// A dungeon's exits are its doors that open onto no room, as the client registers them
+        /// (<see cref="DungeonExitDoors"/>); without an ExitProxyDoors.json they are its exit allow-list. Null outside
+        /// dungeons or when the rooms name none, which keeps every return-recording landing door as an exit.
+        /// </summary>
+        private int[]? ReadDungeonExitDoors(int playfieldId)
+        {
+            string path = Path.Combine(RootPath, GameDataPaths.PlayfieldRoomsRelativePath(playfieldId));
+            if (!File.Exists(path))
+                return null;
+
+            PlayfieldRoomsData? rooms;
+            try
+            {
+                rooms = JsonSerializer.Deserialize<PlayfieldRoomsData>(File.ReadAllText(path), CatalogJsonOptions);
+            }
+            catch (Exception exception)
+            {
+                _logger.Warn("Playfield rooms could not be read for exits: " + path + " (" + exception.Message + ")");
+                return null;
+            }
+
+            float tileSize = GetPlayfieldMetaData(playfieldId)?.TileSize ?? 0f;
+            int[]? exits = DungeonExitDoors.Find(rooms, ReadPlayfieldDynels(playfieldId), tileSize);
+            if (exits != null)
+            {
+                _logger.Info(
+                    "Dungeon exit doors playfield=" + playfieldId.ToString(CultureInfo.InvariantCulture) + " doors="
+                    + string.Join(",", Array.ConvertAll(exits, door => door.ToString("X8", CultureInfo.InvariantCulture))));
+            }
+
+            return exits;
         }
 
         private PlayfieldMetaData? ReadPlayfieldMetaData(int playfieldId)

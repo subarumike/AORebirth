@@ -143,6 +143,12 @@ namespace ZoneEngine_New.Core.GameData
         IReadOnlyCollection<int>? GetConfiguredExitProxyDoorInstances(int playfieldId);
 
         /// <summary>
+        /// A dungeon's doors that open onto no room, in Dynels.dat order (see WorldSimulation.DungeonExitDoors). Null
+        /// outside dungeons or when the rooms name none.
+        /// </summary>
+        IReadOnlyList<int>? GetDungeonExitDoors(int playfieldId) => null;
+
+        /// <summary>
         /// DAO override for a placed door. False when this statel has no route.
         /// </summary>
         bool TryGetTeleportRoute(
