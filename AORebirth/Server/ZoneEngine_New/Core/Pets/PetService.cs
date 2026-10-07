@@ -255,8 +255,8 @@ namespace ZoneEngine_New.Core.Pets
             foreach (NpcCharacter pet in ResolveOwned(owner, petIdentities))
             {
                 PetController controller = pet.Pet!;
-                // An over-equipped pet ignores every command; its owner can still dismiss it.
-                if (controller.IsOverEquipped && command != PetCommandCode.Terminate)
+                // An over-equipped pet ignores every command; its owner can still dismiss it or ask for a report.
+                if (controller.IsOverEquipped && command is not (PetCommandCode.Terminate or PetCommandCode.Report))
                     continue;
 
                 bool healPet = IsHealPet(controller.Type);
@@ -306,9 +306,35 @@ namespace ZoneEngine_New.Core.Pets
                     case PetCommandCode.Terminate:
                         Dismiss(pet, "terminated by owner");
                         break;
+                    case PetCommandCode.Report:
+                        Report(owner, pet);
+                        break;
                 }
             }
         }
+
+        /// <summary>
+        /// /pet report: one plain-text feedback line per pet. Live (capture 2026-10-07T02:52:27Z) sends it as
+        /// FormatFeedback 110/707 with one string, "Anger Manifestation: Health: 100% Nano: 100% NCU: 0/9 Position: 935,756".
+        /// TBD: pet MaxNCU. Pet templates carry no MaxNCU (181), so this reports 0 where live reported 9; the live
+        /// source of a pet's NCU is not known yet.
+        /// </summary>
+        static void Report(Player owner, NpcCharacter pet)
+        {
+            string line = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}: Health: {1}% Nano: {2}% NCU: {3}/{4} Position: {5},{6}",
+                pet.Name ?? string.Empty,
+                Percent(pet.Stats.GetOrZero(CharacterStat.Health), pet.Stats.GetOrZero(CharacterStat.MaxHealth)),
+                Percent(pet.Stats.GetOrZero(CharacterStat.CurrentNano), pet.Stats.GetOrZero(CharacterStat.MaxNanoEnergy)),
+                pet.UsedNcu,
+                pet.MaxNcu,
+                (int)pet.Position.x,
+                (int)pet.Position.z);
+            Helpers.ClientFeedback.SendFormatted(owner, Helpers.ClientFeedback.PlainText, line);
+        }
+
+        static int Percent(int current, int max) => max <= 0 ? 100 : (int)(100L * Math.Max(0, current) / max);
 
         static bool IsHealPet(int type) => PetTypes.Slot(type) == PetTypes.Slot(PetTypes.Heal);
 
