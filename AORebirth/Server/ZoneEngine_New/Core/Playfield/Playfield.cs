@@ -698,7 +698,7 @@ namespace ZoneEngine_New.Core.Playfield
                     generator: null,
                     _logger);
                 if (layout != null)
-                    locality.ApplyDungeonRooms(layout.Rooms);
+                    locality.ApplyDungeonRooms(layout);
                 return locality;
             });
             services.AddSingleton<SpawnService>();

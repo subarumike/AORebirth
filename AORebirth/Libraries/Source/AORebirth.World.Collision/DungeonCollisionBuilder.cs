@@ -89,7 +89,13 @@ namespace AORebirth.World.Collision
             }
 
             int id = playfieldId > 0 ? playfieldId : catalog.StyleId;
-            return new DungeonWorldLayout(new PlayfieldCollisionSet(id, meshes, terrain: null), rooms);
+            var listed = new List<KeyValuePair<int, IReadOnlyList<int>>>(catalog.Rooms.Count);
+            for (int i = 0; i < catalog.Rooms.Count; i++)
+                listed.Add(new KeyValuePair<int, IReadOnlyList<int>>(catalog.Rooms[i].InstanceId, catalog.Rooms[i].LinkedRooms));
+            return new DungeonWorldLayout(
+                new PlayfieldCollisionSet(id, meshes, terrain: null),
+                rooms,
+                roomLinks: DungeonWorldLayout.SymmetricLinks(listed));
         }
 
         public static DungeonWorldLayout BuildLayout(

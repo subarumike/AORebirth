@@ -73,7 +73,7 @@ public sealed class QuestDungeonPlayfield : Playfield
         AORebirth.World.Collision.DungeonWorldLayout? dungeon = DungeonPlayfieldBinder.TryBuild(
             GameData.RootPath, Identity.Instance, Layout.Generator, Logger);
         if (dungeon != null)
-            locality.ApplyDungeonRooms(dungeon.Rooms);
+            locality.ApplyDungeonRooms(dungeon);
 
         var geometry = DungeonPlayfieldBinder.WithDungeonCollision(Identity.Instance, Geometry, dungeon);
         if (geometry.Collision?.HasCollision == true)

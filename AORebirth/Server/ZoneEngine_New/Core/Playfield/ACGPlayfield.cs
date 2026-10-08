@@ -83,7 +83,7 @@ namespace ZoneEngine_New.Core.Playfield
                     generator: null,
                     Logger);
                 if (dungeon != null)
-                    GetRequiredService<PlayfieldLocality>().ApplyDungeonRooms(dungeon.Rooms);
+                    GetRequiredService<PlayfieldLocality>().ApplyDungeonRooms(dungeon);
 
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("pf.world", Identity.Instance);
                 _world = WorldSimulation.PlayfieldWorldSimulation.Create(

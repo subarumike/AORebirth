@@ -43,7 +43,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         /// </summary>
         public void Announce(MessageBody message, Dynel? exclude = null, Dynel? alsoExclude = null)
         {
-            if (!_grid.IsOutdoor)
+            if (!_grid.IsOutdoor && !_grid.IsDungeon)
             {
                 SendToOccupants(_grid.OccupantsInAllCells(), message, exclude, alsoExclude);
                 return;

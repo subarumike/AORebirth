@@ -78,7 +78,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         {
             _heartbeatCounter++;
 
-            if (!_grid.IsOutdoor || !_policy.EnableCellHeatScheduling)
+            if ((!_grid.IsOutdoor && !_grid.IsDungeon) || !_policy.EnableCellHeatScheduling)
             {
                 // Snapshot: Tick may despawn/spawn (death → corpse) and mutate _tracked.
                 _tickDynelBuffer.Clear();
@@ -245,7 +245,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             }
 
             // Track empty cells near players so Hot/Warm/Cold transitions are visible without occupants.
-            if (_grid.IsOutdoor && _playerCells.Count > 0)
+            if ((_grid.IsOutdoor || _grid.IsDungeon) && _playerCells.Count > 0)
             {
                 foreach (int playerCell in _playerCells)
                 {

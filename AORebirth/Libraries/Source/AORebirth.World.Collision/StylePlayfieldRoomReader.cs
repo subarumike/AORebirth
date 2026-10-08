@@ -107,11 +107,15 @@ namespace AORebirth.World.Collision
             if (minX >= maxX || minZ >= maxZ || posX <= 0f || posY < 0f || posZ <= 0f)
                 return false;
 
+            // Each door: the room it opens onto (0xFFFF none), then its position/rotation.
             ushort doorCount = reader.ReadUInt16();
+            var linkedRooms = new List<int>(doorCount);
             for (int i = 0; i < doorCount; i++)
             {
+                ushort linked = reader.ReadUInt16();
                 reader.ReadUInt16();
-                reader.ReadUInt16();
+                if (linked != 0xFFFF)
+                    linkedRooms.Add(linked);
             }
 
             if ((flags1 & 0x80) != 0)
@@ -140,7 +144,8 @@ namespace AORebirth.World.Collision
                     maxX,
                     maxZ,
                     new Vector3(posX, posY, posZ),
-                    flags1 & 3);
+                    flags1 & 3,
+                    linkedRooms: linkedRooms);
                 return TryReadAttractors(reader, formatVersion);
             }
 
@@ -158,7 +163,8 @@ namespace AORebirth.World.Collision
                 maxX,
                 maxZ,
                 new Vector3(posX, posY, posZ),
-                flags1 & 3);
+                flags1 & 3,
+                linkedRooms: linkedRooms);
             return TryReadAttractors(reader, formatVersion);
         }
 

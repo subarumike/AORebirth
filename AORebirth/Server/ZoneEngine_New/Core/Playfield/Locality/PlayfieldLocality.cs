@@ -104,8 +104,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         internal LocalityPolicy Policy => _policy;
 
-        public void ApplyDungeonRooms(IReadOnlyList<DungeonRoomBounds> rooms)
-            => _grid.ApplyDungeonRooms(rooms);
+        public void ApplyDungeonRooms(AORebirth.World.Collision.DungeonWorldLayout layout)
+            => _grid.ApplyDungeonRooms(layout);
 
         /// <summary>
         /// Outdoor XZ must lie in the legacy playfield extent (<c>Width|Height * 4</c>).
@@ -230,7 +230,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
             // Floor then clamp: a registered dynel always has a cell, including at the exclusive
             // far edge where floor(worldSize/cellSize) would otherwise fall past the last index.
-            Cell cell = _grid.ResolveCell(dynel.Position);
+            Cell cell = _grid.ResolveCell(dynel.Position, previous?.Id ?? CellGrid.NonLocalCellId);
             cell.Add(dynel);
             dynel.Cell = cell;
 

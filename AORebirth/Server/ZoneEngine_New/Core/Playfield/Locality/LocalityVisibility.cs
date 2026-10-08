@@ -275,7 +275,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         private IEnumerable<Dynel> CollectCandidates(Player recipient)
         {
-            if (!_grid.IsOutdoor)
+            if (!_grid.IsOutdoor && !_grid.IsDungeon)
             {
                 foreach (Dynel dynel in _tracked)
                 {
@@ -323,7 +323,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         private bool IsInVisibilityNeighborhood(Player recipient, Dynel source)
         {
-            if (!_grid.IsOutdoor)
+            if (!_grid.IsOutdoor && !_grid.IsDungeon)
             {
                 return !ReferenceEquals(recipient, source);
             }

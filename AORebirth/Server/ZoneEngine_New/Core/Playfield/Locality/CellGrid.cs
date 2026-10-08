@@ -22,6 +22,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         private readonly bool _outdoor;
         private readonly int _visibilityNeighborLevel;
         private DungeonRoomBounds[] _rooms = [];
+        private Dictionary<int, DungeonRoomBounds> _roomById = [];
+        private IReadOnlyDictionary<int, IReadOnlyList<int>> _roomLinks = new Dictionary<int, IReadOnlyList<int>>();
+        private Dictionary<int, Dictionary<int, int>> _roomHops = [];
 
         internal CellGrid(PlayfieldMetaData? metaData, int visibilityNeighborLevel)
         {
@@ -82,34 +85,84 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 && z < _worldSizeZ;
         }
 
-        internal void ApplyDungeonRooms(IReadOnlyList<DungeonRoomBounds> rooms)
+        internal void ApplyDungeonRooms(DungeonWorldLayout layout)
         {
-            ArgumentNullException.ThrowIfNull(rooms);
+            ArgumentNullException.ThrowIfNull(layout);
+            IReadOnlyList<DungeonRoomBounds> rooms = layout.Rooms;
             if (_outdoor || rooms.Count == 0)
                 return;
 
             _rooms = new DungeonRoomBounds[rooms.Count];
+            _roomById = new Dictionary<int, DungeonRoomBounds>(rooms.Count);
+            _roomLinks = layout.RoomLinks;
             _cells.Clear();
             for (int i = 0; i < rooms.Count; i++)
             {
                 _rooms[i] = rooms[i];
                 int id = rooms[i].Index;
+                _roomById.TryAdd(id, rooms[i]);
                 if (!_cells.ContainsKey(id))
                     _cells[id] = new Cell(id, this, _visibilityNeighborLevel);
             }
+
+            // Room-to-room door hops, for cell heat (a dungeon's distance is in rooms, not grid squares).
+            _roomHops = new Dictionary<int, Dictionary<int, int>>(_cells.Count);
+            var reached = new List<int>();
+            foreach (int room in _cells.Keys)
+            {
+                var hops = new Dictionary<int, int> { [room] = 0 };
+                reached.Clear();
+                reached.Add(room);
+                for (int i = 0; i < reached.Count; i++)
+                {
+                    if (!_roomLinks.TryGetValue(reached[i], out IReadOnlyList<int>? linked))
+                        continue;
+                    for (int j = 0; j < linked.Count; j++)
+                    {
+                        if (_cells.ContainsKey(linked[j]) && hops.TryAdd(linked[j], hops[reached[i]] + 1))
+                            reached.Add(linked[j]);
+                    }
+                }
+
+                _roomHops[room] = hops;
+            }
+        }
+
+        /// <summary>
+        /// The room a dynel in room <paramref name="currentRoom"/> is in after moving to <paramref name="position"/>, as
+        /// the client picks it (Vehicle.dll RoomSpace_t, 0x100073e2): it stays in its room while still inside it, else
+        /// takes the first linked room that holds it, and only then looks at every room. Room boxes overlap, so the
+        /// room a dynel is already in wins.
+        /// </summary>
+        private int ResolveRoom(System.Numerics.Vector3 position, int currentRoom)
+        {
+            if (currentRoom >= 0 && _roomById.TryGetValue(currentRoom, out DungeonRoomBounds current))
+            {
+                if (current.Contains(position))
+                    return currentRoom;
+
+                if (_roomLinks.TryGetValue(currentRoom, out IReadOnlyList<int>? linked))
+                {
+                    for (int i = 0; i < linked.Count; i++)
+                    {
+                        if (_roomById.TryGetValue(linked[i], out DungeonRoomBounds next) && next.Contains(position))
+                            return linked[i];
+                    }
+                }
+            }
+
+            return DungeonRoomCellResolver.Resolve(_rooms, position);
         }
 
         /// <summary>
         /// Resolves the cell for <paramref name="position"/>. Outdoor indices are floored then
         /// clamped into the grid so a registered dynel always has a cell.
         /// </summary>
-        internal Cell ResolveCell(Vector3 position)
+        internal Cell ResolveCell(Vector3 position, int currentCellId = NonLocalCellId)
         {
             if (_rooms.Length > 0)
             {
-                int roomId = DungeonRoomCellResolver.Resolve(
-                    _rooms,
-                    new System.Numerics.Vector3(position.xf, position.yf, position.zf));
+                int roomId = ResolveRoom(new System.Numerics.Vector3(position.xf, position.yf, position.zf), currentCellId);
                 if (_cells.TryGetValue(roomId, out Cell? dungeonCell))
                     return dungeonCell;
 
@@ -195,6 +248,12 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         internal void CollectNeighbors(int cellId, int radius, List<int> results)
         {
             results.Clear();
+            if (_rooms.Length > 0)
+            {
+                CollectLinkedRooms(cellId, radius, results);
+                return;
+            }
+
             if (!_outdoor || radius < 0 || _numZonesX <= 0 || _numZonesZ <= 0 || cellId < 0)
                 return;
 
@@ -211,8 +270,47 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             }
         }
 
+        /// <summary>A dungeon room and every room within <paramref name="radius"/> door links of it.</summary>
+        private void CollectLinkedRooms(int roomId, int radius, List<int> results)
+        {
+            if (roomId < 0 || radius < 0 || !_cells.ContainsKey(roomId))
+                return;
+
+            results.Add(roomId);
+            int frontierStart = 0;
+            for (int depth = 0; depth < radius; depth++)
+            {
+                int frontierEnd = results.Count;
+                for (int i = frontierStart; i < frontierEnd; i++)
+                {
+                    if (!_roomLinks.TryGetValue(results[i], out IReadOnlyList<int>? linked))
+                        continue;
+                    for (int j = 0; j < linked.Count; j++)
+                    {
+                        if (_cells.ContainsKey(linked[j]) && !results.Contains(linked[j]))
+                            results.Add(linked[j]);
+                    }
+                }
+
+                if (frontierEnd == results.Count)
+                    return;
+                frontierStart = frontierEnd;
+            }
+        }
+
+        /// <summary>
+        /// Cell distance for heat: grid squares outdoors (Chebyshev), door hops between dungeon rooms (rooms no door
+        /// path joins are infinitely far). Other indoor playfields have no distance.
+        /// </summary>
         internal int ChebyshevDistance(int cellA, int cellB)
         {
+            if (_rooms.Length > 0)
+            {
+                return _roomHops.TryGetValue(cellA, out Dictionary<int, int>? hops) && hops.TryGetValue(cellB, out int distance)
+                    ? distance
+                    : int.MaxValue;
+            }
+
             if (!_outdoor)
                 return int.MaxValue;
 

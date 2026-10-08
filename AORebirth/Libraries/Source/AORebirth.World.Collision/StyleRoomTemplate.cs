@@ -20,9 +20,11 @@ namespace AORebirth.World.Collision
             Vector3 templatePos,
             int templateFacing = 0,
             IReadOnlyList<int>? doorPosRots = null,
-            string? name = null)
+            string? name = null,
+            IReadOnlyList<int>? linkedRooms = null)
         {
             DoorPosRots = doorPosRots ?? Array.Empty<int>();
+            LinkedRooms = linkedRooms ?? Array.Empty<int>();
             Name = name ?? string.Empty;
             if (tileMaxX <= tileMinX || tileMaxZ <= tileMinZ)
                 throw new ArgumentOutOfRangeException(nameof(tileMaxX), "Room tile rect is empty.");
@@ -60,6 +62,12 @@ namespace AORebirth.World.Collision
         /// </summary>
         public IReadOnlyList<int> DoorPosRots { get; }
 
+        /// <summary>
+        /// Rooms this room's doors open onto, in door order (a static playfield's door ZoneLink; the client keeps them as
+        /// the room's neighbours, N3.dll n3Playfield_t::UpdateRoomSpace). Empty for style templates, which link nothing.
+        /// </summary>
+        public IReadOnlyList<int> LinkedRooms { get; }
+
         /// <summary>Room name from the template (e.g. clan_mh7, clanvillage_entrance); empty when unknown.</summary>
         public string Name { get; }
 
@@ -90,7 +98,10 @@ namespace AORebirth.World.Collision
                 new Vector3(template[0], template[1], template[2]),
                 entry.Rotation,
                 entry.DoorConnections == null ? null : Array.ConvertAll(entry.DoorConnections, link => link.PosRot),
-                entry.Name);
+                entry.Name,
+                entry.DoorConnections == null
+                    ? null
+                    : Array.FindAll(Array.ConvertAll(entry.DoorConnections, link => link?.ZoneLink ?? -1), room => room >= 0 && room != 0xFFFF));
             return true;
         }
 
