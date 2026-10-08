@@ -159,6 +159,13 @@ namespace ZoneEngine_New.Core.GameData
             return false;
         }
 
+        /// <summary>
+        /// Like <see cref="TryGetDynelCollisionSphere(int, out float, out float)"/> for a placed dynel whose own stats set
+        /// its Mesh (<paramref name="placedMesh"/>) or Scale (<paramref name="placedScale"/>, percent); 0 means not set.
+        /// </summary>
+        bool TryGetDynelCollisionSphere(int templateId, int placedMesh, int placedScale, out float radius, out float centerY)
+            => TryGetDynelCollisionSphere(templateId, out radius, out centerY);
+
         /// <summary>The player body's collision sphere (radius, centre height above the feet); null without the data.</summary>
         AORebirth.Core.GameData.CollisionSphereData? PlayerCollisionSphere => null;
 

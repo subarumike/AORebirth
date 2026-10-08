@@ -18,8 +18,15 @@ namespace AORebirth.Core.GameData
         /// <summary>The player body's sphere (every breed's body mesh carries the same one).</summary>
         public CollisionSphereData PlayerSphere { get; set; }
 
-        /// <summary>Sphere per item template id (doors, mission entrances); templates without a mesh are absent.</summary>
+        /// <summary>Sphere per item template id (doors, mission entrances), already scaled; templates without a mesh are absent.</summary>
         public Dictionary<string, CollisionSphereData> Templates { get; set; }
+
+        /// <summary>
+        /// Unscaled sphere per mesh id. A placed dynel's own stats (Dynels.dat placement blob) can set its Mesh (12), so
+        /// doors sharing one template show different meshes; the client builds the sphere from the placed mesh
+        /// (e.g. template 41565 is mesh 55886 at 800 door C0170320 and 42047 at 566 door C0020236).
+        /// </summary>
+        public Dictionary<string, CollisionSphereData> Meshes { get; set; }
     }
 
     public sealed class CollisionSphereData
@@ -28,5 +35,8 @@ namespace AORebirth.Core.GameData
 
         /// <summary>Height of the sphere's centre above the dynel's position.</summary>
         public float CenterY { get; set; }
+
+        /// <summary>A template's Scale stat (360, percent) when it is not 100; absent for meshes.</summary>
+        public int? Scale { get; set; }
     }
 }

@@ -24,7 +24,11 @@ namespace AORebirth.Tools.RDBDataExtractor
         const int MissionEntranceType = 0xDAC6;
         const string PlayerBodyName = "solitus_male.cir";
 
-        static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
 
         readonly RdbController controller;
         readonly string gameDataDirectory;
@@ -47,20 +51,31 @@ namespace AORebirth.Tools.RDBDataExtractor
             {
                 SchemaVersion = DynelCollisionData.SupportedSchemaVersion,
                 PlayerSphere = this.ReadPlayerSphere(),
-                Templates = new Dictionary<string, CollisionSphereData>()
+                Templates = new Dictionary<string, CollisionSphereData>(),
+                Meshes = new Dictionary<string, CollisionSphereData>()
             };
 
             foreach (int templateId in this.CollectTemplates().OrderBy(id => id))
             {
-                if (this.TryReadTemplateSphere(templateId, out CollisionSphereData sphere))
+                if (this.TryReadTemplateSphere(templateId, out CollisionSphereData sphere, out _))
                     data.Templates[templateId.ToString(CultureInfo.InvariantCulture)] = sphere;
+            }
+
+            // Every mesh: a placed dynel's own stats can pick any mesh (this AODB cannot read placement blobs).
+            IEnumerable<int> meshes = this.controller.RecordTypeToId.TryGetValue((int)ResourceTypeId.RdbMesh, out var meshIds)
+                ? meshIds.Keys
+                : Enumerable.Empty<int>();
+            foreach (int mesh in meshes.OrderBy(id => id))
+            {
+                if (this.TryReadMeshSphere(mesh, out CollisionSphereData sphere))
+                    data.Meshes[mesh.ToString(CultureInfo.InvariantCulture)] = sphere;
             }
 
             Directory.CreateDirectory(this.gameDataDirectory);
             File.WriteAllText(path, JsonSerializer.Serialize(data, JsonOptions));
             Console.WriteLine(
                 "exported " + GameDataPaths.DynelCollisionFileName + " templates=" + data.Templates.Count
-                + " player=" + (data.PlayerSphere != null ? "yes" : "no"));
+                + " meshes=" + data.Meshes.Count + " player=" + (data.PlayerSphere != null ? "yes" : "no"));
             return new ExportFileCounts(1, 0);
         }
 
@@ -124,9 +139,24 @@ namespace AORebirth.Tools.RDBDataExtractor
             }
         }
 
-        bool TryReadTemplateSphere(int templateId, out CollisionSphereData sphere)
+        bool TryReadMeshSphere(int mesh, out CollisionSphereData sphere)
         {
             sphere = null;
+            if (!this.TryReadPackedTorso((int)ResourceTypeId.RdbMesh, mesh, MeshPackedTorsoOffset, out int packed))
+                return false;
+
+            DecodeTorsoSphere(packed, out float radius, out float centerY);
+            if (radius <= 0f)
+                return false;
+
+            sphere = new CollisionSphereData { Radius = radius, CenterY = centerY };
+            return true;
+        }
+
+        bool TryReadTemplateSphere(int templateId, out CollisionSphereData sphere, out int mesh)
+        {
+            sphere = null;
+            mesh = 0;
             ItemObject item;
             try
             {
@@ -140,7 +170,6 @@ namespace AORebirth.Tools.RDBDataExtractor
             if (item?.Stats == null)
                 return false;
 
-            int mesh = 0;
             int scale = 100;
             foreach (var stat in item.Stats)
             {
@@ -161,7 +190,12 @@ namespace AORebirth.Tools.RDBDataExtractor
                 return false;
 
             float factor = scale / 100f;
-            sphere = new CollisionSphereData { Radius = radius * factor, CenterY = centerY * factor };
+            sphere = new CollisionSphereData
+            {
+                Radius = radius * factor,
+                CenterY = centerY * factor,
+                Scale = scale != 100 ? scale : null
+            };
             return true;
         }
 

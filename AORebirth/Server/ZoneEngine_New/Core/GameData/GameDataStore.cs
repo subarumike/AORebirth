@@ -1060,6 +1060,39 @@ namespace ZoneEngine_New.Core.GameData
             return true;
         }
 
+        public bool TryGetDynelCollisionSphere(int templateId, int placedMesh, int placedScale, out float radius, out float centerY)
+        {
+            radius = 0f;
+            centerY = 0f;
+            DynelCollisionData? data = LoadDynelCollision();
+            if (data == null)
+                return false;
+
+            CollisionSphereData? template = null;
+            data.Templates?.TryGetValue(templateId.ToString(CultureInfo.InvariantCulture), out template);
+            int templateScale = template?.Scale is int s && s > 0 ? s : 100;
+            int scale = placedScale > 0 ? placedScale : templateScale;
+
+            // The client builds the sphere from the dynel's own mesh, which its placement can override.
+            if (placedMesh > 0
+                && data.Meshes != null
+                && data.Meshes.TryGetValue(placedMesh.ToString(CultureInfo.InvariantCulture), out CollisionSphereData? mesh)
+                && mesh != null && mesh.Radius > 0f)
+            {
+                radius = mesh.Radius * scale / 100f;
+                centerY = mesh.CenterY * scale / 100f;
+                return true;
+            }
+
+            if (template == null || template.Radius <= 0f)
+                return false;
+
+            float rescale = scale / (float)templateScale;
+            radius = template.Radius * rescale;
+            centerY = template.CenterY * rescale;
+            return true;
+        }
+
         public CollisionSphereData? PlayerCollisionSphere => LoadDynelCollision()?.PlayerSphere;
 
         DynelCollisionData? LoadDynelCollision()

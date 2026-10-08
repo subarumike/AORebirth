@@ -253,25 +253,6 @@
 
         static Vec3 ToVec3(AoVector3 v) => new((float)v.x, (float)v.y, (float)v.z);
 
-        /// <summary>Chest height the door line of sight is taken from, above the feet.</summary>
-        const float DoorSightHeight = 1f;
-
-        /// <summary>How far short of the door's sphere centre the sight line stops, so the door frame does not block it.</summary>
-        const float DoorSightStandoff = 0.25f;
-
-        /// <summary>True when nothing in the playfield surface lies between the character's chest and the door's sphere centre.</summary>
-        bool CanReachDoor(float x, float y, float z, ZoneTriggerVolume door)
-        {
-            var from = new Vec3(x, y + DoorSightHeight, z);
-            var to = new Vec3(door.CenterX, door.CenterY, door.CenterZ);
-            Vec3 delta = to - from;
-            float length = delta.Length;
-            if (length <= DoorSightStandoff)
-                return true;
-
-            return IsSegmentClear(from, from + (delta * ((length - DoorSightStandoff) / length)));
-        }
-
         public void TickSoftTriggers(PlayfieldType playfield, double deltaTime)
         {
             ArgumentNullException.ThrowIfNull(playfield);
@@ -315,14 +296,6 @@
                         ReadProxyReturn(player),
                         out ZoneCrossing crossing))
                 {
-                    // A door's sphere and doorway reach through walls; the client can only touch it from where it can
-                    // reach it, so a door behind a wall stays armed until the character has a clear line to it.
-                    if (crossing.Trigger.DoorPlane && !CanReachDoor(x, y, z, crossing.Trigger))
-                    {
-                        state.Overlapping.Remove(crossing.Trigger.Id);
-                        continue;
-                    }
-
                     if (crossing.Trigger.Kind == ZoneTriggerKind.TargetVicinity)
                         FireTargetVicinity(playfield, player, crossing.Trigger);
                     else if (crossing.Trigger.Kind == ZoneTriggerKind.MissionEntrance)
@@ -586,7 +559,7 @@
 
                 // A teleports route on the exit sends everyone to that door instead of back through their entrance
                 // (an entrance that records no return, such as 800's into 125, leaves nothing to go back to).
-                ApplyClientSphere(volume, d.TemplateId, x, y, z, DoorRotation(d));
+                ApplyClientSphere(volume, d, x, y, z, DoorRotation(d));
                 bool routed = TryApplyDoorRoute(volume, d.IdentityInstance);
                 _triggers.Add(volume);
                 _logger.Info(
@@ -792,7 +765,7 @@
                     DynelInstance = d.IdentityInstance
                 };
 
-                ApplyClientSphere(volume, d.TemplateId, x, y, z, DoorRotation(d));
+                ApplyClientSphere(volume, d, x, y, z, DoorRotation(d));
                 TryApplyDoorRoute(volume, d.IdentityInstance);
                 _triggers.Add(volume);
             }
@@ -830,6 +803,31 @@
             volume.DestDoorInstance = unchecked((int)routedInstance);
             volume.DoorClearance = PortalDoorLandingResolver.ExitDoorClearance;
             return true;
+        }
+
+        /// <summary>Mesh (12) and Scale (360) a placed dynel's own stats set; 0 for each it does not set.</summary>
+        static void PlacedLook(PlayfieldDynel dynel, out int mesh, out int scale)
+        {
+            mesh = 0;
+            scale = 0;
+            if (dynel.Blob == null || dynel.Blob.Length <= 12)
+                return;
+
+            try
+            {
+                AODB.Common.RDBObjects.DynelBlob blob = new AODB.Common.RDBObjects.ItemBase().ReadDynelBlob(dynel.Blob);
+                foreach (KeyValuePair<int, int> stat in blob.AppliedStats)
+                {
+                    if (stat.Key == (int)CharacterStat.Mesh)
+                        mesh = stat.Value;
+                    else if (stat.Key == (int)CharacterStat.Scale)
+                        scale = stat.Value;
+                }
+            }
+            catch (Exception)
+            {
+                // An unreadable blob keeps the template's look.
+            }
         }
 
         /// <summary>ExitInstance (189) set by a door's placement blob; 0 when it has none or the blob does not read.</summary>
@@ -1097,10 +1095,17 @@
         /// Gives a placed dynel's walk-in trigger the client's shape: its template's collision sphere against the player's
         /// (GameData DynelCollision.json). Templates without one keep the default disc.
         /// </summary>
-        void ApplyClientSphere(ZoneTriggerVolume volume, int templateId, float x, float y, float z, AoQuaternion? doorRotation = null)
+        void ApplyClientSphere(ZoneTriggerVolume volume, PlayfieldDynel placed, float x, float y, float z, AoQuaternion? doorRotation = null)
+        {
+            PlacedLook(placed, out int mesh, out int scale);
+            ApplyClientSphere(volume, placed.TemplateId, x, y, z, doorRotation, mesh, scale);
+        }
+
+        void ApplyClientSphere(ZoneTriggerVolume volume, int templateId, float x, float y, float z, AoQuaternion? doorRotation = null,
+            int placedMesh = 0, int placedScale = 0)
         {
             if (templateId <= 0
-                || !_gameData.TryGetDynelCollisionSphere(templateId, out float radius, out float centerY)
+                || !_gameData.TryGetDynelCollisionSphere(templateId, placedMesh, placedScale, out float radius, out float centerY)
                 || _gameData.PlayerCollisionSphere is not { } player)
                 return;
 
@@ -1164,7 +1169,7 @@
                         Radius = r,
                         DynelInstance = d.IdentityInstance
                     };
-                ApplyClientSphere(entrance, d.TemplateId, x, y, z);
+                ApplyClientSphere(entrance, d, x, y, z);
                 _triggers.Add(entrance);
             }
         }
@@ -1211,7 +1216,7 @@
                         DestIndex = portal.DestinationIndex,
                         RecordsReturn = portal.RecordsReturn
                     };
-                ApplyClientSphere(door, d.TemplateId, x, y, z,
+                ApplyClientSphere(door, d, x, y, z,
                     d.IdentityType == (int)IdentityType.Door ? DoorRotation(d) : null);
                 _triggers.Add(door);
             }

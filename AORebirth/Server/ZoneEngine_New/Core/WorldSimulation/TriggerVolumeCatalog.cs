@@ -546,8 +546,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
             v.PlaneNx = normal.xf;
             v.PlaneNy = normal.yf;
             v.PlaneNz = normal.zf;
-            v.PlaneD = (normal.xf * x) + (normal.yf * y) + (normal.zf * z);
-        }
+            v.PlaneD = (normal.xf * x) + (normal.yf * y) + (normal.zf * z);        }
 
         static bool InDoorPlane(ZoneTriggerVolume v, float x, float y, float z)
             => !v.DoorPlane
