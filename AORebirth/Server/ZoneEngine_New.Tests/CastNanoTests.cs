@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Tests
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.IO;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading;
@@ -15,8 +16,10 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
@@ -120,6 +123,35 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, nearVendor.Buffs.Count);
             Assert.AreEqual(0, far.Buffs.Count);
             Assert.AreEqual(0, nearSafe.Buffs.Count);
+        }
+
+        [TestMethod]
+        public void MongoSlamTauntsNearbyNpcsByTheCastersSkill()
+        {
+            // The packaged nanos themselves: 100198 area-casts 100194 over 20m, and 100194's TauntNpc rows are picked
+            // by the caster's stat 129 (2000 below 50, 4000 from 150).
+            var catalog = new ItemTemplateCatalog(
+                new StubGameData(
+                    new HashItemCatalog(new Dictionary<string, string[]>(), new Dictionary<string, HashInstance>()),
+                    rootPath: FindGameDataRoot()),
+                new StubLogger());
+            ItemTemplate slam = catalog.Require(100198);
+            var items = new StubItemBuilder().Add(slam).Add(catalog.Require(100194));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            caster.Stats.Set((CharacterStat)129, 10);
+            NpcCharacter near = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcCharacter far = world.Npc(3, 40, 0, 0, attackable: true);
+            NpcBrain.Create(near);
+            NpcBrain.Create(far);
+
+            slam.ExecuteOnUseSpells(caster, new SilentInventory(), items);
+            Assert.AreEqual(2000f, near.Brain!.Hate.ThreatOf(caster.Identity));
+            Assert.AreEqual(0f, far.Brain!.Hate.ThreatOf(caster.Identity));
+
+            caster.Stats.Set((CharacterStat)129, 200);
+            slam.ExecuteOnUseSpells(caster, new SilentInventory(), items);
+            Assert.AreEqual(6000f, near.Brain.Hate.ThreatOf(caster.Identity));
         }
 
         [TestMethod]
@@ -258,6 +290,20 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, player.Buffs.Count);
             player.RebaseStats();
             Assert.AreEqual(1, player.Buffs.Count);
+        }
+
+        static string FindGameDataRoot()
+        {
+            string? dir = AppContext.BaseDirectory;
+            while (!string.IsNullOrEmpty(dir))
+            {
+                string candidate = Path.Combine(dir, "GameData");
+                if (File.Exists(Path.Combine(candidate, "items.dat")))
+                    return candidate;
+                dir = Path.GetDirectoryName(dir);
+            }
+
+            throw new DirectoryNotFoundException("GameData/items.dat not found from " + AppContext.BaseDirectory);
         }
 
         static bool UseCast(Player player, StubItemBuilder items, FunctionType function, int nanoId, int radius = 0)
