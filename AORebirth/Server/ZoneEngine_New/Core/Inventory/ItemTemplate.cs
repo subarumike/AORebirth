@@ -289,7 +289,6 @@ namespace ZoneEngine_New.Core.Inventory
 
                 RequirementSubject reader = subject ?? self;
                 bool pass = EvaluateLeaf(requirement, reader.GetStat, reader.Resolve);
-                subject = null;
 
                 if (!hasReal)
                 {
@@ -344,7 +343,6 @@ namespace ZoneEngine_New.Core.Inventory
                 {
                     RequirementSubject reader = subject ?? self;
                     values.Push(EvaluateLeaf(requirement, reader.GetStat, reader.Resolve));
-                    subject = null;
                     continue;
                 }
 
@@ -368,9 +366,10 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// OnTarget / OnSelf / OnUser / OnCaster rows name whose stats the next check reads; they are not checks
-        /// themselves (Fists of Stellar Harmony ToUse: caster skills, caster VisualProfession 2, OnTarget,
-        /// VisualProfession 2).
+        /// OnTarget / OnSelf / OnUser / OnCaster rows name whose stats the following checks read, until the next
+        /// selector; they are not checks themselves (Fists of Stellar Harmony ToUse: caster skills, caster
+        /// VisualProfession 2, OnTarget, VisualProfession 2; Mongo Slam! 100194 middle row: OnCaster, stat 129 < 150,
+        /// stat 129 > 49, And).
         /// </summary>
         public static bool IsSubjectSelector(ItemRequirement requirement)
         {

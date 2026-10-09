@@ -156,6 +156,37 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void AreaTauntMiddleRowReadsBothSkillChecksOnTheCaster()
+        {
+            // Mongo Slam!'s middle row: one OnCaster selector, then two stat-129 checks joined by And. Both checks
+            // read the caster, not the NPC (whose stat 129 is 0).
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId,
+                durationCentiseconds: 0,
+                can: 0,
+                flags: NanoFlags.IsHostile,
+                modifiers:
+                [
+                    Taunt(3000,
+                        CasterSkill(Operator.LessThan, 150),
+                        CasterSkill(Operator.GreaterThan, 49),
+                        new ItemRequirement { Operator = (int)Operator.And })
+                ]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 100);
+            NpcCharacter near = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain.Create(near);
+
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual(3000f, near.Brain!.Hate.ThreatOf(caster.Identity));
+
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 200);
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual(3000f, near.Brain.Hate.ThreatOf(caster.Identity));
+        }
+
+        [TestMethod]
         public void TauntAddsNoHateFromAnNpcOrWithoutAnAmount()
         {
             var items = new StubItemBuilder();
