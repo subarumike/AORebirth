@@ -129,6 +129,8 @@ namespace ZoneEngine_New.Core.Inventory
                     return NpcSocialAnim(target, spell);
                 case FunctionType.NpcWipeHateList:
                     return NpcWipeHateList(target);
+                case FunctionType.TauntNpc:
+                    return TauntNpc(target, source, spell);
                 case FunctionType.NpcStopMoving:
                     return NpcStopMoving(target);
                 case FunctionType.NpcTeleportToSpawnPoint:
@@ -587,6 +589,21 @@ namespace ZoneEngine_New.Core.Inventory
 
             npc.Brain.StopFighting();
             npc.Brain.ClearHate();
+            return true;
+        }
+
+        /// <summary>
+        /// TauntNpc args: Amount. The NPC hates whoever taunted it by that much, on the same scale as damage taken
+        /// (Mongo Slam! 100194: 2000 to 4000 by the caster's skill).
+        /// </summary>
+        static bool TauntNpc(Character target, Character? source, ItemSpell spell)
+        {
+            if (target is not NpcCharacter npc || npc.Brain == null || source == null || ReferenceEquals(source, npc))
+                return false;
+            if (!spell.TryReadInt(0, out int amount) || amount <= 0)
+                return false;
+
+            npc.Brain.AddThreat(source.Identity, amount);
             return true;
         }
 
