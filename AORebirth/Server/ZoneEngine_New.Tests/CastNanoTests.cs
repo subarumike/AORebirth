@@ -3,7 +3,6 @@ namespace ZoneEngine_New.Tests
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.IO;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading;
@@ -19,7 +18,6 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
-    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
@@ -126,32 +124,53 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void MongoSlamTauntsNearbyNpcsByTheCastersSkill()
+        public void AreaTauntAddsTheRowPickedByTheCastersSkillToNpcsInRange()
         {
-            // The packaged nanos themselves: 100198 area-casts 100194 over 20m, and 100194's TauntNpc rows are picked
-            // by the caster's stat 129 (2000 below 50, 4000 from 150).
-            var catalog = new ItemTemplateCatalog(
-                new StubGameData(
-                    new HashItemCatalog(new Dictionary<string, string[]>(), new Dictionary<string, HashInstance>()),
-                    rootPath: FindGameDataRoot()),
-                new StubLogger());
-            ItemTemplate slam = catalog.Require(100198);
-            var items = new StubItemBuilder().Add(slam).Add(catalog.Require(100194));
+            // Mongo Slam!'s shape (100198 area-casting 100194): a hostile child whose TauntNpc rows are picked by the
+            // caster's skill.
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId,
+                durationCentiseconds: 0,
+                can: 0,
+                flags: NanoFlags.IsHostile,
+                modifiers:
+                [
+                    Taunt(2000, CasterSkill(Operator.LessThan, 50)),
+                    Taunt(4000, CasterSkill(Operator.GreaterThan, 149))
+                ]));
             using var world = new FanoutWorld(items);
             Player caster = world.Player(1, 0, 0, 0);
-            caster.Stats.Set((CharacterStat)129, 10);
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 10);
             NpcCharacter near = world.Npc(2, 5, 0, 0, attackable: true);
             NpcCharacter far = world.Npc(3, 40, 0, 0, attackable: true);
             NpcBrain.Create(near);
             NpcBrain.Create(far);
 
-            slam.ExecuteOnUseSpells(caster, new SilentInventory(), items);
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
             Assert.AreEqual(2000f, near.Brain!.Hate.ThreatOf(caster.Identity));
             Assert.AreEqual(0f, far.Brain!.Hate.ThreatOf(caster.Identity));
 
-            caster.Stats.Set((CharacterStat)129, 200);
-            slam.ExecuteOnUseSpells(caster, new SilentInventory(), items);
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 200);
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
             Assert.AreEqual(6000f, near.Brain.Hate.ThreatOf(caster.Identity));
+        }
+
+        [TestMethod]
+        public void TauntAddsNoHateFromAnNpcOrWithoutAnAmount()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcCharacter otherNpc = world.Npc(3, 6, 0, 0, attackable: true);
+            NpcBrain.Create(victim);
+
+            Assert.IsFalse(UseTaunt(otherNpc, victim, items, amount: 500));
+            Assert.IsFalse(UseTaunt(caster, victim, items, amount: 0));
+            Assert.IsTrue(victim.Brain!.Hate.IsEmpty);
+
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 500));
+            Assert.AreEqual(500f, victim.Brain.Hate.ThreatOf(caster.Identity));
         }
 
         [TestMethod]
@@ -292,18 +311,31 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, player.Buffs.Count);
         }
 
-        static string FindGameDataRoot()
-        {
-            string? dir = AppContext.BaseDirectory;
-            while (!string.IsNullOrEmpty(dir))
+        static ItemSpell Taunt(int amount, params ItemRequirement[] requirements)
+            => new()
             {
-                string candidate = Path.Combine(dir, "GameData");
-                if (File.Exists(Path.Combine(candidate, "items.dat")))
-                    return candidate;
-                dir = Path.GetDirectoryName(dir);
-            }
+                FunctionType = (int)FunctionType.TauntNpc,
+                Target = (int)ItemTarget.Target,
+                Arguments = [amount],
+                Requirements = [new ItemRequirement { Operator = (int)Operator.OnCaster }, .. requirements]
+            };
 
-            throw new DirectoryNotFoundException("GameData/items.dat not found from " + AppContext.BaseDirectory);
+        static ItemRequirement CasterSkill(Operator comparison, int value)
+            => new()
+            {
+                Operator = (int)comparison,
+                StatNumber = (int)CharacterStat.PsychologicalModification,
+                Value = value
+            };
+
+        static bool UseTaunt(Character source, Character target, StubItemBuilder items, int amount)
+        {
+            var template = new ItemTemplate
+            {
+                Id = 9002,
+                SpellList = new Dictionary<EventType, List<ItemSpell>> { [EventType.OnUse] = [Taunt(amount)] }
+            };
+            return template.ExecuteOnUseSpells(target, new SilentInventory(), items, source: source);
         }
 
         static bool UseCast(Player player, StubItemBuilder items, FunctionType function, int nanoId, int radius = 0)

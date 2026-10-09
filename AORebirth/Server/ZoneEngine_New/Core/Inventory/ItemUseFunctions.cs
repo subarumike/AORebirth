@@ -594,11 +594,17 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// TauntNpc args: Amount. The NPC hates whoever taunted it by that much, on the same scale as damage taken
-        /// (Mongo Slam! 100194: 2000 to 4000 by the caster's skill).
+        /// (Mongo Slam! 100194: 2000 to 4000 by the caster's skill). Threat comes from the same sources as damage
+        /// threat: a living player or player's pet on the NPC's playfield. True means the taunt was delivered; a
+        /// pacified or evading NPC still keeps no hate. Negative amounts (detaunts) are not implemented.
         /// </summary>
         static bool TauntNpc(Character target, Character? source, ItemSpell spell)
         {
             if (target is not NpcCharacter npc || npc.Brain == null || source == null || ReferenceEquals(source, npc))
+                return false;
+            if (source.IsDead || !ReferenceEquals(source.Playfield, npc.Playfield))
+                return false;
+            if (!source.IsPlayer && source is not NpcCharacter { PetOwner: Player })
                 return false;
             if (!spell.TryReadInt(0, out int amount) || amount <= 0)
                 return false;
