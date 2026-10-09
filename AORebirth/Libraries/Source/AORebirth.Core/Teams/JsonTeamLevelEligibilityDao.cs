@@ -136,9 +136,11 @@ namespace AORebirth.Core.Teams
         {
             if (teamSize <= 1)
                 return 1000;
-            if (teamSize <= _memberXpPermille.Length)
-                return _memberXpPermille[teamSize - 1];
-            return 1000 / teamSize;
+            if (_memberXpPermille.Length == 0)
+                return 0;
+
+            // Sizes past the table (raids) keep the last entry.
+            return _memberXpPermille[Math.Min(teamSize, _memberXpPermille.Length) - 1];
         }
 
         /// <summary>Optional <c>MemberXpPermille</c> array, indexed by team size - 1. Empty when absent.</summary>
@@ -155,8 +157,11 @@ namespace AORebirth.Core.Teams
             var values = new int[parts.Length];
             for (int i = 0; i < parts.Length; i++)
             {
-                if (!int.TryParse(parts[i].Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out values[i]))
+                if (!int.TryParse(parts[i].Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out values[i])
+                    || values[i] < 1 || values[i] > 1000)
+                {
                     throw new InvalidDataException("Team eligibility MemberXpPermille is invalid.");
+                }
             }
 
             return values;

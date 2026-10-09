@@ -767,10 +767,13 @@ namespace ZoneEngine_New.Core.Entities
                     continue;
 
                 // Team bonus: each sharing member gets the team-size fraction of the solo amount (LevelEligibility.json).
-                int each = (int)((long)share.Amount * TeamLevelEligibility.Current.MemberXpPermille(recipients.Count) / 1000);
+                // Data without the table keeps the even split, remainder to the killer.
+                int permille = TeamLevelEligibility.Current.MemberXpPermille(recipients.Count);
+                int each = permille > 0 ? (int)((long)share.Amount * permille / 1000) : share.Amount / recipients.Count;
+                int leftover = permille > 0 ? 0 : share.Amount - each * recipients.Count;
                 for (int r = 0; r < recipients.Count; r++)
                 {
-                    int amount = each;
+                    int amount = r == 0 ? each + leftover : each;
                     if (amount <= 0)
                         continue;
 
@@ -855,7 +858,7 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Alien kills (NPCFamily 220). Each damage share is that killer's fraction of their solo AXP,
-        /// computed per recipient level, then split evenly with the nearby team like regular XP.
+        /// computed per recipient level, then split evenly with the nearby team.
         /// </summary>
         void AwardAlienXp(Playfield playfield, IReadOnlyList<int> present)
         {

@@ -26,7 +26,7 @@ namespace AORebirth.Interfaces.Persistence.Teams
 
         /// <summary>
         /// Kill XP each of <paramref name="teamSize"/> sharing members gets, in thousandths of the solo amount.
-        /// An even split when the data has no entry for that size.
+        /// Sizes past the table use its last entry. 0 when the data has no table; callers then split evenly.
         /// </summary>
         int MemberXpPermille(int teamSize);
     }
