@@ -441,7 +441,14 @@ namespace ZoneEngine_New.Core.Entities
             Stats.Set(CharacterStat.NextXP, current.NextLevelXp > 0 ? current.FloorXp + current.NextLevelXp : 0, StatDetail.Base, dirty: true);
 
             if (level > levelBefore)
+            {
                 ApplyLevelUp(gameData, levelBefore, level, amount);
+            }
+            else
+            {
+                // Preserve each award's XP delta when several rewards arrive before the next tick.
+                FlushDirtyStats();
+            }
         }
 
         /// <summary>
