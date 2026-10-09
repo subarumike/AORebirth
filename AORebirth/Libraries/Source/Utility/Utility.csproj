@@ -40,6 +40,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -59,6 +60,9 @@
     <Compile Include="CpuRamUtilization.cs" />
     <Compile Include="DebugStrings.cs" />
     <Compile Include="FunctionArgumentList.cs" />
+    <Compile Include="GameData\Missions\MissionDestinationCatalog.cs" />
+    <Compile Include="GameData\Missions\MissionDestinationCatalogData.cs" />
+    <Compile Include="GameData\Missions\MissionDestinationModels.cs" />
     <Compile Include="HexOutput.cs" />
     <Compile Include="LogUtil.cs" />
     <Compile Include="MessagePackZip.cs" />

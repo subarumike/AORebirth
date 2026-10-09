@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{58C91E37-A635-4D0A-9F05-88B944C5B3DE}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AORebirth.MissionDestinationCatalogTests</RootNamespace>
+    <AssemblyName>MissionDestinationCatalog.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <LangVersion>7.3</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\Utility\GameData\Missions\MissionDestinationCatalog.cs"><Link>MissionDestinationCatalog.cs</Link></Compile>
+    <Compile Include="..\..\AORebirth\Libraries\Source\Utility\GameData\Missions\MissionDestinationModels.cs"><Link>MissionDestinationModels.cs</Link></Compile>
+    <Compile Include="..\..\AORebirth\Libraries\Source\Utility\GameData\Missions\MissionDestinationCatalogData.cs"><Link>MissionDestinationCatalogData.cs</Link></Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
