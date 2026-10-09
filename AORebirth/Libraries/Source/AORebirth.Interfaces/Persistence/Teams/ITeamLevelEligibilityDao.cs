@@ -23,5 +23,11 @@ namespace AORebirth.Interfaces.Persistence.Teams
 
         /// <summary>True when invitee is below the member's share minimum.</summary>
         bool IsTooLowForMember(int memberLevel, int inviteeLevel);
+
+        /// <summary>
+        /// Kill XP each of <paramref name="teamSize"/> sharing members gets, in thousandths of the solo amount.
+        /// An even split when the data has no entry for that size.
+        /// </summary>
+        int MemberXpPermille(int teamSize);
     }
 }

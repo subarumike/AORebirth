@@ -37,4 +37,7 @@ internal sealed class TeamLevelEligibility
 
     internal bool IsTooLowForMember(int memberLevel, int inviteeLevel)
         => _dao.IsTooLowForMember(memberLevel, inviteeLevel);
+
+    internal int MemberXpPermille(int teamSize)
+        => _dao.MemberXpPermille(teamSize);
 }

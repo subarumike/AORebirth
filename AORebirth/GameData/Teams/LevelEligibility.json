@@ -2,6 +2,8 @@
   "MinimumLevel": 1,
   "MaximumLevel": 220,
   "Source": "9e5021d256ff773dba5384fbd528e61ac249be87:AORebirth/Server/ZoneEngine_New/SharedGameplay/TeamXpShareWindow.cs",
+  "MemberXpPermilleSource": "https://martin.brenner.de/ao/xp.html Group Exp Bonus Numbers, Individual XP column",
+  "MemberXpPermille": [1000, 825, 750, 700, 650, 625],
   "Ranges": [
     {
       "Level": 1,

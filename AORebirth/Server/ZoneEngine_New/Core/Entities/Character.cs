@@ -766,11 +766,11 @@ namespace ZoneEngine_New.Core.Entities
                 if (recipients.Count == 0)
                     continue;
 
-                int each = share.Amount / recipients.Count;
-                int leftover = share.Amount - each * recipients.Count;
+                // Team bonus: each sharing member gets the team-size fraction of the solo amount (LevelEligibility.json).
+                int each = (int)((long)share.Amount * TeamLevelEligibility.Current.MemberXpPermille(recipients.Count) / 1000);
                 for (int r = 0; r < recipients.Count; r++)
                 {
-                    int amount = r == 0 ? each + leftover : each;
+                    int amount = each;
                     if (amount <= 0)
                         continue;
 

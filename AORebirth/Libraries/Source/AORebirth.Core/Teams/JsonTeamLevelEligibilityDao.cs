@@ -22,12 +22,18 @@ namespace AORebirth.Core.Teams
         readonly Dictionary<int, Range> _ranges;
         readonly int _minimumLevel;
         readonly int _maximumLevel;
+        readonly int[] _memberXpPermille;
 
-        JsonTeamLevelEligibilityDao(Dictionary<int, Range> ranges, int minimumLevel, int maximumLevel)
+        JsonTeamLevelEligibilityDao(
+            Dictionary<int, Range> ranges,
+            int minimumLevel,
+            int maximumLevel,
+            int[] memberXpPermille)
         {
             _ranges = ranges;
             _minimumLevel = minimumLevel;
             _maximumLevel = maximumLevel;
+            _memberXpPermille = memberXpPermille;
         }
 
         /// <summary>Process singleton loaded from the runtime GameData tree.</summary>
@@ -78,7 +84,7 @@ namespace AORebirth.Core.Teams
                         + level.ToString(CultureInfo.InvariantCulture) + ".");
             }
 
-            return new JsonTeamLevelEligibilityDao(ranges, minimumLevel, maximumLevel);
+            return new JsonTeamLevelEligibilityDao(ranges, minimumLevel, maximumLevel, ReadMemberXpPermille(text));
         }
 
         public bool TryGetRange(int level, out int minimum, out int maximum)
@@ -124,6 +130,36 @@ namespace AORebirth.Core.Teams
             if (!TryGetRange(memberLevel, out int min, out _))
                 return false;
             return inviteeLevel < min;
+        }
+
+        public int MemberXpPermille(int teamSize)
+        {
+            if (teamSize <= 1)
+                return 1000;
+            if (teamSize <= _memberXpPermille.Length)
+                return _memberXpPermille[teamSize - 1];
+            return 1000 / teamSize;
+        }
+
+        /// <summary>Optional <c>MemberXpPermille</c> array, indexed by team size - 1. Empty when absent.</summary>
+        static int[] ReadMemberXpPermille(string text)
+        {
+            Match match = Regex.Match(
+                text,
+                "\"MemberXpPermille\"\\s*:\\s*\\[([^\\]]*)\\]",
+                RegexOptions.CultureInvariant);
+            if (!match.Success || string.IsNullOrWhiteSpace(match.Groups[1].Value))
+                return new int[0];
+
+            string[] parts = match.Groups[1].Value.Split(',');
+            var values = new int[parts.Length];
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if (!int.TryParse(parts[i].Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out values[i]))
+                    throw new InvalidDataException("Team eligibility MemberXpPermille is invalid.");
+            }
+
+            return values;
         }
 
         static int ReadIntField(string text, string name, int fallback)
