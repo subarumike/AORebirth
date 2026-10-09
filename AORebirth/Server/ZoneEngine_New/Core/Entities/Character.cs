@@ -442,6 +442,8 @@ namespace ZoneEngine_New.Core.Entities
 
             if (level > levelBefore)
                 ApplyLevelUp(gameData, levelBefore, level, amount);
+            else
+                FlushDirtyStats(); // Preserve each award's XP delta when several kills occur in one tick.
         }
 
         /// <summary>

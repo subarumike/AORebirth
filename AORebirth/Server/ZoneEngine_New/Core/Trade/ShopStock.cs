@@ -293,10 +293,32 @@ namespace ZoneEngine_New.Core.Trade
                 ?? throw new InvalidOperationException("Configured shop ranges are unavailable.");
             _slots.Clear();
             _sorted = false;
+            var used = new HashSet<(int LowId, int HighId, int Quality)>();
             foreach (ShopStockRange range in ranges)
             {
-                int quality = random.Next(range.MinimumQuality, range.MaximumQuality + 1);
-                _slots.Add(new ShopStockSlot(range.LowId, range.HighId, quality, range.ItemHash));
+                ShopStockSlot Resolve(int quality)
+                    => new ShopStockSlot(range.LowId, range.HighId, quality, range.ItemHash);
+
+                ShopStockSlot slot = Resolve(random.Next(range.MinimumQuality, range.MaximumQuality + 1));
+                if (!used.Add((slot.LowId, slot.HighId, slot.Quality)))
+                {
+                    // Choose uniformly among unused configured QLs, without unbounded retries.
+                    int available = 0;
+                    for (int quality = range.MinimumQuality; quality <= range.MaximumQuality; quality++)
+                    {
+                        ShopStockSlot candidate = Resolve(quality);
+                        if (used.Contains((candidate.LowId, candidate.HighId, candidate.Quality)))
+                            continue;
+                        available++;
+                        if (random.Next(available) == 0)
+                            slot = candidate;
+                    }
+
+                    if (available == 0)
+                        continue;
+                    used.Add((slot.LowId, slot.HighId, slot.Quality));
+                }
+                _slots.Add(slot);
             }
             IsGenerated = true;
             _idleSinceMs = Environment.TickCount64;
