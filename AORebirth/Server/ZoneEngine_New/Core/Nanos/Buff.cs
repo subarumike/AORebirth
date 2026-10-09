@@ -48,8 +48,8 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         /// <summary>
-        /// Heal/damage over time: an OnUse Hit with TickCount &gt; 1 and a TickInterval (centiseconds).
-        /// The land runs it once; the rest run every interval while the buff is up, up to TickCount in all.
+        /// Repeated hits and child-nano casts use their data-defined count and interval (centiseconds).
+        /// Landing runs the first application; the rest run only while the parent buff remains active.
         /// </summary>
         void SchedulePeriodic(DateTime nowUtc, int hitsAlreadyDone)
         {
@@ -60,7 +60,11 @@ namespace ZoneEngine_New.Core.Nanos
             for (int i = 0; i < spells.Count; i++)
             {
                 ItemSpell spell = spells[i];
-                if (!spell.Is(FunctionType.Hit) || spell.TickCount <= 1 || spell.TickInterval == 0)
+                bool periodic = (FunctionType)spell.FunctionType is FunctionType.Hit or FunctionType.CastNano
+                    or FunctionType.TeamCastNano or FunctionType.AreaCastNano or FunctionType.PlayfieldNano
+                    or FunctionType.CastNanoIfPossible or FunctionType.NpcCastNanoIfPossible
+                    or FunctionType.CastNanoIfPossibleOnFightTarget or FunctionType.NpcCastNanoIfPossibleOnFightTarget;
+                if (!periodic || spell.TickCount <= 1 || spell.TickInterval == 0)
                     continue;
 
                 int remaining = spell.TickCount - hitsAlreadyDone;
