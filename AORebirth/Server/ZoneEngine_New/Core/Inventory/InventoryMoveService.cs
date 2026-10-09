@@ -945,7 +945,7 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 IdentityType.WeaponPage => itemClass is ItemClass.Weapon or ItemClass.Utility,
                 IdentityType.ArmorPage => itemClass == ItemClass.Armor,
-                IdentityType.ImplantPage => itemClass == ItemClass.Implant,
+                IdentityType.ImplantPage => itemClass is ItemClass.Implant or ItemClass.Spirit,
                 // Social clothing, plus a weapon in the social right or left hand (cosmetic: it is shown in the hand
                 // while social is, and is never armed).
                 IdentityType.SocialPage => itemClass == ItemClass.Armor
