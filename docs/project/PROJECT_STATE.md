@@ -7,8 +7,8 @@ each non-level-up XP award. Source review confirms that the previous dirty
 stat collection retained only the latest value between flushes. XP amounts,
 modifiers, caps and level calculations are unchanged, and level-up updates
 retain NewLevel-before-stat-flush ordering. Approved Windows build PASS.
-No automated suites or AO client automation were performed. UNVERIFIED:
-live-client display of separate XP awards remains pending Mike.
+No automated suites or AO client automation were performed. OBSERVED:
+Mike verified the XP fix in the local AO client on October9 and approved merging.
 
 OBSERVED (2026-10-06): Mike reports the JSON starter-kit change works after
 local client testing of source ac4720b9bb202ed48c44995c6ec16870600f9456.
