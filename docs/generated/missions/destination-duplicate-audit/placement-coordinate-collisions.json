@@ -1,0 +1,12 @@
+{
+  "bit_key": [
+    "explicit_playfield_id",
+    "X_binary32_bits",
+    "Y_binary32_bits",
+    "Z_binary32_bits"
+  ],
+  "comparison": "Raw little-endian binary32 XYZ; no rounding, tolerance, or nearest-neighbor comparison.",
+  "exact_bit_groups": [],
+  "numeric_xyz_different_bits_groups": [],
+  "numeric_xyz_groups": []
+}

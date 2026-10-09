@@ -1,0 +1,422 @@
+{
+  "available_body_hash_matches": 0,
+  "available_full_packet_hash_matches": 0,
+  "classification": "UNRESOLVED",
+  "disposition": "Keep July and September separate. Available exact hash comparisons are bounded; absent July raw provenance remains UNRESOLVED.",
+  "distinct_available_july_response_body_hashes": 14,
+  "exact_hash_matches": [],
+  "full_packet_records": [
+    {
+      "advertised_offer_count": 5,
+      "body_matches_september": false,
+      "body_sha256": "81a6b175b60f3ace5f0d7e9dae00e0b9f4a35b593807638d77d4ab298c23b03c",
+      "bytes": 4326,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431733146,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 0,
+      "quest_alternative_type_verified": true,
+      "sha256": "88e9360ac00675aee4aa43416c805a68c952591f426006cf4028fb2db470140b",
+      "source": "external-game-data/Missions/RollTemplate.json",
+      "transport_header_present": true
+    }
+  ],
+  "inputs": [
+    {
+      "bytes": 14368,
+      "path": "docs/evidence/RK_TERMINAL_MISSION_STAGE1_EVIDENCE_20260728.md",
+      "sha256": "0b18050f45714e80266814b0a5cdf0ad5c6daafbd77b637b8729067342beae41"
+    },
+    {
+      "bytes": 2730,
+      "path": "docs/generated/missions/acgentrance-reconstruction/mission-offer-destination-field-map.json",
+      "sha256": "ed46956f73544b5a980d113451778bfaea92caea53273dd0b06cdda091bcba60"
+    },
+    {
+      "bytes": 109254,
+      "path": "external-game-data/Missions/RollBodies.json",
+      "sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa"
+    },
+    {
+      "bytes": 8655,
+      "path": "external-game-data/Missions/RollTemplate.json",
+      "sha256": "152c0e53be187eecd63e56651201ad8092284cdafa577e4952738c70adf80867"
+    },
+    {
+      "bytes": 2626843,
+      "path": "external-game-data/Missions/Layouts.json",
+      "sha256": "34ec2bd3305248b30052ce85f66cc7f7e745e36c71e42c2969dbaf52b2f9512e"
+    }
+  ],
+  "july_reported_offers": 115,
+  "july_reported_responses": 23,
+  "july_session_ids": [
+    "20260727-222650",
+    "20260727-222946",
+    "20260727-223041",
+    "20260728-001044",
+    "20260728-003410",
+    "20260728-005042",
+    "20260728-010220",
+    "20260728-012547"
+  ],
+  "layout_provenance": [
+    {
+      "CaptureId": "20260728-001044",
+      "CapturedUtc": "2026-07-28T05:16:45.4304464Z",
+      "CsvLine": 3750,
+      "Direction": "IN",
+      "MessageType": "PlayfieldAnarchyF",
+      "RawPacketLength": 169,
+      "RawPacketSha256": "5529710edbd588aeb8d71e49117044e489db282e24718b50227a9b9379e91322",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-001044",
+      "CapturedUtc": "2026-07-28T05:15:55.9731928Z",
+      "CsvLine": 3478,
+      "Direction": "IN",
+      "MessageType": "QuestFullUpdate",
+      "RawPacketLength": 745,
+      "RawPacketSha256": "d7ae505334ffd13a498903ac6987a7e99836cbbf4f6ad33bf3c452038a21a244",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-003410",
+      "CapturedUtc": "2026-07-28T05:37:54.7358892Z",
+      "CsvLine": 441,
+      "Direction": "IN",
+      "MessageType": "PlayfieldAnarchyF",
+      "RawPacketLength": 229,
+      "RawPacketSha256": "93b312ed4b5b429b7d886abe95f0400aac914f0e4987d472fd4e518f722a6254",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-003410",
+      "CapturedUtc": "2026-07-28T05:35:37.3896689Z",
+      "CsvLine": 222,
+      "Direction": "IN",
+      "MessageType": "QuestFullUpdate",
+      "RawPacketLength": 782,
+      "RawPacketSha256": "84c664f6efb2fd8603b1184b73595f6208281b7e477cbd1fcebe28b5f9e125df",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-005042",
+      "CapturedUtc": "2026-07-28T05:55:51.3902730Z",
+      "CsvLine": 875,
+      "Direction": "IN",
+      "MessageType": "PlayfieldAnarchyF",
+      "RawPacketLength": 253,
+      "RawPacketSha256": "c12fb4366d7b87d31cb65d843aa1de7d5b33e1df5bc095dc9b65c3e2fc0c1e51",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-005042",
+      "CapturedUtc": "2026-07-28T05:52:41.4775604Z",
+      "CsvLine": 196,
+      "Direction": "IN",
+      "MessageType": "QuestFullUpdate",
+      "RawPacketLength": 1233,
+      "RawPacketSha256": "40acf82c40977038909bcb7ca03d1d71160be5af4052365b45760ca07b832c8f",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-010220",
+      "CapturedUtc": "2026-07-28T06:05:53.2062373Z",
+      "CsvLine": 4165,
+      "Direction": "IN",
+      "MessageType": "PlayfieldAnarchyF",
+      "RawPacketLength": 211,
+      "RawPacketSha256": "64a8295525c83d4753bf9fc72046f24f6506aab8f9e664197bd88394295234f2",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-010220",
+      "CapturedUtc": "2026-07-28T06:04:00.4335094Z",
+      "CsvLine": 3639,
+      "Direction": "IN",
+      "MessageType": "QuestFullUpdate",
+      "RawPacketLength": 1196,
+      "RawPacketSha256": "4b2ebe2d6580a693a1a98a694c85e5f3662d27969f16c4ee7ccb9fc7d09c49c8",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-012547",
+      "CapturedUtc": "2026-07-28T06:27:44.6121548Z",
+      "CsvLine": 1463,
+      "Direction": "IN",
+      "MessageType": "PlayfieldAnarchyF",
+      "RawPacketLength": 187,
+      "RawPacketSha256": "4b71f96d543e73043ae415814e0ea406d91001a9f46f6bb06eb5b63f9b0d0ef8",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    },
+    {
+      "CaptureId": "20260728-012547",
+      "CapturedUtc": "2026-07-28T06:26:45.1991239Z",
+      "CsvLine": 1116,
+      "Direction": "IN",
+      "MessageType": "QuestFullUpdate",
+      "RawPacketLength": 899,
+      "RawPacketSha256": "acd7e2e710e8ed1ffb8dbfe1d9252a26ab438c1061b54dccb7ddeb97c0a07aeb",
+      "Source": "raw-packets.csv",
+      "matches_september_full_packet": false
+    }
+  ],
+  "report_date": "2026-07-28",
+  "retained_template_body_relationships": [
+    {
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "interpretation": "Matching template/body bytes, if any, do not establish two independent captured cohorts; unmatched bytes retain unresolved capture provenance.",
+      "roll_body_indexes": [],
+      "template_index": 0,
+      "template_source": "external-game-data/Missions/RollTemplate.json"
+    }
+  ],
+  "roll_body_records": [
+    {
+      "advertised_offer_count": 5,
+      "bytes": 4275,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790851,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 0,
+      "quest_alternative_type_verified": true,
+      "sha256": "152ceabb1536715df69883c5d5088eacb213ecf61fb4f9c2d2f550e9c9cb4e06",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 4469,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790857,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 1,
+      "quest_alternative_type_verified": true,
+      "sha256": "3ddb22e89fb0f9e2176556be6764f8fd02150e77ec51baf69e5bdc52ab234462",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 4603,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790863,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 2,
+      "quest_alternative_type_verified": true,
+      "sha256": "4f622acee4b21c66d4439ff583405023d1eca248b4464620bdf605fdd6fa3d51",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 4108,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790869,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 3,
+      "quest_alternative_type_verified": true,
+      "sha256": "71eb2541a23457abb1e73a2d9de8a1472d3697f53f6874b5452ab69874536a00",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 4523,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790875,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 4,
+      "quest_alternative_type_verified": true,
+      "sha256": "55efb5d88472cddaa788cf2892c96b30b40f1764fa2c2164bc3da1635bf504fd",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 3995,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790880,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 5,
+      "quest_alternative_type_verified": true,
+      "sha256": "967ad2f51ea32de6304529dc2dcb5b6d50d2d19f7d7a2d620e02bc96f92960ba",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 4315,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790885,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 6,
+      "quest_alternative_type_verified": true,
+      "sha256": "a94bad91faa77e8d7915ccbe8f065593d7e3fb3602011b1b652c759c24c00129",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 5248,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790890,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 7,
+      "quest_alternative_type_verified": true,
+      "sha256": "5dbaa64c92660b085263f74942c8272ae828ff055ea46b1207f6c70c27ddf8c5",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 3507,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790896,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 8,
+      "quest_alternative_type_verified": true,
+      "sha256": "5445d5cdbfe9471952c03d3a23de1382ecba4c885ccf6c277850bc1dd1e56032",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 3877,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790901,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 9,
+      "quest_alternative_type_verified": true,
+      "sha256": "08650d6dad4458ca02b6a255ad2ddc530fd05fb0d200a85de31352e2842ca9d5",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 3818,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790906,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 10,
+      "quest_alternative_type_verified": true,
+      "sha256": "786d807fafa7cd42a9d21400c029bec5d9f65922532b88ea878453a7615577fd",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 3769,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790911,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 11,
+      "quest_alternative_type_verified": true,
+      "sha256": "33173d02d87ba1e973b7b8bd3489c510f5983468ac7aaf3cb8a5a995f8a4956a",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    },
+    {
+      "advertised_offer_count": 5,
+      "bytes": 4080,
+      "capture_provenance": "UNRESOLVED_NO_PER_BODY_SESSION_REQUEST_MAPPING",
+      "exact_september_hash_match": false,
+      "first_mission_identity": {
+        "instance": 1431790917,
+        "type": 56003
+      },
+      "first_mission_identity_interpretation": "A reused mission identity alone is not physical response overlap.",
+      "first_mission_identity_matches_september": false,
+      "index": 12,
+      "quest_alternative_type_verified": true,
+      "sha256": "c2847ffbb9d04264e8771e5565fba303577e187ace693266051874281661536f",
+      "source": "external-game-data/Missions/RollBodies.json",
+      "transport_header_present": false
+    }
+  ],
+  "september_mission_identities_available": 93170,
+  "september_offer_hashes_compared": 92815,
+  "session_id_intersection": [],
+  "unresolved": [
+    "Original July session journals and complete per-offer raw provenance are unavailable to this audit.",
+    "Session labels and capture dates differ but do not alone prove physical packet non-overlap.",
+    "No complete July offer boundary inventory with request/mission identities is retained in these metadata artifacts; only fixed first-offer identity fields can be read independently.",
+    "A body hash covers response bytes without its transport header; matching bodies alone do not prove accidental ingestion."
+  ]
+}

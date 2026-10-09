@@ -1,0 +1,66 @@
+{
+  "cohort_count": 18638,
+  "cohort_inventory": "docs/generated/missions/destination-duplicate-audit/cohort-audit-inventory.jsonl.gz",
+  "groups": [
+    {
+      "classification": "IDENTICAL_DECODED_DIFFERENT_RAW",
+      "count_reduction": 0,
+      "decoded_cohort_hash": "160baed198addc77695b983c997729ac9e7712217064f348ef9420cd683ca0e8",
+      "occurrences": [
+        [
+          "mission-20260902T050909317Z-36962762-99d539de",
+          10645,
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002129",
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002129/cohort/0001"
+        ],
+        [
+          "mission-20260902T050909317Z-36962762-99d539de",
+          10650,
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002130",
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002130/cohort/0001"
+        ]
+      ],
+      "severity": "LEGITIMATE_SERVER_RESPONSE_REPEAT"
+    },
+    {
+      "classification": "IDENTICAL_DECODED_DIFFERENT_RAW",
+      "count_reduction": 0,
+      "decoded_cohort_hash": "55dd70a1dc3d5270064bde6f8bd484b2cb34d5414acba1d2c955550cb9d090ff",
+      "occurrences": [
+        [
+          "mission-20260902T051218175Z-37165191-a530d823",
+          10180,
+          "mission-20260902T051218175Z-37165191-a530d823/request/00002036",
+          "mission-20260902T051218175Z-37165191-a530d823/request/00002036/cohort/0001"
+        ],
+        [
+          "mission-20260902T051218175Z-37165191-a530d823",
+          10185,
+          "mission-20260902T051218175Z-37165191-a530d823/request/00002037",
+          "mission-20260902T051218175Z-37165191-a530d823/request/00002037/cohort/0001"
+        ]
+      ],
+      "severity": "LEGITIMATE_SERVER_RESPONSE_REPEAT"
+    },
+    {
+      "classification": "IDENTICAL_DECODED_DIFFERENT_RAW",
+      "count_reduction": 0,
+      "decoded_cohort_hash": "e4926d5a9471a4459a49f05b635dcd70762d993622cab00ef08a88d97bdc264d",
+      "occurrences": [
+        [
+          "mission-20260902T050909317Z-36962762-99d539de",
+          10480,
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002096",
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002096/cohort/0001"
+        ],
+        [
+          "mission-20260902T050909317Z-36962762-99d539de",
+          10485,
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002097",
+          "mission-20260902T050909317Z-36962762-99d539de/request/00002097/cohort/0001"
+        ]
+      ],
+      "severity": "LEGITIMATE_SERVER_RESPONSE_REPEAT"
+    }
+  ]
+}

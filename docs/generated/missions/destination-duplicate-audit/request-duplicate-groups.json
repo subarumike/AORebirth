@@ -1,0 +1,16 @@
+{
+  "class_counts": {
+    "EXACT_DUPLICATE_REQUEST_RECORD": 0,
+    "MISSING_REQUEST_HEADER": 0,
+    "MULTIPLE_RESPONSES_FOR_ONE_REQUEST": 0,
+    "ORPHAN_RESPONSE": 0,
+    "REUSED_REQUEST_ID_CONFLICT": 0,
+    "REUSED_REQUEST_ID_IDENTICAL": 0,
+    "UNIQUE_REQUEST": 18642
+  },
+  "duplicate_groups": [],
+  "logical_request_count": 18642,
+  "request_inventory": "docs/generated/missions/destination-duplicate-audit/request-audit-inventory.jsonl.gz",
+  "same_inputs_rule": "Distinct request IDs with equal terminal/slider/character inputs remain distinct rolls.",
+  "schema_version": 1
+}

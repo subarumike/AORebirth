@@ -1,0 +1,270 @@
+{
+  "artifacts": [
+    {
+      "bytes": 8155381,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/acgentrance-reconstruction/acgentrance-records.jsonl",
+      "primary_key": [
+        "identity_type",
+        "identity_instance_uint32"
+      ],
+      "row_count": 2242,
+      "row_design": "One row per complete client placement identity.",
+      "sha256": "83054c83b923036fcbb789e41e5851f3f5461bbc7361c818b440fcc1e452ad57",
+      "unique_primary_keys": 2242
+    },
+    {
+      "bytes": 19449628,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/acgentrance-reconstruction/mission-location-full-corpus-reconciliation.jsonl.gz",
+      "primary_key": [
+        "session_id",
+        "source_line",
+        "request_id",
+        "cohort_id",
+        "offer_index"
+      ],
+      "row_count": 93185,
+      "row_design": "One row per retained offer provenance key; repeated destinations are valid observations.",
+      "sha256": "302b305b2d65efa6254777c62e7e8fd2bc77464006e903928d03e8e66d0539c8",
+      "unique_primary_keys": 93185
+    },
+    {
+      "bytes": 9755687,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/location-reconciliation/all-offers.jsonl.gz",
+      "primary_key": [
+        "session_id",
+        "source_line",
+        "request_id",
+        "cohort_id",
+        "offer_index"
+      ],
+      "row_count": 93185,
+      "row_design": "One row per retained offer provenance key; historical unresolved assignments remain unchanged.",
+      "sha256": "d70d43317b0b5c19c8004e634922e5559c3bea8c58c0ce488d9e2731e4eeb2df",
+      "unique_primary_keys": 93185
+    },
+    {
+      "bytes": 6637406,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/mission-offer-analysis-inventory.jsonl.gz",
+      "primary_key": [
+        "session_id",
+        "source_line",
+        "request_id",
+        "cohort_id",
+        "offer_index"
+      ],
+      "row_count": 93185,
+      "row_design": "One row per retained offer provenance key.",
+      "sha256": "a56a5a9f3d088b1663f8f637bd7fa0344f4477a47eeb6fe7ef420cb1312eaa4d",
+      "unique_primary_keys": 93185
+    },
+    {
+      "bytes": 319829,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/destination-condition-evidence-matrix.jsonl.gz",
+      "primary_key": [
+        "identity_type",
+        "identity_instance",
+        "experimental_condition"
+      ],
+      "row_count": 25296,
+      "row_design": "One row per placement and complete condition including mission type; repeated placement identities across conditions are intentional.",
+      "sha256": "6559e6b4176a845d2bbb07389de5e5d0d2f44c764efd9c6b51e95fda8e3ace94",
+      "unique_primary_keys": 25296
+    },
+    {
+      "bytes": 6500379,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/destination-ql-evidence-matrix.jsonl.gz",
+      "primary_key": [
+        "identity_type",
+        "identity_instance",
+        "mission_ql"
+      ],
+      "row_count": 560500,
+      "row_design": "One row per complete placement identity and QL; unobserved QLs are retained.",
+      "sha256": "98cbe948b53091135a159f5d8240f60c2a71fb59ce0a692d8905fef8b5c4bf66",
+      "unique_primary_keys": 560500
+    },
+    {
+      "bytes": 151745,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/observed-destination-frequency.jsonl.gz",
+      "primary_key": [
+        "condition",
+        "destination_identity_instance"
+      ],
+      "row_count": 11112,
+      "row_design": "One row per coherent input condition and observed destination; condition is part of identity.",
+      "sha256": "06ff05824027af7c4b9179163532c30e2a82fa05b519234e697fbbe2a6dca1b9",
+      "unique_primary_keys": 11112
+    },
+    {
+      "bytes": 13560,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/observed-playfield-frequency.jsonl.gz",
+      "primary_key": [
+        "condition",
+        "destination_playfield"
+      ],
+      "row_count": 544,
+      "row_design": "One row per coherent input condition and observed playfield.",
+      "sha256": "0ce18a468900ab1b0a3b03af307ed713cf9da0e903f8f116712c761243aec4be",
+      "unique_primary_keys": 544
+    },
+    {
+      "bytes": 11993,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/character-level-destination-matrix.jsonl.gz",
+      "primary_key": [
+        "character_level",
+        "destination_identity"
+      ],
+      "row_count": 1495,
+      "row_design": "One row per character level and complete destination identity.",
+      "sha256": "d518b8c5adabbd77ea4f9c24559b1d8f267cac8460e91ab7ee6bbda0684b12b8",
+      "unique_primary_keys": 1495
+    },
+    {
+      "bytes": 586,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/character-level-playfield-matrix.jsonl.gz",
+      "primary_key": [
+        "character_level",
+        "destination_playfield"
+      ],
+      "row_count": 44,
+      "row_design": "One row per character level and destination playfield.",
+      "sha256": "5210f553d78543e41e338e3d6793bf711857a08686b0b61a62c6fc637b22ca2c",
+      "unique_primary_keys": 44
+    },
+    {
+      "bytes": 6993,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/terminal-destination-matrix.jsonl.gz",
+      "primary_key": [
+        "mission_terminal_identity",
+        "destination_identity"
+      ],
+      "row_count": 828,
+      "row_design": "One row per terminal identity and complete destination identity.",
+      "sha256": "cf5cf103c47d00b74c8da13a30896331702b9fc3de3a6b7e37027e4321bc5128",
+      "unique_primary_keys": 828
+    },
+    {
+      "bytes": 428,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/terminal-playfield-matrix.jsonl.gz",
+      "primary_key": [
+        "mission_terminal_identity",
+        "destination_playfield"
+      ],
+      "row_count": 24,
+      "row_design": "One row per terminal identity and destination playfield.",
+      "sha256": "5ee7065a7e623f8e6e11330b22db13ed83ffe03a2d5bcff60e5c1edc00529729",
+      "unique_primary_keys": 24
+    },
+    {
+      "bytes": 19551,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/mission-type-destination-matrix.jsonl.gz",
+      "primary_key": [
+        "mission_type",
+        "destination_identity"
+      ],
+      "row_count": 2679,
+      "row_design": "One row per mission type and complete destination identity.",
+      "sha256": "b966e7750c4c56a3bd9a483c5aba860fd0cb7b5077e7a4b39da58302303ae0b5",
+      "unique_primary_keys": 2679
+    },
+    {
+      "bytes": 1050,
+      "classification": "GENERATED_ARTIFACT_DESIGN",
+      "duplicate_primary_keys": 0,
+      "duplicate_rows": 0,
+      "groups": [],
+      "issues": [],
+      "missing_primary_key_rows": [],
+      "path": "docs/generated/missions/destination-eligibility-analysis/mission-type-playfield-matrix.jsonl.gz",
+      "primary_key": [
+        "mission_type",
+        "destination_playfield"
+      ],
+      "row_count": 100,
+      "row_design": "One row per mission type and destination playfield.",
+      "sha256": "2298aa25b2e7de9cb3b06d089334b87d76ebc2849216e12ffdecce438b5f319a",
+      "unique_primary_keys": 100
+    }
+  ],
+  "duplicate_primary_key_groups": 0,
+  "duplicate_rows": 0,
+  "interpretation": "Evidence count reduction requires physical provenance proof; matrix condition dimensions must not be dropped."
+}
