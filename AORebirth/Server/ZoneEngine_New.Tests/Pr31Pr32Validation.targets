@@ -1,0 +1,31 @@
+<Project>
+  <!-- Opt-in compilation of the PR31/PR32 cases and related regressions.
+       The ordinary suite is unchanged and its baseline failures remain visible. -->
+  <Target Name="SelectPr31Pr32ValidationTests" BeforeTargets="CoreCompile"
+          Condition="'$(MSBuildProjectName)' == 'ZoneEngine_New.Tests'">
+    <ItemGroup>
+      <!-- Retain SDK-generated sources, including the test host entry point. -->
+      <Compile Remove="@(Compile)"
+               Condition="'%(Compile.Link)' != '' Or ($([System.String]::Copy('%(Compile.FullPath)').StartsWith('$(MSBuildProjectDirectory)\')) And !$([System.String]::Copy('%(Compile.FullPath)').Contains('\obj\')))" />
+      <Compile Include="$(MSBuildProjectDirectory)\TestDoubles.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\CastNanoTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\PerkRequirementIntegrationTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\BuffRepairIntegrationTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\BuffTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\BuffApplyRulesTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\RequirementExpressionTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\ConditionalSpellEventTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\NanoHitTargetGateTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\HitProcTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\ClientFeedbackTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\NanoCastRulesTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\NanoDelayCalculatorTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\NanoCostCalculatorTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\FightingOpponentTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\HateListTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\NpcBrainTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\CleanSpellFunctionTests.cs" />
+      <Compile Include="$(MSBuildProjectDirectory)\InventoryActionTests.cs" />
+    </ItemGroup>
+  </Target>
+</Project>

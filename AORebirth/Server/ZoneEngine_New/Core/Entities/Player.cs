@@ -682,7 +682,10 @@ namespace ZoneEngine_New.Core.Entities
             else if (template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells)
                 && spells.Exists(spell => spell.Target is (int)ItemTarget.Target or (int)ItemTarget.Fightingtarget))
             {
-                Character? resolved = ResolvePerkActionTarget();
+                bool preferSelected = (can & CanFlags.ApplyOnFriendly) != 0
+                    || template.Actions.Exists(action => action.ActionType == (int)ActionType.ToUse
+                        && action.Requirements.Exists(requirement => (Operator)requirement.Operator == Operator.OnTarget));
+                Character? resolved = ResolvePerkActionTarget(preferSelected);
                 if (resolved == null)
                 {
                     RequirementFeedback.SendText(this, "You need a target to use this.");
@@ -706,7 +709,8 @@ namespace ZoneEngine_New.Core.Entities
                         : "Feedback_StartingAttackFailed");
                 else if (failure == UseRequirementsFailure)
                     RequirementFeedback.SendIfUnmet(this, template, ActionType.ToUse,
-                        stat => PerkActionStat(stat, target), ResolvePerkRequirement);
+                        stat => PerkActionStat(stat, target), ResolvePerkRequirement,
+                        stat => target.Stats.Get(stat), resolveTarget: target.ResolveRequirement);
                 return false;
             }
 
@@ -743,7 +747,8 @@ namespace ZoneEngine_New.Core.Entities
                 return "perk action no longer held";
             if (IsPerkActionLocked(use.Template))
                 return "perk locked";
-            if (starting && !use.Template.MeetsActionRequirements(stat => PerkActionStat(stat, use.Target), ActionType.ToUse, ResolvePerkRequirement))
+            if (starting && !use.Template.MeetsActionRequirements(stat => PerkActionStat(stat, use.Target),
+                ActionType.ToUse, ResolvePerkRequirement, stat => use.Target.Stats.Get(stat), use.Target.ResolveRequirement))
                 return UseRequirementsFailure;
             if (!ReferenceEquals(use.Target, this))
             {
@@ -841,17 +846,17 @@ namespace ZoneEngine_New.Core.Entities
             return range > 0 ? range : 1;
         }
 
-        /// <summary>The fighting target, else the selected living character other than this player.</summary>
-        Character? ResolvePerkActionTarget()
+        /// <summary>Explicit friendly/target criteria use selection; other actions prefer the fighting target.</summary>
+        Character? ResolvePerkActionTarget(bool preferSelected = false)
         {
             Character? fighting = TryResolveFightingTarget();
-            if (fighting != null)
+            if (!preferSelected && fighting != null)
                 return fighting;
 
             if (Target.Instance == 0 || Target == Identity || Playfield == null
                 || !Playfield.GetRequiredService<DynelRegistry>().TryGet(Target, out Dynel? dynel)
                 || dynel is not Character selected || selected.IsDead)
-                return null;
+                return preferSelected ? null : fighting;
 
             return selected;
         }

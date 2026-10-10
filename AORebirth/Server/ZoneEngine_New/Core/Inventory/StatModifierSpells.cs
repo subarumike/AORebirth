@@ -29,7 +29,8 @@ namespace ZoneEngine_New.Core.Inventory
                 bool changeVariable = spell.Is(FunctionType.ChangeVariable);
                 bool percentage = spell.Is(FunctionType.ModifyPercentage);
                 if (!shape && !setFlag && !changeVariable && !percentage
-                    && !spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify))
+                    && !spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify)
+                    && !spell.Is(FunctionType.Skill))
                     continue;
                 if (!spell.MeetsRequirements(stats))
                     continue;
