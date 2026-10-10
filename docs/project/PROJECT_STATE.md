@@ -12,11 +12,16 @@ Cross-condition retail eligibility remains UNPROVEN. Identity, WorldPos,
 acceptance, keys, dungeon, DAO and schema contracts remain unchanged.
 Approved build PASS; 61 focused destination/fee/QL regressions, 74 real DAO
 identity checks and 275 full disposable DAO checks passed. The full DAO run
-required the existing identity route's compiler override. Local client
-acceptance is pending; no master merge or Linux deployment is claimed.
+required the existing identity route's compiler override. OBSERVED: Mike confirmed
+five offers after rebuilding local runtime repair 73fc97a75. The logged QL25
+Borealis request selected from 124 candidates; read-only verification confirms
+five exact persisted destinations and a 25-credit charge. Manual mission
+acceptance/entry/completion remains unverified. No master merge or Linux
+deployment is claimed.
 See `docs/evidence/MISSION_ROLL_ELIGIBILITY_REPAIR.md`.
 
-PROVEN (2026-10-09, mission destination integration branch): one shared
+HISTORICAL (2026-10-09, original mission destination integration; selection policy
+and client-roll status superseded by the repair above): one shared
 MissionDestinationCatalog now supplies generated offers and quest dungeons.
 It retains 2,242 physical entrances, of which 812 are observed in 92,830 exact
 retail offers. Destination selection uses 547 captured joint condition/type

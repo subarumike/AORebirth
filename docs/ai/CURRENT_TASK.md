@@ -26,8 +26,15 @@ PASS61/61; real disposable DAO identity checks PASS74 and full DAO checks PASS27
 The full DAO run used the identity route's existing compiler override because
 the default wrapper's C#7.3 setting fails on current nullable source. Exact
 identity, WorldPos, interaction range, keys, dungeon and existing persistence
-remain unchanged. No schema or DAO edits. Local original-client acceptance is
-pending; source validation does not claim retail cross-condition equivalence.
+remain unchanged. No schema or DAO edits.
+
+OBSERVED: after rebuilding local runtime repair 73fc97a75, Mike confirmed five
+offers for Shade at Borealis. The request was level 25 / QL25 / difficulty 6,
+Neutral / breed 2 / profession 15, terminal 0xDAC1:0xC0020320, six raw bytes of 0.
+The QL pool contained 124 destinations. Read-only persistence verification proves
+five exact destination records and a 25-credit charge. Client rolling is verified;
+manual mission acceptance/entry/completion remains unverified. Cross-condition
+retail eligibility remains UNPROVEN.
 
 Repair report: docs/evidence/MISSION_ROLL_ELIGIBILITY_REPAIR.md.
 

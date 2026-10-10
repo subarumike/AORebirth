@@ -142,7 +142,7 @@ It does not publish offers or reach the transactional fee deduction.
 | Destination repeats | Permitted; deterministic seed9 demonstrates a repeated identity. |
 | Real disposable-MySQL high-bit identity validation | PASS 74 checks, including 0xC00001F9 and other positive-only contracts. |
 | Full disposable DAO regression | PASS 275 checks, including fee transactions, rollback and concurrency, with the compiler override described below. |
-| Live original AO client | Pending local rebuild and manual retry. |
+| Live original AO client | OBSERVED: Mike confirmed five offers after the local rebuild from `73fc97a75`; exact request and readback below. |
 
 The default full DAO wrapper initially failed with four CS8370 diagnostics:
 its C#7.3 setting cannot compile current nullable source. A task-local invocation
@@ -166,6 +166,35 @@ a PowerShell foreach pipeline and an overquoted Python selector. They were
 corrected with explicit file reads and the task script invoked as
 `%AO_REBIRTH_PYTHON% build-verify\mission-roll-eligibility-investigation.py`.
 The failed commands changed no runtime files or database rows.
+
+## Local original-client result
+
+Runtime repair `73fc97a75262e091d6ebabece1db8e74e2132cb7` was rebuilt and
+started through the approved local workflow. OBSERVED: Mike confirmed that five
+mission offers appeared for Shade at the Borealis terminal. The successful
+October9 22:11:28 local-time request log records:
+
+| Field | Observed value |
+| --- | --- |
+| Character level / expected QL / difficulty | 25 / 25 / 6 |
+| Faction / breed / profession | Neutral (0) / 2 / 15 |
+| Terminal | PF800, `0xDAC1:0xC0020320` |
+| Terminal XYZ | 629.798 / 66.8001 / 713.0741 |
+| Secondary raw bytes | `[0,0,0,0,0,0]` |
+| Candidate counts | 2,242 physical -> 812 observed -> 812 valid WorldPos -> 124 at QL25 -> five offers |
+| Publication and fee | Five persisted QL25 offers; exactly 25 credits deducted |
+
+PROVEN by guarded read-only database inspection: all five persisted offers have
+unique offer IDs, exact catalog entrance identities, bit-exact XYZ read through
+the existing DAO projection, and retained WorldPos offsets. Their stored frozen
+responses share one valid SHA-256. The recorded balance delta and current balance
+agree with the 25-credit fee. No database mutation was performed by verification.
+
+This retry is a newly observed request; it does not recover the original three
+failed requests' unknown payload fields. Client rolling is now verified.
+Acceptance, dungeon entry and completion were not exercised in this manual
+retry; automated exact-destination acceptance and dungeon regressions passed.
+Cross-condition retail eligibility remains UNPROVEN.
 
 ## Files changed and remaining limits
 
