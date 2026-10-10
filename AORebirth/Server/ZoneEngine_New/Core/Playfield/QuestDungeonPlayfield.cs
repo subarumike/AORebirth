@@ -344,6 +344,7 @@ public sealed class QuestDungeonPlayfield : Playfield
             };
             registry.Register(door);
             locality.RegisterDynel(door);
+            _simulation?.RegisterDoor(door);
 
             if (placement.IsExit)
                 RegisterExit(door);

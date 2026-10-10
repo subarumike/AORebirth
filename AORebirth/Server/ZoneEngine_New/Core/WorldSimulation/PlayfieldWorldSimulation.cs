@@ -48,6 +48,7 @@
         readonly Dictionary<int, double> _zoneGraceUntil = new();
         readonly Dictionary<int, LosCacheEntry> _losCache = new();
         readonly HashSet<int> _exitProxyDoors = new();
+        readonly List<Door> _doors = new();
         readonly int _playfieldId;
         int _nextTriggerId = 1;
         bool _disposed;
@@ -149,6 +150,9 @@
             return world;
         }
 
+        /// <summary>Makes a door block line of sight while it is closed.</summary>
+        public void RegisterDoor(Door door) => _doors.Add(door);
+
         public bool HasLineOfSight(AoVector3 from, AoVector3 to)
             => HasLineOfSight((float)from.x, (float)from.y, (float)from.z, (float)to.x, (float)to.y, (float)to.z);
 
@@ -242,6 +246,12 @@
         /// </summary>
         bool IsSegmentClear(Vec3 from, Vec3 to)
         {
+            for (int i = 0; i < _doors.Count; i++)
+            {
+                if (_doors[i].BlocksSegment(from.X, from.Y, from.Z, to.X, to.Y, to.Z))
+                    return false;
+            }
+
             if (Surface == null)
                 return true;
             if ((to - from).LengthSquared < 1e-8f)

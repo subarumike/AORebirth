@@ -99,6 +99,40 @@ namespace ZoneEngine_New.Core.Entities
             };
         }
 
+        /// <summary>
+        /// True when the door is closed and the segment passes through its doorway: it crosses the door's plane
+        /// (normal = rotation * +Z, as the client's walk-in check uses) within the doorway's extent. The walls around
+        /// the doorway are static collision and block on their own, so the extent only has to cover the opening.
+        /// </summary>
+        public bool BlocksSegment(float fromX, float fromY, float fromZ, float toX, float toY, float toZ)
+        {
+            if (IsOpen)
+                return false;
+
+            // ponytail: doorway treated as a disc of DoorwayHalfWidth x DoorwayHalfHeight around the door;
+            // read the door template's real extent if a style's doorway turns out wider.
+            const float DoorwayHalfWidth = 2f;
+            const float DoorwayHalfHeight = 3f;
+
+            float qx = Rotation.xf, qy = Rotation.yf, qz = Rotation.zf, qw = Rotation.wf;
+            float nx = 2f * ((qx * qz) + (qw * qy));
+            float ny = 2f * ((qy * qz) - (qw * qx));
+            float nz = 1f - (2f * ((qx * qx) + (qy * qy)));
+
+            float px = Position.xf, py = Position.yf, pz = Position.zf;
+            float da = (nx * (fromX - px)) + (ny * (fromY - py)) + (nz * (fromZ - pz));
+            float db = (nx * (toX - px)) + (ny * (toY - py)) + (nz * (toZ - pz));
+            if (da * db > 0f || da == db)
+                return false;
+
+            float t = da / (da - db);
+            float hx = fromX + (t * (toX - fromX)) - px;
+            float hy = fromY + (t * (toY - fromY)) - py;
+            float hz = fromZ + (t * (toZ - fromZ)) - pz;
+            return MathF.Abs(hy) <= DoorwayHalfHeight
+                && (hx * hx) + (hz * hz) <= DoorwayHalfWidth * DoorwayHalfWidth;
+        }
+
         /// <summary>Opens or closes the door for a character standing at it, unless it is locked.</summary>
         public bool TryUse(Player player)
         {
