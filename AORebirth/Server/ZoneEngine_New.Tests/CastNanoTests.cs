@@ -15,10 +15,12 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
+    using ZoneEngine_New.Core.Pets;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Teams;
 
@@ -123,6 +125,288 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void AreaTauntAddsTheRowPickedByTheCastersSkillToNpcsInRange()
+        {
+            // Mongo Slam!'s shape (100198 area-casting 100194): a hostile child whose TauntNpc rows are picked by the
+            // caster's skill.
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId,
+                durationCentiseconds: 0,
+                can: 0,
+                flags: NanoFlags.IsHostile,
+                modifiers:
+                [
+                    Taunt(2000, CasterSkill(Operator.LessThan, 50)),
+                    Taunt(4000, CasterSkill(Operator.GreaterThan, 149))
+                ]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 10);
+            NpcCharacter near = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcCharacter far = world.Npc(3, 40, 0, 0, attackable: true);
+            NpcBrain.Create(near);
+            NpcBrain.Create(far);
+
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual(2000f, near.Brain!.Hate.ThreatOf(caster.Identity));
+            Assert.AreEqual(0f, far.Brain!.Hate.ThreatOf(caster.Identity));
+
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 200);
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual(6000f, near.Brain.Hate.ThreatOf(caster.Identity));
+        }
+
+        [TestMethod]
+        public void AreaTauntMiddleRowReadsBothSkillChecksOnTheCaster()
+        {
+            // Mongo Slam!'s middle row: one OnCaster selector, then two stat-129 checks joined by And. Both checks
+            // read the caster, not the NPC (whose stat 129 is 0).
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId,
+                durationCentiseconds: 0,
+                can: 0,
+                flags: NanoFlags.IsHostile,
+                modifiers:
+                [
+                    Taunt(3000,
+                        CasterSkill(Operator.LessThan, 150),
+                        CasterSkill(Operator.GreaterThan, 49),
+                        new ItemRequirement { Operator = (int)Operator.And })
+                ]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 100);
+            NpcCharacter near = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain.Create(near);
+
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual(3000f, near.Brain!.Hate.ThreatOf(caster.Identity));
+
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 200);
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual(3000f, near.Brain.Hate.ThreatOf(caster.Identity));
+        }
+
+        [TestMethod]
+        public void TauntAddsNoHateFromAnNpcOrWithoutAnAmount()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcCharacter otherNpc = world.Npc(3, 6, 0, 0, attackable: true);
+            NpcBrain.Create(victim);
+
+            Assert.IsFalse(UseTaunt(otherNpc, victim, items, amount: 500));
+            Assert.IsFalse(UseTaunt(caster, victim, items, amount: 0));
+            Assert.IsTrue(victim.Brain!.Hate.IsEmpty);
+
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 500));
+            Assert.AreEqual(500f, victim.Brain.Hate.ThreatOf(caster.Identity));
+        }
+
+        [DataTestMethod]
+        [DataRow(0, 200, 2000)]
+        [DataRow(49, 100, 2000)]
+        [DataRow(50, 0, 3000)]
+        [DataRow(100, 200, 3000)]
+        [DataRow(149, 0, 3000)]
+        [DataRow(150, 100, 4000)]
+        [DataRow(200, 0, 4000)]
+        public void AreaTauntSelectsExactlyOneMongoBandAtSkillBoundaries(
+            int casterSkill, int targetSkill, int expectedThreat)
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId,
+                durationCentiseconds: 0,
+                can: 0,
+                flags: NanoFlags.IsHostile,
+                modifiers:
+                [
+                    Taunt(2000, CasterSkill(Operator.LessThan, 50)),
+                    Taunt(3000,
+                        CasterSkill(Operator.LessThan, 150),
+                        CasterSkill(Operator.GreaterThan, 49),
+                        new ItemRequirement { Operator = (int)Operator.And }),
+                    Taunt(4000, CasterSkill(Operator.GreaterThan, 149))
+                ]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            caster.Stats.Set(CharacterStat.PsychologicalModification, casterSkill);
+            NpcCharacter near = world.Npc(2, 5, 0, 0, attackable: true);
+            near.Stats.Set(CharacterStat.PsychologicalModification, targetSkill);
+            NpcBrain nearBrain = NpcBrain.Create(near);
+            NpcCharacter far = world.Npc(3, 40, 0, 0, attackable: true);
+            NpcBrain farBrain = NpcBrain.Create(far);
+            NpcCharacter safe = world.Npc(4, 3, 0, 0, attackable: false);
+            NpcBrain safeBrain = NpcBrain.Create(safe);
+
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual((float)expectedThreat, nearBrain.Hate.ThreatOf(caster.Identity));
+            Assert.AreEqual(1, nearBrain.Hate.Count);
+            Assert.IsTrue(farBrain.Hate.IsEmpty);
+            Assert.IsTrue(safeBrain.Hate.IsEmpty);
+        }
+
+        [TestMethod]
+        public void PositiveTauntsAccumulateWithoutReplacingExistingHate()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player other = world.Player(3, 1, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim);
+            brain.AddThreat(caster.Identity, 10);
+            brain.AddThreat(other.Identity, 40);
+
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 500));
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 250));
+            Assert.AreEqual(760f, brain.Hate.ThreatOf(caster.Identity));
+            Assert.AreEqual(40f, brain.Hate.ThreatOf(other.Identity));
+            Assert.AreEqual(2, brain.Hate.Count);
+        }
+
+        [TestMethod]
+        public void PlayerOwnedPetTauntCreditsThePetAndNotItsOwner()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player owner = world.Player(1, 0, 0, 0);
+            NpcCharacter pet = world.Npc(3, 1, 0, 0, attackable: true);
+            pet.BindPet(new PetController(owner, type: 1, hash: "synthetic-pet", level: 60, expiresUtc: null));
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim);
+
+            Assert.IsTrue(UseTaunt(pet, victim, items, amount: 500));
+            Assert.AreEqual(500f, brain.Hate.ThreatOf(pet.Identity));
+            Assert.AreEqual(0f, brain.Hate.ThreatOf(owner.Identity));
+            Assert.AreEqual(1, brain.Hate.Count);
+        }
+
+        [TestMethod]
+        public void PacifiedNpcAcceptsTauntWithoutKeepingHate()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim);
+            NanoSpell pacify = TestNanos.Create(BuffId,
+                modifiers: [new ItemSpell { FunctionType = (int)FunctionType.Pacify }]);
+            Assert.AreEqual(BuffApplyDecision.Apply,
+                victim.TryApplyBuff(pacify, victim.Identity, DateTime.UtcNow, out Buff? buff, out _));
+            Assert.IsTrue(victim.IsPacified);
+
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 500));
+            Assert.IsTrue(brain.Hate.IsEmpty);
+            Assert.IsTrue(victim.IsPacified);
+            Assert.AreSame(buff, victim.Buffs[0]);
+            Assert.AreEqual(Identity.None, victim.FightingTarget);
+        }
+
+        [TestMethod]
+        public void EvadingNpcAcceptsTauntWithoutKeepingHateOrLeavingEvade()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter victim = world.Npc(2, NpcAiRules.MaxLeashRange + 10, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim, new Vector3(0, 0, 0));
+            brain.AddThreat(caster.Identity, 10);
+            Assert.IsTrue(brain.ShouldLeash());
+            Assert.IsTrue(brain.IsEvading);
+
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 500));
+            Assert.IsTrue(brain.Hate.IsEmpty);
+            Assert.IsTrue(brain.IsEvading);
+            Assert.AreEqual(Identity.None, victim.FightingTarget);
+        }
+
+        [TestMethod]
+        public void TauntAddsThreatWithoutStartingOrRetargetingAFight()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player other = world.Player(3, 1, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim);
+
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 500));
+            Assert.AreEqual(Identity.None, victim.FightingTarget);
+            Assert.IsNull(brain.ResolveCurrentTarget());
+
+            brain.AddThreat(other.Identity, 10);
+            brain.SetCurrentTarget(other.Identity);
+            victim.SetFightingTarget(other.Identity);
+            Assert.IsTrue(UseTaunt(caster, victim, items, amount: 500));
+            Assert.AreEqual(1000f, brain.Hate.ThreatOf(caster.Identity));
+            Assert.AreEqual(other.Identity, victim.FightingTarget);
+            Assert.AreSame(other, brain.ResolveCurrentTarget());
+        }
+
+        [TestMethod]
+        public void TauntRejectsMissingSelfAndNonPlayerSourcesAndTargetsWithoutBrains()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim);
+            NpcCharacter otherNpc = world.Npc(3, 6, 0, 0, attackable: true);
+            NpcCharacter npcOwnedPet = world.Npc(4, 7, 0, 0, attackable: true);
+            npcOwnedPet.BindPet(new PetController(otherNpc, type: 1, hash: "synthetic-pet", level: 60, expiresUtc: null));
+
+            Assert.IsFalse(UseTaunt(null, victim, items, amount: 500));
+            Assert.IsFalse(UseTaunt(victim, victim, items, amount: 500));
+            Assert.IsFalse(UseTaunt(otherNpc, victim, items, amount: 500));
+            Assert.IsFalse(UseTaunt(npcOwnedPet, victim, items, amount: 500));
+            Assert.IsFalse(UseTaunt(caster, caster, items, amount: 500));
+            Assert.IsFalse(UseTaunt(caster, otherNpc, items, amount: 500));
+            Assert.IsTrue(brain.Hate.IsEmpty);
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(-1)]
+        [DataRow(-500)]
+        public void TauntRejectsZeroAndNegativeAmountsWithoutChangingExistingHate(int amount)
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim);
+            brain.AddThreat(caster.Identity, 75);
+
+            Assert.IsFalse(UseTaunt(caster, victim, items, amount));
+            Assert.AreEqual(75f, brain.Hate.ThreatOf(caster.Identity));
+            Assert.AreEqual(1, brain.Hate.Count);
+        }
+
+        [TestMethod]
+        public void TauntRejectsMissingAndNonNumericAmounts()
+        {
+            var items = new StubItemBuilder();
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter victim = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcBrain brain = NpcBrain.Create(victim);
+
+            Assert.IsFalse(UseTauntSpell(caster, victim, items,
+                new ItemSpell { FunctionType = (int)FunctionType.TauntNpc, Target = (int)ItemTarget.Target }));
+            Assert.IsFalse(UseTauntSpell(caster, victim, items,
+                new ItemSpell
+                {
+                    FunctionType = (int)FunctionType.TauntNpc,
+                    Target = (int)ItemTarget.Target,
+                    Arguments = ["invalid-amount"]
+                }));
+            Assert.IsTrue(brain.Hate.IsEmpty);
+        }
+
+        [TestMethod]
         public void HostileAreaCastWithNoCanFlagsHitsAroundTheTargetNotTheCaster()
         {
             var items = new StubItemBuilder().Add(TestNanos.Create(
@@ -178,6 +462,163 @@ namespace ZoneEngine_New.Tests
             Player solo = ReadyPlayer(9);
             Assert.IsTrue(UseCast(solo, items, FunctionType.TeamCastNano, BuffId));
             Assert.AreEqual(1, solo.Buffs.Count);
+        }
+
+        [TestMethod]
+        public void PeriodicTeamCastNanoRefreshesTheCasterAndTeamAtTheConfiguredIntervalAndCount()
+        {
+            var refresh = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.TeamCastNano,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = [ChildId],
+                TickCount = 3,
+                TickInterval = 100
+            };
+            var items = new StubItemBuilder()
+                .Add(TestNanos.Create(BuffId, modifiers: [refresh]))
+                .Add(TestNanos.Create(ChildId, durationCentiseconds: 1000));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player mate = world.Player(2, 10, 0, 0);
+            Player bystander = world.Player(3, 5, 0, 0);
+            world.Join(caster, mate);
+            DateTime start = DateTime.UtcNow;
+
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(caster, caster, BuffId, items, new SilentInventory(), start));
+            Buff firstCaster = RequireBuff(caster, ChildId);
+            Buff firstMate = RequireBuff(mate, ChildId);
+            NanoRuntime.Tick(caster, start.AddMilliseconds(999));
+            Assert.AreSame(firstCaster, RequireBuff(caster, ChildId));
+            Assert.AreSame(firstMate, RequireBuff(mate, ChildId));
+
+            NanoRuntime.Tick(caster, start.AddSeconds(1));
+            Buff secondCaster = RequireBuff(caster, ChildId);
+            Buff secondMate = RequireBuff(mate, ChildId);
+            Assert.AreNotSame(firstCaster, secondCaster);
+            Assert.AreNotSame(firstMate, secondMate);
+            Assert.AreEqual(caster.Identity, secondCaster.Source);
+            Assert.AreEqual(caster.Identity, secondMate.Source);
+
+            NanoRuntime.Tick(caster, start.AddSeconds(2));
+            Buff thirdCaster = RequireBuff(caster, ChildId);
+            Buff thirdMate = RequireBuff(mate, ChildId);
+            Assert.AreNotSame(secondCaster, thirdCaster);
+            Assert.AreNotSame(secondMate, thirdMate);
+            NanoRuntime.Tick(caster, start.AddSeconds(3));
+            NanoRuntime.Tick(mate, start.AddSeconds(3));
+
+            Assert.AreSame(thirdCaster, RequireBuff(caster, ChildId));
+            Assert.AreSame(thirdMate, RequireBuff(mate, ChildId));
+            Assert.AreEqual(2, caster.Buffs.Count);
+            Assert.AreEqual(1, mate.Buffs.Count);
+            Assert.AreEqual(20, caster.UsedNcu);
+            Assert.AreEqual(10, mate.UsedNcu);
+            Assert.AreEqual(0, bystander.Buffs.Count);
+        }
+
+        [TestMethod]
+        public void CancellingPeriodicTeamAuraStopsRefreshAndLetsTheExistingTeamChildrenExpire()
+        {
+            var refresh = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.TeamCastNano,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = [ChildId],
+                TickCount = 10,
+                TickInterval = 100
+            };
+            var items = new StubItemBuilder()
+                .Add(TestNanos.Create(BuffId, modifiers: [refresh]))
+                .Add(TestNanos.Create(ChildId, durationCentiseconds: 1000));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player mate = world.Player(2, 10, 0, 0);
+            world.Join(caster, mate);
+            DateTime start = DateTime.UtcNow;
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(caster, caster, BuffId, items, new SilentInventory(), start));
+            NanoRuntime.Tick(caster, start.AddSeconds(1));
+            Buff casterChild = RequireBuff(caster, ChildId);
+            Buff mateChild = RequireBuff(mate, ChildId);
+
+            Assert.AreEqual(BuffRemovalOutcome.Removed, NanoRuntime.TryCancelBuff(caster, BuffId));
+            NanoRuntime.Tick(caster, start.AddSeconds(2));
+            NanoRuntime.Tick(mate, start.AddSeconds(2));
+            Assert.AreSame(casterChild, RequireBuff(caster, ChildId));
+            Assert.AreSame(mateChild, RequireBuff(mate, ChildId));
+            Assert.AreEqual(1, caster.Buffs.Count);
+            Assert.AreEqual(1, mate.Buffs.Count);
+            Assert.AreEqual(10, caster.UsedNcu);
+            Assert.AreEqual(10, mate.UsedNcu);
+
+            DateTime bothExpired = casterChild.ExpiresAtUtc > mateChild.ExpiresAtUtc
+                ? casterChild.ExpiresAtUtc : mateChild.ExpiresAtUtc;
+            NanoRuntime.Tick(caster, bothExpired);
+            NanoRuntime.Tick(mate, bothExpired);
+            Assert.AreEqual(0, caster.Buffs.Count);
+            Assert.AreEqual(0, mate.Buffs.Count);
+            Assert.AreEqual(0, caster.UsedNcu);
+            Assert.AreEqual(0, mate.UsedNcu);
+            NanoRuntime.Tick(caster, bothExpired.AddMinutes(1));
+            Assert.AreEqual(0, caster.Buffs.Count);
+            Assert.AreEqual(0, mate.Buffs.Count);
+        }
+
+        [TestMethod]
+        public void PeriodicAreaCastNanoReevaluatesRangeAndKeepsCasterAttribution()
+        {
+            var refresh = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.AreaCastNano,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = [HostileId, 10],
+                TickCount = 3,
+                TickInterval = 100
+            };
+            var items = new StubItemBuilder()
+                .Add(TestNanos.Create(BuffId, modifiers: [refresh]))
+                .Add(TestNanos.Create(HostileId, durationCentiseconds: 1000, can: 0, flags: NanoFlags.IsHostile));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter near = world.Npc(2, 5, 0, 0, attackable: true);
+            NpcCharacter edge = world.Npc(3, 10, 0, 0, attackable: true);
+            NpcCharacter outside = world.Npc(4, 11, 0, 0, attackable: true);
+            NpcCharacter safe = world.Npc(5, 3, 0, 0, attackable: false);
+            DateTime start = DateTime.UtcNow;
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(caster, caster, BuffId, items, new SilentInventory(), start));
+            Buff firstNear = RequireBuff(near, HostileId);
+            Buff firstEdge = RequireBuff(edge, HostileId);
+            Assert.AreEqual(caster.Identity, firstNear.Source);
+            Assert.AreEqual(caster.Identity, firstEdge.Source);
+            Assert.IsFalse(outside.TryGetBuff(HostileId, out _));
+
+            near.Position = new Vector3(25, 0, 0);
+            outside.Position = new Vector3(4, 0, 0);
+            NanoRuntime.Tick(caster, start.AddMilliseconds(999));
+            Assert.IsFalse(outside.TryGetBuff(HostileId, out _));
+            NanoRuntime.Tick(caster, start.AddSeconds(1));
+            Buff secondOutside = RequireBuff(outside, HostileId);
+            Assert.AreEqual(caster.Identity, secondOutside.Source);
+            Assert.AreSame(firstNear, RequireBuff(near, HostileId));
+            Assert.AreNotSame(firstEdge, RequireBuff(edge, HostileId));
+
+            near.Position = new Vector3(5, 0, 0);
+            NanoRuntime.Tick(caster, start.AddSeconds(2));
+            Buff thirdNear = RequireBuff(near, HostileId);
+            Buff thirdOutside = RequireBuff(outside, HostileId);
+            Assert.AreNotSame(firstNear, thirdNear);
+            Assert.AreNotSame(secondOutside, thirdOutside);
+            Assert.AreEqual(caster.Identity, thirdNear.Source);
+            NanoRuntime.Tick(caster, start.AddSeconds(3));
+
+            Assert.AreSame(thirdNear, RequireBuff(near, HostileId));
+            Assert.AreSame(thirdOutside, RequireBuff(outside, HostileId));
+            Assert.IsFalse(caster.TryGetBuff(HostileId, out _));
+            Assert.IsFalse(safe.TryGetBuff(HostileId, out _));
+            Assert.AreEqual(1, near.Buffs.Count);
+            Assert.AreEqual(1, edge.Buffs.Count);
+            Assert.AreEqual(1, outside.Buffs.Count);
+            Assert.AreEqual(0, safe.Buffs.Count);
         }
 
         [TestMethod]
@@ -258,6 +699,43 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, player.Buffs.Count);
             player.RebaseStats();
             Assert.AreEqual(1, player.Buffs.Count);
+        }
+
+        static Buff RequireBuff(Character character, int nanoId)
+        {
+            Assert.IsTrue(character.TryGetBuff(nanoId, out Buff? buff));
+            Assert.IsNotNull(buff);
+            return buff;
+        }
+
+        static ItemSpell Taunt(int amount, params ItemRequirement[] requirements)
+            => new()
+            {
+                FunctionType = (int)FunctionType.TauntNpc,
+                Target = (int)ItemTarget.Target,
+                Arguments = [amount],
+                Requirements = [new ItemRequirement { Operator = (int)Operator.OnCaster }, .. requirements]
+            };
+
+        static ItemRequirement CasterSkill(Operator comparison, int value)
+            => new()
+            {
+                Operator = (int)comparison,
+                StatNumber = (int)CharacterStat.PsychologicalModification,
+                Value = value
+            };
+
+        static bool UseTaunt(Character? source, Character target, StubItemBuilder items, int amount)
+            => UseTauntSpell(source, target, items, Taunt(amount));
+
+        static bool UseTauntSpell(Character? source, Character target, StubItemBuilder items, ItemSpell spell)
+        {
+            var template = new ItemTemplate
+            {
+                Id = 9002,
+                SpellList = new Dictionary<EventType, List<ItemSpell>> { [EventType.OnUse] = [spell] }
+            };
+            return template.ExecuteOnUseSpells(target, new SilentInventory(), items, source: source);
         }
 
         static bool UseCast(Player player, StubItemBuilder items, FunctionType function, int nanoId, int radius = 0)

@@ -168,7 +168,8 @@ namespace ZoneEngine_New.Core.Inventory
         /// also be a Martial Artist). Null reads those checks from <paramref name="getStat"/>.
         /// </param>
         public bool MeetsActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType,
-            Func<ItemRequirement, bool?>? resolve = null, Func<CharacterStat, int>? getTargetStat = null)
+            Func<ItemRequirement, bool?>? resolve = null, Func<CharacterStat, int>? getTargetStat = null,
+            Func<ItemRequirement, bool?>? resolveTarget = null)
         {
             ArgumentNullException.ThrowIfNull(getStat);
 
@@ -182,7 +183,7 @@ namespace ZoneEngine_New.Core.Inventory
                 }
             }
 
-            return action == null || MeetsRequirements(action.Requirements, getStat, resolve, getTargetStat);
+            return action == null || MeetsRequirements(action.Requirements, getStat, resolve, getTargetStat, resolveTarget);
         }
 
         /// <summary>
@@ -191,16 +192,18 @@ namespace ZoneEngine_New.Core.Inventory
         /// without any single failing check.
         /// </summary>
         public IReadOnlyList<UnmetRequirement> UnmetActionRequirements(Func<CharacterStat, int> getStat, ActionType actionType,
-            Func<ItemRequirement, bool?>? resolve = null, Func<CharacterStat, int>? getTargetStat = null)
+            Func<ItemRequirement, bool?>? resolve = null, Func<CharacterStat, int>? getTargetStat = null,
+            Func<ItemRequirement, bool?>? resolveTarget = null)
         {
             ArgumentNullException.ThrowIfNull(getStat);
 
             ItemAction? action = Actions.Find(candidate => candidate.ActionType == (int)actionType);
-            if (action == null || MeetsRequirements(action.Requirements, getStat, resolve, getTargetStat))
+            if (action == null || MeetsRequirements(action.Requirements, getStat, resolve, getTargetStat, resolveTarget))
                 return [];
 
             var unmet = new List<UnmetRequirement>();
             bool onTarget = false;
+            ItemRequirement? previous = null;
             foreach (ItemRequirement requirement in action.Requirements)
             {
                 if (IsRequirementLinkOperator(requirement))
@@ -208,13 +211,18 @@ namespace ZoneEngine_New.Core.Inventory
                 if (IsSubjectSelector(requirement))
                 {
                     onTarget = (Operator)requirement.Operator == Operator.OnTarget && getTargetStat != null;
+                    previous = null;
                     continue;
                 }
 
+                if (previous != null && !ContinuesSubject(previous, requirement))
+                    onTarget = false;
                 Func<CharacterStat, int> reader = onTarget ? getTargetStat! : getStat;
-                if (!EvaluateLeaf(requirement, reader, resolve))
+                if (!EvaluateLeaf(requirement, reader, onTarget ? resolveTarget ?? resolve : resolve))
                     unmet.Add(new UnmetRequirement(requirement, reader((CharacterStat)requirement.StatNumber), onTarget));
-                onTarget = false;
+                previous = requirement;
+                if (requirement.ChildOperator != 0)
+                    onTarget = false;
             }
 
             return unmet;
@@ -233,16 +241,16 @@ namespace ZoneEngine_New.Core.Inventory
             IReadOnlyList<ItemRequirement> requirements,
             Func<CharacterStat, int> getStat,
             Func<ItemRequirement, bool?>? resolve = null,
-            Func<CharacterStat, int>? getTargetStat = null)
+            Func<CharacterStat, int>? getTargetStat = null,
+            Func<ItemRequirement, bool?>? resolveTarget = null)
         {
             ArgumentNullException.ThrowIfNull(getStat);
 
-            // One resolver for every subject; OnTarget only switches the stat reader (the long-standing behaviour).
             return MeetsRequirements(
                 requirements,
                 new RequirementSubject(getStat, resolve),
                 user: null,
-                target: getTargetStat != null ? new RequirementSubject(getTargetStat, resolve) : null);
+                target: getTargetStat != null ? new RequirementSubject(getTargetStat, resolveTarget ?? resolve) : null);
         }
 
         /// <summary>
@@ -332,19 +340,23 @@ namespace ZoneEngine_New.Core.Inventory
 
             var values = new Stack<bool>();
             RequirementSubject? subject = null;
+            ItemRequirement? previous = null;
             foreach (ItemRequirement requirement in requirements)
             {
                 if (IsSubjectSelector(requirement))
                 {
                     subject = SelectSubject(requirement, self, user, target);
+                    previous = null;
                     continue;
                 }
 
                 if (!IsRequirementLinkOperator(requirement))
                 {
+                    if (previous != null && !ContinuesSubject(previous, requirement))
+                        subject = null;
                     RequirementSubject reader = subject ?? self;
                     values.Push(EvaluateLeaf(requirement, reader.GetStat, reader.Resolve));
-                    subject = null;
+                    previous = requirement;
                     continue;
                 }
 
@@ -367,8 +379,22 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
+        // A rank block or comparisons of the same stat share the selected subject. Unrelated
+        // leaves return to the default reader, including event criteria such as LastRnd.
+        static bool ContinuesSubject(ItemRequirement previous, ItemRequirement current)
+        {
+            static bool Perk(Operator op) => op is Operator.HasPerk or Operator.HasNotPerk;
+            static bool Nano(Operator op) => op is Operator.HasRunningNano or Operator.HasNotRunningNano;
+            static bool Comparison(Operator op) => op is Operator.EqualTo or Operator.Unequal
+                or Operator.GreaterThan or Operator.LessThan or Operator.BitAnd or Operator.NotBitAnd;
+            var left = (Operator)previous.Operator;
+            var right = (Operator)current.Operator;
+            return (Perk(left) && Perk(right)) || (Nano(left) && Nano(right))
+                || (Comparison(left) && Comparison(right) && previous.StatNumber == current.StatNumber);
+        }
+
         /// <summary>
-        /// OnTarget / OnSelf / OnUser / OnCaster rows name whose stats the next check reads; they are not checks
+        /// OnTarget / OnSelf / OnUser / OnCaster rows select the subject for the following check group; they are not checks
         /// themselves (Fists of Stellar Harmony ToUse: caster skills, caster VisualProfession 2, OnTarget,
         /// VisualProfession 2).
         /// </summary>
@@ -524,7 +550,8 @@ namespace ZoneEngine_New.Core.Inventory
             IInventoryRepository inventoryRepository,
             IItemBuilder items,
             bool skipPassiveModifiers,
-            SpellCriteria criteria)
+            SpellCriteria criteria,
+            bool isTick = false)
         {
             // Each function names who it applies to (User / Wearer / Self: whoever used the item or cast the
             // nano; Target: the event target). A nano cast on someone else can still act on its caster, e.g. a
@@ -543,7 +570,7 @@ namespace ZoneEngine_New.Core.Inventory
                     new RequirementSubject(stat => eventTarget.Stats.Get(stat), eventTarget.ResolveRequirement)))
                 return false;
 
-            if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify)
+            if (spell.Is(FunctionType.Modify) || spell.Is(FunctionType.ScalingModify) || spell.Is(FunctionType.Skill)
                 || spell.Is(FunctionType.ModifyPercentage) || spell.Is(FunctionType.MonsterShape))
             {
                 if (skipPassiveModifiers)
@@ -559,9 +586,15 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
 
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria,
+                isTick: isTick,
                 templateDamageType: Stats.TryGetValue(CharacterStat.DamageType, out int damageType) ? damageType : 0,
                 sourceTemplate: this);
         }
+
+        internal bool ExecutePeriodicSpell(Character target, Character? source, ItemSpell spell,
+            IInventoryRepository inventoryRepository, IItemBuilder items)
+            => ExecuteSpell(target, source, spell, inventoryRepository, items,
+                skipPassiveModifiers: false, new SpellCriteria(), isTick: true);
 
         /// <summary>
         /// One requirement leaf against the character. A VisualProfession requirement also passes on the

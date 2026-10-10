@@ -48,7 +48,7 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         /// <summary>
-        /// Heal/damage over time ticks due on this character's buffs. Ticks are collected first: a
+        /// Repeated hits and child-nano casts due on this character's buffs. Ticks are collected first: a
         /// killing tick empties NCU, so no buff list is walked while effects run.
         /// </summary>
         static void TickPeriodicEffects(Character character, DateTime nowUtc)
@@ -83,14 +83,13 @@ namespace ZoneEngine_New.Core.Nanos
                     return;
 
                 (Buff buff, ItemSpell spell) = due[i];
+                if (!character.TryGetBuff(buff.Id, out Buff? active) || !ReferenceEquals(buff, active))
+                    continue;
                 // Attributed to the caster while it is still here; otherwise the owner takes it.
                 Character? source = registry.TryGet(buff.Source, out Dynel? dynel) && dynel is Character caster
                     ? caster
                     : null;
-                if (!spell.MeetsRequirements(stat => character.Stats.Get(stat)))
-                    continue;
-
-                ItemUseFunctions.TryExecute(buff.Id, character, source, spell, inventory, items, isTick: true);
+                buff.ExecutePeriodicSpell(character, source, spell, inventory, items);
             }
         }
 

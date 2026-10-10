@@ -25,16 +25,17 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         public static void SendIfUnmet(Player player, ItemTemplate template, ActionType actionType,
             Func<CharacterStat, int>? getStat = null, Func<ItemRequirement, bool?>? resolve = null,
-            Func<CharacterStat, int>? getTargetStat = null, Func<int, string?>? nameOf = null)
+            Func<CharacterStat, int>? getTargetStat = null, Func<int, string?>? nameOf = null,
+            Func<ItemRequirement, bool?>? resolveTarget = null)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(template);
 
             getStat ??= stat => player.Stats.Get(stat);
-            if (player.Session == null || template.MeetsActionRequirements(getStat, actionType, resolve, getTargetStat))
+            if (player.Session == null || template.MeetsActionRequirements(getStat, actionType, resolve, getTargetStat, resolveTarget))
                 return;
 
-            IReadOnlyList<UnmetRequirement> unmet = template.UnmetActionRequirements(getStat, actionType, resolve, getTargetStat);
+            IReadOnlyList<UnmetRequirement> unmet = template.UnmetActionRequirements(getStat, actionType, resolve, getTargetStat, resolveTarget);
             if (unmet.Count == 0)
             {
                 ClientFeedback.Send(player, ClientFeedback.CheckItemRequirements);
