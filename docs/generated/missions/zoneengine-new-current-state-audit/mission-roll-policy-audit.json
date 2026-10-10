@@ -1,0 +1,406 @@
+{
+  "all_five_types_generate": "COMPLETE_ACTIVE",
+  "catalog_source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2",
+  "citations": [
+    {
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
+      "line": 319
+    },
+    {
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "line": 566
+    },
+    {
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+      "line": 52
+    },
+    {
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+      "line": 64
+    }
+  ],
+  "data_policy_root": "GameDataPaths.ResolveRuntimeRoot()/Missions",
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "rules": [
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 15
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 65
+        }
+      ],
+      "classification": "PROTOCOL_FACT",
+      "id": "difficulty-detents",
+      "retail_boundary": "Protocol/source and historical fixture agreement; not proof of live-returned QL.",
+      "rule": "Difficulty wire values1..11 map to indexes0..10. Active parser rejects other values."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+          "line": 34
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+          "line": 35
+        }
+      ],
+      "classification": "PROTOCOL_FACT",
+      "id": "secondary-slider-wire",
+      "retail_boundary": "Retained reconstruction distinguishes center, endpoints and +/-50; no continuous semantic effect inferred.",
+      "rule": "Six bytes decode as signed sbyte percentages in [-100,100]; other values rejected."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+          "line": 17
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+          "line": 18
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/GameData/Missions/RollPolicy.json",
+          "line": 28
+        }
+      ],
+      "classification": "LEGACY_COMPATIBILITY",
+      "id": "slider-semantic-fallback",
+      "retail_boundary": "Fallback is existing engine policy, not capture proof that unresolved settings behave identically. New observed six-slider corpus is not consumed.",
+      "rule": "Two configured profiles: all-zero Neutral; GoodBad/OrderChaos/MoneyExperience=-100 with others0. Every other valid combination is labeled Unresolved but ranks evidence as Neutral."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "line": 13
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/GameData/Missions/RollMixes.json",
+          "line": 3
+        }
+      ],
+      "classification": "CAPTURE_OBSERVATION",
+      "id": "type-cohort-data",
+      "retail_boundary": "Retains July observations, but does not establish server type probabilities. Earlier115 offers and September92830 are separate populations.",
+      "rule": "21 editable five-type cohorts in RollMixes.json, character levels60/220, expected QLs42/154/165/187/220/250. All five type values occur."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "line": 113
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "line": 55
+        }
+      ],
+      "classification": "DERIVED_FORMULA",
+      "id": "type-ranking",
+      "retail_boundary": "Nearest evidence plus uniform tie choice is reconstructed server policy, not a proven retail algorithm.",
+      "rule": "Lexicographically minimize |configured MissionQuality-generated quality|, |configured characterLevel-current level|, |difficulty difference|, categorical slider preference; uniformly pick among tied cohort rows and clone exact five entries."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 37
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 77
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+          "line": 285
+        }
+      ],
+      "classification": "CAPTURE_OBSERVATION",
+      "id": "shell-selection",
+      "retail_boundary": "Byte preservation/shape is distinct from proven probability and runtime objective support.",
+      "rule": "Decode13 configured captured bodies, admit shells whose icon/action/objective/text shapes pass compatibility, then uniformly select same-type shell. Per-offer slider compatibility currently returns true for nonnull inputs."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "line": 17
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "line": 42
+        }
+      ],
+      "classification": "CAPTURE_OBSERVATION",
+      "id": "cash-xp-observations",
+      "retail_boundary": "Observed pairs do not authorize extrapolated rewards at unobserved levels. Current comments use MissionQl without static/expected qualification.",
+      "rule": "108 deduplicated cash/XP records; preserve selected numeric pair."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "line": 172
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "line": 281
+        }
+      ],
+      "classification": "DERIVED_FORMULA",
+      "id": "cash-xp-nearest-selection",
+      "retail_boundary": "Nearest-value reuse at other conditions is policy; not measured retail behavior.",
+      "rule": "Filter exact mission type; minimize QL, character level, difficulty, categorical sliders then PF mismatch; uniformly choose tied rows. No scaling or interpolation."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+          "line": 21
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+          "line": 36
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/GameData/Missions/RollPolicy.json",
+          "line": 49
+        }
+      ],
+      "classification": "LEGACY_COMPATIBILITY",
+      "id": "reward-item-eligibility",
+      "retail_boundary": "Source item catalogs identify items. Membership and fallback do not establish complete retail mission rollability.",
+      "rule": "Read configured packaged reward catalogs, prefer scalable rows covering generated QL; if none, fixed nanos within tolerance10. Exclude rare-list IDs and Grid Armor name fragments; randomly select eligible row, no retail weights."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollPolicy.cs",
+          "line": 31
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWire.cs",
+          "line": 41
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/GameData/Missions/RollPolicy.json",
+          "line": 17
+        }
+      ],
+      "classification": "LEGACY_COMPATIBILITY",
+      "id": "fee-and-lifetime",
+      "retail_boundary": "Existing policy and compatibility fixture, no new retail timing reconstruction.",
+      "rule": "Fee=max(1,characterLevel); offers and newly accepted quests configured172800 seconds; client clock anchor1201445827 plus elapsed synchronized seconds."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 45
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/MissionTerminal.cs",
+          "line": 10
+        }
+      ],
+      "classification": "PROTOCOL_FACT",
+      "id": "wire-identity",
+      "retail_boundary": "Preserve packet identity ownership; new fullACGEntrance placement identity is different from offer and WorldPos PF identities.",
+      "rule": "Generated quest identity typeDAC3; durable positive distinct offer IDs. Terminal typeDAC1. Distinct offer IDs must not be confused with distinct destinations."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/QuestActionList.cs",
+          "line": 61
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+          "line": 47
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "docs/evidence/ACGENTRANCE_REGISTRY_AND_MISSION_DESTINATION_RECONSTRUCTION.md",
+          "line": 156
+        }
+      ],
+      "classification": "PROTOCOL_FACT",
+      "id": "worldpos-offset-meaning",
+      "retail_boundary": "Modern native read proves meaning; do not repurpose or clear these serialized values. Correct labels and identity model separately.",
+      "rule": "QuestAction Unknown18/19 carry signed WorldPos X/Z global-conversion offsets, not proven entrance low/high IDs. Current code uses EntranceLow/High and later BuildingLowId/HighId names."
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRareLootCatalog.cs",
+          "line": 32
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+          "line": 51
+        }
+      ],
+      "classification": "SPECULATIVE",
+      "id": "rare-loot-dormant-selector",
+      "retail_boundary": "Historical comment attributes ~1% preference to Mike; not proven retail loot probability and not currently an active dungeon drop feature.",
+      "rule": "TryRoll uses configurable percentage, +/-20 QL neighborhood then nearest item fallback; no runtime caller found. IsRareLootTemplate is active reward exclusion."
+    }
+  ],
+  "runtime_executed": false,
+  "runtime_reachability": "Program registers QuestAlternativeMessageHandler; SpawnService materializes MissionTerminal from official dynel type; handler calls generator and only sends response after offer+fee commit. Acceptance is separate and currently blocked by entrance data mismatch.",
+  "schema_version": 1,
+  "selected_gamedata_policy_inputs": [
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollPolicy.json",
+      "public_blob_sha256": "ded94c885a21f4a452cb86b6d7bf2b69231c1f209b51dba2c3a0ea104218d446",
+      "public_source": "AORebirth/GameData/Missions/RollPolicy.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "ded94c885a21f4a452cb86b6d7bf2b69231c1f209b51dba2c3a0ea104218d446",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Locations.json",
+      "public_blob_sha256": "7a5ba402f109b5204d89e2267823d7c02ff6f6e1fc4e51b6830263372bf9b881",
+      "public_source": "AORebirth/GameData/Missions/Locations.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "7a5ba402f109b5204d89e2267823d7c02ff6f6e1fc4e51b6830263372bf9b881",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollMixes.json",
+      "public_blob_sha256": "6637e0425ec4b0c708b2de01b9ec5c1bca4e0c2f1e9d5af25dbb0c880c57a486",
+      "public_source": "AORebirth/GameData/Missions/RollMixes.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "6637e0425ec4b0c708b2de01b9ec5c1bca4e0c2f1e9d5af25dbb0c880c57a486",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RewardObservations.json",
+      "public_blob_sha256": "f2e4649f980493a02db134ba0a8aa97c6d73f0b98ecb33b3d5ac8bcdb2354322",
+      "public_source": "AORebirth/GameData/Missions/RewardObservations.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "f2e4649f980493a02db134ba0a8aa97c6d73f0b98ecb33b3d5ac8bcdb2354322",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollBodies.json",
+      "public_blob_sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa",
+      "public_source": "AORebirth/GameData/Missions/RollBodies.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollTemplate.json",
+      "public_blob_sha256": "152c0e53be187eecd63e56651201ad8092284cdafa577e4952738c70adf80867",
+      "public_source": "AORebirth/GameData/Missions/RollTemplate.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "152c0e53be187eecd63e56651201ad8092284cdafa577e4952738c70adf80867",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Text.json",
+      "public_blob_sha256": "cab641b4873830ffe6096f90782b550cdb13c06bb6b21593b9e903047ccee0ec",
+      "public_source": "AORebirth/GameData/Missions/Text.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "cab641b4873830ffe6096f90782b550cdb13c06bb6b21593b9e903047ccee0ec",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RareLoot.json",
+      "public_blob_sha256": "7ed5af4c46ad191577ad0e16baf6c4afdc49743d9c417715c172a413c1418984",
+      "public_source": "AORebirth/GameData/Missions/RareLoot.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "7ed5af4c46ad191577ad0e16baf6c4afdc49743d9c417715c172a413c1418984",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RareLootChancePercent.json",
+      "public_blob_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "public_source": "AORebirth/GameData/Missions/RareLootChancePercent.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Source/MissionLevels.csv",
+      "public_blob_sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f",
+      "public_source": "AORebirth/GameData/Missions/Source/MissionLevels.csv",
+      "selected_private_present": true,
+      "selected_private_sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Source/MissionLevelRules.json",
+      "public_blob_sha256": "1c04621d2dcaa6dbc873b0c3a99c674429859982a127289d64d4bc84a0cc7827",
+      "public_source": "AORebirth/GameData/Missions/Source/MissionLevelRules.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "1c04621d2dcaa6dbc873b0c3a99c674429859982a127289d64d4bc84a0cc7827",
+      "semantic_identical": true
+    }
+  ],
+  "selection_rule_reference": "current-destination-selection.json",
+  "tests_executed": false
+}

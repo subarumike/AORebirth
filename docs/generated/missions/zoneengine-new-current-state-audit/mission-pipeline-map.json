@@ -1,0 +1,729 @@
+{
+  "composition_references": [
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
+      "line": 247
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
+      "line": 319
+    }
+  ],
+  "control_flow_notes": [
+    "Order is a reading guide, not independent transactions: acceptance resolves entrance and freezes parameters before its single quest/key transaction.",
+    "The final two records expand persistence boundaries of earlier stages.",
+    "Normal current offers cannot pass entrance matching with audited source/data; downstream active services are conditional capabilities, not an observed successful end-to-end lifecycle.",
+    "QuestService saves completion before separate reward grant. GeneratedMissionService no longer owns generated acceptance/objective/completion.",
+    "Authored IMissionDao and template/generated ICharacterQuestStore are distinct current owners; retained old binding reads only support existing-state exit."
+  ],
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "schema_version": 1,
+  "stages": [
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+          "line": 23
+        }
+      ],
+      "class": "QuestAlternativeMessageHandler",
+      "data_source": "SpawnService official static dynels; actor stats",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+      "id": "terminal-roll-request",
+      "input": [
+        "in-play owned QuestAlternative request",
+        "registry MissionTerminal within OpenRange",
+        "GameTime sync",
+        "character level and side"
+      ],
+      "method": "Handle",
+      "order": 1,
+      "output": [
+        "validated request or refusal",
+        "reserved five SQL identities"
+      ],
+      "persistence_owner": "IGeneratedMissionDao.ReserveIdentities",
+      "runtime_reachability": "ACTIVE_REGISTERED: Program registers IMessageHandler; SpawnService creates MissionTerminal.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+          "line": 27
+        }
+      ],
+      "class": "MissionRollSliders",
+      "data_source": "AORebirth/GameData/Missions/RollPolicy.json",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+      "id": "slider-decoding",
+      "input": [
+        "six wire bytes"
+      ],
+      "method": "TryCreate",
+      "order": 2,
+      "output": [
+        "signed percentages",
+        "profile/default categorical rank"
+      ],
+      "persistence_owner": "NONE",
+      "runtime_reachability": "ACTIVE: request prevalidation and generator call.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 27
+        }
+      ],
+      "class": "MissionLevelRuntime / MissionLevelData",
+      "data_source": [
+        "AORebirth/GameData/Missions/Source/MissionLevels.csv",
+        "AORebirth/GameData/Missions/Source/MissionLevelRules.json"
+      ],
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+      "id": "mission-quality",
+      "input": [
+        "character level",
+        "difficulty1..11"
+      ],
+      "method": "GetMissionQuality / Quality",
+      "order": 3,
+      "output": [
+        "generated mission quality1..250"
+      ],
+      "persistence_owner": "Frozen later with offer",
+      "runtime_reachability": "ACTIVE: handler and generator.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "line": 15
+        }
+      ],
+      "class": "MissionRollEvidenceCatalog",
+      "data_source": "AORebirth/GameData/Missions/RollMixes.json",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+      "id": "mission-types",
+      "input": [
+        "clamped level",
+        "difficulty",
+        "generated QL",
+        "sliders",
+        "RNG"
+      ],
+      "method": "SelectTypeMix",
+      "order": 4,
+      "output": [
+        "five MissionRollType entries"
+      ],
+      "persistence_owner": "Frozen later with offer",
+      "runtime_reachability": "ACTIVE: generator.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 41
+        }
+      ],
+      "class": "MissionRollLocations",
+      "data_source": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+        "AORebirth/GameData/Missions/Locations.json",
+        "AORebirth/GameData/Missions/RollPolicy.json"
+      ],
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+      "id": "mission-destination-selection",
+      "input": [
+        "clamped level",
+        "terminalPF",
+        "player X/Z",
+        "side",
+        "RNG"
+      ],
+      "method": "constructor / Next",
+      "order": 5,
+      "output": [
+        "one Spot per offer"
+      ],
+      "persistence_owner": "Frozen later with offer",
+      "runtime_reachability": "ACTIVE: generator; no complete placement identity.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 35
+        }
+      ],
+      "class": "GeneratedMissionRollService",
+      "data_source": [
+        "AORebirth/GameData/Missions/RollBodies.json",
+        "AORebirth/GameData/Missions/RewardObservations.json",
+        "packaged MissionRewards item catalogs"
+      ],
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+      "id": "five-offer-composition",
+      "input": [
+        "request",
+        "five type mix",
+        "shells",
+        "spots",
+        "reward rules",
+        "five durable IDs"
+      ],
+      "method": "Generate",
+      "order": 6,
+      "output": [
+        "QuestAlternative response with five distinct offer IDs"
+      ],
+      "persistence_owner": "NONE before projection",
+      "runtime_reachability": "ACTIVE: registered handler.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+          "line": 15
+        }
+      ],
+      "class": "GeneratedMissionRollProjection",
+      "data_source": [
+        "GeneratedMissionWire",
+        "QuestInfo/QuestActionList serializer members"
+      ],
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+      "id": "wire-and-offer-projection",
+      "input": [
+        "request and generated response",
+        "fee/seed/nonce/time"
+      ],
+      "method": "Create",
+      "order": 7,
+      "output": [
+        "typed GeneratedMissionOfferBatch",
+        "frozen response bytes/hash"
+      ],
+      "persistence_owner": "MySqlMissionDao.Generated.PublishOffers",
+      "runtime_reachability": "ACTIVE: handler generates projection before publish.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+          "line": 33
+        }
+      ],
+      "class": "GeneratedMissionService",
+      "data_source": [
+        "IGeneratedMissionDao"
+      ],
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+      "id": "fee-and-offer-persistence",
+      "input": [
+        "actor persistence gate",
+        "hydrated inventory",
+        "typed batch and base cash"
+      ],
+      "method": "PublishOffers",
+      "order": 8,
+      "output": [
+        "committed offer rows and deducted cash or rejection",
+        "response sent only after Applied"
+      ],
+      "persistence_owner": "MySqlMissionDao.Generated.PublishOffers",
+      "runtime_reachability": "ACTIVE: registered handler -> service -> injected DAO.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionServiceTests.cs"
+      ],
+      "transaction_detail": {
+        "data_source": "MissionRollService-generated batch",
+        "input": "GeneratedMissionOfferBatch + live base Cash under PersistenceGate",
+        "output": "frozen typed offers, batch, debit, ledger; postcommit stat publication",
+        "persistence_owner": "MySqlMissionDao.Generated.PublishOffers",
+        "references": [
+          {
+            "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+            "line": 33
+          },
+          {
+            "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+            "line": 33
+          }
+        ],
+        "runtime_reachability": "Program DI -> QuestAlternativeMessageHandler -> GeneratedMissionService.PublishOffers",
+        "stage": "offer persistence and fee",
+        "tests": "GeneratedMissionSmoke direct DAO; NOT_RUN"
+      }
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "IGeneratedMissionDao.ReadOffers; MissionEntranceCatalog; MissionRollPolicy",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "acceptance",
+      "input": "Owned unexpired Offered identity from CreateQuest",
+      "method": "AcceptOffer",
+      "note": "All five offer types use this path, but current one-row PF540 entrance data matches none of the 140 runtime location-pool rows; non-kill objective definitions are empty.",
+      "order": 9,
+      "output": "Atomic generated quest, character row, linked physical key; adopted journal",
+      "persistence_owner": "ICharacterQuestStore.TryAcceptOfferQuest",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 135,
+          "method": "AcceptOffer"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "MissionEntrances.json",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "entrance-binding",
+      "input": "Offer DestinationPlayfield/X/Z",
+      "method": "AcceptOffer",
+      "note": "Offer Y is ignored and output catalog coordinates replace offered XYZ; no exact complete placement identity is retained in offer model.",
+      "order": 10,
+      "output": "Nearest entrance within horizontal radius 1; selected catalog identity/XYZ frozen",
+      "persistence_owner": "generatedquests.AcgBuildingGeneratorJson",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 154,
+          "method": "AcceptOffer"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonIds",
+      "data_source": "Existing IItemInstanceIdAllocator",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+      "id": "dungeon-allocation",
+      "input": "Positive durable item-instance allocation",
+      "method": "TryCreate",
+      "note": "Local durable allocation contract; not operational retail BD/registry identity proof.",
+      "order": 11,
+      "output": "Quest ID D<number>; dungeon Playfield2 = 0x00200000 + number",
+      "persistence_owner": "generatedquests + characterquests",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+          "line": 20,
+          "method": "TryCreate"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "IItemBuilder; InventoryGrantPlan; item allocator",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "key-artifact-grant",
+      "input": "Free inventory grant plan and frozen quest",
+      "method": "AcceptOffer",
+      "note": "No generated repair component or return/fetch objective item is granted here.",
+      "order": 12,
+      "output": "Physical key template28577/type0xC76D linked to quest; post-commit packets",
+      "persistence_owner": "TryAcceptOfferQuest includes item row and key link",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 194,
+          "method": "AcceptOffer"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Hydrated inventory + durable source-key link",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "key-sharing",
+      "input": "Carried key and duplicator28564 in either item-on-item order",
+      "method": "TryDuplicate",
+      "note": "Duplicator is retained. Shared access follows possession rather than team membership.",
+      "order": 13,
+      "output": "New key row/link for same quest, capped12",
+      "persistence_owner": "ICharacterQuestStore.TryAddDuplicateKey",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 298,
+          "method": "TryDuplicate"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Catalog; keylinks; generated quest seed/version",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "exterior-entry",
+      "input": "MissionEntrance target identity; current player; carried linked key",
+      "method": "TryEnter",
+      "note": "Requires exact entrance instance, current PF,10 horizontal/14 vertical range, unexpired/not-ended quest. Does not require owner/team/name equality.",
+      "order": 14,
+      "output": "Generated QuestDungeonPlayfield and transfer to layout.Spawn",
+      "persistence_owner": "Read key links and generated quest",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 253,
+          "method": "TryEnter"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "DungeonLayoutGenerator",
+      "data_source": "Style324; DungeonEntrances.json; style room/collision files; DungeonDoorStyles.json",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+      "id": "layout-generation",
+      "input": "Seed/version and entrance instance as buildingInstance",
+      "method": "TryGenerate",
+      "note": "Both version1 and2 regenerate procedurally; temporary2 floors/size16/5% locks apply to all mission types.",
+      "order": 15,
+      "output": "Procedural generator payload, spawn, configured doors",
+      "persistence_owner": "Frozen seed/version only",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+          "line": 132,
+          "method": "TryGenerate"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonPlayfield",
+      "data_source": "DungeonCollisionBuilder; style Districts.json; item templates; hash NPC definitions",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+      "id": "world-materialization",
+      "input": "Generated room layout",
+      "method": "Build",
+      "note": "No generated fetch/return item, repair object or find-person target materialization. No chest creation in this class.",
+      "order": 16,
+      "output": "Collision/locality; doors; district-based ambient NPCs; kill target when configured",
+      "persistence_owner": "No persistent world state",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 69,
+          "method": "Build"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "PlayfieldManager",
+      "data_source": "DI services + generated layout",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+      "id": "zone-entry",
+      "input": "Quest/dungeon identity/layout/entrance/target/quality",
+      "method": "GetOrCreateQuestDungeon",
+      "note": "Checks existing PF belongs to same quest; releases raced candidate.",
+      "order": 17,
+      "output": "Built, registered, heartbeat-owned QuestDungeonPlayfield",
+      "persistence_owner": "Character transfer uses existing snapshot path",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+          "line": 375,
+          "method": "GetOrCreateQuestDungeon"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestService",
+      "data_source": "QuestTemplate.Objective.Npc matched by SpawnHash or MobTemplate.Hash",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+      "id": "objective-processing",
+      "input": "NPC kill-credit player list or visible targeted NPC",
+      "method": "OnNpcKilled / OnNpcTargeted",
+      "note": "Generated kill uses hardcoded LE01; no dungeon/unique target binding in matcher. TargetNpc mechanics exist, but generated FindPerson receives empty target.",
+      "order": 18,
+      "output": "Matching active quest progress/completion",
+      "persistence_owner": "ICharacterQuestStore.Save",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 268,
+          "method": "OnNpcKilled / OnNpcTargeted"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestService",
+      "data_source": "Generated definition copied from offer",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+      "id": "reward",
+      "input": "Completed quest's frozen reward definition",
+      "method": "Complete / GrantReward / GiveItem",
+      "note": "Completed is saved before reward. Full inventory logs and skips item; no shared completion/reward ledger transaction in this route.",
+      "order": 19,
+      "output": "Cash/XP; reward item if inventory admits; completion event",
+      "persistence_owner": "CharacterQuestStore.Save then independent stat/inventory dirty writes",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 346,
+          "method": "Complete / GrantReward / GiveItem"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Stored dungeon parameters",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "completion",
+      "input": "QuestEnded after quest save/reward",
+      "method": "OnQuestEnded / EndDungeon",
+      "note": "Abandon/expiry evicts; completion retains occupied world until empty.",
+      "order": 20,
+      "output": "Retired links/keys, no further entry; completed occupants remain until exit",
+      "persistence_owner": "ICharacterQuestStore.EndQuestKeys",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 509,
+          "method": "OnQuestEnded / EndDungeon"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Quest ID derived from PF; stored definition/seed/version; current entrance catalog",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "reconnect-restart",
+      "input": "Persisted dungeon playfield ID",
+      "method": "ResolveLogin",
+      "note": "No player argument/owner or held-key comparison at login; server persisted PF is input. Rebuilt world resets live door/NPC/object state.",
+      "order": 21,
+      "output": "Existing world and stored position, regenerated world at spawn, exterior, or configured respawn",
+      "persistence_owner": "Generated quest and character quest rows",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 357,
+          "method": "ResolveLogin"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "SpawnService",
+      "data_source": "Stored quest definitions + durable key links",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "id": "journal-key-restore",
+      "input": "Player world entry",
+      "method": "RestoreKeys call / quest Restore call",
+      "note": "Actual spawn consumer calls service; not inferred from class existence.",
+      "order": 22,
+      "output": "Active journal replay and carried-key name refresh",
+      "persistence_owner": "Read only except dead-key retirement",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "line": 929,
+          "method": "RestoreKeys call / quest Restore call"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "10 minute empty lifetime;1 day retention;50-row sweep batch",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "expiry-cleanup",
+      "input": "Minute timer; current UTC; expired quests with keys",
+      "method": "Sweep",
+      "note": "In-process cache and world objects are ephemeral. No current historical17-step generated binding checkpoint loop.",
+      "order": 23,
+      "output": "End keys, evict, close character rows, release empty worlds, purge old ended definitions",
+      "persistence_owner": "ICharacterQuestStore lifecycle operations",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 571,
+          "method": "Sweep"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "MySqlCharacterQuestDao",
+      "data_source": "QuestDungeonService.AcceptOffer",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+      "id": "accepted-mission-persistence",
+      "input": "owned unexpired offered identity + frozen quest/template/parameters + key grant plan",
+      "method": "TryAcceptOfferQuest",
+      "order": 24,
+      "output": "State=2 offer, generatedquests, characterquests, item_instances and questdungeonkeys in one transaction",
+      "persistence_owner": "MySqlCharacterQuestDao.TryAcceptOfferQuest",
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 211
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 135
+        }
+      ],
+      "runtime_reachability": "CreateQuestMessageHandler -> QuestDungeonService.AcceptOffer -> ICharacterQuestStore",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "stage": "acceptance and key persistence",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": "Current-route direct test not found; NOT_RUN"
+    },
+    {
+      "class": "QuestService",
+      "data_source": "persisted QuestTemplate.Reward",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+      "id": "completion-reward-persistence",
+      "input": "QuestService objective progress/forced GM completion",
+      "method": "Complete / Save / GrantReward",
+      "order": 25,
+      "output": "Completed character row first; separate in-memory stats/items and ordinary persistence",
+      "persistence_owner": "MySqlCharacterQuestDao.SaveCharacterQuest plus existing character/inventory persistence",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 346
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 369
+        }
+      ],
+      "runtime_reachability": "QuestService.Complete -> Save -> GrantReward",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "stage": "completion/reward persistence",
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": "Historical generated reward tests do not exercise this current route; NOT_RUN"
+    }
+  ]
+}

@@ -1,0 +1,3264 @@
+{
+  "binding_citations": [
+    {
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "line": 154
+    }
+  ],
+  "bounded_anti_repeat_attempts": 48,
+  "catalog_source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2",
+  "current_destination_pool_playfield_count": 25,
+  "current_destination_pool_size": 140,
+  "current_destination_selection_identified": "YES",
+  "current_destination_source": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs:Spots",
+  "current_entrance_data_dependency": "QuestDungeonService.AcceptOffer requires MissionEntranceCatalog.TryFindAt. Current selected MissionEntrances.json contains only PF540; no rolled spot uses PF540. With those current inputs, every generated offer is refused before acceptance persists.",
+  "current_only_destinations_invalid": false,
+  "current_pool_in_full_2242": 0,
+  "current_pool_in_observed_812": 0,
+  "current_pool_not_in_full_2242": 140,
+  "current_pool_outside_observed_812": 140,
+  "enforces_unique_destinations_per_five_offers": "NO",
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "input_semantics": "YES/NO fields describe explicit destination candidate filtering; shared RNG consumption can create indirect output changes. Terminal identity is used for request ownership and return-objective retargeting, not pool selection.",
+  "membership_method": "Exact playfield + compiled binary32 XYZ bits from decimal F literals. Complete placement identities are absent from current Spot model. All140 fail this exact join, so original intended placement identities are UNKNOWN; no nearest-neighbor rescue or invalidity claim is made.",
+  "new_catalog_role": "Complete2242 placement identities and exact coordinates are content lookup authority; observed812 remains descriptive metadata and must not automatically become a complete eligibility pool.",
+  "pool_rows": [
+    {
+      "coordinate_literals": [
+        "229.605",
+        "6.504",
+        "452.042"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 213,
+      "worldpos_offset_integers": [
+        43308,
+        27595
+      ],
+      "xyz_bits": [
+        1130732257,
+        1087381701,
+        1138885984
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "235.629",
+        "6.341",
+        "255.948"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 214,
+      "worldpos_offset_integers": [
+        43307,
+        27595
+      ],
+      "xyz_bits": [
+        1131127046,
+        1087039865,
+        1132458672
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "235.654",
+        "6.686",
+        "402.990"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 215,
+      "worldpos_offset_integers": [
+        43307,
+        27595
+      ],
+      "xyz_bits": [
+        1131128685,
+        1087763382,
+        1137278648
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "262.047",
+        "11.323",
+        "350.765"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 216,
+      "worldpos_offset_integers": [
+        43307,
+        27594
+      ],
+      "xyz_bits": [
+        1132660228,
+        1094003458,
+        1135567340
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "266.672",
+        "8.000",
+        "238.107"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 217,
+      "worldpos_offset_integers": [
+        43307,
+        27595
+      ],
+      "xyz_bits": [
+        1132811780,
+        1090519040,
+        1131289444
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "300.328",
+        "11.000",
+        "286.893"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 218,
+      "worldpos_offset_integers": [
+        43308,
+        27594
+      ],
+      "xyz_bits": [
+        1133914620,
+        1093664768,
+        1133474382
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "326.852",
+        "9.341",
+        "236.729"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 219,
+      "worldpos_offset_integers": [
+        43307,
+        27594
+      ],
+      "xyz_bits": [
+        1134783758,
+        1091925180,
+        1131199136
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "351.567",
+        "17.307",
+        "411.014"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 220,
+      "worldpos_offset_integers": [
+        43307,
+        27594
+      ],
+      "xyz_bits": [
+        1135593619,
+        1099592892,
+        1137541579
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "375.765",
+        "11.323",
+        "528.953"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 221,
+      "worldpos_offset_integers": [
+        43308,
+        27595
+      ],
+      "xyz_bits": [
+        1136386540,
+        1094003458,
+        1141128446
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "384.235",
+        "11.323",
+        "237.047"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 222,
+      "worldpos_offset_integers": [
+        43307,
+        27594
+      ],
+      "xyz_bits": [
+        1136664084,
+        1094003458,
+        1131219976
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "390.948",
+        "12.341",
+        "496.171"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 223,
+      "worldpos_offset_integers": [
+        43308,
+        27595
+      ],
+      "xyz_bits": [
+        1136884056,
+        1095070908,
+        1140332003
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "427.014",
+        "17.307",
+        "440.433"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 224,
+      "worldpos_offset_integers": [
+        43308,
+        27595
+      ],
+      "xyz_bits": [
+        1138065867,
+        1099592892,
+        1138505581
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "466.752",
+        "6.341",
+        "204.629"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 225,
+      "worldpos_offset_integers": [
+        43307,
+        27594
+      ],
+      "xyz_bits": [
+        1139368002,
+        1087039865,
+        1129095430
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "469.765",
+        "11.323",
+        "528.953"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 226,
+      "worldpos_offset_integers": [
+        43308,
+        27595
+      ],
+      "xyz_bits": [
+        1139466732,
+        1094003458,
+        1141128446
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "482.877",
+        "15.142",
+        "297.595"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 227,
+      "worldpos_offset_integers": [
+        43307,
+        27594
+      ],
+      "xyz_bits": [
+        1139896386,
+        1098007970,
+        1133825065
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "510.010",
+        "6.686",
+        "200.654"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 228,
+      "worldpos_offset_integers": [
+        43308,
+        27595
+      ],
+      "xyz_bits": [
+        1140785480,
+        1087763382,
+        1128834925
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "540.328",
+        "8.000",
+        "526.893"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 229,
+      "worldpos_offset_integers": [
+        43308,
+        27594
+      ],
+      "xyz_bits": [
+        1141314814,
+        1090519040,
+        1141094695
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "545.958",
+        "6.504",
+        "197.605"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 230,
+      "worldpos_offset_integers": [
+        43307,
+        27595
+      ],
+      "xyz_bits": [
+        1141407056,
+        1087381701,
+        1128635105
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "570.328",
+        "5.000",
+        "337.893"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 231,
+      "worldpos_offset_integers": [
+        43308,
+        27594
+      ],
+      "xyz_bits": [
+        1141806334,
+        1084227584,
+        1135145550
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "577.395",
+        "6.504",
+        "490.958"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 710,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 232,
+      "worldpos_offset_integers": [
+        43307,
+        27594
+      ],
+      "xyz_bits": [
+        1141922120,
+        1087381701,
+        1140161184
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "251.943",
+        "6.817",
+        "1647.62"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 791,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 233,
+      "worldpos_offset_integers": [
+        38080,
+        37660
+      ],
+      "xyz_bits": [
+        1132196200,
+        1088038109,
+        1154347991
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2008.322",
+        "17.356",
+        "675.536"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 234,
+      "worldpos_offset_integers": [
+        33859,
+        39226
+      ],
+      "xyz_bits": [
+        1157302862,
+        1099618583,
+        1143530062
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1172.884",
+        "1.748",
+        "2883.817"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 235,
+      "worldpos_offset_integers": [
+        38061,
+        36351
+      ],
+      "xyz_bits": [
+        1150458954,
+        1071627895,
+        1161051410
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2649.489",
+        "17.537",
+        "202.555"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 236,
+      "worldpos_offset_integers": [
+        37084,
+        39822
+      ],
+      "xyz_bits": [
+        1160091603,
+        1099713479,
+        1128959508
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "466.752",
+        "4.732",
+        "393.448"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 545,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 237,
+      "worldpos_offset_integers": [
+        39122,
+        40646
+      ],
+      "xyz_bits": [
+        1139368002,
+        1083665547,
+        1136965976
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "443.524",
+        "16.812",
+        "366.69"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 238,
+      "worldpos_offset_integers": [
+        39720,
+        39418
+      ],
+      "xyz_bits": [
+        1138606866,
+        1099333370,
+        1136089170
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1496.656",
+        "32.095",
+        "1183.757"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 239,
+      "worldpos_offset_integers": [
+        38486,
+        33943
+      ],
+      "xyz_bits": [
+        1153111294,
+        1107321160,
+        1150548025
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2526.175",
+        "21.505",
+        "3022.011"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 240,
+      "worldpos_offset_integers": [
+        37078,
+        41004
+      ],
+      "xyz_bits": [
+        1159586509,
+        1101793853,
+        1161617453
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1336.069",
+        "16.756",
+        "911.098"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 241,
+      "worldpos_offset_integers": [
+        41975,
+        39147
+      ],
+      "xyz_bits": [
+        1151795765,
+        1099304010,
+        1147389510
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1774.032",
+        "19.234",
+        "2217.048"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 650,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 242,
+      "worldpos_offset_integers": [
+        40865,
+        36043
+      ],
+      "xyz_bits": [
+        1155383558,
+        1100603195,
+        1158320325
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "776.689",
+        "6.109",
+        "611.184"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 243,
+      "worldpos_offset_integers": [
+        37181,
+        31310
+      ],
+      "xyz_bits": [
+        1145187353,
+        1086553326,
+        1142475719
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "809.697",
+        "31.568",
+        "2754.562"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 685,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 244,
+      "worldpos_offset_integers": [
+        34494,
+        29814
+      ],
+      "xyz_bits": [
+        1145728156,
+        1107069764,
+        1160521982
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2790.56",
+        "18.913",
+        "1411.434"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 505,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 245,
+      "worldpos_offset_integers": [
+        35213,
+        44565
+      ],
+      "xyz_bits": [
+        1160669430,
+        1100434899,
+        1152413155
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1622.992",
+        "76.516",
+        "2644.911"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 625,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 246,
+      "worldpos_offset_integers": [
+        41891,
+        30613
+      ],
+      "xyz_bits": [
+        1154146238,
+        1117325361,
+        1160072851
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1319.505",
+        "12.73",
+        "1123.048"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 595,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 247,
+      "worldpos_offset_integers": [
+        46218,
+        35171
+      ],
+      "xyz_bits": [
+        1151660073,
+        1095478804,
+        1150050697
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "731.364",
+        "26.213",
+        "1430.468"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 665,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 248,
+      "worldpos_offset_integers": [
+        31001,
+        29383
+      ],
+      "xyz_bits": [
+        1144444748,
+        1104262201,
+        1152569082
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1509.753",
+        "45.138",
+        "1553.929"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 670,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 249,
+      "worldpos_offset_integers": [
+        37169,
+        27031
+      ],
+      "xyz_bits": [
+        1153218585,
+        1110740304,
+        1153580474
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1469.645",
+        "38.906",
+        "636.102"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 695,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 250,
+      "worldpos_offset_integers": [
+        39961,
+        27027
+      ],
+      "xyz_bits": [
+        1152890020,
+        1109106622,
+        1142883975
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "808.716",
+        "15.805",
+        "2272.775"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 630,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 251,
+      "worldpos_offset_integers": [
+        43498,
+        27918
+      ],
+      "xyz_bits": [
+        1145712083,
+        1098703176,
+        1158548582
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1058.199",
+        "7.605",
+        "403.672"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 696,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 252,
+      "worldpos_offset_integers": [
+        41950,
+        27705
+      ],
+      "xyz_bits": [
+        1149519454,
+        1089690665,
+        1137300996
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1127.185",
+        "39.009",
+        "1135.309"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 570,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 253,
+      "worldpos_offset_integers": [
+        45485,
+        45363
+      ],
+      "xyz_bits": [
+        1150084588,
+        1109133623,
+        1150151139
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "790.341",
+        "46.187",
+        "1579.832"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 565,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 254,
+      "worldpos_offset_integers": [
+        41958,
+        42152
+      ],
+      "xyz_bits": [
+        1145411027,
+        1111015293,
+        1153792672
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1586.889",
+        "11.501",
+        "2130.275"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 255,
+      "worldpos_offset_integers": [
+        40889,
+        33040
+      ],
+      "xyz_bits": [
+        1153850483,
+        1094190105,
+        1157964902
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "311.304",
+        "15.78",
+        "933.627"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 586,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 256,
+      "worldpos_offset_integers": [
+        39743,
+        40341
+      ],
+      "xyz_bits": [
+        1134274281,
+        1098676961,
+        1147758625
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "202.272",
+        "12.799",
+        "1784.574"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 791,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 257,
+      "worldpos_offset_integers": [
+        38081,
+        37660
+      ],
+      "xyz_bits": [
+        1128940962,
+        1095551156,
+        1155469918
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3850.318",
+        "6.387",
+        "1386.086"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 258,
+      "worldpos_offset_integers": [
+        33859,
+        39226
+      ],
+      "xyz_bits": [
+        1165010199,
+        1087136334,
+        1152205505
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1255.864",
+        "1.572",
+        "2830.502"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 259,
+      "worldpos_offset_integers": [
+        38061,
+        36352
+      ],
+      "xyz_bits": [
+        1151138726,
+        1070151500,
+        1160833032
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1593.722",
+        "37.132",
+        "311.454"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 260,
+      "worldpos_offset_integers": [
+        37085,
+        39822
+      ],
+      "xyz_bits": [
+        1153906459,
+        1108641579,
+        1134279197
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "379.785",
+        "13.862",
+        "452.217"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 545,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 261,
+      "worldpos_offset_integers": [
+        39122,
+        40646
+      ],
+      "xyz_bits": [
+        1136518267,
+        1096665793,
+        1138891719
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "563.783",
+        "71.113",
+        "1085.991"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 262,
+      "worldpos_offset_integers": [
+        39720,
+        39418
+      ],
+      "xyz_bits": [
+        1141699101,
+        1116617179,
+        1149747126
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1673.983",
+        "31.056",
+        "1951.098"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 263,
+      "worldpos_offset_integers": [
+        38486,
+        33942
+      ],
+      "xyz_bits": [
+        1154563957,
+        1106801328,
+        1156834083
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2434.97",
+        "24.355",
+        "3360.971"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 264,
+      "worldpos_offset_integers": [
+        37077,
+        41003
+      ],
+      "xyz_bits": [
+        1159212933,
+        1103288074,
+        1163005833
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "720.316",
+        "30.884",
+        "2231.831"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 265,
+      "worldpos_offset_integers": [
+        41975,
+        39148
+      ],
+      "xyz_bits": [
+        1144263737,
+        1106711151,
+        1158380876
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1756.964",
+        "8.441",
+        "2937.478"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 650,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 266,
+      "worldpos_offset_integers": [
+        40866,
+        36043
+      ],
+      "xyz_bits": [
+        1155243737,
+        1090981462,
+        1161271206
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2553.794",
+        "14.08",
+        "2568.971"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 267,
+      "worldpos_offset_integers": [
+        37181,
+        31311
+      ],
+      "xyz_bits": [
+        1159699636,
+        1096894382,
+        1159761801
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1963.619",
+        "49.216",
+        "790.617"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 685,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 268,
+      "worldpos_offset_integers": [
+        34494,
+        29814
+      ],
+      "xyz_bits": [
+        1156936655,
+        1111809327,
+        1145415549
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1951.886",
+        "32.691",
+        "2075.415"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 505,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 269,
+      "worldpos_offset_integers": [
+        35214,
+        44565
+      ],
+      "xyz_bits": [
+        1156840538,
+        1107477398,
+        1157740196
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3655.649",
+        "40.931",
+        "877.994"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 625,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 270,
+      "worldpos_offset_integers": [
+        41890,
+        30614
+      ],
+      "xyz_bits": [
+        1164212834,
+        1109637464,
+        1146847134
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1187.595",
+        "18.627",
+        "2581.574"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 595,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 271,
+      "worldpos_offset_integers": [
+        46218,
+        35171
+      ],
+      "xyz_bits": [
+        1150579466,
+        1100284953,
+        1159813423
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1602.884",
+        "20.104",
+        "1019.075"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 670,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 272,
+      "worldpos_offset_integers": [
+        37168,
+        27030
+      ],
+      "xyz_bits": [
+        1153981514,
+        1101059326,
+        1149158605
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3287.12",
+        "21.324",
+        "856.316"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 695,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 273,
+      "worldpos_offset_integers": [
+        39962,
+        27028
+      ],
+      "xyz_bits": [
+        1162703340,
+        1101698957,
+        1146491961
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2761.952",
+        "18.643",
+        "1603.984"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 565,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 274,
+      "worldpos_offset_integers": [
+        41959,
+        42152
+      ],
+      "xyz_bits": [
+        1160552251,
+        1100293341,
+        1153990525
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1370.519",
+        "30.355",
+        "2618.614"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 275,
+      "worldpos_offset_integers": [
+        40889,
+        33040
+      ],
+      "xyz_bits": [
+        1152077980,
+        1106433802,
+        1159965139
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3508.681",
+        "11.716",
+        "1476.082"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 276,
+      "worldpos_offset_integers": [
+        33859,
+        39226
+      ],
+      "xyz_bits": [
+        1163610853,
+        1094415548,
+        1152942752
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1383.196",
+        "10.717",
+        "1924.584"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 277,
+      "worldpos_offset_integers": [
+        38061,
+        36351
+      ],
+      "xyz_bits": [
+        1152181830,
+        1093368021,
+        1156616880
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1540.457",
+        "38.611",
+        "314.573"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 278,
+      "worldpos_offset_integers": [
+        37084,
+        39823
+      ],
+      "xyz_bits": [
+        1153470112,
+        1109029290,
+        1134381400
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "541.333",
+        "24.006",
+        "553.031"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 545,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 279,
+      "worldpos_offset_integers": [
+        39121,
+        40646
+      ],
+      "xyz_bits": [
+        1141331280,
+        1103105098,
+        1141522940
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2071.823",
+        "30.421",
+        "734.167"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 280,
+      "worldpos_offset_integers": [
+        39721,
+        39418
+      ],
+      "xyz_bits": [
+        1157725483,
+        1106468405,
+        1144490672
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1678.967",
+        "30.954",
+        "2061.281"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 281,
+      "worldpos_offset_integers": [
+        38486,
+        33943
+      ],
+      "xyz_bits": [
+        1154604786,
+        1106747851,
+        1157682303
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2407.016",
+        "23.637",
+        "3358.193"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 282,
+      "worldpos_offset_integers": [
+        37078,
+        41003
+      ],
+      "xyz_bits": [
+        1159098434,
+        1102911635,
+        1162994455
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3284.116",
+        "32.307",
+        "1220.606"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 283,
+      "worldpos_offset_integers": [
+        41975,
+        39147
+      ],
+      "xyz_bits": [
+        1162691035,
+        1107376734,
+        1150849892
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1787.106",
+        "19.734",
+        "2217.608"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 650,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 284,
+      "worldpos_offset_integers": [
+        40865,
+        36044
+      ],
+      "xyz_bits": [
+        1155490660,
+        1100865339,
+        1158322618
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3083.008",
+        "10.162",
+        "2611.168"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 285,
+      "worldpos_offset_integers": [
+        37182,
+        31311
+      ],
+      "xyz_bits": [
+        1161867297,
+        1092786061,
+        1159934640
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1395.307",
+        "12.021",
+        "1780.668"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 685,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 286,
+      "worldpos_offset_integers": [
+        34495,
+        29813
+      ],
+      "xyz_bits": [
+        1152281043,
+        1094735364,
+        1155437920
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2552.298",
+        "18.212",
+        "879.947"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 505,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 287,
+      "worldpos_offset_integers": [
+        35213,
+        44565
+      ],
+      "xyz_bits": [
+        1159693509,
+        1100067373,
+        1146879132
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3619.681",
+        "37.444",
+        "845.158"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 625,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 288,
+      "worldpos_offset_integers": [
+        41890,
+        30613
+      ],
+      "xyz_bits": [
+        1164065509,
+        1108723368,
+        1146309149
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3277.754",
+        "21.457",
+        "806.08"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 695,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 289,
+      "worldpos_offset_integers": [
+        39961,
+        27028
+      ],
+      "xyz_bits": [
+        1162664976,
+        1101768688,
+        1145668895
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1086.549",
+        "50.847",
+        "1736.905"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 290,
+      "worldpos_offset_integers": [
+        40889,
+        33041
+      ],
+      "xyz_bits": [
+        1149751697,
+        1112236884,
+        1155079414
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2229.763",
+        "4.577",
+        "1607.534"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 291,
+      "worldpos_offset_integers": [
+        33859,
+        39227
+      ],
+      "xyz_bits": [
+        1158372405,
+        1083340489,
+        1154019607
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1746.856",
+        "13.378",
+        "2088.865"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 292,
+      "worldpos_offset_integers": [
+        38061,
+        36352
+      ],
+      "xyz_bits": [
+        1155160932,
+        1096158282,
+        1157795287
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1587.373",
+        "42.068",
+        "934.76"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 293,
+      "worldpos_offset_integers": [
+        37084,
+        39823
+      ],
+      "xyz_bits": [
+        1153854448,
+        1109935522,
+        1147777188
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "451.751",
+        "17.534",
+        "449.005"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 545,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 294,
+      "worldpos_offset_integers": [
+        39121,
+        40645
+      ],
+      "xyz_bits": [
+        1138876449,
+        1099711906,
+        1138786468
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1044.952",
+        "16.048",
+        "2117.389"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 295,
+      "worldpos_offset_integers": [
+        39721,
+        39418
+      ],
+      "xyz_bits": [
+        1149410935,
+        1098932814,
+        1157912121
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "976.414",
+        "9.556",
+        "1836.11"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 296,
+      "worldpos_offset_integers": [
+        38485,
+        33942
+      ],
+      "xyz_bits": [
+        1148459647,
+        1092150624,
+        1155892101
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2572.299",
+        "55.734",
+        "2111.519"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 297,
+      "worldpos_offset_integers": [
+        37077,
+        41004
+      ],
+      "xyz_bits": [
+        1159775433,
+        1113517982,
+        1157888078
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3244.423",
+        "19.468",
+        "2689.824"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 298,
+      "worldpos_offset_integers": [
+        41974,
+        39148
+      ],
+      "xyz_bits": [
+        1162528453,
+        1100725879,
+        1160256815
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "491.793",
+        "9.914",
+        "2451.975"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 299,
+      "worldpos_offset_integers": [
+        37181,
+        31311
+      ],
+      "xyz_bits": [
+        1140188545,
+        1092526014,
+        1159282586
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "290.873",
+        "17.268",
+        "2556.594"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 685,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 300,
+      "worldpos_offset_integers": [
+        34494,
+        29813
+      ],
+      "xyz_bits": [
+        1133604798,
+        1099572445,
+        1159711105
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1455.381",
+        "77.846",
+        "2426.669"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 625,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 301,
+      "worldpos_offset_integers": [
+        41891,
+        30613
+      ],
+      "xyz_bits": [
+        1152773169,
+        1117499687,
+        1159178932
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1469.645",
+        "38.906",
+        "760.902"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 695,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 302,
+      "worldpos_offset_integers": [
+        39961,
+        27028
+      ],
+      "xyz_bits": [
+        1152890020,
+        1109106622,
+        1144928698
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "619.721",
+        "21.992",
+        "2797.495"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 303,
+      "worldpos_offset_integers": [
+        40889,
+        33041
+      ],
+      "xyz_bits": [
+        1142615589,
+        1102049182,
+        1160697836
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3596.132",
+        "11.888",
+        "1500.208"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 304,
+      "worldpos_offset_integers": [
+        33860,
+        39226
+      ],
+      "xyz_bits": [
+        1163969053,
+        1094595903,
+        1153140392
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1299.618",
+        "1.296",
+        "2799.794"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 305,
+      "worldpos_offset_integers": [
+        38061,
+        36351
+      ],
+      "xyz_bits": [
+        1151497159,
+        1067836244,
+        1160707252
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1609.965",
+        "41.718",
+        "987.136"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 306,
+      "worldpos_offset_integers": [
+        37085,
+        39823
+      ],
+      "xyz_bits": [
+        1154039521,
+        1109843771,
+        1148635316
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "466.958",
+        "9.632",
+        "413.367"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 545,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 307,
+      "worldpos_offset_integers": [
+        39121,
+        40645
+      ],
+      "xyz_bits": [
+        1139374752,
+        1092230316,
+        1137618682
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "614.047",
+        "71.113",
+        "1152.176"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 308,
+      "worldpos_offset_integers": [
+        39721,
+        39418
+      ],
+      "xyz_bits": [
+        1142522626,
+        1116617179,
+        1150289314
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1402.339",
+        "50.672",
+        "1831.417"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 309,
+      "worldpos_offset_integers": [
+        38486,
+        33943
+      ],
+      "xyz_bits": [
+        1152338649,
+        1112191009,
+        1155853656
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "697.482",
+        "48.786",
+        "2712.075"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 310,
+      "worldpos_offset_integers": [
+        37077,
+        41003
+      ],
+      "xyz_bits": [
+        1143889625,
+        1111696605,
+        1160347955
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3655.392",
+        "28.864",
+        "2169.188"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 311,
+      "worldpos_offset_integers": [
+        41974,
+        39148
+      ],
+      "xyz_bits": [
+        1164211782,
+        1105652089,
+        1158124290
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "710.877",
+        "8.609",
+        "656.553"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 312,
+      "worldpos_offset_integers": [
+        37181,
+        31310
+      ],
+      "xyz_bits": [
+        1144109089,
+        1091157623,
+        1143219044
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2195.19",
+        "11.83",
+        "2413.541"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 685,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 313,
+      "worldpos_offset_integers": [
+        34495,
+        29814
+      ],
+      "xyz_bits": [
+        1158230794,
+        1094535086,
+        1159125160
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1813.573",
+        "69.953",
+        "2142.946"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 625,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 314,
+      "worldpos_offset_integers": [
+        41891,
+        30613
+      ],
+      "xyz_bits": [
+        1155707478,
+        1116465136,
+        1158016803
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1607.531",
+        "12.801",
+        "2110.653"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 315,
+      "worldpos_offset_integers": [
+        40889,
+        33040
+      ],
+      "xyz_bits": [
+        1154019582,
+        1095553253,
+        1157884531
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "3870.664",
+        "59.97",
+        "1566.744"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 316,
+      "worldpos_offset_integers": [
+        33859,
+        39227
+      ],
+      "xyz_bits": [
+        1165093536,
+        1114628424,
+        1153685455
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1805.157",
+        "8.714",
+        "2167.83"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 317,
+      "worldpos_offset_integers": [
+        38061,
+        36352
+      ],
+      "xyz_bits": [
+        1155638534,
+        1091267723,
+        1158118728
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1594.965",
+        "41.718",
+        "987.136"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 318,
+      "worldpos_offset_integers": [
+        37085,
+        39823
+      ],
+      "xyz_bits": [
+        1153916641,
+        1109843771,
+        1148635316
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "465.044",
+        "16.643",
+        "347.994"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 319,
+      "worldpos_offset_integers": [
+        39720,
+        39418
+      ],
+      "xyz_bits": [
+        1139312034,
+        1099244765,
+        1135476539
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1245.395",
+        "23.999",
+        "862.513"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 320,
+      "worldpos_offset_integers": [
+        38485,
+        33942
+      ],
+      "xyz_bits": [
+        1151052964,
+        1103101428,
+        1146593493
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1432.273",
+        "29.408",
+        "1149.982"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 321,
+      "worldpos_offset_integers": [
+        37078,
+        41003
+      ],
+      "xyz_bits": [
+        1152583868,
+        1105937302,
+        1150271341
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1693.86",
+        "29.89",
+        "812.718"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 322,
+      "worldpos_offset_integers": [
+        41974,
+        39148
+      ],
+      "xyz_bits": [
+        1154726789,
+        1106190008,
+        1145777652
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "713.306",
+        "8.609",
+        "638.421"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 323,
+      "worldpos_offset_integers": [
+        37181,
+        31310
+      ],
+      "xyz_bits": [
+        1144148886,
+        1091157623,
+        1142921970
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2861.732",
+        "17.115",
+        "2116.429"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 685,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 324,
+      "worldpos_offset_integers": [
+        34494,
+        29814
+      ],
+      "xyz_bits": [
+        1160960950,
+        1099492229,
+        1157908189
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1842.25",
+        "33.437",
+        "2373.307"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 325,
+      "worldpos_offset_integers": [
+        40889,
+        33041
+      ],
+      "xyz_bits": [
+        1155942400,
+        1107672957,
+        1158960361
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1526.236",
+        "13.009",
+        "1499.663"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 326,
+      "worldpos_offset_integers": [
+        33859,
+        39227
+      ],
+      "xyz_bits": [
+        1153353613,
+        1095771357,
+        1153135927
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1248.157",
+        "1.57",
+        "2800.209"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 327,
+      "worldpos_offset_integers": [
+        38061,
+        36351
+      ],
+      "xyz_bits": [
+        1151075590,
+        1070134723,
+        1160708952
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1601.804",
+        "42.805",
+        "960.256"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 328,
+      "worldpos_offset_integers": [
+        37085,
+        39822
+      ],
+      "xyz_bits": [
+        1153972666,
+        1110128722,
+        1148194914
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "625.702",
+        "11.139",
+        "848.172"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 329,
+      "worldpos_offset_integers": [
+        39721,
+        39418
+      ],
+      "xyz_bits": [
+        1142713582,
+        1093810520,
+        1146358530
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1028.698",
+        "25.408",
+        "1030.646"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 330,
+      "worldpos_offset_integers": [
+        38486,
+        33942
+      ],
+      "xyz_bits": [
+        1149277782,
+        1103840150,
+        1149293740
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1394.881",
+        "33.916",
+        "1390.115"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 331,
+      "worldpos_offset_integers": [
+        37077,
+        41003
+      ],
+      "xyz_bits": [
+        1152277553,
+        1107798524,
+        1152238510
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "925.276",
+        "64.557",
+        "1425.641"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 332,
+      "worldpos_offset_integers": [
+        41975,
+        39147
+      ],
+      "xyz_bits": [
+        1147621802,
+        1115757871,
+        1152529539
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "710.266",
+        "8.609",
+        "621.77"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 333,
+      "worldpos_offset_integers": [
+        37181,
+        31310
+      ],
+      "xyz_bits": [
+        1144099078,
+        1091157623,
+        1142649160
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1630.73",
+        "11.901",
+        "2127.087"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 334,
+      "worldpos_offset_integers": [
+        40889,
+        33040
+      ],
+      "xyz_bits": [
+        1154209628,
+        1094609535,
+        1157951844
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "480.434",
+        "33.523",
+        "696.375"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 335,
+      "worldpos_offset_integers": [
+        33859,
+        39227
+      ],
+      "xyz_bits": [
+        1139816333,
+        1107695501,
+        1143871488
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1713.09",
+        "14.566",
+        "1795.901"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 336,
+      "worldpos_offset_integers": [
+        38061,
+        36352
+      ],
+      "xyz_bits": [
+        1154884321,
+        1097403990,
+        1155562709
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1583.221",
+        "41.709",
+        "969.956"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 337,
+      "worldpos_offset_integers": [
+        37085,
+        39823
+      ],
+      "xyz_bits": [
+        1153820434,
+        1109841412,
+        1148353839
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "471.244",
+        "16.644",
+        "357.15"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 338,
+      "worldpos_offset_integers": [
+        39720,
+        39417
+      ],
+      "xyz_bits": [
+        1139515195,
+        1099245289,
+        1135776563
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1566.071",
+        "30.956",
+        "2030.866"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 339,
+      "worldpos_offset_integers": [
+        38485,
+        33943
+      ],
+      "xyz_bits": [
+        1153679942,
+        1106748899,
+        1157487542
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "960.806",
+        "45.843",
+        "1139.529"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 340,
+      "worldpos_offset_integers": [
+        37077,
+        41003
+      ],
+      "xyz_bits": [
+        1148203926,
+        1110925115,
+        1150185710
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1165.147",
+        "13.429",
+        "1000.577"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 341,
+      "worldpos_offset_integers": [
+        41975,
+        39148
+      ],
+      "xyz_bits": [
+        1150395572,
+        1096211759,
+        1148855534
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1763.334",
+        "17.81",
+        "2421.955"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 342,
+      "worldpos_offset_integers": [
+        37182,
+        31311
+      ],
+      "xyz_bits": [
+        1155295920,
+        1099856609,
+        1159159624
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1097.344",
+        "50.097",
+        "2101.161"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 343,
+      "worldpos_offset_integers": [
+        40889,
+        33040
+      ],
+      "xyz_bits": [
+        1149840130,
+        1112040276,
+        1157845651
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "567.349",
+        "19.947",
+        "714.768"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 795,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 344,
+      "worldpos_offset_integers": [
+        33859,
+        39227
+      ],
+      "xyz_bits": [
+        1141757526,
+        1100977013,
+        1144172839
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2227.586",
+        "21.749",
+        "3125.0"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 790,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 345,
+      "worldpos_offset_integers": [
+        38062,
+        36352
+      ],
+      "xyz_bits": [
+        1158363488,
+        1101921780,
+        1162039296
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1504.222",
+        "37.132",
+        "338.454"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 550,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 346,
+      "worldpos_offset_integers": [
+        37085,
+        39822
+      ],
+      "xyz_bits": [
+        1153173275,
+        1108641579,
+        1135163933
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "2340.189",
+        "38.124",
+        "2851.131"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 585,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 347,
+      "worldpos_offset_integers": [
+        39720,
+        39418
+      ],
+      "xyz_bits": [
+        1158824710,
+        1108901626,
+        1160917529
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "779.526",
+        "34.746",
+        "1742.733"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 760,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 348,
+      "worldpos_offset_integers": [
+        38486,
+        33943
+      ],
+      "xyz_bits": [
+        1145233834,
+        1108016103,
+        1155127157
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "946.335",
+        "40.842",
+        "994.484"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 551,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 349,
+      "worldpos_offset_integers": [
+        37078,
+        41004
+      ],
+      "xyz_bits": [
+        1147966833,
+        1109614133,
+        1148755706
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1278.216",
+        "35.154",
+        "2350.677"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 600,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 350,
+      "worldpos_offset_integers": [
+        41974,
+        39147
+      ],
+      "xyz_bits": [
+        1151321833,
+        1108123058,
+        1158867669
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1800.1",
+        "10.293",
+        "2411.475"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 655,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 351,
+      "worldpos_offset_integers": [
+        37182,
+        31311
+      ],
+      "xyz_bits": [
+        1155597107,
+        1092923425,
+        1159116698
+      ]
+    },
+    {
+      "coordinate_literals": [
+        "1295.175",
+        "46.323",
+        "878.181"
+      ],
+      "exact_catalog_identity": null,
+      "exact_observed_membership": false,
+      "playfield": 635,
+      "source_file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "source_line": 352,
+      "worldpos_offset_integers": [
+        40889,
+        33040
+      ],
+      "xyz_bits": [
+        1151460762,
+        1111050945,
+        1146850198
+      ]
+    }
+  ],
+  "prefers_distinct_playfields_above_character_level": 40,
+  "random_weighting_definition": "No numeric destination weight table or weighted-choice algorithm. Uniform index draws are modified by filtering and retry rejection; this does not prove uniform or independent retail selection.",
+  "rules": [
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 210
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 19
+        }
+      ],
+      "evidence_status": "OBSERVED",
+      "id": "selection-source",
+      "retail_authority": "UNKNOWN",
+      "rule": "Select exclusively from 140 static Spot objects; Spot has PF and XYZ plus two WorldPos integers but no complete placement identity."
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 65
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+          "line": 37
+        }
+      ],
+      "evidence_status": "OBSERVED",
+      "id": "terminal-side-access",
+      "retail_authority": "UNVERIFIED; September exact observations have no matched faction controls.",
+      "rule": "Known non-neutral city affiliation must equal character side; neutral city and unknown/wilderness terminals allow all sides."
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 18
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 20
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 199
+        }
+      ],
+      "evidence_status": "OBSERVED",
+      "id": "destination-side-filter",
+      "retail_authority": "UNVERIFIED; side associations are not proven restrictions.",
+      "rule": "Terminal city affiliation replaces character side when known. Keep same-PF spots regardless of marker side; otherwise neutral terminal affiliation allows only neutral markers, other affiliations allow own side plus neutral. Priority fallback all can escape the side list."
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 38
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/GameData/Missions/RollPolicy.json",
+          "line": 43
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "docs/evidence/MISSION_DESTINATION_ELIGIBILITY_FROM_RESOLVED_CAPTURE_CORPUS.md",
+          "line": 148
+        }
+      ],
+      "conflict": "LEVEL2_PF655_SELECTION_FORCES_SAME_PLAYFIELD_BUT_CAPTURE_HAS_MULTIPLE_PLAYFIELDS",
+      "evidence_status": "OBSERVED",
+      "id": "level-priority-bands",
+      "retail_authority": "CONFLICTS_WITH_PROVEN_EVIDENCE for universal same-PF restriction at captured level2 PF655; other bands UNVERIFIED.",
+      "rule": "Levels <=40 take first nonempty same,near,ring,distance,side,all group. Levels41..80 take local,distance,side,all. Higher levels take distance,side,all. No expected-QL input."
+    },
+    {
+      "authority": "RECONSTRUCTED_INFERENCE",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 21
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 132
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+          "line": 53
+        }
+      ],
+      "evidence_status": "OBSERVED",
+      "id": "distance-estimation",
+      "retail_authority": "UNVERIFIED; no universal cross-playfield distance system is proven.",
+      "rule": "Same-PF distance is horizontal Euclidean distance from player position supplied by handler. Cross-PF distances are invented coarse travel tiers (800/1600 or1100/2400/4200/6500/9000; unknown3500). Above40 min=max(400,12*level-200); max=35*level+900. These distances are server policy, not reconstructed coordinate geometry."
+    },
+    {
+      "authority": "RECONSTRUCTED_INFERENCE",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 46
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 25
+        }
+      ],
+      "evidence_status": "OBSERVED",
+      "id": "uniform-candidate-draw",
+      "retail_authority": "UNVERIFIED; observed frequencies are not weights or proof of independent draws.",
+      "rule": "Random.Next(candidate count) selects one Spot index uniformly for each attempt; no explicit numeric destination weights. Final distribution is modified by candidate filters and retry rejection. RNG is shared with type, shell and reward draws, so those draws can change the resulting RNG sequence without being destination eligibility inputs."
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 44
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 47
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 50
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/GameData/Missions/RollPolicy.json",
+          "line": 35
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "docs/evidence/MISSION_DESTINATION_DUPLICATE_AUDIT.md",
+          "line": 175
+        }
+      ],
+      "evidence_status": "OBSERVED",
+      "id": "bounded-anti-repeat",
+      "retail_authority": "UNVERIFIED anti-repeat distribution; strict prohibition would conflict with 2678 observed repeated-destination cohorts.",
+      "rule": "Retry up to48 times to avoid already selected Spot references. Above level40 additionally avoid any already selected playfield. On exhaustion draw without either restriction, so strict uniqueness is NOT enforced. This nonetheless introduces an anti-repeat bias unproven by current evidence.",
+      "strict_uniqueness_conflict": false,
+      "unsupported_bias": true
+    }
+  ],
+  "runtime_executed": false,
+  "schema_version": 1,
+  "selected_gamedata_policy_inputs": [
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollPolicy.json",
+      "public_blob_sha256": "ded94c885a21f4a452cb86b6d7bf2b69231c1f209b51dba2c3a0ea104218d446",
+      "public_source": "AORebirth/GameData/Missions/RollPolicy.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "ded94c885a21f4a452cb86b6d7bf2b69231c1f209b51dba2c3a0ea104218d446",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Locations.json",
+      "public_blob_sha256": "7a5ba402f109b5204d89e2267823d7c02ff6f6e1fc4e51b6830263372bf9b881",
+      "public_source": "AORebirth/GameData/Missions/Locations.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "7a5ba402f109b5204d89e2267823d7c02ff6f6e1fc4e51b6830263372bf9b881",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollMixes.json",
+      "public_blob_sha256": "6637e0425ec4b0c708b2de01b9ec5c1bca4e0c2f1e9d5af25dbb0c880c57a486",
+      "public_source": "AORebirth/GameData/Missions/RollMixes.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "6637e0425ec4b0c708b2de01b9ec5c1bca4e0c2f1e9d5af25dbb0c880c57a486",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RewardObservations.json",
+      "public_blob_sha256": "f2e4649f980493a02db134ba0a8aa97c6d73f0b98ecb33b3d5ac8bcdb2354322",
+      "public_source": "AORebirth/GameData/Missions/RewardObservations.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "f2e4649f980493a02db134ba0a8aa97c6d73f0b98ecb33b3d5ac8bcdb2354322",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollBodies.json",
+      "public_blob_sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa",
+      "public_source": "AORebirth/GameData/Missions/RollBodies.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollTemplate.json",
+      "public_blob_sha256": "152c0e53be187eecd63e56651201ad8092284cdafa577e4952738c70adf80867",
+      "public_source": "AORebirth/GameData/Missions/RollTemplate.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "152c0e53be187eecd63e56651201ad8092284cdafa577e4952738c70adf80867",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Text.json",
+      "public_blob_sha256": "cab641b4873830ffe6096f90782b550cdb13c06bb6b21593b9e903047ccee0ec",
+      "public_source": "AORebirth/GameData/Missions/Text.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "cab641b4873830ffe6096f90782b550cdb13c06bb6b21593b9e903047ccee0ec",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RareLoot.json",
+      "public_blob_sha256": "7ed5af4c46ad191577ad0e16baf6c4afdc49743d9c417715c172a413c1418984",
+      "public_source": "AORebirth/GameData/Missions/RareLoot.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "7ed5af4c46ad191577ad0e16baf6c4afdc49743d9c417715c172a413c1418984",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RareLootChancePercent.json",
+      "public_blob_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "public_source": "AORebirth/GameData/Missions/RareLootChancePercent.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Source/MissionLevels.csv",
+      "public_blob_sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f",
+      "public_source": "AORebirth/GameData/Missions/Source/MissionLevels.csv",
+      "selected_private_present": true,
+      "selected_private_sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Source/MissionLevelRules.json",
+      "public_blob_sha256": "1c04621d2dcaa6dbc873b0c3a99c674429859982a127289d64d4bc84a0cc7827",
+      "public_source": "AORebirth/GameData/Missions/Source/MissionLevelRules.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "1c04621d2dcaa6dbc873b0c3a99c674429859982a127289d64d4bc84a0cc7827",
+      "semantic_identical": true
+    }
+  ],
+  "selection_pool_and_current_entrance_playfields_intersection": [],
+  "tests_executed": false,
+  "uses_character_level": "YES",
+  "uses_expected_ql": "NO",
+  "uses_faction": "YES",
+  "uses_mission_type": "NO",
+  "uses_random_selection": "YES",
+  "uses_random_weighting": "NO",
+  "uses_secondary_sliders": "NO",
+  "uses_terminal_geography": "YES",
+  "uses_terminal_identity": "NO",
+  "weight_source": "Uniform candidate-index RNG plus unproven candidate filtering and bounded anti-repeat policy; no measured retail weights."
+}

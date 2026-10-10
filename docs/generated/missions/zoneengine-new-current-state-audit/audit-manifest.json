@@ -1,0 +1,1676 @@
+{
+  "branch": "codex/zoneengine-new-mission-current-state-audit",
+  "comparison_algorithm": "Exact identity bits and PF/XYZ binary32; no tolerance or name fallback",
+  "configured_entrance_observation": {
+    "byte_equal_to_public_git_blob": true,
+    "json_equal_to_public_source": true,
+    "logical_name": "SELECTED_GAMEDATA/MissionEntrances.json",
+    "private_payload_published": false,
+    "sha256": "b7e4f7b853a3a4d35992b0f480cdeaca4b5ae80a3099cc0250d668a47af375b2"
+  },
+  "database_access": "NONE",
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "inputs": [
+    {
+      "path": "AORebirth/GameData/MissionEntrances.json",
+      "sha256": "b7e4f7b853a3a4d35992b0f480cdeaca4b5ae80a3099cc0250d668a47af375b2",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/Destinations/MissionDestinationCatalogManifest.json",
+      "sha256": "9fd700f389624ac8d48f6e7fb0c491e0a721cbea8dcbae6eadb47df32a0897c1",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/Destinations/MissionEntrancePlacements.json",
+      "sha256": "780e6a95c3fbd5a7f41bc3e625eb7ede40ba35c294ceb6d9487ab19e74373162",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/Destinations/ObservedMissionDestinations.json",
+      "sha256": "7f22c01d41736252daa9d95ba50094f6940560854d077ab07d74193b79da92e5",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/Locations.json",
+      "sha256": "7a5ba402f109b5204d89e2267823d7c02ff6f6e1fc4e51b6830263372bf9b881",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/RewardObservations.json",
+      "sha256": "f2e4649f980493a02db134ba0a8aa97c6d73f0b98ecb33b3d5ac8bcdb2354322",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/RollBodies.json",
+      "sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/RollMixes.json",
+      "sha256": "6637e0425ec4b0c708b2de01b9ec5c1bca4e0c2f1e9d5af25dbb0c880c57a486",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/RollPolicy.json",
+      "sha256": "ded94c885a21f4a452cb86b6d7bf2b69231c1f209b51dba2c3a0ea104218d446",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/Source/MissionLevelRules.json",
+      "sha256": "1c04621d2dcaa6dbc873b0c3a99c674429859982a127289d64d4bc84a0cc7827",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/GameData/Missions/Source/MissionLevels.csv",
+      "sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
+      "sha256": "66fc9ba77a870d0c4cbcda7fa45359bffd29d07145e187168f3d002d9cda8938",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+      "sha256": "80993d4e35b6aa32ae6ef217119f6c84514bfe45aad6ec6ec330d0f71ab3bfdf",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs",
+      "sha256": "00f2bd5f53a15b65733aad9766123cf0e11671b8b5f5ac2b76033f9bd4271da3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Legacy.cs",
+      "sha256": "0a2839be31ef52f96c8787106c777a5d6250a4aba62348df01c1a7cbdcdddbdf",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+      "sha256": "bc897107cbedbb6ea9599b7a9defa037cfb698171f763839ae2869821177e01c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+      "sha256": "0dfd888f1b9671177e3e6c3e36d8c05ccc0aec5a181a2d4c7b6dc9a7b7c9afe6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+      "sha256": "0688dc60cee5572c396b658c9b4bc21a9e871ed7eb2f1ee9e060f784584c9be8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260927_character_quests.sql",
+      "sha256": "684de5c32fd0d163fc1119e2bc84900e45b4603877f656b955e3b5430b688c75",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260928_quest_dungeon_keys.sql",
+      "sha256": "4c324a71a1a3b3087e4703a5b763ea91088b105e7473ec4427a92ad257300885",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/characterquests.sql",
+      "sha256": "a1e1b02589d685e30c5c1ec08f1e53af196e4ca673857c9873de94cb9c04ba93",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/characters.sql",
+      "sha256": "10aa0e5927857f881b95a6ba65b5d97e50bb2b560e21bf8873a5bf857331d546",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionartifacts.sql",
+      "sha256": "6f8e70af633f47172d16cbcb49b3e5b914aa43953a8332ac45239e94f07ccccb",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionbatches.sql",
+      "sha256": "e8c9d5922d2449f00f5cfb38dd1451843395639c0b2edd10f850aa91fb994aac",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionbindings.sql",
+      "sha256": "4779376b5e9ad3d413afe3b9ff0e619e80167caf9bbd2d02383fe84e2020e593",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionobjects.sql",
+      "sha256": "1aee89bedcb67953859f8a2b8681a010c180924a0d705b9ddf02e878c6419618",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionobservations.sql",
+      "sha256": "18af33d7d8143d13aa095f3f18eb716cb31fe6a85cff9ab5660e762971857c6c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionoffers.sql",
+      "sha256": "ee2c0c45707af0082975013deff528f7d2daeb887680d8316f579260262bf393",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionsequences.sql",
+      "sha256": "115dc7c1ec8f69f694ceaa16caa6d5c45fe39038daf9f2a37f109e0eea65d27f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedquests.sql",
+      "sha256": "ca0f10aeeec13958fcd07e199e65f74894dcc61ee4453dc3ad0c6342ea79f9b9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/item_instance_id_sequence.sql",
+      "sha256": "5cd9dc5f207d2aaf99475ceae7f1ea1c0e9652a3634da9a91542f5b8e20b5a6c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/item_instances.sql",
+      "sha256": "a51bb081d1c625bdf3d903e6255058af2f85e501e90c189947b15aebfea2bc9a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionaccountflags.sql",
+      "sha256": "6ca5f0ffe5d1855caef1b3c6b67cda8ce925b2fd60d2953a990e93c17d469497",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionflags.sql",
+      "sha256": "b99e3321fe9b0cdc10e56ee610627294f51e903706067f912e8305e7c462f964",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionobjectiveobservations.sql",
+      "sha256": "b6e5714a73a985269bb53489d8a85e93ce332e69c805efc42368707283581b92",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionobjectiveprogress.sql",
+      "sha256": "91677b6c4ec03d6322358dedfee084a7cacc3a5d7d14e26a2de56e7e898794eb",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionrewardledger.sql",
+      "sha256": "2274731aa250bc3b2b04308ee7030bd91a0d78a7e9d5783a5708e7b738310621",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionstates.sql",
+      "sha256": "a54d65f4736b14218a46fa4db455c58682cae85be562db89a1d69a6d7650e0e2",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/questdungeonkeys.sql",
+      "sha256": "f7f5f0641a38d74bc0aabbb38888b0764045963fe579a067bb3845992b57f261",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/stats.sql",
+      "sha256": "f752b085b2a273401bdfb575eb7e2fa6eb0690242beab9bebc95a24e4af786d4",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.DungeonGenerator/DungeonEntranceMap.cs",
+      "sha256": "82529a9350c2982fb638b556134252c2f7d4291a9533021520d31ba6fe3b1ebe",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.DungeonGenerator/DungeonGenerator.cs",
+      "sha256": "7c3b4194e4f249c59819fd56d6c40bc45c404493e93ba1039e569c7fd965dce8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IGeneratedMissionDao.cs",
+      "sha256": "43895677ce845c089bf5f90f153210a4767a6d6763dd3a1f01741be2a3dd34eb",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionDao.cs",
+      "sha256": "79f37f41c51caa8493b9561491b84a0296b35ec52af70a953d763ea0c41c2162",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionInventoryMutationTransaction.cs",
+      "sha256": "04c90ccf3fe76ec342624f912dd264ff35e18835e16883ced8a8da831907c950",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/DungeonCollisionBuilderTests.cs",
+      "sha256": "5a81dc41eab85a75a2a13725c8f2d7cf0fde7451175cd9ebb1ac24c43af7933b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/DungeonWorldLayoutTests.cs",
+      "sha256": "dfe311176944b9aad833943a25c38cf7ff09572d3786b2469ec8c0f843be411a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/PlayfieldSurfaceFactoryTests.cs",
+      "sha256": "0fe888474f07bdcb7608bd1095cdd1c476be402182675f1be125007932e7aec7",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonCollisionBuilder.cs",
+      "sha256": "f3e2c32680d97ae23702195694924ab4b561ca1d8b3c61a4cf4ab0c0cdce05f5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonStyleCatalog.cs",
+      "sha256": "66e551533bf787e4d46431bd4f56c2758cac978be2a51a7449120e514cc0f94b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AORebirth.World.Pathfinding.Tests/NavMeshBakerTests.cs",
+      "sha256": "0a4b958018415f11e4fd296e8b3056c529700116e29c743d42c845b3573e3a57",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/AbmouthEncounterRuntimeServiceTests.cs",
+      "sha256": "4061cb57a68fe913d302b947006b09b182b660fb29873c2fa68a7d344e65d1a3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/AreteRegularMobCombatAcceptanceTests.cs",
+      "sha256": "d6384436c85c467dd1c3970cdca09aee9b87a91ea33614f94f42ce190849cd5b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/BotServiceFoundationTests.cs",
+      "sha256": "a1b7600d1f060d85125b43fbf909fe700b43a6c7f5d5f21ea53ddbff4e4258c2",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/BotServicePersistenceTests.cs",
+      "sha256": "caeb56465314cec1787da1c78b155683b40638056ce846d72c7284cb7aa3871b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CaptureRuntimeSafetyTests.cs",
+      "sha256": "18d5227de2bb4ae4771329abc1a26c04e4943ffb9e1a7f6a7ce976a36549e8ec",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatActiveCoverageTests.cs",
+      "sha256": "401a01acbc032d1eca9ccfbdeec22d9b5d326961edadb45fa224734b7f1aea35",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatContractTestStub.cs",
+      "sha256": "b70c7e7a1327420ba41bf89eaa8534aa3947aacadc48b19904b96405338b2743",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatPacketFactoryTests.cs",
+      "sha256": "f3426f2c07606b76eb1d5645dea69ad5d96c64a1b50e091afff9668358a0ccd4",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/CapturedEnemyCombatProfileCatalogTests.cs",
+      "sha256": "ebf9f1c4952a575b3b4f720b05d3f36d215524dc43e36e1480f46d734678ef95",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DailyMissionRewardRulesTests.cs",
+      "sha256": "20650d5436f81c53beaf37e4bf115fc5a19661b758829de6d931cf0b13c00274",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DamageCalculationTests.cs",
+      "sha256": "37f98b41b3863cfec96f6f1975dd49c89a8e8d0e2e6cc7c3e1938444d707d17e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DebuggingSerializerTests.cs",
+      "sha256": "c6fd229dfcbce262a7221aa1086ed952bce3e62a8c6b1988d4aac33fdc31037b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DungeonNamedEncounterCompletionTests.cs",
+      "sha256": "d975a7fa306a63d0a58d02b9a472ca3f8491f3ee9160fb146d105c3cb15259f5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/DungeonNamedLifecycleCompletionTests.cs",
+      "sha256": "2c7f6af9c5b8f8760c64d3d50fa674c1fbf097059579866c110c6a6dfe133f6d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/GlobalLootFoundationTests.cs",
+      "sha256": "59a026e7cdd7ce40d70a33bee842061a68dd2b9a9b11ed6dd6bb0999eb881524",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/LegacyGameplaySource.cs",
+      "sha256": "5a7d34f4ca25faf31af1d865aee344ce5523b3d69ed988859d9c7b884e10c742",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/LinuxZoneEngineDeploymentPermissionTests.cs",
+      "sha256": "5be84a290229406463e4e88c43608a38b6d5f8ba025193caf10b6ec02b541009",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgAcceptanceIdempotencyContractTests.cs",
+      "sha256": "eac88adc6738bf09cb2938015d278b25e7878d25d71ac13373d5eef78a572aad",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgAcceptedProjectionTests.cs",
+      "sha256": "d4334d46d059beb701d76dfc4bf1fd13df6596d9d94df66f57046f44e982205d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgBindingPersistenceTests.cs",
+      "sha256": "0fbf6b8749b5f592614e65192395c1b1b6e334da378665a7995fe3a22445f717",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgExpiryRuntimeContractTests.cs",
+      "sha256": "b0fa0b98230bd68a0b2f82d1cefb090b9970b10b664f515b9aca6799110cf0c8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgExpiryStateStoreTests.cs",
+      "sha256": "e1f99264331189fa8de103a045b807db5c7a99126085ae34bc786c69a35ab96b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgLayoutCatalogTests.cs",
+      "sha256": "1077f03323e5d030bbe531203614205b1f4330e854fc0f719771e833e3d6ac4b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgLegacyCatalogTestStubs.cs",
+      "sha256": "9b0b883895159760d32e593f3b915a350107c6e46ea3f607ad52b998d49134e6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgLegacyFallthroughContractTests.cs",
+      "sha256": "26cb909bf3f619d77a45c77e36addb184f9c5e717eefd480749c4bb12676c4e4",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgObjectiveCompletionTests.cs",
+      "sha256": "e5dd37ac19c1d2e977d747c62e61e252ab3b5b3643eeae6b16b16f3bcf150a8b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgOperationalRuntimeTests.cs",
+      "sha256": "5aa210a8f90af192a7a136db81d9dda91ee16bc37fbb4e4491d0d0a3d020e3fa",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgRuntimeMaterializationTests.cs",
+      "sha256": "cae76abb46b657882012c59ddd1f54503992ee7f55e48e79c117edf21cc28d22",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgSpatialRuntimeTests.cs",
+      "sha256": "936c3876253e3900d93bdc5ae944b3aa2c85558270c2769ef29b6fc4e15d9514",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgTokenProgressRuntimeContractTests.cs",
+      "sha256": "b19a1dbe2f63e320a77dadcfb9a2ff3b64765506b20c8a12c5a62e9dc02392b9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgTokenProgressStoreTests.cs",
+      "sha256": "288f725ccc1d8615ed09a1411988861772720acc9ed79417e26a6f9ec3e46ce9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionDaoArchitectureTests.cs",
+      "sha256": "d7490759491d2adab264febbfa9cd4397ebb99c814576349e56b509084ce30bb",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs",
+      "sha256": "74810a51d6a27ae20ed570e835cada6cee19b7be81944648ba4bbb218da5d176",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionOfferIdentityStoreTests.cs",
+      "sha256": "aca748d6acf901756cd2f1be08fc55dd0b97a54dfd0af16b9e3db481a0e50946",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionOfferStoreTests.cs",
+      "sha256": "5ef2b1edfeb02189946c028b0d01ce044b0602c350929818fbc5e0aa88645e26",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+      "sha256": "a5c4017dae69c4b293fe837290d2fbfa3787995ecd8d0d20ea88612f4dc9bc8c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+      "sha256": "a8883be2054d7aa493ac6adb825bf3e4ebb93a1afb8c9a1aeb37a05e484f2af3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/N3RecoveredContractTests.cs",
+      "sha256": "fe9995f1e26e7d92b0ebcff4e1514424733dadda0a41a456afb99c2b84f4c0f5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/NewCharacterStartAreaSelectionContractTests.cs",
+      "sha256": "f30b70e2b6bf673bd226a0bda03a4c28224ac577bbdae608c0641e0165aaeb21",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/NpcChaseNavigationTests.cs",
+      "sha256": "73671dacc50aa618f73d9d1b0d0632b147487bffbad960eeadfb2347f27766be",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OfficialDungeonNavigationTests.cs",
+      "sha256": "cd698c463fe06df653958b2213250cf008a0045d86d11014c59070c072dd48d8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/OfficialPlayfieldPlacementCatalogTests.cs",
+      "sha256": "7772614cb526b9e8a2e7ddcbea4214c5b93b992da9b1d1883d8616b0b072643b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PersistentMissionFoundationTests.cs",
+      "sha256": "b235bd9d696042c3a2b067cb6306f88b78b325b891760afa98fb3b0ba6030ef3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/Pf127GeometryOnlySafeModeTests.cs",
+      "sha256": "3e9e619d87706acbc46c5fb4c625427ae18750ddd7b5eec79c6931fd0e23b185",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PlayfieldHydrationSeamTests.cs",
+      "sha256": "197cf04d485ad4792269612b90c42623a94075c6e512eef4be6042b067c8be33",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PlayfieldLifecycleTraceTests.cs",
+      "sha256": "40c5ca69637f5581aeb848b195c998f2b8b01f39e1d3ce36d555b2ac69b6f3ef",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/QuestNpcOutboundTransportDiagnosticsTests.cs",
+      "sha256": "935f3e814bc45aa147c9caed61d20fd1e45b9d276cb1338d12c2416743580e91",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/QuestRuntimePersistenceTests.cs",
+      "sha256": "cab894910d5abfec1190ab03bf5168448eb0c37ca4db8c22e466428ddf9d31a1",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SubwayAcceptanceMatrixTests.cs",
+      "sha256": "942b3724d1c0a1bdd9df33999851e02a8fcdc2713ff1b1c0c079bb3ac96b7d85",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SubwayEnemyLootEvidenceTests.cs",
+      "sha256": "b2cff12adee8f272649031f0437689f304b75ef5895dad2a49054ddebe845ff6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/SubwayLootPoolRulesTests.cs",
+      "sha256": "80724f228a2511790d2343ad8348be45e743118cfcb70f267f58f953fb9a36df",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TempleAcceptanceMatrixTests.cs",
+      "sha256": "6f96e7017230d9f863d9dbd1e8c5dc6dd881206c268da2488df918903fcac7bc",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TempleDoorStatusRuntimeTests.cs",
+      "sha256": "6d02f39dd9a11828a96e5cdca46c8597adf76f007771582168ebf1bc3f5e3801",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TempleOfThreeWindsOrdinaryContentTests.cs",
+      "sha256": "8cd498d93cfd61a5c4b9ad1bbd37ad83773dd68e9834288f40481f9b89d21a81",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TypeMetaBuilderTest.cs",
+      "sha256": "83812ef4c125fab3e72d6ca1eb76ad96a5d63b87c529acf9897b8cace53f2dcc",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/WindcallerKarrecInteractionRulesTests.cs",
+      "sha256": "0dfa1894191b362715a368df92a2650285fbecadb561bcbb55ae4257c5ccc09b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/WorldPopulationFoundationTests.cs",
+      "sha256": "7b9294d3b28fa0cf5f56a0e723d0672863c1f6c69de5039781b26c172052b435",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/IdentityType.cs",
+      "sha256": "ba883f827ea06897b4b2a8d72683cf629b4bf764c2b33f0af866ed6fe9fdbbb0",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/QuestActionList.cs",
+      "sha256": "3b3ecb028ca0fe20c867d08dd2c18ff3556230b1a6d4d21d039903160b153f42",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/QuestInfo.cs",
+      "sha256": "e0cae1b31d85ececb90818d42275db3f0e0987a52cb0832f34c30d2f65ccbd3d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationCatalog.cs",
+      "sha256": "a55b70b391acafab79bbbaefa8a90799b4e1f1f09d692bcddf76f00ab6da2bdb",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationCatalogData.cs",
+      "sha256": "49d96077859949bdd1e230f492c7f73e10c58f98e1da418c3b0f3782173c6028",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationModels.cs",
+      "sha256": "e5702bac14481051129d9b2e32ec0343a1223523ee7289fa8b7f37559c7a10b1",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/AcceptedAreteVendorTests.cs",
+      "sha256": "c38b3bb507b8c28b9198df533ce646352abcd05949096af71be0622fffe76e9b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/AcceptedGardenVendorTests.cs",
+      "sha256": "4f3739acbaa7d1eb6f43ed8aed12afa64b3574cdde98c9624acd9c153c79e3ad",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/AcceptedQuestPropTests.cs",
+      "sha256": "4d10f636a3ecc6ffd5307ff6dc871514340e1be37e3251a0674d10f4ef1415c9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/AcceptedVendorRealCatalogTests.cs",
+      "sha256": "35c0d8c00bf9e87d81f8836943bb25a326c47e7caf91d967ae8be64434440ed0",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/AuthoredMissionTestDao.cs",
+      "sha256": "ce045292952b04ab059fd9e3f139dee3592637da207fe86ef0f7073c3d251578",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/AuthoredQuestTests.cs",
+      "sha256": "f9718ce64598d502414ec6c891a4d7f0aec523b7c4b15dd07c22186bb4ffe92f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/CastNanoTests.cs",
+      "sha256": "a90c252b1a96bfc169d3f33ed3eac9338c991e3fc1118ca0b530833420ae9156",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/CharacterDaoConsumerTests.cs",
+      "sha256": "06be62f96c0f1e374e3dc6d7c2f353f3c246aaf5ef7713da201a8cff377ef1fc",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+      "sha256": "9bf078050b5572a78cb6fd3bebc0998dd27e6fd80ecd97b7632c8d26b38e7712",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/DungeonRoomCellTests.cs",
+      "sha256": "a22a80dfb5814e8e80e109e78d5768a17f02d0fe76b799cf13d5588795de7ff5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/EditableNpcContentTests.cs",
+      "sha256": "bf462cd8caeab9b1c0a10fe028b8e80c1c8f09cd80537c51f0519992671b90c8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/ExactSpawnVisibilityTests.cs",
+      "sha256": "15ac66ab943f53387843b72e942748cdff6adeb05fc72f876d7032dc5195cf18",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedCombatCarrierTests.cs",
+      "sha256": "cbefe76d1dc88e4bd106e0990d99af80978e1bd700afdff128aa239f06040b9b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionCorpseInteractionTests.cs",
+      "sha256": "b0a14574cab29b7138a6b37c1ed9e3bc040a0c1acb36f60acd8763ba918aa56e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionCorpseWireTests.cs",
+      "sha256": "d003bdefbb1ecaad617f0173bc9bfb0c3a2025ee183cc7ae9ba84c560a82d856",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionLoginPlanTests.cs",
+      "sha256": "1d52cf4628328c9c7860716a647d04e313ef16cae1503eab9c911485649dfb9a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionMaterializationTests.cs",
+      "sha256": "aa828dcd9d27fe074931783d20ca103dbf0354eead516bafecb5d6620ecd816a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+      "sha256": "dbec081c304fe2c982b8e701c18da7a771cd990fd839ccea66495ca3c27be22d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionServiceTests.cs",
+      "sha256": "888b19119e4297d54de54b862daa099458fc17119fd06ae96c54d868f9e78a2b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionTokenPolicyTests.cs",
+      "sha256": "b62f563485f68207e4d266a3d0351cee1904944353db3fe2871e7e2f49b20c7e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/InteractionContentFixture.cs",
+      "sha256": "29059c320967ee1bd15e1cfe4b8aea4a96d5b287417c2f46707a15fe2b8780a3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/InteractionEditabilityTests.cs",
+      "sha256": "0cd9524b60069a7ad9bddd3ee99331aadbd1a20cb1618506981f5ded983b728f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/InventoryActionTests.cs",
+      "sha256": "7a89b2e60da0edd0267b1dfebf1adee96665434a9df3c087c8d21a7181946596",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs",
+      "sha256": "b7d3c2bcbab7d52f2c7e499dcc333a573042f1fe634b5d920c0c8359586802f5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/MissionCorpseInteractionLeaseTests.cs",
+      "sha256": "5ce404caac51c7572ca9ab3e3669bc64d1bd80cc04d0abac7d8b05680af11024",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/MissionNpcCombatPolicyTests.cs",
+      "sha256": "5373d27a63c8290d08cb57a39ed3390c9ab471e89b594f20b22303d5ae3b1a34",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NpcContentFixtures.cs",
+      "sha256": "039897bc2ea5eed8c4989e571dd750c2668678fffc78464c6f0768f90d7f3e91",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NpcNavigationTests.cs",
+      "sha256": "62c89ada512d24fe0d87550e57d029b2bb732b1ce45d00252a21b6c5242ca032",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NpcTemplateCatalogTests.cs",
+      "sha256": "e346712d3e8fa1b2335b31086fa0b9368fe17d88322ded0bb909766f67dec92f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/NpcTemplateLevelPolicyTests.cs",
+      "sha256": "61bfc15f30bdc0ccf286ac264111a73c2a54ac1c1f73811ec29d517222e99799",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/PlayerDeathRespawnTests.cs",
+      "sha256": "33c4d4972527ae329699391c8a4fabfcc345ab3378413104fbf51f03c72c274c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/PlayfieldTransferTests.cs",
+      "sha256": "01f5eeec78ae2cdc98afd4e5fdbe6a36eb58f73dee9af568b1bad776d2230a69",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/SetStatMessageHandlerTests.cs",
+      "sha256": "7274cbdb4693708d139639bc7692fc5d33d8719629c42cfdc5f84664589ace0c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/SkillTrainingTests.cs",
+      "sha256": "c8b6cfd1f05cdfb9033080c7d0eb73df58ea1586f78e1121b179187a918414f1",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/SpawnHeadingTests.cs",
+      "sha256": "694bee87613b1ee14b4a753b6122a6aa56542a58288c2dba5ee53c9dcfaf1d7a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New.Tests/TeamServiceTests.cs",
+      "sha256": "345449353acabfaa127f12cec2d5aa8ea2094e5962d4315a098fe7b49dec5bfd",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Arete/flint-novak/manifest.json",
+      "sha256": "494c287969244798efb9be90f17cb701c31eb71974768918247fd0009807acc9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Arete/flint-novak/quests/flint-novak.quests.json",
+      "sha256": "4c1539efa23dc95d23a48e40fcc0b0c951cd77608631ea84adb8479b4ef24fa6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Arete/rex-larsson/manifest.json",
+      "sha256": "8b0e1f45d19527d3aebe1eaf270a642826ce97080cc6275fd0112b0135870950",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Arete/rex-larsson/quests/rex-larsson.quests.json",
+      "sha256": "660d67e6aef8b3bc1734d41bedc4ef3663c1ec44b5016f078a47c92aaac53e03",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Doja/nascense-chip/manifest.json",
+      "sha256": "83bc8ba77362926b6c0a18489c53ce85eb3aebda3f1a3419a085bc7ddb512496",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Doja/nascense-chip/quests/doja-nascense.quests.json",
+      "sha256": "b57e6f4c0cc92b4a3c1430f3fe68773680cdd8978e7d87cf68d97414b8f75796",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Nascence/life-dialogs/captures/20260822-221109.capture-reference.json",
+      "sha256": "736b2eca213ab94c8177abf17b991436645b2fa50c3ff10b0d0e7ff0a364916e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Nascence/life-dialogs/manifest.json",
+      "sha256": "15efa32241785887b7b17ad9fc1effd9aa1d8e3479ba56115e25abf1871ddc60",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Nascence/life-dialogs/quests/nascence-life.quests.json",
+      "sha256": "7a7f507a70c3865bb4c6fd2d178482e4ff2d8cfaa002238036408f76707df021",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Nascence/rosenblatt-hiathlin/manifest.json",
+      "sha256": "128fb562b697ed4695135ed7a48ea0d804cc3b49b1a76a33405b8084464a380b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Nascence/rosenblatt-hiathlin/quests/rosenblatt-hiathlin.quests.json",
+      "sha256": "536aaef3847a2c1ea49370f8ec8cc16c077c034f39b7133dee0566254ec43bdf",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Runtime/interactions.json",
+      "sha256": "5938c04bb3c1f3eee438f2641a49245fc307e1866c784daacd23525846a39411",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Subway/windcaller-karrec/manifest.json",
+      "sha256": "c207d988fc4d76e1a26268c1c0afc6980743e4e8540cb1c59aea002922e4170a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Subway/windcaller-karrec/quests/windcaller-karrec.quests.json",
+      "sha256": "c3ce0f3aa141bc8b95fd7a032118054102ad7b043f2a2118563453f3a702481f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Thrak/garden-key/manifest.json",
+      "sha256": "fbb4ff02ac16081f8b5bc031e5d68263c10e5f6e6518148d88dbdd13ea929fa0",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Content/Thrak/garden-key/quests/thrak-garden-key.quests.json",
+      "sha256": "c84dfeaa2cac43f41d27190326d1ca0d0cbf63a8d699a256919ca5d6727706b7",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/NpcBrain.cs",
+      "sha256": "e96fc33c51ebcca4dafcccbaa82800b4b39d0bc7d260976df90586f399385f0a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/PetBehaviourTree.cs",
+      "sha256": "f59b8e3acc6e2f677673c870550ff8eea12e7172fbd3fb43b299d9f9b1ab07db",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Ai/ReachMaps.cs",
+      "sha256": "f6c8b59b8fa5cce1b2357c6e7efbd93ec2accc067ab2682024e2ea4b1a352a31",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/CharacterSnapshotService.cs",
+      "sha256": "fa3a8a581a5b997848692eff46625a008ff153d574be51ad3ca852c1f4b798ef",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Characters/SkillTraining.cs",
+      "sha256": "30354bd47c5c62761df5b02a0d5e14d1791916440ba4dad5f6b7dc341e14f797",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/GetCommand.cs",
+      "sha256": "b27dc7e61403c0bfde8fdc198c75b5656319cdec085903afc4acbeba0ea936c6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/GiveCommand.cs",
+      "sha256": "412079d758a83ffd4b20d1624402b9e9a38df4f5ab072fd43fe1f5f0b933fe98",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/QuestsCommand.cs",
+      "sha256": "2f2bc820cdfc657078462d828fd9ee77bced3a301f73f41dbffc47454476cbc6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Commands/TeleportCommand.cs",
+      "sha256": "a07f43207cd7d489092a1b19b07c4bafbc11312377635d2e633e72addeb4a60e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+      "sha256": "aaa5d75af0931e6bae5008c365c79b95ba4ad3caec698d54b096843f671adc26",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Data/SharedCharacterPersistence.cs",
+      "sha256": "d90239fe96e0aea068cd18ad4e56cdbc35dcb771b0bd5b7ae9f8250eda13b274",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/DebugMcp/DebugMcpHost.cs",
+      "sha256": "af22eed2e09dfec055b594586347d3ec5bf94eccdf0ad696c4a7ee9af317d0f8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/DebugMcp/ZoneDebugSnapshots.cs",
+      "sha256": "df712c15829bc3d222357555c30575ecd790ccd12c9b3f8b02e94f3cde1c1d5f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/DebugMcp/ZoneDebugTools.cs",
+      "sha256": "ed76309ad9f0d2b5fb7fe8f8d01e4526dd30a7c8fe03a1f7022a6ed0a01555e4",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+      "sha256": "f0f274e10b7cf7ac696da69bd0f4bb52a4f5c3cb310ab3216f68426423a4963e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Corpse.cs",
+      "sha256": "0f1cacff3a31cb1de5ca1c370bebdd00574a184c72fb804a3c97b048399e3d7f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Door.cs",
+      "sha256": "cc605df63c720ee0c864ff1c6ad3c1b8ad77d26001d51867256aa2908d4afe90",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/MissionTerminal.cs",
+      "sha256": "2395b5f3d50b670c897e221fee7d13c995403db76614672df17c02704b4466c9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/NpcCharacter.cs",
+      "sha256": "6bc9e2f6ce6a4e6a113086e99e6e05c23728def17334bdf92b11fe75ab88675e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/Player.cs",
+      "sha256": "020aee9c39f4955a1991657c2b52bb0f8493efdab0e75099bd7def4b5e505c04",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/StatCollection.cs",
+      "sha256": "86417a9b7e8e24a850888eeed49c1cd26d66505881183e2f976cf63f38170cd2",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/StaticDynel.cs",
+      "sha256": "0c5cfa6acc84748c6279cd0653b6c16a53b799dd9747e0acb960022a7c347508",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Entities/WorldItem.cs",
+      "sha256": "ada85086ea8cef64a3728d1f0cd2b846d6007f7c54931a108fef1d048fee5aed",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+      "sha256": "4ed7f194adaa909a8e1f0e36885cd68b556b82b9b39a990f8614b3133c26732d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/IGameData.cs",
+      "sha256": "c16b0e87e7383d0f650576e7c10161e277769220220ff5ebe45685558d2c2096",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcContentDefinitions.cs",
+      "sha256": "818103d74e4047660df48da8d54a28fcbad006b4a180f98b5cf87873cbb9775b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/GameData/NpcTemplateCatalog.cs",
+      "sha256": "80eba0fb8eb6aebe96d637e4af4bcc7a861dfc50fa08fe1fe9f1fcc53f53e0b6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/ClientFeedback.cs",
+      "sha256": "2e3015dbafba01786569e11461860b8314af6ad767d41b39b9e46580196b1cf3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/CombatRules.cs",
+      "sha256": "4a4278c9da7b7eb13afd37edb58420444c51968d018d226a4f49eb93ac3f0cce",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Helpers/SpecialAttacks.cs",
+      "sha256": "56311cce2948813a95d6c33ed8624d5b94d52975ed9ea795d955781785fa6ac6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/Container.cs",
+      "sha256": "3e979d33c4409e35b03a3f1fa237d7722536937a479bb024178bd1f159401ad9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryActionService.cs",
+      "sha256": "3e93741d7581caafa9aba1b92de6501ce26c8fead70269d8cc6b37bb0c4605c8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
+      "sha256": "552241f786f546e2327c25848613acdaa7a8ddc6944346a0bd8fcddbdc5ca754",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Inventory/ItemUseFunctions.cs",
+      "sha256": "ace897027192636fb891e317141467d1a85891712f67362e2ae599d0576fc63a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotCatalog.cs",
+      "sha256": "6a8e56046f381773180916cebc40195e9a276e407d19561ee3f89119134728b3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotConditions.cs",
+      "sha256": "1138ca2b21cf6643e4f5d74dc82e18017dd1f16f677e866ddea47a35630efa06",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotEffects.cs",
+      "sha256": "b12d8188e2cb802406622943e94e8b11c1fb15130df3e292873a267b977b88fe",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotParser.cs",
+      "sha256": "47d5abecd86dcdf8d7d029d3a94bffc8f0587912e5a5258574c0c68ebae90ad9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotService.cs",
+      "sha256": "e6292a79df318ad12ec9c0f663e542ec448e35b12a4d0974297cfb6fe0aa5b1a",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Lifecycle/ShutdownScheduler.cs",
+      "sha256": "251f43203996d0d6f9d1e80d08390731a2849a23cecabd2f93e82d9c2dfc9d26",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CastNanoSpellMessageHandler.cs",
+      "sha256": "91cc7468bed4839f5ce84c09c538fd62575a4798176384b056839051ae715d1f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharSecSpecAttackMessageHandler.cs",
+      "sha256": "726c77c646f6ac1338d2e974f4570933737458473bba371fddcc2fc0ace25857",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CharacterActionMessageHandler.cs",
+      "sha256": "4d9b69b317939528952794e8d85381762e9f39b936c574cce456dd8d740782f6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+      "sha256": "9c35e1e60f5161114e97d068c13557a947e414b86c58397b6ced73e18a41e143",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/FollowTargetMessageHandler.cs",
+      "sha256": "a06f22d4c2f5a0c3b4ba22c043f580520bf02d7662aedf950e82fad12512cb7b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/GenericCmdMessageHandler.cs",
+      "sha256": "1887115d1c64cdbc782c274f0c5a9c1527b75d87baa9daa62ed45186c051658d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/LookAtMessageHandler.cs",
+      "sha256": "8de1fcb82563a5b21941ac141192fc1a40feda8e365c03707539f0c063a343d8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+      "sha256": "d6ecac4dc479d2af3f66af4d31d1efff03263031a3dd8c67675c8ed63ddef7ae",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestMessageHandler.cs",
+      "sha256": "55bc3abbb23539fcee340a6afe1bab153b26303d571840eff17cbbe5ef5f79d3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/SkillMessageHandler.cs",
+      "sha256": "77b84e5e517011397eccd3dafc6535f41d76016f078517d704ff26d24e4d7e05",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/SocialActionCmdMessageHandler.cs",
+      "sha256": "fbc3b04b41d0e4213a2de5398b77bb8a8e81258dbe93f6043fb179533801c90f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
+      "sha256": "9df18b49dd9c8ab5cb724af591d7f9b4caad67a20fe7ebd4ba7b39faba3bbbcd",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Metrics/TickProfiler.cs",
+      "sha256": "769889503d3e2f6be159a7bf56e6eb2a5ce5c5048eb39b73444c804df5dda03c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+      "sha256": "6354e0cef768fb6c9937cffc8bfa66c6f6b568ea9263820de5a40f2d33fc4ecc",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+      "sha256": "86f25fdcb9c0e46e2f8af08d8121e219182e32eedb8fb7c1c982dc7880404fe5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
+      "sha256": "246ba09233e3e9e20b907cd49d166deb5b47f6b1d9c5820305eb9c6240cb33e8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+      "sha256": "81a075f61184ed6ae78ec02e2849491dbd5c1cd82e89d49e90abdf13e655959f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+      "sha256": "2d7fd32f787ed7a6e6aa339d41da20995c536a9f7dc3645831adc182427ee839",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/InteractionFiles.cs",
+      "sha256": "2aa9cc22065856883776fe807e5e19ce12b3182c72823a94182d0e6662504659",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionConfigurationContent.cs",
+      "sha256": "edb2353f2e5c34ca3c2e8ea14a76aaaed3c365033b5632216ab2a32da8f5eda8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+      "sha256": "8c4ff64c6af3cea3145db2b836d0ef4a06649e76def4b9f473beaebf46a62ab2",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "sha256": "fa052e8168bc11c302e314bed35053aa2235010a6bd1359a476192756217fb33",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+      "sha256": "f41e1c3a791fc7afb3f6c7d8dd9265187150899b31c692741bbd5154f1d85956",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferTextBuilder.cs",
+      "sha256": "75b42e89287a7dcb93d2bdc4d76829f6e7d757b3e3c830b7adfb6b13c81614f6",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRareLootCatalog.cs",
+      "sha256": "19500be02e538bbdb69fc7d5a3fda3db922df7c9a364473993ae86a58fd5c46c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+      "sha256": "603d6124571492f98e4cae6a03bb7a271f7cd6ff4d7b20c1293124d8f41b429d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureLibrary.cs",
+      "sha256": "30909301a34caac067d07497a71ccd8c25d195f72a0a2a805e1828ce919cb119",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureTemplate.cs",
+      "sha256": "fbeb0d1dc1b5e9e1e7c54fb62e37817b2e48b8b6bcea7f29655f391717653922",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+      "sha256": "3956870f47a2c4c7cae16e1e4d59b9498e0b984fae88a72bb3d936bcb52daf88",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+      "sha256": "ce68df9edefdf09f16233267e22aab01b7aa8cde890b165dc55d008ae31dde5f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollPolicy.cs",
+      "sha256": "fcc6935d1fd6b9ba44a1a7ecad1c82128fe13fcba756e80e6369c02b116e3040",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+      "sha256": "d96926849147e236607a45fcb934d7e6885d9328cc751a902c5891ea4ff5ac03",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestDefinitions.cs",
+      "sha256": "d5900f11d576002c2e7caffb922f8fb353aa978a270b27dd94c6fd8b9fc78a05",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestIndex.cs",
+      "sha256": "24d285ae859df28032e76a1b041990ca6a1f30853830f03780297bf8ec417631",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+      "sha256": "fc093e6d79d74a40ef8b06e5c79bf2403f0af873a12b14db2ed1636f78be9729",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionIdentitySpace.cs",
+      "sha256": "7d5fe7082750a346fb037f667cef550cd0d70535a4fdf1143c5ccc74f98b3e50",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+      "sha256": "347f32e08411f00243708329c69293201ed89a7b0d57a5f054f7010b537db3e5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+      "sha256": "d7d79442fbffef99df51455a28e337b1fde00f9273e47c3ae3ed6929d1d8a6cc",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+      "sha256": "d676fc0ab21d0d7a267e7cb536781998ac968181ff0ab9a7999a802e616a4b52",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWire.cs",
+      "sha256": "ce9d79798a6920cbe3a4d304b83b9226c6439739a7a25dfa91649543c6a089f8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+      "sha256": "6f986c4ef6485c6211260301c586eefd0dabad230ccb2099b370fbabbd7eca80",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionContentJson.cs",
+      "sha256": "d23c1d4fe3791dfea22c3586118d45020586858dfa8e6f739155e5fb10eb0b33",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+      "sha256": "01d61a155902fcc6a7feee83f8d08a422d812aa9c6f57cc90f6318f192d26ef3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+      "sha256": "b0271b8036330839c50ea09fbc0403461771fd037b8d4f8c6af21ddc13299b50",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Missions/QuestPropService.cs",
+      "sha256": "421cbca3209b50fd335773e60ce2d1006d51b161e47dec4979e916adac61eba0",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcTemplateLevelPolicy.cs",
+      "sha256": "dd92a77d68f93f73905ea84f0e4e8c4a1680abb27ca4d70c41c75b9cd8a95d01",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/NpcTemplateValidation.cs",
+      "sha256": "1aa8ae8b81fde8041a899107e17fe1927760fafa16241e8bea023110b2a6b2ad",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Mobs/WorldNpcFactory.cs",
+      "sha256": "90505494a2872b0f90522e73227d6461866adf160a0935ce68ac98d367a6d780",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Movement/CharacterMotor.cs",
+      "sha256": "5741cd457aede465a2bbf5997d712089c7bbf6ed7895c9e1eef91aaf1f60d6d7",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Nanos/NanoRuntime.cs",
+      "sha256": "6e02f2cf8b4befbd59a21cefea360a89b2b11393e03b5b5da2ca79244d00b41c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/IGameTimeSession.cs",
+      "sha256": "b20597bd1650a77e3ced55ac2ec5630b01160980356d33009cfc9cae7f0239f3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/MessageRouter.cs",
+      "sha256": "bdc630b348425fbdb0b24967383a06f7b1330480c6318bbf9af4d567a0a6097b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneAdmissionGate.cs",
+      "sha256": "3450d50f33dd0d6a46b8bc9f8f02f6caab12388eabd99d586ef494ece3a64d14",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneMessageDispatcher.cs",
+      "sha256": "b6a843703d645a7f3870c35eaf73193555ad4419600bc4bf021d076faa2c6025",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneNetworkHost.cs",
+      "sha256": "f1e5ac26078a484b1fd835ba51dec7c06faaddcbe158d9c549814ed093fe99a9",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Network/ZoneSession.cs",
+      "sha256": "78760685cc8b8d2d56aeac5fbef1150ff7b14d5d225700cdfa2846f5bb28b427",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Pets/PetController.cs",
+      "sha256": "3c30808e702c1b4a138537e738f021148347b5305bec0eefadd8c8a182398ca2",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/ACGPlayfield.cs",
+      "sha256": "e1bf460d161e3c4c2fc245c9c2ff655719f0dc7e77038bc56834f5500e48e302",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/DungeonPlayfieldBinder.cs",
+      "sha256": "4255ce39e7d4a7051cea557b15218a44ccb91a7f4a95001a036360612bfda5ae",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+      "sha256": "b2be151aa6051000a8156956546f201afc27515aeada0018ff3dcbbc62e90cd8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/Cell.cs",
+      "sha256": "ea40c582c321c6d3d0880264954539fefcce08c69be777f64a87af830e300b39",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/CellGrid.cs",
+      "sha256": "f84a3cc6d46dec3466088d0b7586b5cca33110a46045d75fe667042a3be5cc51",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/CellHeatScheduler.cs",
+      "sha256": "ebf89aa5a71a14ed0dc4bf506dea2e649f9c643ea6626d8e4e66653766bd5da7",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/LocalityVisibility.cs",
+      "sha256": "56850a1799a68a1943cc0c880004d65576a34d8e9c43b71a832b367764b36ce8",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Locality/PlayfieldLocality.cs",
+      "sha256": "3b74dbecf998836f5728e2e90546c8a352f6beda42b8b9bc7273fd2664a0fba2",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs",
+      "sha256": "b69db2cbd3b2932f080fb9d0976f20961375d6f09143b3892707e40a661bc98f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+      "sha256": "2cee9960fdd4aa52bc8bff61d880595da50690e233574163ff5c2f94219b5dd5",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldTransfer.cs",
+      "sha256": "87f50fb1264228b87f237e398f4b477cf015104b6bb5c461792ff5814bdf707b",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+      "sha256": "11fb64f668f083d0f523d96c41b2af996659f7a3a9e8ee023c0e5fe8198ec885",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "sha256": "73be77e34cd0015c15abd18456e9123c9f25d086913bd69667f5651c8ad8c3ff",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+      "sha256": "bf42378d462486457870143104df4d2e55fcebe52688aac6e52bfa970549d252",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/MissionEntranceCatalog.cs",
+      "sha256": "f34e2c718686930f4f146b87402bc5b69a2e446a3041c5407db8c32ccb1fb346",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+      "sha256": "6c780343254e303ade4549b58786fe5e1d176c9cd7393cef2ce8cec502eff93c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonParameters.cs",
+      "sha256": "3ea8ca73c3b384a42d839f51cff41f0c4606955c7b5144edad500bc8cc237a19",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "sha256": "c76f50ec4f304be1460ebfda5114a7985c0227191ee42c70780009db5d5cd28f",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/MissionBits.cs",
+      "sha256": "2d989b4c74a48f054dec67766b89a8163c3cd37e349ac6cd66a1ac4d5d47e031",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/PlayerQuest.cs",
+      "sha256": "849f98fdbcfa68dc0a794920b44cdced663b8e0b686e31e3346cdd4c3edeb8fe",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestCatalog.cs",
+      "sha256": "d0be0822297296204adca3afd41a6af48f91dabd6546a093bca6621408b51c1c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestJournal.cs",
+      "sha256": "d8b93e74aa8a663762f1356aa5d0181bc659a9a09bafe69cbea60bead3a7fc72",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+      "sha256": "6a075208ba3959a400475f5a7dfc3cd8d2d1701d1224229effde775d5bb29b4e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs",
+      "sha256": "8955c2d3b8e1a70d01599cf0f04f13e7370d78a3aba9124b072b931e76fff4fc",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Teams/TeamService.cs",
+      "sha256": "c9889ca9385f29190390c48b81809540d5c30bab89bd247c353240ecd546b3bc",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/Trade/TradeService.cs",
+      "sha256": "d5bc15a7ecfd20ade9a0fa23e9402483ff4fc5845896ff467087e18e9b682832",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+      "sha256": "308a343a06ec9c88653571bfc5084e64e91d3e9ee6b214cde1212d6fa5390223",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+      "sha256": "34772f0d36adbe35768ee33f6bb27256daea24cc3b5fd7d2eb6ddcecaa9bfc5d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/TriggerVolumeCatalog.cs",
+      "sha256": "16e57a016c820a7de6fd4dce4cacd0adb3f6bbf5af0d063978fd267ce70aa60c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/Program.cs",
+      "sha256": "5c11509905151c88a611188d0aafc081ab125084da697abcf4b69abe631c18ab",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+      "sha256": "d2301d075fc2ea997438f97d5f062b1ffdfb0ab229b6cca8a32dc989d17a5c9c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/XML Data/MissionRewards/ItemDb_Nanos.json",
+      "sha256": "00805abce680f03c2496b5fc032d83300303f928d11f26311bdbfb1f91342a98",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/XML Data/MissionRewards/ItemDb_Rest.json",
+      "sha256": "242bce04bab9b56a7b5a9cb3f915f1f3d15e7c1c7fee1922a2810ebd827d820c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
+      "sha256": "17db4eb05cf8b39d12fe05d1220aafee4cfc1b3eeb50bcbbf51b4adc0608a420",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/MissionDaoValidation/HardeningChecks.cs",
+      "sha256": "70ac731d47856fb4d399b41b566da3f7b6dfe77a43fadc52b1699daae0b776ab",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/MissionDaoValidation/ParallelContractChecks.cs",
+      "sha256": "adde7370944e65a428f2c87ee0670b68319d48faa4f3842f54aedbec8ac49e2d",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/MissionDaoValidation/Program.cs",
+      "sha256": "498566deb2731266387ab965cba3c998f19bfadfe8c2d1b5329e098dc9c739bd",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+      "sha256": "a594d2ef501cd78e67c8ab2b9732f68fed8bcaacadcc87d21af71527f99c7349",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/MissionDestinationCatalog.Tests/Program.cs",
+      "sha256": "4a4c78195b85592b8663d0837cb90f057d4a2c01f139f87d929168259968bfbd",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+      "sha256": "cfe95adeebad3d5abfdd1970c390d98cfb23f8ac92ccf22c012a37a17f959b97",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/ZoneEngineSchemaValidation/ConnectedMissionSeed.cs",
+      "sha256": "669fe3708ae50254182bb8c3fc3df9e55693fb012492535bc715c9c290b43341",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/ZoneEngineSchemaValidation/CutoverDurableReloadSmoke.cs",
+      "sha256": "c41e9c06d7eb8a7e646a3448ff2df50ede17bb07c018159a68b1cb6a902aae7c",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+      "sha256": "1a99d9244c1cdd23a3089cee0eae6b034110444154f696c7f3474aff4b85e99e",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/generate_mission_level_graph.py",
+      "sha256": "3ece1e5c7906180781263f3835a8123489b464a91f7b67f88aec40d9f2930de3",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "Tools/test_acgentrance_reconstruction.py",
+      "sha256": "ee4ca0adc77226ba6e6b50fb2682f877f3fe9597139ca6486802ee8ddb39fb84",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "Tools/test_mission_destination_catalog.py",
+      "sha256": "73b301ca586d52c1560f635d75e5c482f0bfe3e4b3743a4fac3e4da201713ede",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "Tools/test_mission_destination_duplicate_audit.py",
+      "sha256": "14bcea6a0d5265644d5f83f676e1b17160b00a4ac16a1213790fb183eb4f8f37",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "Tools/test_mission_destination_eligibility_analysis.py",
+      "sha256": "c6b3d533bcbb1214618097bf83830fabd1b0c6afd0f4fb70221b73b9d0b61585",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "docs/evidence/ACGENTRANCE_REGISTRY_AND_MISSION_DESTINATION_RECONSTRUCTION.md",
+      "sha256": "621175cf2d1782cc94e9fb0db6ad4fbd6c311d11a5a86fde64f588b3817ca4dc",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "docs/evidence/MISSION_DESTINATION_CATALOG_FOUNDATION.md",
+      "sha256": "c009c6a008cb6efe148520d1276fa89fc45599a30ef06ab142978fd77257d7e8",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "docs/evidence/MISSION_DESTINATION_DUPLICATE_AUDIT.md",
+      "sha256": "b232c908134b5a6854e851f92a2d799e93fa6d3e05e210813973c7cf0f3840e1",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "docs/evidence/MISSION_DESTINATION_ELIGIBILITY_FROM_RESOLVED_CAPTURE_CORPUS.md",
+      "sha256": "1c45fff123c527dc21d4ddff7b276c74f6f7c664478398619d8f7fc02f5b8b70",
+      "source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
+    },
+    {
+      "path": "docs/evidence/ZONEENGINE_NEW_GAMEPLAY_CHECKPOINT_20260908.md",
+      "sha256": "c9f3183329e2c4ddfb5c1d9fd16268988fe7efc454f78a0db1284c5c41bbd602",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "docs/evidence/ZONEENGINE_NEW_MISSIONS_RECONCILIATION.md",
+      "sha256": "502de5a0b53ffc520b7e67b9657f78d09d0c8d72c5a2523703ec30075060ea92",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "path": "docs/evidence/ZONEENGINE_NEW_MISSION_GAP_CLOSURE.md",
+      "sha256": "f4c2eaae926122a0a81156c25b3cd5a698a8b6b2344a6f4fc14873f7801c3c50",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/component-disposition.json",
+      "sha256": "af74fe8226e577b0b695337cc1ddd04dd8d925c47a8f80f220067cefc63877b4"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/component-inventory.json",
+      "sha256": "06cf3dad8b12e9de8a50e863cd18b6f3c4a3193cc0cf5e83b424da745ae9b9cb"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/csharp-content-findings.json",
+      "sha256": "0448eeab3122d00710bd25e4905b7136a2b5883b9b71cd94684b07b7de0dc900"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/current-destination-selection.json",
+      "sha256": "45106e60ab1eb0e61c17fef49700aba856d6b310264b023293471cb3738f65db"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/current-entrance-catalog-comparison.json",
+      "sha256": "ce349245759efd08291569181fabd501b1db9549bdc656520c88a01b23c28b64"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/entrance-instance-flow.json",
+      "sha256": "4d929d28450e4b124a27e99b02a2c87bc084a6d05eb86f60b7d8458b081bf82d"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/generated-dungeon-flow.json",
+      "sha256": "4d26702a782837a84ba46d46ed73966b1b09ede1d467b567f915dc96b7fe7f2d"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/integration-roadmap.json",
+      "sha256": "5043fdd036968bd7fe779761dd3f9f97d3ae7b98c82c601095c84e77ba296b98"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/mission-pipeline-map.json",
+      "sha256": "50f73bbe06508e23025cc552a18d7a2db1c10079ca07801eefe27ccad304b190"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/mission-roll-policy-audit.json",
+      "sha256": "155fe147e5f1387e83f90898768d4ea84095e9162e1329066d272482f7f025c9"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/mission-test-inventory.json",
+      "sha256": "587b5019ef02e5c021fbfbcc7430513a0df302f6a996a3f3d90489afe2453d07"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/mission-type-capability-matrix.json",
+      "sha256": "239805ac821213d66fd692d5beb0b9408a90067fc77692874b1a395dcd565a51"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/persistence-table-map.json",
+      "sha256": "bc5b0533bc3d0897ffaf3bdd3fff2f959dea589ed0e297e0bba5c057f17ec342"
+    },
+    {
+      "path": "docs/generated/missions/zoneengine-new-current-state-audit/ql-system-audit.json",
+      "sha256": "cc52d86a3e22624effb88dfae1a7299ff1f68b5ff843b89b7fa0cf6447fa23d0"
+    }
+  ],
+  "report": {
+    "path": "docs/evidence/ZONEENGINE_NEW_MISSION_CURRENT_STATE_AUDIT.md",
+    "sha256": "15363fba747fd510b66a230a077af70f47cdc24a9e11b8f27f33c498067bd4e8"
+  },
+  "runtime_execution": "NOT_RUN",
+  "schema_version": 1,
+  "semantic_findings": "Reviewed source audit records; canonicalization does not automatically prove their interpretation",
+  "start_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2",
+  "test_suites": "NOT_RUN",
+  "tool": {
+    "path": "Tools/zoneengine_new_mission_current_state_audit.py",
+    "sha256": "2d7da904432e80338061a041c327047c4f741d061050cb554b9085cc6dd32061"
+  }
+}

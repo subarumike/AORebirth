@@ -1,0 +1,333 @@
+{
+  "catalog_source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2",
+  "citations": [
+    {
+      "evidence_status": "OBSERVED",
+      "file": "docs/evidence/MISSION_DESTINATION_ELIGIBILITY_FROM_RESOLVED_CAPTURE_CORPUS.md",
+      "line": 136
+    }
+  ],
+  "concepts": {
+    "character_level": "Actor CharacterStat.Level; clamp1..220 only within generation lookup.",
+    "difficulty_slider_detent": "Request LevelSlider1..11; zero-based column index=wire-1.",
+    "expected_mission_ql": "Static table expectation used by research and current generator; observations cover45 expected values1..66.",
+    "generated_mission_ql": "Server-chosen table value assigned to generated offer Quality and later frozen quest parameters.",
+    "live_returned_mission_ql": "UNVERIFIED; zero proven decoded response-side QL fields in93185-offer research corpus."
+  },
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "no_formula_recovered": "Active QL is table lookup, not a computed level multiplier; generated C# duplicate is unconsumed.",
+  "runtime_executed": false,
+  "schema_version": 1,
+  "selected_gamedata_policy_inputs": [
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollPolicy.json",
+      "public_blob_sha256": "ded94c885a21f4a452cb86b6d7bf2b69231c1f209b51dba2c3a0ea104218d446",
+      "public_source": "AORebirth/GameData/Missions/RollPolicy.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "ded94c885a21f4a452cb86b6d7bf2b69231c1f209b51dba2c3a0ea104218d446",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Locations.json",
+      "public_blob_sha256": "7a5ba402f109b5204d89e2267823d7c02ff6f6e1fc4e51b6830263372bf9b881",
+      "public_source": "AORebirth/GameData/Missions/Locations.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "7a5ba402f109b5204d89e2267823d7c02ff6f6e1fc4e51b6830263372bf9b881",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollMixes.json",
+      "public_blob_sha256": "6637e0425ec4b0c708b2de01b9ec5c1bca4e0c2f1e9d5af25dbb0c880c57a486",
+      "public_source": "AORebirth/GameData/Missions/RollMixes.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "6637e0425ec4b0c708b2de01b9ec5c1bca4e0c2f1e9d5af25dbb0c880c57a486",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RewardObservations.json",
+      "public_blob_sha256": "f2e4649f980493a02db134ba0a8aa97c6d73f0b98ecb33b3d5ac8bcdb2354322",
+      "public_source": "AORebirth/GameData/Missions/RewardObservations.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "f2e4649f980493a02db134ba0a8aa97c6d73f0b98ecb33b3d5ac8bcdb2354322",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollBodies.json",
+      "public_blob_sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa",
+      "public_source": "AORebirth/GameData/Missions/RollBodies.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "2b21b1e2896250d15a8eb736a5452164a071539a3a56cfbdd8779a422d8b77aa",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RollTemplate.json",
+      "public_blob_sha256": "152c0e53be187eecd63e56651201ad8092284cdafa577e4952738c70adf80867",
+      "public_source": "AORebirth/GameData/Missions/RollTemplate.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "152c0e53be187eecd63e56651201ad8092284cdafa577e4952738c70adf80867",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Text.json",
+      "public_blob_sha256": "cab641b4873830ffe6096f90782b550cdb13c06bb6b21593b9e903047ccee0ec",
+      "public_source": "AORebirth/GameData/Missions/Text.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "cab641b4873830ffe6096f90782b550cdb13c06bb6b21593b9e903047ccee0ec",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RareLoot.json",
+      "public_blob_sha256": "7ed5af4c46ad191577ad0e16baf6c4afdc49743d9c417715c172a413c1418984",
+      "public_source": "AORebirth/GameData/Missions/RareLoot.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "7ed5af4c46ad191577ad0e16baf6c4afdc49743d9c417715c172a413c1418984",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/RareLootChancePercent.json",
+      "public_blob_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "public_source": "AORebirth/GameData/Missions/RareLootChancePercent.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Source/MissionLevels.csv",
+      "public_blob_sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f",
+      "public_source": "AORebirth/GameData/Missions/Source/MissionLevels.csv",
+      "selected_private_present": true,
+      "selected_private_sha256": "295ade2cac00ddfc975bbf1c3f0d7f953f3726e08cc21c0c1f32a5b5b30eb70f",
+      "semantic_identical": true
+    },
+    {
+      "bytes_identical": true,
+      "evidence_status": "OBSERVED",
+      "logical_private_source": "SELECTED_PRIVATE_GAMEDATA/Missions/Source/MissionLevelRules.json",
+      "public_blob_sha256": "1c04621d2dcaa6dbc873b0c3a99c674429859982a127289d64d4bc84a0cc7827",
+      "public_source": "AORebirth/GameData/Missions/Source/MissionLevelRules.json",
+      "selected_private_present": true,
+      "selected_private_sha256": "1c04621d2dcaa6dbc873b0c3a99c674429859982a127289d64d4bc84a0cc7827",
+      "semantic_identical": true
+    }
+  ],
+  "sources": [
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "authority_limit": "Canonical repository table accepted by existing runtime. ODS provenance only matches levels1..133 exactly; no live-returned QL observation established by new corpus. The local table is not presented here as independently extracted client binary content.",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 13
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 87
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 24
+        }
+      ],
+      "classification": "LEGACY_COMPATIBILITY",
+      "id": "active-mission-level-csv",
+      "inputs": [
+        "character level clamped1..220",
+        "difficulty wire detent1..11"
+      ],
+      "output": "Generated mission quality1..250; neutral detent6 equals clamped character level. CSV token column separately1..9.",
+      "runtime_consumer": "GeneratedMissionRollService.Generate -> MissionLevelRuntime.GetMissionQuality -> MissionLevelData.Quality; handler prevalidates availability. GetTokenReward/TryGetTokenReward have no active caller found in current engine.",
+      "source": "AORebirth/GameData/Missions/Source/MissionLevels.csv",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs",
+        "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs",
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 53
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 78
+        }
+      ],
+      "classification": "LEGACY_COMPATIBILITY",
+      "id": "mission-level-validation",
+      "inputs": [
+        "CSV220rows",
+        "11 QL columns",
+        "token column"
+      ],
+      "output": "Reject gaps, noncanonical integers, invalid ranges, nonmonotonic values or wrong neutral column.",
+      "runtime_consumer": "MissionLevelData.Load",
+      "source": "AORebirth/GameData/Missions/Source/MissionLevelRules.json",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs",
+        "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs"
+      ]
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+          "line": 7
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj",
+          "line": 51
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 8
+        }
+      ],
+      "classification": "LEGACY_COMPATIBILITY",
+      "disposition": "REMOVE_OBSOLETE_DUPLICATE",
+      "id": "generated-level-graph",
+      "inputs": [
+        "AORebirth/GameData/Missions/Source/MissionLevels.csv"
+      ],
+      "output": "Compiled duplicate220-row static graph and provenance hashes.",
+      "runtime_consumer": "NONE_FOUND; SDK globs compile the file, but current MissionLevelRuntime reads CSV directly and no MissionLevelGraphData reference exists outside this declaration in current engine.",
+      "source": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+      "tests": []
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "Tools/generate_mission_level_graph.py",
+          "line": 4
+        }
+      ],
+      "classification": "DERIVED_FORMULA",
+      "id": "graph-generator",
+      "inputs": [
+        "AORebirth/GameData/Missions/Source/MissionLevels.csv"
+      ],
+      "output": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+      "runtime_consumer": "NONE; offline writer only. Must not regenerate or reinstate this unused graph as part of destination integration.",
+      "source": "Tools/generate_mission_level_graph.py",
+      "tests": []
+    },
+    {
+      "authority": "RECONSTRUCTED_INFERENCE",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "line": 120
+        }
+      ],
+      "classification": "CAPTURE_OBSERVATION",
+      "id": "rollmix-quality-metadata",
+      "inputs": [
+        "configured CharacterLevel,Difficulty,MissionQuality",
+        "current generated quality"
+      ],
+      "output": "Nearest whole type cohort;21 rows over levels60/220 and6 quality values.",
+      "runtime_consumer": "MissionRollEvidenceCatalog.SelectTypeMix",
+      "source": "AORebirth/GameData/Missions/RollMixes.json",
+      "terminology_flag": "MissionQuality is static/expected context in this audit; data has no provenance field establishing each as live-returned QL.",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "authority": "RECONSTRUCTED_INFERENCE",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "line": 232
+        }
+      ],
+      "classification": "CAPTURE_OBSERVATION",
+      "id": "reward-quality-metadata",
+      "inputs": [
+        "configured MissionQl,CharacterLevel,DifficultyWire",
+        "current generated quality"
+      ],
+      "output": "Nearest recorded cash/XP pair, no interpolation.",
+      "runtime_consumer": "MissionRewardEvidenceModel.Apply",
+      "source": "AORebirth/GameData/Missions/RewardObservations.json",
+      "terminology_flag": "MissionQl is not qualified as expected/static. Preserve observation values; correct documentation/metadata semantics in a later scoped change.",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "authority": "LEGACY_ACCEPTED_BEHAVIOR",
+      "authority_limit": "Existing serializer names/maps a value as Quality. This does not prove a live-returned retail missionQL field in September corpus. Preserve bytes while resolving field evidence separately.",
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/QuestInfo.cs",
+          "line": 67
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 58
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+          "line": 40
+        }
+      ],
+      "classification": "PROTOCOL_FACT",
+      "id": "serialized-quality-field",
+      "inputs": [
+        "MissionLevelRuntime lookup result"
+      ],
+      "output": "AoMember19 Quality serialized in generated QuestAlternative; also frozen GeneratedMissionOffer.Quality and accepted QuestDungeonParameters.Quality.",
+      "runtime_consumer": "GeneratedMissionRollService, GeneratedMissionRollProjection, QuestDungeonService.AcceptOffer",
+      "source": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging/GameData/QuestInfo.cs",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs"
+      ]
+    }
+  ],
+  "terminology_findings": [
+    "QuestInfo.Quality is a legacy protocol property name, not new evidence proof.",
+    "RollMixes.MissionQuality and RewardObservations.MissionQl lack expected/static qualifiers. Existing historical documentation claiming exact live QL is weaker authority than the newer explicit unproven field result.",
+    "No named LiveReturnedMissionQl runtime variable found; the gap is unqualified metadata/comment/test claims, not proof of another active live decoder."
+  ],
+  "tests_executed": false
+}

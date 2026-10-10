@@ -1,0 +1,1138 @@
+{
+  "current_status": "NOT_EXECUTED_STATIC_AUDIT",
+  "evidence_status": "PROVEN_STATIC_SOURCE",
+  "future_acceptance": "At minimum prove one exact catalog-bound kill mission through accept, entry, correct dungeon-specific target, atomic reward, exit, reconnect and restart before claiming a complete terminal mission; then add exact content/hooks for other types.",
+  "schema_version": 1,
+  "source_engine_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "status_semantics": "COMPLETE_ACTIVE means the bounded source stage is registered and has a reachable implementation; it does not mean retail correctness, live acceptance or a complete end-to-end mission. PARTIAL_ACTIVE explicitly preserves the mechanism while documenting blockers.",
+  "summaries": {
+    "FIVE_MISSION_TYPES_ACCEPTANCE": "PARTIAL_ACTIVE",
+    "FIVE_MISSION_TYPES_GENERATION": "COMPLETE_ACTIVE",
+    "FIVE_MISSION_TYPES_OBJECTIVES": "PARTIAL_ACTIVE_KILL_ONLY_OTHER_FOUR_MISSING",
+    "FIVE_MISSION_TYPES_RESTART": "PARTIAL_ACTIVE_DEFINITION_AND_SEED_ONLY",
+    "FIVE_MISSION_TYPES_REWARDS": "PARTIAL_ACTIVE_NON_ATOMIC_COMMON_PATH"
+  },
+  "tests": "No builds, suites, DB/client/capture/service operations performed. Older five-bundle materialization and generated reward tests do not prove this current QuestDungeon/QuestService path.",
+  "types": [
+    {
+      "action": "FindItem",
+      "capabilities": {
+        "ACCEPTANCE": {
+          "detail": "Registered CreateQuest handler enters common atomic quest/key acceptance; a successful entrance match and loaded procedural style are prerequisites. Current source data has only one PF540 entrance sample, while none of the 140 runtime pool rows uses PF540; all normally generated offers fail entrance matching.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+              "line": 13,
+              "method": "Handle"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 135,
+              "method": "AcceptOffer"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "CLEANUP": {
+          "detail": "Abandon/expiry/completion invoke key/link retirement and world release; one-day definition purge and ten-minute idle sweep exist. No current durable multi-checkpoint mission-world cleanup state; crash boundaries require focused proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 509,
+              "method": "OnQuestEnded"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 531,
+              "method": "EndDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+              "line": 440,
+              "method": "SweepQuestDungeons"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "DUNGEON_CONTENT": {
+          "detail": "No objective item is specified in generated QuestObjective or materialized by QuestDungeonPlayfield. Common rooms, doors and ambient NPCs are generated for all five types.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 69,
+              "method": "Build"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 117,
+              "method": "AddDistrictSpawns"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "EXPIRY": {
+          "detail": "Minute sweep closes expired definitions with keys, retires keys and evicts; GetLog also expires active character quest on access. Source wiring present, no fresh runtime acceptance.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 571,
+              "method": "Sweep"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 453,
+              "method": "ExpireDue"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "OBJECTIVE": {
+          "detail": "QuestService has no FindItem event processor; current generic authored quest prop routes do not connect this generated type.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 268,
+              "method": "OnNpcKilled"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 292,
+              "method": "OnNpcTargeted"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 323,
+              "method": "Matches"
+            }
+          ],
+          "status": "MISSING"
+        },
+        "PERSISTENCE": {
+          "detail": "Offer, generated definition/seed/entrance, character progress and linked key persist; no exact objective-actor binding or live generated world state persists.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 194,
+              "method": "AcceptOffer"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 482,
+              "method": "Load"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RECONNECT": {
+          "detail": "Journal and carried keys restore; live dungeon remains or seed regenerates at spawn. Objective-world state is not restored.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+              "line": 929,
+              "method": "RestoreKeys call"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 110,
+              "method": "Restore"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RESTART": {
+          "detail": "Definitions, progress, seed/version, links survive in store; regenerated world resets NPCs and doors, and current catalog is required to resolve exterior.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 621,
+              "method": "TryGetDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "REWARD": {
+          "detail": "Shared Complete/GrantReward can grant cash/XP/items, but completion is saved first; inventory-full can lose item and rewards have no same-transaction ledger. For missing objectives the normal terminal mission path cannot reach reward.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 346,
+              "method": "Complete"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 369,
+              "method": "GrantReward"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 398,
+              "method": "GiveItem"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "ROLL_GENERATION": {
+          "detail": "Current selector can produce all five type codes; this is source capability, not retail distribution proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+              "line": 16,
+              "method": "Generate"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "WIRE_OFFER": {
+          "detail": "Shared roll projection builds five offers for generated type codes. Type-specific retail correctness requires the separate roll-policy audit.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+              "line": 15,
+              "method": "Create"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        }
+      },
+      "mission_type": 2,
+      "name": "Find Item"
+    },
+    {
+      "action": "TargetNpc",
+      "capabilities": {
+        "ACCEPTANCE": {
+          "detail": "Registered CreateQuest handler enters common atomic quest/key acceptance; a successful entrance match and loaded procedural style are prerequisites. Current source data has only one PF540 entrance sample, while none of the 140 runtime pool rows uses PF540; all normally generated offers fail entrance matching.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+              "line": 13,
+              "method": "Handle"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 135,
+              "method": "AcceptOffer"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "CLEANUP": {
+          "detail": "Abandon/expiry/completion invoke key/link retirement and world release; one-day definition purge and ten-minute idle sweep exist. No current durable multi-checkpoint mission-world cleanup state; crash boundaries require focused proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 509,
+              "method": "OnQuestEnded"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 531,
+              "method": "EndDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+              "line": 440,
+              "method": "SweepQuestDungeons"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "DUNGEON_CONTENT": {
+          "detail": "Generated QuestObjective.Npc is empty and TargetHash is only returned for IsKill templates; no generated find-person actor. Common rooms, doors and ambient NPCs are generated for all five types.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 69,
+              "method": "Build"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 117,
+              "method": "AddDistrictSpawns"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "EXPIRY": {
+          "detail": "Minute sweep closes expired definitions with keys, retires keys and evicts; GetLog also expires active character quest on access. Source wiring present, no fresh runtime acceptance.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 571,
+              "method": "Sweep"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 453,
+              "method": "ExpireDue"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "OBJECTIVE": {
+          "detail": "Visible LookAt -> OnNpcTargeted exists generically, but Matches returns false for empty generated Objective.Npc.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 268,
+              "method": "OnNpcKilled"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 292,
+              "method": "OnNpcTargeted"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 323,
+              "method": "Matches"
+            }
+          ],
+          "status": "MISSING"
+        },
+        "PERSISTENCE": {
+          "detail": "Offer, generated definition/seed/entrance, character progress and linked key persist; no exact objective-actor binding or live generated world state persists.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 194,
+              "method": "AcceptOffer"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 482,
+              "method": "Load"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RECONNECT": {
+          "detail": "Journal and carried keys restore; live dungeon remains or seed regenerates at spawn. Objective-world state is not restored.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+              "line": 929,
+              "method": "RestoreKeys call"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 110,
+              "method": "Restore"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RESTART": {
+          "detail": "Definitions, progress, seed/version, links survive in store; regenerated world resets NPCs and doors, and current catalog is required to resolve exterior.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 621,
+              "method": "TryGetDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "REWARD": {
+          "detail": "Shared Complete/GrantReward can grant cash/XP/items, but completion is saved first; inventory-full can lose item and rewards have no same-transaction ledger. For missing objectives the normal terminal mission path cannot reach reward.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 346,
+              "method": "Complete"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 369,
+              "method": "GrantReward"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 398,
+              "method": "GiveItem"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "ROLL_GENERATION": {
+          "detail": "Current selector can produce all five type codes; this is source capability, not retail distribution proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+              "line": 16,
+              "method": "Generate"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "WIRE_OFFER": {
+          "detail": "Shared roll projection builds five offers for generated type codes. Type-specific retail correctness requires the separate roll-policy audit.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+              "line": 15,
+              "method": "Create"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        }
+      },
+      "mission_type": 1,
+      "name": "Find Person"
+    },
+    {
+      "action": "KillOne",
+      "capabilities": {
+        "ACCEPTANCE": {
+          "detail": "Registered CreateQuest handler enters common atomic quest/key acceptance; a successful entrance match and loaded procedural style are prerequisites. Current source data has only one PF540 entrance sample, while none of the 140 runtime pool rows uses PF540; all normally generated offers fail entrance matching.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+              "line": 13,
+              "method": "Handle"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 135,
+              "method": "AcceptOffer"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "CLEANUP": {
+          "detail": "Abandon/expiry/completion invoke key/link retirement and world release; one-day definition purge and ten-minute idle sweep exist. No current durable multi-checkpoint mission-world cleanup state; crash boundaries require focused proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 509,
+              "method": "OnQuestEnded"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 531,
+              "method": "EndDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+              "line": 440,
+              "method": "SweepQuestDungeons"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "DUNGEON_CONTENT": {
+          "detail": "Hardcoded LE01 target placed in far reachable room when hash/spawn data resolves; fixed ambient ZK3X population. Common rooms, doors and ambient NPCs are generated for all five types.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 69,
+              "method": "Build"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 117,
+              "method": "AddDistrictSpawns"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "EXPIRY": {
+          "detail": "Minute sweep closes expired definitions with keys, retires keys and evicts; GetLog also expires active character quest on access. Source wiring present, no fresh runtime acceptance.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 571,
+              "method": "Sweep"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 453,
+              "method": "ExpireDue"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "OBJECTIVE": {
+          "detail": "NPC kill credit reaches OnNpcKilled; matcher is only SpawnHash/MobTemplate.Hash. Every generated kill mission uses LE01, without unique target or owning dungeon check.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 268,
+              "method": "OnNpcKilled"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 292,
+              "method": "OnNpcTargeted"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 323,
+              "method": "Matches"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "PERSISTENCE": {
+          "detail": "Offer, generated definition/seed/entrance, character progress and linked key persist; no exact objective-actor binding or live generated world state persists.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 194,
+              "method": "AcceptOffer"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 482,
+              "method": "Load"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RECONNECT": {
+          "detail": "Journal and carried keys restore; live dungeon remains or seed regenerates at spawn. Objective-world state is not restored.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+              "line": 929,
+              "method": "RestoreKeys call"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 110,
+              "method": "Restore"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RESTART": {
+          "detail": "Definitions, progress, seed/version, links survive in store; regenerated world resets NPCs and doors, and current catalog is required to resolve exterior.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 621,
+              "method": "TryGetDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "REWARD": {
+          "detail": "Shared Complete/GrantReward can grant cash/XP/items, but completion is saved first; inventory-full can lose item and rewards have no same-transaction ledger. For missing objectives the normal terminal mission path cannot reach reward.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 346,
+              "method": "Complete"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 369,
+              "method": "GrantReward"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 398,
+              "method": "GiveItem"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "ROLL_GENERATION": {
+          "detail": "Current selector can produce all five type codes; this is source capability, not retail distribution proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+              "line": 16,
+              "method": "Generate"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "WIRE_OFFER": {
+          "detail": "Shared roll projection builds five offers for generated type codes. Type-specific retail correctness requires the separate roll-policy audit.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+              "line": 15,
+              "method": "Create"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        }
+      },
+      "mission_type": 0,
+      "name": "Kill Person"
+    },
+    {
+      "action": "UseItemOnCharacter",
+      "capabilities": {
+        "ACCEPTANCE": {
+          "detail": "Registered CreateQuest handler enters common atomic quest/key acceptance; a successful entrance match and loaded procedural style are prerequisites. Current source data has only one PF540 entrance sample, while none of the 140 runtime pool rows uses PF540; all normally generated offers fail entrance matching.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+              "line": 13,
+              "method": "Handle"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 135,
+              "method": "AcceptOffer"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "CLEANUP": {
+          "detail": "Abandon/expiry/completion invoke key/link retirement and world release; one-day definition purge and ten-minute idle sweep exist. No current durable multi-checkpoint mission-world cleanup state; crash boundaries require focused proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 509,
+              "method": "OnQuestEnded"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 531,
+              "method": "EndDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+              "line": 440,
+              "method": "SweepQuestDungeons"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "DUNGEON_CONTENT": {
+          "detail": "No frozen repair component or repair target is assigned/materialized. Common rooms, doors and ambient NPCs are generated for all five types.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 69,
+              "method": "Build"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 117,
+              "method": "AddDistrictSpawns"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "EXPIRY": {
+          "detail": "Minute sweep closes expired definitions with keys, retires keys and evicts; GetLog also expires active character quest on access. Source wiring present, no fresh runtime acceptance.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 571,
+              "method": "Sweep"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 453,
+              "method": "ExpireDue"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "OBJECTIVE": {
+          "detail": "QuestService has no generated repair consume/use processor. Separate authored QuestPropService interactions are not this generated route.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 268,
+              "method": "OnNpcKilled"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 292,
+              "method": "OnNpcTargeted"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 323,
+              "method": "Matches"
+            }
+          ],
+          "status": "MISSING"
+        },
+        "PERSISTENCE": {
+          "detail": "Offer, generated definition/seed/entrance, character progress and linked key persist; no exact objective-actor binding or live generated world state persists.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 194,
+              "method": "AcceptOffer"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 482,
+              "method": "Load"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RECONNECT": {
+          "detail": "Journal and carried keys restore; live dungeon remains or seed regenerates at spawn. Objective-world state is not restored.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+              "line": 929,
+              "method": "RestoreKeys call"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 110,
+              "method": "Restore"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RESTART": {
+          "detail": "Definitions, progress, seed/version, links survive in store; regenerated world resets NPCs and doors, and current catalog is required to resolve exterior.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 621,
+              "method": "TryGetDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "REWARD": {
+          "detail": "Shared Complete/GrantReward can grant cash/XP/items, but completion is saved first; inventory-full can lose item and rewards have no same-transaction ledger. For missing objectives the normal terminal mission path cannot reach reward.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 346,
+              "method": "Complete"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 369,
+              "method": "GrantReward"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 398,
+              "method": "GiveItem"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "ROLL_GENERATION": {
+          "detail": "Current selector can produce all five type codes; this is source capability, not retail distribution proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+              "line": 16,
+              "method": "Generate"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "WIRE_OFFER": {
+          "detail": "Shared roll projection builds five offers for generated type codes. Type-specific retail correctness requires the separate roll-policy audit.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+              "line": 15,
+              "method": "Create"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        }
+      },
+      "mission_type": 3,
+      "name": "Repair"
+    },
+    {
+      "action": "FindItem2",
+      "capabilities": {
+        "ACCEPTANCE": {
+          "detail": "Registered CreateQuest handler enters common atomic quest/key acceptance; a successful entrance match and loaded procedural style are prerequisites. Current source data has only one PF540 entrance sample, while none of the 140 runtime pool rows uses PF540; all normally generated offers fail entrance matching.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+              "line": 13,
+              "method": "Handle"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 135,
+              "method": "AcceptOffer"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "CLEANUP": {
+          "detail": "Abandon/expiry/completion invoke key/link retirement and world release; one-day definition purge and ten-minute idle sweep exist. No current durable multi-checkpoint mission-world cleanup state; crash boundaries require focused proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 509,
+              "method": "OnQuestEnded"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 531,
+              "method": "EndDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+              "line": 440,
+              "method": "SweepQuestDungeons"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "DUNGEON_CONTENT": {
+          "detail": "No generated objective item or issuing-terminal return binding is assigned/materialized. Common rooms, doors and ambient NPCs are generated for all five types.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 69,
+              "method": "Build"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 117,
+              "method": "AddDistrictSpawns"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "EXPIRY": {
+          "detail": "Minute sweep closes expired definitions with keys, retires keys and evicts; GetLog also expires active character quest on access. Source wiring present, no fresh runtime acceptance.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 571,
+              "method": "Sweep"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 453,
+              "method": "ExpireDue"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "OBJECTIVE": {
+          "detail": "QuestService has no generated pickup/return event processor; the accepted quest definition lacks return-terminal linkage.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 859,
+              "method": "BuildTemplate"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 268,
+              "method": "OnNpcKilled"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 292,
+              "method": "OnNpcTargeted"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 323,
+              "method": "Matches"
+            }
+          ],
+          "status": "MISSING"
+        },
+        "PERSISTENCE": {
+          "detail": "Offer, generated definition/seed/entrance, character progress and linked key persist; no exact objective-actor binding or live generated world state persists.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 194,
+              "method": "AcceptOffer"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 482,
+              "method": "Load"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RECONNECT": {
+          "detail": "Journal and carried keys restore; live dungeon remains or seed regenerates at spawn. Objective-world state is not restored.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+              "line": 929,
+              "method": "RestoreKeys call"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 110,
+              "method": "Restore"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "RESTART": {
+          "detail": "Definitions, progress, seed/version, links survive in store; regenerated world resets NPCs and doors, and current catalog is required to resolve exterior.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 357,
+              "method": "ResolveLogin"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+              "line": 621,
+              "method": "TryGetDungeon"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+              "line": 30,
+              "method": "class contract"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "REWARD": {
+          "detail": "Shared Complete/GrantReward can grant cash/XP/items, but completion is saved first; inventory-full can lose item and rewards have no same-transaction ledger. For missing objectives the normal terminal mission path cannot reach reward.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 346,
+              "method": "Complete"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 369,
+              "method": "GrantReward"
+            },
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+              "line": 398,
+              "method": "GiveItem"
+            }
+          ],
+          "status": "PARTIAL_ACTIVE"
+        },
+        "ROLL_GENERATION": {
+          "detail": "Current selector can produce all five type codes; this is source capability, not retail distribution proof.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+              "line": 16,
+              "method": "Generate"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        },
+        "WIRE_OFFER": {
+          "detail": "Shared roll projection builds five offers for generated type codes. Type-specific retail correctness requires the separate roll-policy audit.",
+          "evidence_status": "PROVEN_STATIC_SOURCE",
+          "references": [
+            {
+              "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+              "line": 15,
+              "method": "Create"
+            }
+          ],
+          "status": "COMPLETE_ACTIVE"
+        }
+      },
+      "mission_type": 4,
+      "name": "Return Item"
+    }
+  ]
+}

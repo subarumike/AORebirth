@@ -1,0 +1,3452 @@
+{
+  "component_count": 67,
+  "components": [
+    {
+      "class": "AuthoredQuestCatalog",
+      "consumers": [
+        "Program.ConfigureServices",
+        "AuthoredQuestService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+      "id": "authored-catalog",
+      "reason": "Already separates authored data from reusable mechanics; destination evidence does not replace it.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+        "line": 10
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestCatalog.cs",
+          "line": 10
+        }
+      ],
+      "required_change": "None for generated destination integration.",
+      "responsibility": "Load editable authored definitions and interaction content",
+      "risk": "Authored IMissionDao quests and characterquests template/generated quests have different persistence owners.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "AuthoredQuestJournal",
+      "consumers": [
+        "AuthoredQuestService.Restore",
+        "AuthoredQuestService.TryExecuteAction",
+        "AuthoredQuestService timed turn-in"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
+      "id": "authored-journal",
+      "reason": "Connected authored projection is independent of destination selection.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
+        "line": 14
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
+          "line": 14
+        }
+      ],
+      "required_change": "Retain existing owner and packet data; do not substitute generated quest projection.",
+      "responsibility": "Project editable authored journal/expiry/delete templates",
+      "risk": "Template projection alone does not establish completion or current retail parity.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "AuthoredMissionProgression",
+      "consumers": [
+        "AuthoredQuestService",
+        "AuthoredQuestService.TimedTurnIn"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+      "id": "authored-mission-progression",
+      "reason": "Current transactional authored flow independent of new static destinations.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 29
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+          "line": 29
+        }
+      ],
+      "required_change": "None for destination catalog milestone.",
+      "responsibility": "Resolved authored definition state/objective transitions",
+      "risk": "Completed repeat-cycle semantics remain separate existing concern.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/AuthoredQuestTests.cs",
+          "line": 272,
+          "test": "CommonMissionServiceDoesNotReactivateCompletedDojaAfterCooldown"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ]
+    },
+    {
+      "class": "AuthoredQuestService (including TimedTurnIn)",
+      "consumers": [
+        "GenericCmdMessageHandler",
+        "item actions",
+        "SpawnService.Restore",
+        "authored NPC dialogue/prop routes"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+      "id": "authored-quest-service",
+      "reason": "Current authored flow already joins item, state, stats and account cooldown through MySqlMissionDao.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 20
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+          "line": 132
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+          "line": 110
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+          "line": 20
+        }
+      ],
+      "related_files": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs"
+      ],
+      "required_change": "Preserve independently from generic QuestService generated flow.",
+      "responsibility": "Editable authored actions and timed turn-in transactional inventory/stat/state/reward publication",
+      "risk": "Name overlap can cause incorrect claims that generated rewards share authored atomicity.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ]
+    },
+    {
+      "class": "Character mission kill-credit callback",
+      "consumers": [
+        "Character.OnDeath -> AwardKillRewards -> AdvanceKillQuests -> QuestService.OnNpcKilled"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+      "id": "character-quest-kill-callback",
+      "reason": "The concrete callback is active and already passes NPC identity/playfield context. Generated target qualification can be added at QuestService without replacing generic death/XP/team machinery.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+          "line": 311,
+          "method": "OnDeath"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+          "line": 661,
+          "method": "AwardKillRewards"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+          "line": 681,
+          "method": "AdvanceKillQuests"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+          "line": 703,
+          "method": "QuestService.OnNpcKilled call"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "On death, derive credited players and nearby teammates, then notify current QuestService with actual NPC and players.",
+      "risk": "MEDIUM: current QuestService's broad hash matcher is the downstream gap, not absence of a combat hook.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/NewCharacterStartAreaSelectionContractTests.cs",
+          "line": 27,
+          "test": "OnlyNewRubiKaCharactersReceivePendingSelectionState"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PersistentMissionFoundationTests.cs",
+          "line": 97,
+          "test": "SameQuestProgressIsIsolatedByStableCharacterIdentity"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/PersistentMissionFoundationTests.cs",
+          "line": 230,
+          "test": "AtomicCharacterStatRewardAndLedgerApplyOnceInOneRepositoryTransaction"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/QuestRuntimePersistenceTests.cs",
+          "line": 53,
+          "test": "B18CFinalDuplicateAfterRestartCompletesAndActivatesB18DOnce"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/CharacterDaoConsumerTests.cs",
+          "line": 19,
+          "test": "AdmissionUsesCurrentDirectoryOwnerAndRetainsReplayProtection"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/CharacterDaoConsumerTests.cs",
+          "line": 41,
+          "test": "DirectoryFailureCannotAdmitOrConsumeValidHandoff"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionMaterializationTests.cs",
+          "line": 26,
+          "test": "AllFiveAcceptedBundlesMaterializeThroughActualNpcFactoryWithExactIdentityAndLife"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/MissionNpcCombatPolicyTests.cs",
+          "line": 17,
+          "test": "MissionActorCombatCapabilityUsesItsNativeEnabledState"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/MissionNpcCombatPolicyTests.cs",
+          "line": 37,
+          "test": "PlayerAndMissionNpcUseNativeTemplateWeaponSwings"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "ICharacterQuestStore / MySqlCharacterQuestStore",
+      "consumers": [
+        "QuestService",
+        "QuestDungeonService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+      "id": "character-quest-store",
+      "reason": "Keeps SQL outside current engine and delegates existing operations.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 11
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+          "line": 11
+        }
+      ],
+      "required_change": "Retain adapter; align unknown-commit translation with DAO repair later.",
+      "responsibility": "Current runtime adapter to shared quest DAO",
+      "risk": "Generic wrapper currently cannot translate a quest DAO commit type it never receives.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ]
+    },
+    {
+      "class": "CreateQuestMessageHandler",
+      "consumers": [
+        "MessageRouter via Program.AddMessageHandler"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+      "id": "create-quest-handler",
+      "reason": "Active registered narrow handler with current session/dead/quarantine/identity fences.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/CreateQuestMessageHandler.cs",
+          "line": 13,
+          "method": "Handle"
+        }
+      ],
+      "required_change": "No change needed for catalog handoff; retain same authorization checks.",
+      "responsibility": "Validate session/player/offer identity and dispatch acceptance",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+          "line": 37
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+          "line": 45
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+          "line": 132
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+          "line": 126
+        }
+      ],
+      "class": "DirectXpRewardPlan",
+      "consumers": [
+        "AuthoredQuestService.TimedTurnIn: CreatePersistedReward"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+      "id": "direct-xp-reward-plan",
+      "reason": "CreatePersistedReward is called by the authored timed turn-in path. The separate Create variant has tests but no runtime caller found in the inspected current engine; this is not proof of a generated mission completion reward path.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+          "line": 37
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+          "line": 45
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/DirectXpRewardPlan.cs",
+          "line": 132
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+          "line": 126
+        }
+      ],
+      "required_change": "No change required for the destination-catalog integration; retain existing ownership and transaction boundaries.",
+      "responsibility": "Project XP/SK, level and refill stat changes before the mission reward transaction, then publish the persisted projection.",
+      "risk": "MEDIUM: preserve durable reward publication.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+          "line": 13,
+          "test": "DirectRewardIsNotCappedAndPlansWholeLevelBeforePublication"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+          "line": 35,
+          "test": "SubFloorLegacyProgressNormalizesAgainstSameAcceptedLevelTable"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+          "line": 48,
+          "test": "ShadowLevelUsesSkConversionAndPreservesXpWatermark"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+          "line": 62,
+          "test": "PlanningDoesNotTreatAnUnownedOldBonusAsARebasedContribution"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+          "line": 78,
+          "test": "PersistedFullBarRewardPreservesDistinctDeathPoolWithoutAwardingIt"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs",
+          "line": 93,
+          "test": "ZeroRewardIsNoOpAndForeignPublicationFailsClosed"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/DirectXpRewardPlanTests.cs"
+      ]
+    },
+    {
+      "class": "DungeonCollisionBuilder",
+      "consumers": [
+        "DungeonPlayfieldBinder",
+        "AORebirth.DungeonGenerator"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonCollisionBuilder.cs",
+      "id": "dungeon-collision-builder",
+      "reason": "Actual geometry assembly exists, contradicting stale report's broad absent-floors statement.",
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonCollisionBuilder.cs",
+          "line": 57,
+          "method": "BuildLayout"
+        }
+      ],
+      "required_change": "No mission destination integration changes required.",
+      "responsibility": "Transform style room meshes, bounds and connected doors into generated world layout",
+      "risk": "LOW for catalog work; geometry/client parity remains separate acceptance.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/DungeonCollisionBuilderTests.cs",
+          "line": 109,
+          "test": "Mesher_FiveByFiveOccupiedRoom_EmitsTrianglesAtPlacedOrigin"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/DungeonCollisionBuilderTests.cs",
+          "line": 167,
+          "test": "DumpObj_WritesNamedObjectsAndFaces"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/DungeonCollisionBuilderTests.cs",
+          "line": 189,
+          "test": "Build_Style341_WhenPackaged_HasCollision"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/DungeonWorldLayoutTests.cs",
+          "line": 42,
+          "test": "StaticLayout_PlacesRoomsAtTemplatePose"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.World.Collision.Tests/DungeonWorldLayoutTests.cs",
+          "line": 100,
+          "test": "TryLoad_Packaged127_UsesRoomsJson"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 30
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 56
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 72
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+          "line": 1176
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+          "line": 610
+        }
+      ],
+      "class": "DungeonExitDoors",
+      "consumers": [
+        "GameDataStore.ReadDungeonExitDoors",
+        "PlayfieldWorldSimulation static portal arrival"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+      "id": "dungeon-exit-doors",
+      "reason": "Existing shared RDB/static-dungeon geometry mechanic. It does not supply a fullACGEntrance placement lookup or an operational BD identity bridge. Native-address comments are source assertions, not independent proof of retail parity in this audit.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 30
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 56
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 72
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataStore.cs",
+          "line": 1176
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+          "line": 610
+        }
+      ],
+      "required_change": "No change required for the destination-catalog integration; retain existing ownership and transaction boundaries.",
+      "responsibility": "Derive static dungeon exit door instances from room connections and choose a valid landing exit.",
+      "risk": "LOW",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "DungeonGenerator / StyleRoomSet",
+      "consumers": [
+        "DungeonLayoutGenerator"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Libraries/Source/AORebirth.DungeonGenerator/DungeonGenerator.cs",
+      "id": "dungeon-generator-library",
+      "reason": "Reusable procedural geometry machinery is independent of the observed destination pool; no evidence calls for replacement.",
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.DungeonGenerator/DungeonGenerator.cs",
+          "line": 115,
+          "method": "Generate / StyleRoomSet.Load"
+        }
+      ],
+      "required_change": "Keep engine mechanics; mission-specific policy belongs to caller data.",
+      "responsibility": "Seeded room layout using style/catalog/entrance map and structural validation",
+      "risk": "MEDIUM: deterministic layout for fixed current algorithm is not retail generation proof.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "DungeonLayoutGenerator",
+      "consumers": [
+        "QuestDungeonService.AcceptOffer",
+        "TryEnter",
+        "ResolveLogin"
+      ],
+      "disposition": "KEEP_BUT_REPLACE_DATA_SOURCE",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+      "id": "dungeon-layout-generator",
+      "reason": "Existing generator and version path are active; fixed style/floors/size/lock chance are explicitly temporary content policy, not destination evidence.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+          "line": 132,
+          "method": "TryGenerate"
+        }
+      ],
+      "required_change": "Move only accepted layout policy into editable data; preserve generator seam. Retain existing version behavior explicitly until separate evidence authorizes replay changes.",
+      "responsibility": "Turn frozen seed/version/building instance into procedural layout, spawn and doors",
+      "risk": "MEDIUM: mapping old version1 to procedural2 changes old intended layout; future migrations must avoid silent further reinterpretation.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "DungeonPlayfieldBinder",
+      "consumers": [
+        "QuestDungeonPlayfield.Build",
+        "Playfield.Build"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/DungeonPlayfieldBinder.cs",
+      "id": "dungeon-playfield-binder",
+      "reason": "Reusable geometry assembly independent of destination selection and placement evidence.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/DungeonPlayfieldBinder.cs",
+          "line": 15,
+          "method": "TryBuild / WithDungeonCollision"
+        }
+      ],
+      "required_change": "No catalog-driven change; retain diagnostics for missing layout/collision.",
+      "responsibility": "Resolve generated/static dungeon room geometry and combine collision surfaces",
+      "risk": "LOW; style inputs remain prerequisite.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "GameDataPaths",
+      "consumers": [
+        "GameDataStore",
+        "MissionContentJson",
+        "future MissionDestinationCatalog caller"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
+      "id": "gamedata-root-selection",
+      "reason": "Existing selector satisfies catalog root handoff.",
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
+        "line": 117
+      },
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
+          "line": 117
+        }
+      ],
+      "required_change": "Pass its selected root into the new loader; no new staging system.",
+      "responsibility": "Existing runtime root selection via AO_REBIRTH_GAMEDATA_PATH",
+      "risk": "Catalog existence in source does not package it into the selected runtime root.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "HashSpawnSystem generated placed-point path",
+      "consumers": [
+        "QuestDungeonPlayfield.AddDistrictSpawns/PlaceTarget",
+        "PlayfieldLocality tick callbacks",
+        "SpawnService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+      "id": "generated-hash-spawn-adapter",
+      "reason": "Existing shared spawn mechanism resolves real GameData templates and rejects unresolved hashes. Preserve it; replace temporary dungeon content choices at the caller, not this generic layer.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 215,
+          "method": "Initialize"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 481,
+          "method": "AddPlacedDistrictPoint"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 644,
+          "method": "TrySpawn"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 741,
+          "method": "PickSpawnTransform"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 763,
+          "method": "SpawnMobBranches"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 915,
+          "method": "MarkMemberDead"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "Register transformed district spawn points; instantiate hash branches on locality tick; retire nonrespawning points on death.",
+      "risk": "MEDIUM: selected point centres are seeded, but actual heading and radius position sample Random.Shared; point state and NPC identity are ephemeral.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        {
+          "current_status": "NOT_RUN_STATIC_REVIEW",
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/EditableNpcContentTests.cs",
+          "line": 98,
+          "method": "ItemTemplateHashSpawnsAsStaticInsteadOfPlaceholder",
+          "what_it_does_not_prove": "Generated mission target identity, seed replay or live instance acceptance.",
+          "what_it_proves": "Source fixture checks mob-vs-item hash classification only."
+        },
+        {
+          "current_status": "NOT_RUN_STATIC_REVIEW",
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/SpawnHeadingTests.cs",
+          "line": 31,
+          "method": "WidthIsTheFacingConeAroundTheMidAngle",
+          "what_it_does_not_prove": "Seeded generated NPC placement or full runtime mission lifecycle.",
+          "what_it_proves": "Pure heading sampling cone semantics."
+        }
+      ]
+    },
+    {
+      "class": "IGeneratedMissionDao",
+      "consumers": [
+        "GeneratedMissionService",
+        "QuestAlternativeMessageHandler",
+        "QuestDungeonService.ReadOffers",
+        "ZoneLoginHandler.ReadAccepted"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IGeneratedMissionDao.cs",
+      "id": "generated-mission-dao-contract",
+      "reason": "Offer/fee path and old-state exit reader still depend on it.",
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IGeneratedMissionDao.cs",
+        "line": 19
+      },
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IGeneratedMissionDao.cs",
+          "line": 19
+        }
+      ],
+      "required_change": "Preserve active portions and existing retained-state readers; review unused capabilities separately before removal.",
+      "responsibility": "Terminal offer contract plus retained typed accepted-world operations",
+      "risk": "Accept/Observe/Complete APIs are not proof of current runtime use.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionIdentitySpace.cs",
+          "line": 4
+        }
+      ],
+      "class": "GeneratedMissionIdentitySpace",
+      "consumers": [
+        "ZoneLoginHandler",
+        "PlayfieldManager",
+        "ItemUseFunctions"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionIdentitySpace.cs",
+      "id": "generated-mission-identity-space",
+      "reason": "Schema/routing identity boundary is not a content placement key.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionIdentitySpace.cs",
+          "line": 4
+        }
+      ],
+      "required_change": "Preserve identity-space guards; no low-bit placement-ID derivation.",
+      "responsibility": "Bounds reserved historical/generated playfield identity namespace.",
+      "risk": "MEDIUM.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+          "line": 13
+        }
+      ],
+      "class": "GeneratedMissionRollProjection",
+      "consumers": [
+        "QuestAlternativeMessageHandler"
+      ],
+      "disposition": "KEEP_AND_CONNECT_NEW_DESTINATION_CATALOG",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+      "id": "generated-mission-roll-projection",
+      "reason": "Current EntranceType/Instance duplicate WorldPos playfield identity, not placement identity.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+          "line": 13
+        }
+      ],
+      "required_change": "Keep frozen-wire/fee boundary; add deliberate typed placement identity bridge while retaining existing WorldPos offsets and historical fields. No schema change authorized in audit.",
+      "responsibility": "Freeze output DTO and raw body/hash for DAO batch publication.",
+      "risk": "HIGH: persistence compatibility.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 56,
+          "test": "FrozenSqlProjectionPreservesEveryDestinationRewardAndWireField"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 95,
+          "test": "SignedSliderValuesAreStoredWithoutByteWrap"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 12
+        }
+      ],
+      "class": "GeneratedMissionRollService",
+      "consumers": [
+        "QuestAlternativeMessageHandler.Handle"
+      ],
+      "disposition": "KEEP_AND_CONNECT_NEW_DESTINATION_CATALOG",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+      "id": "generated-mission-roll-service",
+      "reason": "Active composition already exists; requires authoritative destination record instead of rounded Spot.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 12
+        }
+      ],
+      "required_change": "Preserve wire/identity/composition flow; pass separately selected exact placement into WorldPos construction, without turning2242 or812 into eligibility authority.",
+      "responsibility": "Compose five typed offers from editable shells, policy, identities, destinations and rewards.",
+      "risk": "HIGH: destination identity and packet integration.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 507,
+          "test": "LevelFourNeutralIccRollStaysInTheTerminalPlayfield"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 116,
+          "test": "GeneratedRollPreservesOneCompleteCapturedServerResponseEnvelope"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 184,
+          "test": "GeneratedRollPreservesClientTitleWidthFreshExpiryAndRoundTrips"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 35,
+          "test": "SuppliedDurableAllocatorOwnsEveryGeneratedIdentity"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 47,
+          "test": "NewRuntimeCannotFallBackToFileIdentityAllocation"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 56,
+          "test": "FrozenSqlProjectionPreservesEveryDestinationRewardAndWireField"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 95,
+          "test": "SignedSliderValuesAreStoredWithoutByteWrap"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+          "line": 17
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/DebugMcp/ZoneDebugTools.cs",
+          "line": 466
+        }
+      ],
+      "class": "GeneratedMissionService",
+      "consumers": [
+        "QuestAlternativeMessageHandler.PublishOffers",
+        "ZoneDebugTools.ReadMissions/ReadOffers via DebugMcpHost registration"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+      "id": "generated-mission-service",
+      "reason": "Substantial economic authority already integrated; destination data mismatch is elsewhere.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+          "line": 17
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/DebugMcp/ZoneDebugTools.cs",
+          "line": 466
+        }
+      ],
+      "required_change": "Preserve DAO transaction ownership and no-publication-before-commit behavior.",
+      "responsibility": "Serialize offer publication/fee with player persistence gate; quarantine unknown commits.",
+      "risk": "HIGH if changed; low need for catalog edits.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 47,
+          "test": "NewRuntimeCannotFallBackToFileIdentityAllocation"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionServiceTests.cs",
+          "line": 237,
+          "test": "AcceptedKeyUsesFrozenOwnedArtifactInsteadOfCurrentContentTemplate"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionServiceTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWire.cs",
+          "line": 14
+        }
+      ],
+      "class": "GeneratedMissionWire",
+      "consumers": [
+        "GeneratedMissionRollService",
+        "GeneratedMissionRollProjection",
+        "QuestAlternativeMessageHandler.ClientClock; fixture-only TemplateBody/DecodeTemplate"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWire.cs",
+      "id": "generated-mission-wire",
+      "reason": "Wire projection is reusable; new identity fields must preserve current opaque shell bytes.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionWire.cs",
+          "line": 14
+        }
+      ],
+      "required_change": "Retain codec and clocks; repair misleading WorldPos offset names separately.",
+      "responsibility": "Read/write frozen offers; defensive shell bodies and synchronized expiry conversion.",
+      "risk": "MEDIUM: packet compatibility.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 88,
+          "test": "GeneratedRollUsesTheClampedCharacterLevelConsistently"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 140,
+          "test": "CapturedLibraryCoversEveryFinalizedMissionTypeWithCompatibleActions"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 231,
+          "test": "GeneratedRollsAreDeterministicForTheSameSeed"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 243,
+          "test": "GeneratedRollsDoNotMutateCapturedBodies"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 472,
+          "test": "UnchangedCapturedCombinationPreservesExactText"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 53,
+          "test": "CapturedQuestAlternativeTemplateRoundTripsByteForByte"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 69,
+          "test": "EveryCapturedRollBodyRoundTripsAndMatchesItsGoldenHash"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 97,
+          "test": "CapturedFixtureAccessorsReturnDefensiveCopies"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 116,
+          "test": "GeneratedRollPreservesOneCompleteCapturedServerResponseEnvelope"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 184,
+          "test": "GeneratedRollPreservesClientTitleWidthFreshExpiryAndRoundTrips"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 280,
+          "test": "MissionRollDeadlineUsesThePrivateServerGameTimeAnchor"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 309,
+          "test": "AcceptedMissionExpirySerializesAsFourLosslessWireBytes"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+          "line": 56,
+          "test": "FrozenSqlProjectionPreservesEveryDestinationRewardAndWireField"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs"
+      ]
+    },
+    {
+      "class": "SpawnService generated SpawnMob path",
+      "consumers": [
+        "HashSpawnSystem.SpawnMobBranches",
+        "ordinary world spawn routes"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+      "id": "generated-npc-spawn-service",
+      "reason": "This is the actual generated-dungeon NPC materializer. WorldNpcFactory is a separate editable actor path and is not called here. Existing ordinary NPC mechanics should remain.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "line": 144,
+          "method": "SpawnMob"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "line": 162,
+          "method": "AllocateNpcIdentity / SnapNpcSpawn"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "line": 171,
+          "method": "SpawnHash assignment"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "line": 206,
+          "method": "NPC brain and registry publication"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "Create and register NPC from validated resolved template; compose stats/equipment/brain and assign dynamic identity/hash.",
+      "risk": "MEDIUM: Allocated NPC identity is new per materialization and exact pose is snapped to current world; not a persisted generated-object identity.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "Door",
+      "consumers": [
+        "QuestDungeonPlayfield.SpawnDoors",
+        "GenericCmdMessageHandler.HandleUse/TryGetBreakAndEnter",
+        "PlayfieldLocality spawn visibility"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Door.cs",
+      "id": "generic-dungeon-door",
+      "reason": "Current generated dungeon uses this generic door class. Catalog evidence does not require rewriting door mechanics. Durable door-state retention, if required later, belongs to an explicit quest-world state contract.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Door.cs",
+          "line": 19,
+          "method": "Door"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Door.cs",
+          "line": 55,
+          "method": "BuildSpawnMessage"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Door.cs",
+          "line": 102,
+          "method": "TryUse"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Door.cs",
+          "line": 118,
+          "method": "TryBreakAndEnter"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 335,
+          "method": "SpawnDoors"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "Render door dynel, toggle unlocked state, enforce interaction range and apply break-and-enter result.",
+      "risk": "MEDIUM: Flags are in memory and reset when dungeon regenerates; this is documented rather than claimed durable.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgRuntimeMaterializationTests.cs",
+          "line": 162,
+          "test": "DoorChestAndLockStateSurviveAtomicRestartRestoration"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/TempleDoorStatusRuntimeTests.cs",
+          "line": 287,
+          "test": "TempleWorldInteractionInventoryIsExactAndOfficial"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "InteractionContent and action/journal/prop DTOs",
+      "consumers": [
+        "AuthoredQuestCatalog.Load",
+        "QuestPropService",
+        "AuthoredQuestService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+      "id": "interaction-content",
+      "reason": "Existing content architecture already satisfies authored data loading.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+        "line": 26
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/InteractionContent.cs",
+          "line": 26
+        }
+      ],
+      "required_change": "No replacement content framework.",
+      "responsibility": "Editable interaction schema, exact references, counts and placement validation",
+      "risk": "Validation proves schema consistency, not external identity evidence.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
+          "line": 32
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
+          "line": 48
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 197
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 323
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+          "line": 176
+        }
+      ],
+      "class": "InventoryGrantPlan",
+      "consumers": [
+        "QuestDungeonService.AcceptOffer",
+        "QuestDungeonService.ShareKey",
+        "AuthoredQuestService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
+      "id": "inventory-grant-plan",
+      "reason": "Shared inventory mechanism is active for generated dungeon keys and authored rewards; it neither starts its own transaction nor allocates item identity.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
+          "line": 32
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryGrantPlan.cs",
+          "line": 48
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 197
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 323
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+          "line": 176
+        }
+      ],
+      "required_change": "No change required for the destination-catalog integration; retain existing ownership and transaction boundaries.",
+      "responsibility": "Plan exact inventory rows while the player persistence gate is held; publish planned inventory and notifications after the caller commits.",
+      "risk": "LOW",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/InventoryActionTests.cs"
+      ]
+    },
+    {
+      "class": "KnubotAcceptQuest / KnubotCompleteQuest / KnubotQuestCondition",
+      "consumers": [
+        "Knubot effect/condition evaluator",
+        "QuestService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotEffects.cs",
+      "id": "knubot-quest-bridge",
+      "reason": "Current dialogue bridge calls QuestService and reads QuestCatalog; unrelated to random destination membership.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotEffects.cs",
+        "line": 85
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotEffects.cs",
+          "line": 85
+        }
+      ],
+      "related_files": [
+        "AORebirth/Server/ZoneEngine_New/Core/Knubot/KnubotConditions.cs"
+      ],
+      "required_change": "Preserve bridge when repairing shared QuestService reward boundary.",
+      "responsibility": "Current template quest dialogue assignment, conditions and completion",
+      "risk": "Knubot reward capacity preflight does not cover generated NPC kill completion and is not one atomic durable transaction.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "MissionBits",
+      "consumers": [
+        "QuestCatalog range validation",
+        "QuestService.Complete"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/MissionBits.cs",
+      "id": "mission-bits",
+      "reason": "Generic character-stat bit schema is independent of entrance destinations. Generated BuildTemplate currently leaves MissionBit null.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/MissionBits.cs",
+          "line": 14,
+          "method": "MissionBits"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/MissionBits.cs",
+          "line": 46,
+          "method": "Locate"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/MissionBits.cs",
+          "line": 62,
+          "method": "Set"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 350,
+          "method": "Complete"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "Map bits0..639 onto20 character stats and set completion flag in base value.",
+      "risk": "LOW; bit semantics require ordinary stat persistence, not new destination catalog.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionContentJson.cs",
+          "line": 15
+        }
+      ],
+      "class": "MissionContentJson",
+      "consumers": [
+        "MissionRollPolicy",
+        "MissionLevelRuntime",
+        "MissionRollEvidenceCatalog",
+        "MissionRewardEvidenceModel",
+        "MissionRollCaptureLibrary",
+        "MissionRollCaptureTemplate",
+        "MissionRareLootCatalog"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionContentJson.cs",
+      "id": "mission-content-json",
+      "reason": "Existing GameData selector already meets content routing requirements.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionContentJson.cs",
+          "line": 15
+        }
+      ],
+      "required_change": "Pass selected root to new neutral catalog; no new staging/configuration system.",
+      "responsibility": "Read editable mission content from existing selected GameData root.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs",
+          "line": 64,
+          "test": "ArtifactPoolReloadUsesEditedDataWithSameBinary"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs",
+          "line": 89,
+          "test": "MissionLayoutsLoadWithoutProvenancePermission"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs"
+      ]
+    },
+    {
+      "class": "IMissionDao / IMissionDaoTransaction",
+      "consumers": [
+        "AuthoredQuestService",
+        "AuthoredMissionProgression",
+        "New-character start area"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionDao.cs",
+      "id": "mission-dao-contract",
+      "reason": "Already used by current authored action path and does not select destinations.",
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionDao.cs",
+        "line": 374
+      },
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionDao.cs",
+          "line": 374
+        }
+      ],
+      "required_change": "None for catalog connection.",
+      "responsibility": "Authored owner/account/version/reward transaction contract",
+      "risk": "Do not confuse authored missionstates with current generated characterquests.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ]
+    },
+    {
+      "class": "MissionEntranceCatalog",
+      "consumers": [
+        "QuestDungeonService.AcceptOffer",
+        "TryEnter",
+        "ResolveLogin",
+        "TryGetEntrance"
+      ],
+      "disposition": "KEEP_AND_CONNECT_NEW_DESTINATION_CATALOG",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/MissionEntranceCatalog.cs",
+      "id": "mission-entrance-catalog",
+      "reason": "Existing catalog seam is appropriate but current selected data is one-row sample; full proven loader adds complete unsigned identity, exact XYZ bits, preserved rotation/name/provenance.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/MissionEntranceCatalog.cs",
+          "line": 41,
+          "method": "MissionEntranceCatalog"
+        }
+      ],
+      "required_change": "Adapt this seam to immutable catalog, retain operational entry range separately; use exact offered WorldPos binding where input is exact; never interpret observed812 as whitelist.",
+      "responsibility": "Load exterior entrance metadata; instance and XZ-nearest lookup",
+      "risk": "HIGH: accepted mission binding currently substitutes catalog XYZ after XZ-only match.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "PlayfieldWorldSimulation mission entrance methods",
+      "consumers": [
+        "World simulation movement crossings"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+      "id": "mission-entrance-triggers",
+      "reason": "Interaction volume is a distinct mechanic from historical exact WorldPos reconstruction.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+          "line": 1125,
+          "method": "EnterMissionEntrance / BakeMissionEntranceTriggers"
+        }
+      ],
+      "required_change": "Do not replace player interaction range with bit equality. Keep exact target identity at TryEnter and verify data consistency after catalog connection.",
+      "responsibility": "Bake physical walk-in volumes from Dynels.dat and dispatch exact dynel identity to entry service",
+      "risk": "MEDIUM: actual exterior Dynels.dat coverage controls walk-in availability independently of catalog.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionConfigurationContent.cs",
+          "line": 8
+        }
+      ],
+      "class": "MissionGeographyContent / MissionTextContent",
+      "consumers": [
+        "MissionLocationPool",
+        "MissionOfferTextBuilder",
+        "MissionOfferCompatibility"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionConfigurationContent.cs",
+      "id": "mission-geography-and-text",
+      "reason": "Data-driven ownership correct; geographical selection restrictions unproven.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionConfigurationContent.cs",
+          "line": 8
+        }
+      ],
+      "required_change": "Preserve names/text; mark current tiers/side restrictions as compatibility policy and correct only supported conflicts.",
+      "responsibility": "Load editable geography affiliations/tiers/clusters/names and objective text.",
+      "risk": "MEDIUM.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "class": "IMissionInventoryMutationTransaction",
+      "consumers": [
+        "AuthoredQuestService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionInventoryMutationTransaction.cs",
+      "id": "mission-inventory-transaction",
+      "reason": "Reusable transaction capability already integrated.",
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionInventoryMutationTransaction.cs",
+        "line": 10
+      },
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/Missions/IMissionInventoryMutationTransaction.cs",
+          "line": 10
+        }
+      ],
+      "required_change": "None for destination data.",
+      "responsibility": "Atomic authored grants/consumption in enclosing mission transaction",
+      "risk": "Current QuestService does not automatically inherit this capability.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 9
+        }
+      ],
+      "class": "MissionLevelRuntime / MissionLevelData / MissionLevelRules",
+      "consumers": [
+        "QuestAlternativeMessageHandler",
+        "GeneratedMissionRollService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+      "id": "mission-level-runtime",
+      "reason": "Current lookup is already editable, source-backed static expectation; no destination catalog requirement changes formula.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLevelRuntime.cs",
+          "line": 9
+        }
+      ],
+      "required_change": "Preserve table; label values generated/static expected and never live-decoded evidence.",
+      "responsibility": "Read canonical CSV quality/token table and structural policy.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 65,
+          "test": "DifficultyWireValuesAreOneBasedAndLevel60EasiestIsQl42"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 194,
+          "test": "AllCapturedDifficultyDetentsGenerateForNeutralLeftAndUnresolvedProfiles"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionTokenPolicyTests.cs",
+          "line": 24,
+          "test": "FullProgressPreservesEveryOfficialLevelTokenCellAndExactFactionPairs"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs",
+        "AORebirth/Server/ZoneEngine_New.Tests/MissionContentEditabilityTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 22
+        }
+      ],
+      "class": "MissionLocationPool / Spot / MissionLocationSide",
+      "consumers": [
+        "MissionRollLocations",
+        "QuestAlternativeMessageHandler"
+      ],
+      "disposition": "KEEP_BUT_REPLACE_DATA_SOURCE",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "id": "mission-location-pool",
+      "reason": "No placement IDs; zero exact coordinate joins; hard-coded content conflicts with content boundary.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 22
+        }
+      ],
+      "required_change": "Replace static position rows with explicit exact catalog references under separately reviewed selection policy. Rename offset semantics; preserve all2242 lookup rows and unobserved status.",
+      "responsibility": "Hard-coded140 destination coordinates plus geography helpers.",
+      "risk": "HIGH: cannot approximate intended140 identities.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+          "line": 43
+        }
+      ],
+      "class": "MissionOfferCompatibility / MissionOfferDescriptor",
+      "consumers": [
+        "GeneratedMissionRollService",
+        "GeneratedMissionRollProjection"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+      "id": "mission-offer-compatibility",
+      "reason": "Preserves existing packet shapes without globally banning mission types by sliders.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+          "line": 43
+        }
+      ],
+      "required_change": "Retain compatibility validation; tests should not call it retail destination selection proof.",
+      "responsibility": "Validate captured and generated icon/action/objective/text/reward shape.",
+      "risk": "LOW for catalog integration.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 140,
+          "test": "CapturedLibraryCoversEveryFinalizedMissionTypeWithCompatibleActions"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 263,
+          "test": "GeneratedFiveOfferSetsAreIndependentlyCoherent"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 391,
+          "test": "CompatibilityLayerRejectsTextObjectiveAndRewardContradictions"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 472,
+          "test": "UnchangedCapturedCombinationPreservesExactText"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferTextBuilder.cs",
+          "line": 14
+        }
+      ],
+      "class": "MissionOfferTextBuilder",
+      "consumers": [
+        "GeneratedMissionRollService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferTextBuilder.cs",
+      "id": "mission-offer-text",
+      "reason": "No name-to-identity lookup; display-only formatting is distinct from exact coordinate identity.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferTextBuilder.cs",
+          "line": 14
+        }
+      ],
+      "required_change": "Retain display formatting and existing text data; never use formatted coordinates as join keys.",
+      "responsibility": "Preserve captured title width and compose editable objective/reward/location text.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 472,
+          "test": "UnchangedCapturedCombinationPreservesExactText"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRareLootCatalog.cs",
+          "line": 10
+        }
+      ],
+      "class": "MissionRareLootCatalog",
+      "consumers": [
+        "MissionRollRewardItems.IsRareLootTemplate; no TryRoll runtime caller found"
+      ],
+      "disposition": "DEFER_PENDING_EVIDENCE",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRareLootCatalog.cs",
+      "id": "mission-rare-loot-catalog",
+      "reason": "Do not interpret dormant helper as implemented mission chest/corpse loot.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRareLootCatalog.cs",
+          "line": 10
+        }
+      ],
+      "required_change": "Keep exclusion policy; new dungeon loot needs independent evidence and wiring.",
+      "responsibility": "Active rare-template reward exclusion; dormant configurable interior rare drop helper.",
+      "risk": "HIGH if activated.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "line": 13
+        }
+      ],
+      "class": "MissionRewardEvidenceModel",
+      "consumers": [
+        "GeneratedMissionRollService"
+      ],
+      "disposition": "DEFER_PENDING_EVIDENCE",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+      "id": "mission-reward-evidence-model",
+      "reason": "Recorded pairs are reusable data but nearest-context reuse remains an unproven generation policy.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRewardEvidenceModel.cs",
+          "line": 13
+        }
+      ],
+      "required_change": "Preserve transaction outputs; qualify QL metadata and audit reward evidence separately before expanding supported claims.",
+      "responsibility": "Select recorded cash/XP pair with lexicographic nearest context.",
+      "risk": "HIGH: economy.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 263,
+          "test": "GeneratedFiveOfferSetsAreIndependentlyCoherent"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 454,
+          "test": "FinalizedQl42RewardPairsRemainExactEvidence"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureLibrary.cs",
+          "line": 2
+        }
+      ],
+      "class": "MissionRollCaptureLibrary",
+      "consumers": [
+        "GeneratedMissionWire"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureLibrary.cs",
+      "id": "mission-roll-capture-library",
+      "reason": "Runtime reads packaged compact content, not historical capture directories.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureLibrary.cs",
+          "line": 2
+        }
+      ],
+      "required_change": "Retain exact shell bytes and provenance; do not ship research journals.",
+      "responsibility": "Load13 captured shell bodies from editable compact runtime content.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 97,
+          "test": "CapturedFixtureAccessorsReturnDefensiveCopies"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureTemplate.cs",
+          "line": 9
+        }
+      ],
+      "class": "MissionRollCaptureTemplate",
+      "consumers": [
+        "GeneratedMissionWire.TemplateBody; test consumers"
+      ],
+      "disposition": "TEST_ONLY",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureTemplate.cs",
+      "id": "mission-roll-capture-template",
+      "reason": "Main generator uses captured library; TemplateBody/DecodeTemplate path is used by tests, not request handler.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollCaptureTemplate.cs",
+          "line": 9
+        }
+      ],
+      "required_change": "Retain byte fixture until test inventory is reconciled.",
+      "responsibility": "Expose full captured packet template and transport header length.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "line": 11
+        }
+      ],
+      "class": "MissionRollEvidenceCatalog",
+      "consumers": [
+        "GeneratedMissionRollService"
+      ],
+      "disposition": "DEFER_PENDING_EVIDENCE",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+      "id": "mission-roll-evidence-catalog",
+      "reason": "Existing generator is active and coherent; nearest ranking is not proven retail distribution.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollEvidenceCatalog.cs",
+          "line": 11
+        }
+      ],
+      "required_change": "Retain for compatibility; review broader observation corpus before changing type distributions or promoting expected QL to live QL.",
+      "responsibility": "Select whole five-type cohort from21 data rows by nearest evidence.",
+      "risk": "MEDIUM: visible mission types.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 9
+        }
+      ],
+      "class": "MissionRollLocations",
+      "consumers": [
+        "GeneratedMissionRollService.Generate"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+      "id": "mission-roll-locations",
+      "reason": "Same-PF low-level restriction contradicts observed crossPF low-level corpus; anti-repeat bias is not proven.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+          "line": 9
+        }
+      ],
+      "required_change": "Separate accepted compatibility policy from capture claims; scoped selection correction needs complete evidence conditions and must allow repeats.",
+      "responsibility": "Filter and randomly choose destination spots with level/faction/geography and anti-repeat policy.",
+      "risk": "HIGH: gameplay destination distribution.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollPolicy.cs",
+          "line": 12
+        }
+      ],
+      "class": "MissionRollPolicy",
+      "consumers": [
+        "GeneratedMissionRollService",
+        "MissionRollLocations",
+        "MissionRollSliders",
+        "MissionRollRewardItems",
+        "GeneratedMissionWire",
+        "QuestDungeonService"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollPolicy.cs",
+      "id": "mission-roll-policy",
+      "reason": "Existing data-driven mechanism is suitable; policy provenance includes unproven retail assumptions.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollPolicy.cs",
+          "line": 12
+        }
+      ],
+      "required_change": "Keep loader; correct only evidence-conflicting selection policy in later approved phase, retaining protocol values.",
+      "responsibility": "Load and validate editable fees, clock, types, slider profiles, travel and reward policy.",
+      "risk": "MEDIUM: global generation policy.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 55,
+          "test": "OfficialFindAndReturnItemIconsMapToCapturedBehavior"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 174,
+          "test": "LeftCapturedSliderProfileReproducesItsObservedTypeCohort"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 263,
+          "test": "GeneratedFiveOfferSetsAreIndependentlyCoherent"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 362,
+          "test": "ReturnOffersRetargetTheirObjectiveToTheIssuingTerminal"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 498,
+          "test": "RollFeeRulesPreserveDeductionAndInsufficientCreditBehavior"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+          "line": 14
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Network/MessageRouter.cs",
+          "line": 62
+        }
+      ],
+      "class": "QuestAlternativeMessageHandler",
+      "consumers": [
+        "Program IMessageHandler registration; MessageRouter"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+      "id": "mission-roll-request-handler",
+      "reason": "Actual handler is active. Same-PF travel currently uses player position as terminal coordinates.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+          "line": 14
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Network/MessageRouter.cs",
+          "line": 62
+        }
+      ],
+      "required_change": "Retain ownership/range/clock/commit guards. If terminal-distance policy retained, pass actual terminal coordinates rather than player coordinates; validate evidence semantics first.",
+      "responsibility": "Validate owned in-play terminal request, reserve IDs, generate and commit offers before sending.",
+      "risk": "MEDIUM.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs",
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+          "line": 12
+        }
+      ],
+      "class": "MissionRollRewardItems",
+      "consumers": [
+        "GeneratedMissionRollService"
+      ],
+      "disposition": "DEFER_PENDING_EVIDENCE",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+      "id": "mission-roll-reward-items",
+      "reason": "Existing content-driven reward service should remain; catalog membership and arbitrary uniform selection are not proven retail eligibility/weights.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollRewardItems.cs",
+          "line": 12
+        }
+      ],
+      "required_change": "No destination-task replacement; future reward audit should examine full source eligibility and fixed-QL fallback.",
+      "responsibility": "Read packaged item catalogs and choose QL eligible reward item.",
+      "risk": "HIGH: economy/content.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+          "line": 8
+        }
+      ],
+      "class": "MissionRollSliders",
+      "consumers": [
+        "GeneratedMissionRollService",
+        "GeneratedMissionRollProjection",
+        "QuestAlternativeMessageHandler",
+        "MissionRollEvidenceCatalog",
+        "MissionRewardEvidenceModel"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+      "id": "mission-roll-sliders",
+      "reason": "Wire decoding is established; unresolved-to-neutral semantic fallback is policy not proof.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/MissionRollSliders.cs",
+          "line": 8
+        }
+      ],
+      "required_change": "Preserve byte validation; explicitly distinguish unsupported evidence profiles and policy fallback when integrating new observations.",
+      "responsibility": "Decode signed secondary bytes and rank categorical evidence profiles.",
+      "risk": "MEDIUM: type/reward ranking.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 100,
+          "test": "ContinuousSliderBytesDecodeAsSignedPercentAndRejectInvalidRange"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 122,
+          "test": "UnresolvedSliderCombinationsFallBackCategoricallyToNeutralEvidence"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 263,
+          "test": "GeneratedFiveOfferSetsAreIndependentlyCoherent"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 391,
+          "test": "CompatibilityLayerRejectsTextObjectiveAndRewardContradictions"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 454,
+          "test": "FinalizedQl42RewardPairsRemainExactEvidence"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+        "AORebirth/Server/ZoneEngine_New.Tests/GeneratedMissionRollProjectionTests.cs"
+      ]
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/MissionTerminal.cs",
+          "line": 8
+        }
+      ],
+      "class": "MissionTerminal",
+      "consumers": [
+        "SpawnService.CreateStaticDynel",
+        "QuestAlternativeMessageHandler"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/MissionTerminal.cs",
+      "id": "mission-terminal-entity",
+      "reason": "Class is reachable despite stale comment claiming roll UI unimplemented.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/MissionTerminal.cs",
+          "line": 8
+        }
+      ],
+      "required_change": "Correct stale descriptive comment in later scoped documentation/source cleanup; no runtime replacement.",
+      "responsibility": "Identify static official mission-terminal dynels for request validation.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionAcgAcceptedProjectionTests.cs",
+          "line": 99,
+          "test": "HighBitIssuingTerminalInstanceRemainsConcreteInAcceptedProjection"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 140,
+          "test": "CapturedLibraryCoversEveryFinalizedMissionTypeWithCompatibleActions"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 362,
+          "test": "ReturnOffersRetargetTheirObjectiveToTheIssuingTerminal"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 391,
+          "test": "CompatibilityLayerRejectsTextObjectiveAndRewardContradictions"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs",
+          "line": 472,
+          "test": "UnchangedCapturedCombinationPreservesExactText"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 116,
+          "test": "GeneratedRollPreservesOneCompleteCapturedServerResponseEnvelope"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs",
+          "line": 184,
+          "test": "GeneratedRollPreservesClientTitleWidthFreshExpiryAndRoundTrips"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "MySqlCharacterQuestDao",
+      "consumers": [
+        "MySqlCharacterQuestStore"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+      "id": "mysql-character-quest-dao",
+      "reason": "Actual accepted quest/key operation is transactional; reward boundary and unknown commit handling need targeted follow-up.",
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+        "line": 100
+      },
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 100
+        }
+      ],
+      "required_change": "Preserve current tables/identity model; implement existing unknown-commit convention and targeted completion/reward authority only when authorized.",
+      "responsibility": "Current character/template/generated quest and physical dungeon-key persistence",
+      "risk": "High: completion durability and error recovery; no schema or DAO changed in this audit.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ]
+    },
+    {
+      "class": "MySqlMissionDao (all partials)",
+      "consumers": [
+        "AuthoredQuestService",
+        "GeneratedMissionService",
+        "QuestAlternativeMessageHandler",
+        "QuestDungeonService offer read",
+        "ZoneLoginHandler old binding read"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; NOT_EXECUTED",
+      "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+      "id": "mysql-mission-dao",
+      "reason": "Preserve working connected authored/offer mechanics and durable retired-state exit evidence.",
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+        "line": 40
+      },
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 40
+        }
+      ],
+      "related_files": [
+        "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+        "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs",
+        "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Legacy.cs",
+        "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs"
+      ],
+      "required_change": "No DAO edit for catalog mapping; future reward repair may reuse transaction patterns.",
+      "responsibility": "Authored and offer SQL owner; retained former generated mission persistence",
+      "risk": "Unused generated capabilities must not be reported as active new mission lifecycle.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 15,
+          "test": "ValidateHardening"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 78,
+          "test": "ValidateVersionRestoration"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 87,
+          "test": "mission_account"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 118,
+          "test": "ValidateScopeLifetime"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 136,
+          "test": "ValidateCaughtWriteFailure"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 167,
+          "test": "ValidateInvalidStatBatch"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 184,
+          "test": "ValidateObservationErrors"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 197,
+          "test": "ValidateClosedConnection"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 208,
+          "test": "ValidateOriginalFailure"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 234,
+          "test": "ValidateFeeInput"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 255,
+          "test": "ValidateLifecycleIsolation"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 284,
+          "test": "ValidateRewardLeases"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 326,
+          "test": "ValidateAtomicRewardRetry"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 359,
+          "test": "ValidateSnapshotOrdering"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 370,
+          "test": "ValidateMutationCutpoints"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 406,
+          "test": "ValidateLedgerWriteFailure"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/HardeningChecks.cs",
+          "line": 428,
+          "test": "ValidateAcceptanceFailures"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ParallelContractChecks.cs",
+          "line": 14,
+          "test": "ValidateParallelContracts"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ParallelContractChecks.cs",
+          "line": 25,
+          "test": "ValidateReadCardinalityAndParameters"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ParallelContractChecks.cs",
+          "line": 76,
+          "test": "ValidateConnectionFailures"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ParallelContractChecks.cs",
+          "line": 94,
+          "test": "ValidateCommitFailures"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ParallelContractChecks.cs",
+          "line": 127,
+          "test": "ValidateFeeFailure"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ParallelContractChecks.cs",
+          "line": 154,
+          "test": "ValidateConfiguredFactoryAndCompatibility"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 83,
+          "test": "MISSION_DAO_MYSQL_INTEGRATION"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 103,
+          "test": "ValidateFactory"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 110,
+          "test": "ValidateLifecycleAndNulls"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 114,
+          "test": "mission_account"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 173,
+          "test": "mission-insert-version"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 194,
+          "test": "mission-update-version"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 195,
+          "test": "mission-update"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 198,
+          "test": "ValidateRollbackAndOwnership"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 239,
+          "test": "ValidateObservationConcurrency"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 262,
+          "test": "ValidateRewards"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 324,
+          "test": "ValidateRollFeeConcurrency"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/Program.cs",
+          "line": 350,
+          "test": "ValidateStartArea"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 13,
+          "test": "ValidateCutoverReconciliation"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 19,
+          "test": "MISSION_DAO_CUTOVER_RECONCILIATION"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 22,
+          "test": "ValidateGeneratedConnectionAndRollback"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 63,
+          "test": "ValidateGeneratedFailureDiagnostics"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 106,
+          "test": "ValidateAuthoredInventoryReconciliation"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 116,
+          "test": "authored-inventory-extension-commits-exact-item"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 118,
+          "test": "authored-inventory-escaped-scope-rejected"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 133,
+          "test": "authored-inventory-caught-failure-poisons-scope"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 134,
+          "test": "authored-inventory-real-unique-location-failure-reached"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 135,
+          "test": "authored-inventory-failure-restores-mission-version-and-row"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 137,
+          "test": "authored-inventory-partial-grant-rolled-back"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 139,
+          "test": "authored-inventory-existing-item-preserved"
+        },
+        {
+          "file": "Tools/MissionDaoValidation/ReconciliationChecks.cs",
+          "line": 142,
+          "test": "ValidateUnknownCommitOutcome"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 79,
+          "test": "authored-late-stat-rollback"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 82,
+          "test": "authored-atomic-package-commit"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 84,
+          "test": "authored-source-history-lost"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 86,
+          "test": "authored-grant-identity-location-lost"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 88,
+          "test": "authored-final-stats-not-atomic"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 91,
+          "test": "authored-mission-state-not-restart-durable"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 94,
+          "test": "authored-reward-replay-not-idempotent"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 95,
+          "test": "authored-reward-replay-mutated-database"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 99,
+          "test": "authored-account-owner-fence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 100,
+          "test": "authored-foreign-account-entered-callback"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 102,
+          "test": "authored-missing-character-fence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 103,
+          "test": "authored-missing-character-entered-callback"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 106,
+          "test": "authored-foreign-mission-fence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 112,
+          "test": "authored-stale-item-cas-rollback"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 116,
+          "test": "authored-child-row-retirement-rollback"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/AuthoredMissionSmoke.cs",
+          "line": 133,
+          "test": "authored-observation-write"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 18,
+          "test": "mission-sql-identity-reservation-overlap"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 23,
+          "test": "mission-offer-publish"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 25,
+          "test": "mission-offer-publish-idempotence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 26,
+          "test": "mission-fee-repeated-publication-changed-database"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 28,
+          "test": "mission-same-hash-different-typed-destination-accepted"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 30,
+          "test": "mission-conflicting-frozen-batch-changed-database"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 31,
+          "test": "mission-offer-owner-isolation"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 32,
+          "test": "mission-fee-not-exactly-once"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 36,
+          "test": "mission-cross-owner-accept"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 39,
+          "test": "mission-accept-artifact-collision-rollback"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 42,
+          "test": "mission-accept"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 44,
+          "test": "mission-accept-idempotence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 45,
+          "test": "mission-accept-duplicated-artifact-or-binding"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 47,
+          "test": "mission-owned-position-save"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 49,
+          "test": "mission-position-save-overwrote-online-or-lost-coordinates"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 51,
+          "test": "mission-position-write-failure-changed-character"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 57,
+          "test": "mission-object-update"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 62,
+          "test": "mission-object-stale-cas-changed-database"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 64,
+          "test": "mission-object-hp-position-reset-on-restart"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 65,
+          "test": "mission-object-owner-isolation"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 77,
+          "test": "mission-binding-owner-isolation"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 87,
+          "test": "mission-unrelated-objective-accepted"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 90,
+          "test": "mission-wrong-live-pf-objective-accepted"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 97,
+          "test": "mission-matched-objective-not-applied"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 99,
+          "test": "mission-observation-idempotence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 100,
+          "test": "mission-duplicate-objective-changed-database"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 112,
+          "test": "mission-reward-late-xp-failure-rolls-back-item-cash-ledger-and-completion"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 115,
+          "test": "mission-atomic-reward-stat-values"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 116,
+          "test": "mission-reward-item-not-durable"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 117,
+          "test": "mission-reward-existing-ledger-not-used"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 120,
+          "test": "mission-completion-idempotence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 121,
+          "test": "mission-completion-replay-changed-rewards"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 128,
+          "test": "mission-expiry-offer"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 131,
+          "test": "mission-expiry-accept"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 132,
+          "test": "mission-premature-expiry"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 134,
+          "test": "mission-expiry-transition"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 136,
+          "test": "mission-expiry-idempotence"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 137,
+          "test": "mission-expiry-replay-changed-database"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 138,
+          "test": "mission-early-pf-release"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 140,
+          "test": "mission-cleanup-first-checkpoint"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 141,
+          "test": "mission-cleanup-stale-cas"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 142,
+          "test": "mission-pf-released-before-cleanup-complete"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 144,
+          "test": "mission-cleanup-world-order"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 148,
+          "test": "mission-cleanup-foreign-bank-must-remain-pending"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 152,
+          "test": "mission-cleanup-unverified-container-must-remain-pending"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 156,
+          "test": "mission-bank-cleanup-late-checkpoint-failure-changed-artifacts"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 159,
+          "test": "mission-cleanup-item-checkpoint-atomic"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 160,
+          "test": "mission-cleanup-key-not-retired"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 163,
+          "test": "mission-cleanup-retry-changed-retired-artifacts"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 165,
+          "test": "mission-cleanup-deleted-earned-reward"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 174,
+          "test": "mission-foreign-corpse-claim-mutated-state"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 176,
+          "test": "mission-corpse-late-failure-changed-cash-or-ledger"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 179,
+          "test": "mission-corpse-credits-not-atomic"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 182,
+          "test": "mission-corpse-replay-duplicated-credits"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 183,
+          "test": "mission-corpse-claim-not-restored"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 275,
+          "test": "MISSION_RETURN_FIXTURE_ACCEPT"
+        },
+        {
+          "file": "Tools/ZoneEngineSchemaValidation/GeneratedMissionSmoke.cs",
+          "line": 287,
+          "test": "MISSION_RETURN_FIXTURE_PICKUP_FAILURE_ROLLBACK"
+        }
+      ],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": [
+        "mission-test-inventory.json; filter component/source references"
+      ],
+      "transaction_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 156
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 275
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "class": "PlayerQuest / QuestLog / QuestSource / QuestOwnerType / QuestState",
+      "consumers": [
+        "QuestService",
+        "QuestJournal",
+        "QuestDungeonService.QuestEnded",
+        "QuestsCommand",
+        "GetCommand"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/PlayerQuest.cs",
+      "id": "player-quest-model",
+      "reason": "The per-player model and QuestId dictionary already support durable generated rows and authored templates; do not replace because a new placement catalog exists.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/PlayerQuest.cs",
+          "line": 6,
+          "method": "QuestSource"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/PlayerQuest.cs",
+          "line": 35,
+          "method": "PlayerQuest"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/PlayerQuest.cs",
+          "line": 64,
+          "method": "QuestLog"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "Hold loaded character quest state and generated definition/expiry/ACG parameters with stable enum values.",
+      "risk": "LOW; mutable progress/state must continue to be persisted by service owner.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "PlayfieldManager dungeon methods",
+      "consumers": [
+        "QuestDungeonService"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+      "id": "playfield-manager-dungeons",
+      "reason": "Existing manager handles race, identity, heartbeat and occupancy lifecycle.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+          "line": 375,
+          "method": "GetOrCreateQuestDungeon / SweepQuestDungeons / TryReleaseQuestDungeon"
+        }
+      ],
+      "required_change": "No rewrite. Retain same-quest guards and disposal outside manager lock while adding destination catalog.",
+      "responsibility": "Create/register/start unique quest dungeon; preserve occupied instances; release/dispose empty worlds",
+      "risk": "LOW for catalog integration.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 27
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 37
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 109
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+          "line": 124
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+          "line": 136
+        }
+      ],
+      "class": "ProgressionRewardRules / ProgressionRewardSnapshot",
+      "consumers": [
+        "AuthoredQuestService.TimedTurnIn"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+      "id": "progression-reward-rules",
+      "reason": "The active caller owns its durable reward ledger. Retain that mechanism; separately classify the fixed token tiers as content for a later authorized data extraction. Historical DailyMissionRewardRulesTests names a different namespace/type and is not current helper test coverage.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 27
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 37
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 109
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+          "line": 124
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+          "line": 136
+        }
+      ],
+      "required_change": "No change required for the destination-catalog integration; retain existing ownership and transaction boundaries.",
+      "responsibility": "Compute and freeze authored daily reward XP and faction token effect references.",
+      "risk": "MEDIUM: authored reward content.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestCatalog",
+      "consumers": [
+        "Program service registration",
+        "QuestService.TryAssignTemplate/Load/next step"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestCatalog.cs",
+      "id": "quest-catalog",
+      "reason": "Existing GameData-root-backed authored quest loader is separate from generated destination selection. Templates are data, not hardcoded runtime content.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestCatalog.cs",
+          "line": 24,
+          "method": "constructor"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestCatalog.cs",
+          "line": 37,
+          "method": "LoadTemplates"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
+          "line": 263,
+          "method": "service registration"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "Load editable Quests.json templates by hash and validate mission-bit range.",
+      "risk": "LOW for destination integration; malformed templates or skipped duplicate hashes are existing loader limits.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestIndex.cs",
+          "line": 9
+        }
+      ],
+      "class": "QuestIndex",
+      "consumers": [
+        "AuthoredQuestCatalog",
+        "InteractionContent.LoadQuestIndex"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestIndex.cs",
+      "id": "quest-content-index",
+      "reason": "Existing reusable content index; do not replace with generated destination catalog.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestIndex.cs",
+          "line": 9
+        }
+      ],
+      "required_change": "No change.",
+      "responsibility": "Validate authored cross-content IDs/links and publish snapshot.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestDefinitions.cs",
+          "line": 6
+        }
+      ],
+      "class": "QuestContentPack / QuestDefinition / QuestStep / QuestObjective / QuestCondition / QuestAction",
+      "consumers": [
+        "QuestIndex",
+        "AuthoredQuestCatalog"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestDefinitions.cs",
+      "id": "quest-content-schema",
+      "reason": "Reusable schema/data boundary, not generated destination logic.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/QuestDefinitions.cs",
+          "line": 6
+        }
+      ],
+      "required_change": "No destination-related change.",
+      "responsibility": "Authored content serialization schema.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestMessageHandler",
+      "consumers": [
+        "MessageRouter via Program.AddMessageHandler"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestMessageHandler.cs",
+      "id": "quest-delete-handler",
+      "reason": "Active generic quest lifecycle route; no separate obsolete mission delete path required.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestMessageHandler.cs",
+          "line": 13,
+          "method": "Handle"
+        }
+      ],
+      "required_change": "Retain no-delete and identity checks; preserve cleanup event subscription.",
+      "responsibility": "Dispatch owned active journal deletion into QuestService abandonment",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonIds",
+      "consumers": [
+        "QuestDungeonService",
+        "PlayfieldManager",
+        "ZoneLoginHandler"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+      "id": "quest-dungeon-ids",
+      "reason": "Existing engine identity allocation need not be replaced by static entrance identity.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+          "line": 11,
+          "method": "QuestDungeonIds"
+        }
+      ],
+      "required_change": "No change required for catalog connection; retain bounds/collision guards.",
+      "responsibility": "Derive quest ID and generated playfield from durable allocation",
+      "risk": "LOW for catalog integration; allocation exhaustion remains ordinary operational bound.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonParameters",
+      "consumers": [
+        "QuestDungeonService",
+        "QuestJournal"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonParameters.cs",
+      "id": "quest-dungeon-parameters",
+      "reason": "The persistence envelope already has the needed entrance/instance/seed role. It lacks complete type and exact coordinate bits; BuildingLowId/HighId naming misdescribes copied WorldPos integer fields.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonParameters.cs",
+          "line": 9,
+          "method": "QuestDungeonParameters"
+        }
+      ],
+      "required_change": "Preserve existing rows and contract; add versioned exact placement references and correct field meaning only with compatible reader strategy. No BD/key guess.",
+      "responsibility": "Persist immutable-at-accept entrance and seed/version/mission parameters as generatedquest JSON",
+      "risk": "MEDIUM: replay compatibility and field semantics.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonPlayfield",
+      "consumers": [
+        "PlayfieldManager.GetOrCreateQuestDungeon",
+        "SpawnService"
+      ],
+      "disposition": "KEEP_BUT_REPLACE_DATA_SOURCE",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+      "id": "quest-dungeon-playfield",
+      "reason": "Actual generated room/collision/world mechanics exist. Ambient ZK3X35% and kill LE01 targets are temporary; no other objective actors; world state intentionally ephemeral.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 69,
+          "method": "Build"
+        }
+      ],
+      "required_change": "Preserve geometry/door/exit mechanics. Data-drive proven mission content; freeze exact actor identity and add smallest required persistence for accepted restart guarantees.",
+      "responsibility": "Build room geometry/locality, doors, ambient/target NPCs and exit; emit ACG world packet",
+      "risk": "HIGH: absent objective content, regeneration resets world state, missing geometry can create no exit simulation.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "consumers": [
+        "CreateQuestMessageHandler",
+        "GenericCmdMessageHandler",
+        "PlayfieldWorldSimulation",
+        "ZoneLoginHandler",
+        "SpawnService",
+        "QuestsCommand",
+        "QuestService.QuestEnded"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "quest-dungeon-service",
+      "reason": "Substantial active mechanics exist. Narrow binding/content corrections are required; current all-type acceptance does not establish all-type objectives.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 135,
+          "method": "AcceptOffer / TryEnter / Sweep"
+        }
+      ],
+      "required_change": "Connect exact catalog at AcceptOffer; retain key/instance/expiry flow; replace temporary target definition with proven editable content; add supported exact objective bindings. Keep operational BD unresolved.",
+      "responsibility": "Accept offers atomically; grant/share linked keys; authorize entry; seed resolution; expiry/key/world cleanup",
+      "risk": "HIGH: current LE01 target reused across all kill missions and current catalog blocks every runtime pool destination.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/InteractionFiles.cs",
+          "line": 36
+        }
+      ],
+      "class": "InteractionManifest / ContentJson / ContentValidationResult",
+      "consumers": [
+        "InteractionContent.LoadQuestIndex",
+        "QuestIndex.ReadFiles"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/InteractionFiles.cs",
+      "id": "quest-interaction-files",
+      "reason": "Separate authored content loading boundary.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/InteractionFiles.cs",
+          "line": 36
+        }
+      ],
+      "required_change": "No change.",
+      "responsibility": "Read authored content paths and validate packs.",
+      "risk": "LOW.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestJournal",
+      "consumers": [
+        "QuestService"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestJournal.cs",
+      "id": "quest-journal",
+      "reason": "Registered quest service reuses active journal code. The projection replaces offer XYZ with chosen catalog XYZ and labels WorldPos integers as building templates; generated nonkill objectives are incomplete.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestJournal.cs",
+          "line": 109,
+          "method": "Build / Action"
+        }
+      ],
+      "required_change": "Retain clock rebasing/restore flow. Carry exact selected placement and correct WorldPos semantics, and capture-test each generated type when exact objectives are defined.",
+      "responsibility": "Project generated/authored quest definition to stable client journal identity, action, expiry and waypoint",
+      "risk": "MEDIUM: FNV low24 identity has no collision guard; generated type action parity not established by authored tutorial layouts.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestPropService / ContentProp",
+      "consumers": [
+        "Playfield.Activate/Shutdown",
+        "GenericCmdMessageHandler"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/QuestPropService.cs",
+      "id": "quest-props",
+      "reason": "Existing data-driven exact owner route should be preserved; no generated destination selection.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/QuestPropService.cs",
+        "line": 18
+      },
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/QuestPropService.cs",
+          "line": 18
+        }
+      ],
+      "required_change": "None for catalog connection.",
+      "responsibility": "Bind authored props by exact identity, template and transform; gate player use",
+      "risk": "Do not relabel these authored props as generated Repair/FindItem support.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestService",
+      "consumers": [
+        "Character.AdvanceKillQuests",
+        "LookAtMessageHandler",
+        "QuestMessageHandler",
+        "QuestDungeonService",
+        "SpawnService",
+        "dialogue/GM quest routes"
+      ],
+      "disposition": "KEEP_WITH_SMALL_EVIDENCE_CORRECTION",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+      "id": "quest-service",
+      "reason": "Active general service should stay. Generated mission target matching is too broad; four generated type definitions/hooks missing; completion/reward not atomic.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 268,
+          "method": "OnNpcKilled / OnNpcTargeted / Complete / GrantReward"
+        }
+      ],
+      "required_change": "Add exact generated mission target/dungeon qualification while retaining authored hash semantics; route completion/reward through existing DAO transaction boundary with durable retry for full inventory; then implement proven missing types.",
+      "responsibility": "Generic authored/generated quest state, objective matching, journal restoration, reward and completion",
+      "risk": "HIGH: any credited LE01 hash can advance all generated kill quests; saved completion may outlive failed/lost reward.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "class": "QuestTemplate / QuestObjective / QuestReward / QuestRewardItem",
+      "consumers": [
+        "QuestCatalog",
+        "QuestService",
+        "QuestJournal",
+        "QuestDungeonService.BuildTemplate"
+      ],
+      "disposition": "KEEP_AS_IS",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs",
+      "id": "quest-template-model",
+      "reason": "Existing data shape has NPC, SpecItem and WorldItem fields and reward records. Empty generated definitions are a BuildTemplate/content issue; model existence is not objective implementation.",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs",
+          "line": 12,
+          "method": "QuestTemplate"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs",
+          "line": 69,
+          "method": "QuestObjective"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs",
+          "line": 83,
+          "method": "QuestReward"
+        }
+      ],
+      "required_change": "No destination-catalog-driven change required in this component. Keep targeted changes in the existing quest/dungeon owners identified by the main audit.",
+      "responsibility": "Shared mutable serialization model for authored and generated quest definitions, objectives, rewards and action semantics.",
+      "risk": "MEDIUM: accepts arbitrary action text; supported action processors and validation remain separate.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+          "line": 7
+        }
+      ],
+      "class": "MissionLevelGraphData",
+      "consumers": [
+        "NONE_FOUND"
+      ],
+      "disposition": "REMOVE_OBSOLETE_DUPLICATE",
+      "evidence_status": "OBSERVED_CURRENT_SOURCE; RETAIL_PARITY_UNVERIFIED; TESTS_NOT_RUN",
+      "file": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+      "id": "unused-mission-level-graph",
+      "reason": "Current runtime directly reads CSV; no runtime/tests consumer remains.",
+      "references": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+          "line": 7
+        }
+      ],
+      "required_change": "Optional separately scoped removal of redundant file and offline writer after usage review; not required for mission catalog milestone.",
+      "responsibility": "Unused compiled duplicate CSV table.",
+      "risk": "LOW; do not remove CSV.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "test_inventory_records": [],
+      "test_status": "NOT_RUN_SOURCE_REVIEW_ONLY",
+      "tests": []
+    }
+  ],
+  "counts": {
+    "DEFER_PENDING_EVIDENCE": 4,
+    "KEEP_AND_CONNECT_NEW_DESTINATION_CATALOG": 3,
+    "KEEP_AS_IS": 44,
+    "KEEP_BUT_REPLACE_DATA_SOURCE": 3,
+    "KEEP_WITH_SMALL_EVIDENCE_CORRECTION": 11,
+    "REMOVE_OBSOLETE_DUPLICATE": 1,
+    "TEST_ONLY": 1
+  },
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "implementation_performed": false,
+  "interpretation": "Exactly one disposition per significant component. KEEP_AS_IS preserves a bounded mechanism, not blanket retail correctness. Optional obsolete duplicate removal is not required for destination integration.",
+  "schema_version": 1
+}

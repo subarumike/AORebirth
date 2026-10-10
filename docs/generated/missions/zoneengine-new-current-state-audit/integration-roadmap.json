@@ -1,0 +1,296 @@
+{
+  "catalog_source_sha": "f07bb3c1a99218433e7d459c95ba29ccb22c36b2",
+  "deferred": [
+    "Operational BD/registry-key retail bridge",
+    "Complete destination eligibility and weights",
+    "Full slider/type/reward law and live-returned QL",
+    "Optional unused compiled QL duplicate removal"
+  ],
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "implementation_authorized_by_this_audit": false,
+  "next_milestone": "One evidence-backed normal Kill Person lifecycle with exact destination binding, safe reward and explicit restart behavior; catalog-only milestone may precede it.",
+  "observed_812_role": "Descriptive coverage, conditions and evidence lookup; no automatic complete eligibility whitelist or probability weights.",
+  "phase_dependencies": {
+    "P1": [],
+    "P2": [
+      "P1"
+    ],
+    "P3": [],
+    "P4": [
+      "P2",
+      "P3"
+    ],
+    "P5": [
+      "P3",
+      "P4"
+    ],
+    "P6": [
+      "P4",
+      "P5"
+    ]
+  },
+  "phases": [
+    {
+      "acceptance_criteria": [
+        "2242/812 counts and manifest hashes preserved",
+        "Runtime does not read evidence directories",
+        "Catalog integration alone is not claimed to fix all offers or objective types"
+      ],
+      "change_required": "Reconcile only the foundation loader/data into the current shared library ownership, using the selected GameData root. Listed AORebirth.Core/GameData/Missions paths are proposed target locations, absent at audited master; Utility paths are foundation inputs. Adapt existing entrance seam for complete identity and exact XYZ bits; retain interaction range separately. Preserve old accepted records without guessing their placement. No broad merge of old runtime source.",
+      "current_behavior": "Current entrance seam loads one PF540 row; foundation loader is on a separate older Utility-based source line, absent from current runtime composition.",
+      "evidence_reason": "2242 unique client placements and unique exact PF/XYZ keys. One current sample shares identity but differs in coordinate bits and raw rotation slots.",
+      "exact_classes": [
+        "MissionEntranceCatalog",
+        "MissionDestinationCatalog",
+        "QuestDungeonService",
+        "QuestDungeonParameters",
+        "GameDataPaths"
+      ],
+      "exact_files": [
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/MissionEntranceCatalog.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonParameters.cs",
+        "AORebirth/Libraries/Source/AORebirth.Core/GameData/GameDataPaths.cs",
+        "AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationCatalog.cs",
+        "AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationCatalogData.cs",
+        "AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationModels.cs",
+        "AORebirth/Libraries/Source/AORebirth.Core/AORebirth.Core.csproj",
+        "AORebirth/Libraries/Source/AORebirth.Core/GameData/Missions/MissionDestinationCatalog.cs",
+        "AORebirth/Libraries/Source/AORebirth.Core/GameData/Missions/MissionDestinationCatalogData.cs",
+        "AORebirth/Libraries/Source/AORebirth.Core/GameData/Missions/MissionDestinationModels.cs",
+        "AORebirth/GameData/Missions/Destinations/MissionEntrancePlacements.json",
+        "AORebirth/GameData/Missions/Destinations/ObservedMissionDestinations.json",
+        "AORebirth/GameData/Missions/Destinations/MissionDestinationCatalogManifest.json"
+      ],
+      "id": "P1",
+      "new_tests_required": [
+        "Exact XYZ including Y/one-bit mismatch",
+        "Unsigned high-bit instance",
+        "Selected-root load and corrupt/missing data fail closed",
+        "Current accepted-record compatibility"
+      ],
+      "risk": "MEDIUM: source namespace/project ownership changed since foundation. Rotation convention and existing-record migration cannot be guessed.",
+      "tests_to_change": [
+        "Only assertions treating XZ proximity as authoritative placement identity; none edited in audit"
+      ],
+      "tests_to_retain": [
+        "47 foundation C# catalog assertions and29 Python catalog tests",
+        "Current entry/key ownership and restore semantics"
+      ],
+      "title": "Connect the proven placement catalog at the existing entrance seam"
+    },
+    {
+      "acceptance_criteria": [
+        "One evidence-supported destination survives normal roll and acceptance with exact identity",
+        "No nearest-neighbor rescue",
+        "No claim of complete retail distribution",
+        "New data remains editable"
+      ],
+      "change_required": "Replace coordinate content with exact catalog references plus an explicitly bounded, evidence-backed selection policy. Preserve proven signed WorldPos X/Z offsets via existing WorldPos evidence/accepted data; the compact placement catalog alone does not supply them. Correct contradicted low-level geographic restriction and unsupported anti-repeat preference without inventing weights or using812/all2242 as proven full eligibility.",
+      "current_behavior": "140 rounded C# spots have no exact placement join. Same-PF low-level restriction and48 anti-repeat retries bias selection; fallback still allows repeats.",
+      "evidence_reason": "92830 exact resolved observations at812 placements prove observed destinations and cohort repeats. They do not prove full eligibility, weighting, high-level extrapolation or operationalBD.",
+      "exact_classes": [
+        "MissionRollLocations",
+        "MissionLocationPool",
+        "GeneratedMissionRollService",
+        "GeneratedMissionRollProjection",
+        "QuestDungeonService",
+        "QuestJournal"
+      ],
+      "exact_files": [
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRollLocations.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollProjection.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonParameters.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestJournal.cs",
+        "AORebirth/GameData/Missions/Locations.json",
+        "AORebirth/GameData/Missions/RollPolicy.json"
+      ],
+      "id": "P2",
+      "new_tests_required": [
+        "Repeat same placement with distinct offer identities",
+        "Exact coordinates survive roll/freeze/accept",
+        "WorldPos offsets remain correct and distinct from entrance ID",
+        "Outside-observed metadata does not mean invalid"
+      ],
+      "risk": "HIGH: destination universe is known; complete selection rules and wire offset sourcing still need explicit evidence mapping.",
+      "tests_to_change": [
+        "LevelFourNeutralIccRollStaysInTheTerminalPlayfield generalization",
+        "Hardcoded140-pool expectations",
+        "Any strict destination-uniqueness assertion, if introduced"
+      ],
+      "tests_to_retain": [
+        "Offer identities/serialization/fee/persistence tests",
+        "Exact catalog lookup and duplicate destination acceptance",
+        "Projection byte preservation"
+      ],
+      "title": "Connect selection and preserve the complete offered WorldPos"
+    },
+    {
+      "acceptance_criteria": [
+        "No unknown commit permits continued unsafe mutation",
+        "Completion and rewards cannot silently diverge",
+        "Exactly-once logical reward under verified retries"
+      ],
+      "change_required": "Use established commit-outcome conventions and current persistence owner. Make completion and its reward recoverable and idempotent through the smallest current transaction change; preserve authored quest transaction boundaries. Determine schema necessity explicitly before any migration request.",
+      "current_behavior": "Acceptance quest/key mutation has one ReadCommitted transaction. DAO raw Commit lacks the typed unknown-outcome translation expected by service. Completion is saved before separate cash/XP/item grant; full inventory can skip item.",
+      "evidence_reason": "Direct source control flow proves mismatched exception contract and split completion/reward mutation. Actual failure incidence is UNVERIFIED.",
+      "exact_classes": [
+        "MySqlCharacterQuestDao",
+        "MySqlCharacterQuestStore",
+        "SharedCharacterPersistence",
+        "QuestDungeonService",
+        "QuestService"
+      ],
+      "exact_files": [
+        "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Data/SharedCharacterPersistence.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs"
+      ],
+      "id": "P3",
+      "new_tests_required": [
+        "Actual QuestDao acceptance/key rollback and ambiguous commit handling",
+        "Full inventory with no reward loss",
+        "Disconnect/retry/duplicate completion",
+        "Template dialogue quests remain correct"
+      ],
+      "risk": "HIGH: shared completion path affects template quests as well as generated quests. No schema edit is preauthorized.",
+      "tests_to_change": [
+        "Historical GeneratedMissionService.Accept/Complete tests cannot stand in for current QuestService route"
+      ],
+      "tests_to_retain": [
+        "Authored atomic state/inventory/stats contracts",
+        "Current offer publication and acceptance ownership checks"
+      ],
+      "title": "Repair current acceptance and completion transaction outcomes"
+    },
+    {
+      "acceptance_criteria": [
+        "One ordinary terminal mission accepted, entered and completed with correct single reward",
+        "Mike verifies live client after separately authorized implementation/build",
+        "No new runtime hard-coded content"
+      ],
+      "change_required": "Populate one captured/proven mission target and layout/content selection in editable data, freeze exact objective actor ownership, and use existing kill callback. Keep generator/world/collision/key services. Resolve missing actor/reward evidence before claiming retail-style completion.",
+      "current_behavior": "Generated kill definition uses LE01; ambient spawn usesZK3X and generic probability. Kill matcher accepts hash without unique actor/dungeon binding.",
+      "evidence_reason": "Current reusable mechanics exist; destination evidence does not identify NPC/item content or operational entrance key.",
+      "exact_classes": [
+        "QuestDungeonService",
+        "QuestDungeonPlayfield",
+        "QuestService",
+        "QuestTemplate"
+      ],
+      "exact_files": [
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs"
+      ],
+      "id": "P4",
+      "new_tests_required": [
+        "Wrong dungeon/same hash cannot progress",
+        "Two missions do not share one unrelated target",
+        "Kill->completion->reward->exit->reconnect on current route"
+      ],
+      "risk": "HIGH: exact target materialization and content are not supplied by destination catalog.",
+      "tests_to_change": [
+        "Placeholder-hash assumptions",
+        "Retired generated-world fixture route claims"
+      ],
+      "tests_to_retain": [
+        "Existing generic kill credit and authored progression contracts",
+        "Current procedural geometry and key/entry behavior"
+      ],
+      "title": "Finish one evidence-backed Kill Person lifecycle"
+    },
+    {
+      "acceptance_criteria": [
+        "Restart does not recreate a completable objective or duplicate reward",
+        "Documented world continuity verified through current services"
+      ],
+      "change_required": "Specify required world continuity from accepted behavior, then extend the existing persistence owner only for proven necessary state. Keep current generator/versioned parameters and release checks; do not resurrect old bundle runtime.",
+      "current_behavior": "Quest definition/progress/seed/key survive; world is ephemeral and rebuilt after idle/restart. Seeded layout does not persist live NPC/door/object state. ResolveLogin returns an existing live dungeon before checking ended/expiry state; only absent-world restoration applies those lifecycle checks.",
+      "evidence_reason": "Current source explicitly does not persist world state. September restart claims exercised a different removed route.",
+      "exact_classes": [
+        "QuestDungeonParameters",
+        "DungeonLayoutGenerator",
+        "QuestDungeonService",
+        "QuestDungeonPlayfield",
+        "PlayfieldManager"
+      ],
+      "exact_files": [
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonParameters.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs"
+      ],
+      "id": "P5",
+      "new_tests_required": [
+        "Killed actors, opened doors and consumed objective state across restart where required",
+        "Idle unload/reentry",
+        "Completed/expired character login with and without an existing live dungeon",
+        "Carried shared key versus quest owner/team semantics remain intentional"
+      ],
+      "risk": "HIGH: persistence scope depends on required semantics; any schema change requires separate approval.",
+      "tests_to_change": [
+        "Historical tests referring removed GeneratedMissionWorld"
+      ],
+      "tests_to_retain": [
+        "Generator layout tests",
+        "Occupied dungeon release and closed-key/login-exit contracts"
+      ],
+      "title": "Define and verify the current dungeon restart contract"
+    },
+    {
+      "acceptance_criteria": [
+        "Every type reaches its objective through ordinary handlers",
+        "All11 capability stages independently verified before all-five completion claim"
+      ],
+      "change_required": "Add one type at a time through existing quest services using independently proven editable object/item/person definitions and exact ownership. Preserve current generic target/look/use hooks where applicable.",
+      "current_behavior": "Find Item, Find Person, Repair and Return Item have offer support but no usable generated objective definition/materialization/normal completion path.",
+      "evidence_reason": "Source capability matrix identifies missing processors and empty target definitions; destination evidence alone cannot fill them.",
+      "exact_classes": [
+        "QuestDungeonService",
+        "QuestDungeonPlayfield",
+        "QuestService",
+        "QuestJournal",
+        "QuestTemplate"
+      ],
+      "exact_files": [
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestJournal.cs",
+        "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs"
+      ],
+      "id": "P6",
+      "new_tests_required": [
+        "Per-type spawn/interaction/consume/return binding",
+        "Wrong owner/instance rejection",
+        "Reward/reconnect/restart/expiry/cleanup for each type"
+      ],
+      "risk": "HIGH; separate evidence requirement for each unfinished type.",
+      "tests_to_change": [
+        "Tests claiming all-five gameplay from serializers or retired fixture worlds"
+      ],
+      "tests_to_retain": [
+        "P1-P5 accepted destination/key/persistence contracts",
+        "Authored prop and item flows remain independent"
+      ],
+      "title": "Complete remaining objective types independently"
+    }
+  ],
+  "schema_version": 1,
+  "untouched": [
+    "Packet framing/offer identity/fee ledger",
+    "Authored mission catalog/journal/props and IMissionDao transactions",
+    "Key duplication/authorization and generic zoning mechanics except targeted boundary corrections",
+    "Existing GameData root selection",
+    "Procedural room/collision infrastructure"
+  ],
+  "validation_policy": "No tests executed in audit. Future listed tests are recommendations requiring explicit test authorization; normal implementation requires compile/build and Mike live verification."
+}

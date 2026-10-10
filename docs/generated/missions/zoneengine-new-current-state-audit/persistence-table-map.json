@@ -1,0 +1,2038 @@
+{
+  "active_integration_summary": "IMissionDao remains active for editable authored actions. IGeneratedMissionDao remains active for terminal offers/fees/identities and old saved-world evacuation. New rolled offer acceptance uses CharacterQuestStore/MySqlCharacterQuestDao and current QuestService, not IGeneratedMissionDao.Accept/Observe/Complete.",
+  "database_contacted": false,
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "gaps": [
+    {
+      "evidence_status": "PROVEN_SOURCE_ORDER; FAILURE_OUTCOME_UNVERIFIED",
+      "finding": "QuestService marks and saves Completed before cash/XP/item reward work; a full inventory logs and skips the item, and no mission reward ledger transaction spans these effects.",
+      "id": "CURRENT_QUEST_REWARD_NOT_ATOMIC",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 346
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 369
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 398
+        }
+      ],
+      "required_change": "Preserve current quest model; add the smallest current-quest completion/reward transaction and capacity-safe plan, with replay and rollback tests before claiming end-to-end reward durability.",
+      "risk": "Crash/failure after state save can strand rewards; cannot infer actual live losses from static review."
+    },
+    {
+      "evidence_status": "PROVEN_SOURCE_CONTRACT_GAP; FAILURE_OUTCOME_UNVERIFIED",
+      "finding": "MySqlCharacterQuestDao.Transaction commits directly. SharedCharacterPersistence.Run translates only CharacterPersistenceCommitOutcomeUnknownException; the quest DAO never emits that type. QuestDungeonService catches DatabaseCommitOutcomeUnknownException for acceptance.",
+      "id": "QUEST_COMMIT_UNKNOWN_NOT_TRANSLATED",
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 545
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Data/SharedCharacterPersistence.cs",
+          "line": 17
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 240
+        }
+      ],
+      "required_change": "Use the existing unknown-commit convention at the quest DAO boundary and retain quarantine/reload; verify lost commit acknowledgement and post-commit publication failures.",
+      "risk": "Durable accept/key could exist while caller treats an ordinary provider exception as an operation failure; no audit-time fault injection was performed."
+    },
+    {
+      "evidence_status": "PROVEN_CURRENT_SOURCE",
+      "finding": "Current generatedquests stores seed/template/parameters, not generatedmissionobjects snapshots. Older HP/death/open state DAO tests do not prove current dungeon persistence.",
+      "id": "CURRENT_WORLD_OBJECT_STATE_NOT_PERSISTED",
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 105
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 37
+        }
+      ],
+      "required_change": "Decide smallest next-milestone object-state requirements using existing current dungeon owner; reuse valid DAO patterns instead of reviving an entire retired runtime.",
+      "risk": "Layout recreates but NPC/object state can reset on world recreation."
+    },
+    {
+      "evidence_status": "OBSERVED_TEST_SOURCE_INVENTORY",
+      "finding": "Current QuestDungeonService/MySqlCharacterQuestDao acceptance and completion route has no named direct coverage in the inspected test inventory; older direct DAO tests address a different accepted-mission model.",
+      "id": "CURRENT_QUEST_DAO_TEST_GAP",
+      "references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 211
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 346
+        }
+      ],
+      "required_change": "Add focused current-route acceptance, restart, reward, expiry/key cleanup and ambiguous-commit tests in a later implementation task.",
+      "risk": "Historical reports and tests can give misleading apparent all-five/restart/reward coverage."
+    }
+  ],
+  "mission_table_count": 16,
+  "retained_generated_dao_methods_without_current_engine_callers": [
+    "Accept",
+    "Observe",
+    "Complete",
+    "End",
+    "AdvanceCleanup",
+    "ReadObjects",
+    "UpdateObjects",
+    "SavePosition",
+    "ReadArtifacts",
+    "CleanupArtifacts",
+    "ClaimCorpseCredits"
+  ],
+  "runtime_dao_calls": [
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "LoadForCharacter",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 56
+      },
+      "source": "public IList<CharacterQuestRow> Load(int characterId) => Run(() => _dao.LoadForCharacter(characterId), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "LoadGeneratedForCharacter",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 58
+      },
+      "source": "public IList<GeneratedQuestRow> LoadGeneratedFor(int characterId) => Run(() => _dao.LoadGeneratedForCharacter(characterId), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "LoadGenerated",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 60
+      },
+      "source": "public GeneratedQuestRow? LoadGenerated(string questId) => Run(() => _dao.LoadGenerated(questId), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "SaveCharacterQuest",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 62
+      },
+      "source": "public void Save(CharacterQuestRow row) => Run(() => _dao.SaveCharacterQuest(row), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "SaveGenerated",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 64
+      },
+      "source": "public void SaveGenerated(GeneratedQuestRow row) => Run(() => _dao.SaveGenerated(row), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "TryAcceptOfferQuest",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 68
+      },
+      "source": "=> Run(() => _dao.TryAcceptOfferQuest(ownerId, offerType, offerInstance, quest, characterRow, key, nowUtcTicks), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "TryAddDuplicateKey",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 71
+      },
+      "source": "=> Run(() => _dao.TryAddDuplicateKey(sourceKeyInstanceId, copy, maxKeys, nowUtcTicks), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "LoadKeyQuests",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 74
+      },
+      "source": "=> Run(() => _dao.LoadKeyQuests(keyInstanceIds), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "EndQuestKeys",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 76
+      },
+      "source": "public IList<RetiredDungeonKey> EndQuestKeys(string questId) => Run(() => _dao.EndQuestKeys(questId), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "RetireUnlinkedKeys",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 79
+      },
+      "source": "=> Run(() => _dao.RetireUnlinkedKeys(keyInstanceIds, keyLowId), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "RetireDeadKeysForCharacter",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 82
+      },
+      "source": "=> Run(() => _dao.RetireDeadKeysForCharacter(characterId, keyLowId, ownedContainerTypes, bagContainerType), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "LoadExpiredQuestsWithKeys",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 85
+      },
+      "source": "=> Run(() => _dao.LoadExpiredQuestsWithKeys(nowUtcTicks, limit), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "PurgeEndedGeneratedQuests",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 88
+      },
+      "source": "=> Run(() => _dao.PurgeEndedGeneratedQuests(cutoffUtcTicks, limit), _logger);"
+    },
+    {
+      "contract": "MySqlCharacterQuestDao",
+      "method": "CloseCharacterQuests",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Data/CharacterQuestStore.cs",
+        "line": 91
+      },
+      "source": "=> Run(() => _dao.CloseCharacterQuests(questId, state, nowUtcTicks), _logger);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "SaveGenerated",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+        "line": 173
+      },
+      "source": "_store.SaveGenerated(new GeneratedQuestRow"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadGenerated",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+        "line": 192
+      },
+      "source": "GeneratedQuestRow? row = _store.LoadGenerated(questId);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadGeneratedFor",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+        "line": 477
+      },
+      "source": "foreach (GeneratedQuestRow row in _store.LoadGeneratedFor(characterId))"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "Load",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+        "line": 481
+      },
+      "source": "foreach (CharacterQuestRow row in _store.Load(characterId))"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "Save",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+        "line": 533
+      },
+      "source": "_store.Save(new CharacterQuestRow"
+    },
+    {
+      "contract": "IGeneratedMissionDao",
+      "method": "ReadOffers",
+      "receiver": "_offers",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 148
+      },
+      "source": "offer = _offers.ReadOffers(player.Identity.Instance).FirstOrDefault(value =>"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "TryAcceptOfferQuest",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 225
+      },
+      "source": "accepted = _store.TryAcceptOfferQuest(player.Identity.Instance, offer.OfferType, offer.OfferInstance, quest,"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadKeyQuests",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 271
+      },
+      "source": "IDictionary<int, string> links = _store.LoadKeyQuests(keys.ConvertAll(key => key.InstanceId));"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "TryAddDuplicateKey",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 330
+      },
+      "source": "string? questId = _store.TryAddDuplicateKey(key.InstanceId, KeyRow(plan.Rows[0], now), MaxKeysPerQuest, now.Ticks);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadKeyQuests",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 398
+      },
+      "source": "IDictionary<int, string> links = _store.LoadKeyQuests(keys.ConvertAll(key => key.InstanceId));"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadKeyQuests",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 427
+      },
+      "source": "IDictionary<int, string> links = _store.LoadKeyQuests(held.ConvertAll(entry => entry.Item.InstanceId));"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadKeyQuests",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 481
+      },
+      "source": "foreach (string linked in _store.LoadKeyQuests(keys).Values)"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "RetireDeadKeysForCharacter",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 504
+      },
+      "source": "int retired = _store.RetireDeadKeysForCharacter(characterId, KeyLowId, OwnedContainerTypes, (int)IdentityType.Container);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "EndQuestKeys",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 540
+      },
+      "source": "IList<RetiredDungeonKey> retired = _store.EndQuestKeys(questId);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadExpiredQuestsWithKeys",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 594
+      },
+      "source": "foreach (string questId in _store.LoadExpiredQuestsWithKeys(now.Ticks, SweepBatch))"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadGenerated",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 596
+      },
+      "source": "GeneratedQuestRow? row = _store.LoadGenerated(questId);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "EndQuestKeys",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 600
+      },
+      "source": "_store.EndQuestKeys(questId);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "CloseCharacterQuests",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 602
+      },
+      "source": "_store.CloseCharacterQuests(questId, (int)QuestState.Expired, now.Ticks);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "PurgeEndedGeneratedQuests",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 609
+      },
+      "source": "_store.PurgeEndedGeneratedQuests(now.Ticks - EndedQuestRetention.Ticks, SweepBatch);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "LoadGenerated",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 626
+      },
+      "source": "GeneratedQuestRow? row = _store.LoadGenerated(questId);"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "Load",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 641
+      },
+      "source": "foreach (CharacterQuestRow owned in _store.Load(row.OwnerId))"
+    },
+    {
+      "contract": "ICharacterQuestStore",
+      "method": "RetireUnlinkedKeys",
+      "receiver": "_store",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 681
+      },
+      "source": "foreach (int instance in _store.RetireUnlinkedKeys(ids, KeyLowId))"
+    },
+    {
+      "contract": "IMissionInventoryMutationTransaction",
+      "method": "ApplyInventoryMutation",
+      "receiver": "inventory",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 83
+      },
+      "source": "inventory.ApplyInventoryMutation(plan.Rows.Select(ToMissionItem).ToArray(), []);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 113
+      },
+      "source": "bool Matches(MissionCondition c) => c.States.Contains(tx.GetMission(new(player.Identity.Instance, c.Quest))?.State.ToString(), StringComparer.Ordinal);"
+    },
+    {
+      "contract": "IMissionDao",
+      "method": "GetMissions",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 126
+      },
+      "source": "foreach (var mission in _dao.GetMissions(player.Identity.Instance).Where(x => x.State == DaoState.Active && !timedIds.Contains(x.QuestId)))"
+    },
+    {
+      "contract": "IMissionDao",
+      "method": "Execute",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 141
+      },
+      "source": "Action? publish = _dao.Execute(player.Identity.Instance, account!, operation);"
+    },
+    {
+      "contract": "IMissionInventoryMutationTransaction",
+      "method": "ApplyInventoryMutation",
+      "receiver": "inventory",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 181
+      },
+      "source": "inventory.ApplyInventoryMutation(plan.Rows.Select(ToMissionItem).ToArray(),"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 201
+      },
+      "source": "var state = tx.GetMission(new(tx.CharacterId, quest));"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "TryApplyCharacterStatReward",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.cs",
+        "line": 218
+      },
+      "source": "var result = tx.TryApplyCharacterStatReward(new(new(player.Identity.Instance, quest), rewardKey), \"character-stats\", mutations, evidence, now);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 31
+      },
+      "source": "if (tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State == MissionLifecycleState.Active) return null;"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 35
+      },
+      "source": "if (tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State != MissionLifecycleState.Active)"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 53
+      },
+      "source": "bool turnIn = tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State == MissionLifecycleState.Active;"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 54
+      },
+      "source": "bool active = tx.GetMission(new(player.Identity.Instance, rule.CooldownQuest))?.State == MissionLifecycleState.Active;"
+    },
+    {
+      "contract": "IMissionDao",
+      "method": "ResolveCharacterAccountKey",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 79
+      },
+      "source": "string account = _dao.ResolveCharacterAccountKey(player.Identity.Instance);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 88
+      },
+      "source": "if (tx.GetMission(new(owner, rule.CooldownQuest))?.State == MissionLifecycleState.Active || until > _now()) return true;"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetAccountFlag",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 89
+      },
+      "source": "var accountFlag = tx.GetAccountFlag(tx.AccountKey, rule.CooldownFlag);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetFlag",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 95
+      },
+      "source": "var flag = tx.GetFlag(new(owner, rule.CooldownQuest), rule.CooldownFlag)"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetFlag",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 96
+      },
+      "source": "?? tx.GetFlag(new(owner, rule.Quest), rule.CooldownFlag);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 122
+      },
+      "source": "|| tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State != AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState.Active"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "TryApplyCharacterStatReward",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 133
+      },
+      "source": "RequireNewReward(tx.TryApplyCharacterStatReward(new(new(player.Identity.Instance, rule.Quest), rule.TokenRewardKey), \"character-stats\","
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "TryApplyCharacterStatReward",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 138
+      },
+      "source": "RequireNewReward(tx.TryApplyCharacterStatReward(new(new(player.Identity.Instance, rule.Quest), rule.XpRewardKey), \"character-stats\","
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 174
+      },
+      "source": "|| tx.GetMission(new(tx.CharacterId, rule.Quest))?.State != MissionLifecycleState.Completed"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 175
+      },
+      "source": "|| tx.GetMission(new(tx.CharacterId, rule.CooldownQuest))?.State != MissionLifecycleState.Active)"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetAccountFlag",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 177
+      },
+      "source": "var flag = tx.GetAccountFlag(account, rule.CooldownFlag)"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveAccountFlag",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+        "line": 180
+      },
+      "source": "tx.SaveAccountFlag(account, flag);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 57
+      },
+      "source": "var existing = tx.GetMission(key);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 61
+      },
+      "source": "if (definition.PrerequisiteQuestIds.Any(p => tx.GetMission(new(tx.CharacterId, p))?.State != MissionLifecycleState.Completed))"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 63
+      },
+      "source": "tx.SaveMission(key, new()"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveObjective",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 69
+      },
+      "source": "tx.SaveObjective(new(key, objective.ObjectiveId), new()"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 80
+      },
+      "source": "var mission = tx.GetMission(key) ?? throw new InvalidOperationException(\"Authored quest has not been offered.\");"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 89
+      },
+      "source": "tx.SaveMission(key, mission);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 99
+      },
+      "source": "var mission = tx.GetMission(key) ?? throw new InvalidOperationException(\"Authored quest does not exist.\");"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetObjective",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 108
+      },
+      "source": "var progress = tx.GetObjective(progressKey) ?? throw new InvalidOperationException(\"Authored objective is not initialized.\");"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveObjective",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 113
+      },
+      "source": "tx.SaveObjective(progressKey, progress);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "TryAddObservation",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 117
+      },
+      "source": "if (!tx.TryAddObservation(new()"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveObjective",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 126
+      },
+      "source": "tx.SaveObjective(progressKey, progress);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetObjective",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 129
+      },
+      "source": "|| tx.GetObjective(new(key, o.ObjectiveId)) is not { } row || row.Progress < row.RequiredCount))"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 134
+      },
+      "source": "tx.SaveMission(key, mission);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetMission",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 141
+      },
+      "source": "if (string.IsNullOrWhiteSpace(name) || tx.GetMission(key) == null)"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "GetFlag",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 144
+      },
+      "source": "var flag = tx.GetFlag(key, name);"
+    },
+    {
+      "contract": "IMissionDaoTransaction",
+      "method": "SaveFlag",
+      "receiver": "tx",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredMissionProgression.cs",
+        "line": 149
+      },
+      "source": "tx.SaveFlag(key, flag);"
+    },
+    {
+      "contract": "IGeneratedMissionDao",
+      "method": "PublishOffers",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+        "line": 40
+      },
+      "source": "return CommitAndPublish(player, () => _dao.PublishOffers(batch), result => SetStat(player, CharacterStat.Cash, result.Cash));"
+    },
+    {
+      "contract": "IGeneratedMissionDao",
+      "method": "ReadOffers",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+        "line": 46
+      },
+      "source": "return player.IsPersistenceQuarantined ? [] : _dao.ReadOffers(player.Identity.Instance)"
+    },
+    {
+      "contract": "IGeneratedMissionDao",
+      "method": "ReserveIdentities",
+      "receiver": "_dao",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/QuestAlternativeMessageHandler.cs",
+        "line": 47
+      },
+      "source": "first = _dao.ReserveIdentities(\"offer\", 5);"
+    },
+    {
+      "contract": "IGeneratedMissionDao",
+      "method": "ReadAccepted",
+      "receiver": "_retiredMissions",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
+        "line": 147
+      },
+      "source": "GeneratedMissionBinding? binding = _retiredMissions.ReadAccepted(characterId)"
+    }
+  ],
+  "schema_version": 1,
+  "shared_dependency_table_count": 4,
+  "tables": [
+    {
+      "cleanup_role": "Ended generated quests purged only after expiry retention and no keys; ordinary template rows retained.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "ACTIVE_AUTHORED_TEMPLATE_AND_GENERATED_QUESTS",
+      "owner": "MySqlCharacterQuestDao",
+      "primary_identity": "CharacterId + QuestId",
+      "readers": "QuestService.GetLog/Load/Restore; QuestDungeonService acceptance and expiry",
+      "restart_role": "Per-character quest progress/terminal state; generated Source=1 resolves shared generated definition.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/characterquests.sql",
+          "line": 5
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260927_character_quests.sql",
+          "line": 3
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`CharacterId`, `QuestId`)",
+        "INDEX `quest` (`QuestId`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 121,
+          "sql_context": "\"SELECT \" + CharacterColumns + \" FROM characterquests WHERE CharacterId=@Id ORDER BY AssignedAtUtcTicks\","
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 136,
+          "sql_context": "+ \"FROM generatedquests g JOIN characterquests c ON c.QuestId=g.QuestId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 166,
+          "sql_context": "\"INSERT INTO characterquests (\" + CharacterColumns + \") VALUES \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 435,
+          "sql_context": "Execute(c, t, \"DELETE FROM characterquests WHERE QuestId IN (\" + list + \")\", parameters.ToArray());"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 444,
+          "sql_context": "Execute(\"UPDATE characterquests SET State=@State,UpdatedAtUtcTicks=@Now WHERE QuestId=@Quest AND State=1\","
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 459,
+          "sql_context": "Execute(c, t, \"INSERT INTO characterquests (\" + CharacterColumns + \") VALUES \""
+        }
+      ],
+      "table": "characterquests",
+      "transaction_boundary": "MySqlCharacterQuestDao.Transaction uses ReadCommitted; accept/key-copy/key-retirement/purge multi-row operations commit together. SaveCharacterQuest, SaveGenerated and CloseCharacterQuests are separate autocommit statements; completion reward has no shared transaction.",
+      "writers": "SaveCharacterQuest upsert; TryAcceptOfferQuest; CloseCharacterQuests; PurgeEndedGeneratedQuests"
+    },
+    {
+      "cleanup_role": "Mission completion must not delete character rows.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "SHARED_PERSISTENCE_DEPENDENCY",
+      "owner": "Character persistence + mission DAOs",
+      "primary_identity": "Id",
+      "readers": "Mission owner lock/account validation; normal hydration",
+      "restart_role": "Saved playfield/position selects dungeon-or-exterior restore.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/characters.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 283,
+          "sql_context": "if (ownerId > 0 && !connection.Query<int>(\"SELECT Id FROM characters WHERE Id=@ownerId FOR UPDATE\", new { ownerId }, transaction).Any())"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 331,
+          "sql_context": "connection.Execute(\"UPDATE characters SET Playfield=@livePlayfield,X=@x,Y=@y,Z=@z WHERE Id=@ownerId\", new { livePlayfield, x, y, z, ownerId }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 128,
+          "sql_context": "const string Sql = \"SELECT Username FROM characters WHERE Id=@CharacterId\";"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 187,
+          "sql_context": "\"SELECT Id FROM characters WHERE Id=@characterId FOR UPDATE\","
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 882,
+          "sql_context": "\"SELECT Username FROM characters WHERE Id=@CharacterId FOR UPDATE\";"
+        }
+      ],
+      "table": "characters",
+      "transaction_boundary": "Shared dependency: participates in authored IMissionDao.Execute, generated offer GeneratedTransaction, current MySqlCharacterQuestDao key transaction, or ordinary character/inventory writes depending on caller. No single transaction spans every mission operation.",
+      "writers": "Retained generated SavePosition; ordinary character persistence"
+    },
+    {
+      "cleanup_role": "Old CleanupArtifacts exact-row/checkpoint transaction exists, no current runtime caller found.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "RETAINED_DAO_CAPABILITY_NOT_CURRENT_ROUTE",
+      "owner": "MySqlMissionDao.Generated",
+      "primary_identity": "InstanceId; owner/quest indexes",
+      "readers": "MySqlMissionDao.ReadArtifacts / binding hydration / CleanupArtifacts",
+      "restart_role": "Historical artifact link state only; current dungeon keys use questdungeonkeys instead.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionartifacts.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+          "line": 5
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (InstanceId), KEY quest_artifacts (OwnerId,QuestType,QuestInstance)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 361,
+          "sql_context": "=> connection.Query<MissionItemInstanceData>(\"SELECT i.* FROM generatedmissionartifacts a JOIN item_instances i ON i.InstanceId=a.InstanceId WHERE a.OwnerId=@ownerId AND a.QuestType=@questType AND a.QuestInstance=@questInstance AND a.ArtifactRole IN (1,2,4) ORDER BY i.InstanceId\", new { ownerId, questType, questInstance }, transaction).ToList();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 420,
+          "sql_context": "binding.MissionItem = connection.Query<MissionItemInstanceData>(\"SELECT i.* FROM generatedmissionartifacts a JOIN item_instances i ON i.InstanceId=a.InstanceId WHERE a.OwnerId=@OwnerId AND a.QuestType=@QuestType AND a.QuestInstance=@QuestInstance AND a.ArtifactRole IN (2,4)\", binding, transaction).SingleOrDefault();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 451,
+          "sql_context": "=> connection.Execute(\"INSERT INTO generatedmissionartifacts (OwnerId,QuestType,QuestInstance,InstanceId,ArtifactRole,CreatedAtUtcTicks) VALUES (@OwnerId,@QuestType,@QuestInstance,@instanceId,@role,@now)\", new { binding.OwnerId, binding.QuestType, binding.QuestInstance, instanceId, role, now }, transaction);"
+        }
+      ],
+      "table": "generatedmissionartifacts",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "Accept / Observe / Complete retained DAO artifact association"
+    },
+    {
+      "cleanup_role": "New publish replaces offered rows; no current physical purge consumer.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "ACTIVE_TERMINAL_ROLL",
+      "owner": "MySqlMissionDao.Generated",
+      "primary_identity": "OwnerId + BatchIdentity",
+      "readers": "GeneratedMissionService / QuestDungeonService via ReadOffers join",
+      "restart_role": "Frozen terminal/sliders/fee replay and offer reload.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionbatches.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+          "line": 5
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (OwnerId,BatchIdentity), UNIQUE KEY batch_identity (BatchIdentity)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 38,
+          "sql_context": "var prior = connection.Query<GeneratedBatchCash>(\"SELECT CashAfter FROM generatedmissionbatches WHERE OwnerId=@OwnerId AND BatchIdentity=@BatchIdentity\", batch, transaction).SingleOrDefault();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 42,
+          "sql_context": "var original = connection.Query<GeneratedMissionOfferBatch>(\"SELECT * FROM generatedmissionbatches WHERE OwnerId=@OwnerId AND BatchIdentity=@BatchIdentity\", batch, transaction).Single();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 51,
+          "sql_context": "connection.Execute(\"INSERT INTO generatedmissionbatches (OwnerId,OwnerType,BatchIdentity,RollSeed,ResponseNonce,Fee,TerminalType,TerminalInstance,TerminalPlayfield,LevelSlider,GoodBadSlider,OrderChaosSlider,OpenHiddenSlider,PhysicalMysticalSlider,HeadOnStealthSlider,MoneyExperienceSlider,OfferedAtUtcTicks,ExpiresAtUtcTicks,CashBefore,CashAfter) VALUES (@OwnerId,@OwnerType,@BatchIdentity,@RollSeed,@ResponseNonce,@Fee,@TerminalType,@TerminalInstance,@TerminalPlayfield,@LevelSlider,@GoodBadSlider,@OrderChaosSlider,@OpenHiddenSlider,@PhysicalMysticalSlider,@HeadOnStealthSlider,@MoneyExperienceSlider,@OfferedAtUtcTicks,@ExpiresAtUtcTicks,@CashBefore,@CashAfter)\", parameters, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 553,
+          "sql_context": "+ \",b.TerminalType AS IssuingTerminalType,b.TerminalInstance AS IssuingTerminalInstance,b.TerminalPlayfield AS IssuingTerminalPlayfield FROM generatedmissionoffers o JOIN generatedmissionbatches b ON b.OwnerId=o.OwnerId AND b.BatchIdentity=o.BatchIdentity\";"
+        }
+      ],
+      "table": "generatedmissionbatches",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "PublishOffers freezes batch, fee, current cash and ledger in one owner transaction"
+    },
+    {
+      "cleanup_role": "Older checkpoint and artifact APIs retained; not current QuestDungeonService cleanup owner.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "RETIRED_STATE_EXIT_READER",
+      "owner": "MySqlMissionDao.Generated",
+      "primary_identity": "QuestType + QuestInstance (primary); OwnerId + OfferType + OfferInstance unique",
+      "readers": "ZoneLoginHandler for saved old mission playfield; retained DAO methods",
+      "restart_role": "Existing binding.Offer supplies exterior return for a character saved in retired mission identity range.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionbindings.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+          "line": 5
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (QuestType,QuestInstance)",
+        "UNIQUE KEY owner_offer (OwnerId,OfferType,OfferInstance)",
+        "UNIQUE KEY active_playfield (ActivePlayfield)",
+        "UNIQUE KEY key_instance (KeyInstance), KEY owner_state (OwnerId,State)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 66,
+          "sql_context": "var existing = connection.Query<GeneratedMissionBinding>(\"SELECT \" + BindingColumns + \" FROM generatedmissionbindings WHERE OwnerId=@OwnerId AND OfferType=@OfferType AND OfferInstance=@OfferInstance\", acceptance, transaction).SingleOrDefault();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 89,
+          "sql_context": "connection.Execute(\"INSERT INTO generatedmissionbindings (\" + BindingColumns + \",ActivePlayfield) VALUES (\" + string.Join(\",\", BindingColumns.Split(',').Select(column => \"@\" + column)) + \",@LivePlayfield)\", binding, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 124,
+          "sql_context": "var bindings = connection.Query<GeneratedMissionBinding>(\"SELECT \" + BindingColumns + \" FROM generatedmissionbindings WHERE OwnerId=@ownerId ORDER BY QuestType,QuestInstance\", new { ownerId }).ToList();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 186,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionbindings SET Progress=Progress+@AdvanceProgress,Version=Version+1,UpdatedAtUtcTicks=@ObservedAtUtcTicks WHERE QuestType=@QuestType AND QuestInstance=@QuestInstance\", observation, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 234,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionbindings SET State=@state,CompletedAtUtcTicks=@CompletedAtUtcTicks,UpdatedAtUtcTicks=@CompletedAtUtcTicks,Version=Version+1 WHERE QuestType=@QuestType AND QuestInstance=@QuestInstance\", new { state = (int)GeneratedMissionState.Completed, completion.CompletedAtUtcTicks, completion.QuestType, completion.QuestInstance }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 251,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionbindings SET State=@state,UpdatedAtUtcTicks=@nowUtcTicks,Version=Version+1 WHERE QuestType=@questType AND QuestInstance=@questInstance\", new { state = (int)state, nowUtcTicks, questType, questInstance }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 269,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionbindings SET CleanupCheckpoints=@checkpointMask,ActivePlayfield=CASE WHEN @checkpointMask=@allCheckpoints THEN NULL ELSE ActivePlayfield END,UpdatedAtUtcTicks=@nowUtcTicks,Version=Version+1 WHERE QuestType=@questType AND QuestInstance=@questInstance\", new { checkpointMask, allCheckpoints, nowUtcTicks, questType, questInstance }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 355,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionbindings SET CleanupCheckpoints=CleanupCheckpoints|256,Version=Version+1,UpdatedAtUtcTicks=@nowUtcTicks WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance\", new { ownerId, questType, questInstance, nowUtcTicks }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 412,
+          "sql_context": "var binding = connection.Query<GeneratedMissionBinding>(\"SELECT \" + BindingColumns + \" FROM generatedmissionbindings WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance\", new { ownerId, questType, questInstance }, transaction).SingleOrDefault();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 470,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionbindings SET TokenProgressPercent=@TokenProgressPercent,TokenClaimLevel=@TokenClaimLevel,TokenClaimSide=@TokenClaimSide,TokenDisposition=@TokenDisposition,TokenCount=@TokenCount,CompletionFrozenAtUtcTicks=@CompletionFrozenAtUtcTicks WHERE QuestType=@QuestType AND QuestInstance=@QuestInstance\", binding, transaction);"
+        }
+      ],
+      "table": "generatedmissionbindings",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "No current new-accept runtime writer found; MySqlMissionDao.Accept/Observe/Complete/End remain harness-callable"
+    },
+    {
+      "cleanup_role": "No current engine lifecycle consumer found.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "RETAINED_DAO_CAPABILITY_NOT_CURRENT_ROUTE",
+      "owner": "MySqlMissionDao.Generated",
+      "primary_identity": "OwnerId + QuestType + QuestInstance + RuntimeType + RuntimeInstance",
+      "readers": "MySqlMissionDao.ReadObjects / Observe / token and corpse helpers",
+      "restart_role": "Historical exact object HP/death/open/loot state; current QuestDungeonPlayfield explicitly recreates fresh actors.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionobjects.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+          "line": 5
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (QuestType,QuestInstance,RuntimeType,RuntimeInstance)",
+        "UNIQUE KEY runtime_identity (RuntimeType,RuntimeInstance)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 95,
+          "sql_context": "connection.Execute(\"INSERT INTO generatedmissionobjects (\" + ObjectColumns + \") VALUES (\" + string.Join(\",\", ObjectColumns.Split(',').Select(column => \"@\" + column)) + \")\", value, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 156,
+          "sql_context": "var target = connection.Query<GeneratedMissionObject>(\"SELECT \" + ObjectColumns + \" FROM generatedmissionobjects WHERE OwnerId=@OwnerId AND QuestType=@QuestType AND QuestInstance=@QuestInstance AND RuntimeType=@ObjectiveType AND RuntimeInstance=@ObjectiveInstance FOR UPDATE\", observation, transaction).Single();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 307,
+          "sql_context": "var corpse = connection.Query<GeneratedMissionObject>(\"SELECT \" + ObjectColumns + \" FROM generatedmissionobjects WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance AND RuntimeType=50000 AND RuntimeInstance=@runtimeNpcInstance FOR UPDATE\", new { ownerId, questType, questInstance, runtimeNpcInstance }, transaction).SingleOrDefault();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 315,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionobjects SET CorpseClaimed=1,LootResolved=1,Version=Version+1,UpdatedAtUtcTicks=@nowUtcTicks WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance AND RuntimeType=50000 AND RuntimeInstance=@runtimeNpcInstance\", new { ownerId, questType, questInstance, runtimeNpcInstance, nowUtcTicks }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 367,
+          "sql_context": "return connection.Query<GeneratedMissionObject>(\"SELECT \" + ObjectColumns + \" FROM generatedmissionobjects WHERE OwnerId=@ownerId AND QuestType=@questType AND QuestInstance=@questInstance ORDER BY RuntimeType,RuntimeInstance\", new { ownerId, questType, questInstance }).ToList();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 392,
+          "sql_context": "int affected = connection.Execute(\"UPDATE generatedmissionobjects SET X=@X,Y=@Y,Z=@Z,HeadingX=@HeadingX,HeadingY=@HeadingY,HeadingZ=@HeadingZ,HeadingW=@HeadingW,CurrentHealth=@CurrentHealth,IsDead=@IsDead,IsOpen=@IsOpen,IsLocked=@IsLocked,LootResolved=@LootResolved,ObjectiveConsumed=@ObjectiveConsumed,DeathActorId=@DeathActorId,DiedAtUtcTicks=@DiedAtUtcTicks,CorpseCredits=@CorpseCredits,CorpseExpiresAtUtcTicks=@CorpseExpiresAtUtcTicks,Version=Version+1,UpdatedAtUtcTicks=@now WHERE OwnerId=@OwnerId AND QuestType=@QuestType AND QuestInstance=@QuestInstance AND RuntimeType=@RuntimeType AND RuntimeInstance=@RuntimeInstance AND CapturedType=@CapturedType AND CapturedInstance=@CapturedInstance AND Kind=@Kind AND TemplateId=@TemplateId AND Version=@Version AND Level <=> @Level AND MaxHealth <=> @MaxHealth AND UpdatedAtUtcTicks<=@now AND (IsDead=0 OR @IsDead=1) AND (IsDead=0 OR (DeathActorId=@DeathActorId AND DiedAtUtcTicks=@DiedAtUtcTicks AND CorpseCredits=@CorpseCredits AND CorpseExpiresAtUtcTicks=@CorpseExpiresAtUtcTicks)) AND CorpseClaimed=@CorpseClaimed AND (LootResolved=0 OR @LootResolved=1) AND (ObjectiveConsumed=0 OR @ObjectiveConsumed=1)\", parameters, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 462,
+          "sql_context": "var ambient = connection.Query<GeneratedMissionObject>(\"SELECT \" + ObjectColumns + \" FROM generatedmissionobjects WHERE OwnerId=@OwnerId AND QuestType=@QuestType AND QuestInstance=@QuestInstance AND Kind=8\", binding, transaction).ToArray();"
+        }
+      ],
+      "table": "generatedmissionobjects",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "Accept / UpdateObjects / Observe / ClaimCorpseCredits retained DAO methods"
+    },
+    {
+      "cleanup_role": "No current generated quest consumer or purge found.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "RETAINED_DAO_CAPABILITY_NOT_CURRENT_ROUTE",
+      "owner": "MySqlMissionDao.Generated",
+      "primary_identity": "OwnerId + QuestType + QuestInstance + ObservationIdentity",
+      "readers": "MySqlMissionDao.Observe",
+      "restart_role": "Historical generated observation state only.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionobservations.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+          "line": 5
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (OwnerId,QuestType,QuestInstance,ObservationIdentity)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 148,
+          "sql_context": "if (connection.Query<int>(\"SELECT 1 FROM generatedmissionobservations WHERE OwnerId=@OwnerId AND QuestType=@QuestType AND QuestInstance=@QuestInstance AND ObservationIdentity=@ObservationIdentity\", observation, transaction).Any())"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 185,
+          "sql_context": "connection.Execute(\"INSERT INTO generatedmissionobservations (OwnerId,QuestType,QuestInstance,ObservationIdentity,LivePlayfield,ObjectiveType,ObjectiveInstance,ObjectiveTemplateId,Interaction,ObservedAtUtcTicks) VALUES (@OwnerId,@QuestType,@QuestInstance,@ObservationIdentity,@LivePlayfield,@ObjectiveType,@ObjectiveInstance,@ObjectiveTemplateId,@Interaction,@ObservedAtUtcTicks)\", observation, transaction);"
+        }
+      ],
+      "table": "generatedmissionobservations",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "Observe deduplicates transactionally; no current engine caller found"
+    },
+    {
+      "cleanup_role": "Replaced/accepted rows retained; current quest end does not synchronize old offer state to completed.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "ACTIVE_ROLL_AND_CURRENT_QUEST_ACCEPTANCE",
+      "owner": "MySqlMissionDao.Generated + MySqlCharacterQuestDao",
+      "primary_identity": "OfferType + OfferInstance (primary); OwnerId + BatchIdentity + OfferIndex unique",
+      "readers": "GeneratedMissionService.ReadOffers / QuestDungeonService.AcceptOffer",
+      "restart_role": "Frozen offer typed destination/reward/protocol bytes survives reload.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionoffers.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+          "line": 5
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (OfferType,OfferInstance)",
+        "UNIQUE KEY owner_batch_offer (OwnerId,BatchIdentity,OfferIndex)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 41,
+          "sql_context": "var frozen = connection.Query<GeneratedMissionOffer>(\"SELECT \" + OfferReadProjection(string.Empty) + \" FROM generatedmissionoffers WHERE OwnerId=@OwnerId AND BatchIdentity=@BatchIdentity ORDER BY OfferIndex\", batch, transaction).ToList();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 52,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionoffers SET State=@replaced,Version=Version+1 WHERE OwnerId=@owner AND State=@offered\", new { owner = batch.OwnerId, replaced = (int)GeneratedMissionState.Replaced, offered = (int)GeneratedMissionState.Offered }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 54,
+          "sql_context": "connection.Execute(\"INSERT INTO generatedmissionoffers (\" + OfferColumns + \") VALUES (\" + string.Join(\",\", OfferColumns.Split(',').Select(column => \"@\" + column)) + \")\", offer, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 103,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionoffers SET State=@state,Version=Version+1 WHERE OfferType=@OfferType AND OfferInstance=@OfferInstance\", new { state = (int)GeneratedMissionState.Active, acceptance.OfferType, acceptance.OfferInstance }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 553,
+          "sql_context": "+ \",b.TerminalType AS IssuingTerminalType,b.TerminalInstance AS IssuingTerminalInstance,b.TerminalPlayfield AS IssuingTerminalPlayfield FROM generatedmissionoffers o JOIN generatedmissionbatches b ON b.OwnerId=o.OwnerId AND b.BatchIdentity=o.BatchIdentity\";"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 221,
+          "sql_context": "if (Execute(c, t, \"UPDATE generatedmissionoffers SET State=2,Version=Version+1 \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 545
+        }
+      ],
+      "table": "generatedmissionoffers",
+      "transaction_boundary": "PublishOffers inserts/replaces frozen offers, debits cash and records its ledger in MySqlMissionDao.GeneratedTransaction with the character row locked. Current acceptance instead claims State=1 to State=2 using MySqlCharacterQuestDao.Transaction at ReadCommitted, together with generatedquests, characterquests, item_instances and questdungeonkeys. The old MySqlMissionDao.Accept transaction remains available but is not the current acceptance caller.",
+      "writers": "PublishOffers insert/replace; TryAcceptOfferQuest guarded State=1 to 2 claim"
+    },
+    {
+      "cleanup_role": "No reset or prune.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "ACTIVE_TERMINAL_ROLL",
+      "owner": "MySqlMissionDao.Generated",
+      "primary_identity": "SequenceName",
+      "readers": "QuestAlternativeMessageHandler.Handle",
+      "restart_role": "Durable offer identity allocation. Old quest/playfield sequences remain schema data.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedmissionsequences.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260908_generated_mission_state.sql",
+          "line": 5
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (SequenceName)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 25,
+          "sql_context": "var row = connection.Query<GeneratedSequence>(\"SELECT NextIdentity,MaximumIdentity FROM generatedmissionsequences WHERE SequenceName=@sequence FOR UPDATE\", new { sequence }, transaction).SingleOrDefault();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 28,
+          "sql_context": "connection.Execute(\"UPDATE generatedmissionsequences SET NextIdentity=NextIdentity+@count WHERE SequenceName=@sequence\", new { sequence, count }, transaction);"
+        }
+      ],
+      "table": "generatedmissionsequences",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "ReserveIdentities row lock/increment"
+    },
+    {
+      "cleanup_role": "Expired definitions retained for bounded retention then purged with character rows when no keys remain.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "ACTIVE_GENERATED_QUESTS",
+      "owner": "MySqlCharacterQuestDao",
+      "primary_identity": "QuestId",
+      "readers": "QuestService.Load / QuestDungeonService.GetDungeon/ResolveLogin/Sweep",
+      "restart_role": "DefinitionJson and AcgBuildingGeneratorJson freeze template, seed/version, entrance and dungeon playfield. No object lifecycle snapshots.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/generatedquests.sql",
+          "line": 4
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260927_character_quests.sql",
+          "line": 3
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`QuestId`)",
+        "INDEX `owner` (`OwnerType`, `OwnerId`)",
+        "INDEX `expires` (`ExpiresAtUtcTicks`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 136,
+          "sql_context": "+ \"FROM generatedquests g JOIN characterquests c ON c.QuestId=g.QuestId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 150,
+          "sql_context": "\"SELECT \" + GeneratedColumns + \" FROM generatedquests WHERE QuestId=@Id\","
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 190,
+          "sql_context": "\"INSERT INTO generatedquests (\" + GeneratedColumns + \") VALUES \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 246,
+          "sql_context": "\"SELECT k.QuestId FROM questdungeonkeys k JOIN generatedquests g ON g.QuestId=k.QuestId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 402,
+          "sql_context": "\"SELECT g.QuestId FROM generatedquests g WHERE g.ExpiresAtUtcTicks<=@Now \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 419,
+          "sql_context": "\"SELECT g.QuestId FROM generatedquests g WHERE g.ExpiresAtUtcTicks<@Cutoff \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 436,
+          "sql_context": "Execute(c, t, \"DELETE FROM generatedquests WHERE QuestId IN (\" + list + \")\", parameters.ToArray());"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 450,
+          "sql_context": "Execute(c, t, \"INSERT INTO generatedquests (\" + GeneratedColumns + \") VALUES \""
+        }
+      ],
+      "table": "generatedquests",
+      "transaction_boundary": "MySqlCharacterQuestDao.Transaction uses ReadCommitted; accept/key-copy/key-retirement/purge multi-row operations commit together. SaveCharacterQuest, SaveGenerated and CloseCharacterQuests are separate autocommit statements; completion reward has no shared transaction.",
+      "writers": "SaveGenerated / TryAcceptOfferQuest / PurgeEndedGeneratedQuests"
+    },
+    {
+      "cleanup_role": "No mission reset.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "SHARED_IDENTITY_DEPENDENCY",
+      "owner": "Inventory identity allocator",
+      "primary_identity": "Id (single shared counter row)",
+      "readers": "IItemInstanceIdAllocator used for quest id and key id",
+      "restart_role": "Stable generated quest/key identities from allocator.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/item_instance_id_sequence.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Data/ItemInstanceIdAllocator.cs",
+          "line": 30
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Data/ItemInstanceIdAllocator.cs",
+          "line": 44
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Data/MySqlInventoryRepository.cs",
+          "line": 18
+        }
+      ],
+      "table": "item_instance_id_sequence",
+      "transaction_boundary": "ItemInstanceIdAllocator.Allocate leases a separate 10,000-id block through IInventoryRepository.LeaseInstanceIdBlock when its in-memory block is exhausted. This independent inventory DAO lease precedes and does not enlist in the quest acceptance ReadCommitted transaction; unused allocated identities are not reclaimed by quest code.",
+      "writers": "Inventory allocator leases monotonic identity blocks"
+    },
+    {
+      "cleanup_role": "Retirement sets ContainerType=0; current key cleanup also zeros ContainerInstance and placement=InstanceId.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "SHARED_PERSISTENCE_DEPENDENCY",
+      "owner": "Mission DAO / character quest DAO / inventory persistence",
+      "primary_identity": "InstanceId; unique container position",
+      "readers": "Inventory hydration; key possession/retirement",
+      "restart_role": "Accepted key is durable; current completion item addition is asynchronous inventory mutation.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/item_instances.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`InstanceId`)",
+        "UNIQUE INDEX `UX_item_instances_location` (`ContainerType`, `ContainerInstance`, `ContainerPlacement`)",
+        "INDEX `IX_item_instances_parent` (`ContainerType`, `ContainerInstance`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 361,
+          "sql_context": "=> connection.Query<MissionItemInstanceData>(\"SELECT i.* FROM generatedmissionartifacts a JOIN item_instances i ON i.InstanceId=a.InstanceId WHERE a.OwnerId=@ownerId AND a.QuestType=@questType AND a.QuestInstance=@questInstance AND a.ArtifactRole IN (1,2,4) ORDER BY i.InstanceId\", new { ownerId, questType, questInstance }, transaction).ToList();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 420,
+          "sql_context": "binding.MissionItem = connection.Query<MissionItemInstanceData>(\"SELECT i.* FROM generatedmissionartifacts a JOIN item_instances i ON i.InstanceId=a.InstanceId WHERE a.OwnerId=@OwnerId AND a.QuestType=@QuestType AND a.QuestInstance=@QuestInstance AND a.ArtifactRole IN (2,4)\", binding, transaction).SingleOrDefault();"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 435,
+          "sql_context": "if (connection.Execute(\"UPDATE item_instances SET ContainerType=0,ContainerPlacement=InstanceId WHERE InstanceId=@InstanceId AND ContainerType=@ContainerType AND ContainerInstance=@ContainerInstance AND ContainerPlacement=@ContainerPlacement AND ItemType=@ItemType AND LowId=@LowId AND HighId=@HighId AND Quality=@Quality AND StackCount=@StackCount AND Source=@Source\", item, transaction) != 1)"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 448,
+          "sql_context": "connection.Execute(\"INSERT INTO item_instances (InstanceId,ContainerType,ContainerInstance,ContainerPlacement,ItemType,LowId,HighId,Quality,StackCount,Source) VALUES (@InstanceId,@ContainerType,@ContainerInstance,@ContainerPlacement,@ItemType,@LowId,@HighId,@Quality,@StackCount,@Source)\", item, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs",
+          "line": 46,
+          "sql_context": "\"SELECT InstanceId FROM item_instances WHERE ContainerType=0xC749 AND ContainerInstance=@InstanceId LIMIT 1 FOR UPDATE\","
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 295,
+          "sql_context": "+ \"FROM questdungeonkeys k LEFT JOIN item_instances i ON i.InstanceId=k.KeyInstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 296,
+          "sql_context": "+ \"LEFT JOIN item_instances p ON p.InstanceId=i.ContainerInstance \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 318,
+          "sql_context": "Execute(c, t, \"UPDATE item_instances SET ContainerType=0,ContainerInstance=0,ContainerPlacement=InstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 339,
+          "sql_context": "\"SELECT i.InstanceId FROM item_instances i LEFT JOIN questdungeonkeys k ON k.KeyInstanceId=i.InstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 353,
+          "sql_context": "Execute(c, t, \"UPDATE item_instances SET ContainerType=0,ContainerInstance=0,ContainerPlacement=InstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 376,
+          "sql_context": "\"SELECT i.InstanceId FROM item_instances i LEFT JOIN questdungeonkeys k ON k.KeyInstanceId=i.InstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 379,
+          "sql_context": "+ \"OR (i.ContainerType=@Bag AND i.ContainerInstance IN (SELECT b.InstanceId FROM item_instances b \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 393,
+          "sql_context": "return Execute(c, t, \"UPDATE item_instances SET ContainerType=0,ContainerInstance=0,ContainerPlacement=InstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 468,
+          "sql_context": "Execute(c, t, \"INSERT INTO item_instances (InstanceId,ContainerType,ContainerInstance,ContainerPlacement,ItemType,LowId,HighId,Quality,StackCount,Source) \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 545
+        }
+      ],
+      "table": "item_instances",
+      "transaction_boundary": "Current accepted-key insert, duplicate-key insert and ended-key retirement share MySqlCharacterQuestDao.Transaction at ReadCommitted with the corresponding quest/key links. Authored action grants and consumption use the separate IMissionDao.Execute owner transaction; ordinary inventory flush owns current QuestService reward-item persistence. No single transaction spans current completion state plus all rewards.",
+      "writers": "Atomic accepted key insert; EndQuestKeys retirement; authored inventory transaction; ordinary reward inventory flush"
+    },
+    {
+      "cleanup_role": "Rows retained.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "AUTHORED_ACTIONS",
+      "owner": "MySqlMissionDao",
+      "primary_identity": "AccountKey + FlagKey (unique); surrogate Id",
+      "readers": "AuthoredQuestService.TimedTurnIn",
+      "restart_role": "Cross-character cooldown retained.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionaccountflags.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)",
+        "UNIQUE INDEX `account_flag` (`AccountKey`, `FlagKey`)",
+        "INDEX `account` (`AccountKey`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 679,
+          "sql_context": "+ \"FROM missionaccountflags WHERE AccountKey=@AccountKey AND FlagKey=@FlagKey\";"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 694,
+          "sql_context": "+ \"FROM missionaccountflags WHERE AccountKey=@AccountKey ORDER BY FlagKey\";"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1181,
+          "sql_context": "\"INSERT INTO missionaccountflags \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1193,
+          "sql_context": "\"UPDATE missionaccountflags SET `Value`=@Value, SourceQuestId=@SourceQuestId, \""
+        }
+      ],
+      "table": "missionaccountflags",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "SaveAccountFlag in account-verified owner transaction"
+    },
+    {
+      "cleanup_role": "Rows retained; timed consumers transition state.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "AUTHORED_ACTIONS_AND_CHARACTER_START",
+      "owner": "MySqlMissionDao",
+      "primary_identity": "CharacterId + QuestId + FlagKey (unique); surrogate Id",
+      "readers": "AuthoredQuestService.TimedTurnIn / character start-area selection",
+      "restart_role": "Authored cooldown and durable start-area state.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionflags.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)",
+        "UNIQUE INDEX `character_quest_flag` (`CharacterId`, `QuestId`, `FlagKey`)",
+        "INDEX `character_quest` (`CharacterId`, `QuestId`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 370,
+          "sql_context": "\"INSERT INTO missionflags \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 411,
+          "sql_context": "\"SELECT `Value` FROM missionflags \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 444,
+          "sql_context": "\"UPDATE missionflags SET `Value`=@SelectedState, UpdatedAtUtcTicks=@NowUtcTicks, Version=Version+1 \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 647,
+          "sql_context": "+ \"FROM missionflags WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND FlagKey=@FlagKey\";"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 662,
+          "sql_context": "+ \"FROM missionflags WHERE CharacterId=@CharacterId ORDER BY QuestId, FlagKey\";"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1115,
+          "sql_context": "\"INSERT INTO missionflags \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1126,
+          "sql_context": "\"UPDATE missionflags SET `Value`=@Value, UpdatedAtUtcTicks=@UpdatedAtUtcTicks, \""
+        }
+      ],
+      "table": "missionflags",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "SaveFlag; start-area selection guarded updates"
+    },
+    {
+      "cleanup_role": "Rows retained.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "AUTHORED_ACTIONS",
+      "owner": "MySqlMissionDao",
+      "primary_identity": "CharacterId + QuestId + ObjectiveId + ObservationKey (unique); surrogate Id",
+      "readers": "AuthoredMissionProgression.Complete",
+      "restart_role": "Durable replay deduplication.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionobjectiveobservations.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)",
+        "UNIQUE INDEX `character_quest_objective_observation`",
+        "INDEX `character_quest` (`CharacterId`, `QuestId`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1067,
+          "sql_context": "\"INSERT INTO missionobjectiveobservations \""
+        }
+      ],
+      "table": "missionobjectiveobservations",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "TryAddObservation inside authored owner transaction"
+    },
+    {
+      "cleanup_role": "Rows retained with authored history.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "AUTHORED_ACTIONS",
+      "owner": "MySqlMissionDao",
+      "primary_identity": "CharacterId + QuestId + ObjectiveId (unique); surrogate Id",
+      "readers": "AuthoredMissionProgression.Complete",
+      "restart_role": "Reload objective counters with authored state.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionobjectiveprogress.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)",
+        "UNIQUE INDEX `character_quest_objective` (`CharacterId`, `QuestId`, `ObjectiveId`)",
+        "INDEX `character_quest` (`CharacterId`, `QuestId`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 608,
+          "sql_context": "+ \"CreatedAtUtcTicks, UpdatedAtUtcTicks, Version FROM missionobjectiveprogress \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 629,
+          "sql_context": "+ \"CreatedAtUtcTicks, UpdatedAtUtcTicks, Version FROM missionobjectiveprogress \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1011,
+          "sql_context": "\"INSERT INTO missionobjectiveprogress \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1024,
+          "sql_context": "\"UPDATE missionobjectiveprogress SET Progress=@Progress, RequiredCount=@RequiredCount, \""
+        }
+      ],
+      "table": "missionobjectiveprogress",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "SaveObjective inside authored owner transaction"
+    },
+    {
+      "cleanup_role": "Rows retained.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "AUTHORED_AND_GENERATED_OFFER_ECONOMY",
+      "owner": "MySqlMissionDao",
+      "primary_identity": "CharacterId + QuestId + RewardKey (unique); surrogate Id",
+      "readers": "Authored reward methods; generated offer publish; retained generated DAO Complete",
+      "restart_role": "Idempotence for connected authored/offer economy. Does not cover current QuestService completion rewards.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionrewardledger.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)",
+        "UNIQUE INDEX `character_quest_reward` (`CharacterId`, `QuestId`, `RewardKey`)",
+        "INDEX `character_quest` (`CharacterId`, `QuestId`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 455,
+          "sql_context": "=> connection.Execute(\"INSERT INTO missionrewardledger (CharacterId,QuestId,RewardKey,RewardType,Status,Attempts,EffectReference,AppliedAtUtcTicks,CreatedAtUtcTicks,UpdatedAtUtcTicks,Version) VALUES (@ownerId,@questId,@rewardKey,@rewardType,3,1,@effect,@now,@now,@now,1)\", new { ownerId, questId, rewardKey, rewardType, effect, now }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 249,
+          "sql_context": "\"SELECT RewardType, Status, EffectReference FROM missionrewardledger \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 321,
+          "sql_context": "\"INSERT INTO missionrewardledger \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 711,
+          "sql_context": "+ \"CreatedAtUtcTicks, UpdatedAtUtcTicks, Version FROM missionrewardledger \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 733,
+          "sql_context": "+ \"CreatedAtUtcTicks, UpdatedAtUtcTicks, Version FROM missionrewardledger \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1257,
+          "sql_context": "\"INSERT INTO missionrewardledger \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1313,
+          "sql_context": "\"UPDATE missionrewardledger SET Status=@Status, Attempts=Attempts+1, LastError=NULL, \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1367,
+          "sql_context": "\"UPDATE missionrewardledger SET Status=@Status, EffectReference=@EffectReference, \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1412,
+          "sql_context": "\"UPDATE missionrewardledger SET Status=@Status, LastError=@LastError, \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1536,
+          "sql_context": "\"INSERT INTO missionrewardledger \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1562,
+          "sql_context": "\"UPDATE missionrewardledger SET Status=@Status, Attempts=Attempts+1, LastError=NULL, \""
+        }
+      ],
+      "table": "missionrewardledger",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "Authored atomic stat rewards and generated PublishOffers ledger; retired Complete/ClaimCorpseCredits remain direct DAO capabilities"
+    },
+    {
+      "cleanup_role": "Historical lifecycle rows retained; no automatic physical deletion.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "AUTHORED_ACTIONS",
+      "owner": "MySqlMissionDao",
+      "primary_identity": "CharacterId + QuestId (unique); surrogate Id",
+      "readers": "AuthoredQuestService.Restore / AuthoredMissionProgression",
+      "restart_role": "Reload authored active states and journal; does not own current QuestService generated state.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/missionstates.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`Id`)",
+        "UNIQUE INDEX `character_quest` (`CharacterId`, `QuestId`)",
+        "INDEX `character` (`CharacterId`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 577,
+          "sql_context": "+ \"UpdatedAtUtcTicks, Version FROM missionstates \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 594,
+          "sql_context": "+ \"UpdatedAtUtcTicks, Version FROM missionstates \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 935,
+          "sql_context": "\"INSERT INTO missionstates \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 950,
+          "sql_context": "\"UPDATE missionstates SET State=@State, CurrentStepId=@CurrentStepId, \""
+        }
+      ],
+      "table": "missionstates",
+      "transaction_boundary": "IMissionDao.Execute uses RepeatableRead with character FOR UPDATE lock, account check when supplied, version CAS and explicit unknown-commit exception; generated operations use GeneratedTransaction owner lock and explicit unknown-commit exception. Applies only where the relevant method is called.",
+      "writers": "Authored state transitions inside IMissionDao.Execute"
+    },
+    {
+      "cleanup_role": "EndQuestKeys deletes all links and retires corresponding item rows in same transaction.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "ACTIVE_GENERATED_QUESTS",
+      "owner": "MySqlCharacterQuestDao",
+      "primary_identity": "KeyInstanceId",
+      "readers": "QuestDungeonService.TryEnter/duplicate key/cleanup",
+      "restart_role": "Physical key to generated quest mapping survives server restart.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/questdungeonkeys.sql",
+          "line": 1
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260928_quest_dungeon_keys.sql",
+          "line": 3
+        }
+      ],
+      "schema_keys": [
+        "PRIMARY KEY (`KeyInstanceId`)",
+        "INDEX `quest` (`QuestId`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 246,
+          "sql_context": "\"SELECT k.QuestId FROM questdungeonkeys k JOIN generatedquests g ON g.QuestId=k.QuestId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 254,
+          "sql_context": "using (IDbCommand command = Prepare(c, t, \"SELECT COUNT(*) FROM questdungeonkeys WHERE QuestId=@Quest FOR UPDATE\","
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 275,
+          "sql_context": "\"SELECT KeyInstanceId,QuestId FROM questdungeonkeys WHERE KeyInstanceId IN (\" + list + \")\","
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 295,
+          "sql_context": "+ \"FROM questdungeonkeys k LEFT JOIN item_instances i ON i.InstanceId=k.KeyInstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 315,
+          "sql_context": "Execute(c, t, \"DELETE FROM questdungeonkeys WHERE QuestId=@Quest\", \"@Quest\", questId);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 339,
+          "sql_context": "\"SELECT i.InstanceId FROM item_instances i LEFT JOIN questdungeonkeys k ON k.KeyInstanceId=i.InstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 376,
+          "sql_context": "\"SELECT i.InstanceId FROM item_instances i LEFT JOIN questdungeonkeys k ON k.KeyInstanceId=i.InstanceId \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 403,
+          "sql_context": "+ \"AND EXISTS (SELECT 1 FROM questdungeonkeys k WHERE k.QuestId=g.QuestId) \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 420,
+          "sql_context": "+ \"AND NOT EXISTS (SELECT 1 FROM questdungeonkeys k WHERE k.QuestId=g.QuestId) \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs",
+          "line": 472,
+          "sql_context": "Execute(c, t, \"INSERT INTO questdungeonkeys (KeyInstanceId,QuestId,CreatedAtUtcTicks) VALUES (@Key,@Quest,@Created)\","
+        }
+      ],
+      "table": "questdungeonkeys",
+      "transaction_boundary": "MySqlCharacterQuestDao.Transaction uses ReadCommitted; accept/key-copy/key-retirement/purge multi-row operations commit together. SaveCharacterQuest, SaveGenerated and CloseCharacterQuests are separate autocommit statements; completion reward has no shared transaction.",
+      "writers": "TryAcceptOfferQuest / TryAddDuplicateKey / EndQuestKeys"
+    },
+    {
+      "cleanup_role": "Retained, no mission-owned deletion.",
+      "evidence_status": "PROVEN_CURRENT_SOURCE; DATABASE_STATE_UNVERIFIED",
+      "family": "SHARED_PERSISTENCE_DEPENDENCY",
+      "owner": "Mission DAO / character persistence",
+      "primary_identity": "Type + Instance + StatId (unique)",
+      "readers": "Authored reward and offer cash calculations; normal hydration",
+      "restart_role": "Cash/XP persisted independently of current QuestService state transaction.",
+      "schema_authority": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/stats.sql",
+          "line": 1
+        }
+      ],
+      "schema_keys": [
+        "UNIQUE INDEX `main` (`Type`, `Instance`, `StatId`)",
+        "PRIMARY KEY (`Id`)"
+      ],
+      "source_references": [
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 453,
+          "sql_context": "=> connection.Execute(\"INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@type,@ownerId,@statId,@value) ON DUPLICATE KEY UPDATE StatValue=@value\", new { type, ownerId, statId, value }, transaction);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 534,
+          "sql_context": "var stats = completion.ProgressionStats;"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 535,
+          "sql_context": "if (completion.RequestedExperienceReward != offer.ExperienceReward || completion.FinalExperience < 0 || stats == null"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 537,
+          "sql_context": "|| stats.Any(stat => stat == null || stat.StatIdentityType != completion.CharacterType || !ProgressionStatIds.Contains(stat.StatId) || stat.Value < 0 || stat.Value > int.MaxValue)"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 538,
+          "sql_context": "|| stats.Select(stat => stat.StatId).Distinct().Count() != stats.Count)"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 540,
+          "sql_context": "var xp = stats.SingleOrDefault(stat => stat.StatId == (int)StatIds.xp);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 541,
+          "sql_context": "bool shadow = stats.Any(stat => stat.StatId == (int)StatIds.sk);"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Generated.cs",
+          "line": 544,
+          "sql_context": "|| (completion.CurrentLevel == 220 && stats.Count != 0) || (offer.ExperienceReward == 0 && stats.Count != 0))"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 303,
+          "sql_context": "\"INSERT INTO stats (Instance, Type, StatId, StatValue) \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 478,
+          "sql_context": "\"SELECT StatValue FROM stats WHERE Instance=@Instance AND Type=@Type \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1619,
+          "sql_context": "\"INSERT INTO stats (Instance, Type, StatId, StatValue) \""
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.cs",
+          "line": 1668,
+          "sql_context": "\"SELECT StatValue FROM stats WHERE Instance=@Instance AND Type=@Type AND StatId=@StatId \""
+        }
+      ],
+      "table": "stats",
+      "transaction_boundary": "Shared dependency: participates in authored IMissionDao.Execute, generated offer GeneratedTransaction, current MySqlCharacterQuestDao key transaction, or ordinary character/inventory writes depending on caller. No single transaction spans every mission operation.",
+      "writers": "Offer debit, authored atomic stat reward, ordinary snapshots"
+    }
+  ],
+  "transaction_limits": "All statements describe inspected source; no actual schema, DB contents, engine execution or test execution was performed."
+}

@@ -1,0 +1,427 @@
+{
+  "additional_proximity_review": {
+    "classification": "VALID_ENGINE_MECHANIC_NOT_CLAIMED_AS_RECONSTRUCTION",
+    "detail": "1.2m X/Z room-link tolerance and first-exit fallback are static/RDB dungeon geometry mechanics, not generated mission placement reconstruction or operational BD proof.",
+    "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+    "line": 30,
+    "method": "Find"
+  },
+  "catalog_comparison_artifact": "current-entrance-catalog-comparison.json",
+  "catalog_reference": {
+    "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/MissionEntranceCatalog.cs",
+    "line": 41,
+    "method": "MissionEntranceCatalog / TryGet / TryFindAt"
+  },
+  "current_entrance_count": 1,
+  "current_entrance_identity_model": "Signed Int32 instance dictionary with implicit IdentityType.MissionEntrance (0xDAC6); no type field, source provenance or operational BD/key field.",
+  "current_entrance_lookup_methods": [
+    "TryGet(Int32 instance): exact instance dictionary",
+    "TryFindAt(playfield,float x,float z): <=1 unit horizontal nearest; ignores Y; equal-distance later row wins"
+  ],
+  "current_entrance_source": "selected GameData root/MissionEntrances.json",
+  "current_entrance_used_for_binding": true,
+  "current_entrance_used_for_entry": true,
+  "current_entrance_used_for_selection": false,
+  "effective_stat_bd_resolved": false,
+  "entry_authorization": {
+    "classification": "ENGINE_INTERNAL_CONTRACT",
+    "compares": [
+      "target.Type MissionEntrance",
+      "target.Instance catalog lookup",
+      "player alive/not quarantined/current playable session",
+      "player outside generated dungeon",
+      "current PF equals catalog PF",
+      "10 horizontal/14 vertical proximity",
+      "750ms request cooldown",
+      "held persisted unlocked key template28577 has durable quest link",
+      "quest not ended and expiry in future",
+      "stored EntranceInstance equals targeted entrance instance"
+    ],
+    "does_not_compare": [
+      "name",
+      "accepted quest owner equality",
+      "team ownership/membership",
+      "operational statBD/registry key",
+      "exact offer XYZ bits at entry"
+    ],
+    "reason": "Static placement evidence proves identity/location only. Current key-sharing, allocation and building stamp are working source contracts requiring separate retail bridge evidence.",
+    "references": [
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 253,
+        "method": "TryEnter"
+      },
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 662,
+        "method": "CarriedKeys"
+      },
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 736,
+        "method": "WithinEntrance"
+      }
+    ],
+    "retail_compatibility": "UNPROVEN"
+  },
+  "evidence_status": "PROVEN_STATIC_SOURCE",
+  "identities": [
+    {
+      "model": "IdentityType.MissionEntrance + signed instance preserving wire bits",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 256,
+        "method": "TryEnter"
+      },
+      "role": "static exterior entrance"
+    },
+    {
+      "model": "owner + OfferType/OfferInstance; accepted only Offered and unexpired",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 149,
+        "method": "AcceptOffer"
+      },
+      "role": "offer"
+    },
+    {
+      "model": "D + allocated positive item-instance number; journal is distinct hashed0x5Axxxxxx identity",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+        "line": 20,
+        "method": "TryCreate"
+      },
+      "role": "accepted quest"
+    },
+    {
+      "model": "template28577, type0xC76D, separately allocated item instance, questdungeonkeys link",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 754,
+        "method": "CreateKey"
+      },
+      "role": "physical key"
+    },
+    {
+      "model": "generatedquests.AcgBuildingGeneratorJson holds entrance instance/PF/name/XYZ plus seed/version/PF and offer type/quality",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 164,
+        "method": "AcceptOffer"
+      },
+      "role": "binding"
+    },
+    {
+      "model": "ACG type0xC7A1 with catalog entrance instance; engine contract, not proven operational BD",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+        "line": 143,
+        "method": "TryGenerate"
+      },
+      "role": "generated building"
+    },
+    {
+      "model": "Playfield2 ID0x00200000+allocation, represented by QuestDungeonPlayfield; outer base IdentityType.Playfield",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "line": 41,
+        "method": "constructor / CreatePlayfieldAnarchyFMessage"
+      },
+      "role": "live dungeon"
+    }
+  ],
+  "live_verification": "NOT_PERFORMED",
+  "login_fast_path_limit": {
+    "detail": "Existing live dungeon is returned before checking ended/expiry. Absent-world branch rebuilds active quest or resolves exterior; missing quest/catalog uses configured respawn. No player owner or held-key argument is supplied at login.",
+    "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+    "line": 363,
+    "method": "ResolveLogin"
+  },
+  "operational_entrance_key_resolved": false,
+  "proximity_uses": [
+    {
+      "caller": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 154,
+        "method": "AcceptOffer"
+      },
+      "change_now": false,
+      "classification": "SAFE_BUT_WEAKER_THAN_PROVEN_DATA",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "purpose": "accepted mission binding: offered WorldPos -> static catalog entrance",
+      "reason": "This is the only TryFindAt caller. It is not a player-range check. Exact PF+X/Y/Z bits can resolve evidence; current lookup ignores Y and allows radius1 substitutions. The comment that it only absorbs rounding is unsupported by exact corpus evidence."
+    },
+    {
+      "caller": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 736,
+        "method": "WithinEntrance"
+      },
+      "change_now": false,
+      "classification": "VALID_ENGINE_MECHANIC_NOT_CLAIMED_AS_RECONSTRUCTION",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "purpose": "player interaction/entry range",
+      "reason": "10 horizontal/14 vertical authorization range measures player proximity to an already selected identity; exact historical WorldPos matching does not invalidate this different purpose."
+    },
+    {
+      "caller": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+        "line": 1139,
+        "method": "BakeMissionEntranceTriggers"
+      },
+      "change_now": false,
+      "classification": "VALID_ENGINE_MECHANIC_NOT_CLAIMED_AS_RECONSTRUCTION",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "purpose": "physical walk-in trigger volume",
+      "reason": "Triggers are baked from Dynels.dat MissionEntrance identity/position and defer to TryEnter;1.5 radius is an interaction volume rather than evidence identity matching."
+    }
+  ],
+  "registration": [
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
+      "line": 265,
+      "method": "ConfigureServices"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Program.cs",
+      "line": 320,
+      "method": "AddMessageHandler<CreateQuestMessageHandler>"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/Playfield.cs",
+      "line": 658,
+      "method": "Build service registration"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/GenericCmdMessageHandler.cs",
+      "line": 315,
+      "method": "HandleUse"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/PlayfieldWorldSimulation.cs",
+      "line": 1125,
+      "method": "EnterMissionEntrance"
+    },
+    {
+      "file": "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/ZoneLoginHandler.cs",
+      "line": 134,
+      "method": "HandleAsyncCoreInner"
+    }
+  ],
+  "return_behavior": {
+    "completed": "Retires keys/links but keeps current occupants until they leave; cannot re-enter/rebuild.",
+    "expired_abandoned": "EndDungeon transfers all occupants to exact catalog entrance XYZ and releases when empty.",
+    "normal": "Generated exit door registers return to current catalog exterior, offset along stored catalog heading by PortalDoorLandingResolver.ExitDoorClearance.",
+    "references": [
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "line": 353,
+        "method": "RegisterExit"
+      },
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 531,
+        "method": "EndDungeon"
+      },
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 357,
+        "method": "ResolveLogin"
+      }
+    ],
+    "restart": "Existing live world preserves stored position; rebuilt active world uses layout spawn; closed quest routes exterior; missing quest/catalog routes configured respawn."
+  },
+  "schema_version": 1,
+  "source_engine_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "stages": [
+    {
+      "class": "QuestDungeonService",
+      "data_source": "IGeneratedMissionDao.ReadOffers; MissionEntranceCatalog; MissionRollPolicy",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "acceptance",
+      "input": "Owned unexpired Offered identity from CreateQuest",
+      "method": "AcceptOffer",
+      "note": "All five offer types use this path, but current one-row PF540 entrance data matches none of the 140 runtime location-pool rows; non-kill objective definitions are empty.",
+      "output": "Atomic generated quest, character row, linked physical key; adopted journal",
+      "persistence_owner": "ICharacterQuestStore.TryAcceptOfferQuest",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 135,
+          "method": "AcceptOffer"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "MissionEntrances.json",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "entrance-binding",
+      "input": "Offer DestinationPlayfield/X/Z",
+      "method": "AcceptOffer",
+      "note": "Offer Y is ignored and output catalog coordinates replace offered XYZ; no exact complete placement identity is retained in offer model.",
+      "output": "Nearest entrance within horizontal radius 1; selected catalog identity/XYZ frozen",
+      "persistence_owner": "generatedquests.AcgBuildingGeneratorJson",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 154,
+          "method": "AcceptOffer"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonIds",
+      "data_source": "Existing IItemInstanceIdAllocator",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+      "id": "dungeon-allocation",
+      "input": "Positive durable item-instance allocation",
+      "method": "TryCreate",
+      "note": "Local durable allocation contract; not operational retail BD/registry identity proof.",
+      "output": "Quest ID D<number>; dungeon Playfield2 = 0x00200000 + number",
+      "persistence_owner": "generatedquests + characterquests",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+          "line": 20,
+          "method": "TryCreate"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "IItemBuilder; InventoryGrantPlan; item allocator",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "key-artifact-grant",
+      "input": "Free inventory grant plan and frozen quest",
+      "method": "AcceptOffer",
+      "note": "No generated repair component or return/fetch objective item is granted here.",
+      "output": "Physical key template28577/type0xC76D linked to quest; post-commit packets",
+      "persistence_owner": "TryAcceptOfferQuest includes item row and key link",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 194,
+          "method": "AcceptOffer"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Hydrated inventory + durable source-key link",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "key-sharing",
+      "input": "Carried key and duplicator28564 in either item-on-item order",
+      "method": "TryDuplicate",
+      "note": "Duplicator is retained. Shared access follows possession rather than team membership.",
+      "output": "New key row/link for same quest, capped12",
+      "persistence_owner": "ICharacterQuestStore.TryAddDuplicateKey",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 298,
+          "method": "TryDuplicate"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Catalog; keylinks; generated quest seed/version",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "exterior-entry",
+      "input": "MissionEntrance target identity; current player; carried linked key",
+      "method": "TryEnter",
+      "note": "Requires exact entrance instance, current PF,10 horizontal/14 vertical range, unexpired/not-ended quest. Does not require owner/team/name equality.",
+      "output": "Generated QuestDungeonPlayfield and transfer to layout.Spawn",
+      "persistence_owner": "Read key links and generated quest",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 253,
+          "method": "TryEnter"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    },
+    {
+      "class": "PlayfieldManager",
+      "data_source": "DI services + generated layout",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+      "id": "zone-entry",
+      "input": "Quest/dungeon identity/layout/entrance/target/quality",
+      "method": "GetOrCreateQuestDungeon",
+      "note": "Checks existing PF belongs to same quest; releases raced candidate.",
+      "output": "Built, registered, heartbeat-owned QuestDungeonPlayfield",
+      "persistence_owner": "Character transfer uses existing snapshot path",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+          "line": 375,
+          "method": "GetOrCreateQuestDungeon"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Quest ID derived from PF; stored definition/seed/version; current entrance catalog",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "reconnect-restart",
+      "input": "Persisted dungeon playfield ID",
+      "method": "ResolveLogin",
+      "note": "No player argument/owner or held-key comparison at login; server persisted PF is input. Rebuilt world resets live door/NPC/object state.",
+      "output": "Existing world and stored position, regenerated world at spawn, exterior, or configured respawn",
+      "persistence_owner": "Generated quest and character quest rows",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 357,
+          "method": "ResolveLogin"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "10 minute empty lifetime;1 day retention;50-row sweep batch",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "expiry-cleanup",
+      "input": "Minute timer; current UTC; expired quests with keys",
+      "method": "Sweep",
+      "note": "In-process cache and world objects are ephemeral. No current historical17-step generated binding checkpoint loop.",
+      "output": "End keys, evict, close character rows, release empty worlds, purge old ended definitions",
+      "persistence_owner": "ICharacterQuestStore lifecycle operations",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 571,
+          "method": "Sweep"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    }
+  ]
+}

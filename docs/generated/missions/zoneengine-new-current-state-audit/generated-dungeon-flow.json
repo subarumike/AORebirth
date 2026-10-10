@@ -1,0 +1,461 @@
+{
+  "active_runtime": "QuestDungeonService -> DungeonLayoutGenerator -> AORebirth.DungeonGenerator -> QuestDungeonPlayfield",
+  "additional_current_consumer_observations": [
+    {
+      "claim": "Generated NPC path is QuestDungeonPlayfield -> HashSpawnSystem -> SpawnService.SpawnMob; it does not use WorldNpcFactory.",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 188,
+          "method": "AddDistrictSpawns"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 777,
+          "method": "SpawnMobBranches"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "line": 144,
+          "method": "SpawnMob"
+        }
+      ]
+    },
+    {
+      "claim": "Seed determines district-point selection but not all exact actor poses: heading and within-radius XZ jitter use Random.Shared, then SpawnService snaps position.",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/HashSpawnSystem.cs",
+          "line": 741,
+          "method": "PickSpawnTransform"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/SpawnService.cs",
+          "line": 164,
+          "method": "SnapNpcSpawn"
+        }
+      ]
+    },
+    {
+      "claim": "Existing combat callback provides actual NPC and credited players, so missing exact generated target/dungeon qualification belongs in current QuestService matching, not a replacement combat system.",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Character.cs",
+          "line": 681,
+          "method": "AdvanceKillQuests"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 268,
+          "method": "OnNpcKilled"
+        }
+      ]
+    },
+    {
+      "claim": "QuestObjective.SpecItem/WorldItem data fields exist, but their presence does not implement generated FindItem/Repair/ReturnItem processors.",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestTemplate.cs",
+          "line": 69,
+          "method": "QuestObjective"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 268,
+          "method": "OnNpcKilled / OnNpcTargeted"
+        }
+      ]
+    }
+  ],
+  "capability": [
+    {
+      "detail": "Frozen on accept. CurrentVersion2; retired version1 is mapped to same procedural generator rather than historical layout.",
+      "piece": "layout seed and version",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 164,
+          "method": "AcceptOffer"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+          "line": 132,
+          "method": "TryGenerate"
+        }
+      ],
+      "status": "ACTIVE_RUNTIME"
+    },
+    {
+      "detail": "Server assembles actual room meshes/collision and locality from generated rooms; older no-floors report is stale.",
+      "piece": "rooms and collision",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 69,
+          "method": "Build"
+        },
+        {
+          "file": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonCollisionBuilder.cs",
+          "line": 57,
+          "method": "BuildLayout"
+        }
+      ],
+      "status": "ACTIVE_RUNTIME"
+    },
+    {
+      "detail": "Each room connection instantiates Door; lockDifficulty=max(1,mission Quality). Exit opens and registers walk-out when simulation exists.",
+      "piece": "doors and exit",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 306,
+          "method": "SpawnDoors"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 353,
+          "method": "RegisterExit"
+        }
+      ],
+      "status": "ACTIVE_RUNTIME"
+    },
+    {
+      "detail": "Historical generated chest materializer absent; current QuestDungeonPlayfield creates doors and NPCs only. This does not claim generic authored chests are absent.",
+      "piece": "chests",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 69,
+          "method": "Build"
+        }
+      ],
+      "status": "UNREACHABLE"
+    },
+    {
+      "detail": "HashSpawnSystem creates fixed ambient ZK3X with35% point choice, at least one per room; respawns false. Content is not selected by mission QL/type/faction.",
+      "piece": "NPC materialization",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 117,
+          "method": "AddDistrictSpawns"
+        }
+      ],
+      "status": "ACTIVE_BUT_PARTIAL"
+    },
+    {
+      "detail": "LE01 placed at reachable distant room point if hash resolves. Missing target logs warning and still builds.",
+      "piece": "kill target",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 207,
+          "method": "PlaceTarget"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 856,
+          "method": "TemporaryKillTargetHash"
+        }
+      ],
+      "status": "ACTIVE_BUT_PARTIAL"
+    },
+    {
+      "detail": "Generated FindPerson target empty; fetch/return/repair action definitions have no matching actors or lifecycle processors.",
+      "piece": "other four objective actors",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 859,
+          "method": "BuildTemplate"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 268,
+          "method": "OnNpcKilled / OnNpcTargeted"
+        }
+      ],
+      "status": "UNREACHABLE"
+    },
+    {
+      "detail": "Journal/key/definition/seed durable; regenerated NPC and door state resets. No durable world-state replay.",
+      "piece": "reconnect/restart",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 357,
+          "method": "ResolveLogin"
+        },
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 30,
+          "method": "class contract"
+        }
+      ],
+      "status": "ACTIVE_BUT_PARTIAL"
+    },
+    {
+      "detail": "Current engine source contains no GeneratedMissionAcgService, GeneratedMissionWorld or MissionPlayfield class; older tests/report refer prior implementation.",
+      "piece": "historical five-bundle world adapter",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs",
+          "line": 13,
+          "method": "class contract"
+        }
+      ],
+      "status": "UNREACHABLE"
+    }
+  ],
+  "content_sources": [
+    {
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.DungeonGenerator/DungeonEntranceMap.cs",
+        "line": 37,
+        "method": "Load"
+      },
+      "role": "Style room entrance/exit-door and main-hall designations",
+      "source": "selected GameData DungeonEntrances.json"
+    },
+    {
+      "reference": {
+        "file": "AORebirth/Libraries/Source/AORebirth.World.Collision/DungeonStyleCatalog.cs",
+        "line": 92,
+        "method": "TryLoad"
+      },
+      "role": "Geometry, room shapes, surfaces and generation building blocks",
+      "source": "style324 Playfield metadata/Rooms.json/GNDA.png/DCGA.png/Surfaces.dat via GameDataPaths"
+    },
+    {
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+        "line": 98,
+        "method": "LoadDoorStyles"
+      },
+      "role": "door/exit template IDs and initial open chance; lock chance overwritten5",
+      "source": "selected GameData DungeonDoorStyles.json + item templates"
+    },
+    {
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "line": 117,
+        "method": "AddDistrictSpawns"
+      },
+      "role": "Transformed spawn points; fixed ambient ZK3X and targetLE01",
+      "source": "style324 Districts.json + current hash NPC catalog"
+    }
+  ],
+  "evidence_status": "PROVEN_STATIC_SOURCE",
+  "generation_inputs": {
+    "not_persisted": [
+      "layout room list",
+      "door open/locked runtime changes",
+      "NPC HP/position/death",
+      "corpse state",
+      "chest state",
+      "objective actor identity"
+    ],
+    "persisted": [
+      "seed",
+      "generatorVersion",
+      "dungeonPlayfield",
+      "entrance instance/PF/name/XYZ",
+      "destination type",
+      "two offer integer fields named buildingLowId/buildingHighId",
+      "missionType",
+      "quality",
+      "missionIconId"
+    ],
+    "references": [
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonParameters.cs",
+        "line": 9,
+        "method": "QuestDungeonParameters"
+      },
+      {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "line": 30,
+        "method": "class contract"
+      }
+    ]
+  },
+  "historical_report_warning": "September reports describe GeneratedMissionAcgService/GeneratedMissionWorld/MissionPlayfield and five captured bundles. Those classes are absent from current engine source; their old completion/restart claims do not establish current functionality.",
+  "live_verification": "NOT_PERFORMED",
+  "schema_version": 1,
+  "source_engine_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "stages": [
+    {
+      "class": "QuestDungeonService",
+      "data_source": "IGeneratedMissionDao.ReadOffers; MissionEntranceCatalog; MissionRollPolicy",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "acceptance",
+      "input": "Owned unexpired Offered identity from CreateQuest",
+      "method": "AcceptOffer",
+      "note": "All five offer types use this path, but current one-row PF540 entrance data matches none of the 140 runtime location-pool rows; non-kill objective definitions are empty.",
+      "output": "Atomic generated quest, character row, linked physical key; adopted journal",
+      "persistence_owner": "ICharacterQuestStore.TryAcceptOfferQuest",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 135,
+          "method": "AcceptOffer"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "DungeonLayoutGenerator",
+      "data_source": "Style324; DungeonEntrances.json; style room/collision files; DungeonDoorStyles.json",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+      "id": "layout-generation",
+      "input": "Seed/version and entrance instance as buildingInstance",
+      "method": "TryGenerate",
+      "note": "Both version1 and2 regenerate procedurally; temporary2 floors/size16/5% locks apply to all mission types.",
+      "output": "Procedural generator payload, spawn, configured doors",
+      "persistence_owner": "Frozen seed/version only",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+          "line": 132,
+          "method": "TryGenerate"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonPlayfield",
+      "data_source": "DungeonCollisionBuilder; style Districts.json; item templates; hash NPC definitions",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+      "id": "world-materialization",
+      "input": "Generated room layout",
+      "method": "Build",
+      "note": "No generated fetch/return item, repair object or find-person target materialization. No chest creation in this class.",
+      "output": "Collision/locality; doors; district-based ambient NPCs; kill target when configured",
+      "persistence_owner": "No persistent world state",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+          "line": 69,
+          "method": "Build"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "PlayfieldManager",
+      "data_source": "DI services + generated layout",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+      "id": "zone-entry",
+      "input": "Quest/dungeon identity/layout/entrance/target/quality",
+      "method": "GetOrCreateQuestDungeon",
+      "note": "Checks existing PF belongs to same quest; releases raced candidate.",
+      "output": "Built, registered, heartbeat-owned QuestDungeonPlayfield",
+      "persistence_owner": "Character transfer uses existing snapshot path",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/PlayfieldManager.cs",
+          "line": 375,
+          "method": "GetOrCreateQuestDungeon"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    },
+    {
+      "class": "QuestService",
+      "data_source": "QuestTemplate.Objective.Npc matched by SpawnHash or MobTemplate.Hash",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+      "id": "objective-processing",
+      "input": "NPC kill-credit player list or visible targeted NPC",
+      "method": "OnNpcKilled / OnNpcTargeted",
+      "note": "Generated kill uses hardcoded LE01; no dungeon/unique target binding in matcher. TargetNpc mechanics exist, but generated FindPerson receives empty target.",
+      "output": "Matching active quest progress/completion",
+      "persistence_owner": "ICharacterQuestStore.Save",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.cs",
+          "line": 268,
+          "method": "OnNpcKilled / OnNpcTargeted"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Stored dungeon parameters",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "completion",
+      "input": "QuestEnded after quest save/reward",
+      "method": "OnQuestEnded / EndDungeon",
+      "note": "Abandon/expiry evicts; completion retains occupied world until empty.",
+      "output": "Retired links/keys, no further entry; completed occupants remain until exit",
+      "persistence_owner": "ICharacterQuestStore.EndQuestKeys",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 509,
+          "method": "OnQuestEnded / EndDungeon"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "Quest ID derived from PF; stored definition/seed/version; current entrance catalog",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "reconnect-restart",
+      "input": "Persisted dungeon playfield ID",
+      "method": "ResolveLogin",
+      "note": "No player argument/owner or held-key comparison at login; server persisted PF is input. Rebuilt world resets live door/NPC/object state.",
+      "output": "Existing world and stored position, regenerated world at spawn, exterior, or configured respawn",
+      "persistence_owner": "Generated quest and character quest rows",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 357,
+          "method": "ResolveLogin"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_BUT_PARTIAL",
+      "tests": []
+    },
+    {
+      "class": "QuestDungeonService",
+      "data_source": "10 minute empty lifetime;1 day retention;50-row sweep batch",
+      "evidence_status": "PROVEN_STATIC_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+      "id": "expiry-cleanup",
+      "input": "Minute timer; current UTC; expired quests with keys",
+      "method": "Sweep",
+      "note": "In-process cache and world objects are ephemeral. No current historical17-step generated binding checkpoint loop.",
+      "output": "End keys, evict, close character rows, release empty worlds, purge old ended definitions",
+      "persistence_owner": "ICharacterQuestStore lifecycle operations",
+      "references": [
+        {
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+          "line": 571,
+          "method": "Sweep"
+        }
+      ],
+      "runtime_reachability": "ACTIVE_RUNTIME",
+      "tests": []
+    }
+  ],
+  "tests_executed": false
+}

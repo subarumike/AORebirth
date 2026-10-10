@@ -1,0 +1,409 @@
+{
+  "engine_source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+  "finding_count": 26,
+  "findings": [
+    {
+      "classification": "PROTOCOL_CONSTANT",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/QuestPropService.cs",
+      "id": "content-1",
+      "line": 22,
+      "reason": "Shared prop wire identity kind; actual identities, templates, transforms and actions come from editable data.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "value": "IdentityType.Terminal"
+    },
+    {
+      "classification": "GENERIC_MECHANIC",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestJournal.cs",
+      "id": "content-2",
+      "line": 73,
+      "reason": "Journal projection does not embed destination pools or infer eligibility.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "value": "Typed Quest Delete and recipient markers supplied by content"
+    },
+    {
+      "classification": "PROTOCOL_CONSTANT",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/AuthoredQuestService.TimedTurnIn.cs",
+      "id": "content-3",
+      "line": 196,
+      "reason": "Feedback identifier is a packet presentation constant; timed item IDs, ranges, rewards and cooldown values are data.",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "value": "Feedback category110/message108871108"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 210
+        }
+      ],
+      "classification": "CONTENT_THAT_SHOULD_MOVE_TO_DATA",
+      "evidence_status": "PROVEN_FROM_CURRENT_SOURCE",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "finding": "140 coordinate/WorldPos-offset entries remain C# content; no complete placement identities and no exact catalog join.",
+      "id": "hardcoded140-destination-spots",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+          "line": 132
+        }
+      ],
+      "classification": "UNPROVEN_HARDCODED_CONTENT",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionLocationPool.cs",
+      "finding": "800/1600/1100/2400/4200/6500/9000/3500 travel approximations remain code while affiliations/tiers are data. No proven retail distance law.",
+      "id": "hardcoded-travel-distances",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+          "line": 45
+        }
+      ],
+      "classification": "PROTOCOL_CONSTANT",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs",
+      "finding": "DAC3 quest identity, five offers and required positive unique offer IDs are protocol/engine contracts, not destination content.",
+      "id": "hardcoded-wire-identities",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+          "line": 319
+        }
+      ],
+      "classification": "PROTOCOL_CONSTANT",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+      "finding": "70099 objective and56001 terminal identity types; icon/action mappings themselves in RollPolicy data.",
+      "id": "hardcoded-objective-shape",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+          "line": 264
+        }
+      ],
+      "classification": "CONTENT_THAT_SHOULD_MOVE_TO_DATA",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionOfferCompatibility.cs",
+      "finding": "Generated reward validator hardcodes +/-10 while selector also exposes configurable NanoQualityTolerance; internal constraint can diverge from editable policy.",
+      "id": "hardcoded-reward-ql-tolerance",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+          "line": 29
+        }
+      ],
+      "classification": "CONTENT_THAT_SHOULD_MOVE_TO_DATA",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/SharedGameplay/Missions/MissionLevelGraphData.g.cs",
+      "finding": "Compiled220-row duplicate has no consumer; active loader already reads editable CSV.",
+      "id": "unused-hardcoded-level-graph",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionIdentitySpace.cs",
+          "line": 6
+        }
+      ],
+      "classification": "SCHEMA_CONSTANT",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionIdentitySpace.cs",
+      "finding": "Reserved playfield range is allocator/routing schema, not a placement eligibility list.",
+      "id": "hardcoded-identity-space",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRareLootCatalog.cs",
+          "line": 62
+        }
+      ],
+      "classification": "UNPROVEN_HARDCODED_CONTENT",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/Content/MissionRareLootCatalog.cs",
+      "finding": "Dormant rare selection helper uses +/-20 and nearest fallback; numeric dropchance/IDs already data. No active loot wiring found.",
+      "id": "rare-ql-helper-policy",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "classification": "UNPROVEN_HARDCODED_CONTENT",
+      "id": "temporary-kill-target",
+      "reason": "Every generated kill quest gets one fixed NPC hash unrelated to offer target/type/QL geography; comment explicitly temporary.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 856,
+        "method": "TemporaryKillTargetHash / BuildTemplate"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "npc_hash": "LE01"
+      }
+    },
+    {
+      "classification": "UNPROVEN_HARDCODED_CONTENT",
+      "id": "temporary-ambient-npcs",
+      "reason": "Explicit temporary content choice reused for all generated dungeons; at least one ambient NPC per eligible room.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "line": 99,
+        "method": "TemporaryNpcHash / TemporarySpawnPointChancePercent"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "npc_hash": "ZK3X",
+        "spawn_point_chance_percent": 35
+      }
+    },
+    {
+      "classification": "CONTENT_THAT_SHOULD_MOVE_TO_DATA",
+      "id": "temporary-layout-policy",
+      "reason": "Explicit temporary mission content policy. Geometry generator remains reusable.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+        "line": 40,
+        "method": "TemporaryStyle / TryGenerate"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "floor_size": 16,
+        "floors": 2,
+        "locked_percent": 5,
+        "style": 324
+      }
+    },
+    {
+      "classification": "CONTENT_THAT_SHOULD_MOVE_TO_DATA",
+      "id": "key-item-templates",
+      "reason": "Individual item content IDs are embedded in service. Existing behavior should remain until equivalent editable definitions and validation exist; new placement evidence does not prove item semantics.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 40,
+        "method": "KeyLowId / DuplicatorLowId"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "duplicator_low_id": 28564,
+        "key_low_id": 28577
+      }
+    },
+    {
+      "classification": "PROTOCOL_CONSTANT",
+      "id": "mission-key-wire-type",
+      "reason": "Wire identity and packet placement constants; distinct from content template IDs.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 43,
+        "method": "KeyItemType / SendKey"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "key_type": 51053,
+        "overflow_slot": 111
+      }
+    },
+    {
+      "classification": "GENERIC_MECHANIC",
+      "id": "entry-authority-range",
+      "reason": "Engine interaction/resource bounds, not destination identity evidence.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs",
+        "line": 48,
+        "method": "MaxKeysPerQuest / WithinEntrance"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "cooldown_ms": 750,
+        "horizontal": 10,
+        "max_keys": 12,
+        "vertical": 14
+      }
+    },
+    {
+      "classification": "GENERIC_MECHANIC",
+      "id": "accepted-binding-tolerance",
+      "reason": "Generic nearest matcher is weaker than proven exact WorldPos binding; source comment claiming rounding is not authority.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/MissionEntranceCatalog.cs",
+        "line": 45,
+        "method": "SpotMatchDistance / TryFindAt"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "xz_radius": 1
+      }
+    },
+    {
+      "classification": "SCHEMA_CONSTANT",
+      "id": "dungeon-world-ids",
+      "reason": "Engine allocation namespace; neither entrance eligibility nor retail operational BD.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonIds.cs",
+        "line": 14,
+        "method": "FirstPlayfield / TryCreate"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "first_playfield": 2097152,
+        "quest_id_prefix": "D"
+      }
+    },
+    {
+      "classification": "PROTOCOL_CONSTANT",
+      "id": "journal-wire-layout",
+      "reason": "Generic identity/wire safety contract. Authored action-layout evidence must not substitute for five generated types.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestJournal.cs",
+        "line": 30,
+        "method": "constants / Build"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "instance_prefix": "0x5A000000",
+        "no_delete_flag": "0x400",
+        "short_info_max": 31,
+        "team_flag": "0x100"
+      }
+    },
+    {
+      "classification": "PROTOCOL_CONSTANT",
+      "id": "door-instance-base",
+      "reason": "Dungeon-local identity generation; no placement universe restriction.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs",
+        "line": 298,
+        "method": "FirstDoorInstance"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "first_door_instance": "0x10000001"
+      }
+    },
+    {
+      "classification": "VALIDATED_CONTENT_DATA",
+      "id": "dungeon-door-styles",
+      "reason": "Already editable door/exit template map; parser validates positive IDs and clamps chances. This label means input validation exists, not retail chance proof.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs",
+        "line": 98,
+        "method": "LoadDoorStyles"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "file": "DungeonDoorStyles.json"
+      }
+    },
+    {
+      "classification": "SCHEMA_CONSTANT",
+      "id": "mission-bit-stat-schema",
+      "reason": "Generic character flag mapping; not mission-specific content or destination selection.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Quests/MissionBits.cs",
+        "line": 16,
+        "method": "Count / Stats / Locate"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "bits_per_stat": 32,
+        "count": 640,
+        "stat_slots": 20
+      }
+    },
+    {
+      "classification": "PROTOCOL_CONSTANT",
+      "id": "generic-door-wire-flags",
+      "reason": "Shared door state bits. Source cites client functions; this audit verified consumer wiring but performed no retail capture validation.",
+      "reference": {
+        "file": "AORebirth/Server/ZoneEngine_New/Core/Entities/Door.cs",
+        "line": 21,
+        "method": "OpenFlag / LockedFlag"
+      },
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694",
+      "values": {
+        "locked_flag": 64,
+        "open_flag": 128
+      }
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 25
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+          "line": 37
+        }
+      ],
+      "classification": "CONTENT_THAT_SHOULD_MOVE_TO_DATA",
+      "evidence_status": "OBSERVED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/Missions/ProgressionRewardRules.cs",
+      "finding": "Daily authored token rewards hard-code two tokens per tier and thresholds15/50/75/100/125/150/175/190. These are reward content; Clan/Omni stat IDs62/75 are separate schema/protocol identities. This is not an authorization to change existing rewards during this audit.",
+      "id": "progression-token-tier-content",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    },
+    {
+      "citations": [
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 22
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 42
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 56
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 72
+        },
+        {
+          "evidence_status": "OBSERVED",
+          "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+          "line": 101
+        }
+      ],
+      "classification": "GENERIC_MECHANIC",
+      "evidence_status": "OBSERVED; NATIVE_PARITY_NOT_INDEPENDENTLY_REVERIFIED",
+      "file": "AORebirth/Server/ZoneEngine_New/Core/WorldSimulation/DungeonExitDoors.cs",
+      "finding": "ZoneLink=-1 openings,1.2m X/Z match tolerance,0.99m connection displacement and first-exit fallback belong to the existing static dungeon geometry algorithm. This does not prove mission placement identity or authorize proximity matching against the exact mission catalog.",
+      "id": "dungeon-exit-geometry-contract",
+      "source_sha": "bddea56ca2d47c5eb64ed53f6e9efd279ff4f694"
+    }
+  ],
+  "implementation_performed": false,
+  "limits": "Classification identifies source semantics. A constant being generic/protocol does not validate adjacent game-content defaults. Editable datasets are inventoried separately in roll/QL audits.",
+  "schema_version": 1
+}
