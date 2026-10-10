@@ -1,42 +1,34 @@
 # Current Task
 
-Repair mission-roll destination rejection on codex/mission-destination-integration,
-starting at 30ab16d0de180d48f2323ede4811602b0e21ab7c.
+Reconstruct observed mission destination-zone distributions on
+codex/mission-destination-integration from the original retained offer journals.
+Preserve working runtime repair 73fc97a75 and client verification c24456369.
 
-PROVEN: the baseline rejects an exact captured centered Borealis request
-(level35, expectedQL35, difficulty6, Omni, breed3, profession12,
-terminal0xDAC1:0xC0000320, secondary bytes255). The existing type selector
-requires a Find Item destination bucket absent from every centered observation
-population. Prior tests did not exercise centered requests or handler charging.
+Requested outputs: complete level/slider/zone, expected-QL/zone, zone/level
+tables, overlapping-level comparisons, CSV/JSON datasets and readable reports
+under docs/generated/missions/. Preserve source offer references and all
+original capture conditions; mark missing combinations UNOBSERVED.
 
-PROVEN: full-condition equality also rejects other character/terminal metadata
-without evidence that those dimensions restrict retail destinations. The
-original capture analysis distinguishes positive observations from unknown
-eligibility; missing combinations do not prove exclusion.
+Validation must reconcile 93,185 retained offers, including 92,830 raw-backed
+exact destinations and 355 unresolved offers, 812 identities and 22 destination
+playfields. Read original capture records and verify original packet ownership;
+do not substitute aggregate summaries as the source of observations.
 
-Mike explicitly approved provisional expected-QL-only reuse: union exact
-entrances observed at that QL, retain all other metadata as research provenance,
-allow repeats, use no observation-frequency weighting, and fail without charging
-when the QL has no observations. Cross-condition retail eligibility stays
-UNPROVEN. No nearest-QL or unobserved-placement fallback is permitted.
+Keep current established expected QL distinct from original capture-time labels
+and unavailable live decoded QL. Separate terminal geography, secondary settings
+and character metadata before interpreting overlap. Frequencies and observed
+min/max ranges are not proven destination weights or eligibility restrictions.
 
-The minimal catalog/generator repair and request/candidate diagnostics are
-implemented. Approved build PASS; destination/fee/acceptance/QL regressions
-PASS61/61; real disposable DAO identity checks PASS74 and full DAO checks PASS275.
-The full DAO run used the identity route's existing compiler override because
-the default wrapper's C#7.3 setting fails on current nullable source. Exact
-identity, WorldPos, interaction range, keys, dungeon and existing persistence
-remain unchanged. No schema or DAO edits.
+Analysis only: no live captures, runtime mission generation, DAO/schema,
+GameData, client or service changes. The working repair remains documented in
+docs/evidence/MISSION_ROLL_ELIGIBILITY_REPAIR.md.
 
-OBSERVED: after rebuilding local runtime repair 73fc97a75, Mike confirmed five
-offers for Shade at Borealis. The request was level 25 / QL25 / difficulty 6,
-Neutral / breed 2 / profession 15, terminal 0xDAC1:0xC0020320, six raw bytes of 0.
-The QL pool contained 124 destinations. Read-only persistence verification proves
-five exact destination records and a 25-credit charge. Client rolling is verified;
-manual mission acceptance/entry/completion remains unverified. Cross-condition
-retail eligibility remains UNPROVEN.
-
-Repair report: docs/evidence/MISSION_ROLL_ELIGIBILITY_REPAIR.md.
-
-Original implementation history: docs/evidence/MISSION_DESTINATION_INTEGRATION.md.
-This task does not extend objective/reward behavior or perform Linux deployment.
+Original-source extraction and generation passed: 77 journals, 79,567 events,
+18,642 requests, 18,638 cohorts and all 93,185 offers reconciled. The output
+contains 66 observed level/slider/terminal combinations and 66 UNOBSERVED
+cross-terminal combinations. Independent zone counts and observed QL sets match
+all 22 retained catalog playfields. Independent CSV/JSON/ledger arithmetic and
+hash review passed. Original-source --check regenerated all 23 output files
+byte-for-byte. No runtime/GameData diff, compilation, gameplay suites, service
+changes or new captures. Analysis complete.
+Reports: docs/generated/missions/destination-zone-distribution/README.md.

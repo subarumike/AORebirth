@@ -1,0 +1,54 @@
+{
+  "captures_started": false,
+  "character_levels": [
+    2,
+    7,
+    13,
+    25,
+    35,
+    37
+  ],
+  "dao_changed": false,
+  "destination_playfields": 22,
+  "exact_entrance_identities": 812,
+  "expected_ql_count": 45,
+  "observed_level_slider_terminal_combinations": 66,
+  "offer_ownership_per_view": {
+    "A": "EXACT_ONCE_ALL_RETAINED",
+    "B": "EXACT_ONCE_ALL_RETAINED",
+    "B_terminal": "EXACT_ONCE_ALL_RETAINED",
+    "C": "EXACT_ONCE_ALL_RESOLVED",
+    "entrances": "EXACT_ONCE_ALL_RESOLVED"
+  },
+  "original_static_ql_unrecorded_offers": 355,
+  "probability_or_eligibility_model_created": false,
+  "ql_label_mismatch_offers": 10,
+  "resolved_offers": 92830,
+  "result": "PASS",
+  "retained_offers": 93185,
+  "runtime_generation_changed": false,
+  "source_files": 77,
+  "source_validation": {
+    "cohorts": 18638,
+    "event_types": {
+      "cohort_received": 18638,
+      "error": 2,
+      "raw_response_received": 18567,
+      "request_started": 18642,
+      "request_transmitted": 18571,
+      "reward_saturation_progress": 4994,
+      "session_started": 77,
+      "session_stopped": 76
+    },
+    "events": 79567,
+    "offers": 93185,
+    "populations": {
+      "NO_RAW_DESTINATION_UNRESOLVED": 355,
+      "RAW_BACKED_EXACT_DESTINATION": 92830
+    },
+    "requests": 18642,
+    "sessions": 77
+  },
+  "unobserved_level_slider_terminal_combinations": 66,
+  "unresolved_offers": 355
+}

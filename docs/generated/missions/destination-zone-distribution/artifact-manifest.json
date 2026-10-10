@@ -1,0 +1,114 @@
+{
+  "files": [
+    {
+      "path": "A-character-level-slider-zones.md",
+      "bytes": 21922,
+      "sha256": "a4259662fb7bbaebcb18d2a29345e97f718d0057ffab6701baabb8313200e388"
+    },
+    {
+      "path": "B-mission-ql-zone-distribution.md",
+      "bytes": 20795,
+      "sha256": "a756719a119e5b8122f9dac4c24ab8430420cfc116fd2e80ef3e08ac666265cd"
+    },
+    {
+      "path": "C-zone-character-levels.md",
+      "bytes": 23910,
+      "sha256": "5b99675dc2d27e977d8098c2af4a96098ef2f94359a4f9899c3a4be3cbf78df8"
+    },
+    {
+      "path": "README.md",
+      "bytes": 10076,
+      "sha256": "9c0088676d62a9cf4a08bbcb86380419aa9bdf6a880431cb04d10685bfb7e810"
+    },
+    {
+      "path": "capture-contexts.jsonl.gz",
+      "bytes": 5753917,
+      "sha256": "8f6c6258b42334090f091401df3f982ab7e40447da035f0ed81c7c1cbfc229ec"
+    },
+    {
+      "path": "coverage.csv",
+      "bytes": 13024,
+      "sha256": "8f48983c67d07ad73838272c9f01a1072901aa03aa79e63fa257203d4ccecf74"
+    },
+    {
+      "path": "distribution-data.json",
+      "bytes": 7910123,
+      "sha256": "eca40791480983954a88bfe33938c4cc64e6721ad026323318c7c06992783a02"
+    },
+    {
+      "path": "entrance-observations.csv",
+      "bytes": 1102320,
+      "sha256": "0d1038e151f7aeca882c61dff1a27115dfcfd6335a2ba71808edd99c5007b751"
+    },
+    {
+      "path": "level-slider-zones.csv",
+      "bytes": 772241,
+      "sha256": "d020c683008565b8bc085d87918262ac8f5aacf21bf64c7aac6b7c414fc25af5"
+    },
+    {
+      "path": "level-summary.csv",
+      "bytes": 1618,
+      "sha256": "0d7e2f9f0f37243d211fd055cc8d8d898ca064858a3cc730ea4a160e613c8087"
+    },
+    {
+      "path": "offer-records.csv.gz",
+      "bytes": 13447646,
+      "sha256": "272d629d23c057f99b805b5611807dd93f4d9356c6c85088744af24ce97ca9a9"
+    },
+    {
+      "path": "offer-records.jsonl.gz",
+      "bytes": 15081758,
+      "sha256": "ae326fa53550c7f5fe7427c915042cfce25ee716c63201cd0c4a90f426d0e02b"
+    },
+    {
+      "path": "overlap-comparisons.csv",
+      "bytes": 281645,
+      "sha256": "750bc39d57a82b60c07f43071e864b749191bd2f997a5d21e760f55bc96c5f73"
+    },
+    {
+      "path": "overlapping-levels.md",
+      "bytes": 4477,
+      "sha256": "70de3be2234ad8351227dc8a52831c469f4acfabd831ab7c5627aa155a778321"
+    },
+    {
+      "path": "ql-label-differences.csv",
+      "bytes": 16146,
+      "sha256": "9ba12dc3c6726c4be886cf33e144bf417c9a05edff07d54038f286223ab38646"
+    },
+    {
+      "path": "ql-zones-by-terminal.csv",
+      "bytes": 729314,
+      "sha256": "24bd2eedf47d3b62e24146be70cdf2cfd45acc72a7662f591526950383374d0a"
+    },
+    {
+      "path": "ql-zones.csv",
+      "bytes": 722044,
+      "sha256": "b6bb626b309c9c4c387af4cdb7d508be1489a929e8c16f3c88587ed8d026e698"
+    },
+    {
+      "path": "source-manifest.json",
+      "bytes": 903546,
+      "sha256": "e3c969c4726d5781a949071cc4ca81ccf98d3994e9248aa649cff944cfd6fb83"
+    },
+    {
+      "path": "unresolved-offers.csv",
+      "bytes": 328889,
+      "sha256": "5b86e5e1ac964c4649d1ac8c8b646a1c4d7f82c711c2f212d55f85af1755718e"
+    },
+    {
+      "path": "validation.json",
+      "bytes": 1400,
+      "sha256": "b68f9b4dc8088088265b6ee2b5c9a411aa2b7f1979c757ed6036c87f37624421"
+    },
+    {
+      "path": "zone-level-sliders.csv",
+      "bytes": 762237,
+      "sha256": "4322e93a9ea43cb397b687c7fa79937bf3cec677450b73015abad58018ef4156"
+    },
+    {
+      "path": "zone-summary.csv",
+      "bytes": 21350,
+      "sha256": "a5a489616f9c4c83e4cd1c17955931b64eb7216c8981225bc04d48902df6244c"
+    }
+  ]
+}

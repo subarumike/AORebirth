@@ -2,6 +2,23 @@
 
 Updated: 2026-10-09
 
+PROVEN (2026-10-09, original mission destination-distribution reconstruction):
+All 77 original journals reconcile to 93,185 retained offers: 92,830 raw-backed
+exact destinations, 355 missing-raw records, 812 entrance identities and 22
+destination playfields. Complete level/slider/zone, expected-QL/zone and
+zone/level tables plus source-linked CSV/JSON are under
+docs/generated/missions/destination-zone-distribution/. All eleven difficulty
+positions were observed at each of six captured levels. Level35 used Borealis;
+the other levels used Andromeda, so geography remains a confounder. Ten recorded
+QL labels differ from the current established lookup; both labels are retained.
+Original level2 metadata is recovered for 355 unresolved rows whose historical
+summary had lost the session fallback. Their destinations remain unresolved.
+These are observed distributions, not eligibility rules or probabilities.
+Runtime repair 73fc97a75, GameData, DAO/schema and running services are unchanged.
+Independent output arithmetic/hash review and original-source reproducibility
+check passed for all 23 generated files; every resolved offer is accounted for
+exactly once in each relevant view. No build or gameplay suites were run.
+
 PROVEN (2026-10-09, mission roll repair on integration branch): the original
 joint capture-condition gate rejected uncaptured character metadata and even
 exact captured centered requests when the existing type mix required an absent
