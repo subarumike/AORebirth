@@ -42,4 +42,12 @@
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAreteLoreleiVendorContentProvider.cs" Link="Fixtures/CapturedAreteLoreleiVendorContentProvider.cs" />
     <EmbeddedResource Include="Fixtures/LegacyProductionCharacterStats.json" />
   </ItemGroup>
+  <!-- Explicit focused run: the clean baseline contains unrelated stale test types.
+       The default/full suite remains unchanged and continues reporting those failures. -->
+  <ItemGroup Condition="'$(MissionDestinationFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="MissionDestinationIntegrationTests.cs" />
+    <Compile Include="QuestDungeonDestinationTests.cs" />
+  </ItemGroup>
 </Project>

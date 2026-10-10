@@ -1,10 +1,12 @@
 namespace ZoneEngine_New.Core.MessageHandlers
 {
     using System;
+    using System.Collections.Generic;
     using AORebirth.Interfaces.Persistence.Missions;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using Utility.GameData.Missions;
     using ZoneEngine.Core.Missions;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Missions;
@@ -15,8 +17,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
     {
         private readonly IGeneratedMissionDao _dao;
         private readonly GeneratedMissionService _missions;
-        public QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions)
-        { _dao = dao; _missions = missions; }
+        private readonly MissionDestinationCatalog _destinations;
+        public QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions, MissionDestinationCatalog destinations)
+        { _dao = dao; _missions = missions; _destinations = destinations; }
         public Type MessageBodyType => typeof(QuestAlternativeMessage);
         public void Handle(MessageBody body, IZoneSession session) => Handle((QuestAlternativeMessage)body, session);
 
@@ -48,15 +51,28 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 int next = first;
                 int seed = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
                 int nonce = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
-                var generating = ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.generate", player.Identity.Instance);
-                var response = GeneratedMissionRollService.Generate(message, player.Identity, level,
-                    playfield.Identity.Instance, player.Position.xf, player.Position.zf,
-                    side,
-                    GeneratedMissionWire.ClientClock(synchronizedUtc, now), seed, nonce,
-                    () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."));
-                var batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,
-                    MissionRollPolicy.Current.Fee(level), seed, nonce, now);
-                generating.Dispose();
+                QuestAlternativeMessage response;
+                IReadOnlyList<MissionPlacementIdentity> selectedEntrances;
+                GeneratedMissionOfferBatch batch;
+                using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.generate", player.Identity.Instance))
+                {
+                    try
+                    {
+                        response = GeneratedMissionRollService.Generate(message, player.Identity, level,
+                            playfield.Identity.Instance, player.Position.xf, player.Position.zf,
+                            side,
+                            GeneratedMissionWire.ClientClock(synchronizedUtc, now), seed, nonce,
+                            () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."),
+                            _destinations, player.Stats.Get(CharacterStat.Breed), player.Stats.Get(CharacterStat.Profession), out selectedEntrances);
+                    }
+                    catch (NotSupportedException)
+                    {
+                        Feedback(session, player, "No captured mission destinations support these roll conditions. No credits were deducted.");
+                        return;
+                    }
+                    batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,
+                        MissionRollPolicy.Current.Fee(level), seed, nonce, now, selectedEntrances);
+                }
                 var committing = ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.commit", player.Identity.Instance);
                 var result = _missions.PublishOffers(player, batch);
                 committing.Dispose();

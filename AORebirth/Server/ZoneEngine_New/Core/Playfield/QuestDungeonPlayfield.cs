@@ -14,6 +14,8 @@ using AORebirth.Interfaces.Persistence.Shops;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+using Utility.GameData.Missions;
+
 using ZoneEngine_New.Core.Characters;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
@@ -38,7 +40,7 @@ public sealed class QuestDungeonPlayfield : Playfield
 {
     PlayfieldWorldSimulation? _simulation;
 
-    public QuestDungeonPlayfield(int playfieldId, string questId, DungeonLayout layout, MissionEntrance entrance,
+    public QuestDungeonPlayfield(int playfieldId, string questId, DungeonLayout layout, MissionEntrancePlacement entrance,
         string? targetHash, int quality, IZoneLogger logger, IMessageRouter router, PlayfieldManager manager, PlayerHydrator hydrator, IGameData data,
         IItemBuilder items, HashItemMinter hashItems, IInventoryRepository inventory, IItemInstanceIdAllocator ids,
         InventoryMoveService moves, InventoryFlushService flush, TradeService trades, CharacterSnapshotService snapshot,
@@ -58,7 +60,7 @@ public sealed class QuestDungeonPlayfield : Playfield
     public DungeonLayout Layout { get; }
 
     /// <summary>Where the dungeon is entered from, and where its occupants return to.</summary>
-    public MissionEntrance Entrance { get; }
+    public MissionEntrancePlacement Entrance { get; }
 
     /// <summary>The NPC hash a kill-target quest wants killed here; null when the quest has no kill target.</summary>
     public string? TargetHash { get; }
@@ -360,12 +362,15 @@ public sealed class QuestDungeonPlayfield : Playfield
             return;
         }
 
-        var entrancePosition = new AORebirth.Core.Vector.Vector3(Entrance.X, Entrance.Y, Entrance.Z);
-        var entranceHeading = new AORebirth.Core.Vector.Quaternion(Entrance.HeadingX, Entrance.HeadingY, Entrance.HeadingZ, Entrance.HeadingW);
+        var entrancePosition = new AORebirth.Core.Vector.Vector3(Entrance.LocalX, Entrance.LocalY, Entrance.LocalZ);
+        // Raw placement components are WXYZ: exact-identity comparisons against the current Dynels reader
+        // match all 2,242 catalog rows. The engine's Quaternion constructor takes XYZW.
+        var entranceHeading = new AORebirth.Core.Vector.Quaternion(
+            Entrance.RotationComponent1, Entrance.RotationComponent2, Entrance.RotationComponent3, Entrance.RotationComponent0);
         AORebirth.Core.Vector.Vector3 landing = PortalDoorLandingResolver.LandingInFront(
             entrancePosition, entranceHeading, PortalDoorLandingResolver.ExitDoorClearance);
         _simulation.RegisterDungeonExit(exit.Position.xf, exit.Position.yf, exit.Position.zf, exit.Identity.Instance,
-            Entrance.Playfield, landing, entranceHeading, exit.TemplateId, exit.Rotation);
+            Entrance.PlayfieldId, landing, entranceHeading, exit.TemplateId, exit.Rotation);
     }
 
     protected override void OnDispose()

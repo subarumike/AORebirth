@@ -7,6 +7,8 @@ namespace ZoneEngine_New.Core.Commands
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using Utility.GameData.Missions;
+
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Playfield;
@@ -70,9 +72,9 @@ namespace ZoneEngine_New.Core.Commands
 
                 string row = string.Format(CultureInfo.InvariantCulture, "{0} [{1}] {2}  {3}",
                     Safe(quest.Template.Name), Safe(quest.QuestId), Remaining(quest, now), InfoLink(quest.QuestId, subject));
-                if (_dungeons.TryGetEntrance(quest.QuestId, out MissionEntrance entrance))
+                if (_dungeons.TryGetEntrance(quest.QuestId, out MissionEntrancePlacement entrance))
                     row += string.Format(CultureInfo.InvariantCulture, "  <a href='chatcmd:///say .quests tp {0}'>[TP: {1}]</a>",
-                        quest.QuestId, Safe(entrance.Name));
+                        quest.QuestId, Safe(entrance.DisplayName));
                 rows.Add(row);
             }
 
@@ -235,7 +237,7 @@ namespace ZoneEngine_New.Core.Commands
         {
             Player self = context.Player;
             if (context.Args.Length < 2 || !QuestDungeonIds.TryGetPlayfield(context.Args[1], out _)
-                || !_dungeons.TryGetEntrance(context.Args[1], out MissionEntrance entrance))
+                || !_dungeons.TryGetEntrance(context.Args[1], out MissionEntrancePlacement entrance))
             {
                 GmCommandFeedback.Send(context.Session, self, "No dungeon entrance for that quest.");
                 return;
@@ -247,16 +249,16 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
-            var landing = new Vector3(entrance.X, entrance.Y, entrance.Z);
+            var landing = new Vector3(entrance.LocalX, entrance.LocalY, entrance.LocalZ);
             GmCommandFeedback.Send(context.Session, self, string.Format(CultureInfo.InvariantCulture,
-                "Teleported to {0} ({1}, {2}, {3}) pf={4}", entrance.Name, entrance.X, entrance.Y, entrance.Z, entrance.Playfield));
+                "Teleported to {0} ({1}, {2}, {3}) pf={4}", entrance.DisplayName, entrance.LocalX, entrance.LocalY, entrance.LocalZ, entrance.PlayfieldId));
 
-            if (playfield.Identity.Instance != entrance.Playfield)
+            if (playfield.Identity.Instance != entrance.PlayfieldId)
             {
                 // A GM jump is not a proxy entry: it leaves no way back through an exit proxy.
                 self.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
                 self.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
-                _playfields.Value.WithPlayfield(entrance.Playfield, self, destination =>
+                _playfields.Value.WithPlayfield(entrance.PlayfieldId, self, destination =>
                 {
                     if (ReferenceEquals(self.Playfield, playfield))
                         self.Session?.TransferToPlayfield(destination, landing);

@@ -2,6 +2,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
 {
     using System.Text.Json;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     /// <summary>
     /// What a quest stores to recreate its dungeon (generatedquests.AcgBuildingGeneratorJson): the layout seed and
     /// generator version, never the generated layout itself, plus the entrance it is reached through.
@@ -17,7 +19,10 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         /// <summary>Playfield2 id of this quest's dungeon (<see cref="QuestDungeonIds"/>).</summary>
         public int DungeonPlayfield { get; set; }
 
-        /// <summary>MissionEntrance (0xDAC6) instance the dungeon is entered through.</summary>
+        /// <summary>Defaults to the implicit MissionEntrance type used by older stored dungeon parameters.</summary>
+        public int EntranceType { get; set; } = (int)IdentityType.MissionEntrance;
+
+        /// <summary>MissionEntrance (0xDAC6) instance bits, stored in the protocol's signed integer representation.</summary>
         public int EntranceInstance { get; set; }
 
         public int EntrancePlayfield { get; set; }
@@ -34,7 +39,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         /// <summary>Identity type of the entrance playfield in the offered quest action (journal waypoint).</summary>
         public int DestinationType { get; set; }
 
-        /// <summary>Building template pair the offer carried for the entrance (journal action).</summary>
+        /// <summary>WorldPos X/Z offsets carried by the offer; historical names retained for stored JSON.</summary>
         public int BuildingLowId { get; set; }
 
         public int BuildingHighId { get; set; }
@@ -58,7 +63,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             try
             {
                 QuestDungeonParameters? parsed = JsonSerializer.Deserialize<QuestDungeonParameters>(json, JsonOptions);
-                if (parsed == null || parsed.GeneratorVersion <= 0 || !QuestDungeonIds.IsDungeonPlayfield(parsed.DungeonPlayfield))
+                if (parsed == null || parsed.GeneratorVersion <= 0 || !QuestDungeonIds.IsDungeonPlayfield(parsed.DungeonPlayfield)
+                    || parsed.EntranceType != (int)IdentityType.MissionEntrance)
                     return false;
 
                 parameters = parsed;

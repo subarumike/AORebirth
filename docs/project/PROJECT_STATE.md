@@ -2,6 +2,19 @@
 
 Updated: 2026-10-09
 
+PROVEN (2026-10-09, mission destination integration branch): one shared
+MissionDestinationCatalog now supplies generated offers and quest dungeons.
+It retains 2,242 physical entrances, of which 812 are observed in 92,830 exact
+retail offers. Destination selection uses 547 captured joint condition/type
+sets, uniformly with replacement; uncaptured conditions fail closed. Offers
+retain complete entrance identity and captured WorldPos, and acceptance
+validates those exact values. The old 140-location population and separate
+entrance catalog/data are retired. The approved DAO exception accepts nonzero
+entrance identity bit patterns without relaxing other identity contracts or
+changing the schema. This is feature-branch work, not a master merge or live
+deployment; live AO client acceptance is UNVERIFIED. See
+`docs/evidence/MISSION_DESTINATION_INTEGRATION.md` for validation and limits.
+
 PROVEN (2026-10-09, XP award updates): AwardXp now flushes dirty stats after
 each non-level-up XP award. Source review confirms that the previous dirty
 stat collection retained only the latest value between flushes. XP amounts,

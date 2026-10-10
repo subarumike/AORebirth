@@ -489,7 +489,7 @@ namespace AORebirth.Database.Domain.Missions
         private static void ValidateFrozenOffer(GeneratedMissionOffer offer)
         {
             if (offer == null || offer.OwnerId <= 0 || offer.OfferType != 0xDAC3 || offer.OfferInstance <= 0 || offer.MissionType < 0 || offer.MissionType > 4 || offer.Quality <= 0
-                || offer.DestinationType <= 0 || offer.DestinationInstance <= 0 || offer.DestinationPlayfield <= 0 || offer.EntranceType <= 0 || offer.EntranceInstance <= 0
+                || offer.DestinationType <= 0 || offer.DestinationInstance <= 0 || offer.DestinationPlayfield <= 0 || offer.EntranceType <= 0 || offer.EntranceInstance == 0
                 || offer.EntranceLow <= 0 || offer.EntranceHigh <= 0 || !Finite(offer.DestinationX) || !Finite(offer.DestinationY) || !Finite(offer.DestinationZ)
                 || offer.CashReward < 0 || offer.ExperienceReward < 0 || offer.RewardCount < 0 || (offer.RewardCount > 0 && (offer.RewardLowId <= 0 || offer.RewardHighId <= 0 || offer.RewardQuality <= 0))
                 || offer.FrozenWireBody == null || offer.FrozenWireBody.Length == 0 || offer.FrozenWireBody.Length > 1024 * 1024 || offer.Title == null || offer.Title.Length > 1024 || offer.Description == null)
