@@ -2,14 +2,16 @@
 
 Updated: 2026-10-09
 
-PROVEN (2026-10-09, integration branch candidate only): PR31's perk targeting,
+PROVEN (2026-10-09, merged through PR33): PR31's perk targeting,
 related selector grouping, Skill modifiers and periodic child casts combine
 with PR32's positive taunts without its persistent-selector changes.
 Windows build PASS; focused tests PASS67. The related regression selection
 has 205 passes and the same seven failures proven on starting master; the full
 test project retains proven baseline missing-mission-type compile failures.
-Live AO client acceptance remains UNVERIFIED. This candidate has not been
-merged into public master or deployed. See `docs/evidence/PR31_PR32_INTEGRATION.md`.
+Live AO client acceptance remains UNVERIFIED. Public master merge:
+`a57b22776d75f6efffab55031728e0c0c05ed7e8`; PR31 and PR32 are closed as
+incorporated/superseded. No new build, engine operation or deployment was run
+for the merge. See `docs/evidence/PR31_PR32_INTEGRATION.md`.
 
 PROVEN (2026-10-09, XP award updates): AwardXp now flushes dirty stats after
 each non-level-up XP award. Source review confirms that the previous dirty

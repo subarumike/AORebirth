@@ -1,6 +1,14 @@
 # PR31 / PR32 reconciled integration
 
-Date: 2026-10-09. Windows integration candidate; no master merge or deployment.
+Date: 2026-10-09. Windows integration validation and subsequent repository merge.
+
+PROVEN: PR33 merged the validated implementation into public master at
+`a57b22776d75f6efffab55031728e0c0c05ed7e8`. The merge tree matches the validated
+head exactly. Original PR31 and PR32 are closed as incorporated/superseded;
+PR32's persistent-selector changes remain excluded. Mike authorized this merge
+and requested no new engine builds. No build, test, engine operation or
+deployment was performed for the merge/closure step. Validation below was
+executed before that request.
 
 ## Source identity and integration
 
@@ -8,12 +16,11 @@ Date: 2026-10-09. Windows integration candidate; no master merge or deployment.
 - Starting public master: `bddea56ca2d47c5eb64ed53f6e9efd279ff4f694`.
 - PR31 foundation: `04f0c966d35c9d079264d0d741d42bcef2ce57a6`.
 - PR32 selective input: `0c97b85942989aa0da1b771ad33e8fe9ac8820f4`.
-- The ending commit is the commit containing this report; obtain it with
-  `git log -1 --format=%H` on the integration branch.
+- Validated implementation head: `f5d012f96fe5febdcc99fad803709dc2a1dd133d`.
 
 PROVEN: the six runtime files changed by PR31 are byte-identical to its exact
-head. ItemUseFunctions.cs is byte-identical to PR32's exact head. Public master
-and the original checkout's unrelated mission branch/dirty work were preserved.
+head. ItemUseFunctions.cs is byte-identical to PR32's exact head. Unrelated
+public-master work and the original checkout's mission branch/dirty work were preserved.
 
 | Input | Incorporated changes |
 | --- | --- |
@@ -163,4 +170,5 @@ within the active ZoneEngine_New ownership boundary.
 Changed: the seven runtime files listed above; CastNanoTests.cs; the two new
 integration test files; Pr31Pr32Validation.targets; this report; CURRENT_TASK.md;
 and PROJECT_STATE.md. No unrelated implementation, private GameData, database,
-schema, Linux infrastructure, master merge or deployment is included.
+schema or Linux infrastructure is included. The only later additions are this
+merge record and the matching task/project status notes; no deployment occurred.
