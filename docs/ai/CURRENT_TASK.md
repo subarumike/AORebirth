@@ -1,34 +1,33 @@
 # Current Task
 
-Reconstruct observed mission destination-zone distributions on
-codex/mission-destination-integration from the original retained offer journals.
-Preserve working runtime repair 73fc97a75 and client verification c24456369.
+Consolidate mission destinations on `codex/mission-destination-integration`
+into exactly two runtime files: `MissionDestinations.json` and
+`MissionEntrancePlacements.json`. Keep `MissionDestinationCatalog` as the
+single data owner. Prefer terminal-playfield/expected-QL pools; use the same
+QL-wide union when the origin/QL pair is unobserved. Preserve duplicate picks
+and all other mission mechanics, GameData, DAO and schema contracts.
 
-Requested outputs: complete level/slider/zone, expected-QL/zone, zone/level
-tables, overlapping-level comparisons, CSV/JSON datasets and readable reports
-under docs/generated/missions/. Preserve source offer references and all
-original capture conditions; mark missing combinations UNOBSERVED.
+Migration baseline: `0721fa8844407bf6e1462341bf46d122bda44437`.
+Use the completed source-linked 93,185-offer analysis offline. Preserve all
+2,242 physical placements, 812 observed identities and 45 existing QL pools.
+The migration deliberately retains original capture-time QL labels: switching
+to the research report's current lookup projection would remove three existing
+QL22 destinations. The runtime mission-QL calculation remains unchanged.
 
-Validation must reconcile 93,185 retained offers, including 92,830 raw-backed
-exact destinations and 355 unresolved offers, 812 identities and 22 destination
-playfields. Read original capture records and verify original packet ownership;
-do not substitute aggregate summaries as the source of observations.
+Before retiring the three obsolete JSON files, compare every identity,
+coordinate bit pattern, rotation, WorldPos offset and QL pool against the old
+four-file system, then run the explicitly requested mission and DAO regressions.
+Verify QL29 origin separation, Shade's Borealis QL25 fallback, unsupported-roll
+fee protection, five-offer generation, acceptance, dungeon entry, abandonment
+and key removal. Runtime must never load captures or research outputs.
 
-Keep current established expected QL distinct from original capture-time labels
-and unavailable live decoded QL. Separate terminal geography, secondary settings
-and character metadata before interpreting overlap. Frequencies and observed
-min/max ranges are not proven destination weights or eligibility restrictions.
+Implementation and automated validation are complete. Offline migration/check,
+approved build, 81 focused mission regressions, 74 real DAO identity checks and
+275 full disposable DAO checks passed before retirement. The three old JSON
+files were then removed; the offline check and all 81 focused tests passed
+again. Exactly two runtime destination files remain (2,059,393 bytes total).
 
-Analysis only: no live captures, runtime mission generation, DAO/schema,
-GameData, client or service changes. The working repair remains documented in
-docs/evidence/MISSION_ROLL_ELIGIBILITY_REPAIR.md.
-
-Original-source extraction and generation passed: 77 journals, 79,567 events,
-18,642 requests, 18,638 cohorts and all 93,185 offers reconciled. The output
-contains 66 observed level/slider/terminal combinations and 66 UNOBSERVED
-cross-terminal combinations. Independent zone counts and observed QL sets match
-all 22 retained catalog playfields. Independent CSV/JSON/ledger arithmetic and
-hash review passed. Original-source --check regenerated all 23 output files
-byte-for-byte. No runtime/GameData diff, compilation, gameplay suites, service
-changes or new captures. Analysis complete.
-Reports: docs/generated/missions/destination-zone-distribution/README.md.
+See `docs/evidence/MISSION_DESTINATION_TWO_FILE_MIGRATION.md` and
+`docs/generated/missions/destination-runtime-migration/migration-receipt.json`.
+Live AO client acceptance of this migration is not yet claimed. No Linux or
+master deployment is requested.

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading;
 using AORebirth.Core.GameData;
 using AORebirth.Interfaces.Persistence.Missions;
@@ -33,7 +34,6 @@ public sealed class MissionDestinationIntegrationTests
 {
     static readonly Identity Owner = new() { Type = IdentityType.CanbeAffected, Instance = 990101 };
     static readonly byte[] SupportedSliders = [156, 255, 255, 255, 255, 255];
-    static readonly string[] MissionTypes = ["KILL_PERSON", "FIND_PERSON", "FIND_ITEM", "REPAIR", "RETURN_ITEM"];
     const uint TerminalInstance = 3221226127u;
     static MissionDestinationCatalog catalog = null!;
     static string? previousGameDataRoot;
@@ -47,7 +47,7 @@ public sealed class MissionDestinationIntegrationTests
         string gameDataRoot = Path.Combine(root, "AORebirth", "GameData");
         previousGameDataRoot = Environment.GetEnvironmentVariable(GameDataPaths.EnvironmentVariableName);
         Environment.SetEnvironmentVariable(GameDataPaths.EnvironmentVariableName, gameDataRoot);
-        catalog = MissionDestinationCatalog.Load(gameDataRoot, requireObservedSelection: true);
+        catalog = MissionDestinationCatalog.Load(gameDataRoot);
     }
 
     [ClassCleanup(ClassCleanupBehavior.EndOfClass)]
@@ -59,7 +59,6 @@ public sealed class MissionDestinationIntegrationTests
         Assert.AreEqual(2242, catalog.Count);
         Assert.AreEqual(812, catalog.ObservedDestinations.Count);
         Assert.AreEqual(1430, catalog.Placements.Count(value => !catalog.IsObservedRandomMissionDestination(value.Identity)));
-        Assert.IsFalse(catalog.DestinationUniquenessWithinCohortRequired);
         foreach (var placement in catalog.Placements)
         {
             Assert.AreSame(placement, catalog.GetByIdentity(placement.IdentityType, placement.IdentityInstance));
@@ -81,37 +80,42 @@ public sealed class MissionDestinationIntegrationTests
     }
 
     [TestMethod]
-    public void ExactObservationIndexPreservesCapturedJointConditionsAndObservedSubset()
+    public void TwoRuntimeFilesPreserveTheCompleteCatalogAndObservedWorldPositions()
     {
-        Assert.IsTrue(catalog.HasObservedSelection);
-        Assert.AreEqual(547, catalog.ObservedConditionCount);
-        Assert.AreEqual(812, catalog.ObservedWorldPositionCount);
-        foreach (string type in MissionTypes)
+        using var files = new TemporaryCatalog();
+        CollectionAssert.AreEquivalent(new[] { "MissionEntrancePlacements.json", "MissionDestinations.json" },
+            Directory.GetFiles(files.Directory).Select(Path.GetFileName).ToArray());
+        var loaded = MissionDestinationCatalog.Load(files.Root);
+        Assert.AreEqual(2242, loaded.Count);
+        Assert.AreEqual(812, loaded.ObservedDestinations.Count);
+        Assert.AreEqual(812, loaded.ObservedWorldPositionCount);
+        Assert.AreEqual(files.Read("MissionDestinations.json")["Pools"]!.AsArray().Count, loaded.TerminalPoolCount);
+        foreach (var placement in loaded.ObservedDestinations)
         {
-            Assert.IsTrue(catalog.TryGetObservedDestinations(Condition(type), out var candidates), type);
-            Assert.IsTrue(candidates.Count > 0 && candidates.Count < 812);
-            Assert.AreEqual(candidates.Count, candidates.Select(value => value.Identity).Distinct().Count());
-            foreach (var placement in candidates)
-            {
-                Assert.IsTrue(catalog.IsObservedRandomMissionDestination(placement.Identity));
-                Assert.IsTrue(catalog.TryGetWorldPosition(placement.Identity, out var worldPosition));
-                Assert.AreEqual(placement.Identity, worldPosition.Identity);
-            }
+            Assert.IsTrue(loaded.IsObservedRandomMissionDestination(placement.Identity));
+            Assert.IsTrue(loaded.TryGetWorldPosition(placement.Identity, out var worldPosition));
+            Assert.AreEqual(placement.Identity, worldPosition.Identity);
         }
     }
 
     [TestMethod]
     public void ExpectedQualityPoolsAreExactDistinctUnionsOfRetainedObservations()
     {
-        var qualities = catalog.CapturedConditions.Select(value => value.ExpectedMissionQl).Distinct().Order().ToArray();
+        var qualities = catalog.ExpectedMissionQls.Order().ToArray();
         Assert.AreEqual(45, qualities.Length);
+        using var files = new TemporaryCatalog();
+        var pools = files.Read("MissionDestinations.json")["Pools"]!.AsArray();
         foreach (int quality in qualities)
         {
             var expected = new HashSet<MissionPlacementIdentity>();
-            foreach (var condition in catalog.CapturedConditions.Where(value => value.ExpectedMissionQl == quality))
+            foreach (var pool in pools.Where(value => value!["ExpectedMissionQl"]!.GetValue<int>() == quality))
             {
-                Assert.IsTrue(catalog.TryGetObservedDestinations(condition, out var observed));
-                foreach (var placement in observed) expected.Add(placement.Identity);
+                int origin = pool!["TerminalPlayfieldId"]!.GetValue<int>();
+                Assert.IsTrue(catalog.TryGetDestinations(origin, quality, out var observed, out bool fallback));
+                Assert.IsFalse(fallback);
+                var sourceIdentities = pool["DestinationIdentities"]!.AsArray().Select(ReadIdentity).ToHashSet();
+                Assert.IsTrue(sourceIdentities.SetEquals(observed.Select(value => value.Identity)));
+                expected.UnionWith(sourceIdentities);
             }
             Assert.IsTrue(catalog.TryGetObservedDestinations(quality, out var actual));
             Assert.AreEqual(expected.Count, actual.Count);
@@ -192,13 +196,8 @@ public sealed class MissionDestinationIntegrationTests
         request.PhysicalMysticalSlider = request.HeadOnStealthSlider = request.MoneyExperienceSlider = 255;
         Assert.AreEqual(35, MissionLevelRuntime.GetMissionQuality(35, request.LevelSlider));
         TestContext.WriteLine("CAPTURED_REQUEST level=35 ql=35 detent=6 side=2 breed=3 profession=12 terminal=800/0xDAC1:0xC0000320 secondary=255,255,255,255,255,255");
-        foreach (string type in MissionTypes)
-        {
-            var condition = new MissionDestinationCondition(35, 35, 6, 2, 3, 12, 800, 0xDAC1,
-                0xC0000320u, [255, 255, 255, 255, 255, 255], type);
-            catalog.TryGetObservedDestinations(condition, out var candidates);
-            TestContext.WriteLine("CAPTURED_REQUEST_CANDIDATES type=" + type + " count=" + candidates.Count);
-        }
+        Assert.IsTrue(catalog.TryGetDestinations(800, 35, out var candidates, out bool fallback));
+        Assert.IsFalse(fallback);
         int next = 100000;
         var response = GeneratedMissionRollService.Generate(request, Owner, 35, 800, 0, 0,
             MissionLocationSide.Omni, 1201445827, 17, 4567, () => next++, catalog, 3, 12, out var selected);
@@ -208,6 +207,7 @@ public sealed class MissionDestinationIntegrationTests
         for (int index = 0; index < selected.Count; index++)
         {
             var placement = catalog.GetByIdentity(selected[index].IdentityType, selected[index].IdentityInstance);
+            Assert.IsTrue(candidates.Any(value => value.Identity.Equals(selected[index])));
             var action = response.QuestInfos[index].QuestActions.Single();
             Assert.AreEqual(35, response.QuestInfos[index].Quality);
             Assert.AreEqual(placement.PlayfieldId, action.Playfield.Instance);
@@ -231,37 +231,13 @@ public sealed class MissionDestinationIntegrationTests
     }
 
     [TestMethod]
-    public void MissingSelectionFilePreservesLookupsButFailsClosedForRuntimeRolling()
+    [DataRow("MissionDestinations.json")]
+    [DataRow("MissionEntrancePlacements.json")]
+    public void EitherMissingRuntimeFileFailsClosed(string missing)
     {
-        string temporaryRoot = Path.Combine(Path.GetTempPath(), "aorebirth-mission-destination-" + Guid.NewGuid().ToString("N"));
-        string directory = Path.Combine(temporaryRoot, "Missions", "Destinations");
-        string source = Path.Combine(FindRepositoryRoot(), "AORebirth", "GameData", "Missions", "Destinations");
-        string[] files = ["MissionEntrancePlacements.json", "ObservedMissionDestinations.json",
-            "MissionDestinationCatalogManifest.json", "MissionDestinationSelection.json"];
-        Directory.CreateDirectory(directory);
-        try
-        {
-            foreach (string file in files) File.Copy(Path.Combine(source, file), Path.Combine(directory, file));
-            Assert.IsTrue(MissionDestinationCatalog.Load(temporaryRoot, requireObservedSelection: true).HasObservedSelection);
-            File.Delete(Path.Combine(directory, "MissionDestinationSelection.json"));
-            var lookupOnly = MissionDestinationCatalog.Load(temporaryRoot);
-            Assert.AreEqual(2242, lookupOnly.Count);
-            Assert.AreEqual(812, lookupOnly.ObservedDestinations.Count);
-            Assert.IsFalse(lookupOnly.HasObservedSelection);
-            Assert.IsFalse(lookupOnly.TryGetObservedDestinations(Condition("KILL_PERSON"), out _));
-            Assert.ThrowsExactly<InvalidDataException>(() => MissionDestinationCatalog.Load(temporaryRoot, requireObservedSelection: true));
-            int allocations = 0;
-            Assert.ThrowsExactly<NotSupportedException>(() => GeneratedMissionRollService.Generate(Request(), Owner, 2,
-                655, 0, 0, MissionLocationSide.Omni, 1201445827, 17, 4567, () => 100000 + allocations++, lookupOnly, 1, 15, out _));
-            Assert.AreEqual(0, allocations);
-        }
-        finally
-        {
-            foreach (string file in files) File.Delete(Path.Combine(directory, file));
-            Directory.Delete(directory);
-            Directory.Delete(Path.Combine(temporaryRoot, "Missions"));
-            Directory.Delete(temporaryRoot);
-        }
+        using var files = new TemporaryCatalog();
+        File.Delete(Path.Combine(files.Directory, missing));
+        Assert.ThrowsExactly<FileNotFoundException>(() => MissionDestinationCatalog.Load(files.Root));
     }
 
     [TestMethod]
@@ -298,7 +274,7 @@ public sealed class MissionDestinationIntegrationTests
     [TestMethod]
     public void EveryObservedQualityGeneratesFiveOffersWithDifferentObservationMetadata()
     {
-        foreach (int quality in catalog.CapturedConditions.Select(value => value.ExpectedMissionQl).Distinct())
+        foreach (int quality in catalog.ExpectedMissionQls)
         {
             var request = CenteredBorealisRequest();
             request.MissionTerminalIdentity = new() { Type = (IdentityType)0xDAC1, Instance = 12345 };
@@ -307,7 +283,7 @@ public sealed class MissionDestinationIntegrationTests
                 MissionLocationSide.Clan, 1201445827, 17, 4567, () => next++, catalog, 4, 15, out var selected);
             Assert.AreEqual(5, response.QuestInfos.Length, "QL=" + quality);
             Assert.AreEqual(5, selected.Count);
-            Assert.IsTrue(catalog.TryGetObservedDestinations(quality, out var eligible));
+            Assert.IsTrue(catalog.TryGetDestinations(800, quality, out var eligible, out _));
             Assert.IsTrue(selected.All(identity => eligible.Any(value => value.Identity.Equals(identity))));
             Assert.IsTrue(response.QuestInfos.All(value => value.Quality == quality));
         }
@@ -326,18 +302,142 @@ public sealed class MissionDestinationIntegrationTests
     }
 
     [TestMethod]
-    public void ExactObservationLookupPreservesUnobservedJointConditions()
+    public void OriginQualityPoolsRemainDistinctAndFallbackUsesOnlyTheExactRequestedQuality()
     {
-        Assert.IsFalse(catalog.TryGetObservedDestinations(new MissionDestinationCondition(2, 2, 1, 2, 1, 15, 655,
-            56001, TerminalInstance, SupportedSliders, "KILL_PERSON"), out _));
-        Assert.IsFalse(catalog.TryGetObservedDestinations(Condition("UNRESOLVED"), out _));
+        Assert.IsTrue(catalog.TryGetDestinations(655, 29, out var andromeda, out bool andromedaFallback));
+        Assert.IsTrue(catalog.TryGetDestinations(800, 29, out var borealis, out bool borealisFallback));
+        Assert.IsFalse(andromedaFallback);
+        Assert.IsFalse(borealisFallback);
+        Assert.AreEqual(215, andromeda.Count);
+        Assert.AreEqual(196, borealis.Count);
+        Assert.AreEqual(0, andromeda.Select(value => value.Identity).Intersect(borealis.Select(value => value.Identity)).Count());
+        Assert.IsTrue(catalog.TryGetDestinations(540, 29, out var unknownOrigin, out bool unknownFallback));
+        Assert.IsTrue(unknownFallback);
+        Assert.AreEqual(411, unknownOrigin.Count);
+        Assert.IsTrue(catalog.TryGetDestinations(800, 25, out var ql25, out bool ql25Fallback));
+        Assert.IsTrue(ql25Fallback);
+        Assert.AreEqual(124, ql25.Count);
+        foreach (int origin in new[] { 655, 800, 540 })
+        {
+            Assert.IsFalse(catalog.TryGetDestinations(origin, 34, out var unsupported, out bool fallback));
+            Assert.AreEqual(0, unsupported.Count);
+            Assert.IsFalse(fallback);
+        }
     }
 
     [TestMethod]
-    public void ShadeLevel25CenteredBorealisReproductionAssumptionPublishesFiveOffersThenChargesOnce()
+    [DataRow(655)]
+    [DataRow(800)]
+    public void GeneratedQuality29CohortsUseTheirOwnOriginPool(int origin)
     {
-        // Mike's original packet slider bytes were not retained. Centered bytes are an explicit
-        // reproduction assumption; this is not a claim that they reconstruct his exact request.
+        var request = CenteredBorealisRequest();
+        Assert.IsTrue(catalog.TryGetDestinations(origin, 29, out var candidates, out bool fallback));
+        Assert.IsFalse(fallback);
+        var expected = candidates.Select(value => value.Identity).ToHashSet();
+        int next = 100000;
+        var response = GeneratedMissionRollService.Generate(request, Owner, 29, origin, 0, 0,
+            MissionLocationSide.Neutral, 1201445827, 17, 4567, () => next++, catalog, 2, 15, out var selected);
+        Assert.AreEqual(5, response.QuestInfos.Length);
+        Assert.IsTrue(selected.All(expected.Contains));
+        Assert.IsTrue(response.QuestInfos.All(value => value.Quality == 29));
+    }
+
+    [TestMethod]
+    [DataRow("placement-schema")]
+    [DataRow("destination-schema")]
+    [DataRow("placement-kind")]
+    [DataRow("destination-kind")]
+    [DataRow("empty-placements")]
+    [DataRow("empty-pools")]
+    [DataRow("empty-pool")]
+    [DataRow("duplicate-placement")]
+    [DataRow("duplicate-pool")]
+    [DataRow("duplicate-pool-identity")]
+    [DataRow("missing-placement")]
+    [DataRow("missing-worldpos")]
+    [DataRow("position-bits")]
+    [DataRow("raw-name")]
+    public void CatalogRejectsMalformedOrUnresolvableRuntimeData(string defect)
+    {
+        using var files = new TemporaryCatalog();
+        JsonNode placements = files.Read("MissionEntrancePlacements.json");
+        JsonNode destinations = files.Read("MissionDestinations.json");
+        JsonArray rows = placements["Placements"]!.AsArray();
+        JsonArray pools = destinations["Pools"]!.AsArray();
+        JsonArray identities = pools[0]!["DestinationIdentities"]!.AsArray();
+        switch (defect)
+        {
+            case "placement-schema": placements["SchemaVersion"] = 1; break;
+            case "destination-schema": destinations["SchemaVersion"] = 2; break;
+            case "placement-kind": placements["CatalogKind"] = "OTHER"; break;
+            case "destination-kind": destinations["CatalogKind"] = "OTHER"; break;
+            case "empty-placements": rows.Clear(); break;
+            case "empty-pools": pools.Clear(); break;
+            case "empty-pool": identities.Clear(); break;
+            case "duplicate-placement": rows.Add(rows[0]!.DeepClone()); break;
+            case "duplicate-pool": pools.Add(pools[0]!.DeepClone()); break;
+            case "duplicate-pool-identity": identities.Add(identities[0]!.DeepClone()); break;
+            case "missing-placement": identities[0]!["IdentityInstance"] = 0xD1234567u; break;
+            case "missing-worldpos": rows.Single(row => ReadIdentity(row).Equals(ReadIdentity(identities[0])))!["WorldPos"] = null; break;
+            case "position-bits": rows[0]!["LocalXBits"] = rows[0]!["LocalXBits"]!.GetValue<uint>() ^ 1u; break;
+            case "raw-name": rows[0]!["RawNameHex"] = "00"; break;
+        }
+        files.Write("MissionEntrancePlacements.json", placements);
+        files.Write("MissionDestinations.json", destinations);
+        Assert.ThrowsExactly<InvalidDataException>(() => MissionDestinationCatalog.Load(files.Root), defect);
+    }
+
+    [TestMethod]
+    public void DataOnlyPlacementAndPoolExpansionNeedsNoCountHashOrRuntimeCodeChange()
+    {
+        using var files = new TemporaryCatalog();
+        const uint addedInstance = 0xD1234567u;
+        const int addedOrigin = 999;
+        const int addedQuality = 34;
+        Assert.IsFalse(catalog.TryGetByIdentity(0xDAC6, addedInstance, out _));
+        Assert.IsFalse(catalog.TryGetObservedDestinations(addedQuality, out _));
+        JsonNode placements = files.Read("MissionEntrancePlacements.json");
+        JsonArray rows = placements["Placements"]!.AsArray();
+        JsonNode added = rows.First(row => row!["WorldPos"] != null)!.DeepClone();
+        added["IdentityInstance"] = addedInstance;
+        float x = MathF.BitIncrement((float)added["LocalX"]!.GetValue<double>());
+        added["LocalX"] = (double)x;
+        added["LocalXBits"] = BitConverter.SingleToUInt32Bits(x);
+        rows.Add(added);
+        JsonNode destinations = files.Read("MissionDestinations.json");
+        destinations["Pools"]!.AsArray().Add(new JsonObject
+        {
+            ["TerminalPlayfieldId"] = addedOrigin,
+            ["ExpectedMissionQl"] = addedQuality,
+            ["DestinationIdentities"] = new JsonArray(new JsonObject
+            {
+                ["IdentityType"] = 0xDAC6u, ["IdentityInstance"] = addedInstance
+            })
+        });
+        files.Write("MissionEntrancePlacements.json", placements);
+        files.Write("MissionDestinations.json", destinations);
+        var expanded = MissionDestinationCatalog.Load(files.Root);
+        Assert.AreEqual(catalog.Count + 1, expanded.Count);
+        Assert.AreEqual(catalog.ObservedDestinations.Count + 1, expanded.ObservedDestinations.Count);
+        Assert.AreEqual(catalog.TerminalPoolCount + 1, expanded.TerminalPoolCount);
+        Assert.IsTrue(expanded.TryGetDestinations(addedOrigin, addedQuality, out var pool, out bool fallback));
+        Assert.IsFalse(fallback);
+        Assert.AreEqual(addedInstance, pool.Single().IdentityInstance);
+        int next = 100000;
+        var response = GeneratedMissionRollService.Generate(CenteredBorealisRequest(), Owner, addedQuality, addedOrigin, 0, 0,
+            MissionLocationSide.Neutral, 1201445827, 17, 4567, () => next++, expanded, 2, 15, out var selected);
+        Assert.AreEqual(5, response.QuestInfos.Length);
+        Assert.AreEqual(5, selected.Count);
+        Assert.IsTrue(selected.All(identity => identity.Equals(pool.Single().Identity)));
+        Assert.AreEqual(5, response.QuestInfos.Select(value => value.QuestIdentity.Instance).Distinct().Count());
+        Assert.IsTrue(response.QuestInfos.All(value => BitConverter.SingleToUInt32Bits(value.QuestActions.Single().X) == BitConverter.SingleToUInt32Bits(x)));
+    }
+
+    [TestMethod]
+    public void ShadeLevel25NeutralBorealisUsesQualityFallbackAndPublishesFiveOffersThenChargesOnce()
+    {
+        // Live acceptance retained level 25 / neutral / breed 2 / profession 15 in PF 800,
+        // terminal 0xDAC1:0xC0020320, detent 6 and six raw zero secondary sliders.
         using var fixture = new RollFixture(25);
         fixture.Dao.BeforePublish = batch =>
         {
@@ -346,7 +446,8 @@ public sealed class MissionDestinationIntegrationTests
             Assert.AreEqual(5000, batch.CurrentCash);
             Assert.AreEqual(5, batch.Offers.Count);
             Assert.AreEqual(0, fixture.Session.Sent.OfType<QuestAlternativeMessage>().Count());
-            Assert.IsTrue(catalog.TryGetObservedDestinations(25, out var candidates));
+            Assert.IsTrue(catalog.TryGetDestinations(800, 25, out var candidates, out bool fallback));
+            Assert.IsTrue(fallback);
             foreach (var offer in batch.Offers)
             {
                 var identity = new MissionPlacementIdentity(unchecked((uint)offer.EntranceType), unchecked((uint)offer.EntranceInstance));
@@ -398,9 +499,6 @@ public sealed class MissionDestinationIntegrationTests
         Assert.IsFalse(fixture.Player.IsPersistenceQuarantined);
     }
 
-    static MissionDestinationCondition Condition(string type) => new(2, 1, 1, 2, 1, 15, 655, 56001,
-        TerminalInstance, SupportedSliders, type);
-
     static QuestAlternativeMessage CenteredBorealisRequest() => new()
     {
         Identity = Owner, VersionId = 4, LevelSlider = 6,
@@ -409,6 +507,15 @@ public sealed class MissionDestinationIntegrationTests
         PhysicalMysticalSlider = 255, HeadOnStealthSlider = 255, MoneyExperienceSlider = 255,
         QuestInfos = []
     };
+
+    static QuestAlternativeMessage LiveShadeRequest()
+    {
+        var request = CenteredBorealisRequest();
+        request.MissionTerminalIdentity = new() { Type = (IdentityType)0xDAC1, Instance = unchecked((int)0xC0020320u) };
+        request.GoodBadSlider = request.OrderChaosSlider = request.OpenHiddenSlider = 0;
+        request.PhysicalMysticalSlider = request.HeadOnStealthSlider = request.MoneyExperienceSlider = 0;
+        return request;
+    }
 
     static QuestAlternativeMessage Request() => new()
     {
@@ -426,6 +533,31 @@ public sealed class MissionDestinationIntegrationTests
         throw new DirectoryNotFoundException("The focused mission tests must run from this repository's build output.");
     }
 
+    static MissionPlacementIdentity ReadIdentity(JsonNode? node) => new(
+        node!["IdentityType"]!.GetValue<uint>(), node["IdentityInstance"]!.GetValue<uint>());
+
+    sealed class TemporaryCatalog : IDisposable
+    {
+        static readonly string[] Files = ["MissionEntrancePlacements.json", "MissionDestinations.json"];
+        internal readonly string Root = Path.Combine(Path.GetTempPath(), "aorebirth-mission-destination-" + Guid.NewGuid().ToString("N"));
+        internal string Directory => Path.Combine(Root, "Missions", "Destinations");
+        internal TemporaryCatalog()
+        {
+            System.IO.Directory.CreateDirectory(Directory);
+            string source = Path.Combine(FindRepositoryRoot(), "AORebirth", "GameData", "Missions", "Destinations");
+            foreach (string name in Files) File.Copy(Path.Combine(source, name), Path.Combine(Directory, name));
+        }
+        internal JsonNode Read(string name) => JsonNode.Parse(File.ReadAllText(Path.Combine(Directory, name)))!;
+        internal void Write(string name, JsonNode data) => File.WriteAllText(Path.Combine(Directory, name), data.ToJsonString());
+        public void Dispose()
+        {
+            foreach (string name in Files) File.Delete(Path.Combine(Directory, name));
+            System.IO.Directory.Delete(Directory);
+            System.IO.Directory.Delete(Path.Combine(Root, "Missions"));
+            System.IO.Directory.Delete(Root);
+        }
+    }
+
     sealed class RollFixture : IDisposable
     {
         internal readonly Player Player = TestWorld.CreatePlayer(Owner.Instance);
@@ -441,7 +573,7 @@ public sealed class MissionDestinationIntegrationTests
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(playfield, new Identity { Type = IdentityType.Playfield, Instance = 800 });
             var registry = new DynelRegistry();
-            var terminal = new MissionTerminal(CenteredBorealisRequest().MissionTerminalIdentity, new ItemTemplate());
+            var terminal = new MissionTerminal(LiveShadeRequest().MissionTerminalIdentity, new ItemTemplate());
             terminal.Playfield = playfield;
             registry.Register(terminal);
             _services = new ServiceCollection().AddSingleton(registry).AddSingleton(new PlayfieldLocality(800, null)).BuildServiceProvider();
@@ -457,7 +589,7 @@ public sealed class MissionDestinationIntegrationTests
             Session.BindPlayer(Player);
             _handler = new QuestAlternativeMessageHandler(Dao, new GeneratedMissionService(Dao, new StubLogger()), catalog);
         }
-        internal void Handle() => _handler.Handle(CenteredBorealisRequest(), Session);
+        internal void Handle() => _handler.Handle(LiveShadeRequest(), Session);
         public void Dispose() => _services.Dispose();
     }
 

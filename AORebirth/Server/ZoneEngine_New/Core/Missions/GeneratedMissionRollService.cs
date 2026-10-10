@@ -27,9 +27,9 @@ internal static class GeneratedMissionRollService
         if (!MissionRollSliders.TryCreate(request, out var sliders, out var error)) throw new ArgumentException(error, nameof(request));
         int level = MissionLevelRuntime.ClampCharacterLevel(characterLevel);
         int quality = MissionLevelRuntime.GetMissionQuality(characterLevel, request.LevelSlider);
-        // Provisional gameplay policy: reuse exact destinations positively observed at this expected QL.
-        // Other captured fields remain research metadata, not proven destination restrictions.
-        if (!catalog.TryGetObservedDestinations(quality, out var destinationPool) || destinationPool.Count == 0)
+        // Prefer observed terminal-playfield/QL destinations, with same-QL fallback for uncaptured origins.
+        // These pools describe observations; unobserved conditions are not proven exclusions.
+        if (!catalog.TryGetDestinations(terminalPlayfield, quality, out var destinationPool, out _) || destinationPool.Count == 0)
             throw new NotSupportedException("No mission destinations have been observed at expected QL " + quality + ".");
         var random = new Random(seed);
         var policy = MissionRollPolicy.Current;

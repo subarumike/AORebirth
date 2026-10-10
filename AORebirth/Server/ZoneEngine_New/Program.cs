@@ -264,7 +264,7 @@ namespace ZoneEngine_New
             services.AddSingleton<ICharacterQuestStore, MySqlCharacterQuestStore>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestService>();
             services.AddSingleton(_ => Utility.GameData.Missions.MissionDestinationCatalog.Load(
-                AORebirth.Core.GameData.GameDataPaths.ResolveRuntimeRoot(), requireObservedSelection: true));
+                AORebirth.Core.GameData.GameDataPaths.ResolveRuntimeRoot()));
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
 

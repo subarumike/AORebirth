@@ -1,6 +1,23 @@
 # AORebirth Project State
 
-Updated: 2026-10-09
+Updated: 2026-10-10
+
+PROVEN (2026-10-10, two-file mission destination migration on integration branch):
+MissionDestinationCatalog now loads only MissionDestinations.json and
+MissionEntrancePlacements.json. All 2,242 placements, 812 observed identities
+and WorldPos records, 47 origin/QL pools and 45 QL-wide pools are preserved.
+Selection prefers terminal-playfield/QL observations, then falls back within
+the same QL; uncovered QLs remain unsupported. This geographic policy is not
+proof of retail exclusions or probabilities. Capture-time QL labels deliberately
+preserve all existing pools; the known current-lookup QL22 discrepancy is not
+applied. Other mission generation, QL, content, DAO/schema and dungeon mechanics
+are unchanged. Runtime data is 2,059,393 bytes, 55.24% smaller.
+Offline comparison, approved build, 81 focused mission regressions, 74 real DAO
+identity checks and 275 full DAO checks passed before retiring the three old
+files. Offline comparison and all 81 focused tests passed again after retirement.
+Original-client validation of this migration remains UNVERIFIED; prior five-offer
+client acceptance belongs to 73fc97a75. No master merge or Linux deployment.
+See `docs/evidence/MISSION_DESTINATION_TWO_FILE_MIGRATION.md`.
 
 PROVEN (2026-10-09, original mission destination-distribution reconstruction):
 All 77 original journals reconcile to 93,185 retained offers: 92,830 raw-backed

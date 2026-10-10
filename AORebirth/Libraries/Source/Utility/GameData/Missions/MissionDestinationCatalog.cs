@@ -8,167 +8,141 @@ namespace Utility.GameData.Missions
     using System.Linq;
     using System.Runtime.Serialization;
     using System.Runtime.Serialization.Json;
-    using System.Security.Cryptography;
     using System.Xml;
 
     /// <summary>
-    /// Exact placement, observed expected-QL and captured-condition lookup. A roll may reference the same placement
-    /// repeatedly: DESTINATION_UNIQUENESS_WITHIN_COHORT_REQUIRED=NO.
+    /// Immutable entrance placements and destination pools loaded from editable runtime data.
+    /// A cohort may reference the same placement repeatedly.
     /// </summary>
     public sealed class MissionDestinationCatalog
     {
-        public const string ClientPlacementClassification = "CLIENT_ACGENTRANCE_PLACEMENT";
-        public const string ObservedClassification = "OBSERVED_RANDOM_MISSION_DESTINATION";
-        public const string UnobservedClassification = "CLIENT_ACGENTRANCE_NOT_YET_OBSERVED_IN_RANDOM_MISSION_CAPTURE";
-
         private const string PlacementFile = "MissionEntrancePlacements.json";
-        private const string ObservationFile = "ObservedMissionDestinations.json";
-        private const string ManifestFile = "MissionDestinationCatalogManifest.json";
-        private const string SelectionFile = "MissionDestinationSelection.json";
-        private const string SelectionPolicy = "UNIFORM_DISTINCT_DESTINATIONS_WITH_REPLACEMENT_NOT_RETAIL_WEIGHTED";
+        private const string DestinationFile = "MissionDestinations.json";
 
-        private readonly Dictionary<MissionPlacementIdentity, MissionEntrancePlacement> identities;
-        private readonly Dictionary<CoordinateKey, MissionEntrancePlacement> coordinates;
+        private static readonly IReadOnlyList<MissionEntrancePlacement> EmptyPlacements =
+            new ReadOnlyCollection<MissionEntrancePlacement>(new MissionEntrancePlacement[0]);
+        private readonly Dictionary<MissionPlacementIdentity, MissionEntrancePlacement> identities =
+            new Dictionary<MissionPlacementIdentity, MissionEntrancePlacement>();
+        private readonly Dictionary<CoordinateKey, MissionEntrancePlacement> coordinates =
+            new Dictionary<CoordinateKey, MissionEntrancePlacement>();
         private readonly Dictionary<int, IReadOnlyList<MissionEntrancePlacement>> playfields;
-        private readonly Dictionary<MissionPlacementIdentity, ObservedMissionDestinationEvidence> evidence;
-        private readonly Dictionary<MissionDestinationCondition, IReadOnlyList<MissionEntrancePlacement>> conditions =
-            new Dictionary<MissionDestinationCondition, IReadOnlyList<MissionEntrancePlacement>>();
+        private readonly Dictionary<TerminalQlKey, IReadOnlyList<MissionEntrancePlacement>> terminalPools =
+            new Dictionary<TerminalQlKey, IReadOnlyList<MissionEntrancePlacement>>();
         private readonly Dictionary<int, IReadOnlyList<MissionEntrancePlacement>> expectedMissionQls =
             new Dictionary<int, IReadOnlyList<MissionEntrancePlacement>>();
         private readonly Dictionary<MissionPlacementIdentity, MissionDestinationWorldPosition> worldPositions =
             new Dictionary<MissionPlacementIdentity, MissionDestinationWorldPosition>();
-        private static readonly IReadOnlyList<MissionEntrancePlacement> EmptyPlacements =
-            new ReadOnlyCollection<MissionEntrancePlacement>(new MissionEntrancePlacement[0]);
+        private readonly HashSet<MissionPlacementIdentity> pooledIdentities = new HashSet<MissionPlacementIdentity>();
 
-        private MissionDestinationCatalog(
-            CatalogManifestData manifest,
-            PlacementData[] placementRows,
-            ObservedDestinationData[] observedRows)
+        private MissionDestinationCatalog(PlacementData[] placementRows, MissionDestinationPoolData[] poolRows)
         {
-            identities = new Dictionary<MissionPlacementIdentity, MissionEntrancePlacement>();
-            coordinates = new Dictionary<CoordinateKey, MissionEntrancePlacement>();
-            evidence = new Dictionary<MissionPlacementIdentity, ObservedMissionDestinationEvidence>();
             var placementList = new List<MissionEntrancePlacement>();
-            var observedList = new List<ObservedMissionDestinationEvidence>();
-            var observedPlayfields = new HashSet<int>();
             foreach (PlacementData row in placementRows)
             {
                 ValidatePlacement(row);
                 var placement = new MissionEntrancePlacement(row);
-                var key = new CoordinateKey(row.PlayfieldId, row.LocalXBits, row.LocalYBits, row.LocalZBits);
+                var coordinate = new CoordinateKey(row.PlayfieldId, row.LocalXBits, row.LocalYBits, row.LocalZBits);
                 Require(!identities.ContainsKey(placement.Identity), "Duplicate complete placement identity: " + placement.Identity);
-                Require(!coordinates.ContainsKey(key), "Ambiguous exact coordinate key for placement: " + placement.Identity);
+                Require(!coordinates.ContainsKey(coordinate), "Ambiguous exact coordinate key for placement: " + placement.Identity);
                 identities.Add(placement.Identity, placement);
-                coordinates.Add(key, placement);
+                coordinates.Add(coordinate, placement);
                 placementList.Add(placement);
+                if (row.WorldPos != null)
+                {
+                    Require(row.WorldPos.PlayfieldIdentityType == 40016,
+                        "Invalid WorldPos playfield identity type: " + placement.Identity);
+                    worldPositions.Add(placement.Identity, new MissionDestinationWorldPosition(placement.Identity, row.WorldPos));
+                }
             }
 
-            long observationCount = 0;
-            foreach (ObservedDestinationData row in observedRows)
+            foreach (MissionDestinationPoolData row in poolRows)
             {
-                ValidateObserved(row);
-                var identity = new MissionPlacementIdentity(row.IdentityType, row.IdentityInstance);
-                MissionEntrancePlacement placement;
-                Require(identities.TryGetValue(identity, out placement), "Observed identity absent from full catalog: " + identity);
-                Require(!evidence.ContainsKey(identity), "Duplicate observed identity: " + identity);
-                Require(placement.ObservationClassification == ObservedClassification, "Contradictory observed classification: " + identity);
-                var observation = new ObservedMissionDestinationEvidence(row, placement.PlayfieldId);
-                evidence.Add(identity, observation);
-                observedList.Add(observation);
-                observedPlayfields.Add(placement.PlayfieldId);
-                observationCount += row.ObservationCount;
+                Require(row != null && row.TerminalPlayfieldId > 0 && row.ExpectedMissionQl > 0,
+                    "Invalid destination pool terminal playfield or expected QL.");
+                var key = new TerminalQlKey(row.TerminalPlayfieldId, row.ExpectedMissionQl);
+                Require(!terminalPools.ContainsKey(key), "Duplicate terminal playfield and expected QL pool.");
+                Require(row.DestinationIdentities != null && row.DestinationIdentities.Length > 0,
+                    "Empty destination pool.");
+                var pool = new List<MissionEntrancePlacement>();
+                var unique = new HashSet<MissionPlacementIdentity>();
+                foreach (MissionIdentityData destination in row.DestinationIdentities)
+                {
+                    Require(destination != null, "Null destination pool identity.");
+                    var identity = new MissionPlacementIdentity(destination.IdentityType, destination.IdentityInstance);
+                    MissionEntrancePlacement placement;
+                    Require(identities.TryGetValue(identity, out placement), "Destination identity absent from placements: " + identity);
+                    Require(worldPositions.ContainsKey(identity), "Destination identity has no WorldPos: " + identity);
+                    Require(unique.Add(identity), "Duplicate destination identity in pool: " + identity);
+                    pool.Add(placement);
+                    pooledIdentities.Add(identity);
+                }
+                terminalPools.Add(key, pool.AsReadOnly());
             }
 
-            Require(observationCount == manifest.RawBackedObservationCount, "Raw-backed observation total mismatch.");
-            Require(observedPlayfields.Count == manifest.ObservedPlayfieldCount, "Observed playfield count mismatch.");
-            foreach (MissionEntrancePlacement placement in placementList)
+            foreach (var group in terminalPools.GroupBy(x => x.Key.ExpectedMissionQl))
             {
-                Require(
-                    (placement.ObservationClassification == ObservedClassification) == evidence.ContainsKey(placement.Identity),
-                    "Placement observation classification contradicts observed catalog: " + placement.Identity);
+                var pool = group.SelectMany(x => x.Value).Select(x => x.Identity).Distinct()
+                    .OrderBy(x => x.IdentityType).ThenBy(x => x.IdentityInstance)
+                    .Select(x => identities[x]).ToList().AsReadOnly();
+                expectedMissionQls.Add(group.Key, pool);
             }
 
             Placements = placementList.AsReadOnly();
-            ObservedDestinations = observedList.AsReadOnly();
+            ObservedDestinations = pooledIdentities.OrderBy(x => x.IdentityType).ThenBy(x => x.IdentityInstance)
+                .Select(x => identities[x]).ToList().AsReadOnly();
+            ExpectedMissionQls = expectedMissionQls.Keys.OrderBy(x => x).ToList().AsReadOnly();
             playfields = placementList.GroupBy(x => x.PlayfieldId).ToDictionary(
                 x => x.Key, x => (IReadOnlyList<MissionEntrancePlacement>)x.ToList().AsReadOnly());
-            SourceEvidenceCommit = manifest.SourceEvidenceCommit;
-            CapturedConditions = new ReadOnlyCollection<MissionDestinationCondition>(new MissionDestinationCondition[0]);
         }
 
         public int Count { get { return Placements.Count; } }
         public IReadOnlyList<MissionEntrancePlacement> Placements { get; }
-        public IReadOnlyList<ObservedMissionDestinationEvidence> ObservedDestinations { get; }
-        public string SourceEvidenceCommit { get; }
-        public bool DestinationUniquenessWithinCohortRequired { get { return false; } }
-        public bool HasObservedSelection { get { return conditions.Count > 0; } }
-        public int ObservedConditionCount { get { return conditions.Count; } }
+        public IReadOnlyList<MissionEntrancePlacement> ObservedDestinations { get; }
+        public IReadOnlyList<int> ExpectedMissionQls { get; }
+        public int TerminalPoolCount { get { return terminalPools.Count; } }
         public int ObservedWorldPositionCount { get { return worldPositions.Count; } }
-        public IReadOnlyList<MissionDestinationCondition> CapturedConditions { get; private set; }
+        public bool DestinationUniquenessWithinCohortRequired { get { return false; } }
 
         /// <summary>
-        /// The caller supplies its already-selected GameData root. Normal loading reads only
-        /// compact content only. Runtime callers require the fourth, captured-selection file;
-        /// three-file foundation consumers retain lookup-only support. An invalid present file always fails.
+        /// Loads the two runtime catalogs from the caller's selected GameData root.
+        /// Captures, analysis artifacts and source manifests are not runtime dependencies.
         /// </summary>
-        public static MissionDestinationCatalog Load(string gameDataRoot, string repositoryRoot = null, bool requireObservedSelection = false)
+        public static MissionDestinationCatalog Load(string gameDataRoot)
         {
             if (string.IsNullOrWhiteSpace(gameDataRoot))
                 throw new ArgumentException("A GameData root is required.", nameof(gameDataRoot));
 
             string directory = Path.Combine(gameDataRoot, "Missions", "Destinations");
-            var manifest = Read<CatalogManifestData>(File.ReadAllBytes(Path.Combine(directory, ManifestFile)), ManifestFile);
-            ValidateManifest(manifest);
-            byte[] placementBytes = File.ReadAllBytes(Path.Combine(directory, PlacementFile));
-            byte[] observationBytes = File.ReadAllBytes(Path.Combine(directory, ObservationFile));
-            CheckHash(placementBytes, manifest.Files.Single(x => x.Path == PlacementFile).Sha256, PlacementFile);
-            CheckHash(observationBytes, manifest.Files.Single(x => x.Path == ObservationFile).Sha256, ObservationFile);
-
-            if (repositoryRoot != null)
-            {
-                if (string.IsNullOrWhiteSpace(repositoryRoot))
-                    throw new ArgumentException("A nonempty development repository root is required.", nameof(repositoryRoot));
-                foreach (SourceHashData source in manifest.Sources.Concat(new[] { manifest.Generator }))
-                {
-                    CheckHash(File.ReadAllBytes(Path.Combine(repositoryRoot, source.Path.Replace('/', Path.DirectorySeparatorChar))),
-                        source.Sha256, source.Path);
-                }
-            }
-
-            var placements = Read<PlacementCatalogData>(placementBytes, PlacementFile);
-            var observed = Read<ObservedCatalogData>(observationBytes, ObservationFile);
-            Require(placements != null && placements.SchemaVersion == 1 && placements.CatalogKind == "CLIENT_ACGENTRANCE_PLACEMENTS",
+            var placements = Read<PlacementCatalogData>(File.ReadAllBytes(Path.Combine(directory, PlacementFile)), PlacementFile);
+            var destinations = Read<MissionDestinationData>(File.ReadAllBytes(Path.Combine(directory, DestinationFile)), DestinationFile);
+            Require(placements != null && placements.SchemaVersion == 2 && placements.CatalogKind == "MISSION_ENTRANCE_PLACEMENTS",
                 "Unsupported placement schema or catalog kind.");
-            Require(observed != null && observed.SchemaVersion == 1 && observed.CatalogKind == "OBSERVED_RANDOM_MISSION_DESTINATIONS",
-                "Unsupported observation schema or catalog kind.");
-            Require(placements.Placements != null && placements.Placements.Length == manifest.FullPlacementCount,
-                "Full placement row count mismatch.");
-            Require(observed.Destinations != null && observed.Destinations.Length == manifest.ObservedDestinationCount,
-                "Observed destination row count mismatch.");
-            var catalog = new MissionDestinationCatalog(manifest, placements.Placements, observed.Destinations);
-            string selectionPath = Path.Combine(directory, SelectionFile);
-            if (File.Exists(selectionPath))
-            {
-                catalog.LoadSelection(Read<MissionSelectionData>(File.ReadAllBytes(selectionPath), SelectionFile), directory);
-            }
-            else if (requireObservedSelection)
-                throw new InvalidDataException("Captured mission destination selection data is required: " + SelectionFile);
-            return catalog;
+            Require(destinations != null && destinations.SchemaVersion == 1 && destinations.CatalogKind == "MISSION_DESTINATIONS",
+                "Unsupported destination schema or catalog kind.");
+            Require(placements.Placements != null && placements.Placements.Length > 0, "Placement catalog is empty.");
+            Require(destinations.Pools != null && destinations.Pools.Length > 0, "Destination catalog is empty.");
+            return new MissionDestinationCatalog(placements.Placements, destinations.Pools);
         }
 
-        public bool TryGetObservedDestinations(MissionDestinationCondition condition, out IReadOnlyList<MissionEntrancePlacement> destinations)
+        /// <summary>
+        /// Uses the terminal playfield's exact-QL pool when present, otherwise the union at that same QL.
+        /// Missing QLs remain unsupported; no neighboring-QL or all-placement fallback is used.
+        /// </summary>
+        public bool TryGetDestinations(int terminalPlayfield, int expectedQl,
+            out IReadOnlyList<MissionEntrancePlacement> destinations, out bool usedQlFallback)
         {
-            if (condition != null && conditions.TryGetValue(condition, out destinations))
+            usedQlFallback = false;
+            if (terminalPools.TryGetValue(new TerminalQlKey(terminalPlayfield, expectedQl), out destinations))
                 return true;
+            if (expectedMissionQls.TryGetValue(expectedQl, out destinations))
+            {
+                usedQlFallback = true;
+                return true;
+            }
             destinations = EmptyPlacements;
             return false;
         }
 
-        /// <summary>
-        /// Unions positive observations at exactly this expected QL under the approved catalog reuse policy.
-        /// Other captured conditions remain provenance, not proven exclusions. This does not establish
-        /// complete retail eligibility or reuse observations from a different QL.
-        /// </summary>
         public bool TryGetObservedDestinations(int expectedMissionQl, out IReadOnlyList<MissionEntrancePlacement> destinations)
         {
             if (expectedMissionQls.TryGetValue(expectedMissionQl, out destinations))
@@ -180,103 +154,6 @@ namespace Utility.GameData.Missions
         public bool TryGetWorldPosition(MissionPlacementIdentity identity, out MissionDestinationWorldPosition worldPosition)
         {
             return worldPositions.TryGetValue(identity, out worldPosition);
-        }
-
-        private void LoadSelection(MissionSelectionData document, string directory)
-        {
-            Require(document != null && document.Manifest != null && document.Payload != null, "Missing selection document.");
-            MissionSelectionManifestData manifest = document.Manifest;
-            Require(manifest.SchemaVersion == 1
-                && manifest.SourceEvidenceCommit == "f07bb3c1a99218433e7d459c95ba29ccb22c36b2"
-                && IsHex(manifest.PayloadSha256, 64), "Unsupported captured selection provenance.");
-            Require(manifest.FoundationFiles != null && manifest.FoundationFiles.Length == 3,
-                "Selection must identify all three foundation files.");
-            var foundationPaths = new HashSet<string>(StringComparer.Ordinal);
-            foreach (SourceHashData source in manifest.FoundationFiles)
-            {
-                ValidateSource(source);
-                Require((source.Path == PlacementFile || source.Path == ObservationFile || source.Path == ManifestFile)
-                    && foundationPaths.Add(source.Path), "Invalid selection foundation file.");
-                CheckHash(File.ReadAllBytes(Path.Combine(directory, source.Path)), source.Sha256, source.Path);
-            }
-            Require(manifest.Sources != null && manifest.Sources.Length > 0, "Selection source provenance is absent.");
-            var sourcePaths = new HashSet<string>(StringComparer.Ordinal);
-            foreach (SourceHashData source in manifest.Sources)
-            {
-                ValidateSource(source);
-                Require(sourcePaths.Add(source.Path), "Duplicate selection source provenance.");
-            }
-            ValidateSource(manifest.Generator);
-            Require(manifest.Generator.Path == "Tools/mission_destination_selection.py", "Unexpected selection generator.");
-            MissionSelectionPayloadData payload = document.Payload;
-            using (var stream = new MemoryStream())
-            {
-                new DataContractJsonSerializer(typeof(MissionSelectionPayloadData),
-                    new DataContractJsonSerializerSettings { MaxItemsInObjectGraph = 1000000 }).WriteObject(stream, payload);
-                CheckHash(stream.ToArray(), manifest.PayloadSha256, "canonical selection payload");
-            }
-            Require(payload.SchemaVersion == 1 && payload.CatalogKind == "CAPTURED_MISSION_DESTINATION_SELECTION"
-                && payload.SelectionPolicy == SelectionPolicy && payload.RawBackedObservationCount == 92830,
-                "Unsupported captured selection contract.");
-            Require(payload.WorldPositions != null && payload.WorldPositions.Length == 812
-                && payload.Conditions != null && payload.Conditions.Length == 547, "Captured selection count mismatch.");
-            foreach (MissionWorldPositionData row in payload.WorldPositions)
-            {
-                Require(row != null && row.PlayfieldIdentityType == 40016, "Invalid captured WorldPos row.");
-                var identity = new MissionPlacementIdentity(row.IdentityType, row.IdentityInstance);
-                Require(evidence.ContainsKey(identity) && !worldPositions.ContainsKey(identity),
-                    "Duplicate or unobserved WorldPos identity: " + identity);
-                worldPositions.Add(identity, new MissionDestinationWorldPosition(row));
-            }
-            var conditionList = new List<MissionDestinationCondition>();
-            var selectedIdentities = new HashSet<MissionPlacementIdentity>();
-            int associationCount = 0;
-            foreach (MissionConditionData row in payload.Conditions)
-            {
-                Require(row != null && row.CharacterLevel >= 1 && row.CharacterLevel <= 220
-                    && row.ExpectedMissionQl >= 1 && row.ExpectedMissionQl <= 250
-                    && row.DifficultyDetent >= 1 && row.DifficultyDetent <= 11 && row.FactionSide >= 0
-                    && row.Breed > 0 && row.Profession > 0 && row.TerminalPlayfieldId > 0
-                    && row.TerminalIdentityType > 0 && row.TerminalIdentityInstance > 0
-                    && row.SecondarySliderBytes != null && row.SecondarySliderBytes.Length == 6
-                    && row.SecondarySliderBytes.All(x => x >= 0 && x <= 255), "Invalid captured condition.");
-                Require(new[] { "FIND_ITEM", "FIND_PERSON", "KILL_PERSON", "REPAIR", "RETURN_ITEM" }.Contains(row.MissionType),
-                    "Unknown captured mission type.");
-                var condition = new MissionDestinationCondition(row.CharacterLevel, row.ExpectedMissionQl, row.DifficultyDetent,
-                    row.FactionSide, row.Breed, row.Profession, row.TerminalPlayfieldId, row.TerminalIdentityType,
-                    row.TerminalIdentityInstance, row.SecondarySliderBytes.Select(x => (byte)x).ToArray(), row.MissionType);
-                Require(!conditions.ContainsKey(condition), "Duplicate captured joint condition.");
-                Require(row.DestinationIdentities != null && row.DestinationIdentities.Length > 0, "Empty captured destination set.");
-                var destinations = new List<MissionEntrancePlacement>();
-                var unique = new HashSet<MissionPlacementIdentity>();
-                foreach (MissionIdentityData destination in row.DestinationIdentities)
-                {
-                    Require(destination != null, "Null captured destination identity.");
-                    var identity = new MissionPlacementIdentity(destination.IdentityType, destination.IdentityInstance);
-                    Require(worldPositions.ContainsKey(identity) && unique.Add(identity), "Unobserved or duplicate condition destination.");
-                    ObservedMissionDestinationEvidence observed = evidence[identity];
-                    Require(observed.ObservedCharacterLevels.Contains(row.CharacterLevel)
-                        && observed.ObservedExpectedMissionQls.Contains(row.ExpectedMissionQl)
-                        && observed.ObservedFactionSideValues.Contains(row.FactionSide)
-                        && observed.ObservedTerminalPlayfields.Contains(row.TerminalPlayfieldId)
-                        && observed.ObservedMissionTypes.Contains(row.MissionType), "Condition contradicts foundation observations.");
-                    destinations.Add(identities[identity]);
-                    selectedIdentities.Add(identity);
-                }
-                associationCount += destinations.Count;
-                conditions.Add(condition, destinations.AsReadOnly());
-                conditionList.Add(condition);
-            }
-            Require(associationCount == 25296 && selectedIdentities.SetEquals(evidence.Keys),
-                "Captured selection associations or identity coverage mismatch.");
-            CapturedConditions = conditionList.AsReadOnly();
-            foreach (var group in conditions.GroupBy(x => x.Key.ExpectedMissionQl))
-            {
-                var destinations = group.SelectMany(x => x.Value).Select(x => x.Identity).Distinct()
-                    .OrderBy(x => x.IdentityType).ThenBy(x => x.IdentityInstance)
-                    .Select(x => identities[x]).ToList().AsReadOnly();
-                expectedMissionQls.Add(group.Key, destinations);
-            }
         }
 
         public MissionEntrancePlacement GetByIdentity(uint identityType, uint identityInstance)
@@ -302,52 +179,7 @@ namespace Utility.GameData.Missions
 
         public bool IsObservedRandomMissionDestination(MissionPlacementIdentity identity)
         {
-            return evidence.ContainsKey(identity);
-        }
-
-        public ObservedMissionDestinationEvidence GetObservedEvidence(MissionPlacementIdentity identity)
-        {
-            ObservedMissionDestinationEvidence result;
-            return evidence.TryGetValue(identity, out result) ? result : null;
-        }
-
-        private static void ValidateManifest(CatalogManifestData manifest)
-        {
-            Require(manifest != null && manifest.SchemaVersion == 1, "Unsupported catalog manifest schema.");
-            Require(IsHex(manifest.SourceEvidenceCommit, 40), "Invalid source evidence commit.");
-            // Version 1 is the explicitly bounded accepted corpus, not an inferred eligibility pool.
-            Require(manifest.FullPlacementCount == 2242 && manifest.ObservedDestinationCount == 812
-                && manifest.ObservedPlayfieldCount == 22 && manifest.UnobservedPlacementCount == 1430
-                && manifest.RawBackedObservationCount == 92830 && manifest.MissingRawOffersExcluded == 355
-                && manifest.MissingRawOffersPromoted == 0 && manifest.OperationalEntranceKeysResolved == 0
-                && !manifest.DestinationUniquenessWithinCohortRequired, "Contradictory version 1 corpus manifest.");
-            Require(manifest.Files != null && manifest.Files.Length == 2 && manifest.Files.All(x => x != null),
-                "Manifest must identify exactly two compact data files.");
-            Require(manifest.Files.Count(x => x.Path == PlacementFile && x.RowCount == manifest.FullPlacementCount) == 1
-                && manifest.Files.Count(x => x.Path == ObservationFile && x.RowCount == manifest.ObservedDestinationCount) == 1,
-                "Unexpected or repeated manifest data file.");
-            foreach (CatalogFileData file in manifest.Files)
-            {
-                Require(IsHex(file.Sha256, 64), "Invalid content hash: " + file.Path);
-            }
-            Require(manifest.Sources != null && manifest.Sources.Length > 0, "Source evidence hash inventory is absent.");
-            var paths = new HashSet<string>(StringComparer.Ordinal);
-            foreach (SourceHashData source in manifest.Sources)
-            {
-                ValidateSource(source);
-                Require(paths.Add(source.Path), "Duplicate source provenance path: " + source.Path);
-            }
-            ValidateSource(manifest.Generator);
-            Require(manifest.Generator.Path == "Tools/mission_destination_catalog.py", "Unexpected catalog generator path.");
-        }
-
-        private static void ValidateSource(SourceHashData source)
-        {
-            Require(source != null && !string.IsNullOrWhiteSpace(source.Path), "Source provenance is absent.");
-            Require(!Path.IsPathRooted(source.Path) && source.Path.IndexOf('\\') < 0 && source.Path.IndexOf(':') < 0
-                && source.Path.Split('/').All(x => x.Length > 0 && x != "." && x != ".."),
-                "Source provenance must be repository-relative: " + source.Path);
-            Require(IsHex(source.Sha256, 64), "Invalid source provenance hash: " + source.Path);
+            return pooledIdentities.Contains(identity);
         }
 
         private static void ValidatePlacement(PlacementData row)
@@ -362,53 +194,43 @@ namespace Utility.GameData.Missions
             ValidateBinary32(row.RotationComponent1, "rotation 1");
             ValidateBinary32(row.RotationComponent2, "rotation 2");
             ValidateBinary32(row.RotationComponent3, "rotation 3");
-            Require(row.Classification == ClientPlacementClassification
-                && (row.ObservationClassification == ObservedClassification || row.ObservationClassification == UnobservedClassification),
-                "Unknown placement evidence classification.");
-            Require(!row.OperationalEntranceKey.HasValue && !row.EffectiveStatBd.HasValue,
-                "Operational entrance key and effective stat BD must remain unresolved nulls.");
             Require(!string.IsNullOrEmpty(row.DisplayName) && row.RawNameHex != null
                 && row.RawNameHex.Length > 0 && row.RawNameHex.Length % 2 == 0 && IsHex(row.RawNameHex, row.RawNameHex.Length),
-                "Missing or malformed placement name provenance.");
+                "Missing or malformed placement name bytes.");
             var characters = new char[row.RawNameHex.Length / 2];
             for (int i = 0; i < characters.Length; i++)
             {
                 characters[i] = (char)byte.Parse(row.RawNameHex.Substring(i * 2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             }
             Require(new string(characters) == row.DisplayName, "Display name differs from byte-preserving raw name.");
-            Require(row.NameProvenance != null && !string.IsNullOrWhiteSpace(row.NameProvenance.Encoding)
-                && !string.IsNullOrWhiteSpace(row.NameProvenance.ResolutionPath)
-                && row.NameProvenance.ResourceType > 0 && row.NameProvenance.ResourceInstance > 0 && row.NameProvenance.SourceOffset >= 0,
-                "Incomplete name source provenance.");
-            Require(row.TemplateInstance > 0 && row.SourcePlacementContainer != null
-                && row.SourcePlacementContainer.ResourceType > 0 && row.SourcePlacementContainer.ResourceInstance > 0
-                && row.SourceRecordOffset >= 0 && row.SourceRecordLength > 0 && IsHex(row.SourceRecordSha256, 64)
-                && IsHex(row.SourceDatabaseSha256, 64), "Incomplete placement source provenance.");
         }
 
-        private static void ValidateObserved(ObservedDestinationData row)
+        private readonly struct TerminalQlKey : IEquatable<TerminalQlKey>
         {
-            Require(row != null && row.IdentityType > 0 && row.IdentityInstance > 0, "Invalid observed destination identity.");
-            Require(row.Classification == ObservedClassification, "Invalid observed destination classification.");
-            Require(row.ObservationCount > 0 && row.RequestCount > 0 && row.CohortCount > 0 && row.SessionCount > 0
-                && row.RequestCount <= row.ObservationCount && row.CohortCount <= row.ObservationCount
-                && row.SessionCount <= row.RequestCount && row.SessionCount <= row.CohortCount,
-                "Invalid observed evidence counts.");
-            ValidateSet(row.ObservedExpectedMissionQls, "expected mission QLs", x => x > 0);
-            ValidateSet(row.ObservedCharacterLevels, "character levels", x => x > 0);
-            ValidateSet(row.ObservedTerminalPlayfields, "terminal playfields", x => x > 0);
-            ValidateSet(row.ObservedMissionTypes, "mission types", x => !string.IsNullOrWhiteSpace(x));
-            ValidateSet(row.ObservedFactionSides, "faction sides", x => !string.IsNullOrWhiteSpace(x));
-            ValidateSet(row.ObservedFactionSideValues, "faction side values", x => x >= 0);
-            Require(row.ObservedFactionSides.Length == 1 && row.ObservedFactionSides[0] == "Omni"
-                && row.ObservedFactionSideValues.Length == 1 && row.ObservedFactionSideValues[0] == 2
-                && row.FactionEvidenceClassification == "OBSERVED_WITH_OMNI", "Contradictory observed faction evidence.");
-        }
+            private readonly int terminalPlayfield;
 
-        private static void ValidateSet<T>(T[] values, string label, Func<T, bool> valid)
-        {
-            Require(values != null && values.Length > 0 && values.All(valid)
-                && new HashSet<T>(values).Count == values.Length, "Missing, invalid or repeated observed " + label + ".");
+            public TerminalQlKey(int terminalPlayfield, int expectedMissionQl)
+            {
+                this.terminalPlayfield = terminalPlayfield;
+                ExpectedMissionQl = expectedMissionQl;
+            }
+
+            public int ExpectedMissionQl { get; }
+
+            public bool Equals(TerminalQlKey other)
+            {
+                return terminalPlayfield == other.terminalPlayfield && ExpectedMissionQl == other.ExpectedMissionQl;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is TerminalQlKey && Equals((TerminalQlKey)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked { return (terminalPlayfield * 397) ^ ExpectedMissionQl; }
+            }
         }
 
         private static void ValidateCoordinate(double value, uint bits, string axis)
@@ -520,15 +342,6 @@ namespace Utility.GameData.Missions
         {
             return value != null && value.Length == length && value.All(
                 x => (x >= '0' && x <= '9') || (x >= 'a' && x <= 'f') || (x >= 'A' && x <= 'F'));
-        }
-
-        private static void CheckHash(byte[] bytes, string expected, string label)
-        {
-            using (SHA256 hash = SHA256.Create())
-            {
-                string actual = BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
-                Require(string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase), "SHA-256 mismatch: " + label);
-            }
         }
 
         private static void Require(bool condition, string message)

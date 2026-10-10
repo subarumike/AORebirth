@@ -38,7 +38,7 @@ public sealed class QuestDungeonDestinationTests
     public TestContext TestContext { get; set; } = null!;
 
     static readonly Lazy<MissionDestinationCatalog> Catalog = new(() =>
-        MissionDestinationCatalog.Load(Path.Combine(RepositoryRoot(), "AORebirth", "GameData"), requireObservedSelection: true));
+        MissionDestinationCatalog.Load(Path.Combine(RepositoryRoot(), "AORebirth", "GameData")));
     static readonly Lazy<GameDataStore> RuntimeData = new(() =>
     {
         string? root = Environment.GetEnvironmentVariable(GameDataPaths.EnvironmentVariableName);
@@ -276,6 +276,78 @@ public sealed class QuestDungeonDestinationTests
         Assert.IsNotNull(login.Position);
     }
 
+    [TestMethod]
+    public void JournalDeletionSavesAbandonmentBeforeEndingKeysAndPreventsEntry()
+    {
+        using var f = new Fixture();
+        Assert.IsNull(f.Accept());
+        Identity journal = f.Session.Sent.OfType<QuestFullUpdateMessage>().Single().Quests.Single().QuestId;
+        string frozenDestination = f.Store.Generated!.AcgBuildingGeneratorJson;
+        int keyInstance = f.Player.Inventory.Inventory.Content.Values.Single().InstanceId;
+        f.Store.BeforeEndKeys = questId =>
+        {
+            Assert.AreEqual(f.Store.Generated.QuestId, questId);
+            Assert.AreEqual((int)QuestState.Abandoned, f.Store.Character!.State);
+            Assert.IsTrue(f.Session.Sent.OfType<QuestMessage>().Any(message => message.Action == QuestAction.Delete
+                && message.Mission.Equals(journal)), "Persist abandonment and delete the journal entry before ending its keys.");
+        };
+        Assert.IsTrue(f.Abandon(journal.Instance));
+        Assert.AreEqual(1, f.Store.EndKeysCalls);
+        Assert.AreEqual(0, f.Store.Links.Count);
+        CollectionAssert.AreEqual(new[] { keyInstance }, f.Store.RetiredKeys.ToArray());
+        Assert.AreEqual(frozenDestination, f.Store.Generated.AcgBuildingGeneratorJson, "Ending a quest must not change its frozen entrance.");
+        Assert.IsFalse(f.Abandon(journal.Instance), "An already ended journal entry must not end keys twice.");
+        Assert.AreEqual(1, f.Store.EndKeysCalls);
+        f.Persistence.BeforeMutation = batch =>
+        {
+            Assert.AreEqual(0, f.Store.Links.Count);
+            Assert.AreEqual(keyInstance, batch.Locations.Single().InstanceId);
+        };
+        Assert.IsFalse(f.Service.TryEnter(f.Player, f.Target));
+        Assert.AreEqual(0, f.Session.Transfers.Count);
+        Assert.AreEqual(0, f.Player.Inventory.Inventory.Content.Count);
+        Assert.IsTrue(f.Session.Sent.OfType<CharacterActionMessage>().Any(message => message.Action == CharacterActionType.DeleteItem));
+        f.AssertNoErrors();
+    }
+
+    [TestMethod]
+    public void UnlinkedKeyRemovalCommitsBeforeDeletingOnlyTheRetiredKeyFromInventory()
+    {
+        using var f = new Fixture();
+        Assert.IsNull(f.Accept());
+        var key = f.Player.Inventory.Inventory.Content.Single();
+        int unrelatedSlot = f.Player.Inventory.Inventory.FindFreeSlot();
+        Item unrelated = TestWorld.CreateItem(lowId: QuestDungeonService.DuplicatorLowId, instanceId: 700001);
+        f.Player.Inventory.Inventory.Add(unrelatedSlot, unrelated);
+        f.Store.Links.Remove(key.Value.InstanceId);
+        f.Session.Sent.Clear();
+        f.Persistence.BeforeMutation = batch =>
+        {
+            Assert.IsTrue(Monitor.IsEntered(f.Player.PersistenceGate));
+            Assert.AreSame(key.Value, f.Player.Inventory.Inventory.Content[key.Key]);
+            Assert.IsFalse(f.Session.Sent.OfType<CharacterActionMessage>().Any());
+            CollectionAssert.AreEqual(new[] { key.Value.InstanceId }, f.Store.RetiredKeys.ToArray());
+            ItemLocationUpdate retired = batch.Locations.Single();
+            Assert.AreEqual(key.Value.InstanceId, retired.InstanceId);
+            Assert.AreEqual((int)IdentityType.None, retired.ContainerType);
+            Assert.AreEqual(f.Player.Identity.Instance, retired.ContainerInstance);
+        };
+        f.Service.RestoreKeys(f.Player);
+        Assert.AreEqual(1, f.Persistence.MutationCalls);
+        Assert.IsFalse(f.Player.Inventory.Inventory.Content.ContainsKey(key.Key));
+        Assert.AreSame(unrelated, f.Player.Inventory.Inventory.Content.Single().Value);
+        CharacterActionMessage deletion = f.Session.Sent.OfType<CharacterActionMessage>().Single();
+        Assert.AreEqual(CharacterActionType.DeleteItem, deletion.Action);
+        Assert.AreEqual(IdentityType.Inventory, deletion.Target.Type);
+        Assert.AreEqual(key.Key, deletion.Target.Instance);
+        Assert.AreEqual(0, f.Session.Sent.OfType<SimpleItemFullUpdateMessage>().Count());
+        f.Service.RestoreKeys(f.Player);
+        Assert.AreEqual(1, f.Persistence.MutationCalls, "A removed key must not be retired or deleted again on restore.");
+        Assert.IsFalse(f.Service.TryEnter(f.Player, f.Target));
+        Assert.AreEqual(0, f.Session.Transfers.Count);
+        f.AssertNoErrors();
+    }
+
     static string RepositoryRoot()
     {
         for (DirectoryInfo? directory = new(AppContext.BaseDirectory); directory != null; directory = directory.Parent)
@@ -293,6 +365,7 @@ public sealed class QuestDungeonDestinationTests
         internal readonly DungeonLayoutGenerator Layouts;
         internal readonly PlayfieldManager Manager;
         internal readonly GeneratedMissionOffer Offer;
+        internal readonly Persistence Persistence = new();
         internal QuestDungeonService Service = null!;
         readonly DiagnosticLogger _logger = new();
         readonly StubItemBuilder _items = new();
@@ -320,9 +393,8 @@ public sealed class QuestDungeonDestinationTests
             Offers.Offer = Offer;
             Store.Offer = Offer;
             var lazyManager = new Lazy<PlayfieldManager>(() => Manager ?? throw new InvalidOperationException("Fixture manager is not initialized."));
-            var persistence = new Persistence();
-            _flush = new InventoryFlushService(lazyManager, persistence, _logger);
-            _actions = new InventoryActionService(persistence, _flush, _ids, _logger);
+            _flush = new InventoryFlushService(lazyManager, Persistence, _logger);
+            _actions = new InventoryActionService(Persistence, _flush, _ids, _logger);
             _quests = new QuestService(new QuestCatalog(RuntimeData.Value, _logger), Store, _items, _flush, _logger);
             Layouts = new DungeonLayoutGenerator(RuntimeData.Value, _logger);
             Assert.IsTrue(Layouts.IsAvailable, "Existing runtime GameData must contain procedural style 324. Root=" + RuntimeData.Value.RootPath + "; " + _logger.Errors);
@@ -332,7 +404,7 @@ public sealed class QuestDungeonDestinationTests
             Manager = new PlayfieldManager(_logger, new MessageRouter([], _logger), new PlayerHydrator(_items, RuntimeData.Value),
                 RuntimeData.Value, _items, minter, new StubInventoryRepository(), _ids,
                 new InventoryMoveService(_logger, _flush, _actions), _flush,
-                new TradeService(_logger, RuntimeData.Value, _templates, minter, _ids, _flush, persistence),
+                new TradeService(_logger, RuntimeData.Value, _templates, minter, _ids, _flush, Persistence),
                 Blank<CharacterSnapshotService>(), new PlayfieldMetricsRegistry(), new TeamService(), authored, _templates, new Shops(), _quests);
             SetExteriorIdentity(Entrance.PlayfieldId);
             Player.Playfield = _exterior;
@@ -346,6 +418,8 @@ public sealed class QuestDungeonDestinationTests
         }
 
         internal Identity Target => new() { Type = (IdentityType)Entrance.IdentityType, Instance = unchecked((int)Entrance.IdentityInstance) };
+        internal bool Abandon(int journalInstance) => _quests.TryAbandon(Player, journalInstance);
+        internal void AssertNoErrors() => Assert.AreEqual(string.Empty, _logger.Errors);
         internal string? Accept()
         {
             string? result = Service.AcceptOffer(Player, new Identity { Type = (IdentityType)Offer.OfferType, Instance = Offer.OfferInstance });
@@ -407,10 +481,17 @@ public sealed class QuestDungeonDestinationTests
 
     sealed class Persistence : ICharacterCoalesceCommit, IInventoryMutationPersistence, ITradePersistence
     {
+        internal Action<InventoryMutationBatch>? BeforeMutation;
+        internal int MutationCalls;
         public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates,
             int characterId, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks)
             => throw new AssertFailedException("Clean quest grants must not use an independent inventory commit.");
-        public void Persist(InventoryMutationBatch batch) => throw new AssertFailedException("Unexpected inventory mutation.");
+        public void Persist(InventoryMutationBatch batch)
+        {
+            Assert.IsNotNull(BeforeMutation, "Unexpected inventory mutation.");
+            MutationCalls++;
+            BeforeMutation(batch);
+        }
         public void Persist(TradePersistenceBatch batch) => throw new AssertFailedException("Unexpected trade commit.");
     }
 
@@ -427,7 +508,10 @@ public sealed class QuestDungeonDestinationTests
         internal readonly Dictionary<int, string> Links = [];
         internal readonly List<QuestDungeonKeyItemRow> Keys = [];
         internal Action? BeforeAccept;
+        internal Action<string>? BeforeEndKeys;
         internal int AcceptCalls;
+        internal int EndKeysCalls;
+        internal readonly List<int> RetiredKeys = [];
         public bool TryAcceptOfferQuest(int ownerId, int offerType, int offerInstance, GeneratedQuestRow quest,
             CharacterQuestRow characterRow, QuestDungeonKeyItemRow key, long nowUtcTicks)
         {
@@ -451,13 +535,28 @@ public sealed class QuestDungeonDestinationTests
         public GeneratedQuestRow? LoadGenerated(string questId) => Generated?.QuestId == questId ? Generated : null;
         public IDictionary<int, string> LoadKeyQuests(IReadOnlyCollection<int> keyInstanceIds)
             => Links.Where(pair => keyInstanceIds.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
-        public IList<int> RetireUnlinkedKeys(IReadOnlyCollection<int> keyInstanceIds, int keyLowId) => [];
+        public IList<int> RetireUnlinkedKeys(IReadOnlyCollection<int> keyInstanceIds, int keyLowId)
+        {
+            Assert.AreEqual(QuestDungeonService.KeyLowId, keyLowId);
+            int[] retired = keyInstanceIds.Where(id => !Links.ContainsKey(id)).ToArray();
+            foreach (int id in retired) if (!RetiredKeys.Contains(id)) RetiredKeys.Add(id);
+            return retired;
+        }
         public IList<string> LoadExpiredQuestsWithKeys(long nowUtcTicks, int limit) => [];
         public int PurgeEndedGeneratedQuests(long cutoffUtcTicks, int limit) => 0;
         public int RetireDeadKeysForCharacter(int characterId, int keyLowId, IReadOnlyCollection<int> ownedContainerTypes, int bagContainerType) => 0;
         public void Save(CharacterQuestRow row) => Character = row;
         public void SaveGenerated(GeneratedQuestRow row) => Generated = row;
-        public IList<RetiredDungeonKey> EndQuestKeys(string questId) => throw new AssertFailedException();
+        public IList<RetiredDungeonKey> EndQuestKeys(string questId)
+        {
+            EndKeysCalls++;
+            BeforeEndKeys?.Invoke(questId);
+            var retired = Keys.Where(key => Links.TryGetValue(key.InstanceId, out string? linked) && linked == questId)
+                .Select(key => new RetiredDungeonKey { KeyInstanceId = key.InstanceId,
+                    ContainerType = key.ContainerType, ContainerInstance = key.ContainerInstance }).ToArray();
+            foreach (var key in retired) { Links.Remove(key.KeyInstanceId); RetiredKeys.Add(key.KeyInstanceId); }
+            return retired;
+        }
         public void CloseCharacterQuests(string questId, int state, long nowUtcTicks) => throw new AssertFailedException();
     }
 
