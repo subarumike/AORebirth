@@ -12,7 +12,7 @@ namespace Utility.GameData.Missions
     using System.Xml;
 
     /// <summary>
-    /// Exact placement and bounded captured-condition lookup. A roll may reference the same placement
+    /// Exact placement, observed expected-QL and captured-condition lookup. A roll may reference the same placement
     /// repeatedly: DESTINATION_UNIQUENESS_WITHIN_COHORT_REQUIRED=NO.
     /// </summary>
     public sealed class MissionDestinationCatalog
@@ -33,6 +33,8 @@ namespace Utility.GameData.Missions
         private readonly Dictionary<MissionPlacementIdentity, ObservedMissionDestinationEvidence> evidence;
         private readonly Dictionary<MissionDestinationCondition, IReadOnlyList<MissionEntrancePlacement>> conditions =
             new Dictionary<MissionDestinationCondition, IReadOnlyList<MissionEntrancePlacement>>();
+        private readonly Dictionary<int, IReadOnlyList<MissionEntrancePlacement>> expectedMissionQls =
+            new Dictionary<int, IReadOnlyList<MissionEntrancePlacement>>();
         private readonly Dictionary<MissionPlacementIdentity, MissionDestinationWorldPosition> worldPositions =
             new Dictionary<MissionPlacementIdentity, MissionDestinationWorldPosition>();
         private static readonly IReadOnlyList<MissionEntrancePlacement> EmptyPlacements =
@@ -162,6 +164,19 @@ namespace Utility.GameData.Missions
             return false;
         }
 
+        /// <summary>
+        /// Unions positive observations at exactly this expected QL under the approved catalog reuse policy.
+        /// Other captured conditions remain provenance, not proven exclusions. This does not establish
+        /// complete retail eligibility or reuse observations from a different QL.
+        /// </summary>
+        public bool TryGetObservedDestinations(int expectedMissionQl, out IReadOnlyList<MissionEntrancePlacement> destinations)
+        {
+            if (expectedMissionQls.TryGetValue(expectedMissionQl, out destinations))
+                return true;
+            destinations = EmptyPlacements;
+            return false;
+        }
+
         public bool TryGetWorldPosition(MissionPlacementIdentity identity, out MissionDestinationWorldPosition worldPosition)
         {
             return worldPositions.TryGetValue(identity, out worldPosition);
@@ -255,6 +270,13 @@ namespace Utility.GameData.Missions
             Require(associationCount == 25296 && selectedIdentities.SetEquals(evidence.Keys),
                 "Captured selection associations or identity coverage mismatch.");
             CapturedConditions = conditionList.AsReadOnly();
+            foreach (var group in conditions.GroupBy(x => x.Key.ExpectedMissionQl))
+            {
+                var destinations = group.SelectMany(x => x.Value).Select(x => x.Identity).Distinct()
+                    .OrderBy(x => x.IdentityType).ThenBy(x => x.IdentityInstance)
+                    .Select(x => identities[x]).ToList().AsReadOnly();
+                expectedMissionQls.Add(group.Key, destinations);
+            }
         }
 
         public MissionEntrancePlacement GetByIdentity(uint identityType, uint identityInstance)

@@ -39,9 +39,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
             var side = MissionLocationPool.ResolveCharacterSide(player.Stats.Get(CharacterStat.Side));
             if (!MissionLocationPool.CanCharacterRollAtTerminal(side, playfield.Identity.Instance))
             { Feedback(session, player, "This mission terminal is not available to your side. No credits were deducted."); return; }
-            if (!MissionLevelRuntime.TryGetMissionQuality(level, message.LevelSlider, out _)
+            if (!MissionLevelRuntime.TryGetMissionQuality(level, message.LevelSlider, out int quality)
                 || !MissionRollSliders.TryCreate(message, out _, out _))
             { Feedback(session, player, "The mission terminal rejected unsupported slider settings. No credits were deducted."); return; }
+            int breed = player.Stats.Get(CharacterStat.Breed);
+            int profession = player.Stats.Get(CharacterStat.Profession);
+            _destinations.TryGetObservedDestinations(quality, out var destinationPool);
+            player.Logger.Info(FormattableString.Invariant(
+                $"Mission destination selection policy=OBSERVED_EXPECTED_QL_REUSE crossConditionEligibility=UNPROVEN owner={player.Identity.Instance} level={level} expectedQl={quality} difficulty={message.LevelSlider} faction={(int)side} breed={breed} profession={profession} terminalType={(uint)message.MissionTerminalIdentity.Type:X8} terminalInstance={unchecked((uint)message.MissionTerminalIdentity.Instance):X8} terminalPf={playfield.Identity.Instance} terminalX={terminal.Position.xf:R} terminalY={terminal.Position.yf:R} terminalZ={terminal.Position.zf:R} sliders=[{message.GoodBadSlider},{message.OrderChaosSlider},{message.OpenHiddenSlider},{message.PhysicalMysticalSlider},{message.HeadOnStealthSlider},{message.MoneyExperienceSlider}] physical={_destinations.Count} observed={_destinations.ObservedDestinations.Count} validWorldPos={_destinations.ObservedWorldPositionCount} expectedQlCandidates={destinationPool.Count}"));
             try
             {
                 DateTime now = DateTime.UtcNow;
@@ -63,11 +68,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
                             side,
                             GeneratedMissionWire.ClientClock(synchronizedUtc, now), seed, nonce,
                             () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."),
-                            _destinations, player.Stats.Get(CharacterStat.Breed), player.Stats.Get(CharacterStat.Profession), out selectedEntrances);
+                            _destinations, breed, profession, out selectedEntrances);
                     }
                     catch (NotSupportedException)
                     {
-                        Feedback(session, player, "No captured mission destinations support these roll conditions. No credits were deducted.");
+                        Feedback(session, player, $"No mission destinations have been observed at expected QL {quality}. No credits were deducted.");
                         return;
                     }
                     batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,

@@ -27,6 +27,10 @@ internal static class GeneratedMissionRollService
         if (!MissionRollSliders.TryCreate(request, out var sliders, out var error)) throw new ArgumentException(error, nameof(request));
         int level = MissionLevelRuntime.ClampCharacterLevel(characterLevel);
         int quality = MissionLevelRuntime.GetMissionQuality(characterLevel, request.LevelSlider);
+        // Provisional gameplay policy: reuse exact destinations positively observed at this expected QL.
+        // Other captured fields remain research metadata, not proven destination restrictions.
+        if (!catalog.TryGetObservedDestinations(quality, out var destinationPool) || destinationPool.Count == 0)
+            throw new NotSupportedException("No mission destinations have been observed at expected QL " + quality + ".");
         var random = new Random(seed);
         var policy = MissionRollPolicy.Current;
         var response = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody((int)((uint)nonce % (uint)GeneratedMissionWire.CapturedCount)));
@@ -34,20 +38,6 @@ internal static class GeneratedMissionRollService
         response.MissionTerminalIdentity = request.MissionTerminalIdentity;
         var types = MissionRollEvidenceCatalog.SelectTypeMix(level, request.LevelSlider, quality, sliders, random);
         if (types.Length != 5) throw new InvalidOperationException("A mission offer cohort must contain five entries.");
-        // Each complete captured condition is its own evidence population. No nearest-QL,
-        // faction, terminal, slider or mission-type fallback is permitted for destinations.
-        var destinationPools = types.Distinct().ToDictionary(type => type, type =>
-        {
-            var condition = new MissionDestinationCondition(characterLevel, quality, request.LevelSlider,
-                (int)side, breed, profession, terminalPlayfield,
-                unchecked((uint)request.MissionTerminalIdentity.Type), unchecked((uint)request.MissionTerminalIdentity.Instance),
-                [request.GoodBadSlider, request.OrderChaosSlider, request.OpenHiddenSlider,
-                 request.PhysicalMysticalSlider, request.HeadOnStealthSlider, request.MoneyExperienceSlider],
-                DestinationEvidenceType(type));
-            if (!catalog.TryGetObservedDestinations(condition, out var placements) || placements.Count == 0)
-                throw new NotSupportedException("No captured mission destinations support this complete roll condition.");
-            return placements;
-        });
         var shells = ReadShells();
         var identities = new HashSet<int>();
         var entrances = new List<MissionPlacementIdentity>(5);
@@ -72,8 +62,7 @@ internal static class GeneratedMissionRollService
             action.UnknownHash15 = checked(clientClockSeconds + policy.OfferLifetimeSeconds);
             // Uniform selection of distinct observed identities, with replacement. Observation
             // counts are evidence coverage, never retail probability weights.
-            var pool = destinationPools[type];
-            var destination = pool[random.Next(pool.Count)];
+            var destination = destinationPool[random.Next(destinationPool.Count)];
             if (!catalog.TryGetWorldPosition(destination.Identity, out var worldPosition))
                 throw new InvalidOperationException("The selected entrance has no proven WorldPos offsets.");
             entrances.Add(destination.Identity);

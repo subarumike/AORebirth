@@ -1,5 +1,9 @@
 # Mission destination integration
 
+Historical implementation report for `30ab16d0d`. The later, explicitly approved
+expected-QL-only destination policy supersedes the joint-condition rolling gate;
+see [Mission-roll eligibility repair](MISSION_ROLL_ELIGIBILITY_REPAIR.md).
+
 Date: 2026-10-09
 
 Branch: `codex/mission-destination-integration`

@@ -2,6 +2,20 @@
 
 Updated: 2026-10-09
 
+PROVEN (2026-10-09, mission roll repair on integration branch): the original
+joint capture-condition gate rejected uncaptured character metadata and even
+exact captured centered requests when the existing type mix required an absent
+type bucket. Mike approved provisional expected-QL-only destination reuse.
+The shared catalog now unions exact observed entrances at that QL, retains
+all original condition metadata, allows repeats and rejects uncovered QLs.
+Cross-condition retail eligibility remains UNPROVEN. Identity, WorldPos,
+acceptance, keys, dungeon, DAO and schema contracts remain unchanged.
+Approved build PASS; 61 focused destination/fee/QL regressions, 74 real DAO
+identity checks and 275 full disposable DAO checks passed. The full DAO run
+required the existing identity route's compiler override. Local client
+acceptance is pending; no master merge or Linux deployment is claimed.
+See `docs/evidence/MISSION_ROLL_ELIGIBILITY_REPAIR.md`.
+
 PROVEN (2026-10-09, mission destination integration branch): one shared
 MissionDestinationCatalog now supplies generated offers and quest dungeons.
 It retains 2,242 physical entrances, of which 812 are observed in 92,830 exact
