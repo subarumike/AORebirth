@@ -8,6 +8,8 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
     using ZoneEngine.Core.Missions;
     using ZoneEngine_New.Core.Missions;
+    using AORebirth.Core.GameData;
+    using Utility.GameData.Missions;
 
     [TestClass]
     public sealed class GeneratedMissionRollProjectionTests
@@ -37,7 +39,8 @@ namespace ZoneEngine_New.Tests
             QuestAlternativeMessage request = Request();
             int next = 0x55569000;
             var response = GeneratedMissionRollService.Generate(request, Owner, 60, 710, 500, 500,
-                MissionLocationSide.Omni, 1201445827, 1234, 4567, () => next++);
+                MissionLocationSide.Omni, 1201445827, 1234, 4567, () => next++,
+                MissionDestinationCatalog.Load(GameDataPaths.ResolveRuntimeRoot()), 1, 15, out _);
             CollectionAssert.AreEqual(Enumerable.Range(0x55569000, 5).ToArray(),
                 response.QuestInfos.Select(offer => offer.QuestIdentity.Instance).ToArray());
             Assert.AreEqual(0x55569005, next);
@@ -47,7 +50,8 @@ namespace ZoneEngine_New.Tests
         public void NewRuntimeCannotFallBackToFileIdentityAllocation()
         {
             Assert.ThrowsException<ArgumentNullException>(() => GeneratedMissionRollService.Generate(
-                Request(), Owner, 60, 710, 500, 500, MissionLocationSide.Omni, 1201445827, 1234, 4567, null!));
+                Request(), Owner, 60, 710, 500, 500, MissionLocationSide.Omni, 1201445827, 1234, 4567, null!,
+                MissionDestinationCatalog.Load(GameDataPaths.ResolveRuntimeRoot()), 1, 15, out _));
             Assert.IsNull(typeof(GeneratedMissionService).Assembly.GetType("ZoneEngine.Core.Missions.MissionOfferIdentityStore"));
             Assert.IsNull(typeof(GeneratedMissionService).Assembly.GetType("ZoneEngine.Core.Missions.MissionStateDirectory"));
         }
@@ -58,9 +62,10 @@ namespace ZoneEngine_New.Tests
             QuestAlternativeMessage request = Request();
             int next = 0x55569000;
             var response = GeneratedMissionRollService.Generate(request, Owner, 60, 710,
-                500, 500, MissionLocationSide.Omni, 1201445827, 1234, 4567, () => next++);
+                500, 500, MissionLocationSide.Omni, 1201445827, 1234, 4567, () => next++,
+                MissionDestinationCatalog.Load(GameDataPaths.ResolveRuntimeRoot()), 1, 15, out var selectedEntrances);
             DateTime issued = new(2026, 9, 8, 12, 0, 0, DateTimeKind.Utc);
-            var batch = GeneratedMissionRollProjection.Create(request, response, 710, 60, 1234, 4567, issued);
+            var batch = GeneratedMissionRollProjection.Create(request, response, 710, 60, 1234, 4567, issued, selectedEntrances);
             byte[] wire = GeneratedMissionWire.Write(response);
             Assert.AreEqual(5, batch.Offers.Count);
             Assert.AreEqual(issued.AddHours(48).Ticks, batch.ExpiresAtUtcTicks);
@@ -100,8 +105,9 @@ namespace ZoneEngine_New.Tests
             request.MoneyExperienceSlider = 156;
             int next = 0x55569000;
             var response = GeneratedMissionRollService.Generate(request, Owner, 60, 710,
-                500, 500, MissionLocationSide.Omni, 1201445827, 1234, 4567, () => next++);
-            var batch = GeneratedMissionRollProjection.Create(request, response, 710, 60, 1234, 4567, DateTime.UtcNow);
+                500, 500, MissionLocationSide.Omni, 1201445827, 1234, 4567, () => next++,
+                MissionDestinationCatalog.Load(GameDataPaths.ResolveRuntimeRoot()), 1, 15, out var selectedEntrances);
+            var batch = GeneratedMissionRollProjection.Create(request, response, 710, 60, 1234, 4567, DateTime.UtcNow, selectedEntrances);
             Assert.AreEqual(-100, batch.GoodBadSlider);
             Assert.AreEqual(-100, batch.OrderChaosSlider);
             Assert.AreEqual(-100, batch.MoneyExperienceSlider);

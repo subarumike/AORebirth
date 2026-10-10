@@ -25,5 +25,8 @@
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/TestEmailRegex.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/WeakReference.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/Config/DebugMcpSettings.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationCatalog.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationCatalogData.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Libraries/Source/Utility/GameData/Missions/MissionDestinationModels.cs" />
   </ItemGroup>
 </Project>

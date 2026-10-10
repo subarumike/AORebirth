@@ -1,6 +1,91 @@
 # AORebirth Project State
 
-Updated: 2026-10-09
+Updated: 2026-10-10
+
+OBSERVED (2026-10-10, original-client mission acceptance): Mike reports that
+30f1b3c33eb1334f6dc6e514cb3c7ac8a5f84150 works in the original AO client for
+level/slider QL, five offers and credit deductions, geographic selection,
+acceptance/persistence, dungeon entry, deletion/key removal and exact destinations.
+The annotated tag mission-destinations-working-30f1b3c33 preserves that source.
+
+PROVEN (2026-10-10, mission integration with master ce4a3bf973): The merged tree
+preserves the verified mission implementation and all master perk/buff/aura/taunt
+runtime/test changes exactly. Only CURRENT_TASK.md required content conflict
+resolution; both branches' project history is retained. Two runtime destination
+files remain, with 2,242 placements, 812 supported identities and 45 QL pools.
+Approved build, offline catalog comparison, 81 mission cases, 74 real DAO identity
+checks and 275 full DAO persistence checks passed. Ordinary full-test compilation
+has the same six CS0246 diagnostics on exact fetched master and the merged tree,
+proven by normalized diagnostic comparison; no new errors. This is an explicit
+preexisting limitation, not a full-project test pass. Mission objectives and PF324
+template selection remain unchanged and unfinished. No new feature or Linux work.
+See docs/evidence/MISSION_DESTINATION_MASTER_MERGE.md.
+
+PROVEN (2026-10-10, two-file mission destination migration on integration branch):
+MissionDestinationCatalog now loads only MissionDestinations.json and
+MissionEntrancePlacements.json. All 2,242 placements, 812 observed identities
+and WorldPos records, 47 origin/QL pools and 45 QL-wide pools are preserved.
+Selection prefers terminal-playfield/QL observations, then falls back within
+the same QL; uncovered QLs remain unsupported. This geographic policy is not
+proof of retail exclusions or probabilities. Capture-time QL labels deliberately
+preserve all existing pools; the known current-lookup QL22 discrepancy is not
+applied. Other mission generation, QL, content, DAO/schema and dungeon mechanics
+are unchanged. Runtime data is 2,059,393 bytes, 55.24% smaller.
+Offline comparison, approved build, 81 focused mission regressions, 74 real DAO
+identity checks and 275 full DAO checks passed before retiring the three old
+files. Offline comparison and all 81 focused tests passed again after retirement.
+Original-client validation of this migration remains UNVERIFIED; prior five-offer
+client acceptance belongs to 73fc97a75. No master merge or Linux deployment.
+See `docs/evidence/MISSION_DESTINATION_TWO_FILE_MIGRATION.md`.
+
+PROVEN (2026-10-09, original mission destination-distribution reconstruction):
+All 77 original journals reconcile to 93,185 retained offers: 92,830 raw-backed
+exact destinations, 355 missing-raw records, 812 entrance identities and 22
+destination playfields. Complete level/slider/zone, expected-QL/zone and
+zone/level tables plus source-linked CSV/JSON are under
+docs/generated/missions/destination-zone-distribution/. All eleven difficulty
+positions were observed at each of six captured levels. Level35 used Borealis;
+the other levels used Andromeda, so geography remains a confounder. Ten recorded
+QL labels differ from the current established lookup; both labels are retained.
+Original level2 metadata is recovered for 355 unresolved rows whose historical
+summary had lost the session fallback. Their destinations remain unresolved.
+These are observed distributions, not eligibility rules or probabilities.
+Runtime repair 73fc97a75, GameData, DAO/schema and running services are unchanged.
+Independent output arithmetic/hash review and original-source reproducibility
+check passed for all 23 generated files; every resolved offer is accounted for
+exactly once in each relevant view. No build or gameplay suites were run.
+
+PROVEN (2026-10-09, mission roll repair on integration branch): the original
+joint capture-condition gate rejected uncaptured character metadata and even
+exact captured centered requests when the existing type mix required an absent
+type bucket. Mike approved provisional expected-QL-only destination reuse.
+The shared catalog now unions exact observed entrances at that QL, retains
+all original condition metadata, allows repeats and rejects uncovered QLs.
+Cross-condition retail eligibility remains UNPROVEN. Identity, WorldPos,
+acceptance, keys, dungeon, DAO and schema contracts remain unchanged.
+Approved build PASS; 61 focused destination/fee/QL regressions, 74 real DAO
+identity checks and 275 full disposable DAO checks passed. The full DAO run
+required the existing identity route's compiler override. OBSERVED: Mike confirmed
+five offers after rebuilding local runtime repair 73fc97a75. The logged QL25
+Borealis request selected from 124 candidates; read-only verification confirms
+five exact persisted destinations and a 25-credit charge. Manual mission
+acceptance/entry/completion remains unverified. No master merge or Linux
+deployment is claimed.
+See `docs/evidence/MISSION_ROLL_ELIGIBILITY_REPAIR.md`.
+
+HISTORICAL (2026-10-09, original mission destination integration; selection policy
+and client-roll status superseded by the repair above): one shared
+MissionDestinationCatalog now supplies generated offers and quest dungeons.
+It retains 2,242 physical entrances, of which 812 are observed in 92,830 exact
+retail offers. Destination selection uses 547 captured joint condition/type
+sets, uniformly with replacement; uncaptured conditions fail closed. Offers
+retain complete entrance identity and captured WorldPos, and acceptance
+validates those exact values. The old 140-location population and separate
+entrance catalog/data are retired. The approved DAO exception accepts nonzero
+entrance identity bit patterns without relaxing other identity contracts or
+changing the schema. This is feature-branch work, not a master merge or live
+deployment; live AO client acceptance is UNVERIFIED. See
+`docs/evidence/MISSION_DESTINATION_INTEGRATION.md` for validation and limits.
 
 PROVEN (2026-10-09, merged through PR33): PR31's perk targeting,
 related selector grouping, Skill modifiers and periodic child casts combine

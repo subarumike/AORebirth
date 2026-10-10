@@ -36,7 +36,8 @@ namespace AORebirth.Tools.MissionDaoValidation
 
         private static int Main(string[] args)
         {
-            if (args.Length != 1 || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
+            bool generatedIdentityOnly = args.Length == 2 && args[1] == "--generated-identity-only";
+            if ((args.Length != 1 && !generatedIdentityOnly) || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
             {
                 Console.Error.WriteLine("REFUSED: exact --run-disposable argument required.");
                 return 2;
@@ -64,6 +65,14 @@ namespace AORebirth.Tools.MissionDaoValidation
                 }
 
                 var dao = new MySqlMissionDao(() => Open(disposable.ApplicationConnectionString));
+                if (generatedIdentityOnly)
+                {
+                    ValidateGeneratedEntranceIdentity(dao, disposable.ApplicationConnectionString);
+                    Console.WriteLine("MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES");
+                    Console.WriteLine("MISSION_ENTRANCE_IDENTITY_MYSQL=PASS");
+                    Console.WriteLine("MISSION_ENTRANCE_IDENTITY_CHECKS=" + checks.ToString(CultureInfo.InvariantCulture));
+                    return 0;
+                }
                 ValidateFactory();
                 ValidateLifecycleAndNulls(dao);
                 ValidateRollbackAndOwnership(dao);

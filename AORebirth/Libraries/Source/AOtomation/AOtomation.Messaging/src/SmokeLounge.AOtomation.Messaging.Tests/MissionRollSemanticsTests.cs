@@ -13,6 +13,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
 
     using ZoneEngine.Core.Missions;
     using ZoneEngine_New.Core.Missions;
+    using AORebirth.Core.GameData;
+    using Utility.GameData.Missions;
 
     [TestClass]
     [DeploymentItem(@".\XML Data\MissionLevels.csv", @"XML Data")]
@@ -523,7 +525,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                     1201445827,
                     12345,
                     0x24681357,
-                    () => ++nextIdentity);
+                    () => ++nextIdentity,
+                    MissionDestinationCatalog.Load(GameDataPaths.ResolveRuntimeRoot()), 1, 15, out _);
 
             Assert.AreEqual(5, generated.QuestInfos.Length);
             foreach (QuestInfo offer in generated.QuestInfos)
@@ -571,7 +574,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 1201445827,
                 seed,
                 0x24681357,
-                () => ++nextIdentity);
+                () => ++nextIdentity,
+                MissionDestinationCatalog.Load(GameDataPaths.ResolveRuntimeRoot()), 1, 15, out _);
         }
 
         private static QuestAlternativeMessage Request(

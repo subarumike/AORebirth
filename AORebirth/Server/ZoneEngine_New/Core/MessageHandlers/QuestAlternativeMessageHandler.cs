@@ -1,10 +1,12 @@
 namespace ZoneEngine_New.Core.MessageHandlers
 {
     using System;
+    using System.Collections.Generic;
     using AORebirth.Interfaces.Persistence.Missions;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using Utility.GameData.Missions;
     using ZoneEngine.Core.Missions;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Missions;
@@ -15,8 +17,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
     {
         private readonly IGeneratedMissionDao _dao;
         private readonly GeneratedMissionService _missions;
-        public QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions)
-        { _dao = dao; _missions = missions; }
+        private readonly MissionDestinationCatalog _destinations;
+        public QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions, MissionDestinationCatalog destinations)
+        { _dao = dao; _missions = missions; _destinations = destinations; }
         public Type MessageBodyType => typeof(QuestAlternativeMessage);
         public void Handle(MessageBody body, IZoneSession session) => Handle((QuestAlternativeMessage)body, session);
 
@@ -36,9 +39,15 @@ namespace ZoneEngine_New.Core.MessageHandlers
             var side = MissionLocationPool.ResolveCharacterSide(player.Stats.Get(CharacterStat.Side));
             if (!MissionLocationPool.CanCharacterRollAtTerminal(side, playfield.Identity.Instance))
             { Feedback(session, player, "This mission terminal is not available to your side. No credits were deducted."); return; }
-            if (!MissionLevelRuntime.TryGetMissionQuality(level, message.LevelSlider, out _)
+            if (!MissionLevelRuntime.TryGetMissionQuality(level, message.LevelSlider, out int quality)
                 || !MissionRollSliders.TryCreate(message, out _, out _))
             { Feedback(session, player, "The mission terminal rejected unsupported slider settings. No credits were deducted."); return; }
+            int breed = player.Stats.Get(CharacterStat.Breed);
+            int profession = player.Stats.Get(CharacterStat.Profession);
+            bool supported = _destinations.TryGetDestinations(playfield.Identity.Instance, quality, out var destinationPool, out bool usedQlFallback);
+            string destinationSelection = !supported ? "UNSUPPORTED" : usedQlFallback ? "QL_FALLBACK" : "ORIGIN_SPECIFIC";
+            player.Logger.Info(FormattableString.Invariant(
+                $"Mission destination selection policy=TERMINAL_PLAYFIELD_EXPECTED_QL_WITH_QL_FALLBACK selection={destinationSelection} crossConditionEligibility=UNPROVEN owner={player.Identity.Instance} level={level} expectedQl={quality} difficulty={message.LevelSlider} faction={(int)side} breed={breed} profession={profession} terminalType={(uint)message.MissionTerminalIdentity.Type:X8} terminalInstance={unchecked((uint)message.MissionTerminalIdentity.Instance):X8} terminalPf={playfield.Identity.Instance} terminalX={terminal.Position.xf:R} terminalY={terminal.Position.yf:R} terminalZ={terminal.Position.zf:R} sliders=[{message.GoodBadSlider},{message.OrderChaosSlider},{message.OpenHiddenSlider},{message.PhysicalMysticalSlider},{message.HeadOnStealthSlider},{message.MoneyExperienceSlider}] physical={_destinations.Count} observed={_destinations.ObservedDestinations.Count} validWorldPos={_destinations.ObservedWorldPositionCount} destinationCandidates={destinationPool.Count}"));
             try
             {
                 DateTime now = DateTime.UtcNow;
@@ -48,15 +57,28 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 int next = first;
                 int seed = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
                 int nonce = System.Security.Cryptography.RandomNumberGenerator.GetInt32(int.MaxValue);
-                var generating = ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.generate", player.Identity.Instance);
-                var response = GeneratedMissionRollService.Generate(message, player.Identity, level,
-                    playfield.Identity.Instance, player.Position.xf, player.Position.zf,
-                    side,
-                    GeneratedMissionWire.ClientClock(synchronizedUtc, now), seed, nonce,
-                    () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."));
-                var batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,
-                    MissionRollPolicy.Current.Fee(level), seed, nonce, now);
-                generating.Dispose();
+                QuestAlternativeMessage response;
+                IReadOnlyList<MissionPlacementIdentity> selectedEntrances;
+                GeneratedMissionOfferBatch batch;
+                using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.generate", player.Identity.Instance))
+                {
+                    try
+                    {
+                        response = GeneratedMissionRollService.Generate(message, player.Identity, level,
+                            playfield.Identity.Instance, player.Position.xf, player.Position.zf,
+                            side,
+                            GeneratedMissionWire.ClientClock(synchronizedUtc, now), seed, nonce,
+                            () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."),
+                            _destinations, breed, profession, out selectedEntrances);
+                    }
+                    catch (NotSupportedException)
+                    {
+                        Feedback(session, player, $"No mission destinations have been observed at expected QL {quality}. No credits were deducted.");
+                        return;
+                    }
+                    batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,
+                        MissionRollPolicy.Current.Fee(level), seed, nonce, now, selectedEntrances);
+                }
                 var committing = ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.commit", player.Identity.Instance);
                 var result = _missions.PublishOffers(player, batch);
                 committing.Dispose();

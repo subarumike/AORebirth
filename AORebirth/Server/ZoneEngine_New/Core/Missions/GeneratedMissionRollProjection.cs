@@ -7,16 +7,20 @@ namespace ZoneEngine_New.Core.Missions
     using AORebirth.Interfaces.Persistence.Missions;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+    using Utility.GameData.Missions;
     using ZoneEngine.Core.Missions;
 
     /// <summary>Typed SQL projection of the accepted generator's actual output, never client-authored offers.</summary>
     internal static class GeneratedMissionRollProjection
     {
         internal static GeneratedMissionOfferBatch Create(QuestAlternativeMessage request,
-            QuestAlternativeMessage response, int playfield, int fee, int seed, int nonce, DateTime issuedUtc)
+            QuestAlternativeMessage response, int playfield, int fee, int seed, int nonce, DateTime issuedUtc,
+            IReadOnlyList<MissionPlacementIdentity> selectedEntrances)
         {
             if (response.QuestInfos == null || response.QuestInfos.Length != 5)
                 throw new InvalidOperationException("The accepted mission generator must supply exactly five offers.");
+            if (selectedEntrances == null || selectedEntrances.Count != response.QuestInfos.Length)
+                throw new InvalidOperationException("Every generated offer must retain its selected entrance identity.");
             if (!MissionRollSliders.TryCreate(request, out var sliders, out string error))
                 throw new ArgumentException(error, nameof(request));
             byte[] wire = GeneratedMissionWire.Write(response);
@@ -32,6 +36,9 @@ namespace ZoneEngine_New.Core.Missions
                     || offer.QuestActions[0] == null || offer.ItemRewards?.Length > 1)
                     throw new InvalidOperationException("Unsupported generated offer projection: " + failure);
                 QuestActionList destination = offer.QuestActions[0];
+                MissionPlacementIdentity entrance = selectedEntrances[index];
+                if (entrance.IdentityType != 0xDAC6 || entrance.IdentityInstance == 0)
+                    throw new InvalidOperationException("A complete ACGEntrance placement identity is required.");
                 QuestItemShort? reward = offer.ItemRewards?.Length == 1 ? offer.ItemRewards[0] : null;
                 offers.Add(new GeneratedMissionOffer
                 {
@@ -41,9 +48,9 @@ namespace ZoneEngine_New.Core.Missions
                     DestinationType = (int)destination.Playfield.Type, DestinationInstance = destination.Playfield.Instance,
                     DestinationPlayfield = destination.Playfield.Instance,
                     DestinationX = destination.X, DestinationY = destination.Y, DestinationZ = destination.Z,
-                    // Legacy's frozen ExteriorEntranceIdentity is this exact Playfield identity;
-                    // the building low/high pair is separate, not a guessed resource-to-door mapping.
-                    EntranceType = (int)destination.Playfield.Type, EntranceInstance = destination.Playfield.Instance,
+                    // The selected placement identity is server-side metadata. WorldPos remains
+                    // the existing wire playfield, exact local XYZ and captured offset pair.
+                    EntranceType = unchecked((int)entrance.IdentityType), EntranceInstance = unchecked((int)entrance.IdentityInstance),
                     EntranceLow = destination.Unknown18, EntranceHigh = destination.Unknown19,
                     CashReward = offer.CashReward, ExperienceReward = offer.ExperienceReward,
                     RewardLowId = reward?.LowId ?? 0, RewardHighId = reward?.HighId ?? 0,

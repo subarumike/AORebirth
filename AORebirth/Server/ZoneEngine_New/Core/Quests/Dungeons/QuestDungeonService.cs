@@ -15,6 +15,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
+    using Utility.GameData.Missions;
+
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
@@ -82,7 +84,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
 
         readonly ICharacterQuestStore _store;
         readonly QuestService _quests;
-        readonly MissionEntranceCatalog _entrances;
+        readonly MissionDestinationCatalog _entrances;
         readonly DungeonLayoutGenerator _layouts;
         readonly IGeneratedMissionDao _offers;
         readonly IItemBuilder _items;
@@ -99,7 +101,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         readonly Timer _sweep;
         int _sweeping;
 
-        public QuestDungeonService(ICharacterQuestStore store, QuestService quests, MissionEntranceCatalog entrances,
+        public QuestDungeonService(ICharacterQuestStore store, QuestService quests, MissionDestinationCatalog entrances,
             DungeonLayoutGenerator layouts, IGeneratedMissionDao offers, IItemBuilder items, IItemInstanceIdAllocator ids,
             InventoryFlushService flush, InventoryActionService inventoryActions, Lazy<PlayfieldManager> playfields,
             IGameData gameData, IZoneLogger logger)
@@ -151,10 +153,11 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 if (offer == null)
                     return "That mission is no longer offered.";
 
-                if (!_entrances.TryFindAt(offer.DestinationPlayfield, offer.DestinationX, offer.DestinationZ, out MissionEntrance entrance))
+                if (!TryResolveOfferEntrance(_entrances, offer, out MissionEntrancePlacement entrance))
                 {
-                    _logger.Warn(string.Format(CultureInfo.InvariantCulture, "Mission offer {0}:{1} has no entrance at pf={2} ({3},{4})",
-                        offer.OfferType, offer.OfferInstance, offer.DestinationPlayfield, offer.DestinationX, offer.DestinationZ));
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Mission offer {0}:{1} has an unavailable or mismatched entrance {2:X8}:{3:X8} at pf={4}",
+                        offer.OfferType, offer.OfferInstance, offer.EntranceType, offer.EntranceInstance, offer.DestinationPlayfield));
                     return "That mission's location is unavailable.";
                 }
 
@@ -166,12 +169,13 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                     Seed = RandomNumberGenerator.GetInt32(int.MaxValue),
                     GeneratorVersion = DungeonLayoutGenerator.CurrentVersion,
                     DungeonPlayfield = dungeonPlayfield,
-                    EntranceInstance = entrance.Instance,
-                    EntrancePlayfield = entrance.Playfield,
-                    EntranceName = entrance.Name,
-                    EntranceX = entrance.X,
-                    EntranceY = entrance.Y,
-                    EntranceZ = entrance.Z,
+                    EntranceType = unchecked((int)entrance.IdentityType),
+                    EntranceInstance = unchecked((int)entrance.IdentityInstance),
+                    EntrancePlayfield = entrance.PlayfieldId,
+                    EntranceName = entrance.DisplayName,
+                    EntranceX = entrance.LocalX,
+                    EntranceY = entrance.LocalY,
+                    EntranceZ = entrance.LocalZ,
                     DestinationType = offer.DestinationType,
                     BuildingLowId = offer.EntranceLow,
                     BuildingHighId = offer.EntranceHigh,
@@ -181,7 +185,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 };
                 using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.layout", player.Identity.Instance))
                 {
-                    if (!_layouts.TryGenerate(parameters.Seed, parameters.GeneratorVersion, entrance.Instance, out _))
+                    if (!_layouts.TryGenerate(parameters.Seed, parameters.GeneratorVersion, parameters.EntranceInstance, out _))
                         return "Mission dungeons are unavailable.";
                 }
 
@@ -234,7 +238,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         _quests.AdoptGenerated(player, questId, template, now, expires, parametersJson);
                     _logger.Info(string.Format(CultureInfo.InvariantCulture,
                         "Dungeon quest accepted char={0} quest={1} offer={2}:{3} entrance={4} ({5}) dungeon={6}",
-                        player.Identity.Instance, questId, offer.OfferType, offer.OfferInstance, entrance.Instance, entrance.Name, dungeonPlayfield));
+                        player.Identity.Instance, questId, offer.OfferType, offer.OfferInstance, parameters.EntranceInstance, entrance.DisplayName, dungeonPlayfield));
                     return null;
                 }
                 catch (DatabaseCommitOutcomeUnknownException exception)
@@ -245,6 +249,26 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             }
         }
 
+        /// <summary>Resolves only the selected placement identity and verifies its exact offered WorldPos.</summary>
+        internal static bool TryResolveOfferEntrance(MissionDestinationCatalog catalog, GeneratedMissionOffer offer,
+            out MissionEntrancePlacement entrance)
+        {
+            entrance = null!;
+            if (offer.EntranceType != (int)IdentityType.MissionEntrance
+                || !catalog.TryGetByIdentity(unchecked((uint)offer.EntranceType), unchecked((uint)offer.EntranceInstance), out MissionEntrancePlacement selected)
+                || !catalog.TryGetWorldPosition(selected.Identity, out MissionDestinationWorldPosition worldPosition)
+                || unchecked((uint)offer.DestinationType) != worldPosition.PlayfieldIdentityType
+                || offer.DestinationPlayfield != selected.PlayfieldId || offer.DestinationInstance != selected.PlayfieldId
+                || offer.EntranceLow != worldPosition.WorldOffsetX || offer.EntranceHigh != worldPosition.WorldOffsetZ
+                || BitConverter.SingleToUInt32Bits(offer.DestinationX) != selected.LocalXBits
+                || BitConverter.SingleToUInt32Bits(offer.DestinationY) != selected.LocalYBits
+                || BitConverter.SingleToUInt32Bits(offer.DestinationZ) != selected.LocalZBits)
+                return false;
+
+            entrance = selected;
+            return true;
+        }
+
         /// <summary>
         /// The player used a MissionEntrance. When a key they carry opens a dungeon behind this entrance they are
         /// sent into it (created from its seed if needed). False when no carried key matches, so other entrance
@@ -253,14 +277,15 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         public bool TryEnter(Player player, Identity target)
         {
             ArgumentNullException.ThrowIfNull(player);
-            if (target.Type != IdentityType.MissionEntrance || !_entrances.TryGet(target.Instance, out MissionEntrance entrance))
+            if (target.Type != IdentityType.MissionEntrance
+                || !_entrances.TryGetByIdentity(unchecked((uint)target.Type), unchecked((uint)target.Instance), out MissionEntrancePlacement entrance))
                 return false;
 
             lock (player.PersistenceGate)
             {
                 if (player.IsPersistenceQuarantined || player.IsDead || player.Session is not IZoneSession session
                     || player.Playfield is not Playfield playfield || playfield is QuestDungeonPlayfield
-                    || playfield.Identity.Instance != entrance.Playfield || !WithinEntrance(player, entrance)
+                    || playfield.Identity.Instance != entrance.PlayfieldId || !WithinEntrance(player, entrance)
                     || !TryBeginRequest(player))
                     return false;
 
@@ -275,10 +300,11 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 foreach (string questId in links.Values.Distinct(StringComparer.Ordinal))
                 {
                     if (!TryGetDungeon(questId, out CachedDungeon dungeon) || dungeon.Ended || dungeon.ExpiresAtUtcTicks <= now
-                        || dungeon.Parameters.EntranceInstance != entrance.Instance)
+                        || unchecked((uint)dungeon.Parameters.EntranceType) != entrance.IdentityType
+                        || unchecked((uint)dungeon.Parameters.EntranceInstance) != entrance.IdentityInstance)
                         continue;
 
-                    if (!_layouts.TryGenerate(dungeon.Parameters.Seed, dungeon.Parameters.GeneratorVersion, entrance.Instance, out DungeonLayout layout))
+                    if (!_layouts.TryGenerate(dungeon.Parameters.Seed, dungeon.Parameters.GeneratorVersion, dungeon.Parameters.EntranceInstance, out DungeonLayout layout))
                         return false;
 
                     QuestDungeonPlayfield world = _playfields.Value.GetOrCreateQuestDungeon(dungeon.Parameters.DungeonPlayfield, questId, layout, entrance,
@@ -363,14 +389,15 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             if (playfields.TryGetQuestDungeon(storedPlayfield, out QuestDungeonPlayfield live))
                 return (live, null);
 
-            if (TryGetDungeon(questId, out CachedDungeon dungeon) && _entrances.TryGet(dungeon.Parameters.EntranceInstance, out MissionEntrance entrance))
+            if (TryGetDungeon(questId, out CachedDungeon dungeon)
+                && _entrances.TryGetByIdentity(unchecked((uint)dungeon.Parameters.EntranceType), unchecked((uint)dungeon.Parameters.EntranceInstance), out MissionEntrancePlacement entrance))
             {
                 if (!dungeon.Ended && dungeon.ExpiresAtUtcTicks > DateTime.UtcNow.Ticks && dungeon.Parameters.DungeonPlayfield == storedPlayfield
-                    && _layouts.TryGenerate(dungeon.Parameters.Seed, dungeon.Parameters.GeneratorVersion, entrance.Instance, out DungeonLayout layout))
+                    && _layouts.TryGenerate(dungeon.Parameters.Seed, dungeon.Parameters.GeneratorVersion, dungeon.Parameters.EntranceInstance, out DungeonLayout layout))
                     return (playfields.GetOrCreateQuestDungeon(storedPlayfield, questId, layout, entrance, dungeon.TargetHash,
                         dungeon.Parameters.Quality), layout.Spawn);
 
-                return (playfields.GetOrCreate(entrance.Playfield), new Vector3(entrance.X, entrance.Y, entrance.Z));
+                return (playfields.GetOrCreate(entrance.PlayfieldId), new Vector3(entrance.LocalX, entrance.LocalY, entrance.LocalZ));
             }
 
             RespawnContentCatalog respawn = _gameData.RespawnContent;
@@ -488,11 +515,11 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         }
 
         /// <summary>The entrance a quest's dungeon is reached through, when the quest has one.</summary>
-        public bool TryGetEntrance(string questId, out MissionEntrance entrance)
+        public bool TryGetEntrance(string questId, out MissionEntrancePlacement entrance)
         {
             entrance = null!;
             return !string.IsNullOrEmpty(questId) && TryGetDungeon(questId, out CachedDungeon dungeon)
-                && _entrances.TryGet(dungeon.Parameters.EntranceInstance, out entrance);
+                && _entrances.TryGetByIdentity(unchecked((uint)dungeon.Parameters.EntranceType), unchecked((uint)dungeon.Parameters.EntranceInstance), out entrance);
         }
 
         /// <summary>
@@ -553,8 +580,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             {
                 if (evict)
                 {
-                    Playfield exterior = playfields.GetOrCreate(dungeon.Entrance.Playfield);
-                    var landing = new Vector3(dungeon.Entrance.X, dungeon.Entrance.Y, dungeon.Entrance.Z);
+                    Playfield exterior = playfields.GetOrCreate(dungeon.Entrance.PlayfieldId);
+                    var landing = new Vector3(dungeon.Entrance.LocalX, dungeon.Entrance.LocalY, dungeon.Entrance.LocalZ);
                     foreach (Player inside in dungeon.GetRequiredService<DynelRegistry>().PlayerEntities().ToArray())
                         dungeon.DispatchPlayerProjection(inside, () => inside.Session?.TransferToPlayfield(exterior, landing));
                 }
@@ -733,12 +760,12 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             return Array.IndexOf(OwnedContainerTypes, key.ContainerType) >= 0 ? key.ContainerInstance : 0;
         }
 
-        static bool WithinEntrance(Player player, MissionEntrance entrance)
+        static bool WithinEntrance(Player player, MissionEntrancePlacement entrance)
         {
-            double dx = player.Position.x - entrance.X;
-            double dz = player.Position.z - entrance.Z;
+            double dx = player.Position.x - entrance.LocalX;
+            double dz = player.Position.z - entrance.LocalZ;
             return (dx * dx) + (dz * dz) <= EntryHorizontalRange * EntryHorizontalRange
-                && Math.Abs(player.Position.y - entrance.Y) <= EntryVerticalRange;
+                && Math.Abs(player.Position.y - entrance.LocalY) <= EntryVerticalRange;
         }
 
         bool TryBeginRequest(Player player)

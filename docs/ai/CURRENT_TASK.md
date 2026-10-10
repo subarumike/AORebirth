@@ -1,35 +1,30 @@
 # Current Task
 
-PR31 / PR32 reconciled integration merged (2026-10-09).
+Merge the manually verified mission destination implementation into public master.
 
-Validated branch: `codex/integrate-perk-aura-taunt`, starting public master
-`bddea56ca2d47c5eb64ed53f6e9efd279ff4f694`.
+Verified source: codex/mission-destination-integration at
+30f1b3c33eb1334f6dc6e514cb3c7ac8a5f84150. Mike reports original AO client
+verification of rolling/QL, five offers/fees, terminal geography, acceptance,
+persistence, dungeon entry, mission deletion and key removal.
+Preservation tag: mission-destinations-working-30f1b3c33.
+Fetched target: ce4a3bf973b92cc7b42c3a867e636f04b89eaca7.
+Merge base: bddea56ca2d47c5eb64ed53f6e9efd279ff4f694.
 
-PROVEN: PR33 merged the validated head
-`f5d012f96fe5febdcc99fad803709dc2a1dd133d` into public master at
-`a57b22776d75f6efffab55031728e0c0c05ed7e8`. The merge tree matches the validated
-head exactly. PR31 and PR32 are closed as incorporated/superseded, with PR32's
-selector changes explicitly excluded. Mike requested no engine builds while
-more changes are coming; this merge/closure ran no builds, tests or engines.
+Preserve both parents: master has the completed PR31/PR32 perk/buff/aura/taunt
+integration recorded in docs/evidence/PR31_PR32_INTEGRATION.md. The mission
+branch has the exact two-file destination catalog, 2,242 placements, 812 supported
+identities and 45 QL pools documented in
+docs/evidence/MISSION_DESTINATION_TWO_FILE_MIGRATION.md.
+The only content conflict was this active-task document. Project-state history
+from both branches is retained. Runtime, content and test files merged cleanly.
 
-PROVEN: all six PR31 runtime files are retained exactly. PR32 contributes only
-the positive TauntNpc handler and its original three tests; its persistent
-requirement-selector changes are excluded. Additional focused tests cover
-target stats/state/feedback, related requirement groups, event LastRnd,
-Mongo bands, player/pet taunts, Skill bonuses, auras and DoT/HoT ticks.
-
-Approved Windows build PASS. Focused cases PASS67. Related regression run:
-205 passed / 7 failed / 212 total, with the exact same seven failure names and
-assertion messages reproduced on untouched starting master (152/7/159).
-Full-project compilation has the same six missing-mission-type diagnostics on
-both trees. No new failure was observed in the executed selection.
-
-The Opportunity Knocks negative control on exact PR32 fails both event-roll
-cases; the reconciled candidate passes both. See
-`docs/evidence/PR31_PR32_INTEGRATION.md` for provenance, commands and limits.
-
-PROVEN: periodic team/area fanout, cancellation, count exhaustion, recipient
-movement/range and caster attribution passed end-to-end runtime fixtures.
-UNVERIFIED: live AO client acceptance.
-No database, schema, GameData or Linux changes. No deployment.
-The original checkout's mission branch and dirty work remain untouched.
+No new gameplay changes, refactoring, mission-objective changes, PF324 template
+selection changes or retired destination/location systems are permitted.
+Merged validation passed: approved build, offline exact catalog check, 81 mission
+regressions, 74 real DAO identity checks and 275 full DAO persistence checks.
+The ordinary full test project reproduces the same six CS0246 compilation
+diagnostics on untouched fetched master and the merged tree; no new diagnostics.
+No source/test workaround was introduced. See
+docs/evidence/MISSION_DESTINATION_MASTER_MERGE.md for the comparison and scope.
+The validated merge and exact preservation tag are ready for publication to master.
+No Linux work or deployment is requested.

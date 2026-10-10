@@ -373,7 +373,7 @@ namespace ZoneEngine_New.Core.Playfield
         /// Requesting it restarts its empty timer, so a dungeon cannot be released under a player who is entering.
         /// </summary>
         public QuestDungeonPlayfield GetOrCreateQuestDungeon(int playfieldId, string questId,
-            ZoneEngine_New.Core.Quests.Dungeons.DungeonLayout layout, ZoneEngine_New.Core.Quests.Dungeons.MissionEntrance entrance,
+            ZoneEngine_New.Core.Quests.Dungeons.DungeonLayout layout, Utility.GameData.Missions.MissionEntrancePlacement entrance,
             string? targetHash = null, int quality = 0)
         {
             ArgumentNullException.ThrowIfNull(questId);
