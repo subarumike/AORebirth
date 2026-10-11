@@ -390,7 +390,7 @@ try {
     }
     Assert-BundledFrameworks $packageRoot
     foreach ($required in @(
-        'AORebirth.exe', 'prerequisites\vc_redist.x64.exe', 'tools\DatabaseSetup\DatabaseSetup.dll', 'tools\DatabaseMigrationTool\DatabaseMigrationTool.dll',
+        'AORebirth.exe', 'AORebirth.exe.config', 'prerequisites\vc_redist.x64.exe', 'tools\DatabaseSetup\DatabaseSetup.dll', 'tools\DatabaseMigrationTool\DatabaseMigrationTool.dll',
         'tools\DatabasePreflight\DatabasePreflight.exe', 'tools\AccountBroker\AORebirth.AccountBroker.Service.exe',
         'server\ZoneEngine_New\Config\Gameplay.json', 'server\ZoneEngine_New\Config\NavAgent.json',
         'server\ZoneEngine_New\XML Data\MissionRewards\ItemDb_Clusters.json',
@@ -447,6 +447,15 @@ try {
         files = $manifestFiles
     }
     $manifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $packageRoot 'package-manifest.json') -Encoding UTF8
+    $verification = Start-Process -FilePath (Join-Path $packageRoot 'AORebirth.exe') -ArgumentList '--verify-package' `
+        -WorkingDirectory $packageRoot -WindowStyle Hidden -Wait -PassThru `
+        -RedirectStandardOutput (Join-Path $workRoot 'package-verification.stdout.log') `
+        -RedirectStandardError (Join-Path $workRoot 'package-verification.stderr.log')
+    if ($verification.ExitCode -ne 0) {
+        throw "The staged launcher rejected this package (exit $($verification.ExitCode)). See package-verification logs in $workRoot."
+    }
+    $verification.Dispose()
+    Write-Host 'STAGED_PACKAGE_VERIFICATION=PASS'
     $zipPath = Join-Path $workRoot ('AORebirth-Windows-x64-' + $PublicMasterSha.Substring(0, 12) + '.zip')
     [IO.Compression.ZipFile]::CreateFromDirectory($packageRoot, $zipPath, [IO.Compression.CompressionLevel]::Optimal, $true)
     $zipSha = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()

@@ -14,6 +14,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <DebugType>pdbonly</DebugType>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -33,6 +34,10 @@
     <Compile Include="PackageController.cs" />
     <Compile Include="LauncherForm.cs" />
     <Compile Include="AccountUrlReservation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="app.manifest" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -64,6 +64,10 @@ producer who has already completed that build on the same source; package
 publishing still compiles the existing project graph into isolated output
 folders. All build/publish failures stop package construction. No fixture,
 unit, regression, or live-client tests run automatically.
+Before compression, the freshly staged launcher runs its read-only
+`--verify-package` mode against the complete inventory and configuration.
+A nonzero exit stops packaging before a ZIP is created. This verification
+does not initialize a database, start a server, or launch the client.
 
 The producer requires the documented Windows build prerequisites: Visual
 Studio MSBuild, .NET 10 SDK, .NET Framework targeting packs, and restored

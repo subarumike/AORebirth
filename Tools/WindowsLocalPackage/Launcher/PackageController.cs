@@ -550,9 +550,10 @@ namespace AORebirth.WindowsLocalLauncher
             bool fresh = !Directory.Exists(data) || !Directory.EnumerateFileSystemEntries(data).Any();
             if (fresh)
             {
-                if (state.SetupComplete || state.OwnsDataDirectory)
+                if (state.SetupComplete)
                     throw new InvalidDataException("The local database files are missing. Restore your data backup before continuing.");
 
+                // An initial native-loader failure can leave an empty directory; retry only that empty state.
                 state.OwnsDataDirectory = true;
                 state.Save(root);
                 Directory.CreateDirectory(data);
