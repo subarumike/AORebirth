@@ -2,6 +2,10 @@
 
 Updated: 2026-10-11
 
+The Windows local package Start/Stop and automatic database provisioning repair
+is complete, pushed as f0d1d575eeca3b12c952fbc639b18c6c03f66657 on
+codex/windows-local-package.
+
 PROVEN (2026-10-11, local Windows package): isolated reproduction matches the
 player's Start/Stop port-owner popup. Bundled MySQL 8.4.11 launches a monitor parent
 whose child owns TCP 3308. The launcher rejected that child before DatabaseSetup
@@ -22,9 +26,17 @@ completed Start, Stop, reopen, restart and Stop. Subsequent current-machine
 acceptance through the actual launcher controller started from completely empty
 data and exited 0: setup started no services, first Start and reopened restart
 became ready, and both Stops completed with normal status and no abnormal-shutdown
-popup. Final ZIP integrity checks and distribution remain pending. Engine source,
-database helper/schema semantics and GameData are unchanged; no existing database
-is reset.
+popup. Engine source, database helper/schema semantics and GameData are unchanged;
+no existing database is reset.
+
+PROVEN: final package construction/integrity completed with exit 0 and
+PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package returned 0
+with PACKAGE_INVENTORY_AND_CONFIGURATION_VERIFIED. The full replacement and
+overlay ZIPs passed their payload integrity checks. Exactly five payload files
+changed; all 9,307 others, including all 8,090 GameData files, are preserved.
+Binary packages, checksums and validation records remain private ignored local
+outputs and have not been published. Distribution and live client acceptance
+remain separate.
 
 PUBLIC BASELINE OBSERVATION: empty-server Zone disposal logs an ObjectDisposed
 InventoryFlushService warning and exits 0 with unchanged core bytes. The warning

@@ -1,6 +1,7 @@
 # Current Task
 
-Repair the prebuilt Windows package from public master
+Completed the prebuilt Windows package Start/Stop and automatic database
+provisioning repair for the package from public master
 `6ec06bbd45e72496923275dcc8fd4e25fecace73`.
 
 Mike authorized a precompiled package with the full release GameData, bundled
@@ -16,9 +17,10 @@ tools, Account Broker, and engine headless/shutdown signals. Do not change
 gameplay or existing engine behavior. Private GameData and binary packages
 remain outside tracked source. No Linux work or deployment is authorized.
 
-OBSERVED: Start and Stop both report "A required port belongs to another process.
-No unrelated process was stopped." MySQL remains active while the game database
-is absent. PROVEN by isolated reproduction: bundled MySQL 8.4.11 starts a monitor
+OBSERVED original failure: Start and Stop both reported "A required port belongs
+to another process. No unrelated process was stopped." MySQL remained active
+while the game database was absent. PROVEN by isolated reproduction: bundled
+MySQL 8.4.11 starts a monitor
 parent and a child that owns TCP 3308. The launcher tracks the parent, rejects its
 own child's listener before DatabaseSetup runs, and repeats that rejection during
 Stop.
@@ -47,8 +49,17 @@ and Stop. Subsequent current-machine acceptance through the actual launcher
 controller began with a completely empty data directory and exited 0: setup
 started no services, first Start became ready, first Stop completed, reopening
 and restarting became ready, and second Stop completed. Both Stop statuses were
-normal, without an abnormal-shutdown popup. Updated final ZIP integrity checks
-and distribution remain pending.
+normal, without an abnormal-shutdown popup.
+
+PROVEN: final package construction/integrity completed with exit 0 and
+PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package returned 0
+with PACKAGE_INVENTORY_AND_CONFIGURATION_VERIFIED. The full replacement and
+overlay ZIPs passed their payload integrity checks. Exactly five payload files
+changed; all 9,307 others, including all 8,090 GameData files, are preserved.
+The fix is pushed as f0d1d575eeca3b12c952fbc639b18c6c03f66657 on
+codex/windows-local-package. Binary packages, checksums and validation records
+remain in private ignored local output and have not been published.
+The repair is complete; distribution and live client acceptance are separate.
 
 PUBLIC BASELINE OBSERVATION: empty-server Zone disposal logs an ObjectDisposed
 InventoryFlushService warning while exiting with code 0. Core bytes are unchanged;
