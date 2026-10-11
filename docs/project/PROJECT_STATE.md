@@ -1,6 +1,19 @@
 # AORebirth Project State
 
-Updated: 2026-10-10
+Updated: 2026-10-11
+
+OBSERVED (2026-10-11, local Windows package): a player reports first-time setup
+and stop errors with MySQL left active. PROVEN from current launcher source:
+setup starts MySQL and checks service ports; Create account/Play implicitly start
+services and the UI lacks an explicit Start button. The packaging repair now
+makes setup file-only and puts database initialization and services behind Start
+server. PROVEN: the revised launcher compiles and its actual setup handler
+completes with TCP 7012 occupied, without owned services or MySQL initialization.
+Repeat setup/reopening preserves configuration and protected credentials. Start
+rejects an existing port conflict before any service launch; account creation
+requires Start. Replacement ZIP verification remains in progress. No engine,
+gameplay, schema or GameData change is involved. The player's exact
+database/stop error remains UNVERIFIED; existing data must not be reset.
 
 PROVEN (2026-10-10, local Windows packaging): the exact public-master source
 6ec06bbd45e72496923275dcc8fd4e25fecace73 builds through the approved Windows

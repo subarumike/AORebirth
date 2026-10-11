@@ -4,20 +4,33 @@ Extract the complete ZIP to a writable folder, then double-click `AORebirth.exe`
 Use a folder outside Program Files and outside a synchronized cloud folder.
 Keep the entire extracted folder together.
 
-First-run setup prepares a private local database and lets you create an account.
-Download the fixed AO client from the launcher, or select an existing copy of
-that client. Play starts the bundled server and then opens the client. Stop
-Server saves and stops the processes owned by this installation. Open Logs
-shows diagnostic files if startup fails.
+First-time setup verifies the package and prepares local files. It does not
+start MySQL or any server, initialize the database, reserve a URL, or require
+free network ports. Opening the launcher also starts no services.
+
+Download the fixed AO client from the launcher, or select an existing copy.
+Press **Start server** when ready. This checks all required ports before starting
+anything, initializes the private database on first start, and starts the local
+services. Once ready, create your local account and press **Play**. Create account
+and Play require the server to be running; neither starts it implicitly.
+**Stop server** saves and stops the processes owned by this installation.
+**Open Logs** shows diagnostic files if startup fails.
+
+Setup requires no free ports. Start server requires TCP ports 3308 (private
+MySQL), 6996 and 7012 (chat), 7500 (login), 7501 (zone), and 7510 (local account
+registration). If a port is occupied, Start server reports it before launching
+services. Close the application that owns the port; do not terminate unrelated
+processes merely because they use one of these ports.
 
 No Git, Visual Studio, .NET SDK, compilation, SQL commands, or terminal commands
 are required on the player's machine. Supported target: Windows 11 x64 with
 .NET Framework 4.8 enabled. The package includes the .NET 10 runtime, ASP.NET
 Core runtime when required, MySQL binaries, and the Microsoft VC++ prerequisite
-installer. The launcher reports missing prerequisites before starting setup.
+installer. Use **Install prerequisites** before **Start server**.
 
-Accounts, characters, passwords, and the local database are created under
-`data` at first run. Do not delete `data` when replacing a package. This first
+Local configuration and protected passwords are prepared under `data` by setup.
+The local database is initialized only by Start server. Accounts and characters
+are subsequently stored there. Do not delete `data` when replacing a package. This first
 package does not automate upgrades of existing databases; retain the existing
 installation until an upgrade has been separately accepted. Never run two
 copies of the local package on the same default ports.
@@ -147,7 +160,8 @@ channel.
 ## Acceptance still required
 
 On a clean Windows machine without developer tools, verify extraction to a
-path containing spaces, first-run setup, prerequisite handling, account
+path containing spaces, first-run setup with no services or listeners,
+explicit Start server and occupied-port handling, prerequisite handling, account
 creation, client download/selection, server readiness, Mike's live login and
 play check, clean shutdown, restart with the same character, and clear errors
 for occupied ports or missing content. Record failures and the exact package

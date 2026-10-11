@@ -272,7 +272,7 @@ namespace AORebirth.WindowsLocalLauncher
             CheckDownloadCancellation();
             Directory.Move(staging, destination);
             SetExtractedClient(destination, client);
-            status("Client downloaded, verified and installed. Create your account, then press Play.");
+            status("Client downloaded, verified and installed. Press Start server, then create your account and press Play.");
         }
 
         internal void InstallPrerequisites()
@@ -297,39 +297,13 @@ namespace AORebirth.WindowsLocalLauncher
         internal void Prepare()
         {
             EnsurePackage();
-            if (IsRunning)
-                throw new InvalidOperationException("Stop the local server before running setup.");
-
             InitializeUserFiles();
-            AccountUrlReservation.EnsureForCurrentUser();
-            RunDotnet("server/ZoneEngine_New/ZoneEngine_New.dll", "--validate-startup", 180000, "world-check");
-            RequireFreePorts(3308, 6996, 7012, 7500, 7501, 7510);
-            try
-            {
-                StartDatabase();
-                status("Preparing the local database...");
-                var environment = BaseEnvironment();
-                environment["AO_REBIRTH_MIGRATION_CONNECTION"] = AdminConnection(adminPasswordInUse);
-                environment["AO_REBIRTH_MYSQL_ADMIN_PASSWORD"] = state.AdminPassword;
-                RunExecutable("runtime/dotnet.exe", Quote(PathOf("tools/DatabaseSetup/DatabaseSetup.dll"))
-                    + " prepare --root " + Quote(root) + " --port 3308", 300000, "database-setup", environment, null);
-                adminPasswordInUse = state.AdminPassword;
-                state.SetupComplete = true;
-                state.Save(root);
-                status("Local server setup is complete.");
-            }
-            finally
-            {
-                Stop();
-            }
+            status("Setup complete. Your local files are ready. Press Start server to initialize the database if needed and start the server.");
         }
 
         internal void Start()
         {
             EnsurePackage();
-            if (!state.SetupComplete)
-                throw new InvalidOperationException("Run First-time setup before starting the local server.");
-
             if (IsRunning)
             {
                 EnsureServerReady();
@@ -341,6 +315,19 @@ namespace AORebirth.WindowsLocalLauncher
             try
             {
                 StartDatabase();
+                if (!state.SetupComplete)
+                {
+                    status("Preparing the local database...");
+                    var environment = BaseEnvironment();
+                    environment["AO_REBIRTH_MIGRATION_CONNECTION"] = AdminConnection(adminPasswordInUse);
+                    environment["AO_REBIRTH_MYSQL_ADMIN_PASSWORD"] = state.AdminPassword;
+                    RunExecutable("runtime/dotnet.exe", Quote(PathOf("tools/DatabaseSetup/DatabaseSetup.dll"))
+                        + " prepare --root " + Quote(root) + " --port 3308", 300000, "database-setup", environment, null);
+                    adminPasswordInUse = state.AdminPassword;
+                    state.SetupComplete = true;
+                    state.Save(root);
+                }
+
                 status("Checking local database readiness...");
                 RunDotnet("server/ZoneEngine_New/ZoneEngine_New.dll", "--validate-database", 60000, "database-check");
                 RunDotnet("server/ZoneEngine_New/ZoneEngine_New.dll", "--validate-startup", 180000, "world-check");
@@ -350,16 +337,25 @@ namespace AORebirth.WindowsLocalLauncher
                 StartBroker();
                 status("Local server is ready. Create an account or press Play.");
             }
-            catch
+            catch (Exception startupFailure)
             {
-                Stop();
+                try
+                {
+                    Stop();
+                }
+                catch (Exception shutdownFailure)
+                {
+                    throw new InvalidOperationException("Local server startup failed: " + startupFailure.Message
+                        + Environment.NewLine + "Shutdown also failed: " + shutdownFailure.Message, startupFailure);
+                }
+
                 throw;
             }
         }
 
         internal void CreateAccount()
         {
-            Start();
+            RequireStartedServer();
             Process.Start(new ProcessStartInfo("http://127.0.0.1:7510/register") { UseShellExecute = true });
         }
 
@@ -374,7 +370,7 @@ namespace AORebirth.WindowsLocalLauncher
                 throw new InvalidDataException("The selected client executable is missing. Select the extracted client folder again.");
 
             VerifyClientExecutable(executable, client);
-            Start();
+            RequireStartedServer();
             Process.Start(new ProcessStartInfo(executable, (string)client.Attribute("arguments") ?? string.Empty)
             {
                 WorkingDirectory = Path.GetDirectoryName(executable),
@@ -400,6 +396,14 @@ namespace AORebirth.WindowsLocalLauncher
 
             EnsureServerReady();
             status("Local server and account registration are ready.");
+        }
+
+        private void RequireStartedServer()
+        {
+            if (!IsRunning)
+                throw new InvalidOperationException("Press Start server before creating an account or playing.");
+
+            EnsureServerReady();
         }
 
         private void EnsureServerReady()
@@ -472,7 +476,7 @@ namespace AORebirth.WindowsLocalLauncher
                         var environment = BaseEnvironment();
                         environment["MYSQL_PWD"] = adminPasswordInUse ?? state.AdminPassword;
                         WaitForPorts(item, new[] { 3308 }, 2000);
-                        RunExecutable("mysql/bin/mysql.exe", MysqlArguments(), 30000, "database-stop", environment, "SHUTDOWN;\n");
+                        RunExecutable("mysql/bin/mysql.exe", MysqlArguments() + " --execute=\"SHUTDOWN;\"", 30000, "database-stop", environment, null);
                         if (!item.Process.WaitForExit(30000))
                             throw new InvalidOperationException("MySQL did not stop cleanly. Keep the launcher open and inspect the logs.");
                     }
@@ -590,8 +594,8 @@ namespace AORebirth.WindowsLocalLauncher
         {
             var environment = BaseEnvironment();
             environment["MYSQL_PWD"] = password;
-            return RunExecutable("mysql/bin/mysql.exe", MysqlArguments(), 15000, "database-connect",
-                environment, "SELECT 1;\n", false) == 0;
+            return RunExecutable("mysql/bin/mysql.exe", MysqlArguments() + " --execute=\"SELECT 1;\"", 15000, "database-connect",
+                environment, null, false) == 0;
         }
 
         private static string MysqlArguments()

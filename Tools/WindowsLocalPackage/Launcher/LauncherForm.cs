@@ -42,7 +42,7 @@ namespace AORebirth.WindowsLocalLauncher
             layout.Controls.Add(new Label { Text = "AORebirth", Font = new Font(Font.FontFamily, 24F, FontStyle.Bold), AutoSize = true }, 0, 0);
             layout.Controls.Add(new Label
             {
-                Text = "1. Install prerequisites, then run first-time setup.\r\n2. Download the client (it will be verified and extracted automatically).\r\n3. Create your local account and press Play.",
+                Text = "1. Install prerequisites and run setup to prepare your local files.\r\n2. Download the client, then press Start server.\r\n3. Once the server is ready, create your local account and press Play.",
                 Dock = DockStyle.Fill
             }, 0, 1);
             clientFolder = new Label { Dock = DockStyle.Fill, AutoEllipsis = true };
@@ -66,6 +66,7 @@ namespace AORebirth.WindowsLocalLauncher
                 AddButton("First-time setup", () => controller.Prepare());
                 AddButton("Download client", () => controller.DownloadClient());
                 AddButton("Choose client folder", ChooseClient);
+                AddButton("Start server", () => controller.Start());
                 AddButton("Create account", () => controller.CreateAccount());
                 AddButton("Play", () => controller.Play());
                 AddButton("Stop server", () => controller.Stop());
@@ -77,7 +78,7 @@ namespace AORebirth.WindowsLocalLauncher
                 RefreshClientFolder();
                 status.Text = controller.IsRunning ? "Recovered local services from a previous launcher session. Press Status to check them or Stop server to shut them down."
                     : controller.SetupComplete ? "Ready to start your local server."
-                    : "First-time setup will initialize a dedicated local database. Windows may ask permission to enable local account registration.";
+                    : "Setup prepares files without starting services. Start server initializes the local database if needed and starts services when you choose.";
             }
             catch (Exception exception)
             {
