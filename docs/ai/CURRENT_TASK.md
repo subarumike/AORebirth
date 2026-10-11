@@ -35,9 +35,14 @@ handler against the full package in a path containing spaces completes with TCP
 Repeating setup/reopening preserves protected credentials and configuration;
 Create account refuses before Start. Explicit Start reports an existing 6996
 conflict before launching any services. Existing port owners were untouched.
-Replacement ZIP integrity verification is pending. Reuse the original package's
-engine/runtime/GameData bytes, updating launcher, player instructions and package
-metadata only. Preserve existing databases and credentials; no automatic reset or
+The full replacement ZIP and small overlay ZIP are complete. Final staged
+launcher verification and every payload hash in both ZIPs succeeded. Exactly five
+package files changed: launcher executable, player README, provenance, inventory
+and manifest. All 9,307 other inventoried files match the original package,
+including all 8,090 GameData files. Package tooling is clean commit 72f3a8148343517c50129c8b6dfc0e1f72ef1cc3,
+pushed to codex/windows-local-package. Private packages, checksums, update
+instructions and the validation receipt remain in ignored local output.
+Preserve existing databases and credentials; no automatic reset or
 partial-database recovery is authorized. No automated fixture/unit/regression
 suites or live AO client launch are authorized.
 
@@ -46,5 +51,5 @@ account creation, complete client download, and live login/play/restart. Mike
 performs live client acceptance; do not describe compilation as playable
 acceptance. Existing databases must never be reset by first-run setup.
 
-Complete local replacement and overlay ZIPs with exact provenance and integrity
-records. Distribution and live-client acceptance remain separate.
+The setup/start boundary repair and local packaging are complete. Distribution,
+fresh database/server acceptance and live-client acceptance remain separate.

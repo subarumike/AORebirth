@@ -11,8 +11,13 @@ server. PROVEN: the revised launcher compiles and its actual setup handler
 completes with TCP 7012 occupied, without owned services or MySQL initialization.
 Repeat setup/reopening preserves configuration and protected credentials. Start
 rejects an existing port conflict before any service launch; account creation
-requires Start. Replacement ZIP verification remains in progress. No engine,
-gameplay, schema or GameData change is involved. The player's exact
+requires Start. Full replacement and small overlay ZIPs passed every payload
+hash check and the final staged launcher verification. Exactly five package files
+changed; all 9,307 remaining inventoried payloads, including 8,090 GameData files,
+are preserved. Tooling commit 72f3a8148343517c50129c8b6dfc0e1f72ef1cc3 is pushed
+to codex/windows-local-package. No engine, gameplay, schema or GameData change is
+involved. Fresh database/full server start and live-client acceptance remain
+UNVERIFIED. The player's exact
 database/stop error remains UNVERIFIED; existing data must not be reset.
 
 PROVEN (2026-10-10, local Windows packaging): the exact public-master source
