@@ -2,23 +2,35 @@
 
 Updated: 2026-10-11
 
-OBSERVED (2026-10-11, local Windows package): a player reports first-time setup
-and stop errors with MySQL left active. PROVEN from current launcher source:
-setup starts MySQL and checks service ports; Create account/Play implicitly start
-services and the UI lacks an explicit Start button. The packaging repair now
-makes setup file-only and puts database initialization and services behind Start
-server. PROVEN: the revised launcher compiles and its actual setup handler
-completes with TCP 7012 occupied, without owned services or MySQL initialization.
-Repeat setup/reopening preserves configuration and protected credentials. Start
-rejects an existing port conflict before any service launch; account creation
-requires Start. Full replacement and small overlay ZIPs passed every payload
-hash check and the final staged launcher verification. Exactly five package files
-changed; all 9,307 remaining inventoried payloads, including 8,090 GameData files,
-are preserved. Tooling commit 72f3a8148343517c50129c8b6dfc0e1f72ef1cc3 is pushed
-to codex/windows-local-package. No engine, gameplay, schema or GameData change is
-involved. Fresh database/full server start and live-client acceptance remain
-UNVERIFIED. The player's exact
-database/stop error remains UNVERIFIED; existing data must not be reset.
+PROVEN (2026-10-11, local Windows package): isolated reproduction matches the
+player's Start/Stop port-owner popup. Bundled MySQL 8.4.11 launches a monitor parent
+whose child owns TCP 3308. The launcher rejected that child before DatabaseSetup
+and repeated the same check during Stop. The scoped launcher fix starts MySQL with
+--no-monitor and stops the verified held process through its existing native
+PID-specific shutdown event, including old monitor-parent records. Stop no longer
+requires a TCP listener or database credentials and never force-kills MySQL.
+Port errors identify the component, port and expected/actual PIDs. Expected bounded
+termination of the verified stateless Account Broker is excluded from abnormal
+shutdown reporting; other shutdown failures remain visible.
+
+Setup is file-only; Start alone provisions the database and starts services.
+Actual setup-handler checks proved occupied ports do not block setup, repeating
+setup/reopening preserves protected credentials/settings, and Start rejects
+conflicts before launching services. PROVEN: actual isolated launcher acceptance
+recovered the previous failed setup, automatically initialized the schema, and
+completed Start, Stop, reopen, restart and Stop. Subsequent current-machine
+acceptance through the actual launcher controller started from completely empty
+data and exited 0: setup started no services, first Start and reopened restart
+became ready, and both Stops completed with normal status and no abnormal-shutdown
+popup. Final ZIP integrity checks and distribution remain pending. Engine source,
+database helper/schema semantics and GameData are unchanged; no existing database
+is reset.
+
+PUBLIC BASELINE OBSERVATION: empty-server Zone disposal logs an ObjectDisposed
+InventoryFlushService warning and exits 0 with unchanged core bytes. The warning
+is recorded, not repaired. Clean-machine prerequisites/UAC, account registration POST,
+complete client download and live client gameplay remain UNVERIFIED. No automated
+fixture/unit/regression suites or AO client launch were performed for this repair.
 
 PROVEN (2026-10-10, local Windows packaging): the exact public-master source
 6ec06bbd45e72496923275dcc8fd4e25fecace73 builds through the approved Windows
@@ -31,10 +43,10 @@ load successfully. Packaging tooling is under Tools/WindowsLocalPackage and
 preserves current engine/runtime source. Private GameData, binary packages and
 validation records remain outside Git. The fixed website Classic client is a
 separate download.
-UNVERIFIED: clean-machine prerequisites/UAC, first-run database setup, account
-creation, complete client download and live client play/restart. No automated
+UNVERIFIED: clean-machine prerequisites/UAC, account registration POST,
+complete client download and live client play/restart. No automated
 fixture/unit/regression suites, database operations, client launch, Linux work
-or deployment were performed for packaging.
+or deployment were performed at that packaging stage.
 
 OBSERVED (2026-10-10, original-client mission acceptance): Mike reports that
 30f1b3c33eb1334f6dc6e514cb3c7ac8a5f84150 works in the original AO client for

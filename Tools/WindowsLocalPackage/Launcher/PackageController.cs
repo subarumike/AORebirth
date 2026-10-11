@@ -12,6 +12,7 @@ namespace AORebirth.WindowsLocalLauncher
     using System.Net;
     using System.Net.NetworkInformation;
     using System.Runtime.InteropServices;
+    using System.Security.AccessControl;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
@@ -455,30 +456,7 @@ namespace AORebirth.WindowsLocalLauncher
                     status("Stopping " + item.Name + "...");
                     if (item.Name == "MySQL")
                     {
-                        WaitForPorts(item, new[] { 3308 }, 2000);
-                        if (CanConnectAdmin(state.AdminPassword))
-                        {
-                            adminPasswordInUse = state.AdminPassword;
-                        }
-                        else if (!state.SetupComplete && state.OwnsDataDirectory)
-                        {
-                            WaitForPorts(item, new[] { 3308 }, 2000);
-                            if (!CanConnectAdmin(string.Empty))
-                                throw new InvalidOperationException("The recovered local MySQL credentials could not be verified. Its ownership record was preserved.");
-
-                            adminPasswordInUse = string.Empty;
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException("The recovered local MySQL credentials could not be verified. MySQL was left running and its ownership record was preserved.");
-                        }
-
-                        var environment = BaseEnvironment();
-                        environment["MYSQL_PWD"] = adminPasswordInUse ?? state.AdminPassword;
-                        WaitForPorts(item, new[] { 3308 }, 2000);
-                        RunExecutable("mysql/bin/mysql.exe", MysqlArguments() + " --execute=\"SHUTDOWN;\"", 30000, "database-stop", environment, null);
-                        if (!item.Process.WaitForExit(30000))
-                            throw new InvalidOperationException("MySQL did not stop cleanly. Keep the launcher open and inspect the logs.");
+                        StopDatabase(item);
                     }
                     else
                     {
@@ -494,7 +472,8 @@ namespace AORebirth.WindowsLocalLauncher
                         if (!item.Process.WaitForExit(item.ShutdownFile == null ? 5000 : 45000))
                         {
                             VerifyOwnership(item);
-                            forced = true;
+                            // The stateless account broker has no graceful shutdown hook.
+                            forced |= item.Name != "AccountBroker";
                             item.Process.Kill();
                             if (!item.Process.WaitForExit(10000))
                                 throw new InvalidOperationException(item.Name + " has not exited.");
@@ -578,7 +557,7 @@ namespace AORebirth.WindowsLocalLauncher
                     "database-initialize", BaseEnvironment(), null);
             }
 
-            OwnedProcess process = Launch("MySQL", "mysql/bin/mysqld.exe", arguments + " --console", null, BaseEnvironment());
+            OwnedProcess process = Launch("MySQL", "mysql/bin/mysqld.exe", arguments + " --no-monitor --console", null, BaseEnvironment());
             WaitForPorts(process, new[] { 3308 }, 60000);
             adminPasswordInUse = state.AdminPassword;
             if (!CanConnectAdmin(state.AdminPassword))
@@ -596,6 +575,47 @@ namespace AORebirth.WindowsLocalLauncher
             environment["MYSQL_PWD"] = password;
             return RunExecutable("mysql/bin/mysql.exe", MysqlArguments() + " --execute=\"SELECT 1;\"", 15000, "database-connect",
                 environment, null, false) == 0;
+        }
+
+        private static void StopDatabase(OwnedProcess item)
+        {
+            string pid = item.Process.Id.ToString(CultureInfo.InvariantCulture);
+            // MySQL 8.4 sql/mysqld.cc uses these case-sensitive names with and without its monitor.
+            // https://github.com/mysql/mysql-server/blob/mysql-8.4.11/sql/mysqld.cc#L8159
+            string[] eventNames = { "MYSQLShutdown" + pid, "mysqld" + pid + "_shutdown" };
+            var timer = Stopwatch.StartNew();
+            while (timer.ElapsedMilliseconds < 30000)
+            {
+                if (item.Process.HasExited)
+                    return;
+
+                VerifyOwnership(item);
+                foreach (string eventName in eventNames)
+                {
+                    EventWaitHandle shutdownEvent;
+                    if (!EventWaitHandle.TryOpenExisting(eventName, EventWaitHandleRights.Modify, out shutdownEvent))
+                        continue;
+
+                    using (shutdownEvent)
+                    {
+                        VerifyOwnership(item);
+                        if (item.Process.HasExited)
+                            return;
+
+                        if (!shutdownEvent.Set())
+                            throw new InvalidOperationException("MySQL's graceful shutdown request failed. Its ownership record was preserved.");
+
+                        if (!item.Process.WaitForExit(30000))
+                            throw new InvalidOperationException("MySQL did not stop cleanly. Keep the launcher open and inspect the logs.");
+
+                        return;
+                    }
+                }
+
+                Thread.Sleep(250);
+            }
+
+            throw new InvalidOperationException("MySQL's graceful shutdown event is unavailable. MySQL was left running and its ownership record was preserved.");
         }
 
         private static string MysqlArguments()
@@ -965,8 +985,15 @@ namespace AORebirth.WindowsLocalLauncher
                 if (ports.All(port => listeners.ContainsKey(port) && listeners[port] == item.Process.Id))
                     return;
 
-                if (ports.Any(port => listeners.ContainsKey(port) && listeners[port] != item.Process.Id))
-                    throw new InvalidOperationException("A required port belongs to another process. No unrelated process was stopped.");
+                foreach (int port in ports)
+                {
+                    int actualOwner;
+                    if (listeners.TryGetValue(port, out actualOwner) && actualOwner != item.Process.Id)
+                        throw new InvalidOperationException(item.Name + " port " + port.ToString(CultureInfo.InvariantCulture)
+                            + " belongs to PID " + actualOwner.ToString(CultureInfo.InvariantCulture)
+                            + "; expected PID " + item.Process.Id.ToString(CultureInfo.InvariantCulture)
+                            + ". No unrelated process was stopped.");
+                }
 
                 Thread.Sleep(250);
             }

@@ -16,40 +16,46 @@ tools, Account Broker, and engine headless/shutdown signals. Do not change
 gameplay or existing engine behavior. Private GameData and binary packages
 remain outside tracked source. No Linux work or deployment is authorized.
 
-OBSERVED: a player reports setup/stop errors and MySQL remaining active during
-first-time setup. The exact popup and underlying database failure are unknown.
-PROVEN: the original launcher started MySQL and required all service ports during
-setup. Create account and Play implicitly started services; no Start button
-existed. Setup/shutdown failures could mask the original startup error.
+OBSERVED: Start and Stop both report "A required port belongs to another process.
+No unrelated process was stopped." MySQL remains active while the game database
+is absent. PROVEN by isolated reproduction: bundled MySQL 8.4.11 starts a monitor
+parent and a child that owns TCP 3308. The launcher tracks the parent, rejects its
+own child's listener before DatabaseSetup runs, and repeats that rejection during
+Stop.
 
-The scoped repair makes setup file-only, adds Start server, and moves database
-initialization into that explicit action. Database-ready state keeps its existing
-meaning. Account creation and Play require a running server. Startup errors remain
-visible if cleanup also fails. Fixed MySQL probe/shutdown SQL uses --execute to
-avoid writing into an already exited client's stdin. This is not proof of the
-player's exact shutdown failure.
+The scoped launcher repair uses --no-monitor for the long-lived MySQL process.
+Stop signals only an existing native shutdown event derived from the verified
+held PID, supporting both the new process and an old monitor parent. It uses
+bounded waits without TCP readiness, password probes, SQL shutdown or database
+force-killing. Port errors identify the component, port and expected/actual PIDs.
+The stateless Account Broker has no graceful hook; bounded termination of its
+verified owned PID is expected and excluded from the abnormal-shutdown warning,
+consistent with its existing exit-code handling. Other shutdown failures remain
+visible. Engine source, database helper/schema semantics and GameData are unchanged.
 
-PROVEN: the revised launcher compiles. Manual invocation of its actual setup
-handler against the full package in a path containing spaces completes with TCP
-7012 already occupied. No owned services, MySQL files or process logs are created.
-Repeating setup/reopening preserves protected credentials and configuration;
-Create account refuses before Start. Explicit Start reports an existing 6996
-conflict before launching any services. Existing port owners were untouched.
-The full replacement ZIP and small overlay ZIP are complete. Final staged
-launcher verification and every payload hash in both ZIPs succeeded. Exactly five
-package files changed: launcher executable, player README, provenance, inventory
-and manifest. All 9,307 other inventoried files match the original package,
-including all 8,090 GameData files. Package tooling is clean commit 72f3a8148343517c50129c8b6dfc0e1f72ef1cc3,
-pushed to codex/windows-local-package. Private packages, checksums, update
-instructions and the validation receipt remain in ignored local output.
-Preserve existing databases and credentials; no automatic reset or
-partial-database recovery is authorized. No automated fixture/unit/regression
-suites or live AO client launch are authorized.
+Setup remains file-only. Start alone initializes the database and starts services;
+account creation and Play require the already running server. Database-ready state
+keeps its existing meaning. Original startup errors remain visible if cleanup also
+fails. Earlier actual-handler checks proved setup works with TCP 7012 occupied,
+creates no services/MySQL files/process logs, preserves settings and protected
+credentials on repetition/reopening, and rejects Start port conflicts before any
+service launch without touching their owners.
 
-UNVERIFIED: clean-machine prerequisites/UAC, fresh database initialization,
-account creation, complete client download, and live login/play/restart. Mike
-performs live client acceptance; do not describe compilation as playable
-acceptance. Existing databases must never be reset by first-run setup.
+PROVEN: actual isolated launcher acceptance recovered the previous failed setup,
+automatically initialized the schema, and completed Start, Stop, reopen, restart
+and Stop. Subsequent current-machine acceptance through the actual launcher
+controller began with a completely empty data directory and exited 0: setup
+started no services, first Start became ready, first Stop completed, reopening
+and restarting became ready, and second Stop completed. Both Stop statuses were
+normal, without an abnormal-shutdown popup. Updated final ZIP integrity checks
+and distribution remain pending.
 
-The setup/start boundary repair and local packaging are complete. Distribution,
-fresh database/server acceptance and live-client acceptance remain separate.
+PUBLIC BASELINE OBSERVATION: empty-server Zone disposal logs an ObjectDisposed
+InventoryFlushService warning while exiting with code 0. Core bytes are unchanged;
+this warning is recorded, not repaired or promoted to gameplay acceptance.
+
+UNVERIFIED: clean-machine prerequisites/UAC, account registration POST,
+complete client download, and live login/play/restart. Mike performs
+live client acceptance. Preserve existing databases and credentials; no automatic
+reset or partial-database repair is authorized. No automated fixture/unit/
+regression suites or AO client launch were performed for this repair.
