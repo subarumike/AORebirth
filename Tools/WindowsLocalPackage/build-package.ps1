@@ -318,6 +318,27 @@ try {
         Remove-StagingDirectory (Join-Path $destination 'GameData')
         Export-LocalConfig (Join-Path $destination 'Config.xml')
     }
+    # The current content manifest loads its quest pack only. This authored
+    # research summary is copied by the project's broad Content glob, but is
+    # not a runtime input; retain its source and omit only this packaged copy.
+    $excludedNonRuntimeFiles = @()
+    $referenceRelative = 'server/ZoneEngine_New/Content/Nascence/life-dialogs/captures/20260822-221109.capture-reference.json'
+    $referencePath = [IO.Path]::GetFullPath((Join-Path $packageRoot $referenceRelative))
+    if (Test-Path -LiteralPath $referencePath -PathType Leaf) {
+        $contentRoot = Join-Path $packageRoot 'server\ZoneEngine_New\Content\Nascence\life-dialogs'
+        Get-SafeFiles $contentRoot | Out-Null
+        $contentManifest = Get-Content -LiteralPath (Join-Path $contentRoot 'manifest.json') -Raw | ConvertFrom-Json
+        foreach ($questPack in $contentManifest.QuestPacks) {
+            if ([IO.Path]::GetFullPath((Join-Path $contentRoot $questPack)) -eq $referencePath) {
+                throw 'The source-reference file became a runtime quest input; review the package exclusion.'
+            }
+        }
+        if (-not $referencePath.StartsWith($workRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'Refusing to remove a reference file outside package staging.'
+        }
+        Remove-Item -LiteralPath $referencePath
+        $excludedNonRuntimeFiles += [ordered]@{ path = $referenceRelative; reason = 'Authored source-reference summary; not listed in runtime manifest QuestPacks.' }
+    }
     Publish-Net10 'Tools\DatabaseMigrationTool\DatabaseMigrationTool.csproj' (Join-Path $packageRoot 'tools\DatabaseMigrationTool') 'DatabaseMigrationTool'
     Publish-Net10 'Tools\WindowsLocalPackage\DatabaseSetup\DatabaseSetup.csproj' (Join-Path $packageRoot 'tools\DatabaseSetup') 'DatabaseSetup'
     Build-Net48 'Tools\DatabasePreflight\DatabasePreflight.csproj' (Join-Path $packageRoot 'tools\DatabasePreflight')
@@ -404,6 +425,7 @@ try {
         generatedUtc = (Get-Date).ToUniversalTime().ToString('o')
         coreBuildSkipped = [bool]$SkipCoreBuild
         dependencies = $dependencies
+        excludedNonRuntimeFiles = $excludedNonRuntimeFiles
         toolingFiles = $toolingInventory
         validation = 'BUILD_AND_PACKAGE_ONLY; CLEAN_MACHINE_AND_LIVE_CLIENT_ACCEPTANCE_UNVERIFIED'
     }
