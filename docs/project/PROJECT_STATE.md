@@ -6,8 +6,9 @@ The preceding Windows local package Start/Stop and automatic database provisioni
 repair is complete, pushed as f0d1d575eeca3b12c952fbc639b18c6c03f66657 on
 codex/windows-local-package.
 
-Current follow-up: the existing SQL server must remain running. Start selects
-the package's private MySQL port through existing PackageState, retaining 3308
+The coexistence follow-up is complete. Start no longer requires a free fixed SQL
+port. It selects the package's private MySQL port through existing PackageState,
+retaining 3308
 as the backward-compatible default and choosing/persisting a free OS-assigned
 loopback port if busy. All database consumers use that same port. The package
 does not reuse another SQL database or stop its server. Setup remains file-only;
@@ -19,7 +20,16 @@ cycles selected/persisted another port and completed setup with no services,
 Start, Stop, reopen, restart and Stop with exit 0. Fresh data was initialized
 automatically; the ready database did not run first-time schema provisioning and
 its auto.cnf UUID file hash was preserved. This did not exercise an actual external
-SQL instance. Refreshed ZIP integrity validation remains pending.
+SQL instance.
+
+PROVEN: refreshed full and overlay package construction/integrity completed with
+exit 0 and PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package
+returned 0 with PACKAGE_INVENTORY_AND_CONFIGURATION_VERIFIED. Exactly five
+payload files changed; all 9,307 others, including all 8,090 GameData files, are
+preserved. The coexistence fix is pushed as
+197dff8bc5b2acd55d271aa004d8333dee4a4ec0 on codex/windows-local-package.
+Packages, checksums and validation records remain private ignored local outputs,
+not published. Distribution and live client acceptance remain separate.
 
 PROVEN (2026-10-11, local Windows package): isolated reproduction matches the
 player's Start/Stop port-owner popup. Bundled MySQL 8.4.11 launches a monitor parent
@@ -55,8 +65,9 @@ remain separate.
 
 PUBLIC BASELINE OBSERVATION: empty-server Zone disposal logs an ObjectDisposed
 InventoryFlushService warning and exits 0 with unchanged core bytes. The warning
-is recorded, not repaired. Clean-machine prerequisites/UAC, account registration POST,
-complete client download and live client gameplay remain UNVERIFIED. No automated
+is recorded, not repaired. Clean-machine prerequisites/UAC, an actual external SQL
+workload, account registration POST, complete client download and live client
+gameplay remain UNVERIFIED. No automated
 fixture/unit/regression suites or AO client launch were performed for this repair.
 
 PROVEN (2026-10-10, local Windows packaging): the exact public-master source

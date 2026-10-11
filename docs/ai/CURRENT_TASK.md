@@ -1,6 +1,7 @@
 # Current Task
 
-Allow the prebuilt Windows package to coexist with an existing SQL server.
+Completed automatic private database port selection in the prebuilt Windows
+package for coexistence with an existing SQL server.
 The preceding Start/Stop and automatic database provisioning repair is complete.
 The package is based on public master
 `6ec06bbd45e72496923275dcc8fd4e25fecace73`.
@@ -12,7 +13,7 @@ Git, a compiler, developer tools, or terminal commands. Setup must prepare files
 without starting services or requiring free ports. Only an explicit Start server
 action may initialize the database and start local services.
 
-Current follow-up: select the private MySQL port at Start using existing
+Start now selects the private MySQL port using existing
 PackageState, retaining 3308 as the backward-compatible default. If the saved
 port is busy, select a free OS-assigned loopback port and persist it. Every
 database consumer must use the same selected port. Existing SQL servers remain
@@ -26,7 +27,17 @@ port without first-time schema provisioning; its auto.cnf UUID file hash was
 unchanged. Both cases completed setup with no services, Start, Stop, reopen,
 restart and Stop with exit 0, retained the saved port, and left the controlled
 listener unchanged. This tests occupied-port coexistence, not an actual external
-SQL instance. Refreshed ZIP integrity validation remains pending.
+SQL instance.
+
+PROVEN: refreshed full and overlay package construction/integrity completed with
+exit 0 and PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package
+returned 0 with PACKAGE_INVENTORY_AND_CONFIGURATION_VERIFIED. Exactly five
+payload files changed; all 9,307 others, including all 8,090 GameData files, are
+preserved. The coexistence fix is pushed as
+197dff8bc5b2acd55d271aa004d8333dee4a4ec0 on codex/windows-local-package.
+Packages, checksums and validation records remain private ignored local outputs,
+not published. Packaging is complete; distribution and live client acceptance
+remain separate.
 
 Implementation is isolated under `Tools/WindowsLocalPackage`. Reuse the current
 Windows project graph, configuration/GameData environment overrides, schema
@@ -83,8 +94,8 @@ PUBLIC BASELINE OBSERVATION: empty-server Zone disposal logs an ObjectDisposed
 InventoryFlushService warning while exiting with code 0. Core bytes are unchanged;
 this warning is recorded, not repaired or promoted to gameplay acceptance.
 
-UNVERIFIED: clean-machine prerequisites/UAC, account registration POST,
-complete client download, and live login/play/restart. Mike performs
+UNVERIFIED: clean-machine prerequisites/UAC, an actual external SQL workload,
+account registration POST, complete client download, and live login/play/restart. Mike performs
 live client acceptance. Preserve existing databases and credentials; no automatic
 reset or partial-database repair is authorized. No automated fixture/unit/
 regression suites or AO client launch were performed for this repair.
