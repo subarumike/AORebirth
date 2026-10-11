@@ -15,11 +15,20 @@ gameplay or existing engine behavior. Private GameData and binary packages
 remain outside tracked source. No Linux work or deployment is authorized.
 
 PROVEN: the established Windows build completed on the exact master source.
+The local Windows candidate ZIP is built. Its staged launcher inventory check,
+every compressed payload hash, full GameData comparison against the authorized
+source, and ZIP checksum verification succeeded. Bundled runtimes and MySQL
+load, and the existing offline ZoneEngine_New startup validation succeeds.
 The Classic website ZIP layout and executable checksum were inspected without
-launching the client. Package construction and offline verification are in
-progress. No automated fixture, unit, or regression suites were requested or run.
+launching the client. The private ZIP, checksum and validation record remain in
+ignored local output. No automated fixture, unit, or regression suites were
+requested or run.
 
 UNVERIFIED: clean-machine prerequisites/UAC, fresh database initialization,
 account creation, complete client download, and live login/play/restart. Mike
 performs live client acceptance; do not describe compilation as playable
 acceptance. Existing databases must never be reset by first-run setup.
+
+Packaging is complete as a local acceptance candidate. The next step is Mike's
+fresh-install and live-client acceptance of that exact ZIP; distribution or
+deployment has not been performed.

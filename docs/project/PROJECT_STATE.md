@@ -5,11 +5,14 @@ Updated: 2026-10-10
 PROVEN (2026-10-10, local Windows packaging): the exact public-master source
 6ec06bbd45e72496923275dcc8fd4e25fecace73 builds through the approved Windows
 wrapper. The isolated package engine/helper graph and graphical launcher compile.
-An assembled runtime with the full release GameData passes the existing offline
+A candidate ZIP with the full release GameData is built. The staged launcher
+inventory, every compressed payload hash, complete GameData source comparison,
+and ZIP checksum verification succeeded. Its runtime passes the existing offline
 ZoneEngine_New startup check; bundled .NET/ASP.NET Core 10.0.12 and MySQL 8.4.11
 load successfully. Packaging tooling is under Tools/WindowsLocalPackage and
-preserves current engine/runtime source. Private GameData and binary packages
-remain outside Git. The fixed website Classic client is a separate download.
+preserves current engine/runtime source. Private GameData, binary packages and
+validation records remain outside Git. The fixed website Classic client is a
+separate download.
 UNVERIFIED: clean-machine prerequisites/UAC, first-run database setup, account
 creation, complete client download and live client play/restart. No automated
 fixture/unit/regression suites, database operations, client launch, Linux work
