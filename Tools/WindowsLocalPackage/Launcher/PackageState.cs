@@ -16,6 +16,7 @@ namespace AORebirth.WindowsLocalLauncher
         internal string RuntimePassword;
         internal bool OwnsDataDirectory;
         internal bool SetupComplete;
+        internal int DatabasePort = 3308;
 
         internal static PackageState Load(string root)
         {
@@ -27,6 +28,9 @@ namespace AORebirth.WindowsLocalLauncher
                 state.ClientFolder = (string)value.Attribute("clientFolder") ?? string.Empty;
                 state.OwnsDataDirectory = (bool?)value.Attribute("ownsDataDirectory") ?? false;
                 state.SetupComplete = (bool?)value.Attribute("setupComplete") ?? false;
+                state.DatabasePort = (int?)value.Attribute("databasePort") ?? 3308;
+                if (state.DatabasePort < 1024 || state.DatabasePort > 65535)
+                    throw new InvalidDataException("The saved local database port is invalid.");
             }
 
             string secrets = Path.Combine(root, "data", "launcher.secrets");
@@ -80,7 +84,8 @@ namespace AORebirth.WindowsLocalLauncher
             var document = new XDocument(new XElement("Launcher",
                 new XAttribute("clientFolder", ClientFolder),
                 new XAttribute("ownsDataDirectory", OwnsDataDirectory),
-                new XAttribute("setupComplete", SetupComplete)));
+                new XAttribute("setupComplete", SetupComplete),
+                new XAttribute("databasePort", DatabasePort)));
             AtomicWrite(Path.Combine(data, "launcher.xml"), Encoding.UTF8.GetBytes(document.ToString()));
         }
 

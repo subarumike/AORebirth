@@ -11,6 +11,7 @@ namespace AORebirth.WindowsLocalLauncher
     using System.Linq;
     using System.Net;
     using System.Net.NetworkInformation;
+    using System.Net.Sockets;
     using System.Runtime.InteropServices;
     using System.Security.AccessControl;
     using System.Security.Cryptography;
@@ -21,7 +22,6 @@ namespace AORebirth.WindowsLocalLauncher
 
     internal sealed class PackageController
     {
-        internal const int DatabasePort = 3308;
         private readonly string root;
         private readonly PackageState state;
         private readonly Action<string> status;
@@ -312,7 +312,8 @@ namespace AORebirth.WindowsLocalLauncher
             }
 
             InitializeUserFiles();
-            RequireFreePorts(3308, 6996, 7012, 7500, 7501, 7510);
+            RequireFreePorts(6996, 7012, 7500, 7501, 7510);
+            SelectDatabasePort();
             try
             {
                 StartDatabase();
@@ -323,7 +324,7 @@ namespace AORebirth.WindowsLocalLauncher
                     environment["AO_REBIRTH_MIGRATION_CONNECTION"] = AdminConnection(adminPasswordInUse);
                     environment["AO_REBIRTH_MYSQL_ADMIN_PASSWORD"] = state.AdminPassword;
                     RunExecutable("runtime/dotnet.exe", Quote(PathOf("tools/DatabaseSetup/DatabaseSetup.dll"))
-                        + " prepare --root " + Quote(root) + " --port 3308", 300000, "database-setup", environment, null);
+                        + " prepare --root " + Quote(root) + " --port " + state.DatabasePort.ToString(CultureInfo.InvariantCulture), 300000, "database-setup", environment, null);
                     adminPasswordInUse = state.AdminPassword;
                     state.SetupComplete = true;
                     state.Save(root);
@@ -418,7 +419,7 @@ namespace AORebirth.WindowsLocalLauncher
                 VerifyOwnership(item);
                 if (name != "AccountBroker")
                 {
-                    int[] ports = name == "MySQL" ? new[] { 3308 } : name == "ChatEngine" ? new[] { 6996, 7012 }
+                    int[] ports = name == "MySQL" ? new[] { state.DatabasePort } : name == "ChatEngine" ? new[] { 6996, 7012 }
                         : name == "LoginEngine" ? new[] { 7500 } : new[] { 7501 };
                     WaitForPorts(item, ports, 2000);
                 }
@@ -526,6 +527,47 @@ namespace AORebirth.WindowsLocalLauncher
             ValidateConfig(PackageState.ReadXml(config));
         }
 
+        private void SelectDatabasePort()
+        {
+            var unavailable = new HashSet<int>(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Select(listener => listener.Port));
+            unavailable.UnionWith(new[] { 6996, 7012, 7500, 7501, 7510 });
+            for (int attempt = 0; attempt < 5; attempt++)
+            {
+                int requested = attempt == 0 ? state.DatabasePort : 0;
+                if (requested != 0 && unavailable.Contains(requested))
+                    continue;
+
+                var reservation = new TcpListener(IPAddress.Loopback, requested);
+                reservation.ExclusiveAddressUse = true;
+                try
+                {
+                    try
+                    {
+                        reservation.Start();
+                    }
+                    catch (SocketException exception) when (exception.SocketErrorCode == SocketError.AddressAlreadyInUse
+                        || exception.SocketErrorCode == SocketError.AccessDenied)
+                    {
+                        continue;
+                    }
+
+                    int selected = ((IPEndPoint)reservation.LocalEndpoint).Port;
+                    if (unavailable.Contains(selected))
+                        continue;
+
+                    state.DatabasePort = selected;
+                    state.Save(root);
+                    return;
+                }
+                finally
+                {
+                    reservation.Stop();
+                }
+            }
+
+            throw new InvalidOperationException("Windows could not assign an available local database port. No other processes were changed.");
+        }
+
         private void StartDatabase()
         {
             status("Starting the private local MySQL instance...");
@@ -548,7 +590,8 @@ namespace AORebirth.WindowsLocalLauncher
 
             string options = PathOf("data/mysql.ini");
             File.WriteAllText(options, "[mysqld]\r\nbasedir=\"" + PathOf("mysql").Replace('\\', '/')
-                + "\"\r\ndatadir=\"" + data.Replace('\\', '/') + "\"\r\nport=3308\r\nbind-address=127.0.0.1\r\nmysqlx=0\r\nskip-log-bin\r\nlocal-infile=0\r\n");
+                + "\"\r\ndatadir=\"" + data.Replace('\\', '/') + "\"\r\nport=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + "\r\nbind-address=127.0.0.1\r\nmysqlx=0\r\nskip-log-bin\r\nlocal-infile=0\r\n");
             string arguments = "--defaults-file=" + Quote(options);
             if (fresh)
             {
@@ -558,7 +601,7 @@ namespace AORebirth.WindowsLocalLauncher
             }
 
             OwnedProcess process = Launch("MySQL", "mysql/bin/mysqld.exe", arguments + " --no-monitor --console", null, BaseEnvironment());
-            WaitForPorts(process, new[] { 3308 }, 60000);
+            WaitForPorts(process, new[] { state.DatabasePort }, 60000);
             adminPasswordInUse = state.AdminPassword;
             if (!CanConnectAdmin(state.AdminPassword))
             {
@@ -618,9 +661,10 @@ namespace AORebirth.WindowsLocalLauncher
             throw new InvalidOperationException("MySQL's graceful shutdown event is unavailable. MySQL was left running and its ownership record was preserved.");
         }
 
-        private static string MysqlArguments()
+        private string MysqlArguments()
         {
-            return "--no-defaults --protocol=TCP --host=127.0.0.1 --port=3308 --user=root --batch --skip-column-names --connect-timeout=5";
+            return "--no-defaults --protocol=TCP --host=127.0.0.1 --port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + " --user=root --batch --skip-column-names --connect-timeout=5";
         }
 
         private void StartEngine(string name, int[] ports)
@@ -908,7 +952,8 @@ namespace AORebirth.WindowsLocalLauncher
                 ["DOTNET_ROOT"] = PathOf("runtime"),
                 ["DOTNET_ROOT_X64"] = PathOf("runtime"),
                 ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
-                ["AO_REBIRTH_MYSQL_CONNECTION"] = "Server=127.0.0.1;Port=3308;Database=cellao_codex_clean;User ID=aorebirth_local;Password=" + state.RuntimePassword + ";AllowPublicKeyRetrieval=True;",
+                ["AO_REBIRTH_MYSQL_CONNECTION"] = "Server=127.0.0.1;Port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                    + ";Database=cellao_codex_clean;User ID=aorebirth_local;Password=" + state.RuntimePassword + ";AllowPublicKeyRetrieval=True;",
                 ["AO_REBIRTH_EXPECTED_DATABASE"] = "cellao_codex_clean",
                 ["AO_REBIRTH_CONFIG_PATH"] = PathOf("data/config/Config.xml"),
                 ["AO_REBIRTH_GAMEDATA_PATH"] = PathOf("GameData"),
@@ -918,9 +963,10 @@ namespace AORebirth.WindowsLocalLauncher
             };
         }
 
-        private static string AdminConnection(string password)
+        private string AdminConnection(string password)
         {
-            return "Server=127.0.0.1;Port=3308;Database=cellao_codex_clean;User ID=root;Password=" + password + ";AllowPublicKeyRetrieval=True;";
+            return "Server=127.0.0.1;Port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + ";Database=cellao_codex_clean;User ID=root;Password=" + password + ";AllowPublicKeyRetrieval=True;";
         }
 
         private void CaptureOutput(Process process, string name)

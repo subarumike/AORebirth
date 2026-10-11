@@ -2,9 +2,24 @@
 
 Updated: 2026-10-11
 
-The Windows local package Start/Stop and automatic database provisioning repair
-is complete, pushed as f0d1d575eeca3b12c952fbc639b18c6c03f66657 on
+The preceding Windows local package Start/Stop and automatic database provisioning
+repair is complete, pushed as f0d1d575eeca3b12c952fbc639b18c6c03f66657 on
 codex/windows-local-package.
+
+Current follow-up: the existing SQL server must remain running. Start selects
+the package's private MySQL port through existing PackageState, retaining 3308
+as the backward-compatible default and choosing/persisting a free OS-assigned
+loopback port if busy. All database consumers use that same port. The package
+does not reuse another SQL database or stop its server. Setup remains file-only;
+fixed game/service port conflicts still stop Start before any services launch.
+PROVEN current-machine port coexistence: a controlled TCP 3308 listener remained
+unchanged throughout fresh empty-data and existing ready-database acceptance.
+The latter used old launcher.xml without databasePort. Both actual controller
+cycles selected/persisted another port and completed setup with no services,
+Start, Stop, reopen, restart and Stop with exit 0. Fresh data was initialized
+automatically; the ready database did not run first-time schema provisioning and
+its auto.cnf UUID file hash was preserved. This did not exercise an actual external
+SQL instance. Refreshed ZIP integrity validation remains pending.
 
 PROVEN (2026-10-11, local Windows package): isolated reproduction matches the
 player's Start/Stop port-owner popup. Bundled MySQL 8.4.11 launches a monitor parent
@@ -29,8 +44,8 @@ became ready, and both Stops completed with normal status and no abnormal-shutdo
 popup. Engine source, database helper/schema semantics and GameData are unchanged;
 no existing database is reset.
 
-PROVEN: final package construction/integrity completed with exit 0 and
-PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package returned 0
+PROVEN for the preceding repair: package construction/integrity completed with
+exit 0 and PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package returned 0
 with PACKAGE_INVENTORY_AND_CONFIGURATION_VERIFIED. The full replacement and
 overlay ZIPs passed their payload integrity checks. Exactly five payload files
 changed; all 9,307 others, including all 8,090 GameData files, are preserved.

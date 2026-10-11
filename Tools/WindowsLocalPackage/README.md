@@ -9,18 +9,23 @@ start MySQL or any server, initialize the database, reserve a URL, or require
 free network ports. Opening the launcher also starts no services.
 
 Download the fixed AO client from the launcher, or select an existing copy.
-Press **Start server** when ready. This checks all required ports before starting
-anything, initializes the private database on first start, and starts the local
-services. Once ready, create your local account and press **Play**. Create account
+Press **Start server** when ready. This checks the game ports and selects a private
+database port before starting anything, initializes the database on first start,
+and starts the local services. Once ready, create your local account and press **Play**. Create account
 and Play require the server to be running; neither starts it implicitly.
 **Stop server** saves and stops the processes owned by this installation.
 **Open Logs** shows diagnostic files if startup fails.
 
-Setup requires no free ports. Start server requires TCP ports 3308 (private
-MySQL), 6996 and 7012 (chat), 7500 (login), 7501 (zone), and 7510 (local account
-registration). If a port is occupied, Start server reports it before launching
-services. Close the application that owns the port; do not terminate unrelated
-processes merely because they use one of these ports.
+Your existing SQL server can remain running. AORebirth starts its own bundled
+MySQL with separate data and credentials. Start server prefers its saved private
+port (3308 by default); if occupied, it selects a free loopback port automatically
+and saves that choice. All AORebirth database connections use that selected port.
+It does not reuse an existing SQL database or stop another SQL server.
+
+Setup requires no free ports. The fixed game/service TCP ports remain 6996 and
+7012 (chat), 7500 (login), 7501 (zone), and 7510 (local account registration).
+If one is occupied, Start server reports the conflict before launching services
+and leaves its owner untouched.
 
 No Git, Visual Studio, .NET SDK, compilation, SQL commands, or terminal commands
 are required on the player's machine. Supported target: Windows 11 x64 with
@@ -33,7 +38,7 @@ The local database is initialized only by Start server. Accounts and characters
 are subsequently stored there. Do not delete `data` when replacing a package. This first
 package does not automate upgrades of existing databases; retain the existing
 installation until an upgrade has been separately accepted. Never run two
-copies of the local package on the same default ports.
+copies of the local package on the same fixed game/service ports.
 Protected local credentials are tied to the current Windows user and machine;
 this first release does not support moving its data to another account or PC.
 
@@ -41,6 +46,9 @@ The package contains the full AORebirth GameData supplied for this release.
 `LICENSE`, `NOTICE`, and bundled upstream notices accompany the software.
 Do not redistribute components beyond their stated terms.
 
+Local checks passed with port 3308 occupied by a test application: AORebirth chose
+another port, prepared its database, and stopped/restarted while that application
+kept running. The chosen port was retained after reopening the launcher.
 Clean-machine installation and live AO client acceptance are **unverified**
 until recorded for the exact ZIP SHA-256. Compilation and package construction
 alone do not establish playable acceptance.
@@ -161,7 +169,8 @@ channel.
 
 On a clean Windows machine without developer tools, verify extraction to a
 path containing spaces, first-run setup with no services or listeners,
-explicit Start server and occupied-port handling, prerequisite handling, account
+explicit Start server with an existing SQL server left running, occupied game-port
+handling, prerequisite handling, account
 creation, client download/selection, server readiness, Mike's live login and
 play check, clean shutdown, restart with the same character, and clear errors
 for occupied ports or missing content. Record failures and the exact package

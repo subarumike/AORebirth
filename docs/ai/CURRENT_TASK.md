@@ -1,7 +1,8 @@
 # Current Task
 
-Completed the prebuilt Windows package Start/Stop and automatic database
-provisioning repair for the package from public master
+Allow the prebuilt Windows package to coexist with an existing SQL server.
+The preceding Start/Stop and automatic database provisioning repair is complete.
+The package is based on public master
 `6ec06bbd45e72496923275dcc8fd4e25fecace73`.
 
 Mike authorized a precompiled package with the full release GameData, bundled
@@ -10,6 +11,22 @@ and a separate download of the fixed website client. Players must not need
 Git, a compiler, developer tools, or terminal commands. Setup must prepare files
 without starting services or requiring free ports. Only an explicit Start server
 action may initialize the database and start local services.
+
+Current follow-up: select the private MySQL port at Start using existing
+PackageState, retaining 3308 as the backward-compatible default. If the saved
+port is busy, select a free OS-assigned loopback port and persist it. Every
+database consumer must use the same selected port. Existing SQL servers remain
+running and their databases are not reused. Setup still starts nothing.
+
+PROVEN current-machine port coexistence: a controlled TCP 3308 listener stayed
+running throughout both actual launcher-controller acceptance cycles. Fresh empty
+data selected another port and initialized its schema automatically. An existing
+ready database with old launcher.xml missing databasePort also selected another
+port without first-time schema provisioning; its auto.cnf UUID file hash was
+unchanged. Both cases completed setup with no services, Start, Stop, reopen,
+restart and Stop with exit 0, retained the saved port, and left the controlled
+listener unchanged. This tests occupied-port coexistence, not an actual external
+SQL instance. Refreshed ZIP integrity validation remains pending.
 
 Implementation is isolated under `Tools/WindowsLocalPackage`. Reuse the current
 Windows project graph, configuration/GameData environment overrides, schema
@@ -51,15 +68,16 @@ started no services, first Start became ready, first Stop completed, reopening
 and restarting became ready, and second Stop completed. Both Stop statuses were
 normal, without an abnormal-shutdown popup.
 
-PROVEN: final package construction/integrity completed with exit 0 and
-PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package returned 0
+PROVEN for the preceding repair: package construction/integrity completed with
+exit 0 and PACKAGE_INTEGRITY=PASS. The final staged launcher --verify-package returned 0
 with PACKAGE_INVENTORY_AND_CONFIGURATION_VERIFIED. The full replacement and
 overlay ZIPs passed their payload integrity checks. Exactly five payload files
 changed; all 9,307 others, including all 8,090 GameData files, are preserved.
 The fix is pushed as f0d1d575eeca3b12c952fbc639b18c6c03f66657 on
 codex/windows-local-package. Binary packages, checksums and validation records
 remain in private ignored local output and have not been published.
-The repair is complete; distribution and live client acceptance are separate.
+That repair is complete; its acceptance does not establish SQL coexistence for
+this follow-up. Distribution and live client acceptance are separate.
 
 PUBLIC BASELINE OBSERVATION: empty-server Zone disposal logs an ObjectDisposed
 InventoryFlushService warning while exiting with code 0. Core bytes are unchanged;
