@@ -2,6 +2,19 @@
 
 Updated: 2026-10-10
 
+PROVEN (2026-10-10, local Windows packaging): the exact public-master source
+6ec06bbd45e72496923275dcc8fd4e25fecace73 builds through the approved Windows
+wrapper. The isolated package engine/helper graph and graphical launcher compile.
+An assembled runtime with the full release GameData passes the existing offline
+ZoneEngine_New startup check; bundled .NET/ASP.NET Core 10.0.12 and MySQL 8.4.11
+load successfully. Packaging tooling is under Tools/WindowsLocalPackage and
+preserves current engine/runtime source. Private GameData and binary packages
+remain outside Git. The fixed website Classic client is a separate download.
+UNVERIFIED: clean-machine prerequisites/UAC, first-run database setup, account
+creation, complete client download and live client play/restart. No automated
+fixture/unit/regression suites, database operations, client launch, Linux work
+or deployment were performed for packaging.
+
 OBSERVED (2026-10-10, original-client mission acceptance): Mike reports that
 30f1b3c33eb1334f6dc6e514cb3c7ac8a5f84150 works in the original AO client for
 level/slider QL, five offers and credit deductions, geographic selection,

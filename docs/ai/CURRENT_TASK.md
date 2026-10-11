@@ -1,30 +1,25 @@
 # Current Task
 
-Merge the manually verified mission destination implementation into public master.
+Produce a local Windows package from public master
+`6ec06bbd45e72496923275dcc8fd4e25fecace73`.
 
-Verified source: codex/mission-destination-integration at
-30f1b3c33eb1334f6dc6e514cb3c7ac8a5f84150. Mike reports original AO client
-verification of rolling/QL, five offers/fees, terminal geography, acceptance,
-persistence, dungeon entry, mission deletion and key removal.
-Preservation tag: mission-destinations-working-30f1b3c33.
-Fetched target: ce4a3bf973b92cc7b42c3a867e636f04b89eaca7.
-Merge base: bddea56ca2d47c5eb64ed53f6e9efd279ff4f694.
+Mike authorized a precompiled package with the full release GameData, bundled
+runtime and dedicated local MySQL, graphical first-run/account/play controls,
+and a separate download of the fixed website client. Players must not need
+Git, a compiler, developer tools, or terminal commands.
 
-Preserve both parents: master has the completed PR31/PR32 perk/buff/aura/taunt
-integration recorded in docs/evidence/PR31_PR32_INTEGRATION.md. The mission
-branch has the exact two-file destination catalog, 2,242 placements, 812 supported
-identities and 45 QL pools documented in
-docs/evidence/MISSION_DESTINATION_TWO_FILE_MIGRATION.md.
-The only content conflict was this active-task document. Project-state history
-from both branches is retained. Runtime, content and test files merged cleanly.
+Implementation is isolated under `Tools/WindowsLocalPackage`. Reuse the current
+Windows project graph, configuration/GameData environment overrides, schema
+tools, Account Broker, and engine headless/shutdown signals. Do not change
+gameplay or existing engine behavior. Private GameData and binary packages
+remain outside tracked source. No Linux work or deployment is authorized.
 
-No new gameplay changes, refactoring, mission-objective changes, PF324 template
-selection changes or retired destination/location systems are permitted.
-Merged validation passed: approved build, offline exact catalog check, 81 mission
-regressions, 74 real DAO identity checks and 275 full DAO persistence checks.
-The ordinary full test project reproduces the same six CS0246 compilation
-diagnostics on untouched fetched master and the merged tree; no new diagnostics.
-No source/test workaround was introduced. See
-docs/evidence/MISSION_DESTINATION_MASTER_MERGE.md for the comparison and scope.
-The validated merge and exact preservation tag are ready for publication to master.
-No Linux work or deployment is requested.
+PROVEN: the established Windows build completed on the exact master source.
+The Classic website ZIP layout and executable checksum were inspected without
+launching the client. Package construction and offline verification are in
+progress. No automated fixture, unit, or regression suites were requested or run.
+
+UNVERIFIED: clean-machine prerequisites/UAC, fresh database initialization,
+account creation, complete client download, and live login/play/restart. Mike
+performs live client acceptance; do not describe compilation as playable
+acceptance. Existing databases must never be reset by first-run setup.
