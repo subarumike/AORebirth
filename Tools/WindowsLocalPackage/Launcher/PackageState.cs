@@ -11,6 +11,7 @@ namespace AORebirth.WindowsLocalLauncher
 
     internal sealed class PackageState
     {
+        internal const string DefaultPassword = "aorebirth";
         internal string ClientFolder = string.Empty;
         internal string AdminPassword;
         internal string RuntimePassword;
@@ -40,7 +41,9 @@ namespace AORebirth.WindowsLocalLauncher
                 try
                 {
                     string[] values = Encoding.UTF8.GetString(clear).Split('\n');
-                    if (values.Length != 2 || values[0].Length < 32 || values[1].Length < 32)
+                    if (values.Length != 2
+                        || (values[0] != DefaultPassword && values[0].Length < 32)
+                        || (values[1] != DefaultPassword && values[1].Length < 32))
                         throw new InvalidDataException("The saved local credentials are invalid.");
 
                     state.AdminPassword = values[0];
@@ -66,8 +69,8 @@ namespace AORebirth.WindowsLocalLauncher
             RestrictDirectory(data);
             if (AdminPassword == null)
             {
-                AdminPassword = NewPassword();
-                RuntimePassword = NewPassword();
+                AdminPassword = DefaultPassword;
+                RuntimePassword = DefaultPassword;
             }
 
             string secretPath = Path.Combine(data, "launcher.secrets");
@@ -114,17 +117,6 @@ namespace AORebirth.WindowsLocalLauncher
             }
 
             Directory.SetAccessControl(path, security);
-        }
-
-        private static string NewPassword()
-        {
-            byte[] bytes = new byte[32];
-            using (var random = RandomNumberGenerator.Create())
-            {
-                random.GetBytes(bytes);
-            }
-
-            return Convert.ToBase64String(bytes);
         }
 
         internal static void AtomicWrite(string path, byte[] bytes)

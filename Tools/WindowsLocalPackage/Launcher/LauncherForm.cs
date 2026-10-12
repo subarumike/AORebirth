@@ -1,6 +1,7 @@
 namespace AORebirth.WindowsLocalLauncher
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using System.Threading.Tasks;
     using System.Windows.Forms;
@@ -71,6 +72,7 @@ namespace AORebirth.WindowsLocalLauncher
                 AddButton("Play", () => controller.Play());
                 AddButton("Stop server", () => controller.Stop());
                 AddButton("Status", () => controller.CheckStatus());
+                AddButton("SQL login", ShowSqlLogin);
                 AddButton("Open logs", () => controller.OpenLogs());
                 cancelDownload = new Button { Text = "Cancel download", AutoSize = true, MinimumSize = new Size(142, 38), Margin = new Padding(0, 0, 10, 10), Enabled = false };
                 cancelDownload.Click += (sender, args) => controller.CancelDownload();
@@ -96,6 +98,12 @@ namespace AORebirth.WindowsLocalLauncher
                 if (label == "Choose client folder")
                 {
                     ChooseClient();
+                    return;
+                }
+
+                if (label == "SQL login")
+                {
+                    ShowSqlLogin();
                     return;
                 }
 
@@ -127,6 +135,86 @@ namespace AORebirth.WindowsLocalLauncher
                     ShowFailure(exception);
                 }
             }
+        }
+
+        private void ShowSqlLogin()
+        {
+            try
+            {
+                using (Form dialog = BuildSqlLoginDialog(controller.GetSqlLoginDetails()))
+                {
+                    dialog.ShowDialog(this);
+                }
+            }
+            catch (Exception exception)
+            {
+                ShowFailure(exception);
+            }
+        }
+
+        private Form BuildSqlLoginDialog(IDictionary<string, string> details)
+        {
+            var dialog = new Form
+            {
+                Text = "Local SQL login",
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                ShowInTaskbar = false,
+                ClientSize = new Size(580, 360),
+                Font = Font,
+                BackColor = Color.White
+            };
+            var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(24), ColumnCount = 2, RowCount = 8 };
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
+            layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
+            var description = new Label { Text = "Use these details to connect to this installation's local SQL database.", Dock = DockStyle.Fill };
+            layout.Controls.Add(description, 0, 0);
+            layout.SetColumnSpan(description, 2);
+            TextBox password = null;
+            string[] fields = { "Host", "Port", "Database", "Username", "Password" };
+            for (int index = 0; index < fields.Length; index++)
+            {
+                string field = fields[index];
+                layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
+                layout.Controls.Add(new Label { Text = field, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, index + 1);
+                var value = new TextBox { Text = details[field], ReadOnly = true, Dock = DockStyle.Fill, UseSystemPasswordChar = field == "Password" };
+                layout.Controls.Add(value, 1, index + 1);
+                if (field == "Password")
+                {
+                    password = value;
+                }
+            }
+
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 32));
+            var showPassword = new CheckBox { Text = "Show password", AutoSize = true };
+            showPassword.CheckedChanged += (sender, args) => password.UseSystemPasswordChar = !showPassword.Checked;
+            layout.Controls.Add(showPassword, 1, 6);
+            layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
+            var buttons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft, WrapContents = false };
+            var close = new Button { Text = "Close", DialogResult = DialogResult.OK, AutoSize = true, MinimumSize = new Size(142, 38), Margin = new Padding(0, 0, 10, 10) };
+            var copyPassword = new Button { Text = "Copy password", AutoSize = true, MinimumSize = new Size(142, 38), Margin = new Padding(0, 0, 10, 10) };
+            copyPassword.Click += (sender, args) =>
+            {
+                try
+                {
+                    Clipboard.SetText(password.Text);
+                }
+                catch (Exception exception)
+                {
+                    ShowFailure(exception);
+                }
+            };
+            buttons.Controls.Add(close);
+            buttons.Controls.Add(copyPassword);
+            layout.Controls.Add(buttons, 0, 7);
+            layout.SetColumnSpan(buttons, 2);
+            dialog.Controls.Add(layout);
+            dialog.AcceptButton = close;
+            dialog.CancelButton = close;
+            return dialog;
         }
 
         private async Task RunAction(Action action, bool downloading = false)

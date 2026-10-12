@@ -22,6 +22,18 @@ port (3308 by default); if occupied, it selects a free loopback port automatical
 and saves that choice. All AORebirth database connections use that selected port.
 It does not reuse an existing SQL database or stop another SQL server.
 
+The local SQL administrator login is `root` / `aorebirth`; AORebirth's internal
+runtime login is `aorebirth_local` / `aorebirth`. Use host `127.0.0.1`, database
+`cellao_codex_clean`, and the port shown by **SQL login** (also saved in
+`data/launcher.xml`). That button shows and copies the connection details after
+the first successful Start server. It remains available while stopped, but the
+server must be running to connect.
+
+When updating an existing installation, keep its `data` folder and press
+**Start server** once before using SQL login. That start applies the documented
+passwords to this installation's owned private database while preserving its
+accounts and characters. No other SQL server is changed.
+
 Setup requires no free ports. The fixed game/service TCP ports remain 6996 and
 7012 (chat), 7500 (login), 7501 (zone), and 7510 (local account registration).
 If one is occupied, Start server reports the conflict before launching services
@@ -36,7 +48,7 @@ installer. Use **Install prerequisites** before **Start server**.
 Local configuration and protected passwords are prepared under `data` by setup.
 The local database is initialized only by Start server. Accounts and characters
 are subsequently stored there. Do not delete `data` when replacing a package. This first
-package does not automate upgrades of existing databases; retain the existing
+package does not automate schema upgrades of existing databases; retain the existing
 installation until an upgrade has been separately accepted. Never run two
 copies of the local package on the same fixed game/service ports.
 Protected local credentials are tied to the current Windows user and machine;

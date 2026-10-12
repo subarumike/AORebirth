@@ -1,6 +1,46 @@
 # AORebirth Project State
 
-Updated: 2026-10-11
+Updated: 2026-10-12
+
+Current Windows SQL-access follow-up: Mike explicitly rejects random passwords
+and a full-package upload. The authorized fixed local credentials are
+root / aorebirth and aorebirth_local / aorebirth. Fresh installations use these
+defaults; existing owned databases update credentials on the next explicit Start
+while preserving accounts, characters and schema. PackageController/PackageState
+and the existing DatabaseSetup helper implement the scoped set-passwords path,
+retaining owned-server/datadir/selected-port checks and parameterized SQL. No
+engine core, schema definition, GameData or gameplay change is involved. SQL login
+is a read-only root-endpoint dialog available after Start has applied credentials,
+with masking, optional reveal and explicit password copy. The small overlay is
+pending; no full ZIP was generated, rebuilt or uploaded for this follow-up.
+
+PROVEN (2026-10-12, current-machine SQL acceptance): launcher/helper compilation
+and secrets scan passed. UI renders passed read-only fields, initial masking,
+reveal/remask and all 12 actions fitting in three rows. Copy is wired but was not
+invoked; no clipboard action occurred.
+
+Fresh retry exited 0: Prepare started no services; Start automatically created
+the database on selected private port 46513 with a controlled TCP 3308 listener
+held throughout. Both fixed-password logins succeeded using packaged mysql-client
+SELECT checks; the database had 59 tables and zero login/character rows.
+Stop/reopen/restart/Stop and SQL-detail display while stopped passed.
+
+The existing-ready case's retained-state legacy-credential assertion passed and
+the case exited 0.
+It did not enter first-time schema preparation. The auto.cnf identity hash and
+saved port 64593 were retained. Both fixed-password logins succeeded, and the
+59-table/zero-login/zero-character snapshot after Start was unchanged across
+restart. Stop/reopen/restart/Stop passed; the controlled listener was unchanged.
+The initial attempt refused other active-checkout engines before launch; the
+approved wrapper stopped those positively identified engines, and retry passed.
+
+UNVERIFIED limits: existing SQL row counts were not probed before the credential
+change; nonempty player-row preservation was not tested. Partial-failure retry
+was source-reviewed, not runtime-injected. An actual external SQL workload,
+clean-PC prerequisites/UAC and live client behavior remain unverified. Prior
+accepted coexistence/package results below remain historical. The existing
+Zone InventoryFlushService disposal warning is recorded with unchanged core
+bytes; no core fix is included.
 
 The preceding Windows local package Start/Stop and automatic database provisioning
 repair is complete, pushed as f0d1d575eeca3b12c952fbc639b18c6c03f66657 on

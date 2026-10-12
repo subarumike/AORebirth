@@ -14,6 +14,7 @@ internal static class Program
 {
     private const string Database = "cellao_codex_clean";
     private const string RuntimeUser = "aorebirth_local";
+    private const string DefaultPassword = "aorebirth";
 
     private static int Main(string[] args)
     {
@@ -21,11 +22,11 @@ internal static class Program
         {
             if (!OperatingSystem.IsWindows())
                 throw new SetupRefusedException("PLATFORM_REFUSED: this package setup requires Windows.");
-            if (args.Length != 5 || args[0] != "prepare" || args[1] != "--root" || args[3] != "--port"
+            if (args.Length != 5 || (args[0] != "prepare" && args[0] != "set-passwords") || args[1] != "--root" || args[3] != "--port"
                 || !uint.TryParse(args[4], NumberStyles.None, CultureInfo.InvariantCulture, out uint port)
                 || port is < 1024 or > 65535)
             {
-                Console.Error.WriteLine("USAGE: DatabaseSetup prepare --root PACKAGE_ROOT --port DEDICATED_PORT");
+                Console.Error.WriteLine("USAGE: DatabaseSetup prepare|set-passwords --root PACKAGE_ROOT --port DEDICATED_PORT");
                 return 64;
             }
 
@@ -35,15 +36,31 @@ internal static class Program
             MySqlConnectionStringBuilder admin = ReadConnection("AO_REBIRTH_MIGRATION_CONNECTION", port, "root");
             MySqlConnectionStringBuilder runtime = ReadConnection("AO_REBIRTH_MYSQL_CONNECTION", port, RuntimeUser);
             string adminPassword = Environment.GetEnvironmentVariable("AO_REBIRTH_MYSQL_ADMIN_PASSWORD") ?? string.Empty;
-            if (adminPassword.Length < 24 || runtime.Password.Length < 24)
-                throw new SetupRefusedException("SECRET_CONFIGURATION_REQUIRED: generated database passwords are missing.");
-            if (admin.Password.Length != 0 && admin.Password != adminPassword)
+            if ((adminPassword != DefaultPassword && adminPassword.Length < 24)
+                || (runtime.Password != DefaultPassword && runtime.Password.Length < 24))
+                throw new SetupRefusedException("SECRET_CONFIGURATION_REQUIRED: local database passwords are missing or invalid.");
+            if (args[0] == "prepare" && admin.Password.Length != 0 && admin.Password != adminPassword)
                 throw new SetupRefusedException("SECRET_CONFIGURATION_MISMATCH: administrator configuration is inconsistent.");
 
             var server = new MySqlConnectionStringBuilder(admin.ConnectionString) { Database = string.Empty };
             using var connection = new MySqlConnection(server.ConnectionString);
             connection.Open();
             VerifyBundledServer(connection, expectedData, port);
+
+            if (args[0] == "set-passwords")
+            {
+                if (!SchemaExists(connection))
+                    throw new SetupRefusedException("DATABASE_NOT_READY: start the local database setup before updating its login.");
+
+                // Keep administrator access until both runtime accounts have been updated.
+                foreach (string host in new[] { "localhost", "127.0.0.1" })
+                {
+                    Execute(connection, "ALTER USER 'aorebirth_local'@'" + host + "' IDENTIFIED BY @password", ("@password", runtime.Password));
+                }
+                Execute(connection, "ALTER USER CURRENT_USER() IDENTIFIED BY @password", ("@password", adminPassword));
+                Console.WriteLine("LOCAL_SQL_LOGIN_READY: documented local credentials applied; game data preserved.");
+                return 0;
+            }
 
             if (SchemaExists(connection))
             {

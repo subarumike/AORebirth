@@ -44,6 +44,22 @@ namespace AORebirth.WindowsLocalLauncher
         internal bool SetupComplete { get { return state.SetupComplete; } }
         internal bool IsRunning { get { return owned.Any(item => !item.Process.HasExited); } }
 
+        internal Dictionary<string, string> GetSqlLoginDetails()
+        {
+            if (!state.SetupComplete || state.AdminPassword != PackageState.DefaultPassword
+                || state.RuntimePassword != PackageState.DefaultPassword)
+                throw new InvalidOperationException("Press Start server once to apply the local SQL login. You can view it here afterwards, even while the server is stopped.");
+
+            return new Dictionary<string, string>
+            {
+                ["Host"] = "127.0.0.1",
+                ["Port"] = state.DatabasePort.ToString(CultureInfo.InvariantCulture),
+                ["Database"] = "cellao_codex_clean",
+                ["Username"] = "root",
+                ["Password"] = PackageState.DefaultPassword
+            };
+        }
+
         internal static void VerifyPackage(string root)
         {
             string manifest = SafePath(root, "package-manifest.json");
@@ -330,6 +346,7 @@ namespace AORebirth.WindowsLocalLauncher
                     state.Save(root);
                 }
 
+                ApplyLocalSqlLogin();
                 status("Checking local database readiness...");
                 RunDotnet("server/ZoneEngine_New/ZoneEngine_New.dll", "--validate-database", 60000, "database-check");
                 RunDotnet("server/ZoneEngine_New/ZoneEngine_New.dll", "--validate-startup", 180000, "world-check");
@@ -605,6 +622,13 @@ namespace AORebirth.WindowsLocalLauncher
             adminPasswordInUse = state.AdminPassword;
             if (!CanConnectAdmin(state.AdminPassword))
             {
+                if (state.AdminPassword != PackageState.DefaultPassword && CanConnectAdmin(PackageState.DefaultPassword))
+                {
+                    // Recover if a previous password update succeeded before local settings were saved.
+                    adminPasswordInUse = PackageState.DefaultPassword;
+                    return;
+                }
+
                 if (state.SetupComplete || !state.OwnsDataDirectory || !CanConnectAdmin(string.Empty))
                     throw new InvalidOperationException("The local database credentials could not be verified. Restore matching data and credentials from backup.");
 
@@ -618,6 +642,25 @@ namespace AORebirth.WindowsLocalLauncher
             environment["MYSQL_PWD"] = password;
             return RunExecutable("mysql/bin/mysql.exe", MysqlArguments() + " --execute=\"SELECT 1;\"", 15000, "database-connect",
                 environment, null, false) == 0;
+        }
+
+        private void ApplyLocalSqlLogin()
+        {
+            if (state.AdminPassword == PackageState.DefaultPassword && state.RuntimePassword == PackageState.DefaultPassword)
+                return;
+
+            status("Applying the local SQL login...");
+            var environment = BaseEnvironment();
+            environment["AO_REBIRTH_MIGRATION_CONNECTION"] = AdminConnection(adminPasswordInUse);
+            environment["AO_REBIRTH_MYSQL_ADMIN_PASSWORD"] = PackageState.DefaultPassword;
+            environment["AO_REBIRTH_MYSQL_CONNECTION"] = RuntimeConnection(PackageState.DefaultPassword);
+            RunExecutable("runtime/dotnet.exe", Quote(PathOf("tools/DatabaseSetup/DatabaseSetup.dll"))
+                + " set-passwords --root " + Quote(root) + " --port " + state.DatabasePort.ToString(CultureInfo.InvariantCulture),
+                60000, "database-login-update", environment, null);
+            state.AdminPassword = PackageState.DefaultPassword;
+            state.RuntimePassword = PackageState.DefaultPassword;
+            adminPasswordInUse = PackageState.DefaultPassword;
+            state.Save(root);
         }
 
         private static void StopDatabase(OwnedProcess item)
@@ -952,8 +995,7 @@ namespace AORebirth.WindowsLocalLauncher
                 ["DOTNET_ROOT"] = PathOf("runtime"),
                 ["DOTNET_ROOT_X64"] = PathOf("runtime"),
                 ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
-                ["AO_REBIRTH_MYSQL_CONNECTION"] = "Server=127.0.0.1;Port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
-                    + ";Database=cellao_codex_clean;User ID=aorebirth_local;Password=" + state.RuntimePassword + ";AllowPublicKeyRetrieval=True;",
+                ["AO_REBIRTH_MYSQL_CONNECTION"] = RuntimeConnection(state.RuntimePassword),
                 ["AO_REBIRTH_EXPECTED_DATABASE"] = "cellao_codex_clean",
                 ["AO_REBIRTH_CONFIG_PATH"] = PathOf("data/config/Config.xml"),
                 ["AO_REBIRTH_GAMEDATA_PATH"] = PathOf("GameData"),
@@ -961,6 +1003,12 @@ namespace AORebirth.WindowsLocalLauncher
                 ["AO_REBIRTH_ISCOM_LISTEN_IP"] = "127.0.0.1",
                 ["AO_REBIRTH_CHAT_LISTEN_IP"] = "127.0.0.1"
             };
+        }
+
+        private string RuntimeConnection(string password)
+        {
+            return "Server=127.0.0.1;Port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + ";Database=cellao_codex_clean;User ID=aorebirth_local;Password=" + password + ";AllowPublicKeyRetrieval=True;";
         }
 
         private string AdminConnection(string password)
