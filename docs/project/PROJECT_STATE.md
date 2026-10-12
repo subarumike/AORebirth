@@ -2,8 +2,9 @@
 
 Updated: 2026-10-12
 
-Current Windows SQL-access follow-up: Mike explicitly rejects random passwords
-and a full-package upload. The authorized fixed local credentials are
+The Windows SQL-access follow-up is complete, committed and pushed as
+8ccb7979f34412324fb615bf9a3e6aed709e585d on codex/windows-local-package.
+Mike explicitly rejects random passwords and a full-package upload. The authorized fixed local credentials are
 root / aorebirth and aorebirth_local / aorebirth. Fresh installations use these
 defaults; existing owned databases update credentials on the next explicit Start
 while preserving accounts, characters and schema. PackageController/PackageState
@@ -12,7 +13,7 @@ retaining owned-server/datadir/selected-port checks and parameterized SQL. No
 engine core, schema definition, GameData or gameplay change is involved. SQL login
 is a read-only root-endpoint dialog available after Start has applied credentials,
 with masking, optional reveal and explicit password copy. The small overlay is
-pending; no full ZIP was generated, rebuilt or uploaded for this follow-up.
+complete; no full ZIP was generated, rebuilt or uploaded for this follow-up.
 
 PROVEN (2026-10-12, current-machine SQL acceptance): launcher/helper compilation
 and secrets scan passed. UI renders passed read-only fields, initial masking,
@@ -33,6 +34,16 @@ saved port 64593 were retained. Both fixed-password logins succeeded, and the
 restart. Stop/reopen/restart/Stop passed; the controlled listener was unchanged.
 The initial attempt refused other active-checkout engines before launch; the
 approved wrapper stopped those positively identified engines, and retry passed.
+
+PROVEN overlay closure (2026-10-12): finalization exited 0 with
+PACKAGE_INTEGRITY=PASS and clean provenance at
+8ccb7979f34412324fb615bf9a3e6aed709e585d. Six payload files total 685,011 bytes;
+all 9,306 original files were preserved, including all 8,090 GameData files.
+The final staged AORebirth.exe --verify-package exited 0 with
+PACKAGE_INVENTORY_AND_CONFIGURATION_VERIFIED. The approved stop wrapper ran
+after acceptance and engine ports are closed. The overlay and validation records
+remain private, ignored and local only; distribution and live client acceptance
+are separate.
 
 UNVERIFIED limits: existing SQL row counts were not probed before the credential
 change; nonempty player-row preservation was not tested. Partial-failure retry
