@@ -63,6 +63,8 @@ namespace ZoneEngine_New.Core.Teams
         private readonly Dictionary<int, Team> _membership = new();
         private readonly Dictionary<int, Invitation> _invitations = new();
         private readonly Dictionary<int, DateTime> _declinedUntil = new();
+        // Last playfield told to ChatEngine for its LFT location filter, captured on the owner tick.
+        private readonly Dictionary<int, (int Playfield, int Expansion)> _lftLocations = new();
         private readonly IChatEngineLink? _chat;
         private readonly TeamLevelEligibility _eligibility;
         private readonly Func<DateTime> _utcNow;
@@ -87,6 +89,8 @@ namespace ZoneEngine_New.Core.Teams
                 if (_stopped) return;
                 if (player.Identity.Type != IdentityType.CanbeAffected || player.Identity.Instance <= 0)
                     throw new ArgumentException("A team owner must be a character identity.", nameof(player));
+                // Every arrival (login, zone change, reconnect) attaches, so this tracks the live playfield.
+                PublishLftLocation(player);
                 if (_players.TryGetValue(player.Identity.Instance, out Player? previous))
                 {
                     if (ReferenceEquals(previous, player)) return;
@@ -137,8 +141,9 @@ namespace ZoneEngine_New.Core.Teams
                 // Zoning clears Player.Session before transport closure. Superseded transport callbacks
                 // must also be ignored; neither is the accepted Legacy leave-game transition.
                 if (!Owns(player) || !ReferenceEquals(player.Session, disconnectedSession)) return;
+                // A LinkDead member keeps its place: a reconnect resends the roster (RefreshPlayer),
+                // and only the LinkDead despawn (DetachPlayer) takes it out of the team.
                 CancelInvitations(player.Identity.Instance);
-                Remove(player, notifyLeaving: false);
             }
         }
 
@@ -158,6 +163,7 @@ namespace ZoneEngine_New.Core.Teams
                 _publishedRosters.Remove(player.Identity.Instance);
                 _rosterResetSessions.Remove(player.Identity.Instance);
                 _declinedUntil.Remove(player.Identity.Instance);
+                _lftLocations.Remove(player.Identity.Instance);
             }
         }
 
@@ -176,6 +182,7 @@ namespace ZoneEngine_New.Core.Teams
                 _rosterResetSessions.Clear();
                 _invitations.Clear();
                 _declinedUntil.Clear();
+                _lftLocations.Clear();
                 _players.Clear();
                 _stopped = true;
             }
@@ -483,6 +490,20 @@ namespace ZoneEngine_New.Core.Teams
             if (text.Equals("#aorebirth-lft-remove", StringComparison.OrdinalIgnoreCase))
                 return true;
 
+            // Chat (re)connected after the roster's team join was sent; rejoin its team/raid channel.
+            if (text.Equals("#aorebirth-chat-online", StringComparison.Ordinal))
+            {
+                lock (_sync)
+                {
+                    if (!_stopped && _membership.TryGetValue(characterId, out Team? team))
+                    {
+                        ChatCommand(characterId, "#aorebirth-team-join " + team.Id);
+                        if (team.IsRaid) ChatCommand(characterId, "#aorebirth-raid-convert " + team.Id);
+                    }
+                }
+                return true;
+            }
+
             const string seedPrefix = "#aorebirth-lft-seed";
             if (!text.StartsWith(seedPrefix, StringComparison.Ordinal))
                 return false;
@@ -492,6 +513,9 @@ namespace ZoneEngine_New.Core.Teams
                 if (_stopped || !_players.TryGetValue(characterId, out Player? searcher) || !IsActive(searcher))
                     return true;
 
+                // ChatEngine resolves "This playfield" / RK / SL right after this; it may have restarted since
+                // the arrivals, so repeat the searcher's and each candidate's location.
+                SendLftLocation(characterId);
                 string[] tokens = text.Split([' '], StringSplitOptions.RemoveEmptyEntries);
                 for (int i = 1; i < tokens.Length; i++)
                 {
@@ -503,6 +527,7 @@ namespace ZoneEngine_New.Core.Teams
                         continue;
                     if (!_players.TryGetValue(candidateId, out Player? candidate) || !IsActive(candidate))
                         continue;
+                    SendLftLocation(candidateId);
                     if (!TryLevel(candidate, out int level))
                         continue;
                     WireInvitePresence(searcher, candidate, level);
@@ -537,6 +562,7 @@ namespace ZoneEngine_New.Core.Teams
                 Send(inviter, Action(inviter, CharacterActionType.TeamRequestReply, invitee.Identity, 0, 20));
                 return true;
             }
+            bool created = team == null;
             if (team == null)
             {
                 if (_nextTeamId == int.MaxValue) return Error(invitee, "Team identity space is exhausted.");
@@ -874,6 +900,22 @@ namespace ZoneEngine_New.Core.Teams
         {
             foreach (int target in _invitations.Where(p => p.Key == id || p.Value.Inviter.Identity.Instance == id)
                 .Select(p => p.Key).ToArray()) _invitations.Remove(target);
+        }
+        private void PublishLftLocation(Player player)
+        {
+            if (player.Playfield is not { } playfield || playfield.Identity.Instance <= 0) return;
+            // ChatEngine.Lists.LftPlayfieldRegistry: expansion 1 = Rubi-Ka, 2 = Shadowlands.
+            int expansion = PlayfieldEntryFlags.ExpansionPlayfield(playfield.MetaData) == 1 ? 2 : 1;
+            var location = (playfield.Identity.Instance, expansion);
+            int id = player.Identity.Instance;
+            if (_lftLocations.TryGetValue(id, out var sent) && sent == location) return;
+            _lftLocations[id] = location;
+            SendLftLocation(id);
+        }
+        private void SendLftLocation(int id)
+        {
+            if (_lftLocations.TryGetValue(id, out var location))
+                ChatCommand(id, "#aorebirth-pf " + location.Playfield + " " + location.Expansion);
         }
         private void ChatCommand(int id, string command)
             => _chat?.TrySend(new ChatCommand { CharacterId = id, ChatCommandString = command });

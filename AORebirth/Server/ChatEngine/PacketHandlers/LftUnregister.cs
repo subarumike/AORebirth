@@ -26,19 +26,14 @@ namespace ChatEngine.PacketHandlers
 
             bool wasListed = LftRegistry.IsListed(client.Character.CharacterId);
 
-            // Force unlist (sticky). Empty Apply matches clear-description path.
-            LftRegistry.ApplyResult result = LftRegistry.Apply(
-                client.Character.CharacterId,
-                string.Empty,
-                client.ChatAuthenticatedUtc);
+            LftRegistry.Remove(client.Character.CharacterId);
 
             bool listed = LftRegistry.IsListed(client.Character.CharacterId);
 
             client.Server.Debug(
                 client,
-                "{0} >> LftUnregister(05DD): result={1} wasListed={2} listed={3} payloadLen={4}",
+                "{0} >> LftUnregister(05DD): wasListed={1} listed={2} payloadLen={3}",
                 client.Character.characterName,
-                result,
                 wasListed,
                 listed,
                 payloadLen);

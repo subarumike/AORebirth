@@ -7,7 +7,7 @@ namespace ChatEngine.PacketHandlers
 
     /// <summary>
     /// Looking for Team register (chat type 0x05DC / 1500).
-    /// Uncheck reference: payloadLen=2 Comment: → Unlisted listed=False (remove from all searches).
+    /// Ticking the box sends 05DD then 05DC; an empty comment (payloadLen=2) still lists.
     /// Capture 20260727-lft-list-search: /lft test → 05DC0006000474657374.
     /// </summary>
     public static class LftRegister
@@ -18,7 +18,7 @@ namespace ChatEngine.PacketHandlers
             reader.ReadUInt16(); // type
             ushort payloadLen = reader.ReadUInt16();
 
-            // Uncheck: payloadLen=2 is u16be strlen=0 (empty Comment). Also allow length 0.
+            // payloadLen=2 is u16be strlen=0 (no comment). Also allow length 0.
             string comment = string.Empty;
             if (payloadLen >= 2)
             {
@@ -27,7 +27,7 @@ namespace ChatEngine.PacketHandlers
 
             reader.Finish();
 
-            // Treat whitespace-only like empty uncheck.
+            // Whitespace-only is no comment.
             if (string.IsNullOrWhiteSpace(comment))
             {
                 comment = string.Empty;

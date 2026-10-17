@@ -62,6 +62,14 @@ namespace ChatEngine.PacketHandlers
 
             ChannelBase channel = client.ChatServer().GetChannel(packet);
 
+            // Team/raid channels are membership-only: a stale Team tab must not still reach the team.
+            if (channel == null
+                || ((channel.channelType == ChannelType.Team || channel.channelType == ChannelType.Raid)
+                    && !client.Channels.Contains(channel)))
+            {
+                return;
+            }
+
             PacketReader reader = new PacketReader(ref packet);
             reader.ReadUInt16();
             reader.ReadUInt16();

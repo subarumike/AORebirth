@@ -136,6 +136,14 @@ namespace ChatEngine.CoreServer
         public void OnClientDisconnect(IClient client, bool forced)
         {
             Client cl = (Client)client;
+
+            // A reconnect is a new Client; drop the old one from its channels.
+            foreach (ChannelBase channel in cl.Channels.ToArray())
+            {
+                channel.RemoveClient(cl);
+            }
+
+            cl.Channels.Clear();
             this.clientOwnership.Disconnect(cl.Character.CharacterId, cl,
                 id => CharacterOnlineOwnershipGuard.TryClearLoginOwnership(unchecked((int)id), CharacterDao.Instance.SetOffline),
                 LftRegistry.Remove);

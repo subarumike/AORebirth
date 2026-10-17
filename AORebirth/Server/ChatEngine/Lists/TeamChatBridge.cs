@@ -9,6 +9,7 @@ namespace ChatEngine.Lists
     using ChatEngine.Channels;
     using ChatEngine.CoreClient;
     using ChatEngine.CoreServer;
+    using ChatEngine.Packets;
 
     /// <summary>
     /// ZoneEngine → ChatEngine team/raid channel wiring (capture 20260902-073932).
@@ -20,6 +21,9 @@ namespace ChatEngine.Lists
         public const string RaidConvertPrefix = "#aorebirth-raid-convert";
 
         public const string TeamLeavePrefix = "#aorebirth-team-leave";
+
+        /// <summary>ChatEngine → ZoneEngine: this character's chat logged in; resend its team join.</summary>
+        public const string ChatOnlineCommand = "#aorebirth-chat-online";
 
         public static bool TryHandle(ChatServer server, ChatCommand chatCommand)
         {
@@ -216,6 +220,15 @@ namespace ChatEngine.Lists
 
             found.RemoveClient(client);
             client.Channels.Remove(found);
+
+            // Close the client's tab too; otherwise it keeps a Team/Raid tab it can no longer use.
+            byte[] leaveId = new byte[5];
+            leaveId[0] = (byte)found.channelType;
+            leaveId[1] = (byte)(found.ChannelId >> 24);
+            leaveId[2] = (byte)(found.ChannelId >> 16);
+            leaveId[3] = (byte)(found.ChannelId >> 8);
+            leaveId[4] = (byte)found.ChannelId;
+            client.Send(ChannelLeave.Create(leaveId));
         }
     }
 }

@@ -5,7 +5,8 @@ namespace ChatEngine.Lists
 
     /// <summary>
     /// In-memory Looking for Team registrations (chat-server only).
-    /// 05DC + comment = listed; 05DD or empty 05DC = unlisted.
+    /// 05DC = listed (the comment is optional); 05DD = unlisted.
+    /// Ticking the box sends 05DD then 05DC, so an empty 05DC is a tick without a comment.
     /// </summary>
     public static class LftRegistry
     {
@@ -24,32 +25,23 @@ namespace ChatEngine.Lists
 
             UpdatedComment,
 
-            Unlisted,
-
             IgnoredLoginEcho
         }
 
         /// <summary>
-        /// Empty comment = unlist. Non-empty = list / update comment.
+        /// List the character or update its comment; an empty comment still lists.
         /// </summary>
         public static ApplyResult Apply(uint characterId, string comment, DateTime chatAuthUtc)
         {
             if (characterId == 0)
             {
-                return ApplyResult.Unlisted;
+                return ApplyResult.IgnoredLoginEcho;
             }
 
-            bool blank = string.IsNullOrWhiteSpace(comment);
-            string trimmed = blank ? string.Empty : comment.Trim();
+            string trimmed = string.IsNullOrWhiteSpace(comment) ? string.Empty : comment.Trim();
 
             lock (Sync)
             {
-                if (blank)
-                {
-                    ListedByCharacterId.Remove(characterId);
-                    return ApplyResult.Unlisted;
-                }
-
                 if (ListedByCharacterId.ContainsKey(characterId))
                 {
                     ListedByCharacterId[characterId] = trimmed;

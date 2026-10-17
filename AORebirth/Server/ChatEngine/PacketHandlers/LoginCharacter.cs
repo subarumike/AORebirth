@@ -41,6 +41,7 @@ namespace ChatEngine.PacketHandlers
 
     using ChatEngine.Channels;
     using ChatEngine.CoreClient;
+    using ChatEngine.Lists;
     using ChatEngine.Packets;
 
     using Utility;
@@ -97,6 +98,17 @@ namespace ChatEngine.PacketHandlers
 
             client.Send(LoginOk.Create());
             client.ChatServer().AddClientToChannels(client);
+
+            // The zone may have sent this character's team join before chat was connected; ask it to resend.
+            if (!client.IsBot && Program.ISCom != null)
+            {
+                Program.ISCom.BroadCast(
+                    new AORebirth.Communication.Messages.ChatCommand
+                    {
+                        CharacterId = unchecked((int)playerId),
+                        ChatCommandString = TeamChatBridge.ChatOnlineCommand
+                    });
+            }
 
             if (client.IsBot)
             {

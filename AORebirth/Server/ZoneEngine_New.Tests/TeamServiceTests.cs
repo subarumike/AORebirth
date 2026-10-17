@@ -5,10 +5,12 @@ namespace ZoneEngine_New.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.IO;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Text.Json.Nodes;
     using AORebirth.Communication.Messages;
+    using AORebirth.Core.GameData;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -146,6 +148,23 @@ namespace ZoneEngine_New.Tests
             Parallel.For(0, 12, _ => f.Accept(b, a));
             CollectionAssert.AreEqual(new[] { 1, 2 }, f.Teams.GetTeam(a)!.MemberIds.ToArray());
             Assert.IsFalse(f.AllBodies.OfType<TeamMemberMessage>().Any());
+        }
+
+        [TestMethod]
+        public void LaterJoinAnnouncesOnlyTheJoinerToExistingMembers()
+        {
+            var f = new Fixture();
+            Player a = f.Player(1), b = f.Player(2), c = f.Player(3);
+            f.Join(a, b);
+            f.Invite(a, c);
+            f.Clear();
+            f.Accept(c, a);
+            foreach (Player existing in new[] { a, b })
+                CollectionAssert.AreEqual(new[] { 3 }, f.Session(existing).Bodies.OfType<TeamMemberMessage>()
+                    .Select(m => m.Member.Instance).ToArray());
+            CollectionAssert.AreEqual(new[] { 3, 1, 2 }, f.Session(c).Bodies.OfType<TeamMemberMessage>()
+                .Select(m => m.Member.Instance).ToArray());
+            Assert.AreEqual(3, a.Stats.GetOrZero(CharacterStat.NumberOfTeamMembers));
         }
 
         [TestMethod]
@@ -563,6 +582,9 @@ namespace ZoneEngine_New.Tests
             {
                 inactive.Close();
                 f.Teams.OnTransportDisconnected(b, inactive);
+                // A LinkDead member keeps its place; the LinkDead despawn takes it out.
+                Assert.IsNotNull(f.Teams.GetTeam(b));
+                f.Teams.DetachPlayer(b);
             }
             else
             {
@@ -691,19 +713,31 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        public void DisconnectDropsMembershipAndReconnectCannotRestorePersistedTeamStat()
+        public void LinkDeadKeepsMembershipReconnectResendsRosterAndDespawnCannotRestorePersistedTeamStat()
         {
             var f = new Fixture();
             Player a = f.Player(1), b = f.Player(2);
             f.Join(a, b);
+            int team = f.Teams.GetTeam(a)!.TeamId;
             f.Teams.OnTransportDisconnected(b, f.Session(b));
-            Assert.IsNull(f.Teams.GetTeam(a));
+            Assert.AreEqual(team, f.Teams.GetTeam(a)!.TeamId);
             f.ReplaceSession(b);
+            f.Chat.Commands.Clear();
             f.Teams.AttachPlayer(b);
             f.Teams.RefreshPlayer(b);
-            Assert.IsNull(f.Teams.GetTeam(b));
-            Assert.AreEqual(0, b.Stats.GetOrZero(CharacterStat.Team));
+            Assert.IsTrue(f.Teams.AreTeammates(a, b));
+            Assert.AreEqual(team, b.Stats.GetOrZero(CharacterStat.Team));
+            CollectionAssert.AreEqual(new[] { 2, 1 }, f.Session(b).Bodies.OfType<TeamMemberMessage>()
+                .Select(m => m.Member.Instance).ToArray());
+            Assert.IsTrue(f.Chat.Commands.Any(c => c.CharacterId == 2 && c.ChatCommandString == "#aorebirth-team-join " + team));
+            f.Chat.Commands.Clear();
+            Assert.IsTrue(f.Teams.TryHandleInboundChatCommand(2, "#aorebirth-chat-online"));
+            Assert.IsTrue(f.Chat.Commands.Any(c => c.CharacterId == 2 && c.ChatCommandString == "#aorebirth-team-join " + team));
             f.Teams.DetachPlayer(b);
+            Assert.IsNull(f.Teams.GetTeam(a));
+            f.Chat.Commands.Clear();
+            Assert.IsTrue(f.Teams.TryHandleInboundChatCommand(2, "#aorebirth-chat-online"));
+            Assert.IsFalse(f.Chat.Commands.Any());
             Player reloaded = f.Player(2, oldTeamStat: 0x02809999);
             Assert.IsNull(f.Teams.GetTeam(reloaded));
             Assert.AreEqual(0, reloaded.Stats.GetOrZero(CharacterStat.Team));
@@ -944,6 +978,53 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(f.Teams.TryHandleChatCommand(b, ["team", "leave"]));
             Assert.IsNull(f.Teams.GetTeam(a));
             Assert.IsNull(f.Teams.GetTeam(b));
+        }
+
+        [TestMethod]
+        public void ArrivalsTellChatEngineTheLivePlayfieldForLft()
+        {
+            var f = new Fixture();
+            Player a = f.Player(1);
+            Assert.IsFalse(f.Chat.Commands.Any(c => c.ChatCommandString.StartsWith("#aorebirth-pf", StringComparison.Ordinal)));
+
+            a.Playfield = LftPlayfield(4310, shadowlands: true);
+            f.Teams.AttachPlayer(a);
+            f.Teams.AttachPlayer(a); // the login path attaches twice; one push per playfield
+            a.Playfield = LftPlayfield(551, shadowlands: false);
+            f.Teams.AttachPlayer(a);
+
+            CollectionAssert.AreEqual(
+                new[] { "#aorebirth-pf 4310 2", "#aorebirth-pf 551 1" },
+                f.Chat.Commands.Where(c => c.CharacterId == 1).Select(c => c.ChatCommandString).ToArray());
+        }
+
+        [TestMethod]
+        public void LftSeedRepeatsTheSearcherAndCandidateLocations()
+        {
+            var f = new Fixture();
+            Player a = f.Player(1), b = f.Player(2);
+            a.Playfield = LftPlayfield(551, shadowlands: false);
+            b.Playfield = LftPlayfield(4310, shadowlands: true);
+            f.Teams.AttachPlayer(a);
+            f.Teams.AttachPlayer(b);
+            f.Chat.Commands.Clear();
+
+            Assert.IsTrue(f.Teams.TryHandleInboundChatCommand(1, "#aorebirth-lft-seed 2:Member2 3:Offline"));
+
+            CollectionAssert.AreEquivalent(
+                new[] { "1:#aorebirth-pf 551 1", "2:#aorebirth-pf 4310 2" },
+                f.Chat.Commands.Select(c => c.CharacterId + ":" + c.ChatCommandString).ToArray());
+        }
+
+        private static Playfield LftPlayfield(int id, bool shadowlands)
+        {
+            var playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
+            typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(playfield, new Identity { Type = IdentityType.Playfield, Instance = id });
+            typeof(Playfield).GetField("<MetaData>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(playfield, new PlayfieldMetaData
+                    { UnknownV9A = shadowlands ? PlayfieldEntryFlags.ShadowlandsMetaDataBit : 0 });
+            return playfield;
         }
 
         [TestMethod]
