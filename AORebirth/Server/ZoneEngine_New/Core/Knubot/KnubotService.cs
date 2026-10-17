@@ -257,7 +257,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             }
 
             conversation.LastActivityAt = _milliseconds();
-            effects.Trades.TryOpenKnubot(player, npc, TradeText(npc));
+            effects.Trades.TryOpenKnubot(player, npc, TradeText(npc), script.TradeSlots(Context(conversation)));
             return true;
         }
     }

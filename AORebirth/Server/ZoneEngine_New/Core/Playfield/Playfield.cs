@@ -696,6 +696,9 @@ namespace ZoneEngine_New.Core.Playfield
                 spawn.Tick();
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("npc.activation");
                 GetRequiredService<NpcContentActivationService>().Tick();
+                GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Tick();
+                GetRequiredService<NpcDefenseService>().Tick();
+                GetRequiredService<NpcRescueService>().Tick();
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inventory.moves");
                 _inventoryMoves.Tick(this, deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("itemuse");
@@ -800,7 +803,6 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_logger);
             services.AddSingleton(_playfieldManager);
             services.AddSingleton(_playfieldManager.Teams);
-            services.AddSingleton(_playfieldManager.AuthoredQuests);
             if (_playfieldManager.Quests != null)
                 services.AddSingleton(_playfieldManager.Quests);
             if (_playfieldManager.QuestDungeons != null)
@@ -859,6 +861,8 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_shopDao);
             services.AddSingleton<NpcContentActivationService>();
             services.AddSingleton<ZoneEngine_New.Core.Missions.QuestPropService>();
+            services.AddSingleton<NpcDefenseService>();
+            services.AddSingleton<NpcRescueService>();
             services.AddSingleton<HashSpawnSystem>();
             services.AddSingleton<ItemUseService>();
             return services;

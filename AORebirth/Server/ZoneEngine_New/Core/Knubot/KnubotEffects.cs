@@ -164,7 +164,53 @@ public sealed record KnubotOpenTrade : KnubotEffect
     public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => context.Script.Trades.Length != 0;
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)
-        => services.Trades.TryOpenKnubot(context.Player, context.Npc, KnubotService.TradeText(context.Npc));
+        => services.Trades.TryOpenKnubot(context.Player, context.Npc, KnubotService.TradeText(context.Npc),
+            context.Script.TradeSlots(context));
+}
+
+/// <summary>
+/// <c>{attack}</c>: the NPC turns on the player it is talking to (Kneebreaker Alfonzo Rizzolo, after "I have come to
+/// put your plans to an end.": "...take your best shot." and he attacks, live 2026-10-07). An NPC with no brain or one
+/// the player cannot fight does nothing.
+/// </summary>
+public sealed record KnubotAttack : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => true;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        NpcCharacter npc = context.Npc;
+        Player player = context.Player;
+        if (npc.Brain == null || npc.IsDead || player.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield)
+            || !ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(npc, player))
+            return;
+
+        npc.Brain.AddThreat(player.Identity, ZoneEngine_New.Core.Ai.NpcAiRules.ProximityHate);
+        npc.StartFighting(player.Identity, 0);
+    }
+}
+
+/// <summary>
+/// <c>{kill}</c>: the NPC kills the player it is talking to outright, fight or not (Patrick Sun after "Excellent! Now,
+/// relax. This won't hurt a bit.": live 2026-07-25 sent one HealthDamage from Patrick for the player's whole health
+/// 2.95 s later, then the death; the player wakes at the insurance beacon). Written after a <c>{delay}</c>.
+/// </summary>
+public sealed record KnubotKill : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => true;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        NpcCharacter npc = context.Npc;
+        Player player = context.Player;
+        if (npc.IsDead || player.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield))
+            return;
+
+        int health = Math.Max(1, player.Stats.GetOrZero(CharacterStat.Health));
+        player.AnnounceHealthDamage(npc, 0, -health, 0);
+        // A friendly NPC cannot attack, so the hit is the player's own: ApplyDamage's death path without combat rules.
+        player.ApplyDamage(player, health, HitType.Normal);
+    }
 }
 
 /// <summary>Main-inventory item helpers shared by conditions and effects.</summary>

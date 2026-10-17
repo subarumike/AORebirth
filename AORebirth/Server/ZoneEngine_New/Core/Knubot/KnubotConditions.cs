@@ -53,7 +53,9 @@ public sealed class KnubotLoadContext(QuestCatalog quests, IGameData gameData, I
 /// One check from an <c>If</c> list. Prefix <c>!</c> to negate. Forms:
 /// <c>quest HASH none|active|done|failed|expired|abandoned</c>, <c>HasQuest HASH</c> (in the journal now),
 /// <c>HasAnyQuest HASH,HASH,...</c> (any of them in the journal now),
-/// <c>HasCompletedQuest HASH</c> (the quest's mission bit), <c>has ITEMHASH [count]</c>, <c>met</c>.
+/// <c>HasCompletedQuest HASH</c> (the quest's mission bit), <c>CanCompleteQuest HASH</c> (active, and its level band
+/// and Recurring cooldown would let it complete now), <c>has ITEMHASH [count]</c>, <c>met</c>,
+/// <c>fighting</c> (the NPC is in a fight).
 /// Stat checks are <c>Requirements</c> rows, compiled by <see cref="TryParseRequirements"/>.
 /// </summary>
 public abstract record KnubotCondition(bool Negated)
@@ -114,6 +116,16 @@ public abstract record KnubotCondition(bool Negated)
                 condition = new KnubotQuestCondition(negated, words[1], QuestState.Active);
                 return true;
 
+            case "cancompletequest":
+                if (words.Length != 2 || !load.Quests.TryGet(words[1], out _))
+                {
+                    error = "expected 'CanCompleteQuest HASH' with a Quests.json hash: " + trimmed;
+                    return false;
+                }
+
+                condition = new KnubotCanCompleteQuestCondition(negated, words[1]);
+                return true;
+
             case "hasanyquest":
                 string[] hashes = string.Join(' ', words, 1, words.Length - 1)
                     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -171,6 +183,16 @@ public abstract record KnubotCondition(bool Negated)
                 }
 
                 condition = new KnubotMetCondition(negated);
+                return true;
+
+            case "fighting":
+                if (words.Length != 1)
+                {
+                    error = "'fighting' takes no arguments";
+                    return false;
+                }
+
+                condition = new KnubotFightingCondition(negated);
                 return true;
 
             default:
@@ -294,6 +316,17 @@ public sealed record KnubotQuestCondition(bool Negated, string Hash, QuestState?
     }
 }
 
+/// <summary>
+/// The quest is active and would complete now: in its level band, no Recurring cooldown running. A turn-in trade
+/// checks this before it takes the item (the DOJA chip), so a refused completion never swallows it.
+/// </summary>
+public sealed record KnubotCanCompleteQuestCondition(bool Negated, string Hash) : KnubotCondition(Negated)
+{
+    protected override bool Test(KnubotContext context)
+        => context.Quests.GetLog(context.Player).Quests.TryGetValue(Hash, out PlayerQuest? quest) && quest.IsActive
+            && context.Quests.WhyNotEligible(context.Player, quest.Template) == null;
+}
+
 /// <summary>At least one of the quests is active in the player's journal.</summary>
 public sealed record KnubotAnyQuestCondition(bool Negated, string[] Hashes) : KnubotCondition(Negated)
 {
@@ -331,4 +364,13 @@ public sealed record KnubotRequirementCondition(ItemRequirement[] Requirements) 
 public sealed record KnubotMetCondition(bool Negated) : KnubotCondition(Negated)
 {
     protected override bool Test(KnubotContext context) => context.Met;
+}
+
+/// <summary>
+/// <c>fighting</c>: the NPC is in a fight. Live Marcus Stone does not open his chat then; a Vicinity opener has him
+/// call for help instead ("What're you looking at? Help me out here!").
+/// </summary>
+public sealed record KnubotFightingCondition(bool Negated) : KnubotCondition(Negated)
+{
+    protected override bool Test(KnubotContext context) => context.Npc.FightingTarget.Instance != 0;
 }

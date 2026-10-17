@@ -190,9 +190,111 @@ namespace ZoneEngine_New.Core.Ai
                 return;
             }
 
-            if (Npc.Motor.State != Movement.MovementState.Walk)
+            if (_patrolRun)
+            {
+                if (Npc.Motor.State == Movement.MovementState.Walk)
+                    Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToRun);
+            }
+            else if (Npc.Motor.State != Movement.MovementState.Walk)
+            {
                 Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToWalk);
+            }
             PathTo(destination);
+        }
+
+        // Patrol (a captured waypoint graph): wandering's walk and pause, but each stroll goes to the next waypoint,
+        // picked by how often live NPCs walked each edge from the current one.
+        Mobs.NpcPatrol? _patrol;
+        HashSet<int>? _patrolNodes;
+        int _patrolAt = -1;
+        bool _patrolRun;
+
+        /// <summary>Waypoints this far from home are left out, so a patrol stays inside the 70 m leash.</summary>
+        const float PatrolRadius = 60f;
+
+        public bool HasPatrol => _patrol != null;
+
+        /// <summary>
+        /// Walks the part of <paramref name="patrol"/> within <see cref="PatrolRadius"/> of home, starting from the
+        /// waypoint nearest the NPC. Needs a home and at least two waypoints there; otherwise nothing changes.
+        /// </summary>
+        public void EnablePatrol(Mobs.NpcPatrol patrol)
+        {
+            ArgumentNullException.ThrowIfNull(patrol);
+            if (Pet != null || Npc.IsImmobile || Home is not Vector3 home)
+                return;
+
+            var near = new HashSet<int>();
+            int nearest = -1;
+            double nearestDistance = double.MaxValue;
+            for (int i = 0; i < patrol.Nodes.Length; i++)
+            {
+                float[] node = patrol.Nodes[i];
+                if (node is not { Length: 3 })
+                    continue;
+                var point = new Vector3(node[0], node[1], node[2]);
+                if (Vector3.Abs(point - home) > PatrolRadius)
+                    continue;
+                near.Add(i);
+                double distance = Vector3.Abs(point - Npc.Position);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearest = i;
+                }
+            }
+            if (near.Count < 2)
+                return;
+
+            _patrol = patrol;
+            _patrolNodes = near;
+            _patrolAt = nearest;
+            _patrolRun = patrol.Run;
+            _wanderRadius = PatrolRadius;
+            _wanderMinPauseSeconds = Math.Max(0, patrol.MinPauseSeconds);
+            _wanderMaxPauseSeconds = Math.Max(_wanderMinPauseSeconds, patrol.MaxPauseSeconds);
+            _wanderDestination = null;
+            _wanderPauseUntilUtc = DateTime.UtcNow.AddSeconds(NextWanderPause());
+        }
+
+        bool TryPickPatrolPoint(out Vector3 destination)
+        {
+            destination = default!;
+            if (_patrol == null || _patrolNodes == null)
+                return false;
+
+            int total = 0;
+            foreach (int[] edge in _patrol.Edges)
+                if (edge is { Length: 3 } && edge[0] == _patrolAt && edge[1] != _patrolAt && _patrolNodes.Contains(edge[1]))
+                    total += Math.Max(1, edge[2]);
+
+            int next = -1;
+            if (total > 0)
+            {
+                int roll = Random.Shared.Next(total);
+                foreach (int[] edge in _patrol.Edges)
+                {
+                    if (edge is not { Length: 3 } || edge[0] != _patrolAt || edge[1] == _patrolAt || !_patrolNodes.Contains(edge[1]))
+                        continue;
+                    roll -= Math.Max(1, edge[2]);
+                    if (roll < 0)
+                    {
+                        next = edge[1];
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // A dead end (live left the area there): go on from any other waypoint nearby.
+                int[] others = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(_patrolNodes, i => i != _patrolAt));
+                next = others[Random.Shared.Next(others.Length)];
+            }
+
+            float[] node = _patrol.Nodes[next];
+            _patrolAt = next;
+            destination = new Vector3(node[0], node[1], node[2]);
+            return true;
         }
 
         void EndStroll(DateTime now)
@@ -204,6 +306,9 @@ namespace ZoneEngine_New.Core.Ai
 
         bool TryPickWanderPoint(out Vector3 destination)
         {
+            if (_patrol != null)
+                return TryPickPatrolPoint(out destination);
+
             destination = default!;
             NavMeshPathfinder? finder = Npc.Playfield?.Pathfinder;
             if (finder == null || Home is not Vector3 home)
@@ -459,7 +564,7 @@ namespace ZoneEngine_New.Core.Ai
 
         public void ScanProximity()
         {
-            if (!Npc.Attackable)
+            if (!Npc.Attackable || !Npc.AttacksOnSight)
                 return;
             if (!NpcAiRules.IsProximityHostile(Npc.Stats.GetOrZero(NpcAiRules.BreedHostilityStat)))
                 return;
@@ -479,6 +584,18 @@ namespace ZoneEngine_New.Core.Ai
         /// Adds 1 hate when BreedHostility &gt; 0 and the player is nearby, in line of sight and not already listed.
         /// </summary>
         public void TryProximityAggro(Character player)
+        {
+            if (Npc.AttacksOnSight)
+                TryNotice(player);
+        }
+
+        /// <summary>
+        /// Something drew this NPC's attention to <paramref name="player"/> (a guard's strongbox being picked): it goes
+        /// for them by the same rules as proximity aggro, even when it never attacks on sight.
+        /// </summary>
+        public void TryAlertAggro(Character player) => TryNotice(player);
+
+        void TryNotice(Character player)
         {
             if (player == null || !player.IsPlayer || player.IsDead)
                 return;

@@ -121,6 +121,12 @@ namespace ZoneEngine_New.Core.Ai
 
         public const float ProximityHate = 1f;
 
+        /// <summary>
+        /// Threat a defender NPC (Marcus Stone on a Burning Cleaning Robot) draws: below a player's first hit, so the
+        /// NPC turns to any player who joins the fight.
+        /// </summary>
+        public const float DefenderThreat = 0.1f;
+
         public static bool IsWithinNoChanceGrace(DateTime lastChanceUtc, DateTime now)
         {
             if (lastChanceUtc == default)

@@ -163,7 +163,19 @@ namespace ZoneEngine_New.Core.Inventory
                         UseTargetRules.Failure.NoFightingTarget => UseTargetRules.LostFightingTarget,
                         { } failure => "target " + failure
                     },
-                () => item.ExecuteUse(player, slot, _inventoryRepository, _items, useTarget),
+                () =>
+                {
+                    // Read before the use: a consumed item leaves the inventory with it.
+                    int lowId = item.LowId, highId = item.HighId;
+                    bool used = item.ExecuteUse(player, slot, _inventoryRepository, _items, useTarget);
+                    // A self-use item (the Health Regeneration Stim) still counts on the NPC the player has selected,
+                    // as live: the stim's effects landed on the Wounded Dockworker.
+                    Character? on = !ReferenceEquals(useTarget, player) ? useTarget
+                        : _playfield.GetRequiredService<DynelRegistry>().TryGet(player.Target, out Dynel? selected) ? selected as Character : null;
+                    if (used && on != null && !ReferenceEquals(on, player))
+                        _playfield.GetService<Mobs.NpcRescueService>()?.OnItemUsed(player, lowId, highId, on);
+                    return used;
+                },
                 lockTarget: locked => item.Locked = locked,
                 ResolveDelayCentiseconds(item));
             return Enqueue(pending);

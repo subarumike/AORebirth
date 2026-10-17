@@ -143,6 +143,8 @@ namespace ZoneEngine_New.Core.Inventory
                     return NpcTeleportToSpawnPoint(target);
                 case FunctionType.NpcFightSelected:
                     return NpcFightSelected(target, source);
+                case FunctionType.SolveQuest:
+                    return SolveQuest(target, source, spell);
                 default:
                     LogUtil.Debug(
                         DebugInfoDetail.Network,
@@ -716,6 +718,22 @@ namespace ZoneEngine_New.Core.Inventory
             brain.StopPathing();
             npc.Motor.Warp(home);
             return true;
+        }
+
+        /// <summary>
+        /// SolveQuest [hash]: completes the user's active quest of that hash (or template alias) as an NPC turn-in does.
+        /// Health Regeneration Stim 297044 used on a Wounded Dockworker: SolveQuest "82OD" finishes JTEV.
+        /// </summary>
+        static bool SolveQuest(Character target, Character? source, ItemSpell spell)
+        {
+            if ((source ?? target) is not Player player || player.Playfield?.GetService<Quests.QuestService>() is not { } quests)
+                return false;
+            string hash = spell.TryReadString(0, out string text) ? text.Trim()
+                : spell.TryReadInt(0, out int packed) && NpcCharacter.TryDecodeAoHash(packed, out string decoded) ? decoded
+                : string.Empty;
+            if (hash.Length == 0 || player.QuestLog?.FindActive(hash) is not { } quest)
+                return false;
+            return quests.TryComplete(player, quest.QuestId, out _);
         }
 
         static bool NpcFightSelected(Character target, Character? source)

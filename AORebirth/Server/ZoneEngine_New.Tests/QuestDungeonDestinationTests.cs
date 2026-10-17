@@ -780,13 +780,11 @@ public sealed class QuestDungeonDestinationTests
             Layouts = new DungeonLayoutGenerator(RuntimeData.Value, _logger);
             Assert.IsTrue(Layouts.IsAvailable, "Existing runtime GameData must contain the configured procedural styles. Root=" + RuntimeData.Value.RootPath + "; " + _logger.Errors);
             var minter = new HashItemMinter(RuntimeData.Value, _templates, _items);
-            var authored = new AuthoredQuestService(null!, _flush, _items, _templates, _ids,
-                new AuthoredQuestCatalog(new InteractionContent()), _logger);
             Manager = new PlayfieldManager(_logger, new MessageRouter([], _logger), new PlayerHydrator(_items, RuntimeData.Value),
                 RuntimeData.Value, _items, minter, new StubInventoryRepository(), _ids,
                 new InventoryMoveService(_logger, _flush, _actions), _flush,
                 new TradeService(_logger, RuntimeData.Value, _templates, minter, _ids, _flush, Persistence),
-                Blank<CharacterSnapshotService>(), new PlayfieldMetricsRegistry(), new TeamService(), authored, _templates, new Shops(), _quests);
+                Blank<CharacterSnapshotService>(), new PlayfieldMetricsRegistry(), new TeamService(), _templates, new Shops(), _quests);
             SetExteriorIdentity(Entrance.PlayfieldId);
             Player.Playfield = _exterior;
             Player.Position = new Vector3(Entrance.LocalX, Entrance.LocalY, Entrance.LocalZ);

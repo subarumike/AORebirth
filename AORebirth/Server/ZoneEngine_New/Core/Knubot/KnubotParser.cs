@@ -10,7 +10,7 @@ using ZoneEngine_New.Core.Inventory;
 /// <summary>
 /// Turns line text into ordered pieces and effects. Tags:
 /// text <c>{name}</c> <c>{npc}</c> <c>{itemref LOW HIGH QL}</c> <c>{emote}…{/emote}</c> <c>{delay SECONDS}</c>;
-/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{shop}</c> <c>{opentrade}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
+/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{shop}</c> <c>{opentrade}</c> <c>{attack}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
 /// <c>{{</c> and <c>}}</c> write literal braces. Reply text allows only the text tags without delay.
 /// </summary>
 public static class KnubotParser
@@ -186,6 +186,16 @@ public static class KnubotParser
                 case "opentrade":
                     Expect(words, 1, 1, body, errors);
                     Effect(new KnubotOpenTrade());
+                    break;
+
+                case "attack":
+                    Expect(words, 1, 1, body, errors);
+                    Effect(new KnubotAttack());
+                    break;
+
+                case "kill":
+                    Expect(words, 1, 1, body, errors);
+                    Effect(new KnubotKill());
                     break;
 
                 case "goto":

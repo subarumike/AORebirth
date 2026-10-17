@@ -141,6 +141,26 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
     public IReadOnlyDictionary<string, KnubotLine> Lines { get; } = lines;
     public KnubotTrade[] Trades { get; } = trades;
 
+    /// <summary>
+    /// Slots the Give Item window shows: what the trade the player can make now takes (one per item, a stack counted by
+    /// its size: Marcus Stone's stim hand-in is one slot), or the largest trade when none applies yet.
+    /// </summary>
+    public int TradeSlots(KnubotContext context)
+    {
+        KnubotTrade[] open = Array.FindAll(Trades, x => KnubotCondition.All(x.If, context));
+        KnubotTrade[] sized = open.Length != 0 ? open : Trades;
+        int slots = 0;
+        foreach (KnubotTrade trade in sized)
+        {
+            int items = 0;
+            foreach (KnubotTradeItem item in trade.Items)
+                items += item.Count;
+            slots = Math.Max(slots, items);
+        }
+
+        return Math.Max(1, slots);
+    }
+
     /// <summary>A reply with no content behind it yet: the engine says a debug line and offers the same replies again.</summary>
     public bool IsDeadEnd(KnubotReply reply)
         => reply.Goto is not (CloseTarget or OpenerTarget) && !Lines.ContainsKey(reply.Goto);

@@ -58,6 +58,29 @@ public sealed class NpcContentIntegrationTests
         }
     }
 
+    [TestMethod]
+    public void Every_npc_loot_row_names_an_item_hash_that_can_be_minted()
+    {
+        string root = Root();
+        using var items = JsonDocument.Parse(File.ReadAllText(Path.Combine(root,"AORebirth/GameData/ItemTemplates.json")));
+        using var npcs = JsonDocument.Parse(File.ReadAllText(Path.Combine(root,"AORebirth/GameData/NpcTemplates.json")));
+        foreach (JsonProperty leaf in npcs.RootElement.EnumerateObject())
+        {
+            if (!leaf.Value.TryGetProperty("Templates", out JsonElement bands)) continue;
+            foreach (JsonElement band in bands.EnumerateArray())
+            {
+                if (!band.TryGetProperty("LootTable", out JsonElement table)) continue;
+                foreach (JsonElement row in table.EnumerateArray())
+                {
+                    string hash = row.GetProperty("Hash").GetString()!;
+                    bool known = items.RootElement.TryGetProperty(hash, out JsonElement item)
+                        && (item.TryGetProperty("Templates", out _) || item.TryGetProperty("Children", out _));
+                    Assert.IsTrue(known, $"{leaf.Name} loot hash {hash} is not in ItemTemplates.json");
+                }
+            }
+        }
+    }
+
     static string Root()
     {
         for (DirectoryInfo? directory = new(AppContext.BaseDirectory); directory != null; directory = directory.Parent)

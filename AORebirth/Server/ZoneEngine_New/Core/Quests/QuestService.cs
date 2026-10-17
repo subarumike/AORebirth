@@ -133,8 +133,11 @@ namespace ZoneEngine_New.Core.Quests
             }
         }
 
-        /// <summary>Gives a Quests.json quest. A completed or closed one is started over; an active one is refused.</summary>
-        public bool TryAssignTemplate(Player player, string hash, out string result)
+        /// <summary>
+        /// Gives a Quests.json quest. A completed or closed one is started over; an active one is refused, and so is
+        /// one outside the player's level band or on a running Recurring cooldown unless <paramref name="force"/> (a GM).
+        /// </summary>
+        public bool TryAssignTemplate(Player player, string hash, out string result, bool force = false)
         {
             ArgumentNullException.ThrowIfNull(player);
             if (!_catalog.TryGet(hash, out QuestTemplate template))
@@ -147,6 +150,12 @@ namespace ZoneEngine_New.Core.Quests
             if (log.Quests.TryGetValue(template.Hash, out PlayerQuest? held) && held.IsActive)
             {
                 result = string.Format(CultureInfo.InvariantCulture, "{0} already has quest {1} ({2}).", player.Name, template.Hash, template.Name);
+                return false;
+            }
+
+            if (!force && WhyNotEligible(player, template) is string why)
+            {
+                result = why;
                 return false;
             }
 
@@ -306,7 +315,7 @@ namespace ZoneEngine_New.Core.Quests
                         TryEarnNpcObjective(player, quest, npc, inspected: false);
                         continue;
                     }
-                    if (quest.IsActive && quest.Template.IsKill && Matches(npc, quest.Template.Objective.Npc))
+                    if (quest.IsActive && quest.Template.IsKill && Matches(npc, quest.Template.Objective))
                         (advanced ??= new List<PlayerQuest>()).Add(quest);
                 }
 
@@ -351,6 +360,17 @@ namespace ZoneEngine_New.Core.Quests
                 Complete(player, quests[i]);
         }
 
+        /// <summary>A kill objective's NPC: its hash or one of its extra hashes, inside its area when it has one.</summary>
+        static bool Matches(NpcCharacter npc, QuestObjective objective)
+        {
+            if (!Matches(npc, objective.Npc) && !Array.Exists(objective.Npcs ?? [], hash => Matches(npc, hash)))
+                return false;
+            if (objective.Area is not { Length: 3 } area)
+                return true;
+            double dx = npc.Position.x - area[0], dz = npc.Position.z - area[1];
+            return dx * dx + dz * dz <= (double)area[2] * area[2];
+        }
+
         static bool Matches(NpcCharacter npc, string? objectiveNpc)
         {
             if (string.IsNullOrEmpty(objectiveNpc))
@@ -363,6 +383,9 @@ namespace ZoneEngine_New.Core.Quests
         void Advance(Player player, PlayerQuest quest, NpcCharacter npc)
         {
             quest.Progress = Math.Min(quest.RequiredCount, quest.Progress + 1);
+            // A search ("find a Bio Analyzing Computer by killing robots") can end on any kill.
+            if (quest.Remaining > 0 && quest.Template.Objective.FindChance is int chance && Random.Shared.Next(100) < chance)
+                quest.Progress = quest.RequiredCount;
             if (quest.Remaining > 0)
             {
                 Save(player, quest);
