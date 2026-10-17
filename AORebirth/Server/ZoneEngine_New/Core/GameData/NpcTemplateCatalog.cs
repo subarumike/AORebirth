@@ -371,10 +371,16 @@ namespace ZoneEngine_New.Core.GameData
                 MaxLevel = max,
                 UnresolvedPlaceholder = isFallback,
                 Equipment = CopyPairs(nearest.Equipment),
+                MonsterWeapons = new List<string>(nearest.MonsterWeapons ?? new List<string>()),
+                CombatWeapons = CopyPairs(nearest.CombatWeapons),
+                Defense = nearest.Defense,
                 TextureOverrides = new List<TextureOverride>(nearest.TextureOverrides),
                 CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(nearest.CorpseFullUpdateTemplate),
                 KnuBotId = nearest.KnuBotId,
-                ItemTable = CopyLoot(nearest.LootTable)
+                ItemTable = CopyLoot(nearest.LootTable),
+                Nanos = new List<int>(nearest.Nanos ?? new List<int>()),
+                GfxEffects = new List<Mobs.NpcGfxEffect>(nearest.GfxEffects ?? new List<Mobs.NpcGfxEffect>()),
+                Patrol = nearest.Patrol
             };
         }
 
@@ -582,6 +588,15 @@ namespace ZoneEngine_New.Core.GameData
 
         public List<List<int>> Equipment { get; set; } = new();
 
+        /// <summary>Monster weapon hashes (MonsterWeapons.json) armed as attack cycles, as an equipper item's EquipMonsterWeapon does.</summary>
+        public List<string> MonsterWeapons { get; set; } = new();
+
+        /// <summary>Weapon items [low, high] armed as attack cycles as they are, for weapons with no monster weapon hash.</summary>
+        public List<List<int>> CombatWeapons { get; set; } = new();
+
+        /// <summary>NPCs it fights on its own (town guards that help a chased player).</summary>
+        public Mobs.NpcDefenseDefinition? Defense { get; set; }
+
         /// <summary>Material texture overrides sent on the spawn packet (SCFU extended textures).</summary>
         public List<TextureOverride> TextureOverrides { get; set; } = new();
 
@@ -589,6 +604,13 @@ namespace ZoneEngine_New.Core.GameData
 
         [JsonPropertyName("LootTable")]
         public List<MobItemTableEntry> LootTable { get; set; } = new();
+
+        /// <summary>Nano programs running on it from spawn (live SimpleCharFullUpdate ActiveNanos: boss size/glow).</summary>
+        public List<int> Nanos { get; set; } = new();
+
+        public List<Mobs.NpcGfxEffect> GfxEffects { get; set; } = new();
+
+        public Mobs.NpcPatrol? Patrol { get; set; }
     }
 
     public sealed class NpcLeaf

@@ -40,8 +40,10 @@ namespace ZoneEngine_New.Core.Helpers
             if (IsInRestrictedGas(target))
                 return false;
 
-            // A NoCombat NPC does not attack, and neither does anyone whose fighting a buff restricts.
-            if (attacker is NpcCharacter { Attackable: false } || attacker.CombatRestricted)
+            // A NoCombat NPC does not attack, and neither does anyone whose fighting a buff restricts. A defender
+            // (Marcus Stone, town guards) fights NPCs even when players cannot attack it.
+            if (attacker.CombatRestricted
+                || attacker is NpcCharacter { Attackable: false } quiet && !(quiet.Defense != null && IsPlainNpc(target)))
                 return false;
 
             // A pet and its owner (and the owner's other pets) are one side.
@@ -67,8 +69,12 @@ namespace ZoneEngine_New.Core.Helpers
                 return (player.ActionRestrictionFlags & PlayerAttackable) != 0;
             }
 
-            return target is not NpcCharacter npc || npc.Attackable;
+            // The NPCs a defender fights may hit back; players and their pets still may not attack it.
+            return target is not NpcCharacter npc || npc.Attackable || npc.Defense != null && IsPlainNpc(attacker);
         }
+
+        /// <summary>An NPC that is no player's pet.</summary>
+        static bool IsPlainNpc(Character character) => character is NpcCharacter { PetOwner: not Player };
 
         static bool CanAttackNonPlayer(Character target) => target is not NpcCharacter npc || npc.Attackable;
 

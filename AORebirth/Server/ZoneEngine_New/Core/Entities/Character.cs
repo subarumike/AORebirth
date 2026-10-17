@@ -2466,7 +2466,8 @@ namespace ZoneEngine_New.Core.Entities
                 NanoRuntime.TryStripNano(this, broken[i]);
 
             if (this is NpcCharacter npc && !ReferenceEquals(aggressor, this) && !aggressor.IsDead)
-                npc.Brain?.AddThreatFrom(aggressor, Ai.NpcAiRules.ProximityHate);
+                npc.Brain?.AddThreatFrom(aggressor,
+                    aggressor is NpcCharacter { Defense: not null } ? Ai.NpcAiRules.DefenderThreat : Ai.NpcAiRules.ProximityHate);
         }
 
         /// <summary>

@@ -59,7 +59,10 @@ namespace ZoneEngine_New.Core.Helpers
 
         public static int ResolveAmmoCount(CharacterWeapon? armed, Item? weapon, bool attackerIsPlayer)
         {
-            // NPC: melee style of the visual override, else the monster weapon.
+            // NPC swinging a weapon held in the hand: 0, as live sends for humanoids (Marcus Stone 65 hits, Dockworkers
+            // 167, raw dumps 2026-09-29/10-01); natural weapons keep the melee/ranged style of the monster weapon.
+            if (!attackerIsPlayer && armed?.VisualHand != null)
+                return 0;
             if (!attackerIsPlayer)
                 return UsesMeleeAmmo(armed?.DamageItem ?? weapon) ? PlayerMeleeAmmoCount : NpcRangedAmmoCount;
 

@@ -32,6 +32,17 @@ public static class WorldNpcFactory
         foreach (var stat in definition.Stats) npc.Stats.Set((CharacterStat)stat.Key, stat.Value);
         foreach (var texture in definition.Textures) npc.SetSpawnTexture(texture.Place, texture.Id);
         foreach (var mesh in definition.Meshes) npc.AddSpawnMesh(Clone(mesh));
+        npc.Defense = definition.Defense;
+        int level = npc.Stats.GetOrOne(CharacterStat.Level);
+        foreach (var pair in definition.CombatWeapons ?? new())
+        {
+            if (pair == null || pair.Count < 1 || pair[0] <= 0) continue;
+            int high = pair.Count >= 2 && pair[1] > 0 ? pair[1] : pair[0];
+            // Held in the hand so clients see the swing (slot 6), and armed as the attack cycle.
+            npc.EquipVisualWeapon(items.CreateWithNewInstance(pair[0], high, level, AORebirth.Enums.ItemSource.Other));
+            npc.EquipCombatWeapon(items.CreateWithNewInstance(pair[0], high, level, AORebirth.Enums.ItemSource.Other));
+        }
+        if (definition.CombatWeapons is { Count: > 0 }) npc.RebaseWeapons();
         npc.Motor.RefreshFromStats();
         return npc;
     }

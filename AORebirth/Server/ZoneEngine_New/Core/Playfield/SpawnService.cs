@@ -176,6 +176,7 @@ namespace ZoneEngine_New.Core.Playfield
                 MobTemplate = template,
                 SpawnHash = spawnHash ?? template.Hash,
                 Attackable = !template.Has(NpcFeature.NoCombat),
+                Defense = template.Defense,
                 Position = at,
                 Rotation = heading ?? new Quaternion(),
                 SpawnSource = spawnSource
@@ -218,15 +219,21 @@ namespace ZoneEngine_New.Core.Playfield
                 includeWield: true,
                 _items,
                 _playfield.GetRequiredService<IInventoryRepository>());
+            ApplySpawnNanos(npc, template);
             Metrics.TickStallWatch.Stage("spawn.rebase", identity.Instance);
             npc.Rebase();
             TryAttachShop(npc);
             // Vendors fight back like any NPC; only NoCombat (blue-named or flagged) NPCs stay brainless.
-            if (attachDefaultBrain && npc.Attackable)
+            // A blue-named defender (a town guard) still needs a brain to chase what it fights, and one with a captured
+            // patrol (Lolly the Reet, an Omni-AF Private) to walk it; without hate it never fights.
+            if (attachDefaultBrain && (npc.Attackable || npc.Defense != null || template.Patrol != null))
                 NpcBrain.Create(npc, new Vector3(at.x, at.y, at.z), NpcAiProfiles.Resolve(template.Hash));
 
             // Anything the first spawn packet has to carry (a pet's PetMaster) goes on before it is registered.
             configure?.Invoke(npc);
+            // A captured patrol beats a district's random wander: live NPCs of this kind walked these waypoints.
+            if (template.Patrol != null)
+                npc.Brain?.EnablePatrol(template.Patrol);
 
             Metrics.TickStallWatch.Stage("spawn.register", identity.Instance);
             if (fixedIdentity == null)
@@ -249,6 +256,39 @@ namespace ZoneEngine_New.Core.Playfield
                     position.zf));
 
             return npc;
+        }
+
+        /// <summary>How long a spawn nano lasts: longer than any NPC lives, and inside the client's centisecond timer.</summary>
+        static readonly TimeSpan SpawnNanoLifetime = TimeSpan.FromDays(7);
+
+        /// <summary>
+        /// The template's spawn nanos as running buffs (live: a boss's SimpleCharFullUpdate already lists Increase size by
+        /// 40, a glow and a damage type). Before the first rebase, so their effects are in the spawn stats and packet.
+        /// </summary>
+        void ApplySpawnNanos(NpcCharacter npc, MobTemplate template)
+        {
+            if (template.Nanos is not { Count: > 0 } nanos)
+                return;
+
+            DateTime expires = DateTime.UtcNow + SpawnNanoLifetime;
+            for (int i = 0; i < nanos.Count; i++)
+            {
+                Nanos.NanoSpell spell;
+                try
+                {
+                    spell = Nanos.NanoSpell.From(_items.CreateTemplate(nanos[i], nanos[i], quality: 1));
+                }
+                catch (Exception exception)
+                {
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Spawn nano {0} for {1} ({2}) is not in items.dat: {3}", nanos[i], template.Name, template.Hash, exception.Message));
+                    continue;
+                }
+
+                if (npc.TryRestoreBuff(spell, npc.Identity, i + 1, expires) == null)
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Spawn nano {0} for {1} ({2}) did not land (not a buff, or already running)", nanos[i], template.Name, template.Hash));
+            }
         }
 
         /// <summary>

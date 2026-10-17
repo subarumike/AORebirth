@@ -54,6 +54,15 @@ namespace ZoneEngine_New.Core.Entities
         public bool Attackable { get; set; } = true;
 
         /// <summary>
+        /// Starts fights with players who come near (BreedHostility). False for a quest prop's guard, which goes for a
+        /// player only when they tamper with the prop (see <see cref="Missions.QuestPropService"/>).
+        /// </summary>
+        public bool AttacksOnSight { get; set; } = true;
+
+        /// <summary>Fights other NPCs on its own (see <see cref="Mobs.NpcDefenseService"/>); null for everyone else.</summary>
+        public Mobs.NpcDefenseDefinition? Defense { get; set; }
+
+        /// <summary>
         /// The NPC's body cannot move: its MonsterData Features (stat 224, copied on at spawn) lack
         /// <see cref="GameData.MonsterBodyFeatures.CanMove"/>. It never paths, wanders or chases, and fights from where it
         /// stands. Unknown Features count as mobile.
@@ -287,10 +296,69 @@ namespace ZoneEngine_New.Core.Entities
         public override void Tick(double deltaTime)
         {
             if (!IsDead)
+            {
                 Brain?.Tick(deltaTime);
+                TickGfxEffects();
+            }
 
             TickStallWatch.Stage("npc.base", Identity.Instance);
             base.Tick(deltaTime);
+        }
+
+        // When each of the template's repeating effects plays next (index into MobTemplate.GfxEffects).
+        DateTime[]? _nextGfxUtc;
+
+        /// <summary>
+        /// Plays the template's repeating effects (a Burning Cleaning Robot's flames): live sends one SpellList with a
+        /// GfxEffect (function 53030) per effect on the NPC, the Burning Cleaning Robot every 4.8-5.2 s. Only while
+        /// someone can see it.
+        /// </summary>
+        void TickGfxEffects()
+        {
+            List<NpcGfxEffect>? effects = MobTemplate?.GfxEffects;
+            if (effects is not { Count: > 0 } || Cell == null)
+                return;
+
+            DateTime now = DateTime.UtcNow;
+            if (_nextGfxUtc == null || _nextGfxUtc.Length != effects.Count)
+            {
+                _nextGfxUtc = new DateTime[effects.Count];
+                for (int i = 0; i < effects.Count; i++)
+                    _nextGfxUtc[i] = now.AddSeconds(NextGfxDelay(effects[i]));
+            }
+
+            for (int i = 0; i < effects.Count; i++)
+            {
+                if (now < _nextGfxUtc[i])
+                    continue;
+
+                _nextGfxUtc[i] = now.AddSeconds(NextGfxDelay(effects[i]));
+                foreach (int gfx in effects[i].Gfx)
+                {
+                    Cell.Announce(new SpellListMessage
+                    {
+                        Identity = Identity,
+                        NanoEffects =
+                        [
+                            new NanoEffect
+                            {
+                                Effect = new Identity { Type = (IdentityType)(int)FunctionType.GfxEffect, Instance = Random.Shared.Next(1, int.MaxValue) },
+                                Unknown1 = 4,
+                                Hits = 1,
+                                GfxValue = gfx
+                            }
+                        ],
+                        Character = Identity
+                    });
+                }
+            }
+        }
+
+        static double NextGfxDelay(NpcGfxEffect effect)
+        {
+            double min = Math.Max(0.5, effect.MinSeconds);
+            double max = Math.Max(min, effect.MaxSeconds);
+            return min + Random.Shared.NextDouble() * (max - min);
         }
 
         protected override void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
@@ -360,6 +428,23 @@ namespace ZoneEngine_New.Core.Entities
                 TickStallWatch.Stage("equip.weapon", lowId);
                 TryExpandMonsterWeapon(gameData, item, quality, logger);
             }
+
+            // Templates built from captures name the weapons directly instead of through an equipper item.
+            foreach (string hash in template.MonsterWeapons)
+            {
+                if (!string.IsNullOrEmpty(hash))
+                    AddMonsterWeapon(gameData, hash, quality, logger);
+            }
+
+            foreach (List<int> pair in template.CombatWeapons)
+            {
+                if (pair == null || pair.Count < 1 || pair[0] <= 0)
+                    continue;
+
+                int highId = pair.Count >= 2 && pair[1] > 0 ? pair[1] : pair[0];
+                if (!TryAddEquipment(_items.CreateWithNewInstance(pair[0], highId, quality, ItemSource.Other), logger, combatWeapon: true))
+                    return;
+            }
         }
 
         /// <summary>Equipment items named "Boss Modifier Item (…)" are alternatives: each spawn keeps one at random.</summary>
@@ -402,8 +487,12 @@ namespace ZoneEngine_New.Core.Entities
         {
             if ((ItemClass)item.GetStat(CharacterStat.ItemClass) != ItemClass.Npc)
                 return;
-            if (!TryFindEquipMonsterWeaponHash(item, out string weaponHash))
-                return;
+            if (TryFindEquipMonsterWeaponHash(item, out string weaponHash))
+                AddMonsterWeapon(gameData, weaponHash, quality, logger);
+        }
+
+        void AddMonsterWeapon(IGameData gameData, string weaponHash, int quality, IZoneLogger? logger)
+        {
             if (!gameData.TryGetMonsterWeapon(weaponHash, out int[] ids))
             {
                 logger?.Warn(
@@ -435,6 +524,17 @@ namespace ZoneEngine_New.Core.Entities
         {
             ArgumentNullException.ThrowIfNull(weapon);
             return TryAddEquipment(weapon, logger, combatWeapon: true);
+        }
+
+        /// <summary>
+        /// Wears a weapon in the hand (not an attack cycle): the combat weapon's hits are then shown as this weapon's
+        /// swing, right-hand slot 6 with instance 0, as live sends for humanoid NPCs (Marcus Stone, Dockworkers).
+        /// Call <see cref="RebaseWeapons"/> afterwards.
+        /// </summary>
+        internal bool EquipVisualWeapon(Item weapon, IZoneLogger? logger = null)
+        {
+            ArgumentNullException.ThrowIfNull(weapon);
+            return TryAddEquipment(weapon, logger);
         }
 
         bool TryAddEquipment(Item item, IZoneLogger? logger, bool combatWeapon = false, string? sawHash = null)

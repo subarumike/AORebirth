@@ -4,6 +4,7 @@ namespace ZoneEngine_New.Core.Playfield
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text.Json;
 
     using AORebirth.Core.GameData;
@@ -253,11 +254,38 @@ namespace ZoneEngine_New.Core.Playfield
                     _spawnRate));
         }
 
+        /// <summary>A spawn point this close to a standalone shop is the shop's own statel point.</summary>
+        const float ShopReplacesPointRadius = 0.5f;
+
+        static bool UnderShop(PlayfieldSpawnEntry entry, float[][] shops)
+        {
+            if (entry.Position == null || entry.Position.Length < 3)
+                return false;
+            foreach (float[] at in shops)
+            {
+                float dx = at[0] - entry.Position[0], dy = at[1] - entry.Position[1], dz = at[2] - entry.Position[2];
+                if (dx * dx + dz * dz <= ShopReplacesPointRadius * ShopReplacesPointRadius && Math.Abs(dy) <= 3f)
+                    return true;
+            }
+
+            return false;
+        }
+
         private void LoadSpawns(CellGrid grid)
         {
             PlayfieldSpawnsData data = _gameData.GetPlayfieldSpawns(_playfield.Identity.Instance);
             PlayfieldSpawnEntry[] entries = data.Spawns ?? [];
             int skipped = 0;
+            // A placed content NPC that stands in for a hash (Marcus Stone for MUSN) replaces all its points here.
+            var content = _gameData.GetPlayfieldNpcs(_playfield.Identity.Instance);
+            var placedHashes = new HashSet<string>(
+                content.Npcs
+                    .Where(npc => !string.IsNullOrEmpty(npc.ReplacesHash))
+                    .Select(npc => npc.ReplacesHash),
+                StringComparer.Ordinal);
+            // A standalone shop is the machine its own statel point spawns in retail (the Arete Junk Shop on JUSO):
+            // the point spawns nothing under it, not a template-less "To Be Determined" NPC.
+            float[][] shops = content.StandaloneShops.Select(shop => shop.Position).Where(at => at is { Length: >= 3 }).ToArray();
 
             foreach (PlayfieldSpawnEntry entry in entries)
             {
@@ -275,6 +303,12 @@ namespace ZoneEngine_New.Core.Playfield
 
                 string? hashText = entry.HashText;
                 if (string.IsNullOrEmpty(hashText))
+                {
+                    skipped++;
+                    continue;
+                }
+
+                if (placedHashes.Contains(spawnHash) || UnderShop(entry, shops))
                 {
                     skipped++;
                     continue;

@@ -51,6 +51,10 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
                 Bind(npc, new(definition.Key, definition.Provenance, definition.ContentNpcIdentity, definition.PlayfieldId, definition.Vendor != null));
                 npc.Died += OnDied;
                 if (npc.Shop != null) npc.Shop.Playfield = playfield;
+                // A placed defender (Marcus Stone) needs a brain to walk to, face and swing at what it fights, and to
+                // go home after; its BreedHostility stays 0, so it never picks a fight with a player.
+                if (definition.Defense != null && !definition.Passive && npc.Brain == null)
+                    ZoneEngine_New.Core.Ai.NpcBrain.Create(npc, new AORebirth.Core.Vector.Vector3(npc.Position.x, npc.Position.y, npc.Position.z));
                 locality.RegisterDynel(npc);
                 _activated.Add(definition.Key);
             }
@@ -84,7 +88,15 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
 
             bool registered = false;
             VendingMachine bound = shop;
-            if (registry.TryGet(shop.Identity, out var current))
+            if (!registry.TryGet(shop.Identity, out _) && PlacedMachineAt(shop, definition.Vendor.TemplateId) is { } placed)
+            {
+                // The world's own machine stands here (Dynels.dat, under a runtime id; the Arete ICC Ammunition
+                // terminal): the shop is that machine with this stock. Its placement is the world's, as live.
+                bound = placed;
+                if (!bound.Stock.IsConfiguredSnapshot)
+                    bound.Stock.SetConfiguredSnapshot(ToStockSlots(definition.Vendor.Stock));
+            }
+            else if (registry.TryGet(shop.Identity, out var current))
             {
                 if (current is not VendingMachine existing || !ReferenceEquals(existing.Playfield, playfield)
                     || existing.Template.Id != definition.Vendor.TemplateId || existing.OwnerNpc != null)
@@ -121,6 +133,23 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
                 throw;
             }
         }
+    }
+
+    /// <summary>A world vending machine of <paramref name="templateId"/> standing on <paramref name="shop"/>'s spot.</summary>
+    VendingMachine? PlacedMachineAt(VendingMachine shop, int templateId)
+    {
+        const double SameSpotMeters = 0.5;
+        foreach (var dynel in registry.Dynels())
+        {
+            if (dynel is VendingMachine machine && machine.OwnerNpc == null && machine.Template.Id == templateId
+                && ReferenceEquals(machine.Playfield, playfield) && !_standaloneShops.ContainsKey(machine)
+                && Math.Abs(machine.Position.x - shop.Position.x) <= SameSpotMeters
+                && Math.Abs(machine.Position.z - shop.Position.z) <= SameSpotMeters
+                && Math.Abs(machine.Position.y - shop.Position.y) <= 3)
+                return machine;
+        }
+
+        return null;
     }
 
     static ShopStockSlot[] ToStockSlots(IEnumerable<WorldVendorStock> stock)
