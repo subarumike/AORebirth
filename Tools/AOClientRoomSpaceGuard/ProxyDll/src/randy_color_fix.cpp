@@ -1945,6 +1945,15 @@ namespace aorf
             return false;
         }
 
+        // A replacement renderer (ao-vk) is randy31.dll, with Funcom's kept as randy31_orig.dll: GUI.dll's draws go
+        // into the replacement, not the Funcom code this repair guards. The early render-state guard above still
+        // covers Funcom's code wherever it runs (it checks the faulting module's bytes, not its name).
+        if (GetModuleHandleW(L"randy31_orig.dll"))
+        {
+            Log("SKIP randy31 renderer repair: randy31.dll is a replacement renderer (randy31_orig.dll loaded)");
+            return true;
+        }
+
         HMODULE randy = GetModuleHandleW(L"randy31.dll");
         HMODULE gui = GetModuleHandleW(L"GUI.dll");
         HMODULE utils = GetModuleHandleW(L"Utils.dll");
