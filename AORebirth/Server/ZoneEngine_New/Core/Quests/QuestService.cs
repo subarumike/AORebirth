@@ -330,6 +330,27 @@ namespace ZoneEngine_New.Core.Quests
                 CompleteAll(player, found);
         }
 
+        /// <summary>
+        /// A tradeskill combine made an item with these template ids: active Assemble quests wanting it complete.
+        /// </summary>
+        public void OnItemAssembled(Player player, int lowId, int highId)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+
+            List<PlayerQuest>? found = null;
+            foreach (PlayerQuest quest in GetLog(player).Quests.Values)
+            {
+                if (quest.IsActive && string.Equals(quest.Template.Action, QuestTemplate.AssembleAction, StringComparison.Ordinal)
+                    && !RequiresBoundObjective(quest)
+                    && quest.Template.Objective.Items is { } items
+                    && (Array.IndexOf(items, lowId) >= 0 || Array.IndexOf(items, highId) >= 0))
+                    (found ??= new List<PlayerQuest>()).Add(quest);
+            }
+
+            if (found != null)
+                CompleteAll(player, found);
+        }
+
         List<PlayerQuest>? FindActiveOn(Player player, NpcCharacter npc, string action)
         {
             List<PlayerQuest>? found = null;

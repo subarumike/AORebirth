@@ -32,11 +32,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         private readonly InventoryActionService _inventoryActions;
         private readonly TeamService _teams;
+        private readonly Tradeskills.TradeskillService? _tradeskills;
 
-        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams)
+        public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams,
+            Tradeskills.TradeskillService? tradeskills = null)
         {
             _inventoryActions = inventoryActions;
             _teams = teams;
+            _tradeskills = tradeskills;
         }
 
         public Type MessageBodyType => typeof(CharacterActionMessage);
@@ -176,6 +179,33 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case CharacterActionType.JoinItems:
                     _inventoryActions.Handle(player, message);
                     break;
+
+                // Tradeskill window: Parameter1 = container type (0 clears), Parameter2 = slot; Build carries the
+                // chosen QL in Target.Instance.
+                case CharacterActionType.TradeskillSourceChanged:
+                    _tradeskills?.SourceChanged(player, message.Parameter1, message.Parameter2);
+                    break;
+
+                case CharacterActionType.TradeskillTargetChanged:
+                    _tradeskills?.TargetChanged(player, message.Parameter1, message.Parameter2);
+                    break;
+
+                case CharacterActionType.TradeskillBuildPressed:
+                    _tradeskills?.BuildPressed(player, message.Target.Instance);
+                    break;
+
+                case CharacterActionType.UseItemOnItem:
+                {
+                    // An inventory item dropped on another (CellAO's handler): Target = the dragged item,
+                    // Parameter1/Parameter2 = the container type and slot it was dropped on.
+                    var droppedOn = new Identity { Type = (IdentityType)message.Parameter1, Instance = message.Parameter2 };
+                    var outcome = _tradeskills?.TryCombineDrag(player, message.Target, droppedOn);
+                    player.Logger.Info(string.Format(CultureInfo.InvariantCulture,
+                        "CharacterAction UseItemOnItem character={0} source={1}:{2} target={3}:{4} tradeskill={5}",
+                        player.Identity.Instance, message.Target.Type, message.Target.Instance, droppedOn.Type, droppedOn.Instance,
+                        outcome?.ToString() ?? "unavailable"));
+                    break;
+                }
 
                 case CharacterActionType.UsePerk:
                     // Perk Actions button (Gamecode.dll 0x1004277c): Parameter2 = the button's action hash.

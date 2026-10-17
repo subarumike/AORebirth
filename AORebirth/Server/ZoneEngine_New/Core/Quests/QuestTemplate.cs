@@ -24,6 +24,9 @@ namespace ZoneEngine_New.Core.Quests
         public const string ReturnItemAction = "FindItem2";
         public const string RepairAction = "UseItemOnItem";
 
+        /// <summary>Finished by a tradeskill combine that makes one of <see cref="QuestObjective.Items"/>.</summary>
+        public const string AssembleAction = "Assemble";
+
         public static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
@@ -90,6 +93,9 @@ namespace ZoneEngine_New.Core.Quests
         public string? SpecItem { get; set; }
 
         public string? WorldItem { get; set; }
+
+        /// <summary>Assemble: item template ids (low or high) a combine must make to finish the step.</summary>
+        public int[]? Items { get; set; }
     }
 
     public sealed class QuestReward

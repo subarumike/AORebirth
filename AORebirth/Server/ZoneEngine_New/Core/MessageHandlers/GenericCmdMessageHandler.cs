@@ -26,11 +26,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly IItemBuilder _items;
         private readonly AuthoredQuestService _quests;
         private readonly Quests.Dungeons.QuestDungeonService? _dungeons;
+        private readonly Tradeskills.TradeskillService? _tradeskills;
 
         public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items,
-            AuthoredQuestService quests, Quests.Dungeons.QuestDungeonService? dungeons = null)
+            AuthoredQuestService quests, Quests.Dungeons.QuestDungeonService? dungeons = null,
+            Tradeskills.TradeskillService? tradeskills = null)
         {
             _dungeons = dungeons;
+            _tradeskills = tradeskills;
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
             _inventoryRepository = inventoryRepository;
@@ -162,6 +165,16 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     else if (message.Target is { Length: >= 2 }
                         && TryUseItemOnItem(player, playfield, message.Target[0], message.Target[1]))
                         Acknowledge(session, message, message.Target[1]);
+                    else if (message.Target is { Length: >= 2 } && _tradeskills != null
+                        && _tradeskills.TryCombineDrag(player, message.Target[0], message.Target[1]) is var combine
+                        && combine != Tradeskills.TradeskillService.CombineOutcome.NoRecipe)
+                    {
+                        // A tradeskill recipe: combined, or refused with its own feedback.
+                        if (combine == Tradeskills.TradeskillService.CombineOutcome.Combined)
+                            Acknowledge(session, message, message.Target[1]);
+                        else
+                            Deny(session, message);
+                    }
                     else Deny(session, message, player, "no accepted item-on-target interaction");
                     break;
 

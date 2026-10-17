@@ -242,6 +242,13 @@ namespace ZoneEngine_New
             services.AddSingleton<InventoryFlushService>();
             services.AddSingleton<IInventoryMutationPersistence, MySqlInventoryMutationPersistence>();
             services.AddSingleton<InventoryActionService>();
+            services.AddSingleton(provider =>
+            {
+                var logger = provider.GetRequiredService<IZoneLogger>();
+                return ZoneEngine_New.Core.Tradeskills.TradeskillCatalog.Load(
+                    provider.GetRequiredService<IGameData>().RootPath, text => logger.Info("Tradeskills: " + text));
+            });
+            services.AddSingleton<ZoneEngine_New.Core.Tradeskills.TradeskillService>();
             services.AddSingleton(_ => new MySqlMissionDao(() =>
             {
                 var connection = new MySqlConnection(MySqlConnectionSettings.GetRequiredConnectionString());
