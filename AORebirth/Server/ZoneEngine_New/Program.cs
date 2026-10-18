@@ -260,6 +260,7 @@ namespace ZoneEngine_New
             services.AddSingleton<GeneratedMissionService>();
             services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
             services.AddSingleton<AuthoredQuestService>();
+            services.AddSingleton<ItemPackageService>();
             services.AddSingleton<InventoryMoveService>();
             services.AddSingleton<ITradePersistence, MySqlTradePersistence>();
             services.AddSingleton<TradeService>();

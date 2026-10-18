@@ -190,7 +190,7 @@ namespace ZoneEngine_New.Core.Commands
                     {
                         var items = new List<string>();
                         foreach (QuestRewardItem item in reward.Records[i])
-                            items.Add(Safe(item.Name) + " QL" + item.Quality.ToString(CultureInfo.InvariantCulture) + " (" + item.Id.ToString(CultureInfo.InvariantCulture) + ")");
+                            items.Add(Safe(string.IsNullOrEmpty(item.Hash) ? item.Name : item.Hash) + " QL" + item.Quality.ToString(CultureInfo.InvariantCulture) + " (" + item.Id.ToString(CultureInfo.InvariantCulture) + ")");
                         rows.Add(Row("Reward choice " + (i + 1).ToString(CultureInfo.InvariantCulture), string.Join(", ", items)));
                     }
                 }

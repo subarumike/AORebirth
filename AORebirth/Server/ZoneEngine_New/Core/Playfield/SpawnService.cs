@@ -226,6 +226,8 @@ namespace ZoneEngine_New.Core.Playfield
                 NpcBrain.Create(npc, new Vector3(at.x, at.y, at.z), NpcAiProfiles.Resolve(template.Hash));
 
             // Anything the first spawn packet has to carry (a pet's PetMaster) goes on before it is registered.
+            if (_playfield.GetService<Missions.QuestPropService>()?.IsGuard(npc) == true)
+                npc.AttacksOnSight = false;
             configure?.Invoke(npc);
 
             Metrics.TickStallWatch.Stage("spawn.register", identity.Instance);

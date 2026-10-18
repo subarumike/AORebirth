@@ -832,6 +832,11 @@ namespace ZoneEngine_New.Core.Inventory
                 && (pending.SourcePage.Identity.Type != pending.DestPage.Identity.Type
                     || pending.SourceSlot != pending.DestSlot))
                 player.OnEquipmentChanged(new EquipSlot(pending.DestPage.Identity.Type, pending.DestSlot));
+
+            // Equip quests (Install the implant). Social clothing is cosmetic and does not count.
+            if (pending.DestPage.Identity.Type.IsWearPage() && pending.DestPage.Identity.Type != IdentityType.SocialPage
+                && !pending.SourcePage.Identity.Type.IsWearPage())
+                player.Playfield?.GetService<Quests.QuestService>()?.OnItemEquipped(player, pending.Item);
         }
 
         bool ApplyMove(

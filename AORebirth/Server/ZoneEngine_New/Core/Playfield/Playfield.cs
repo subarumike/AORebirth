@@ -700,6 +700,7 @@ namespace ZoneEngine_New.Core.Playfield
                 spawn.Tick();
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("npc.activation");
                 GetRequiredService<NpcContentActivationService>().Tick();
+                GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Tick();
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("inventory.moves");
                 _inventoryMoves.Tick(this, deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("itemuse");

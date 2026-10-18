@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Quests;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -286,12 +287,22 @@ public sealed partial class QuestService
                 return;
             quest.NextRewardRetryUtcTicks = _now().AddSeconds(5).Ticks;
             bool committed = false;
+            // Template quests carry their level band and cooldown; checked before earning, and the cooldown once more
+            // inside the earning transaction. A reward already earned is only delivered, never checked again.
+            QuestTemplate? recurring = quest.Source == QuestSource.Template && quest.Template.Recurring != null ? quest.Template : null;
             try
             {
+                if (quest.Source == QuestSource.Template && !quest.IsRewardPending && WhyNotEligible(player, quest.Template) is string why)
+                {
+                    ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, why);
+                    return;
+                }
+
                 _flush.HardFlush(player);
                 // Earning is durable even when capacity, content availability or delivery fails later.
                 FrozenMissionTokenReward? tokenReward = null;
-                var earned = _completionDao.Execute(player.Identity.Instance, null!, tx =>
+                string? account = recurring?.Recurring!.IsPerAccount == true ? Account(player) : null;
+                var earned = _completionDao.Execute(player.Identity.Instance, account!, tx =>
                 {
                     var completion = RequireCompletion(tx);
                     var stored = completion.ReadCharacterQuest(quest.QuestId);
@@ -304,6 +315,8 @@ public sealed partial class QuestService
                         ExpectedDefinitionJson = stored.DefinitionJson,
                         ExpectedAcgBuildingGeneratorJson = stored.AcgBuildingGeneratorJson, NowUtcTicks = _now().Ticks
                     });
+                    if (result.Status == CharacterQuestCompletionStatus.Earned && recurring != null)
+                        StartCooldown(tx, player, recurring);
                     if (result.Status is CharacterQuestCompletionStatus.Earned or CharacterQuestCompletionStatus.AlreadyEarned)
                     {
                         tokenReward = ReadTokenReward(tx, player, quest, result.Quest);
@@ -329,6 +342,9 @@ public sealed partial class QuestService
                     : quest.Template;
                 var reward = rewardTemplate.Reward;
                 var definitions = SelectRewardRecord(quest, reward).ToList();
+                if (!string.IsNullOrEmpty(rewardTemplate.NextStep) && _catalog.TryGet(rewardTemplate.NextStep, out QuestTemplate nextStep)
+                    && nextStep.StartItems is { Count: > 0 } startItems)
+                    definitions.AddRange(startItems);
                 if (tokenReward?.Won == true)
                 {
                     definitions.Add(new QuestRewardItem { Id = tokenReward.ItemId, HighId = tokenReward.ItemId, Quality = tokenReward.Quality });
@@ -353,13 +369,26 @@ public sealed partial class QuestService
                     NotifyPending(player, quest);
                     return;
                 }
-                var xp = DirectXpRewardPlan.CreateQuestReward(player, Math.Max(0, reward?.Xp ?? 0));
+                int level = player.Stats.GetOrOne(CharacterStat.Level);
+                int xpReward = Math.Max(0, reward?.Xp ?? 0)
+                    + (reward?.FullLevelXp == true ? ProgressionRewardRules.GetFullRubikaLevelXpReward(level) : 0);
+                var xp = DirectXpRewardPlan.CreateQuestReward(player, xpReward);
                 // Runtime vitals are published by the full XP plan; only durable stats belong in the reward transaction.
                 var values = xp.Stats.Where(pair => !StatCollection.IsRuntimeOnly(pair.Key))
                     .ToDictionary(pair => pair.Key, pair => pair.Value);
                 if (reward?.Credits > 0)
                     values[CharacterStat.Cash] = (int)Math.Min(int.MaxValue,
                         (long)player.Stats.GetOrZero(CharacterStat.Cash, StatDetail.Base) + reward.Credits);
+                int sideTokens = 0;
+                CharacterStat sideTokenStat = default;
+                if (reward?.SideTokens == true
+                    && ProgressionRewardRules.TryGetSideTokenStatId(player.Stats.GetOrZero(CharacterStat.Side), out int tokenStatId)
+                    && (sideTokens = ProgressionRewardRules.GetSideTokenReward(level, player.Stats.GetOrZero(CharacterStat.Side))) > 0)
+                {
+                    sideTokenStat = (CharacterStat)tokenStatId;
+                    values[sideTokenStat] = (int)Math.Min(int.MaxValue,
+                        (long)player.Stats.GetOrZero(sideTokenStat, StatDetail.Base) + sideTokens);
+                }
                 if (rewardTemplate.MissionBit is int bit && MissionBits.IsValid(bit))
                 {
                     var (stat, mask) = MissionBits.Locate(bit);
@@ -415,6 +444,9 @@ public sealed partial class QuestService
                 foreach (var pair in values.Where(pair => !xp.Stats.ContainsKey(pair.Key)))
                     player.Stats.Set(pair.Key, pair.Value, StatDetail.Base, dirty: true);
                 player.FlushDirtyStats();
+                if (sideTokens > 0)
+                    ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, string.Format(CultureInfo.InvariantCulture,
+                        "Side tokens collected: {0}.", values[sideTokenStat]));
                 QuestJournal.Delete(player, quest);
                 ClientFeedback.Send(player, "Feedback_MissionAccomplished");
                 _logger.Info("Quest completed and rewards committed char=" + player.Identity.Instance + " quest=" + quest.QuestId
@@ -422,6 +454,11 @@ public sealed partial class QuestService
                         + " tokenKills=" + tokenReward.Killed + "/" + tokenReward.Total));
                 if (!string.IsNullOrEmpty(rewardTemplate.NextStep) && _catalog.TryGet(rewardTemplate.NextStep, out _))
                     TryAssignTemplate(player, rewardTemplate.NextStep, out _);
+            }
+            catch (QuestCooldownActiveException cooldown)
+            {
+                // Another character of the account finished it first: nothing was earned, the quest stays active.
+                ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, cooldown.Message);
             }
             catch (Exception exception)
             {
