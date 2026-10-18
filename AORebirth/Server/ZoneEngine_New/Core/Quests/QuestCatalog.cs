@@ -69,6 +69,18 @@ namespace ZoneEngine_New.Core.Quests
                         template.MissionBit = null;
                     }
 
+                    // A broken cooldown or level band would let the quest repeat freely: the quest is left out instead.
+                    if (template.Recurring is { } recurring && (recurring.CooldownSeconds <= 0
+                            || !(recurring.IsPerAccount || string.Equals(recurring.Per, QuestRecurring.PerCharacter, StringComparison.OrdinalIgnoreCase)))
+                        || template.MinLevel < 1 || template.MaxLevel < (template.MinLevel ?? 1))
+                    {
+                        logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                            "Quest {0} has an invalid Recurring cooldown or level band; quest skipped", template.Hash));
+                        _templates.Remove(template.Hash);
+                        skipped++;
+                        continue;
+                    }
+
                     if (UnresolvedItem(template) is string unresolved)
                     {
                         logger.Warn(string.Format(CultureInfo.InvariantCulture,

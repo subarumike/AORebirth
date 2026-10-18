@@ -71,6 +71,18 @@ namespace ZoneEngine_New.Core.Quests
         public QuestReward? Reward { get; set; }
 
         /// <summary>
+        /// Can be done again after a cooldown (the daily DOJA chip turn-in). Without it a quest is done once, or
+        /// restarted only by whoever gives it again.
+        /// </summary>
+        public QuestRecurring? Recurring { get; set; }
+
+        /// <summary>Lowest level that may take and finish this quest (a DOJA chip's level band).</summary>
+        public int? MinLevel { get; set; }
+
+        /// <summary>Highest level that may take and finish this quest.</summary>
+        public int? MaxLevel { get; set; }
+
+        /// <summary>
         /// Items the player is handed as this step starts after the previous one (live, Surveillance Uplink: the
         /// Rebuilt HC-12 SecTec Monitor arrives with the Deliver the Bio Analyzing Computer reward). Granted with the
         /// previous step's reward, not shown in its reward box.
@@ -173,6 +185,31 @@ namespace ZoneEngine_New.Core.Quests
 
         /// <summary>Alternative item sets; one record is given, all its items together.</summary>
         public List<List<QuestRewardItem>>? Records { get; set; }
+    }
+
+    /// <summary>How a recurring quest waits before it can be taken again.</summary>
+    public sealed class QuestRecurring
+    {
+        public const string PerAccount = "Account";
+        public const string PerCharacter = "Character";
+
+        /// <summary>From completion until the quest can be taken (and completed) again.</summary>
+        public int CooldownSeconds { get; set; }
+
+        /// <summary>"Account": one completion holds back every character on the account. "Character": only that one.</summary>
+        public string Per { get; set; } = PerCharacter;
+
+        /// <summary>
+        /// Quests sharing one cooldown (each DOJA chip's quest: one chip a day, whichever). The quest's own hash when
+        /// empty.
+        /// </summary>
+        public string? CooldownGroup { get; set; }
+
+        /// <summary>Said when the cooldown holds the quest back. {time} is the time left.</summary>
+        public string? CooldownText { get; set; }
+
+        [JsonIgnore]
+        public bool IsPerAccount => string.Equals(Per, PerAccount, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

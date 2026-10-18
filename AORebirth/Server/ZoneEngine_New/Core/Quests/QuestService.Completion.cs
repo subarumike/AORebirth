@@ -287,12 +287,22 @@ public sealed partial class QuestService
                 return;
             quest.NextRewardRetryUtcTicks = _now().AddSeconds(5).Ticks;
             bool committed = false;
+            // Template quests carry their level band and cooldown; checked before earning, and the cooldown once more
+            // inside the earning transaction. A reward already earned is only delivered, never checked again.
+            QuestTemplate? recurring = quest.Source == QuestSource.Template && quest.Template.Recurring != null ? quest.Template : null;
             try
             {
+                if (quest.Source == QuestSource.Template && !quest.IsRewardPending && WhyNotEligible(player, quest.Template) is string why)
+                {
+                    ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, why);
+                    return;
+                }
+
                 _flush.HardFlush(player);
                 // Earning is durable even when capacity, content availability or delivery fails later.
                 FrozenMissionTokenReward? tokenReward = null;
-                var earned = _completionDao.Execute(player.Identity.Instance, null!, tx =>
+                string? account = recurring?.Recurring!.IsPerAccount == true ? Account(player) : null;
+                var earned = _completionDao.Execute(player.Identity.Instance, account!, tx =>
                 {
                     var completion = RequireCompletion(tx);
                     var stored = completion.ReadCharacterQuest(quest.QuestId);
@@ -305,6 +315,8 @@ public sealed partial class QuestService
                         ExpectedDefinitionJson = stored.DefinitionJson,
                         ExpectedAcgBuildingGeneratorJson = stored.AcgBuildingGeneratorJson, NowUtcTicks = _now().Ticks
                     });
+                    if (result.Status == CharacterQuestCompletionStatus.Earned && recurring != null)
+                        StartCooldown(tx, player, recurring);
                     if (result.Status is CharacterQuestCompletionStatus.Earned or CharacterQuestCompletionStatus.AlreadyEarned)
                     {
                         tokenReward = ReadTokenReward(tx, player, quest, result.Quest);
@@ -449,6 +461,11 @@ public sealed partial class QuestService
                         + " tokenKills=" + tokenReward.Killed + "/" + tokenReward.Total));
                 if (!string.IsNullOrEmpty(rewardTemplate.NextStep) && _catalog.TryGet(rewardTemplate.NextStep, out _))
                     TryAssignTemplate(player, rewardTemplate.NextStep, out _);
+            }
+            catch (QuestCooldownActiveException cooldown)
+            {
+                // Another character of the account finished it first: nothing was earned, the quest stays active.
+                ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, cooldown.Message);
             }
             catch (Exception exception)
             {

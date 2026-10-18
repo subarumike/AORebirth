@@ -87,6 +87,26 @@ namespace ZoneEngine_New.Core.Quests
         }
 
         /// <summary>
+        /// Ends an active quest that is no longer an option (Steal the credits... once the card went back to Leonora
+        /// Marty): saved as failed and taken out of the journal, with no reward. False when it is not active.
+        /// </summary>
+        public bool TryFail(Player player, PlayerQuest quest)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(quest);
+            if (!quest.IsActive || quest.IsRewardPending)
+                return false;
+
+            quest.State = QuestState.Failed;
+            Save(player, quest);
+            QuestJournal.Delete(player, quest);
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest failed char={0} quest={1} ({2})",
+                player.Identity.Instance, quest.QuestId, quest.Template.Name));
+            QuestEnded?.Invoke(player, quest);
+            return true;
+        }
+
+        /// <summary>
         /// The player deleted a journal entry. The client sends the delete request (QuestIIR_t, Gamecode.dll
         /// N3Msg_RemoveQuest) but leaves the entry until the server removes it. False when the id is not one of
         /// this player's active quests, so other quest systems can take it.
@@ -134,8 +154,11 @@ namespace ZoneEngine_New.Core.Quests
             }
         }
 
-        /// <summary>Gives a Quests.json quest. A completed or closed one is started over; an active one is refused.</summary>
-        public bool TryAssignTemplate(Player player, string hash, out string result)
+        /// <summary>
+        /// Gives a Quests.json quest. A completed or closed one is started over; an active one is refused, and so is
+        /// one outside the player's level band or on a running Recurring cooldown unless <paramref name="force"/> (a GM).
+        /// </summary>
+        public bool TryAssignTemplate(Player player, string hash, out string result, bool force = false)
         {
             ArgumentNullException.ThrowIfNull(player);
             if (!_catalog.TryGet(hash, out QuestTemplate template))
@@ -148,6 +171,12 @@ namespace ZoneEngine_New.Core.Quests
             if (log.Quests.TryGetValue(template.Hash, out PlayerQuest? held) && held.IsActive)
             {
                 result = string.Format(CultureInfo.InvariantCulture, "{0} already has quest {1} ({2}).", player.Name, template.Hash, template.Name);
+                return false;
+            }
+
+            if (!force && WhyNotEligible(player, template) is string why)
+            {
+                result = why;
                 return false;
             }
 
