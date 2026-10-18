@@ -459,7 +459,7 @@ namespace ZoneEngine_New.Core.Ai
 
         public void ScanProximity()
         {
-            if (!Npc.Attackable)
+            if (!Npc.Attackable || !Npc.AttacksOnSight)
                 return;
             if (!NpcAiRules.IsProximityHostile(Npc.Stats.GetOrZero(CharacterStat.BreedHostility)))
                 return;
@@ -479,6 +479,18 @@ namespace ZoneEngine_New.Core.Ai
         /// Adds 1 hate when BreedHostility &gt; 0 and the player is nearby, in line of sight and not already listed.
         /// </summary>
         public void TryProximityAggro(Character player)
+        {
+            if (Npc.AttacksOnSight)
+                TryNotice(player);
+        }
+
+        /// <summary>
+        /// Something drew this NPC's attention to <paramref name="player"/> (a guard's strongbox being picked): it goes
+        /// for them by the same rules as proximity aggro, even when it never attacks on sight.
+        /// </summary>
+        public void TryAlertAggro(Character player) => TryNotice(player);
+
+        void TryNotice(Character player)
         {
             if (player == null || !player.IsPlayer || player.IsDead)
                 return;

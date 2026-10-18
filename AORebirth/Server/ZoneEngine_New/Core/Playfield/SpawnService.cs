@@ -226,6 +226,8 @@ namespace ZoneEngine_New.Core.Playfield
                 NpcBrain.Create(npc, new Vector3(at.x, at.y, at.z), NpcAiProfiles.Resolve(template.Hash));
 
             // Anything the first spawn packet has to carry (a pet's PetMaster) goes on before it is registered.
+            if (_playfield.GetService<Missions.QuestPropService>()?.IsGuard(npc) == true)
+                npc.AttacksOnSight = false;
             configure?.Invoke(npc);
 
             Metrics.TickStallWatch.Stage("spawn.register", identity.Instance);
@@ -985,20 +987,6 @@ namespace ZoneEngine_New.Core.Playfield
             // The client lists its pets once it has zoned in (or reconnected).
             if (player.OwnedPets.Count > 0)
                 _playfield.GetRequiredService<Pets.PetService>().AnnounceOwnedPets(player);
-
-            try
-            {
-                _playfieldManager.AuthoredQuests.Restore(player);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(
-                    ex,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Authored quest restore failed character={0}; continuing with world visibility",
-                        player.Identity.Instance));
-            }
 
             try
             {

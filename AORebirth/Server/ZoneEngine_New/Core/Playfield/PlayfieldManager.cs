@@ -78,7 +78,6 @@ namespace ZoneEngine_New.Core.Playfield
             CharacterSnapshotService characterSnapshot,
             IPlayfieldMetricsRegistry metricsRegistry,
             TeamService teams,
-            AuthoredQuestService authoredQuests,
             IItemTemplateCatalog itemTemplates,
             IShopDao shopDao,
             Quests.QuestService? quests = null,
@@ -121,7 +120,6 @@ namespace ZoneEngine_New.Core.Playfield
             _metricsRegistry = metricsRegistry;
             _shopDao = shopDao;
             Teams = teams ?? throw new ArgumentNullException(nameof(teams));
-            AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
             ItemTemplates = itemTemplates ?? throw new ArgumentNullException(nameof(itemTemplates));
             Quests = quests;
             _emptyPlayfieldSweep = new Timer(
@@ -132,7 +130,6 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         public TeamService Teams { get; }
-        public AuthoredQuestService AuthoredQuests { get; }
 
         /// <summary>Knubot NPC conversations, ticked on every playfield owner.</summary>
         public ZoneEngine_New.Core.Knubot.KnubotService? Knubot { get; }

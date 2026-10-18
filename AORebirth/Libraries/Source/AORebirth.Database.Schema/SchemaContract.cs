@@ -32,7 +32,8 @@ public static class SchemaContract
         "20260928_quest_dungeon_keys.sql",
         "20261001_character_perk_locks.sql",
         "20261013_character_research.sql",
-        "20261016_character_nano_line_locks.sql"
+        "20261016_character_nano_line_locks.sql",
+        "20261016_recurring_doja_quest.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.

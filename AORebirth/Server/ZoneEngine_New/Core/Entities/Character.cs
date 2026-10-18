@@ -2255,6 +2255,10 @@ namespace ZoneEngine_New.Core.Entities
                 // Gamecode.dll FUN_100065d8 case 0x70: fails when the playfield forbids flying
                 // ("FlyingMustMeAllowedOnThePlayfield"). Hoverboards (Phasefront 281569), Yalmahas, wings.
                 Operator.FlyingAllowed => PlayfieldEntryFlags.IsFlyingAllowed(Playfield?.MetaData),
+                // Value = a spawn hash: this is that NPC (the Health Regeneration Stim works on a Wounded Dockworker).
+                Operator.IsNpcHash => this is NpcCharacter npc && NpcCharacter.TryDecodeAoHash(value, out string hash)
+                    && (string.Equals(npc.SpawnHash, hash, StringComparison.Ordinal)
+                        || string.Equals(npc.MobTemplate?.Hash, hash, StringComparison.Ordinal)),
                 _ => null
             };
         }
