@@ -54,6 +54,12 @@ namespace ZoneEngine_New.Core.Entities
         public bool Attackable { get; set; } = true;
 
         /// <summary>
+        /// Starts fights with players who come near (BreedHostility). False for a quest prop's guard, which goes for a
+        /// player only when they tamper with the prop (see <see cref="Missions.QuestPropService"/>).
+        /// </summary>
+        public bool AttacksOnSight { get; set; } = true;
+
+        /// <summary>
         /// The NPC's body cannot move: its MonsterData Features (stat 224, copied on at spawn) lack
         /// <see cref="GameData.MonsterBodyFeatures.CanMove"/>. It never paths, wanders or chases, and fights from where it
         /// stands. Unknown Features count as mobile.

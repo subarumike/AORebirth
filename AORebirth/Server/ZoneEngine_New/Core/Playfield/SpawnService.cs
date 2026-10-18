@@ -151,7 +151,8 @@ namespace ZoneEngine_New.Core.Playfield
             Action<NpcCharacter>? configure = null,
             bool attachDefaultBrain = true,
             Identity? fixedIdentity = null,
-            string? spawnPointKey = null)
+            string? spawnPointKey = null,
+            string? npcKey = null)
         {
             ArgumentNullException.ThrowIfNull(template);
             ArgumentNullException.ThrowIfNull(position);
@@ -227,11 +228,14 @@ namespace ZoneEngine_New.Core.Playfield
                 NpcBrain.Create(npc, new Vector3(at.x, at.y, at.z), NpcAiProfiles.Resolve(template.Hash));
 
             // Anything the first spawn packet has to carry (a pet's PetMaster) goes on before it is registered.
+            if (_playfield.GetService<Missions.QuestPropService>()?.IsGuard(npc) == true)
+                npc.AttacksOnSight = false;
             configure?.Invoke(npc);
 
-            // NpcScripts: the most specific binding for this spawn point / hash, if any.
+            // NpcScripts: the most specific binding for this spawn point / NPC key / hash, if any. npcKey names an NPC
+            // that content brings out away from Npcs.json (a Props.json SpawnOnUse creature).
             if (spawnSource != SpawnSource.Summoned)
-                _playfield.GetService<NpcScripts.NpcScriptCatalog>()?.TryAttach(npc, _playfield.ResourceId, spawnPointKey, npcKey: null);
+                _playfield.GetService<NpcScripts.NpcScriptCatalog>()?.TryAttach(npc, _playfield.ResourceId, spawnPointKey, npcKey);
 
             Metrics.TickStallWatch.Stage("spawn.register", identity.Instance);
             if (fixedIdentity == null)

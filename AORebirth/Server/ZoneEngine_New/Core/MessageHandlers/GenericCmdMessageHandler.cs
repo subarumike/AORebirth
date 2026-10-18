@@ -387,14 +387,30 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
+            // A client-static quest object ("Install the implant" at the Surgery Clinic): the step completes, and the
+            // object's own use, if the server has one, still goes on.
+            bool completedStep = playfield.GetRequiredService<QuestPropService>().TryCompleteStaticUse(session, target);
+
             if (!playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel))
             {
+                if (completedStep)
+                {
+                    Acknowledge(session, message, target);
+                    return;
+                }
+
                 Deny(session, message, player, "dynel not in registry: " + target);
                 return;
             }
 
             if (dynel is not IUsableDynel usable)
             {
+                if (completedStep)
+                {
+                    Acknowledge(session, message, target);
+                    return;
+                }
+
                 Deny(
                     session,
                     message,
@@ -407,7 +423,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (!usable.TryUse(player))
+            if (!usable.TryUse(player) && !completedStep)
             {
                 Deny(
                     session,
