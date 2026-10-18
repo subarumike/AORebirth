@@ -41,6 +41,26 @@ namespace ZoneEngine_New.Core.Quests
         /// <summary>Every loaded template (read-only after load).</summary>
         public IEnumerable<QuestTemplate> Templates => _templates.Values;
 
+        /// <summary>
+        /// The template of <paramref name="hash"/>, or the one listing it in <see cref="QuestTemplate.Aliases"/>: the
+        /// live quest hash an item names (SpawnQuest KY6D on the Bank of Rubi-Ka Credit Card is HWXS).
+        /// </summary>
+        public bool TryGetByHashOrAlias(string hash, out QuestTemplate template)
+        {
+            if (TryGet(hash, out template))
+                return true;
+            foreach (QuestTemplate candidate in _templates.Values)
+            {
+                if (Array.IndexOf(candidate.Aliases ?? [], hash) >= 0)
+                {
+                    template = candidate;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         void LoadTemplates(string path, IZoneLogger logger)
         {
             if (!File.Exists(path))

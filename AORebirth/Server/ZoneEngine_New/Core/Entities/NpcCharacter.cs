@@ -599,7 +599,7 @@ namespace ZoneEngine_New.Core.Entities
             return false;
         }
 
-        static bool TryDecodeAoHash(int packed, out string hash)
+        internal static bool TryDecodeAoHash(int packed, out string hash)
         {
             char a = (char)((packed >> 24) & 0xFF);
             char b = (char)((packed >> 16) & 0xFF);

@@ -51,6 +51,24 @@ public sealed partial class QuestService
         return until is DateTime end && end > now ? CooldownText(recurring, end - now) : null;
     }
 
+    /// <summary>
+    /// An item that starts a quest was used (ItemBehavior.json QuestStarters, the DOJA chip). True when the quest is
+    /// held afterwards; <paramref name="message"/> is what to tell the player, null when there is nothing to say
+    /// (started, or already held: using the item again changes nothing).
+    /// </summary>
+    public bool TryStartFromItem(Player player, string hash, out string? message)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        message = null;
+        if (!_catalog.TryGetByHashOrAlias(hash, out QuestTemplate template))
+            return false;
+        if (GetLog(player).Quests.TryGetValue(template.Hash, out PlayerQuest? held) && held.IsActive)
+            return true;
+
+        message = WhyNotEligible(player, template);
+        return message == null && TryAssignTemplate(player, template.Hash, out _);
+    }
+
     DateTime? ReadCooldown(Player player, QuestTemplate template)
     {
         if (_completionDao == null)

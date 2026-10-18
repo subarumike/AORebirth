@@ -65,6 +65,12 @@ namespace ZoneEngine_New.Core.Quests
 
         public int? MissionBit { get; set; }
 
+        /// <summary>
+        /// The live game's own hashes for this step, where they differ from <see cref="Hash"/>: items name the quest by
+        /// these in their criteria (HasActiveQuest) and SolveQuest (Health Regeneration Stim 297044: 82OD = JTEV).
+        /// </summary>
+        public string[]? Aliases { get; set; }
+
         /// <summary>Single follow-up quest hash, assigned when this one completes.</summary>
         public string? NextStep { get; set; }
 

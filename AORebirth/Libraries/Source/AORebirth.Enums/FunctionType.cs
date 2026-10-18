@@ -269,6 +269,13 @@ namespace AORebirth.Enums
         Faction = 53189,
 
         /// <summary>
+        /// Ends the user's active quest of that QasInstance [QAS instance]. Bank of Rubi-Ka Credit Card 297302:
+        /// 53251 [105109] (M5MT, Deliver the Lost Credit Card) beside SolveQuest KY6D (Steal the credits...) - keeping the
+        /// credits is no longer delivering the card. AO's own name for it is not known.
+        /// </summary>
+        FailQuestByQas = 53251,
+
+        /// <summary>
         /// </summary>
         Fear = 53121,
 
@@ -815,6 +822,14 @@ namespace AORebirth.Enums
         /// <summary>
         /// </summary>
         Teleport = 53016,
+
+        /// <summary>
+        /// A teleport [x, y, z, playfield]. Arete Landing's exit door (template 41565, Dynels.dat instance 0xC0001999) has
+        /// it on OnTargetInVicinity with [3337, 38, 866, 655], for a player with the ID card bit (MissionBits14 16384) and
+        /// nano 295602 running, which the elevator 297303 casts as it moves them onto the door; live then landed them in
+        /// ICC HQ (655) at 3337, 36.1, 866. AO's own name for it is not known.
+        /// </summary>
+        TeleportOut = 53142,
 
         /// <summary>
         /// </summary>
