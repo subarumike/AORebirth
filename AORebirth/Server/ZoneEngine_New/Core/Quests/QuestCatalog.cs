@@ -7,10 +7,12 @@ namespace ZoneEngine_New.Core.Quests
     using System.Text.Json;
 
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
 
     /// <summary>
-    /// GameData/Quests.json templates keyed by hash.
+    /// GameData/Quests.json templates keyed by hash. Items are named by ItemTemplates.json hash: reward and start
+    /// items are resolved to template ids here, and a quest naming an item hash that does not resolve is left out.
     /// </summary>
     public sealed class QuestCatalog
     {
@@ -18,11 +20,16 @@ namespace ZoneEngine_New.Core.Quests
 
         readonly Dictionary<string, QuestTemplate> _templates = new(StringComparer.Ordinal);
 
-        public QuestCatalog(IGameData gameData, IZoneLogger logger)
+        readonly IGameData _gameData;
+        readonly HashItemMinter? _minter;
+
+        public QuestCatalog(IGameData gameData, IZoneLogger logger, HashItemMinter? minter = null)
         {
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
 
+            _gameData = gameData;
+            _minter = minter;
             LoadTemplates(Path.Combine(gameData.RootPath, FileName), logger);
         }
 
@@ -61,6 +68,14 @@ namespace ZoneEngine_New.Core.Quests
                             template.Hash, bit, MissionBits.Count - 1));
                         template.MissionBit = null;
                     }
+
+                    if (UnresolvedItem(template) is string unresolved)
+                    {
+                        logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                            "Quest {0} names item hash {1}, which does not resolve to one item; quest skipped", template.Hash, unresolved));
+                        _templates.Remove(template.Hash);
+                        skipped++;
+                    }
                 }
 
                 logger.Info(string.Format(CultureInfo.InvariantCulture, "GameData quests={0} skipped={1} from {2}", _templates.Count, skipped, path));
@@ -69,6 +84,42 @@ namespace ZoneEngine_New.Core.Quests
             {
                 logger.Error(exception, string.Format(CultureInfo.InvariantCulture, "Failed to load {0} from {1}", FileName, path));
             }
+        }
+
+        /// <summary>
+        /// Resolves every hash-named item of <paramref name="template"/> to its template ids for the item's quality.
+        /// Returns the first hash that does not resolve, or null. A hash must name one item family (an ItemTemplates.json
+        /// leaf) so the quest always hands over the same item.
+        /// </summary>
+        string? UnresolvedItem(QuestTemplate template)
+        {
+            var items = new List<QuestRewardItem>();
+            foreach (List<QuestRewardItem> record in template.Reward?.Records ?? [])
+                items.AddRange(record);
+            items.AddRange(template.StartItems ?? []);
+
+            var leaves = new List<HashInstance>();
+            foreach (QuestRewardItem item in items)
+            {
+                if (string.IsNullOrEmpty(item.Hash))
+                    continue;
+
+                leaves.Clear();
+                _gameData.CollectHashLeafInstances(item.Hash, leaves);
+                // Only the ids come from the hash: the item keeps the quest's Quality, as it did when quests named ids.
+                if (leaves.Count != 1 || _minter == null
+                    || !_minter.TryRollIds(item.Hash, item.Quality, out int lowId, out int highId, out _))
+                    return item.Hash;
+
+                item.Id = lowId;
+                item.HighId = highId;
+            }
+
+            if ((template.Action is QuestTemplate.AssembleAction or QuestTemplate.EquipAction)
+                && (template.Objective.SpecItem is not { Length: > 0 } specItem || !_gameData.CanResolveItemHash(specItem)))
+                return template.Objective.SpecItem ?? "(no SpecItem)";
+
+            return null;
         }
     }
 }

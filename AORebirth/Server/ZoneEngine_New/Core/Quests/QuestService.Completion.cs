@@ -330,6 +330,9 @@ public sealed partial class QuestService
                     : quest.Template;
                 var reward = rewardTemplate.Reward;
                 var definitions = SelectRewardRecord(quest, reward).ToList();
+                if (!string.IsNullOrEmpty(rewardTemplate.NextStep) && _catalog.TryGet(rewardTemplate.NextStep, out QuestTemplate nextStep)
+                    && nextStep.StartItems is { Count: > 0 } startItems)
+                    definitions.AddRange(startItems);
                 if (tokenReward?.Won == true)
                 {
                     definitions.Add(new QuestRewardItem { Id = tokenReward.ItemId, HighId = tokenReward.ItemId, Quality = tokenReward.Quality });
@@ -361,13 +364,26 @@ public sealed partial class QuestService
                     NotifyPending(player, quest);
                     return;
                 }
-                var xp = DirectXpRewardPlan.CreateQuestReward(player, Math.Max(0, reward?.Xp ?? 0));
+                int level = player.Stats.GetOrOne(CharacterStat.Level);
+                int xpReward = Math.Max(0, reward?.Xp ?? 0)
+                    + (reward?.FullLevelXp == true ? ProgressionRewardRules.GetFullRubikaLevelXpReward(level) : 0);
+                var xp = DirectXpRewardPlan.CreateQuestReward(player, xpReward);
                 // Runtime vitals are published by the full XP plan; only durable stats belong in the reward transaction.
                 var values = xp.Stats.Where(pair => !StatCollection.IsRuntimeOnly(pair.Key))
                     .ToDictionary(pair => pair.Key, pair => pair.Value);
                 if (reward?.Credits > 0)
                     values[CharacterStat.Cash] = Characters.CashLimit.Clamp(
                         (long)player.Stats.GetOrZero(CharacterStat.Cash, StatDetail.Base) + reward.Credits);
+                int sideTokens = 0;
+                CharacterStat sideTokenStat = default;
+                if (reward?.SideTokens == true
+                    && ProgressionRewardRules.TryGetSideTokenStatId(player.Stats.GetOrZero(CharacterStat.Side), out int tokenStatId)
+                    && (sideTokens = ProgressionRewardRules.GetSideTokenReward(level, player.Stats.GetOrZero(CharacterStat.Side))) > 0)
+                {
+                    sideTokenStat = (CharacterStat)tokenStatId;
+                    values[sideTokenStat] = (int)Math.Min(int.MaxValue,
+                        (long)player.Stats.GetOrZero(sideTokenStat, StatDetail.Base) + sideTokens);
+                }
                 if (rewardTemplate.MissionBit is int bit && MissionBits.IsValid(bit))
                 {
                     var (stat, mask) = MissionBits.Locate(bit);
@@ -423,6 +439,9 @@ public sealed partial class QuestService
                 foreach (var pair in values.Where(pair => !xp.Stats.ContainsKey(pair.Key)))
                     player.Stats.Set(pair.Key, pair.Value, StatDetail.Base, dirty: true);
                 player.FlushDirtyStats();
+                if (sideTokens > 0)
+                    ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, string.Format(CultureInfo.InvariantCulture,
+                        "Side tokens collected: {0}.", values[sideTokenStat]));
                 QuestJournal.Delete(player, quest);
                 ClientFeedback.Send(player, "Feedback_MissionAccomplished");
                 _logger.Info("Quest completed and rewards committed char=" + player.Identity.Instance + " quest=" + quest.QuestId
