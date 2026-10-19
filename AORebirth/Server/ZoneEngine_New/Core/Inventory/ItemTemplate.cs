@@ -570,6 +570,10 @@ namespace ZoneEngine_New.Core.Inventory
             Character eventTarget = target;
             Character user = source ?? target;
             target = ItemUseFunctions.ResolveApplyOn(target, source, spell);
+            // A quest is only solved for a player: a nano a creature lands on a player (Resolve 2PZ7, area-cast by the
+            // Omni-AF Private) names its Wearer, which resolves to the creature; the player it landed on is meant.
+            if (spell.Is(FunctionType.SolveQuest) && target is not Player && eventTarget is Player)
+                target = eventTarget;
             Character applyOn = target;
             if (!ItemTemplate.MeetsRequirements(
                     spell.Requirements,

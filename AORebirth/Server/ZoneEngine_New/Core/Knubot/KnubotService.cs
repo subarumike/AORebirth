@@ -112,7 +112,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             if (opener.Vicinity != null)
             {
                 met.Add(script.Id);
-                SayNearby(npc, playfield, opener.Vicinity);
+                playfield.GetService<ZoneEngine_New.Core.Chat.VicinityChatRelay>()?.Speak(npc, opener.Vicinity);
                 return true;
             }
 
@@ -127,20 +127,6 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             Say(conversation, opener.Say!, 0);
             Pump(conversation);
             return true;
-        }
-    }
-
-    /// <summary>Say range for players (/say), used for NPC lines spoken aloud.</summary>
-    const float VicinitySayRange = 10f;
-
-    /// <summary>The NPC says <paramref name="text"/> aloud to every player within say range.</summary>
-    static void SayNearby(NpcCharacter npc, Playfield playfield, string text)
-    {
-        var message = new ChatTextMessage { Identity = npc.Identity, Text = text, Unknown1 = 0, Unknown2 = 0, Unknown3 = 0 };
-        foreach (Player listener in playfield.GetRequiredService<DynelRegistry>().PlayerEntities())
-        {
-            if (listener.Session != null && listener.GetEdgeDistanceTo(npc) <= VicinitySayRange)
-                listener.Session.Send(message);
         }
     }
 
@@ -200,7 +186,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
         if (opener?.Say == null)
         {
             if (opener?.Vicinity != null)
-                SayNearby(conversation.Npc, conversation.Playfield, opener.Vicinity);
+                conversation.Playfield.GetService<ZoneEngine_New.Core.Chat.VicinityChatRelay>()?.Speak(conversation.Npc, opener.Vicinity);
             QueueClose(conversation, DefaultCloseSeconds);
         }
         else

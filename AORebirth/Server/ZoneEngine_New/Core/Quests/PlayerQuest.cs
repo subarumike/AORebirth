@@ -72,5 +72,23 @@ namespace ZoneEngine_New.Core.Quests
     public sealed class QuestLog
     {
         public Dictionary<string, PlayerQuest> Quests { get; } = new(StringComparer.Ordinal);
+
+        /// <summary>
+        /// The active quest an item names by hash (criteria HasActiveQuest, function SolveQuest): its id, its template
+        /// hash, or one of the template's <see cref="QuestTemplate.Aliases"/>.
+        /// </summary>
+        public PlayerQuest? FindActive(string hash)
+        {
+            if (Quests.TryGetValue(hash, out PlayerQuest? direct) && direct.IsActive)
+                return direct;
+            foreach (PlayerQuest quest in Quests.Values)
+            {
+                if (quest.IsActive && (string.Equals(quest.Template.Hash, hash, StringComparison.Ordinal)
+                    || Array.IndexOf(quest.Template.Aliases ?? [], hash) >= 0))
+                    return quest;
+            }
+
+            return null;
+        }
     }
 }

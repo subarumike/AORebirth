@@ -225,7 +225,9 @@ namespace ZoneEngine_New.Core.Playfield
             if (attachDefaultBrain && npc.Attackable)
                 NpcBrain.Create(npc, new Vector3(at.x, at.y, at.z), NpcAiProfiles.Resolve(template.Hash));
 
-            // Anything the first spawn packet has to carry (a pet's PetMaster) goes on before it is registered.
+            // Anything the first spawn packet has to carry (a pet's PetMaster, a wounded NPC's pose) goes on before it
+            // is registered.
+            Mobs.NpcEventService.Prepare(npc);
             configure?.Invoke(npc);
 
             Metrics.TickStallWatch.Stage("spawn.register", identity.Instance);
@@ -234,6 +236,7 @@ namespace ZoneEngine_New.Core.Playfield
             else if (!_registry.TryRegister(npc))
                 throw new InvalidOperationException("The accepted NPC identity is already registered.");
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(npc);
+            _playfield.GetRequiredService<Mobs.NpcEventService>().Track(npc);
 
             Metrics.TickStallWatch.Stage("spawn.log", identity.Instance);
             _logger.Info(

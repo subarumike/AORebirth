@@ -242,6 +242,9 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.HasNotWieldedItem => !Inventory.IsEquipped(id, wieldedOnly: true),
                 Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
                 Operator.MustAlliedCombat => IsAlliedInCombat(),
+                // Value = a quest hash (or a template's Aliases entry): that quest is in the journal and active.
+                Operator.HasActiveQuest => NpcCharacter.TryDecodeAoHash(id, out string questHash)
+                    && QuestLog?.FindActive(questHash) != null,
                 _ => base.ResolveRequirement(requirement)
             };
         }

@@ -85,8 +85,10 @@ namespace ZoneEngine_New.Core.Playfield
             ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService? questDungeons = null,
             ZoneEngine_New.Core.Knubot.KnubotService? knubot = null,
             ZoneEngine_New.Core.Configuration.GameplaySettings? gameplay = null,
-            ZoneEngine_New.Core.Modules.ZoneModuleHost? modules = null)
+            ZoneEngine_New.Core.Modules.ZoneModuleHost? modules = null,
+            ZoneEngine_New.Core.Chat.VicinityChatRelay? vicinity = null)
         {
+            Vicinity = vicinity;
             QuestDungeons = questDungeons;
             Knubot = knubot;
             Gameplay = gameplay;
@@ -136,6 +138,9 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>Knubot NPC conversations, ticked on every playfield owner.</summary>
         public ZoneEngine_New.Core.Knubot.KnubotService? Knubot { get; }
+
+        /// <summary>Vicinity chat, for NPCs speaking (see <see cref="Chat.VicinityChatRelay.Speak"/>).</summary>
+        public ZoneEngine_New.Core.Chat.VicinityChatRelay? Vicinity { get; }
 
         public IItemTemplateCatalog ItemTemplates { get; }
 

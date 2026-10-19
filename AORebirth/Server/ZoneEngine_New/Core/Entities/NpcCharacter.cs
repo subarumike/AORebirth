@@ -53,6 +53,11 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public bool Attackable { get; set; } = true;
 
+        /// <summary>No passive health and nano regeneration while set (a wounded NPC waiting for its rescue).</summary>
+        public bool RegenHeld { get; set; }
+
+        protected override bool UsesPassiveRegen => !RegenHeld;
+
         /// <summary>
         /// The NPC's body cannot move: its MonsterData Features (stat 224, copied on at spawn) lack
         /// <see cref="GameData.MonsterBodyFeatures.CanMove"/>. It never paths, wanders or chases, and fights from where it
@@ -297,6 +302,27 @@ namespace ZoneEngine_New.Core.Entities
             base.Tick(deltaTime);
         }
 
+        /// <summary>
+        /// Plays GfxEffect <paramref name="gfx"/> on this NPC for everyone around it: live's one SpellList with a
+        /// GfxEffect (function 53030), as scene steps send it (the Burning Cleaning Robot's flames).
+        /// </summary>
+        public void AnnounceGfxEffect(int gfx)
+            => Cell?.Announce(new SpellListMessage
+            {
+                Identity = Identity,
+                NanoEffects =
+                [
+                    new NanoEffect
+                    {
+                        Effect = new Identity { Type = (IdentityType)(int)FunctionType.GfxEffect, Instance = Random.Shared.Next(1, int.MaxValue) },
+                        Unknown1 = 4,
+                        Hits = 1,
+                        GfxValue = gfx
+                    }
+                ],
+                Character = Identity
+            });
+
         protected override void OnDamaged(Character attacker, int hpRemoved, HitType hitType)
         {
             // A player's pet draws threat like its owner does, so a mob turns on the pet that hits it, and its owner
@@ -530,7 +556,7 @@ namespace ZoneEngine_New.Core.Entities
             return false;
         }
 
-        static bool TryDecodeAoHash(int packed, out string hash)
+        internal static bool TryDecodeAoHash(int packed, out string hash)
         {
             char a = (char)((packed >> 24) & 0xFF);
             char b = (char)((packed >> 16) & 0xFF);

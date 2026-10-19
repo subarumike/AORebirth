@@ -60,6 +60,12 @@ namespace ZoneEngine_New.Core.Mobs
         /// <summary>Per-slot AOID lists from the template Equipment jagged array.</summary>
         public List<List<int>> Equipment { get; set; } = new();
 
+        /// <summary>Pose and health at spawn (see <see cref="NpcEventService"/>).</summary>
+        public NpcSpawnState? SpawnState { get; set; }
+
+        /// <summary>Its events: timed steps from spawn, in or out of a fight, on an item used on it or a nano event (see <see cref="NpcEventService"/>).</summary>
+        public List<NpcEventDefinition>? Events { get; set; }
+
         /// <summary>SCFU texture overrides keyed by place. Empty omits the texture block.</summary>
         public Dictionary<int, int> Textures { get; set; } = new();
 

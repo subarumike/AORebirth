@@ -56,6 +56,9 @@ namespace AORebirth.Communication.Messages
         /// </summary>
         public int SenderId { get; set; }
 
+        /// <summary>The speaker's name when it is not a character (an NPC); null looks the character up.</summary>
+        public string SenderName { get; set; }
+
         /// <summary>
         /// </summary>
         public string Text { get; set; }

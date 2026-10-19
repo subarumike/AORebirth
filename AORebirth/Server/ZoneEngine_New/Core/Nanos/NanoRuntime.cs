@@ -459,6 +459,22 @@ namespace ZoneEngine_New.Core.Nanos
             return LandImmediate(source, target, NanoSpell.From(template), inventory, items, nowUtc, gmApply);
         }
 
+        /// <summary>Lands an already built <paramref name="spell"/> (CastNano2's retimed copy) at once.</summary>
+        public static bool TryApplyImmediate(
+            Character source,
+            Character target,
+            NanoSpell spell,
+            IItemBuilder items,
+            IInventoryRepository inventory,
+            DateTime nowUtc,
+            bool gmApply = false)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(spell);
+            return !target.IsDead && LandImmediate(source, target, spell, inventory, items, nowUtc, gmApply);
+        }
+
         /// <summary>
         /// Lands <paramref name="spell"/> at once. <paramref name="gmApply"/> (a GM's .give nano): combat legality does
         /// not apply, so a hostile-flagged nano such as PvP Enabled (202732) lands on any living character, and the
@@ -518,6 +534,8 @@ namespace ZoneEngine_New.Core.Nanos
 
             if (replaced != null && replaced.Id != spell.Id)
                 AnnounceBuffRemoved(target, replaced);
+            else if (replaced != null && target is NpcCharacter replacedOn)
+                replacedOn.Playfield?.GetService<Mobs.NpcEventService>()?.OnNanoEvent(replacedOn, spell.Id, Mobs.NpcEventDefinition.Replaced);
 
             SendNanoDuration(source, target, applied);
             ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: true, inventory, items);
@@ -965,6 +983,9 @@ namespace ZoneEngine_New.Core.Nanos
 
         static void ExecuteBuffEnd(Character owner, Buff buff)
         {
+            if (owner is NpcCharacter npc)
+                npc.Playfield?.GetService<Mobs.NpcEventService>()?.OnNanoEvent(npc, buff.Id, Mobs.NpcEventDefinition.Ended);
+
             Playfield? playfield = owner.Playfield;
             // A charm lasts as long as its nano: when the nano runs out or is stripped, the NPC is its own again
             // before the nano's OnTerminate runs on it (so its Hit lands on the NPC, not on a pet), and it settles

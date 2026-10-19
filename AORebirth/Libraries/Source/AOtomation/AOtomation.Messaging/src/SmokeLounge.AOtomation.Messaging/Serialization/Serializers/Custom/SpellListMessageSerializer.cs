@@ -173,7 +173,9 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
             else if (effects.Length > 0)
             {
-                streamWriter.WriteBytes(new byte[8]);
+                // No nano (Identity 0:0) and an empty one-byte-length name: live robots' GfxEffect SpellList is 118
+                // bytes, ending in these nine zeros (2026-09-29 captures, Burning Cleaning Robot).
+                streamWriter.WriteBytes(new byte[9]);
             }
         }
 

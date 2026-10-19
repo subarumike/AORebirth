@@ -35,16 +35,33 @@ namespace ZoneEngine_New.Core.Chat
             if (chat == null || string.IsNullOrEmpty(chat.Text))
                 return;
 
+            Send(speaker, chat.Type, chat.Text, senderName: null);
+        }
+
+        /// <summary>
+        /// An NPC speaks in vicinity chat (a quest line: Lolly, the Omni-AF Private, the Wounded Dockworker): the
+        /// players within the chat type's range get it, as a player's /say.
+        /// </summary>
+        public void Speak(Character speaker, string text, ChatMessageType type = ChatMessageType.Say)
+        {
+            ArgumentNullException.ThrowIfNull(speaker);
+            if (!string.IsNullOrEmpty(text))
+                Send(speaker, type, text, speaker.Name);
+        }
+
+        private void Send(Character speaker, ChatMessageType type, string text, string? senderName)
+        {
             Playfield? playfield = speaker.Playfield;
             if (playfield == null)
                 return;
 
-            if (!TryResolveRange(chat.Type, out float range))
+            if (!TryResolveRange(type, out float range))
                 return;
 
             List<int> recipientIds = new List<int>();
             int senderId = speaker.Identity.Instance;
-            recipientIds.Add(senderId);
+            if (speaker is Player)
+                recipientIds.Add(senderId);
 
             DynelRegistry registry = playfield.GetRequiredService<DynelRegistry>();
             foreach (Player other in registry.PlayerEntities())
@@ -56,12 +73,16 @@ namespace ZoneEngine_New.Core.Chat
                 recipientIds.Add(other.Identity.Instance);
             }
 
+            if (recipientIds.Count == 0)
+                return;
+
             VicinityChatMessage vicinity = new VicinityChatMessage
             {
                 CharacterIds = recipientIds,
-                MessageType = (byte)chat.Type,
-                Text = chat.Text,
-                SenderId = senderId
+                MessageType = (byte)type,
+                Text = text,
+                SenderId = senderId,
+                SenderName = senderName
             };
 
             if (_chatLink.TrySend(vicinity))
@@ -72,7 +93,7 @@ namespace ZoneEngine_New.Core.Chat
                     CultureInfo.InvariantCulture,
                     "Vicinity chat send failed character={0} type={1} recipients={2}",
                     senderId,
-                    chat.Type,
+                    type,
                     recipientIds.Count));
         }
 

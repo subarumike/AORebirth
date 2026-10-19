@@ -599,7 +599,8 @@ namespace ChatEngine.CoreServer
                 vicinityChatMessage.Text,
                 (byte)vicinityChatMessage.MessageType);
 
-            string lookup = CharacterDao.Instance.GetCharacterNameById(vicinityChatMessage.SenderId);
+            string lookup = vicinityChatMessage.SenderName
+                            ?? CharacterDao.Instance.GetCharacterNameById(vicinityChatMessage.SenderId);
             byte[] nameLookup = NameLookupResult.Create((uint)vicinityChatMessage.SenderId, lookup);
 
             foreach (int charId in vicinityChatMessage.CharacterIds)

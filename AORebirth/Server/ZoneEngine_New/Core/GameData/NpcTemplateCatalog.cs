@@ -371,6 +371,8 @@ namespace ZoneEngine_New.Core.GameData
                 MaxLevel = max,
                 UnresolvedPlaceholder = isFallback,
                 Equipment = CopyPairs(nearest.Equipment),
+                SpawnState = nearest.SpawnState,
+                Events = nearest.Events,
                 TextureOverrides = new List<TextureOverride>(nearest.TextureOverrides),
                 CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(nearest.CorpseFullUpdateTemplate),
                 KnuBotId = nearest.KnuBotId,
@@ -581,6 +583,15 @@ namespace ZoneEngine_New.Core.GameData
         public int KnuBotId { get; set; }
 
         public List<List<int>> Equipment { get; set; } = new();
+
+        /// <summary>Pose and health at spawn (the Wounded Dockworker sitting hurt; see <see cref="Mobs.NpcEventService"/>).</summary>
+        public Mobs.NpcSpawnState? SpawnState { get; set; }
+
+        /// <summary>
+        /// Its events: timed steps from spawn, in or out of a fight, on an item used on it or a nano event (the
+        /// Dockworker's moans and rescue, the cleaning robots' flames; see <see cref="Mobs.NpcEventService"/>).
+        /// </summary>
+        public List<Mobs.NpcEventDefinition>? Events { get; set; }
 
         /// <summary>Material texture overrides sent on the spawn packet (SCFU extended textures).</summary>
         public List<TextureOverride> TextureOverrides { get; set; } = new();
