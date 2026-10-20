@@ -28,6 +28,8 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         public const string LostFightingTarget = "no longer the fighting target";
 
+        const int NpcItemRange = 5;
+
         public enum Failure
         {
             None,
@@ -48,9 +50,30 @@ namespace ZoneEngine_New.Core.Inventory
         {
             CanFlags can = template.Stats.TryGetValue(CharacterStat.Can, out int value) ? (CanFlags)(uint)value : 0;
             if (!IsHostileTargeted(can)
-                && template.Stats.TryGetValue(CharacterStat.SkillTimeOnSelectedTarget, out int selected) && selected == 1)
+                && (template.Stats.TryGetValue(CharacterStat.SkillTimeOnSelectedTarget, out int selected) && selected == 1
+                    || NamesTargetNpc(template)))
                 can |= CanFlags.ApplyOnFriendly;
             return can;
+        }
+
+        /// <summary>
+        /// A use that only works on a given NPC ([OnTarget, IsNpcHash] in ToUse) goes to the selected character even with
+        /// Can = Use alone: live, the Health Regeneration Stim 297044 lands on the Wounded Dockworker the player selected.
+        /// </summary>
+        static bool NamesTargetNpc(ItemTemplate template)
+        {
+            foreach (ItemAction action in template.Actions)
+            {
+                if (action.ActionType != (int)ActionType.ToUse)
+                    continue;
+                foreach (ItemRequirement requirement in action.Requirements)
+                {
+                    if ((Operator)requirement.Operator == Operator.IsNpcHash)
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         public static bool NeedsFightingTarget(CanFlags can) => (can & CanFlags.ApplyOnFightingTarget) != 0;
@@ -149,7 +172,10 @@ namespace ZoneEngine_New.Core.Inventory
             if (ReferenceEquals(target, user))
                 return null;
             int range = template.Stats.TryGetValue(CharacterStat.AttackRange, out int value) ? StatCollection.Normalize(value) : 0;
-            if (user.GetEdgeDistanceTo(target) > (range > 0 ? range : 1))
+            // No AttackRange: one metre, or the few metres an NPC-only item (the stim on a lying dockworker) allows.
+            if (range <= 0)
+                range = target is NpcCharacter && NamesTargetNpc(template) ? NpcItemRange : 1;
+            if (user.GetEdgeDistanceTo(target) > range)
                 return Failure.OutOfRange;
             if (!user.HasLineOfSightTo(target))
                 return Failure.NoLineOfSight;

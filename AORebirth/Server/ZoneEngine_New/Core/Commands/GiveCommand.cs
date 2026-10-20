@@ -254,7 +254,7 @@ namespace ZoneEngine_New.Core.Commands
             if (id.Length > 4 && id[0] == 'G')
                 _quests.TryAssignGenerated(subject, id, out result);
             else
-                _quests.TryAssignTemplate(subject, id, out result);
+                _quests.TryAssignTemplate(subject, id, out result, force: true);
             GmCommandFeedback.Send(context.Session, context.Player, result);
         }
 
