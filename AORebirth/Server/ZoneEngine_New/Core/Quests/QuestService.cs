@@ -87,6 +87,26 @@ namespace ZoneEngine_New.Core.Quests
         }
 
         /// <summary>
+        /// Ends an active quest that is no longer an option (Steal the credits... once the card went back to Leonora
+        /// Marty): saved as failed and taken out of the journal, with no reward. False when it is not active.
+        /// </summary>
+        public bool TryFail(Player player, PlayerQuest quest)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(quest);
+            if (!quest.IsActive || quest.IsRewardPending)
+                return false;
+
+            quest.State = QuestState.Failed;
+            Save(player, quest);
+            QuestJournal.Delete(player, quest);
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest failed char={0} quest={1} ({2})",
+                player.Identity.Instance, quest.QuestId, quest.Template.Name));
+            QuestEnded?.Invoke(player, quest);
+            return true;
+        }
+
+        /// <summary>
         /// The player deleted a journal entry. The client sends the delete request (QuestIIR_t, Gamecode.dll
         /// N3Msg_RemoveQuest) but leaves the entry until the server removes it. False when the id is not one of
         /// this player's active quests, so other quest systems can take it.
@@ -134,8 +154,11 @@ namespace ZoneEngine_New.Core.Quests
             }
         }
 
-        /// <summary>Gives a Quests.json quest. A completed or closed one is started over; an active one is refused.</summary>
-        public bool TryAssignTemplate(Player player, string hash, out string result)
+        /// <summary>
+        /// Gives a Quests.json quest. A completed or closed one is started over; an active one is refused, and so is
+        /// one outside the player's level band or on a running Recurring cooldown unless <paramref name="force"/> (a GM).
+        /// </summary>
+        public bool TryAssignTemplate(Player player, string hash, out string result, bool force = false)
         {
             ArgumentNullException.ThrowIfNull(player);
             if (!_catalog.TryGet(hash, out QuestTemplate template))
@@ -148,6 +171,12 @@ namespace ZoneEngine_New.Core.Quests
             if (log.Quests.TryGetValue(template.Hash, out PlayerQuest? held) && held.IsActive)
             {
                 result = string.Format(CultureInfo.InvariantCulture, "{0} already has quest {1} ({2}).", player.Name, template.Hash, template.Name);
+                return false;
+            }
+
+            if (!force && WhyNotEligible(player, template) is string why)
+            {
+                result = why;
                 return false;
             }
 
@@ -307,7 +336,7 @@ namespace ZoneEngine_New.Core.Quests
                         TryEarnNpcObjective(player, quest, npc, inspected: false);
                         continue;
                     }
-                    if (quest.IsActive && quest.Template.IsKill && Matches(npc, quest.Template.Objective.Npc))
+                    if (quest.IsActive && quest.Template.IsKill && Matches(npc, quest.Template.Objective))
                         (advanced ??= new List<PlayerQuest>()).Add(quest);
                 }
 
@@ -336,19 +365,29 @@ namespace ZoneEngine_New.Core.Quests
         /// <see cref="QuestObjective.SpecItem"/> hash covers that item complete.
         /// </summary>
         public void OnItemAssembled(Player player, Item result)
+            => CompleteItemAction(player, QuestTemplate.AssembleAction, result);
+
+        /// <summary>
+        /// The player equipped <paramref name="item"/>: active Equip quests whose <see cref="QuestObjective.SpecItem"/>
+        /// hash covers that item complete.
+        /// </summary>
+        public void OnItemEquipped(Player player, Item item)
+            => CompleteItemAction(player, QuestTemplate.EquipAction, item);
+
+        void CompleteItemAction(Player player, string action, Item item)
         {
             ArgumentNullException.ThrowIfNull(player);
-            ArgumentNullException.ThrowIfNull(result);
+            ArgumentNullException.ThrowIfNull(item);
             if (player.Playfield?.GetService<IGameData>() is not IGameData gameData)
                 return;
 
             List<PlayerQuest>? found = null;
             foreach (PlayerQuest quest in GetLog(player).Quests.Values)
             {
-                if (quest.IsActive && string.Equals(quest.Template.Action, QuestTemplate.AssembleAction, StringComparison.Ordinal)
+                if (quest.IsActive && string.Equals(quest.Template.Action, action, StringComparison.Ordinal)
                     && !RequiresBoundObjective(quest)
                     && quest.Template.Objective.SpecItem is { Length: > 0 } specItem
-                    && HashHolds(gameData, specItem, result))
+                    && HashHolds(gameData, specItem, item))
                     (found ??= new List<PlayerQuest>()).Add(quest);
             }
 
@@ -357,14 +396,14 @@ namespace ZoneEngine_New.Core.Quests
         }
 
         /// <summary>Template ids each item hash covers (all its leaf families), resolved once per hash.</summary>
-        readonly System.Collections.Concurrent.ConcurrentDictionary<string, HashSet<int>> _assembleHashIds = new(StringComparer.Ordinal);
+        readonly System.Collections.Concurrent.ConcurrentDictionary<string, HashSet<int>> _itemHashIds = new(StringComparer.Ordinal);
 
         bool HashHolds(IGameData gameData, string hash, Item item)
         {
             if (string.IsNullOrEmpty(hash))
                 return false;
 
-            HashSet<int> ids = _assembleHashIds.GetOrAdd(hash, key =>
+            HashSet<int> ids = _itemHashIds.GetOrAdd(hash, key =>
             {
                 var leaves = new List<HashInstance>();
                 gameData.CollectHashLeafInstances(key, leaves);
@@ -397,6 +436,17 @@ namespace ZoneEngine_New.Core.Quests
                 Complete(player, quests[i]);
         }
 
+        /// <summary>A kill objective's NPC: its hash or one of its extra hashes, inside its area when it has one.</summary>
+        static bool Matches(NpcCharacter npc, QuestObjective objective)
+        {
+            if (!Matches(npc, objective.Npc) && !Array.Exists(objective.Npcs ?? [], hash => Matches(npc, hash)))
+                return false;
+            if (objective.Area is not { Length: 3 } area)
+                return true;
+            double dx = npc.Position.x - area[0], dz = npc.Position.z - area[1];
+            return dx * dx + dz * dz <= (double)area[2] * area[2];
+        }
+
         static bool Matches(NpcCharacter npc, string? objectiveNpc)
         {
             if (string.IsNullOrEmpty(objectiveNpc))
@@ -409,6 +459,9 @@ namespace ZoneEngine_New.Core.Quests
         void Advance(Player player, PlayerQuest quest, NpcCharacter npc)
         {
             quest.Progress = Math.Min(quest.RequiredCount, quest.Progress + 1);
+            // A search ("find a Bio Analyzing Computer by killing robots") can end on any kill.
+            if (quest.Remaining > 0 && quest.Template.Objective.FindChance is int chance && Random.Shared.Next(100) < chance)
+                quest.Progress = quest.RequiredCount;
             if (quest.Remaining > 0)
             {
                 Save(player, quest);

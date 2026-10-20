@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Knubot;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using AORebirth.Enums;
 
@@ -9,6 +10,7 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Trade;
@@ -49,7 +51,15 @@ public abstract record KnubotEffect
     public abstract void Apply(KnubotContext context, KnubotEffectServices services);
 
     public static bool CanApplyAll(KnubotEffect[] effects, KnubotContext context, KnubotEffectServices services)
+        => CanApplyAll(effects, context, services, out _);
+
+    /// <summary>
+    /// <paramref name="lacksSpace"/> is true when every effect could apply but the main inventory has too few free
+    /// slots for what the line hands over.
+    /// </summary>
+    public static bool CanApplyAll(KnubotEffect[] effects, KnubotContext context, KnubotEffectServices services, out bool lacksSpace)
     {
+        lacksSpace = false;
         if (effects.Length == 0)
             return true;
 
@@ -64,7 +74,8 @@ public abstract record KnubotEffect
                 return false;
         }
 
-        return KnubotItems.FreeSlots(player) >= plan.SlotsNeeded;
+        lacksSpace = KnubotItems.FreeSlots(player) < plan.SlotsNeeded;
+        return !lacksSpace;
     }
 
     /// <summary>Applies one effect if it can still be applied now.</summary>
@@ -96,6 +107,26 @@ public sealed record KnubotAcceptQuest(string Hash) : KnubotEffect
             return;
 
         services.Quests.TryAssignTemplate(context.Player, Hash, out _);
+    }
+}
+
+/// <summary>
+/// <c>{failquest HASH}</c>: drops an active quest that is no longer an option, with no reward (Leonora Marty takes
+/// the card back: Steal the credits... ends). Nothing to do when it is not held.
+/// </summary>
+public sealed record KnubotFailQuest(string Hash) : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
+    {
+        if (plan.QuestState(context, Hash) == QuestState.Active)
+            plan.Quests[Hash] = QuestState.Failed;
+        return true;
+    }
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        if (context.Quests.GetLog(context.Player).Quests.TryGetValue(Hash, out PlayerQuest? quest))
+            services.Quests.TryFail(context.Player, quest);
     }
 }
 
@@ -149,6 +180,71 @@ public sealed record KnubotSpawnItem(string Hash, int? Quality, int Count) : Knu
     }
 }
 
+/// <summary>
+/// <c>{take ITEMHASH [count]}</c>: the NPC takes items the player carries in the main inventory, with no trade window
+/// (Fia Lou unwraps the Gift from Fia Lou and keeps the paper before handing over the NCU chips). Each item taken whole
+/// frees its slot for what the line gives after it. Written before the effect that needs the room.
+/// </summary>
+public sealed record KnubotTakeItem(string Hash, int Count) : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
+    {
+        int left = Count;
+        foreach ((_, Item item) in Carried(context, services))
+        {
+            int stack = Math.Max(1, item.StackCount);
+            if (stack <= left)
+                plan.SlotsNeeded--;
+            left -= Math.Min(stack, left);
+            if (left == 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        Player player = context.Player;
+        Container page = player.Inventory.Inventory;
+        int left = Count;
+        foreach ((int placement, Item item) in Carried(context, services))
+        {
+            var slot = new Identity { Type = page.Identity.Type, Instance = placement };
+            while (left > 0 && item.DestroyOne(player, slot))
+            {
+                left--;
+                if (item.StackCount <= 0)
+                    break;
+            }
+
+            if (left == 0)
+                return;
+        }
+    }
+
+    /// <summary>The main-inventory items the hash covers, with their slots, in slot order.</summary>
+    List<(int Placement, Item Item)> Carried(KnubotContext context, KnubotEffectServices services)
+    {
+        var leaves = new List<HashInstance>();
+        services.Minter.CollectLeafInstances(Hash, leaves);
+        var ids = new HashSet<int>();
+        foreach (HashInstance leaf in leaves)
+            ids.UnionWith(leaf.TemplateIds);
+
+        var found = new List<(int Placement, Item Item)>();
+        Container page = context.Player.Inventory.Inventory;
+        foreach (KeyValuePair<int, Item> entry in page.Content.OrderBy(pair => pair.Key))
+        {
+            if (entry.Key >= page.Offset && entry.Key < page.Offset + page.Capacity && entry.Value != null && !entry.Value.Locked
+                && (ids.Contains(entry.Value.LowId) || ids.Contains(entry.Value.HighId)))
+                found.Add((entry.Key, entry.Value));
+        }
+
+        return found;
+    }
+}
+
 /// <summary><c>{shop}</c>: opens the NPC's vendor window.</summary>
 public sealed record KnubotOpenShop : KnubotEffect
 {
@@ -165,6 +261,66 @@ public sealed record KnubotOpenTrade : KnubotEffect
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)
         => services.Trades.TryOpenKnubot(context.Player, context.Npc, KnubotService.TradeText(context.Npc));
+}
+
+/// <summary>
+/// <c>{attack}</c>: the NPC turns on the player it is talking to (Kneebreaker Alfonzo Rizzolo, after "I have come to
+/// put your plans to an end.": "...take your best shot." and he attacks, live 2026-10-07). An NPC with no brain or one
+/// the player cannot fight does nothing.
+/// </summary>
+public sealed record KnubotAttack : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => true;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        NpcCharacter npc = context.Npc;
+        Player player = context.Player;
+        if (npc.Brain == null || npc.IsDead || player.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield)
+            || !ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(npc, player))
+            return;
+
+        npc.Brain.AddThreat(player.Identity, ZoneEngine_New.Core.Ai.NpcAiRules.ProximityHate);
+        npc.StartFighting(player.Identity, 0);
+    }
+}
+
+/// <summary>
+/// <c>{kill}</c>: the NPC kills the player it is talking to outright, fight or not (Patrick Sun after "Excellent! Now,
+/// relax. This won't hurt a bit.": live 2026-07-25 sent one HealthDamage from Patrick for the player's whole health
+/// 2.95 s later, then the death; the player wakes at the insurance beacon). Written after a <c>{delay}</c>.
+/// </summary>
+public sealed record KnubotKill : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => true;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        NpcCharacter npc = context.Npc;
+        Player player = context.Player;
+        if (npc.IsDead || player.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield))
+            return;
+
+        int health = Math.Max(1, player.Stats.GetOrZero(CharacterStat.Health));
+        player.AnnounceHealthDamage(npc, 0, -health, 0);
+        // A friendly NPC cannot attack, so the hit is the player's own: ApplyDamage's death path without combat rules.
+        player.ApplyDamage(player, health, HitType.Normal);
+    }
+}
+
+/// <summary>
+/// <c>{despawn}</c>: the NPC leaves as if it had died, and its spawn point brings it back on its usual timer (Lolly the
+/// Reet, picked up into the player's inventory after eating the cookie).
+/// </summary>
+public sealed record KnubotDespawn : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => true;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        if (!context.Npc.IsDead && context.Npc.Playfield != null)
+            context.Npc.DespawnAsDeath();
+    }
 }
 
 /// <summary>Main-inventory item helpers shared by conditions and effects.</summary>
