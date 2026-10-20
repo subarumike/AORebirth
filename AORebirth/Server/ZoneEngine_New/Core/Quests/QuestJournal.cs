@@ -56,7 +56,14 @@ namespace ZoneEngine_New.Core.Quests
         static readonly TimeSpan DisplayedLifetime = TimeSpan.FromDays(5);
 
         /// <summary>Retail action layout per Quests.json action, from the captured KION/KLTR/FDTH journals.</summary>
-        sealed record ActionLayout(int Version, int IconId, int SlotType, bool TargetInSlot3);
+        sealed record ActionLayout(int Version, int IconId, int SlotType, bool TargetInSlot3, bool NamesTarget = true);
+
+        /// <summary>
+        /// Live's waypoint identity type and the two values it sends beside every Quests.json waypoint (captured
+        /// Arete Landing journals, 2026-09-29: PlayfieldId Playfield2:6553, Unknown10 = Unknown11 = 100000).
+        /// </summary>
+        const int WaypointPlayfieldType = 0x9C50;
+        const int WaypointUnknown = 100000;
 
         static readonly Dictionary<string, ActionLayout> Layouts = new(StringComparer.Ordinal)
         {
@@ -113,6 +120,12 @@ namespace ZoneEngine_New.Core.Quests
             int journalInstance = JournalInstance(quest.QuestId);
             Layouts.TryGetValue(template.Action, out ActionLayout? layout);
 
+            // A quest whose Action has no journal layout (talk, use, deliver, return, assemble) still gets live's
+            // action when it has a captured waypoint: the action is what carries the compass point.
+            if (layout == null && template.Waypoint is { Version: > 0 } waypoint)
+                layout = new ActionLayout(waypoint.Version, DefaultIconId, waypoint.SlotType != 0 ? waypoint.SlotType : 0xD2FC,
+                    TargetInSlot3: false, NamesTarget: false);
+
             // Dungeon quests (accepted terminal missions): the terminal's icon, and an action whatever the objective,
             // because the action carries the waypoint to the dungeon entrance.
             bool isDungeon = Dungeons.QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out Dungeons.QuestDungeonParameters dungeon);
@@ -135,7 +148,7 @@ namespace ZoneEngine_New.Core.Quests
                 QuestId = new Identity { Type = IdentityType.Mission, Instance = journalInstance },
                 Version = 15,
                 Flags = flags,
-                ShortInfo = ShortName(template.Name),
+                ShortInfo = ShortInfo(template),
                 LongInfo = LongInfo(template),
                 // Retail names the giver NPC here; Quests.json has no giver, so the instance stays 0.
                 UnknownId1 = new Identity { Type = IdentityType.CanbeAffected, Instance = 0 },
@@ -186,7 +199,7 @@ namespace ZoneEngine_New.Core.Quests
             var objectiveItem = template.IsFindItem ? dungeon?.ObjectiveItem : null;
             Identity actionIdentity = objectiveItem?.Identity ?? new Identity();
             Identity destinationIdentity = new();
-            Identity npcIdentity = template.IsFindItem || layout.TargetInSlot3
+            Identity npcIdentity = template.IsFindItem || layout.TargetInSlot3 || !layout.NamesTarget
                 ? new Identity() : new Identity { Type = IdentityType.NpcHash, Instance = target };
             if (dungeon != null)
             {
@@ -220,6 +233,19 @@ namespace ZoneEngine_New.Core.Quests
             DateTime expires = quest.ExpiresAtUtc ?? quest.AssignedAtUtc + DisplayedLifetime;
             uint expiresOnClient = ClientExpiry(player, DateTime.SpecifyKind(expires, DateTimeKind.Utc), DateTime.UtcNow);
 
+            // Waypoint: the dungeon entrance for terminal missions, else the quest's captured live waypoint.
+            QuestWaypoint? waypoint = dungeon == null && template.Waypoint is { Playfield: > 0, Position.Length: 3 } w ? w : null;
+            Identity waypointPlayfield = dungeon != null
+                ? new Identity { Type = (IdentityType)dungeon.DestinationType, Instance = dungeon.EntrancePlayfield }
+                : waypoint != null
+                    ? new Identity { Type = (IdentityType)WaypointPlayfieldType, Instance = waypoint.Playfield }
+                    : new Identity();
+            SmokeLounge.AOtomation.Messaging.GameData.Vector3? waypointPosition = dungeon != null
+                ? new SmokeLounge.AOtomation.Messaging.GameData.Vector3(dungeon.EntranceX, dungeon.EntranceY, dungeon.EntranceZ)
+                : waypoint != null
+                    ? new SmokeLounge.AOtomation.Messaging.GameData.Vector3(waypoint.Position[0], waypoint.Position[1], waypoint.Position[2])
+                    : null;
+
             return new QuestActionInfo
             {
                 Version = layout.Version,
@@ -233,15 +259,11 @@ namespace ZoneEngine_New.Core.Quests
                 // Retail's four bytes here are the big-endian Unix time the quest expires.
                 UnknownHash1 = BigEndianChars(expiresOnClient),
                 UnknownId7 = new Identity { Type = (IdentityType)layout.SlotType, Instance = 0x18000000 | slot },
-                // Waypoint: the dungeon entrance's playfield and position, with the entrance building's template pair.
-                PlayfieldId = dungeon == null
-                    ? new Identity()
-                    : new Identity { Type = (IdentityType)dungeon.DestinationType, Instance = dungeon.EntrancePlayfield },
-                Unknown10 = dungeon?.BuildingLowId ?? 0,
-                Unknown11 = dungeon?.BuildingHighId ?? 0,
-                Position = dungeon == null
-                    ? null
-                    : new SmokeLounge.AOtomation.Messaging.GameData.Vector3(dungeon.EntranceX, dungeon.EntranceY, dungeon.EntranceZ)
+                // Waypoint: playfield and position; a dungeon entrance also carries the entrance building's template pair.
+                PlayfieldId = waypointPlayfield,
+                Unknown10 = dungeon?.BuildingLowId ?? (waypoint != null ? WaypointUnknown : 0),
+                Unknown11 = dungeon?.BuildingHighId ?? (waypoint != null ? WaypointUnknown : 0),
+                Position = waypointPosition
             };
         }
 
@@ -266,8 +288,22 @@ namespace ZoneEngine_New.Core.Quests
         static string ShortName(string name)
             => name.Length <= MaxShortInfoLength ? name : name[..MaxShortInfoLength];
 
+        /// <summary>
+        /// For a quest with live's journal text, Summary is live's own short name, used when it fits (live shortens
+        /// long names itself: "Use the Stim on a Wounded Do..."). Otherwise (hand-written quests, whose Summary is a
+        /// sentence: KION "kill the target NPC") the name cut to fit.
+        /// </summary>
+        static string ShortInfo(QuestTemplate template)
+            => !string.IsNullOrWhiteSpace(template.Description)
+                && !string.IsNullOrEmpty(template.Summary) && template.Summary.Length <= MaxShortInfoLength
+                ? template.Summary
+                : ShortName(template.Name);
+
         static string LongInfo(QuestTemplate template)
         {
+            if (!string.IsNullOrWhiteSpace(template.Description))
+                return template.Description;
+
             var text = new StringBuilder(template.Name);
             if (!string.IsNullOrEmpty(template.Summary))
             {
