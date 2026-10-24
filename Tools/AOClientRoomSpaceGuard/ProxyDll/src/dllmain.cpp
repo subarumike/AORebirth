@@ -8,6 +8,7 @@
 #include "gui_rect_fix.h"
 #include "login_key_patch.h"
 #include "logging.h"
+#include "playfield_name_fix.h"
 #include "randy_color_fix.h"
 #include "roomspace_fix.h"
 
@@ -158,6 +159,9 @@ namespace
             aorf::Log("DAILYLOGIN route=BLOCKED reason=start_worker");
         }
 
+        // Cosmetic (LFT location names): logged and skipped when this Gamecode.dll isn't the expected shape.
+        aorf::InstallPlayfieldNameFix();
+
         if (profile == aorf::ClientProfile::NewClient)
         {
             if (!aorf::InstallNewClientGuiDrawFix())
@@ -203,6 +207,16 @@ namespace
     }
 }
 
+namespace aorf
+{
+    // The AOPlugins build (aoplugin_main.cpp) starts the same worker from AopPluginAttach.
+    void StartClientPatch()
+    {
+        OnProcessAttach();
+    }
+}
+
+#ifndef AO_REBIRTH_AOPLUGIN
 BOOL APIENTRY DllMain(HINSTANCE, DWORD reason, LPVOID)
 {
     if (reason == DLL_PROCESS_ATTACH)
@@ -211,3 +225,4 @@ BOOL APIENTRY DllMain(HINSTANCE, DWORD reason, LPVOID)
     }
     return TRUE;
 }
+#endif

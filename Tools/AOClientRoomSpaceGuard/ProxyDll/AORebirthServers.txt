@@ -1,0 +1,10 @@
+# Login servers that take the AORebirth login key, besides AORebirth's own (2.24.96.30) and 127.0.0.1 on port 7500:
+# one host:port a line, the host and port of the dimension's "connect" and "ports". With
+# AO_REBIRTH_LOGINKEY_PATCH unset (Auto), the patch switches the client to the AORebirth key when the launcher
+# starts it for one of these; logins to any other server keep Funcom's key.
+#
+# The plugin reads this from AOPlugins\aorebirth-patch\servers.txt (the version.dll build: aorebirth-patch\servers.txt
+# beside AnarchyOnline.exe). Its log, %LOCALAPPDATA%\AORebirthClientPatch\AORebirthClientPatch.log, says which
+# server matched (LOGINKEY listed ... match=YES).
+#
+# ao.example.net:7500
