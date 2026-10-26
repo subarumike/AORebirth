@@ -20,7 +20,6 @@ public sealed class InteractionContent
     public Dictionary<string, InteractionAction> Actions { get; set; } = new(StringComparer.Ordinal);
     public Dictionary<string, JournalDefinition> Journals { get; set; } = new(StringComparer.Ordinal);
     public TimedTurnInDefinition[] TimedTurnIns { get; set; } = [];
-    public QuestPropDefinition[] Props { get; set; } = [];
     public static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true, IncludeFields = true };
 
     public static InteractionContent Load(string contentRoot)
@@ -84,9 +83,6 @@ public sealed class InteractionContent
             }
             foreach (string hex in journal.DeleteHex) if (Convert.FromHexString(hex).Length < 4) throw new InvalidDataException("Invalid journal deletion frame.");
         }
-        if (Props.GroupBy(x => (x.Playfield, x.Instance)).Any(x => x.Count() > 1)
-            || Props.Any(x => !Actions.ContainsKey(x.Action) || x.Position.Length != 3 || x.Rotation.Length != 4
-                || x.Position.Concat(x.Rotation).Any(x => !float.IsFinite(x)))) throw new InvalidDataException("Invalid quest prop content.");
     }
 
     /// <summary>Loads and validates every quest pack the manifests name.</summary>
@@ -180,10 +176,3 @@ public sealed class TimedTurnInDefinition
     public string UnavailableText { get; set; } = ""; public string TokenText { get; set; } = "";
 }
 public sealed class TimedItem { public int ItemId { get; set; } public int MinLevel { get; set; } public int MaxLevel { get; set; } public bool Enabled { get; set; } public string Name { get; set; } = ""; }
-public sealed class QuestPropDefinition
-{
-    public int Instance { get; set; } public int Playfield { get; set; } public int TemplateId { get; set; }
-    public float[] Position { get; set; } = []; public float[] Rotation { get; set; } = [];
-    public string Action { get; set; } = ""; public bool ItemTarget { get; set; }
-    public Dictionary<int,uint> Stats { get; set; } = new();
-}

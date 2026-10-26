@@ -15,6 +15,9 @@ public sealed class ItemBehaviorContent
     public static ItemBehaviorContent Current { get; } = Load();
     public int[] ProtectedItems { get; set; } = [];
     public ItemPackageContent[] Packages { get; set; } = [];
+
+    /// <summary>Items whose use starts a Quests.json quest and is kept (the Nascense DOJA chip).</summary>
+    public ItemQuestStarterContent[] QuestStarters { get; set; } = [];
     public VitalItemContent[] VitalItems { get; set; } = [];
     public FistWeaponContent[] FistWeapons { get; set; } = [];
 
@@ -36,13 +39,19 @@ public sealed class ItemBehaviorContent
         var result = JsonSerializer.Deserialize<ItemBehaviorContent>(json, options)
             ?? throw new InvalidDataException("Item behavior content is empty.");
         if (result.ProtectedItems.Any(id => id <= 0) || result.Packages.Any(p => p.SourceIds.Length == 0
-            || p.SourceIds.Any(id => id <= 0) || p.ProductLowId <= 0 || p.ProductHighId <= 0 || p.Quality <= 0)
+            || p.SourceIds.Any(id => id <= 0) || p.AllProducts.Length == 0
+            || p.AllProducts.Any(x => x.LowId <= 0 || x.HighId <= 0 || x.Quality <= 0)
+            || p.CompleteQuests.Any(string.IsNullOrWhiteSpace))
             || result.VitalItems.Any(v => v.TemplateIds.Length == 0 || v.TemplateIds.Any(id => id <= 0)
                 || !Enum.IsDefined(v.LockStat) || v.LockSeconds <= 0 || v.MinimumQuality < 1 || v.MaximumQuality < v.MinimumQuality
                 || v.MinimumRestore < 0 || v.MaximumRestore < v.MinimumRestore)
             || result.Packages.SelectMany(p => p.SourceIds).Distinct().Count() != result.Packages.Sum(p => p.SourceIds.Length)
             || result.VitalItems.SelectMany(v => v.TemplateIds).Distinct().Count() != result.VitalItems.Sum(v => v.TemplateIds.Length))
             throw new InvalidDataException("Invalid or ambiguous item behavior content.");
+        if (result.QuestStarters.Any(s => s.ItemIds.Length == 0 || s.ItemIds.Any(id => id <= 0) || string.IsNullOrWhiteSpace(s.Quest))
+            || result.QuestStarters.SelectMany(s => s.ItemIds).Distinct().Count() != result.QuestStarters.Sum(s => s.ItemIds.Length)
+            || result.QuestStarters.SelectMany(s => s.ItemIds).Intersect(result.Packages.SelectMany(p => p.SourceIds)).Any())
+            throw new InvalidDataException("Invalid or ambiguous item quest starter content.");
         if (result.FistWeapons.Any(value => value.Tier <= 0 || value.LowId <= 0 || value.HighId <= 0
                 || value.MidId < 0 || (value.MidId > 0) != (value.MidQuality > 0)
                 || value.Profession.HasValue && !Enum.IsDefined(value.Profession.Value))
@@ -68,6 +77,7 @@ public sealed class ItemBehaviorContent
     }
 
     public ItemPackageContent? FindPackage(Item item) => Packages.SingleOrDefault(p => p.SourceIds.Contains(item.LowId) || p.SourceIds.Contains(item.HighId));
+    public ItemQuestStarterContent? FindQuestStarter(Item item) => QuestStarters.SingleOrDefault(s => s.ItemIds.Contains(item.LowId) || s.ItemIds.Contains(item.HighId));
     public VitalItemContent? FindVitalItem(Item item) => VitalItems.SingleOrDefault(v => v.TemplateIds.Contains(item.LowId) || v.TemplateIds.Contains(item.HighId));
     public bool IsProtected(Item item) => ProtectedItems.Contains(item.LowId) || ProtectedItems.Contains(item.HighId);
     public bool TryResolveWornMeshOverride(Item item, int meshId, int overrideTextureId, out int resolvedOverrideTextureId)
@@ -98,6 +108,10 @@ public sealed class FistWeaponContent
     public int MidQuality { get; set; }
 }
 
+/// <summary>
+/// A sealed item that opens into others (ItemPackageService): one product (ProductLowId/HighId/Quality) or several
+/// (Products). A product that is a Unique already held is always left out. Opening it may also complete Quests.json steps ("Buy a Lockpick").
+/// </summary>
 public sealed class ItemPackageContent
 {
     public int[] SourceIds { get; set; } = [];
@@ -105,6 +119,30 @@ public sealed class ItemPackageContent
     public int ProductHighId { get; set; }
     public int Quality { get; set; }
     public bool Unique { get; set; }
+    public ItemPackageProduct[] Products { get; set; } = [];
+    public string[] CompleteQuests { get; set; } = [];
+
+    /// <summary>Every product, the single-product fields included.</summary>
+    public ItemPackageProduct[] AllProducts => ProductLowId == 0
+        ? Products
+        : [new ItemPackageProduct { LowId = ProductLowId, HighId = ProductHighId, Quality = Quality }, .. Products];
+}
+
+/// <summary>Using one of ItemIds starts Quest (a Quests.json hash); the item stays. Using it again changes nothing.</summary>
+public sealed class ItemQuestStarterContent
+{
+    public int[] ItemIds { get; set; } = [];
+    public string Quest { get; set; } = "";
+}
+
+public sealed class ItemPackageProduct
+{
+    public int LowId { get; set; }
+    public int HighId { get; set; }
+    public int Quality { get; set; } = 1;
+
+    /// <summary>Left out when the player already carries one (a second Lock Pick from a second sealed box).</summary>
+    public bool SkipIfCarried { get; set; }
 }
 
 public sealed class VitalItemContent

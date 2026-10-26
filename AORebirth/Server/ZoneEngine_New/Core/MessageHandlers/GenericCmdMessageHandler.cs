@@ -27,13 +27,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly AuthoredQuestService _quests;
         private readonly Quests.Dungeons.QuestDungeonService? _dungeons;
         private readonly Tradeskills.TradeskillService? _tradeskills;
+        private readonly ItemPackageService? _packages;
+        private readonly Quests.QuestService? _questService;
 
         public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items,
             AuthoredQuestService quests, Quests.Dungeons.QuestDungeonService? dungeons = null,
-            Tradeskills.TradeskillService? tradeskills = null)
+            Tradeskills.TradeskillService? tradeskills = null, ItemPackageService? packages = null,
+            Quests.QuestService? questService = null)
         {
             _dungeons = dungeons;
             _tradeskills = tradeskills;
+            _packages = packages;
+            _questService = questService;
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
             _inventoryRepository = inventoryRepository;
@@ -309,6 +314,28 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
+            if (_packages?.IsPackage(item) == true)
+            {
+                if (_packages.TryOpen(player, target, item))
+                    Acknowledge(session, message, target);
+                else if (!player.IsPersistenceQuarantined && session.State == SessionState.InPlay)
+                    Deny(session, message, player, "item package was not opened");
+                return;
+            }
+
+            // An item that starts a quest (the DOJA chip) is kept; the player hears why when it cannot start now.
+            if (_questService != null && ItemBehaviorContent.Current.FindQuestStarter(item) is { } starter)
+            {
+                bool started = _questService.TryStartFromItem(player, starter.Quest, out string? why);
+                if (why != null)
+                    ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, why);
+                if (started)
+                    Acknowledge(session, message, target);
+                else
+                    Deny(session, message);
+                return;
+            }
+
             ItemUseService uses = playfield.GetRequiredService<ItemUseService>();
             ItemUseStart start = uses.TryBegin(player, target, item);
             if (start == ItemUseStart.Rejected)
@@ -360,14 +387,30 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
+            // A client-static quest object ("Install the implant" at the Surgery Clinic): the step completes, and the
+            // object's own use, if the server has one, still goes on.
+            bool completedStep = playfield.GetRequiredService<QuestPropService>().TryCompleteStaticUse(session, target);
+
             if (!playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel))
             {
+                if (completedStep)
+                {
+                    Acknowledge(session, message, target);
+                    return;
+                }
+
                 Deny(session, message, player, "dynel not in registry: " + target);
                 return;
             }
 
             if (dynel is not IUsableDynel usable)
             {
+                if (completedStep)
+                {
+                    Acknowledge(session, message, target);
+                    return;
+                }
+
                 Deny(
                     session,
                     message,
@@ -380,7 +423,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            if (!usable.TryUse(player))
+            if (!usable.TryUse(player) && !completedStep)
             {
                 Deny(
                     session,
