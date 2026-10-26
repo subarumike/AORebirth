@@ -22,28 +22,53 @@ internal static class Program
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
             if (args.Length == 1 && args[0] == "--self-test")
-                return CatalogChecks.Run();
+            {
+                CatalogChecks.Run();
+                return HistoricalChecks.Run();
+            }
             if (args.Length == 0 || args.Contains("--help", StringComparer.Ordinal))
             {
                 Console.WriteLine("ItemExpansionCatalog --gamedata-root <private GameData> [--verify]");
+                Console.WriteLine("Add --historical [--research-root <frozen research>] --report <local report.md> for reconstruction.");
                 Console.WriteLine("--verify independently regenerates and compares without changing the catalog.");
                 Console.WriteLine("--self-test runs focused in-memory catalog checks; no database or engine access.");
                 return args.Length == 0 ? 1 : 0;
             }
             string? root = null;
             bool verify = false;
+            bool historical = false;
+            string? research = null;
+            string? report = null;
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i] == "--gamedata-root" && ++i < args.Length)
                     root = Path.GetFullPath(args[i]);
                 else if (args[i] == "--verify")
                     verify = true;
+                else if (args[i] == "--historical")
+                    historical = true;
+                else if (args[i] == "--research-root" && ++i < args.Length)
+                    research = Path.GetFullPath(args[i]);
+                else if (args[i] == "--report" && ++i < args.Length)
+                    report = Path.GetFullPath(args[i]);
                 else
                     throw new ArgumentException("Unknown or incomplete argument: " + args[i]);
             }
             if (root == null)
                 throw new ArgumentException("An explicit private --gamedata-root is required.");
-            Run(root, verify);
+            if (historical)
+            {
+                if (report == null)
+                    throw new ArgumentException("Historical reconstruction requires an explicit local --report path.");
+                HistoricalCatalog.Run(root, research ?? Path.Combine(root, "Loot", "ExpansionClassification",
+                    "HistoricalReconstruction", "research"), report, verify);
+            }
+            else
+            {
+                if (research != null || report != null)
+                    throw new ArgumentException("Historical research/report arguments require --historical.");
+                Run(root, verify);
+            }
             return 0;
         }
         catch (Exception error)

@@ -68,3 +68,40 @@ Rubi-Ka membership; the current requirement rules do not establish it by
 absence. A positive Shadowlands association does not by itself identify a
 garden/sanctuary key. Expansion membership, structural item kind and normal
 chest eligibility remain separate decisions; no loot behavior changes here.
+
+## Historical reconstruction
+
+Historical mode consumes a frozen research bundle and exact-ID observation
+index. It keeps the previous top-level classification files byte-for-byte and
+writes new lists under `HistoricalReconstruction/catalogs/`.
+
+Use `Tools\collect-historical-item-sources.cmd --cache-root "<private research root>\community"`
+for the bounded pinned public-table cache. Research-specific archived database
+and patch collectors retain their own private checkpoints and source receipts;
+resume them from the paths recorded in the local research report.
+
+Use `Tools\normalize-historical-item-evidence.cmd --research-root "<private research root>" --fetch-guides`
+to join the cached sources by exact identities. A later normalization reuses
+downloaded evidence. Freeze that bundle before generating the catalogs.
+
+Run `Tools\generate-item-expansion-catalog.cmd --gamedata-root "<private GameData root>" --historical --report "<local report.md>"`.
+Add `--verify` for the independent second parse and byte-identical comparison.
+The actual successful comparison writes a private hash-bound receipt alongside
+the historical output. The existing `--self-test` also covers the historical
+evidence and acquisition rules. None of these commands build or start engines.
+
+Historical origin, first recovered appearance, recorded addition tags, current
+account requirements, world access and acquisition sources are distinct axes.
+No post-expansion date maps automatically to expansion membership. An initial
+base-client association uses exact identities in the primary initial roster;
+independently recovered roster intersections retain stronger confidence. Neither
+proves retail-release build, obtainability or ordinary chest loot. Historical-only IDs remain separate from current primary
+definitions. Client-template deletions do not imply deletion of player items.
+
+Only positive documented ordinary RK mission-chest evidence enters the chest
+allowlist, with source QL qualifications. Special-purpose exclusions, historical
+reports, conflicting claims and missing evidence remain separately labelled.
+The broad excluded/review file does not claim every listed item was absent from
+retail chests. The report documents source gaps and incomplete reconstruction.
+Private data, full generated research catalogs and local reports stay outside
+public Git publication; only reusable tooling is suitable for a public branch.
