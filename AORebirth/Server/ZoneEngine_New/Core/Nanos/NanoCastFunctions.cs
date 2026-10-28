@@ -24,12 +24,18 @@ namespace ZoneEngine_New.Core.Nanos
 
         static readonly AsyncLocal<int> Depth = new();
 
+        /// <param name="scripted">
+        /// The function names its target NPC by spawn hash (OTAF Official Notice 297243 on an Omni-AF Private "OIUR"): a
+        /// quest effect on that NPC, landed outside combat rules as a GM apply is, though the nano carries the hostile
+        /// flag and the NPC is NoCombat.
+        /// </param>
         public static bool TryExecute(
             Character target,
             Character? source,
             ItemSpell spell,
             IItemBuilder items,
-            IInventoryRepository inventory)
+            IInventoryRepository inventory,
+            bool scripted = false)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
@@ -47,7 +53,7 @@ namespace ZoneEngine_New.Core.Nanos
             {
                 return ((FunctionType)spell.FunctionType) switch
                 {
-                    FunctionType.CastNano => CastNano(caster, target, spell, items, inventory, nowUtc),
+                    FunctionType.CastNano => CastNano(caster, target, spell, items, inventory, nowUtc, scripted),
                     FunctionType.CastNanoIfPossible => CastNanoIfPossible(caster, target, spell, items, inventory, nowUtc),
                     FunctionType.NpcCastNanoIfPossible => CastNanoIfPossible(caster, target, spell, items, inventory, nowUtc),
                     FunctionType.CastNanoIfPossibleOnFightTarget => CastNanoOnFightTarget(caster, spell, items, inventory, nowUtc),
@@ -71,12 +77,13 @@ namespace ZoneEngine_New.Core.Nanos
             ItemSpell spell,
             IItemBuilder items,
             IInventoryRepository inventory,
-            DateTime nowUtc)
+            DateTime nowUtc,
+            bool scripted = false)
         {
             if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
                 return false;
 
-            return NanoRuntime.TryApplyImmediate(caster, target, nanoId, items, inventory, nowUtc);
+            return NanoRuntime.TryApplyImmediate(caster, target, nanoId, items, inventory, nowUtc, gmApply: scripted);
         }
 
         /// <summary>
@@ -133,6 +140,11 @@ namespace ZoneEngine_New.Core.Nanos
             if (!TryResolveChild(items, nanoId, out NanoSpell? child) || child == null)
                 return false;
 
+            // A child whose own use requirements pick who gets it (Resolve 2PZ7 297276: NPCFamily 0 and quest 2PZ7
+            // active) is a quest effect: it lands on exactly those, outside combat rules.
+            ItemTemplate childTemplate = items.CreateTemplate(nanoId, nanoId, quality: 1);
+            bool picksRecipients = childTemplate.Actions.Exists(a => a.ActionType == (int)ActionType.ToUse && a.Requirements.Count > 0);
+
             // ItemTarget.Target (nukes such as 28638) is centered on the cast recipient.
             // User and Wearer stay centered on the caster.
             Character center = spell.Target == (int)ItemTarget.Target ? target : caster;
@@ -153,6 +165,14 @@ namespace ZoneEngine_New.Core.Nanos
                     continue;
                 if (center.Distance3D(candidate) > radius)
                     continue;
+                if (picksRecipients)
+                {
+                    if (!childTemplate.MeetsActionRequirements(stat => candidate.Stats.GetOrZero(stat), ActionType.ToUse,
+                            candidate.ResolveRequirement))
+                        continue;
+                    NanoRuntime.TryApplyImmediate(caster, candidate, nanoId, items, inventory, nowUtc, gmApply: true);
+                    continue;
+                }
                 if (!AcceptsRecipient(caster, candidate, child))
                     continue;
                 // The area spreads from its centre only to what that centre can see: a wall or a closed door between
