@@ -52,6 +52,9 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Reloads authoritative durable contents before each new open, never on a close toggle.</summary>
         public Func<Chest, bool>? RefreshLoot { get; set; }
 
+        /// <summary>Runs after a successful closed-to-open transition and the existing contents response.</summary>
+        public event Action<Player>? AfterOpen;
+
         /// <summary>Generated mission chests bind the current RK policy; generic containers retain their own rules.</summary>
         public Func<Item, bool>? LootItemValidator { get; set; }
 
@@ -108,7 +111,11 @@ namespace ZoneEngine_New.Core.Entities
                     return false;
                 if (!IsOpen && (!CanOpenLoot(player) || RefreshLoot?.Invoke(this) == false))
                     return false;
-                return base.TryUse(player);
+                bool wasOpen = IsOpen;
+                bool used = base.TryUse(player);
+                if (used && !wasOpen && IsOpen)
+                    AfterOpen?.Invoke(player);
+                return used;
             }
         }
 

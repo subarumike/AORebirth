@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AOSharpCaptureProtocol\RawSimpleCharFullUpdateDecoder.cs">
@@ -43,6 +44,10 @@
       <Link>MissionFlowCapture.cs</Link>
     </Compile>
     <Compile Include="AcgLayoutExtractor.cs" />
+    <Compile Include="TrapPacketReplay.cs" />
+    <Compile Include="..\AOSharpCaptureProtocol\RawTrapFullUpdateDecoder.cs">
+      <Link>RawTrapFullUpdateDecoder.cs</Link>
+    </Compile>
     <Compile Include="MissionAcgCapturedLayoutCatalogEmitter.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>

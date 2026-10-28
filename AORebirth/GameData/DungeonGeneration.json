@@ -2,6 +2,13 @@
   "_comment": "AORebirth generation policy, not a reconstruction of Funcom selection probabilities. QL2 team captures have two floors; QL220 has five. Intermediate sizes/floor bands are configurable policy. Team layout support reserves a separate boss floor; team acceptance and boss population are a subsequent milestone. Room roles and exact floor-travel anchors live in DungeonEntrances.json.",
   "FloorHeight": 64,
   "LockedDoorChancePercent": 0,
+  "Traps": {
+    "_comment": "Optional parented trap policy frozen only for newly accepted missions. Disabled until reviewed private profiles are supplied; no original server trigger probability or skill formula is claimed. Existing missions are not retrofitted.",
+    "Enabled": false,
+    "ChestChance": 0,
+    "MaximumCount": 0,
+    "Profiles": []
+  },
   "Chests": {
     "_comment": "User-defined AORebirth rarity policy. Missing and raw 1 are separate Common groups; raw 2 Uncommon, 3 Rare, 4 Very Rare, 5 Extremely Rare. Filter mission QL +/-5 within 1..250 before weighted group selection, then choose an eligible item uniformly. Unknown family links support stored QL only. Appearance comes from mission-20261011-004128-b8e7bf2e ordinal 480; only the verified Locked flag is cleared for ordinary chests.",
     "RoomDensity": 0.3,

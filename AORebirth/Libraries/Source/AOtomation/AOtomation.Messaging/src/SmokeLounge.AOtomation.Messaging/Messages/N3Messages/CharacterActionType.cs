@@ -64,6 +64,9 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         SetNanoDuration = 0x00000062,
 
+        /// <summary>Original trap detection feedback: the second identity (parameter words) selects the trap.</summary>
+        TrapDetected = 0x000000BE,
+
         ItemAnim = 0x00000063,
 
         Death = 0x00000063,

@@ -28,6 +28,9 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         /// <summary>Absent on missions accepted before token rewards were enabled.</summary>
         public MissionTokenRewardPolicy? TokenReward { get; set; }
 
+        /// <summary>Frozen optional policy; absent on older missions, which are never retrofitted.</summary>
+        public MissionTrapPolicy? Traps { get; set; }
+
         public int OriginTerminalType { get; set; }
         public int OriginTerminalInstance { get; set; }
         public int OriginPlayfield { get; set; }
@@ -93,6 +96,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                     || (parsed.ObjectiveTool != null && (!parsed.ObjectiveTool.IsValid || !parsed.ObjectiveTool.IsSourceItem))
                     || (parsed.ObjectiveNpc != null && !parsed.ObjectiveNpc.IsValid)
                     || (parsed.TokenReward != null && !parsed.TokenReward.IsValid)
+                    || (parsed.Traps != null && !parsed.Traps.IsValid)
                     || (parsed.ObjectiveItem != null && parsed.ObjectiveItem.MissionType != parsed.MissionType)
                     || (parsed.ObjectiveTool != null && parsed.MissionType != 3)
                     || (parsed.ObjectiveNpc != null && parsed.ObjectiveNpc.MissionType != parsed.MissionType)

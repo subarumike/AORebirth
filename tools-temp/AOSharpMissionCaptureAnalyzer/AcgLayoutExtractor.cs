@@ -1313,14 +1313,14 @@ namespace AOSharpMissionCaptureAnalyzer
         {
             return new List<NamedIntValue>
                        {
-                           NamedInt("Unknown1", quest.Version),
+                           NamedInt("Unknown1", QuestScalar(quest, "Version", "Unknown1")),
                            NamedInt("Unknown2", quest.Unknown2),
                            NamedInt("Unknown3", quest.Unknown3),
-                           NamedInt("Unknown4", quest.Flags),
-                           NamedInt("Unknown5", quest.RewardDescriptorVersion),
-                           NamedInt("Unknown6", quest.CashReward),
+                           NamedInt("Unknown4", QuestScalar(quest, "Flags", "Unknown4")),
+                           NamedInt("Unknown5", QuestScalar(quest, "RewardDescriptorVersion", "Unknown5")),
+                           NamedInt("Unknown6", QuestScalar(quest, "CashReward", "Unknown6")),
                            NamedInt("Unknown7", quest.Unknown7),
-                           NamedInt("Unknown8", quest.ExperienceReward),
+                           NamedInt("Unknown8", QuestScalar(quest, "ExperienceReward", "Unknown8")),
                            NamedInt("Unknown9", quest.Unknown9),
                            NamedInt("Unknown10", quest.Unknown10),
                            NamedInt("Unknown11", quest.Unknown11),
@@ -1342,6 +1342,16 @@ namespace AOSharpMissionCaptureAnalyzer
                            NamedInt("Unknown27", quest.Unknown27),
                            NamedInt("Unknown28", quest.Unknown28)
                        };
+        }
+
+        private static int QuestScalar(Quest quest, string currentName, string retainedName)
+        {
+            // The retained recorder assembly exposes neutral names; newer AOSharp
+            // builds expose typed aliases. Preserve the actual existing value.
+            var property = quest.GetType().GetProperty(currentName) ?? quest.GetType().GetProperty(retainedName);
+            if (property == null)
+                throw new InvalidDataException("Quest scalar is absent: " + currentName + "/" + retainedName);
+            return Convert.ToInt32(property.GetValue(quest, null), CultureInfo.InvariantCulture);
         }
 
         private static NamedIntValue NamedInt(string field, int value)

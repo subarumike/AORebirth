@@ -423,7 +423,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         world = _playfields.Value.GetOrCreateQuestDungeon(dungeon.Parameters.DungeonPlayfield, questId, layout, entrance,
                             dungeon.TargetHash, dungeon.Parameters.Quality, UncollectedObjective(dungeon.Parameters), TryCollectObjective,
                             tokenProgress == null ? unfinishedNpc : dungeon.Parameters.ObjectiveNpc, tokenProgress,
-                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon));
+                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon),
+                            trapPopulation: CreateTrapPopulation(questId, dungeon));
                     }
                     catch (ZoneEngine_New.Core.World.PlayfieldHostedElsewhereException)
                     {
@@ -536,7 +537,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         return (playfields.GetOrCreateQuestDungeon(storedPlayfield, questId, layout, entrance, dungeon.TargetHash,
                             dungeon.Parameters.Quality, UncollectedObjective(dungeon.Parameters), TryCollectObjective,
                             tokenProgress == null ? unfinishedNpc : dungeon.Parameters.ObjectiveNpc, tokenProgress,
-                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon)), layout.Spawn, null);
+                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon),
+                            trapPopulation: CreateTrapPopulation(questId, dungeon)), layout.Spawn, null);
                     }
                     catch (ZoneEngine_New.Core.World.PlayfieldHostedElsewhereException)
                     {
@@ -939,6 +941,10 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         MissionChestPopulation? CreateChestPopulation(string questId, CachedDungeon dungeon)
             => _quests.CreateChestPopulation(dungeon.OwnerId, questId, dungeon.AssignedAtUtcTicks,
                 dungeon.FrozenJson, dungeon.Parameters, _layouts.ChestPolicy);
+
+        MissionTrapPopulation? CreateTrapPopulation(string questId, CachedDungeon dungeon)
+            => _quests.CreateTrapPopulation(dungeon.OwnerId, questId, dungeon.AssignedAtUtcTicks,
+                dungeon.FrozenJson, dungeon.Parameters);
 
         /// <summary>The NPC hash a kill quest wants, or null for other quests.</summary>
         static string? KillTarget(QuestTemplate? template)

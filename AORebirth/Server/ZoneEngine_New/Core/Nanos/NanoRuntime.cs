@@ -504,6 +504,87 @@ namespace ZoneEngine_New.Core.Nanos
             return LandImmediate(source, target, NanoSpell.From(template), inventory, items, nowUtc, gmApply);
         }
 
+        /// <summary>Validates the recovered passive Skill program without consuming a trap or mutating NCU.</summary>
+        public static bool CanApplyEnvironmentalPassiveBuff(Character target, int nanoId, IItemBuilder items)
+        {
+            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(items);
+            if (target.IsDead || nanoId <= 0)
+                return false;
+            ItemTemplate template = items.CreateTemplate(nanoId, nanoId, 1);
+            if (template.Id != nanoId || !SupportsEnvironmentalPassiveBuff(template))
+                return false;
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(NanoSpell.From(template), target.Buffs,
+                target.BuffNcuCapacity, out _);
+            return decision is BuffApplyDecision.Apply or BuffApplyDecision.Replace;
+        }
+
+        /// <summary>
+        /// A resource-defined passive Skill buff. Unknown trap TauntNpc behavior is left inactive;
+        /// instant damage, child programs and other unsupported resource programs fail closed.
+        /// </summary>
+        public static bool SupportsEnvironmentalPassiveBuff(ItemTemplate template)
+        {
+            ArgumentNullException.ThrowIfNull(template);
+            NanoSpell spell = NanoSpell.From(template);
+            if (!spell.IsBuff || spell.DurationCentiseconds <= 0
+                || !spell.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? use))
+                return false;
+            foreach (KeyValuePair<EventType, List<ItemSpell>> program in spell.SpellList)
+                if (program.Key != EventType.OnUse && program.Value.Count > 0)
+                    return false;
+            bool skill = false;
+            foreach (ItemSpell function in use)
+            {
+                if (function.Is(FunctionType.TauntNpc))
+                    continue;
+                if (!function.Is(FunctionType.Skill) || function.Target != (int)ItemTarget.Target
+                    || !function.TryReadInt(0, out int stat)
+                    || stat < 0 || !function.TryReadInt(1, out _))
+                    return false;
+                skill = true;
+            }
+            return skill;
+        }
+
+        /// <summary>
+        /// Preserves the four recovered Smoke Bomb sequences: CastNano from the trap, event 109,
+        /// victim CA107, then CA98. CA98 carries only the trap instance; its client-side 50000 alias
+        /// does not change the actual 51008 caster/source retained on the buff.
+        /// </summary>
+        public static bool TryApplyEnvironmentalPassiveBuff(Identity source, Character target, int nanoId,
+            IItemBuilder items, DateTime nowUtc, Action? afterCastPublished = null)
+        {
+            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(items);
+            if (source == Identity.None || source.Instance <= 0
+                || !CanApplyEnvironmentalPassiveBuff(target, nanoId, items))
+                return false;
+            NanoSpell spell = NanoSpell.From(items.CreateTemplate(nanoId, nanoId, 1));
+            target.TryApplyBuff(spell, source, nowUtc, out Buff? applied, out Buff? replaced);
+            if (applied == null)
+                return false;
+
+            Announce(target, new CastNanoSpellMessage
+            {
+                Identity = target.Identity, NanoId = nanoId, Target = target.Identity,
+                Unknown = 0, Unknown1 = 1, Caster = source
+            });
+            afterCastPublished?.Invoke();
+            AnnounceCastFinished(target, nanoId);
+            if (replaced != null && replaced.Id != spell.Id)
+                AnnounceBuffRemoved(target, replaced);
+            Announce(target, new CharacterActionMessage
+            {
+                Identity = target.Identity, Unknown = 0, Action = CharacterActionType.SetNanoDuration,
+                Target = new Identity { Type = IdentityType.NanoProgram, Instance = nanoId },
+                Parameter1 = source.Instance, Parameter2 = applied.DurationCentiseconds
+            });
+            // Skill modifiers are already applied/reversed by the existing NCU rebase path.
+            // Do not execute the resource's unresolved TauntNpc program with an invented caster.
+            return true;
+        }
+
         /// <summary>
         /// Lands <paramref name="spell"/> at once. <paramref name="gmApply"/> (a GM's .give nano): combat legality does
         /// not apply, so a hostile-flagged nano such as PvP Enabled (202732) lands on any living character, and the

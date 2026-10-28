@@ -351,6 +351,18 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 return false;
             }
 
+            // A parented Smoke Bomb has no absolute transform on the wire. The
+            // chest must already exist on this exact client before its child does;
+            // candidate HashSet/grid order does not establish that dependency.
+            if (source is MissionTrap trap)
+            {
+                if (!_byIdentity.TryGetValue(trap.ParentIdentity.Long(), out Dynel? parent)
+                    || parent is not Chest || !ReferenceEquals(parent, trap.ParentDynel))
+                    return false;
+                if (!IsVisibleToRecipient(recipient, parent) && !TryEnterVisibility(recipient, parent))
+                    return false;
+            }
+
             if (!MarkVisibleEntry(recipient, source))
             {
                 return false;

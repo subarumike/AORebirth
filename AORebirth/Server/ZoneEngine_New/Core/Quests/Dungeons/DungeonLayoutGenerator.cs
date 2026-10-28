@@ -97,6 +97,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             public DungeonRepairMachinePolicy? RepairMachine { get; set; }
             public DungeonNpcObjectivePolicy? NpcObjectives { get; set; }
             public MissionChestPolicy? Chests { get; set; }
+            public MissionTrapPolicy? Traps { get; set; }
             public MissionTokenRewardPolicy? TokenReward { get; set; }
             public List<GenerationProfile> Profiles { get; set; } = [];
         }
@@ -161,6 +162,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 if (_policy == null || _policy.Population?.IsValid(gameData) != true || _policy.FloorHeight is <= 0 or > 255
                     || (_policy.TokenReward != null && !_policy.TokenReward.IsValid)
                     || (_policy.Chests != null && !_policy.Chests.IsValid)
+                    || (_policy.Traps != null && !_policy.Traps.IsValid)
                     || _policy.LockedDoorChancePercent is < 0 or > 100 || _policy.Profiles.Count == 0
                     || _policy.Profiles.Any(p => p.MinQuality < 1 || p.MinQuality > p.MaxQuality
                         || p.Styles.Length == 0 || p.Styles.Any(s => s <= 0) || p.Floors < (p.Team ? 2 : 1) || p.Floors > 8
@@ -229,6 +231,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 parameters.GeneratorVersion = CurrentVersion;
                 parameters.IsTeam = team;
                 parameters.TokenReward = _policy.TokenReward?.Clone();
+                parameters.Traps = _policy.Traps?.Enabled == true ? _policy.Traps.Clone() : null;
                 parameters.LayoutPlan = new DungeonLayoutPlan
                 {
                     StyleId = style, FloorCount = profile.Floors,

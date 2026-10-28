@@ -43,6 +43,8 @@ public sealed class QuestDungeonPlayfield : Playfield
     AORebirth.World.Collision.DungeonWorldLayout? _chestDungeon;
     bool _chestsReady;
     Exception? _chestPopulationFailure;
+    bool _trapsReady;
+    Exception? _trapPopulationFailure;
     readonly MissionItemObjectiveBinding? _objectiveItem;
     readonly MissionNpcObjectiveBinding? _objectiveNpc;
     readonly bool _spawnNpcObjective;
@@ -54,7 +56,8 @@ public sealed class QuestDungeonPlayfield : Playfield
         InventoryMoveService moves, InventoryFlushService flush, TradeService trades, CharacterSnapshotService snapshot,
         IPlayfieldMetricsRegistry metrics, IShopDao shopDao, MissionItemObjectiveBinding? objectiveItem = null,
         Func<Player, MissionObjectiveItem, bool>? collectObjective = null, MissionNpcObjectiveBinding? npcObjective = null,
-        MissionTokenProgress? tokenProgress = null, bool spawnNpcObjective = true, MissionChestPopulation? chestPopulation = null)
+        MissionTokenProgress? tokenProgress = null, bool spawnNpcObjective = true, MissionChestPopulation? chestPopulation = null,
+        MissionTrapPopulation? trapPopulation = null)
         : base(new Identity { Type = IdentityType.Playfield, Instance = playfieldId }, logger, router,
             manager, hydrator, data, items, hashItems, inventory, ids, moves, flush, trades, snapshot, metrics, shopDao)
     {
@@ -76,6 +79,7 @@ public sealed class QuestDungeonPlayfield : Playfield
         TokenProgress = tokenProgress;
         TokenProgress?.Attach(this, logger);
         ChestPopulation = chestPopulation;
+        TrapPopulation = trapPopulation;
     }
 
     public string QuestId { get; }
@@ -85,6 +89,8 @@ public sealed class QuestDungeonPlayfield : Playfield
     public MissionTokenProgress? TokenProgress { get; }
 
     public MissionChestPopulation? ChestPopulation { get; }
+
+    public MissionTrapPopulation? TrapPopulation { get; }
 
     /// <summary>Where the dungeon is entered from, and where its occupants return to.</summary>
     public MissionEntrancePlacement Entrance { get; }
@@ -138,8 +144,10 @@ public sealed class QuestDungeonPlayfield : Playfield
     /// <summary>Called during build and on the existing destination admission tick before visibility activates.</summary>
     internal bool EnsureChestPopulation()
     {
-        if (_chestsReady || ChestPopulation == null || IsDisposed)
+        if (IsDisposed)
             return true;
+        if (_chestsReady || ChestPopulation == null)
+            return EnsureTrapPopulation();
         if (_chestPopulationFailure != null)
             throw new InvalidDataException("The mission chest population requires fresh dungeon reconstruction.", _chestPopulationFailure);
         if (_chestDungeon == null)
@@ -149,12 +157,31 @@ public sealed class QuestDungeonPlayfield : Playfield
         try
         {
             _chestsReady = ChestPopulation.Populate(this, _chestDungeon, _simulation);
-            return _chestsReady;
         }
         catch (Exception exception)
         {
             _chestPopulationFailure = exception;
             ChestPopulation.Retire();
+            throw;
+        }
+        return _chestsReady && EnsureTrapPopulation();
+    }
+
+    bool EnsureTrapPopulation()
+    {
+        if (_trapsReady || TrapPopulation == null || IsDisposed)
+            return true;
+        if (_trapPopulationFailure != null)
+            throw new InvalidDataException("The mission trap population requires fresh reconstruction.", _trapPopulationFailure);
+        try
+        {
+            _trapsReady = TrapPopulation.Populate(this);
+            return _trapsReady;
+        }
+        catch (Exception exception)
+        {
+            _trapPopulationFailure = exception;
+            TrapPopulation.Retire();
             throw;
         }
     }
@@ -527,6 +554,7 @@ public sealed class QuestDungeonPlayfield : Playfield
     protected override void OnDispose()
     {
         ChestPopulation?.Retire();
+        TrapPopulation?.Retire();
         _simulation?.Dispose();
         _simulation = null;
         base.OnDispose();

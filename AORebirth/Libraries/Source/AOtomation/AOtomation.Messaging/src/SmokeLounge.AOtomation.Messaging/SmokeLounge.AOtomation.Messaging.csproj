@@ -202,6 +202,9 @@
     <Compile Include="Messages\N3Messages\CharSecSpecAttackMessage.cs" />
     <Compile Include="Messages\Header.cs" />
     <Compile Include="Messages\N3Messages\ActionMessage.cs" />
+    <Compile Include="Messages\N3Messages\TrapItemFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\MineFullUpdateMessage.cs" />
+    <Compile Include="Messages\N3Messages\TrapDisarmedMessage.cs" />
     <Compile Include="Messages\N3Messages\AddPetMessage.cs" />
     <Compile Include="Messages\N3Messages\AreaFormulaMessage.cs" />
     <Compile Include="Messages\N3Messages\AttackInfoMessage.cs" />

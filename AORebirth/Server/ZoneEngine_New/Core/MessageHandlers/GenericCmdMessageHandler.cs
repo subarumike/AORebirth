@@ -120,6 +120,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     break;
 
                 case GenericCmdAction.UseItemOnItem:
+                    if (message.Target is { Length: >= 2 })
+                    {
+                        bool disarmed = TryDisarmMissionTrap(player, playfield, message.Target[0], message.Target[1], out bool trapHandled);
+                        if (trapHandled)
+                        {
+                            if (disarmed)
+                                Acknowledge(session, message, message.Target[1]);
+                            else
+                                Deny(session, message, player, "mission trap disarming is disabled or the exact tool/target is ineligible");
+                            break;
+                        }
+                    }
                     if (message.Target is { Length: >= 2 } && _dungeons != null)
                     {
                         bool committed = _dungeons.TryUseGeneratedMissionItem(player, message.Target[0], message.Target[1], out bool handled);
@@ -428,6 +440,20 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
             reloaded = result == WeaponAmmo.ReloadResult.Reloaded;
             return true;
+        }
+
+        static bool TryDisarmMissionTrap(Player player, Playfield playfield, Identity sourceSlot, Identity target,
+            out bool handled)
+        {
+            handled = playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel)
+                && dynel is MissionTrap;
+            if (!handled || dynel is not MissionTrap trap || sourceSlot.Type != IdentityType.Inventory
+                || !player.Inventory.IsHydrated
+                || !player.Inventory.TryGetItem(sourceSlot.Type, sourceSlot.Instance, out Item tool))
+                return false;
+            // The original held-source path preserves the supplied destination. Parent-target
+            // substitution and original server skill/consumption rules are not inferred.
+            return trap.TryDisarm(player, tool);
         }
 
         /// <summary>

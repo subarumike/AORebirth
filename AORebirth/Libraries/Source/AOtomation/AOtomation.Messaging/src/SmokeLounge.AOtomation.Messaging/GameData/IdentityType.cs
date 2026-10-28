@@ -53,6 +53,9 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         Terminal = 0x0000C73D,
 
+        // Original TrapItem/Mine runtime identity, captured in mission full updates.
+        Trap = 0x0000C740,
+
         Door = 0x0000C748,
 
         Container = 0x0000C749,

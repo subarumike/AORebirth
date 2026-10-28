@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../ChatEngine/CoreServer/ChatSessionOwnership.cs" Link="ChatSessionOwnership.cs" />
+    <Compile Include="../../../tools-temp/AOSharpCaptureProtocol/RawTrapFullUpdateDecoder.cs" Link="Fixtures/RawTrapFullUpdateDecoder.cs" />
     <!-- Existing mission behavior tests now exercise the native implementation directly. -->
     <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs" Link="Missions/MissionLevelGraphTests.cs" />
     <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs" Link="Missions/MissionRollSemanticsTests.cs" />
@@ -115,6 +116,11 @@
     <Compile Include="MissionChestProtocolTests.cs" />
     <Compile Include="MissionChestPopulationTests.cs" />
     <Compile Include="MissionChestObjectiveIntegrationTests.cs" />
+    <Compile Include="MissionTrapPacketTests.cs" />
+    <Compile Include="MissionTrapRuntimeTests.cs" />
+    <Compile Include="MissionTrapResourceTests.cs" />
+    <Compile Include="MissionTrapPersistenceTests.cs" />
+    <Compile Include="../../../tools-temp/AOSharpCaptureProtocol/RawTrapFullUpdateDecoder.cs" Link="Fixtures/RawTrapFullUpdateDecoder.cs" />
     <Compile Include="AuthoredMissionTestDao.cs" />
     <Compile Include="PlayerInventoryOverflowTests.cs" />
     <Compile Include="ReconnectVisibilityTests.cs" />

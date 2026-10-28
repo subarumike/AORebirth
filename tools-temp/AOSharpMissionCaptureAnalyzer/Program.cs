@@ -68,6 +68,11 @@ namespace AOSharpMissionCaptureAnalyzer
 
         private static int Main(string[] args)
         {
+            if (args.Length == 3 && string.Equals(args[0], "--traps", StringComparison.OrdinalIgnoreCase))
+            {
+                return TrapPacketReplay.Run(args[1], args[2]);
+            }
+
             if (args.Length == 1 && string.Equals(args[0], "--self-test", StringComparison.OrdinalIgnoreCase))
             {
                 return RunSelfTest();
@@ -101,7 +106,7 @@ namespace AOSharpMissionCaptureAnalyzer
             if (args.Length != 1)
             {
                 Console.Error.WriteLine(
-                    "Usage: AOSharpMissionCaptureAnalyzer.exe <capture-folder> | --extract <capture-folder> | --corpus <captures-root> [output-json] | --generate-catalog <captures-root> <output-cs> | --self-test");
+                    "Usage: AOSharpMissionCaptureAnalyzer.exe <capture-folder> | --extract <capture-folder> | --corpus <captures-root> [output-json] | --generate-catalog <captures-root> <output-cs> | --traps <captures-root> <private-output-root> | --self-test");
                 return 2;
             }
 
@@ -569,7 +574,7 @@ namespace AOSharpMissionCaptureAnalyzer
             return rows;
         }
 
-        private static string[] ParseCsvLine(string line)
+        internal static string[] ParseCsvLine(string line)
         {
             var fields = new List<string>();
             var field = new StringBuilder();
