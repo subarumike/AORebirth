@@ -439,6 +439,10 @@ namespace ZoneEngine_New.Core.Ai
                 StopPathing();
             }
 
+            // Charmed (CharmNpc): it only follows its leader until the charming nano ends.
+            if (TickCharm())
+                return;
+
             TickStallWatch.Stage("brain.scan", Npc.Identity.Instance);
             // A pet picks its fights from its owner, never from who happens to walk by.
             if (Pet == null)
@@ -473,6 +477,77 @@ namespace ZoneEngine_New.Core.Ai
             if (Npc.IsCastingNano)
                 StopPathing();
         }
+
+        // CharmNpc: who this NPC follows, while the nano that charmed it runs on it.
+        Identity _charmLeader;
+        int _charmNanoId;
+        Nanos.Buff? _charmBuff;
+
+        /// <summary>
+        /// CharmNpc: follows <paramref name="leader"/> like a pet for as long as nano <paramref name="nanoId"/> runs on
+        /// this NPC (Call to Arms 297247 on an Omni-AF Private), then goes back to what it was doing.
+        /// </summary>
+        public void Charm(Character leader, int nanoId)
+        {
+            ArgumentNullException.ThrowIfNull(leader);
+            _charmLeader = leader.Identity;
+            _charmNanoId = nanoId;
+            _charmBuff = null;
+            foreach (Nanos.Buff buff in Npc.Buffs)
+            {
+                if (buff.Id == nanoId)
+                    _charmBuff = buff;
+            }
+            ClearHate();
+            StopFighting();
+            StopWandering();
+        }
+
+        public bool IsCharmed => _charmNanoId != 0;
+
+        bool TickCharm()
+        {
+            if (_charmNanoId == 0)
+                return false;
+
+            Character? leader = null;
+            if (Npc.Playfield?.GetService<ZoneEngine_New.Core.Playfield.DynelRegistry>() is { } registry
+                && registry.TryGet(_charmLeader, out Dynel? found) && found is Character character
+                && !character.IsDead && ReferenceEquals(character.Playfield, Npc.Playfield))
+                leader = character;
+
+            // The copy that charmed it: a recast (CastNano2 at Henri Zure) replaces it and ends the charm.
+            bool charmRuns = false;
+            foreach (Nanos.Buff buff in Npc.Buffs)
+            {
+                if (buff.Id == _charmNanoId && (_charmBuff == null || ReferenceEquals(buff, _charmBuff)))
+                {
+                    charmRuns = true;
+                    break;
+                }
+            }
+
+            if (leader == null || !charmRuns)
+            {
+                // As a pet charm's end: what the charmer and their friends ran on it goes, except a recast copy.
+                Nanos.NanoRuntime.ClearBuffsOnCharmEnd(Npc, charmRuns ? 0 : _charmNanoId);
+                _charmNanoId = 0;
+                _charmLeader = default;
+                _charmBuff = null;
+                StopPathing();
+                _treeResetPending = true;
+                return false;
+            }
+
+            double distance = Npc.Distance3D(leader);
+            if (distance > PetAi.FollowStartMeters)
+                PathTo(leader.Position, CharmReplanMeters);
+            else if (distance <= PetAi.FollowStopMeters)
+                StopPathing();
+            return true;
+        }
+
+        const float CharmReplanMeters = 3.0f;
 
         public void AddThreat(Identity identity, float amount)
         {

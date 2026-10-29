@@ -108,13 +108,17 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>
         /// A charm's end empties the released NPC's NCU: buffs its charmer and their friends ran on it while it served
         /// must not stay on a monster that turns back on them. Removed as stripped, so no buff end effect runs.
+        /// <paramref name="keepNanoId"/>: a copy of the charming nano that replaced the charm (CastNano2 over it, Henri
+        /// Zure's Call to Arms recast) stays and runs out.
         /// </summary>
-        public static void ClearBuffsOnCharmEnd(Character character)
+        public static void ClearBuffsOnCharmEnd(Character character, int keepNanoId = 0)
         {
             ArgumentNullException.ThrowIfNull(character);
 
             character.CancelNanoCast();
-            List<Buff> removed = character.RemoveAllBuffs(BuffRemovalReason.Stripped);
+            List<Buff> removed = keepNanoId == 0
+                ? character.RemoveAllBuffs(BuffRemovalReason.Stripped)
+                : character.RemoveBuffs(buff => buff.Id != keepNanoId);
             for (int i = 0; i < removed.Count; i++)
                 AnnounceBuffRemoved(character, removed[i]);
         }
@@ -502,6 +506,22 @@ namespace ZoneEngine_New.Core.Nanos
                 return false;
 
             return LandImmediate(source, target, NanoSpell.From(template), inventory, items, nowUtc, gmApply);
+        }
+
+        /// <summary>Lands an already built <paramref name="spell"/> (CastNano2's retimed copy) at once.</summary>
+        public static bool TryApplyImmediate(
+            Character source,
+            Character target,
+            NanoSpell spell,
+            IItemBuilder items,
+            IInventoryRepository inventory,
+            DateTime nowUtc,
+            bool gmApply = false)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(target);
+            ArgumentNullException.ThrowIfNull(spell);
+            return !target.IsDead && LandImmediate(source, target, spell, inventory, items, nowUtc, gmApply);
         }
 
         /// <summary>
