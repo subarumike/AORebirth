@@ -296,6 +296,9 @@ namespace ZoneEngine_New.Core.Entities
                 // never depends on it here either: a perk trained with Bazzit's Alien Library keeps working when the
                 // library is gone. Training checks it (ResolveTrainRequirement).
                 Operator.ObtainedItem => true,
+                // Value = a quest hash (or a template's Aliases entry): that quest is in the journal and active.
+                Operator.HasActiveQuest => NpcCharacter.TryDecodeAoHash(id, out string questHash)
+                    && QuestLog?.FindActive(questHash) != null,
                 _ => base.ResolveRequirement(requirement)
             };
         }

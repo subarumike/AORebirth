@@ -95,8 +95,13 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.TeamCastNano:
                 case FunctionType.PlayfieldNano:
                 case FunctionType.CastOnPets:
-                    return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository);
+                    return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository, NamesNpc(spell));
+                case FunctionType.NpcSayRobotSpeech:
+                    // [text key] such as {stock_pet_init}: the key's text is not known here, and it is only a line
+                    // the NPC says. Counts as done so the functions after it run as live's do.
+                    return true;
                 case FunctionType.Teleport:
+                case FunctionType.TeleportOut:
                     return target is Player teleportPlayer && Teleport(teleportPlayer, spell);
                 case FunctionType.LineTeleport:
                     return target is Player linePlayer && LineTeleport(linePlayer, spell);
@@ -148,6 +153,12 @@ namespace ZoneEngine_New.Core.Inventory
                     return NpcTeleportToSpawnPoint(target);
                 case FunctionType.NpcFightSelected:
                     return NpcFightSelected(target, source);
+                case FunctionType.SolveQuest:
+                    return SolveQuest(target, source, spell);
+                case FunctionType.SpawnQuest:
+                    return ResolveApplyOn(target, source, spell) is Player questPlayer && SpawnQuest(questPlayer, spell);
+                case FunctionType.FailQuestByQas:
+                    return ResolveApplyOn(target, source, spell) is Player failPlayer && FailQuest(failPlayer, spell);
                 default:
                     LogUtil.Debug(
                         DebugInfoDetail.Network,
@@ -803,6 +814,66 @@ namespace ZoneEngine_New.Core.Inventory
 
             brain.StopPathing();
             npc.Motor.Warp(home);
+            return true;
+        }
+
+        /// <summary>
+        /// True when the function's requirements name its target NPC by spawn hash (Operator.IsNpcHash): it is written
+        /// for that NPC, a quest effect rather than an attack (OTAF Official Notice 297243 on "OIUR").
+        /// </summary>
+        static bool NamesNpc(ItemSpell spell)
+            => spell.Requirements.Exists(r => r.Operator == (int)Operator.IsNpcHash);
+
+        /// <summary>
+        /// SolveQuest [hash]: completes the user's active quest of that hash (or template alias) as an NPC turn-in does.
+        /// Health Regeneration Stim 297044 used on a Wounded Dockworker: SolveQuest "82OD" finishes JTEV.
+        /// </summary>
+        static bool SolveQuest(Character target, Character? source, ItemSpell spell)
+        {
+            // Solved for the player of the use: the user of an item (Health Regeneration Stim on a Wounded Dockworker),
+            // or the player a creature's nano landed on (Resolve 2PZ7, area-cast by the Omni-AF Private).
+            if ((source as Player ?? target as Player) is not Player player
+                || player.Playfield?.GetService<Quests.QuestService>() is not { } quests)
+                return false;
+            string hash = spell.TryReadString(0, out string text) ? text.Trim()
+                : spell.TryReadInt(0, out int packed) && NpcCharacter.TryDecodeAoHash(packed, out string decoded) ? decoded
+                : string.Empty;
+            if (hash.Length == 0 || player.QuestLog?.FindActive(hash) is not { } quest)
+                return false;
+            return quests.TryComplete(player, quest.QuestId, out _);
+        }
+
+        /// <summary>
+        /// SpawnQuest [hash, ?, ?]: gives the player the Quests.json quest of that hash or template alias, as a quest
+        /// starter item does. Bank of Rubi-Ka Credit Card 297315: KY6D (Steal the credits) and QHL3 (Deliver the Lost
+        /// Credit Card). True when the quest is held afterwards.
+        /// </summary>
+        static bool SpawnQuest(Player player, ItemSpell spell)
+        {
+            if (player.Playfield?.GetService<Quests.QuestService>() is not { } quests)
+                return false;
+            string hash = spell.TryReadString(0, out string text) ? text.Trim()
+                : spell.TryReadInt(0, out int packed) && NpcCharacter.TryDecodeAoHash(packed, out string decoded) ? decoded
+                : string.Empty;
+            if (hash.Length == 0)
+                return false;
+            bool started = quests.TryStartFromItem(player, hash, out string? why);
+            if (why != null)
+                ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, why);
+            return started;
+        }
+
+        static bool FailQuest(Player player, ItemSpell spell)
+        {
+            if (player.Playfield?.GetService<Quests.QuestService>() is not { } quests || !spell.TryReadInt(0, out int qas) || qas <= 0)
+                return false;
+            foreach (Quests.PlayerQuest quest in quests.GetLog(player).Quests.Values)
+            {
+                if (quest.IsActive && quest.Template.QasInstance == qas)
+                    return quests.TryFail(player, quest);
+            }
+
+            // Not held (deleted already): nothing left to end.
             return true;
         }
 

@@ -33,6 +33,7 @@ public static class SchemaContract
         "20261001_character_perk_locks.sql",
         "20261013_character_research.sql",
         "20261016_character_nano_line_locks.sql",
+        "20261016_recurring_doja_quest.sql",
         "20261025_character_pet_names.sql"
     });
 

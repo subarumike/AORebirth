@@ -261,6 +261,18 @@ namespace AORebirth.Enums
         MustBeCastersPet = 118,
 
         /// <summary>
+        /// The subject is the NPC of this spawn hash (Value = 4 ASCII bytes, big-endian: Health Regeneration Stim 297044
+        /// [OnTarget, 104 "WODO"] = a Wounded Dockworker; Crowbar 297052 "FRAG").
+        /// </summary>
+        IsNpcHash = 104,
+
+        /// <summary>
+        /// The subject has this quest active (Value = the quest hash, 4 ASCII bytes big-endian: "Resolve 2PZ7" 297276
+        /// needs 2PZ7; Health Regeneration Stim 297044 needs 82OD, the quest its OnUse SolveQuest finishes).
+        /// </summary>
+        HasActiveQuest = 117,
+
+        /// <summary>
         /// The user, its pets, its team or their pets are fighting (client "MustAlliedCombat"; the client's own
         /// evaluator passes it, the server decides).
         /// </summary>

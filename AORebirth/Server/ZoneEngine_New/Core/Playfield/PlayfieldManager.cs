@@ -79,7 +79,6 @@ namespace ZoneEngine_New.Core.Playfield
             CharacterSnapshotService characterSnapshot,
             IPlayfieldMetricsRegistry metricsRegistry,
             TeamService teams,
-            AuthoredQuestService authoredQuests,
             IItemTemplateCatalog itemTemplates,
             IShopDao shopDao,
             Quests.QuestService? quests = null,
@@ -131,7 +130,6 @@ namespace ZoneEngine_New.Core.Playfield
             _metricsRegistry = metricsRegistry;
             _shopDao = shopDao;
             Teams = teams ?? throw new ArgumentNullException(nameof(teams));
-            AuthoredQuests = authoredQuests ?? throw new ArgumentNullException(nameof(authoredQuests));
             ItemTemplates = itemTemplates ?? throw new ArgumentNullException(nameof(itemTemplates));
             Quests = quests;
             // A reload that gives a visible NPC a script, or takes it away, is told to its observers on each tick.
@@ -145,7 +143,6 @@ namespace ZoneEngine_New.Core.Playfield
         }
 
         public TeamService Teams { get; }
-        public AuthoredQuestService AuthoredQuests { get; }
 
         /// <summary>This instance's World link; null in tools and tests that run one isolated engine.</summary>
         public ZoneEngine_New.Core.World.WorldLink? World { get; }

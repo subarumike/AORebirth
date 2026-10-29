@@ -175,8 +175,7 @@ public sealed class MissionChestProtocolTests
         registry.Register(chest);
         request.Identity = request.User = world.Player.Identity;
         contents.Identity = success.Identity = success.User = world.Player.Identity;
-        var handler = new GenericCmdMessageHandler(new StubInventoryRepository(), new StubItemBuilder(),
-            (AuthoredQuestService)RuntimeHelpers.GetUninitializedObject(typeof(AuthoredQuestService)));
+        var handler = new GenericCmdMessageHandler(new StubInventoryRepository(), new StubItemBuilder());
 
         handler.Handle(request, world.Session);
 

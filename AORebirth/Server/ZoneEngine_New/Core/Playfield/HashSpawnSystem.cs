@@ -281,12 +281,39 @@ namespace ZoneEngine_New.Core.Playfield
                     _spawnRate));
         }
 
+        /// <summary>
+        /// A content prop that names this point's hash (ReplacesHash) and stands on it is the statel the point spawns
+        /// in retail (the Arete Cargo Box, its Gas Fires): the prop replaces it, and the point spawns nothing itself.
+        /// </summary>
+        static bool ReplacedByProp(PlayfieldSpawnEntry entry, IReadOnlyList<ZoneEngine_New.Core.Missions.QuestPropDefinition> props)
+        {
+            if (entry.Position == null || entry.Position.Length < 3)
+                return false;
+
+            for (int i = 0; i < props.Count; i++)
+            {
+                if (!string.Equals(props[i].ReplacesHash, entry.HashText, StringComparison.Ordinal))
+                    continue;
+
+                float[] at = props[i].Position;
+                float dx = at[0] - entry.Position[0], dy = at[1] - entry.Position[1], dz = at[2] - entry.Position[2];
+                if (dx * dx + dz * dz <= PropReplacesPointRadius * PropReplacesPointRadius && Math.Abs(dy) <= 3f)
+                    return true;
+            }
+
+            return false;
+        }
+
+        const float PropReplacesPointRadius = 0.5f;
+
         private void LoadSpawns(CellGrid grid)
         {
             PlayfieldSpawnsData data = _gameData.GetPlayfieldSpawns(_playfield.ResourceId);
             PlayfieldSpawnEntry[] entries = data.Spawns ?? [];
             SpawnExclusionCatalog exclusions = _gameData.SpawnExclusions;
             int skipped = 0;
+            IReadOnlyList<ZoneEngine_New.Core.Missions.QuestPropDefinition> props =
+                _playfield.GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Definitions;
             int excluded = 0;
 
             foreach (PlayfieldSpawnEntry entry in entries)
@@ -320,6 +347,12 @@ namespace ZoneEngine_New.Core.Playfield
                 if (entry.StaticTemplateId is int templateId && !_spawnService.HasStaticTemplate(templateId))
                 {
                     _logger.Warn($"Skipping static placement hash={spawnHash}: template={templateId} not found");
+                    skipped++;
+                    continue;
+                }
+
+                if (ReplacedByProp(entry, props))
+                {
                     skipped++;
                     continue;
                 }

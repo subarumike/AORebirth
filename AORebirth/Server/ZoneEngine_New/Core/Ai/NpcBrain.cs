@@ -718,6 +718,18 @@ namespace ZoneEngine_New.Core.Ai
         /// </summary>
         public void TryProximityAggro(Character player)
         {
+            if (Npc.AttacksOnSight)
+                TryNotice(player);
+        }
+
+        /// <summary>
+        /// Something drew this NPC's attention to <paramref name="player"/> (a guard's strongbox being picked): it goes
+        /// for them by the same rules as proximity aggro, even when it never attacks on sight.
+        /// </summary>
+        public void TryAlertAggro(Character player) => TryNotice(player);
+
+        void TryNotice(Character player)
+        {
             if (player == null || !player.IsPlayer || player.IsDead || player is Player { HiddenFromPlayers: true })
                 return;
             if (player is Player zoning && zoning.InZoneInGrace(DateTime.UtcNow))
