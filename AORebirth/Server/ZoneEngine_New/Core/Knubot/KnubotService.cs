@@ -13,6 +13,7 @@ using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Logging;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
@@ -411,7 +412,8 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
 
     /// <summary>
     /// Checks all of the line's effects, then queues its text and effects in the order written, and its end.
-    /// A line whose effects cannot all be applied says its Fail line instead.
+    /// A line whose effects cannot all be applied says its Fail line instead; with none, a line that only lacks
+    /// inventory room tells the player so (Feedback_InventoryFull) rather than closing without a word.
     /// </summary>
     void Say(Conversation conversation, string lineId, int chain)
     {
@@ -423,13 +425,13 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             return;
         }
 
-        if (!KnubotEffect.CanApplyAll(line.Effects, Context(conversation), effects))
+        if (!KnubotEffect.CanApplyAll(line.Effects, Context(conversation), effects, out bool lacksSpace))
         {
             logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "Knubot {0}: line '{1}' cannot run for char={2}: {3}; {4}",
                 conversation.Script.Id, lineId, conversation.Player.Identity.Instance, BlockingEffect(conversation, line),
                 line.Fail != null ? "saying '" + line.Fail + "'" : "closing (no Fail line)"));
-            Fail(conversation, line, chain);
+            Fail(conversation, line, chain, lacksSpace);
             return;
         }
 
@@ -453,8 +455,10 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
         return "needs " + plan.SlotsNeeded + " free inventory slots, has " + KnubotItems.FreeSlots(conversation.Player);
     }
 
-    void Fail(Conversation conversation, KnubotLine line, int chain)
+    void Fail(Conversation conversation, KnubotLine line, int chain, bool lacksSpace = false)
     {
+        if (lacksSpace && line.Fail == null)
+            ClientFeedback.Send(conversation.Player, "Feedback_InventoryFull");
         if (line.Fail != null)
             Say(conversation, line.Fail, chain + 1);
         else
@@ -594,16 +598,38 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
 
             if (next.Effect == null)
                 Finish(conversation, next.Line!, next.Chain);
-            else if (!KnubotEffect.TryApply(next.Effect, Context(conversation), effects))
+            else if (!TryApplyWithRest(conversation, next, out bool lacksSpace))
             {
                 // The player's state changed since the line started (full inventory, quest taken elsewhere):
                 // the rest of the line is dropped and its Fail line is said instead.
                 logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot {0}: {1} no longer applies on line '{2}' for char={3}",
                     conversation.Script.Id, next.Effect, next.Line!.Id, conversation.Player.Identity.Instance));
                 conversation.Packets.Clear();
-                Fail(conversation, next.Line, next.Chain);
+                Fail(conversation, next.Line, next.Chain, lacksSpace);
             }
         }
+    }
+
+    /// <summary>
+    /// Applies <paramref name="next"/>'s effect only if it and every effect still queued for the same line can still all
+    /// apply, as they were checked when the line started: a {take} never runs when the {completequest} after it would
+    /// now fail for room (the player filled the inventory while the line played).
+    /// </summary>
+    bool TryApplyWithRest(Conversation conversation, Outgoing next, out bool lacksSpace)
+    {
+        var rest = new List<KnubotEffect> { next.Effect! };
+        foreach (Outgoing queued in conversation.Packets)
+        {
+            if (queued.Effect != null && ReferenceEquals(queued.Line, next.Line) && queued.Chain == next.Chain)
+                rest.Add(queued.Effect);
+        }
+
+        KnubotContext context = Context(conversation);
+        if (!KnubotEffect.CanApplyAll(rest.ToArray(), context, effects, out lacksSpace))
+            return false;
+
+        next.Effect!.Apply(context, effects);
+        return true;
     }
 
     void Remove(Conversation conversation)
