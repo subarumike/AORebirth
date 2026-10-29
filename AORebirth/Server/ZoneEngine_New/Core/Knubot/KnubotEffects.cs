@@ -164,7 +164,8 @@ public sealed record KnubotOpenTrade : KnubotEffect
     public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => context.Script.Trades.Length != 0;
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)
-        => services.Trades.TryOpenKnubot(context.Player, context.Npc, KnubotService.TradeText(context.Npc));
+        => services.Trades.TryOpenKnubot(context.Player, context.Npc, KnubotService.TradeText(context.Npc),
+            context.Script.TradeSlots(context));
 }
 
 /// <summary>

@@ -262,7 +262,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             }
 
             conversation.LastActivityAt = _milliseconds();
-            effects.Trades.TryOpenKnubot(player, npc, TradeText(npc));
+            effects.Trades.TryOpenKnubot(player, npc, TradeText(npc), script.TradeSlots(Context(conversation)));
             return true;
         }
     }
@@ -300,7 +300,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
                 {
                     if (effects.Trades.TryGetSession(player, out TradeSession orphan) && orphan.Kind == TradeKind.Knubot
                         && orphan.Npc != null && orphan.Npc.Identity == target)
-                        effects.Trades.EndKnubot(player, orphan.Npc, decline ? 0 : credits, "no chat");
+                        effects.Trades.EndKnubot(player, orphan.Npc, decline ? 0 : credits, "no chat", clientRestored: decline);
                 }
             }
 
@@ -317,7 +317,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             int refund = decline ? 0 : credits;
             if (decline)
             {
-                effects.Trades.EndKnubot(player, npc, refund, "declined");
+                effects.Trades.EndKnubot(player, npc, refund, "declined", clientRestored: true);
                 return true;
             }
 
@@ -331,7 +331,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             KnubotContext context = Context(conversation);
             ZoneEngine_New.Core.Inventory.Item[] offered = session.InitiatorOffer.Items.Values.ToArray();
             KnubotTrade? trade = conversation.Script.Trades.FirstOrDefault(x => KnubotCondition.All(x.If, context) && x.Matches(offered, credits));
-            if (trade == null || !effects.Trades.TryCommitKnubot(player, npc, credits))
+            if (trade == null || !trade.ReturnItems && !effects.Trades.TryCommitKnubot(player, npc, credits))
             {
                 effects.Trades.EndKnubot(player, npc, refund, trade == null ? "no matching trade" : "commit failed");
                 // The items are back with the player; a script may have the NPC say why.
@@ -345,6 +345,9 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
 
                 return true;
             }
+            // Shown, not given: everything offered goes back, then the trade's line runs.
+            if (trade.ReturnItems)
+                effects.Trades.EndKnubot(player, npc, refund, "shown");
 
             logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot {0}: trade '{1}' taken from char={2}",
                 conversation.Script.Id, trade.Id, player.Identity.Instance));

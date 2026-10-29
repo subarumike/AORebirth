@@ -44,6 +44,12 @@ public sealed class KnubotTradeFile
     public KnubotTradeItemFile[] Items { get; set; } = [];
     public int Credits { get; set; }
 
+    /// <summary>
+    /// The NPC only looks: the trade matches as usual, then the items go back to the player as on a decline (Alex
+    /// Gibbs' FOUD, "You should hold onto that trinket").
+    /// </summary>
+    public bool ReturnItems { get; set; }
+
     /// <summary>A line id, <c>close</c>, or <c>opener</c>, as on a reply.</summary>
     public string Goto { get; set; } = string.Empty;
 }
@@ -151,6 +157,30 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
     /// <summary>Line id said when an accepted Give Item window matches no trade; null when the script has none.</summary>
     public string? TradeRefused { get; } = tradeRefused;
 
+    /// <summary>
+    /// Slots the Give Item window shows: what the trade the player can make now takes (one per item, a stack counted by
+    /// its size: Marcus Stone's stim hand-in is one slot), or the largest trade when none applies yet. A script with no
+    /// Trades (only a TradeRefused line) keeps the full window.
+    /// </summary>
+    public int TradeSlots(KnubotContext context)
+    {
+        if (Trades.Length == 0)
+            return Trade.TradeOffer.Capacity;
+
+        KnubotTrade[] open = Array.FindAll(Trades, x => KnubotCondition.All(x.If, context));
+        KnubotTrade[] sized = open.Length != 0 ? open : Trades;
+        int slots = 0;
+        foreach (KnubotTrade trade in sized)
+        {
+            int items = 0;
+            foreach (KnubotTradeItem item in trade.Items)
+                items += item.Count;
+            slots = Math.Max(slots, items);
+        }
+
+        return Math.Max(1, slots);
+    }
+
     /// <summary>A reply with no content behind it yet: the engine says a debug line and offers the same replies again.</summary>
     public bool IsDeadEnd(KnubotReply reply)
         => reply.Goto is not (CloseTarget or OpenerTarget) && !Lines.ContainsKey(reply.Goto);
@@ -167,7 +197,8 @@ public sealed record KnubotOpener(KnubotCondition[] If, KnubotCondition[] Any, s
 public sealed record KnubotReply(string Id, KnubotTextPiece[] Text, KnubotCondition[] If, string Goto);
 
 /// <summary><see cref="Id"/> is the trade's key in the script's Trades, for logs.</summary>
-public sealed record KnubotTrade(string Id, KnubotCondition[] If, KnubotTradeItem[] Items, int Credits, string Goto)
+public sealed record KnubotTrade(string Id, KnubotCondition[] If, KnubotTradeItem[] Items, int Credits, string Goto,
+    bool ReturnItems = false)
 {
     /// <summary>
     /// True when <paramref name="offered"/> is exactly this trade: every item counts toward one wanted hash, every

@@ -1254,7 +1254,8 @@ namespace ZoneEngine_New.Core.Trade
         /// at the index the client used, the first free one. Nothing is written until the trade commits, so an
         /// interrupted trade leaves every item at its stored location.
         /// </summary>
-        public bool TryOpenKnubot(Player player, NpcCharacter npc, string message)
+        /// <param name="slots">Item slots the Give Item window shows (1..<see cref="TradeOffer.Capacity"/>).</param>
+        public bool TryOpenKnubot(Player player, NpcCharacter npc, string message, int slots = TradeOffer.Capacity)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(npc);
@@ -1285,7 +1286,7 @@ namespace ZoneEngine_New.Core.Trade
                 Identity = player.Identity,
                 Unknown1 = 2,
                 Target = npc.Identity,
-                NumberOfItemSlotsInTradeWindow = TradeOffer.Capacity,
+                NumberOfItemSlotsInTradeWindow = Math.Clamp(slots, 1, TradeOffer.Capacity),
                 Message = string.IsNullOrWhiteSpace(message) ? "Trade" : message
             });
 
@@ -1393,7 +1394,7 @@ namespace ZoneEngine_New.Core.Trade
         /// <summary>
         /// The NPC keeps everything in the window and takes <paramref name="credits"/>, which the client already took
         /// off its own Cash when it accepted. Returns false when nothing changed hands; the caller then ends the
-        /// window with <see cref="EndKnubot(Player, NpcCharacter, int, string)"/>.
+        /// window with <see cref="EndKnubot(Player, NpcCharacter, int, string, bool)"/>.
         /// </summary>
         public bool TryCommitKnubot(Player player, NpcCharacter npc, int credits)
         {
@@ -1437,22 +1438,26 @@ namespace ZoneEngine_New.Core.Trade
         }
 
         /// <summary>Ends <paramref name="player"/>'s Knubot trade with <paramref name="npc"/>, handing everything back.</summary>
-        public void EndKnubot(Player player, NpcCharacter npc, int refundCredits, string reason)
+        /// <param name="clientRestored">The player declined: the client already put its window's items back.</param>
+        public void EndKnubot(Player player, NpcCharacter npc, int refundCredits, string reason, bool clientRestored = false)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(npc);
 
             if (TryGetKnubot(player, npc, out TradeSession session))
-                EndKnubot(session, refundCredits, reason);
+                EndKnubot(session, refundCredits, reason, clientRestored);
         }
 
         /// <summary>
         /// Hands every item back in window order, as the client does: each goes to the first free main-inventory
-        /// slot and is listed in KnuBotRejectedItems; one that no longer fits is left off the list (the client drops
-        /// its copy) and goes to overflow if it may. <paramref name="refundCredits"/> gives back what the client took
-        /// off its Cash when it accepted.
+        /// slot, or to overflow when the inventory is full, and is announced to the client as a grant.
+        /// <paramref name="refundCredits"/> gives back what the client took off its Cash when it accepted. On a decline
+        /// (<paramref name="clientRestored"/>) the client has already moved each item to the first free main-inventory
+        /// slot itself (Gamecode.dll 0x10067921, called by N3Msg_NPCChatEndTrade before it sends the decline), so
+        /// granting those again showed a duplicate; only items that went to overflow are sent, as a move from the
+        /// window.
         /// </summary>
-        void EndKnubot(TradeSession session, int refundCredits, string reason)
+        void EndKnubot(TradeSession session, int refundCredits, string reason, bool clientRestored = false)
         {
             if (session.Committing)
                 return;
@@ -1460,20 +1465,20 @@ namespace ZoneEngine_New.Core.Trade
             session.Committing = true;
             Player player = session.Initiator;
             TradeOffer offer = session.InitiatorOffer;
-            var returned = new List<KnuBotRejectedItem>(offer.Count);
-            var overflowed = new List<(Item Item, Container Page)>();
+            var returned = new List<(Item Item, Container Page)>(offer.Count);
+            var overflowed = new List<(Item Item, Container Page, int TradeSlot, int Slot)>();
             foreach (int tradeSlot in offer.Items.Keys.OrderBy(x => x).ToArray())
             {
                 Item item = offer.Remove(tradeSlot)!;
                 if (TryPlaceMain(player, item, out Container page, out int slot))
                 {
                     player.Inventory.MarkDirty(item, page, slot);
-                    returned.Add(RejectedItem(item));
+                    returned.Add((item, page));
                 }
                 else if (player.Inventory.TryPlace(item, out page, out slot))
                 {
                     player.Inventory.MarkDirty(item, page, slot);
-                    overflowed.Add((item, page));
+                    overflowed.Add((item, page, tradeSlot, slot));
                 }
                 else
                 {
@@ -1487,10 +1492,27 @@ namespace ZoneEngine_New.Core.Trade
             _flush.NotifyDirty(player);
             Unregister(player);
 
+            // Live sends KnuBotRejectedItems with an empty list (every captured trade end, 2026-09-29..10-01). Listing
+            // the items there left them invisible in the client until relog (Hacker Tool at the Shipping Manifest
+            // Terminal, cookie refused by Lolly, 2026-10-18), so each one is announced as a normal grant instead.
             if (session.Npc != null)
-                player.Session?.Send(RejectedItemsFrame(player, session.Npc, returned.ToArray(), Math.Max(0, refundCredits)));
-            foreach ((Item item, Container page) in overflowed)
-                SendGrant(player, item, page);
+                player.Session?.Send(RejectedItemsFrame(player, session.Npc, [], Math.Max(0, refundCredits)));
+            if (!clientRestored)
+            {
+                foreach ((Item item, Container page) in returned)
+                    SendGrant(player, item, page);
+            }
+
+            foreach ((Item item, Container page, int tradeSlot, int slot) in overflowed)
+            {
+                // On a decline the client still holds these in its window: retail moves each from the window into
+                // overflow (ContainerAddItem), as a declined player trade's overflow return does.
+                if (clientRestored)
+                    OverflowGrants.SendFromTrade(player, tradeSlot, slot);
+                else
+                    SendGrant(player, item, page);
+            }
+
             OverflowGrants.Trim(player);
 
             _logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot trade closed player={0} returned={1} overflow={2} reason={3}",
@@ -1524,11 +1546,6 @@ namespace ZoneEngine_New.Core.Trade
             removeFrom?.Add(removeSlot, item);
             return false;
         }
-
-        /// <summary>How the client finds the item in its window: instanced items by identity, others by template and QL.</summary>
-        static KnuBotRejectedItem RejectedItem(Item item) => item.Identity.Type != IdentityType.None
-            ? new KnuBotRejectedItem { LowId = (int)item.Identity.Type, HighId = item.Identity.Instance, Quality = -1 }
-            : new KnuBotRejectedItem { LowId = item.LowId, HighId = item.HighId, Quality = item.Quality };
 
         static KnuBotRejectedItemsMessage RejectedItemsFrame(Player player, NpcCharacter npc, KnuBotRejectedItem[] items, int credits)
             => new()

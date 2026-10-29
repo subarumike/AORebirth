@@ -453,7 +453,7 @@ public sealed class KnubotCatalog
             foreach (string error in tradeErrors)
                 errors.Add("trade '" + pair.Key + "': " + error);
 
-            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target));
+            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target, source.ReturnItems));
         }
 
         foreach (KnubotLine line in lines.Values)
