@@ -1,0 +1,39 @@
+# This file holds all the timelines available at this time.
+# All lines starting with # is ignored by parser...
+#
+
+STARTINFO
+description     =       Rubi-Ka
+displayname     =       Rubi-Ka
+connect         =       cm.d1.funcom.com
+ports           =       7505
+url             =
+version         =       18.8.62
+ENDINFO
+
+STARTINFO
+description     =       Rubi-Ka 2019
+displayname     =       Rubi-Ka 2019
+connect         =       cm.d1.funcom.com
+ports           =       7506
+url             =
+version         =       18.8.62
+ENDINFO
+
+STARTINFO
+description     =       AORebirth
+displayname     =       AORebirth
+connect         =       2.24.96.30
+ports           =       7500
+url             =
+version         =       18.8.62
+ENDINFO
+
+STARTINFO
+description     =       AORebirth Local
+displayname     =       AORebirth Local
+connect         =       127.0.0.1
+ports           =       7500
+url             =
+version         =       18.8.62
+ENDINFO

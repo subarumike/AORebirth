@@ -1,12 +1,15 @@
 #include "login_key_patch.h"
 #include "logging.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
 #include <bcrypt.h>
 
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <cwctype>
 #include <string>
@@ -30,6 +33,9 @@ namespace aorf
         constexpr unsigned long AoRebirthLocalIpClientArgumentOrder =
             (1ul << 24) | 127ul;
         constexpr unsigned long AoRebirthLoginPort = 7500;
+        // More login servers that take the AORebirth key, one "host:port" a line (# comments), in aorebirth-patch\
+        // beside this DLL: private servers run from AORebirth (AO-Andersson's setup writes its own server there).
+        constexpr wchar_t ListedServersFile[] = L"aorebirth-patch\\servers.txt";
 
         enum class Policy
         {
@@ -282,6 +288,175 @@ namespace aorf
                  endpoint.ip == AoRebirthLocalIpHostOrder ||
                  endpoint.ip == AoRebirthLocalIpClientArgumentOrder) &&
                 endpoint.port == AoRebirthLoginPort;
+        }
+
+        struct ListedServer
+        {
+            std::string host;
+            unsigned long port;
+        };
+
+        // The lines of servers.txt: "host:port"; blank lines, # comments and anything malformed are skipped.
+        std::vector<ListedServer> ParseListedServers(const std::string& text)
+        {
+            std::vector<ListedServer> servers;
+            size_t start = 0;
+            while (start < text.size())
+            {
+                size_t end = text.find('\n', start);
+                if (end == std::string::npos)
+                {
+                    end = text.size();
+                }
+
+                std::string line = text.substr(start, end - start);
+                start = end + 1;
+                const size_t comment = line.find('#');
+                if (comment != std::string::npos)
+                {
+                    line.erase(comment);
+                }
+
+                const char* space = " \t\r";
+                const size_t first = line.find_first_not_of(space);
+                if (first == std::string::npos)
+                {
+                    continue;
+                }
+
+                line = line.substr(first, line.find_last_not_of(space) - first + 1);
+                const size_t colon = line.rfind(':');
+                if (colon == std::string::npos || colon == 0 || colon + 1 == line.size() ||
+                    line.size() - colon - 1 > 5 ||
+                    line.find_first_not_of("0123456789", colon + 1) != std::string::npos)
+                {
+                    continue;
+                }
+
+                const unsigned long port = std::strtoul(line.c_str() + colon + 1, nullptr, 10);
+                if (port == 0 || port > 65535)
+                {
+                    continue;
+                }
+
+                servers.push_back({ line.substr(0, colon), port });
+            }
+
+            return servers;
+        }
+
+        bool ReadListedServersFile(std::string& text, std::wstring& path)
+        {
+            HMODULE self = nullptr;
+            if (!GetModuleHandleExW(
+                    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                    reinterpret_cast<LPCWSTR>(&ParseListedServers),
+                    &self))
+            {
+                return false;
+            }
+
+            wchar_t module[MAX_PATH] = {};
+            const DWORD length = GetModuleFileNameW(self, module, MAX_PATH);
+            if (length == 0 || length >= MAX_PATH)
+            {
+                return false;
+            }
+
+            path.assign(module, length);
+            path.erase(path.find_last_of(L"\\/") + 1);
+            path += ListedServersFile;
+
+            HANDLE file = CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+            if (file == INVALID_HANDLE_VALUE)
+            {
+                return false;
+            }
+
+            char buffer[4096];
+            DWORD read = 0;
+            text.clear();
+            while (text.size() < 65536 && ReadFile(file, buffer, sizeof(buffer), &read, nullptr) && read > 0)
+            {
+                text.append(buffer, read);
+            }
+
+            CloseHandle(file);
+            return true;
+        }
+
+        // Whether the launch endpoint is one of servers.txt's: the same port, and the host resolving to the address
+        // the launcher passed (it resolves the dimension's host itself; either byte order, as above). Winsock is
+        // loaded here rather than imported, like daily_login_routing.cpp.
+        bool IsListedServerEndpoint(const LaunchEndpoint& endpoint)
+        {
+            std::string text;
+            std::wstring path;
+            if (!ReadListedServersFile(text, path))
+            {
+                return false;
+            }
+
+            const std::vector<ListedServer> servers = ParseListedServers(text);
+            Log("LOGINKEY listed servers=%zu file=%ls", servers.size(), path.c_str());
+            if (servers.empty())
+            {
+                return false;
+            }
+
+            using FnWSAStartup = int(WSAAPI*)(WORD, LPWSADATA);
+            using FnGetAddrInfo = int(WSAAPI*)(PCSTR, PCSTR, const ADDRINFOA*, PADDRINFOA*);
+            using FnFreeAddrInfo = void(WSAAPI*)(PADDRINFOA);
+            HMODULE ws2 = LoadLibraryW(L"ws2_32.dll");
+            auto wsaStartup = ws2 ? reinterpret_cast<FnWSAStartup>(GetProcAddress(ws2, "WSAStartup")) : nullptr;
+            auto getAddrInfo = ws2 ? reinterpret_cast<FnGetAddrInfo>(GetProcAddress(ws2, "getaddrinfo")) : nullptr;
+            auto freeAddrInfo = ws2 ? reinterpret_cast<FnFreeAddrInfo>(GetProcAddress(ws2, "freeaddrinfo")) : nullptr;
+            WSADATA wsa = {};
+            if (!wsaStartup || !getAddrInfo || !freeAddrInfo || wsaStartup(MAKEWORD(2, 2), &wsa) != 0)
+            {
+                Log("LOGINKEY listed reason=ws2_unavailable");
+                return false;
+            }
+
+            // No WSACleanup: winsock stays initialised for the game, which uses it anyway.
+            for (const ListedServer& server : servers)
+            {
+                if (server.port != endpoint.port)
+                {
+                    continue;
+                }
+
+                ADDRINFOA hints = {};
+                hints.ai_family = AF_INET;
+                hints.ai_socktype = SOCK_STREAM;
+                PADDRINFOA result = nullptr;
+                const int error = getAddrInfo(server.host.c_str(), nullptr, &hints, &result);
+                if (error != 0)
+                {
+                    Log("LOGINKEY listed host=%s resolve=FAIL code=%d", server.host.c_str(), error);
+                    continue;
+                }
+
+                bool match = false;
+                for (PADDRINFOA address = result; address && !match; address = address->ai_next)
+                {
+                    const unsigned long network =
+                        reinterpret_cast<const sockaddr_in*>(address->ai_addr)->sin_addr.S_un.S_addr;
+                    const unsigned long host =
+                        ((network & 0xfful) << 24) | ((network & 0xff00ul) << 8) |
+                        ((network >> 8) & 0xff00ul) | (network >> 24);
+                    match = endpoint.ip == host || endpoint.ip == network;
+                }
+
+                freeAddrInfo(result);
+                if (match)
+                {
+                    Log("LOGINKEY listed host=%s port=%lu match=YES", server.host.c_str(), server.port);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         std::string Hex(const std::vector<unsigned char>& bytes)
@@ -610,7 +785,15 @@ namespace aorf
                     return 0;
                 }
 
-                if (!IsAoRebirthEndpoint(endpoint))
+                if (IsAoRebirthEndpoint(endpoint))
+                {
+                    Log("LOGINKEY patch=ARMED reason=auto_endpoint_aorebirth port=%lu", endpoint.port);
+                }
+                else if (IsListedServerEndpoint(endpoint))
+                {
+                    Log("LOGINKEY patch=ARMED reason=auto_endpoint_listed port=%lu", endpoint.port);
+                }
+                else
                 {
                     Log(
                         "LOGINKEY patch=SKIP reason=auto_endpoint_not_aorebirth ipFormat=%s port=%lu",
@@ -618,8 +801,6 @@ namespace aorf
                         endpoint.port);
                     return 0;
                 }
-
-                Log("LOGINKEY patch=ARMED reason=auto_endpoint_aorebirth port=%lu", endpoint.port);
             }
 
             bool completed[sizeof(Targets) / sizeof(Targets[0])] = {};
@@ -749,6 +930,15 @@ namespace aorf
             }
 
             if (TryParseLaunchEndpoint(L"anarchyonline.exe DUmissing", endpoint))
+            {
+                return false;
+            }
+
+            const std::vector<ListedServer> listed = ParseListedServers(
+                "# servers\r\n ao.example.net:7500 \r\n\r\n10.0.0.5:7501 # lan\nbad\nnoport:\n:7500\nhost:99999\nhost:12x\n");
+            if (listed.size() != 2 ||
+                listed[0].host != "ao.example.net" || listed[0].port != 7500 ||
+                listed[1].host != "10.0.0.5" || listed[1].port != 7501)
             {
                 return false;
             }
