@@ -37,11 +37,11 @@ CONFIG_OVERRIDES = {"AORebirth/Config/Config.xml", "AORebirth/Config/ChatEngine.
 PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChestSeasonalExclusions.json", "Loot/MissionChestSpecialExclusions.json"}
 # Named catalog loaders and GameDataPaths; no extension-only root admission.
 RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ComboNames.json
-DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json
+DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json GoverningForms.json
 ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterData.json
 MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json PerkActions.json
 Perks.json PetReplies.json PetTypes.json Quests.json QuestRewards.json Research.json Respawn.json
-SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json Tradeskills.json VendingMachines.json
+SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Tradeskills.json VendingMachines.json
 WaterExits.json Xp.json""".split())
 RUNTIME_MISSION_FILES = frozenset("""Locations.json Text.json RollPolicy.json RollMixes.json
 RollTemplate.json RollBodies.json RewardObservations.json RareLoot.json RareLootChancePercent.json
