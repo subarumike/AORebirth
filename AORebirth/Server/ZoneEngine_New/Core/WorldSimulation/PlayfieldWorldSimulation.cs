@@ -825,6 +825,10 @@
                 if (!ReferenceEquals(player.Playfield, source) || player.Session is not IZoneSession { IsTransferring: false } current)
                     return;
 
+                // Refused before the way back and the route save point are written, so they keep pointing here.
+                if (destination.RefuseArrivalWithoutCollision(player))
+                    return;
+
                 WriteProxyReturn(player, source.Identity.Instance, crossing.Trigger);
                 StoreRouteSavePoint(player, destPlayfieldId, crossing);
                 if (crossing.Trigger.RecordsReturn

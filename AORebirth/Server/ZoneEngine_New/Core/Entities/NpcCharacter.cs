@@ -24,7 +24,7 @@ namespace ZoneEngine_New.Core.Entities
     /// </summary>
     public class NpcCharacter : Character, IUsableDynel
     {
-        public const int EquipmentCapacity = 50;
+        public const int EquipmentCapacity = 999;
 
         readonly IItemBuilder _items;
         readonly Dictionary<int, string> _equipmentSawHashes = new();

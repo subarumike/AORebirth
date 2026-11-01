@@ -64,8 +64,9 @@ namespace AORebirth.Database.Domain.CharacterCreation
                     throw new InvalidDataException(_path + ": invalid start package JSON.", exception);
                 }
 
-                if (document == null || document.Packages == null || document.Packages.Length == 0)
-                    throw InvalidCatalog("packages must be a nonempty array.");
+                // An empty list, or a profession left out, gives that profession no start kit.
+                if (document == null || document.Packages == null)
+                    throw InvalidCatalog("packages must be an array (it may be empty).");
 
                 var packages = new List<CharacterStartProfessionPackage>(document.Packages.Length);
                 var professions = new HashSet<int>();
@@ -119,12 +120,6 @@ namespace AORebirth.Database.Domain.CharacterCreation
                             row.Evidence ?? string.Empty,
                             items,
                             nanos));
-                }
-
-                foreach (Profession profession in Enum.GetValues(typeof(Profession)))
-                {
-                    if (IsPlayerProfession((int)profession) && !professions.Contains((int)profession))
-                        throw InvalidCatalog("Missing start package for professionId=" + (int)profession + ".");
                 }
 
                 _cached = new CharacterStartPackageCatalog(packages);

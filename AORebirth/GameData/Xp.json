@@ -1,4 +1,8 @@
 {
+    "NoKillXpFamilies": [
+        { "Family": 0, "Note": "Guards and civilians" },
+        { "Family": 219, "Note": "Unicorns, Dust Brigade barrier generators, Containment Unit, Strange Mist" }
+    ],
     "1": {
        "KillAward": 109,
        "NextLevelXp": 1450,

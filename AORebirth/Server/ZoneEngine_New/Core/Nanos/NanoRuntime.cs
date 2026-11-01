@@ -105,7 +105,10 @@ namespace ZoneEngine_New.Core.Nanos
             }
         }
 
-        /// <summary>Death empties NCU and drops a cast in flight, ignoring CanCancel.</summary>
+        /// <summary>
+        /// Death empties NCU, except the <see cref="NanoSpell.SurvivesDeath"/> (DontRemoveOnDeath) entries, and drops a
+        /// cast in flight, ignoring CanCancel.
+        /// </summary>
         public static void ClearBuffsOnDeath(Character character)
         {
             ArgumentNullException.ThrowIfNull(character);
@@ -114,7 +117,7 @@ namespace ZoneEngine_New.Core.Nanos
             character.CancelNanoCast();
             if (cast != null)
                 CastResolved(character, cast, PlayerActionOutcome.Interrupted, detail: "caster died");
-            List<Buff> removed = character.RemoveAllBuffs(BuffRemovalReason.Death);
+            List<Buff> removed = character.RemoveBuffs(static buff => !buff.SurvivesDeath);
             for (int i = 0; i < removed.Count; i++)
                 AnnounceBuffRemoved(character, removed[i]);
         }

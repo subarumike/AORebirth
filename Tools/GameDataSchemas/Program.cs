@@ -35,11 +35,42 @@ Write("QuestRewards", "Quest rewards: the items a Quests.json reward hash gives,
     typeof(Dictionary<,>).MakeGenericType(typeof(string), rewardFile), LoaderOptions(typeof(QuestRewardTable)));
 Write("Quests", "Quests: Quests.json quest templates, a list keyed by Hash.", nameof(QuestTemplate),
     typeof(List<QuestTemplate>), LoaderOptions(typeof(QuestTemplate)));
+// Xp.json: level rows keyed by level number, plus the NoKillXpFamilies list beside them.
+Type xpLevelRow = typeof(GameDataStore).GetNestedType("XpLevelRow", BindingFlags.NonPublic)
+    ?? throw new InvalidOperationException("GameDataStore.XpLevelRow not found.");
+JsonSerializerOptions xpOptions = LoaderOptions(typeof(NoKillXpFamilyCatalog));
+Emit("Xp", "XP table: the level rows, keyed by level, and the NPC families whose kills give no XP.",
+    "GameDataStore.XpLevelRow and NoKillXpFamilyCatalog.FamilyRow", new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            [NoKillXpFamilyCatalog.PropertyName] = Refine(
+                xpOptions.GetJsonSchemaAsNode(typeof(List<NoKillXpFamilyCatalog.FamilyRow>), Exporter())),
+        },
+        ["patternProperties"] = new JsonObject { ["^[1-9][0-9]*$"] = xpOptions.GetJsonSchemaAsNode(xpLevelRow, Exporter()) },
+        ["additionalProperties"] = false,
+    });
 return 0;
 
-void Write(string name, string title, string source, Type type, JsonSerializerOptions options)
+// NoKillXpFamilies: Family is required and an NPCFamily value, 0 or more.
+static JsonNode Refine(JsonNode list)
 {
-    var exporter = new JsonSchemaExporterOptions
+    if (list["items"] is JsonObject item && item["properties"] is JsonObject properties)
+    {
+        item["required"] = new JsonArray("Family");
+        properties["Family"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0, ["description"] = "NPCFamily (stat 455)." };
+    }
+
+    return list;
+}
+
+void Write(string name, string title, string source, Type type, JsonSerializerOptions options)
+    => Emit(name, title, source, options.GetJsonSchemaAsNode(type, Exporter()));
+
+JsonSchemaExporterOptions Exporter()
+{
+    return new JsonSchemaExporterOptions
     {
         TreatNullObliviousAsNonNullable = true,
         // A misspelt property loads as nothing at all; flag it in the editor.
@@ -65,8 +96,10 @@ void Write(string name, string title, string source, Type type, JsonSerializerOp
             return node;
         },
     };
+}
 
-    JsonNode schema = options.GetJsonSchemaAsNode(type, exporter);
+void Emit(string name, string title, string source, JsonNode schema)
+{
     if (schema is JsonObject root)
     {
         var ordered = new JsonObject

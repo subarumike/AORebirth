@@ -1064,16 +1064,27 @@ namespace ZoneEngine_New.Core.Entities
             return present;
         }
 
+        /// <summary>
+        /// Whether an NPC of <paramref name="npcFamily"/> (the raw stat) gives no regular kill XP: the Xp.json list when
+        /// the zone has the catalog, else Gameplay.json's. An unset NPCFamily is not family 0.
+        /// </summary>
+        public static bool GivesNoKillXp(NoKillXpFamilyCatalog? catalog, GameplayXp xpRules, int npcFamily)
+        {
+            if (StatCollection.IsUnset(npcFamily))
+                return false;
+            return catalog != null ? catalog.GivesNoKillXp(npcFamily) : xpRules.GivesNoKillXp(npcFamily);
+        }
+
         void AwardRegularXp(Playfield playfield, IReadOnlyList<int> present)
         {
             if (IsPlayer)
                 return;
 
-            // Guards and civilians (Gameplay.json xp.noKillXpNpcFamilies, family 0) are worth nothing, grey XP included.
-            // Only an NPCFamily the template actually carries counts; an unset stat is not family 0.
+            // Guards and civilians (family 0) and the other Xp.json NoKillXpFamilies are worth nothing, grey XP included.
+            // Read per kill, so a reload applies from the next kill. Only an NPCFamily the template actually carries
+            // counts; an unset stat is not family 0.
             GameplayXp xpRules = playfield.GetService<GameplaySettings>()?.Xp ?? new GameplayXp();
-            int npcFamily = Stats.Get(CharacterStat.NPCFamily);
-            if (!StatCollection.IsUnset(npcFamily) && xpRules.GivesNoKillXp(npcFamily))
+            if (GivesNoKillXp(playfield.GetService<NoKillXpFamilyCatalog>(), xpRules, Stats.Get(CharacterStat.NPCFamily)))
                 return;
 
             IGameData gameData = playfield.GetRequiredService<IGameData>();
@@ -2793,8 +2804,12 @@ namespace ZoneEngine_New.Core.Entities
                 Operator.HasFormula => UploadedNanoIds.Contains(value),
                 Operator.HasNotFormula => !UploadedNanoIds.Contains(value),
                 // Gamecode.dll FUN_100065d8 case 0x70: fails when the playfield forbids flying
-                // ("FlyingMustMeAllowedOnThePlayfield"). Hoverboards (Phasefront 281569), Yalmahas, wings.
+                // ("FlyingMustMeAllowedOnThePlayfield"). Hoverboards (Phasefront 281569), Yalmahas, wings. The server also
+                // refuses indoors and in the Shadowlands (PlayfieldEntryFlags.IsFlyingAllowed).
                 Operator.FlyingAllowed => PlayfieldEntryFlags.IsFlyingAllowed(Playfield?.MetaData),
+                // Gamecode.dll FUN_100588c4 (case 0x7c): the client refuses while dead or mid-teleport from its own
+                // character state before it sends the use; the server needs the character alive on a playfield.
+                Operator.MustBeAbleToTeleport => !IsDead && Playfield != null,
                 _ => null
             };
         }

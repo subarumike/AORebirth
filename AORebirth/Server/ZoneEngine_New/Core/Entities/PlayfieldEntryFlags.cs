@@ -43,8 +43,15 @@ namespace ZoneEngine_New.Core.Entities
         public static int ExpansionPlayfield(PlayfieldMetaData? metaData)
             => metaData != null && (metaData.UnknownV9A & ShadowlandsMetaDataBit) != 0 ? 1 : 0;
 
-        /// <summary>FlyingAllowed: the playfield's metadata does not forbid flying. No metadata fails closed.</summary>
+        /// <summary>
+        /// FlyingAllowed: outdoors, outside the Shadowlands, on a playfield whose metadata does not forbid flying. The
+        /// client's own check reads only the no-fly bit, which most indoor playfields (the Grid 152 among them) leave
+        /// clear; flying indoors or in the Shadowlands is a server rule. No metadata fails closed.
+        /// </summary>
         public static bool IsFlyingAllowed(PlayfieldMetaData? metaData)
-            => metaData != null && (metaData.PlayfieldTypeBits & NoFlyingMetaDataBit) == 0;
+            => metaData != null
+               && !metaData.IsIndoor
+               && ExpansionPlayfield(metaData) == 0
+               && (metaData.PlayfieldTypeBits & NoFlyingMetaDataBit) == 0;
     }
 }

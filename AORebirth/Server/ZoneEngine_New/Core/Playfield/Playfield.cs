@@ -22,6 +22,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Metrics;
@@ -323,6 +324,30 @@ namespace ZoneEngine_New.Core.Playfield
         /// <summary>Optional world simulation assigned by <see cref="ACGPlayfield.Build"/>.</summary>
         public WorldSimulationAccess WorldAccess =>
             _serviceProvider.GetRequiredService<WorldSimulationAccess>();
+
+        /// <summary>
+        /// False when the playfield built with no collision at all (no terrain, no surfaces, no dungeon rooms): a
+        /// character sent there has nothing to stand on, so movers refuse the trip (<see cref="RefuseArrivalWithoutCollision"/>).
+        /// </summary>
+        public bool HasCollision => WorldAccess.Instance?.Surface != null;
+
+        /// <summary>
+        /// True, after telling <paramref name="player"/> and logging it, when this playfield has no collision and the
+        /// move here must not start. False when the playfield can be entered.
+        /// </summary>
+        public bool RefuseArrivalWithoutCollision(Player player)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (HasCollision)
+                return false;
+
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                "Refused transfer of character {0} to playfield {1} (resource {2}): it has no collision geometry",
+                player.Identity.Instance, Identity.Instance, ResourceId));
+            ClientFeedback.SendFormatted(player, ClientFeedback.PlainText,
+                "This area did not load properly and can't be entered right now.");
+            return true;
+        }
 
         protected void RegisterWorldServices(WorldSimulation.PlayfieldWorldSimulation world)
         {

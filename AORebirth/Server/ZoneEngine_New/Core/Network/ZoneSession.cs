@@ -352,6 +352,10 @@ namespace ZoneEngine_New.Core.Network
             ArgumentNullException.ThrowIfNull(destination);
             ArgumentNullException.ThrowIfNull(landing);
             ArgumentNullException.ThrowIfNull(heading);
+            // Nothing to stand on there: the character would hang in the air, unable to cast. Stay put instead.
+            if (Player is { } mover && destination.RefuseArrivalWithoutCollision(mover))
+                return false;
+
             PlayfieldAdmission? destinationAdmission = destination.TryAcquireAdmission()
                 ?? throw new ObjectDisposedException(nameof(destination));
             try

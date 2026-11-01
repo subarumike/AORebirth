@@ -27,17 +27,9 @@ namespace LoginEngine.CharacterCreation
 
         public static CharacterStartProfessionPackage RequirePackage(int professionId)
         {
-            CharacterStartProfessionPackage package = ResolvePackages().TryGetPackage(professionId);
-            if (package == null)
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "No start package for professionId={0}",
-                        professionId));
-            }
-
-            return package;
+            // A profession StartPackages.json leaves out starts with nothing.
+            return ResolvePackages().TryGetPackage(professionId)
+                ?? new CharacterStartProfessionPackage(professionId, string.Empty, string.Empty, null, null);
         }
 
         public static void Apply(int characterId, CharacterStartProfessionPackage package,

@@ -207,7 +207,9 @@ namespace AORebirth.Tools.RDBDataExtractor
         /// Outdoor playfields store their static geometry as one SurfaceResource per locality cell,
         /// keyed <c>(playfieldId &lt;&lt; 16) | cellId</c>, so the record whose id is the bare
         /// playfield id usually does not exist. Enumerate the RDB index for the whole id range
-        /// instead of guessing which cells are populated.
+        /// instead of guessing which cells are populated. Cell 0 is kept: indoor and dungeon-style
+        /// playfields key room meshes by room index, so room 0 (the only room of a one-room interior
+        /// such as the superior market shops 1189-1193) lives at <c>(playfieldId &lt;&lt; 16) | 0</c>.
         /// </summary>
         private List<PlayfieldSurfaceEntry> CollectCellSurfaces(int playfieldId)
         {
@@ -219,7 +221,7 @@ namespace AORebirth.Tools.RDBDataExtractor
             List<int> recordIds = new List<int>();
             foreach (int recordId in this.controller.RecordTypeToId[surfaceType].Keys)
             {
-                if ((recordId >> 16) == playfieldId && (recordId & 0xFFFF) != 0)
+                if ((recordId >> 16) == playfieldId)
                     recordIds.Add(recordId);
             }
 

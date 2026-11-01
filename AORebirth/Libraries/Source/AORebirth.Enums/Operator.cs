@@ -261,6 +261,12 @@ namespace AORebirth.Enums
         MustBeCastersPet = 118,
 
         /// <summary>
+        /// The user can teleport now (client ConvertCriteria "MustBeAbleToTeleport", Gamecode.dll FUN_100588c4). On the
+        /// ToUse of teleport nanos (Fixer grid 142712, NT teleports 227421), breed/gender changes and recall beacons.
+        /// </summary>
+        MustBeAbleToTeleport = 124,
+
+        /// <summary>
         /// The user, its pets, its team or their pets are fighting (client "MustAlliedCombat"; the client's own
         /// evaluator passes it, the server decides).
         /// </summary>

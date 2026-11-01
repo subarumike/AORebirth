@@ -911,6 +911,9 @@ namespace ZoneEngine_New.Core.Playfield
                     acg.World?.RegisterExitProxyDoor(command.Envelope.ExitProxyDoor);
             }
 
+            // Fly the playfield no longer allows ends before FullCharacter reports the movement mode.
+            player.Motor.RefreshFlightAuthority();
+
             Metrics.TickStallWatch.Stage("arrive.self", characterId);
             session.State = SessionState.SpawnReady;
             // InitiateCompression + ChatServerInfo + PlayfieldAnarchyF + GameTime are sent from ZoneLoginHandler.
@@ -1387,6 +1390,9 @@ namespace ZoneEngine_New.Core.Playfield
             Nanos.NanoRuntime.StripPlayshiftFailures(player);
             // Worn items go ineffective (or work again) by the same requirements.
             ZoneEngine_New.Core.Inventory.PlayshiftItems.Refresh(player);
+            // A flyer that just went ineffective (a Yalmaha in the Shadowlands) leaves Fly now, not on the next tick: the
+            // FullCharacter the client gets carries CurrentMovementMode, and Fly there keeps the client flying.
+            player.Motor.RefreshFlightAuthority();
             _playfield.GetRequiredService<Pets.PetService>().ArriveWithOwner(player);
             player.SaveState.MarkDirty();
             // The next trigger sample has to start at this landing. Keeping the position from

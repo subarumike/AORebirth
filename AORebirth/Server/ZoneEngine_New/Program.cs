@@ -379,6 +379,8 @@ namespace ZoneEngine_New
             services.AddSingleton<ZoneEngine_New.Core.GameData.IReloadableGameData, ZoneEngine_New.Core.GameData.ItemTemplatesReload>();
             services.AddSingleton<ZoneEngine_New.Core.GameData.IReloadableGameData, ZoneEngine_New.Core.GameData.KnubotReload>();
             services.AddSingleton<ZoneEngine_New.Core.GameData.IReloadableGameData, ZoneEngine_New.Core.Quests.QuestRewardsReload>();
+            services.AddSingleton<ZoneEngine_New.Core.GameData.NoKillXpFamilyCatalog>();
+            services.AddSingleton<ZoneEngine_New.Core.GameData.IReloadableGameData, ZoneEngine_New.Core.GameData.NoKillXpFamiliesReload>();
             services.AddSingleton<ZoneEngine_New.Core.GameData.GameDataReloadRegistry>();
 
             //Commands

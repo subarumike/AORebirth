@@ -82,6 +82,21 @@ namespace ZoneEngine_New.Core.Inventory
         public IEnumerable<KeyValuePair<int, Item>> EnumerateSlots()
         {
             int last = Offset + Capacity;
+            // A large, mostly empty container (an NPC's 999-slot equipment) walks only its occupied slots, in slot order.
+            if (Content.Count * 8 < Capacity)
+            {
+                int[] slots = new int[Content.Count];
+                Content.Keys.CopyTo(slots, 0);
+                Array.Sort(slots);
+                foreach (int slot in slots)
+                {
+                    if (slot >= Offset && slot < last && Content.TryGetValue(slot, out Item? held) && held != null)
+                        yield return new KeyValuePair<int, Item>(slot, held);
+                }
+
+                yield break;
+            }
+
             for (int slot = Offset; slot < last; slot++)
             {
                 if (Content.TryGetValue(slot, out Item? item) && item != null)

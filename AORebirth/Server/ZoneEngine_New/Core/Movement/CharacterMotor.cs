@@ -903,7 +903,13 @@ namespace ZoneEngine_New.Core.Movement
             if (_npc != null)
                 SettleNpcVehicle();
             else if (surface == null)
+            {
+                // No collision to fall onto (the playfield has no surface geometry): the body holds its altitude, as
+                // HoldOverVoid does over a hole, instead of staying airborne forever and refusing nanos as falling.
+                if (_sim.Airborne)
+                    _sim.LandNow(_sim.Position.Y);
                 return;
+            }
 
             bool idle = !HasPath
                 && _followTarget == null
@@ -1234,8 +1240,8 @@ namespace ZoneEngine_New.Core.Movement
         }
 
         // A running CanFly effect (StatModifierSpells: IsVehicle reads 1 while the nano runs or the item is worn) on a
-        // playfield that allows flying (the FlyingAllowed criterion: metadata no-fly bit clear, which covers all of the
-        // Shadowlands). A client mode request cannot grant this authority. Checked every tick and on each movement
+        // playfield that allows flying (the FlyingAllowed criterion: outdoors, not the Shadowlands, metadata no-fly bit
+        // clear). A client mode request cannot grant this authority. Checked every tick and on each movement
         // action, not on each transient Bonus clear during equipment/nano rebasing.
         bool HasFlightAuthority() => _character.Stats.GetOrZero(CharacterStat.IsVehicle) == 1
             && (_character.Playfield != null

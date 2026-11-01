@@ -47,6 +47,7 @@ namespace ZoneEngine_New.Core.Nanos
             IgnoresNcu = (nanoFlags & NanoFlags.NoRemoveNoNCUFriendly) != 0;
             RemovesOnZone = (nanoFlags & NanoFlags.IsBuff) != 0
                 && (nanoFlags & NanoFlags.RemoveOnZone) == NanoFlags.RemoveOnZone;
+            SurvivesDeath = (nanoFlags & NanoFlags.DontRemoveOnDeath) != 0;
             IsSelfOnly = (can & CanFlags.ApplyOnSelf) != 0 || AllFunctionsApplyToCaster();
         }
 
@@ -138,6 +139,9 @@ namespace ZoneEngine_New.Core.Nanos
 
         /// <summary>An IsBuff nano with <see cref="NanoFlags.RemoveOnZone"/>: it ends on a playfield change.</summary>
         public bool RemovesOnZone { get; }
+
+        /// <summary><see cref="NanoFlags.DontRemoveOnDeath"/>: the NCU entry stays when its owner dies (239825).</summary>
+        public bool SurvivesDeath { get; }
 
         /// <summary>Friendly buffs that occupy NCU. Hostile and NoRemoveNoNCUFriendly do not.</summary>
         public bool ConsumesNcu => !IsHostile && !IgnoresNcu;

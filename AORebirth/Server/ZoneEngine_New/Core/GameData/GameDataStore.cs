@@ -813,10 +813,24 @@ namespace ZoneEngine_New.Core.GameData
 
             try
             {
-                Dictionary<string, XpLevelRow>? loaded =
-                    JsonSerializer.Deserialize<Dictionary<string, XpLevelRow>>(
+                // Level rows are keyed by level; other keys (NoKillXpFamilies) belong to other readers.
+                Dictionary<string, JsonElement>? file =
+                    JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
                         File.ReadAllText(path),
                         CatalogJsonOptions);
+                Dictionary<string, XpLevelRow?>? loaded = null;
+                if (file != null)
+                {
+                    loaded = new Dictionary<string, XpLevelRow?>(file.Count);
+                    foreach (KeyValuePair<string, JsonElement> pair in file)
+                    {
+                        if (string.Equals(pair.Key, NoKillXpFamilyCatalog.PropertyName, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        loaded[pair.Key] = pair.Value.ValueKind == JsonValueKind.Object
+                            ? pair.Value.Deserialize<XpLevelRow>(CatalogJsonOptions)
+                            : null;
+                    }
+                }
                 if (loaded == null)
                 {
                     _logger.Warn(
@@ -829,17 +843,17 @@ namespace ZoneEngine_New.Core.GameData
 
                 var parsed = new List<(int Level, XpLevelRow Row)>();
                 int skipped = 0;
-                foreach (KeyValuePair<string, XpLevelRow> pair in loaded)
+                foreach (KeyValuePair<string, XpLevelRow?> pair in loaded)
                 {
                     if (!int.TryParse(pair.Key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int level)
                         || level <= 0
-                        || pair.Value == null)
+                        || pair.Value is not XpLevelRow row)
                     {
                         skipped++;
                         continue;
                     }
 
-                    parsed.Add((level, pair.Value));
+                    parsed.Add((level, row));
                 }
 
                 parsed.Sort((left, right) => left.Level.CompareTo(right.Level));

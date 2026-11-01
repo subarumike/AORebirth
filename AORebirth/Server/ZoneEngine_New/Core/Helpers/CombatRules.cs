@@ -75,6 +75,11 @@ namespace ZoneEngine_New.Core.Helpers
                 if (!attacker.IsPlayer)
                     return true;
 
+                // Team and raid members never hit each other, whatever the gas or PvP flags. A raid is one team; pets
+                // reach here through their owners above.
+                if (attacker is Player attackingPlayer && AreTeammates(attackingPlayer, player))
+                    return false;
+
                 return IsPlayerVulnerable(attacker, player) && PvpLevelRange.Allows(attacker, player);
             }
 
@@ -82,6 +87,10 @@ namespace ZoneEngine_New.Core.Helpers
         }
 
         static bool CanAttackNonPlayer(Character target) => target is not NpcCharacter npc || npc.Attackable;
+
+        /// <summary>Same team or raid (<see cref="Teams.TeamService.AreTeammates"/>); false off a playfield.</summary>
+        static bool AreTeammates(Player first, Player second)
+            => (first.Playfield ?? second.Playfield)?.GetService<Teams.TeamService>()?.AreTeammates(first, second) == true;
 
         /// <summary>A player other players may attack: a running buff sets PvPEnabled or PvPEnabled_Tower.</summary>
         public static bool IsPvpEnabled(Player player)
