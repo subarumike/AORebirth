@@ -81,6 +81,12 @@ namespace ChatEngine.CoreServer
         public IReadOnlyDictionary<uint, Client> ConnectedClients { get { return this.clientOwnership.Clients; } }
 
         /// <summary>
+        /// The "Org Msg" system channel as retail lists it: type 10, id 1, flags 0x8006. Org members join it at login with
+        /// their organization channel; it is not in <see cref="Channels"/>, so nobody can speak in it.
+        /// </summary>
+        private readonly ChannelBase orgMsgChannel = new ChannelBase((ChannelFlags)0x8006, ChannelType.OrgMsg, 1, "Org Msg");
+
+        /// <summary>
         /// </summary>
         public string MessageOfTheDay = string.Empty;
 
@@ -687,6 +693,7 @@ namespace ChatEngine.CoreServer
                     }
 
                     orgChannel.AddClient(client);
+                    this.orgMsgChannel.AddClient(client);
                 }
             }
         }
@@ -753,6 +760,9 @@ namespace ChatEngine.CoreServer
                             ChatCommandString = chat.ToCharacter.Command
                         });
                         break;
+                    case AORebirth.World.Contracts.V1.ChatEvent.BodyOneofCase.Organization:
+                        this.SendOrganizationMessage(chat.Organization.OrganizationId, chat.Organization.Text);
+                        break;
                 }
             }
             catch (Exception e)
@@ -760,6 +770,17 @@ namespace ChatEngine.CoreServer
                 LogUtil.Debug(DebugInfoDetail.Error, "World chat event failed type=" + chat.BodyCase + " err=" + e.Message);
                 LogUtil.ErrorException(e);
             }
+        }
+
+        /// <summary>Delivers the captured server notice through the existing channel named "Org Msg".</summary>
+        internal void SendOrganizationMessage(int organizationId, string text)
+        {
+            if (organizationId <= 0 || string.IsNullOrEmpty(text))
+                return;
+
+            ChannelBase channel = this.Channels.FirstOrDefault(
+                x => x is OrganizationChannel && x.ChannelId == (uint)organizationId);
+            channel?.BotMessage(0, "Org Msg", text, ChannelType.OrgMsg, 1);
         }
 
         /// <summary>A command for the zone instance that runs <paramref name="characterId"/> (World routes it).</summary>

@@ -20,7 +20,16 @@ namespace ZoneEngine_New.Core.Data
             return row == null
                 ? null
                 : new OrganizationRecord(row.Id, row.Creation, row.Name, row.LeaderId, row.LeaderName,
-                    row.GovernmentForm, row.Description, row.Objective, row.History);
+                    row.GovernmentForm, row.Description, row.Objective, row.History, row.Tax, row.Bank);
         }
+
+        public bool IsNameTaken(string name, int exceptOrganizationId)
+            => Run(() => _persistence.IsOrganizationNameTaken(name, exceptOrganizationId));
+
+        public void SaveText(int organizationId, OrganizationTextField field, string value)
+            => Run(() => _persistence.SaveOrganizationText(organizationId, field, value));
+
+        public void SaveGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank)
+            => Run(() => _persistence.SaveOrganizationGoverningForm(organizationId, governingForm, leaderId, lowestRank));
     }
 }

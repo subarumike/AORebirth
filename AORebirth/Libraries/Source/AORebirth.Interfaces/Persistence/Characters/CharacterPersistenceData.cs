@@ -137,9 +137,20 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public string Description { get; set; } = string.Empty;
         public string Objective { get; set; } = string.Empty;
         public string History { get; set; } = string.Empty;
+        public long Tax { get; set; }
+        public long Bank { get; set; }
     }
 
-    /// <summary>One /pet rename: the pet type
+    /// <summary>The editable text columns of the organizations table.</summary>
+    public enum OrganizationTextField
+    {
+        Name,
+        Description,
+        Objective,
+        History
+    }
+
+    /// <summary>One /pet rename
     public sealed class PersistedPetNameData
     {
         public int PetType { get; set; }

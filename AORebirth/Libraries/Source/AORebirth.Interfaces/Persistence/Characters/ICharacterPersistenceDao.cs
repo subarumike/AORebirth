@@ -15,6 +15,15 @@ namespace AORebirth.Interfaces.Persistence.Characters
         IList<CharacterStatData> LoadStats(int characterId);
         /// <summary>The organizations row for an org id (stats Clan), or null when none exists.</summary>
         PersistedOrganizationData LoadOrganization(int organizationId);
+        /// <summary>True when another organization already uses this name (case-insensitive).</summary>
+        bool IsOrganizationNameTaken(string name, int exceptOrganizationId);
+        /// <summary>Updates one text column of the organizations row.</summary>
+        void SaveOrganizationText(int organizationId, OrganizationTextField field, string value);
+        /// <summary>
+        /// Sets organizations.GovernmentForm and, in the same transaction, resets the rank stat (ClanLevel) of every
+        /// member except the leader to <paramref name="lowestRank"/>.
+        /// </summary>
+        void SaveOrganizationGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank);
         IList<PersistedItemData> LoadCarriedItems(int characterId);
         IList<PersistedItemData> LoadBankItems(int characterId);
         IList<PersistedItemData> LoadContainerItems(int containerInstanceId);

@@ -28,6 +28,9 @@ namespace ZoneEngine_New.Core.Chat
         /// False when it could not be handed to World.
         /// </summary>
         bool SendAnonymousVicinity(string text, IReadOnlyList<int> recipients, byte[]? blob = null);
+
+        /// <summary>Delivers a server-generated notice to the existing Org Msg channel.</summary>
+        bool SendOrganizationMessage(int organizationId, string text);
     }
 
     /// <summary>
@@ -86,6 +89,19 @@ namespace ZoneEngine_New.Core.Chat
             };
             vicinity.Recipients.AddRange(recipients);
             return Publish(new ChatEvent { Vicinity = vicinity });
+        }
+
+        public bool SendOrganizationMessage(int organizationId, string text)
+        {
+            if (organizationId <= 0 || string.IsNullOrEmpty(text)) return false;
+            return Publish(new ChatEvent
+            {
+                Organization = new OrganizationMessage
+                {
+                    OrganizationId = organizationId,
+                    Text = text
+                }
+            });
         }
 
         public bool SendAnonymousVicinity(string text, IReadOnlyList<int> recipients, byte[]? blob = null)

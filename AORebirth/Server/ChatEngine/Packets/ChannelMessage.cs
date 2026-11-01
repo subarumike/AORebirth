@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -59,12 +59,32 @@ namespace ChatEngine.Packets
         /// </returns>
         public static byte[] Create(ChannelBase channel, uint playerid, string message, string blob)
         {
+            return Create(channel.channelType, channel.ChannelId, playerid, message, blob);
+        }
+
+        public static byte[] Create(ChannelType channelType, uint channelId, uint playerid, string message, string blob)
+        {
             PacketWriter writer = new PacketWriter(65);
-            writer.WriteByte((byte)channel.channelType);
-            writer.WriteUInt32(channel.ChannelId);
+            writer.WriteByte((byte)channelType);
+            writer.WriteUInt32(channelId);
             writer.WriteUInt32(playerid);
             writer.WriteString(message);
             writer.WriteString(blob);
+            return writer.Finish();
+        }
+
+        /// <summary>
+        /// Server notice (catalog refs): the blob is written as a zero-length string (0000) like live, not as the single
+        /// NUL byte WriteString uses for "", which makes the client show the raw ref text.
+        /// </summary>
+        public static byte[] CreateNotice(ChannelType channelType, uint channelId, uint playerid, string message)
+        {
+            PacketWriter writer = new PacketWriter(65);
+            writer.WriteByte((byte)channelType);
+            writer.WriteUInt32(channelId);
+            writer.WriteUInt32(playerid);
+            writer.WriteString(message);
+            writer.WriteUInt16(0);
             return writer.Finish();
         }
 
