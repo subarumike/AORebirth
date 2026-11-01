@@ -33,6 +33,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 || !playfield.GetRequiredService<DynelRegistry>().TryGet(message.MissionTerminalIdentity, out var dynel)
                 || dynel is not MissionTerminal terminal || terminal.GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
                 return;
+            if (!MissionRollPolicy.Current.Enabled)
+            { Feedback(session, player, "Mission terminals are disabled. No credits were deducted."); return; }
             if (session is not IGameTimeSession { GameTimeSynchronizedAtUtc: not null } clock)
             { Feedback(session, player, "The mission clock has not synchronized. No credits were deducted."); return; }
             int level = player.Stats.Get(CharacterStat.Level);

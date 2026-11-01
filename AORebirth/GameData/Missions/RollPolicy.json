@@ -13,6 +13,7 @@
     ],
     "Basis": "Existing deployed policies externalized without adding new retail claims. Packet identities/actions and clock are protocol compatibility values; travel bands are existing server policy."
   },
+  "Enabled": true,
   "OfferLifetimeSeconds": 172800,
   "AcceptedLifetimeSeconds": 172800,
   "MinimumRollFee": 1,

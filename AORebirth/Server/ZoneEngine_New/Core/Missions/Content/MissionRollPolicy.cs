@@ -13,6 +13,8 @@ internal sealed class MissionRollPolicy
 {
     internal static MissionRollPolicy Current { get; } = Load();
     public PolicyProvenance Provenance { get; set; } = new();
+    /// <summary>False turns mission terminal rolling off: a roll is refused before any credits are taken. Missing reads as on.</summary>
+    public bool Enabled { get; set; } = true;
     public int OfferLifetimeSeconds { get; set; }
     public int AcceptedLifetimeSeconds { get; set; }
     public int MinimumRollFee { get; set; }
