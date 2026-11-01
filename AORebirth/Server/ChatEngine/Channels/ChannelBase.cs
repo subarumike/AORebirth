@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -212,6 +212,15 @@ namespace ChatEngine.Channels
         /// </summary>
         internal void BotMessage(uint botWireId, string botName, string text)
         {
+            this.BotMessage(botWireId, botName, text, this.channelType, this.ChannelId);
+        }
+
+        /// <summary>
+        /// Delivers a server notice to this channel's members while using another client-visible channel header.
+        /// Organization notices use the captured Admin/1 header, displayed by the client as "Org Msg".
+        /// </summary>
+        internal void BotMessage(uint botWireId, string botName, string text, ChannelType wireChannelType, uint wireChannelId)
+        {
             IClient[] recipients;
             lock (this.clients)
             {
@@ -219,11 +228,14 @@ namespace ChatEngine.Channels
                 this.clients.CopyTo(recipients);
             }
 
-            byte[] message = Packets.ChannelMessage.Create(this, botWireId, text ?? string.Empty, string.Empty);
+            byte[] message = wireChannelType == this.channelType
+                ? Packets.ChannelMessage.Create(wireChannelType, wireChannelId, botWireId, text ?? string.Empty, string.Empty)
+                : Packets.ChannelMessage.CreateNotice(wireChannelType, wireChannelId, botWireId, text ?? string.Empty);
             foreach (IClient recipient in recipients)
             {
                 Client client = (Client)recipient;
-                if (!client.KnownClients.Contains(botWireId))
+                // Wire id 0 is "no sender" (captured Org Msg lines): there is no name to look up.
+                if (botWireId != 0 && !client.KnownClients.Contains(botWireId))
                 {
                     client.Send(NameLookupResult.Create(botWireId, botName ?? "AORebirth Bot"));
                     client.KnownClients.Add(botWireId);

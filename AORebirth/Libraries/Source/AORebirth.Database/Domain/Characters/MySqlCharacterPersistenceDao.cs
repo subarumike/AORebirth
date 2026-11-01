@@ -165,7 +165,7 @@ namespace AORebirth.Database.Domain.Characters
         {
             if (organizationId <= 0) return null;
             var rows = Query("SELECT o.Id,o.Creation,o.Name,o.LeaderId,COALESCE(c.Name,''),o.GovernmentForm,"
-                + "o.Description,o.Objective,o.History "
+                + "o.Description,o.Objective,o.History,o.Tax,o.Bank "
                 + "FROM organizations o LEFT JOIN characters c ON c.Id=o.LeaderId WHERE o.Id=@Id LIMIT 1",
                 r => new PersistedOrganizationData
                 {
@@ -174,9 +174,52 @@ namespace AORebirth.Database.Domain.Characters
                     LeaderName = r.IsDBNull(4) ? string.Empty : r.GetString(4), GovernmentForm = r.GetInt32(5),
                     Description = r.IsDBNull(6) ? string.Empty : r.GetString(6),
                     Objective = r.IsDBNull(7) ? string.Empty : r.GetString(7),
-                    History = r.IsDBNull(8) ? string.Empty : r.GetString(8)
+                    History = r.IsDBNull(8) ? string.Empty : r.GetString(8),
+                    Tax = r.IsDBNull(9) ? 0 : r.GetInt64(9), Bank = r.IsDBNull(10) ? 0 : r.GetInt64(10)
                 }, "@Id", organizationId);
             return rows.Count == 0 ? null : rows[0];
+        }
+
+        public bool IsOrganizationNameTaken(string name, int exceptOrganizationId)
+        {
+            if (string.IsNullOrEmpty(name)) throw new ArgumentException("A name is required.", nameof(name));
+            return Query("SELECT COUNT(*) FROM organizations WHERE Name=@Name AND Id<>@Id",
+                r => Convert.ToInt64(r.GetValue(0), CultureInfo.InvariantCulture),
+                "@Name", name, "@Id", exceptOrganizationId)[0] > 0;
+        }
+
+        public void SaveOrganizationText(int organizationId, OrganizationTextField field, string value)
+        {
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            string column;
+            switch (field)
+            {
+                case OrganizationTextField.Name: column = "Name"; break;
+                case OrganizationTextField.Description: column = "Description"; break;
+                case OrganizationTextField.Objective: column = "Objective"; break;
+                case OrganizationTextField.History: column = "History"; break;
+                default: throw new ArgumentOutOfRangeException(nameof(field));
+            }
+            Transaction((c, t) => Execute(c, t, "UPDATE organizations SET " + column + "=@Value WHERE Id=@Id",
+                "@Value", value, "@Id", organizationId));
+        }
+
+        public void SaveOrganizationGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank)
+        {
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            Transaction((c, t) =>
+            {
+                Execute(c, t, "UPDATE organizations SET GovernmentForm=@Form WHERE Id=@Id",
+                    "@Form", governingForm, "@Id", organizationId);
+                Execute(c, t, "UPDATE stats r JOIN stats m ON m.Type=r.Type AND m.Instance=r.Instance "
+                    + "AND m.StatId=@Clan AND m.StatValue=@Id SET r.StatValue=@Lowest "
+                    + "WHERE r.Type=@Type AND r.StatId=@Level AND r.Instance<>@Leader",
+                    "@Clan", (int)CharacterStat.Clan, "@Id", organizationId, "@Lowest", lowestRank,
+                    "@Type", (int)IdentityType.CanbeAffected, "@Level", (int)CharacterStat.ClanLevel,
+                    "@Leader", leaderId);
+                return 0;
+            });
         }
 
         public IDictionary<int, string> LoadItemNames()

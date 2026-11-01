@@ -1,10 +1,10 @@
 {
   "Forms": {
-    "0": { "Name": "Department", "Ranks": ["President", "General", "Squad Commander", "Unit Commander", "Unit Leader", "Unit Member", "Applicant"] },
-    "1": { "Name": "Faction", "Ranks": ["Director", "Board Member", "Executive", "Member", "Applicant"] },
-    "2": { "Name": "Republic", "Ranks": ["President", "Advisor", "Veteran", "Member", "Applicant"] },
-    "3": { "Name": "Monarchy", "Ranks": ["Monarch", "Council", "Follower"] },
-    "4": { "Name": "Anarchism", "Ranks": ["Anarchist"] },
-    "5": { "Name": "Feudalism", "Ranks": ["Lord", "Knight", "Vassal", "Peasant"] }
+    "0": { "Name": "Feudalism", "Ranks": ["Lord", "Knight", "Vassal", "Peasant"] },
+    "1": { "Name": "Department", "Ranks": ["President", "General", "Squad Commander", "Unit Commander", "Unit Leader", "Unit Member", "Applicant"] },
+    "2": { "Name": "Faction", "Ranks": ["Director", "Board Member", "Executive", "Member", "Applicant"] },
+    "3": { "Name": "Republic", "Ranks": ["President", "Advisor", "Veteran", "Member", "Applicant"] },
+    "4": { "Name": "Monarchy", "Ranks": ["Monarch", "Council", "Follower"] },
+    "5": { "Name": "Anarchism", "Ranks": ["Anarchist"] }
   }
 }

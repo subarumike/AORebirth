@@ -642,6 +642,7 @@ message ChatEvent {
     LftUpdate lft = 2;
     CharacterChatCommand to_character = 3;
     PresenceChanged presence = 4;
+    OrganizationMessage organization = 5;
   }
 }
 
@@ -678,4 +679,10 @@ message PresenceChanged {
   int32 character_id = 1;
   bool online = 2;
   int32 playfield_id = 3;
+}
+
+// A server-generated notice for the existing organization chat channel.
+message OrganizationMessage {
+  int32 organization_id = 1;
+  string text = 2;
 }

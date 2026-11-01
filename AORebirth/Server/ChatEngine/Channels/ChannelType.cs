@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2005-2014, CellAO Team
 // 
@@ -71,6 +71,9 @@ namespace ChatEngine.Channels
         /// <summary>
         /// </summary>
         Towers = 10,
+
+        /// <summary>The "Org Msg" system channel (captured ChannelList type 10, id 1); same wire value as Towers.</summary>
+        OrgMsg = 10,
 
         /// <summary>
         /// </summary>
