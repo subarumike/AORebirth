@@ -26,17 +26,17 @@ namespace ZoneEngine_New.Core.Modules
         internal static TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(10);
 
         readonly Lazy<PlayfieldManager> _manager;
-        readonly Func<ZoneEngine_New.Core.Data.ILoginFlagsRepository>? _accounts;
+        readonly Func<ZoneEngine_New.Core.Accounts.AccountSanctionService>? _accounts;
         readonly string? _gameDataRoot;
         readonly ZoneEngine_New.Core.Logging.IZoneLogger? _logger;
         readonly Func<ZoneEngine_New.Core.Lifecycle.ShutdownScheduler>? _shutdown;
         readonly Dictionary<string, Operation> _operations;
 
-        /// <param name="accounts">The login accounts, for account operations; null leaves them unregistered.</param>
+        /// <param name="accounts">Account suspensions and bans, for the account operations; null leaves them unregistered.</param>
         /// <param name="gameDataRoot">The GameData tree, to check a teleport's playfield exists; null skips the check.</param>
         /// <param name="shutdown">The engine's timed shutdown, for the server operations; null leaves them unregistered.</param>
         public ZoneModuleActions(Func<PlayfieldManager> manager,
-            Func<ZoneEngine_New.Core.Data.ILoginFlagsRepository>? accounts = null, string? gameDataRoot = null,
+            Func<ZoneEngine_New.Core.Accounts.AccountSanctionService>? accounts = null, string? gameDataRoot = null,
             ZoneEngine_New.Core.Logging.IZoneLogger? logger = null,
             Func<ZoneEngine_New.Core.Lifecycle.ShutdownScheduler>? shutdown = null)
         {

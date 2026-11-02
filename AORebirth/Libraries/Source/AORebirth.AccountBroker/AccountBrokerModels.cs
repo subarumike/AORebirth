@@ -56,6 +56,9 @@ namespace AORebirth.AccountBroker
         public int AccountFlags { get; set; }
 
         public int GM { get; set; }
+
+        /// <summary>An account_sanctions suspension or ban is active.</summary>
+        public bool Sanctioned { get; set; }
     }
 
     public sealed class ExternalMappingResult

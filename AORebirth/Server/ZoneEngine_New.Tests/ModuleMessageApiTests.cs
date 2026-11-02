@@ -193,7 +193,11 @@ public sealed class ModuleMessageApiTests
     public void AccountOperationsNeedAnAccountStore()
     {
         Assert.IsFalse(Names(new ZoneModuleActions(() => null!)).Contains(OperationNames.AccountBan));
-        Assert.IsTrue(Names(new ZoneModuleActions(() => null!, () => new NoLogins())).Contains(OperationNames.AccountBan));
+        // The store is only resolved when an account operation runs.
+        HashSet<string> names = Names(new ZoneModuleActions(() => null!, () => null!));
+        Assert.IsTrue(names.Contains(OperationNames.AccountBan));
+        Assert.IsTrue(names.Contains(OperationNames.AccountSuspend));
+        Assert.IsTrue(names.Contains(OperationNames.AccountUnban));
     }
 
     [TestMethod]
@@ -242,10 +246,5 @@ public sealed class ModuleMessageApiTests
     {
         Assert.IsTrue(fields.TryGetIdentity(name, out EntityRef value), name);
         Assert.AreEqual(new EntityRef((int)expected.Type, expected.Instance), value, name);
-    }
-
-    sealed class NoLogins : ZoneEngine_New.Core.Data.ILoginFlagsRepository
-    {
-        public int SetLoginFlags(string username, int flags) => 0;
     }
 }

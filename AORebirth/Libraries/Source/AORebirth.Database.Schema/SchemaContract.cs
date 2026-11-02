@@ -35,7 +35,8 @@ public static class SchemaContract
         "20261016_character_nano_line_locks.sql",
         "20261025_character_pet_names.sql",
         "20261029_daily_login_claims.sql",
-        "20261030_daily_login_character_scope.sql"
+        "20261030_daily_login_character_scope.sql",
+        "20261102_account_sanctions.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -55,7 +56,8 @@ public static class SchemaContract
         "generatedmissionsequences", "generatedmissionbatches", "generatedmissionoffers",
         "generatedmissionbindings", "generatedmissionobservations", "generatedmissionartifacts", "generatedmissionobjects",
         "characterskilllocks", "characterquests", "generatedquests", "questdungeonkeys",
-        "characterperklocks", "characterresearch", "characternanolinelocks", "characterpetnames", "dailyloginclaims"
+        "characterperklocks", "characterresearch", "characternanolinelocks", "characterpetnames", "dailyloginclaims",
+        "account_sanctions"
     });
 
     public static readonly IReadOnlyList<(string Table, string Columns)> UniqueKeys = Array.AsReadOnly(new[]
@@ -78,7 +80,8 @@ public static class SchemaContract
         ("characterresearch", "CharacterId,ResearchId"),
         ("characternanolinelocks", "CharacterId,NanoStrain"),
         ("characterpetnames", "CharacterId,PetType"),
-        ("dailyloginclaims", "Id"), ("dailyloginclaims", "ClaimToken"), ("dailyloginclaims", "CharacterId,ClaimDateUtc")
+        ("dailyloginclaims", "Id"), ("dailyloginclaims", "ClaimToken"), ("dailyloginclaims", "CharacterId,ClaimDateUtc"),
+        ("account_sanctions", "SanctionId")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()
@@ -176,6 +179,12 @@ public static class SchemaContract
         Add("dailyloginclaims", "date", "ClaimDateUtc");
         Add("dailyloginclaims", "mediumtext", "StateJson ResultJson");
         Add("dailyloginclaims", "tinyint", "IsLegacyImport", true);
+        Add("account_sanctions", "bigint", "SanctionId", false);
+        Add("account_sanctions", "int", "AccountId", false);
+        Add("account_sanctions", "datetime", "IssuedAtUtc EndsAtUtc LiftedAtUtc");
+        Add("account_sanctions", "varchar", "IssuedBy Reason LiftedBy LiftReason");
+        Add("login", "int", "Id Flags");
+        Add("login", "varchar", "Username");
         return result.AsReadOnly();
     }
 }

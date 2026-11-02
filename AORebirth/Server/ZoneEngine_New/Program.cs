@@ -118,6 +118,8 @@ namespace ZoneEngine_New
                 _ = rootServices.GetRequiredService<InventoryFlushService>();
                 // Subscribes to quest endings and starts the dungeon expiry and idle-release sweep.
                 _ = rootServices.GetRequiredService<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
+                // Starts the sweep that removes characters of accounts suspended or banned since they logged in.
+                _ = rootServices.GetRequiredService<ZoneEngine_New.Core.Accounts.AccountSanctionService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
                 networkHost.Start();
                 try
@@ -295,8 +297,10 @@ namespace ZoneEngine_New
                 () => provider.GetRequiredService<ZoneEngine_New.Core.Knubot.KnubotCatalog>(),
                 () => provider.GetRequiredService<PlayfieldManager>(),
                 () => provider.GetRequiredService<ZoneEngine_New.Core.GameData.GameDataReloadRegistry>(),
-                () => new ZoneEngine_New.Core.Data.MySqlLoginFlagsRepository(),
+                () => provider.GetRequiredService<ZoneEngine_New.Core.Accounts.AccountSanctionService>(),
                 () => provider.GetRequiredService<ZoneEngine_New.Core.Lifecycle.ShutdownScheduler>()));
+            services.AddSingleton<ZoneEngine_New.Core.Accounts.IAccountSanctionRepository, ZoneEngine_New.Core.Accounts.MySqlAccountSanctionRepository>();
+            services.AddSingleton<ZoneEngine_New.Core.Accounts.AccountSanctionService>();
             services.AddSingleton<ZoneEngine_New.Core.Characters.StuckService>();
             services.AddSingleton<HashItemMinter>();
             services.AddSingleton<PlayerHydrator>();
@@ -405,6 +409,7 @@ namespace ZoneEngine_New
             services.AddSingleton<ZoneEngine_New.Core.Lifecycle.IEngineShutdown, ProgramShutdown>();
             services.AddSingleton<ZoneEngine_New.Core.Lifecycle.ShutdownScheduler>();
             services.AddSingleton<IGmCommand, ShutdownCommand>();
+            services.AddSingleton<IGmCommand, AccountCommand>();
             services.AddSingleton<GmCommandDispatcher>();
             services.AddSingleton(provider => new Lazy<GmCommandDispatcher>(provider.GetRequiredService<GmCommandDispatcher>));
             services.AddSingleton<ZoneLoginHandler>();

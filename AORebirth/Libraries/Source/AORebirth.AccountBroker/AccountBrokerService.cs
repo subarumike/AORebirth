@@ -20,6 +20,11 @@ namespace AORebirth.AccountBroker
 
         private const int NormalGm = 0;
 
+        /// <summary>1 when the login row has an active account_sanctions row (not lifted, permanent or not yet ended).</summary>
+        private const string ActiveSanctionColumn =
+            "EXISTS(SELECT 1 FROM account_sanctions s WHERE s.AccountId=login.Id AND s.LiftedAtUtc IS NULL "
+            + "AND (s.EndsAtUtc IS NULL OR s.EndsAtUtc > UTC_TIMESTAMP(6))) AS Sanctioned";
+
         private readonly Func<IDbConnection> connectionFactory;
 
         public AccountBrokerService(Func<IDbConnection> connectionFactory)
@@ -54,7 +59,7 @@ namespace AORebirth.AccountBroker
             {
                 GameAccountSnapshot gameAccount =
                     this.GetGameAccountByNormalizedUsername(connection, transaction, normalizedUsername);
-                if (gameAccount == null || gameAccount.Flags != NormalFlags)
+                if (gameAccount == null || !IsAdmissible(gameAccount))
                 {
                     transaction.Commit();
                     return FailedAuthentication("INVALID_CREDENTIALS");
@@ -377,7 +382,7 @@ namespace AORebirth.AccountBroker
 
                 GameAccountSnapshot gameAccount =
                     this.GetGameAccountForUpdate(connection, transaction, identity.GameAccountId);
-                if (gameAccount == null || gameAccount.Flags != NormalFlags)
+                if (gameAccount == null || !IsAdmissible(gameAccount))
                 {
                     transaction.Commit();
                     throw new AccountBrokerException("GAME_ACCOUNT_NOT_ACTIVE", "Game account is not active.");
@@ -446,7 +451,7 @@ namespace AORebirth.AccountBroker
 
                 GameAccountSnapshot gameAccount =
                     this.GetGameAccountForUpdate(connection, transaction, identity.GameAccountId);
-                if (gameAccount == null || gameAccount.Flags != NormalFlags)
+                if (gameAccount == null || !IsAdmissible(gameAccount))
                 {
                     transaction.Commit();
                     return null;
@@ -540,7 +545,7 @@ namespace AORebirth.AccountBroker
                     || !IsActiveLinkedIdentity(identity)
                     || !identity.EmailVerified
                     || gameAccount == null
-                    || gameAccount.Flags != NormalFlags
+                    || !IsAdmissible(gameAccount)
                     || !FixedTimeEquals(tokenRow.EmailHash, HashToken(NormalizeEmail(identity.CanonicalEmail))))
                 {
                     transaction.Commit();
@@ -584,7 +589,7 @@ namespace AORebirth.AccountBroker
                 PasswordResetTokenRow current =
                     this.GetPasswordResetToken(connection, transaction, token, true);
                 if (gameAccount == null
-                    || gameAccount.Flags != NormalFlags
+                    || !IsAdmissible(gameAccount)
                     || current == null
                     || !string.Equals(current.TokenState, "Active", StringComparison.Ordinal))
                 {
@@ -1257,7 +1262,7 @@ namespace AORebirth.AccountBroker
             return this.GetSingleGameAccount(
                 connection,
                 transaction,
-                "SELECT Id, Username, Password, Flags, AccountFlags, GM FROM login WHERE Id=@id",
+                "SELECT Id, Username, Password, Flags, AccountFlags, GM, " + ActiveSanctionColumn + " FROM login WHERE Id=@id",
                 Parameter("@id", id));
         }
 
@@ -1269,7 +1274,7 @@ namespace AORebirth.AccountBroker
             return this.GetSingleGameAccount(
                 connection,
                 transaction,
-                "SELECT Id, Username, Password, Flags, AccountFlags, GM FROM login WHERE Id=@id FOR UPDATE",
+                "SELECT Id, Username, Password, Flags, AccountFlags, GM, " + ActiveSanctionColumn + " FROM login WHERE Id=@id FOR UPDATE",
                 Parameter("@id", id));
         }
 
@@ -1281,7 +1286,7 @@ namespace AORebirth.AccountBroker
             return this.GetSingleGameAccount(
                 connection,
                 transaction,
-                "SELECT Id, Username, Password, Flags, AccountFlags, GM FROM login WHERE Username=@username",
+                "SELECT Id, Username, Password, Flags, AccountFlags, GM, " + ActiveSanctionColumn + " FROM login WHERE Username=@username",
                 Parameter("@username", username));
         }
 
@@ -1293,7 +1298,7 @@ namespace AORebirth.AccountBroker
             return this.GetSingleGameAccount(
                 connection,
                 transaction,
-                "SELECT Id, Username, Password, Flags, AccountFlags, GM FROM login WHERE LOWER(Username)=@username",
+                "SELECT Id, Username, Password, Flags, AccountFlags, GM, " + ActiveSanctionColumn + " FROM login WHERE LOWER(Username)=@username",
                 Parameter("@username", normalizedUsername));
         }
 
@@ -1386,9 +1391,19 @@ namespace AORebirth.AccountBroker
                     PasswordHash = Convert.ToString(reader["Password"]),
                     Flags = Convert.ToInt32(reader["Flags"]),
                     AccountFlags = Convert.ToInt32(reader["AccountFlags"]),
-                    GM = Convert.ToInt32(reader["GM"])
+                    GM = Convert.ToInt32(reader["GM"]),
+                    Sanctioned = Convert.ToInt64(reader["Sanctioned"]) != 0
                 };
             }
+        }
+
+        /// <summary>
+        /// The game account may be used: Flags is 0 (LoginEngine's rule) and no account_sanctions row is active, the same
+        /// suspension or ban that refuses the game login.
+        /// </summary>
+        private static bool IsAdmissible(GameAccountSnapshot gameAccount)
+        {
+            return gameAccount.Flags == NormalFlags && !gameAccount.Sanctioned;
         }
 
         private ProvisioningJobRow GetProvisioningJob(

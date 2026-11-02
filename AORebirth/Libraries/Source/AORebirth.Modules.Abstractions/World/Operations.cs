@@ -190,8 +190,20 @@ namespace AORebirth.Modules.World
         /// <summary>Logs the player out, with the normal logout save: <c>reason</c>.</summary>
         public const string PlayerKick = "player.kick";
 
-        /// <summary>Blocks the account from logging in: <c>reason</c>.</summary>
+        /// <summary>
+        /// Bans the account permanently: <c>reason</c>. From 1.8 it is recorded as a sanction (see
+        /// <see cref="IZoneActions.AccountSanctions"/>) and the account's characters in play are removed.
+        /// </summary>
         public const string AccountBan = "account.ban";
+
+        /// <summary>
+        /// Suspends the account for <c>seconds</c> (60 to ten years), with an optional <c>reason</c> (module API 1.8). It
+        /// cannot log in until the time passes or <see cref="AccountUnban"/> lifts it; its characters in play are removed.
+        /// </summary>
+        public const string AccountSuspend = "account.suspend";
+
+        /// <summary>Lifts every active suspension and ban of the account: optional <c>reason</c> (module API 1.8).</summary>
+        public const string AccountUnban = "account.unban";
 
         /// <summary>
         /// Shuts this zone instance down gracefully after a countdown every online player is told about (module API 1.7):

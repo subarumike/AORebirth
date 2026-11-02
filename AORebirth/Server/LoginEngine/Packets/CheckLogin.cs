@@ -26,6 +26,8 @@ namespace LoginEngine.Packets
 
     using AO.Core.Encryption;
 
+    using AORebirth.Database.Dao;
+
     using LoginEngine.CoreClient;
     using LoginEngine.QueryBase;
 
@@ -99,7 +101,8 @@ namespace LoginEngine.Packets
                     StringComparison.OrdinalIgnoreCase)
                 && this.lf.FlagsL == LoginAllowedFlag)
             {
-                return true;
+                // A suspension or ban (account_sanctions) refuses the login the same way Flags does.
+                return !LoginDataDao.Instance.IsSanctioned(accountName);
             }
 
             return false;
