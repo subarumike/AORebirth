@@ -77,6 +77,14 @@ namespace ZoneEngine_New.Core.Quests
         public QuestReward? Reward { get; set; }
 
         /// <summary>
+        /// A Quests.json quest that runs out this many seconds after it is assigned, with the journal timer, as a
+        /// generated quest does: live's DOJA cooldown mission ("You can only turn in one DOJA chip today.", 64800 s),
+        /// which the chips' HasActiveQuest refuses on while it runs. Null: it never expires. Not read for generated
+        /// quests, which carry their own expiry.
+        /// </summary>
+        public int? ExpiresAfterSeconds { get; set; }
+
+        /// <summary>
         /// Items the player is handed when this step is assigned, however it starts (a previous step, Knubot
         /// <c>{givequest}</c>, <c>.quests</c>): live, Surveillance Uplink, the Rebuilt HC-12 SecTec Monitor arrives with the
         /// step. Not part of any reward box.

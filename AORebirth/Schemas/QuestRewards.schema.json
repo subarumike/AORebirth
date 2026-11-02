@@ -85,6 +85,12 @@
                         "const": "level"
                       }
                     ]
+                  },
+                  "Count": {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
                   }
                 },
                 "additionalProperties": false

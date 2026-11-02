@@ -19,8 +19,9 @@ namespace ZoneEngine_New.Core.Quests
     using ZoneEngine_New.Core.Logging;
 
     /// <summary>
-    /// Assigns quests to players and runs them. Template quests come from Quests.json and never expire;
-    /// generated quests live once in <c>generatedquests</c> (definition, expiry, ACG data) and can be shared.
+    /// Assigns quests to players and runs them. Template quests come from Quests.json and expire only with
+    /// <see cref="QuestTemplate.ExpiresAfterSeconds"/>, counted from their assignment; generated quests live once in
+    /// <c>generatedquests</c> (definition, expiry, ACG data) and can be shared.
     /// Each player's state is a <c>characterquests</c> row, written straight away on every change. A player's log is only touched on that player's playfield.
     /// Existing NPC objectives retain their triggers; generated Find Item advances only from its exact bound pickup.
     /// </summary>
@@ -77,12 +78,12 @@ namespace ZoneEngine_New.Core.Quests
         public QuestRewardTable? Rewards => _rewards;
 
         /// <summary>
-        /// A player's quest left the active state (abandoned, completed or expired), after it was saved and removed
+        /// A player's quest left the active state (abandoned, completed, failed or expired), after it was saved and removed
         /// from the journal. Raised on that player's playfield.
         /// </summary>
         public event Action<Player, PlayerQuest>? QuestEnded;
 
-        /// <summary>The player's quests, loaded on first use. Expired generated quests are closed here.</summary>
+        /// <summary>The player's quests, loaded on first use. Expired quests are closed here.</summary>
         public QuestLog GetLog(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
@@ -91,6 +92,26 @@ namespace ZoneEngine_New.Core.Quests
 
             ExpireDue(player, player.QuestLog);
             return player.QuestLog;
+        }
+
+        /// <summary>
+        /// Ends an active quest that is no longer an option (Steal the credits... once the card went back to Leonora
+        /// Marty): saved as failed and taken out of the journal, with no reward. False when it is not active.
+        /// </summary>
+        public bool TryFail(Player player, PlayerQuest quest)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(quest);
+            if (!quest.IsActive || quest.IsRewardPending)
+                return false;
+
+            quest.State = QuestState.Failed;
+            Save(player, quest);
+            QuestJournal.Delete(player, quest);
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest failed char={0} quest={1} ({2})",
+                player.Identity.Instance, quest.QuestId, quest.Template.Name));
+            QuestEnded?.Invoke(player, quest);
+            return true;
         }
 
         /// <summary>
@@ -141,7 +162,10 @@ namespace ZoneEngine_New.Core.Quests
             }
         }
 
-        /// <summary>Gives a Quests.json quest. A completed or closed one is started over; an active one is refused.</summary>
+        /// <summary>
+        /// Gives a Quests.json quest. A completed or closed one is started over; an active one is refused. One with
+        /// <see cref="QuestTemplate.ExpiresAfterSeconds"/> starts its timer now.
+        /// </summary>
         public bool TryAssignTemplate(Player player, string hash, out string result)
         {
             ArgumentNullException.ThrowIfNull(player);
@@ -443,6 +467,7 @@ namespace ZoneEngine_New.Core.Quests
         PlayerQuest Assign(Player player, QuestLog log, string questId, QuestSource source, QuestTemplate template,
             DateTime? expiresAtUtc, string? acgJson)
         {
+            DateTime now = _now();
             var quest = new PlayerQuest
             {
                 QuestId = questId,
@@ -451,8 +476,8 @@ namespace ZoneEngine_New.Core.Quests
                 State = QuestState.Active,
                 Progress = 0,
                 RequiredCount = template.RequiredCount,
-                AssignedAtUtc = _now(),
-                ExpiresAtUtc = source == QuestSource.Generated ? expiresAtUtc : null,
+                AssignedAtUtc = now,
+                ExpiresAtUtc = source == QuestSource.Generated ? expiresAtUtc : TemplateExpiry(template, now),
                 AcgBuildingGeneratorJson = acgJson
             };
 
@@ -528,6 +553,7 @@ namespace ZoneEngine_New.Core.Quests
                 var source = (QuestSource)row.Source;
                 QuestTemplate? template = null;
                 GeneratedQuestRow? definition = null;
+                var assignedAtUtc = new DateTime(row.AssignedAtUtcTicks, DateTimeKind.Utc);
                 if (source == QuestSource.Template)
                     template = _catalog.TryGet(row.QuestId, out QuestTemplate found) ? found : null;
                 else if (generated.TryGetValue(row.QuestId, out definition))
@@ -548,8 +574,10 @@ namespace ZoneEngine_New.Core.Quests
                     State = (QuestState)row.State,
                     Progress = row.Progress,
                     RequiredCount = row.RequiredCount,
-                    AssignedAtUtc = new DateTime(row.AssignedAtUtcTicks, DateTimeKind.Utc),
-                    ExpiresAtUtc = definition != null ? new DateTime(definition.ExpiresAtUtcTicks, DateTimeKind.Utc) : null,
+                    AssignedAtUtc = assignedAtUtc,
+                    ExpiresAtUtc = definition != null
+                        ? new DateTime(definition.ExpiresAtUtcTicks, DateTimeKind.Utc)
+                        : TemplateExpiry(template, assignedAtUtc),
                     AcgBuildingGeneratorJson = definition?.AcgBuildingGeneratorJson
                 };
                 PlayerQuest loaded = log.Quests[row.QuestId];
@@ -567,6 +595,10 @@ namespace ZoneEngine_New.Core.Quests
 
             return log;
         }
+
+        /// <summary>A template quest's end: its stored assignment time plus the template's lifetime, so no column holds it.</summary>
+        static DateTime? TemplateExpiry(QuestTemplate template, DateTime assignedAtUtc)
+            => template.ExpiresAfterSeconds is int seconds ? assignedAtUtc.AddSeconds(seconds) : null;
 
         static QuestTemplate? Deserialize(string? json)
         {
