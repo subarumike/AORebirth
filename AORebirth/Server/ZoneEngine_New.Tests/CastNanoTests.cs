@@ -25,6 +25,7 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Teams;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -997,11 +998,14 @@ namespace ZoneEngine_New.Tests
                     .AddSingleton(_registry)
                     .AddSingleton(_teams)
                     .AddSingleton(_manager)
+                    .AddSingleton<WorldSimulationAccess>()
                     .AddSingleton<IItemBuilder>(items)
                     .AddSingleton<IInventoryRepository>(new SilentInventory())
                     .BuildServiceProvider();
                 typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
                     .SetValue(Playfield, _services);
+                typeof(Playfield).GetField("_lifecycleSync", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .SetValue(Playfield, new Lock());
                 typeof(Playfield).GetField("_pendingStatRebases", BindingFlags.Instance | BindingFlags.NonPublic)!
                     .SetValue(Playfield, new ConcurrentDictionary<Character, byte>());
             }

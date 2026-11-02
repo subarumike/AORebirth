@@ -78,6 +78,12 @@
     <Compile Include="SkillLockTests.cs" />
     <Compile Include="RequirementExpressionTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(HostileAreaPetFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="InventoryActionTests.cs" />
+    <Compile Include="CastNanoTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TeamRosterFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
