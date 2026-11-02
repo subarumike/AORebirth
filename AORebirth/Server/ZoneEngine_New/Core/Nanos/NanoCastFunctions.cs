@@ -25,9 +25,9 @@ namespace ZoneEngine_New.Core.Nanos
         static readonly AsyncLocal<int> Depth = new();
 
         /// <param name="scripted">
-        /// The function names its target NPC by spawn hash (OTAF Official Notice 297243 on an Omni-AF Private "OIUR"): a
-        /// quest effect on that NPC, landed outside combat rules as a GM apply is, though the nano carries the hostile
-        /// flag and the NPC is NoCombat.
+        /// The function names its target NPC by spawn hash (OTAF Official Notice 297243 casting Call to Arms 297247 on an
+        /// Omni-AF Private "OIUR"): a quest effect on that NPC, landed as a GM apply is. The nano carries the hostile flag,
+        /// so a normal landing could be evaded or resisted and would count as an attack the NPC answers.
         /// </param>
         public static bool TryExecute(
             Character target,
@@ -140,9 +140,11 @@ namespace ZoneEngine_New.Core.Nanos
             if (!TryResolveChild(items, nanoId, out NanoSpell? child) || child == null)
                 return false;
 
-            // A child whose own use requirements name a quest or an NPC (Resolve 2PZ7 297276: NPCFamily 0 and quest 2PZ7
-            // active) is a quest effect: it lands on exactly those, outside combat rules. Combat area nanos with a plain
-            // stat test (Mongo Slam 100194, Shockwave Stun 213012) keep the combat checks below.
+            // A child whose own use requirements name a quest or an NPC is a quest effect: Resolve 2PZ7 297276 (a player
+            // with quest 2PZ7 active), area-cast by the charmed Omni-AF Private when Call to Arms ends. It lands only on the
+            // characters that meet them, as a GM apply: not on everyone in range as a hostile area nano would, and not
+            // evaded, resisted or counted as an attack. Combat area nanos with a plain stat test (Mongo Slam 100194,
+            // Shockwave Stun 213012) keep the checks below.
             ItemTemplate childTemplate = items.CreateTemplate(nanoId, nanoId, quality: 1);
             bool picksRecipients = childTemplate.Actions.Exists(a => a.ActionType == (int)ActionType.ToUse
                 && a.Requirements.Exists(r => r.Operator is (int)Operator.HasActiveQuest or (int)Operator.IsNpcHash));

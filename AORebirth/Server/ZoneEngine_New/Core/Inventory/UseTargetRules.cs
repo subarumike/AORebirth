@@ -28,8 +28,6 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         public const string LostFightingTarget = "no longer the fighting target";
 
-        const int NpcItemRange = 5;
-
         public enum Failure
         {
             None,
@@ -172,10 +170,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (ReferenceEquals(target, user))
                 return null;
             int range = template.Stats.TryGetValue(CharacterStat.AttackRange, out int value) ? StatCollection.Normalize(value) : 0;
-            // No AttackRange: one metre, or the few metres an NPC-only item (the stim on a lying dockworker) allows.
-            if (range <= 0)
-                range = target is NpcCharacter && NamesTargetNpc(template) ? NpcItemRange : 1;
-            if (user.GetEdgeDistanceTo(target) > range)
+            if (user.GetEdgeDistanceTo(target) > (range > 0 ? range : 1))
                 return Failure.OutOfRange;
             if (!user.HasLineOfSightTo(target))
                 return Failure.NoLineOfSight;
