@@ -297,8 +297,8 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         /// <param name="area">
-        /// An AreaCastNano spread: everything in range is caught, friend or foe. A hostile child spares only its
-        /// caster and NPCs that cannot be attacked (or that an NPC caster leaves alone); a friendly one reaches all.
+        /// An AreaCastNano spread: a hostile child spares its caster, friendly pets, and NPCs that cannot be attacked
+        /// (or that an NPC caster leaves alone); a friendly one reaches all.
         /// </param>
         internal static bool AcceptsRecipient(Character source, Character candidate, NanoSpell child, bool area = false)
         {
@@ -334,13 +334,29 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         /// <summary>
-        /// A hostile area effect catches friend and foe alike: everyone in range but its source, NPCs that cannot be
-        /// attacked, and the NPCs an NPC source leaves alone (<see cref="IsSparedByNpcArea"/>).
+        /// A hostile area effect catches friend and foe alike except its source, pets owned by its source or team/raid,
+        /// NPCs that cannot be attacked, and the NPCs an NPC source leaves alone (<see cref="IsSparedByNpcArea"/>).
         /// </summary>
         internal static bool IsCaughtByHostileArea(Character source, Character candidate)
             => !ReferenceEquals(source, candidate)
                 && candidate is not NpcCharacter { Attackable: false }
+                && !IsFriendlyPet(source, candidate)
                 && !IsSparedByNpcArea(source, candidate);
+
+        /// <summary>Pet affiliation follows its owner; a raid uses the existing team membership rules.</summary>
+        internal static bool IsFriendlyPet(Character source, Character candidate)
+        {
+            if (candidate is not NpcCharacter { PetOwner: Character owner })
+                return false;
+
+            Character sourceOwner = source is NpcCharacter { PetOwner: Character casterOwner } ? casterOwner : source;
+            if (ReferenceEquals(sourceOwner, owner))
+                return true;
+
+            return sourceOwner is Player sourcePlayer && owner is Player ownerPlayer
+                && (sourcePlayer.Playfield ?? ownerPlayer.Playfield)?.GetService<TeamService>()
+                    ?.AreTeammates(sourcePlayer, ownerPlayer) == true;
+        }
 
         /// <summary>
         /// An NPC's hostile area nano leaves other NPCs alone unless it is fighting that NPC.

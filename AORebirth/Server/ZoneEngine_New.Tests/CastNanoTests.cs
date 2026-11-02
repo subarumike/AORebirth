@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Tests
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading;
@@ -22,6 +23,7 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Pets;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Teams;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -446,6 +448,165 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, near.Buffs.Count);
         }
 
+        [DataTestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void HostileAreaCastSparesOwnTeamAndRaidPetsButStillCatchesUnrelatedPets(bool raid)
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId, can: 0, flags: NanoFlags.IsHostile, modifiers: [Taunt(500)]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player teammate = world.Player(2, 1, 0, 0);
+            Player thirdMember = world.Player(3, 2, 0, 0);
+            Player unrelatedOwner = world.Player(4, 3, 0, 0);
+            world.Join(caster, teammate);
+            world.Join(caster, thirdMember);
+            if (raid)
+            {
+                TeamService teams = world.Playfield.GetRequiredService<TeamService>();
+                Assert.IsTrue(teams.ConvertToRaid(caster));
+                Assert.IsTrue(teams.MoveRaidMember(caster, thirdMember.Identity.Instance, 1));
+            }
+
+            NpcCharacter ownPet = world.Npc(10, 4, 0, 0, attackable: true);
+            NpcCharacter teamPet = world.Npc(11, 5, 0, 0, attackable: true);
+            NpcCharacter thirdPet = world.Npc(12, 6, 0, 0, attackable: true);
+            NpcCharacter unrelatedPet = world.Npc(13, 7, 0, 0, attackable: true);
+            NpcCharacter ordinaryNpc = world.Npc(14, 8, 0, 0, attackable: true);
+            ownPet.BindPet(new PetController(caster, 1, "synthetic-pet", 60, null));
+            teamPet.BindPet(new PetController(teammate, 1, "synthetic-pet", 60, null));
+            thirdPet.BindPet(new PetController(thirdMember, 1, "synthetic-pet", 60, null));
+            unrelatedPet.BindPet(new PetController(unrelatedOwner, 1, "synthetic-pet", 60, null));
+            foreach (NpcCharacter npc in new[] { ownPet, teamPet, thirdPet, unrelatedPet, ordinaryNpc })
+                NpcBrain.Create(npc);
+
+            Assert.IsTrue(UseAreaOn(caster, caster, items, HostileId, radius: 20));
+
+            foreach (NpcCharacter pet in new[] { ownPet, teamPet, thirdPet })
+            {
+                Assert.IsFalse(pet.TryGetBuff(HostileId, out _));
+                Assert.IsTrue(pet.Brain!.Hate.IsEmpty);
+            }
+            foreach (NpcCharacter npc in new[] { unrelatedPet, ordinaryNpc })
+            {
+                Assert.IsTrue(npc.TryGetBuff(HostileId, out _));
+                Assert.IsTrue(npc.Brain!.Hate.ThreatOf(caster.Identity) >= 500f);
+            }
+        }
+
+        [TestMethod]
+        public void HostileAreaFromPetUsesItsOwnersPetAndTeamAffiliation()
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId, can: 0, flags: NanoFlags.IsHostile, modifiers: [Taunt(500)]));
+            using var world = new FanoutWorld(items);
+            Player owner = world.Player(1, 0, 0, 0);
+            Player teammate = world.Player(2, 1, 0, 0);
+            Player unrelatedOwner = world.Player(3, 2, 0, 0);
+            world.Join(owner, teammate);
+            NpcCharacter caster = world.Npc(10, 3, 0, 0, attackable: true);
+            NpcCharacter siblingPet = world.Npc(11, 4, 0, 0, attackable: true);
+            NpcCharacter teamPet = world.Npc(12, 5, 0, 0, attackable: true);
+            NpcCharacter unrelatedPet = world.Npc(13, 6, 0, 0, attackable: true);
+            caster.BindPet(new PetController(owner, 1, "synthetic-pet", 60, null));
+            siblingPet.BindPet(new PetController(owner, 1, "synthetic-pet", 60, null));
+            teamPet.BindPet(new PetController(teammate, 1, "synthetic-pet", 60, null));
+            unrelatedPet.BindPet(new PetController(unrelatedOwner, 1, "synthetic-pet", 60, null));
+            caster.Stats.Set(CharacterStat.PetMaster, owner.Identity.Instance);
+            siblingPet.Stats.Set(CharacterStat.PetMaster, owner.Identity.Instance);
+            teamPet.Stats.Set(CharacterStat.PetMaster, teammate.Identity.Instance);
+            unrelatedPet.Stats.Set(CharacterStat.PetMaster, unrelatedOwner.Identity.Instance);
+            foreach (NpcCharacter pet in new[] { siblingPet, teamPet, unrelatedPet })
+                NpcBrain.Create(pet);
+
+            Assert.IsTrue(UseAreaOn(caster, caster, items, HostileId, radius: 20));
+
+            Assert.IsFalse(siblingPet.TryGetBuff(HostileId, out _));
+            Assert.IsFalse(teamPet.TryGetBuff(HostileId, out _));
+            Assert.IsTrue(siblingPet.Brain!.Hate.IsEmpty);
+            Assert.IsTrue(teamPet.Brain!.Hate.IsEmpty);
+            Assert.IsTrue(unrelatedPet.TryGetBuff(HostileId, out _));
+            Assert.IsTrue(unrelatedPet.Brain!.Hate.ThreatOf(caster.Identity) >= 500f);
+            Assert.AreEqual(0f, unrelatedPet.Brain.Hate.ThreatOf(owner.Identity));
+        }
+
+        [TestMethod]
+        public void FriendlyAreaBuffStillLandsOnOwnAndTeamPets()
+        {
+            var items = new StubItemBuilder().Add(Timed(BuffId));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player teammate = world.Player(2, 1, 0, 0);
+            world.Join(caster, teammate);
+            NpcCharacter ownPet = world.Npc(10, 2, 0, 0, attackable: true);
+            NpcCharacter teamPet = world.Npc(11, 3, 0, 0, attackable: true);
+            ownPet.BindPet(new PetController(caster, 1, "synthetic-pet", 60, null));
+            teamPet.BindPet(new PetController(teammate, 1, "synthetic-pet", 60, null));
+
+            Assert.IsTrue(UseAreaOn(caster, caster, items, BuffId, radius: 20));
+
+            Assert.IsTrue(caster.TryGetBuff(BuffId, out _));
+            Assert.IsTrue(ownPet.TryGetBuff(BuffId, out _));
+            Assert.IsTrue(teamPet.TryGetBuff(BuffId, out _));
+        }
+
+        [DataTestMethod]
+        [DataRow(0)]
+        [DataRow(6000)]
+        public void DirectHostileAreaRejectsFriendlyPetBeforePacketsBuffOrTauntButAllowsGmOverride(int duration)
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId, durationCentiseconds: duration, can: 0, flags: NanoFlags.IsHostile,
+                modifiers:
+                [
+                    new ItemSpell
+                    {
+                        FunctionType = (int)FunctionType.TauntNpc,
+                        Target = (int)ItemTarget.User,
+                        Arguments = [500]
+                    }
+                ]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            NpcCharacter ownPet = world.Npc(10, 2, 0, 0, attackable: true);
+            NpcCharacter ordinaryNpc = world.Npc(11, 3, 0, 0, attackable: true);
+            ownPet.BindPet(new PetController(caster, 1, "synthetic-pet", 60, null));
+            NpcBrain.Create(ownPet);
+            NpcBrain.Create(ordinaryNpc);
+            Cell cell = new CellGrid(null, visibilityNeighborLevel: 0).ResolveCell(default);
+            foreach (Character character in new Character[] { caster, ownPet, ordinaryNpc })
+            {
+                character.Cell = cell;
+                cell.Add(character);
+            }
+            var session = (InventoryActionTests.Session)caster.Session!;
+
+            // The same cell and session observe both packets for an eligible target.
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(
+                caster, ordinaryNpc, HostileId, items, new SilentInventory(), DateTime.UtcNow, areaSpread: true));
+            Assert.IsTrue(session.Messages.OfType<CastNanoSpellMessage>().Any(m => m.Target == ordinaryNpc.Identity));
+            Assert.IsTrue(session.Messages.OfType<CharacterActionMessage>().Any(m =>
+                m.Action == CharacterActionType.FinishNanoCasting && m.Parameter2 == HostileId));
+            Assert.IsTrue(ordinaryNpc.Brain!.Hate.ThreatOf(caster.Identity) >= 500f);
+            session.Messages.Clear();
+
+            Assert.IsFalse(NanoRuntime.TryApplyImmediate(
+                caster, ownPet, HostileId, items, new SilentInventory(), DateTime.UtcNow, areaSpread: true));
+
+            Assert.AreEqual(0, session.Messages.Count);
+            Assert.IsFalse(ownPet.TryGetBuff(HostileId, out _));
+            Assert.IsTrue(ownPet.Brain!.Hate.IsEmpty);
+
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(
+                caster, ownPet, HostileId, items, new SilentInventory(), DateTime.UtcNow,
+                gmApply: true, areaSpread: true));
+            Assert.IsTrue(session.Messages.OfType<CastNanoSpellMessage>().Any(m => m.Target == ownPet.Identity));
+            Assert.IsTrue(session.Messages.OfType<CharacterActionMessage>().Any(m =>
+                m.Action == CharacterActionType.FinishNanoCasting && m.Parameter2 == HostileId));
+            Assert.AreEqual(duration > 0, ownPet.TryGetBuff(HostileId, out _));
+        }
+
         [TestMethod]
         public void TeamCastNanoLandsOnTeammatesAndSoloSelf()
         {
@@ -755,7 +916,7 @@ namespace ZoneEngine_New.Tests
             return template.ExecuteOnUseSpells(player, new SilentInventory(), items);
         }
 
-        static bool UseAreaOn(Player caster, Character center, StubItemBuilder items, int nanoId, int radius)
+        static bool UseAreaOn(Character caster, Character center, StubItemBuilder items, int nanoId, int radius)
         {
             var template = new ItemTemplate
             {

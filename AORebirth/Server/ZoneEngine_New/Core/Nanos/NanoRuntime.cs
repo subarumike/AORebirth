@@ -504,7 +504,8 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>
         /// Lands a nano immediately: no cast bar, recharge, nano spend, or upload check.
         /// Buffs occupy NCU; instant nanos just run their OnUse effects. <paramref name="areaSpread"/> (an area nano
-        /// catching everything in range): a hostile nano also lands on targets the source could not attack directly.
+        /// catching everything in range): a hostile nano also lands on targets the source could not attack directly,
+        /// except pets owned by the source or its team/raid.
         /// </summary>
         public static bool TryApplyImmediate(
             Character source,
@@ -549,6 +550,9 @@ namespace ZoneEngine_New.Core.Nanos
             if (!gmApply)
             {
                 if (IsNoCombat(source) || IsNoCombat(target))
+                    return false;
+
+                if (spell.IsHostile && areaSpread && NanoCastFunctions.IsFriendlyPet(source, target))
                     return false;
 
                 if (spell.IsHostile && !areaSpread && !IsHostileNanoTarget(source, target))
