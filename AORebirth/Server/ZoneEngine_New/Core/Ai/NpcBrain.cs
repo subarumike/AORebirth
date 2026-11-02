@@ -454,6 +454,19 @@ namespace ZoneEngine_New.Core.Ai
                 return;
             }
 
+            // Calmed (Pacify, e.g. 155577): stands where it is until the effect ends. No patrol, stroll, scripted walk
+            // or walk home; each picks up again on the first think after the calm expires.
+            if (Npc.IsPacified)
+            {
+                StopWandering();
+                InterruptScriptedMovement();
+                StopPathing();
+                _nanos.Tick(DateTime.UtcNow);
+                if (Npc.IsCastingNano)
+                    StopPathing();
+                return;
+            }
+
             // A wanderer drops its stroll and runs as soon as it has anything to fight or flee.
             _wanderedThisThink = false;
             if (!Hate.IsEmpty || _leashing || _evading)

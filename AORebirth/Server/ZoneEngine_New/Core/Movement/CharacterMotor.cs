@@ -749,15 +749,35 @@ namespace ZoneEngine_New.Core.Movement
             Vector3 held = _character.Position;
             if (message.Coordinates != null)
             {
+                // A root or stun holds the body where it stands, not where it hangs: one landing mid-jump or mid-fall
+                // leaves the held point in the air while the client keeps falling. Judging that drop as drift pulled the
+                // client back up every pull-back interval for the whole stun. So drift is horizontal only, and the held
+                // body comes down with the client (never up), no lower than the floor.
                 double dx = message.Coordinates.X - held.x;
-                double dy = message.Coordinates.Y - held.y;
                 double dz = message.Coordinates.Z - held.z;
                 DateTime now = DateTime.UtcNow;
-                if ((dx * dx) + (dy * dy) + (dz * dz) > RootDriftMeters * RootDriftMeters
+                if ((dx * dx) + (dz * dz) > RootDriftMeters * RootDriftMeters
                     && (now - _lastRootCorrectionUtc).TotalSeconds >= RootCorrectionSeconds)
                 {
                     RootCorrectionDue = true;
                     _lastRootCorrectionUtc = now;
+                }
+
+                float reportedY = message.Coordinates.Y;
+                if (reportedY < held.yf)
+                {
+                    Playfield? playfield = _character.Playfield;
+                    float y = reportedY;
+                    if (playfield != null
+                        && playfield.TrySnapFeetToFloor(new Vector3(held.x, reportedY, held.z), out Vector3 floor)
+                        && y < (float)floor.y)
+                        y = (float)floor.y;
+                    if (y < held.yf)
+                    {
+                        held = new Vector3(held.x, y, held.z);
+                        _character.Position = held;
+                        _sim.Position = new Vec3(held.xf, y, held.zf);
+                    }
                 }
 
                 message.Coordinates = new MsgVector3(held.xf, held.yf, held.zf);
