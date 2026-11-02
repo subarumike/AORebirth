@@ -513,7 +513,22 @@ namespace ZoneEngine_New.Core.Entities
             _corpseSwapRemainingSeconds = CorpseSpawnDelayMilliseconds / 1000.0;
 
             List<int>? credited = AwardKillRewards();
+            if (IsPlayer && IsInvader(killer))
+                IncrementStat(CharacterStat.KilledByInvaders);
             RaiseModuleDeathEvents(killer, credited);
+        }
+
+        /// <summary>An alien NPC (NPCFamily 220) itself; pets never count.</summary>
+        static bool IsInvader(Character? killer)
+            => killer is NpcCharacter { PetOwner: null } alien
+                && alien.Stats.GetOrZero(CharacterStat.NPCFamily) == AlienNpcFamily;
+
+        /// <summary>Adds one to a counter stat (saved and sent like any changed stat).</summary>
+        void IncrementStat(CharacterStat stat)
+        {
+            int value = Stats.GetOrZero(stat);
+            if (value < int.MaxValue)
+                Stats.Set(stat, value + 1, StatDetail.Base, dirty: true);
         }
 
         /// <summary>
@@ -1268,8 +1283,12 @@ namespace ZoneEngine_New.Core.Entities
                     // NOTE: Gameplay.json xp.teamMemberPercent is a stand-in table, not live's team XP rule.
                     long amount = (long)(solo * share.Amount / AlienShareBasis * xpRules.MemberPercent(recipients.Count) / 100);
                     amount = Math.Max(amount, xpRules.AlienMinimumXp);
-                    if (amount > 0)
+                    if (amount > 0 && recipient.IsPlayer)
+                    {
                         recipient.AwardAlienXp((int)Math.Min(amount, int.MaxValue));
+                        // Every player paid alien XP for the kill counts it; pets earn neither.
+                        recipient.IncrementStat(CharacterStat.InvadersKilled);
+                    }
                 }
             }
         }
