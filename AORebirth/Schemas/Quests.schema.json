@@ -117,6 +117,15 @@
         "minimum": 0,
         "maximum": 639
       },
+      "Aliases": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        }
+      },
       "NextStep": {
         "type": [
           "string",

@@ -84,6 +84,9 @@ namespace ZoneEngine_New.Tests
         public bool TryGetHashInstance(string hash, out HashInstance instance)
             => _hashItems.TryGetInstance(hash, out instance);
 
+        public bool IsHashSpawnAll(string hash)
+            => _hashItems.IsSpawnAll(hash);
+
         public bool TryGetAssignedItemHash(int lowId, int highId, out string hash)
             => _hashItems.TryGetAssignedHash(lowId, highId, out hash);
 

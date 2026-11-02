@@ -95,6 +95,23 @@ namespace ZoneEngine_New.Core.Quests
         }
 
         /// <summary>
+        /// An item's SpawnQuest (the DOJA chips' SpawnQuest MAA6, the credit card's KY6D) gives the Quests.json quest of
+        /// <paramref name="hash"/> or a template alias. True when it is held afterwards; using the item again while it
+        /// is held changes nothing. Who may start it is the item's own ToUse and criteria (the chip's level band, its
+        /// HasActiveQuest gates), checked before the function runs.
+        /// </summary>
+        public bool TryStartFromItem(Player player, string hash)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (!_catalog.TryGetByHashOrAlias(hash, out QuestTemplate template))
+                return false;
+            if (GetLog(player).Quests.TryGetValue(template.Hash, out PlayerQuest? held) && held.IsActive)
+                return true;
+
+            return TryAssignTemplate(player, template.Hash, out _);
+        }
+
+        /// <summary>
         /// Ends an active quest that is no longer an option (Steal the credits... once the card went back to Leonora
         /// Marty): saved as failed and taken out of the journal, with no reward. False when it is not active.
         /// </summary>

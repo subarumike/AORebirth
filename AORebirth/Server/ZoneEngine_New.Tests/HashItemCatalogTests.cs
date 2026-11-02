@@ -175,6 +175,27 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void SpawnItemRollTakesEverySpawnAllBranchAndOnlyItFallsBackBelowAFamily()
+        {
+            HashItemCatalog catalog = HashItemCatalog.Parse(
+                """
+                {
+                    "ALL": { "SpawnAll": true, "Children": ["LOW", "HIGH"] },
+                    "LOW": { "Templates": [1] },
+                    "HIGH": { "Templates": [2] }
+                }
+                """);
+            var minter = new HashItemMinter(new StubGameData(catalog), new StubCatalog().Add(1, 1).Add(2, 17), new StubItemBuilder());
+            var rolled = new List<(int LowId, int HighId, int Quality)>();
+
+            minter.RollItemSpawnIds("ALL", 1, rolled);
+
+            CollectionAssert.AreEqual(new[] { (1, 1, 1), (2, 2, 17) }, rolled);
+            // Loot and corpse drops keep refusing a family that starts above the roll.
+            Assert.IsFalse(minter.TryRollHighestUpTo("HIGH", 1, out _, out _, out _));
+        }
+
+        [TestMethod]
         public void ClampQualityFloorsBelowOne()
         {
             HashItemCatalog catalog = HashItemCatalog.Parse(CatalogJson);

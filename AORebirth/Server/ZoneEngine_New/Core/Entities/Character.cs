@@ -2810,6 +2810,10 @@ namespace ZoneEngine_New.Core.Entities
                 // Gamecode.dll FUN_100588c4 (case 0x7c): the client refuses while dead or mid-teleport from its own
                 // character state before it sends the use; the server needs the character alive on a playfield.
                 Operator.MustBeAbleToTeleport => !IsDead && Playfield != null,
+                // Value = a spawn hash: this is that NPC (the Health Regeneration Stim works on a Wounded Dockworker).
+                Operator.IsNpcHash => this is NpcCharacter npc && NpcCharacter.TryDecodeAoHash(value, out string hash)
+                    && (string.Equals(npc.SpawnHash, hash, StringComparison.Ordinal)
+                        || string.Equals(npc.MobTemplate?.Hash, hash, StringComparison.Ordinal)),
                 _ => null
             };
         }

@@ -45,10 +45,52 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// SpawnItem's mint: of every leaf family reachable from <paramref name="hash"/>, the one that reaches the
-        /// highest QL at or below <paramref name="desiredQuality"/>, random among families tied at that QL. A QL-range
-        /// family reaches the request itself when it spans it, else its top QL. False when every family starts above
-        /// the request.
+        /// SpawnItem's mint (<see cref="RollItemSpawnIds"/>): every item one SpawnItem of <paramref name="hash"/> gives,
+        /// each with a freshly allocated instance id. Appends to <paramref name="into"/>.
+        /// </summary>
+        public void MintItemSpawns(string hash, int desiredQuality, ItemSource source, List<Item> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            var rolled = new List<(int LowId, int HighId, int Quality)>();
+            RollItemSpawnIds(hash, desiredQuality, rolled);
+            foreach ((int lowId, int highId, int quality) in rolled)
+                into.Add(_items.CreateWithNewInstance(lowId, highId, quality, source));
+        }
+
+        /// <summary>
+        /// The ids and QL of every item one SpawnItem of <paramref name="hash"/> gives. A SpawnAll parent gives one for
+        /// each child branch (a Nanoprogram Container's kit: Enforcer 248259's 9ATM is three crystals); any other hash
+        /// gives the one <see cref="TryRollHighestUpTo"/> picks. When every family of a hash starts above the request, it
+        /// gives the one that starts lowest, at that QL: a fixed-QL item named at QL 1 comes at its own QL (the same
+        /// kit's N34Q is the QL 17 Mongo Slam crystal). Appends to <paramref name="into"/>.
+        /// </summary>
+        public void RollItemSpawnIds(string hash, int desiredQuality, List<(int LowId, int HighId, int Quality)> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            RollItemSpawnIds(hash, desiredQuality, into, new HashSet<string>(StringComparer.Ordinal));
+        }
+
+        void RollItemSpawnIds(string hash, int desiredQuality, List<(int LowId, int HighId, int Quality)> into, HashSet<string> trail)
+        {
+            if (string.IsNullOrEmpty(hash) || !trail.Add(hash))
+                return;
+
+            if (_gameData.IsHashSpawnAll(hash) && _gameData.TryGetHashTemplate(hash, out IReadOnlyList<string> children))
+            {
+                for (int i = 0; i < children.Count; i++)
+                    RollItemSpawnIds(children[i], desiredQuality, into, trail);
+                return;
+            }
+
+            if (TryRollHighestUpTo(hash, desiredQuality, lowestWhenAbove: true, out int lowId, out int highId, out int quality))
+                into.Add((lowId, highId, quality));
+        }
+
+        /// <summary>
+        /// An NPC's SpawnItem mint (the item it carries to its corpse): of every leaf family reachable from
+        /// <paramref name="hash"/>, the one that reaches the highest QL at or below <paramref name="desiredQuality"/>,
+        /// random among families tied at that QL. A QL-range family reaches the request itself when it spans it, else its
+        /// top QL. False when every family starts above the request.
         /// </summary>
         public bool TryMintHighestUpTo(string hash, int desiredQuality, ItemSource source, out Item item)
         {
@@ -62,6 +104,9 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>The ids and QL <see cref="TryMintHighestUpTo"/> would mint, without creating an <see cref="Item"/>.</summary>
         public bool TryRollHighestUpTo(string hash, int desiredQuality, out int lowId, out int highId, out int quality)
+            => TryRollHighestUpTo(hash, desiredQuality, lowestWhenAbove: false, out lowId, out highId, out quality);
+
+        bool TryRollHighestUpTo(string hash, int desiredQuality, bool lowestWhenAbove, out int lowId, out int highId, out int quality)
         {
             lowId = 0;
             highId = 0;
@@ -90,6 +135,25 @@ namespace ZoneEngine_New.Core.Inventory
                 else if (reached == best && Random.Shared.Next(++ties) == 0)
                 {
                     picked = leaf.Instance;
+                }
+            }
+
+            if (picked == null && lowestWhenAbove)
+            {
+                best = int.MaxValue;
+                for (int i = 0; i < leaves.Length; i++)
+                {
+                    LeafRange leaf = leaves[i];
+                    if (leaf.Min < best)
+                    {
+                        best = leaf.Min;
+                        ties = 1;
+                        picked = leaf.Instance;
+                    }
+                    else if (leaf.Min == best && Random.Shared.Next(++ties) == 0)
+                    {
+                        picked = leaf.Instance;
+                    }
                 }
             }
 

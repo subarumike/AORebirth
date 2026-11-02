@@ -72,5 +72,30 @@ namespace ZoneEngine_New.Core.Quests
     public sealed class QuestLog
     {
         public Dictionary<string, PlayerQuest> Quests { get; } = new(StringComparer.Ordinal);
+
+        /// <summary>
+        /// The active quest an item names by hash (criteria HasActiveQuest, function SolveQuest): its id, its template
+        /// hash, or one of the template's <see cref="QuestTemplate.Aliases"/>. A quest whose
+        /// <see cref="PlayerQuest.ExpiresAtUtc"/> has passed is not active here, though <c>QuestService.GetLog</c> has not
+        /// closed it yet: the DOJA cooldown quest stops refusing the chips when it runs out.
+        /// </summary>
+        public PlayerQuest? FindActive(string hash) => FindActive(hash, DateTime.UtcNow);
+
+        public PlayerQuest? FindActive(string hash, DateTime nowUtc)
+        {
+            if (Quests.TryGetValue(hash, out PlayerQuest? direct) && Running(direct, nowUtc))
+                return direct;
+            foreach (PlayerQuest quest in Quests.Values)
+            {
+                if (Running(quest, nowUtc) && (string.Equals(quest.Template.Hash, hash, StringComparison.Ordinal)
+                    || Array.IndexOf(quest.Template.Aliases ?? [], hash) >= 0))
+                    return quest;
+            }
+
+            return null;
+        }
+
+        static bool Running(PlayerQuest quest, DateTime nowUtc)
+            => quest.IsActive && (quest.IsRewardPending || quest.ExpiresAtUtc is not DateTime expires || nowUtc < expires);
     }
 }

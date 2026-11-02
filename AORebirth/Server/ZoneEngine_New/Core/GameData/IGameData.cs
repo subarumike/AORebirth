@@ -90,6 +90,9 @@ namespace ZoneEngine_New.Core.GameData
 
         bool TryGetHashInstance(string hash, out HashInstance instance);
 
+        /// <summary>True when <paramref name="hash"/> is a parent whose every child branch spawns (<c>SpawnAll</c>).</summary>
+        bool IsHashSpawnAll(string hash) => false;
+
         /// <summary>Returns the unique assigned leaf hash for one exact LowId/HighId pair.</summary>
         bool TryGetAssignedItemHash(int lowId, int highId, out string hash)
         { hash = string.Empty; return false; }

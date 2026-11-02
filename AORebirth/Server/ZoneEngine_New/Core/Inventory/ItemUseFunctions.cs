@@ -97,8 +97,13 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.TeamCastNano:
                 case FunctionType.PlayfieldNano:
                 case FunctionType.CastOnPets:
-                    return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository);
+                    return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository, NamesNpc(spell));
+                case FunctionType.NpcSayRobotSpeech:
+                    // [text key] such as {stock_pet_init}: the key's text is not known here, and it is only a line
+                    // the NPC says. Counts as done so the functions after it run as live's do.
+                    return true;
                 case FunctionType.Teleport:
+                case FunctionType.TeleportOut:
                     return target is Player teleportPlayer && Teleport(teleportPlayer, spell);
                 case FunctionType.LineTeleport:
                     return target is Player linePlayer && LineTeleport(linePlayer, spell);
@@ -150,6 +155,12 @@ namespace ZoneEngine_New.Core.Inventory
                     return NpcTeleportToSpawnPoint(target);
                 case FunctionType.NpcFightSelected:
                     return NpcFightSelected(target, source);
+                case FunctionType.SolveQuest:
+                    return SolveQuest(target, source, spell);
+                case FunctionType.SpawnQuest:
+                    return ResolveApplyOn(target, source, spell) is Player questPlayer && SpawnQuest(questPlayer, spell);
+                case FunctionType.FailQuestByQas:
+                    return ResolveApplyOn(target, source, spell) is Player failPlayer && FailQuest(failPlayer, spell);
                 default:
                     LogUtil.Debug(
                         DebugInfoDetail.Network,
@@ -664,18 +675,20 @@ namespace ZoneEngine_New.Core.Inventory
                 .Charm(owner, npc, templateId, Pets.PetTypes.CharmType(requirements), requirements);
         }
 
-        /// <summary>
-        /// Catalog shape: hash, quality, and a 0/1 third integer. Both third values grant one item; any other third
-        /// value is refused. The item is the hash's highest QL at or below the requested quality
-        /// (<see cref="HashItemMinter.TryMintHighestUpTo"/>; the quality scales with the casting item's QL). A player
-        /// gets it in inventory; an NPC carries it and its corpse drops it alongside the item table loot.
-        /// </summary>
         /// <summary>SpawnItem Flags: the item goes to the user's inventory rather than the world.</summary>
         const int SpawnItemIntoInventory = 1;
 
         /// <summary>SpawnItem Flags: RelX/Y/Z is a playfield position, not an offset from the user.</summary>
         const int SpawnItemAbsolutePosition = 4;
 
+        /// <summary>
+        /// Catalog shape: hash, quality, and a 0/1 third integer. Both third values grant the hash's items; any other
+        /// third value is refused. A player gets every item one SpawnItem of the hash gives
+        /// (<see cref="HashItemMinter.MintItemSpawns"/>: a SpawnAll parent's every branch, as a Nanoprogram Container's
+        /// kit; else the hash's highest QL at or below the requested quality, which scales with the casting item's QL).
+        /// An NPC gets the one <see cref="HashItemMinter.TryMintHighestUpTo"/> picks: carried, its corpse drops it alongside
+        /// the item table loot, or placed in the world when the Flags say so.
+        /// </summary>
         static bool SpawnItem(Character target, ItemSpell spell)
         {
             if (!spell.TryReadString(0, out string hash) || hash.Length == 0)
@@ -715,9 +728,17 @@ namespace ZoneEngine_New.Core.Inventory
             if (target is not Player player || player.Playfield == null || player.Session == null)
                 return false;
 
-            if (!player.Playfield.GetRequiredService<HashItemMinter>().TryMintHighestUpTo(hash, quality, ItemSource.Other, out Item item))
-                return false;
+            var items = new List<Item>();
+            player.Playfield.GetRequiredService<HashItemMinter>().MintItemSpawns(hash, quality, ItemSource.Other, items);
+            bool given = false;
+            foreach (Item item in items)
+                given |= GiveSpawnedItem(player, spell, item, intoWorld, spawnFlags);
+            return given;
+        }
 
+        /// <summary>One item of a player's SpawnItem: into the inventory (overflow when full), or placed in the world.</summary>
+        static bool GiveSpawnedItem(Player player, ItemSpell spell, Item item, bool intoWorld, int spawnFlags)
+        {
             // Other outcomes were possible (the use was not refused up front), but this roll is a Unique already held.
             if (Trade.TradeRules.IsUnique(item) && Trade.TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId))
             {
@@ -731,7 +752,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
             }
 
-            if (InventoryStacking.TryGrantOntoStack(player, item, player.Playfield.GetService<InventoryFlushService>()))
+            if (InventoryStacking.TryGrantOntoStack(player, item, player.Playfield!.GetService<InventoryFlushService>()))
                 return true;
             if (!player.Inventory.TryPlace(item, out Container page, out int slot))
                 return false;
@@ -748,7 +769,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
             }
 
-            player.Session.Send(
+            player.Session!.Send(
                 new AddTemplateMessage
                 {
                     Identity = player.Identity,
@@ -852,6 +873,63 @@ namespace ZoneEngine_New.Core.Inventory
 
             brain.StopPathing();
             npc.Motor.Warp(home);
+            return true;
+        }
+
+        /// <summary>
+        /// True when the function's requirements name its target NPC by spawn hash (Operator.IsNpcHash): it is written
+        /// for that NPC, a quest effect rather than an attack (OTAF Official Notice 297243 on "OIUR").
+        /// </summary>
+        static bool NamesNpc(ItemSpell spell)
+            => spell.Requirements.Exists(r => r.Operator == (int)Operator.IsNpcHash);
+
+        /// <summary>
+        /// SolveQuest [hash]: completes the user's active quest of that hash (or template alias) as an NPC turn-in does.
+        /// Health Regeneration Stim 297044 used on a Wounded Dockworker: SolveQuest "82OD" finishes JTEV.
+        /// </summary>
+        static bool SolveQuest(Character target, Character? source, ItemSpell spell)
+        {
+            // Solved for the player of the use: the user of an item (Health Regeneration Stim on a Wounded Dockworker),
+            // or the player a creature's nano landed on (Resolve 2PZ7, area-cast by the Omni-AF Private).
+            if ((source as Player ?? target as Player) is not Player player
+                || player.Playfield?.GetService<Quests.QuestService>() is not { } quests)
+                return false;
+            string hash = spell.TryReadString(0, out string text) ? text.Trim()
+                : spell.TryReadInt(0, out int packed) && NpcCharacter.TryDecodeAoHash(packed, out string decoded) ? decoded
+                : string.Empty;
+            if (hash.Length == 0 || player.QuestLog?.FindActive(hash) is not { } quest)
+                return false;
+            return quests.TryComplete(player, quest.QuestId, out _);
+        }
+
+        /// <summary>
+        /// SpawnQuest [hash, ?, ?]: gives the player the Quests.json quest of that hash or template alias, as a quest
+        /// starter item does. Bank of Rubi-Ka Credit Card 297315: KY6D (Steal the credits) and QHL3 (Deliver the Lost
+        /// Credit Card). True when the quest is held afterwards.
+        /// </summary>
+        static bool SpawnQuest(Player player, ItemSpell spell)
+        {
+            if (player.Playfield?.GetService<Quests.QuestService>() is not { } quests)
+                return false;
+            string hash = spell.TryReadString(0, out string text) ? text.Trim()
+                : spell.TryReadInt(0, out int packed) && NpcCharacter.TryDecodeAoHash(packed, out string decoded) ? decoded
+                : string.Empty;
+            if (hash.Length == 0)
+                return false;
+            return quests.TryStartFromItem(player, hash);
+        }
+
+        static bool FailQuest(Player player, ItemSpell spell)
+        {
+            if (player.Playfield?.GetService<Quests.QuestService>() is not { } quests || !spell.TryReadInt(0, out int qas) || qas <= 0)
+                return false;
+            foreach (Quests.PlayerQuest quest in quests.GetLog(player).Quests.Values)
+            {
+                if (quest.IsActive && quest.Template.QasInstance == qas)
+                    return quests.TryFail(player, quest);
+            }
+
+            // Not held (deleted already): nothing left to end.
             return true;
         }
 

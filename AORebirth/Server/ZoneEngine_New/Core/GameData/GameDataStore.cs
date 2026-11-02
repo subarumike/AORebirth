@@ -213,6 +213,9 @@ namespace ZoneEngine_New.Core.GameData
         public bool TryGetHashInstance(string hash, out HashInstance instance)
             => _hashItems.TryGetInstance(hash, out instance);
 
+        public bool IsHashSpawnAll(string hash)
+            => _hashItems.IsSpawnAll(hash);
+
         public IReadOnlyCollection<HashInstance> ItemFamilies => _hashItems.Instances;
 
         public bool TryGetAssignedItemHash(int lowId, int highId, out string hash)

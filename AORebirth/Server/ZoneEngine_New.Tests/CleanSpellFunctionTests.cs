@@ -132,6 +132,37 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void SpawnItemGivesEveryBranchOfASpawnAllHashAndAFixedQualityItemAtItsOwn()
+        {
+            Player player = TestWorld.CreatePlayer(6);
+            var sent = new RecordingSession();
+            player.Session = sent;
+            // A Nanoprogram Container's kit: SpawnItem 9ATM (three crystals) and N34Q (the QL 17 Mongo Slam crystal), both at QL 1.
+            HashItemCatalog catalog = HashItemCatalog.Parse(
+                """
+                {
+                    "9ATM": { "SpawnAll": true, "Children": ["AR1", "AR2", "AR3"] },
+                    "AR1": { "Templates": [1, 1] },
+                    "AR2": { "Templates": [2, 2] },
+                    "AR3": { "Templates": [3, 3] },
+                    "N34Q": { "Templates": [4] }
+                }
+                """);
+            StubCatalog templates = new StubCatalog().Add(1, 1).Add(2, 4).Add(3, 4).Add(4, 17);
+            var builder = new StubItemBuilder();
+            player.Playfield = PlayfieldWith(new HashItemMinter(new StubGameData(catalog), templates, builder), builder);
+
+            Assert.IsTrue(Run(player, FunctionType.SpawnItem, "9ATM", 1, 0));
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, sent.Bodies.OfType<AddTemplateMessage>().Select(m => m.LowId).ToArray());
+
+            Assert.IsTrue(Run(player, FunctionType.SpawnItem, "N34Q", 1, 0));
+            AddTemplateMessage crystal = sent.Bodies.OfType<AddTemplateMessage>().Last();
+            Assert.AreEqual(4, crystal.LowId);
+            Assert.AreEqual(17, crystal.Quality);
+            Assert.AreEqual(4, player.Inventory.Inventory.Content.Count);
+        }
+
+        [TestMethod]
         public void NpcSocialAnimSendsTheAnimationId()
         {
             Player player = TestWorld.CreatePlayer(7);
@@ -238,9 +269,7 @@ namespace ZoneEngine_New.Tests
 
             public void UnbindPlayer() => Player = null;
 
-            public void TransferToPlayfield(Playfield destination, Vector3 landing)
-            {
-            }
+            public bool TransferToPlayfield(Playfield destination, Vector3 landing) => false;
 
             public void Send(byte[] packet)
             {
