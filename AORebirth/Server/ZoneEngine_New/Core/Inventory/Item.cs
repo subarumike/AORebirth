@@ -363,14 +363,14 @@ namespace ZoneEngine_New.Core.Inventory
         /// a reload). A stack taken to 0 leaves inventory and is retired; the caller tells the client (a Reload's
         /// RemoveAmmoStack drops the slot), so no DeleteItem is sent here.
         /// </summary>
-        internal bool TakeFromStack(Player player, int placement, int count)
+        internal bool TakeFromStack(Player player, Container page, int placement, int count)
         {
             ArgumentNullException.ThrowIfNull(player);
+            ArgumentNullException.ThrowIfNull(page);
             if (count <= 0 || count > StackCount || Locked)
                 return false;
 
             PlayerInventory inventory = player.Inventory;
-            Container page = inventory.Inventory;
             if (!page.Content.TryGetValue(placement, out Item? occupant) || !ReferenceEquals(occupant, this))
                 return false;
 

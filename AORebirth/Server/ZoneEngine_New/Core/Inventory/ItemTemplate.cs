@@ -497,8 +497,25 @@ namespace ZoneEngine_New.Core.Inventory
 
             criteria ??= new SpellCriteria();
             bool executed = false;
+            // An item used on a target is used up before anything it pays out: a reward or teleport that ran first could
+            // otherwise land while the DestroyItem after it found the item gone or moved, keeping both. The caller has
+            // checked the item is still in its slot and unlocked, so a DestroyItem that runs first only fails on its criteria.
+            bool consumeFirst = eventType == EventType.OnUseItemOn && criteria.Subject != null;
+            if (consumeFirst)
+            {
+                foreach (ItemSpell spell in spells)
+                {
+                    if (spell.Is(FunctionType.DestroyItem))
+                        executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria);
+                }
+            }
+
             foreach (ItemSpell spell in spells)
+            {
+                if (consumeFirst && spell.Is(FunctionType.DestroyItem))
+                    continue;
                 executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria);
+            }
 
             return executed;
         }
@@ -527,7 +544,7 @@ namespace ZoneEngine_New.Core.Inventory
                 if (!spell.Is(FunctionType.LockSkill) || !ItemUseFunctions.TryReadSkillLock(spell, out int stat, out _))
                     continue;
 
-                TimeSpan left = ItemUseFunctions.ResolveApplyOn(target, source, spell).SkillLocks.Remaining(stat, nowUtc);
+                TimeSpan left = ResolveApplyOn(target, source, spell).SkillLocks.Remaining(stat, nowUtc);
                 if (left <= TimeSpan.Zero)
                     continue;
 
@@ -561,6 +578,14 @@ namespace ZoneEngine_New.Core.Inventory
                 source: source);
         }
 
+        /// <summary>True when User / Wearer / Self functions act on the character running this template, not its source.</summary>
+        protected virtual bool UserIsRecipient => false;
+
+        Character ResolveApplyOn(Character target, Character? source, ItemSpell spell)
+            => UserIsRecipient && spell.Target is (int)ItemTarget.User or (int)ItemTarget.Wearer or (int)ItemTarget.Self
+                ? target
+                : ItemUseFunctions.ResolveApplyOn(target, source, spell);
+
         bool ExecuteSpell(
             Character target,
             Character? source,
@@ -579,7 +604,7 @@ namespace ZoneEngine_New.Core.Inventory
             // pick exactly one branch.
             Character eventTarget = target;
             Character user = source ?? target;
-            target = ItemUseFunctions.ResolveApplyOn(target, source, spell);
+            target = ResolveApplyOn(target, source, spell);
             Character applyOn = target;
             if (!ItemTemplate.MeetsRequirements(
                     spell.Requirements,

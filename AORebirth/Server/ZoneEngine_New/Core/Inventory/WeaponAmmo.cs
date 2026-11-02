@@ -83,7 +83,7 @@ namespace ZoneEngine_New.Core.Inventory
             if (Rounds(item) > 0)
                 return true;
 
-            TryReload(player, weapon, ammoPlacement: null);
+            TryReload(player, weapon, ammoSlot: null);
             return false;
         }
 
@@ -122,7 +122,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         static void ReloadOrSayNoAmmo(Player player, CharacterWeapon weapon)
         {
-            ReloadResult result = TryReload(player, weapon, ammoPlacement: null);
+            ReloadResult result = TryReload(player, weapon, ammoSlot: null);
             if (weapon.Item is not Item item)
                 return;
 
@@ -133,22 +133,23 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
-        /// Tops up <paramref name="weapon"/>'s clip from the main-inventory stack at <paramref name="ammoPlacement"/>, or
-        /// from the first stack of its ammo when null, then starts the reload pause and sends Reload.
+        /// Tops up <paramref name="weapon"/>'s clip from the stack at <paramref name="ammoSlot"/> (a main-inventory slot or a
+        /// carried bag's packed Backpack slot), or from the first main-inventory stack of its ammo when null, then starts
+        /// the reload pause and sends Reload.
         /// </summary>
-        public static ReloadResult TryReload(Player player, CharacterWeapon weapon, int? ammoPlacement)
+        public static ReloadResult TryReload(Player player, CharacterWeapon weapon, Identity? ammoSlot)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(weapon);
 
-            ReloadResult result = Reload(player, weapon, ammoPlacement);
+            ReloadResult result = Reload(player, weapon, ammoSlot);
             LogUtil.Debug(DebugInfoDetail.Engine, string.Format(CultureInfo.InvariantCulture,
                 "Ammo reload character={0} weapon={1} result={2} clip={3}", player.Identity.Instance,
                 weapon.Item?.LowId ?? 0, result, weapon.Item is Item armed ? Rounds(armed) : 0));
             return result;
         }
 
-        static ReloadResult Reload(Player player, CharacterWeapon weapon, int? ammoPlacement)
+        static ReloadResult Reload(Player player, CharacterWeapon weapon, Identity? ammoSlot)
         {
             if (weapon.Item is not Item item || !UsesAmmo(item) || !player.Inventory.IsHydrated)
                 return ReloadResult.NoClip;
@@ -160,17 +161,28 @@ namespace ZoneEngine_New.Core.Inventory
             if (rounds >= clip)
                 return ReloadResult.AlreadyFull;
 
+            Container page = player.Inventory.Inventory;
             int placement = 0;
+            Identity usedSlot = Identity.None;
             Item? ammo = null;
-            if (ammoPlacement is int offered)
+            if (ammoSlot is Identity offered)
             {
-                if (!player.Inventory.Inventory.Content.TryGetValue(offered, out ammo) || !IsAmmoFor(ammo, item))
+                bool found;
+                if (offered.Type == IdentityType.Backpack)
+                    found = player.Inventory.TryGetCarriedBackpackItem(offered, out page, out placement, out ammo);
+                else
+                {
+                    placement = offered.Instance;
+                    found = offered.Type == IdentityType.Inventory && page.Content.TryGetValue(placement, out ammo);
+                }
+
+                if (!found || ammo == null || !IsAmmoFor(ammo, item))
                     return ReloadResult.AmmoMismatch;
-                placement = offered;
+                usedSlot = offered;
             }
             else
             {
-                KeyValuePair<int, Item> found = player.Inventory.Inventory.Content
+                KeyValuePair<int, Item> found = page.Content
                     .Where(slot => IsAmmoFor(slot.Value, item))
                     .OrderBy(slot => slot.Key)
                     .FirstOrDefault();
@@ -178,6 +190,7 @@ namespace ZoneEngine_New.Core.Inventory
                 {
                     placement = found.Key;
                     ammo = found.Value;
+                    usedSlot = new Identity { Type = IdentityType.Inventory, Instance = placement };
                 }
             }
 
@@ -189,7 +202,7 @@ namespace ZoneEngine_New.Core.Inventory
                 if (ammo == null)
                     return ReloadResult.NoAmmo;
                 take = Math.Min(take, ammo.StackCount);
-                if (!ammo.TakeFromStack(player, placement, take))
+                if (!ammo.TakeFromStack(player, page, placement, take))
                     return ReloadResult.NoAmmo;
             }
 
@@ -201,9 +214,8 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 Identity = player.Identity,
                 Unknown = 1,
-                AmmoSlot = ammo == null
-                    ? Identity.None
-                    : new Identity { Type = IdentityType.Inventory, Instance = placement },
+                // The slot as the client named it: a bag's stack by its packed Backpack identity.
+                AmmoSlot = ammo == null ? Identity.None : usedSlot,
                 Weapon = item.WeaponInstanceIdentity ?? item.Identity,
                 AmmoStackCount = ammo?.StackCount ?? 0,
                 ClipCount = rounds + take,
@@ -230,7 +242,7 @@ namespace ZoneEngine_New.Core.Inventory
                     continue;
 
                 primary ??= item;
-                switch (TryReload(player, weapon, ammoPlacement: null))
+                switch (TryReload(player, weapon, ammoSlot: null))
                 {
                     case ReloadResult.Reloaded:
                     case ReloadResult.AlreadyReloading:

@@ -48,8 +48,17 @@ namespace ZoneEngine_New.Core.Nanos
             RemovesOnZone = (nanoFlags & NanoFlags.IsBuff) != 0
                 && (nanoFlags & NanoFlags.RemoveOnZone) == NanoFlags.RemoveOnZone;
             SurvivesDeath = (nanoFlags & NanoFlags.DontRemoveOnDeath) != 0;
-            IsSelfOnly = (can & CanFlags.ApplyOnSelf) != 0 || AllFunctionsApplyToCaster();
+            _userIsRecipient = AllFunctionsApplyToCaster();
+            IsSelfOnly = (can & CanFlags.ApplyOnSelf) != 0 || _userIsRecipient;
         }
+
+        readonly bool _userIsRecipient;
+
+        /// <summary>
+        /// Every function names the User or Wearer: the nano acts on whoever runs it. One that a perk or another nano
+        /// lands on someone else hits that character (Bleeding Wounds 227363's DoT 274379), credited to its caster.
+        /// </summary>
+        protected override bool UserIsRecipient => _userIsRecipient;
 
         /// <summary>
         /// True when an OnUse function is more than a one-shot launch: anything but casting another nano (CastNano,

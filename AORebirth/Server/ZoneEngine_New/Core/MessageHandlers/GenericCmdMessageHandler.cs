@@ -120,6 +120,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     break;
 
                 case GenericCmdAction.UseItemOnItem:
+                    // An item is never used on itself.
+                    if (message.Target is { Length: >= 2 } && message.Target[0] == message.Target[1])
+                    {
+                        Deny(session, message, player, "item used on itself");
+                        break;
+                    }
                     if (message.Target is { Length: >= 2 } && _dungeons != null)
                     {
                         bool committed = _dungeons.TryUseGeneratedMissionItem(player, message.Target[0], message.Target[1], out bool handled);
@@ -421,17 +427,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         /// <summary>
         /// True when <paramref name="target"/> is one of the player's worn guns and <paramref name="sourceSlot"/> a main
-        /// inventory slot: the drop is a reload from that stack. <paramref name="reloaded"/> says whether it happened.
+        /// inventory or carried-bag slot: the drop is a reload from that stack. <paramref name="reloaded"/> says whether it happened.
         /// </summary>
         static bool TryReloadFromDrop(Player player, Identity sourceSlot, Identity target, out bool reloaded)
         {
             reloaded = false;
-            if (sourceSlot.Type != IdentityType.Inventory || !player.Inventory.IsHydrated
+            if (sourceSlot.Type is not (IdentityType.Inventory or IdentityType.Backpack) || !player.Inventory.IsHydrated
                 || !WeaponAmmo.TryGetArmedWeapon(player, target, out CharacterWeapon weapon)
                 || !WeaponAmmo.UsesAmmo(weapon.Item))
                 return false;
 
-            WeaponAmmo.ReloadResult result = WeaponAmmo.TryReload(player, weapon, sourceSlot.Instance);
+            WeaponAmmo.ReloadResult result = WeaponAmmo.TryReload(player, weapon, sourceSlot);
             switch (result)
             {
                 case WeaponAmmo.ReloadResult.AlreadyReloading:
@@ -455,9 +461,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
         /// </summary>
         bool TryUseItemOnItem(Player player, Playfield playfield, Identity sourceSlot, Identity target)
         {
-            if (!player.Inventory.IsHydrated || sourceSlot.Type != IdentityType.Inventory)
+            // The used item comes from the inventory or a carried bag (packed Backpack handle/slot), as a plain use does.
+            if (!player.Inventory.IsHydrated
+                || sourceSlot.Type is not (IdentityType.Inventory or IdentityType.Backpack))
                 return false;
-            if (!player.Inventory.TryGetItem(sourceSlot.Type, sourceSlot.Instance, out Item source) || source.Locked)
+            if (!player.Inventory.TryGetUseItem(sourceSlot, out Item source) || source.Locked)
                 return false;
 
             ItemTemplate? template = null;
@@ -471,9 +479,11 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
                 template = staticDynel.Template;
             }
-            else if (target.Type != IdentityType.OverflowWindow
-                && player.Inventory.TryGetItem(target.Type, target.Instance, out Item targetItem))
+            else if (player.Inventory.TryGetUseItem(target, out Item targetItem))
             {
+                // Same reach as a plain use: carried pages and bags, never the bank or overflow; a locked item is never used on.
+                if (targetItem.Locked || ReferenceEquals(targetItem, source))
+                    return false;
                 template = targetItem.Definition;
             }
 
@@ -612,7 +622,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
         }
 
         /// <summary>
-        /// Break and Enter: an item with CanFlags.BreakAndEnter (a lock pick) from the player's inventory, used on a
+        /// Break and Enter: an item with CanFlags.BreakAndEnter (a lock pick) from the player's inventory or a carried bag, used on a
         /// lockable door or chest on the player's playfield. The item is not used up.
         /// </summary>
         static bool TryGetBreakAndEnter(Player player, Playfield playfield, Identity slot, Identity target, out IBreakAndEnterTarget lockable,
@@ -620,8 +630,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
         {
             lockable = null!;
             pick = null!;
-            if (slot.Type != IdentityType.Inventory || !player.Inventory.IsHydrated
-                || !player.Inventory.TryGetItem(slot.Type, slot.Instance, out Item item) || !item.Can(CanFlags.BreakAndEnter))
+            // The pick comes from the inventory or a carried bag, and is not locked (mid-move or trade).
+            if (slot.Type is not (IdentityType.Inventory or IdentityType.Backpack) || !player.Inventory.IsHydrated
+                || !player.Inventory.TryGetUseItem(slot, out Item item) || item.Locked || !item.Can(CanFlags.BreakAndEnter))
                 return false;
 
             if (!playfield.GetRequiredService<DynelRegistry>().TryGet(target, out Dynel? dynel) || dynel is not IBreakAndEnterTarget found)

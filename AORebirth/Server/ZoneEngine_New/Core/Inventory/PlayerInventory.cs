@@ -184,6 +184,13 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
             }
 
+            // Bank items can only be moved, split, joined or deleted; nothing is used from or on the bank.
+            if (slot.Type == IdentityType.BankByRef)
+            {
+                item = null!;
+                return false;
+            }
+
             if (slot.Type != IdentityType.Backpack)
                 return TryGetItem(slot.Type, slot.Instance, out item);
 

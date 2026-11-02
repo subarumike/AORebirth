@@ -23,7 +23,7 @@ namespace ZoneEngine_New.Core.Entities
     /// </summary>
     public class Corpse : LootableDynel
     {
-        public const int LootCapacity = 9;
+        public const int LootCapacity = 20;
 
         /// <summary>Lifetime in centiseconds (1/100 s). 18000 = 3 minutes.</summary>
         private const int DefaultTimeExist = 18000;

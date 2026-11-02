@@ -61,8 +61,8 @@ namespace ZoneEngine_New.Core.Tradeskills
 
         sealed class Window
         {
-            public int SourceSlot = -1;
-            public int TargetSlot = -1;
+            public Identity SourceSlot = Identity.None;
+            public Identity TargetSlot = Identity.None;
         }
 
         /// <summary>What a recipe makes from these two items for this player, before anything changes.</summary>
@@ -105,9 +105,10 @@ namespace ZoneEngine_New.Core.Tradeskills
         void SlotChanged(Player player, int container, int slot, bool isSource)
         {
             Window window = _windows.GetOrCreateValue(player);
-            Item? item = container == (int)IdentityType.Inventory ? InventoryItem(player, slot) : null;
-            if (isSource) window.SourceSlot = item == null ? -1 : slot;
-            else window.TargetSlot = item == null ? -1 : slot;
+            var picked = new Identity { Type = IdentityType.Inventory, Instance = slot };
+            Item? item = container == (int)IdentityType.Inventory ? InventoryItem(player, picked) : null;
+            if (isSource) window.SourceSlot = item == null ? Identity.None : picked;
+            else window.TargetSlot = item == null ? Identity.None : picked;
             if (item == null)
                 return;
 
@@ -144,7 +145,8 @@ namespace ZoneEngine_New.Core.Tradeskills
 
         public void BuildPressed(Player player, int quality)
         {
-            if (!_windows.TryGetValue(player, out Window? window) || window.SourceSlot < 0 || window.TargetSlot < 0)
+            if (!_windows.TryGetValue(player, out Window? window) || window.SourceSlot == Identity.None
+                || window.TargetSlot == Identity.None)
             {
                 ClientFeedback.Send(player, ClientFeedback.CombineNotPossible);
                 return;
@@ -155,13 +157,18 @@ namespace ZoneEngine_New.Core.Tradeskills
 
         // ------------------------------------------------------------------ drag
 
-        /// <summary>An inventory item used on another inventory item (GenericCmd UseItemOnItem).</summary>
+        /// <summary>
+        /// An item used on another (GenericCmd UseItemOnItem), each in the main inventory or a carried bag (packed
+        /// Backpack handle/slot). Never an item on itself.
+        /// </summary>
         public CombineOutcome TryCombineDrag(Player player, Identity source, Identity target)
         {
-            if (source.Type != IdentityType.Inventory || target.Type != IdentityType.Inventory || source.Instance == target.Instance)
+            if (!IsCombineSlot(source) || !IsCombineSlot(target) || source == target)
                 return CombineOutcome.NoRecipe;
-            Item? sourceItem = InventoryItem(player, source.Instance);
-            Item? targetItem = InventoryItem(player, target.Instance);
+            Item? sourceItem = InventoryItem(player, source);
+            Item? targetItem = InventoryItem(player, target);
+            if (ReferenceEquals(sourceItem, targetItem))
+                return CombineOutcome.NoRecipe;
             if (sourceItem == null || targetItem == null)
                 return CombineOutcome.NoRecipe;
             if (!_catalog.TryMatch(sourceItem.LowId, sourceItem.HighId, targetItem.LowId, targetItem.HighId, out _, out _))
@@ -173,7 +180,7 @@ namespace ZoneEngine_New.Core.Tradeskills
                 return CombineOutcome.NoRecipe;
             }
 
-            CombineOutcome outcome = Combine(player, source.Instance, target.Instance, requestedQl: null);
+            CombineOutcome outcome = Combine(player, source, target, requestedQl: null);
             // A combine runs at once: refused (feedback sent), or started and done.
             if (outcome == CombineOutcome.Combined)
             {
@@ -201,14 +208,14 @@ namespace ZoneEngine_New.Core.Tradeskills
 
         // ------------------------------------------------------------------ combine
 
-        CombineOutcome Combine(Player player, int sourceSlot, int targetSlot, int? requestedQl)
+        CombineOutcome Combine(Player player, Identity sourceSlot, Identity targetSlot, int? requestedQl)
         {
             if (player.IsDead || player.IsPersistenceQuarantined || !player.Inventory.IsHydrated || sourceSlot == targetSlot)
                 return CombineOutcome.Refused;
 
             Item? source = InventoryItem(player, sourceSlot);
             Item? target = InventoryItem(player, targetSlot);
-            if (source == null || target == null || source.Locked || target.Locked)
+            if (source == null || target == null || ReferenceEquals(source, target) || source.Locked || target.Locked)
             {
                 ClientFeedback.Send(player, ClientFeedback.CombineNotPossible);
                 return CombineOutcome.Refused;
@@ -256,7 +263,7 @@ namespace ZoneEngine_New.Core.Tradeskills
                 return CombineOutcome.Refused;
             }
 
-            var consumed = new List<(int Slot, Item Item)>();
+            var consumed = new List<(Identity Slot, Item Item)>();
             if (recipe.ConsumeSource) consumed.Add((SlotOf(plan.RecipeSource, sourceSlot, targetSlot, source), plan.RecipeSource));
             if (recipe.ConsumeTarget) consumed.Add((SlotOf(plan.RecipeTarget, sourceSlot, targetSlot, source), plan.RecipeTarget));
             if (consumed.Any(c => c.Item.StackCount > 1))
@@ -265,51 +272,47 @@ namespace ZoneEngine_New.Core.Tradeskills
                 return CombineOutcome.Refused;
             }
 
-            // The client deletes the used items, then puts the overflow result in its first free slot; with the inventory
-            // full it stays in the overflow window's first free slot.
+            // The client deletes the used items, then puts the overflow result in its first free slot. The result must fit in
+            // the main inventory: with no room there (counting a slot a used item frees) the combine is refused, never parked
+            // in overflow.
             Container page = player.Inventory.Inventory;
-            var freed = new HashSet<int>(consumed.Select(c => c.Slot));
-            Container resultPage = page;
+            // Only a used item's main-inventory slot can take the result; a bag slot it leaves stays in its bag.
+            var freed = new HashSet<int>(consumed.Where(c => c.Slot.Type == IdentityType.Inventory).Select(c => c.Slot.Instance));
             int resultSlot = Enumerable.Range(page.Offset, page.Capacity)
                 .FirstOrDefault(slot => !page.Content.ContainsKey(slot) || freed.Contains(slot), -1);
             if (resultSlot < 0)
             {
-                resultPage = player.Inventory.Overflow;
-                resultSlot = resultPage.FindFreeSlot();
-                if (resultSlot < 0)
-                {
-                    Feedback(player, "Your inventory and overflow are full. Free a slot and try the combine again.");
-                    return CombineOutcome.Refused;
-                }
+                Feedback(player, "Your inventory is full. Free a slot and try the combine again.");
+                return CombineOutcome.Refused;
             }
 
             Item result = _items.CreateWithNewInstance(low, high, quality, ItemSource.Other);
             var graveyard = new Identity { Type = IdentityType.None, Instance = player.Identity.Instance };
             var changes = consumed
                 .Select(c => new InventoryRowChange(c.Item, graveyard, c.Item.InstanceId, c.Item.StackCount, Retired: true))
-                .Append(new InventoryRowChange(result, resultPage.Identity, resultSlot, result.StackCount))
+                .Append(new InventoryRowChange(result, page.Identity, resultSlot, result.StackCount))
                 .ToList();
             string sourceName = NameOf(source), targetName = NameOf(target);
 
             bool committed = _inventory.TryCommit(player, changes,
                 () => ReferenceEquals(InventoryItem(player, sourceSlot), source)
                     && ReferenceEquals(InventoryItem(player, targetSlot), target)
-                    && (!resultPage.Content.ContainsKey(resultSlot) || (ReferenceEquals(resultPage, page) && freed.Contains(resultSlot))),
+                    && (!page.Content.ContainsKey(resultSlot) || freed.Contains(resultSlot)),
                 () =>
                 {
-                    foreach ((int slot, Item _) in consumed)
+                    foreach ((Identity slot, Item _) in consumed)
                     {
-                        page.Content.Remove(slot);
+                        if (!TryResolveCombineSlot(player, slot, out Container usedPage, out int placement, out _))
+                            throw new InvalidOperationException("Validated tradeskill ingredient slot changed.");
+                        usedPage.Content.Remove(placement);
+                        // A bag slot is dropped by the packed Backpack identity the client used for it.
                         player.Session?.Send(new CharacterActionMessage
                         {
-                            Identity = player.Identity, Action = CharacterActionType.DeleteItem,
-                            Target = new Identity { Type = IdentityType.Inventory, Instance = slot }
+                            Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot
                         });
                     }
-                    if (!resultPage.Add(resultSlot, result))
+                    if (!page.Add(resultSlot, result))
                         throw new InvalidOperationException("Reserved tradeskill result slot changed.");
-                    if (!ReferenceEquals(resultPage, page))
-                        player.Inventory.NoteOverflowArrival(result);
                     ClientFeedback.SendFormatted(player, ClientFeedback.CombinedResult, sourceName, targetName, result.Quality, NameOf(result));
                     player.Session?.Send(new TemplateActionMessage
                     {
@@ -331,14 +334,11 @@ namespace ZoneEngine_New.Core.Tradeskills
                 return CombineOutcome.Refused;
             }
 
-            foreach ((int _, Item used) in consumed)
+            foreach ((Identity _, Item used) in consumed)
                 Modules.ModuleHooks.ItemMoved(player, used, Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Inventory),
                     Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Destroyed));
             Modules.ModuleHooks.ItemMoved(player, result, Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.None),
                 Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Inventory));
-
-            if (!ReferenceEquals(resultPage, page))
-                OverflowGrants.Trim(player);
 
             int xp = Xp(player, result.Quality);
             if (xp > 0)
@@ -347,7 +347,7 @@ namespace ZoneEngine_New.Core.Tradeskills
             if (_windows.TryGetValue(player, out Window? window))
             {
                 if (recipe.ConsumeSource || recipe.ConsumeTarget)
-                    window.SourceSlot = window.TargetSlot = -1;
+                    window.SourceSlot = window.TargetSlot = Identity.None;
             }
             _logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "Tradeskill char={0} recipe={1} ({2}) {3}/{4} ql{5} + {6}/{7} ql{8} -> {9}/{10} ql{11} slot={12} xp={13}",
@@ -356,7 +356,7 @@ namespace ZoneEngine_New.Core.Tradeskills
             return CombineOutcome.Combined;
         }
 
-        static int SlotOf(Item item, int sourceSlot, int targetSlot, Item sourceItem)
+        static Identity SlotOf(Item item, Identity sourceSlot, Identity targetSlot, Item sourceItem)
             => ReferenceEquals(item, sourceItem) ? sourceSlot : targetSlot;
 
         Plan? MakePlan(Player player, Item source, Item target, int? requestedQl)
@@ -510,8 +510,25 @@ namespace ZoneEngine_New.Core.Tradeskills
             return names;
         }
 
-        static Item? InventoryItem(Player player, int slot)
-            => slot >= 0 && player.Inventory.Inventory.Content.TryGetValue(slot, out Item? item) ? item : null;
+        static bool IsCombineSlot(Identity slot) => slot.Type is IdentityType.Inventory or IdentityType.Backpack;
+
+        /// <summary>
+        /// A combine ingredient's page, placement and item: a main-inventory slot, or a carried bag's packed Backpack slot
+        /// (hydrated, removable, not locked). Bank, wear pages and overflow are never combined from.
+        /// </summary>
+        static bool TryResolveCombineSlot(Player player, Identity slot, out Container page, out int placement, out Item item)
+        {
+            if (slot.Type == IdentityType.Backpack)
+                return player.Inventory.TryGetCarriedBackpackItem(slot, out page, out placement, out item);
+
+            page = player.Inventory.Inventory;
+            placement = slot.Instance;
+            item = null!;
+            return slot.Type == IdentityType.Inventory && placement >= 0 && page.Content.TryGetValue(placement, out item!);
+        }
+
+        static Item? InventoryItem(Player player, Identity slot)
+            => TryResolveCombineSlot(player, slot, out _, out _, out Item item) ? item : null;
 
         static void Send(Player player, CharacterActionType action, Identity target, int parameter1, int parameter2)
             => player.Session?.Send(new CharacterActionMessage

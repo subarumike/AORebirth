@@ -17,7 +17,7 @@ namespace ZoneEngine_New.Core.Entities
     /// </summary>
     public class Chest : LootableDynel, IBreakAndEnterTarget
     {
-        public const int LootCapacity = 21;
+        public const int LootCapacity = 20;
 
         float _collisionRadius;
 
