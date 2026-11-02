@@ -230,6 +230,9 @@ namespace ZoneEngine_New.Core.GameData
         public void CollectHashSpawns(string hash, List<HashInstance> into, Func<string, string, bool> canPick)
             => _hashItems.CollectSpawns(hash, into, canPick);
 
+        public bool IsSpawnAllItemHash(string hash)
+            => _hashItems.IsSpawnAll(hash);
+
         public void CollectMobSpawns(string hash, int? level, List<MobTemplate> into)
             => _npcTemplates.CollectSpawns(hash, level, into);
 

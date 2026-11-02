@@ -694,30 +694,49 @@ namespace ZoneEngine_New.Core.Inventory
             // the inventory case is carried loot its corpse drops.
             bool intoWorld = spell.TryReadInt(4, out int spawnFlags) && (spawnFlags & SpawnItemIntoInventory) == 0;
 
+            // A SpawnAll hash makes one item per child branch; any other hash makes one.
+            var minted = new List<Item>();
             if (target is NpcCharacter npc)
             {
-                if (npc.Playfield == null
-                    || !npc.Playfield.GetRequiredService<HashItemMinter>().TryMintHighestUpTo(
-                        hash, quality, intoWorld ? ItemSource.Other : ItemSource.Loot, out Item carried))
-                {
+                if (npc.Playfield == null)
                     return false;
-                }
 
-                if (intoWorld)
+                npc.Playfield.GetRequiredService<HashItemMinter>().MintHighestUpToSpawns(
+                    hash, quality, intoWorld ? ItemSource.Other : ItemSource.Loot, minted);
+                bool carriedAny = false;
+                foreach (Item carried in minted)
                 {
-                    SpawnItemIntoWorld(npc, carried, spell, spawnFlags);
-                    return true;
+                    if (intoWorld)
+                    {
+                        SpawnItemIntoWorld(npc, carried, spell, spawnFlags);
+                        carriedAny = true;
+                    }
+                    else
+                    {
+                        carriedAny |= npc.TryCarryLoot(carried);
+                    }
                 }
 
-                return npc.TryCarryLoot(carried);
+                return carriedAny;
             }
 
             if (target is not Player player || player.Playfield == null || player.Session == null)
                 return false;
 
-            if (!player.Playfield.GetRequiredService<HashItemMinter>().TryMintHighestUpTo(hash, quality, ItemSource.Other, out Item item))
+            player.Playfield.GetRequiredService<HashItemMinter>().MintHighestUpToSpawns(hash, quality, ItemSource.Other, minted);
+            if (minted.Count == 0)
                 return false;
 
+            bool grantedAny = false;
+            foreach (Item item in minted)
+                grantedAny |= GrantSpawnedItem(player, item, spell, intoWorld, spawnFlags);
+
+            return grantedAny;
+        }
+
+        /// <summary>One SpawnItem result for a player: into the world, onto a stack, or into an inventory slot.</summary>
+        static bool GrantSpawnedItem(Player player, Item item, ItemSpell spell, bool intoWorld, int spawnFlags)
+        {
             // Other outcomes were possible (the use was not refused up front), but this roll is a Unique already held.
             if (Trade.TradeRules.IsUnique(item) && Trade.TradeRules.WouldDuplicateUnique(player, item.LowId, item.HighId))
             {
@@ -731,13 +750,13 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
             }
 
-            if (InventoryStacking.TryGrantOntoStack(player, item, player.Playfield.GetService<InventoryFlushService>()))
+            if (InventoryStacking.TryGrantOntoStack(player, item, player.Playfield!.GetService<InventoryFlushService>()))
                 return true;
             if (!player.Inventory.TryPlace(item, out Container page, out int slot))
                 return false;
 
             player.Inventory.MarkDirty(item, page, slot);
-            player.Playfield.GetService<InventoryFlushService>()?.NotifyDirty(player);
+            player.Playfield!.GetService<InventoryFlushService>()?.NotifyDirty(player);
             Modules.ModuleHooks.ItemMoved(player, item, Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.None),
                 Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Inventory));
             if (ReferenceEquals(page, player.Inventory.Overflow))
@@ -748,7 +767,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return true;
             }
 
-            player.Session.Send(
+            player.Session!.Send(
                 new AddTemplateMessage
                 {
                     Identity = player.Identity,

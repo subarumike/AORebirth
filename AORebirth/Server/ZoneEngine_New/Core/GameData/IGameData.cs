@@ -112,6 +112,9 @@ namespace ZoneEngine_New.Core.GameData
         void CollectHashSpawns(string hash, List<HashInstance> into, Func<string, string, bool> canPick)
             => CollectHashSpawns(hash, into);
 
+        /// <summary>True when the item hash is a category flagged SpawnAll (every child branch spawns).</summary>
+        bool IsSpawnAllItemHash(string hash) => false;
+
         /// <summary>
         /// NPCs one spawn of <paramref name="hash"/> should create.
         /// A parent with optional SpawnAll contributes every child branch; other parents contribute one random child.

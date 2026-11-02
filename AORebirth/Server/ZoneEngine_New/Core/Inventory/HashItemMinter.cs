@@ -60,6 +60,39 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
+        /// <summary>
+        /// SpawnItem's mint for a hash that may be flagged SpawnAll: a SpawnAll category mints one item per leaf family
+        /// reachable from it, each at its highest QL at or below <paramref name="desiredQuality"/> (a leaf starting above
+        /// the request is skipped). Any other hash, a leaf included, mints one item by <see cref="TryMintHighestUpTo"/>.
+        /// Appends to <paramref name="into"/>.
+        /// </summary>
+        public void MintHighestUpToSpawns(string hash, int desiredQuality, ItemSource source, List<Item> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            if (string.IsNullOrEmpty(hash))
+                return;
+
+            if (!_gameData.IsSpawnAllItemHash(hash))
+            {
+                if (TryMintHighestUpTo(hash, desiredQuality, source, out Item one))
+                    into.Add(one);
+                return;
+            }
+
+            int wanted = desiredQuality < 1 ? 1 : desiredQuality;
+            LeafRange[] leaves = _leafRanges.GetOrAdd(hash, BuildLeafRanges);
+            for (int i = 0; i < leaves.Length; i++)
+            {
+                LeafRange leaf = leaves[i];
+                if (leaf.Min > wanted)
+                    continue;
+
+                int reached = Math.Min(wanted, leaf.Max);
+                if (HashItemCatalog.TrySelectIds(leaf.Instance, reached, CatalogQuality, out int lowId, out int highId))
+                    into.Add(_items.CreateWithNewInstance(lowId, highId, reached, source));
+            }
+        }
+
         /// <summary>The ids and QL <see cref="TryMintHighestUpTo"/> would mint, without creating an <see cref="Item"/>.</summary>
         public bool TryRollHighestUpTo(string hash, int desiredQuality, out int lowId, out int highId, out int quality)
         {

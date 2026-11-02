@@ -105,6 +105,10 @@ namespace ZoneEngine_New.Core.GameData
             return true;
         }
 
+        /// <summary>True when <paramref name="hash"/> is a category flagged <c>SpawnAll</c>.</summary>
+        public bool IsSpawnAll(string hash)
+            => !string.IsNullOrEmpty(hash) && _spawnAll.Contains(hash);
+
         public bool TryGetInstance(string hash, out HashInstance instance)
         {
             if (string.IsNullOrEmpty(hash) || !_instances.TryGetValue(hash, out HashInstance? found))
