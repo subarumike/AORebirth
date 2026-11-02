@@ -444,6 +444,9 @@ public sealed class KnubotCatalog
                 tradeErrors.Add("Credits cannot be negative");
             if (items.Count == 0 && source.Credits == 0 && tradeErrors.Count == 0)
                 tradeErrors.Add("needs Items or Credits");
+            // An inspection hands everything back, so it has items to look at and no credits it would pretend to take.
+            if (source.InspectItems && (items.Count == 0 || source.Credits != 0) && tradeErrors.Count == 0)
+                tradeErrors.Add("InspectItems needs Items and no Credits");
 
             string target = (source.Goto ?? string.Empty).Trim();
             if (target is not (KnubotScript.CloseTarget or KnubotScript.OpenerTarget) && !lines.ContainsKey(target))
@@ -453,7 +456,7 @@ public sealed class KnubotCatalog
             foreach (string error in tradeErrors)
                 errors.Add("trade '" + pair.Key + "': " + error);
 
-            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target));
+            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target, source.InspectItems));
         }
 
         foreach (KnubotLine line in lines.Values)

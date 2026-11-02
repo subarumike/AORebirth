@@ -331,7 +331,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             KnubotContext context = Context(conversation);
             ZoneEngine_New.Core.Inventory.Item[] offered = session.InitiatorOffer.Items.Values.ToArray();
             KnubotTrade? trade = conversation.Script.Trades.FirstOrDefault(x => KnubotCondition.All(x.If, context) && x.Matches(offered, credits));
-            if (trade == null || !effects.Trades.TryCommitKnubot(player, npc, credits))
+            if (trade == null || (!trade.InspectItems && !effects.Trades.TryCommitKnubot(player, npc, credits)))
             {
                 effects.Trades.EndKnubot(player, npc, refund, trade == null ? "no matching trade" : "commit failed");
                 // The items are back with the player; a script may have the NPC say why.
@@ -346,8 +346,12 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
                 return true;
             }
 
-            logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot {0}: trade '{1}' taken from char={2}",
-                conversation.Script.Id, trade.Id, player.Identity.Instance));
+            // Inspected, not given: everything offered goes back (as on a refusal), then the trade's line runs.
+            if (trade.InspectItems)
+                effects.Trades.EndKnubot(player, npc, refund, "inspected");
+
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot {0}: trade '{1}' {2} char={3}",
+                conversation.Script.Id, trade.Id, trade.InspectItems ? "inspected for" : "taken from", player.Identity.Instance));
             conversation.LastActivityAt = _milliseconds();
             conversation.Replies = [];
             Continue(conversation, trade.Goto);
