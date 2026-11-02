@@ -282,9 +282,10 @@ public sealed record KnubotAttack : KnubotEffect
 }
 
 /// <summary>
-/// <c>{kill}</c>: the NPC kills the player it is talking to outright, fight or not (Patrick Sun after "Excellent! Now,
-/// relax. This won't hurt a bit.": live 2026-07-25 sent one HealthDamage from Patrick for the player's whole health
-/// 2.95 s later, then the death; the player wakes at the insurance beacon). Written after a <c>{delay}</c>.
+/// <c>{kill}</c>: the NPC kills the player it is talking to outright (Patrick Sun after "Excellent! Now, relax. This won't
+/// hurt a bit.{delay 3}": live 2026-10-18 sent one melee HealthDamage from Patrick, killing flag set, 3.5 s after the line,
+/// with no attack or fight; the player wakes at the insurance beacon). Patrick is blue-named, so not an attacker under
+/// combat rules: the hit is scripted (<see cref="Character.KillScripted"/>).
 /// </summary>
 public sealed record KnubotKill : KnubotEffect
 {
@@ -292,15 +293,8 @@ public sealed record KnubotKill : KnubotEffect
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)
     {
-        NpcCharacter npc = context.Npc;
-        Player player = context.Player;
-        if (npc.IsDead || player.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield))
-            return;
-
-        int health = Math.Max(1, player.Stats.GetOrZero(CharacterStat.Health));
-        player.AnnounceHealthDamage(npc, 0, -health, 0);
-        // A friendly NPC cannot attack, so the hit is the player's own: ApplyDamage's death path without combat rules.
-        player.ApplyDamage(player, health, HitType.Normal);
+        if (!context.Npc.IsDead && ReferenceEquals(context.Npc.Playfield, context.Player.Playfield))
+            context.Player.KillScripted(context.Npc);
     }
 }
 
