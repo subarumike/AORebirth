@@ -2467,15 +2467,48 @@ namespace ZoneEngine_New.Core.Entities
             return absorbed;
         }
 
+        /// <summary>HealthDamage flags of a hit that takes the target to 0 (live sends 5 on every killing HealthDamage).</summary>
+        public const int KillingHitFlag = 5;
+
+        /// <summary>
+        /// A scripted killing hit by <paramref name="killer"/> (Knubot <c>{kill}</c>: Patrick Sun after "This won't hurt a
+        /// bit."): health to 0 and the death, named to the killer, with no combat rules, evasion or nano absorb in the
+        /// way, and no fight. Live (2026-10-18) sends it as one melee HealthDamage from Patrick, a blue-named NPC, with
+        /// <see cref="KillingHitFlag"/>, and no attack before it. False when already dead.
+        /// </summary>
+        public bool KillScripted(Character killer)
+        {
+            ArgumentNullException.ThrowIfNull(killer);
+            if (_deathNotified)
+                return false;
+
+            int health = Math.Max(1, Stats.GetOrZero(CharacterStat.Health));
+            AnnounceHealthDamage(killer, 0, -health, (int)CharacterStat.MeleeAC, KillingHitFlag);
+            _applyingDamage = true;
+            try
+            {
+                Stats.Set(CharacterStat.Health, 0, StatDetail.Base, dirty: true);
+            }
+            finally
+            {
+                _applyingDamage = false;
+            }
+
+            OnDeath(killer);
+            return true;
+        }
+
         /// <summary>
         /// Client combat/status text for FunctionType.Hit health changes (nano damage/heals).
-        /// AOEmu field layout: TargetHealth, signed DamageAmount, DamageType=AC on damage else 0.
+        /// AOEmu field layout: TargetHealth, signed DamageAmount, DamageType=AC on damage else 0, then
+        /// <paramref name="flags"/> (<see cref="KillingHitFlag"/> on a hit that kills).
         /// </summary>
         public void AnnounceHealthDamage(
             Character? source,
             int targetHealthAfter,
             int signedAmount,
-            int damageTypeStat)
+            int damageTypeStat,
+            int flags = 0)
         {
             if (signedAmount == 0)
                 return;
@@ -2486,7 +2519,7 @@ namespace ZoneEngine_New.Core.Entities
                 Unknown1 = targetHealthAfter,
                 Unknown2 = signedAmount,
                 Unknown3 = signedAmount < 0 ? damageTypeStat : 0,
-                Unknown4 = 0,
+                Unknown4 = flags,
                 Target = source?.Identity ?? Identity,
                 Unknown5 = 0
             };

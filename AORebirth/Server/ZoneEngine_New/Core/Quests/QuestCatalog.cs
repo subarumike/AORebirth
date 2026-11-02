@@ -71,6 +71,13 @@ namespace ZoneEngine_New.Core.Quests
                         template.MissionBit = null;
                     }
 
+                    if (template.ExpiresAfterSeconds is int seconds && seconds <= 0)
+                    {
+                        logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0} ExpiresAfterSeconds {1} is not positive; ignored",
+                            template.Hash, seconds));
+                        template.ExpiresAfterSeconds = null;
+                    }
+
                     // Live's dumped compass point stands in for a waypoint nobody wrote by hand.
                     if (template.Waypoint == null && template.Waypoints is { Count: > 0 } && template.Waypoints[0] is { Playfield: > 0 } dumped)
                         template.Waypoint = new QuestWaypoint { Playfield = dumped.Playfield, Position = [dumped.X, dumped.Y, dumped.Z] };

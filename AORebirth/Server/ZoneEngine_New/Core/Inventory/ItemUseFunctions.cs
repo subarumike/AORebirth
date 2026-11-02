@@ -881,9 +881,17 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             Character? opponent = ReferenceEquals(npc, target) ? source : target;
-            if (opponent == null || ReferenceEquals(opponent, npc) || opponent.IsDead)
-                return false;
-            if (!ReferenceEquals(opponent.Playfield, npc.Playfield))
+            return opponent != null && StartNpcFight(npc, opponent);
+        }
+
+        /// <summary>
+        /// The NPC turns on <paramref name="opponent"/>: threat, then a fight (NpcFightSelected; Knubot <c>{attack}</c>).
+        /// False when it has no brain, either is dead, or they are not on one playfield.
+        /// </summary>
+        internal static bool StartNpcFight(NpcCharacter npc, Character opponent)
+        {
+            if (npc.Brain == null || npc.IsDead || opponent.IsDead || ReferenceEquals(opponent, npc)
+                || !ReferenceEquals(opponent.Playfield, npc.Playfield))
                 return false;
 
             npc.Brain.AddThreatFrom(opponent, NpcAiRules.ProximityHate);

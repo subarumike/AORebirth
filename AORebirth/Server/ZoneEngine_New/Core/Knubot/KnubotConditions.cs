@@ -54,7 +54,8 @@ public sealed class KnubotLoadContext(QuestCatalog quests, IGameData gameData, I
 /// <c>quest HASH none|active|done|failed|expired|abandoned</c> (<c>done</c> is the quest's mission bit when it has one,
 /// else a completed journal entry), <c>HasQuest HASH</c> (in the journal now),
 /// <c>HasAnyQuest HASH,HASH,...</c> (any of them in the journal now),
-/// <c>HasCompletedQuest HASH</c> (the quest's mission bit), <c>has ITEMHASH [count]</c>, <c>met</c>.
+/// <c>HasCompletedQuest HASH</c> (the quest's mission bit), <c>has ITEMHASH [count]</c>, <c>met</c>,
+/// <c>fighting</c> (the NPC is in a fight).
 /// Stat checks are <c>Requirements</c> rows, compiled by <see cref="TryParseRequirements"/>.
 /// </summary>
 public abstract record KnubotCondition(bool Negated)
@@ -174,6 +175,16 @@ public abstract record KnubotCondition(bool Negated)
                 }
 
                 condition = new KnubotMetCondition(negated);
+                return true;
+
+            case "fighting":
+                if (words.Length != 1)
+                {
+                    error = "'fighting' takes no arguments";
+                    return false;
+                }
+
+                condition = new KnubotFightingCondition(negated);
                 return true;
 
             default:
@@ -334,4 +345,13 @@ public sealed record KnubotRequirementCondition(ItemRequirement[] Requirements) 
 public sealed record KnubotMetCondition(bool Negated) : KnubotCondition(Negated)
 {
     protected override bool Test(KnubotContext context) => context.Met;
+}
+
+/// <summary>
+/// <c>fighting</c>: the NPC is in a fight. Live Marcus Stone does not open his chat then; a Vicinity opener has him
+/// call for help instead ("What're you looking at? Help me out here!").
+/// </summary>
+public sealed record KnubotFightingCondition(bool Negated) : KnubotCondition(Negated)
+{
+    protected override bool Test(KnubotContext context) => context.Npc.FightingTarget.Instance != 0;
 }
