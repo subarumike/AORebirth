@@ -40,6 +40,10 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 if (!spell.Is(FunctionType.SpawnItem) || !spell.TryReadString(0, out string hash) || string.IsNullOrWhiteSpace(hash))
                     continue;
+                // Only the branches this player would actually run: the Izgimmer cyberdecks (253195-253214) carry one
+                // SpawnItem per breed/gender, and the branch for the deck's own breed/gender spawns the deck itself.
+                if (!ItemTemplate.MeetsRequirements(spell.Requirements, stat => player.Stats.Get(stat), player.ResolveRequirement))
+                    continue;
 
                 leaves.Clear();
                 gameData.CollectHashLeafInstances(hash.Trim(), leaves);
