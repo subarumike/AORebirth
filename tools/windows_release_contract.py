@@ -16,6 +16,7 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import stat
+import struct
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -695,17 +696,259 @@ def generated_items_receipt(root, profile, receipt_path, public_sha):
     return proof, data, raw
 
 
+def surface_cells(data):
+    """Read the existing signed little-endian layout without tolerating trailing bytes."""
+    if not isinstance(data, bytes) or len(data) < 4:
+        raise ValueError("Surfaces.dat header is missing")
+    count, = struct.unpack_from("<i", data)
+    if count < 0 or count > (len(data) - 4) // 8:
+        raise ValueError("Surfaces.dat entry count exceeds its byte bounds")
+    offset, cells = 4, {}
+    for _ in range(count):
+        if len(data) - offset < 8:
+            raise ValueError("Surfaces.dat entry header is truncated")
+        cell, size = struct.unpack_from("<ii", data, offset)
+        offset += 8
+        if cell < 0 or cell in cells or size < 0 or size > len(data) - offset:
+            raise ValueError("Surfaces.dat cell identity/length is invalid or duplicate")
+        cells[cell] = data[offset:offset + size]
+        offset += size
+    if offset != len(data):
+        raise ValueError("Surfaces.dat has trailing bytes")
+    return cells
+
+
+def surface_cell_index(cells):
+    return [{"CELL_ID": cell, "size": len(payload), "sha256": digest(payload)}
+            for cell, payload in sorted(cells.items())]
+
+
+def validate_surface_cell_index(rows):
+    if not isinstance(rows, list):
+        raise ValueError("Measured Surfaces.dat cell index required")
+    for row in rows:
+        if (not isinstance(row, dict) or set(row) != {"CELL_ID", "size", "sha256"}
+                or type(row["CELL_ID"]) is not int or not 0 <= row["CELL_ID"] <= 2147483647
+                or type(row["size"]) is not int or not 0 <= row["size"] <= 2147483647
+                or not re.fullmatch("[0-9a-f]{64}", row["sha256"])):
+            raise ValueError("Measured Surfaces.dat cell identity differs")
+    if [row["CELL_ID"] for row in rows] != sorted({row["CELL_ID"] for row in rows}):
+        raise ValueError("Surfaces.dat cell index is duplicate or unordered")
+    return {row["CELL_ID"]: row for row in rows}
+
+
+def validate_generated_surfaces_provenance(proof, items, public_sha):
+    fields = {"FORMAT_VERSION", "PUBLIC_MASTER_SHA", "CREATED_UTC", "GENERATED_ITEMS_PROVENANCE_SHA256",
+              "LOCAL_RECEIPT_SHA256", "EXPORTS"}
+    if (not isinstance(proof, dict) or set(proof) != fields or proof["FORMAT_VERSION"] != 1
+            or not items or proof["PUBLIC_MASTER_SHA"] != items["PUBLIC_MASTER_SHA"]
+            or proof["GENERATED_ITEMS_PROVENANCE_SHA256"] != digest(encoded(items))
+            or not re.fullmatch("[0-9a-f]{64}", proof["LOCAL_RECEIPT_SHA256"])
+            or not isinstance(proof["EXPORTS"], list) or not proof["EXPORTS"] or len(proof["EXPORTS"]) > 65535):
+        raise ValueError("Current measured surfaces must bind the same fresh items exporter/input provenance")
+    validate_generated_items_provenance(items, public_sha)
+    if timestamp(items["CREATED_UTC"]) > timestamp(proof["CREATED_UTC"]):
+        raise ValueError("Surfaces receipt predates its measured exporter/input proof")
+    assembly = next(row["sha256"] for row in items["TOOL_BUILD"]["BINARIES"]
+                    if row["path"] == EXPORTER_OUTPUT + "/RDBDataExtractor.dll")
+    seen = set()
+    for row in proof["EXPORTS"]:
+        if set(row) != {"PATH", "SOURCE_RECORD", "EXPORT", "OUTPUT", "VALIDATION", "CELLS"}:
+            raise ValueError("Bounded generated surfaces export schema differs")
+        match = re.fullmatch(r"Playfields/([1-9][0-9]*)/Surfaces\.dat", row["PATH"])
+        if not match or int(match[1]) > 65535 or row["PATH"] in seen:
+            raise ValueError("Generated surfaces must identify unique decimal playfield paths")
+        seen.add(row["PATH"])
+        source, output, export, validation = (row[key] for key in ("SOURCE_RECORD", "OUTPUT", "EXPORT", "VALIDATION"))
+        if (set(source) != {"TYPE", "ID", "size", "sha256"} or source["TYPE"] != 1000013
+                or type(source["ID"]) is not int or source["ID"] != int(match[1]) << 16
+                or type(source["size"]) is not int or source["size"] <= 0
+                or not re.fullmatch("[0-9a-f]{64}", source["sha256"])):
+            raise ValueError("SurfaceResource body identity differs from its exact playfield record")
+        validate_manifest([output])
+        cells = validate_surface_cell_index(row["CELLS"])
+        if (output["path"] != row["PATH"] or 0 not in cells or cells[0]["size"] != source["size"]
+                or cells[0]["sha256"] != source["sha256"]
+                or output["size"] != 4 + sum(8 + cell["size"] for cell in cells.values())):
+            raise ValueError("Generated surface cell zero differs from the measured header-stripped RDB body")
+        expected_command = [EXPORTER_OUTPUT + "/RDBDataExtractor.exe", "extract", "--ao-path", "<AO_CLIENT_ROOT>",
+            "--gamedata-dir", "<STAGED_GAMEDATA_ROOT>", "--output-dir", "<STAGED_GAMEDATA_ROOT>/Playfields",
+            "--tilemap-id", match[1], "--overwrite", "--skip-items-dat", "--skip-monster-data", "--skip-dynel-collision", "--skip-text"]
+        if (set(export) != {"COMMAND", "EXIT_CODE", "STARTED_UTC", "FINISHED_UTC"}
+                or export["COMMAND"] != expected_command or type(export["EXIT_CODE"]) is not int or export["EXIT_CODE"] != 0
+                or not timestamp(items["TOOL_BUILD"]["FINISHED_UTC"]) <= timestamp(export["STARTED_UTC"])
+                    <= timestamp(export["FINISHED_UTC"]) <= timestamp(proof["CREATED_UTC"])):
+            raise ValueError("Successful measured current playfield-only exporter invocation required")
+        expected_validation = dict(CURRENT_PLAYFIELD_SURFACES_READER="PASS", READER_ASSEMBLY_SHA256=assembly,
+            ENTRY_COUNT=len(cells), CELL0_COUNT=1, CELL0_SIZE=source["size"], CELL0_SHA256=source["sha256"],
+            NONZERO_CELL_COUNT=len(cells) - 1, STRICT_LAYOUT_EOF=True, CANONICAL_NONZERO_CELLS_PRESERVED=True)
+        if (validation != expected_validation
+                or any(type(validation.get(key)) is not int for key in ("ENTRY_COUNT", "CELL0_COUNT", "CELL0_SIZE", "NONZERO_CELL_COUNT"))
+                or validation.get("STRICT_LAYOUT_EOF") is not True or validation.get("CANONICAL_NONZERO_CELLS_PRESERVED") is not True):
+            raise ValueError("Actual compiled surfaces reader/source-body/preservation measurements differ")
+    return {row["PATH"]: row for row in proof["EXPORTS"]}
+
+
+def generated_surfaces_receipt(root, profile, receipt_path, public_sha, items):
+    root = Path(root).resolve(strict=True)
+    path = Path(receipt_path)
+    path = checked(root, path.relative_to(root).as_posix() if path.is_absolute() else path.as_posix())
+    if git(root, "check-ignore", "--", str(path)).strip() == b"":
+        raise ValueError("Generated surfaces receipt must remain ignored/local")
+    raw, receipt = path.read_bytes(), read_json(path)
+    if set(receipt) != {"FORMAT_VERSION", "PUBLIC_MASTER_SHA", "CREATED_UTC", "GENERATED_ITEMS_RECEIPT", "EXPORTS"}:
+        raise ValueError("Generated surfaces local receipt schema differs")
+    measured_items, _, _ = generated_items_receipt(root, profile, receipt["GENERATED_ITEMS_RECEIPT"], public_sha)
+    if measured_items != items:
+        raise ValueError("Surface export differs from the intake's actual exporter/source/RDB-input proof")
+    item_path = Path(receipt["GENERATED_ITEMS_RECEIPT"])
+    item_path = checked(root, item_path.relative_to(root).as_posix() if item_path.is_absolute() else item_path.as_posix())
+    client_root = Path(read_json(item_path)["RDB_INPUTS"]["ROOT"]).resolve(strict=True).parents[2]
+    proof = {key: receipt[key] for key in ("FORMAT_VERSION", "PUBLIC_MASTER_SHA", "CREATED_UTC")}
+    proof.update(GENERATED_ITEMS_PROVENANCE_SHA256=digest(encoded(items)), LOCAL_RECEIPT_SHA256=digest(raw), EXPORTS=[])
+    outputs = {}
+    canonical = Path(profile["CANONICAL_GAMEDATA_ROOT"]).resolve(strict=True)
+    for row in receipt["EXPORTS"]:
+        if set(row) != {"PATH", "STAGED_PATH", "SOURCE_RECORD", "EXPORT", "OUTPUT", "VALIDATION"}:
+            raise ValueError("Generated surfaces staged export schema differs")
+        match = re.fullmatch(r"Playfields/([1-9][0-9]*)/Surfaces\.dat", row["PATH"])
+        if not match or row["PATH"] in outputs:
+            raise ValueError("Only unique playfield Surfaces.dat outputs may be adopted")
+        staged = Path(row["STAGED_PATH"])
+        staged = checked(root, staged.relative_to(root).as_posix() if staged.is_absolute() else staged.as_posix())
+        if (staged.is_relative_to(canonical) or git(root, "check-ignore", "--", str(staged)).strip() == b""
+                or staged.parts[-3:] != ("Playfields", match[1], "Surfaces.dat")):
+            raise ValueError("Surface output must be a rooted ignored stage outside canonical data")
+        before = file_state(staged)
+        data = staged.read_bytes()
+        if file_state(staged) != before or row["OUTPUT"] != content_identity(data):
+            raise ValueError("Staged surfaces changed or differ from the measured export")
+        stage_root = staged.parents[2]
+        expected_command = [str(root / EXPORTER_OUTPUT / "RDBDataExtractor.exe"), "extract", "--ao-path", str(client_root),
+            "--gamedata-dir", str(stage_root), "--output-dir", str(stage_root / "Playfields"), "--tilemap-id", match[1],
+            "--overwrite", "--skip-items-dat", "--skip-monster-data", "--skip-dynel-collision", "--skip-text"]
+        actual = row["EXPORT"]["COMMAND"]
+        if len(actual) != len(expected_command) or any(ntpath.normcase(ntpath.normpath(a)) != ntpath.normcase(ntpath.normpath(b))
+                                                     for a, b in zip(actual, expected_command)):
+            raise ValueError("Surface command differs from the existing per-playfield exporter")
+        normalized = [EXPORTER_OUTPUT + "/RDBDataExtractor.exe", "extract", "--ao-path", "<AO_CLIENT_ROOT>",
+            "--gamedata-dir", "<STAGED_GAMEDATA_ROOT>", "--output-dir", "<STAGED_GAMEDATA_ROOT>/Playfields", *actual[8:]]
+        proof["EXPORTS"].append({key: row[key] for key in ("PATH", "SOURCE_RECORD", "VALIDATION")} | {
+            "OUTPUT": content_identity(data, row["PATH"]), "EXPORT": {**row["EXPORT"], "COMMAND": normalized},
+            "CELLS": surface_cell_index(surface_cells(data))})
+        outputs[row["PATH"]] = data
+    proof["EXPORTS"].sort(key=lambda row: row["PATH"])
+    validate_generated_surfaces_provenance(proof, items, public_sha)
+    return proof, outputs, raw
+
+
+def validate_generated_surfaces_adoptions(bundle, value, actual, portable=False):
+    proof, adoptions = value.get("GENERATED_SURFACES_PROVENANCE"), value.get("GENERATED_SURFACES_ADOPTIONS", [])
+    if not proof:
+        if adoptions or value.get("GENERATED_SURFACES_LOCAL_RECEIPT"):
+            raise ValueError("Surface adoption lacks measured generation provenance")
+        return
+    outputs = validate_generated_surfaces_provenance(proof, value.get("GENERATED_ITEMS_PROVENANCE"), value["PUBLIC_MASTER_SHA"])
+    if not portable:
+        receipt = value.get("GENERATED_SURFACES_LOCAL_RECEIPT")
+        if not receipt or digest(load_descriptor(bundle, receipt).read_bytes()) != proof["LOCAL_RECEIPT_SHA256"]:
+            raise ValueError("Local surface replay lost its original measured receipt")
+    seen = set()
+    for row in adoptions:
+        if set(row) != {"PATH", "CANONICAL_BEFORE", "CANONICAL_AFTER", "BEFORE_CELLS"}:
+            raise ValueError("Surface before/after adoption schema differs")
+        path = row["PATH"]
+        if path not in outputs or path in seen:
+            raise ValueError("Unexpected or duplicate surface adoption")
+        seen.add(path)
+        before = row["CANONICAL_BEFORE"] if portable else content_identity(load_optional(bundle, row["CANONICAL_BEFORE"]), path)
+        after = row["CANONICAL_AFTER"] if portable else content_identity(load_optional(bundle, row["CANONICAL_AFTER"]), path)
+        before_cells = validate_surface_cell_index(row["BEFORE_CELLS"])
+        after_cells = validate_surface_cell_index(outputs[path]["CELLS"])
+        if (before != actual.get(path) or after != outputs[path]["OUTPUT"] or before == after
+                or 0 in before_cells or {cell: item for cell, item in after_cells.items() if cell != 0} != before_cells
+                or before is None and bool(before_cells)
+                or before is not None and before["size"] != 4 + sum(8 + cell["size"] for cell in before_cells.values())):
+            raise ValueError("Surface adoption must add only missing cell zero while preserving every private cell")
+        if not portable:
+            old_bytes, new_bytes = load_optional(bundle, row["CANONICAL_BEFORE"]), load_optional(bundle, row["CANONICAL_AFTER"])
+            old_cells = surface_cells(old_bytes) if old_bytes is not None else {}
+            new_cells = surface_cells(new_bytes)
+            if (surface_cell_index(old_cells) != row["BEFORE_CELLS"] or surface_cell_index(new_cells) != outputs[path]["CELLS"]
+                    or any(new_cells.get(cell) != payload for cell, payload in old_cells.items())):
+                raise ValueError("Surface adoption changed a private cell's actual payload")
+        actual[path] = after
+    if any(actual.get(path) != row["OUTPUT"] for path, row in outputs.items()):
+        raise ValueError("Canonical surfaces differ from their measured generated outputs")
+
+
 def required_catalogs(value):
     if not isinstance(value, list):
         raise ValueError("Explicit required-current catalog mapping required")
     seen = set()
     for row in value:
-        if (set(row) != {"AUTHORITY", "PATH", "APPROVAL"} or row["AUTHORITY"] not in ("PUBLIC_PRODUCT_DATA", "PRIVATE_CONTENT_UPSTREAM")
-                or not isinstance(row["APPROVAL"], str) or not row["APPROVAL"].strip() or row["PATH"] in seen):
+        fields = {"AUTHORITY", "PATH", "APPROVAL"}
+        if (not isinstance(row, dict) or not fields <= set(row) or set(row) - fields - {"ENTRIES"}
+                or row["AUTHORITY"] not in ("PUBLIC_PRODUCT_DATA", "PRIVATE_CONTENT_UPSTREAM")
+                or not isinstance(row["PATH"], str) or not isinstance(row["APPROVAL"], str)
+                or not row["APPROVAL"].strip() or row["PATH"] in seen):
             raise ValueError("Required-current catalog mapping is invalid/duplicate")
         relative(row["PATH"])
+        if "ENTRIES" in row:
+            entries = row["ENTRIES"]
+            if (row["AUTHORITY"] != "PUBLIC_PRODUCT_DATA" or row["PATH"] != "ItemTemplates.json"
+                    or not isinstance(entries, list) or not entries
+                    or any(not isinstance(key, str) or not re.fullmatch("[A-Za-z0-9]+", key) for key in entries)
+                    or len(set(entries)) != len(entries)):
+                raise ValueError("Selective restoration requires explicit unique public ItemTemplates keys")
         seen.add(row["PATH"])
     return value
+
+
+def restore_catalog_entries(incoming, private, entries):
+    source = json.loads(incoming.decode("utf-8-sig"), object_pairs_hook=pairs)
+    before = {} if private is None else json.loads(private.decode("utf-8-sig"), object_pairs_hook=pairs)
+    if not isinstance(source, dict) or not isinstance(before, dict) or any(key not in source for key in entries):
+        raise ValueError("Required ItemTemplates entries lack a current source or object catalog")
+    restored = [key for key in entries if key not in before]
+    after = {**before, **{key: source[key] for key in restored}}
+    proof = {"VALUES": {key: {"SOURCE_SHA256": value_hash(source[key]),
+                             "BEFORE_SHA256": value_hash(before.get(key, MISSING)),
+                             "AFTER_SHA256": value_hash(after[key])} for key in entries},
+             "BEFORE_ENTRY_COUNT": len(before), "AFTER_ENTRY_COUNT": len(after),
+             "PRESERVED_BEFORE_SHA256": value_hash(before),
+             "PRESERVED_AFTER_SHA256": value_hash({key: item for key, item in after.items() if key not in restored})}
+    result = private if not restored else (json.dumps(after, ensure_ascii=False, indent=2) + "\n").encode()
+    return result, proof
+
+
+def validate_catalog_entry_proof(proof, entries, before, after):
+    fields = {"VALUES", "BEFORE_ENTRY_COUNT", "AFTER_ENTRY_COUNT", "PRESERVED_BEFORE_SHA256", "PRESERVED_AFTER_SHA256"}
+    if (not isinstance(proof, dict) or set(proof) != fields or not isinstance(proof["VALUES"], dict)
+            or set(proof["VALUES"]) != set(entries)
+            or any(type(proof[key]) is not int or proof[key] < 0 for key in ("BEFORE_ENTRY_COUNT", "AFTER_ENTRY_COUNT"))
+            or any(not isinstance(proof[key], str) or not re.fullmatch("[0-9a-f]{64}", proof[key])
+                   for key in ("PRESERVED_BEFORE_SHA256", "PRESERVED_AFTER_SHA256"))
+            or proof["PRESERVED_BEFORE_SHA256"] != proof["PRESERVED_AFTER_SHA256"]):
+        raise ValueError("Selective catalog preservation measurement differs")
+    restored = 0
+    for item in proof["VALUES"].values():
+        if (not isinstance(item, dict) or set(item) != {"SOURCE_SHA256", "BEFORE_SHA256", "AFTER_SHA256"}
+                or any(not isinstance(item[key], str) or not re.fullmatch("[0-9a-f]{64}", item[key])
+                       for key in ("SOURCE_SHA256", "AFTER_SHA256"))
+                or (item["BEFORE_SHA256"] != "MISSING" and (not isinstance(item["BEFORE_SHA256"], str)
+                    or not re.fullmatch("[0-9a-f]{64}", item["BEFORE_SHA256"])))):
+            raise ValueError("Selective catalog entry identities differ")
+        missing = item["BEFORE_SHA256"] == "MISSING"
+        restored += missing
+        if item["AFTER_SHA256"] != item["SOURCE_SHA256" if missing else "BEFORE_SHA256"]:
+            raise ValueError("Selective catalog restoration replaces a present private entry")
+    if (proof["BEFORE_ENTRY_COUNT"] < len(entries) - restored
+            or proof["AFTER_ENTRY_COUNT"] != proof["BEFORE_ENTRY_COUNT"] + restored
+            or (before is None and (proof["BEFORE_ENTRY_COUNT"] != 0 or restored != len(entries)
+                or proof["PRESERVED_BEFORE_SHA256"] != value_hash({})))
+            or (after == before) != (restored == 0)):
+        raise ValueError("Selective catalog entry counts or unchanged identities differ")
 
 
 def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
@@ -808,27 +1051,50 @@ def validate_supplemental_content(bundle, value, actual, portable=False):
         source = value["SOURCE_SNAPSHOTS"][mapping["AUTHORITY"]]["AFTER"].get(path)
         if source is None or path in value["PROTECTED_GENERATED_FILES"]:
             raise ValueError("Required catalog has no current source identity or is protected")
-        if path not in actual:
+        if "ENTRIES" in mapping or path not in actual:
             expected[path] = mapping
     for restoration in value.get("CATALOG_RESTORATIONS", []):
-        if set(restoration) != {"AUTHORITY", "PATH", "APPROVAL", "CANONICAL_BEFORE", "CANONICAL_AFTER"}:
+        if not isinstance(restoration, dict) or not isinstance(restoration.get("PATH"), str):
             raise ValueError("Required-current catalog restoration schema differs")
         path = restoration["PATH"]
-        if (path not in expected or path in seen or restoration["CANONICAL_BEFORE"] is not None
-                or {key: restoration[key] for key in ("AUTHORITY", "PATH", "APPROVAL")} != expected[path]):
+        mapping = expected.get(path)
+        if mapping is None or path in seen:
+            raise ValueError("Catalog restoration is unapproved or duplicated")
+        fields = set(mapping) | {"CANONICAL_BEFORE", "CANONICAL_AFTER"}
+        if "ENTRIES" in mapping:
+            fields |= {"UPSTREAM_CURRENT", "ENTRY_PROOF"}
+        if set(restoration) != fields or {key: restoration[key] for key in mapping} != mapping:
             raise ValueError("Catalog restoration is unapproved or would overwrite existing content")
         seen.add(path)
-        result = restoration["CANONICAL_AFTER"] if portable else content_identity(load_optional(bundle, restoration["CANONICAL_AFTER"]), path)
+        before_data = None if portable else load_optional(bundle, restoration["CANONICAL_BEFORE"])
+        after_data = None if portable else load_optional(bundle, restoration["CANONICAL_AFTER"])
+        before = restoration["CANONICAL_BEFORE"] if portable else content_identity(before_data, path)
+        result = restoration["CANONICAL_AFTER"] if portable else content_identity(after_data, path)
         if result is None:
             raise ValueError("Required-current catalog restoration is empty")
         validate_manifest([result])
         source = value["SOURCE_SNAPSHOTS"][restoration["AUTHORITY"]]["AFTER"][path]
-        if result["path"] != path or {key: result[key] for key in ("size", "blob")} != source:
+        if result["path"] != path or before != actual.get(path):
+            raise ValueError("Catalog restoration does not bind the current canonical identity")
+        if "ENTRIES" in mapping:
+            source_data = None if portable else load_optional(bundle, restoration["UPSTREAM_CURRENT"])
+            identity = restoration["UPSTREAM_CURRENT"] if portable else content_identity(source_data)
+            if (not isinstance(identity, dict) or set(identity) != {"size", "sha256", "blob"}
+                    or {key: identity[key] for key in ("size", "blob")} != source):
+                raise ValueError("Selective catalog entries differ from the current source snapshot")
+            validate_manifest([{"path": path, **identity}])
+            if not portable:
+                replayed, proof = restore_catalog_entries(source_data, before_data, mapping["ENTRIES"])
+                if replayed != after_data or proof != restoration["ENTRY_PROOF"]:
+                    raise ValueError("Selective catalog result is not the measured add-only replay")
+            validate_catalog_entry_proof(restoration["ENTRY_PROOF"], mapping["ENTRIES"], before, result)
+        elif before is not None or {key: result[key] for key in ("size", "blob")} != source:
             raise ValueError("Catalog restoration differs from exact current source bytes")
         actual[path] = result
     if seen != set(expected):
         raise ValueError("Required-current catalog restorations are incomplete")
     validate_private_catalog_adoptions(bundle, value, actual, portable)
+    validate_generated_surfaces_adoptions(bundle, value, actual, portable)
     proof, adoption = value.get("GENERATED_ITEMS_PROVENANCE"), value.get("GENERATED_ITEMS_ADOPTION")
     if not proof:
         if adoption or value.get("GENERATED_ITEMS_LOCAL_RECEIPT"):
@@ -864,7 +1130,7 @@ def validate_supplemental_content(bundle, value, actual, portable=False):
     validate_runtime_exclusions(bundle, value, actual, portable)
 
 
-def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before_rows, resolutions=None, generated_receipt=None):
+def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before_rows, resolutions=None, generated_receipt=None, surfaces_receipt=None):
     resolutions = resolutions or {}
     canonical = Path(profile["CANONICAL_GAMEDATA_ROOT"]).resolve(strict=True)
     snapshots, records, projected = {}, [], {}
@@ -907,6 +1173,17 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
             raise ValueError("Required catalog is not present in its current authority or is generated")
         target = checked(canonical, path, exists=False)
         private = projected[path] if path in projected else target.read_bytes() if target.is_file() else None
+        if "ENTRIES" in mapping:
+            incoming = source_blob(root, profile, authority, current_source["blob"])
+            result, proof = restore_catalog_entries(incoming, private, mapping["ENTRIES"])
+            prefix = "catalog-restorations/" + str(len(restorations)) + "/"
+            before = stash(bundle, prefix + "canonical-before", private)
+            restorations.append({**mapping, "CANONICAL_BEFORE": before,
+                "CANONICAL_AFTER": before if result == private else stash(bundle, prefix + "canonical-after", result),
+                "UPSTREAM_CURRENT": stash(bundle, prefix + "upstream-current", incoming), "ENTRY_PROOF": proof})
+            if result != private:
+                projected[path] = result
+            continue
         if private is not None:
             continue
         incoming = source_blob(root, profile, authority, current_source["blob"])
@@ -944,6 +1221,12 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
         if data != private:
             projected[path] = data
     generated, adoption, local_receipt = None, None, None
+    if surfaces_receipt and not generated_receipt:
+        surface_path = Path(surfaces_receipt)
+        surface_path = checked(root, surface_path.relative_to(root).as_posix() if surface_path.is_absolute() else surface_path.as_posix())
+        if git(root, "check-ignore", "--", str(surface_path)).strip() == b"":
+            raise ValueError("Surface intake requires an ignored measured local receipt")
+        generated_receipt = read_json(surface_path)["GENERATED_ITEMS_RECEIPT"]
     if generated_receipt:
         if "items.dat" not in profile.get("PROTECTED_GENERATED_FILES", ()):
             raise ValueError("Generated items adoption requires the existing protected items.dat binding")
@@ -978,6 +1261,23 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
                     != {key: item for key, item in candidate.items() if key != "QUALIFIED_REUSE"}):
                 raise ValueError("Generated items reuse differs from the validated original provenance")
             local_receipt = stash(bundle, "generated-items-local-receipt.json", raw)
+    surface_proof, surface_adoptions, surface_local_receipt = None, [], None
+    if surfaces_receipt:
+        surface_proof, outputs, raw = generated_surfaces_receipt(root, profile, surfaces_receipt, public_sha, generated)
+        surface_local_receipt = stash(bundle, "generated-surfaces-local-receipt.json", raw)
+        for path, data in sorted(outputs.items()):
+            target = checked(canonical, path, exists=False)
+            private = projected[path] if path in projected else target.read_bytes() if target.is_file() else None
+            if private == data:
+                continue
+            before_cells = surface_cells(private) if private is not None else {}
+            after_cells = surface_cells(data)
+            if 0 in before_cells or {cell: payload for cell, payload in after_cells.items() if cell != 0} != before_cells:
+                raise ValueError("Generated surfaces may only add missing cell zero; every private cell must remain verbatim")
+            prefix = "generated-surfaces-adoptions/" + str(len(surface_adoptions)) + "/"
+            surface_adoptions.append({"PATH": path, "CANONICAL_BEFORE": stash(bundle, prefix + "before", private),
+                "CANONICAL_AFTER": stash(bundle, prefix + "after", data), "BEFORE_CELLS": surface_cell_index(before_cells)})
+            projected[path] = data
     if profile.get("REQUIRE_GENERATED_ITEMS") is True and not generated:
         raise ValueError("This release requires current generated items.dat or verified unchanged exporter/input/output reuse")
     expected = {row["path"]: row for row in before_rows}
@@ -1022,6 +1322,9 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
             plan["GENERATED_ITEMS_LOCAL_RECEIPT"] = local_receipt
         if adoption:
             plan["GENERATED_ITEMS_ADOPTION"] = adoption
+    if surface_proof:
+        plan.update(GENERATED_SURFACES_PROVENANCE=surface_proof, GENERATED_SURFACES_ADOPTIONS=surface_adoptions,
+                    GENERATED_SURFACES_LOCAL_RECEIPT=surface_local_receipt)
     if baseline.get("APPLIED_RECONCILIATION_BUNDLE"):
         previous = Path(baseline["APPLIED_RECONCILIATION_BUNDLE"])
         if not previous.resolve().is_relative_to(Path(profile["STATE_ROOT"]).resolve()):
@@ -1112,7 +1415,7 @@ def validate_reconciliation(bundle, reconciliation):
     return after
 
 
-def intake(root, profile, resolutions=None, generated_receipt=None):
+def intake(root, profile, resolutions=None, generated_receipt=None, surfaces_receipt=None):
     attempt_id, started = uuid.uuid4().hex, now()
     public_sha, dump_sha, public_fetch, dump_fetch = fresh_sources(root, profile)
     public_fetch["ATTEMPT_ID"] = dump_fetch["ATTEMPT_ID"] = attempt_id
@@ -1131,7 +1434,7 @@ def intake(root, profile, resolutions=None, generated_receipt=None):
     bundle = state_root / ("attempt-" + uuid.uuid4().hex)
     bundle.mkdir()
     write_json(bundle / "before-manifest.json", rows)
-    plan, projected = reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, rows, resolutions, generated_receipt)
+    plan, projected = reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, rows, resolutions, generated_receipt, surfaces_receipt)
     validate_reconciliation(bundle, plan)
     attempt = {"FORMAT_VERSION": 1, "PUBLIC_MASTER_SHA": public_sha, "LOCAL_WINDOWS_SOURCE_SHA": public_sha,
                "ATTEMPT_ID": attempt_id, "ATTEMPT_STARTED_UTC": started,
@@ -1146,8 +1449,8 @@ def intake(root, profile, resolutions=None, generated_receipt=None):
     return bundle, attempt, plan, projected, states
 
 
-def apply_content(root, profile, approved_plan_sha256, resolutions=None, generated_receipt=None):
-    bundle, attempt, plan, projected, states = intake(root, profile, resolutions, generated_receipt)
+def apply_content(root, profile, approved_plan_sha256, resolutions=None, generated_receipt=None, surfaces_receipt=None):
+    bundle, attempt, plan, projected, states = intake(root, profile, resolutions, generated_receipt, surfaces_receipt)
     if digest(encoded(plan)) != approved_plan_sha256:
         raise ValueError("Fresh content plan differs from the approved plan")
     canonical = Path(profile["CANONICAL_GAMEDATA_ROOT"])
@@ -1524,16 +1827,27 @@ def summarize_reconciliation(bundle, reconciliation):
                 "SOURCE_SNAPSHOTS", "PROTECTED_GENERATED_FILES", "BEFORE_MANIFEST", "CANONICAL_MANIFEST")}
     summary.update(PROOF_KIND="PORTABLE_MEASURED_RECONCILIATION_V1", CHANGES=records,
                    LOCAL_REPLAY_SHA256=digest(encoded(reconciliation)))
-    for key in ("REQUIRED_CURRENT_CATALOGS", "GENERATED_ITEMS_PROVENANCE"):
+    for key in ("REQUIRED_CURRENT_CATALOGS", "GENERATED_ITEMS_PROVENANCE", "GENERATED_SURFACES_PROVENANCE"):
         if key in reconciliation:
             summary[key] = reconciliation[key]
     if "CATALOG_RESTORATIONS" in reconciliation:
-        summary["CATALOG_RESTORATIONS"] = [{**{key: row[key] for key in ("AUTHORITY", "PATH", "APPROVAL")},
-            "CANONICAL_BEFORE": None, "CANONICAL_AFTER": content_identity(load_optional(bundle, row["CANONICAL_AFTER"]), row["PATH"])}
-            for row in reconciliation["CATALOG_RESTORATIONS"]]
+        summary["CATALOG_RESTORATIONS"] = []
+        for row in reconciliation["CATALOG_RESTORATIONS"]:
+            item = {**{key: row[key] for key in ("AUTHORITY", "PATH", "APPROVAL")},
+                **{key: content_identity(load_optional(bundle, row[key]), row["PATH"])
+                   for key in ("CANONICAL_BEFORE", "CANONICAL_AFTER")}}
+            if "ENTRIES" in row:
+                item.update(ENTRIES=row["ENTRIES"], ENTRY_PROOF=row["ENTRY_PROOF"],
+                    UPSTREAM_CURRENT=content_identity(load_optional(bundle, row["UPSTREAM_CURRENT"])))
+            summary["CATALOG_RESTORATIONS"].append(item)
     if "GENERATED_ITEMS_ADOPTION" in reconciliation:
         summary["GENERATED_ITEMS_ADOPTION"] = {key: content_identity(load_optional(bundle, item), "items.dat")
             for key, item in reconciliation["GENERATED_ITEMS_ADOPTION"].items()}
+    if "GENERATED_SURFACES_ADOPTIONS" in reconciliation:
+        summary["GENERATED_SURFACES_ADOPTIONS"] = [{"PATH": row["PATH"], "BEFORE_CELLS": row["BEFORE_CELLS"],
+            **{key: content_identity(load_optional(bundle, row[key]), row["PATH"])
+               for key in ("CANONICAL_BEFORE", "CANONICAL_AFTER")}}
+            for row in reconciliation["GENERATED_SURFACES_ADOPTIONS"]]
     if "PRIVATE_CATALOG_ADOPTIONS" in reconciliation:
         summary["PRIVATE_CATALOG_ADOPTIONS"] = [{**{key: row[key] for key in ("PATH", "SHA256", "APPROVAL")},
             "APPROVAL_INSTRUCTION": content_identity(load_optional(bundle, row["APPROVAL_INSTRUCTION"])),
@@ -1559,7 +1873,7 @@ def validate_reconciliation_summary(bundle, summary):
     required = {"FORMAT_VERSION", *TUPLE, "CANONICAL_BEFORE_MANIFEST", "SOURCE_SNAPSHOTS",
                 "PROTECTED_GENERATED_FILES", "BEFORE_MANIFEST", "CANONICAL_MANIFEST", "PROOF_KIND",
                 "CHANGES", "LOCAL_REPLAY_SHA256"}
-    optional = {"PRIOR_CHECKPOINT", "REQUIRED_CURRENT_CATALOGS", "CATALOG_RESTORATIONS", "GENERATED_ITEMS_PROVENANCE", "GENERATED_ITEMS_ADOPTION", "PRIVATE_CATALOG_ADOPTIONS", "RUNTIME_EXCLUSIONS"}
+    optional = {"PRIOR_CHECKPOINT", "REQUIRED_CURRENT_CATALOGS", "CATALOG_RESTORATIONS", "GENERATED_ITEMS_PROVENANCE", "GENERATED_ITEMS_ADOPTION", "GENERATED_SURFACES_PROVENANCE", "GENERATED_SURFACES_ADOPTIONS", "PRIVATE_CATALOG_ADOPTIONS", "RUNTIME_EXCLUSIONS"}
     if (not required <= set(summary) or set(summary) - required - optional or summary["FORMAT_VERSION"] != 1
             or summary["PROOF_KIND"] != "PORTABLE_MEASURED_RECONCILIATION_V1"
             or not re.fullmatch("[0-9a-f]{64}", summary["LOCAL_REPLAY_SHA256"])):
@@ -1725,6 +2039,9 @@ def require_successful_attempt(bundle, attempt):
     generated = reconciliation.get("GENERATED_ITEMS_PROVENANCE")
     if generated and timestamp(generated["CREATED_UTC"]) > timestamp(attempt["BUILD_STARTED_UTC"]):
         raise ValueError("Generated items must be adopted before the actual Windows build")
+    surfaces = reconciliation.get("GENERATED_SURFACES_PROVENANCE")
+    if surfaces and timestamp(surfaces["CREATED_UTC"]) > timestamp(attempt["BUILD_STARTED_UTC"]):
+        raise ValueError("Generated surfaces must be adopted before the actual Windows build")
     return rows, reconciliation
 
 
@@ -1964,6 +2281,7 @@ def main(argv=None):
     parser.add_argument("--approved-plan-sha256")
     parser.add_argument("--resolutions", type=Path)
     parser.add_argument("--generated-items-receipt", type=Path)
+    parser.add_argument("--generated-surfaces-receipt", type=Path)
     parser.add_argument("--build-attempt")
     parser.add_argument("--windows-receipt")
     parser.add_argument("--acceptance-evidence")
@@ -1977,7 +2295,7 @@ def main(argv=None):
         root = args.repository_root.resolve(strict=True)
         if args.developer_build:
             release_arguments = (args.profile, args.approved_plan_sha256, args.resolutions,
-                                 args.generated_items_receipt, args.build_attempt, args.windows_receipt,
+                                 args.generated_items_receipt, args.generated_surfaces_receipt, args.build_attempt, args.windows_receipt,
                                  args.acceptance_evidence, args.publishing, child)
             if args.mode != "verify-build-token" or any(release_arguments):
                 raise ValueError("Developer compilation cannot replace a governed build, publishing or release validation")
@@ -1987,6 +2305,8 @@ def main(argv=None):
         profile = profile_for(root, args.profile)
         if args.generated_items_receipt and args.mode not in ("prepare-build", "reconcile-content"):
             raise ValueError("Generated items may be adopted only through existing content preparation/reconciliation")
+        if args.generated_surfaces_receipt and args.mode not in ("prepare-build", "reconcile-content"):
+            raise ValueError("Generated surfaces may be adopted only through existing content preparation/reconciliation")
         if args.mode == "verify-build-token":
             verify_build_token(root, profile, args.entrypoint, args.product, args.publishing)
         elif args.mode == "verify-startup-attempt":
@@ -2004,9 +2324,9 @@ def main(argv=None):
         elif args.mode == "reconcile-content":
             if not args.approved_plan_sha256:
                 raise ValueError("Explicit hash-bound safe content-plan approval required")
-            apply_content(root, profile, args.approved_plan_sha256, read_json(args.resolutions) if args.resolutions else None, args.generated_items_receipt)
+            apply_content(root, profile, args.approved_plan_sha256, read_json(args.resolutions) if args.resolutions else None, args.generated_items_receipt, args.generated_surfaces_receipt)
         elif args.mode == "prepare-build":
-            bundle, attempt, plan, _, _ = intake(root, profile, read_json(args.resolutions) if args.resolutions else None, args.generated_items_receipt)
+            bundle, attempt, plan, _, _ = intake(root, profile, read_json(args.resolutions) if args.resolutions else None, args.generated_items_receipt, args.generated_surfaces_receipt)
             print("CONTENT_PLAN_SHA256=" + digest(encoded(plan)))
             print("BUILD_ATTEMPT_RECEIPT=" + (bundle / "prepared.json").relative_to(root).as_posix())
             if plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"]:

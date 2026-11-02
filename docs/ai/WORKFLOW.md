@@ -273,8 +273,20 @@ cmd /d /c tools\windows_release_contract.cmd prepare-build --generated-items-rec
 cmd /d /c tools\windows_release_contract.cmd reconcile-content --generated-items-receipt "<ignored-receipt>" --approved-plan-sha256 "<measured-plan-sha256>"
 ```
 
-Only the protected items.dat may be adopted this way, together with the ordinary
-approved additions/modifications/removals. When fresh regeneration is required,
+Generated-items adoption is limited to protected items.dat, together with the
+ordinary approved additions/modifications/removals. For reviewed playfield
+surfaces, the same two commands accept `--generated-surfaces-receipt
+"<ignored-surface-receipt>"`. Its version-1 receipt references the measured
+generated-items receipt for the same exporter build, source closure and RDB
+inputs, and binds each actual playfield export and compiled reader observation.
+The helper parses the complete binary layout and permits only a missing cell 0
+whose nonempty payload matches its header-stripped SurfaceResource body. Every
+existing nonzero cell remains byte-identical; an existing cell 0 is never replaced.
+Raw stages, RDB paths and replay payloads remain ignored/local; portable evidence
+contains only bounded identities and measurements. Later unchanged intake uses
+the applied canonical checkpoint without repeating generation.
+
+When fresh regeneration is required,
 a byte-identical export still needs its measured new provenance. An unrelated
 product SHA change alone does not require regeneration: qualified cache or
 derived-receipt reuse must prove the relevant source/tool/input closure and
@@ -282,7 +294,12 @@ output hashes unchanged under the contract, preserving the original execution
 identity rather than claiming another export. An explicitly approved
 REQUIRED_CURRENT_CATALOGS profile mapping may restore an absent required catalog
 from its exact current public or private source; it never replaces present
-private content. The next normal build carries these measured bindings without
+private content. For `PUBLIC_PRODUCT_DATA` / `ItemTemplates.json` only, an explicit
+`ENTRIES` list may restore missing hash keys from the current source snapshot.
+Present keys retain their complete private values and aliases. Local replay binds
+the source and before/after payloads; portable evidence contains only their
+identities, selected-entry hashes and measured preservation counts and hashes.
+The next normal build carries these measured bindings without
 another exporter run. Raw catalogs, client inputs and exporter binaries stay
 local; portable acceptance contains bounded identities and measurements only.
 Current ItemTemplateCatalog loading is validated after the real Windows build
