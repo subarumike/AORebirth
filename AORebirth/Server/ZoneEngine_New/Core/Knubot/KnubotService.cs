@@ -134,6 +134,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
                 return true;
 
             met.Add(script.Id);
+            npc.Brain?.BeginConversation(player);
             conversation.Packets.Enqueue(Outgoing.Packet(new KnuBotOpenChatWindowMessage
             {
                 Identity = player.Identity, Target = npc.Identity, Unknown1 = 2, Unknown2 = 1
@@ -254,6 +255,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
                     return true;
 
                 met.Add(script.Id);
+                npc.Brain?.BeginConversation(player);
                 conversation.Packets.Enqueue(Outgoing.Packet(new KnuBotOpenChatWindowMessage
                 {
                     Identity = player.Identity, Target = npc.Identity, Unknown1 = 2, Unknown2 = 1
@@ -612,7 +614,9 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
 
     void Remove(Conversation conversation)
     {
-        _sessions.TryRemove(new KeyValuePair<int, Conversation>(conversation.Player.Identity.Instance, conversation));
+        // Every chat ends here: the NPC may walk on (NpcBrain.IsHeldByConversation).
+        if (_sessions.TryRemove(new KeyValuePair<int, Conversation>(conversation.Player.Identity.Instance, conversation)))
+            conversation.Npc.Brain?.EndConversation(conversation.Player);
         conversation.Packets.Clear();
         conversation.Replies = [];
         effects.Trades.EndKnubot(conversation.Player, conversation.Npc, 0, "chat closed");

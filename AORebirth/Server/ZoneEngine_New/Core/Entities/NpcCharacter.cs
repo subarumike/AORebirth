@@ -150,6 +150,22 @@ namespace ZoneEngine_New.Core.Entities
             Brain = brain;
         }
 
+        /// <summary>
+        /// Turns the NPC toward <paramref name="other"/>. The client takes no heading packet for an NPC (a CharDCMove is
+        /// ignored), and a short FollowTarget step did not move it either (it was still sitting for the client after the
+        /// StandUp action), so it gets its full spawn packet again: standing, with the new heading.
+        /// </summary>
+        public void Face(Character other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+            float dx = other.Position.xf - Position.xf, dz = other.Position.zf - Position.zf;
+            if (Math.Abs(dx) < 1e-3f && Math.Abs(dz) < 1e-3f)
+                return;
+            float half = MathF.Atan2(dx, dz) * 0.5f;
+            Motor.Warp(Position, new AORebirth.Core.Vector.Quaternion(0, MathF.Sin(half), 0, MathF.Cos(half)));
+            Playfield?.GetService<ZoneEngine_New.Core.Playfield.Locality.PlayfieldLocality>()?.Announce(this, BuildSpawnMessage());
+        }
+
         /// <summary>Using a vendor NPC opens its shop; other NPCs have no use action yet.</summary>
         public bool TryUse(Player player)
         {

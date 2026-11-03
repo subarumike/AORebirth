@@ -382,6 +382,123 @@ namespace ZoneEngine_New.Core.Ai
 
         public IReadOnlyList<Vector3> PatrolWaypoints { get; set; }
 
+        /// <summary>The patrol runs between its waypoints (Movement.Patrol.Run); without it the NPC walks.</summary>
+        public bool PatrolRun { get; set; }
+
+        /// <summary>
+        /// The waypoint the patrol is heading for. Kept on the brain, not in PatrolNode: the node ends every think so
+        /// the root re-checks leash and combat, and starts the route over only on a tree reset.
+        /// </summary>
+        internal int PatrolIndex { get; private set; }
+
+        bool _patrolledThisThink;
+        bool _patrolWalking;
+
+        /// <summary>
+        /// One patrol think: head for the current waypoint at the patrol's pace, and on to the next one on arrival.
+        /// False when there is no route.
+        /// </summary>
+        internal bool TickPatrol()
+        {
+            IReadOnlyList<Vector3> points = PatrolWaypoints;
+            if (points.Count == 0)
+            {
+                PatrolAnchor = null;
+                return false;
+            }
+
+            _patrolledThisThink = true;
+            if (PatrolIndex >= points.Count)
+                PatrolIndex = 0;
+
+            // Each NPC walks the route shifted by its own stable offset (NpcSpread), so a shared route does not stack.
+            Vector3 dest = NpcSpread.Destination(Npc, points[PatrolIndex]);
+            if (NpcAiRules.IsNearby(Npc.Position, dest, NpcAiRules.ArriveHomeMeters))
+            {
+                // A program bound to this NPC may act at the waypoint (NpcScripts Arrived).
+                Npc.Scripts?.Raise(NpcScripts.NpcScriptTrigger.Arrived, PatrolIndex);
+                PatrolIndex = (PatrolIndex + 1) % points.Count;
+                dest = NpcSpread.Destination(Npc, points[PatrolIndex]);
+            }
+
+            _patrolWalking = !PatrolRun;
+            if (PatrolRun)
+            {
+                if (Npc.Motor.State == Movement.MovementState.Walk)
+                    Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToRun);
+            }
+            else if (Npc.Motor.State != Movement.MovementState.Walk)
+            {
+                Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToWalk);
+            }
+
+            // The leash measures from this waypoint while the patrol walks to it (LeashAnchor).
+            PatrolAnchor = dest;
+            PathTo(dest);
+            return true;
+        }
+
+        /// <summary>
+        /// Another branch took over from a walking patrol (a fight, a leash, a chat): back to running pace, unless a
+        /// scripted walk or a stroll set the walk this think.
+        /// </summary>
+        void LeavePatrolPace()
+        {
+            if (!_patrolWalking)
+                return;
+
+            _patrolWalking = false;
+            if (Npc.Motor.State == Movement.MovementState.Walk && !ScriptHoldsMovement && !_wanderedThisThink)
+                Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToRun);
+        }
+
+        // Conversations (Knubot): while a player has a chat open with the NPC it stops what it was walking and stands,
+        // and for a moment after the last chat closes, so the player is not left behind. Leash and combat come before
+        // the hold in the tree, so an attack still ends it.
+        readonly HashSet<int> _talkers = new();
+        DateTime _conversationHoldUntilUtc;
+        Character? _faceTalker;
+
+        public bool IsHeldByConversation => _talkers.Count > 0 || DateTime.UtcNow < _conversationHoldUntilUtc;
+
+        /// <summary>A chat with <paramref name="talker"/> opened: the NPC stops and turns to them on its next think.</summary>
+        public void BeginConversation(Character talker)
+        {
+            ArgumentNullException.ThrowIfNull(talker);
+            if (Pet != null || !_talkers.Add(talker.Identity.Instance))
+                return;
+
+            // Only an NPC that walks somewhere turns: one that stands at its post keeps the heading it was placed with.
+            if (PatrolEnabled || WanderEnabled || ScriptHoldsMovement)
+                _faceTalker = talker;
+        }
+
+        /// <summary>The chat with <paramref name="talker"/> closed; the NPC lingers a moment after the last one.</summary>
+        public void EndConversation(Character talker)
+        {
+            ArgumentNullException.ThrowIfNull(talker);
+            if (!_talkers.Remove(talker.Identity.Instance))
+                return;
+
+            if (_talkers.Count == 0)
+            {
+                _faceTalker = null;
+                _conversationHoldUntilUtc = DateTime.UtcNow.AddSeconds(NpcAiRules.ConversationLingerSeconds);
+            }
+        }
+
+        /// <summary>One held think: stand still, and turn to the player who opened the chat once.</summary>
+        internal void TickConversationHold()
+        {
+            StopPathing();
+            if (_faceTalker is not { } talker)
+                return;
+
+            _faceTalker = null;
+            if (!talker.IsDead && ReferenceEquals(talker.Playfield, Npc.Playfield) && !Npc.IsImmobile)
+                Npc.Face(talker);
+        }
+
         /// <summary>When the pathing NPC last made <see cref="NpcFollowTarget.PathStuckProgressMeters"/> of progress.</summary>
         internal DateTime ProgressSinceUtc { get; set; }
 
@@ -429,6 +546,9 @@ namespace ZoneEngine_New.Core.Ai
             {
                 _treeResetPending = false;
                 _tree.Reset();
+                // After a reset the patrol starts its route over, as it did when the node held the cursor.
+                PatrolIndex = 0;
+                PatrolAnchor = null;
             }
 
             // Pacified: no aggression. Drop whatever hate or fight got in and stand down.
@@ -469,16 +589,20 @@ namespace ZoneEngine_New.Core.Ai
 
             // A wanderer drops its stroll and runs as soon as it has anything to fight or flee.
             _wanderedThisThink = false;
+            _patrolledThisThink = false;
             if (!Hate.IsEmpty || _leashing || _evading)
             {
                 StopWandering();
                 InterruptScriptedMovement();
+                LeavePatrolPace();
             }
 
             TickStallWatch.Stage("brain.tree", Npc.Identity.Instance);
             _tree.Tick((float)deltaTime);
             if (!_wanderedThisThink)
                 StopWandering();
+            if (!_patrolledThisThink)
+                LeavePatrolPace();
             TickStallWatch.Stage("brain.nanos", Npc.Identity.Instance);
             _nanos.Tick(DateTime.UtcNow);
 
