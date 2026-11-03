@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="AODB" Version="1.0.13" />
-    <PackageReference Include="N3Lite" Version="0.1.11" />
+    <PackageReference Include="N3Lite" Version="0.1.13" />
     <PackageReference Include="StbImageSharp" Version="2.30.15" />
   </ItemGroup>
 
