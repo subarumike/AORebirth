@@ -454,50 +454,31 @@ namespace ZoneEngine_New.Core.Ai
 
         // Conversations (Knubot): while a player has a chat open with the NPC it stops what it was walking and stands,
         // and for a moment after the last chat closes, so the player is not left behind. Leash and combat come before
-        // the hold in the tree, so an attack still ends it.
+        // the hold in the tree, so an attack still ends it. Live (Lolly the Reet and three other patrollers, 2026-10):
+        // no FollowTarget for the whole chat, the route picked up again 1-3 s after the close, and no turn or re-spawn.
         readonly HashSet<int> _talkers = new();
         DateTime _conversationHoldUntilUtc;
-        Character? _faceTalker;
 
         public bool IsHeldByConversation => _talkers.Count > 0 || DateTime.UtcNow < _conversationHoldUntilUtc;
 
-        /// <summary>A chat with <paramref name="talker"/> opened: the NPC stops and turns to them on its next think.</summary>
+        /// <summary>A chat with <paramref name="talker"/> opened: the NPC stops on its next think.</summary>
         public void BeginConversation(Character talker)
         {
             ArgumentNullException.ThrowIfNull(talker);
-            if (Pet != null || !_talkers.Add(talker.Identity.Instance))
-                return;
-
-            // Only an NPC that walks somewhere turns: one that stands at its post keeps the heading it was placed with.
-            if (PatrolEnabled || WanderEnabled || ScriptHoldsMovement)
-                _faceTalker = talker;
+            if (Pet == null)
+                _talkers.Add(talker.Identity.Instance);
         }
 
         /// <summary>The chat with <paramref name="talker"/> closed; the NPC lingers a moment after the last one.</summary>
         public void EndConversation(Character talker)
         {
             ArgumentNullException.ThrowIfNull(talker);
-            if (!_talkers.Remove(talker.Identity.Instance))
-                return;
-
-            if (_talkers.Count == 0)
-            {
-                _faceTalker = null;
+            if (_talkers.Remove(talker.Identity.Instance) && _talkers.Count == 0)
                 _conversationHoldUntilUtc = DateTime.UtcNow.AddSeconds(NpcAiRules.ConversationLingerSeconds);
-            }
         }
 
-        /// <summary>One held think: stand still, and turn to the player who opened the chat once.</summary>
-        internal void TickConversationHold()
-        {
-            StopPathing();
-            if (_faceTalker is not { } talker)
-                return;
-
-            _faceTalker = null;
-            if (!talker.IsDead && ReferenceEquals(talker.Playfield, Npc.Playfield) && !Npc.IsImmobile)
-                Npc.Face(talker);
-        }
+        /// <summary>One held think: stand still where the chat found it.</summary>
+        internal void TickConversationHold() => StopPathing();
 
         /// <summary>When the pathing NPC last made <see cref="NpcFollowTarget.PathStuckProgressMeters"/> of progress.</summary>
         internal DateTime ProgressSinceUtc { get; set; }
