@@ -1287,8 +1287,17 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(landing);
 
+            if (player.Session == null)
+                return;
+
+            Pets.PetService pets = _playfield.GetRequiredService<Pets.PetService>();
+            pets.RemoveClientPetEntries(player);
             if (SendSamePlayfieldArrival(player, landing))
+            {
                 player.SendDeathRespawnAction();
+                // Re-read current ownership: a released or expired charm must not be announced again.
+                pets.AnnounceOwnedPets(player);
+            }
         }
 
         /// <summary>
