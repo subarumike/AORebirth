@@ -204,8 +204,9 @@ namespace ZoneEngine_New.Core.Helpers
             if (!attacker.HasLineOfSightTo(target) || attacker.GetEdgeDistanceTo(target) > weapon.GetAttackRange())
                 return FireResult.Waiting;
 
-            if (special is CharacterStat.AimedShot or CharacterStat.SneakAttack)
-                attacker.BreakSneak();
+            // Firing any special gives the attacker away. A special that opens the fight keeps stealth until here
+            // (StartFightingForSpecial), so one that kills outright gets no swing to break it.
+            attacker.BreakSneak();
             // Being attacked gives a sneaker away.
             target.BreakSneak();
 
