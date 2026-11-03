@@ -106,10 +106,15 @@ namespace ZoneEngine_New.Core.Tradeskills
             return best;
         }
 
-        /// <summary>Reads <see cref="FileName"/> from the GameData root; a missing file is empty.</summary>
+        public const string ReloadName = "Tradeskills";
+
+        /// <summary>
+        /// Reads <see cref="FileName"/> from the GameData root, through the GameData override folder; a missing file is
+        /// empty. A file that does not parse throws.
+        /// </summary>
         public static TradeskillCatalog Load(string gameDataRoot, Action<string>? log = null)
         {
-            string path = Path.Combine(gameDataRoot, FileName);
+            string path = AORebirth.Core.GameData.GameDataPaths.ResolveFile(gameDataRoot, FileName);
             if (!File.Exists(path))
             {
                 log?.Invoke(FileName + " not found at " + path);
