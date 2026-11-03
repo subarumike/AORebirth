@@ -11,7 +11,8 @@ namespace ZoneEngine_New.Core.Commands
     /// <summary>
     /// <c>.despawn</c>: removes the selected non-player dynel as if it had died, so whatever spawned it respawns it on its
     /// normal timer. NPCs raise <see cref="Character.Died"/> without a corpse, loot or XP; spawn-point statics go through
-    /// the hash spawn system; corpses are simply removed. Statics no spawn point owns (world fixtures) are refused.
+    /// the hash spawn system; corpses and world items no spawn point owns (drops, item-use spawns) are simply removed.
+    /// Other statics no spawn point owns (world fixtures) are refused.
     /// </summary>
     public sealed class DespawnCommand : IGmCommand
     {
@@ -24,7 +25,7 @@ namespace ZoneEngine_New.Core.Commands
         public GmCommandHelp Help { get; } = new(
             "Removes your selected NPC as if it had died.",
             [
-                new(".despawn", "Despawns your look-at target. Players cannot be despawned."),
+                new(".despawn", "Despawns your look-at target: an NPC, corpse or world item. Players cannot be despawned."),
             ],
             [
                 new(".despawn", "Select a mob first, then run it."),
@@ -75,6 +76,12 @@ namespace ZoneEngine_New.Core.Commands
 
                 case Corpse corpse:
                     playfield.GetRequiredService<SpawnService>().DespawnCorpse(corpse);
+                    break;
+
+                case WorldItem worldItem:
+                    // As a pickup: a spawn point's item comes back on its own timer; a drop or loose item just goes.
+                    if (!playfield.GetRequiredService<HashSpawnSystem>().TryDespawnStaticAsDeath(worldItem))
+                        playfield.GetRequiredService<SpawnService>().DespawnStatic(worldItem);
                     break;
 
                 case StaticDynel staticDynel:
