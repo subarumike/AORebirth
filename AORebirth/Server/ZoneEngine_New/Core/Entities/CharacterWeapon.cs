@@ -214,19 +214,14 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
-        /// RangedInit flag, or non-melee ammo presentation when InitiativeType is missing.
+        /// The client's melee/ranged split (Gamecode.dll 0x1008088f, used by the dual-wield check 0x1006914e to pick
+        /// Multi Melee or Multi Ranged): a weapon is melee when its AmmoType is below 1 and ranged otherwise.
+        /// InitiativeType and Attack skills do not decide it, so a cyberdeck (AmmoType 10, Material Creation) is ranged.
         /// </summary>
         public bool IsRanged()
-        {
-            Item? style = DamageItem;
-            if (style == null)
-                return false;
-
-            if ((style.GetWeaponFlags() & WeaponFlags.Ranged) != 0)
-                return true;
-
-            return style.IsWieldableCombatWeapon() && !AttackInfoRules.UsesMeleeAmmo(style);
-        }
+            => DamageItem is Item style
+                && style.IsWieldableCombatWeapon()
+                && style.GetStat(CharacterStat.AmmoType) >= 1;
 
         public void ResetAttack()
         {
