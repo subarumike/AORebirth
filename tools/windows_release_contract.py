@@ -40,7 +40,7 @@ PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChes
 RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ComboNames.json
 DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json GoverningForms.json
 ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterData.json
-MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json PerkActions.json
+MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json ObjectStateMachines.json PerkActions.json
 Perks.json PetReplies.json PetTypes.json Quests.json QuestRewards.json Research.json Respawn.json
 SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Tradeskills.json VendingMachines.json
 WaterExits.json Xp.json""".split())

@@ -589,6 +589,15 @@ namespace ZoneEngine_New.Core.Inventory
                 ? target
                 : ItemUseFunctions.ResolveApplyOn(target, source, spell);
 
+        /// <summary>Executes one retained static action after its owner-specific scheduling and requirement gate.</summary>
+        internal bool ExecuteStaticSpell(ItemSpell row, Player player, SpellCriteria criteria,
+            bool requirementsAlreadyChecked = false)
+            => ExecuteSpell(criteria.TriggerContext?.ExecutionTarget as Character ?? player,
+                criteria.TriggerContext?.Source as Character ?? player, row,
+                player.Playfield!.GetRequiredService<IInventoryRepository>(),
+                player.Playfield.GetRequiredService<IItemBuilder>(), false, criteria,
+                skipRequirements: requirementsAlreadyChecked);
+
         bool ExecuteSpell(
             Character target,
             Character? source,
@@ -597,7 +606,8 @@ namespace ZoneEngine_New.Core.Inventory
             IItemBuilder items,
             bool skipPassiveModifiers,
             SpellCriteria criteria,
-            bool isTick = false)
+            bool isTick = false,
+            bool skipRequirements = false)
         {
             // Each function names who it applies to (User / Wearer / Self: whoever used the item or cast the
             // nano; Target: the event target). A nano cast on someone else can still act on its caster, e.g. a
@@ -609,7 +619,7 @@ namespace ZoneEngine_New.Core.Inventory
             Character user = source ?? target;
             target = ResolveApplyOn(target, source, spell);
             Character applyOn = target;
-            if (!ItemTemplate.MeetsRequirements(
+            if (!skipRequirements && !ItemTemplate.MeetsRequirements(
                     spell.Requirements,
                     new RequirementSubject(stat => criteria.Resolve(stat, id => applyOn.Stats.Get(id)), applyOn.ResolveRequirement),
                     new RequirementSubject(stat => user.Stats.Get(stat), user.ResolveRequirement),

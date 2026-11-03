@@ -711,6 +711,7 @@ namespace ZoneEngine_New.Core.Playfield
                 foreach (PlayfieldTransfer transfer in _outgoingTransfers.Keys) transfer.SourceShutdown();
                 _playfieldManager.Knubot?.Shutdown(this);
                 GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Shutdown();
+                GetRequiredService<AreaTriggerService>().Dispose();
                 Player[] remaining = [.. _dynelRegistry.PlayerEntities()];
                 foreach (Player player in remaining)
                 {
@@ -815,6 +816,8 @@ namespace ZoneEngine_New.Core.Playfield
                 _inventoryMoves.Tick(this, deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("itemuse");
                 GetRequiredService<ItemUseService>().Tick(deltaTime);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("static.triggers");
+                GetRequiredService<AreaTriggerService>().Tick(deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("trades");
                 _trades.Tick(this, deltaTime);
 
@@ -979,6 +982,8 @@ namespace ZoneEngine_New.Core.Playfield
                 return locality;
             });
             services.AddSingleton<SpawnService>();
+            services.AddSingleton(_ => StaticObjectStateMachineCatalog.Load(_gameData.RootPath, _logger));
+            services.AddSingleton<AreaTriggerService>();
             services.AddSingleton<ZoneEngine_New.Core.Ai.ReachMaps>();
             services.AddSingleton(provider => new Pets.PetService(this, _gameData, _logger));
             services.AddSingleton(_shopDao);

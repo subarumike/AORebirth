@@ -44,6 +44,9 @@ namespace ZoneEngine_New.Core.Inventory
 
         public uint TickInterval { get; set; }
 
+        /// <summary>Original common SpellStat35 metadata; its native semantic name remains unverified.</summary>
+        public int Metadata35 { get; set; } = -1;
+
         public List<object> Arguments { get; set; } = new();
 
         public List<ItemRequirement> Requirements { get; set; } = new();
@@ -138,6 +141,7 @@ namespace ZoneEngine_New.Core.Inventory
                 Target = Target,
                 TickCount = TickCount,
                 TickInterval = TickInterval,
+                Metadata35 = Metadata35,
                 Arguments = new List<object>(Arguments),
                 Requirements = new List<ItemRequirement>(Requirements.Count)
             };
@@ -157,6 +161,9 @@ namespace ZoneEngine_New.Core.Inventory
     /// </summary>
     public sealed class SpellCriteria
     {
+        /// <summary>Static event owner, source and accepted invocation, kept separate from the character recipient.</summary>
+        public WorldSimulation.AreaTriggerContext? TriggerContext { get; init; }
+
         public const int RollMin = 1;
         public const int RollMaxInclusive = 100;
 

@@ -654,8 +654,12 @@ namespace ZoneEngine_New.Core.Playfield
                 StaticDynel dynel = CreateStaticDynel(record);
                 _registry.Register(dynel);
                 _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(dynel);
+                _playfield.WorldAccess.Instance?.BindStaticDoor(dynel);
+                _playfield.GetRequiredService<AreaTriggerService>().Register(dynel);
                 spawned++;
             }
+
+            _playfield.GetRequiredService<AreaTriggerService>().Initialize();
 
             _logger.Info(
                 string.Format(
@@ -687,6 +691,21 @@ namespace ZoneEngine_New.Core.Playfield
                 };
             else
                 dynel = new PlayfieldStaticDynel(identity, template);
+
+            // Placement state overrides shared template defaults (including the authored state-machine resource).
+            if (record.Blob is { Length: > 12 })
+            {
+                try
+                {
+                    DynelBlob blob = new ItemBase().ReadDynelBlob(record.Blob);
+                    foreach (KeyValuePair<int, int> stat in blob.AppliedStats)
+                        dynel.Stats.Set((CharacterStat)stat.Key, stat.Value, StatDetail.Base);
+                }
+                catch (Exception exception)
+                {
+                    _logger.Warn("Static placement state unreadable for " + identity + ": " + exception.GetType().Name);
+                }
+            }
 
             dynel.Playfield = _playfield;
             dynel.Position = new Vector3(record.Position.X, record.Position.Y, record.Position.Z);
@@ -1021,6 +1040,9 @@ namespace ZoneEngine_New.Core.Playfield
             player.StopInPlace();
 
             session.State = SessionState.SpawnReady;
+            // A retained player still reconnects into a rebuilt client world. Restore authored door state
+            // at the same pre-SCFU boundary as initial entry, including the close-inhibit latch.
+            _playfield.WorldAccess.Instance?.Doors.SendStates(session);
 
             PlayerSpawnPayloadValidator.RequireValid(player);
 

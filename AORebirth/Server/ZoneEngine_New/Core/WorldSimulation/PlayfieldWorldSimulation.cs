@@ -1498,6 +1498,23 @@
         /// <summary>Doors as sight blockers: the playfield's static doors, plus quest dungeon doors as they spawn.</summary>
         public DoorOcclusion Doors => _doors;
 
+        /// <summary>Shares a placed door's live stats with touch, sight and zone-in state publication.</summary>
+        public void BindStaticDoor(StaticDynel door) => _doors.BindStaticDoor(door);
+
+        /// <summary>Applies complete state-machine Flags to a bound door and publishes changed open/lock state.</summary>
+        public bool ApplyDoorFlags(PlayfieldType playfield, StaticDynel door, int flags, bool? closeInhibit = null)
+            => _doors.ApplyDoorFlags(playfield, door, flags, closeInhibit);
+
+        public bool ApplyDoorFlags(PlayfieldType playfield, Entities.Dynel owner, int flags, bool? closeInhibit = null)
+        {
+            if (owner is Door door)
+            {
+                door.ApplyFlags(flags, closeInhibit);
+                return true;
+            }
+            return owner is StaticDynel placed && ApplyDoorFlags(playfield, placed, flags, closeInhibit);
+        }
+
         /// <summary>
         /// Makes a quest dungeon door block line of sight while closed (see <see cref="DoorOcclusion"/>). A template
         /// without a collision sphere does not block; false then.

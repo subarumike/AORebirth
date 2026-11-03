@@ -44,6 +44,16 @@
   </ItemGroup>
   <!-- Explicit focused run: the clean baseline contains unrelated stale test types.
        The default/full suite remains unchanged and continues reporting those failures. -->
+  <ItemGroup Condition="'$(StaticDoorFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="TriggerTestWorld.cs" />
+    <Compile Include="AreaTriggerTests.cs" />
+    <Compile Include="AreaTriggerSchedulerTests.cs" />
+    <Compile Include="CryptDoorIntegrationTests.cs" />
+    <Compile Include="DoorStateTests.cs" />
+    <Compile Include="DoorNetworkIntegrationTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(DailyLoginFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />

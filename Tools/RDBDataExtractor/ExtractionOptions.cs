@@ -28,6 +28,11 @@ namespace AORebirth.Tools.RDBDataExtractor
         public string GameDataDirectory { get; set; }
 
         [Option(
+            "state-machine-profile",
+            HelpText = "Export only ObjectStateMachines.json from a reviewed private snapshot/profile; requires --gamedata-dir and does not open the AO client database.")]
+        public string StateMachineProfile { get; set; }
+
+        [Option(
             "tilemap-id",
             HelpText = "Export one RDBPlayfield id; co-locates its referenced tilemap under that folder.")]
         public int? TilemapId { get; set; }

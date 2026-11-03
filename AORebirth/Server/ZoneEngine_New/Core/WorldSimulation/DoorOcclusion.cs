@@ -50,6 +50,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
         const float ApproachMargin = 3f;
 
         readonly List<Blocker> _blockers = new();
+        readonly Dictionary<Identity, StaticDynel> _staticDoors = new();
+        readonly Dictionary<Identity, bool> _closeInhibited = new();
         readonly List<Character> _nearby = new();
         readonly float _touchRadius;
         readonly float _touchCenterY;
@@ -66,6 +68,50 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// <summary>Raised when a door changes state, so cached sight lines through it are dropped.</summary>
         public event Action? Changed;
 
+        /// <summary>
+        /// Binds placed door stats after template and placement overrides have been applied. State publication
+        /// does not require a collision sphere; a door without one still receives trigger and zone-in updates.
+        /// </summary>
+        public void BindStaticDoor(StaticDynel door)
+        {
+            ArgumentNullException.ThrowIfNull(door);
+            if (door.Identity.Type != IdentityType.Door)
+                return;
+
+            _staticDoors[door.Identity] = door;
+            _closeInhibited.TryAdd(door.Identity, false);
+            foreach (Blocker blocker in _blockers)
+            {
+                if (blocker.StaticIdentity == door.Identity)
+                    blocker.StaticEntity = door;
+            }
+            Changed?.Invoke();
+        }
+
+        /// <summary>
+        /// Writes the bound door's complete flags, then publishes an open/lock change. Returns true for a bound
+        /// door, including an unchanged state; callers must not write Flags before calling this method.
+        /// </summary>
+        public bool ApplyDoorFlags(PlayfieldType playfield, StaticDynel door, int flags, bool? closeInhibit = null)
+        {
+            ArgumentNullException.ThrowIfNull(playfield);
+            ArgumentNullException.ThrowIfNull(door);
+            if (!_staticDoors.TryGetValue(door.Identity, out StaticDynel? bound) || !ReferenceEquals(bound, door))
+                return false;
+
+            int previous = door.Stats.GetOrZero(CharacterStat.Flags);
+            bool previousInhibit = _closeInhibited[door.Identity];
+            bool inhibit = closeInhibit ?? previousInhibit;
+            door.Stats.Set(CharacterStat.Flags, flags);
+            _closeInhibited[door.Identity] = inhibit;
+            if (((previous ^ flags) & (Door.OpenFlag | Door.LockedFlag)) != 0 || previousInhibit != inhibit)
+            {
+                Changed?.Invoke();
+                SendStaticStatus(playfield, door.Identity, flags, inhibit);
+            }
+            return true;
+        }
+
         /// <summary>A quest dungeon's door entity: its own flags say open and locked.</summary>
         public void Add(Door door, float radius, float centerY)
         {
@@ -77,11 +123,16 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// <summary>A door placed in the playfield's static data (Dynels.dat), which the client creates itself.</summary>
         public void Add(int doorInstance, AoVector3 position, float rotationY, float rotationW, float radius, float centerY,
             int flags)
-            => Add(new Blocker(null, position, rotationY, rotationW, radius, centerY,
+        {
+            var identity = new Identity { Type = IdentityType.Door, Instance = doorInstance };
+            _staticDoors.TryGetValue(identity, out StaticDynel? door);
+            Add(new Blocker(null, position, rotationY, rotationW, radius, centerY,
                 (flags & Door.OpenFlag) != 0, (flags & Door.LockedFlag) != 0)
             {
-                StaticIdentity = new Identity { Type = IdentityType.Door, Instance = doorInstance }
+                StaticIdentity = identity,
+                StaticEntity = door
             });
+        }
 
         /// <summary>
         /// Puts an arriving client's copy of every static door on the server's state, as retail's zone-in sends a
@@ -90,9 +141,15 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public void SendStates(Network.IZoneSession session)
         {
             ArgumentNullException.ThrowIfNull(session);
+            foreach (StaticDynel door in _staticDoors.Values)
+            {
+                int flags = door.Stats.GetOrZero(CharacterStat.Flags);
+                session.Send(Door.StatusMessage(door.Identity, (flags & Door.OpenFlag) != 0, (flags & Door.LockedFlag) != 0,
+                    _closeInhibited[door.Identity]));
+            }
             foreach (Blocker d in _blockers)
             {
-                if (d.StaticIdentity is { } identity)
+                if (d.StaticIdentity is { } identity && !_staticDoors.ContainsKey(identity))
                     session.Send(Door.StatusMessage(identity, d.IsOpen, d.IsLocked));
             }
         }
@@ -137,7 +194,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// <summary>
         /// Opens every closed, unlocked door a living character is touching, and closes every door whose contact
         /// ended. A door that is open with nobody having touched it (spawned open, or opened by Use) stays open until
-        /// someone passes through it.
+        /// someone passes through it. An authored close-inhibit latch keeps an unlocked door open after contact.
         /// </summary>
         public void Tick(PlayfieldType playfield, double deltaTime)
         {
@@ -164,7 +221,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
                     if (sendOpen)
                         SendStatus(playfield, d);
                 }
-                else if (!touched && d.Touched && d.IsOpen)
+                else if (!touched && d.Touched && d.IsOpen && !(IsCloseInhibited(d) && !d.IsLocked))
                 {
                     d.Close();
                     changed = true;
@@ -229,7 +286,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
         }
 
         /// <summary>Tells every client the door's state: a quest dungeon door to those who see it, a static door to the playfield.</summary>
-        static void SendStatus(PlayfieldType playfield, Blocker d)
+        bool IsCloseInhibited(Blocker door)
+            => door.Entity?.CloseInhibited ?? (door.StaticIdentity is { } identity
+                && _closeInhibited.TryGetValue(identity, out bool inhibit) && inhibit);
+
+        void SendStatus(PlayfieldType playfield, Blocker d)
         {
             if (d.Entity is Door door)
             {
@@ -239,7 +300,14 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
             if (d.StaticIdentity is not { } identity)
                 return;
-            var message = Door.StatusMessage(identity, d.IsOpen, d.IsLocked);
+            var message = Door.StatusMessage(identity, d.IsOpen, d.IsLocked, IsCloseInhibited(d));
+            foreach (Player player in playfield.GetRequiredService<DynelRegistry>().PlayerEntities())
+                player.Session?.Send(message);
+        }
+
+        static void SendStaticStatus(PlayfieldType playfield, Identity identity, int flags, bool closeInhibit)
+        {
+            var message = Door.StatusMessage(identity, (flags & Door.OpenFlag) != 0, (flags & Door.LockedFlag) != 0, closeInhibit);
             foreach (Player player in playfield.GetRequiredService<DynelRegistry>().PlayerEntities())
                 player.Session?.Send(message);
         }
@@ -290,9 +358,13 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
             public Door? Entity => _door;
 
-            public bool IsOpen => _door?.IsOpen ?? _open;
+            public StaticDynel? StaticEntity { get; set; }
 
-            public bool IsLocked => _door?.IsLocked ?? _locked;
+            public bool IsOpen => _door?.IsOpen ?? (StaticEntity is { } door
+                ? (door.Stats.GetOrZero(CharacterStat.Flags) & Door.OpenFlag) != 0 : _open);
+
+            public bool IsLocked => _door?.IsLocked ?? (StaticEntity is { } door
+                ? (door.Stats.GetOrZero(CharacterStat.Flags) & Door.LockedFlag) != 0 : _locked);
 
             /// <summary>A character was in contact at the last check.</summary>
             public bool Touched { get; set; }
@@ -320,6 +392,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             {
                 if (_door != null)
                     _door.OpenByTouch();
+                else if (StaticEntity is { } door)
+                    door.Stats.Set(CharacterStat.Flags, door.Stats.GetOrZero(CharacterStat.Flags) | Door.OpenFlag);
                 else
                     _open = true;
             }
@@ -328,6 +402,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             {
                 if (_door != null)
                     _door.CloseAfterTouch();
+                else if (StaticEntity is { } door)
+                    door.Stats.Set(CharacterStat.Flags, door.Stats.GetOrZero(CharacterStat.Flags) & ~Door.OpenFlag);
                 else
                     _open = false;
             }

@@ -137,6 +137,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 Target = ToInt(Get(arguments, AodbFunctionOperator.ApplyOn)),
                 TickCount = ToInt(Get(arguments, AodbFunctionOperator.Duration)),
                 TickInterval = unchecked((uint)ToInt(Get(arguments, AodbFunctionOperator.Interval))),
+                Metadata35 = arguments.TryGetValue(AodbFunctionOperator.TargetList, out object? metadata35)
+                    ? ToInt(metadata35) : -1,
                 Arguments = MapArguments(Get(arguments, AodbFunctionOperator.Arg1)),
                 Requirements = MapCriteria(Get(arguments, AodbFunctionOperator.Criteria))
             };

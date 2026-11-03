@@ -144,6 +144,15 @@ namespace ZoneEngine_New.Core.Inventory
                     return NpcWipeHateList(target);
                 case FunctionType.TauntNpc:
                     return TauntNpc(target, source, spell);
+                case FunctionType.AreaTrigger:
+                case FunctionType.RemoteAreaTrigger:
+                {
+                    Player? invoker = source as Player ?? target as Player;
+                    var context = criteria?.TriggerContext ?? new AreaTriggerContext(
+                        source ?? target, source ?? target, invoker, target, invoker?.Session)
+                        { ExecutionTarget = target };
+                    return context.Owner.Playfield?.GetService<AreaTriggerService>()?.TryExecute(spell, context) == true;
+                }
                 case FunctionType.NpcStopMoving:
                     return NpcStopMoving(target);
                 case FunctionType.NpcTeleportToSpawnPoint:

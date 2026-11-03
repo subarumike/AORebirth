@@ -1,5 +1,15 @@
 # Current Task
 
+ACTIVE (2026-11-03): implement the static locked-door/switch repair on
+`codex/crypt-door-triggers`, based on freshly fetched public master
+`b091d32d9fdef66ca3e080674ee606643031bdf9`. Use the completed native trigger
+research and finalized PF665 capture; distinguish native proof from editable
+server compatibility policy. Mike authorized focused deterministic/multiplayer
+tests, builds and deployment after validation. Exact-input Windows acceptance
+is still required before Linux release work. Preserve user configuration and
+other pre-existing dirty work. See
+[the scoped repair report](../reports/STATIC_DOOR_TRIGGER_REPAIR.md).
+
 Completed implementation (2026-11-03): integrate the captured Halloween Win and
 Fail button responses after the preceding build. Reuse existing static placements,
 template events, seasonal settings and nano execution. The generic buff HeadMesh repair

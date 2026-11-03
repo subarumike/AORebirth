@@ -30,6 +30,9 @@ namespace AORebirth.Tools.RDBDataExtractor
                     return SelfTests.Run() ? 0 : 1;
                 }
 
+                if (!string.IsNullOrWhiteSpace(options.StateMachineProfile))
+                    return StateMachineExporter.Export(options.StateMachineProfile, options.GameDataDirectory, options.Overwrite);
+
                 ExtractionOptions resolved = ExtractionOptions.Resolve(options);
 
                 if (!Directory.Exists(resolved.AoClientPath))

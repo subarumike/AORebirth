@@ -34,6 +34,9 @@ namespace ZoneEngine_New.Core.Entities
 
         public ItemTemplate Template { get; }
 
+        /// <summary>Instance-local name from authored state-entry actions; shared templates remain immutable.</summary>
+        public string? RuntimeName { get; set; }
+
         /// <summary>
         /// Template OnUse runs after the template's AttackDelay, like an inventory use, through the
         /// playfield's <see cref="ItemUseService"/>. <see cref="DelaysUse"/> false runs at once.
@@ -55,6 +58,7 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Gates checked when a use is asked for: <see cref="CanStillUse"/>, within reach and the ToUse requirements.</summary>
         public bool CanBeginUse(Player player)
             => CanStillUse(player)
+                && (Playfield?.GetService<WorldSimulation.AreaTriggerService>()?.IsUseEnabled(this) ?? true)
                 && GetEdgeDistanceTo(player) <= LootableDynel.OpenRange
                 && Template.MeetsActionRequirements(stat => player.Stats.Get(stat), ActionType.ToUse, UseResolver(player));
 
@@ -91,6 +95,9 @@ namespace ZoneEngine_New.Core.Entities
             if (Playfield == null || player.Session == null)
                 return false;
 
+            if (Playfield.GetService<WorldSimulation.AreaTriggerService>() is { } triggers)
+                return triggers.BeginUse(this, player);
+
             return Template.ExecuteOnUseSpells(
                 player,
                 Playfield.GetRequiredService<IInventoryRepository>(),
@@ -122,7 +129,7 @@ namespace ZoneEngine_New.Core.Entities
                 Stats = BuildStats(),
                 // Client displays this as a C string. The length must include the trailing NUL,
                 // matching mission-key SimpleItemFullUpdate. Empty stays length 0.
-                Name = TerminateClientName(Template.Name)
+                Name = TerminateClientName(RuntimeName ?? Template.Name)
             };
             message.Owner = Identity.None;
             return message;
