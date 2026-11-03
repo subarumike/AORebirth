@@ -62,8 +62,8 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// SpawnItem's mint for a hash that may be flagged SpawnAll: a SpawnAll category mints one item per leaf family
-        /// reachable from it, each at its highest QL at or below <paramref name="desiredQuality"/> (a leaf starting above
-        /// the request is skipped). Any other hash, a leaf included, mints one item by <see cref="TryMintHighestUpTo"/>.
+        /// reachable from it, each at its highest QL at or below <paramref name="desiredQuality"/>; a leaf starting above
+        /// the request mints at its lowest QL (Soldier Nanoprogram Container 248265 asks QL 1 for its QL 1-7 crystals). Any other hash, a leaf included, mints one item by <see cref="TryMintHighestUpTo"/>.
         /// Appends to <paramref name="into"/>.
         /// </summary>
         public void MintHighestUpToSpawns(string hash, int desiredQuality, ItemSource source, List<Item> into)
@@ -84,10 +84,7 @@ namespace ZoneEngine_New.Core.Inventory
             for (int i = 0; i < leaves.Length; i++)
             {
                 LeafRange leaf = leaves[i];
-                if (leaf.Min > wanted)
-                    continue;
-
-                int reached = Math.Min(wanted, leaf.Max);
+                int reached = leaf.Min > wanted ? leaf.Min : Math.Min(wanted, leaf.Max);
                 if (HashItemCatalog.TrySelectIds(leaf.Instance, reached, CatalogQuality, out int lowId, out int highId))
                     into.Add(_items.CreateWithNewInstance(lowId, highId, reached, source));
             }
