@@ -528,8 +528,18 @@ namespace ZoneEngine_New.Core.Pets
         }
 
         /// <summary>
-        /// Tells the owner's client about every pet it has (after it finishes zoning in or reconnects), so its pet
-        /// window lists them. The client ignores a pet it already lists.
+        /// Removes client pet entries before character reconstruction, keeping server ownership intact.
+        /// Local Lost Eden inspection shows that a later removal can miss its already-reset ownership set.
+        /// </summary>
+        public void RemoveClientPetEntries(Player owner)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+            foreach (NpcCharacter pet in owner.OwnedPets.All)
+                SendRemovePet(owner, pet);
+        }
+
+        /// <summary>
+        /// Tells the owner's client about every pet it currently has after zoning, reconnecting or reconstruction.
         /// </summary>
         public void AnnounceOwnedPets(Player owner)
         {
@@ -929,9 +939,9 @@ namespace ZoneEngine_New.Core.Pets
         }
 
         static void SendAddPet(Player owner, NpcCharacter pet)
-            => owner.Session?.Send(new AddPetMessage { Identity = owner.Identity, Unknown = 0, PetIdentity = pet.Identity });
+            => owner.Session?.Send(new AddPetMessage { Identity = owner.Identity, PetIdentity = pet.Identity });
 
         static void SendRemovePet(Player owner, NpcCharacter pet)
-            => owner.Session?.Send(new RemovePetMessage { Identity = owner.Identity, Unknown = 0, PetIdentity = pet.Identity });
+            => owner.Session?.Send(new RemovePetMessage { Identity = owner.Identity, PetIdentity = pet.Identity });
     }
 }
