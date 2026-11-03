@@ -229,7 +229,8 @@ namespace ZoneEngine_New.Core.Inventory
                     continue;
                 if (IsSubjectSelector(requirement))
                 {
-                    onTarget = (Operator)requirement.Operator == Operator.OnTarget && getTargetStat != null;
+                    onTarget = (Operator)requirement.Operator is Operator.OnTarget or Operator.OnFightingTarget
+                        && getTargetStat != null;
                     continue;
                 }
 
@@ -407,23 +408,25 @@ namespace ZoneEngine_New.Core.Inventory
                 or Operator.LessThan or Operator.BitAnd or Operator.NotBitAnd;
 
         /// <summary>
-        /// OnTarget / OnSelf / OnUser / OnCaster rows select the subject for the following check group; they are not checks
-        /// themselves (Fists of Stellar Harmony ToUse: caster skills, caster VisualProfession 2, OnTarget,
-        /// VisualProfession 2).
+        /// OnTarget / OnFightingTarget / OnSelf / OnUser / OnCaster rows select the subject for the following check group;
+        /// they are not checks themselves (Fists of Stellar Harmony ToUse: caster skills, caster VisualProfession 2,
+        /// OnTarget, VisualProfession 2).
         /// </summary>
         public static bool IsSubjectSelector(ItemRequirement requirement)
         {
             ArgumentNullException.ThrowIfNull(requirement);
 
-            return (Operator)requirement.Operator is Operator.OnTarget or Operator.OnSelf or Operator.OnUser
-                or Operator.OnCaster;
+            return (Operator)requirement.Operator is Operator.OnTarget or Operator.OnFightingTarget or Operator.OnSelf
+                or Operator.OnUser or Operator.OnCaster;
         }
 
+        // OnFightingTarget reads the target subject: a hostile action's target is the character being fought
+        // (Pistol Mastery's follow-up needs "Affected by Quick Shot" 209924 running on it).
         static RequirementSubject SelectSubject(ItemRequirement selector, RequirementSubject self,
             RequirementSubject? user, RequirementSubject? target)
             => (Operator)selector.Operator switch
             {
-                Operator.OnTarget => target ?? self,
+                Operator.OnTarget or Operator.OnFightingTarget => target ?? self,
                 Operator.OnUser or Operator.OnCaster => user ?? self,
                 _ => self
             };

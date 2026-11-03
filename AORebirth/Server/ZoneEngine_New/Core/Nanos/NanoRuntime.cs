@@ -1531,7 +1531,9 @@ namespace ZoneEngine_New.Core.Nanos
                     continue;
                 if (ItemTemplate.IsSubjectSelector(requirement))
                 {
-                    subject = (Operator)requirement.Operator == Operator.OnTarget ? recipient ?? caster : caster;
+                    subject = (Operator)requirement.Operator is Operator.OnTarget or Operator.OnFightingTarget
+                        ? recipient ?? caster
+                        : caster;
                     continue;
                 }
 
