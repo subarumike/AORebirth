@@ -39,6 +39,14 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
             bool added = CopyEvent(dynel, spellList, AodbEventType.OnUse, EventType.OnUse);
             added |= CopyEvent(dynel, spellList, AodbEventType.OnTargetInVicinity, EventType.OnTargetInVicinity);
+            // Ordinary portal entry remains owned by the portal resolver. Trigger-bearing entry
+            // lists also need their static owner and authored retained actions on the server.
+            List<ItemSpell>? walkIn = ReadWalkIn(dynel);
+            if (walkIn != null && walkIn.Exists(IsAreaTrigger))
+            {
+                spellList[EventType.OnEnter] = walkIn;
+                added = true;
+            }
             if (!added)
                 return template;
 
@@ -80,6 +88,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
             return null;
         }
+
+        public static bool IsAreaTrigger(ItemSpell spell)
+            => spell.Is(FunctionType.AreaTrigger) || spell.Is(FunctionType.RemoteAreaTrigger);
 
         static bool CopyEvent(
             PlayfieldDynel dynel,

@@ -343,6 +343,103 @@ class ReleaseContractTests(unittest.TestCase):
             gate.validate_reconciliation(bundle, plan)
         self.assertEqual(gate.inventory(canonical)[0], rows)
 
+    @staticmethod
+    def object_state_machine_catalog():
+        return {"SchemaVersion": 1, "Machines": [{"Id": 1, "InitialState": 0,
+            "InitialStateCompatibility": "INFERRED: reviewed synthetic initial-state binding",
+            "States": [{"Id": 0, "EntrySpells": [], "SignalTimers": [], "Transitions": []}]}],
+            "SignalPolicies": [{"SignalMask": 1, "DoorOperations": ["Unlock", "Open"],
+                "Compatibility": "INFERRED: reviewed synthetic server signal policy"}]}
+
+    def test_object_state_machine_adoption_uses_existing_hash_approval_and_portable_chain(self):
+        canonical = self.root / "canonical"
+        canonical.mkdir()
+        (canonical / "items.dat").write_bytes(b"existing generated fixture")
+        before_rows, _ = gate.inventory(canonical)
+        stage = self.root / "ignored-object-inputs"
+        stage.mkdir()
+        data = stage / "ObjectStateMachines.json"
+        data.write_bytes(gate.encoded(self.object_state_machine_catalog()))
+        text = "Adopt the reviewed ObjectStateMachines.json runtime catalog."
+        instruction = stage / "authorization.txt"
+        instruction.write_bytes(text.encode())
+        mapping = {"PATH": data.name, "STAGED_PATH": str(data), "SHA256": gate.digest(data.read_bytes()),
+            "APPROVAL": {"BY": "Mike", "INSTRUCTION_PATH": str(instruction),
+                "INSTRUCTION_SHA256": gate.digest(instruction.read_bytes()), "TEXT": text}}
+        profile = {"CANONICAL_GAMEDATA_ROOT": str(canonical), "STATE_ROOT": str(self.root),
+            "PROTECTED_GENERATED_FILES": [], "PRIVATE_CATALOG_ADOPTIONS": [mapping]}
+        bundle = self.root / "object-plan"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", before_rows)
+        with mock.patch.object(gate, "tree_files", return_value={}), mock.patch.object(gate, "git", return_value=b"ignored"):
+            plan, projected = gate.reconcile_plan(self.root, profile, bundle, PUBLIC, DUMP,
+                {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP}, before_rows)
+            gate.validate_reconciliation(bundle, plan)
+            summary = gate.summarize_reconciliation(bundle, plan)
+        self.assertEqual(projected, {data.name: data.read_bytes()})
+        self.assertEqual(summary["PRIVATE_CATALOG_ADOPTIONS"][0]["SHA256"], mapping["SHA256"])
+        self.assertNotIn("STAGED_PATH", gate.encoded(summary).decode())
+        self.assertNotIn(str(self.root), gate.encoded(summary).decode())
+        for mutation in (lambda row: row.update(SHA256="f" * 64),
+                         lambda row: row["APPROVAL"].update(BY="Agent"),
+                         lambda row: row["APPROVAL"].update(TEXT="Invented approval for ObjectStateMachines.json"),
+                         lambda row: row["APPROVAL"].update(INSTRUCTION_SHA256="f" * 64)):
+            changed = copy.deepcopy(plan)
+            mutation(changed["PRIVATE_CATALOG_ADOPTIONS"][0])
+            with self.assertRaises(ValueError):
+                gate.validate_reconciliation(bundle, changed)
+        # A second intake may recognize identical bytes, but cannot overwrite private edits.
+        identical = {data.name: gate.content_identity(data.read_bytes(), data.name)}
+        row = copy.deepcopy(plan["PRIVATE_CATALOG_ADOPTIONS"][0])
+        row["CANONICAL_BEFORE"] = row["CANONICAL_AFTER"]
+        replay = {**plan, "PRIVATE_CATALOG_ADOPTIONS": [row]}
+        gate.validate_private_catalog_adoptions(bundle, replay, dict(identical))
+        altered = copy.deepcopy(replay)
+        different = gate.encoded({**self.object_state_machine_catalog(), "SchemaVersion": 2})
+        altered["PRIVATE_CATALOG_ADOPTIONS"][0]["CANONICAL_BEFORE"] = gate.stash(bundle, "different-private", different)
+        with self.assertRaisesRegex(ValueError, "overwrite unexplained private content"):
+            gate.validate_private_catalog_adoptions(bundle, altered,
+                {data.name: gate.content_identity(different, data.name)})
+
+    def test_object_state_machine_adoption_requires_nonempty_classified_valid_states(self):
+        invalid = (
+            lambda row: row.update(SchemaVersion=2),
+            lambda row: row.update(SchemaVersion=True),
+            lambda row: row.update(Machines=[]),
+            lambda row: row.update(SignalPolicies=None),
+            lambda row: row["Machines"][0].update(States=[]),
+            lambda row: row["Machines"][0].update(InitialState=99),
+            lambda row: row["Machines"][0].update(InitialStateCompatibility=" "),
+            lambda row: row["Machines"].append(copy.deepcopy(row["Machines"][0])),
+            lambda row: row["Machines"][0]["States"].append(copy.deepcopy(row["Machines"][0]["States"][0])),
+            lambda row: row["Machines"][0]["States"][0].update(Transitions=[{"TargetState": 2, "Criteria": []}]),
+            lambda row: row["SignalPolicies"][0].update(Compatibility=""),
+            lambda row: row["SignalPolicies"][0].update(SignalMask=0),
+            lambda row: row["SignalPolicies"][0].update(DoorOperations=["Invented"]),
+            lambda row: row["SignalPolicies"][0].update(DoorOperations=[]),
+            lambda row: row["SignalPolicies"][0].update(UseEnabled=1),
+            lambda row: row["SignalPolicies"].append(copy.deepcopy(row["SignalPolicies"][0])),
+        )
+        for index, mutate in enumerate(invalid):
+            content = self.object_state_machine_catalog()
+            mutate(content)
+            with self.subTest(case=index), self.assertRaises(ValueError):
+                gate.validate_object_state_machine_adoption(content)
+        valid = self.object_state_machine_catalog()
+        valid["SignalPolicies"][0].update(DoorOperations=[], UseEnabled=False)
+        gate.validate_object_state_machine_adoption(valid)
+        gate.validate_object_state_machine_adoption(json.loads(json.dumps(valid).replace('"SchemaVersion"', '"schemaVersion"')))
+
+    def test_private_catalog_adoption_paths_preserve_chest_group_and_independent_catalogs(self):
+        for paths in ([], ["ObjectStateMachines.json"], ["QuestRewards.json"],
+                      sorted(gate.INDEPENDENT_PRIVATE_CATALOGS), sorted(gate.PRIVATE_CHEST_CATALOGS),
+                      sorted(gate.PRIVATE_CHEST_CATALOGS | gate.INDEPENDENT_PRIVATE_CATALOGS)):
+            gate.validate_private_catalog_paths([{"PATH": path} for path in paths])
+        for paths in (["ObjectStateMachines.json", "ObjectStateMachines.json"], ["items.dat"],
+                      ["ObjectStateMachines.json", sorted(gate.PRIVATE_CHEST_CATALOGS)[0]]):
+            with self.subTest(paths=paths), self.assertRaises(ValueError):
+                gate.validate_private_catalog_paths([{"PATH": path} for path in paths])
+
     def test_portable_acceptance_survives_location_change_without_windows_binaries(self):
         bundle, _ = make_portable_fixture(self.root)
         relocated = self.root / "private-source" / "evidence"

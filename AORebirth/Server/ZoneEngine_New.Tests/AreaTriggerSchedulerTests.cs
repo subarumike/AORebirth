@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.WorldSimulation;
+    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     [TestClass]
     public sealed class AreaTriggerSchedulerTests
@@ -165,6 +166,65 @@ namespace ZoneEngine_New.Tests
             Seconds(world, 5);
             Assert.AreEqual(0, original.Sent.OfType<FormatFeedbackMessage>().Count());
             Assert.AreEqual(0, replacement.Sent.OfType<FormatFeedbackMessage>().Count());
+        }
+
+        [DataTestMethod]
+        [DataRow(4, true)]
+        [DataRow(14, false)]
+        [DataRow(23, false)]
+        public void DefaultSelectorUsesOwnerAndUnsupportedRemoteChainsEndTheList(int selector, bool admitted)
+        {
+            using var world = new TriggerTestWorld(new StaticObjectStateMachineCatalog([], [
+                new(256, [], false, "Explicit test activation compatibility")]));
+            ItemSpell first = Trigger();
+            first.Target = selector;
+            first.Arguments = [256, 1];
+            ItemSpell second = Trigger();
+            second.Arguments = [256, 1];
+            StaticDynel control = world.Add(10, 0, 0, 0, first, second);
+            world.First.Position = new Vector3(100, 0, 0);
+            Assert.AreEqual(admitted, world.Triggers.BeginUse(control, world.First));
+            world.Tick(0);
+            Assert.AreEqual(!admitted, world.Triggers.IsUseEnabled(control));
+        }
+
+        [DataTestMethod]
+        [DataRow(EventType.OnTargetInVicinity)]
+        [DataRow(EventType.OnEnter)]
+        public void CrossingUsesFullOwnerIdentityAndRetainsItsReset(EventType eventType)
+        {
+            var catalog = new StaticObjectStateMachineCatalog([], [
+                new(256, [], false, "Explicit test activation compatibility"),
+                new(4, [], true, "Explicit test activation compatibility")]);
+            using var world = new TriggerTestWorld(catalog);
+            // A different dynel type intentionally shares the instance and was registered first.
+            StaticDynel decoy = world.Add(10, IdentityType.Door, new ItemTemplate { Id = 10 }, new Vector3(100, 0, 0));
+            ItemSpell disable = Trigger();
+            disable.Arguments = [256, 1];
+            ItemSpell reset = Trigger();
+            reset.Arguments = [4, 1];
+            reset.TickInterval = 200;
+            var template = new ItemTemplate
+            {
+                Id = 20, SpellList = new() { [eventType] = new() { disable, reset } }
+            };
+            StaticDynel control = world.Add(10, IdentityType.Terminal, template, new Vector3(0, 0, 0));
+            StaticDynel opposite = world.Add(11, -0.9, 0, 0);
+            Assert.IsTrue(world.World.RegisterVicinityDynel(control.Identity, template, 0, 0, 0));
+            world.First.Position = new Vector3(-5, 0, 0);
+            world.Second.Position = new Vector3(100, 0, 0);
+            world.World.TickSoftTriggers(world.Playfield, 0); // seed the existing overlap tracker outside.
+            world.First.Position = new Vector3(0.8, 0, 0);
+            world.World.TickSoftTriggers(world.Playfield, 0);
+            world.Tick(0);
+            Assert.IsFalse(world.Triggers.IsUseEnabled(control));
+            Assert.IsFalse(world.Triggers.IsUseEnabled(opposite), "Area center must be the owner, not the crossing player.");
+            Assert.IsTrue(world.Triggers.IsUseEnabled(decoy), "A same-instance object of another type is not the owner.");
+            world.Tick(1);
+            Assert.IsFalse(world.Triggers.IsUseEnabled(control), "The retained reset must not execute immediately.");
+            Seconds(world, 2);
+            Assert.IsTrue(world.Triggers.IsUseEnabled(control));
+            Assert.IsTrue(world.Triggers.IsUseEnabled(opposite));
         }
     }
 }

@@ -1,5 +1,14 @@
 # AORebirth Project State
 
+PROVEN SERVER TESTS, CLIENT UNVERIFIED (2026-11-03, static doors/switches): the
+trigger executor preserves static context, ordered state transitions and authored
+timers, using editable private compatibility policies for unrecovered server
+signal meanings. Sixty focused cases pass, including actual Crypt door chains,
+other-playfield events and two loopback TCP sessions. Actual AO client traversal
+and animation remain unverified. Production has not changed; canonical catalog
+adoption and exact-input Windows release acceptance remain pending. See
+[the scoped repair report](../reports/STATIC_DOOR_TRIGGER_REPAIR.md).
+
 IMPLEMENTED, CLIENT UNVERIFIED (2026-11-03, Halloween button appearance): active
 buff HeadMesh effects now occupy the helmet mesh layer while preserving the base
 head. Appearance rebasing restores current equipment when the buff is removed,

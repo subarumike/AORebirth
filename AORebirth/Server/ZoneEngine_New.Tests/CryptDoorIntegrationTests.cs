@@ -4,10 +4,12 @@ namespace ZoneEngine_New.Tests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text.Json;
 
     using AODB.Common.RDBObjects;
     using AORebirth.Core.GameData;
+    using AORebirth.Enums;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -30,7 +32,8 @@ namespace ZoneEngine_New.Tests
     [DoNotParallelize]
     public sealed class CryptDoorIntegrationTests
     {
-        static readonly Lazy<CryptAssets> Assets = new(CryptAssets.Load);
+        static readonly Lazy<IReadOnlyDictionary<int, CryptAssets>> AllAssets = new(CryptAssets.LoadAll);
+        static readonly Lazy<CryptAssets> Assets = new(() => AllAssets.Value[4805]);
 
         [TestMethod]
         [DataRow(0, 17, -25)]
@@ -233,6 +236,164 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(0, crypt.World.SecondSession.Sent.OfType<DoorStatusUpdateMessage>().Count());
         }
 
+        [TestMethod]
+        public void Playfield1404ActualControlRetainsDelayedOpenAndResetWithoutChangingOtherDoors()
+        {
+            using var area = new CryptWorld(AllAssets.Value[1404]);
+            using var otherInstance = new CryptWorld(AllAssets.Value[1404]);
+            StaticDynel control = area.Control("C000057C");
+            ItemSpell open = control.Template.SpellList[EventType.OnUse].Single(spell =>
+                spell.Is(FunctionType.RemoteAreaTrigger) && Convert.ToInt32(spell.Arguments[3]) == 136);
+            Assert.AreEqual(200u, open.TickInterval, "Use the authored two-second open delay.");
+            StaticDynel door = area.Objects.Values.Single(item => item.Identity.Type == IdentityType.Door
+                && Within(item, Convert.ToInt32(open.Arguments[0]), Convert.ToInt32(open.Arguments[1]),
+                    Convert.ToInt32(open.Arguments[2]), Convert.ToInt32(open.Arguments[4])));
+            var originalFlags = area.Objects.Values.Where(item => item.Identity.Type == IdentityType.Door)
+                .ToDictionary(item => item.Identity, item => item.Stats.GetOrZero(CharacterStat.Flags));
+            int unrelatedFlags = OtherFlags(door);
+            AssertDoor(door, open: false, locked: true);
+
+            area.Use(control, area.World.First);
+            area.Step();
+            Assert.IsFalse(area.World.Triggers.IsUseEnabled(control));
+            Assert.IsFalse(control.TryUse(area.World.First));
+            area.Advance(1.5);
+            AssertDoor(door, open: false, locked: true);
+            area.Advance(2.45);
+            AssertDoor(door, open: true, locked: false, unrelatedFlags);
+            area.AssertBothSaw(door, open: true, locked: false);
+            area.Advance(15.5);
+            Assert.IsFalse(IsLocked(door), "The twenty-second reset must not run before its authored delay.");
+            area.AdvanceUntil(() => IsLocked(door), 3);
+            area.AssertBothSaw(door, open: false, locked: true);
+            area.AdvanceUntil(() => area.World.Triggers.IsUseEnabled(control), 2.5);
+            AssertDoor(door, open: false, locked: true, unrelatedFlags);
+
+            foreach (StaticDynel item in area.Objects.Values.Where(item => item.Identity.Type == IdentityType.Door
+                         && item.Identity != door.Identity))
+                Assert.AreEqual(originalFlags[item.Identity], item.Stats.GetOrZero(CharacterStat.Flags));
+            otherInstance.Advance(23);
+            foreach (StaticDynel item in otherInstance.Objects.Values.Where(item => item.Identity.Type == IdentityType.Door))
+                Assert.AreEqual(originalFlags[item.Identity], item.Stats.GetOrZero(CharacterStat.Flags),
+                    "A coincident placement in another playfield instance must not receive the signal.");
+            Assert.IsTrue(otherInstance.World.Triggers.IsUseEnabled(otherInstance.Control("C000057C")));
+        }
+
+        [TestMethod]
+        [DataRow(4604, "C00011FC", EventType.OnTargetInVicinity, 0)]
+        [DataRow(4873, "C0061309", EventType.OnEnter, 900)]
+        public void OtherPlayfieldsDispatchTheirActualEventAroundTheOwnerAndRetainAuthoredReset(
+            int playfield, string controlId, EventType eventType, int resetSeconds)
+        {
+            using var area = new CryptWorld(AllAssets.Value[playfield]);
+            using var otherInstance = new CryptWorld(AllAssets.Value[playfield]);
+            StaticDynel control = area.Control(controlId);
+            List<ItemSpell> rows = control.Template.SpellList[eventType];
+            ItemSpell disable = rows.Single(spell => spell.Is(FunctionType.AreaTrigger)
+                && Convert.ToInt32(spell.Arguments[0]) == 256);
+            Assert.AreEqual(1, disable.Target);
+            Assert.AreEqual(1, disable.TickCount);
+            Assert.AreEqual(0u, disable.TickInterval);
+            int radius = Convert.ToInt32(disable.Arguments[1]);
+            var recipients = area.Objects.Values.Where(item => Within(item, control.Position.x,
+                control.Position.y, control.Position.z, radius)).Select(item => item.Identity).ToHashSet();
+            Assert.IsTrue(recipients.Contains(control.Identity), "The placed owner is itself an eligible recipient.");
+            Assert.IsTrue(recipients.Count < area.Objects.Count, "The actual file must also supply unaffected placements.");
+
+            // BeginEvent is the production event dispatch/scheduling entrypoint. World crossing detection is
+            // covered separately; keep this actor outside the signal radius to distinguish owner from user.
+            area.World.First.Position = new Vector3(control.Position.x + radius + 2, control.Position.y, control.Position.z);
+            area.World.First.Stats.Set(CharacterStat.NPCFamily, 0);
+            Assert.IsTrue(area.World.Triggers.BeginEvent(control, area.World.First, eventType));
+            area.Step();
+            foreach (StaticDynel item in area.Objects.Values)
+                Assert.AreEqual(!recipients.Contains(item.Identity), area.World.Triggers.IsUseEnabled(item),
+                    "Only real placed objects inside the authored owner-centered radius should receive disable: " + item.Identity);
+            Assert.IsFalse(area.World.Triggers.BeginEvent(control, area.World.First, eventType),
+                "A disabled authored event must not queue another activation.");
+
+            if (resetSeconds > 0)
+            {
+                ItemSpell reset = rows.Single(spell => spell.Is(FunctionType.AreaTrigger)
+                    && Convert.ToInt32(spell.Arguments[0]) == 4);
+                Assert.AreEqual((uint)(resetSeconds * 100), reset.TickInterval);
+                area.Advance(resetSeconds - 0.25);
+                Assert.IsFalse(area.World.Triggers.IsUseEnabled(control), "Retained OnEnter reset must not execute immediately.");
+                area.AdvanceUntil(() => area.World.Triggers.IsUseEnabled(control), 2.5);
+                Assert.IsTrue(area.Objects.Values.All(area.World.Triggers.IsUseEnabled));
+            }
+            else
+            {
+                Assert.IsFalse(rows.Any(spell => spell.Is(FunctionType.AreaTrigger)
+                    && Convert.ToInt32(spell.Arguments[0]) == 4), "Do not invent a reset absent from the authored event.");
+                area.Advance(5);
+                Assert.IsFalse(area.World.Triggers.IsUseEnabled(control));
+            }
+
+            otherInstance.Advance(resetSeconds + 3);
+            Assert.IsTrue(otherInstance.Objects.Values.All(otherInstance.World.Triggers.IsUseEnabled),
+                "Identical placements in another playfield instance must not receive either queued signal.");
+        }
+
+        [TestMethod]
+        public void Playfield4873ActualOnEnterCriteriaRejectsTheWrongUserNpcFamily()
+        {
+            using var area = new CryptWorld(AllAssets.Value[4873]);
+            StaticDynel control = area.Control("C0061309");
+            area.World.First.Position = new Vector3(control.Position.x, control.Position.y, control.Position.z);
+            area.World.First.Stats.Set(CharacterStat.NPCFamily, 1);
+            area.World.Triggers.BeginEvent(control, area.World.First, EventType.OnEnter);
+            area.Step();
+            Assert.IsTrue(area.Objects.Values.All(area.World.Triggers.IsUseEnabled),
+                "The authored OnUser/NPCFamily=0 criterion must gate the disable action.");
+        }
+
+        [TestMethod]
+        public void Playfield4873ProductionVicinityDispatcherKeepsActualOnEnterOwnerAndDelayedReset()
+        {
+            using var area = new CryptWorld(AllAssets.Value[4873]);
+            StaticDynel control = area.Control("C0061309");
+            ItemSpell disable = control.Template.SpellList[EventType.OnEnter].Single(spell =>
+                spell.Is(FunctionType.AreaTrigger) && Convert.ToInt32(spell.Arguments[0]) == 256);
+            ItemSpell reset = control.Template.SpellList[EventType.OnEnter].Single(spell =>
+                spell.Is(FunctionType.AreaTrigger) && Convert.ToInt32(spell.Arguments[0]) == 4);
+            int radius = Convert.ToInt32(disable.Arguments[1]);
+            area.World.First.Position = new Vector3(control.Position.x + radius + 2, control.Position.y, control.Position.z);
+            area.World.First.Stats.Set(CharacterStat.NPCFamily, 0);
+            var pad = new ZoneTriggerVolume
+            {
+                Kind = ZoneTriggerKind.TargetVicinity,
+                DynelIdentity = control.Identity,
+                DynelInstance = control.Identity.Instance,
+                StaticEvent = EventType.OnEnter,
+                VicinityEvents = control.Template,
+                CenterX = control.Position.xf, CenterY = control.Position.yf, CenterZ = control.Position.zf
+            };
+
+            // Exercise the real crossing dispatcher without claiming that this reflection call detects movement.
+            // It must preserve the exact placed owner and selected OnEnter list when handing off to the scheduler.
+            MethodInfo? dispatch = typeof(PlayfieldWorldSimulation).GetMethod("FireTargetVicinity",
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.IsNotNull(dispatch);
+            dispatch.Invoke(area.World.World, new object[] { area.World.Playfield, area.World.First, pad });
+            area.Step();
+            Assert.IsFalse(area.World.Triggers.IsUseEnabled(control),
+                "The actual dispatcher must run OnEnter around the placed owner, not around the entering player.");
+            double resetSeconds = reset.TickInterval / 100d;
+            area.Advance(resetSeconds - 0.25);
+            Assert.IsFalse(area.World.Triggers.IsUseEnabled(control),
+                "The dispatcher must retain the authored interval instead of immediately running both rows.");
+            area.AdvanceUntil(() => area.World.Triggers.IsUseEnabled(control), 2.5);
+        }
+
+        static bool Within(StaticDynel item, double x, double y, double z, double radius)
+        {
+            double dx = item.Position.x - x;
+            double dy = item.Position.y - y;
+            double dz = item.Position.z - z;
+            return dx * dx + dy * dy + dz * dz < radius * radius;
+        }
+
         static bool IsOpen(StaticDynel door) => (door.Stats.GetOrZero(CharacterStat.Flags) & Door.OpenFlag) != 0;
         static bool IsLocked(StaticDynel door) => (door.Stats.GetOrZero(CharacterStat.Flags) & Door.LockedFlag) != 0;
         static int OtherFlags(StaticDynel door) => door.Stats.GetOrZero(CharacterStat.Flags) & ~(Door.OpenFlag | Door.LockedFlag);
@@ -328,26 +489,31 @@ namespace ZoneEngine_New.Tests
 
         sealed record CryptAssets(PlayfieldDynels Placements, StubItemBuilder Builder, StaticObjectStateMachineCatalog Catalog)
         {
-            public static CryptAssets Load()
+            public static IReadOnlyDictionary<int, CryptAssets> LoadAll()
             {
                 string root = GameDataPaths.ResolveRuntimeRoot();
-                string placementPath = Path.Combine(root, GameDataPaths.PlayfieldDynelsRelativePath(4805));
                 string itemsPath = Path.Combine(root, GameDataPaths.ItemsFileName);
                 string machinesPath = GameDataPaths.ResolveFile(root, StaticObjectStateMachineCatalog.FileName);
-                foreach (string path in new[] { placementPath, itemsPath, machinesPath })
+                var placementPaths = new[] { 4805, 1404, 4604, 4873 }.ToDictionary(id => id,
+                    id => Path.Combine(root, GameDataPaths.PlayfieldDynelsRelativePath(id)));
+                foreach (string path in placementPaths.Values.Concat(new[] { itemsPath, machinesPath }))
                 {
                     if (!File.Exists(path))
                         Assert.Inconclusive("Selected private GameData is unavailable: " + path + ". Select it with " + GameDataPaths.EnvironmentVariableName + ".");
                 }
 
-                var placements = new PlayfieldDynels();
-                using (var stream = File.OpenRead(placementPath))
-                using (var reader = new BinaryReader(stream))
+                var placements = new Dictionary<int, PlayfieldDynels>();
+                foreach (KeyValuePair<int, string> path in placementPaths)
                 {
-                    placements.Deserialize(reader);
+                    var rows = new PlayfieldDynels();
+                    using var stream = File.OpenRead(path.Value);
+                    using var reader = new BinaryReader(stream);
+                    rows.Deserialize(reader);
                     Assert.AreEqual(stream.Length, stream.Position, "The actual placed-object file must decode completely.");
+                    placements.Add(path.Key, rows);
                 }
-                var requiredTemplates = placements.Dynels.Select(record => record.TemplateId).ToHashSet();
+                var requiredTemplates = placements.Values.SelectMany(rows => rows.Dynels)
+                    .Select(record => record.TemplateId).ToHashSet();
                 var builder = new StubItemBuilder();
                 foreach (DatItemTemplate item in ItemsDatReader.Read(itemsPath))
                 {
@@ -357,7 +523,7 @@ namespace ZoneEngine_New.Tests
                 Assert.AreEqual(0, requiredTemplates.Count, "Every actual placement template must be present in items.dat.");
                 StaticObjectStateMachineCatalog catalog = StaticObjectStateMachineCatalog.Load(root, new StubLogger());
                 Assert.IsTrue(catalog.TryGet(200964, out _), "The selected runtime catalog must contain the authored entrance machine.");
-                return new CryptAssets(placements, builder, catalog);
+                return placements.ToDictionary(pair => pair.Key, pair => new CryptAssets(pair.Value, builder, catalog));
             }
         }
     }

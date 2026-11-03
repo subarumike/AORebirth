@@ -18,6 +18,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         public Dynel ExecutionTarget { get; init; } = Owner;
 
+        public int SourceDoorInstance { get; init; }
+
         public bool HasCurrentInvoker => Invoker != null
             && Session != null
             && ReferenceEquals(Invoker.Session, Session)

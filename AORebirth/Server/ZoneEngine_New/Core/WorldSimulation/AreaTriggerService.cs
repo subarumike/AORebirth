@@ -95,23 +95,30 @@ namespace ZoneEngine_New.Core.WorldSimulation
             => !_disposed && (!_objects.TryGetValue(owner, out ObjectRuntime? runtime) || runtime.UseEnabled);
 
         public bool BeginUse(StaticDynel owner, Player user)
+            => BeginEvent(owner, user, EventType.OnUse);
+
+        /// <summary>Applies an authored static event with the same owner/retention rules as use.</summary>
+        public bool BeginEvent(StaticDynel owner, Player user, EventType eventType, SpellCriteria? criteria = null)
         {
             if (_disposed || !IsCurrent(owner) || !IsCurrent(user) || !IsUseEnabled(owner)
                 || user.Session?.State != SessionState.InPlay)
                 return false;
 
             ObjectRuntime runtime = Get(owner);
-            var context = new AreaTriggerContext(owner, user, user, user, user.Session);
+            var context = new AreaTriggerContext(owner, user, user, user, user.Session)
+            {
+                SourceDoorInstance = criteria?.SourceDoorInstance ?? 0
+            };
             runtime.Context = context;
-            if (!owner.Template.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? rows))
-                return true;
+            if (!owner.Template.SpellList.TryGetValue(eventType, out List<ItemSpell>? rows))
+                return eventType == EventType.OnUse;
 
             // Leave unrelated static item behavior on its existing execution path. Only authored
             // trigger lists and bound state machines need the native retained-action scheduler.
             if (runtime.Machine == null && !rows.Any(IsAreaTrigger))
-                return owner.Template.ExecuteOnUseSpells(user,
+                return owner.Template.ExecuteSpells(eventType, user,
                     _playfield.GetRequiredService<IInventoryRepository>(),
-                    _playfield.GetRequiredService<IItemBuilder>());
+                    _playfield.GetRequiredService<IItemBuilder>(), criteria);
 
             return ApplyRows(rows, context);
         }
@@ -322,10 +329,10 @@ namespace ZoneEngine_New.Core.WorldSimulation
         {
             Dynel? target = row.Target switch
             {
-                0 or 1 => context.Owner,
                 2 => context.Source,
                 3 => context.Target,
-                _ => null // Native remote chains (14/23) need their own proven resolver.
+                14 or 23 => null, // Native remote chains need their own proven resolver.
+                _ => context.Owner
             };
             selected = context;
             if (target == null || !IsCurrent(target))
@@ -380,7 +387,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         bool MeetsRequirements(ItemSpell row, AreaTriggerContext context)
         {
-            ObjectRuntime runtime = Get(context.Owner);
+            // Native effect criteria receive the selected Beholder, just like the effect itself.
+            ObjectRuntime runtime = Get(context.ExecutionTarget);
             RequirementSubject Subject(Dynel subject) => new(
                 stat => subject.Stats.GetOrZero(stat),
                 requirement => requirement.Operator == 20
@@ -436,7 +444,8 @@ namespace ZoneEngine_New.Core.WorldSimulation
             // player effects require the exact original session, never a replacement login.
             if (context.Owner is StaticDynel owner && context.HasCurrentInvoker)
                 return owner.Template.ExecuteStaticSpell(row, context.Invoker!,
-                    new SpellCriteria { TriggerContext = context }, requirementsAlreadyChecked: true);
+                    new SpellCriteria { TriggerContext = context, SourceDoorInstance = context.SourceDoorInstance },
+                    requirementsAlreadyChecked: true);
             return false;
         }
 
