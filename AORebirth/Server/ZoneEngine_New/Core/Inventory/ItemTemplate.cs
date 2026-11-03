@@ -445,8 +445,8 @@ namespace ZoneEngine_New.Core.Inventory
         /// An empty OnUse list is a successful no-op; only present but unhandled functions fail.
         /// </summary>
         /// <param name="skipPassiveModifiers">
-        /// When true, Modify, ScalingModify, MonsterShape, and SetFlag are skipped because NCU
-        /// rebase already applies them from active buffs.
+        /// When true, Modify, ScalingModify, MonsterShape, SetFlag and HeadMesh are skipped because
+        /// rebase already supplies the stats and appearance from active buffs.
         /// </param>
         /// <param name="source">
         /// Optional source for damage attribution (nano caster). Defaults to <paramref name="target"/>.
@@ -625,7 +625,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             if ((spell.Is(FunctionType.SetFlag) || spell.Is(FunctionType.ChangeActionRestriction)
-                    || spell.Is(FunctionType.ChangeVariable))
+                    || spell.Is(FunctionType.ChangeVariable) || spell.Is(FunctionType.HeadMesh))
                 && skipPassiveModifiers)
                 return true;
 

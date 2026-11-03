@@ -1,5 +1,16 @@
 # AORebirth Project State
 
+IMPLEMENTED, CLIENT UNVERIFIED (2026-11-03, Halloween button appearance): active
+buff HeadMesh effects now occupy the helmet mesh layer while preserving the base
+head. Appearance rebasing restores current equipment when the buff is removed,
+and both spawn and appearance messages use the same result. Existing item-driven
+Win/Fail text, health and nano responses remain data-defined. Four focused
+regression cases were added but not executed; ZoneEngine_New compilation passed.
+The test project could not compile because unrelated files reference missing
+communication and mission types. Conditional Win-button knockback and the Fail
+animation remain unsupported without proven packet behavior. This change has no
+Linux or live-client acceptance.
+
 PROVEN SOURCE INTEGRATION (2026-10-30): the locally accepted Daily Login feature
 is combined with public master `132459c1d3f732a88abffca4750150446933f57b`, including
 all listed combat, world-object, developer-build and quest updates and PR #46

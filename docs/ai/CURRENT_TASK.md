@@ -1,5 +1,16 @@
 # Current Task
 
+Completed implementation (2026-11-03): integrate the captured Halloween Win and
+Fail button responses after the preceding build. Reuse existing static placements,
+template events, seasonal settings and nano execution. The generic buff HeadMesh repair
+compiles; focused regression cases were authored without running a suite.
+Private activation changes are restricted to the two reviewed existing Borealis
+records and preserve all coordinates, raw metadata and other seasonal content.
+Knockback and unobserved animation packet behavior remain unsupported. Public
+source integration does not accept or deploy a new release tuple.
+
+## Previous source integration
+
 Completed source integration (2026-10-30): combine Mike's locally accepted Daily Login
 Rewards feature at `c8fed6c026f3110043b8a0a18c19460485c62c9d` with freshly
 fetched public master `132459c1d3f732a88abffca4750150446933f57b` on

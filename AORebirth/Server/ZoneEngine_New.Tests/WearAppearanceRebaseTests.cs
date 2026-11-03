@@ -1,5 +1,6 @@
 namespace ZoneEngine_New.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -12,6 +13,7 @@ namespace ZoneEngine_New.Tests
 
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Nanos;
 
     /// <summary>
     /// Worn appearance comes from the OnWear spells of the pages a character shows: armor and
@@ -119,6 +121,110 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void Buff_head_mesh_overlays_the_helmet_and_preserves_the_base_head_and_other_meshes()
+        {
+            Player player = TestWorld.CreatePlayer(10);
+            player.Stats.Set(CharacterStat.HeadMesh, 40683);
+            player.Inventory.Armor.Add(ArmorHead, MeshItem(FunctionType.HeadMesh, meshId: 12345));
+            player.Inventory.Armor.Add(ArmorBack, MeshItem(FunctionType.BackMesh, meshId: 777));
+            ApplyHeadMeshBuff(player, 5100, new ItemSpell
+            {
+                FunctionType = (int)FunctionType.HeadMesh,
+                Arguments = [42, 88111]
+            });
+
+            Mesh[] meshes = player.BuildSpawnMessage().Meshes;
+            Mesh helmet = meshes.Single(mesh => mesh.Position == 0 && mesh.Layer == (byte)MeshLayer.Helmet);
+            Assert.AreEqual(88111u, helmet.Id);
+            Assert.AreEqual(42, helmet.OverrideTextureId);
+            Assert.AreEqual(40683u, meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Equipment).Id);
+            Assert.IsTrue(meshes.Any(mesh => mesh.Position == 5 && mesh.Id == 777));
+            Assert.AreEqual(88111u, player.BuildAppearanceUpdateMessage().Meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+            Assert.AreEqual(40683, player.Stats.Get(CharacterStat.HeadMesh, StatDetail.Base));
+        }
+
+        [TestMethod]
+        public void Removing_a_head_mesh_buff_restores_the_helmet_equipped_while_the_buff_was_active()
+        {
+            Player player = TestWorld.CreatePlayer(11);
+            player.Inventory.Armor.Add(ArmorHead, MeshItem(FunctionType.HeadMesh, meshId: 12345));
+            ApplyHeadMeshBuff(player, 5101, new ItemSpell
+            {
+                FunctionType = (int)FunctionType.HeadMesh,
+                Arguments = [0, 88111]
+            });
+
+            player.Inventory.Armor.Remove(ArmorHead);
+            player.Inventory.Armor.Add(ArmorHead, MeshItem(FunctionType.HeadMesh, meshId: 54321));
+            player.Rebase();
+            Assert.AreEqual(88111u, player.BuildAppearanceUpdateMessage().Meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+
+            Assert.AreEqual(BuffRemovalOutcome.Removed,
+                player.TryRemoveBuff(5101, BuffRemovalReason.Cancelled, out Buff? removed));
+            Assert.AreEqual(5101, removed?.Id);
+            player.Rebase();
+
+            Assert.AreEqual(54321u, player.BuildSpawnMessage().Meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+            Assert.AreEqual(54321u, player.BuildAppearanceUpdateMessage().Meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+        }
+
+        [TestMethod]
+        public void Buff_head_mesh_is_recomputed_when_its_requirement_changes()
+        {
+            Player player = TestWorld.CreatePlayer(12);
+            player.Stats.Set(CharacterStat.Strength, 10);
+            player.Inventory.Armor.Add(ArmorHead, MeshItem(FunctionType.HeadMesh, meshId: 12345));
+            ApplyHeadMeshBuff(player, 5102, new ItemSpell
+            {
+                FunctionType = (int)FunctionType.HeadMesh,
+                Arguments = [0, 88111],
+                Requirements = [new ItemRequirement
+                {
+                    StatNumber = (int)CharacterStat.Strength,
+                    Operator = (int)Operator.GreaterThan,
+                    Value = 50
+                }]
+            });
+
+            Assert.AreEqual(12345u, player.BuildAppearanceUpdateMessage().Meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+
+            player.Stats.Set(CharacterStat.Strength, 100);
+            player.Rebase();
+            Assert.AreEqual(88111u, player.BuildAppearanceUpdateMessage().Meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+
+            player.Stats.Set(CharacterStat.Strength, 10);
+            player.Rebase();
+            Assert.AreEqual(12345u, player.BuildAppearanceUpdateMessage().Meshes.Single(mesh => mesh.Position == 0
+                && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+        }
+
+        [TestMethod]
+        public void Malformed_buff_head_mesh_arguments_preserve_the_worn_helmet()
+        {
+            List<object>[] invalidArguments = [[], ["invalid"], [0, 0], [0, -1]];
+            for (int i = 0; i < invalidArguments.Length; i++)
+            {
+                Player player = TestWorld.CreatePlayer(20 + i);
+                player.Inventory.Armor.Add(ArmorHead, MeshItem(FunctionType.HeadMesh, meshId: 12345));
+                ApplyHeadMeshBuff(player, 5200 + i, new ItemSpell
+                {
+                    FunctionType = (int)FunctionType.HeadMesh,
+                    Arguments = invalidArguments[i]
+                });
+
+                Assert.AreEqual(12345u, player.BuildAppearanceUpdateMessage().Meshes.Single(mesh => mesh.Position == 0
+                    && mesh.Layer == (byte)MeshLayer.Helmet).Id);
+            }
+        }
+
+        [TestMethod]
         public void Wear_page_slot_decides_the_mesh_position()
         {
             Player player = TestWorld.CreatePlayer(6);
@@ -197,6 +303,17 @@ namespace ZoneEngine_New.Tests
 
         static Item MeshItem(FunctionType function, int meshId, int overrideTextureId = 0)
             => WearItem(function, [overrideTextureId, meshId]);
+
+        static void ApplyHeadMeshBuff(Player player, int nanoId, ItemSpell spell)
+        {
+            Assert.AreEqual(BuffApplyDecision.Apply, player.TryApplyBuff(
+                TestNanos.Create(nanoId, ncuCost: 0, canCancel: true, modifiers: [spell]),
+                player.Identity,
+                DateTime.UtcNow,
+                out _,
+                out _));
+            player.Rebase();
+        }
 
         static Item WearItem(FunctionType function, List<object> arguments)
             => new()

@@ -3850,6 +3850,7 @@ namespace ZoneEngine_New.Core.Entities
                 ApplyBackMesh(utility++, item, worn);
 
             List<Mesh> meshes = worn.Resolve(Stats.Get(CharacterStat.VisualFlags));
+            ApplyBuffHeadMeshes(meshes);
 
             if (robe == _wearRobe && SameWearAppearance(textures, meshes))
                 return;
@@ -3864,6 +3865,33 @@ namespace ZoneEngine_New.Core.Entities
             _wearMeshes.AddRange(meshes);
 
             InvalidateAppearance();
+        }
+
+        void ApplyBuffHeadMeshes(List<Mesh> meshes)
+        {
+            // Live AppearanceUpdate (Borealis, 2026-11-03): a buff's HeadMesh occupies the helmet layer;
+            // the character's base head remains underneath. Rebuilding restores current equipment when it ends.
+            foreach (Buff buff in _buffs)
+            {
+                foreach (ItemSpell spell in buff.ModifierSpells)
+                {
+                    if (!spell.Is(FunctionType.HeadMesh)
+                        || !ItemTemplate.MeetsRequirements(spell.Requirements, stat => Stats.Get(stat), ResolveRequirement)
+                        || !spell.TryReadMesh(out int meshId, out int overrideTextureId) || meshId <= 0)
+                        continue;
+
+                    meshes.RemoveAll(mesh => mesh.Position == 0 && mesh.Layer == (byte)MeshLayer.Helmet);
+                    int before = meshes.FindIndex(mesh => mesh.Position > 0
+                        || (mesh.Position == 0 && mesh.Layer > (byte)MeshLayer.Helmet));
+                    meshes.Insert(before < 0 ? meshes.Count : before, new Mesh
+                    {
+                        Position = 0,
+                        Id = (uint)meshId,
+                        OverrideTextureId = overrideTextureId,
+                        Layer = (byte)MeshLayer.Helmet
+                    });
+                }
+            }
         }
 
         /// <summary>True when the robe flag is shown for this character's worn look.</summary>
