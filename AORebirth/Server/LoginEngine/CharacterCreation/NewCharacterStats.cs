@@ -81,6 +81,8 @@ namespace LoginEngine.CharacterCreation
                 if (breed.Strength <= 0 || breed.Agility <= 0 || breed.Stamina <= 0
                     || breed.Intelligence <= 0 || breed.Sense <= 0 || breed.Psychic <= 0)
                     throw new InvalidDataException(path + ": breed " + breed.Breed + " needs all six positive starting abilities.");
+                if (breed.Gender is int gender && (gender <= 0 || !Enum.IsDefined(typeof(Gender), gender)))
+                    throw new InvalidDataException(path + ": breed " + breed.Breed + " has an invalid Gender " + gender + ".");
             }
 
             if (breeds.Count == 0)
@@ -158,6 +160,9 @@ namespace LoginEngine.CharacterCreation
         public int Sense { get; set; }
 
         public int Psychic { get; set; }
+
+        /// <summary>When set, every character of this breed gets this gender (1 Uni, 2 Male, 3 Female) whatever the client sent.</summary>
+        public int? Gender { get; set; }
 
         /// <summary>The order <see cref="StarterVitalStats"/> takes: Str, Psy, Sen, Int, Sta, Agi.</summary>
         public int[] ToLegacyOrder() => new[] { Strength, Psychic, Sense, Intelligence, Stamina, Agility };

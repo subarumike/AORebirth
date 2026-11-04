@@ -89,6 +89,6 @@
     { "Breed": 1, "Name": "Solitus", "Strength": 6, "Agility": 6, "Stamina": 6, "Intelligence": 6, "Sense": 6, "Psychic": 6 },
     { "Breed": 2, "Name": "Opifex", "Strength": 3, "Agility": 15, "Stamina": 6, "Intelligence": 6, "Sense": 10, "Psychic": 3 },
     { "Breed": 3, "Name": "Nanomage", "Strength": 3, "Agility": 3, "Stamina": 3, "Intelligence": 15, "Sense": 6, "Psychic": 10 },
-    { "Breed": 4, "Name": "Atrox", "Strength": 15, "Agility": 6, "Stamina": 10, "Intelligence": 3, "Sense": 3, "Psychic": 3 }
+    { "Breed": 4, "Name": "Atrox", "Strength": 15, "Agility": 6, "Stamina": 10, "Intelligence": 3, "Sense": 3, "Psychic": 3, "Gender": 1 }
   ]
 }
