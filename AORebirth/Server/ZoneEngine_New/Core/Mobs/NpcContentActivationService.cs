@@ -38,34 +38,8 @@ internal sealed class NpcContentActivationService(Playfield playfield, DynelRegi
         PlayfieldNpcContentCatalog playfieldContent = gameData?.GetPlayfieldNpcs(playfield.ResourceId)
             ?? PlayfieldNpcContentCatalog.Load(GameDataPaths.ResolveRuntimeRoot(), playfield.ResourceId);
 
-        foreach (var definition in playfieldContent.Npcs)
-        {
-            if (_activated.Contains(definition.Key)) continue;
-            var npc = WorldNpcFactory.Create(definition, items);
-            npc.Playfield = playfield;
-            if (definition.Vendor != null && !WorldNpcFactory.TryAttachShop(npc, definition.Vendor, catalog, out string failure))
-                _unavailableVendorEndpoints[definition.Key] = failure;
-            if (!registry.TryRegister(npc))
-                throw new InvalidOperationException("Content NPC identity collision: " + definition.Key);
-            try
-            {
-                Bind(npc, new(definition.Key, definition.Provenance, definition.ContentNpcIdentity, definition.PlayfieldId, definition.Vendor != null));
-                npc.Died += OnDied;
-                if (npc.Shop != null) npc.Shop.Playfield = playfield;
-                locality.RegisterDynel(npc);
-                _activated.Add(definition.Key);
-                // NpcScripts: a placed NPC is bound by its content Key.
-                playfield.GetService<NpcScripts.NpcScriptCatalog>()?.TryAttach(npc, playfield.ResourceId, spawnPointKey: null, npcKey: definition.Key);
-            }
-            catch
-            {
-                _bindings.Remove(npc);
-                npc.Died -= OnDied;
-                locality.UnregisterDynel(npc);
-                registry.UnregisterExact(npc);
-                throw;
-            }
-        }
+        // NPCs come from the playfield's hash spawns (Spawns.json); the Npcs.json list is not placed, or every
+        // vendor it shares with a spawn point stands there twice. Only its standalone shops are activated.
         ActivateStandaloneShops(playfieldContent);
         ActivateDatabaseShops();
     }
