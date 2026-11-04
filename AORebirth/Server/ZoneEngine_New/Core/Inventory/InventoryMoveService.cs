@@ -170,11 +170,16 @@ namespace ZoneEngine_New.Core.Inventory
             destPage.Content.TryGetValue(destSlot, out Item? destOccupant);
             if (destOccupant != null && destOccupant.Locked)
                 return;
-            if (lootSource is Chest && destOccupant != null)
+            // Loot never swaps: the occupant would be put into the corpse or chest.
+            if (lootSource != null && destOccupant != null)
                 return;
 
             // Occupied wear or unequip-onto-occupied bag is a swap. Bag-to-bag stays empty-only.
             if (destOccupant != null && !destIsWear && !sourceIsWear)
+                return;
+
+            // Equipping from inside a bag swaps the worn item into that bag slot; a worn bag may not go there.
+            if (WouldNestBag(sourcePage, sourceSlot, destPage, destSlot, item, destOccupant))
                 return;
 
             bool touchesEquipment = sourceIsWear || destIsWear;
@@ -437,6 +442,21 @@ namespace ZoneEngine_New.Core.Inventory
             destPage = player.Inventory.Bank;
             return true;
         }
+
+        /// <summary>
+        /// A bag would land inside a bag: the moved item into a bag page, or the swapped-out occupant back into the
+        /// bag page the moved item came from.
+        /// </summary>
+        static bool WouldNestBag(Container sourcePage, int sourceSlot, Container destPage, int destSlot, Item item,
+            Item? destOccupant)
+        {
+            if (ReferenceEquals(sourcePage, destPage) && sourceSlot == destSlot)
+                return false;
+            return (IsBagPage(destPage) && IsBagItem(item))
+                || (destOccupant != null && IsBagPage(sourcePage) && IsBagItem(destOccupant));
+        }
+
+        static bool IsBagPage(Container page) => (page.Flags & ContainerFlags.Backpack) != 0;
 
         public static bool IsBagItem(Item item)
         {
@@ -983,10 +1003,12 @@ namespace ZoneEngine_New.Core.Inventory
             Item item, LootableDynel? lootSource)
         {
             Item? existingDest = destPage.Content.GetValueOrDefault(destSlot);
-            if (lootSource is Chest && existingDest != null)
+            if (lootSource != null && existingDest != null)
                 return false;
             if (ReferenceEquals(sourcePage, destPage) && sourceSlot == destSlot)
                 return true;
+            if (WouldNestBag(sourcePage, sourceSlot, destPage, destSlot, item, existingDest))
+                return false;
             player.InvalidateOwnedItemCache();
             if (sourceSlot < sourcePage.Offset || sourceSlot >= sourcePage.Offset + sourcePage.Capacity
                 || destSlot < destPage.Offset || destSlot >= destPage.Offset + destPage.Capacity
