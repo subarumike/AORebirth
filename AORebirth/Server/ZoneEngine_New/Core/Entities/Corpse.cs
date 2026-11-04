@@ -83,6 +83,7 @@ namespace ZoneEngine_New.Core.Entities
             ExpiresAtUtc = DateTime.UtcNow.AddMilliseconds(TimeExist * 10);
             CopySourceStats(dead);
             OwnerTextures = dead.BuildWireTextures();
+            OwnerTextureOverrides = dead.CopyTextureOverrides() ?? [];
         }
 
         /// <summary>
@@ -179,6 +180,9 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>Owner's textures captured at death.</summary>
         Texture[] OwnerTextures { get; }
+
+        /// <summary>Owner's material texture overrides (SCFU extended textures) captured at death.</summary>
+        TextureOverride[] OwnerTextureOverrides { get; }
 
         MobCorpseFullUpdateTemplate? CorpseFullUpdateTemplate { get; }
 
@@ -314,7 +318,8 @@ namespace ZoneEngine_New.Core.Entities
                 // Dead character identity (AOSharp IdentityType.Character == CanbeAffected).
                 UnknownIdentity = Owner,
                 Textures = OwnerTextures.Length > 0 ? OwnerTextures : BuildDefaultTextures(),
-                Unknown7 = 0
+                HasTextureOverrides = OwnerTextureOverrides.Length > 0 ? 1 : 0,
+                TextureOverrides = OwnerTextureOverrides
             };
         }
 

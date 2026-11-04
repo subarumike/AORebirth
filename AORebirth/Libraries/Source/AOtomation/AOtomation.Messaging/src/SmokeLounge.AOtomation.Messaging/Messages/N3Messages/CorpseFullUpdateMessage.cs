@@ -91,9 +91,18 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(19, SerializeSize = ArraySizeType.X3F1)]
         public Texture[] Textures { get; set; }
 
-        /// <summary>Trailing int after cloth data (live CFU / AOSharp writer).</summary>
+        /// <summary>
+        /// Non-zero when <see cref="TextureOverrides"/> follows. The client (Gamecode.dll 0x1009f826) reads this int after
+        /// the cloth data and only then reads the TextureData vector.
+        /// </summary>
         [AoMember(20)]
-        public int Unknown7 { get; set; }
+        [AoFlags("textureOverrides")]
+        public int HasTextureOverrides { get; set; }
+
+        /// <summary>Material texture overrides the living character wore (same entries as SCFU extended textures).</summary>
+        [AoMember(21, SerializeSize = ArraySizeType.X3F1)]
+        [AoUsesFlags("textureOverrides", typeof(TextureOverride[]), FlagsCriteria.HasAny, int.MaxValue)]
+        public TextureOverride[] TextureOverrides { get; set; }
 
         #endregion
     }
