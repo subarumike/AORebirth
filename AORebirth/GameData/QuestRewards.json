@@ -22,7 +22,7 @@
             "Ql": 1
           },
           {
-            "Hash": "AR00008FAB00008FAB",
+            "Hash": "ARBASZ",
             "Name": "2 - 3 NCU Memory",
             "Ql": 1
           }
@@ -47,7 +47,7 @@
             "Count": 50
           },
           {
-            "Hash": "AR000470E3000470E3",
+            "Hash": "ARGRPM",
             "Name": "Health and Nano Stim",
             "Ql": 1,
             "Count": 25
@@ -157,7 +157,7 @@
             "Ql": 1
           },
           {
-            "Hash": "AR00048AA100048AA1",
+            "Hash": "ARFNXN",
             "Name": "Nano Crystal (Restock Special Ammo)",
             "Ql": 10
           }
@@ -246,7 +246,7 @@
             "Ql": 1
           },
           {
-            "Hash": "AR0000B5780000B578",
+            "Hash": "ARQHIP",
             "Name": "Nano Crystal (Basic Worker-Droid)",
             "Ql": 1
           }
@@ -317,10 +317,68 @@
             "Hash": "SP38",
             "Name": "Solar-Powered Pistol",
             "Ql": 1
+          }
+        ]
+      },
+      {
+        "If": [
+          {
+            "Stat": "Profession",
+            "Operator": "EqualTo",
+            "Value": 11
           },
           {
-            "Hash": "ARJWPB",
-            "Name": "Worn Cyberdeck",
+            "Stat": "Sex",
+            "Operator": "EqualTo",
+            "Value": 1
+          }
+        ],
+        "Items": [
+          {
+            "Id": 297667,
+            "Name": "Worn Cyberdeck (male)",
+            "Ql": 1
+          }
+        ]
+      },
+      {
+        "If": [
+          {
+            "Stat": "Profession",
+            "Operator": "EqualTo",
+            "Value": 11
+          },
+          {
+            "Stat": "Sex",
+            "Operator": "EqualTo",
+            "Value": 2
+          }
+        ],
+        "Items": [
+          {
+            "Id": 297666,
+            "Name": "Worn Cyberdeck (female)",
+            "Ql": 1
+          }
+        ]
+      },
+      {
+        "If": [
+          {
+            "Stat": "Profession",
+            "Operator": "EqualTo",
+            "Value": 11
+          },
+          {
+            "Stat": "Sex",
+            "Operator": "EqualTo",
+            "Value": 3
+          }
+        ],
+        "Items": [
+          {
+            "Id": 297665,
+            "Name": "Worn Cyberdeck (neuter)",
             "Ql": 1
           }
         ]
