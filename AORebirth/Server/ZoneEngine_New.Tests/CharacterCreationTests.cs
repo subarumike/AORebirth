@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json.Nodes;
 using AORebirth.Core.GameData;
 using AORebirth.Database.Dao;
+using AORebirth.Database.Domain.CharacterCreation;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.CharacterCreation;
 using LoginEngine.CharacterCreation;
@@ -41,6 +42,178 @@ public sealed class CharacterCreationTests
         Environment.SetEnvironmentVariable(GameDataPaths.EnvironmentVariableName, previousOverride);
         Directory.Delete(directory, recursive: true);
     }
+
+    [DataTestMethod]
+    [DataRow(2, 297666)]
+    [DataRow(3, 297665)]
+    [DataRow(1, 297667)]
+    public void NativeCyberdeckVariantIsAvailableInTheStarterPackage(int gender, int expectedId)
+    {
+        var packages = new JsonCharacterStartPackageDao(Path.Combine(AppContext.BaseDirectory, "GameData"));
+        CharacterStartProfessionPackage package = packages.TryGetPackage(11);
+        Assert.IsNotNull(package);
+        Assert.IsTrue(package.Items.Any(item => item.Placement == 72 && item.LowId == expectedId
+            && item.HighId == expectedId && item.Quality == 1 && item.Count == 1 && item.Gender == gender),
+            "NT starter package lacks the native cyberdeck for Sex " + gender + " (" + expectedId
+            + "); slot 72 currently contains " + string.Join(", ", package.Items.Where(item => item.Placement == 72)
+                .Select(item => item.LowId + "/" + item.HighId)) + ".");
+    }
+
+    [DataTestMethod]
+    [DataRow(1)]
+    [DataRow(2)]
+    [DataRow(3)]
+    [DataRow(4)]
+    public void StarterSelectionPreservesEveryProfessionAndNormalizesEveryBreed(int breed)
+    {
+        var packages = new JsonCharacterStartPackageDao(Path.Combine(AppContext.BaseDirectory, "GameData"));
+        CharacterStartPackageCatalog catalog = packages.LoadCatalog();
+        Assert.AreEqual(14, catalog.Packages.Count);
+        string[] original = StarterSnapshot(catalog);
+        NewCharacterStats starter = NewCharacterStats.Load(DefaultFile);
+
+        foreach (CharacterStartProfessionPackage package in catalog.Packages)
+        foreach (int requestedGender in new[] { 1, 2, 3 })
+        {
+            int gender = starter.AbilitiesFor(breed).Gender ?? requestedGender;
+            CharacterStartProfessionPackage selected = package.SelectForGender(gender);
+            Assert.AreEqual(package.ProfessionId, selected.ProfessionId);
+            Assert.AreEqual(package.Profession, selected.Profession);
+            Assert.AreEqual(package.Evidence, selected.Evidence);
+            CollectionAssert.AreEqual(package.UploadedNanos.ToArray(), selected.UploadedNanos.ToArray());
+            CollectionAssert.AreEqual(package.Items.Where(item => !item.Gender.HasValue).ToArray(),
+                selected.Items.Where(item => !item.Gender.HasValue).ToArray());
+            Assert.AreEqual(selected.Items.Count, selected.Items.Select(item => item.Placement).Distinct().Count());
+
+            if (package.ProfessionId == 11)
+            {
+                int expectedId = gender == 1 ? 297667 : gender == 2 ? 297666 : 297665;
+                CharacterStartPackageItem cyberdeck = selected.Items.Single(item => item.Placement == 72);
+                Assert.AreEqual(expectedId, cyberdeck.LowId);
+                Assert.AreEqual(expectedId, cyberdeck.HighId);
+                Assert.AreEqual(1, cyberdeck.Quality);
+                Assert.AreEqual(1, cyberdeck.Count);
+                Assert.AreEqual(9, selected.Items.Count);
+            }
+            else
+                CollectionAssert.AreEqual(package.Items.ToArray(), selected.Items.ToArray());
+        }
+
+        Assert.AreSame(catalog, packages.LoadCatalog());
+        CollectionAssert.AreEqual(original, StarterSnapshot(packages.LoadCatalog()));
+    }
+
+    [TestMethod]
+    public void LegacyStarterItemConstructorRemainsAvailableAndUnconditional()
+    {
+        ConstructorInfo? constructor = typeof(CharacterStartPackageItem).GetConstructor(new[]
+            { typeof(int), typeof(int), typeof(int), typeof(int), typeof(int) });
+        Assert.IsNotNull(constructor);
+        var item = (CharacterStartPackageItem)constructor.Invoke(new object[] { 64, 100, 101, 5, 25 });
+        Assert.AreEqual(64, item.Placement);
+        Assert.AreEqual(100, item.LowId);
+        Assert.AreEqual(101, item.HighId);
+        Assert.AreEqual(5, item.Quality);
+        Assert.AreEqual(25, item.Count);
+        Assert.IsNull(item.Gender);
+    }
+
+    [TestMethod]
+    public void UnconditionalStarterRowsAndUploadedNanosRemainAvailableForEveryGender()
+    {
+        WriteStarterItems(new JsonArray { StarterItem(), StarterItem(65) });
+        var packages = new JsonCharacterStartPackageDao(directory);
+        CharacterStartProfessionPackage package = packages.TryGetPackage(11);
+        foreach (int gender in new[] { 1, 2, 3 })
+        {
+            CharacterStartProfessionPackage selected = package.SelectForGender(gender);
+            CollectionAssert.AreEqual(package.Items.ToArray(), selected.Items.ToArray());
+            CollectionAssert.AreEqual(new[] { 1234 }, selected.UploadedNanos.ToArray());
+            Assert.IsTrue(selected.Items.All(item => !item.Gender.HasValue));
+        }
+    }
+
+    [TestMethod]
+    public void DisjointStarterGenderSelectorsShareOnePlacementWithoutMutatingTheCache()
+    {
+        WriteStarterItems(new JsonArray { StarterItem(), StarterItem(65, 1), StarterItem(65, 2), StarterItem(65, 3) });
+        var packages = new JsonCharacterStartPackageDao(directory);
+        CharacterStartPackageCatalog catalog = packages.LoadCatalog();
+        string[] original = StarterSnapshot(catalog);
+        foreach (int gender in new[] { 1, 2, 3 })
+        {
+            CharacterStartProfessionPackage selected = packages.TryGetPackage(11).SelectForGender(gender);
+            Assert.AreEqual(2, selected.Items.Count);
+            Assert.AreEqual(gender, selected.Items.Single(item => item.Placement == 65).Gender);
+            Assert.IsNull(selected.Items.Single(item => item.Placement == 64).Gender);
+        }
+        CollectionAssert.AreEqual(original, StarterSnapshot(packages.LoadCatalog()));
+    }
+
+    [DataTestMethod]
+    [DataRow(-1)]
+    [DataRow(0)]
+    [DataRow(4)]
+    [DataRow(99)]
+    public void InvalidStarterGenderSelectorsAreRejected(int gender)
+    {
+        WriteStarterItems(new JsonArray { StarterItem(64, gender) });
+        Assert.ThrowsExactly<InvalidDataException>(() => new JsonCharacterStartPackageDao(directory).LoadCatalog());
+    }
+
+    [TestMethod]
+    public void MalformedStarterGenderSelectorIsRejected()
+    {
+        JsonObject item = StarterItem();
+        item["gender"] = "unknown";
+        WriteStarterItems(new JsonArray { item });
+        Assert.ThrowsExactly<InvalidDataException>(() => new JsonCharacterStartPackageDao(directory).LoadCatalog());
+    }
+
+    [DataTestMethod]
+    [DataRow("duplicate")]
+    [DataRow("unconditional-first")]
+    [DataRow("unconditional-last")]
+    [DataRow("unconditional-only")]
+    public void OverlappingStarterPlacementsAreRejected(string overlap)
+    {
+        int? first = overlap == "unconditional-first" || overlap == "unconditional-only" ? null : 2;
+        int? second = overlap == "unconditional-last" || overlap == "unconditional-only" ? null : 2;
+        WriteStarterItems(new JsonArray { StarterItem(64, first), StarterItem(64, second) });
+        Assert.ThrowsExactly<InvalidDataException>(() => new JsonCharacterStartPackageDao(directory).LoadCatalog());
+    }
+
+    static JsonObject StarterItem(int placement = 64, int? gender = null)
+    {
+        var item = new JsonObject
+        {
+            ["placement"] = placement, ["lowId"] = 100, ["highId"] = 100,
+            ["quality"] = 1, ["count"] = 1
+        };
+        if (gender.HasValue)
+            item["gender"] = gender.Value;
+        return item;
+    }
+
+    void WriteStarterItems(JsonArray items)
+    {
+        var document = new JsonObject
+        {
+            ["packages"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["professionId"] = 11, ["profession"] = "fixture", ["evidence"] = "test",
+                    ["items"] = items, ["uploadedNanos"] = new JsonArray { 1234 }
+                }
+            }
+        };
+        File.WriteAllText(Path.Combine(directory, JsonCharacterStartPackageDao.FileName), document.ToJsonString());
+    }
+
+    static string[] StarterSnapshot(CharacterStartPackageCatalog catalog) => catalog.Packages.SelectMany(package =>
+        package.Items.Select(item => string.Join("/", package.ProfessionId, item.Placement, item.LowId, item.HighId,
+            item.Quality, item.Count, item.Gender?.ToString() ?? "unconditional"))).ToArray();
 
     [TestMethod]
     public void NoOverrideLoadsTheFileBesideTheRuntime()

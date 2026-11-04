@@ -749,7 +749,24 @@
           "lowId": 297665,
           "highId": 297665,
           "quality": 1,
-          "count": 1
+          "count": 1,
+          "gender": 3
+        },
+        {
+          "placement": 72,
+          "lowId": 297666,
+          "highId": 297666,
+          "quality": 1,
+          "count": 1,
+          "gender": 2
+        },
+        {
+          "placement": 72,
+          "lowId": 297667,
+          "highId": 297667,
+          "quality": 1,
+          "count": 1,
+          "gender": 1
         }
       ],
       "uploadedNanos": []

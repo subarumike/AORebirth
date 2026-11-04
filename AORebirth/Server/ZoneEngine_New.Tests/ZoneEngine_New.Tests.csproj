@@ -121,6 +121,7 @@
     <Compile Include="CharacterCreationTests.cs" />
     <Compile Include="CharacterListTests.cs" />
     <None Include="../../GameData/NewCharacter.json" Link="GameData/NewCharacter.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../GameData/StartPackages.json" Link="GameData/StartPackages.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup Condition="'$(LoginCharacterCreationFocusedTests)' != 'true'">
     <Compile Remove="CharacterCreationTests.cs" />

@@ -81,7 +81,7 @@ namespace AORebirth.Database.Domain.CharacterCreation
                         throw InvalidCatalog("professionId=" + row.ProfessionId + " needs an items array.");
 
                     var items = new List<CharacterStartPackageItem>();
-                    var placements = new HashSet<int>();
+                    var placements = new Dictionary<int, HashSet<int?>>();
                     for (int j = 0; j < row.Items.Length; j++)
                     {
                         ItemRow item = row.Items[j];
@@ -92,12 +92,22 @@ namespace AORebirth.Database.Domain.CharacterCreation
                             throw InvalidCatalog("professionId=" + row.ProfessionId + ", items[" + j
                                 + "] needs positive item IDs, quality and count, and an inventory placement from "
                                 + InventoryFirstSlot + " to " + (InventoryFirstSlot + InventorySlotCount - 1) + ".");
-                        if (!placements.Add(item.Placement))
+                        if (item.Gender.HasValue && !IsPlayerGender(item.Gender.Value))
+                            throw InvalidCatalog("professionId=" + row.ProfessionId + ", items[" + j
+                                + "] has an invalid gender selector.");
+                        if (!placements.TryGetValue(item.Placement, out HashSet<int?> genders))
+                        {
+                            genders = new HashSet<int?>();
+                            placements.Add(item.Placement, genders);
+                        }
+                        if (genders.Contains(null) || genders.Contains(item.Gender)
+                            || (!item.Gender.HasValue && genders.Count > 0))
                             throw InvalidCatalog("professionId=" + row.ProfessionId
-                                + " repeats inventory placement " + item.Placement + ".");
+                                + " repeats inventory placement " + item.Placement + " for overlapping genders.");
+                        genders.Add(item.Gender);
 
                         items.Add(new CharacterStartPackageItem(
-                            item.Placement, item.LowId, item.HighId, item.Quality, item.Count));
+                            item.Placement, item.LowId, item.HighId, item.Quality, item.Count, item.Gender));
                     }
 
                     var nanos = new List<int>();
@@ -131,6 +141,9 @@ namespace AORebirth.Database.Domain.CharacterCreation
 
         static bool IsPlayerProfession(int professionId) => Enum.IsDefined(typeof(Profession), professionId)
             && professionId != (int)Profession.None && professionId != (int)Profession.Monster;
+
+        static bool IsPlayerGender(int gender) => gender == (int)Gender.Neutral
+            || gender == (int)Gender.Male || gender == (int)Gender.Female;
 
         public CharacterStartProfessionPackage TryGetPackage(int professionId)
         {
@@ -191,6 +204,9 @@ namespace AORebirth.Database.Domain.CharacterCreation
 
             [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "gender")]
+            public int? Gender { get; set; }
         }
     }
 }
