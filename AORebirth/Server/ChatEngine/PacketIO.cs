@@ -89,6 +89,9 @@ namespace ChatEngine
         /// </returns>
         public byte[] Finish()
         {
+            if (this._data.Count > ushort.MaxValue)
+                throw new InvalidOperationException("Chat packet body exceeds its unsigned 16-bit length field.");
+
             this._packet.AddRange(BitConverter.GetBytes((ushort)IPAddress.HostToNetworkOrder((short)this._type)));
             this._packet.AddRange(BitConverter.GetBytes((ushort)IPAddress.HostToNetworkOrder((short)this._data.Count)));
             this._packet.AddRange(this._data);
@@ -142,7 +145,11 @@ namespace ChatEngine
             }
             else
             {
-                short length = IPAddress.HostToNetworkOrder((Int16)Encoding.UTF8.GetByteCount(input));
+                int byteCount = Encoding.UTF8.GetByteCount(input);
+                if (byteCount > ushort.MaxValue)
+                    throw new ArgumentOutOfRangeException(nameof(input), "Encoded chat string exceeds its unsigned 16-bit length field.");
+
+                short length = IPAddress.HostToNetworkOrder((Int16)byteCount);
                 this._data.AddRange(BitConverter.GetBytes((UInt16)length));
                 this._data.AddRange(Encoding.UTF8.GetBytes(input));
             }
@@ -249,6 +256,11 @@ namespace ChatEngine
         /// </returns>
         public byte[] ReadBytes(int count)
         {
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+            if (count > this.stream.Length - this.stream.Position)
+                throw new EndOfStreamException("Chat field exceeds the remaining packet body.");
+
             return this.reader.ReadBytes(count);
         }
 

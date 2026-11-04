@@ -42,8 +42,18 @@
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedAreteLoreleiVendorContentProvider.cs" Link="Fixtures/CapturedAreteLoreleiVendorContentProvider.cs" />
     <EmbeddedResource Include="Fixtures/LegacyProductionCharacterStats.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ChatNetworkTests.cs;ClientSendTests.cs" />
+  </ItemGroup>
   <!-- Explicit focused run: the clean baseline contains unrelated stale test types.
        The default/full suite remains unchanged and continues reporting those failures. -->
+  <ItemGroup Condition="'$(ChatNetworkFocusedTests)' == 'true'">
+    <ProjectReference Remove="@(ProjectReference)" />
+    <ProjectReference Include="../../../WindowsBuildNet10/Projects/ChatEngine.WinNet10.csproj" />
+    <Compile Remove="@(Compile)" />
+    <Compile Include="ChatNetworkTests.cs" />
+    <Compile Include="ClientSendTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(StaticDoorFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
