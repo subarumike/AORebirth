@@ -2,10 +2,12 @@ namespace ZoneEngine_New.Tests;
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 
 using AORebirth.Core.GameData;
 using AORebirth.Enums;
@@ -36,8 +38,9 @@ public sealed class RingUpgradeTests
     public void RecordSelectedInputs()
     {
         NativeAssets assets = Assets.Value;
-        TestContext.WriteLine("RING_UPGRADE_INPUTS items={0} itemsSha256={1} catalog={2} catalogSha256={3}",
-            assets.ItemsPath, assets.ItemsSha256, assets.HashPath, assets.HashSha256);
+        TestContext.WriteLine("RING_UPGRADE_INPUTS items={0} itemsSha256={1} catalog={2} catalogSha256={3} originalCatalog={4} originalCatalogSha256={5}",
+            assets.ItemsPath, assets.ItemsSha256, assets.HashPath, assets.HashSha256,
+            assets.OriginalHashPath, assets.OriginalHashSha256);
     }
 
     [TestMethod]
@@ -112,6 +115,78 @@ public sealed class RingUpgradeTests
         }
     }
 
+    [TestMethod]
+    public void AbmouthLootParentRetainsItsOriginalFixedRingAliasAndOtherBranches()
+    {
+        NativeAssets assets = Assets.Value;
+        JsonNode original = JsonNode.Parse(File.ReadAllText(assets.OriginalHashPath))!;
+        JsonNode selected = JsonNode.Parse(File.ReadAllText(assets.HashPath))!;
+        Assert.IsTrue(JsonNode.DeepEquals(original[RingHash], original["TWWC"]),
+            "The existing fixed alias must match every property of the original ring leaf.");
+        Assert.IsTrue(JsonNode.DeepEquals(original["TWWC"], selected["TWWC"]),
+            "The existing fixed alias must remain unchanged.");
+
+        JsonNode expectedParent = original["ARVSZJ"]!.DeepClone();
+        CollectionAssert.AreEqual(new[] { RingHash, "BOOJ", "JUTR" },
+            expectedParent["Children"]!.AsArray().Select(child => child!.GetValue<string>()).ToArray());
+        expectedParent["Children"]!.AsArray()[0] = "TWWC";
+        Assert.IsTrue(JsonNode.DeepEquals(expectedParent, selected["ARVSZJ"]),
+            "Only the first loot child may change, preserving the parent shape, order and choices.");
+        foreach (string child in new[] { "BOOJ", "JUTR" })
+        {
+            Assert.IsTrue(JsonNode.DeepEquals(original[child], selected[child]),
+                "The other native loot branch must remain unchanged: " + child);
+        }
+
+        Assert.IsTrue(assets.Hashes.TryGetInstance("TWWC", out HashInstance fixedRing));
+        CollectionAssert.AreEqual(new[] { LowId }, fixedRing.TemplateIds);
+        Assert.AreEqual(1, assets.Templates.Require(fixedRing.TemplateIds.Single()).Quality);
+
+        foreach (string child in new[] { "TWWC", "BOOJ", "JUTR" })
+        {
+            Assert.IsTrue(assets.Hashes.TryGetInstance(child, out HashInstance leaf));
+            Assert.IsTrue(leaf.TemplateIds.All(id =>
+                ((ItemFlags)assets.Templates.Require(id).Flags & ItemFlags.Special) != 0),
+                "The native Special flags keep every branch eligible throughout the drop window.");
+        }
+        Assert.IsTrue(assets.Hashes.TryGetInstance("BOOJ", out HashInstance rangedBranch));
+        Assert.IsTrue(rangedBranch.TemplateIds.Select(id => assets.Templates.Require(id).Quality).Distinct().Count() > 1,
+            "The existing ranged branch must keep this parent outside the fixed-quality ladder policy.");
+    }
+
+    [TestMethod]
+    public void EveryAbmouthLootBranchPreservesItsNativeOutputAcrossTheOriginalQualityWindow()
+    {
+        NativeAssets assets = Assets.Value;
+        HashItemCatalog original = HashItemCatalog.Parse(File.ReadAllText(assets.OriginalHashPath));
+        Assert.IsTrue(original.TryGetCategory("ARVSZJ", out IReadOnlyList<string> originalChildren));
+        Assert.IsTrue(assets.Hashes.TryGetCategory("ARVSZJ", out IReadOnlyList<string> selectedChildren));
+        Assert.AreEqual(3, originalChildren.Count);
+        Assert.AreEqual(originalChildren.Count, selectedChildren.Count);
+        var builder = new ItemBuilder(assets.Templates, new StubLogger());
+        var originalMinter = new HashItemMinter(new StubGameData(original), assets.Templates, builder);
+        var selectedMinter = new HashItemMinter(new StubGameData(assets.Hashes), assets.Templates, builder);
+
+        for (int branch = 0; branch < originalChildren.Count; branch++)
+        {
+            for (int rolledQuality = 22; rolledQuality <= 37; rolledQuality++)
+            {
+                var expected = new List<(int LowId, int HighId, int Quality)>();
+                var actual = new List<(int LowId, int HighId, int Quality)>();
+                // Direct leaves exercise the real minter without drawing a random parent choice.
+                originalMinter.RollSpawnIds(originalChildren[branch], rolledQuality, rolledQuality, rolledQuality, expected);
+                selectedMinter.RollSpawnIds(selectedChildren[branch], rolledQuality, rolledQuality, rolledQuality, actual);
+                Assert.AreEqual(1, expected.Count);
+                CollectionAssert.AreEqual(expected.ToArray(), actual.ToArray(),
+                    "Native loot output differs for branch " + branch + " at rolled QL " + rolledQuality);
+                if (branch == 0)
+                {
+                    Assert.AreEqual((LowId, LowId, 1), actual.Single());
+                }
+            }
+        }
+    }
+
     static Item AssertSingleReplacement(Harness world, int expectedQuality)
     {
         Assert.AreEqual(0, world.Original.StackCount);
@@ -152,7 +227,7 @@ public sealed class RingUpgradeTests
     }
 
     sealed record NativeAssets(HashItemCatalog Hashes, ItemTemplateCatalog Templates, string ItemsPath,
-        string ItemsSha256, string HashPath, string HashSha256)
+        string ItemsSha256, string HashPath, string HashSha256, string OriginalHashPath, string OriginalHashSha256)
     {
         public static NativeAssets Load()
         {
@@ -161,13 +236,16 @@ public sealed class RingUpgradeTests
             string root = GameDataPaths.ResolveRuntimeRoot();
             string itemsPath = Path.Combine(root, GameDataPaths.ItemsFileName);
             string hashPath = GameDataPaths.ResolveFile(root, "ItemTemplates.json");
+            string originalHashPath = Path.Combine(root, "ItemTemplates.json");
             Assert.IsTrue(File.Exists(itemsPath), "The selected native items.dat must exist.");
             Assert.IsTrue(File.Exists(hashPath), "The selected runtime hash catalog must exist.");
+            Assert.IsTrue(File.Exists(originalHashPath), "The unchanged canonical catalog supplies the loot preimage.");
             HashItemCatalog hashes = HashItemCatalog.Parse(File.ReadAllText(hashPath));
             var templates = new ItemTemplateCatalog(new StubGameData(hashes, rootPath: root), new StubLogger());
             Assert.AreEqual("Ring of the Nucleus Basalis", templates.Require(LowId).Name);
             Assert.AreEqual(templates.Require(LowId).Name, templates.Require(HighId).Name);
-            return new NativeAssets(hashes, templates, itemsPath, Digest(itemsPath), hashPath, Digest(hashPath));
+            return new NativeAssets(hashes, templates, itemsPath, Digest(itemsPath), hashPath, Digest(hashPath),
+                originalHashPath, Digest(originalHashPath));
         }
 
         static string Digest(string path)
