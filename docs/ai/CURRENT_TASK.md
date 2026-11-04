@@ -1,5 +1,25 @@
 # Current Task
 
+IMPLEMENTED AND TESTED (2026-11-04): repair shared ChatEngine TCP framing and incomplete sends
+on `codex/chatengine-framing`, based on freshly fetched public master
+`4457f015e60728fed8eeca304e47486770e66685`. Mike explicitly authorized focused
+local regression fixtures. Preserve the separately committed initial bug repairs
+on `codex/nov04-bug-repairs`, canonical GameData and unrelated work. No production
+access, service changes, client control, deployment or master integration is
+authorized. Live log access remains UNVERIFIED; the incident timestamp is UNKNOWN.
+Source defects are proven independently of live attribution. Existing native
+length fields define bounded frame assembly; do not invent flood or HTML policy.
+
+Repair commit `50bf8097bd5970bc9aff85216bddc04569a6281c` passes all 40 focused
+cases on a committed-source rerun (24 receive/codec, 16 send/ownership), with
+zero failures or skips. ChatEngine and LoginEngine compile with zero errors.
+Native framing, complete queued sends and pooled-buffer ownership are corrected;
+no GameData or rate-policy change is included. Exact-input Windows startup and
+Mike's acceptance, Linux packaging and deployment remain outside this run. See
+[the repair report](../reports/CHATENGINE_STREAM_FRAMING_REPAIR.md).
+
+## Retained prior task history
+
 ACTIVE (2026-11-03): implement the static locked-door/switch repair on
 `codex/crypt-door-triggers`, based on freshly fetched public master
 `b091d32d9fdef66ca3e080674ee606643031bdf9`. Use the completed native trigger
