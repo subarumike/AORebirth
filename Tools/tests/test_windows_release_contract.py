@@ -655,6 +655,41 @@ class ReleaseContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             gate.validate_startup(bundle, windows, attempt)
 
+    def test_approved_whole_document_removal_preserves_private_metadata_and_shops(self):
+        base = {"SchemaVersion": 1, "PlayfieldId": 99, "Npcs": [{"Key": "synthetic"}],
+                "StandaloneShops": [{"Key": "synthetic-shop"}]}
+        private = copy.deepcopy(base)
+        private["Npcs"][0]["HasDialogue"] = True
+        resolution = {"": {"INPUT_HASHES": {"BASE": gate.value_hash(base),
+            "UPSTREAM": "MISSING", "PRIVATE": gate.value_hash(private)},
+            "ACTION": "PRESERVE_PRIVATE", "APPROVAL": "Synthetic test approval"}}
+        original = json.dumps(private).encode()
+        self.assertEqual(gate.merge_bytes(json.dumps(base).encode(), None, original, resolution), original)
+        with self.assertRaises(gate.ContentConflict):
+            gate.merge_value(base, gate.MISSING, private, {})
+
+    def test_whole_document_resolution_rejects_changed_input_hashes(self):
+        base, private = {"a": 1}, {"a": 2}
+        resolution = {"": {"INPUT_HASHES": {"BASE": gate.value_hash(base),
+            "UPSTREAM": "MISSING", "PRIVATE": gate.value_hash(private)},
+            "ACTION": "PRESERVE_PRIVATE", "APPROVAL": "Synthetic test approval"}}
+        for key in ("BASE", "UPSTREAM", "PRIVATE"):
+            invalid = copy.deepcopy(resolution)
+            invalid[""]["INPUT_HASHES"][key] = "f" * 64
+            with self.subTest(key=key), self.assertRaises(gate.ContentConflict):
+                gate.merge_value(base, gate.MISSING, private, invalid)
+
+    def test_whole_document_resolution_requires_approval_and_known_action(self):
+        base, private = {"a": 1}, {"a": 2}
+        resolution = {"": {"INPUT_HASHES": {"BASE": gate.value_hash(base),
+            "UPSTREAM": "MISSING", "PRIVATE": gate.value_hash(private)},
+            "ACTION": "PRESERVE_PRIVATE", "APPROVAL": "Synthetic test approval"}}
+        for key, value in (("APPROVAL", ""), ("ACTION", "UNKNOWN")):
+            invalid = copy.deepcopy(resolution)
+            invalid[""][key] = value
+            with self.subTest(key=key), self.assertRaises(gate.ContentConflict):
+                gate.merge_value(base, gate.MISSING, private, invalid)
+
     def test_reconcile_add_modify_delete_preserves_private_and_detects_conflicts(self):
         base = {"a": 1, "remove": 2, "repaired": 3}
         private = {"a": 1, "remove": 2, "repaired": 7, "private": {"x": 8}}

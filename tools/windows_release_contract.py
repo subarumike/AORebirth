@@ -365,6 +365,13 @@ def merge_value(base, incoming, private, resolutions, pointer=""):
         return incoming
     if value_hash(incoming) == value_hash(base) or value_hash(incoming) == value_hash(private):
         return private
+    expected = {"BASE": value_hash(base), "UPSTREAM": value_hash(incoming), "PRIVATE": value_hash(private)}
+    if pointer in resolutions:
+        resolution = resolutions[pointer]
+        if (not isinstance(resolution, dict) or resolution.get("INPUT_HASHES") != expected
+                or not resolution.get("APPROVAL") or resolution.get("ACTION") not in ("PRESERVE_PRIVATE", "RESOLVED_VALUE")):
+            raise ContentConflict(pointer, expected)
+        return private if resolution["ACTION"] == "PRESERVE_PRIVATE" else resolution["VALUE"]
     if isinstance(base, dict) and isinstance(private, dict) and (isinstance(incoming, dict) or incoming is MISSING):
         incoming_missing = incoming is MISSING
         incoming = {} if incoming is MISSING else incoming
@@ -377,12 +384,7 @@ def merge_value(base, incoming, private, resolutions, pointer=""):
         return MISSING if incoming_missing and not result else result
     if base is MISSING and isinstance(incoming, dict) and isinstance(private, dict):
         return merge_value({}, incoming, private, resolutions, pointer)
-    resolution = resolutions.get(pointer)
-    expected = {"BASE": value_hash(base), "UPSTREAM": value_hash(incoming), "PRIVATE": value_hash(private)}
-    if (not isinstance(resolution, dict) or resolution.get("INPUT_HASHES") != expected
-            or not resolution.get("APPROVAL") or resolution.get("ACTION") not in ("PRESERVE_PRIVATE", "RESOLVED_VALUE")):
-        raise ContentConflict(pointer, expected)
-    return private if resolution["ACTION"] == "PRESERVE_PRIVATE" else resolution["VALUE"]
+    raise ContentConflict(pointer, expected)
 
 
 def merge_bytes(base, incoming, private, resolutions):
