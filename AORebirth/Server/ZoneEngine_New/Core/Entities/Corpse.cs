@@ -488,6 +488,10 @@ namespace ZoneEngine_New.Core.Entities
                 if (stat == CharacterStat.Cash && dead.IsPlayer)
                     continue;
 
+                // NPC family 0 (guards and similar) drops no credits.
+                if (stat == CharacterStat.Cash && dead.Stats.GetOrZero(CharacterStat.NPCFamily) == 0)
+                    continue;
+
                 int value = dead.Stats.Get(stat);
                 if (!StatCollection.IsUnset(value))
                     SourceStats[stat] = value;
