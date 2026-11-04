@@ -80,6 +80,7 @@ namespace ZoneEngine_New.Core.Network
             });
         private readonly List<byte> _receiveBuffer = new(ReceiveChunkSize);
         private readonly object _compressSync = new();
+        private const int CompressedSendTimeoutMilliseconds = 60_000;
         private SocketSendStream? _sendStream;
         private ZLibStream? _zStream;
         private short _packetNumber;
@@ -109,6 +110,10 @@ namespace ZoneEngine_New.Core.Network
 
             Id = id;
             _socket = socket;
+            // Only the compressed path sends synchronously. A client that takes nothing for this long is gone: fail the
+            // send so the session closes and the player goes LinkDead, instead of pinning a pool thread and reporting
+            // the player Online until the kernel drops the connection.
+            _socket.SendTimeout = CompressedSendTimeoutMilliseconds;
             _codec = codec;
             _dispatcher = dispatcher;
             _logger = logger;
@@ -648,8 +653,10 @@ namespace ZoneEngine_New.Core.Network
             _sendQueue.Writer.TryComplete();
             // The receive loop owns this buffer; do not mutate its List from a closing thread.
 
-            DisposeCompressionStreams();
-
+            // The socket goes first. A send loop stuck in a compressed Send to a dead client holds _compressSync until
+            // the kernel gives up on the connection (~15 min); closing the socket fails that Send at once. Disposing
+            // the streams first waited on that lock, and zlib's final block wrote to the same full socket: a reconnect
+            // stealing such a session froze its playfield tick (Lost Eden 2026-11-04, pf 2132411023, 7+ minutes).
             try
             {
                 _socket.Shutdown(SocketShutdown.Both);
@@ -665,6 +672,8 @@ namespace ZoneEngine_New.Core.Network
             catch
             {
             }
+
+            DisposeCompressionStreams();
 
             if (Player != null)
             {
