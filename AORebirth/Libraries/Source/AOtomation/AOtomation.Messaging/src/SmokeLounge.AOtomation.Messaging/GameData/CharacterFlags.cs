@@ -45,6 +45,12 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         HasBlueName = 0x00800000,
 
         /// <summary>
+        /// Bit 27. Controlled pet. The original client's damage feedback checks this flag and its pet list
+        /// to select pet combat chat (Gamecode.dll 0x1009b7a1). Live pet capture 2026-11-02 sets it on bind.
+        /// </summary>
+        IsPet = 0x08000000,
+
+        /// <summary>
         /// Bit 28. Common on live NPC SCFU CharacterFlags; does not color player
         /// nametags (Mike 2026-07-19: white with [GM] suffix). Retained for
         /// decode/docs only — not a green-name bit.

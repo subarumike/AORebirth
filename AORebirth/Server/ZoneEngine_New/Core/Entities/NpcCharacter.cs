@@ -91,9 +91,18 @@ namespace ZoneEngine_New.Core.Entities
         {
             ArgumentNullException.ThrowIfNull(controller);
             Pet = controller;
+            Stats.Set(CharacterStat.Flags,
+                GetClientCharacterFlags() | (int)CharacterFlags.IsPet,
+                StatDetail.Base, dirty: true);
         }
 
-        internal void UnbindPet() => Pet = null;
+        internal void UnbindPet()
+        {
+            Pet = null;
+            Stats.Set(CharacterStat.Flags,
+                GetClientCharacterFlags() & ~(int)CharacterFlags.IsPet,
+                StatDetail.Base, dirty: true);
+        }
 
         /// <summary>
         /// The hash this NPC was spawned from (a family/META hash from Spawns.json or a command). The resolved

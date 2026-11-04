@@ -4603,6 +4603,24 @@ namespace ZoneEngine_New.Core.Entities
             | AORebirth.Enums.ItemFlags.Stationary
             | AORebirth.Enums.ItemFlags.WantCollision);
 
+        /// <summary>The complete Flags stat sent to clients, including the NPC spawn defaults.</summary>
+        protected int GetClientCharacterFlags()
+        {
+            int flags = Stats.Get(CharacterStat.Flags);
+            if (this is NpcCharacter npc)
+            {
+                flags = (StatCollection.IsUnset(flags) ? 0 : flags) | RetailNpcCharacterFlags;
+                if (npc.Attackable)
+                    flags |= (int)AORebirth.Enums.ItemFlags.CanBeAttacked;
+            }
+            if (Stats.TryGetValue(CharacterStat.GmLevel, out int gmLevel) && gmLevel > 0)
+            {
+                flags &= ~(int)CharacterFlags.NpcStyleFlag28;
+                flags |= (int)CharacterFlags.HasBlueName;
+            }
+            return flags;
+        }
+
         /// <summary>
         /// Builds a SimpleCharFullUpdate (SCFU) spawn packet from current character state.
         /// Structure follows ZoneEngine SimpleCharFullUpdate.ConstructMessage without capture/runtime special cases.
@@ -4621,19 +4639,7 @@ namespace ZoneEngine_New.Core.Entities
             MsgQuaternion heading = Rotation ?? new MsgQuaternion();
 
             string? name = Name;
-            int characterFlags = Stats.Get(CharacterStat.Flags);
-            if (this is NpcCharacter npcCharacter)
-            {
-                characterFlags = (Entities.StatCollection.IsUnset(characterFlags) ? 0 : characterFlags) | RetailNpcCharacterFlags;
-                if (npcCharacter.Attackable)
-                    characterFlags |= (int)AORebirth.Enums.ItemFlags.CanBeAttacked;
-            }
-            if (Stats.TryGetValue(CharacterStat.GmLevel, out int gmLevel) && gmLevel > 0)
-            {
-                // The blue name marks a GM. The name itself stays as stored: a " [GM]" suffix broke %t in chat.
-                characterFlags &= ~(int)CharacterFlags.NpcStyleFlag28;
-                characterFlags |= (int)CharacterFlags.HasBlueName;
-            }
+            int characterFlags = GetClientCharacterFlags();
 
             int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
             int currentHealth = Stats.GetOrZero(CharacterStat.Health);
