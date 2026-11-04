@@ -432,13 +432,117 @@ class ReleaseContractTests(unittest.TestCase):
 
     def test_private_catalog_adoption_paths_preserve_chest_group_and_independent_catalogs(self):
         for paths in ([], ["ObjectStateMachines.json"], ["QuestRewards.json"],
+                      ["Playfields/17/Spawns.json"], ["Playfields/17/Spawns.json", "ObjectStateMachines.json"],
                       sorted(gate.INDEPENDENT_PRIVATE_CATALOGS), sorted(gate.PRIVATE_CHEST_CATALOGS),
                       sorted(gate.PRIVATE_CHEST_CATALOGS | gate.INDEPENDENT_PRIVATE_CATALOGS)):
             gate.validate_private_catalog_paths([{"PATH": path} for path in paths])
         for paths in (["ObjectStateMachines.json", "ObjectStateMachines.json"], ["items.dat"],
+                      ["Playfields/17/Spawns.json", "Playfields/17/Spawns.json"],
+                      ["Playfields/0/Spawns.json"], ["Playfields/17/../Spawns.json"],
+                      ["Playfields/17/Spawns.json/extra"], ["Playfields/17/Rooms.json"],
+                      ["Playfields/../17/Spawns.json"], ["/Playfields/17/Spawns.json"],
+                      ["Playfields\\17\\Spawns.json"], ["Playfields/non-numeric/Spawns.json"],
                       ["ObjectStateMachines.json", sorted(gate.PRIVATE_CHEST_CATALOGS)[0]]):
             with self.subTest(paths=paths), self.assertRaises(ValueError):
                 gate.validate_private_catalog_paths([{"PATH": path} for path in paths])
+
+    def spawn_catalog_fixture(self):
+        path = "Playfields/17/Spawns.json"
+        before = {"SchemaVersion": 1, "PlayfieldId": 17, "Spawns": [
+            {"Hash": 1, "HashText": "fixture-a", "Position": [1, 2, 3],
+             "Extensions": {"Events": [{"Name": "fixture", "Active": True}]}},
+            {"Hash": 2, "HashText": "fixture-b", "Position": [4, 5, 6]}]}
+        after = copy.deepcopy(before)
+        for entry in after["Spawns"]:
+            entry.update(MinLevel=1, MaxLevel=2, RespawnTime=30)
+        after["Spawns"][0]["Extensions"]["Events"][0]["Unknown1"] = 0
+        canonical = self.root / "canonical"
+        target = canonical / path
+        target.parent.mkdir(parents=True)
+        target.write_bytes(gate.encoded(before))
+        stage = self.root / "ignored-spawn-inputs"
+        stage.mkdir()
+        data = stage / "Spawns.json"
+        data.write_bytes(gate.encoded(after))
+        text = "Approve " + path
+        instruction = stage / "authorization.txt"
+        instruction.write_bytes(text.encode())
+        mapping = {"PATH": path, "STAGED_PATH": str(data), "SHA256": gate.digest(data.read_bytes()),
+            "APPROVAL": {"BY": "Mike", "INSTRUCTION_PATH": str(instruction),
+                "INSTRUCTION_SHA256": gate.digest(instruction.read_bytes()), "TEXT": text}}
+        profile = {"CANONICAL_GAMEDATA_ROOT": str(canonical), "STATE_ROOT": str(self.root),
+            "PROTECTED_GENERATED_FILES": [], "PRIVATE_CATALOG_ADOPTIONS": [mapping]}
+        rows, _ = gate.inventory(canonical)
+        bundle = self.root / "spawn-plan"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", rows)
+        with mock.patch.object(gate, "tree_files", return_value={}), mock.patch.object(gate, "git", return_value=b"ignored"):
+            plan, projected = gate.reconcile_plan(self.root, profile, bundle, PUBLIC, DUMP,
+                {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP}, rows)
+        return path, bundle, plan, projected, before, after, target
+
+    def test_spawn_adoption_preserves_existing_fields_and_portable_approval_chain(self):
+        path, bundle, plan, projected, before, after, target = self.spawn_catalog_fixture()
+        gate.validate_reconciliation(bundle, plan)
+        summary = gate.summarize_reconciliation(bundle, plan)
+        gate.validate_reconciliation_summary(bundle, summary)
+        self.assertEqual(projected, {path: gate.encoded(after)})
+        self.assertEqual(target.read_bytes(), gate.encoded(before))
+        self.assertEqual(summary["PRIVATE_CATALOG_ADOPTIONS"][0]["APPROVAL"]["TEXT"], "Approve " + path)
+        self.assertNotIn("STAGED_PATH", gate.encoded(summary).decode())
+        self.assertNotIn(str(self.root), gate.encoded(summary).decode())
+        lower = json.loads(json.dumps(after).replace('"SchemaVersion"', '"schemaVersion"')
+                           .replace('"PlayfieldId"', '"playfieldId"').replace('"Spawns"', '"spawns"'))
+        gate.validate_spawn_catalog_adoption(path, lower, copy.deepcopy(lower))
+
+    def test_spawn_adoption_rejects_destructive_and_malformed_approved_bytes(self):
+        path, bundle, plan, _, before, after, _ = self.spawn_catalog_fixture()
+        mutations = (
+            lambda value: value["Spawns"][0].pop("Hash"),
+            lambda value: value["Spawns"][0].update(Hash=9),
+            lambda value: value["Spawns"][0].update(Hash=True),
+            lambda value: value["Spawns"][0].update(Hash=1.0),
+            lambda value: value["Spawns"].reverse(),
+            lambda value: value["Spawns"].append(copy.deepcopy(value["Spawns"][0])),
+            lambda value: value["Spawns"].pop(),
+            lambda value: value["Spawns"][0]["Position"].reverse(),
+            lambda value: value["Spawns"][0]["Extensions"]["Events"][0].update(Active=False),
+            lambda value: value["Spawns"][0].update(hash=9),
+            lambda value: value.update(Spawns=[]),
+            lambda value: value.update(Spawns=[None]),
+            lambda value: value.update(Spawns=[{}]),
+            lambda value: value.update(SchemaVersion=True),
+            lambda value: value.update(PlayfieldId=18),
+        )
+        actual = {path: gate.content_identity(gate.encoded(before), path)}
+        for index, mutate in enumerate(mutations):
+            changed, payload = copy.deepcopy(plan), copy.deepcopy(after)
+            mutate(payload)
+            data = gate.encoded(payload)
+            row = changed["PRIVATE_CATALOG_ADOPTIONS"][0]
+            row.update(SHA256=gate.digest(data), CANONICAL_AFTER=gate.stash(bundle, "rejected-" + str(index), data))
+            with self.subTest(case=index), self.assertRaises(ValueError):
+                gate.validate_private_catalog_adoptions(bundle, changed, dict(actual))
+        for malformed in (None, {}, [], {"SchemaVersion": 1, "Spawns": []}):
+            with self.subTest(existing=malformed), self.assertRaises(ValueError):
+                gate.validate_spawn_catalog_adoption(path, malformed, after)
+
+    def test_spawn_adoption_retains_hash_bound_actual_path_approval(self):
+        path, bundle, plan, _, before, _, _ = self.spawn_catalog_fixture()
+        actual = {path: gate.content_identity(gate.encoded(before), path)}
+        mutations = (
+            lambda row: row.update(SHA256="f" * 64),
+            lambda row: row["APPROVAL"].update(BY="Agent"),
+            lambda row: row["APPROVAL"].update(TEXT="Approve Spawns.json"),
+            lambda row: row["APPROVAL"].update(TEXT="Invented approval for " + path),
+            lambda row: row["APPROVAL"].update(INSTRUCTION_SHA256="f" * 64),
+            lambda row: row.update(CANONICAL_BEFORE=None),
+        )
+        for index, mutate in enumerate(mutations):
+            changed = copy.deepcopy(plan)
+            mutate(changed["PRIVATE_CATALOG_ADOPTIONS"][0])
+            with self.subTest(case=index), self.assertRaises(ValueError):
+                gate.validate_private_catalog_adoptions(bundle, changed, dict(actual))
 
     def test_portable_acceptance_survives_location_change_without_windows_binaries(self):
         bundle, _ = make_portable_fixture(self.root)

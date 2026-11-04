@@ -952,13 +952,53 @@ def validate_catalog_entry_proof(proof, entries, before, after):
         raise ValueError("Selective catalog entry counts or unchanged identities differ")
 
 
+def is_private_spawn_catalog(path):
+    return bool(re.fullmatch(r"Playfields/[1-9][0-9]*/Spawns\.json", path))
+
+
 def validate_private_catalog_paths(rows):
     if not isinstance(rows, list) or any(not isinstance(row, dict) or not isinstance(row.get("PATH"), str) for row in rows):
         raise ValueError("Private catalog adoption mappings are invalid")
     paths = {row["PATH"] for row in rows}
-    if (len(paths) != len(rows) or paths - PRIVATE_CHEST_CATALOGS - INDEPENDENT_PRIVATE_CATALOGS
+    if (len(paths) != len(rows) or any(path not in PRIVATE_CHEST_CATALOGS | INDEPENDENT_PRIVATE_CATALOGS
+                                     and not is_private_spawn_catalog(path) for path in paths)
             or paths & PRIVATE_CHEST_CATALOGS not in (set(), PRIVATE_CHEST_CATALOGS)):
-        raise ValueError("Private catalog adoption requires complete chest policies or independent QuestRewards.json/ObjectStateMachines.json")
+        raise ValueError("Private catalog adoption requires complete chest policies or independent QuestRewards.json/ObjectStateMachines.json/playfield Spawns.json")
+
+
+def validate_spawn_catalog_adoption(path, existing, content):
+    # Check the loader envelope and add-only preservation; the existing runtime loader
+    # remains authoritative for the meaning of individual placement fields.
+    def envelope(value):
+        if isinstance(value, dict):
+            if len({key.casefold() for key in value}) != len(value):
+                raise ValueError("Spawn adoption fields cannot differ only by case")
+            for item in value.values():
+                envelope(item)
+        elif isinstance(value, list):
+            for item in value:
+                envelope(item)
+
+    def preserved(before, after):
+        if isinstance(before, dict):
+            return isinstance(after, dict) and all(key in after and preserved(item, after[key])
+                                                   for key, item in before.items())
+        if isinstance(before, list):
+            return (isinstance(after, list) and len(before) == len(after)
+                    and all(preserved(old, new) for old, new in zip(before, after)))
+        return type(before) is type(after) and value_hash(before) == value_hash(after)
+
+    for value in (existing, content):
+        envelope(value)
+        fields = {key.casefold(): item for key, item in value.items()} if isinstance(value, dict) else {}
+        if (type(fields.get("schemaversion")) is not int or fields["schemaversion"] != 1
+                or type(fields.get("playfieldid", 0)) is not int
+                or fields.get("playfieldid", 0) not in (0, int(PurePosixPath(path).parts[1]))
+                or not isinstance(fields.get("spawns"), list) or not fields["spawns"]
+                or any(not isinstance(row, dict) or not row for row in fields["spawns"])):
+            raise ValueError("Spawn adoption requires existing and approved nonempty schema-1 playfield spawns")
+    if not preserved(existing, content):
+        raise ValueError("Spawn adoption may only add dictionary fields; every existing field and ordered list must be preserved")
 
 
 def validate_object_state_machine_adoption(content):
@@ -1029,11 +1069,12 @@ def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
         if set(row) != {"PATH", "SHA256", "APPROVAL", "APPROVAL_INSTRUCTION", "CANONICAL_BEFORE", "CANONICAL_AFTER"}:
             raise ValueError("Private catalog adoption schema differs")
         path, approval = row["PATH"], row["APPROVAL"]
+        spawn_catalog = is_private_spawn_catalog(path)
         if (path in seen or path in value["PROTECTED_GENERATED_FILES"] or not re.fullmatch("[0-9a-f]{64}", row["SHA256"])
                 or not isinstance(approval, dict) or set(approval) != {"BY", "INSTRUCTION_SHA256", "TEXT"}
                 or approval["BY"] != "Mike" or not re.fullmatch("[0-9a-f]{64}", approval["INSTRUCTION_SHA256"])
                 or not isinstance(approval["TEXT"], str) or not 0 < len(approval["TEXT"]) <= 4096
-                or PurePosixPath(path).name not in approval["TEXT"]):
+                or (path if spawn_catalog else PurePosixPath(path).name) not in approval["TEXT"]):
             raise ValueError("Private catalog adoption lacks exact hash-bound user approval")
         seen.add(path)
         instruction = row["APPROVAL_INSTRUCTION"] if portable else content_identity(load_optional(bundle, row["APPROVAL_INSTRUCTION"]))
@@ -1051,7 +1092,9 @@ def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
         validate_manifest([after])
         if after["path"] != path or after["sha256"] != row["SHA256"] or after["size"] <= 0:
             raise ValueError("Private catalog result differs from approved staged bytes")
-        if before is not None and before != after:
+        if spawn_catalog and before is None:
+            raise ValueError("Spawn field adoption requires an existing private spawn catalog")
+        if before is not None and before != after and not spawn_catalog:
             source = value["SOURCE_SNAPSHOTS"]["PUBLIC_PRODUCT_DATA"]["AFTER"].get(path)
             if source != {key: before[key] for key in ("size", "blob")}:
                 raise ValueError("Private catalog adoption would overwrite unexplained private content")
@@ -1063,6 +1106,8 @@ def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
             content = read_json(load_descriptor(bundle, row["CANONICAL_AFTER"]))
             if path == "ObjectStateMachines.json":
                 validate_object_state_machine_adoption(content)
+            elif spawn_catalog:
+                validate_spawn_catalog_adoption(path, read_json(load_descriptor(bundle, row["CANONICAL_BEFORE"])), content)
             elif path == "QuestRewards.json":
                 if (not isinstance(content, dict) or not content
                         or any(not isinstance(table, dict) or not isinstance(table.get("Entries"), list)
