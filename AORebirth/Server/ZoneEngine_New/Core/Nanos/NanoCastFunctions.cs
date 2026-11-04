@@ -159,11 +159,28 @@ namespace ZoneEngine_New.Core.Nanos
                 // them shelters the candidate (area nukes such as 100198).
                 if (!center.HasLineOfSightTo(candidate))
                     continue;
+                if (ResistsArea(caster, center, candidate, child))
+                    continue;
 
                 NanoRuntime.TryApplyImmediate(caster, candidate, nanoId, items, inventory, nowUtc, areaSpread: true);
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// A hostile area child rolls each caught character's own nano defense (Nano Resist + Add All Def.) against the
+        /// child's attack skills, as a cast on that character does. The centre of a target-centred area is skipped: it
+        /// is the character the parent nano was cast on, which rolled already. A self-centred area (Active Distributed
+        /// Entanglement 85222, child 82905) never rolls its caster.
+        /// </summary>
+        static bool ResistsArea(Character caster, Character center, Character candidate, NanoSpell child)
+        {
+            if (!child.IsHostile || ReferenceEquals(candidate, caster)
+                || (ReferenceEquals(candidate, center) && !ReferenceEquals(center, caster)))
+                return false;
+
+            return !DamageCalculator.ResolveNanoLand(caster, candidate, child, out _, out _, out _);
         }
 
         /// <summary>

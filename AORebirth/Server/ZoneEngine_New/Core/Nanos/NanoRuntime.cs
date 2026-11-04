@@ -695,12 +695,17 @@ namespace ZoneEngine_New.Core.Nanos
                 }
             }
 
+            // A hostile nano cast on oneself is an area centred on the caster (Active Distributed Entanglement 85222):
+            // there is no target to resist it, so the caster's own resists are never rolled. Each character the area
+            // catches rolls its own strain resist and nano defense (NanoCastFunctions.AreaCastNano).
+            bool rollsRecipient = spell.IsHostile && !ReferenceEquals(caster, recipient);
+
             // A finished hostile cast pulls the NPC whether it lands, is resisted or is refused; a resetting NPC ignores it.
             if (spell.IsHostile)
                 AddHostileThreat(caster, recipient!);
 
             // Resisted: an evading NPC is untouchable on its way home. The cast is spent; nothing lands.
-            if (spell.IsHostile && recipient!.IsEvading)
+            if (rollsRecipient && recipient!.IsEvading)
             {
                 ClientFeedback.Send(caster, ClientFeedback.TargetResisted);
                 LogUtil.Debug(
@@ -717,7 +722,7 @@ namespace ZoneEngine_New.Core.Nanos
             }
 
             // Resisted: the target's Resist Nano for this strain (e.g. 10% Snare) won the roll.
-            if (spell.IsHostile && recipient!.ResistsNanoStrain(spell.NanoStrain))
+            if (rollsRecipient && recipient!.ResistsNanoStrain(spell.NanoStrain))
             {
                 ClientFeedback.Send(caster, ClientFeedback.TargetResisted);
                 LogUtil.Debug(
@@ -737,7 +742,7 @@ namespace ZoneEngine_New.Core.Nanos
 
             // Resisted: the target's nano defense (Nano Resist + Add All Def.) beat the nano's attack skills + Add All
             // Off. See DamageCalculator.ResolveNanoLand; the curve may need tuning.
-            if (spell.IsHostile
+            if (rollsRecipient
                 && !DamageCalculator.ResolveNanoLand(caster, recipient!, spell, out int attackRating, out int defenseRating, out int landChance))
             {
                 ClientFeedback.Send(caster, ClientFeedback.TargetResisted);
